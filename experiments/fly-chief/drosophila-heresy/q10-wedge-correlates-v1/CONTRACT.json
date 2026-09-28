@@ -1,0 +1,442 @@
+{
+  "protocol": "Q10-WC",
+  "title": "Wedge-Width Correlates Descriptive Qualification",
+  "kind": "FROZEN_PRE_QUALIFICATION_CONTRACT",
+  "created_utc": "2026-09-16T21:09:04Z",
+  "status": "FROZEN_PRE_QUALIFICATION__NOT_EXECUTED",
+  "document_state": "FINAL",
+  "plan_sha256": "29626F018BE33E4FE949778A34B1AAD07C3562809DBE32057BC757B6C5AD425F",
+  "lineage": {
+    "parent_protocol": "Q10-SM",
+    "parent_directory": "experiments/drosophila-heresy/q10-safety-margin-v1",
+    "parent_contract_sha256": "5A7CD7E15724F6260C2D42296BED5FF3667CA32FA1D8D48E5408EFFA2A0F35BF",
+    "parent_plan_sha256": "8A70CFADA7A833AA1110FDE5DBF0CFAFDDD4AFD4297A06AD846B1959439B8B9D",
+    "parent_result_sha256": "68200D7F49B8A4B943150A1C3A5AB4B46DF4ED8EB1EBBE7A3DF45F8BEEBBD337",
+    "parent_status_sha256": "D19D051DA550BCDED9C436F9A7164AF0C4322D8BB16C418D7C4CA9E04217A9C4",
+    "parent_summary_sha256": "2B64FF590E226CD393EBCFF6A5147728BAC931F395D76970567EBD6061EDA113",
+    "required_parent_status": "Q10_SM_STAGE1_VALID__F32_SAFE_FREEDOM_PRESENT",
+    "required_parent_sequential_f32_readout": "NOT_RUN",
+    "required_parent_ulp_repair": "NOT_RUN",
+    "q08_mutation_forbidden": true,
+    "q09_mutation_forbidden": true,
+    "q10_bg_mutation_forbidden": true,
+    "q10_sm_mutation_forbidden": true
+  },
+  "authorization": {
+    "documents_only": false,
+    "exact_document_count": null,
+    "source_creation_or_edit_authorized": true,
+    "build_authorized": true,
+    "qualification_execution_authorized": true,
+    "experiment_run_authorized": false,
+    "existing_root_edit_authorized": true,
+    "later_explicit_authorization_required": false,
+    "scientific_seed_bundles_used": 0,
+    "behavioral_inference": false,
+    "sequential_f32_readout_authorized": false,
+    "ulp_move_or_repair_authorized": false,
+    "dh08b_authorized": false
+  },
+  "scope": {
+    "question": "descriptive association of frozen Q10-SM local wedge width with prespecified event-local geometry fields",
+    "qualification_only": true,
+    "descriptive_only": true,
+    "causal_claim_allowed": false,
+    "behavioral_claim_allowed": false,
+    "biological_claim_allowed": false,
+    "direction_effect_claim_allowed": false,
+    "future_learning_state_claim_allowed": false,
+    "metaplasticity_claim_allowed": false,
+    "future_gate_selection_from_outcomes_allowed": false
+  },
+  "engineering_population": {
+    "qualification_seeds": [
+      9701,
+      9702,
+      9703,
+      9704,
+      9705
+    ],
+    "stage_a_seeds": [
+      9701
+    ],
+    "stage_b_seeds": [
+      9702,
+      9703,
+      9704,
+      9705
+    ],
+    "sides": [
+      "R",
+      "L"
+    ],
+    "taus": [
+      4.0,
+      16.0
+    ],
+    "reversal_events_per_side_tau": 256,
+    "expected_events_per_seed": 1024,
+    "expected_stage_a_events": 1024,
+    "expected_stage_b_new_events": 4096,
+    "expected_cumulative_events": 5120,
+    "scientific_seeds_allowed": [],
+    "top_up_forbidden": true,
+    "replacement_seed_forbidden": true,
+    "outcome_dependent_extension_forbidden": true,
+    "stage_b_entry_rule": "Stage A lineage, receipt parity, derivations, deterministic analysis, and independent review pass without any contract change",
+    "change_after_stage_a": "new protocol identity and fresh engineering seeds required"
+  },
+  "parent_event_reuse": {
+    "constructor": "exact frozen Q10-SM Stage 1 constructor",
+    "learner_state_semantics_unchanged": true,
+    "task_stream_unchanged": true,
+    "support_semantics_unchanged": true,
+    "linear_operator_unchanged": true,
+    "rank_cutoff_unchanged": true,
+    "reserve_ulps_each_direction": 32,
+    "tangent_candidates": 8,
+    "candidate_signs": 2,
+    "candidate_count": 16,
+    "path_safe_search_unchanged": true,
+    "continuous_tolerance": 2e-10,
+    "nonidentity_cosine_epsilon": 1e-8,
+    "f32_commitment_and_safety_checks_unchanged": true,
+    "event_status_definitions_unchanged": true,
+    "simulation_rng_change_forbidden": true,
+    "receipt_fields_required": [
+      "seed",
+      "side",
+      "tau",
+      "trial",
+      "status",
+      "rotation_angle",
+      "residual_cosine",
+      "true_minimum_safety_slack",
+      "support_count",
+      "interior_variable_count",
+      "fixed_boundary_count",
+      "combined_rank",
+      "combined_nullity",
+      "true_norm",
+      "true_null_norm",
+      "candidate_count",
+      "degeneracy_count",
+      "exhaustion_status"
+    ],
+    "all_parent_integrity_fields_required": true,
+    "forbidden_fields": [
+      "action",
+      "reward",
+      "accuracy",
+      "probe",
+      "old-map margin",
+      "reversal-map margin",
+      "behavioral trajectory",
+      "sequential-f32 readout",
+      "ULP move",
+      "ULP repair"
+    ]
+  },
+  "analysis_populations": {
+    "all_valid_events": {
+      "expected_count": 5120,
+      "analysis_eligible_statuses": [
+        "Q10_SM_STAGE1_VALID__F32_SAFE_FREEDOM_PRESENT",
+        "Q10_SM_STAGE1_VALID__SAFETY_MARGIN_DOMINATED"
+      ],
+      "uses": [
+        "coverage",
+        "status counts",
+        "accepted-versus-dominated selection audit"
+      ],
+      "integrity_failure_handling": "invalidate qualification; never silently exclude"
+    },
+    "accepted_nonidentity_events": {
+      "required_parent_status": "Q10_SM_STAGE1_VALID__F32_SAFE_FREEDOM_PRESENT",
+      "required_exhaustion_status": "ACCEPTED",
+      "nonidentity_rule": "abs(residual_cosine) < 1 - 1e-8",
+      "use": "wedge-width association summaries"
+    },
+    "dominated_event_angle_imputation": "forbidden",
+    "invalid_event_rule": "any Q10_SM_STAGE1_INVALID event invalidates Q10-WC",
+    "ambiguous_event_rule": "any Q10_SM_STAGE1_VALID__NUMERICALLY_AMBIGUOUS event yields Q10_WC_NOT_INTERPRETABLE__NUMERICALLY_AMBIGUOUS and stops descriptive interpretation",
+    "coverage_rule": "exactly one receipt for every seed x side x tau_bits x trial key"
+  },
+  "width_outcome": {
+    "canonical": "theta = rotation_angle",
+    "domain": "0 < theta <= pi/2 for accepted events",
+    "interpretation": "larger theta is a wider locally reachable path-safe wedge within the frozen Q10-SM constructor family",
+    "mirror": "c = abs(residual_cosine)",
+    "identity_check": "abs(cos(theta) - c) <= 2e-10",
+    "sensitivity_diagnostics": [
+      "c",
+      "1 - c"
+    ],
+    "sensitivity_diagnostics_are_additional_hypotheses": false
+  },
+  "derived_variables": {
+    "true_endpoint_slack": {
+      "raw": "s_true = true_minimum_safety_slack",
+      "canonical": "x_slack = log10(s_true)",
+      "admission": "finite s_true > 0",
+      "offset_allowed": false,
+      "imputation_allowed": false
+    },
+    "active_support_boundary_occupancy": {
+      "active_boundary_count": "n_boundary_active = support_count - interior_variable_count",
+      "canonical": "f_boundary_active = n_boundary_active / support_count",
+      "admission": "support_count > 0 and 0 <= interior_variable_count <= support_count",
+      "whole_state_diagnostic": "fixed_boundary_count",
+      "whole_state_substitution_for_canonical_forbidden": true
+    },
+    "active_support": {
+      "canonical": "n_support = support_count",
+      "integrity_mirror": "f_interior_support = interior_variable_count / support_count"
+    },
+    "null_geometry": {
+      "canonical_nullity": "n_null = combined_nullity",
+      "canonical_null_energy": "f_null_energy = (true_null_norm / true_norm)^2",
+      "null_energy_admission": "true_norm and true_null_norm present and finite and true_norm > 0",
+      "missingness_report_required": true,
+      "imputation_allowed": false,
+      "supporting_diagnostics": [
+        "combined_rank",
+        "true_null_norm"
+      ]
+    },
+    "reversal_timing": {
+      "canonical": "t = trial",
+      "admission": "integer 1..256",
+      "normalized": "t_norm = (trial - 1) / 255",
+      "windows": [
+        {
+          "name": "early-1",
+          "first": 1,
+          "last": 16
+        },
+        {
+          "name": "early-2",
+          "first": 17,
+          "last": 32
+        },
+        {
+          "name": "middle-1",
+          "first": 33,
+          "last": 64
+        },
+        {
+          "name": "middle-2",
+          "first": 65,
+          "last": 128
+        },
+        {
+          "name": "late",
+          "first": 129,
+          "last": 256
+        }
+      ],
+      "behavioral_interpretation_allowed": false
+    }
+  },
+  "explicit_wedge_correlates_rules": [
+    "Wedge width is only the accepted Q10-SM path-safe rotation theta, not global feasible-manifold width.",
+    "Theta is canonical; residual cosine and 1-cosine are deterministic mirrors, not separate discoveries.",
+    "Canonical correlates are limited to x_slack, f_boundary_active, n_support, n_null, admitted f_null_energy, and t.",
+    "Associations are conditional on Q10-SM acceptance; dominated events receive no synthetic width.",
+    "Events are nested repeated geometry observations; pooled event count is not an independent-replicate count.",
+    "No imputation, jitter, continuity correction, winsorization, or silent row deletion is allowed.",
+    "Association magnitude is not importance, mechanism, constraint, or cause.",
+    "No outcome may select a future cosine, rotation, correlation, repair, constructor, scientific, or behavioral gate."
+  ],
+  "numerical_conventions": {
+    "receipt_arithmetic": "IEEE-754 binary64; all analyzed values finite",
+    "event_key": "seed, side, binary64 tau bit pattern, trial",
+    "sort_order": "stable ascending",
+    "tie_definition": "identical binary64 bit patterns after the frozen transformation",
+    "rank_method": "average one-based rank for ties",
+    "spearman_definition": "Pearson correlation of average-rank vectors",
+    "undefined_correlation": "fewer than required pairwise-complete rows or zero rank sum of squared deviations",
+    "quantile_method": "Hyndman-Fan type 7 with h=(n-1)q and linear interpolation for q in 0.25, 0.5, 0.75",
+    "slack_transform": "correctly rounded log10 from the pinned analysis runtime, finite positive inputs only",
+    "plain_language_direction": "positive, negative, or zero from coefficient sign; magnitude adjectives forbidden",
+    "display_rounding_rule": "round only after computation; displayed values never feed later calculations"
+  },
+  "descriptive_analysis": {
+    "inferential_tests_allowed": false,
+    "p_values_allowed": false,
+    "significance_labels_allowed": false,
+    "inferential_confidence_intervals_allowed": false,
+    "causal_models_allowed": false,
+    "outcome_selected_transformations_allowed": false,
+    "outcome_selected_subgroups_allowed": false,
+    "coverage_and_selection_audit": {
+      "strata": [
+        "seed",
+        "side",
+        "tau",
+        "timing window",
+        "parent event status"
+      ],
+      "outputs": [
+        "exact event counts",
+        "accepted fraction",
+        "accepted and dominated predictor median and interquartile range",
+        "derived-variable finite and missingness counts"
+      ],
+      "acceptance_model_claim_allowed": false
+    },
+    "pairwise_associations": {
+      "population": "accepted nonidentity events",
+      "metric": "Spearman correlation using average ranks for ties",
+      "outcome": "theta",
+      "canonical_predictors": [
+        "x_slack",
+        "f_boundary_active",
+        "n_support",
+        "n_null",
+        "f_null_energy when available",
+        "t"
+      ],
+      "required_outputs": [
+        "signed correlation",
+        "absolute correlation",
+        "pairwise-complete count",
+        "tie counts",
+        "plain-language direction",
+        "c and 1-c sensitivity correlations"
+      ],
+      "undefined_handling": "report undefined with reason; never replace with zero"
+    },
+    "dependence_aware_summaries": {
+      "trajectory_key": "seed x side x tau",
+      "trajectory_count": 20,
+      "minimum_pairwise_complete_events": 16,
+      "nonzero_rank_variance_required": true,
+      "trajectory_outputs": [
+        "all valid within-trajectory correlations",
+        "valid-trajectory count",
+        "median",
+        "minimum",
+        "maximum"
+      ],
+      "leave_one_seed_out_count": 5,
+      "leave_one_seed_out_pooled_correlations_required": true,
+      "timing_window_outputs": "theta and c median and interquartile range by fixed timing window, side, and tau",
+      "inferential_use_allowed": false
+    },
+    "fixed_multivariable_summaries": {
+      "method": "ordinary least squares",
+      "continuous_transform": "average rank over the frozen model row set, then center and scale using population standard deviation",
+      "intercept": true,
+      "categorical_references": {
+        "seed": 9701,
+        "side": "R",
+        "tau": 4.0
+      },
+      "core_model": {
+        "population": "all accepted events with complete admitted core variables",
+        "formula": "rank(theta) ~ rank(x_slack) + rank(f_boundary_active) + rank(n_support) + rank(n_null) + rank(t) + seed indicators + side indicator + tau indicator"
+      },
+      "null_energy_model": {
+        "population": "exact core-model row set",
+        "formula": "rank(theta) ~ rank(x_slack) + rank(f_boundary_active) + rank(n_support) + rank(n_null) + rank(f_null_energy) + rank(t) + seed indicators + side indicator + tau indicator",
+        "admission": "fit only when f_null_energy is available for every core-model row",
+        "missing_rule": "if any core-model row lacks admitted f_null_energy, report model unavailable; no complete-case subset model"
+      },
+      "solver": "deterministic singular-value decomposition",
+      "rank_cutoff": "sigma_max * max(rows, columns) * f64::EPSILON * 1000",
+      "condition_number": "sigma_max / sigma_min_retained",
+      "r_squared": "1 - SSE/SST",
+      "interactions_allowed": false,
+      "splines_allowed": false,
+      "alternate_models_allowed": false,
+      "variable_selection_allowed": false,
+      "required_outputs": [
+        "standardized coefficients",
+        "model row count",
+        "matrix rank",
+        "condition number",
+        "descriptive R-squared"
+      ],
+      "forbidden_outputs": [
+        "p-values",
+        "standard errors",
+        "confidence intervals",
+        "importance ranking",
+        "causal interpretation"
+      ],
+      "instability_rule": "if SST=0, design rank deficient, or condition number > 1e10, label numerically unstable and do not interpret coefficients"
+    }
+  },
+  "integrity_and_review": {
+    "parent_hash_verification_required": true,
+    "exact_event_key": "seed, side, tau, trial",
+    "duplicate_event_keys_allowed": false,
+    "exact_coverage_required": true,
+    "parent_receipt_integrity_required": true,
+    "derived_formula_recomputation_required": true,
+    "average_rank_tie_handling_recomputation_required": true,
+    "event_file_order_invariance_required": true,
+    "independent_aggregate_recomputation_required": true,
+    "independent_reviewer_required": true,
+    "behavior_field_firewall_required": true,
+    "scientific_seed_firewall_required": true,
+    "sequential_readout_and_repair_firewall_required": true,
+    "source_executable_config_manifest_and_reviewer_hashes_required_if_later_executed": true,
+    "failure_rule": "fail closed; no silent exclusion or repair"
+  },
+  "required_outputs_if_later_authorized": [
+    "immutable fresh-seed event receipts",
+    "5120-event coverage and lineage manifest",
+    "coverage and accepted-versus-dominated selection tables",
+    "pooled pairwise association table",
+    "within-trajectory association table",
+    "leave-one-seed-out association table",
+    "fixed timing-window summaries",
+    "fixed core and conditional null-energy multivariable summaries, explicit unavailability, or numerical-instability declarations",
+    "independent reviewer receipt",
+    "RESULT.md",
+    "STATUS.json"
+  ],
+  "future_gates": {
+    "cosine_threshold": null,
+    "rotation_threshold": null,
+    "correlation_threshold": null,
+    "repair_budget": null,
+    "constructor_gate": null,
+    "scientific_endpoint": null,
+    "behavioral_gate": null,
+    "selection_from_q10_wc_outcomes_forbidden": true
+  },
+  "status_vocabulary": [
+    "FROZEN_DESCRIPTIVE_QUALIFICATION_CONTRACT__NOT_EXECUTED",
+    "Q10_WC_VALID__DESCRIPTIVE_ASSOCIATIONS_REPORTED",
+    "Q10_WC_VALID__INSUFFICIENT_VARIATION",
+    "Q10_WC_NOT_INTERPRETABLE__NUMERICALLY_AMBIGUOUS",
+    "Q10_WC_INVALID"
+  ],
+  "claims_explicitly_forbidden": [
+    "causal constraint on wedge width",
+    "behavior effect",
+    "direction effect",
+    "future-learning-state effect",
+    "metaplasticity mechanism",
+    "biological or connectome-specific conclusion",
+    "global feasible-manifold characterization",
+    "retroactive Q10-SM reinterpretation",
+    "future threshold or gate selected from descriptive outcomes",
+    "DH-08B authorization"
+  ],
+  "assumptions": [
+    "Q10-SM event construction and receipt semantics remain frozen and reproducible for fresh engineering seeds.",
+    "The measured wedge is the best path-safe endpoint found by the frozen 16-candidate Q10-SM constructor, not the global box-constrained feasible manifold.",
+    "Rotation angle and residual cosine describe the same accepted geodesic rotation; angle is canonical for numerical readability.",
+    "Active boundary occupancy is derived within permitted support; whole-state fixed boundary count is a separate diagnostic.",
+    "Reversal trial is a deterministic event ordinal and may be temporally dependent with geometry.",
+    "Events within a seed-side-tau trajectory are not independent experimental replicates.",
+    "Accepted-event associations are conditional on constructor acceptance, which is exposed by the separate selection audit.",
+    "Correlated predictors may describe overlapping geometry; coefficients and pairwise associations do not establish cause.",
+    "No descriptive outcome may select a later threshold, seed, subgroup, model, constructor, scientific endpoint, or behavioral gate.",
+    "No biological claim follows from this synthetic engineering audit."
+  ]
+}

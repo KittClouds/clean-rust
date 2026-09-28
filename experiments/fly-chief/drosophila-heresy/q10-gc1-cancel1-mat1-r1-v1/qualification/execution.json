@@ -1,0 +1,21 @@
+{
+  "case_counts": {
+    "seed9731-L-tau16__set2": 100,
+    "seed9731-L-tau4__set3": 4,
+    "seed9731-R-tau16__set1": 27,
+    "seed9731-R-tau16__set3": 0,
+    "seed9731-R-tau4__set0": 0,
+    "seed9731-R-tau4__set1": 32,
+    "seed9731-R-tau4__set2": 7,
+    "seed9731-R-tau4__set3": 31
+  },
+  "checks_passed": true,
+  "identity": "q10-gc1-cancel1-mat1-r1-v1",
+  "parents_unchanged": true,
+  "protocol": "Q10-LR1-MAT1-R1",
+  "records_sha256": "7DDDBACD03C25795667BC630263C0169389AC9A64D4192A0C33BFC494B16E55C",
+  "scope": "engineering_only_materialization_no_search",
+  "source_pair_records": 3753,
+  "successful_pairs": 201,
+  "verification_failures": []
+}

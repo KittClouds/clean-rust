@@ -1,0 +1,24 @@
+{
+  "causal_allocation": false,
+  "checks_passed": true,
+  "component_identities": 89,
+  "components_sha256": "8C058955ED8619C9AB00233867C777E06CBD656822F4DB94E800221F53E1D0A0",
+  "geometry_class_counts": {
+    "BOTH_COMPONENTS_INVALID": 61,
+    "BOTH_COMPONENTS_VALID": 87,
+    "ONE_COMPONENT_VALID": 53
+  },
+  "identity": "q10-gc1-cancel1-vr1-v1",
+  "observations_sha256": "7F05AEF5AAA1ABA50EAC6ADE5F48EA480060635F0DCFC04075659AAD6A9B9364",
+  "pair_count_by_case": {
+    "seed9731-L-tau16__set2": 100,
+    "seed9731-L-tau4__set3": 4,
+    "seed9731-R-tau16__set1": 27,
+    "seed9731-R-tau4__set1": 32,
+    "seed9731-R-tau4__set2": 7,
+    "seed9731-R-tau4__set3": 31
+  },
+  "protocol": "Q10-LR1-VR1",
+  "scope": "derived_read_only_association_audit",
+  "source_records": 201
+}

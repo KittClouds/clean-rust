@@ -1,0 +1,855 @@
+{
+  "schema_version": 1,
+  "repository_revision": "multi-repository:d5c0cf4e4d4db0aa07cca42b63ea517393864f56582886faf160f79628082330",
+  "repositories": {
+    "turbovec": {
+      "source_path": "repositories/turbovec/source",
+      "revision": "8202f194a0cbbd52213a004290401e180e5c123d",
+      "archive": "tasks/heldout-bank-v1/repositories/turbovec-8202f194a0cbbd52213a004290401e180e5c123d.tar",
+      "archive_sha256": "0e35e94a12334df72f0360e8343d1a36cdd972a76b44189bcfd4ebb067984aed",
+      "working_tree_clean": true
+    },
+    "ripgrep": {
+      "source_path": "repositories/ripgrep/source",
+      "revision": "e89fff89ac9af12e8d4ce9d5fd07beb408ca730f",
+      "archive": "tasks/heldout-bank-v1/repositories/ripgrep-e89fff89ac9af12e8d4ce9d5fd07beb408ca730f.tar",
+      "archive_sha256": "ab6238b9f0bb7c4b35714491701387222976d8a68d0b6bdf38b20810e78bf31a",
+      "working_tree_clean": true
+    }
+  },
+  "families": {
+    "turbovec-mask-allowlist": {
+      "repository_id": "turbovec",
+      "repository_revision": "8202f194a0cbbd52213a004290401e180e5c123d",
+      "snapshot_sha256": "209a6c9c47be7b48d3cf76c355407c60e85d366c8b4c7f292074cb8d74206a34",
+      "test_filter": "block_skip_at_one_percent_selectivity_matches_post_filter",
+      "test_args": [
+        "--test",
+        "filtering"
+      ],
+      "package_name": "turbovec",
+      "features": [],
+      "variants": {
+        "keep": {
+          "candidate_root": "tasks/heldout-bank-v1/families/turbovec-mask-allowlist/candidates/keep",
+          "manifest": "tasks/heldout-bank-v1/families/turbovec-mask-allowlist/candidates/keep/Cargo.toml",
+          "patch": "tasks/heldout-bank-v1/families/turbovec-mask-allowlist/keep.patch",
+          "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "passed": false,
+          "command": [
+            "cargo",
+            "test",
+            "--locked",
+            "--manifest-path",
+            "C:\\rd-c\\experiment-010\\tasks\\heldout-bank-v1\\families\\turbovec-mask-allowlist\\candidates\\keep\\Cargo.toml",
+            "--package",
+            "turbovec",
+            "--test",
+            "filtering",
+            "block_skip_at_one_percent_selectivity_matches_post_filter",
+            "--",
+            "--exact"
+          ],
+          "completion_log": "tasks/heldout-bank-v1/families/turbovec-mask-allowlist/completion/keep.log",
+          "completion_log_sha256": "d887c3a1c0da7a1c798980c47d379ea5a59d86b46743aaa37cbdb8df0191733e"
+        },
+        "gold": {
+          "candidate_root": "tasks/heldout-bank-v1/families/turbovec-mask-allowlist/candidates/gold",
+          "manifest": "tasks/heldout-bank-v1/families/turbovec-mask-allowlist/candidates/gold/Cargo.toml",
+          "patch": "tasks/heldout-bank-v1/families/turbovec-mask-allowlist/gold.patch",
+          "patch_sha256": "0351d46c399b62825821094c90c92701d18d5e56718bc7af4825e6dc9b13ac74",
+          "passed": true,
+          "command": [
+            "cargo",
+            "test",
+            "--locked",
+            "--manifest-path",
+            "C:\\rd-c\\experiment-010\\tasks\\heldout-bank-v1\\families\\turbovec-mask-allowlist\\candidates\\gold\\Cargo.toml",
+            "--package",
+            "turbovec",
+            "--test",
+            "filtering",
+            "block_skip_at_one_percent_selectivity_matches_post_filter",
+            "--",
+            "--exact"
+          ],
+          "completion_log": "tasks/heldout-bank-v1/families/turbovec-mask-allowlist/completion/gold.log",
+          "completion_log_sha256": "c485ba5d95d53644f0ffa61505ea8016778d87a946f994bcf9e9b3f5fce637ee"
+        },
+        "gold_comment": {
+          "candidate_root": "tasks/heldout-bank-v1/families/turbovec-mask-allowlist/candidates/gold_comment",
+          "manifest": "tasks/heldout-bank-v1/families/turbovec-mask-allowlist/candidates/gold_comment/Cargo.toml",
+          "patch": "tasks/heldout-bank-v1/families/turbovec-mask-allowlist/gold_comment.patch",
+          "patch_sha256": "f977765cc076a1eb302b0c9310a0770c7c74035912ad92214d0a70ffb5325974",
+          "passed": true,
+          "command": [
+            "cargo",
+            "test",
+            "--locked",
+            "--manifest-path",
+            "C:\\rd-c\\experiment-010\\tasks\\heldout-bank-v1\\families\\turbovec-mask-allowlist\\candidates\\gold_comment\\Cargo.toml",
+            "--package",
+            "turbovec",
+            "--test",
+            "filtering",
+            "block_skip_at_one_percent_selectivity_matches_post_filter",
+            "--",
+            "--exact"
+          ],
+          "completion_log": "tasks/heldout-bank-v1/families/turbovec-mask-allowlist/completion/gold_comment.log",
+          "completion_log_sha256": "fa68bbaca561ec2480e6c05d9a426991259008d41d484dc1c855dd1c4b28e09c"
+        },
+        "mutant": {
+          "candidate_root": "tasks/heldout-bank-v1/families/turbovec-mask-allowlist/candidates/mutant",
+          "manifest": "tasks/heldout-bank-v1/families/turbovec-mask-allowlist/candidates/mutant/Cargo.toml",
+          "patch": "tasks/heldout-bank-v1/families/turbovec-mask-allowlist/mutant.patch",
+          "patch_sha256": "027c3f06e442faa979b6e9381ceb566b4a2d4028837c4747ddad6f91984801ab",
+          "passed": false,
+          "command": [
+            "cargo",
+            "test",
+            "--locked",
+            "--manifest-path",
+            "C:\\rd-c\\experiment-010\\tasks\\heldout-bank-v1\\families\\turbovec-mask-allowlist\\candidates\\mutant\\Cargo.toml",
+            "--package",
+            "turbovec",
+            "--test",
+            "filtering",
+            "block_skip_at_one_percent_selectivity_matches_post_filter",
+            "--",
+            "--exact"
+          ],
+          "completion_log": "tasks/heldout-bank-v1/families/turbovec-mask-allowlist/completion/mutant.log",
+          "completion_log_sha256": "2dd59a8f3d9ee9cc6b847bf37e9e25d9c1b86ee4cd8ee484bc3a81c0a1de0ed5"
+        }
+      }
+    },
+    "turbovec-id-remove-readd": {
+      "repository_id": "turbovec",
+      "repository_revision": "8202f194a0cbbd52213a004290401e180e5c123d",
+      "snapshot_sha256": "6f8992837d0fe84619bfd496ddef1555aa3b20c7612487362df8608ddbdd213c",
+      "test_filter": "remove_then_re_add_same_id_is_allowed",
+      "test_args": [
+        "--test",
+        "id_map"
+      ],
+      "package_name": "turbovec",
+      "features": [],
+      "variants": {
+        "keep": {
+          "candidate_root": "tasks/heldout-bank-v1/families/turbovec-id-remove-readd/candidates/keep",
+          "manifest": "tasks/heldout-bank-v1/families/turbovec-id-remove-readd/candidates/keep/Cargo.toml",
+          "patch": "tasks/heldout-bank-v1/families/turbovec-id-remove-readd/keep.patch",
+          "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "passed": false,
+          "command": [
+            "cargo",
+            "test",
+            "--locked",
+            "--manifest-path",
+            "C:\\rd-c\\experiment-010\\tasks\\heldout-bank-v1\\families\\turbovec-id-remove-readd\\candidates\\keep\\Cargo.toml",
+            "--package",
+            "turbovec",
+            "--test",
+            "id_map",
+            "remove_then_re_add_same_id_is_allowed",
+            "--",
+            "--exact"
+          ],
+          "completion_log": "tasks/heldout-bank-v1/families/turbovec-id-remove-readd/completion/keep.log",
+          "completion_log_sha256": "19609e45346a93d24acd805bb6b12205fec0828c0fbb197182ab1656a88fccbe"
+        },
+        "gold": {
+          "candidate_root": "tasks/heldout-bank-v1/families/turbovec-id-remove-readd/candidates/gold",
+          "manifest": "tasks/heldout-bank-v1/families/turbovec-id-remove-readd/candidates/gold/Cargo.toml",
+          "patch": "tasks/heldout-bank-v1/families/turbovec-id-remove-readd/gold.patch",
+          "patch_sha256": "c38e076a8bc156f51817b22c9d46c450421eb8586893ca918d5cf68a3aab2c91",
+          "passed": true,
+          "command": [
+            "cargo",
+            "test",
+            "--locked",
+            "--manifest-path",
+            "C:\\rd-c\\experiment-010\\tasks\\heldout-bank-v1\\families\\turbovec-id-remove-readd\\candidates\\gold\\Cargo.toml",
+            "--package",
+            "turbovec",
+            "--test",
+            "id_map",
+            "remove_then_re_add_same_id_is_allowed",
+            "--",
+            "--exact"
+          ],
+          "completion_log": "tasks/heldout-bank-v1/families/turbovec-id-remove-readd/completion/gold.log",
+          "completion_log_sha256": "2c3fa09181629f35169f71b7622896d2b57f1251a62638ac67b6258569d68d8f"
+        },
+        "gold_comment": {
+          "candidate_root": "tasks/heldout-bank-v1/families/turbovec-id-remove-readd/candidates/gold_comment",
+          "manifest": "tasks/heldout-bank-v1/families/turbovec-id-remove-readd/candidates/gold_comment/Cargo.toml",
+          "patch": "tasks/heldout-bank-v1/families/turbovec-id-remove-readd/gold_comment.patch",
+          "patch_sha256": "5071ceeede54082f166a1d50243cbc910e06dbc783b9911323ebe22c8d67ee7c",
+          "passed": true,
+          "command": [
+            "cargo",
+            "test",
+            "--locked",
+            "--manifest-path",
+            "C:\\rd-c\\experiment-010\\tasks\\heldout-bank-v1\\families\\turbovec-id-remove-readd\\candidates\\gold_comment\\Cargo.toml",
+            "--package",
+            "turbovec",
+            "--test",
+            "id_map",
+            "remove_then_re_add_same_id_is_allowed",
+            "--",
+            "--exact"
+          ],
+          "completion_log": "tasks/heldout-bank-v1/families/turbovec-id-remove-readd/completion/gold_comment.log",
+          "completion_log_sha256": "4cdee21db273a63279866ec60aadd982063bd40cd6945666625832bf00eb80d1"
+        },
+        "mutant": {
+          "candidate_root": "tasks/heldout-bank-v1/families/turbovec-id-remove-readd/candidates/mutant",
+          "manifest": "tasks/heldout-bank-v1/families/turbovec-id-remove-readd/candidates/mutant/Cargo.toml",
+          "patch": "tasks/heldout-bank-v1/families/turbovec-id-remove-readd/mutant.patch",
+          "patch_sha256": "206a716d47a60ca5e1b0de9ccd26c71c9a1a710134b4a703b06af6fc81a87c5b",
+          "passed": false,
+          "command": [
+            "cargo",
+            "test",
+            "--locked",
+            "--manifest-path",
+            "C:\\rd-c\\experiment-010\\tasks\\heldout-bank-v1\\families\\turbovec-id-remove-readd\\candidates\\mutant\\Cargo.toml",
+            "--package",
+            "turbovec",
+            "--test",
+            "id_map",
+            "remove_then_re_add_same_id_is_allowed",
+            "--",
+            "--exact"
+          ],
+          "completion_log": "tasks/heldout-bank-v1/families/turbovec-id-remove-readd/completion/mutant.log",
+          "completion_log_sha256": "c30c6d64eaba98d9cd09e32e4ec94fdafa64636232529abee09d8f5ad98d1eaf"
+        }
+      }
+    },
+    "turbovec-id-swap-repair": {
+      "repository_id": "turbovec",
+      "repository_revision": "8202f194a0cbbd52213a004290401e180e5c123d",
+      "snapshot_sha256": "608d68fd4875ae1cae9221e43a947fc7a8610b8b2a791773028f6b52185a0219",
+      "test_filter": "remaining_ids_still_self_query_after_mixed_removes",
+      "test_args": [
+        "--test",
+        "id_map"
+      ],
+      "package_name": "turbovec",
+      "features": [],
+      "variants": {
+        "keep": {
+          "candidate_root": "tasks/heldout-bank-v1/families/turbovec-id-swap-repair/candidates/keep",
+          "manifest": "tasks/heldout-bank-v1/families/turbovec-id-swap-repair/candidates/keep/Cargo.toml",
+          "patch": "tasks/heldout-bank-v1/families/turbovec-id-swap-repair/keep.patch",
+          "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "passed": false,
+          "command": [
+            "cargo",
+            "test",
+            "--locked",
+            "--manifest-path",
+            "C:\\rd-c\\experiment-010\\tasks\\heldout-bank-v1\\families\\turbovec-id-swap-repair\\candidates\\keep\\Cargo.toml",
+            "--package",
+            "turbovec",
+            "--test",
+            "id_map",
+            "remaining_ids_still_self_query_after_mixed_removes",
+            "--",
+            "--exact"
+          ],
+          "completion_log": "tasks/heldout-bank-v1/families/turbovec-id-swap-repair/completion/keep.log",
+          "completion_log_sha256": "36e5af6df3abb413167457ae6fa60231b573670f7c9325392cb1c4757ffce1f1"
+        },
+        "gold": {
+          "candidate_root": "tasks/heldout-bank-v1/families/turbovec-id-swap-repair/candidates/gold",
+          "manifest": "tasks/heldout-bank-v1/families/turbovec-id-swap-repair/candidates/gold/Cargo.toml",
+          "patch": "tasks/heldout-bank-v1/families/turbovec-id-swap-repair/gold.patch",
+          "patch_sha256": "3f16db25c03d7158b34d061e6a263bff6dcbd7977dee404cc7028c9b7a185f9b",
+          "passed": true,
+          "command": [
+            "cargo",
+            "test",
+            "--locked",
+            "--manifest-path",
+            "C:\\rd-c\\experiment-010\\tasks\\heldout-bank-v1\\families\\turbovec-id-swap-repair\\candidates\\gold\\Cargo.toml",
+            "--package",
+            "turbovec",
+            "--test",
+            "id_map",
+            "remaining_ids_still_self_query_after_mixed_removes",
+            "--",
+            "--exact"
+          ],
+          "completion_log": "tasks/heldout-bank-v1/families/turbovec-id-swap-repair/completion/gold.log",
+          "completion_log_sha256": "7dbd63a92c6a2e0c0cd8776c65845dc5448abf5f62c1381aec8363153a49a622"
+        },
+        "gold_comment": {
+          "candidate_root": "tasks/heldout-bank-v1/families/turbovec-id-swap-repair/candidates/gold_comment",
+          "manifest": "tasks/heldout-bank-v1/families/turbovec-id-swap-repair/candidates/gold_comment/Cargo.toml",
+          "patch": "tasks/heldout-bank-v1/families/turbovec-id-swap-repair/gold_comment.patch",
+          "patch_sha256": "f92aef127b434ce4962d0cf28b159dfe3049b0572d67553880f97da5ced86edd",
+          "passed": true,
+          "command": [
+            "cargo",
+            "test",
+            "--locked",
+            "--manifest-path",
+            "C:\\rd-c\\experiment-010\\tasks\\heldout-bank-v1\\families\\turbovec-id-swap-repair\\candidates\\gold_comment\\Cargo.toml",
+            "--package",
+            "turbovec",
+            "--test",
+            "id_map",
+            "remaining_ids_still_self_query_after_mixed_removes",
+            "--",
+            "--exact"
+          ],
+          "completion_log": "tasks/heldout-bank-v1/families/turbovec-id-swap-repair/completion/gold_comment.log",
+          "completion_log_sha256": "b146cddfc8a5cf0aeae5d47d85d479becd7528afc118da0ff11da72f31f8be65"
+        },
+        "mutant": {
+          "candidate_root": "tasks/heldout-bank-v1/families/turbovec-id-swap-repair/candidates/mutant",
+          "manifest": "tasks/heldout-bank-v1/families/turbovec-id-swap-repair/candidates/mutant/Cargo.toml",
+          "patch": "tasks/heldout-bank-v1/families/turbovec-id-swap-repair/mutant.patch",
+          "patch_sha256": "4e9f6d2ebebddf364cc4cd528d7822e691de77588fe01a1afc0152cd5f5003e4",
+          "passed": false,
+          "command": [
+            "cargo",
+            "test",
+            "--locked",
+            "--manifest-path",
+            "C:\\rd-c\\experiment-010\\tasks\\heldout-bank-v1\\families\\turbovec-id-swap-repair\\candidates\\mutant\\Cargo.toml",
+            "--package",
+            "turbovec",
+            "--test",
+            "id_map",
+            "remaining_ids_still_self_query_after_mixed_removes",
+            "--",
+            "--exact"
+          ],
+          "completion_log": "tasks/heldout-bank-v1/families/turbovec-id-swap-repair/completion/mutant.log",
+          "completion_log_sha256": "00fa2e6b3a89e6cdce6a4aee9ff0f8420a95f632e0c0e3df3edc809c46069e61"
+        }
+      }
+    },
+    "turbovec-rotation-wire-format": {
+      "repository_id": "turbovec",
+      "repository_revision": "8202f194a0cbbd52213a004290401e180e5c123d",
+      "snapshot_sha256": "13fa3258b3e7d4d2e315e3f6ff68e1e6ea775c111fbc0eb9cd9b7c8f223f5f6a",
+      "test_filter": "golden_rotation_bits_pin_the_chacha_stream",
+      "test_args": [
+        "--test",
+        "rotation_determinism"
+      ],
+      "package_name": "turbovec",
+      "features": [],
+      "variants": {
+        "keep": {
+          "candidate_root": "tasks/heldout-bank-v1/families/turbovec-rotation-wire-format/candidates/keep",
+          "manifest": "tasks/heldout-bank-v1/families/turbovec-rotation-wire-format/candidates/keep/Cargo.toml",
+          "patch": "tasks/heldout-bank-v1/families/turbovec-rotation-wire-format/keep.patch",
+          "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "passed": false,
+          "command": [
+            "cargo",
+            "test",
+            "--locked",
+            "--manifest-path",
+            "C:\\rd-c\\experiment-010\\tasks\\heldout-bank-v1\\families\\turbovec-rotation-wire-format\\candidates\\keep\\Cargo.toml",
+            "--package",
+            "turbovec",
+            "--test",
+            "rotation_determinism",
+            "golden_rotation_bits_pin_the_chacha_stream",
+            "--",
+            "--exact"
+          ],
+          "completion_log": "tasks/heldout-bank-v1/families/turbovec-rotation-wire-format/completion/keep.log",
+          "completion_log_sha256": "f7b35e6e6ecbb22ec80d65d37371ee53d2b07b6e19eda7b1bb3662d1c6318db5"
+        },
+        "gold": {
+          "candidate_root": "tasks/heldout-bank-v1/families/turbovec-rotation-wire-format/candidates/gold",
+          "manifest": "tasks/heldout-bank-v1/families/turbovec-rotation-wire-format/candidates/gold/Cargo.toml",
+          "patch": "tasks/heldout-bank-v1/families/turbovec-rotation-wire-format/gold.patch",
+          "patch_sha256": "007e449ffd08981da2a14e8ad064b052c3b914a91563dddfcaf8b08d8d89f579",
+          "passed": true,
+          "command": [
+            "cargo",
+            "test",
+            "--locked",
+            "--manifest-path",
+            "C:\\rd-c\\experiment-010\\tasks\\heldout-bank-v1\\families\\turbovec-rotation-wire-format\\candidates\\gold\\Cargo.toml",
+            "--package",
+            "turbovec",
+            "--test",
+            "rotation_determinism",
+            "golden_rotation_bits_pin_the_chacha_stream",
+            "--",
+            "--exact"
+          ],
+          "completion_log": "tasks/heldout-bank-v1/families/turbovec-rotation-wire-format/completion/gold.log",
+          "completion_log_sha256": "d275062eb9d218034ed1151232a6a77ca75d4478c347ec48024ddf66743e7acf"
+        },
+        "gold_comment": {
+          "candidate_root": "tasks/heldout-bank-v1/families/turbovec-rotation-wire-format/candidates/gold_comment",
+          "manifest": "tasks/heldout-bank-v1/families/turbovec-rotation-wire-format/candidates/gold_comment/Cargo.toml",
+          "patch": "tasks/heldout-bank-v1/families/turbovec-rotation-wire-format/gold_comment.patch",
+          "patch_sha256": "620ba171f88123de86b3582f0b41b48c45f3820f4aa76105319ba60f286a8f76",
+          "passed": true,
+          "command": [
+            "cargo",
+            "test",
+            "--locked",
+            "--manifest-path",
+            "C:\\rd-c\\experiment-010\\tasks\\heldout-bank-v1\\families\\turbovec-rotation-wire-format\\candidates\\gold_comment\\Cargo.toml",
+            "--package",
+            "turbovec",
+            "--test",
+            "rotation_determinism",
+            "golden_rotation_bits_pin_the_chacha_stream",
+            "--",
+            "--exact"
+          ],
+          "completion_log": "tasks/heldout-bank-v1/families/turbovec-rotation-wire-format/completion/gold_comment.log",
+          "completion_log_sha256": "fb6a994b04dc0b86420c926e5bb1300f3952a28fcb73d1833332b982b92bbf5d"
+        },
+        "mutant": {
+          "candidate_root": "tasks/heldout-bank-v1/families/turbovec-rotation-wire-format/candidates/mutant",
+          "manifest": "tasks/heldout-bank-v1/families/turbovec-rotation-wire-format/candidates/mutant/Cargo.toml",
+          "patch": "tasks/heldout-bank-v1/families/turbovec-rotation-wire-format/mutant.patch",
+          "patch_sha256": "0f250400d060f791524f689a9a43a98af396f0da5dc2daf3b3f492ac9d3353d4",
+          "passed": false,
+          "command": [
+            "cargo",
+            "test",
+            "--locked",
+            "--manifest-path",
+            "C:\\rd-c\\experiment-010\\tasks\\heldout-bank-v1\\families\\turbovec-rotation-wire-format\\candidates\\mutant\\Cargo.toml",
+            "--package",
+            "turbovec",
+            "--test",
+            "rotation_determinism",
+            "golden_rotation_bits_pin_the_chacha_stream",
+            "--",
+            "--exact"
+          ],
+          "completion_log": "tasks/heldout-bank-v1/families/turbovec-rotation-wire-format/completion/mutant.log",
+          "completion_log_sha256": "7136007d29801a69107ba7225b2da7c6d92e0ebc4e3b3a34faf7159a2d62d07c"
+        }
+      }
+    },
+    "ripgrep-case-insensitive-glob": {
+      "repository_id": "ripgrep",
+      "repository_revision": "e89fff89ac9af12e8d4ce9d5fd07beb408ca730f",
+      "snapshot_sha256": "903dac98a558a3233b1671db0b60dc0293c7e56fbcd88bf9d13927763960b1a2",
+      "test_filter": "glob::tests::matchcasei2",
+      "test_args": [
+        "--lib"
+      ],
+      "package_name": "globset",
+      "features": [],
+      "variants": {
+        "keep": {
+          "candidate_root": "tasks/heldout-bank-v1/families/ripgrep-case-insensitive-glob/candidates/keep",
+          "manifest": "tasks/heldout-bank-v1/families/ripgrep-case-insensitive-glob/candidates/keep/Cargo.toml",
+          "patch": "tasks/heldout-bank-v1/families/ripgrep-case-insensitive-glob/keep.patch",
+          "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "passed": false,
+          "command": [
+            "cargo",
+            "test",
+            "--locked",
+            "--manifest-path",
+            "C:\\rd-c\\experiment-010\\tasks\\heldout-bank-v1\\families\\ripgrep-case-insensitive-glob\\candidates\\keep\\Cargo.toml",
+            "--package",
+            "globset",
+            "--lib",
+            "glob::tests::matchcasei2",
+            "--",
+            "--exact"
+          ],
+          "completion_log": "tasks/heldout-bank-v1/families/ripgrep-case-insensitive-glob/completion/keep.log",
+          "completion_log_sha256": "6f388cf577691ccedba9c9b2b9deed249ca8e7cd989945e5783e965c41509c05"
+        },
+        "gold": {
+          "candidate_root": "tasks/heldout-bank-v1/families/ripgrep-case-insensitive-glob/candidates/gold",
+          "manifest": "tasks/heldout-bank-v1/families/ripgrep-case-insensitive-glob/candidates/gold/Cargo.toml",
+          "patch": "tasks/heldout-bank-v1/families/ripgrep-case-insensitive-glob/gold.patch",
+          "patch_sha256": "41fb794fb6ac8f8b265fa9bfe17155da8d26a63cbaee3c9fb70ed63c05a76cd5",
+          "passed": true,
+          "command": [
+            "cargo",
+            "test",
+            "--locked",
+            "--manifest-path",
+            "C:\\rd-c\\experiment-010\\tasks\\heldout-bank-v1\\families\\ripgrep-case-insensitive-glob\\candidates\\gold\\Cargo.toml",
+            "--package",
+            "globset",
+            "--lib",
+            "glob::tests::matchcasei2",
+            "--",
+            "--exact"
+          ],
+          "completion_log": "tasks/heldout-bank-v1/families/ripgrep-case-insensitive-glob/completion/gold.log",
+          "completion_log_sha256": "5cbdd88209d4202568b41343032a87e91f0b844ddc7b7706e490aa802d3e0f13"
+        },
+        "gold_comment": {
+          "candidate_root": "tasks/heldout-bank-v1/families/ripgrep-case-insensitive-glob/candidates/gold_comment",
+          "manifest": "tasks/heldout-bank-v1/families/ripgrep-case-insensitive-glob/candidates/gold_comment/Cargo.toml",
+          "patch": "tasks/heldout-bank-v1/families/ripgrep-case-insensitive-glob/gold_comment.patch",
+          "patch_sha256": "ba2df6b3963a2e63bf04e89df67f324cd81986cda5b521dff1061b12d9bf2648",
+          "passed": true,
+          "command": [
+            "cargo",
+            "test",
+            "--locked",
+            "--manifest-path",
+            "C:\\rd-c\\experiment-010\\tasks\\heldout-bank-v1\\families\\ripgrep-case-insensitive-glob\\candidates\\gold_comment\\Cargo.toml",
+            "--package",
+            "globset",
+            "--lib",
+            "glob::tests::matchcasei2",
+            "--",
+            "--exact"
+          ],
+          "completion_log": "tasks/heldout-bank-v1/families/ripgrep-case-insensitive-glob/completion/gold_comment.log",
+          "completion_log_sha256": "da1555e4a178218898aa7741cca002f64c119fd8ae2cbc4e8179ded372457351"
+        },
+        "mutant": {
+          "candidate_root": "tasks/heldout-bank-v1/families/ripgrep-case-insensitive-glob/candidates/mutant",
+          "manifest": "tasks/heldout-bank-v1/families/ripgrep-case-insensitive-glob/candidates/mutant/Cargo.toml",
+          "patch": "tasks/heldout-bank-v1/families/ripgrep-case-insensitive-glob/mutant.patch",
+          "patch_sha256": "645c24ac169e883eb1d6e47aa9032257ed6c19a9dc10e6fcacea938ffee66814",
+          "passed": false,
+          "command": [
+            "cargo",
+            "test",
+            "--locked",
+            "--manifest-path",
+            "C:\\rd-c\\experiment-010\\tasks\\heldout-bank-v1\\families\\ripgrep-case-insensitive-glob\\candidates\\mutant\\Cargo.toml",
+            "--package",
+            "globset",
+            "--lib",
+            "glob::tests::matchcasei2",
+            "--",
+            "--exact"
+          ],
+          "completion_log": "tasks/heldout-bank-v1/families/ripgrep-case-insensitive-glob/completion/mutant.log",
+          "completion_log_sha256": "6089c0a6144a188b51debaf5112249e13c614d60fb953a0e44d2c98c8eb99913"
+        }
+      }
+    },
+    "ripgrep-literal-separator-glob": {
+      "repository_id": "ripgrep",
+      "repository_revision": "e89fff89ac9af12e8d4ce9d5fd07beb408ca730f",
+      "snapshot_sha256": "1678dbbeed2ef50c42989b13607335ca1e16ff863e0158235e25e407842ba483",
+      "test_filter": "glob::tests::matchslash2",
+      "test_args": [
+        "--lib"
+      ],
+      "package_name": "globset",
+      "features": [],
+      "variants": {
+        "keep": {
+          "candidate_root": "tasks/heldout-bank-v1/families/ripgrep-literal-separator-glob/candidates/keep",
+          "manifest": "tasks/heldout-bank-v1/families/ripgrep-literal-separator-glob/candidates/keep/Cargo.toml",
+          "patch": "tasks/heldout-bank-v1/families/ripgrep-literal-separator-glob/keep.patch",
+          "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "passed": false,
+          "command": [
+            "cargo",
+            "test",
+            "--locked",
+            "--manifest-path",
+            "C:\\rd-c\\experiment-010\\tasks\\heldout-bank-v1\\families\\ripgrep-literal-separator-glob\\candidates\\keep\\Cargo.toml",
+            "--package",
+            "globset",
+            "--lib",
+            "glob::tests::matchslash2",
+            "--",
+            "--exact"
+          ],
+          "completion_log": "tasks/heldout-bank-v1/families/ripgrep-literal-separator-glob/completion/keep.log",
+          "completion_log_sha256": "810724590a5949d7b7bf38a999098bc846bb24c10d148f68985c91c0661adbcb"
+        },
+        "gold": {
+          "candidate_root": "tasks/heldout-bank-v1/families/ripgrep-literal-separator-glob/candidates/gold",
+          "manifest": "tasks/heldout-bank-v1/families/ripgrep-literal-separator-glob/candidates/gold/Cargo.toml",
+          "patch": "tasks/heldout-bank-v1/families/ripgrep-literal-separator-glob/gold.patch",
+          "patch_sha256": "75c4ee5bf57f0293b5a6ec8c79a83a50a9d36b0533db14b10a0566ab402f448a",
+          "passed": true,
+          "command": [
+            "cargo",
+            "test",
+            "--locked",
+            "--manifest-path",
+            "C:\\rd-c\\experiment-010\\tasks\\heldout-bank-v1\\families\\ripgrep-literal-separator-glob\\candidates\\gold\\Cargo.toml",
+            "--package",
+            "globset",
+            "--lib",
+            "glob::tests::matchslash2",
+            "--",
+            "--exact"
+          ],
+          "completion_log": "tasks/heldout-bank-v1/families/ripgrep-literal-separator-glob/completion/gold.log",
+          "completion_log_sha256": "f14dd668b72c5db2f1899b9e75054ec284e145d87cdf7b7fd5bb98caded28179"
+        },
+        "gold_comment": {
+          "candidate_root": "tasks/heldout-bank-v1/families/ripgrep-literal-separator-glob/candidates/gold_comment",
+          "manifest": "tasks/heldout-bank-v1/families/ripgrep-literal-separator-glob/candidates/gold_comment/Cargo.toml",
+          "patch": "tasks/heldout-bank-v1/families/ripgrep-literal-separator-glob/gold_comment.patch",
+          "patch_sha256": "65bd186d034e483ee8e56fde06f3ea4f20665eb6a920922c1c2bf87625467ffe",
+          "passed": true,
+          "command": [
+            "cargo",
+            "test",
+            "--locked",
+            "--manifest-path",
+            "C:\\rd-c\\experiment-010\\tasks\\heldout-bank-v1\\families\\ripgrep-literal-separator-glob\\candidates\\gold_comment\\Cargo.toml",
+            "--package",
+            "globset",
+            "--lib",
+            "glob::tests::matchslash2",
+            "--",
+            "--exact"
+          ],
+          "completion_log": "tasks/heldout-bank-v1/families/ripgrep-literal-separator-glob/completion/gold_comment.log",
+          "completion_log_sha256": "0aeb9228cb86e2a98edb0c00f9541cf0498d2565e042a6108aa9b6d5522d344b"
+        },
+        "mutant": {
+          "candidate_root": "tasks/heldout-bank-v1/families/ripgrep-literal-separator-glob/candidates/mutant",
+          "manifest": "tasks/heldout-bank-v1/families/ripgrep-literal-separator-glob/candidates/mutant/Cargo.toml",
+          "patch": "tasks/heldout-bank-v1/families/ripgrep-literal-separator-glob/mutant.patch",
+          "patch_sha256": "943ccba73ac87d1fabb3c88f78a4812aff99bb9246779665de9b69f3711a0342",
+          "passed": false,
+          "command": [
+            "cargo",
+            "test",
+            "--locked",
+            "--manifest-path",
+            "C:\\rd-c\\experiment-010\\tasks\\heldout-bank-v1\\families\\ripgrep-literal-separator-glob\\candidates\\mutant\\Cargo.toml",
+            "--package",
+            "globset",
+            "--lib",
+            "glob::tests::matchslash2",
+            "--",
+            "--exact"
+          ],
+          "completion_log": "tasks/heldout-bank-v1/families/ripgrep-literal-separator-glob/completion/mutant.log",
+          "completion_log_sha256": "193a4222b47f6277640d7de34077f7b0c4615d2f3bb78783e244a40854cb75ff"
+        }
+      }
+    },
+    "ripgrep-recursive-glob": {
+      "repository_id": "ripgrep",
+      "repository_revision": "e89fff89ac9af12e8d4ce9d5fd07beb408ca730f",
+      "snapshot_sha256": "156f9e56b6be3d41805d37b80c96df8013fa845489bdfd8a200c89be4c0d30d5",
+      "test_filter": "glob::tests::re22",
+      "test_args": [
+        "--lib"
+      ],
+      "package_name": "globset",
+      "features": [],
+      "variants": {
+        "keep": {
+          "candidate_root": "tasks/heldout-bank-v1/families/ripgrep-recursive-glob/candidates/keep",
+          "manifest": "tasks/heldout-bank-v1/families/ripgrep-recursive-glob/candidates/keep/Cargo.toml",
+          "patch": "tasks/heldout-bank-v1/families/ripgrep-recursive-glob/keep.patch",
+          "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "passed": false,
+          "command": [
+            "cargo",
+            "test",
+            "--locked",
+            "--manifest-path",
+            "C:\\rd-c\\experiment-010\\tasks\\heldout-bank-v1\\families\\ripgrep-recursive-glob\\candidates\\keep\\Cargo.toml",
+            "--package",
+            "globset",
+            "--lib",
+            "glob::tests::re22",
+            "--",
+            "--exact"
+          ],
+          "completion_log": "tasks/heldout-bank-v1/families/ripgrep-recursive-glob/completion/keep.log",
+          "completion_log_sha256": "d6922abc5018b11f3642b22e874617ffac7a4551a8faac0a1e5cbee24eb1fd92"
+        },
+        "gold": {
+          "candidate_root": "tasks/heldout-bank-v1/families/ripgrep-recursive-glob/candidates/gold",
+          "manifest": "tasks/heldout-bank-v1/families/ripgrep-recursive-glob/candidates/gold/Cargo.toml",
+          "patch": "tasks/heldout-bank-v1/families/ripgrep-recursive-glob/gold.patch",
+          "patch_sha256": "141751f0596f2515235db26a90bd3ffe4cdf8edf586f4f01e29631341392b1ca",
+          "passed": true,
+          "command": [
+            "cargo",
+            "test",
+            "--locked",
+            "--manifest-path",
+            "C:\\rd-c\\experiment-010\\tasks\\heldout-bank-v1\\families\\ripgrep-recursive-glob\\candidates\\gold\\Cargo.toml",
+            "--package",
+            "globset",
+            "--lib",
+            "glob::tests::re22",
+            "--",
+            "--exact"
+          ],
+          "completion_log": "tasks/heldout-bank-v1/families/ripgrep-recursive-glob/completion/gold.log",
+          "completion_log_sha256": "ca7cbcd9be68a8b94948d38355f0b42197513c90b13b165b8236cf4dda8e5281"
+        },
+        "gold_comment": {
+          "candidate_root": "tasks/heldout-bank-v1/families/ripgrep-recursive-glob/candidates/gold_comment",
+          "manifest": "tasks/heldout-bank-v1/families/ripgrep-recursive-glob/candidates/gold_comment/Cargo.toml",
+          "patch": "tasks/heldout-bank-v1/families/ripgrep-recursive-glob/gold_comment.patch",
+          "patch_sha256": "8203baf35e2cb5d2e1edf344f977b04891aa2508439c978d2e4203b69620060f",
+          "passed": true,
+          "command": [
+            "cargo",
+            "test",
+            "--locked",
+            "--manifest-path",
+            "C:\\rd-c\\experiment-010\\tasks\\heldout-bank-v1\\families\\ripgrep-recursive-glob\\candidates\\gold_comment\\Cargo.toml",
+            "--package",
+            "globset",
+            "--lib",
+            "glob::tests::re22",
+            "--",
+            "--exact"
+          ],
+          "completion_log": "tasks/heldout-bank-v1/families/ripgrep-recursive-glob/completion/gold_comment.log",
+          "completion_log_sha256": "3d8a59f720d5131bca43ce2c128c12f9fbe88ee1657bb40588b782d05f438312"
+        },
+        "mutant": {
+          "candidate_root": "tasks/heldout-bank-v1/families/ripgrep-recursive-glob/candidates/mutant",
+          "manifest": "tasks/heldout-bank-v1/families/ripgrep-recursive-glob/candidates/mutant/Cargo.toml",
+          "patch": "tasks/heldout-bank-v1/families/ripgrep-recursive-glob/mutant.patch",
+          "patch_sha256": "1c12b124f8575708682a41748896ab7424fc398835f5b33879fb378939813db9",
+          "passed": false,
+          "command": [
+            "cargo",
+            "test",
+            "--locked",
+            "--manifest-path",
+            "C:\\rd-c\\experiment-010\\tasks\\heldout-bank-v1\\families\\ripgrep-recursive-glob\\candidates\\mutant\\Cargo.toml",
+            "--package",
+            "globset",
+            "--lib",
+            "glob::tests::re22",
+            "--",
+            "--exact"
+          ],
+          "completion_log": "tasks/heldout-bank-v1/families/ripgrep-recursive-glob/completion/mutant.log",
+          "completion_log_sha256": "61128a921065c7cca1f452597bf948ebff207d5f8840b14efc1d4dbc694abbaa"
+        }
+      }
+    },
+    "ripgrep-gitignore-bom": {
+      "repository_id": "ripgrep",
+      "repository_revision": "e89fff89ac9af12e8d4ce9d5fd07beb408ca730f",
+      "snapshot_sha256": "88b1821040580414cdd9a18683765ff5439c9ded6a463083db9c48326987b182",
+      "test_filter": "gitignore_skip_bom",
+      "test_args": [
+        "--test",
+        "gitignore_skip_bom"
+      ],
+      "package_name": "ignore",
+      "features": [],
+      "variants": {
+        "keep": {
+          "candidate_root": "tasks/heldout-bank-v1/families/ripgrep-gitignore-bom/candidates/keep",
+          "manifest": "tasks/heldout-bank-v1/families/ripgrep-gitignore-bom/candidates/keep/Cargo.toml",
+          "patch": "tasks/heldout-bank-v1/families/ripgrep-gitignore-bom/keep.patch",
+          "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "passed": false,
+          "command": [
+            "cargo",
+            "test",
+            "--locked",
+            "--manifest-path",
+            "C:\\rd-c\\experiment-010\\tasks\\heldout-bank-v1\\families\\ripgrep-gitignore-bom\\candidates\\keep\\Cargo.toml",
+            "--package",
+            "ignore",
+            "--test",
+            "gitignore_skip_bom",
+            "gitignore_skip_bom",
+            "--",
+            "--exact"
+          ],
+          "completion_log": "tasks/heldout-bank-v1/families/ripgrep-gitignore-bom/completion/keep.log",
+          "completion_log_sha256": "105607608f6b02cfffc16731096cc0a893b07378c152a3256d3fcf98146b1a71"
+        },
+        "gold": {
+          "candidate_root": "tasks/heldout-bank-v1/families/ripgrep-gitignore-bom/candidates/gold",
+          "manifest": "tasks/heldout-bank-v1/families/ripgrep-gitignore-bom/candidates/gold/Cargo.toml",
+          "patch": "tasks/heldout-bank-v1/families/ripgrep-gitignore-bom/gold.patch",
+          "patch_sha256": "5000d6bc36df5a03c4f167b335cc6d248a22bac17ad2b7041182b31fa05e97af",
+          "passed": true,
+          "command": [
+            "cargo",
+            "test",
+            "--locked",
+            "--manifest-path",
+            "C:\\rd-c\\experiment-010\\tasks\\heldout-bank-v1\\families\\ripgrep-gitignore-bom\\candidates\\gold\\Cargo.toml",
+            "--package",
+            "ignore",
+            "--test",
+            "gitignore_skip_bom",
+            "gitignore_skip_bom",
+            "--",
+            "--exact"
+          ],
+          "completion_log": "tasks/heldout-bank-v1/families/ripgrep-gitignore-bom/completion/gold.log",
+          "completion_log_sha256": "8d695b0c7da1e16b9e53fda961a8c1104151ac73fdc038744d082780761eaf17"
+        },
+        "gold_comment": {
+          "candidate_root": "tasks/heldout-bank-v1/families/ripgrep-gitignore-bom/candidates/gold_comment",
+          "manifest": "tasks/heldout-bank-v1/families/ripgrep-gitignore-bom/candidates/gold_comment/Cargo.toml",
+          "patch": "tasks/heldout-bank-v1/families/ripgrep-gitignore-bom/gold_comment.patch",
+          "patch_sha256": "48fa64eaccc75e7448cc9bd2806c6344120c775dc45a53944cce0c7f7f443fd2",
+          "passed": true,
+          "command": [
+            "cargo",
+            "test",
+            "--locked",
+            "--manifest-path",
+            "C:\\rd-c\\experiment-010\\tasks\\heldout-bank-v1\\families\\ripgrep-gitignore-bom\\candidates\\gold_comment\\Cargo.toml",
+            "--package",
+            "ignore",
+            "--test",
+            "gitignore_skip_bom",
+            "gitignore_skip_bom",
+            "--",
+            "--exact"
+          ],
+          "completion_log": "tasks/heldout-bank-v1/families/ripgrep-gitignore-bom/completion/gold_comment.log",
+          "completion_log_sha256": "04be59e2443a90a847a86030e8e919affa41a1ca64507ca985ea44e29bb1721a"
+        },
+        "mutant": {
+          "candidate_root": "tasks/heldout-bank-v1/families/ripgrep-gitignore-bom/candidates/mutant",
+          "manifest": "tasks/heldout-bank-v1/families/ripgrep-gitignore-bom/candidates/mutant/Cargo.toml",
+          "patch": "tasks/heldout-bank-v1/families/ripgrep-gitignore-bom/mutant.patch",
+          "patch_sha256": "ab2085ede44153fec30518b5ed0ab39d5ca6857004a7998783ce2a91a936fecd",
+          "passed": false,
+          "command": [
+            "cargo",
+            "test",
+            "--locked",
+            "--manifest-path",
+            "C:\\rd-c\\experiment-010\\tasks\\heldout-bank-v1\\families\\ripgrep-gitignore-bom\\candidates\\mutant\\Cargo.toml",
+            "--package",
+            "ignore",
+            "--test",
+            "gitignore_skip_bom",
+            "gitignore_skip_bom",
+            "--",
+            "--exact"
+          ],
+          "completion_log": "tasks/heldout-bank-v1/families/ripgrep-gitignore-bom/completion/mutant.log",
+          "completion_log_sha256": "36077769e35ca74461425818c4484b791e094dc0cdaca62fc261000cc31c4f6c"
+        }
+      }
+    }
+  }
+}

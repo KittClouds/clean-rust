@@ -1,0 +1,144 @@
+{
+  "schema_version": 1,
+  "run_id": "e011-r3-20260925-order-robust-prompt-01",
+  "condition": "full-frame",
+  "role": "small",
+  "bundle_id": "minicpm5-2b-q8-local-v5+candidate-order-instruction-v1",
+  "parent_weights_bundle_id": "minicpm5-2b-q8-local-v5",
+  "server_alias": "e009-small-v5",
+  "server_process_id": 28856,
+  "model_sha256": "c5415f8989bf88a8288f1b55a3cc371af53c07b0faa220a63bd7a990cfaba078",
+  "runtime_sha256": "ffaee576ad271ede87b92a7d8c3863dc8f331bbac666ee00099c250e8809e743",
+  "prompt_sha256": "3a673a9843cd1fb965ebd411d550bdb5a9b0019989cae727a0f67e7a62d073a6",
+  "input_lock_sha256": "519c96fb51adab9e736b8a978504373e3d8517679dbdaa86839523079df09a97",
+  "pre_model_seal_sha256": "d6623d1778d1d0d9b28f67d3ae0fc39a1b957f54cf3a06f1297dd42f729ca858",
+  "frame_lock_sha256": "e8de47cb4452eb36ab40b6e82650467dcd578a697a086b9c998ed4f20d9a6f6d",
+  "frame_sha256": "919e0d0f41ded647b8584f198ea8a80b02ca992766f60f60226866d5bde9cd8e",
+  "task_id": "turbovec-turbovec-id-remove-readd-v1",
+  "request_sha256": "2fcdf3583b4907c9d0d9de3d576126e1cf4727d96d60f6da19b03f430f608d62",
+  "request": {
+    "model": "e009-small-v5",
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a typed observer in a deterministic coding workflow. The runtime owns workflow state and will execute only one action from the offered action_options after validating your output.\n\nRead the task_prompt and evidence, then compare the offered actions. Choose the action most likely to satisfy the task while preserving the repository's stated constraints. Do not write or propose code outside the offered choices. Do not claim to have executed tests. If no offered action is sufficiently supported, use null for action_choice and express uncertainty with abstention_percent.\n\nThe action_options array is an unordered set. Its displayed order is arbitrary and may change between equivalent requests. Numeric action IDs are opaque labels: never use their values or positions as evidence, a ranking, or a tie-break. Compare candidates using their summaries and diff content against the task and evidence. After choosing by content, return that candidate's current numeric action ID. If the content does not support one choice over the alternatives, abstain with action_choice null.\n\nReturn exactly one JSON object matching the provided schema. action_choice must be an offered numeric action ID or null. applicability_percent is your estimate from 0 to 100 that this observer can handle the task from the available evidence. abstention_percent is your estimate from 0 to 100 that the runtime should defer this choice. Use integer percentage points only. Do not add prose or fields.\n"
+      },
+      {
+        "role": "user",
+        "content": "{\"schema_id\":\"rdc-real-coding-observation.v1\",\"task_id\":\"turbovec-turbovec-id-remove-readd-v1\",\"task_family\":\"turbovec-id-remove-readd\",\"repository_id\":\"turbovec\",\"task_variant\":1,\"task_prompt\":\"Repair the stable-ID removal path. The frozen remove-and-readd test fails on this snapshot; choose the patch that makes the ID reusable.\",\"repository_revision\":\"8202f194a0cbbd52213a004290401e180e5c123d\",\"snapshot_sha256\":\"6f8992837d0fe84619bfd496ddef1555aa3b20c7612487362df8608ddbdd213c\",\"evidence\":[{\"kind\":\"source_excerpt\",\"source_id\":\"turbovec/src/id_map.rs\",\"content_blake3\":\"5232ec7083a5da17f4c02716e9c438ca57bee0bf486a3dcd2be59c3fd332c822\",\"content\":\"//! Stable external IDs on top of [`TurboQuantIndex`].\\n//!\\n//! [`TurboQuantIndex`] stores vectors positionally: calling `swap_remove`\\n//! invalidates external references because the previously-last vector\\n//! moves into the deleted slot. `IdMapIndex` wraps the positional index\\n//! with a bidirectional `id ↔ slot` mapping so callers can identify\\n//! vectors by a stable `u64` ID that doesn't change when other vectors\\n//! are inserted or removed.\"},{\"kind\":\"baseline_tool_result\",\"source_id\":\"cargo-test::remove_then_re_add_same_id_is_allowed\",\"content_blake3\":\"b4b1bef1e5e99c4e7fb255b588adb2771430dd9eff2ec7ba86ff3f83b79406b3\",\"content\":\"Exact test `remove_then_re_add_same_id_is_allowed` failed on the frozen snapshot. Candidate patches have not been run in this task.\\n\\nrunning 1 test\\ntest remove_then_re_add_same_id_is_allowed ... FAILED\\n\\nfailures:\\n\\n---- remove_then_re_add_same_id_is_allowed stdout ----\\n\\nthread 'remove_then_re_add_same_id_is_allowed' (27340) panicked at turbovec\\\\tests\\\\id_map.rs:153:5:\\nassertion failed: !idx.contains(3)\\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\\n\\n\\nfailures:\\n    remove_then_re_add_same_id_is_allowed\\n\\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 22 filtered out; finished in 1.10s\\n\\n   Compiling turbovec v0.9.0 (<frozen-repository-snapshot>\\\\turbovec)\\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 8.89s\\n     Running tests\\\\id_map.rs (<cargo-target>\\\\debug\\\\deps\\\\id_map-6028bbdd1bdac666.exe)\\nerror: test failed, to rerun pass `-p turbovec --test id_map`\\n\"}],\"action_options\":[{\"action\":{\"id\":11,\"schema_id\":1},\"summary\":\"Leave the current implementation unchanged.\",\"diff_excerpt\":\"No source line changes are included.\",\"patch_sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"},{\"action\":{\"id\":37,\"schema_id\":1},\"summary\":\"Apply the focused source change shown here.\",\"diff_excerpt\":\"@@ -553,7 +553,6 @@\\n-        self.ids_mut().insert(id, last);\",\"patch_sha256\":\"c38e076a8bc156f51817b22c9d46c450421eb8586893ca918d5cf68a3aab2c91\"},{\"action\":{\"id\":68,\"schema_id\":1},\"summary\":\"Apply this alternative change in the same code path.\",\"diff_excerpt\":\"@@ -553,7 +553,7 @@\\n-        self.ids_mut().insert(id, last);\\n+        self.ids_mut().insert(id, slot);\",\"patch_sha256\":\"206a716d47a60ca5e1b0de9ccd26c71c9a1a710134b4a703b06af6fc81a87c5b\"},{\"action\":{\"id\":94,\"schema_id\":1},\"summary\":\"Apply the source change and add a contract comment.\",\"diff_excerpt\":\"@@ -552,8 +552,8 @@\\n+        // Remove the external ID before it can be reinserted.\\n-        self.ids_mut().insert(id, last);\",\"patch_sha256\":\"5071ceeede54082f166a1d50243cbc910e06dbc783b9911323ebe22c8d67ee7c\"}]}"
+      }
+    ],
+    "temperature": 0,
+    "top_p": 1,
+    "seed": 0,
+    "max_tokens": 1024,
+    "stream": false,
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rdc_coding_observer_output_v1",
+        "strict": true,
+        "schema": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "rdc-coding-observer-output.v2",
+          "title": "RDC Coding Observer Output v2",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "action_choice",
+            "applicability_percent",
+            "abstention_percent"
+          ],
+          "properties": {
+            "action_choice": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 65535
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "applicability_percent": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "abstention_percent": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            }
+          }
+        }
+      }
+    }
+  },
+  "normalization_contract": "percent-0-100-to-milli-x10-v1+line-endings-lf-v1",
+  "thresholds": {
+    "minimum_applicability_milli": 850,
+    "maximum_abstention_milli": 150
+  },
+  "http_status": 200,
+  "response": {
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "{\"action_choice\":null,\"applicability_percent\":0,\"abstention_percent\":100}"
+        }
+      }
+    ],
+    "created": 1790371206,
+    "model": "e009-small-v5",
+    "system_fingerprint": "b10982-fc82583e6",
+    "object": "chat.completion",
+    "usage": {
+      "completion_tokens": 21,
+      "prompt_tokens": 1413,
+      "total_tokens": 1434,
+      "prompt_tokens_details": {
+        "cached_tokens": 312
+      }
+    },
+    "id": "chatcmpl-yDBQAAc2RcKchUID34SYsK6hDxEKjpB5",
+    "timings": {
+      "cache_n": 312,
+      "prompt_n": 1101,
+      "prompt_ms": 114.39,
+      "prompt_per_token_ms": 0.10389645776566757,
+      "prompt_per_second": 9624.96721741411,
+      "predicted_n": 21,
+      "predicted_ms": 136.388,
+      "predicted_per_token_ms": 6.8194,
+      "predicted_per_second": 146.64046690324662
+    }
+  },
+  "content": "{\"action_choice\":null,\"applicability_percent\":0,\"abstention_percent\":100}",
+  "output": {
+    "action_choice": null,
+    "applicability_percent": 0,
+    "abstention_percent": 100
+  },
+  "normalized_output": {
+    "action_choice": null,
+    "applicability_milli": 0,
+    "abstention_milli": 1000
+  },
+  "normalization_error": null,
+  "usage": {
+    "completion_tokens": 21,
+    "prompt_tokens": 1413,
+    "total_tokens": 1434,
+    "prompt_tokens_details": {
+      "cached_tokens": 312
+    }
+  },
+  "finish_reason": "stop",
+  "elapsed_ms": 299.25
+}

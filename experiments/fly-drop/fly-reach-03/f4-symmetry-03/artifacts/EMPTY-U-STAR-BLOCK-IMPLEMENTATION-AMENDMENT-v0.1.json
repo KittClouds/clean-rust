@@ -1,0 +1,13 @@
+{
+  "schema": "F4-SYMMETRY-03-empty-Ustar-block-implementation-amendment-v1",
+  "status": "IMPLEMENTATION_CLARIFICATION_NO_SCIENCE_CHANGE",
+  "parent_contract_sha256": "7c49b8419896dca4418de3497ecd8566b2167d1c6bf24d7860d904d70f87afe0",
+  "trigger": "The first sealed preparation stopped because its parser required all eight blocks to appear among eligible U* rows.",
+  "controlling_existing_rule": "The contract states that U* support is not guaranteed per block and empty or class-absent cells remain visible and undefined where appropriate; blocks are never replaced on that basis.",
+  "clarification": "An accepted block with zero eligible U* rows remains in the frozen eight-fold fit grid. Its model is trained on all available rows from the other blocks, its held-out prediction stream contains zero rows, and block-level scoring is undefined. It counts as nonpositive for the predeclared six-of-eight 0011 support rule.",
+  "data_policy": "Reuse the exact already-collected native-only bytes from the stopped QREP1 identity. Do not regenerate tasks, select blocks, change U*, replace rows, or rerun native trajectories.",
+  "fit_policy": "Create a new implementation-corrected sealed identity. No prediction or held-out truth from the stopped identity exists and none is reused.",
+  "scientific_changes": [],
+  "measured_reach03_authorized": false,
+  "biological_promotion": false
+}

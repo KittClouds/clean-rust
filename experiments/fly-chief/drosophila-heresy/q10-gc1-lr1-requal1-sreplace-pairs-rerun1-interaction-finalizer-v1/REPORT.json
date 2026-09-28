@@ -1,0 +1,27 @@
+{
+  "behavioral_probe": false,
+  "checks_passed": 5024,
+  "checks_total": 5024,
+  "counts": {
+    "axis_nonzero": 0,
+    "contexts": 8,
+    "linear_drive_nonzero": 0,
+    "norm_nonzero": 1878,
+    "pair_records": 4999,
+    "readout_nonzero": 0,
+    "weight_nonzero": 0
+  },
+  "identity": "q10-gc1-lr1-requal1-sreplace-pairs-rerun1-interaction-finalizer-v1",
+  "non_norm_interaction_all_exact_zero": true,
+  "norm_interaction": {
+    "max_abs": 8.881784197001252e-16,
+    "mean_abs": 1.550181378652449e-16,
+    "median_abs": 0.0,
+    "nonzero": 1878,
+    "p95_abs": 4.440892098500626e-16
+  },
+  "parent_execution_sha256": "5016A2331F7336A1684413B5D91E9957ECC2B56622C3B4BD3FB643585A95C6F6",
+  "protocol": "REQUAL1-SREPLACE-PAIRS-RERUN1-INTERACTION-FINALIZER",
+  "scientific_promotion": false,
+  "status": "INTERACTION_FINALIZER_PASS"
+}

@@ -1,0 +1,73 @@
+{
+  "protocol": "jev-information-density/v0.8g-matched-policy-lfm",
+  "status": "prospective_frozen_before_model_contact",
+  "scientific_question": "With support, composition, exposure geometry, and training budget matched, does the frozen curation policy train a better decision compiler than constrained random selection?",
+  "treatment": {
+    "random_arm": "R100-star",
+    "curated_arm": "C100-star",
+    "groups_per_arm": 100000,
+    "minimum_exact_training_signature_distance": 0.10,
+    "sealed_exact_training_signature_distance": 0.13489,
+    "state_identity_is_matched": false,
+    "state_exposure_distribution_is_matched": true
+  },
+  "model": {
+    "repo_id": "LiquidAI/LFM2.5-1.2B-Base",
+    "revision": "7453bca97ca1e67754c4035a4b4c584e1c9dd725",
+    "snapshot_directory": "D:\\codex-runs\\jev-lfm-variable-v07\\models\\lfm2.5-1.2b-base",
+    "backbone_frozen": true,
+    "trust_remote_code": false
+  },
+  "representation": {
+    "implementation": "jev-lfm-variable-v07/extract_lfm.py::encode_lfm_texts",
+    "location": "mean_full",
+    "layer": "final",
+    "dtype": "bfloat16_backbone_float32_cache",
+    "max_length": 1024,
+    "batch_size": 1,
+    "padding": false,
+    "pooling": "masked arithmetic mean over unpadded final-layer token states"
+  },
+  "compiler": {
+    "implementation": "jev-frozen-scaling-v05/train_v05.py",
+    "head": "dynamic_mlp_compatibility",
+    "projection_width": 128,
+    "candidate_profile": "name_definition",
+    "loss": "L3_source_typed",
+    "brier_weight": 0.25,
+    "invariance_weight": 0.10,
+    "candidate_order_training_augmentation": "reverse candidate and target arrays per batch"
+  },
+  "training": {
+    "epochs": 3,
+    "batch_size_groups": 256,
+    "optimizer": "AdamW",
+    "learning_rate": 0.002,
+    "weight_decay": 0.01,
+    "scheduler": "none",
+    "gradient_clipping": "none; gradient norm is observed only",
+    "paired_seeds": [20260927, 20260928, 20260929],
+    "paired_initialization": true,
+    "shuffle": "sorted group_id input order, then random.Random(seed + zero_based_epoch).shuffle",
+    "terminal_epoch_is_primary": 3,
+    "arm_schedule": [
+      ["seed-1", "random"], ["seed-1", "curated"],
+      ["seed-2", "curated"], ["seed-2", "random"],
+      ["seed-3", "random"], ["seed-3", "curated"]
+    ]
+  },
+  "evaluation": {
+    "primary": "NewTight-Eval, eligible closed choice/applicability groups only",
+    "secondary": ["legacy dev", "legacy test", "legacy external"],
+    "temperature_fit": "legacy dev exact-generative-posterior rows only, matching v0.5/v0.7 procedure",
+    "open_world": "not scored by the closed-set head; count and report as unsupported",
+    "result_driven_tuning": false
+  },
+  "boundaries": {
+    "modify_v04_v05_v06_v07_results": false,
+    "modify_banks_or_profile": false,
+    "backbone_weight_updates": false,
+    "phoenix": false,
+    "result_driven_hyperparameter_changes": false
+  }
+}

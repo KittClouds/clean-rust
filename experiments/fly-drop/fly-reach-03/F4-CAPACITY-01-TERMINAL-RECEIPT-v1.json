@@ -1,0 +1,176 @@
+{
+  "biological_promotion": false,
+  "class_support_audit_sha256": "348a4dab5bafab2693fbcd95daed503733e45f6ca71c50a85698dc6725ef4d06",
+  "contract_sha256": "c997aef47e4d02287fd535977081625bcb4a1403ecf343c7abbee251ff758fff",
+  "estimator_tuning": false,
+  "findings": {
+    "cross_block_signed_margin": [
+      {
+        "balanced_error": 0.7763285976028866,
+        "holdout_block": 303000,
+        "mean_abs_logit": 7.069185256958008,
+        "omega_hat": 0.0,
+        "positive_prediction_rate": 0.5282917672298203,
+        "rows": 3729,
+        "signed_margin": 2.4117834318829217,
+        "train_rows": 9691
+      },
+      {
+        "balanced_error": 0.5,
+        "holdout_block": 303001,
+        "mean_abs_logit": 16.883731842041016,
+        "omega_hat": 0.0,
+        "positive_prediction_rate": 0.0,
+        "rows": 2815,
+        "signed_margin": -10.159661304209628,
+        "train_rows": 10605
+      },
+      {
+        "balanced_error": 0.7578957773948782,
+        "holdout_block": 303002,
+        "mean_abs_logit": 6.796867370605469,
+        "omega_hat": 0.0,
+        "positive_prediction_rate": 0.3447793970852466,
+        "rows": 5009,
+        "signed_margin": -2.654239428155226,
+        "train_rows": 8411
+      },
+      {
+        "balanced_error": 0.23753629753061717,
+        "holdout_block": 303003,
+        "mean_abs_logit": 9.978906631469727,
+        "omega_hat": 0.5249274049387657,
+        "positive_prediction_rate": 0.4777718264595608,
+        "rows": 1867,
+        "signed_margin": 1.7660377898523079,
+        "train_rows": 11553
+      }
+    ],
+    "memorization": {
+      "balanced_error": 0.0,
+      "batch_size": 64,
+      "epochs": 1000,
+      "mean_abs_logit": 13.919451713562012,
+      "negative_rows": 128,
+      "omega_hat": 1.0,
+      "positive_prediction_rate": 0.5,
+      "positive_rows": 128,
+      "rows": 256,
+      "signed_margin": 13.918847472729224
+    },
+    "temporal_support": {
+      "303000:train": {
+        "both_classes": 1,
+        "negative": 2923,
+        "positive": 153,
+        "rows": 3076
+      },
+      "303000:validation": {
+        "both_classes": 0,
+        "negative": 653,
+        "positive": 0,
+        "rows": 653
+      },
+      "303001:train": {
+        "both_classes": 1,
+        "negative": 893,
+        "positive": 1453,
+        "rows": 2346
+      },
+      "303001:validation": {
+        "both_classes": 0,
+        "negative": 0,
+        "positive": 469,
+        "rows": 469
+      },
+      "303002:train": {
+        "both_classes": 1,
+        "negative": 2227,
+        "positive": 1530,
+        "rows": 3757
+      },
+      "303002:validation": {
+        "both_classes": 1,
+        "negative": 774,
+        "positive": 478,
+        "rows": 1252
+      },
+      "303003:train": {
+        "both_classes": 0,
+        "negative": 1410,
+        "positive": 0,
+        "rows": 1410
+      },
+      "303003:validation": {
+        "both_classes": 0,
+        "negative": 457,
+        "positive": 0,
+        "rows": 457
+      }
+    },
+    "within_block_temporal": [
+      {
+        "balanced_error": 0.0,
+        "block": 303000,
+        "mean_abs_logit": 10.285021781921387,
+        "omega_hat": 1.0,
+        "positive_prediction_rate": 0.0,
+        "rows": 653,
+        "signed_margin": 10.285021738107867,
+        "train_rows": 3076,
+        "validation_rule": "trial >= 6144"
+      },
+      {
+        "balanced_error": 0.0,
+        "block": 303001,
+        "mean_abs_logit": 9.933374404907227,
+        "omega_hat": 1.0,
+        "positive_prediction_rate": 1.0,
+        "rows": 469,
+        "signed_margin": 9.933373925019941,
+        "train_rows": 2346,
+        "validation_rule": "trial >= 6144"
+      },
+      {
+        "balanced_error": 0.0,
+        "block": 303002,
+        "mean_abs_logit": 10.30536937713623,
+        "omega_hat": 1.0,
+        "positive_prediction_rate": 0.3817891373801917,
+        "rows": 1252,
+        "signed_margin": 10.298589762995121,
+        "train_rows": 3757,
+        "validation_rule": "trial >= 6144"
+      },
+      {
+        "balanced_error": 0.0,
+        "block": 303003,
+        "mean_abs_logit": 9.030147552490234,
+        "omega_hat": 1.0,
+        "positive_prediction_rate": 0.0,
+        "rows": 457,
+        "signed_margin": 9.029477655584483,
+        "train_rows": 1410,
+        "validation_rule": "trial >= 6144"
+      }
+    ]
+  },
+  "identity": "F4-CAPACITY-01",
+  "interpretation": [
+    "The frozen 80D encoder plus frozen MLP can memorize the deterministic 256-row subset.",
+    "The temporal holdouts are degenerate for three blocks and cannot support a two-class balanced generalization claim.",
+    "Cross-block held-out margins change sign and magnitude by block, consistent with task-conditioned orientation or symmetry instability.",
+    "No conclusion is drawn about raw F4 information sufficiency from this identity."
+  ],
+  "measured_namespace_created": false,
+  "parent_status_preserved": "QUALIFICATION_STOP_F4_ENCODER_CAPACITY",
+  "prediction_flip_rescue": false,
+  "probe_receipt_sha256": "96846cf1c123c264615ea3a617c08ba8da783915e0e9df90fb0381af7689db07",
+  "representation_ladder": {
+    "reason": "repair the predeclared within-block support design before changing the representation; no outcome-driven expansion was authored",
+    "status": "DEFERRED"
+  },
+  "schema": "FLY-REACH-03-F4-CAPACITY-01-terminal-receipt-v1",
+  "scientific_interpretation_opened": false,
+  "status": "DIAGNOSTIC_COMPLETE_TEMPORAL_SUPPORT_LIMIT_CROSS_BLOCK_ORIENTATION"
+}

@@ -1,0 +1,100 @@
+{
+  "action_relevance": {
+    "batch_size": 512,
+    "classes": [
+      -1,
+      0,
+      1
+    ],
+    "early_stop_patience": 15,
+    "feature_order": [
+      "assignment_one_hot:48",
+      "edit_one_hot(entity,from_role,to_role):192",
+      "affected_constraint_entity_incidence_counts_normalized:12",
+      "affected_clause_role_incidence_counts_normalized:4",
+      "n_over_12",
+      "k_over_4",
+      "affected_clause_fraction",
+      "h_global:2048",
+      "mean_all_H:2048",
+      "mean_H_for_clauses_incident_to_edited_entity:2048"
+    ],
+    "learning_rate": 0.001,
+    "loss": "class-weighted cross entropy with inverse train frequency",
+    "max_epochs": 120,
+    "model": "one hidden-layer MLP, 128 ReLU units, three logits",
+    "optimizer": "AdamW",
+    "primary_feature_dimensions": 6403,
+    "qualification_gate": "macro-F1 >= 0.90 and frozen manifest support minimums",
+    "selection_metric": "validation macro-F1",
+    "weight_decay": 0.0001,
+    "comparison": "Primary begins with the exact 259 public feature columns used by name_incidence_only_action; append frozen semantic summaries."
+  },
+  "binding": {
+    "batch_size": 128,
+    "combined_f1": "(entity_micro_f1 + role_micro_f1) / 2",
+    "early_stop_patience": 35,
+    "learning_rate": 0.01,
+    "loss": "masked binary cross entropy with train-derived per-output positive weights capped at 20",
+    "max_epochs": 300,
+    "model": "single affine 16-logit binary classifier",
+    "normalize": "train mean and standard deviation, fitted on train split only",
+    "optimizer": "AdamW",
+    "qualification_gate": "combined F1 >= 0.90; entity and role F1 reported separately",
+    "selection_metric": "validation arithmetic mean of entity micro-F1 and role micro-F1",
+    "targets": "two multi-label heads: entity mention IDs 0..n-1 and role mention IDs 0..k-1",
+    "threshold_tuning": "separate entity/role thresholds on validation from 0.10 to 0.90 by 0.05; maximize micro-F1; ties closest to 0.50 then larger threshold",
+    "weight_decay": 0.0001,
+    "positive_weight_formula": "min(20, negative_valid_targets / positive_targets); no floor at 1"
+  },
+  "failure_policy": "Continue all sensor diagnostics after a failed rung. Preserve each report; diagnose and version an interface or support repair before using the component in later controller fits. Engineering retests on a previously reported qualification partition are adaptive diagnostics, not independent confirmation.",
+  "feature_contract": {
+    "action": "First the exact 259-dimensional public incidence, assignment, edit and task-size baseline used by the name-incidence control; then global_h, mean all constraint_H rows, and mean H rows incident to edited entity.",
+    "binding": "concatenate constraint_H row, task global_h row, and public n/12,k/4 scalars; no incidence features",
+    "float_dtype": "float32",
+    "identity": "constraint_H row only",
+    "label_boundary": "private typed clause/action labels are offline targets only; never model features",
+    "action_dimensions": 6403
+  },
+  "identity": {
+    "batch_size": 128,
+    "classes": [
+      "different",
+      "exactly_one_role",
+      "fixed_role",
+      "forbidden_role",
+      "implies_not_role",
+      "same"
+    ],
+    "early_stop_patience": 35,
+    "learning_rate": 0.03,
+    "loss": "class-weighted cross entropy with inverse train frequency",
+    "max_epochs": 300,
+    "model": "single affine multinomial classifier",
+    "normalize": "train mean and standard deviation, fitted on train split only",
+    "optimizer": "AdamW",
+    "qualification_metric": "balanced accuracy; threshold 0.90",
+    "selection_metric": "validation balanced accuracy",
+    "weight_decay": 0.0001
+  },
+  "input_manifest": "sensor-support-manifest-v02.json",
+  "manifest": "FAS-R1-SENSOR-PROBE-FIT-v02",
+  "purpose": "versioned engineering adapter repair after v01 diagnostic",
+  "seed": 71026,
+  "shortcut_controls": {
+    "name_incidence_only_action": "same MLP recipe over assignment/edit/public entity-role incidence, no H or h_global",
+    "template_only_action": "same MLP over assignment/edit/public incidence and all/affected counts of template_id 0/1, no H or h_global",
+    "template_only_identity": "train-split template_id majority lookup; qualification balanced accuracy"
+  },
+  "split_usage": {
+    "qualification": "Previously reported by probe v01; v02 reuse is an adaptive engineering diagnostic, not an untouched holdout.",
+    "train": "fit weights and train normalization only",
+    "validation": "select checkpoint and binding thresholds only"
+  },
+  "status": "FROZEN_ENGINEERING_ADAPTER_REPAIR",
+  "amendment": {
+    "from": "FAS-R1-SENSOR-PROBE-FIT-v01",
+    "reason": "v01 action primary omitted the 12-dimensional public co-entity-incidence feature present in the name-incidence control, so the comparison was not nested; action features now place the complete 259-dimensional public baseline first, followed by the three frozen H summaries.",
+    "qualification_interpretation": "The same qualification partition was reported under v01. This v02 result is an adaptive engineering retest, not an independent confirmation."
+  }
+}

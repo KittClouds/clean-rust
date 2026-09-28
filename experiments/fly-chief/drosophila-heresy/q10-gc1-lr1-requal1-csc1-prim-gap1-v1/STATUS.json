@@ -1,0 +1,9 @@
+{
+  "engineering_only": true,
+  "execution_sha256": "4D5C1CE44CBEA10023F99D8B2BF31DA9AC24690522849CE34B15F7C86EAB2464",
+  "identity": "q10-gc1-lr1-requal1-csc1-prim-gap1-v1",
+  "protocol": "Q10-PRIM-GAP1",
+  "replay_executed": false,
+  "scientific_promotion": false,
+  "status": "PRIM_GAP1_COMPLETE"
+}

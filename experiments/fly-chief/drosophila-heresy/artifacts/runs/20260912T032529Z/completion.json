@@ -1,0 +1,31 @@
+{
+  "seal_sha256": "ad0d7def1d846ff8d8d8acde61d836002c64c94ba9740eb8560a70d547ada9e9",
+  "resource": {
+    "exit_code": 0,
+    "observed_peak_working_set_bytes": 25051136,
+    "wall_seconds_including_launch": 24.70974339998793,
+    "memory_method": "Windows GetProcessMemoryInfo PeakWorkingSetSize sampled every 0.2 s; simulator process only"
+  },
+  "output_hashes": {
+    "execution.json": "e57cc24c9416618014f58dc55a42651f8446d1cfa97e806f511c99e496a1a66b",
+    "learning-curves.svg": "289052668400c54e2983d02d43e13ca6e3a12e7de368a9b3f17b77c3ba539b5d",
+    "left_transfer-tau16_glut_excitatory.jsonl": "591b19249ee5864a1c09693bc163c8c210abddb5f2439d5912a8625f6ae13c84",
+    "left_transfer-tau16_glut_inhibitory.jsonl": "89f9c2ed82dbbd7e014fd03ed6f207d9ba46492a209b74d015f3db18499d0bd4",
+    "left_transfer-tau4_glut_excitatory.jsonl": "70bdb478f4f9af1b80e5d89ded618451fe5d529c4f04ad204c1a2b039f2bf586",
+    "left_transfer-tau4_glut_inhibitory.jsonl": "fd5654389fa371e05878adfb41eb36188afc1491c531774c81c76e6449047785",
+    "primary-tau16_glut_excitatory.jsonl": "ff74bc2872d2e03be10f99a1c85a69b895b0b332ae11ce9bcad9ef5d69502dc3",
+    "primary-tau16_glut_inhibitory.jsonl": "d6aee69155350cf5c36f7ddc50db8f15501e1baf788d2564c26f9723b610dc5e",
+    "primary-tau4_glut_excitatory.jsonl": "ef57ebdc1ade5e0af6b263aa107b0482c7956899052f3388e8d35c012d7b7d67",
+    "primary-tau4_glut_inhibitory.jsonl": "24e0a7c297d984a4a0b67b0e45830bdf1135b29f4a9e30f9776eb55b281e4da4",
+    "REPORT.md": "df5b18c57abefb35ce84dbc92905b10ba7374810e627ba99ad0248a63e83cc5d",
+    "resource-receipt.json": "c58ce94f62904d7e9e1d4fe79a787581211c354eb77be6893f5f0eac75197595",
+    "seal.json": "ad0d7def1d846ff8d8d8acde61d836002c64c94ba9740eb8560a70d547ada9e9",
+    "stdout.log": "37109d470327d296e3d76839086f8c9cecfb04d48a456be58a62c8e6cb2fe123",
+    "summary.json": "154df154ded94f85ffab6796bd2aabf40e1f3ec9e7e07bd6e50465b7914a653d",
+    "task_transfer-tau16_glut_excitatory.jsonl": "c8964d7151c4d0cf2caf546b25c60a5adad4a3fd0c36860f4119a12c688b6cdb",
+    "task_transfer-tau16_glut_inhibitory.jsonl": "5103e7a2be365f6591430a4959829ee21c0737cda0cb9580442fb4aa984e6945",
+    "task_transfer-tau4_glut_excitatory.jsonl": "c5d90f1229a0588002dc29247e8512b85f5e0a406bbd269fad68f80330cac809",
+    "task_transfer-tau4_glut_inhibitory.jsonl": "4db5ce0b3c2b6ac3a472e9db6a57d5572518deb01186c61621dea88f5d88911f"
+  },
+  "frozen_inputs_verified_after_run": true
+}

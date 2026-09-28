@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "amendment_id": "E012-BANK-A12",
+  "state": "PAIRED_BANK_REPAIR_NO_MODEL_CONTACT",
+  "supersedes_for_scoring": "construction-01 scored-bank-v1",
+  "diagnostic_parent": "E012-BANK-A11",
+  "required_pair_invariants": [
+    "all observer-visible fields outside the named channel are identical",
+    "joint E_t by E_x cells change the valid action set under either single-factor contrast",
+    "E_c pairs change ID-bound candidate content and executable valid action IDs while preserving IDs and order",
+    "paired frames share opaque presentation task ID and task variant",
+    "exact valid and invalid balance by action ID and producer position"
+  ],
+  "candidate_fixture_repairs": [
+    "help-color narrow-width distractor returns Auto instead of the required Always or Never mode",
+    "map-order canonical-sort distractor omits the first key"
+  ],
+  "model_contact_authorized": false
+}

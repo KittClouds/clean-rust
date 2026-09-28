@@ -1,0 +1,26 @@
+{
+  "task_id": "heldout-fill-clear-intervals-easy-01",
+  "lane": "always-large",
+  "action_id": 37,
+  "patch_sha256": "bebc6d7e52683412107259b240d2fd73c74066dd77d5cbfb37357f0d37d8667c",
+  "candidate_variant": "gold",
+  "test_filter": "fills::tests::inherit_clears_only_the_requested_interval",
+  "command": [
+    "cargo",
+    "test",
+    "--manifest-path",
+    "C:\\rd-c\\experiment-009\\tasks\\expanded\\heldout-bank-v5\\families\\fill-clear-intervals\\candidates\\gold\\Cargo.toml",
+    "-p",
+    "gpui-animated-gradient-text",
+    "--lib",
+    "fills::tests::inherit_clears_only_the_requested_interval",
+    "--",
+    "--exact"
+  ],
+  "exit_code": 0,
+  "status": "passed",
+  "passed": true,
+  "elapsed_ms": 7918.689,
+  "output_sha256": "b2a3549d8828889163fe92c95a51ce5242d57356dda8d49032779fee24c6caff",
+  "output": "\nrunning 1 test\ntest fills::tests::inherit_clears_only_the_requested_interval ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 10 filtered out; finished in 0.00s\n\n   Compiling gpui-animated-gradient-text v0.2.0 (C:\\rd-c\\experiment-009\\tasks\\expanded\\heldout-bank-v5\\families\\fill-clear-intervals\\candidates\\gold\\crates\\gpui-animated-gradient-text)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 7.67s\n     Running unittests src\\lib.rs (D:\\cargo-targets\\rdc-e009-expanded\\scoring\\debug\\deps\\gpui_animated_gradient_text-97c243e5a105215d.exe)\n"
+}

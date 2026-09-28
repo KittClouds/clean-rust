@@ -1,0 +1,119 @@
+{
+  "analysis_code": {
+    "bytes": 12902,
+    "path": "analysis/run_analysis.py",
+    "sha256": "e728d9873480c1c32fe9f488c73017c73e1c92014587ddebdfda7f14da7a102d"
+  },
+  "analysis_order": [
+    "integrity",
+    "primary_Delta_C_support_gate",
+    "companion_B_B0",
+    "vulnerability_D_absolute_A",
+    "secondary_severity_and_lesion_family",
+    "normalized_R",
+    "weight_state_displacement"
+  ],
+  "collection_artifacts": [
+    {
+      "bytes": 1824904,
+      "path": "execution-manifest.csv",
+      "sha256": "b1718c980f9bbeedb34f5fa6c540dc7a63483a924cebd753f022853bc9e51261"
+    },
+    {
+      "bytes": 19932795,
+      "path": "final-outcomes.csv",
+      "sha256": "eb9b765f37f406ee715fd8aa07de7aa15f30a021e10777cd50e986c2ec85ef35"
+    },
+    {
+      "bytes": 42621726,
+      "path": "final-outcomes.jsonl",
+      "sha256": "a4fb264a795e2aa3438d8a78c6de6480925d11ec59cd2566d525077d048e24a7"
+    },
+    {
+      "bytes": 23023506,
+      "path": "fit-receipts.jsonl",
+      "sha256": "3e73d97418bd2e01ba85da81ef9babcf826e4fb15df8c0fec1beaad15bbe4061"
+    },
+    {
+      "bytes": 615,
+      "path": "collection-receipt.json",
+      "sha256": "e679c5a650fcc670c152ec1980d4de90842efa620e3648dfee319667b29ad199"
+    },
+    {
+      "bytes": 1322,
+      "path": "integrity-receipt.json",
+      "sha256": "dcac6e929074704f91021fe9b3cf45ad665c8ef482593a9bbbaadfb3c9fa69bf"
+    }
+  ],
+  "comparative_outcomes_opened_after_integrity_pass": true,
+  "created_utc": "2026-09-22T03:11:16.323437Z",
+  "integrity_receipt_sha256": "dcac6e929074704f91021fe9b3cf45ad665c8ef482593a9bbbaadfb3c9fa69bf",
+  "integrity_status": "INTEGRITY_PASS",
+  "operator_census_status": "NOT_COLLECTED",
+  "primary": {
+    "bootstrap": {
+      "executed": false,
+      "percentile_interval": null,
+      "replicates_declared": 20000,
+      "resample_units": [
+        "s",
+        "m",
+        "g"
+      ]
+    },
+    "estimand": "Delta_C = mean C_0.10(fly) - mean C_0.10(degree-preserving-shuffle)",
+    "fly_C_mean_raw_all_declared_cells": 5.340576171875e-05,
+    "global_complete_blocks": [],
+    "minimum_global_complete_blocks": 8,
+    "null_C_mean_raw_all_declared_cells": 0.002574920654296875,
+    "raw_descriptive_delta_all_declared_cells": -0.002521514892578125,
+    "reason": "0 of 12 learner/task blocks reached competence on every substrate",
+    "status": "PRIMARY_NOT_EVALUABLE",
+    "support_rule": "global intersection across fly and every null realization; no replacement"
+  },
+  "result_files": [
+    {
+      "bytes": 856,
+      "path": "results/competence-summary.json",
+      "sha256": "8e2c8eaa024d2e9a3499c806b18eae43aa6214fd4da2243e3a394cf8d3ebd03c"
+    },
+    {
+      "bytes": 128527,
+      "path": "results/crossed-factor-summary.csv",
+      "sha256": "786c4026fb94d21c894a14a07c6fcf0dfdbc73a8cc5e688f153b4d63db8fdd44"
+    },
+    {
+      "bytes": 104,
+      "path": "results/exploratory-operator-phenotype.json",
+      "sha256": "20d8214694adeb23fb26b9e67d978d3f6fbc96f6600bb39568072e44f1e28784"
+    },
+    {
+      "bytes": 150,
+      "path": "results/primary-bootstrap.json",
+      "sha256": "ca8637122276800119e94ff4e0433ed35f3476dd140ba7f99006e3548e20ec4f"
+    },
+    {
+      "bytes": 757,
+      "path": "results/primary-contrast.json",
+      "sha256": "bf0dd60e7f28e5349b3b6d624df11d3a0c53a91f0cf659fbfb5632323eaf5329"
+    },
+    {
+      "bytes": 1391,
+      "path": "results/RESULTS.md",
+      "sha256": "887067d50384b99c1e43c7fcb8edd4fdec2fb5b35613787c45f579c180e24c38"
+    },
+    {
+      "bytes": 23667,
+      "path": "results/secondary-controls.json",
+      "sha256": "77b5177928b87ea3da24b08128671290943ad704bf7a4ab19926c081e4c2617e"
+    },
+    {
+      "bytes": 168498,
+      "path": "results/trajectory-summary.csv",
+      "sha256": "ea5fb2e14adf01b3a50a83688a90fc1ec977b850fc58a7af65004da0ef85b191"
+    }
+  ],
+  "run_id": "FLY-PHENO-00-RUN1",
+  "schema": "FLY-PHENO-00-analysis-receipt-v1",
+  "status": "ANALYSIS_COMPLETE_PRIMARY_NOT_EVALUABLE"
+}

@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "experiment": "E012 Prospective Frame Decomposition",
+  "state": "FROZEN_BEFORE_FRAME_PROJECTION",
+  "model_contact_authorized": false,
+  "task_count": 48,
+  "conditions_per_task": 26,
+  "expected_frame_count": 1248,
+  "task_source_fixture_sha256": "4f675c5a66caeef388866971f8a7be9d44916007c94c97266d8465111f40676e",
+  "candidate_label_sha256": "0268384c7a859467e5533b54e73a25eb09aedde2cd34205e22a8ea27fb4f04b7",
+  "projector": "scripts/project_frames_e012_v1_2.py",
+  "projector_sha256": "04782c97ade1705a8715963355e12d95d146e330fe53c02cd3a6b6981f8ceaa1",
+  "presentation_binary_sha256": "c16f11a37d93f844156f1a5f2cdbe82912843b0b4615b93cd2a746f814e541c2",
+  "hash_binary_sha256": "27cb573a7d74eacef3f56d40391b08b24285668a313caf961c56ec79fe624f30",
+  "files": [
+    {
+      "path": "amendments/bank-amendment-04.json",
+      "sha256": "9cfb3c228eba41a8b16e06e8d3d05e8fce540c9c88f114f79be4104f27c7414d",
+      "bytes": 2768
+    },
+    {
+      "path": "amendments/bank-amendment-05.json",
+      "sha256": "bfe9cd2475c7ef05048d90ff85e8f53ae93c31821eab974806a3ccdff517c668",
+      "bytes": 2603
+    },
+    {
+      "path": "amendments/bank-amendment-08.json",
+      "sha256": "61c10bb099b3655dffff9f715e9fda6340deb730c9166ce806d1ad259f097eeb",
+      "bytes": 1174
+    },
+    {
+      "path": "task-construction-spec-v1.1.json",
+      "sha256": "7110c34bb0fa91a5512a10e70cf6c36048d48c8f56b3ac558b16576734f97441",
+      "bytes": 1694
+    },
+    {
+      "path": "bank/construction-01/task-construction-lock-v1.1.json",
+      "sha256": "fe90cb29fd0b6b9c233826188d3692124e14660f109065415a58015dbad54c28",
+      "bytes": 1049
+    },
+    {
+      "path": "bank/construction-01/scored-check-run-lock-v1.2.json",
+      "sha256": "52e1900015e64454220ca37f0db1fef9dd9f0e5bfa7428687929a4b7a47bfb81",
+      "bytes": 2828
+    },
+    {
+      "path": "bank/construction-01/label-finalization-lock-v1.json",
+      "sha256": "9080bd5aa4b7cc5974c7059c23f84519c5bb8b508ed688e44fd5f9765a2e394c",
+      "bytes": 2746
+    },
+    {
+      "path": "bank/construction-01/scored-bank-v1/vault/task-source-fixtures-final-v1.json",
+      "sha256": "4f675c5a66caeef388866971f8a7be9d44916007c94c97266d8465111f40676e",
+      "bytes": 330122
+    },
+    {
+      "path": "bank/construction-01/scored-bank-v1/vault/candidate-check-labels-final-v1.json",
+      "sha256": "0268384c7a859467e5533b54e73a25eb09aedde2cd34205e22a8ea27fb4f04b7",
+      "bytes": 970000
+    },
+    {
+      "path": "bank/construction-01/scored-bank-v1/vault/label-finalization-report-v1.json",
+      "sha256": "f7ebf356fcfa74ac5d4e0df44fdb66d68a07e4da6743bfd99d8fc9ec4cac4fd5",
+      "bytes": 13172
+    },
+    {
+      "path": "bank/construction-01/scored-bank-v1/vault/candidate-check-results.json",
+      "sha256": "22c8c6db459a124a91d8cc4971b33be0e5baf97d3450c23b34fac51fcb235d43",
+      "bytes": 961716
+    },
+    {
+      "path": "bank/construction-01/scored-bank-v1/vault/task-source-fixtures.json",
+      "sha256": "462937e9b9ae5787a016bbda7ab0939bf0a92dafdf9a7a5d72664583244e0b3c",
+      "bytes": 336199
+    },
+    {
+      "path": "scripts/project_frames_e012_v1_2.py",
+      "sha256": "04782c97ade1705a8715963355e12d95d146e330fe53c02cd3a6b6981f8ceaa1",
+      "bytes": 21930
+    },
+    {
+      "path": "scripts/audit_task_bank_e012_v1_1.py",
+      "sha256": "7a0e6e8b5392b799bdc105d2bf857ba9d9964bcecbaa45b5351e52820dfb5533",
+      "bytes": 20531
+    },
+    {
+      "path": "scripts/freeze_frame_projection_e012_v1_1.py",
+      "sha256": "fda8e2896a9500a346371a389407db0541ec3ebf4f7311274fd7ee731c86b516",
+      "bytes": 3362
+    },
+    {
+      "path": "external::D:/rdc-e012-target/runtime-integration/release/e011-presentation.exe",
+      "sha256": "c16f11a37d93f844156f1a5f2cdbe82912843b0b4615b93cd2a746f814e541c2",
+      "bytes": 341504
+    },
+    {
+      "path": "external::D:/rdc-e012-target/runtime-integration/release/e011-hash.exe",
+      "sha256": "27cb573a7d74eacef3f56d40391b08b24285668a313caf961c56ec79fe624f30",
+      "bytes": 210944
+    }
+  ],
+  "sha256_self_excluded": true
+}

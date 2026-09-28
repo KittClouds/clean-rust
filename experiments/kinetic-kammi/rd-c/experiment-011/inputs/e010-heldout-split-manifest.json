@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "design": "2 repositories x 4 families per repository x 2 prompt variants",
+  "development_bank": null,
+  "heldout_task_count": 16,
+  "repository_unit": [
+    "turbovec",
+    "ripgrep"
+  ],
+  "selection_source": "pre-contact committed repository source and test inventory",
+  "observer_outputs_consulted": false
+}

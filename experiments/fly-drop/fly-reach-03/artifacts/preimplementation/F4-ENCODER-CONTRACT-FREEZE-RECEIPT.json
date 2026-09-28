@@ -1,0 +1,9 @@
+{
+  "amendment_sha256": "bd08419eac37a9d46b839ea18cd07c14badcffccc8fb013dd3401b52ded0a9f4",
+  "base_contract_sha256": "6beb47c4784a7d6e37a91e45688dd86e50b15291a8f0dbf07c56c71aefbe47a7",
+  "measured_execution_authorized": false,
+  "measured_namespace_created": false,
+  "schema": "FLY-REACH-03-F4-encoder-contract-freeze-receipt-v1",
+  "spec_sha256": "3325e1b6ce91956162fa3022c9e2c3bdf3396b269e975da9c108f45d9129d43b",
+  "status": "PASS"
+}

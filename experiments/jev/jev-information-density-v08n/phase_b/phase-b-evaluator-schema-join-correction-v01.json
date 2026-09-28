@@ -1,0 +1,185 @@
+{
+  "protocol": "jev-information-density/v0.8n-road-b-evaluator-schema-join-correction-v01",
+  "identity": "v0.8N-phase-b-schema-join-correction-v01",
+  "status": "CORRECTION_NOT_APPLIED_FAIL_CLOSED_MAPPING_UNRESOLVED",
+  "authorization_scope": "One metadata-only join preflight and, only if unique, continuation under the existing single panel unlock. No second unlock or new evaluation identity.",
+  "panel": {
+    "identity": "v0.8N-eval-panel-v01/matched-panel-v02",
+    "opening_count": 1,
+    "unlock_receipt_sha256": "e8ff5e4548ab5e0b2b96433d844c64836aa03ff878034381c1933db913cb3ec0",
+    "second_unlock_created": false,
+    "evaluation_output_directory_exists": false
+  },
+  "frozen_evaluator": {
+    "path": "experiments/jev-information-density-v08n/phase_b/evaluate_phase_b_v01.py",
+    "sha256": "fa22bc8febff89d2b635091c6cb40be6f3beba4549c4a135d16e213f6fd3dda4",
+    "modified": false
+  },
+  "initial_failure": {
+    "exact_schema": "jev-v08n-schema:salinity_control",
+    "exception": "RuntimeError: held-out schema has no training candidate-order binding: salinity_control",
+    "preserved_traceback_path": "experiments/jev-information-density-v08n/phase_b/evaluator-failed-attempt-v01.json",
+    "preserved_traceback_sha256": "c2f430c43ed02bc77dee84bff0566ad66888e73070d76d3b07847cb4d361a19e",
+    "head_loaded": false,
+    "predictions_or_metrics_created": false
+  },
+  "correction_artifacts": {
+    "correction_source_created": false,
+    "correction_source_sha256": null,
+    "reason": "No unique schema-to-candidate-feature binding exists in the sealed contracts, training occurrence stream, candidate catalog, or authoritative candidate identities.",
+    "metadata_preflight_source": "experiments/jev-information-density-v08n/phase_b/preflight_evaluator_schema_join_v01.py",
+    "metadata_preflight_source_sha256": "8a8747d8a442f5e789ae28c2a026c7fd36ded61965efa6d86ce9918c354a7e20",
+    "metadata_preflight_at_utc": "2026-09-23T10:34:42+00:00",
+    "correction_adapter_created": false,
+    "evaluator_continuation_performed": false
+  },
+  "authoritative_inputs": {
+    "run_contract": {
+      "path": "experiments/jev-information-density-v08n/phase_b/phase-b-run-contract-v01.json",
+      "sha256": "da538aa03355732a2ba362da45d947e169b87aa644d0efd6ba7ef7a546306c1f"
+    },
+    "training_primary_occurrence_manifest": {
+      "path": "D:/codex-runs/jev-information-density-v08n/v0.8N-base-v01/phase-b-v03-inputs/common-primary-occurrence-manifest.jsonl",
+      "sha256": "773119294a51aa46487de26f9f253355187a7bfd1e75cb2f258c307c86f10b06",
+      "rows": 10000,
+      "schema_order_namespaces": [
+        "chemical_concentration",
+        "dosage_safety",
+        "flow_management",
+        "humidity_control",
+        "inventory_control",
+        "liquid_level",
+        "load_management",
+        "power_quality",
+        "pressure_control",
+        "rotational_speed",
+        "thermal_control",
+        "torque_control"
+      ]
+    },
+    "candidate_catalog": {
+      "path": "D:/codex-runs/jev-information-density-v08n/v0.8N-base-v01/phase-b-v03-inputs/candidate-catalog.json",
+      "sha256": "1698ea2078951837b3cb780a3f873c3c099e5e3d001c714e1d58a41e2951487e",
+      "row_count": 48,
+      "feature_dimension": 2048,
+      "schema_order_namespaces": [
+        "chemical_concentration",
+        "dosage_safety",
+        "flow_management",
+        "humidity_control",
+        "inventory_control",
+        "liquid_level",
+        "load_management",
+        "power_quality",
+        "pressure_control",
+        "rotational_speed",
+        "thermal_control",
+        "torque_control"
+      ]
+    },
+    "heldout_schema_identities": {
+      "path": "D:/codex-runs/jev-information-density-v08n/v0.8N-eval-panel-v01/semantic-scope/heldout-neighborhoods.jsonl",
+      "sha256": "031e834e784868c16e3a71cd8f1c5ccab88c81ff496c6b062d535266a33028ac",
+      "row_count": 2000
+    },
+    "heldout_candidate_identity_authority": {
+      "family_spec_path": "experiments/jev-information-density-v08n/generator/src/families.rs",
+      "family_spec_sha256": "e56885005487b36b573c1bf4d47741413ca72df0992ff62bcf48891eecacb429",
+      "identity_construction_path": "experiments/jev-information-density-v08n/generator/src/generator.rs",
+      "identity_construction_sha256": "f04a9b1d4f6682522e5957be3c0075db4bd7aa4e4e25968650f2ff24a42c7f5b",
+      "note": "These sources define held-out candidate identities and order, but none of those identities has a corresponding row in the sealed 48-entry candidate-feature catalog. They therefore do not provide a head-input feature binding."
+    }
+  },
+  "whole_panel_schema_join_preflight": {
+    "status": "FAIL_CLOSED_MAPPING_UNRESOLVED",
+    "schema_counts": {
+      "jev-v08n-schema:exposure_control": 500,
+      "jev-v08n-schema:respiratory_monitoring": 500,
+      "jev-v08n-schema:salinity_control": 500,
+      "jev-v08n-schema:vibration_monitoring": 500
+    },
+    "schemas": [
+      {
+        "schema_family_id": "jev-v08n-schema:exposure_control",
+        "candidate_semantic_ids_in_authoritative_schema_order": [
+          "exposure_control::overexposure",
+          "exposure_control::underexposure",
+          "exposure_control::contrast_drift",
+          "exposure_control::sensor_bias"
+        ],
+        "training_order_binding_before": null,
+        "catalog_candidate_matches": 0,
+        "binding_after": null,
+        "authoritative_feature_binding_source": null,
+        "disposition": "UNRESOLVED"
+      },
+      {
+        "schema_family_id": "jev-v08n-schema:respiratory_monitoring",
+        "candidate_semantic_ids_in_authoritative_schema_order": [
+          "respiratory_monitoring::rapid_breathing",
+          "respiratory_monitoring::slow_breathing",
+          "respiratory_monitoring::irregular_breathing",
+          "respiratory_monitoring::sensor_bias"
+        ],
+        "training_order_binding_before": null,
+        "catalog_candidate_matches": 0,
+        "binding_after": null,
+        "authoritative_feature_binding_source": null,
+        "disposition": "UNRESOLVED"
+      },
+      {
+        "schema_family_id": "jev-v08n-schema:salinity_control",
+        "candidate_semantic_ids_in_authoritative_schema_order": [
+          "salinity_control::high_salinity",
+          "salinity_control::low_salinity",
+          "salinity_control::mineral_imbalance",
+          "salinity_control::sensor_bias"
+        ],
+        "training_order_binding_before": null,
+        "catalog_candidate_matches": 0,
+        "binding_after": null,
+        "authoritative_feature_binding_source": null,
+        "disposition": "UNRESOLVED_INITIAL_FAILURE"
+      },
+      {
+        "schema_family_id": "jev-v08n-schema:vibration_monitoring",
+        "candidate_semantic_ids_in_authoritative_schema_order": [
+          "vibration_monitoring::excess_vibration",
+          "vibration_monitoring::low_vibration",
+          "vibration_monitoring::resonance",
+          "vibration_monitoring::sensor_bias"
+        ],
+        "training_order_binding_before": null,
+        "catalog_candidate_matches": 0,
+        "binding_after": null,
+        "authoritative_feature_binding_source": null,
+        "disposition": "UNRESOLVED"
+      }
+    ],
+    "candidate_feature_crosswalk_found": false,
+    "all_input_hashes_match_sealed_sources": true,
+    "second_unlock_or_panel_replacement": false
+  },
+  "no_outcome_information_used": {
+    "head_checkpoints_loaded": false,
+    "head_outputs_read": false,
+    "predictions_read_or_created": false,
+    "heldout_targets_used_for_mapping": false,
+    "metric_values_used": false,
+    "training_loss_used": false,
+    "geometry_or_surface_diagnostics_used_for_mapping": false,
+    "candidate_order_optimization_performed": false
+  },
+  "preflight_output_state": {
+    "evaluation_directory_absent_at_preflight": true,
+    "predictions_absent": true,
+    "metrics_absent": true,
+    "head_load_absent": true,
+    "metric_smoke_tests_unchanged": "5/5 passed"
+  },
+  "final_disposition": "PHASE_B_EVALUATION_INCOMPLETE_NO_SCHEMA_JOIN_CORRECTION_NO_INFERENCE",
+  "semantic_analysis_contract_changed": false,
+  "training_or_checkpoints_changed": false,
+  "newtight_access": false,
+  "phoenix_access": false
+}

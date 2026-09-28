@@ -1,0 +1,122 @@
+{
+  "schema": "CHIEF_E4_VISIBLE_INTAKE_V1",
+  "status": "VISIBLE_IDENTITIES_MATCH",
+  "contract_sha256": "21fc77d5a288b9adef995d88f089890235f8dcb2fbc3c9e452725bb67892a22f",
+  "contract_root": "278ae16eeb6852d3efad44221556a87be6df54964471f0870931fe2e99b305d1",
+  "legacy_contract_closure_source": "LibraryAcceptanceV1 independent E4 447/447 replay",
+  "source": [
+    {
+      "path": "C:\\Users\\shuga\\.codex\\worktrees\\e4-0-contract-work\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\source\\scripts\\e4_gpu_lease_v04.py",
+      "expected_sha256": "45a14179765501fbda6e56fe93969cb28bd5ef3705b37a7ef6727833c4f84a3f",
+      "actual_sha256": "45a14179765501fbda6e56fe93969cb28bd5ef3705b37a7ef6727833c4f84a3f",
+      "expected_bytes": 25284,
+      "actual_bytes": 25284,
+      "match": true
+    },
+    {
+      "path": "C:\\Users\\shuga\\.codex\\worktrees\\e4-0-contract-work\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\source\\scripts\\e4_online_parity_v05.py",
+      "expected_sha256": "23c04759d07cf91d85cb36d86c8bdf2cc2dda1e3383ea93bc3e27d6c3a722604",
+      "actual_sha256": "23c04759d07cf91d85cb36d86c8bdf2cc2dda1e3383ea93bc3e27d6c3a722604",
+      "expected_bytes": 1213,
+      "actual_bytes": 1213,
+      "match": true
+    },
+    {
+      "path": "C:\\Users\\shuga\\.codex\\worktrees\\e4-0-contract-work\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\source\\scripts\\e4_runner_artifacts_v05.py",
+      "expected_sha256": "25c708eeeecd3c2a71beb03847446ff4301779e44114ada5399c93a437fe6d37",
+      "actual_sha256": "25c708eeeecd3c2a71beb03847446ff4301779e44114ada5399c93a437fe6d37",
+      "expected_bytes": 16642,
+      "actual_bytes": 16642,
+      "match": true
+    },
+    {
+      "path": "C:\\Users\\shuga\\.codex\\worktrees\\e4-0-contract-work\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\source\\scripts\\e4_runner_common_v05.py",
+      "expected_sha256": "0b508de5c61737ff2b7d4a1838d8277ac9fe5428874e7b9bec834ee1145ca8a4",
+      "actual_sha256": "0b508de5c61737ff2b7d4a1838d8277ac9fe5428874e7b9bec834ee1145ca8a4",
+      "expected_bytes": 23451,
+      "actual_bytes": 23451,
+      "match": true
+    },
+    {
+      "path": "C:\\Users\\shuga\\.codex\\worktrees\\e4-0-contract-work\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\source\\scripts\\e4_runner_modes_v05.py",
+      "expected_sha256": "a173a1366799f8a63b5793ed99275fa3f1371c4c0ba7275e357d39dd1eef34f1",
+      "actual_sha256": "a173a1366799f8a63b5793ed99275fa3f1371c4c0ba7275e357d39dd1eef34f1",
+      "expected_bytes": 32820,
+      "actual_bytes": 32820,
+      "match": true
+    },
+    {
+      "path": "C:\\Users\\shuga\\.codex\\worktrees\\e4-0-contract-work\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\source\\tests\\test_e4_runner_v05.py",
+      "expected_sha256": "3f6ae0fcad7d5c913f6bad503ed054d66608e9b7c85fb43f3d839227728f11e8",
+      "actual_sha256": "3f6ae0fcad7d5c913f6bad503ed054d66608e9b7c85fb43f3d839227728f11e8",
+      "expected_bytes": 26636,
+      "actual_bytes": 26636,
+      "match": true
+    }
+  ],
+  "stages": [
+    {
+      "path": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e4-0-v01\\stage-seal-v01.json",
+      "manifest_sha256": "ad8175710b4f2db9aa6529e787962b0fbce92260f0b7020a322242342fc1af2d",
+      "root": "27731b483b8242aaef15ca22b97796b7b305a79db9bbb235765e13dcd9d08967",
+      "contract_sha256": "ea4f11cec5d65a3be7716c77febf5d448d8ebf1a5a4049aee5d25d51c0c50958",
+      "contract_root": "7344badf07476d19d9c6228f80d026a112c339e93daa75593e61031f68456e64",
+      "verified_visible_entries": [
+        {
+          "path": "receipts/population-generation-receipt-v01.json",
+          "sha256": "1b9b6ce0fe2cf81ecae30c0d48ea84477b6662cd8da0e9b18b19ccddf4f02d7b",
+          "bytes": 1147803,
+          "match": true
+        },
+        {
+          "path": "population/panel-inputs-v01.jsonl",
+          "sha256": "ed8ca6ac10f2008c49b9460890e0595ad2e573e0b0af488763f52e0f9cfc4d9f",
+          "bytes": 50057501,
+          "match": true
+        },
+        {
+          "path": "population/row-manifest-v01.jsonl",
+          "sha256": "234a616bbbe1e392704e21c3d1b6402067d836b9f47a59d5432d01cd92c261b6",
+          "bytes": 39686934,
+          "match": true
+        }
+      ],
+      "protected_entries_not_opened": [
+        "labels/primary-terminal-labels-v01.jsonl",
+        "labels/template-joint-escrow-v01.jsonl"
+      ],
+      "full_closure_independently_verified": false
+    },
+    {
+      "path": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e4-0-v01\\parity-panel\\stage-seal-v01.json",
+      "manifest_sha256": "f67eabda02b19a1f1c0219278b65a656011f728141d94e49c83e0170f339ca5b",
+      "root": "6ef00306df0df20ada7b7a86b09567ae46e07f112f66d974d7885e8f1e5d4d95",
+      "contract_sha256": "ea4f11cec5d65a3be7716c77febf5d448d8ebf1a5a4049aee5d25d51c0c50958",
+      "contract_root": "7344badf07476d19d9c6228f80d026a112c339e93daa75593e61031f68456e64",
+      "verified_visible_entries": [
+        {
+          "path": "parity-panel/panel-inputs-v01.jsonl",
+          "sha256": "7b1b7b3cd34c59bce5e0b702be33684f8e39a61a2b8aa50249b2365205401855",
+          "bytes": 325274,
+          "match": true
+        },
+        {
+          "path": "parity-panel/row-manifest-v01.jsonl",
+          "sha256": "50d3917225910a1519aa54666d2efc69052498809bfe73029a4e045f2d731fa7",
+          "bytes": 325414,
+          "match": true
+        },
+        {
+          "path": "parity-panel/selection-receipt-v01.json",
+          "sha256": "00388e9a5f80c8c7c5cf332cc7f5102b384e03efbbe5fb75a2dab76933077e67",
+          "bytes": 2443,
+          "match": true
+        }
+      ],
+      "protected_entries_not_opened": [],
+      "full_closure_independently_verified": true
+    }
+  ],
+  "scientific_stage_authorized": false,
+  "scope": "Reads manifest, source, and visible files only. Protected labels not opened."
+}

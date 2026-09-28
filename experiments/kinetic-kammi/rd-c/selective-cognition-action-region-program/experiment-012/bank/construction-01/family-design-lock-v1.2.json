@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "state": "FROZEN_BEFORE_SCORED_TASK_FIXTURES",
+  "model_contact_authorized": false,
+  "scored_task_frames_created": false,
+  "effective_bank_plan_version": "1.2",
+  "bank_amendments": [
+    {
+      "id": "E012-BANK-A01",
+      "markdown_sha256": "10c8996b05f6b6733f1a0204be8559d328c15aa9536b1545f72b21ebd02d7699",
+      "json_sha256": "27751a46d5fe4231b7b58928113adbc7036bbcead16f556204f5447fe8c58d2f"
+    },
+    {
+      "id": "E012-BANK-A02",
+      "markdown_sha256": "df9eedb1ef620696eb4b599455c38bd950657a01dfa4610969fc04f7703800ec",
+      "json_sha256": "facb1b9e4a2534ae54b69899f2f78a96ea3121d8e231faf8897da76727ae1636"
+    }
+  ],
+  "sha256": {
+    "effective_protocol_lock": "a40040b1616250f393c0f6972ded38c4be0002b367263adae6bd3bb8c49c5fe3",
+    "protocol_source": "4ff0e13a1ad48bf030a81aef8e0d0d9b31047048e78bd69a05b3eb7d49922390",
+    "channel_contract": "3dce1202084bc2d780e6d8f767324a6d53e0aa5927ce173d9ba690f0c09dcfba",
+    "observer_frame_projection": "0ea1c2359226f02c92bc61108251b350fd977cb33fba0ba3addb72f3983dd4b7",
+    "base_bank_design_lock": "24f1c88bf467989a53227998fc3707a9290f932b29fc9c711a23883b5ec0de5b",
+    "prior_bank_design_lock_v1_1": "fd8ea977e88c43e4c57149bf5e6d429c5c9c6f296f0ed7456a54554f8288dea1",
+    "effective_bank_plan": "759d1ef3b75f50665dcec94aa25c497c1ee785ed760542aebafcdbf201d186ea",
+    "effective_family_design": "5cd029d0c636a61d092e7dd93392480573f716fe50a3059fdebad8dd2cf99efb",
+    "source_inventory": "f5a3268e2446f00b31b05a0dca887b79e08665010bd922206749f7257293b9bc",
+    "feasibility_audit": "d8ef16adc51c2622e8695cb0fc0ea55ba1d24a1a1ddc0a7cc2d44df8f6bead0f",
+    "repository_source_audit": "1d3d7fc4a46f5233e81c44a6e22c91ae04db119896d95cbe48b140eb4bd69ade",
+    "feasibility_input_manifest": "f37d58a2284731046751a5c98884833b893a08a5c09c581a693c90c41aef02a4",
+    "feasibility_freezer_source": "6651eb4d0e5149185632c37b1f45552aa068ea1ed018960879e066b61809cfa1"
+  },
+  "input_manifest_path": "bank/construction-01/feasibility-input-manifest-v1.2.json",
+  "input_file_count": 219,
+  "selected_family_count": 12,
+  "candidate_case_rows": 192,
+  "baseline_case_rows": 48,
+  "failed_feasibility_trials_preserved": [
+    "clap-color",
+    "serde-offset",
+    "clap-repeat",
+    "serde-map-order",
+    "serde-map-order-repair-01"
+  ]
+}

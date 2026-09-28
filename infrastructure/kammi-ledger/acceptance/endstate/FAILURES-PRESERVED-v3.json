@@ -1,0 +1,12 @@
+{
+  "schema": "KAMMI_ACCEPTANCE_FAILURE_HISTORY_V1",
+  "parent": "FAILURES-PRESERVED-v2.json",
+  "authority": "Infrastructure construction history only",
+  "failures": [
+    {"id":"release-binding-preflight","failure":"Release test refused acceptance after source changed during an overlapping edit","evidence":"build transcript; 29-test suite failure","repair":"freeze source before qualification; retain fail-closed current-source check"},
+    {"id":"mixed-memory-fixture-v1","failure":"New interleaving fixtures omitted required tags argument","evidence":"build transcript; 34-test suite errors","repair":"supply explicit tags in fixtures; implementation unchanged"},
+    {"id":"incremental-fts-fixture-v1","failure":"Digit-suffixed lexical needles collided under native FTS tokenization","evidence":"preflight-20260927-131346/tests.json and tests.log","repair":"use distinct alphabetic words for the visibility fixture; document native BM25 and incremental term-overlap ranks"},
+    {"id":"native-wal-wording-v3","failure":"After real daemon kill, native WAL corruption used an unrecognized message; failed initialization also retained writer lock until teardown","evidence":"preflight-20260927-131614/tests.json and tests.log","repair":"recognize known projection-only checksum/WAL errors; preserve derived files then replay; explicitly close owner on initialization failure; retain external-process fixtures"},
+    {"id":"memory-fts-scaling-cliff","failure":"Every alternating write/search could reconstruct the entire native FTS index; vector queries unnecessarily triggered it","evidence":"source inspection and incremental rebuild-count fixture","repair":"separate vector path; incremental lexical postings expose recent records; rebuild native FTS at doubling boundaries"}
+  ]
+}

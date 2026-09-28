@@ -1,0 +1,62 @@
+{
+  "task_id": "small_only-task-e8fdd1f4__7ab3d64ee684",
+  "frame_digest_hex": "7ab3d64ee684b028be6e3f929f879b0b5ec42ae80862c35522ceab4b2584110d",
+  "request_id_hex": "067cb4bffb0f04933332e46db43b88b961a2354849ad1470f0d5e659d5144454",
+  "response_request_id_hex": "067cb4bffb0f04933332e46db43b88b961a2354849ad1470f0d5e659d5144454",
+  "request_receipt_digest_hex": "4ca37488dba816abc7ec657da5f4cb93af0c56e65edd8537444538c808b1d039",
+  "response_receipt_digest_hex": "4ca37488dba816abc7ec657da5f4cb93af0c56e65edd8537444538c808b1d039",
+  "presentation_receipt_hex": "524443510100040000007ab3d64ee684b028be6e3f929f879b0b5ec42ae80862c35522ceab4b2584110d833d9b0781654f63e206363a285f8a6ba7bb5c524f5bc7a476892f32be477a54b5794600825b88316742c6b7e6a972504661fa9e2574f8879785fd4e275f56ca0390f89e62090b8132ed8f8e301a5fbf09517f2832ccdc90b9dff53aa58cd65c4d27e4d333d5223545b18d213885f7b09633a4ac0a06a2005143e382cd203b8862de90751d9ce0e217937598038eda1508ffb8115b57df45f775e2bac1840991cab6e044aa7ecf66",
+  "action_ledger_path": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\artifacts\\runs\\e012-20260926-frame-decomposition-01\\action-ledgers\\small_only\\task-e8fdd1f4__7ab3d64ee684.bin",
+  "ordered_options": [
+    {
+      "producer_ordinal": 0,
+      "action": {
+        "id": 31157,
+        "schema_id": 1
+      },
+      "summary": "Apply the candidate change shown in the code excerpt.",
+      "diff_excerpt": "@@ -5,6 +5,5 @@\n     let mut stream = de.into_iter::<Value>();\n     let _ = stream.next();\n     let base = stream.byte_offset();\n-    // E012 candidate slot.\n-    base.saturating_add(2)\n+    base.saturating_sub(1)\n }",
+      "patch_sha256": "4600825b88316742c6b7e6a972504661fa9e2574f8879785fd4e275f56ca0390"
+    },
+    {
+      "producer_ordinal": 1,
+      "action": {
+        "id": 40696,
+        "schema_id": 1
+      },
+      "summary": "Apply the candidate change shown in the code excerpt.",
+      "diff_excerpt": "@@ -5,6 +5,5 @@\n     let mut stream = de.into_iter::<Value>();\n     let _ = stream.next();\n     let base = stream.byte_offset();\n-    // E012 candidate slot.\n-    base.saturating_add(2)\n+    base.saturating_add(1)\n }",
+      "patch_sha256": "62090b8132ed8f8e301a5fbf09517f2832ccdc90b9dff53aa58cd65c4d27e4d3"
+    },
+    {
+      "producer_ordinal": 2,
+      "action": {
+        "id": 54579,
+        "schema_id": 1
+      },
+      "summary": "Apply the candidate change shown in the code excerpt.",
+      "diff_excerpt": "@@ -5,6 +5,5 @@\n     let mut stream = de.into_iter::<Value>();\n     let _ = stream.next();\n     let base = stream.byte_offset();\n-    // E012 candidate slot.\n-    base.saturating_add(2)\n+    base\n }",
+      "patch_sha256": "223545b18d213885f7b09633a4ac0a06a2005143e382cd203b8862de90751d9c"
+    },
+    {
+      "producer_ordinal": 3,
+      "action": {
+        "id": 58080,
+        "schema_id": 1
+      },
+      "summary": "Apply the candidate change shown in the code excerpt.",
+      "diff_excerpt": "@@ -5,6 +5,5 @@\n     let mut stream = de.into_iter::<Value>();\n     let _ = stream.next();\n     let base = stream.byte_offset();\n-    // E012 candidate slot.\n-    base.saturating_add(2)\n+    0\n }",
+      "patch_sha256": "17937598038eda1508ffb8115b57df45f775e2bac1840991cab6e044aa7ecf66"
+    }
+  ],
+  "observer_output": {
+    "action_choice": null,
+    "applicability_milli": 0,
+    "abstention_milli": 1000
+  },
+  "thresholds": {
+    "minimum_applicability_milli": 850,
+    "maximum_abstention_milli": 150
+  },
+  "completion_check_passed": false
+}

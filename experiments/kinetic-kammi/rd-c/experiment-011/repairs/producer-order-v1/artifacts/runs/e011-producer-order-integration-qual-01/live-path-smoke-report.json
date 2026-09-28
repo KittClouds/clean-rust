@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "normal_producer_order": {
+    "passed": true,
+    "presentation_verified": true,
+    "replay_state_identical": true,
+    "unique_action_effects": 1
+  },
+  "transport_scramble_before_serialization": {
+    "passed": true,
+    "tasks_restored": 4,
+    "tasks_total": 4
+  },
+  "mutation_after_receipt": {
+    "passed": true,
+    "rejection": "candidate order or identity changed after observer request",
+    "safe_fallback": "ABSTAIN_AND_ABORT_ACTION",
+    "action_effects": 0
+  },
+  "response_replay_wrong_presentation": {
+    "passed": true,
+    "rejection": "observer response is bound to a different presentation",
+    "safe_fallback": "ABSTAIN_AND_ABORT_ACTION",
+    "action_effects": 0
+  },
+  "invariants": {
+    "illegal_commits": 0,
+    "duplicate_effects": 0,
+    "all_replay_identical": true
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "classification_counts": {
+    "MUTABLE_COORDINATE_UNREPRESENTED_BY_ACTION_GRAMMAR": 33
+  },
+  "context": [
+    "seed9731-R-tau4.json",
+    3
+  ],
+  "coordinate_count": 24091,
+  "legal_nonzero_coordinate_count": 24091,
+  "mapped_nonzero_coordinate_count": 223,
+  "singleton_action_count": 472,
+  "unsupported_row_domain_sha256": "BFD49351FF1A3615A1DC2A9A7C12ABBACEB5AA41C75C77ADC670FF591250E8D2",
+  "unsupported_rows": [
+    55,
+    84,
+    155,
+    202,
+    206,
+    231,
+    234,
+    245,
+    255,
+    283,
+    300,
+    304,
+    305,
+    352,
+    452,
+    490,
+    498,
+    499,
+    519,
+    545,
+    549,
+    577,
+    590,
+    593,
+    600,
+    620,
+    635,
+    639,
+    647,
+    671,
+    672,
+    683,
+    735
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "behavioral_probe": false,
+  "engineering_only": true,
+  "execution_sha256": "9C47DBA6BF576FC6696E70153F0CE80FB0163B538794BE82158710C1064A04E5",
+  "identity": "q10-gc1-lr1-requal1-par8-ref1-v1",
+  "protocol": "REQUAL1-PAR8-REF1",
+  "scientific_promotion": false,
+  "status": "REQUAL1_PAR8_REFERENCE_COMPLETE"
+}

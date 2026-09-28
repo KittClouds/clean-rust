@@ -1,0 +1,16 @@
+{
+  "protocol": "jev-information-density/v0.8p-v04-identity-v01",
+  "identity": "v0.8P-v04-source-identity-adjudication-v01",
+  "status": "STAGE_A_COMPLETE; STAGE_B_NOT_AUTHORIZED",
+  "fresh_identity": true,
+  "v03": "FINISHED_FAIL_CLOSED; immutable; no retry",
+  "stage_a_contract": {
+    "path": "experiments/jev-information-density-v08p-v04/identity/v04-source-identity-adjudication-contract-v01.json",
+    "sha256": "b22e68f0adebeb015fff818fdbdd776aca9c294eb1cd5b535303ac03b69b878b"
+  },
+  "stage_a_trace": {
+    "path": "experiments/jev-information-density-v08p-v04/provenance/stage-a-authority-trace-v01.json",
+    "sha256": "050a24e85f45eaf8b70d382871b4aaa50f973b25c8494ad116531f0b152ed02e"
+  },
+  "no_panel_generation_or_model_contact": true
+}

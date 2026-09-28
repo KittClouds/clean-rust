@@ -1,0 +1,28 @@
+{
+  "runtime_path": "D:\\phoenix-runtimes\\llama.cpp\\b10982\\runtime\\llama-server.exe",
+  "context_tokens": 4096,
+  "gpu_layers": 99,
+  "started_at": "2026-09-25T17:01:54.0278893Z",
+  "alias": "e009-small-v5",
+  "role": "small",
+  "reasoning_mode": "off",
+  "base_url": "http://127.0.0.1:18089",
+  "model_path": "D:\\phoenix-models\\candidates\\minicpm5-2b\\2079a22f3beaa4e306449978533478fe0522f4b3\\MiniCPM5-2B-Q8_0.gguf",
+  "process_id": 14524,
+  "runtime_args": [
+    "--model",
+    "D:\\phoenix-models\\candidates\\minicpm5-2b\\2079a22f3beaa4e306449978533478fe0522f4b3\\MiniCPM5-2B-Q8_0.gguf",
+    "--host",
+    "127.0.0.1",
+    "--port",
+    "18089",
+    "--alias",
+    "e009-small-v5",
+    "--ctx-size",
+    "4096",
+    "--n-gpu-layers",
+    "99",
+    "--reasoning",
+    "off"
+  ]
+}

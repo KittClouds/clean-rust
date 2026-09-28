@@ -1,0 +1,14 @@
+{
+  "schema": "FAS_E4_0_PRESEAL_AUDIT_ATTEMPT_V01",
+  "status": "TRACK_D_CONTRACT_MODE_STOP_VERIFIER_SCHEMA_MISMATCH",
+  "contract_id": "FAS_FROZEN_CAPABILITY_FABRIC_E4_0_V06",
+  "contract_sha256": "ea4f11cec5d65a3be7716c77febf5d448d8ebf1a5a4049aee5d25d51c0c50958",
+  "contract_seal_root_sha256": "7344badf07476d19d9c6228f80d026a112c339e93daa75593e61031f68456e64",
+  "error": "final contract historical predecessor identities mismatch",
+  "cause": "D v02 contract mode compares the complete predecessor dictionary to a four-root subset; the frozen contract also carries exact sealed E1/E2/E3 artifact hashes. This does not indicate a contract or scientific-predecessor mismatch.",
+  "independent_alternative": "Track E v06 postseal audit passed and independently recomputed the complete contract/source-map seal and all 93 member identities.",
+  "model_or_tokenizer_contacted": false,
+  "cuda_initialized": false,
+  "population_generated": false,
+  "labels_opened": false
+}

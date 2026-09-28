@@ -1,0 +1,52 @@
+{
+  "amendment_id": "FAS_S11_PANEL_COLLISION_ADMISSION_CORRECTION_V01",
+  "status": "FROZEN_CONSTRUCTION_CORRECTION_PRE_MODEL_CONTACT",
+  "parent_protocol_root_sha256": "9f11fb59d0f01ed12ee9c9f1753ae990ce5bcb20cf4f799d35a11a39079a4598",
+  "failed_attempt_id": "S11_PANEL_CONSTRUCTION_V01",
+  "failed_attempt_disposition": "PANEL_CONSTRUCTION_FAIL_CLOSED",
+  "trigger": {
+    "initial_ranked_quartets": 5318,
+    "initial_event_rows": 21272,
+    "duplicate_event_rows": 189,
+    "repeated_input_hashes": 170,
+    "model_or_feature_data_accessed": false
+  },
+  "unchanged": [
+    "candidate universe and generator seed",
+    "rendered input content and identities",
+    "candidate selection hash and canonical key",
+    "class quotas 1733/1815/1770",
+    "family and template support requirements",
+    "scientific estimands and frozen analysis contract",
+    "tokenizer/model/feature/observer authorization state"
+  ],
+  "admission": {
+    "class_order": [0, 1, 2],
+    "within_class_order": ["selection_sha256 ascending", "ordinal ascending"],
+    "unit": "whole four-event A/C/E/P quartet",
+    "accept_when": "all four rendered-input SHA-256 values are mutually unique and absent from all previously admitted quartets",
+    "duplicate_disposition": "INTRA_PANEL_DUPLICATE_REJECTED",
+    "continue_until_original_class_quota": true,
+    "global_input_hash_uniqueness": true,
+    "reseed_or_quota_relaxation": false,
+    "fail_closed_if_quota_or_support_fails": true
+  },
+  "construction_only_diagnostic": {
+    "result_source": "hash-only candidate ledger from failed v01 construction; no model-facing result used",
+    "selected_quartets": 5318,
+    "selected_event_rows": 21272,
+    "unique_rendered_input_hashes": 21272,
+    "all_world_families_present": true,
+    "all_observation_templates_present": true,
+    "all_query_templates_present": true,
+    "all_observation_query_template_cells_present": true
+  },
+  "authority": {
+    "panel_construction_authorized": true,
+    "tokenizer_loaded": false,
+    "model_loaded": false,
+    "feature_extraction_performed": false,
+    "observer_replay_performed": false,
+    "probe_fitting_performed": false
+  }
+}

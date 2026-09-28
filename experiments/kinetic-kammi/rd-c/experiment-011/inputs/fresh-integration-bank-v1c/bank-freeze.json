@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "state": "FROZEN_BEFORE_MODEL_CONTACT",
+  "bank_id": "e011-fresh-integration-bank-v1c",
+  "frame_lock_sha256": "8265011f22c0c372f7d742e0b948e5bac33e4f6b5a38120b9423be410004e566",
+  "sealed_labels_sha256": "a75b3e09725fb1b16f14e124ffc27795af2b60795d633416f83ff01ea04aa146",
+  "bank_build_receipt_sha256": "1c02d5334dfdf00b4cff22d38250e4a9739b56bdeb511f51cf139dce4354333e",
+  "task_manifest_sha256": "1bf67633e5f24fbd533a3afdaa20e9e71da8c88d9af19b86c3af30c29b2e072d",
+  "system_prompt_sha256": "976ef1cd914bacb366c64418825010124338a626a0400d459858acc7e48f5a48",
+  "output_schema_sha256": "97170fa0d6a44681f680ad0ac533a3f3913709757e4ee6cbf96d9c9f40d1b2fb",
+  "bundle_lock_sha256": "a626836853bdb0755fd2e4e1569b6b91b33861306c7d1e4a51e3de54a9ee713d",
+  "thresholds_sha256": "846b0668db2a7796ac1ee90c190d45532a3065617ff1abca03df495496ddb173",
+  "thresholds": {
+    "minimum_applicability_milli": 850,
+    "maximum_abstention_milli": 150
+  },
+  "task_count": 4,
+  "repositories": {
+    "ripgrep": 2,
+    "turbovec": 2
+  },
+  "presentation_contract": "producer-order ordinal is assigned at frame construction; carry ordinal, restore ascending order before serialization; receipt is bound to task digest and ordered action ID/patch digest pairs"
+}

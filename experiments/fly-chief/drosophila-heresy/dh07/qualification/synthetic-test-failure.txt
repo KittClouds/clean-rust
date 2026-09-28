@@ -1,0 +1,23 @@
+Command: cargo test --release --locked --offline
+Date: 2026-09-15
+Build: succeeded
+Summary: 44 passed; 3 failed; 7 ignored
+
+Expected scientific-contract failures observed before null search:
+
+1. reversal trial 6; support 45; base lower/upper bounds 0/0;
+   target L2 0.13090407304676444;
+   realized true-axis cosine -0.0019045771985542305.
+
+2. reversal trial 3; support 41; base lower/upper bounds 2/0;
+   target L2 0.1251421790886409;
+   realized true-axis cosine -0.035257970584393464.
+
+Both exceed the provisional 5e-6 gate and therefore reject the strict
+"only off-axis direction differs" contract. The gate will not be relaxed to
+make these tests pass.
+
+The third failure was a stale expected-failure assertion: the bounded-cone
+fixture now correctly stops at the prior true-axis leakage gate, so it did not
+reach 64 bound rejections. This fixture will be separated into explicit gate
+and constructor-branch tests.

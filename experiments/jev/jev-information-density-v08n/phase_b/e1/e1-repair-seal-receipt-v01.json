@@ -1,0 +1,58 @@
+{
+  "protocol": "jev-information-density/v0.8n-e1-repair-seal-receipt-v01",
+  "identity": "v0.8N-E1-repair-recipe-seal-v01",
+  "created_at_utc": "2026-09-23T10:53:51Z",
+  "disposition": "RECIPE_AND_METADATA_BASIS_SEALED; EXTRACTION_AND_SECOND_PANEL_OPENING_NOT_AUTHORIZED",
+  "contract": {
+    "path": "experiments/jev-information-density-v08n/phase_b/e1/e1-repair-contract-v01.json",
+    "sha256": "770d2e3a548e4e31e6a1e7af878f19db925f901666c5bceecd0c11454ee858e2"
+  },
+  "metadata_audit": {
+    "path": "experiments/jev-information-density-v08n/phase_b/e1/e1-candidate-basis-metadata-audit-v01.json",
+    "sha256": "f91b27f60905280d86cbf302520945c59619a501ae749b6ecfeee75d5c5ed752",
+    "source_sha256": "8b4e0414d498745a209287b6a3461ac6bc999dd435b9e684a64b07aaa84fb238"
+  },
+  "candidate_text_manifest": {
+    "path": "experiments/jev-information-density-v08n/phase_b/e1/e1-candidate-text-manifest-v01.jsonl",
+    "sha256": "7987ae385454b32ddec548e48ef6543253b7b061ee1f077c064363c06304a285",
+    "rows": 16,
+    "all_semantic_ids_unique": true,
+    "all_model_input_text_hashes_unique": true
+  },
+  "original_phase_b": {
+    "final_disposition_path": "experiments/jev-information-density-v08n/phase_b/phase-b-final-disposition-v01.json",
+    "final_disposition_sha256": "bae6d7ac88f5ca0c5684c219e0e0b82f03962bf6f0292c205cba58765c75a656",
+    "status": "EVALUATION_INPUT_CONTRACT_INCOMPLETE",
+    "training_sealed": true,
+    "predictions_or_metrics": false,
+    "panel_opening_count": 1
+  },
+  "source_contract_hashes_rechecked": {
+    "run_contract": "da538aa03355732a2ba362da45d947e169b87aa644d0efd6ba7ef7a546306c1f",
+    "analysis_contract": "0072c44903ea253cd8ad288cda8c100270f19d909ddced098af32d388ac29e1f",
+    "execution_input_contract": "efb2bbe59293d7899083927cc187a292b5dfd1dc2948a0b752b3d9cbae2fd18d",
+    "family_spec": "e56885005487b36b573c1bf4d47741413ca72df0992ff62bcf48891eecacb429",
+    "generator": "f04a9b1d4f6682522e5957be3c0075db4bd7aa4e4e25968650f2ff24a42c7f5b",
+    "candidate_surface_serializer": "a3049d52e1183c806c84522a617a05646eb86fbcb69af72b5bb26f4808852cb1",
+    "generic_lfm_text_encoder": "b8cd79a9a3265eca0fde5f509ba7c058bc2065d7747efe17ff7c7c1f6335b2d0",
+    "training_candidate_catalog": "1698ea2078951837b3cb780a3f873c3c099e5e3d001c714e1d58a41e2951487e",
+    "original_schema_join_receipt": "1db0042f1a15364e6a304daf426a56c561ca44986c632b6453f960bcf4e6d41f",
+    "failed_attempt_traceback": "c2f430c43ed02bc77dee84bff0566ad66888e73070d76d3b07847cb4d361a19e"
+  },
+  "boundary_state_at_seal": {
+    "heldout_candidate_vectors_created": false,
+    "head_checkpoints_loaded": false,
+    "head_inference": false,
+    "predictions_or_metrics_created": false,
+    "panel_reopened": false,
+    "panel_unlock_count": 1,
+    "newtight_access": false,
+    "legacy_evaluation_access": false,
+    "phoenix_access": false,
+    "original_phase_b_contract_modified": false,
+    "phase_b_original_authorization_reused_for_e1": false,
+    "e1_extraction_authorized": false,
+    "e1_second_panel_opening_authorized": false
+  },
+  "future_evaluation_label": "POST-REGISTERED E1 REPAIRED HELD-OUT EVALUATION; NOT THE PREREGISTERED ORIGINAL PHASE-B RESULT"
+}

@@ -1,0 +1,22 @@
+[package]
+name = "adaptive-runtime-ar-00f"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.96"
+publish = false
+
+[dependencies]
+adaptive-runtime-ar-00 = { package = "adaptive-runtime-ar-00", path = "../ar-00" }
+adaptive-runtime-ar-00c-int1 = { package = "adaptive-runtime-ar-00c-int1", path = "../ar-00c-int1" }
+adaptive-runtime-ar-00d = { package = "adaptive-runtime-ar-00d", path = "../ar-00d" }
+hashbrown = "0.16"
+
+[[bench]]
+name = "ar00f"
+harness = false
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+panic = "abort"

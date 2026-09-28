@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "state": "MODEL_CONTACT_GATE_PASS",
+  "run_id": "e012-20260926-frame-decomposition-01",
+  "model_contact_authorized": true,
+  "frozen_input_lock_sha256": "4bab6fd945248b6209fa33e3a1df10786298ac620342ce167251411c6a258cd8",
+  "dry_runs": {
+    "small": {
+      "path": "artifacts/runs/e012-20260926-frame-decomposition-01/preflight/request-dry-run-small.json",
+      "sha256": "e0bc191cf8511ae1ee27557cb788f994d7fef50474ee72216204de9bd55ea5ef",
+      "request_count": 48,
+      "total_request_bytes": 239980
+    },
+    "large": {
+      "path": "artifacts/runs/e012-20260926-frame-decomposition-01/preflight/request-dry-run-large.json",
+      "sha256": "1cd5992902aab23aa8c43036d0eac5023b73798144c95715b1a766884ea30df7",
+      "request_count": 48,
+      "total_request_bytes": 239980
+    }
+  },
+  "model_requests_started": false
+}

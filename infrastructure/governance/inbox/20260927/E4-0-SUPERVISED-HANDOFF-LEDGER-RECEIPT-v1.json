@@ -1,0 +1,24 @@
+{
+  "schema": "CHIEF_E4_SUPERVISED_HANDOFF_LEDGER_RECEIPT_V1",
+  "status": "LIBRARY_INTERFACE_QUALIFIED_E4_AUTH_WITHHELD",
+  "artifacts": [
+    {
+      "artifact_id": "sha256:f2c86f1052df8e8d8858a77ce82287ffc0fe39690be4e80cc89186854ab7c5b0",
+      "event_id": "sha256:c42ad73ab06bd569462b2812caf8fbb9d1633bbe402462b089c9054d18032713"
+    },
+    {
+      "artifact_id": "sha256:3922826f115964408ac3cae1d367d520c7b27b5b85c158ad283c6065a2e4a525",
+      "event_id": "sha256:a53f39f9b1ed62b36f61272fa363c46927ca1703ad06108eface16245c904dca"
+    },
+    {
+      "artifact_id": "sha256:bb72985f8030e84113dc074a437ccb6ebb2469b948e7325ea161bac57be8795a",
+      "event_id": "sha256:0308497052c9718023b632361778fff00f9837087e9520989df3f96013cbe290"
+    }
+  ],
+  "seal": {
+    "root": "sha256:ad1ffbc9203fd0cac5553ea4a5d3c72654c22054e68348474414096e35dd8cc5",
+    "event_id": "sha256:ab818e21501968978d617a297a1887f740d6d53417090a1410fcba06fceace87"
+  },
+  "e4_0_model_contact_authorized": false,
+  "e4_01_entry_open": false
+}

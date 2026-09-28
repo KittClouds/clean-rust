@@ -1,0 +1,8 @@
+{
+  "final_gate": "complete_parent_and_source_hash_recovery",
+  "identity": "q10-gc1-lr1-rec1-v1",
+  "mutation_policy": "read_only",
+  "protocol": "LR1-REC1-PARENT-SNAPSHOT-RECOVERY",
+  "recovery_rule": "all non-self parent bindings and all source chunk/marker hashes must match; no splicing or partial recovery",
+  "scope": "read_only_recovery_gate"
+}

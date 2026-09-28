@@ -1,0 +1,180 @@
+{
+  "freeze_id": "FAS_FROZEN_OBSERVER_BUNDLE_E0_FREEZE_V04",
+  "project_id": "fas-frozen-observer-bundle-engineering-v01",
+  "status": "E0_FROZEN_NOT_AUTHORIZED_FOR_MODEL_CONTACT",
+  "frozen_utc_date": "2026-09-25",
+  "starting_history": {
+    "cross_lab_snapshot": "docs/day-06-research-state-2026-09-25.md",
+    "fas_historical_record": "FAS-00 -> S01 accessibility -> S05 representation/readout match -> S11 fresh-world transport",
+    "engineering_question": "Can one pinned frozen representation cache support five independent narrow observers with useful task performance and lower repeated extraction/storage cost?",
+    "historical_metrics_are_motivation_only": true,
+    "historical_s01_panel_labels_features_and_fits_reused": false
+  },
+  "representation_abi_path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/representation-abi-v01.json",
+  "representation_abi_sha256": "d266d678147f895ed389e330496f261053deb2d82dd160ab82255899377a288f",
+  "panel_world_contract_path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/panel-world-contract-v03.json",
+  "panel_world_contract_sha256": "1a2ba8795ec34434c8e1c0c43937a999195bd04ca5284a8e83d12578908a86cb",
+  "extractor_source_path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/extract_features_v01.py",
+  "extractor_source_sha256": "12c9803a3cfa3fa0b501e3a5068439f3fd75d558a13eb099c137a14262bbb38d",
+  "panel_generator": {
+    "source_sha256": "fa2bd0617135a0dce4e12f0e0967f82e461133b394a7d969daba5afb11e2cce1",
+    "entrypoint_source_sha256": "7ce62779ddf8dd994ad9ace6a10dd5bda76de3bd87c1c0e19459cf38b428ec0f",
+    "cargo_manifest_sha256": "c7448c046ceb9722a96ef3318bbc0b55e459ecdf06f6ea1c87634b10a27d022a",
+    "cargo_lock_sha256": "4ed5fca0a39c8869c082daf94cb0afd183533714a8253e44acf8d610129e17d7",
+    "versioned_source_root": "experiments/fas-frozen-observer-bundle-engineering-v01/source/panel-generator-v04"
+  },
+  "task_endpoints": {
+    "context_identity": "closed-set context_term_id classification over all 32 fitted classes",
+    "entity_identity": "closed-set entity_term_id classification over all 32 fitted classes",
+    "relation": "2-way relation_id classification; fit and score only both terms in train-side ID ranges",
+    "observed_state": "3-way state_id classification; fit and score only both terms in train-side ID ranges",
+    "exact_target": "3-way exact_target prediction; fit only both terms in train-side ID ranges; score in-domain and the three frozen novel-term slices"
+  },
+  "performance_gates": {
+    "primary_metric": "balanced_accuracy",
+    "gate": "one-sided 95 percent whole-quartet-bootstrap lower bound >= 0.90 for each endpoint",
+    "individual_endpoints": [
+      "context_identity",
+      "entity_identity",
+      "relation",
+      "observed_state",
+      "exact_target_in_domain",
+      "exact_target_context_novel",
+      "exact_target_entity_novel",
+      "exact_target_both_novel"
+    ],
+    "multiplicity_statement": "These are eight individual engineering gates. They do not provide a simultaneous 95 percent guarantee over the bundle; no familywise or multiplicity-adjusted claim is made.",
+    "minimum_test_rows_per_class": 200,
+    "no_cross_endpoint_rescue": true,
+    "no_s01_metric_inherited": true
+  },
+  "bootstrap": {
+    "replicates": 10000,
+    "seed": 2026092503,
+    "resampling_unit": "whole quartet; all four rows are sampled together",
+    "lower_bound": "5th percentile of bootstrap balanced-accuracy values",
+    "identity_strata": "quartet baseline A-variant context_term_id for context identity; baseline A-variant entity_term_id for entity identity",
+    "relation_strata": "relation_id",
+    "state_strata": "state_id",
+    "target_strata": "exact_target within each predeclared evaluation endpoint",
+    "sampling": "within each task-specific class stratum, sample the original number of eligible test quartets with replacement"
+  },
+  "observer_fit": {
+    "count": 5,
+    "independent_fits": true,
+    "shared_trainable_parameters": false,
+    "multitask_loss": false,
+    "view_search": false,
+    "scaler": "train-only float64 chunked Welford population mean/scale, chunk_rows=2048; zero scales become 1; persist mean and scale as little-endian float32",
+    "linear_model": "multinomial linear readout; zero-initialized float32 weights and bias; mean cross-entropy plus 0.5 * 1e-4 * sum(weights squared); no bias regularization",
+    "optimizer": {
+      "name": "PyTorch LBFGS",
+      "learning_rate": 1.0,
+      "max_iter": 300,
+      "max_eval": 375,
+      "tolerance_grad": 1e-07,
+      "tolerance_change": 1e-09,
+      "history_size": 10,
+      "line_search": "strong_wolfe"
+    },
+    "determinism_seed": 0,
+    "expected_linear_parameters": 147528,
+    "expected_linear_parameter_bytes_f32": 590112,
+    "expected_scaler_bytes_f32": 81920,
+    "expected_total_observer_bytes_before_metadata": 672032
+  },
+  "serving_workloads": {
+    "declared_bundle_serving_workload": "one raw input -> one backbone extraction -> all five requested heads",
+    "single_head_workload": "one raw input -> one requested head",
+    "single_head_claim": "B1 and B2 each require one backbone extraction for a single-head request; no shared-compute advantage is claimed for this workload.",
+    "five_output_fanout_claim": "B1 performs one extraction plus five readouts; B2 performs five separate pipeline extractions plus five readouts. Label B2 fanout costs as receipt-derived counterfactual arithmetic unless executed.",
+    "readout_latency_batches": [
+      1,
+      32,
+      256,
+      4096
+    ],
+    "report_backbone_extraction_separately": true
+  },
+  "economics": {
+    "B1_SHARED": "one measured full-panel extraction, one feature cache and row manifest, five independent heads",
+    "B2_FIVE_PIPELINES": "five pipeline extractions over the same rows, five identical task caches and manifests, one input corpus shared read-only; primary offline counterfactual",
+    "B3_FIVE_DEPLOYED_BACKBONES": "five separately stored/loaded backbone copies; deployment-context arithmetic only",
+    "B1_and_B2_head_state_equal": true,
+    "historical_panel_feature_cache_bytes": 872415232,
+    "historical_panel_row_manifest_bytes": 368110353,
+    "historical_B2_minus_B1_cache_manifest_bytes": 4962102340,
+    "historical_model_file_bytes": 2340697936,
+    "historical_B3_five_model_file_bytes": 11703489680,
+    "all_historical_sizes_are_budget_arithmetic_not_v01_receipts": true
+  },
+  "integration_parity": {
+    "predicted_label_agreement": 1.0,
+    "logit_atol": 1e-06,
+    "logit_rtol": 1e-06,
+    "standalone_and_bundle_use_identical_feature_rows": true
+  },
+  "resource_limits": {
+    "workspace_target_volume": "D:",
+    "observed_host_ram_bytes_at_freeze": 34239672320,
+    "observed_gpu": "NVIDIA GeForce RTX 3080",
+    "observed_gpu_vram_bytes": 12884901888,
+    "peak_host_ram_bytes_max": 25769803776,
+    "peak_gpu_memory_bytes_max": 10737418240,
+    "fresh_panel_inputs_max_bytes": 411171094,
+    "row_manifest_max_bytes": 736220706,
+    "feature_cache_plus_atomic_staging_max_bytes": 1744830464,
+    "labels_observers_predictions_receipts_scratch_max_bytes": 536870912,
+    "projected_peak_bytes": 3429093176,
+    "model_weights_referenced_read_only": true,
+    "if_model_copy_is_required_add_bytes": 2340697936,
+    "minimum_free_space_after_projected_peak_fraction": 0.1,
+    "recheck_free_space_before_e2": true
+  },
+  "phases": {
+    "E0": "Machine-readable v04 validator freeze with exact contract unit coverage; binds and preserves earlier E0/E1 history.",
+    "E1": "fresh panel, whole-quartet split, separate labels, support receipt, resource preflight, and seal",
+    "E2": "one feature extraction; requires a new explicit model-contact authorization",
+    "E3": "fit and score; requires a separate run authorization after E2 cache sealing",
+    "E4": "standalone/bundle parity and result seal"
+  },
+  "program_boundary": {
+    "immediate_downstream_option": "routing integration only after v01 closes and passes",
+    "deferred": [
+      "geometry",
+      "fly/shared-head work",
+      "scale fan-out",
+      "multi-model comparison",
+      "universal capability cartography until v01 closes"
+    ],
+    "no_causal_claim": true
+  },
+  "frozen_source_sha256": {
+    "experiments/fas-frozen-observer-bundle-engineering-v01/source/panel-generator-v04/Cargo.toml": "c7448c046ceb9722a96ef3318bbc0b55e459ecdf06f6ea1c87634b10a27d022a",
+    "experiments/fas-frozen-observer-bundle-engineering-v01/source/panel-generator-v04/Cargo.lock": "4ed5fca0a39c8869c082daf94cb0afd183533714a8253e44acf8d610129e17d7",
+    "experiments/fas-frozen-observer-bundle-engineering-v01/source/panel-generator-v04/src/lib.rs": "e57ddf18054a9c7d049d849d28654bbf85419e13993bc917906cfef3d4669cc7",
+    "experiments/fas-frozen-observer-bundle-engineering-v01/source/panel-generator-v04/src/generate.rs": "fa2bd0617135a0dce4e12f0e0967f82e461133b394a7d969daba5afb11e2cce1",
+    "experiments/fas-frozen-observer-bundle-engineering-v01/source/panel-generator-v04/src/model.rs": "94cca0249f5508be13e186921bc2441a830fa4af695211cd7fb08126a79c11e2",
+    "experiments/fas-frozen-observer-bundle-engineering-v01/source/panel-generator-v04/src/main.rs": "7ce62779ddf8dd994ad9ace6a10dd5bda76de3bd87c1c0e19459cf38b428ec0f",
+    "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/build_panel_v04.ps1": "b18b401da22b6dffb623c0ea858bc38278111484c8fcf587310f399d5f32d56a",
+    "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/extract_features_v01.py": "12c9803a3cfa3fa0b501e3a5068439f3fd75d558a13eb099c137a14262bbb38d",
+    "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/seal_e0_v04.py": "5a0c8391eee09d55dd0930cc3c981c5c007b1c0e38379df4602feb29e1c2d615"
+  },
+  "model_contact_authorized": false,
+  "tokenizer_contact_authorized": false,
+  "feature_extraction_authorized": false,
+  "observer_fitting_authorized": false,
+  "amendment": {
+    "amendment_id": "FAS_FROZEN_OBSERVER_BUNDLE_E0_V04_NESTED_SUPPORT_GATE_VALIDATOR_FIX",
+    "supersedes_e0_root_sha256": "1e42c8aa5eba7cd8f3d49c5f9f37cfbd277f9899bab750fa3b17dc0aea414a09",
+    "prior_e0_v03_manifest_sha256": "69a0126c81076af95049e24dc09fd76c3de0d0b8a9559b3fcaaab783f6665091",
+    "prior_e1_v01_failure_receipt_sha256": "d5181cbd62a873225af34c9bd4f9b4463c80151db8228e8e46fe394511e1f01e",
+    "prior_e1_v03_failure_receipt_sha256": "1992ff6095bdcb761070708e63d0a3607a9b9cc66c927749bf1874cb469ff3c5",
+    "reason": "The v03 validator read minimum_test_rows_per_class at the top level while the frozen panel contract nests it under support_gate. Both previous E1 attempts stopped before any panel rows were written.",
+    "contract_to_validator_unit_check_added": true,
+    "scientific_design_changed": false,
+    "panel_seed_changed": false,
+    "representation_abi_changed": false,
+    "model_or_tokenizer_contact_occurred": false
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "task_id": "turbovec-turbovec-mask-allowlist-v2",
+  "frame_hash_hex": "d77f86fcc130e8d3f4a4a707411f59250f1ef151618dfc254100633b00511625",
+  "selected_patch_sha256": "f977765cc076a1eb302b0c9310a0770c7c74035912ad92214d0a70ffb5325974",
+  "action_ledger_path": "C:\\rd-c\\experiment-010\\artifacts\\runs\\e010-20260925-cross-repo-01\\ledgers\\hand-written\\turbovec-turbovec-mask-allowlist-v2.actions.bin",
+  "actions": [
+    {
+      "id": 11,
+      "schema_id": 1
+    },
+    {
+      "id": 37,
+      "schema_id": 1
+    },
+    {
+      "id": 68,
+      "schema_id": 1
+    },
+    {
+      "id": 94,
+      "schema_id": 1
+    }
+  ],
+  "observer_output": {
+    "action_choice": 94,
+    "applicability_milli": 900,
+    "abstention_milli": 0
+  },
+  "thresholds": {
+    "minimum_applicability_milli": 850,
+    "maximum_abstention_milli": 150
+  },
+  "completion_check_passed": true
+}

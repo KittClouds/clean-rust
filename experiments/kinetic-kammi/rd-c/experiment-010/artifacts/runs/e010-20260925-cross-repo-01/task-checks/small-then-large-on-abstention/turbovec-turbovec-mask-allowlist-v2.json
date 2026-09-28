@@ -1,0 +1,29 @@
+{
+  "task_id": "turbovec-turbovec-mask-allowlist-v2",
+  "lane": "small-then-large-on-abstention",
+  "action_id": 11,
+  "patch_sha256": "0351d46c399b62825821094c90c92701d18d5e56718bc7af4825e6dc9b13ac74",
+  "candidate_variant": "gold",
+  "test_filter": "block_skip_at_one_percent_selectivity_matches_post_filter",
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--manifest-path",
+    "C:\\rd-c\\experiment-010\\tasks\\heldout-bank-v1\\families\\turbovec-mask-allowlist\\candidates\\gold\\Cargo.toml",
+    "--package",
+    "turbovec",
+    "--test",
+    "filtering",
+    "block_skip_at_one_percent_selectivity_matches_post_filter",
+    "--",
+    "--exact"
+  ],
+  "exit_code": 0,
+  "status": "passed",
+  "passed": true,
+  "elapsed_ms": 10449.895,
+  "completion_source": "live-cargo-test",
+  "output_sha256": "a1f3703f283b3db5e3ad29c3aca96a03b9ade9a7dba6ac032218e5f6f01d5b4b",
+  "output": "\nrunning 1 test\ntest block_skip_at_one_percent_selectivity_matches_post_filter ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 21 filtered out; finished in 1.17s\n\n   Compiling turbovec v0.9.0 (C:\\rd-c\\experiment-010\\tasks\\heldout-bank-v1\\families\\turbovec-mask-allowlist\\candidates\\gold\\turbovec)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 9.04s\n     Running tests\\filtering.rs (D:\\cargo-targets\\rdc-e010\\scoring\\debug\\deps\\filtering-e398ca839dedcfa2.exe)\n"
+}

@@ -1,0 +1,22 @@
+{
+  "record_id": "FAS_S09_V04_PREFLIGHT_CORRECTION_RECORD",
+  "failed_protocol_root_sha256": "d98ac86be4fd38a8f770c2530ad0e291a398c2aaceb6f398a479b265d225e3a2",
+  "failed_protocol_seal_file_sha256": "91dd15fed8626863b21714a79a8f7204b02e2b36213d230630310a05f65c8a6f",
+  "exact_failure": {
+    "stage": "parent protocol identity preflight",
+    "field": "supersedes.protocol_seal_file_sha256",
+    "contracted_value": "fe3f2ba88fb0f71518ff410409825cb02cfdf20299b19d0f8219ae96ceef7326",
+    "observed_value": "fe3f2baf40b0f71518ff410409825cb02cfdf20299b19d0f8219ae96ceef7326",
+    "error": "v03 protocol seal file differs from v04 parent binding"
+  },
+  "preserved_attempt": "history-preflight-v04-attempt",
+  "disposition": {
+    "model_loaded": false,
+    "feature_matrices_read_by_preflight": false,
+    "probe_fitting_started": false,
+    "analysis_preflight_sealed": false,
+    "scientific_outputs_changed": false,
+    "v03_parent_artifacts_changed": false
+  },
+  "correction": "Correct the single transcription error in the v03 protocol seal file hash, include this sidecar in the v04 protocol seal, and reseal the pre-analysis packet."
+}

@@ -1,0 +1,23 @@
+{
+  "artifact_id": "E012-PC-RESERVE-POLICY-VERIFICATION-v1.3.1",
+  "bank_generated_by_agent": false,
+  "checks": {
+    "bank_owner_user": true,
+    "exists:amendment": true,
+    "exists:generator": true,
+    "exists:parent_lock_v13": true,
+    "exists:parent_spec_v13": true,
+    "exists:parent_verification_v13": true,
+    "fixed_16_reserves": true,
+    "no_model_contact": true,
+    "sha256:amendment": true,
+    "sha256:generator": true,
+    "sha256:parent_lock_v13": true,
+    "sha256:parent_spec_v13": true,
+    "sha256:parent_verification_v13": true,
+    "slot_zero_only": true
+  },
+  "lock_sha256": "1c8016c95c78c8fe2531644df8f18431bb8ee24ba66ec25322517a2a14bf5ea1",
+  "model_contact_performed": false,
+  "state": "PASS"
+}

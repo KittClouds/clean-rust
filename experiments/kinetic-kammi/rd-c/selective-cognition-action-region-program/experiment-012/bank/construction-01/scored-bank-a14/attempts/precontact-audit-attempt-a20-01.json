@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "attempt": "A20_PRECONTACT_AUDIT_LAUNCH_01",
+  "state": "AUDIT_FAILED_PAIR_ORDER_CHECK_INCLUDED_ABSTENTION_CONTROLS",
+  "model_contact_authorized": false,
+  "audit_script_sha256": "1ca5c96a31f11598b6bcfa4ebd9828858ec3c26520f5bdfb5f2ec537bdfd9b9a",
+  "audit_lock_sha256": "9e64f31e07e5f46da74844d38f9f5ce5a196b613591143628dd29896d967cf73",
+  "error": "ValueError: producer order differs within a counterfactual pair in conflicting-alias-requirement; this is an abstention control, not a truth-switch pair",
+  "audit_output_written": false
+}

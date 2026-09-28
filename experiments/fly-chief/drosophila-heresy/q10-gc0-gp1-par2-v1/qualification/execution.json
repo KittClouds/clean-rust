@@ -1,0 +1,161 @@
+{
+  "counts": {
+    "candidates_with_exact_declared_rows": 1727,
+    "endpoint_set_count": 14,
+    "exact_nonzero_replays": 390694,
+    "groups_with_palette_shortfall": 1,
+    "palette_count": 7207,
+    "raw_group_count": 801
+  },
+  "endpoint_set_results": [
+    {
+      "baseline_mismatch_count": 243,
+      "endpoint": "seed9731-L-tau16.json",
+      "palette_support_count": 631,
+      "set_index": 0,
+      "uncovered_mismatch_count": 0,
+      "uncovered_mismatch_rows": []
+    },
+    {
+      "baseline_mismatch_count": 244,
+      "endpoint": "seed9731-L-tau16.json",
+      "palette_support_count": 631,
+      "set_index": 1,
+      "uncovered_mismatch_count": 0,
+      "uncovered_mismatch_rows": []
+    },
+    {
+      "baseline_mismatch_count": 251,
+      "endpoint": "seed9731-L-tau16.json",
+      "palette_support_count": 647,
+      "set_index": 2,
+      "uncovered_mismatch_count": 0,
+      "uncovered_mismatch_rows": []
+    },
+    {
+      "baseline_mismatch_count": 249,
+      "endpoint": "seed9731-L-tau16.json",
+      "palette_support_count": 641,
+      "set_index": 3,
+      "uncovered_mismatch_count": 0,
+      "uncovered_mismatch_rows": []
+    },
+    {
+      "baseline_mismatch_count": 259,
+      "endpoint": "seed9731-L-tau4.json",
+      "palette_support_count": 620,
+      "set_index": 0,
+      "uncovered_mismatch_count": 0,
+      "uncovered_mismatch_rows": []
+    },
+    {
+      "baseline_mismatch_count": 251,
+      "endpoint": "seed9731-L-tau4.json",
+      "palette_support_count": 609,
+      "set_index": 1,
+      "uncovered_mismatch_count": 0,
+      "uncovered_mismatch_rows": []
+    },
+    {
+      "baseline_mismatch_count": 247,
+      "endpoint": "seed9731-L-tau4.json",
+      "palette_support_count": 624,
+      "set_index": 2,
+      "uncovered_mismatch_count": 0,
+      "uncovered_mismatch_rows": []
+    },
+    {
+      "baseline_mismatch_count": 245,
+      "endpoint": "seed9731-L-tau4.json",
+      "palette_support_count": 625,
+      "set_index": 3,
+      "uncovered_mismatch_count": 0,
+      "uncovered_mismatch_rows": []
+    },
+    {
+      "baseline_mismatch_count": 247,
+      "endpoint": "seed9731-R-tau16.json",
+      "palette_support_count": 598,
+      "set_index": 1,
+      "uncovered_mismatch_count": 0,
+      "uncovered_mismatch_rows": []
+    },
+    {
+      "baseline_mismatch_count": 234,
+      "endpoint": "seed9731-R-tau16.json",
+      "palette_support_count": 588,
+      "set_index": 3,
+      "uncovered_mismatch_count": 0,
+      "uncovered_mismatch_rows": []
+    },
+    {
+      "baseline_mismatch_count": 222,
+      "endpoint": "seed9731-R-tau4.json",
+      "palette_support_count": 588,
+      "set_index": 0,
+      "uncovered_mismatch_count": 0,
+      "uncovered_mismatch_rows": []
+    },
+    {
+      "baseline_mismatch_count": 241,
+      "endpoint": "seed9731-R-tau4.json",
+      "palette_support_count": 600,
+      "set_index": 1,
+      "uncovered_mismatch_count": 0,
+      "uncovered_mismatch_rows": []
+    },
+    {
+      "baseline_mismatch_count": 238,
+      "endpoint": "seed9731-R-tau4.json",
+      "palette_support_count": 584,
+      "set_index": 2,
+      "uncovered_mismatch_count": 0,
+      "uncovered_mismatch_rows": []
+    },
+    {
+      "baseline_mismatch_count": 215,
+      "endpoint": "seed9731-R-tau4.json",
+      "palette_support_count": 568,
+      "set_index": 3,
+      "uncovered_mismatch_count": 0,
+      "uncovered_mismatch_rows": []
+    }
+  ],
+  "firewall": {
+    "behavioral_probe": false,
+    "engineering_only": true,
+    "gc1_authorized": false,
+    "global_assembly": false,
+    "parent_writes": false,
+    "scientific_promotion": false,
+    "write_root": "experiments/drosophila-heresy/q10-gc0-gp1-par2-v1"
+  },
+  "gate": {
+    "all_groups_completed": true,
+    "authority_complete": true,
+    "gc1_authorized": false,
+    "global_assembly_executed": false,
+    "palette_stream_complete": true,
+    "raw_support_complete": true
+  },
+  "group_status_counts": {
+    "PALETTE_COMPLETE": 800,
+    "PALETTE_SHORTFALL_PRESERVED": 1
+  },
+  "identity": "q10-gc0-gp1-par2-v1",
+  "palette_sha256": "56A8BCFD950C2C796279556B03C4905622B1207023C1142076AE7147203477FA",
+  "protocol": "Q10-GC0-GP1-PAR2",
+  "verified_parent_bindings": {
+    "ac2_effects": "4D45D48375385AE8886A744BF9CE8E926140F9181C30966316D7350608327EE5",
+    "ac2_features": "7EC54C783A97078243D4AA5B1AEDC65AC5FBE0475C8F11561D84FF4D8120C2F2",
+    "ac3_effects": "6A0CFF57B00EFF8191F60F79B85A31E25C6138BD361346A93F4174243A7DCC97",
+    "ac3_features": "75AB83ED1D832D80D74E4D136F272F11FA9E5F3905E12897A26A4994FCE02268",
+    "ac3_status": "41D0A104E0EB66349EDE05FF2C63BC4B72B79A7714DCE676B0C30C8359284568",
+    "gc0_runner": "AEEC0DD2A8D06F65744710B099A581D378C4238139B488B0B67445026AC0CC88",
+    "gp1_contract": "81500A70D1CF5A88B019860F8672AE4DBD086470FD1AAE4583A6DD19EF6578E6",
+    "gp1_plan": "F6F7CFC9C450114C7B30718126EB42B8C88EC77A79480135162941D288891C25",
+    "pf0_execution": "45A4800D22E300FED98FF30A7384BFC31931A13C24556EE48D39F8B46226B410",
+    "pf0_status": "FF68C673B88C8AD010953E37C23B90B6EF203D77FDA1B9CCD2F5198CA10FD6A1",
+    "pf5_contract": "20995E1826A9C62E0E8689017A2F3E624CC9E63B76B210FBD4AB11D7E9E7D34F"
+  }
+}

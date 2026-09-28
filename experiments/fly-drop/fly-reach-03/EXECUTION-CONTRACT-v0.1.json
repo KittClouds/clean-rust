@@ -1,0 +1,176 @@
+{
+  "schema": "FLY-REACH-03-execution-contract-v0.1",
+  "status": "QUALIFICATION_PREP",
+  "authoritative_math_contract_sha256": "6beb47c4784a7d6e37a91e45688dd86e50b15291a8f0dbf07c56c71aefbe47a7",
+  "machine_semantics": "math-objects-v0.3.json",
+  "engineering_only": true,
+  "execution_authorized": false,
+  "feature_schema_version": "row-v1",
+  "target": {
+    "value_type": "i8",
+    "values": [-1, 0, 1],
+    "source": "reference_delta_into",
+    "tau": 1e-12,
+    "zero_channel": true
+  },
+  "support": {
+    "name": "S_N_signarm",
+    "stage": "native proposed delta before sim.apply_delta",
+    "epsilon": "EPS",
+    "definition": "abs(native_proposed_delta_i) > EPS",
+    "magnitude": "abs(native_proposed_delta_i)",
+    "delivered_support_is_primary": false
+  },
+  "primary_population": {
+    "name": "U*",
+    "row_key": ["substrate", "side", "block", "coordinate", "trial"],
+    "requirements": [
+      "all F0 through F4 fields defined and finite",
+      "target != 0",
+      "primary_support == true",
+      "sampled coordinate belongs to declared cell sample",
+      "every-trial row has no missing lag predecessor marker"
+    ],
+    "same_rows_for_all_filtrations": true
+  },
+  "filtrations": {
+    "F0": {
+      "fields": [
+        ["coordinate", "u32", "static edge index"],
+        ["pre", "u32", "KC local id"],
+        ["post", "u32", "MB local id"],
+        ["pre_degree", "u32", "KC to MB edge count"],
+        ["post_degree", "u32", "incoming MB edge count"],
+        ["anatomical_mb_sign", "f32", "frozen anatomical sign"],
+        ["substrate", "enum8", "static substrate id"],
+        ["side", "enum8", "static hemisphere"]
+      ],
+      "time_semantics": "static"
+    },
+    "F1": {
+      "fields": [
+        ["weight_before", "f32", "sim.weights[i] before native delivery"],
+        ["eligibility", "f32", "sim.eligibility[i] after current trial events"],
+        ["presynaptic_spike_count", "u32", "edge occurrence count across current trial events"],
+        ["postsynaptic_deviation", "f32", "sim.post[post] - sim.baseline[post]"],
+        ["local_signed_contribution", "f32", "current trial local signed accumulation"],
+        ["weight_sign", "i8", "sign(weight_before) with EPS zero rule"]
+      ],
+      "time_semantics": "current trial, before native delivery",
+      "native_state_or_input": "native state and current presynaptic event activity"
+    },
+    "F2": {
+      "fields": [
+        ["eligibility_history", "f32[<=32]", "current and preceding trial values"],
+        ["weight_history", "f32[<=32]", "current and preceding trial values"],
+        ["local_sign_history", "i8[<=32]", "current and preceding local sign values"]
+      ],
+      "window_trials": 32,
+      "time_semantics": "every-trial ring buffer"
+    },
+    "F3a": {
+      "fields": [
+        ["reward", "f32", "native reward consumed by proposal"],
+        ["dan_mean", "f32", "mean DAN state consumed by gain computation"],
+        ["feedback_mean", "f32", "mean feedback state"],
+        ["gain_for_post", "f32", "native gain consumed for this post row"],
+        ["scale", "f32", "native scale consumed by proposal"],
+        ["native_update_consumed", "bool", "contract marker, always true for F3a"]
+      ],
+      "time_semantics": "current trial before delivery",
+      "actually_enters_native_update": true
+    },
+    "F3b": {
+      "fields": [
+        ["eligibility_l1", "f32", "native-state summary computable without reference"],
+        ["active_eligibility_fraction", "f32", "native-state summary computable without reference"],
+        ["global_work", "u64", "native counter"],
+        ["global_events", "u64", "native counter"]
+      ],
+      "time_semantics": "current trial before delivery",
+      "actually_enters_native_update": false
+    },
+    "F4": {
+      "storage": "separate immutable snapshot joined by f4_snapshot_id",
+      "logical_fields": [
+        ["weights", "f32[n_edges]", "complete pre-delivery weight vector"],
+        ["bias", "f32[n_mb]", "complete deterministic readout state"],
+        ["denom", "f32[n_mb]", "complete deterministic normalization state"],
+        ["action_sign", "f32[n_mb]", "complete deterministic action sign vector"],
+        ["labels", "bool[n_cues]", "task labels"],
+        ["schedule", "u32[][]", "task schedule"],
+        ["cue_patterns", "pattern[]", "complete cue edge lists, offsets, DAN vectors"]
+      ],
+      "physical_encoding": {
+        "name": "deterministic_replay_descriptor_v1",
+        "reason": "full per-trial state vectors are shared by sampled rows and are reconstructed losslessly from the immutable native trajectory",
+        "fields": [
+          ["graph_id", "string", "hash-keyed graph input"],
+          ["task_manifest_id", "string", "hash-keyed labels, schedule, and cue patterns"],
+          ["substrate", "enum8", "native substrate id"],
+          ["side", "enum8", "hemisphere"],
+          ["block", "u64", "task/learner block"],
+          ["trial", "u32", "pre-delivery trial index"],
+          ["sim_seed", "u64", "frozen simulator seed, equal to task_seed for the inherited REACH-02 lineage"],
+          ["tau", "f32", "frozen eligibility decay parameter"],
+          ["eta", "f32", "frozen native learning rate"],
+          ["reference_lr", "f64", "frozen reference operator step"],
+          ["pre_state_sha256", "bytes32|null", "full logical-state digest at frozen checkpoints; null between checkpoints"],
+          ["reference_vector_sha256", "bytes32|null", "digest of complete reconstructed reference vector at frozen checkpoints"],
+          ["sample_reference_sha256", "bytes32", "digest of sampled reference values used by rows"],
+          ["sample_target_sha256", "bytes32", "digest of sampled target values used by rows"]
+        ],
+        "checkpoint_trials": [0, 512, 1024, 2048, 4096, 8192],
+        "losslessness": "replay uses the hash-verified graph, task manifest, simulator parameters, and native update order; checkpoint reference-vector and every sampled-target digest must match before analysis"
+      },
+      "reference_reconstruction": "replay native trajectory to the declared pre-delivery trial, verify pre_state_sha256, then call reference_delta_into"
+    }
+  },
+  "sampling": {
+    "design": "uniform_without_replacement_per_substrate_side_block_cell",
+    "coordinates_per_cell": 64,
+    "cell_key": ["substrate", "side", "block"],
+    "seed_namespace": "FLY-REACH-03-coordinate-sampling-v1",
+    "inclusion_probability": "min(1, 64 / n_kc_mb_edges_for_cell)",
+    "secondary_strata": ["pre_degree_quartile", "post_degree_quartile", "anatomical_mb_sign"],
+    "secondary_strata_do_not_change_primary_probability": true,
+    "fixture_override": "three coordinates, p=1, non-scientific only"
+  },
+  "temporal": {
+    "sample_resolution": "every trial",
+    "lag_units": "trials",
+    "lag_set": [1, 2, 4, 8, 16, 32],
+    "online_accumulators": ["eligible_adjacent_pairs", "flip_counts", "lag_sign_products", "lag_pair_counts"]
+  },
+  "estimator": {
+    "family": "numpy_mlp_binary_classifier",
+    "architecture": ["input", "dense(64)", "gelu", "dense(32)", "gelu", "dense(1)"],
+    "output": "logit",
+    "optimizer": "Adam",
+    "optimizer_defaults": {"beta1": 0.9, "beta2": 0.999, "epsilon": 1e-8},
+    "qualification_search": {
+      "learning_rate": [0.0003, 0.001],
+      "batch_size": [2048, 4096],
+      "epochs": [200],
+      "hidden_layers": [[64, 32]]
+    },
+    "selection": "lowest leave-block-out IPW-balanced error on qualification blocks",
+    "measured_fit": "one frozen selected configuration, same family and capacity for every filtration",
+    "constant_baseline": "must report Omega_hat=0"
+  },
+  "inference": {
+    "independent_resample_axis": "task/learner block",
+    "resample_unit": "complete substrate-by-side panel",
+    "bootstrap_replicates": 20000,
+    "balanced_error": "half q-weighted error within Y=+1 plus half q-weighted error within Y=-1",
+    "capability_weighted_sign_score": "q-weighted m*abs(g) numerator and denominator",
+    "no_empirical_monotonicity_enforcement": true
+  },
+  "integrity": {
+    "telemetry_on_off_must_match": true,
+    "f4_reconstruction_required_before_estimators": true,
+    "no_classifier_in_native_loop": true,
+    "no_reference_sign_controller": true,
+    "no_measured_namespace_until_qualification_pass": true
+  }
+}

@@ -1,0 +1,182 @@
+[
+  {
+    "candidate_id": 34154,
+    "candidate_role_hidden": "skip_one",
+    "case_id": "case-01",
+    "exit_code": 0,
+    "passed": true,
+    "stdout": "\nrunning 1 test\ntest check_contract ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Blocking waiting for file lock on package cache\n    Blocking waiting for file lock on package cache\n   Compiling e012-bytes-cursor-harness v0.1.0 (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\task-harnesses\\bytes-cursor-repair-01)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.69s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-bb108e61a25deb77.exe)\n"
+  },
+  {
+    "candidate_id": 34154,
+    "candidate_role_hidden": "skip_one",
+    "case_id": "case-02",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (28168) panicked at tests\\contract.rs:13:5:\nassertion `left == right` failed: cursor observation mismatch\n  left: 17\n right: 34\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Blocking waiting for file lock on build directory\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.66s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-bb108e61a25deb77.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 34154,
+    "candidate_role_hidden": "skip_one",
+    "case_id": "case-03",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (24068) panicked at tests\\contract.rs:13:5:\nassertion `left == right` failed: cursor observation mismatch\n  left: 51\n right: 68\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.02s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-bb108e61a25deb77.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 34154,
+    "candidate_role_hidden": "skip_one",
+    "case_id": "case-04",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (39648) panicked at tests\\contract.rs:13:5:\nassertion `left == right` failed: cursor observation mismatch\n  left: 51\n right: 85\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Blocking waiting for file lock on build directory\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.16s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-bb108e61a25deb77.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 36737,
+    "candidate_role_hidden": "skip_two",
+    "case_id": "case-01",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (45576) panicked at tests\\contract.rs:13:5:\nassertion `left == right` failed: cursor observation mismatch\n  left: 34\n right: 17\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "   Compiling e012-bytes-cursor-harness v0.1.0 (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\task-harnesses\\bytes-cursor-repair-01)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.16s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-bb108e61a25deb77.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 36737,
+    "candidate_role_hidden": "skip_two",
+    "case_id": "case-02",
+    "exit_code": 0,
+    "passed": true,
+    "stdout": "\nrunning 1 test\ntest check_contract ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Blocking waiting for file lock on build directory\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.13s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-bb108e61a25deb77.exe)\n"
+  },
+  {
+    "candidate_id": 36737,
+    "candidate_role_hidden": "skip_two",
+    "case_id": "case-03",
+    "exit_code": 0,
+    "passed": true,
+    "stdout": "\nrunning 1 test\ntest check_contract ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.03s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-bb108e61a25deb77.exe)\n"
+  },
+  {
+    "candidate_id": 36737,
+    "candidate_role_hidden": "skip_two",
+    "case_id": "case-04",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (22816) panicked at tests\\contract.rs:13:5:\nassertion `left == right` failed: cursor observation mismatch\n  left: 68\n right: 85\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.03s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-bb108e61a25deb77.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 64124,
+    "candidate_role_hidden": "skip_three",
+    "case_id": "case-01",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (14640) panicked at C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\repositories\\bytes\\src\\lib.rs:170:5:\nadvance out of bounds: the len is 0 but advancing by 1\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "   Compiling e012-bytes-cursor-harness v0.1.0 (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\task-harnesses\\bytes-cursor-repair-01)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.84s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-bb108e61a25deb77.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 64124,
+    "candidate_role_hidden": "skip_three",
+    "case_id": "case-02",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (29068) panicked at C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\repositories\\bytes\\src\\lib.rs:170:5:\nadvance out of bounds: the len is 0 but advancing by 1\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Blocking waiting for file lock on build directory\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.92s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-bb108e61a25deb77.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 64124,
+    "candidate_role_hidden": "skip_three",
+    "case_id": "case-03",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (268) panicked at tests\\contract.rs:13:5:\nassertion `left == right` failed: cursor observation mismatch\n  left: 85\n right: 68\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.03s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-bb108e61a25deb77.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 64124,
+    "candidate_role_hidden": "skip_three",
+    "case_id": "case-04",
+    "exit_code": 0,
+    "passed": true,
+    "stdout": "\nrunning 1 test\ntest check_contract ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.03s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-bb108e61a25deb77.exe)\n"
+  },
+  {
+    "candidate_id": 31099,
+    "candidate_role_hidden": "skip_none",
+    "case_id": "case-01",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (21672) panicked at tests\\contract.rs:13:5:\nassertion `left == right` failed: cursor observation mismatch\n  left: 160\n right: 17\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "   Compiling e012-bytes-cursor-harness v0.1.0 (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\task-harnesses\\bytes-cursor-repair-01)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.85s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-bb108e61a25deb77.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 31099,
+    "candidate_role_hidden": "skip_none",
+    "case_id": "case-02",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (41044) panicked at tests\\contract.rs:13:5:\nassertion `left == right` failed: cursor observation mismatch\n  left: 160\n right: 34\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Blocking waiting for file lock on build directory\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.87s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-bb108e61a25deb77.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 31099,
+    "candidate_role_hidden": "skip_none",
+    "case_id": "case-03",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (23528) panicked at tests\\contract.rs:13:5:\nassertion `left == right` failed: cursor observation mismatch\n  left: 192\n right: 68\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.03s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-bb108e61a25deb77.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 31099,
+    "candidate_role_hidden": "skip_none",
+    "case_id": "case-04",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (14708) panicked at tests\\contract.rs:13:5:\nassertion `left == right` failed: cursor observation mismatch\n  left: 192\n right: 85\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.03s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-bb108e61a25deb77.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": null,
+    "candidate_role_hidden": "base_snapshot",
+    "case_id": "case-01",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (3048) panicked at tests\\contract.rs:13:5:\nassertion `left == right` failed: cursor observation mismatch\n  left: 160\n right: 17\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "   Compiling e012-bytes-cursor-harness v0.1.0 (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\task-harnesses\\bytes-cursor-repair-01)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.11s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-bb108e61a25deb77.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": null,
+    "candidate_role_hidden": "base_snapshot",
+    "case_id": "case-02",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (20244) panicked at tests\\contract.rs:13:5:\nassertion `left == right` failed: cursor observation mismatch\n  left: 160\n right: 34\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Blocking waiting for file lock on build directory\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.67s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-bb108e61a25deb77.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": null,
+    "candidate_role_hidden": "base_snapshot",
+    "case_id": "case-03",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (1052) panicked at tests\\contract.rs:13:5:\nassertion `left == right` failed: cursor observation mismatch\n  left: 192\n right: 68\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.02s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-bb108e61a25deb77.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": null,
+    "candidate_role_hidden": "base_snapshot",
+    "case_id": "case-04",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (38944) panicked at tests\\contract.rs:13:5:\nassertion `left == right` failed: cursor observation mismatch\n  left: 192\n right: 85\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.02s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-bb108e61a25deb77.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  }
+]

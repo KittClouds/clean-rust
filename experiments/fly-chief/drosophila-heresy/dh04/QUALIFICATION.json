@@ -1,0 +1,15 @@
+{
+  "stage": "before_first_DH04_scientific_execution",
+  "rust_tests_passed": 31,
+  "rust_tests_ignored": 5,
+  "python_analysis_tests_passed": 4,
+  "clippy_release_all_targets_warnings_as_errors": "passed",
+  "explicit_dh04_benchmark": "passed",
+  "release_locked_offline_build": "passed",
+  "parent_dh03_seal_sha256": "9322e7e3dbde9df0596c5480783cbdc3f8c6914ea381f5cf600106cdc623ed03",
+  "parent_dh02_seal_sha256": "6439892580573e420dc30a1df401fe874a195788b89272462b09c0a0d0964ad5",
+  "parent_dh01_seal_sha256": "ad0d7def1d846ff8d8acde61d836002c64c94ba9740eb8560a70d547ada9e9",
+  "target": "D:/drosophila-heresy/dh04-target",
+  "junction": "C:/code land/clean-rust/experiments/drosophila-heresy/dh04/target",
+  "validation_scope": "synthetic engineering, geometry, lineage, and analysis tests only; no DH04 anatomy-task outcome was inspected"
+}

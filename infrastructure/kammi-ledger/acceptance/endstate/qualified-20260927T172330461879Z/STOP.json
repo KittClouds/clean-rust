@@ -1,0 +1,8 @@
+{
+  "replacement": "new complete source-bound run",
+  "reason": "Live predicate and remote-return commit checks repaired before acceptance; all old qualification bytes retained",
+  "acceptance_conferred": false,
+  "phase": "memory",
+  "schema": "KAMMI_QUALIFICATION_STOP_V1",
+  "status": "STOPPED_SOURCE_CHANGED"
+}

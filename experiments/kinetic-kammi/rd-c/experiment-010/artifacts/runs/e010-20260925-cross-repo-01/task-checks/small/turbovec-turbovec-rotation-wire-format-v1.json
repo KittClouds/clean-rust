@@ -1,0 +1,29 @@
+{
+  "task_id": "turbovec-turbovec-rotation-wire-format-v1",
+  "lane": "small",
+  "action_id": 68,
+  "patch_sha256": "007e449ffd08981da2a14e8ad064b052c3b914a91563dddfcaf8b08d8d89f579",
+  "candidate_variant": "gold",
+  "test_filter": "golden_rotation_bits_pin_the_chacha_stream",
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--manifest-path",
+    "C:\\rd-c\\experiment-010\\tasks\\heldout-bank-v1\\families\\turbovec-rotation-wire-format\\candidates\\gold\\Cargo.toml",
+    "--package",
+    "turbovec",
+    "--test",
+    "rotation_determinism",
+    "golden_rotation_bits_pin_the_chacha_stream",
+    "--",
+    "--exact"
+  ],
+  "exit_code": 0,
+  "status": "passed",
+  "passed": true,
+  "elapsed_ms": 8629.767,
+  "completion_source": "live-cargo-test",
+  "output_sha256": "cc1c339699bc52564c253830b42ef862c93c000b23725266d955cca20927d4df",
+  "output": "\nrunning 1 test\ntest golden_rotation_bits_pin_the_chacha_stream ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.00s\n\n   Compiling turbovec v0.9.0 (C:\\rd-c\\experiment-010\\tasks\\heldout-bank-v1\\families\\turbovec-rotation-wire-format\\candidates\\gold\\turbovec)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 8.37s\n     Running tests\\rotation_determinism.rs (D:\\cargo-targets\\rdc-e010\\scoring\\debug\\deps\\rotation_determinism-762b4124a14c9a64.exe)\n"
+}

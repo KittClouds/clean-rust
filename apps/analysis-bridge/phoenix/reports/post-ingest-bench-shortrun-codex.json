@@ -1,0 +1,467 @@
+{
+  "corpus": "shortrun",
+  "warmups": 0,
+  "iterations": 2,
+  "cases": [
+    {
+      "caseId": "shortrun-full",
+      "title": "Shortrun Full",
+      "textBytes": 161490,
+      "legacy": {
+        "counts": {
+          "dirtyScopeCount": 1,
+          "relationScopeCount": 1,
+          "relationCaseCount": 94,
+          "persistedRelationEdgeCount": 1,
+          "stateSchemaScopeCount": 1,
+          "stateSchemaSlotFamilyCount": 8,
+          "stateSchemaSlotDefinitionCount": 19,
+          "stateSchemaActiveDefinitionCount": 7,
+          "stateSchemaCandidateCount": 10,
+          "stateSchemaWriteProposalCount": 3,
+          "memoryScopeCount": 1,
+          "memoryStateCount": 6,
+          "memoryCardCount": 326
+        },
+        "phases": {
+          "dirty_list_us": {
+            "runsUs": [
+              0,
+              0
+            ],
+            "minUs": 0,
+            "meanUs": 0.0,
+            "medianUs": 0.0,
+            "p95Us": 0,
+            "maxUs": 0
+          },
+          "memory_stage_us": {
+            "runsUs": [
+              1502946,
+              1569239
+            ],
+            "minUs": 1502946,
+            "meanUs": 1536092.5,
+            "medianUs": 1569239.0,
+            "p95Us": 1569239,
+            "maxUs": 1569239
+          },
+          "relation_stage_us": {
+            "runsUs": [
+              2674752,
+              2804415
+            ],
+            "minUs": 2674752,
+            "meanUs": 2739583.5,
+            "medianUs": 2804415.0,
+            "p95Us": 2804415,
+            "maxUs": 2804415
+          },
+          "scope_load_us": {
+            "runsUs": [
+              0,
+              0
+            ],
+            "minUs": 0,
+            "meanUs": 0.0,
+            "medianUs": 0.0,
+            "p95Us": 0,
+            "maxUs": 0
+          },
+          "state_schema_stage_us": {
+            "runsUs": [
+              1442290,
+              1453010
+            ],
+            "minUs": 1442290,
+            "meanUs": 1447650.0,
+            "medianUs": 1453010.0,
+            "p95Us": 1453010,
+            "maxUs": 1453010
+          },
+          "total_us": {
+            "runsUs": [
+              5686283,
+              5760372
+            ],
+            "minUs": 5686283,
+            "meanUs": 5723327.5,
+            "medianUs": 5760372.0,
+            "p95Us": 5760372,
+            "maxUs": 5760372
+          }
+        }
+      },
+      "shared": {
+        "counts": {
+          "dirtyScopeCount": 1,
+          "relationScopeCount": 1,
+          "relationCaseCount": 94,
+          "persistedRelationEdgeCount": 1,
+          "stateSchemaScopeCount": 1,
+          "stateSchemaSlotFamilyCount": 8,
+          "stateSchemaSlotDefinitionCount": 19,
+          "stateSchemaActiveDefinitionCount": 7,
+          "stateSchemaCandidateCount": 10,
+          "stateSchemaWriteProposalCount": 3,
+          "memoryScopeCount": 1,
+          "memoryStateCount": 6,
+          "memoryCardCount": 326
+        },
+        "scheduler": {
+          "scopeCount": 1,
+          "requestedStageCount": 3,
+          "dirtyScopeListUs": 98,
+          "runtimeImageLoadUs": 81309,
+          "analysisBuildUs": 8545,
+          "eventIdentityStageUs": 0,
+          "temporalStageUs": 0,
+          "causalStageUs": 0,
+          "relationStageUs": 1310274,
+          "stateSchemaStageUs": 11420,
+          "memoryStageUs": 113454,
+          "graphStageUs": 0,
+          "runtimeImageCacheHits": 0,
+          "runtimeImageCacheMisses": 1,
+          "analysisCacheHits": 3,
+          "analysisCacheMisses": 1,
+          "relationPreparedInputCacheHits": 0,
+          "relationPreparedInputCacheMisses": 1,
+          "stageReadyCount": 3,
+          "stageRunCount": 3,
+          "stageCompleteCount": 3,
+          "stageProductCount": 3,
+          "relationModelJobCount": 0,
+          "relationModelJobWindowCount": 0,
+          "relationModelJobPairSlots": 0,
+          "relationSchemaGroupCount": 3
+        },
+        "phases": {
+          "dirty_list_us": {
+            "runsUs": [
+              98,
+              102
+            ],
+            "minUs": 98,
+            "meanUs": 100.0,
+            "medianUs": 102.0,
+            "p95Us": 102,
+            "maxUs": 102
+          },
+          "memory_stage_us": {
+            "runsUs": [
+              113454,
+              118347
+            ],
+            "minUs": 113454,
+            "meanUs": 115900.5,
+            "medianUs": 118347.0,
+            "p95Us": 118347,
+            "maxUs": 118347
+          },
+          "relation_stage_us": {
+            "runsUs": [
+              1300657,
+              1310274
+            ],
+            "minUs": 1300657,
+            "meanUs": 1305465.5,
+            "medianUs": 1310274.0,
+            "p95Us": 1310274,
+            "maxUs": 1310274
+          },
+          "scope_load_us": {
+            "runsUs": [
+              81309,
+              81430
+            ],
+            "minUs": 81309,
+            "meanUs": 81369.5,
+            "medianUs": 81430.0,
+            "p95Us": 81430,
+            "maxUs": 81430
+          },
+          "state_schema_stage_us": {
+            "runsUs": [
+              10964,
+              11420
+            ],
+            "minUs": 10964,
+            "meanUs": 11192.0,
+            "medianUs": 11420.0,
+            "p95Us": 11420,
+            "maxUs": 11420
+          },
+          "total_us": {
+            "runsUs": [
+              1435147,
+              1441621
+            ],
+            "minUs": 1435147,
+            "meanUs": 1438384.0,
+            "medianUs": 1441621.0,
+            "p95Us": 1441621,
+            "maxUs": 1441621
+          }
+        }
+      }
+    },
+    {
+      "caseId": "shortrun-chapter-1",
+      "title": "Chapter 1: Quicksave",
+      "textBytes": 16235,
+      "legacy": {
+        "counts": {
+          "dirtyScopeCount": 1,
+          "relationScopeCount": 1,
+          "relationCaseCount": 0,
+          "persistedRelationEdgeCount": 0,
+          "stateSchemaScopeCount": 1,
+          "stateSchemaSlotFamilyCount": 8,
+          "stateSchemaSlotDefinitionCount": 15,
+          "stateSchemaActiveDefinitionCount": 7,
+          "stateSchemaCandidateCount": 2,
+          "stateSchemaWriteProposalCount": 0,
+          "memoryScopeCount": 1,
+          "memoryStateCount": 0,
+          "memoryCardCount": 49
+        },
+        "phases": {
+          "dirty_list_us": {
+            "runsUs": [
+              0,
+              0
+            ],
+            "minUs": 0,
+            "meanUs": 0.0,
+            "medianUs": 0.0,
+            "p95Us": 0,
+            "maxUs": 0
+          },
+          "memory_stage_us": {
+            "runsUs": [
+              128746,
+              151735
+            ],
+            "minUs": 128746,
+            "meanUs": 140240.5,
+            "medianUs": 151735.0,
+            "p95Us": 151735,
+            "maxUs": 151735
+          },
+          "relation_stage_us": {
+            "runsUs": [
+              164589,
+              234758
+            ],
+            "minUs": 164589,
+            "meanUs": 199673.5,
+            "medianUs": 234758.0,
+            "p95Us": 234758,
+            "maxUs": 234758
+          },
+          "scope_load_us": {
+            "runsUs": [
+              0,
+              0
+            ],
+            "minUs": 0,
+            "meanUs": 0.0,
+            "medianUs": 0.0,
+            "p95Us": 0,
+            "maxUs": 0
+          },
+          "state_schema_stage_us": {
+            "runsUs": [
+              120693,
+              154000
+            ],
+            "minUs": 120693,
+            "meanUs": 137346.5,
+            "medianUs": 154000.0,
+            "p95Us": 154000,
+            "maxUs": 154000
+          },
+          "total_us": {
+            "runsUs": [
+              414029,
+              540495
+            ],
+            "minUs": 414029,
+            "meanUs": 477262.0,
+            "medianUs": 540495.0,
+            "p95Us": 540495,
+            "maxUs": 540495
+          }
+        }
+      },
+      "shared": {
+        "counts": {
+          "dirtyScopeCount": 1,
+          "relationScopeCount": 1,
+          "relationCaseCount": 0,
+          "persistedRelationEdgeCount": 0,
+          "stateSchemaScopeCount": 1,
+          "stateSchemaSlotFamilyCount": 8,
+          "stateSchemaSlotDefinitionCount": 15,
+          "stateSchemaActiveDefinitionCount": 7,
+          "stateSchemaCandidateCount": 2,
+          "stateSchemaWriteProposalCount": 0,
+          "memoryScopeCount": 1,
+          "memoryStateCount": 0,
+          "memoryCardCount": 49
+        },
+        "scheduler": {
+          "scopeCount": 1,
+          "requestedStageCount": 3,
+          "dirtyScopeListUs": 73,
+          "runtimeImageLoadUs": 12540,
+          "analysisBuildUs": 999,
+          "eventIdentityStageUs": 0,
+          "temporalStageUs": 0,
+          "causalStageUs": 0,
+          "relationStageUs": 64022,
+          "stateSchemaStageUs": 2748,
+          "memoryStageUs": 11929,
+          "graphStageUs": 0,
+          "runtimeImageCacheHits": 0,
+          "runtimeImageCacheMisses": 1,
+          "analysisCacheHits": 3,
+          "analysisCacheMisses": 1,
+          "relationPreparedInputCacheHits": 0,
+          "relationPreparedInputCacheMisses": 1,
+          "stageReadyCount": 3,
+          "stageRunCount": 3,
+          "stageCompleteCount": 3,
+          "stageProductCount": 3,
+          "relationModelJobCount": 0,
+          "relationModelJobWindowCount": 0,
+          "relationModelJobPairSlots": 0,
+          "relationSchemaGroupCount": 0
+        },
+        "phases": {
+          "dirty_list_us": {
+            "runsUs": [
+              73,
+              83
+            ],
+            "minUs": 73,
+            "meanUs": 78.0,
+            "medianUs": 83.0,
+            "p95Us": 83,
+            "maxUs": 83
+          },
+          "memory_stage_us": {
+            "runsUs": [
+              10692,
+              11929
+            ],
+            "minUs": 10692,
+            "meanUs": 11310.5,
+            "medianUs": 11929.0,
+            "p95Us": 11929,
+            "maxUs": 11929
+          },
+          "relation_stage_us": {
+            "runsUs": [
+              64022,
+              66023
+            ],
+            "minUs": 64022,
+            "meanUs": 65022.5,
+            "medianUs": 66023.0,
+            "p95Us": 66023,
+            "maxUs": 66023
+          },
+          "scope_load_us": {
+            "runsUs": [
+              12197,
+              12540
+            ],
+            "minUs": 12197,
+            "meanUs": 12368.5,
+            "medianUs": 12540.0,
+            "p95Us": 12540,
+            "maxUs": 12540
+          },
+          "state_schema_stage_us": {
+            "runsUs": [
+              2748,
+              3380
+            ],
+            "minUs": 2748,
+            "meanUs": 3064.0,
+            "medianUs": 3380.0,
+            "p95Us": 3380,
+            "maxUs": 3380
+          },
+          "total_us": {
+            "runsUs": [
+              79087,
+              80562
+            ],
+            "minUs": 79087,
+            "meanUs": 79824.5,
+            "medianUs": 80562.0,
+            "p95Us": 80562,
+            "maxUs": 80562
+          }
+        }
+      }
+    }
+  ],
+  "projections": [
+    {
+      "phase": "legacy.total_us",
+      "sliceCaseId": "shortrun-chapter-1",
+      "fullCaseId": "shortrun-full",
+      "sliceMeanUs": 477262.0,
+      "projectedFullLinearUs": 4747338.489682784,
+      "actualFullMeanUs": 5723327.5,
+      "superlinearFactor": 1.2055865644377994
+    },
+    {
+      "phase": "shared.total_us",
+      "sliceCaseId": "shortrun-chapter-1",
+      "fullCaseId": "shortrun-full",
+      "sliceMeanUs": 79824.5,
+      "projectedFullLinearUs": 794016.5386510625,
+      "actualFullMeanUs": 1438384.0,
+      "superlinearFactor": 1.8115290173220313
+    },
+    {
+      "phase": "legacy.relation_stage_us",
+      "sliceCaseId": "shortrun-chapter-1",
+      "fullCaseId": "shortrun-full",
+      "sliceMeanUs": 199673.5,
+      "projectedFullLinearUs": 1986157.9005235604,
+      "actualFullMeanUs": 2739583.5,
+      "superlinearFactor": 1.379338218415481
+    },
+    {
+      "phase": "shared.relation_stage_us",
+      "sliceCaseId": "shortrun-chapter-1",
+      "fullCaseId": "shortrun-full",
+      "sliceMeanUs": 65022.5,
+      "projectedFullLinearUs": 646780.6298121343,
+      "actualFullMeanUs": 1305465.5,
+      "superlinearFactor": 2.0184053755276947
+    }
+  ],
+  "deltas": [
+    {
+      "caseId": "shortrun-full",
+      "legacyMeanUs": 5723327.5,
+      "sharedMeanUs": 1438384.0,
+      "savedUs": 4284943.5,
+      "speedup": 3.9789983064327745
+    },
+    {
+      "caseId": "shortrun-chapter-1",
+      "legacyMeanUs": 477262.0,
+      "sharedMeanUs": 79824.5,
+      "savedUs": 397437.5,
+      "speedup": 5.9788911925536645
+    }
+  ]
+}

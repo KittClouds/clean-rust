@@ -1,0 +1,9 @@
+{
+  "schema": "CHIEF_E4_0_EXTRACT_PREPARED_LEDGER_RECEIPT_V1",
+  "status": "PREPARED_REGISTERED_FLIGHT_AUTHORITY_WITHHELD",
+  "artifact_id": "sha256:4db990e309b1f9a1b84006c0f4b879e63db99aff03dadb6108872e7ca8d2d5b5",
+  "seal_root": "sha256:97c40e99d41b38dc29528938a9b63fcbda6a137831bb200658a638a825afe569",
+  "stage_id": "E4_0_FRESH_FEATURE_EXTRACTION_V1",
+  "model_contact_authorized": false,
+  "e4_01_entry_open": false
+}

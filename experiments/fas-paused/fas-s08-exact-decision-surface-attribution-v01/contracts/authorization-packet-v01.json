@@ -1,0 +1,14 @@
+{
+  "authorization_id": "FAS_S08_AUTHORIZATION_V01",
+  "status": "AUTHORIZED_BY_USER_IN_CURRENT_TASK",
+  "source": "User authorized one complete FAS-S08 exact decision-surface attribution packet using sealed S06 inputs, no SAE, no transformer contact, no new extraction, and no new probe fits.",
+  "scope": "Execute the frozen S08 read-only geometry, exact 16-cell Walsh margin decomposition, S01 training-only coordinate census/selection, held-out S01 interventions, then post-S01-seal FAS-00 descriptive transfer.",
+  "model_contact": false,
+  "feature_extraction": false,
+  "probe_fitting": false,
+  "adaptive_mechanisms": false,
+  "sae": false,
+  "layerwise_analysis": false,
+  "fas00_coordinate_selection": false,
+  "parent_modification": false
+}

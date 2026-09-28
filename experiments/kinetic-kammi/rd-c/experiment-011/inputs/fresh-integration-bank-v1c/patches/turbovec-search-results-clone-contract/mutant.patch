@@ -1,0 +1,11 @@
+--- a/turbovec/src/lib.rs
++++ b/turbovec/src/lib.rs
+@@ -464,7 +464,7 @@
+ /// patterns. Good enough for `assert_eq!` on results the index actually
+ /// returns; not a substitute for comparing scores within a tolerance,
+ /// and not enough to key a map.
+-#[derive(Debug, PartialEq)]
++#[derive(Debug, Copy, Clone, PartialEq)]
+ pub struct SearchResults {
+     /// Scores, row-major `nq × k`, sorted descending within each row
+     /// (best match first).

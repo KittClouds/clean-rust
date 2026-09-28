@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "scope": "post-hoc diagnosis of the two original small-observer pilot abstentions; no task labels used to refit thresholds",
+  "thresholds": {
+    "minimum_applicability_milli": 700,
+    "maximum_abstention_milli": 600
+  },
+  "score_contract": "rdc-coding-observer-output.v1; both score fields are milli in [0,1000]; normalization was line-endings-lf-v1 only",
+  "traces": {
+    "coding-gpu-pick-01": {
+      "observer_record_path": "artifacts/runs/e009-20260925-pilot-01/lane-small/coding-gpu-pick-01.json",
+      "observer_record_sha256": "473f251882c681ed9f31c5460275eccf99375be078b20b0321c05dcf025580c0",
+      "bundle_id": "minicpm5-2b-q8-local-v1",
+      "output": {
+        "action_choice": null,
+        "applicability_milli": 0,
+        "abstention_milli": 0
+      },
+      "compiled_decision": "Abstain(NotApplicable)",
+      "selected_action_id": null,
+      "abstained": true,
+      "prompt_tokens": 921,
+      "generated_tokens": 23,
+      "elapsed_ms": 462.998
+    },
+    "coding-embedding-batch-01": {
+      "observer_record_path": "artifacts/runs/e009-20260925-pilot-01/lane-small/coding-embedding-batch-01.json",
+      "observer_record_sha256": "1e012c8d26118fc3a1f093232515b49aada6002bff3cc638f8f498a2460e7f12",
+      "bundle_id": "minicpm5-2b-q8-local-v1",
+      "output": {
+        "action_choice": 51,
+        "applicability_milli": 95,
+        "abstention_milli": 0
+      },
+      "compiled_decision": "Abstain(NotApplicable)",
+      "selected_action_id": null,
+      "abstained": true,
+      "prompt_tokens": 922,
+      "generated_tokens": 23,
+      "elapsed_ms": 227.092
+    }
+  },
+  "interpretation": [
+    "coding-gpu-pick-01 returned action_choice=null, applicability_milli=0, abstention_milli=0. The compiler produced Abstain(NotApplicable) because applicability 0 is below the frozen 700 floor; the uncertainty score passes the <=600 gate.",
+    "coding-embedding-batch-01 proposed action 51 with applicability_milli=95 and abstention_milli=0. Under the v1 milli contract, 95 is below the 700 floor, so the compiler produced Abstain(NotApplicable). A percent/milli misunderstanding is plausible because 95 resembles the later percent wire format, but the trace cannot establish intended units; no reinterpretation was applied.",
+    "The later v2 interface makes scores explicit integer percent and normalizes percent x 10 into milli. The v5 bundle used this versioned boundary. These pilot traces did not set v5 thresholds."
+  ],
+  "provenance_sha256": {
+    "pilot_frozen_input_lock": "09225e3107b4b6b0ccbca04b2efe266e5a58053fdd2a69606f1536bc0aa536d4",
+    "pilot_lane_results": "9dcc2063b00cfc2a660309e235b84654a9b749a8c389c55c8833726e1f493ef1",
+    "v1_system_prompt": "2b97ece95d1afb065fed7287d5125e8e032196c209610c9bc9931841aa1db7e6",
+    "v1_output_schema": "d3e44b9964d52bb68384b83e17d9cb5699be96bae7dc98d576acaaabcf3eb8ef",
+    "v1_bundle_lock": "e3a719ac2644ec6dfde0c45e6820cc7f4c4a567e7d003196b46df355f3cac2bf"
+  }
+}

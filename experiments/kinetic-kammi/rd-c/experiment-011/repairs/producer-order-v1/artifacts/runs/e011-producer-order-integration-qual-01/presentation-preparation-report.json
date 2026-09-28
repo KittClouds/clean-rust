@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "run_id": "e011-producer-order-integration-qual-01",
+  "bank_id": "e011-fresh-integration-bank-v1c",
+  "task_count": 4,
+  "transport_permuted_and_restored": 4,
+  "exact_original_frame_reconstructions": 4,
+  "frame_lock_sha256": "8265011f22c0c372f7d742e0b948e5bac33e4f6b5a38120b9423be410004e566",
+  "prepared_frame_lock_sha256": "0fc0a92d14db74862b9f9d6cc282a706dc361fa8c3c6a65a940e536e843bb290"
+}

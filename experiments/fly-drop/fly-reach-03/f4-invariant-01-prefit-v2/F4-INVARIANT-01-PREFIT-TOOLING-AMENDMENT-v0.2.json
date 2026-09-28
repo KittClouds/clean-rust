@@ -1,0 +1,43 @@
+{
+  "schema": "F4-INVARIANT-01-prefit-tooling-amendment-v0.2",
+  "identity": "F4-INVARIANT-01",
+  "status": "IMPLEMENTATION_ONLY_STOP_REPAIR",
+  "applies_to_execution_attempt": "F4-INVARIANT-01-COLLECT2-EXEC2",
+  "parent_collection_run_id": "F4-INVARIANT-01-COLLECT2",
+  "preserved_failed_attempt": {
+    "attempt_id": "F4-INVARIANT-01-COLLECT2-EXEC1",
+    "stop_receipt": "experiments/fly-reach-03/runs/F4-INVARIANT-01-COLLECT2-EXEC1-STOP-RECEIPT.json",
+    "stop_receipt_sha256": "5b88b1c0230ffbb552f50fb2aa2cd4a4b827057be2500b71cd7d2bd94218ac16",
+    "failure": "Executor startup raised NameError because IMPL was omitted from the fit_common import.",
+    "fits_started": 0,
+    "fit_receipts_created": 0,
+    "prediction_streams_created": 0,
+    "prediction_lock_created": false,
+    "heldout_truth_opened": false
+  },
+  "superseded_prefit_manifest_sha256": "67040f6e459644b479bceaa6e738afcb55b1626b7f587b5aeef54ceb4e61e862",
+  "task_bank_run": "F4-INVARIANT-01-RUN2",
+  "task_bank_sha256": "8e49f61018255fa32d4328056d46a0b5a14b70306ccfa98733849dcac245c02c",
+  "purpose": "Repair a pre-fit executor startup defect before any fit output existed. Preserve the failed attempt and re-freeze tooling and manifest under a fresh execution-attempt identity.",
+  "mechanical_changes_only": [
+    "import the already-defined IMPL path into the executor",
+    "write all execution outputs under the fresh EXEC2 attempt directory",
+    "recompute source hashes, initial tensor bundle hashes, and the 72-row fit manifest for EXEC2"
+  ],
+  "frozen_inputs_reused_byte_for_byte": [
+    "design and implementation contracts",
+    "task bank and task seeds",
+    "COLLECT2 native trajectories, Ustar rows, predictor stream, and scoring truth stream",
+    "fold normalization payloads and shared-input reconciliation",
+    "initializer seed manifest and per-cell initialization values",
+    "D and S model semantics, feature generation, optimizer, update count, batch order, and prediction format",
+    "held-out support result of 7/12 and the 72-fit execution grid"
+  ],
+  "scientific_rules_changed": false,
+  "task_or_seed_namespace_changed": false,
+  "heldout_support_used_to_change_fit_grid": false,
+  "qualification_only": true,
+  "measured_reach03_authorized": false,
+  "biological_promotion": false,
+  "pheno_status": "unchanged"
+}

@@ -1,0 +1,49 @@
+{
+  "task_id": "coding-embedding-batch-01",
+  "lane": "preflight-mutant",
+  "action_id": 17,
+  "tests": [
+    {
+      "filter": "tests::length_bucket_order_is_stable_for_equal_lengths",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "C:\\rd-c\\experiment-009\\tasks\\embedding-batch-order-v2\\candidate-mutant\\rust-native\\phoenix\\Cargo.toml",
+        "-p",
+        "phoenix-embed",
+        "--lib",
+        "tests::length_bucket_order_is_stable_for_equal_lengths",
+        "--",
+        "--exact"
+      ],
+      "exit_code": 101,
+      "tests_run": 1,
+      "passed": false,
+      "elapsed_ms": 12016.062,
+      "output": "\nrunning 1 test\ntest tests::length_bucket_order_is_stable_for_equal_lengths ... FAILED\n\nfailures:\n\n---- tests::length_bucket_order_is_stable_for_equal_lengths stdout ----\n\nthread 'tests::length_bucket_order_is_stable_for_equal_lengths' (21308) panicked at crates\\phoenix-embed\\src\\tests.rs:60:5:\nassertion `left == right` failed\n  left: [0, 1, 2, 3]\n right: [1, 3, 0, 2]\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    tests::length_bucket_order_is_stable_for_equal_lengths\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 9 filtered out; finished in 2.90s\n\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.34s\n     Running unittests src\\lib.rs (D:\\cargo-targets\\rdc-e009\\embed-full-mutant-v2\\debug\\deps\\phoenix_embed-048caeb98a730a7a.exe)\nerror: test failed, to rerun pass `-p phoenix-embed --lib`\n"
+    },
+    {
+      "filter": "tests::telemetry_reports_padding_amplification",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "C:\\rd-c\\experiment-009\\tasks\\embedding-batch-order-v2\\candidate-mutant\\rust-native\\phoenix\\Cargo.toml",
+        "-p",
+        "phoenix-embed",
+        "--lib",
+        "tests::telemetry_reports_padding_amplification",
+        "--",
+        "--exact"
+      ],
+      "exit_code": 0,
+      "tests_run": 1,
+      "passed": true,
+      "elapsed_ms": 570.29,
+      "output": "\nrunning 1 test\ntest tests::telemetry_reports_padding_amplification ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 9 filtered out; finished in 0.00s\n\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.48s\n     Running unittests src\\lib.rs (D:\\cargo-targets\\rdc-e009\\embed-full-mutant-v2\\debug\\deps\\phoenix_embed-048caeb98a730a7a.exe)\n"
+    }
+  ],
+  "completed": false,
+  "status": "failed-or-mutated"
+}

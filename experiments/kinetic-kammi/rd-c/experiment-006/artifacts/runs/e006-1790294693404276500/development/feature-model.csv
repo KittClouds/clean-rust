@@ -1,0 +1,9 @@
+feature,weight
+bias,0.25959557
+observer_disagreement,-0.28730786
+warning,-0.28730786
+age,0.92470443
+confidence_gap,-1.02383506
+revision_gap,0.61646920
+audit_selected,0.11305455
+stale_visible,-0.28730786

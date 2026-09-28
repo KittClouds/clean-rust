@@ -1,0 +1,44 @@
+{
+  "schema": "FAS_E4_0_CONTRACT_TOOLING_SOURCE_TESTS_V14",
+  "receipt_id": "E4_0_CONTRACT_TOOLING_V14_SOURCE_TESTS",
+  "status": "PASS_SYNTHETIC_CONTRACT_AND_SOURCE_MAP_TESTS",
+  "commands": [
+    "python -m py_compile experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/build_e4_0_source_map_v14.py experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/finalize_e4_0_contract_v14.py experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/seal_e4_0_contract_v14.py experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/test_e4_0_contract_v14.py",
+    "python experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/test_e4_0_contract_v14.py (26 synthetic tests)"
+  ],
+  "unit_test_count": 26,
+  "py_compile": "PASS",
+  "source_bindings": [
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/build_e4_0_source_map_v14.py",
+      "bytes": 53355,
+      "sha256": "e6ee1d8f2ff0461a621ede0d8ff52d9d2aef3e6c3cf38dab0e57bd3d45e741fe"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/finalize_e4_0_contract_v14.py",
+      "bytes": 54978,
+      "sha256": "9e8c6b3bc716920d6b7d669aa2d2aa92c263cf61035e4f7e2bbf4632f0eacecc"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/seal_e4_0_contract_v14.py",
+      "bytes": 17713,
+      "sha256": "6f73091e75eb04d814a1416c5c99849c01ebcbe0e1d1d36a8251442bc5dd572e"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/test_e4_0_contract_v14.py",
+      "bytes": 24406,
+      "sha256": "79bab1c21900e5b37416e4ad416030ff3217a13089210728c04509a8ba1a2de3"
+    }
+  ],
+  "runtime_access": {
+    "model_contact": false,
+    "tokenizer_contact": false,
+    "cuda_initialized": false,
+    "gpu_lease_acquired": false,
+    "cache_created": false,
+    "labels_opened": false
+  },
+  "scope": "Synthetic v14 source-map, contract finalizer, and sealer tests. Covers exact acceptance of the registered v12 Track E predecessor PASS receipt status, v13 finalization stop lineage, v06 scientific invariance, v06-v11 sealed ancestry, map closure, and duplicate-path rejection. No contract/map/seal/authorization or runtime contact.",
+  "execution_authorization_conferred": false,
+  "recorded_utc": "2026-09-27T04:06:29.018169+00:00"
+}

@@ -1,0 +1,28 @@
+{
+  "counts": {
+    "candidates_with_exact_declared_rows": 1727,
+    "endpoint_set_count": 14,
+    "exact_nonzero_replays": 390694,
+    "groups_with_palette_shortfall": 1,
+    "palette_count": 7207,
+    "raw_group_count": 801
+  },
+  "engineering_only": true,
+  "gate": {
+    "all_groups_completed": true,
+    "authority_complete": true,
+    "gc1_authorized": false,
+    "global_assembly_executed": false,
+    "palette_stream_complete": true,
+    "raw_support_complete": true
+  },
+  "group_status_counts": {
+    "PALETTE_COMPLETE": 800,
+    "PALETTE_SHORTFALL_PRESERVED": 1
+  },
+  "identity": "q10-gc0-gp1-par2-v1",
+  "interpretation": "The complete raw-group authority-aware palette was generated with group-granular deterministic workers. Exact candidate semantics are unchanged; no global assembly or science was run.",
+  "protocol": "Q10-GC0-GP1-PAR2",
+  "scientific_promotion": false,
+  "status": "PAR2_ENGINEERING_PALETTE_COMPLETE"
+}

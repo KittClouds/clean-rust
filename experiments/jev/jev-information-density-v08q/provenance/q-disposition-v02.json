@@ -1,0 +1,11 @@
+{
+  "Q_BUNDLE_SEALED": true,
+  "Q_EVALUATION_AUTHORIZED": false,
+  "Q_FEATURE_EXTRACTION_AUTHORIZED": false,
+  "Q_MODEL_CONTACT_AUTHORIZED": false,
+  "Q_PANEL_CONSTRUCTION_AUTHORIZED": false,
+  "Q_TRAINING_AUTHORIZED": false,
+  "identity": "JEV_V08Q_DISPOSITION_V02",
+  "phase": "prospective_contract_bundle_only",
+  "source_lock_root_sha256": "5e973916fb62747cde2de51f7deb2e29616ea1ead13ce384dcdb254901d936d3"
+}

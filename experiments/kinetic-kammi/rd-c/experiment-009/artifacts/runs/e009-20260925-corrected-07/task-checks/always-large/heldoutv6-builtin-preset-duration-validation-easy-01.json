@@ -1,0 +1,14 @@
+{
+  "task_id": "heldoutv6-builtin-preset-duration-validation-easy-01",
+  "lane": "always-large",
+  "action_id": 37,
+  "patch_sha256": "dc1fedf88775a3b713716752563fcab086ddfe1dbb35914b55473609cd9a23a5",
+  "candidate_variant": "gold",
+  "test_filter": "preset::tests::builtins_are_valid_and_exportable",
+  "status": "passed",
+  "passed": true,
+  "elapsed_ms": 0.0,
+  "completion_source": "precontact-bank-build-receipt",
+  "completion_log_sha256": "a36f8aa745a242bd5f5178c8dab9cfe4fdd4e40404227c3b0e72bb8278396f19",
+  "bank_build_receipt_sha256": "1e8f063758e9d469041e2fa602389bf28478b415aa4c0fedcaa123af0241bc30"
+}

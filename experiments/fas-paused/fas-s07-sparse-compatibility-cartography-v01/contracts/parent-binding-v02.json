@@ -1,0 +1,35 @@
+{
+  "binding_id": "FAS_S07_PARENT_BINDING_V01",
+  "parents": {
+    "s01_phase2_result_root": "1fc3aeb432ecdbef21a35aea8fed5b0d59671681eb8eb8032533c9ce751a4384",
+    "s01_feature_cache_root": "4964f35fb87a45a9447cd0f5f028668027ca3ad3a8f0d0c3f9eb7b9cbe7ccaaa",
+    "s01_phase3_result_root": "2581b50d75382c197793ea46400bf2b8a27508df22b2ff5bdbe82eb20a5238b7",
+    "s04_result_root": "02e5d903cb2ddab7f995a1e31508a09c0b51cd57b3cd45b2a1b8f5e0ac4892a2",
+    "s05_result_root": "6e5cb0586611aeb0b07dff7b8788b7b8bea749179bbe5a38ef98a8045e890466",
+    "s06_result_root": "b21e4cb026d0b3956f9a666c4928a79922e39ee33b9f64653181d6dbc9a0d1b0",
+    "fas00_phase2a_cache_root": "9af2c6c73a2f21608e8a2dc912d8838968eaebffb32b4b1ea0a18364e488d217",
+    "fas00_phase3_result_root": "09fd072754e3b149ac2a9564928209a792eba091064033ca0d7f455333dda0c5",
+    "s02_final_cache_root": "ce7604bcd82b1b13ff4828b71dddf835e0c7f9d924ec1b886af5ad78c415ac11",
+    "s02_result_root": "1585488434830939e11cdf67dd9ff336ef133ab596a87c011394fb8d42db143d"
+  },
+  "direct_inputs": {
+    "fas00_phase1_qualification_events": {"path":"D:/codex-runs/fas-frozen-adaptive-substrate-v00/phase1-v03/corpus/qualification-events-v03.jsonl","sha256":"9fdd7ce9e49b86ac9acb3da035429c616865f527123bd0ac7c312b1b912439ca","bytes":56280424},
+    "fas00_phase1_corpus_manifest": {"path":"D:/codex-runs/fas-frozen-adaptive-substrate-v00/phase1-v03/corpus/corpus-manifest-v03.json","sha256":"1a6905972dd397c2035bc8a3349933530a1ce4184f576df57d7f57746fc0628f","bytes":1278},
+    "s01_mean_features": {"path":"D:/codex-runs/fas-s01-frozen-sensor-transfer-cartography/s01-2-feature-geometry-v01/feature-cache-v01/V0_MEAN_FULL.f32le","sha256":"9cc840390abd2c9d186f33b6a62948b55d4cdd15d52a4cfe03bd32775a2fe76c","bytes":872415232},
+    "s01_final_features": {"path":"D:/codex-runs/fas-s01-frozen-sensor-transfer-cartography/s01-2-feature-geometry-v01/feature-cache-v01/V1_FINAL_POSITION.f32le","sha256":"095366563e0ef08a38192c325c93a000614cbdbd3a467e2e8c5c92e14acd1409","bytes":872415232},
+    "s01_feature_rows": {"path":"D:/codex-runs/fas-s01-frozen-sensor-transfer-cartography/s01-2-feature-geometry-v01/feature-cache-v01/feature-rows-v01.jsonl","sha256":"a8ea72310c0926962a0783d90eb3ceda19ca0b334bd2c00aafdd226e8aaaa40b","bytes":368110353},
+    "s01_corpus": {"path":"D:/codex-runs/fas-s01-frozen-sensor-transfer-cartography/s01-2-v01-sealed/corpus/counterfactual-quartets-v01.jsonl","sha256":"51a55212ba89d55bd6df532673ad4546c95def1f5d75622661f7c17b3e4a7ad1","bytes":205585547},
+    "s01_event_metadata": {"path":"D:/codex-runs/fas-s01-frozen-sensor-transfer-cartography/s01-3-linear-accessibility-v01/metadata/event-metadata-v01.npz","sha256":"8452759c748fc0b17fb20fd246d522e0dfa5521058f72226397f47baa74e38ec","bytes":15658966},
+    "s01_mean_probe": {"path":"D:/codex-runs/fas-s01-frozen-sensor-transfer-cartography/s01-3-linear-accessibility-v01/probes/V0_MEAN_FULL/EXACT_TARGET/probe-state-v01.npz","sha256":"1b3db11aa1fe691a98b40b0b9001c3f0125d1acd47f7c069ef53fd487a2d46e4","bytes":58644},
+    "s01_final_probe": {"path":"D:/codex-runs/fas-s01-frozen-sensor-transfer-cartography/s01-3-linear-accessibility-v01/probes/V1_FINAL_POSITION/EXACT_TARGET/probe-state-v01.npz","sha256":"2cbbd450468ae7ebbe073ca9badaf229dcf9d3b55ff80ed102ccf9eb7e942641","bytes":58644},
+    "s05_event_populations": {"path":"D:/codex-runs/fas-s05-crossed-representation-readout-decomposition-v07/event-populations-v01.json","sha256":"3637a78e6d48d66c0c8c4106a3984d9c5dc2a38beb2289cada91e98d0ee6e4bb","bytes":54176880},
+    "s06_crossed_ledger": {"path":"D:/codex-runs/fas-s06-representation-scaler-probe-compatibility-cube-v02/crossed-cube-ledger-v01.jsonl","sha256":"55f4d7bc04218c3f54eea2fbe555a8d0942137a1bc12c049913eaf14e3b4c558","bytes":124922890},
+    "s06_compatibility_summary": {"path":"D:/codex-runs/fas-s06-representation-scaler-probe-compatibility-cube-v02/compatibility-summary-v01.json","sha256":"d987b0a861e52639c84e97c2b88be11258167e49ca59812e298f5c8f13197606","bytes":296199},
+    "fas00_mean_features": {"path":"D:/codex-runs/fas-frozen-adaptive-substrate-v00/phase2a-v01/feature-cache-v01/features-v01.f32le","sha256":"6205b7d7a224b798b387886b43ec27103b37f091dccd9b623847cb7a52b0c8c2","bytes":536870912},
+    "fas00_feature_rows": {"path":"D:/codex-runs/fas-frozen-adaptive-substrate-v00/phase2a-v01/feature-cache-v01/feature-rows-v01.jsonl","sha256":"6ee54626d0da6e1b3fab5f544e9af9f4c68f0afd5045bc39d62994e0a629011b","bytes":85443514},
+    "fas00_mean_probe": {"path":"D:/codex-runs/fas-frozen-adaptive-substrate-v00/phase3-v02/results-v01/probe-artifacts/HELDOUT_TERM_EXACT_TARGET.npz","sha256":"be7c4fa016f1ad5887a8bf087a395a6ca02377d706be291a5ad1b6fbcc9cabbb","bytes":82934},
+    "s02_final_features": {"path":"D:/codex-runs/fas-s02-original-corpus-readout-surface-attribution-v01/s02-1-final-position-v02/feature-cache-v01/final-position-v01.f32le","sha256":"e4ef40343b10761236abdd2e77bb06aff69edb1ffe91a9344cf029a09790e3ba","bytes":268435456},
+    "s02_final_rows": {"path":"D:/codex-runs/fas-s02-original-corpus-readout-surface-attribution-v01/s02-1-final-position-v02/feature-cache-v01/final-position-rows-v01.jsonl","sha256":"279a2cefcda70842b7bff8b1072d0ee590dbb0a13c0c16f181a1df62ad2aa9f2","bytes":30424807},
+    "s02_final_probe": {"path":"D:/codex-runs/fas-s02-original-corpus-readout-surface-attribution-v01/s02-2-readout-attribution-v01/correction-v05/results-v01/final-position-probe-v01.npz","sha256":"928e8aca604efb5c09c733ed23e94228ea24336cb417ff190103638d269871cc","bytes":82934}
+  }
+}

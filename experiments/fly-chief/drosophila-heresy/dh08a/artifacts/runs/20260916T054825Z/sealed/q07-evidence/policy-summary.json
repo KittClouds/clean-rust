@@ -1,0 +1,68 @@
+{
+  "status": "CLOSED_LOOP_QUALIFICATION_PASSED",
+  "runs": 48,
+  "events": 12288,
+  "development_events": 8192,
+  "holdout_events": 4096,
+  "failures": [],
+  "gates_sha256": "2d42c05926cf8b07a125c855df6d68094c7bada6c573dd099eb40c7dafbe03c2",
+  "measured_seeds_used": 0,
+  "distributions": {
+    "residual_abs_cosine": {
+      "n": 12288,
+      "minimum": 5.086855969058276e-13,
+      "median": 2.586753576697118e-09,
+      "p95": 8.048751264353351e-09,
+      "maximum": 2.396809552802721e-08,
+      "mean": 3.148710503381664e-09
+    },
+    "axial_error_over_total_norm": {
+      "n": 12288,
+      "minimum": 1.867689969521702e-13,
+      "median": 3.2012258029120273e-09,
+      "p95": 1.1161061789404603e-08,
+      "maximum": 3.076246580247497e-08,
+      "mean": 4.114422577653785e-09
+    },
+    "norm_relative_error": {
+      "n": 12288,
+      "minimum": 4.4977684201520043e-13,
+      "median": 2.6134053003253857e-09,
+      "p95": 8.353578175827969e-09,
+      "maximum": 1.891370027309842e-08,
+      "mean": 3.2240469676564077e-09
+    },
+    "residual_norm_relative_error": {
+      "n": 12288,
+      "minimum": 1.9484781721319006e-12,
+      "median": 2.6132714233778617e-09,
+      "p95": 8.353690702873183e-09,
+      "maximum": 1.892242356500732e-08,
+      "mean": 3.224162791127797e-09
+    },
+    "sweeps": {
+      "n": 12288,
+      "minimum": 1.0,
+      "median": 1.0,
+      "p95": 1.0,
+      "maximum": 2.0,
+      "mean": 1.0001627604166667
+    },
+    "moves": {
+      "n": 12288,
+      "minimum": 1380.0,
+      "median": 2101.5,
+      "p95": 2408.0,
+      "maximum": 2740.0,
+      "mean": 2098.61865234375
+    },
+    "support": {
+      "n": 12288,
+      "minimum": 6115.0,
+      "median": 8715.5,
+      "p95": 9767.0,
+      "maximum": 10442.0,
+      "mean": 8690.975260416666
+    }
+  }
+}

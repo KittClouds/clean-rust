@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "state": "FROZEN_BEFORE_SCORED_TASK_FIXTURES",
+  "model_contact_authorized": false,
+  "scored_task_frames_created": false,
+  "effective_bank_plan_version": "1.3",
+  "bank_amendments": [
+    {
+      "id": "E012-BANK-A01",
+      "markdown_sha256": "10c8996b05f6b6733f1a0204be8559d328c15aa9536b1545f72b21ebd02d7699",
+      "json_sha256": "27751a46d5fe4231b7b58928113adbc7036bbcead16f556204f5447fe8c58d2f"
+    },
+    {
+      "id": "E012-BANK-A02",
+      "markdown_sha256": "df9eedb1ef620696eb4b599455c38bd950657a01dfa4610969fc04f7703800ec",
+      "json_sha256": "facb1b9e4a2534ae54b69899f2f78a96ea3121d8e231faf8897da76727ae1636"
+    },
+    {
+      "id": "E012-BANK-A03",
+      "markdown_sha256": "1847311ef6e383b3bd854e5d170ba0d27afc10a52a0e3c34e57575c23004e4c5",
+      "json_sha256": "4fdeb4138c2e45c8f1aaaaf72d7bb4ad1adcb30f7cbedbf694260ba6a81e3dd0"
+    }
+  ],
+  "sha256": {
+    "effective_protocol_lock": "a40040b1616250f393c0f6972ded38c4be0002b367263adae6bd3bb8c49c5fe3",
+    "protocol_source": "4ff0e13a1ad48bf030a81aef8e0d0d9b31047048e78bd69a05b3eb7d49922390",
+    "channel_contract": "3dce1202084bc2d780e6d8f767324a6d53e0aa5927ce173d9ba690f0c09dcfba",
+    "observer_frame_projection": "0ea1c2359226f02c92bc61108251b350fd977cb33fba0ba3addb72f3983dd4b7",
+    "base_bank_design_lock": "24f1c88bf467989a53227998fc3707a9290f932b29fc9c711a23883b5ec0de5b",
+    "prior_bank_design_lock_v1_1": "fd8ea977e88c43e4c57149bf5e6d429c5c9c6f296f0ed7456a54554f8288dea1",
+    "prior_bank_design_lock_v1_2": "7e54d4f479994c8f0636554e5646cbc4f02135ed05e6bbd4dd2d8211e9767c10",
+    "effective_bank_plan": "56dccac2ddac42645e13c74a55b094021a74a6a9324c2ed37239aae63e3c8501",
+    "effective_family_design": "5cd029d0c636a61d092e7dd93392480573f716fe50a3059fdebad8dd2cf99efb",
+    "source_inventory": "f5a3268e2446f00b31b05a0dca887b79e08665010bd922206749f7257293b9bc",
+    "feasibility_audit": "eb0347d64694a28b5a170df19a0939ce311a0fe036eabfea77e1e3924a742aa9",
+    "repository_source_audit": "1d3d7fc4a46f5233e81c44a6e22c91ae04db119896d95cbe48b140eb4bd69ade",
+    "feasibility_input_manifest": "470f166f5a4c33bb18c0446b9f85b8b13ff297941c380819ba256552a6041bd3",
+    "feasibility_freezer_source": "8d44d416f248d807083e6ce36a82032cbb058ef8f476867683f9a63a99f0a882"
+  },
+  "input_manifest_path": "bank/construction-01/feasibility-input-manifest-v1.3.json",
+  "input_file_count": 269,
+  "selected_family_count": 12,
+  "execution_evidence_family_count": 4,
+  "candidate_case_rows": 192,
+  "baseline_case_rows": 48,
+  "failed_feasibility_trials_preserved": [
+    "clap-color",
+    "serde-offset",
+    "clap-repeat",
+    "serde-map-order",
+    "serde-map-order-repair-01",
+    "bytes-cursor",
+    "bytes-composite",
+    "serde-offset-repair-01",
+    "serde-numeric-joint"
+  ]
+}

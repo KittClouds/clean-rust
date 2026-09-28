@@ -1,0 +1,11 @@
+{
+  "bitwise_matches": 192,
+  "comparisons": 192,
+  "cue_count": 4,
+  "first_mismatch": null,
+  "fixture": "fly:L/block303000/trial0/after-begin_trial-before-apply_delta",
+  "gate_id": "FORWARD_PROBABILITY",
+  "posts_per_cue": 48,
+  "schema": "F4-SYMMETRY-01-forward-p-reconciliation-v1",
+  "status": "PASS"
+}

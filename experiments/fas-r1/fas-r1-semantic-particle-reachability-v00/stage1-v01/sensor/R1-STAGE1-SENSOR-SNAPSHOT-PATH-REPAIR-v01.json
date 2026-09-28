@@ -1,0 +1,39 @@
+{
+  "schema": "R1_STAGE1_SENSOR_SNAPSHOT_PATH_REPAIR_V01",
+  "status": "REPAIRED_PREMODEL_NO_WEIGHT_LOAD",
+  "old_identity": "R1-STAGE1-SENSOR-QUALIFICATION-v02",
+  "new_identity": "R1-STAGE1-SENSOR-QUALIFICATION-v03",
+  "old_manifest_sha256": "7224d48d77f226b665a8629169663f513875a338553dc3de829c21b643d06994",
+  "failed_attempt_path": "D:\\codex-runs\\fas-r1-semantic-particle-reachability-v00\\stage1-v01\\sensor-qualification-v01\\sensor-extraction-v02\\failure.json",
+  "failed_attempt_sha256": "3a2ac951e311f94712e308d9a6b460b7c32a1ff694c828df95253a749aca8e47",
+  "failure": {
+    "type": "snapshot_path_name_check",
+    "message": "The local snapshot directory includes a repository-name prefix before the pinned revision, so basename equality failed.",
+    "execution_phase": "snapshot path validation before snapshot hashing, AutoConfig, AutoModel, or forward inference",
+    "torch_transformers_imported": true,
+    "model_weights_loaded": false,
+    "forward_inference_performed": false,
+    "probe_fitting_performed": false
+  },
+  "exact_repair": {
+    "new_extractor": "run_sensor_v03.py",
+    "new_extractor_sha256": "88dd7b7e6fcb25cd23db386e7ddfbdb2ccec1681c261e7b9f20590c1d1b24a73",
+    "regression_test": "test_sensor_extractor_v03.py",
+    "regression_test_sha256": "9ffd682f9f2acb9e9df5dd5cb393d009949d7bda602f54ddee1a2c87bffbeb50",
+    "regression_result": "PASS 4/4",
+    "behavior": "Accept a snapshot directory path based on its exact frozen file inventory, not its basename. Before AutoConfig/AutoModel loading, verify the inventory file SHA-256, pinned revision, every file byte length/SHA-256, and tokenizer file inventory."
+  },
+  "frozen_inventory": {
+    "path": "D:\\codex-runs\\fas-r1-semantic-particle-reachability-v00\\stage1-v01\\sensor-qualification-v01\\MODEL-SNAPSHOT-INVENTORY.json",
+    "sha256": "84142f95653f8f0f1c60934d6c5c711747b89e48e8ff3181c67dc437becef103",
+    "snapshot_content_changed": false
+  },
+  "unchanged_scientific_inputs": {
+    "stage0_artifact_root_sha256": "2078a366082a358275fa2b10d9f657967ef71a7c259a709822e631f01ce929d7",
+    "public_probe_tasks_sha256": "8fa9a27eef4cb01505cef252b97982a5d6418b6ad3a4c0063fc24dfb48b644bc",
+    "private_targets_sha256": "1c159f78a9147cb56668857f4674f43cfa5192eb59b1875eb34f8c1ff8a15fdb",
+    "action_examples_sha256": "21a0bb7c90a2c01107b70e286873022997fa6b1b929c7ac06da7a65c5315e19d",
+    "family_split_sha256": "83d94095bb5aa0c16f6f8673c160c5b3fe87f3609682ce24483219b9450d3f2e",
+    "probe_shapes_thresholds_and_seeds_changed": false
+  }
+}

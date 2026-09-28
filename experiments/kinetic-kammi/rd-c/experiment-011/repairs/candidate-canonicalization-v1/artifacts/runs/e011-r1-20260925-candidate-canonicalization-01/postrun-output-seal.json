@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "state": "OUTPUTS_SEALED_BEFORE_SCORING",
+  "run_id": "e011-r1-20260925-candidate-canonicalization-01",
+  "created_utc": "2026-09-25T20:37:56.095162+00:00",
+  "pre_model_seal_sha256": "2931086b51d9ffeb361d37abd5410aab6eec06dbb061ef7a766490dd8a2cdff5",
+  "outputs": {
+    "small": {
+      "record_count": 16,
+      "http_success_count": 16,
+      "normalized_output_count": 16,
+      "tree_sha256": "ec682b93e201151bad2cde4fa5afd35cf94f3014406eb654a00e2d44a1fcbaba"
+    },
+    "large": {
+      "record_count": 16,
+      "http_success_count": 16,
+      "normalized_output_count": 16,
+      "tree_sha256": "9bff3e299a94819903c4a8f3fe8154b99299b25ea0ee71b4973397fbdd9b643e"
+    }
+  }
+}

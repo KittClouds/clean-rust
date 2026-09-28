@@ -1,0 +1,16 @@
+{
+  "comparative_outcomes_computed": false,
+  "empty_block_id": 304005,
+  "heldout_fits_started": false,
+  "heldout_truth_opened": false,
+  "native_collection_status": "PASS",
+  "native_rows": 16342,
+  "native_streams": 144,
+  "new_identity_required": true,
+  "prediction_streams_created": false,
+  "reason": "The preparation implementation required every accepted block to have at least one common U* row, while the frozen contract explicitly permits empty outcome cells.",
+  "run_id": "F4-SYMMETRY-03-QREP1",
+  "schema": "F4-SYMMETRY-03-prefit-stop-v1",
+  "status": "STOP_IMPLEMENTATION_GAP",
+  "task_bank_replaced": false
+}

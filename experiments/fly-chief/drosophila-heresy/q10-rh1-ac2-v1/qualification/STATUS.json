@@ -1,0 +1,13 @@
+{
+  "protocol": "Q10-PF6-RH1-AC2",
+  "status": "AC2_COMPLETE_AUTHORITY_TABLE_NO_FACTORIAL",
+  "summary_sha256": "C0D93364B17D0739DB47519EA458833DA15E9DF59E28C85E6BD1A7D9B757EB04",
+  "effects_sha256": "4D45D48375385AE8886A744BF9CE8E926140F9181C30966316D7350608327EE5",
+  "features_sha256": "7EC54C783A97078243D4AA5B1AEDC65AC5FBE0475C8F11561D84FF4D8120C2F2",
+  "feature_records": 2707,
+  "unique_endpoint_coordinate_pairs": 2707,
+  "measured_factorial_started": false,
+  "scientific_seed_bundles": 0,
+  "behavioral_probe": false,
+  "dh08b_authorized": false
+}

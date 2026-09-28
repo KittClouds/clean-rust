@@ -1,0 +1,76 @@
+{
+  "contract_id": "FASS01_S01_2A_TOKENIZER_ALIGNMENT_V01",
+  "project_id": "fas-s01-frozen-sensor-transfer-cartography",
+  "phase_id": "S01-2A-v01",
+  "mode": "TOKENIZER_ONLY_EXHAUSTIVE_ALIGNMENT_QUALIFICATION",
+  "parent_identity": {
+    "S01_2_corpus_sha256": "51a55212ba89d55bd6df532673ad4546c95def1f5d75622661f7c17b3e4a7ad1",
+    "S01_2_protocol_bundle_root_sha256": "67644d4a99b9c84f312caac591e00e2a12903cea0433832868aa35dce2b5d6f9",
+    "S01_2_result_tree_root_sha256": "f6065b8163799239e0d7b1200b5dda4aad169772ead14b999130a473ff9d9049",
+    "S01_2_world_contract_sha256": "d886932c92068432b8f670c3a43c1ef604485ebf626c2babae8179b506847c87",
+    "S01_2_feature_extraction_contract_sha256": "08ddd42795d71d9b598da5015d5541316c6cf1f2c0761ce3c0890229cda4d5b0",
+    "S01_2_geometry_contract_sha256": "4f6df89b02d0b991e09ab5d8f2658627c48799a10b1dd0557795c433d61099ab"
+  },
+  "tokenizer": {
+    "repo_id": "LiquidAI/LFM2.5-1.2B-Base",
+    "revision": "7453bca97ca1e67754c4035a4b4c584e1c9dd725",
+    "expected_resolved_commit": "7453bca97ca1e67754c4035a4b4c584e1c9dd725",
+    "required_fast_tokenizer": true,
+    "allowed_snapshot_files": ["config.json", "special_tokens_map.json", "tokenizer.json", "tokenizer_config.json"],
+    "forbidden_artifact_patterns": ["*.safetensors", "*.bin", "*.pt", "*.pth", "*.gguf", "*.onnx", "*.h5", "*.msgpack"]
+  },
+  "tokenization": {
+    "library_api": "transformers.AutoTokenizer.from_pretrained(local_pinned_snapshot, use_fast=True, local_files_only=True, trust_remote_code=False)",
+    "per_input_options": {"add_special_tokens": true, "padding": false, "truncation": false, "return_offsets_mapping": true, "return_special_tokens_mask": true},
+    "unit": "one serialized input_text at a time in corpus JSONL order; no batch, added prompt, truncation, or padding",
+    "offset_unit": "character offsets; corpus inputs are ASCII so offsets equal UTF-8 byte offsets",
+    "row_count": 106496,
+    "sequence_positions": "Every returned input ID occupies one model-visible position. First position is 0; final position is sequence_length-1. Record both positions and token IDs. Special positions remain model-visible for these positions and V0, but are excluded from span means."
+  },
+  "span_alignment": {
+    "types": ["context", "entity", "relation"],
+    "rule_source": "sealed S01-2 feature-extraction-contract-v01.json tokenizer.ambiguity_rejection",
+    "span_occurrences": "Resolve every recorded half-open character span separately. A nonspecial token is selected only when its nonempty offset overlaps the span; every selected token offset must lie wholly inside that span.",
+    "coverage": "Every character in each span must be covered by exactly one selected nonspecial token; a gap, overlap, boundary-crossing token, empty position set, or invalid offset affecting a required span is ambiguous and rejects that input.",
+    "union": "After every occurrence independently passes, report occurrence-level token positions and the sorted deduplicated union of positions for each span type.",
+    "rejection": "Keep every input in the alignment JSONL and list every rejection reason. Do not repair, omit, or relabel any input. Any ambiguous required span makes S01_2_TOKEN_ALIGNMENT_READY false."
+  },
+  "token_identity": {
+    "token_ids_sha256": "SHA-256 of token IDs serialized as consecutive little-endian unsigned 32-bit integers, with no header or separators",
+    "offset_mapping": "Store the complete ordered list of [start,end] integer pairs, including all special-token positions.",
+    "special_tokens_mask": "Store the complete ordered binary mask returned by the pinned fast tokenizer."
+  },
+  "determinism": {
+    "sample_size": 256,
+    "sample_selection": "The first 256 variant rows in sealed corpus JSONL order, selected without tokenizer outputs.",
+    "repeat": "After exhaustive tokenization, tokenize those 256 same input strings again, one at a time, with the same frozen options. Compare canonical serialized token IDs, token-ID hash, offsets, special mask, sequence length, first/final positions, span mappings, and rejection reasons exactly. Any mismatch fails closed."
+  },
+  "support_gates": {
+    "support_unit": "complete A/C/E/P quartet; a quartet is complete only if all four inputs pass context, entity, and relation alignment",
+    "factorial": {"cells": 1536, "required_per_cell": 16},
+    "binding_context": {"cells": 64, "required_per_cell": 16},
+    "binding_entity": {"cells": 64, "required_per_cell": 16},
+    "on_shortage": "FAIL_CLOSED; report every under-supported cell and do not merge cells or lower support"
+  },
+  "outputs": [
+    "tokenizer asset manifest with exact commit and SHA-256 for every allowed file",
+    "one alignment JSONL record for every sealed event",
+    "alignment summary and support audit",
+    "repeat-check receipt for the fixed 256-event sample",
+    "machine-readable disposition and result-tree seal"
+  ],
+  "forbidden": [
+    "LFM model weights or model instantiation",
+    "hidden states, feature extraction, feature cache, or backbone writes",
+    "corpus mutation or individual string repair",
+    "span-definition, tokenizer, representation-view, threshold, or support-rule changes",
+    "probe fitting, representation geometry, evaluation, or S01-3 authorization"
+  ],
+  "required_terminal_gates": {
+    "S01_2_CORPUS_READY": true,
+    "S01_2_TOKEN_ALIGNMENT_READY": "PASS only if tokenizer identity matches, all 106496 rows are tokenized, all required spans are unambiguous, repeat check matches, and every support cell remains at 16",
+    "S01_2_EXTRACTION_READY": true,
+    "S01_2_MODEL_CONTACT_AUTHORIZED": false,
+    "S01_3_AUTHORIZED": false
+  }
+}

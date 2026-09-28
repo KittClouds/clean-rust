@@ -1,0 +1,14 @@
+{
+  "schema": "F4-INVARIANT-01-COLLECT1-precollection-stop-v1",
+  "status": "STOP",
+  "gate": "COLLECTION_WRAPPER_PREFLIGHT",
+  "detail": "Wrapper attempted to open IMPLEMENTATION-PREFLIGHT-RECEIPT.json; the frozen collection identity uses COLLECTION-PREFLIGHT-RECEIPT.json. Native collector was not invoked.",
+  "task_bank_sha256": "8e49f61018255fa32d4328056d46a0b5a14b70306ccfa98733849dcac245c02c",
+  "native_output_directory_empty": true,
+  "raw_predictors_created": false,
+  "scoring_truth_created": false,
+  "native_collection_started": false,
+  "fit_manifest_created": false,
+  "fits_executed": false,
+  "scientific_outcomes_opened": false
+}

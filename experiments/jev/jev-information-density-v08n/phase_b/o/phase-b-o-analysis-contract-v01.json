@@ -1,0 +1,98 @@
+{
+  "protocol": "jev-information-density/v0.8n-posthoc-capability-trajectory-analysis-v01",
+  "identity": "POST-HOC v0.8O SEALED-CHECKPOINT TRAJECTORY ANALYSIS",
+  "registration_status": "FROZEN_BEFORE_V08O_INFERENCE",
+  "parent_result": {
+    "identity": "POST-REGISTERED v0.8N-E1 REPAIRED HELD-OUT EVALUATION OF SEALED PHASE-B CHECKPOINTS",
+    "result_seal_sha256": "a23b3a6dc90a739888ae8d1cab440ac6c8f6ed23dd12b26c1bfd7786cd56ce68",
+    "original_phase_b_disposition": "EVALUATION_INPUT_CONTRACT_INCOMPLETE"
+  },
+  "input_requirements": {
+    "raw_predictions": "the complete v0.8O 36-cell prediction matrix, hash-tree sealed before this analysis starts",
+    "rows": 288000,
+    "cells": 36,
+    "neighborhoods_per_cell": 2000,
+    "views_per_neighborhood": 4,
+    "epochs": [0, 1, 2, 3],
+    "seeds": [20260927, 20260928, 20260929],
+    "arms": ["B-DUP", "B-MATCHED", "B-SHAM"],
+    "metric_semantics_sha256": "0072c44903ea253cd8ad288cda8c100270f19d909ddced098af32d388ac29e1f"
+  },
+  "neighborhood_vector": {
+    "fields": [
+      "sham_l1",
+      "sham_map_flip",
+      "matched_l1",
+      "matched_map_flip",
+      "anchor_old_map",
+      "fact_new_map",
+      "strict_transition",
+      "correct_direction",
+      "new_probability_delta",
+      "delta_mae",
+      "anchor_nll",
+      "anchor_brier",
+      "anchor_gold_map_accuracy",
+      "sham_gold_probability_movement",
+      "sham_margin_movement",
+      "matched_gold_probability_movement",
+      "matched_margin_movement"
+    ],
+    "implementation": "call the unchanged frozen neighborhood_metrics function from analyze_phase_b_v01.py; do not alter metric definitions",
+    "aggregation": "arithmetic means by seed, arm, epoch, and family; retain all four families and all 36 cells; no composite score"
+  },
+  "transition_decomposition": {
+    "events": [
+      {"cell": "A_AND_F", "anchor_old_map": true, "fact_new_map": true, "meaning": "successful strict transition"},
+      {"cell": "A_AND_NOT_F", "anchor_old_map": true, "fact_new_map": false, "meaning": "fact-response failure"},
+      {"cell": "NOT_A_AND_F", "anchor_old_map": false, "fact_new_map": true, "meaning": "anchor-preservation failure"},
+      {"cell": "NOT_A_AND_NOT_F", "anchor_old_map": false, "fact_new_map": false, "meaning": "joint/broad failure"}
+    ],
+    "report": "counts and proportions per seed, arm, epoch, overall and separately by each of the four held-out families",
+    "partition_invariant": "the four cell counts sum to 2000 for every seed/arm/epoch and to 500 within each family"
+  },
+  "paired_trajectory_contrasts": {
+    "primary_display": "SHAM minus MATCHED for every seed and epoch, on each named metric separately",
+    "neighborhood_pairing": "join exact neighborhood_id within each seed, epoch, and arm; report mean paired difference overall and by family",
+    "dupe_and_sham_context": "also retain all DUP/MATCHED/SHAM trajectories; do not rank arms globally",
+    "uncertainty": "descriptive only; no pooled optimizer-seed inference, no endpoint equivalence claim, no outcome-dependent subgrouping"
+  },
+  "parameter_trajectory": {
+    "source": "sealed initial head templates and all sealed epoch checkpoint state_dict values",
+    "global_displacement": "sqrt(sum over every parameter tensor of float64 squared difference from the paired seed initialization)",
+    "per_tensor_displacement": "same L2 calculation for each exact state_dict key, with parameter count",
+    "arm_update_cosines": "cosine between concatenated parameter update vectors for each of the three arm pairs within a seed and epoch; epoch 0 undefined/null",
+    "limits": "descriptive parameter-space distances only; no basin, mechanism, or causal interpretation"
+  },
+  "trajectory_labels": {
+    "descriptive_taxonomy_only": [
+      "EARLY_BROAD_COUPLING",
+      "LATE_COUPLING",
+      "ANCHOR_SPECIFIC_COUPLING",
+      "FACT_RESPONSE_COUPLING",
+      "LOW_RESPONSE_BASIN",
+      "NONMONOTONIC"
+    ],
+    "assignment_rule": "do not assign labels by an automatic threshold; discuss only as explicit descriptive patterns supported by the sealed trajectories"
+  },
+  "prohibitions": {
+    "checkpoint_selection_or_promotion": true,
+    "threshold_or_metric_changes": true,
+    "training_or_extra_epochs": true,
+    "new_seeds": true,
+    "newtight_legacy_or_phoenix": true,
+    "result_driven_subgroups_or_reweighting": true,
+    "claim_of_frozen_backbone_capability_change": true,
+    "claim_that_an_epoch_is_a_valid_operating_point": true
+  },
+  "deliverables": [
+    "trajectory-response-matrix.json",
+    "transition-four-cell-decomposition.json",
+    "paired-sham-minus-matched-trajectories.json",
+    "parameter-trajectories.json",
+    "trajectory-cartography.md",
+    "sham-trajectory-planes.svg",
+    "matched-trajectory-planes.svg"
+  ],
+  "interpretation_ceiling": "descriptive mapping of already-existing optimizer trajectories on the E1 held-out object; no checkpoint is promoted, and epoch-specific behavior only motivates future prospective tests"
+}

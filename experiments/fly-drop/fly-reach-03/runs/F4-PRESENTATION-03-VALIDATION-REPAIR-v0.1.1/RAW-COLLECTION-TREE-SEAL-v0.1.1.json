@@ -1,0 +1,27 @@
+{
+  "amendment_sha256": "e692c6661273916cae3c2944c362314eace0bdb400024ec85da575688e6edc7d",
+  "file_count": 3,
+  "files": [
+    {
+      "bytes": 48593,
+      "name": "NATIVE-COLLECTION-RECEIPT.json",
+      "sha256": "534a8d817ed3d610d9f257c51392426f05cabc1f4fd157ddfa39d9a5243f34cf"
+    },
+    {
+      "bytes": 10012082,
+      "name": "RAW-PREDICTORS.bin",
+      "sha256": "495c68070624e4b8eaeeba217aeb03bdac6636d75e6691292a59872c11a9455f"
+    },
+    {
+      "bytes": 1141757,
+      "name": "RAW-SCORING-TRUTH.bin",
+      "sha256": "ff9d000145fc503e83710ca99d65b0304d52c1f94533d92c78e28b9730214d50"
+    }
+  ],
+  "native_cell_count": 216,
+  "parent_run_id": "F4-PRESENTATION-03-ENG1",
+  "sampled_row_count": 29275,
+  "schema": "F4-PRESENTATION-03-raw-collection-tree-seal-v1",
+  "status": "PASS",
+  "validation_repair_identity": "F4-PRESENTATION-03-VALIDATION-REPAIR-v0.1.1"
+}

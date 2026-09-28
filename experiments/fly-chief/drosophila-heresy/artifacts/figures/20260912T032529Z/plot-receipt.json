@@ -1,0 +1,9 @@
+{
+  "summary_sha256": "154df154ded94f85ffab6796bd2aabf40e1f3ec9e7e07bd6e50465b7914a653d",
+  "statistics_recomputed": false,
+  "matplotlib_version": "3.11.2",
+  "output_hashes": {
+    "routing-effect.png": "55d30e4c6da26f69294b7d0ca5ba34fa04d735473eb4349208c54d34ab95e65d",
+    "routing-effect.svg": "a449611244f4eac2a9ddd411d73e3dfba70f8ecf6001bd8725d197348078bfe1"
+  }
+}

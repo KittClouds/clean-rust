@@ -1,0 +1,29 @@
+{
+  "e013_confirmation_bank_built": false,
+  "e013_development_bank_built": false,
+  "e013_model_contact_performed": false,
+  "e014_authorized": false,
+  "freeze_boundary": [
+    "No E012 files were changed.",
+    "No model/API calls, threshold fitting, or signal fitting occurred.",
+    "The positive control is designed but not run.",
+    "No E013 banks were built or scored.",
+    "No frame lesions or E014 work were performed."
+  ],
+  "model_contact_authorized": false,
+  "protocol_id": "E013-TRUST-SIGNAL-DEVELOPMENT-v0.1",
+  "protocol_sha256": "ebe79c6cf554c48aca70515e0ab84a4fa3fff48f48e1a15cede14ba88d69e786",
+  "schema_version": 1,
+  "self_hash_note": "This lock records the protocol document hash; the lock file does not hash itself.",
+  "state": "SEALED_PROTOCOL_DESIGN_ONLY",
+  "upstream_artifacts": {
+    "e012_anatomy_report_sha256": "70846f29d13a122518ce47d1fb5ded28cf484255aa6dff59621a222d0075bc63",
+    "e012_anatomy_seal_sha256": "fc35eb76c074daebc2c6c82958c889a11334608968dd8e51878ed896ee90735a",
+    "e012_autopsy_sha256": "17dfc2e69a146e569d895500e3cc43f8852c60d1e274f48f28dc4745a87ea694",
+    "e012_baseline_report_sha256": "2155e62daf0650da8e44fb3c44704deb8c4bd2aff615e859ec215aabd6e1a6ed",
+    "e012_closeout_sha256": "fc6a90a4f90ffd682d4ee119946585c4d98be83cefb379a0b69b9dd21378a6fe",
+    "e012_frozen_input_lock_sha256": "4bab6fd945248b6209fa33e3a1df10786298ac620342ce167251411c6a258cd8",
+    "e012_run_id": "e012-20260926-frame-decomposition-01",
+    "positive_control_design_sha256": "0ca7c871841447c6b9f34f47037233a74b0efaec0aba05a38f74c84517df2787"
+  }
+}

@@ -1,0 +1,301 @@
+{
+  "schema": "fas-frozen-observer-bundle-e3-score-v01",
+  "contract_id": "FAS_FROZEN_OBSERVER_BUNDLE_E3_HELDOUT_SCORING_V01",
+  "status": "FROZEN_HELDOUT_SCORING_ONLY_AUTHORIZATION_REQUIRED_BY_HASH",
+  "created_utc": "2026-09-26T13:36:32.735778+00:00",
+  "e0_root_sha256": "899a131c09298fdafdcc6771ad01e8982857a1cd47900259800f97dd7bea7ccd",
+  "e1_root_sha256": "6ba77a899363651e3ba119b005f59a22e86f011f83c86b873857cd3f9ab64b03",
+  "e2_v07_root_sha256": "a2e2aa76f77904665b9abfa2a22f609c05219d8bc64c537bed41f5c634d1da8a",
+  "e3_v02_root_sha256": "899ff6a61272b86fdf1cd51d8c14100e77185157c242f27fbffe452803a435e1",
+  "input_files": {
+    "e0_contract": {
+      "path": "C:\\code land\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\contracts\\e0-freeze-v10-sealed-v01.json",
+      "sha256": "a47c66391d9f691ed182ab327c6fd6d68a6ed18c5c08ac6250a46c5dde2556f3",
+      "bytes": 35176
+    },
+    "e0_seal": {
+      "path": "C:\\code land\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\seals\\e0-seal-v10.json",
+      "sha256": "f5138b5b90ea187c226521da2c8eaf8d60bb133b5c66ed54c8a822edf565197d",
+      "bytes": 27253
+    },
+    "e0_audit": {
+      "path": "C:\\code land\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\audits\\e0-v10-independent-audit-v01.json",
+      "sha256": "e5462e6374a0e547965bec802183e42fb8b16d3518d65ed06eac2e343a5b178b",
+      "bytes": 2383
+    },
+    "e1_seal": {
+      "path": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e1-panel-v04\\e1-seal-v01.json",
+      "sha256": "973b53e93e2c56b0cc1054fd545a558dcce4de07068c9729bcd4fa4f1fc86168",
+      "bytes": 2500
+    },
+    "e1_audit": {
+      "path": "C:\\code land\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\audits\\e1-independent-audit-v04.json",
+      "sha256": "4bdb261a2c1c553377b6064ee6662ffb257a4e7e70dba97bf9d13d685d93dbf1",
+      "bytes": 1068
+    },
+    "e1_support": {
+      "path": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e1-panel-v04\\receipts\\support-receipt-v01.json",
+      "sha256": "10f8e8f15a4b3666fe7e6ed4bef27420ac36c34954ffecf8e2321e32f8c30fb5",
+      "bytes": 2786
+    },
+    "e1_rows": {
+      "path": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e1-panel-v04\\panel\\row-manifest-v01.jsonl",
+      "sha256": "ebfdf0064430ecae7a9ae2edd139f47c0c61291aa6c30c8ccb97daa195f835bc",
+      "bytes": 23126310
+    },
+    "e1_split": {
+      "path": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e1-panel-v04\\panel\\split-manifest-v01.jsonl",
+      "sha256": "fb20dd79b5d02a46e7ac65f8a69b621c19f47b193db4e9c5f898778032464e70",
+      "bytes": 5383371
+    },
+    "e3_seal": {
+      "path": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e3-v02\\e3-v02-seal.json",
+      "sha256": "b8dce8dc7ff2d1a1739619f1ed00444d970ccc46872bb1acca2f1e07bf31a485",
+      "bytes": 19475
+    },
+    "e3_audit": {
+      "path": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e3-v02\\e3-v02-independent-audit-v01.json",
+      "sha256": "a0950baf5aa64f77b9789a6fcb64a7c3afd2c3c03dea87d66c76a47049ab6cbe",
+      "bytes": 12497
+    },
+    "e3_bundle": {
+      "path": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e3-v02\\frozen-capability-fabric-v02.json",
+      "sha256": "8fa86f8c9891949196844ca62522822a246e47b4185cc4ed45c45136ada6576f",
+      "bytes": 9568
+    },
+    "feature_cache": {
+      "path": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e2-v07\\V1_FINAL_POSITION.f32le",
+      "sha256": "8eb80df5f73e761fe6c025fc1c66abef2027d639b6c14f56d4177d6e6a7a45a4",
+      "bytes": 872415232,
+      "identity_source": "E3 v02 sealed artifact entry; full content reverified during prelabel scoring preflight"
+    }
+  },
+  "evaluation_labels": {
+    "path": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e1-panel-v04\\labels\\eval-labels-v01.jsonl",
+    "sha256": "5dcc56dd42cac4bb60c72552c646fd6511a4389ceba3d22a1aa142b25287ab7e",
+    "bytes": 9758374,
+    "rows": 21292,
+    "quartets": 5323,
+    "access_rule": "open and stream exactly once after this prelabel contract, authorization, root, source, support, runtime, and disk preflight passes",
+    "prelabel_hashing_or_reading": false
+  },
+  "task_endpoints": {
+    "context_identity": "closed-set context_term_id classification over all 32 fitted classes",
+    "entity_identity": "closed-set entity_term_id classification over all 32 fitted classes",
+    "relation": "2-way relation_id classification; fit and score only both terms in train-side ID ranges",
+    "observed_state": "3-way state_id classification; fit and score only both terms in train-side ID ranges",
+    "exact_target": "3-way exact_target prediction; fit only both terms in train-side ID ranges; score in-domain and the three frozen novel-term slices"
+  },
+  "endpoints": [
+    "context_identity",
+    "entity_identity",
+    "relation",
+    "observed_state",
+    "exact_target_in_domain",
+    "exact_target_context_novel",
+    "exact_target_entity_novel",
+    "exact_target_both_novel"
+  ],
+  "performance_gates": {
+    "primary_metric": "balanced_accuracy",
+    "gate": "one-sided 95 percent whole-quartet-bootstrap lower bound >= 0.90 for each endpoint",
+    "individual_endpoints": [
+      "context_identity",
+      "entity_identity",
+      "relation",
+      "observed_state",
+      "exact_target_in_domain",
+      "exact_target_context_novel",
+      "exact_target_entity_novel",
+      "exact_target_both_novel"
+    ],
+    "multiplicity_statement": "These are eight individual engineering gates. They do not provide a simultaneous 95 percent guarantee over the bundle; no familywise or multiplicity-adjusted claim is made.",
+    "minimum_test_rows_per_class": 200,
+    "no_cross_endpoint_rescue": true,
+    "no_s01_metric_inherited": true
+  },
+  "bootstrap": {
+    "replicates": 10000,
+    "seed": 2026092503,
+    "resampling_unit": "whole quartet; all four rows are sampled together",
+    "lower_bound": "5th percentile of bootstrap balanced-accuracy values",
+    "identity_strata": "quartet baseline A-variant context_term_id for context identity; baseline A-variant entity_term_id for entity identity",
+    "relation_strata": "relation_id",
+    "state_strata": "state_id",
+    "target_strata": "exact_target within each predeclared evaluation endpoint",
+    "sampling": "within each task-specific class stratum, sample the original number of eligible test quartets with replacement",
+    "implementation_rng": "NumPy Generator(PCG64); one generator consumed in frozen endpoint order",
+    "quantile_method": "linear"
+  },
+  "support_gate": {
+    "minimum_test_rows_per_class": 200,
+    "sealed_e1_test_class_support": {
+      "CONTEXT_IDENTITY": [
+        663,
+        629,
+        705,
+        690,
+        686,
+        630,
+        679,
+        671,
+        718,
+        694,
+        649,
+        659,
+        655,
+        673,
+        619,
+        676,
+        666,
+        625,
+        702,
+        592,
+        703,
+        678,
+        669,
+        629,
+        677,
+        668,
+        630,
+        724,
+        593,
+        704,
+        685,
+        651
+      ],
+      "ENTITY_IDENTITY": [
+        665,
+        699,
+        641,
+        630,
+        677,
+        675,
+        673,
+        663,
+        650,
+        616,
+        639,
+        649,
+        683,
+        709,
+        659,
+        628,
+        637,
+        606,
+        683,
+        683,
+        718,
+        682,
+        689,
+        708,
+        622,
+        655,
+        682,
+        659,
+        702,
+        660,
+        663,
+        687
+      ],
+      "EXACT_TARGET_BOTH_NOVEL": [
+        1748,
+        1804,
+        1924
+      ],
+      "EXACT_TARGET_CONTEXT_NOVEL": [
+        1776,
+        1768,
+        1576
+      ],
+      "EXACT_TARGET_ENTITY_NOVEL": [
+        1808,
+        1696,
+        1756
+      ],
+      "EXACT_TARGET_IN_DOMAIN": [
+        1768,
+        1828,
+        1840
+      ],
+      "OBSERVED_STATE": [
+        2112,
+        1664,
+        1660
+      ],
+      "RELATION_IDENTITY": [
+        2960,
+        2476
+      ]
+    },
+    "all_eight_endpoints_meet_floor": true
+  },
+  "inference": {
+    "backend": "PyTorch CPU float32 linear inference",
+    "batch_rows": 2048,
+    "torch_num_threads": 1,
+    "torch_num_interop_threads": 1,
+    "tf32": false,
+    "cuda_contact": false,
+    "linear_operation": "torch.nn.functional.linear((features - mean) / scale, weight, bias); argmax over class dimension",
+    "head_artifacts": "the five E3 v02 sealed independent heads and scalers"
+  },
+  "resources": {
+    "minimum_free_disk_bytes": 536870912,
+    "minimum_free_disk_reason": "reserve at least 512 MiB on score-output volume before creating predictions, metrics, bootstrap outputs, and preservation receipts",
+    "gpu_measurement": "not applicable; scoring inference is CPU-only and does not initialize CUDA"
+  },
+  "scope": {
+    "one_heldout_label_opening": true,
+    "score_five_frozen_heads_only": true,
+    "refit_authorized": false,
+    "threshold_or_scaler_changes_authorized": false,
+    "representation_or_layer_search_authorized": false,
+    "hyperparameter_rescue_authorized": false,
+    "shared_or_multitask_heads_authorized": false,
+    "drop_failed_endpoint_or_rerun_authorized": false,
+    "E4_integration_authorized": false,
+    "seal_outputs_and_independent_replay": true,
+    "eight_individual_95_percent_gates_are_not_a_simultaneous_95_percent_claim": true
+  },
+  "source_files": {
+    "scorer": {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/score_e3_v01.py",
+      "sha256": "f4cb42e6c5e4aee5db69add6155f0b7e2cd2b393c17ed2a628b3f2f6023b5b41",
+      "bytes": 39835
+    },
+    "tests": {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/tests/test_e3_score_v01.py",
+      "sha256": "68b8956a54cf2a7c7e7b37ccb8abd8b40e7e99f9a2d214d514780516fa1bf8b8",
+      "bytes": 7442
+    },
+    "contract_builder": {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/build_e3_score_contract_v01.py",
+      "sha256": "da487e58d9764d239fcd97345f1e3dcb71133c133d2e66fb2c6d3f2a53dea4b5",
+      "bytes": 12331
+    },
+    "independent_auditor": {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/audit_e3_score_v01.py",
+      "sha256": "7a1a5693ebe839f24c8a55eebd53708a194807cddb89d3e8d04e34c225a67f5a",
+      "bytes": 25289
+    }
+  },
+  "runtime": {
+    "python_version": "3.13.15",
+    "numpy_version": "2.5.3",
+    "torch_version": "2.11.0+cu128",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "machine": "AMD64",
+    "scoring_device": "CPU",
+    "cuda_initialized": false
+  },
+  "output": {
+    "root": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e3-score-v01",
+    "predictions": "scored-test-rows-v01.jsonl",
+    "metrics": "metrics-and-gates-v01.json",
+    "bootstrap": "whole-quartet-bootstrap-v01.npz",
+    "run_receipt": "e3-score-run-receipt-v01.json",
+    "prelabel_receipt": "prelabel-preflight-v01.json",
+    "stop_receipt": "e3-score-stop-v01.json when any post-output-creation gate fails"
+  }
+}

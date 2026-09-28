@@ -1,0 +1,29 @@
+{
+  "task_id": "turbovec-turbovec-mask-allowlist-v2",
+  "lane": "hand-written",
+  "action_id": 94,
+  "patch_sha256": "f977765cc076a1eb302b0c9310a0770c7c74035912ad92214d0a70ffb5325974",
+  "candidate_variant": "gold_comment",
+  "test_filter": "block_skip_at_one_percent_selectivity_matches_post_filter",
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--manifest-path",
+    "C:\\rd-c\\experiment-010\\tasks\\heldout-bank-v1\\families\\turbovec-mask-allowlist\\candidates\\gold_comment\\Cargo.toml",
+    "--package",
+    "turbovec",
+    "--test",
+    "filtering",
+    "block_skip_at_one_percent_selectivity_matches_post_filter",
+    "--",
+    "--exact"
+  ],
+  "exit_code": 0,
+  "status": "passed",
+  "passed": true,
+  "elapsed_ms": 40041.702,
+  "completion_source": "live-cargo-test",
+  "output_sha256": "6c97953195fdab53df4443364e53188e56e338e602a3b2359b5973a37e91011b",
+  "output": "\nrunning 1 test\ntest block_skip_at_one_percent_selectivity_matches_post_filter ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 21 filtered out; finished in 1.20s\n\n   Compiling autocfg v1.5.0\n   Compiling libm v0.2.16\n   Compiling zerocopy v0.8.48\n   Compiling cfg-if v1.0.4\n   Compiling proc-macro2 v1.0.106\n   Compiling quote v1.0.45\n   Compiling unicode-ident v1.0.24\n   Compiling crossbeam-utils v0.8.21\n   Compiling paste v1.0.15\n   Compiling bytemuck v1.25.0\n   Compiling crossbeam-epoch v0.9.20\n   Compiling typenum v1.19.0\n   Compiling rawpointer v0.2.1\n   Compiling rayon-core v1.13.0\n   Compiling either v1.15.0\n   Compiling getrandom v0.2.17\n   Compiling rand_core v0.6.4\n   Compiling safe_arch v0.7.4\n   Compiling num-traits v0.2.19\n   Compiling matrixmultiply v0.3.10\n   Compiling wide v0.7.33\n   Compiling syn v2.0.117\n   Compiling crossbeam-deque v0.8.6\n   Compiling rayon v1.12.0\n   Compiling approx v0.5.1\n   Compiling num-integer v0.1.46\n   Compiling num-complex v0.4.6\n   Compiling ordered-float v4.6.0\n   Compiling num-rational v0.4.2\n   Compiling simba v0.8.1\n   Compiling nalgebra-macros v0.2.2\n   Compiling ppv-lite86 v0.2.21\n   Compiling rand_chacha v0.3.1\n   Compiling rand v0.8.6\n   Compiling rand_distr v0.4.3\n   Compiling nalgebra v0.32.6\n   Compiling statrs v0.17.1\n   Compiling turbovec v0.9.0 (C:\\rd-c\\experiment-010\\tasks\\heldout-bank-v1\\families\\turbovec-mask-allowlist\\candidates\\gold_comment\\turbovec)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 38.57s\n     Running tests\\filtering.rs (D:\\cargo-targets\\rdc-e010\\scoring\\debug\\deps\\filtering-e398ca839dedcfa2.exe)\n"
+}

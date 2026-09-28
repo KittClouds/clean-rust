@@ -1,0 +1,261 @@
+{
+  "schema_version": 1,
+  "frames": [
+    {
+      "frame": {
+        "schema_id": "rdc-real-coding-observation.v1",
+        "task_id": "fresh-ripgrep-unclosed-class-single-v1",
+        "task_family": "ripgrep-unclosed-class-opt-in",
+        "task_prompt": "The caller enables literal handling for an unfinished `[` class. Repair this option so the exact parser test accepts the literal bracket.",
+        "repository_revision": "e89fff89ac9af12e8d4ce9d5fd07beb408ca730f",
+        "snapshot_sha256": "2e061eccef840f0cc09930d63bdea2482199a6887c71f61694664b303c06ea59",
+        "evidence": [
+          {
+            "kind": "source_and_test_contract",
+            "source_id": "ripgrep/crates/globset/src/glob.rs::glob::tests::allow_unclosed_class_single",
+            "content_blake3": "9330f8c416cd4cae4578498ec057efa70a16df6a2e1a45a7ca1498dde14eacff",
+            "content": "The task snapshot inverts the allow_unclosed_class setting. The frozen parser test expects an unfinished `[` to compile as a literal when the option is enabled."
+          }
+        ],
+        "action_options": [
+          {
+            "action": {
+              "id": 11,
+              "schema_id": 1
+            },
+            "summary": "Apply the focused implementation patch.",
+            "diff_excerpt": "--- a/crates/globset/src/glob.rs\n+++ b/crates/globset/src/glob.rs\n@@ -661,7 +661,7 @@\n     /// might want to enable this when compatibility (e.g., with POSIX glob\n     /// implementations) is more important than good error messages.\n     pub fn allow_unclosed_class(&mut self, yes: bool) -> &mut GlobBuilder<'a> {\n-        self.opts.allow_unclosed_class = !yes;\n+        self.opts.allow_unclosed_class = yes;\n         self\n     }\n }",
+            "patch_sha256": "e47d23b20f7029ce2f0f92c9d01bd6263c1bc470134441b1b10bc7e84186ce46"
+          },
+          {
+            "action": {
+              "id": 37,
+              "schema_id": 1
+            },
+            "summary": "Apply the focused patch with a contract comment.",
+            "diff_excerpt": "--- a/crates/globset/src/glob.rs\n+++ b/crates/globset/src/glob.rs\n@@ -661,7 +661,8 @@\n     /// might want to enable this when compatibility (e.g., with POSIX glob\n     /// implementations) is more important than good error messages.\n     pub fn allow_unclosed_class(&mut self, yes: bool) -> &mut GlobBuilder<'a> {\n-        self.opts.allow_unclosed_class = !yes;\n+        // Preserve the caller's opt-in parser setting.\n+        self.opts.allow_unclosed_class = yes;\n         self\n     }\n }",
+            "patch_sha256": "fc4d68e44e43320591232d87667f6796e22b8b39aac4e81640905721ee053b90"
+          },
+          {
+            "action": {
+              "id": 68,
+              "schema_id": 1
+            },
+            "summary": "Apply this plausible alternate change.",
+            "diff_excerpt": "--- a/crates/globset/src/glob.rs\n+++ b/crates/globset/src/glob.rs\n@@ -661,7 +661,7 @@\n     /// might want to enable this when compatibility (e.g., with POSIX glob\n     /// implementations) is more important than good error messages.\n     pub fn allow_unclosed_class(&mut self, yes: bool) -> &mut GlobBuilder<'a> {\n-        self.opts.allow_unclosed_class = !yes;\n+        self.opts.allow_unclosed_class = false;\n         self\n     }\n }",
+            "patch_sha256": "0fe59c27bee439e611d2a8b681f71fb1100a25fc7d13a193aac5c454512f1917"
+          },
+          {
+            "action": {
+              "id": 94,
+              "schema_id": 1
+            },
+            "summary": "Retain the current implementation.",
+            "diff_excerpt": "No source changes; keep the broken implementation.",
+            "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        ]
+      },
+      "blake3": "90a6cafe5605872778e2ef9ed0aa1b263b8bf8f9e99b54b89fa17ca85492976a",
+      "producer_ordinals": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "repository_id": "ripgrep"
+    },
+    {
+      "frame": {
+        "schema_id": "rdc-real-coding-observation.v1",
+        "task_id": "fresh-ripgrep-unclosed-class-many-v2",
+        "task_family": "ripgrep-unclosed-class-opt-in",
+        "task_prompt": "An enabled parser option should treat an unclosed `[abc` sequence as literal text. Choose a patch that restores that behavior in the frozen test.",
+        "repository_revision": "e89fff89ac9af12e8d4ce9d5fd07beb408ca730f",
+        "snapshot_sha256": "2e061eccef840f0cc09930d63bdea2482199a6887c71f61694664b303c06ea59",
+        "evidence": [
+          {
+            "kind": "source_and_test_contract",
+            "source_id": "ripgrep/crates/globset/src/glob.rs::glob::tests::allow_unclosed_class_many",
+            "content_blake3": "b089770a4453a1eb37f5ed0ade10d35407f53be041152eb6fdcb2da26680cb76",
+            "content": "The task snapshot negates the allow_unclosed_class option. The exact parser test checks literal treatment of an unfinished multi-character class."
+          }
+        ],
+        "action_options": [
+          {
+            "action": {
+              "id": 11,
+              "schema_id": 1
+            },
+            "summary": "Apply the focused implementation patch.",
+            "diff_excerpt": "--- a/crates/globset/src/glob.rs\n+++ b/crates/globset/src/glob.rs\n@@ -661,7 +661,7 @@\n     /// might want to enable this when compatibility (e.g., with POSIX glob\n     /// implementations) is more important than good error messages.\n     pub fn allow_unclosed_class(&mut self, yes: bool) -> &mut GlobBuilder<'a> {\n-        self.opts.allow_unclosed_class = !yes;\n+        self.opts.allow_unclosed_class = yes;\n         self\n     }\n }",
+            "patch_sha256": "e47d23b20f7029ce2f0f92c9d01bd6263c1bc470134441b1b10bc7e84186ce46"
+          },
+          {
+            "action": {
+              "id": 37,
+              "schema_id": 1
+            },
+            "summary": "Apply the focused patch with a contract comment.",
+            "diff_excerpt": "--- a/crates/globset/src/glob.rs\n+++ b/crates/globset/src/glob.rs\n@@ -661,7 +661,8 @@\n     /// might want to enable this when compatibility (e.g., with POSIX glob\n     /// implementations) is more important than good error messages.\n     pub fn allow_unclosed_class(&mut self, yes: bool) -> &mut GlobBuilder<'a> {\n-        self.opts.allow_unclosed_class = !yes;\n+        // Preserve the caller's opt-in parser setting.\n+        self.opts.allow_unclosed_class = yes;\n         self\n     }\n }",
+            "patch_sha256": "fc4d68e44e43320591232d87667f6796e22b8b39aac4e81640905721ee053b90"
+          },
+          {
+            "action": {
+              "id": 68,
+              "schema_id": 1
+            },
+            "summary": "Apply this plausible alternate change.",
+            "diff_excerpt": "--- a/crates/globset/src/glob.rs\n+++ b/crates/globset/src/glob.rs\n@@ -661,7 +661,7 @@\n     /// might want to enable this when compatibility (e.g., with POSIX glob\n     /// implementations) is more important than good error messages.\n     pub fn allow_unclosed_class(&mut self, yes: bool) -> &mut GlobBuilder<'a> {\n-        self.opts.allow_unclosed_class = !yes;\n+        self.opts.allow_unclosed_class = false;\n         self\n     }\n }",
+            "patch_sha256": "0fe59c27bee439e611d2a8b681f71fb1100a25fc7d13a193aac5c454512f1917"
+          },
+          {
+            "action": {
+              "id": 94,
+              "schema_id": 1
+            },
+            "summary": "Retain the current implementation.",
+            "diff_excerpt": "No source changes; keep the broken implementation.",
+            "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        ]
+      },
+      "blake3": "5b8a7802674a9fc55e42f0fb7df9591055fbce15697bb7ee41c9879a1cfdae32",
+      "producer_ordinals": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "repository_id": "ripgrep"
+    },
+    {
+      "frame": {
+        "schema_id": "rdc-real-coding-observation.v1",
+        "task_id": "fresh-turbovec-search-results-clone-contract-v1",
+        "task_family": "turbovec-search-results-clone-contract",
+        "task_prompt": "Restore the public result type's clone behavior. The frozen API test mutates a cloned score buffer and requires the original result to stay unchanged.",
+        "repository_revision": "8202f194a0cbbd52213a004290401e180e5c123d",
+        "snapshot_sha256": "c861cd20393d80fb2195e4278f754c87ff933c0cbe4bcfda0910113f6806213a",
+        "evidence": [
+          {
+            "kind": "source_and_test_contract",
+            "source_id": "turbovec/turbovec/src/lib.rs::search_results_clone_is_independent_of_its_source",
+            "content_blake3": "9887430fa2b2fc0bf332892ead877392ed409063be90f9f643dd92db7996dae0",
+            "content": "The task snapshot removed Clone from SearchResults. Its frozen API test calls clone, edits the copy, and checks that the source buffer is independent."
+          }
+        ],
+        "action_options": [
+          {
+            "action": {
+              "id": 11,
+              "schema_id": 1
+            },
+            "summary": "Apply the focused implementation patch.",
+            "diff_excerpt": "--- a/turbovec/src/lib.rs\n+++ b/turbovec/src/lib.rs\n@@ -464,7 +464,7 @@\n /// patterns. Good enough for `assert_eq!` on results the index actually\n /// returns; not a substitute for comparing scores within a tolerance,\n /// and not enough to key a map.\n-#[derive(Debug, PartialEq)]\n+#[derive(Debug, Clone, PartialEq)]\n pub struct SearchResults {\n     /// Scores, row-major `nq × k`, sorted descending within each row\n     /// (best match first).",
+            "patch_sha256": "d7c1e233f97f4ca98a72dc565d3133d301c4b3118dee9ead829d3ba18e06c1a3"
+          },
+          {
+            "action": {
+              "id": 37,
+              "schema_id": 1
+            },
+            "summary": "Apply the focused patch with a contract comment.",
+            "diff_excerpt": "--- a/turbovec/src/lib.rs\n+++ b/turbovec/src/lib.rs\n@@ -464,7 +464,8 @@\n /// patterns. Good enough for `assert_eq!` on results the index actually\n /// returns; not a substitute for comparing scores within a tolerance,\n /// and not enough to key a map.\n-#[derive(Debug, PartialEq)]\n+/// Cloning owns independent result buffers.\n+#[derive(Debug, Clone, PartialEq)]\n pub struct SearchResults {\n     /// Scores, row-major `nq × k`, sorted descending within each row\n     /// (best match first).",
+            "patch_sha256": "f1ca29b631625189ac005bac09f87b8ad604ae23f7aa132f716107ebcc6090d8"
+          },
+          {
+            "action": {
+              "id": 68,
+              "schema_id": 1
+            },
+            "summary": "Apply this plausible alternate change.",
+            "diff_excerpt": "--- a/turbovec/src/lib.rs\n+++ b/turbovec/src/lib.rs\n@@ -464,7 +464,7 @@\n /// patterns. Good enough for `assert_eq!` on results the index actually\n /// returns; not a substitute for comparing scores within a tolerance,\n /// and not enough to key a map.\n-#[derive(Debug, PartialEq)]\n+#[derive(Debug, Copy, Clone, PartialEq)]\n pub struct SearchResults {\n     /// Scores, row-major `nq × k`, sorted descending within each row\n     /// (best match first).",
+            "patch_sha256": "17bba2661ae4036b0ce69de7fe9345b59183020ce8ba2bfeec7e03edd7141a06"
+          },
+          {
+            "action": {
+              "id": 94,
+              "schema_id": 1
+            },
+            "summary": "Retain the current implementation.",
+            "diff_excerpt": "No source changes; keep the broken implementation.",
+            "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        ]
+      },
+      "blake3": "f657868d37e91cb9959ff0d4f0c82ec7c2c43e71ebfcec9ebc6518f76372b1c8",
+      "producer_ordinals": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "repository_id": "turbovec"
+    },
+    {
+      "frame": {
+        "schema_id": "rdc-real-coding-observation.v1",
+        "task_id": "fresh-turbovec-search-results-trait-set-v2",
+        "task_family": "turbovec-search-results-clone-contract",
+        "task_prompt": "A downstream caller needs to clone a SearchResults value. Repair the missing trait so the compile-time and behavior checks in the exact API test pass.",
+        "repository_revision": "8202f194a0cbbd52213a004290401e180e5c123d",
+        "snapshot_sha256": "c861cd20393d80fb2195e4278f754c87ff933c0cbe4bcfda0910113f6806213a",
+        "evidence": [
+          {
+            "kind": "source_and_test_contract",
+            "source_id": "turbovec/turbovec/src/lib.rs::search_results_implements_the_downstream_derive_set",
+            "content_blake3": "ae4528a94bdf8c34bd4801fc17a18b2b5958f2744d98536673967c935f703382",
+            "content": "The task snapshot removed Clone from SearchResults. The frozen public API test asserts Debug, Clone, and PartialEq support, then clones and compares the value."
+          }
+        ],
+        "action_options": [
+          {
+            "action": {
+              "id": 11,
+              "schema_id": 1
+            },
+            "summary": "Apply the focused implementation patch.",
+            "diff_excerpt": "--- a/turbovec/src/lib.rs\n+++ b/turbovec/src/lib.rs\n@@ -464,7 +464,7 @@\n /// patterns. Good enough for `assert_eq!` on results the index actually\n /// returns; not a substitute for comparing scores within a tolerance,\n /// and not enough to key a map.\n-#[derive(Debug, PartialEq)]\n+#[derive(Debug, Clone, PartialEq)]\n pub struct SearchResults {\n     /// Scores, row-major `nq × k`, sorted descending within each row\n     /// (best match first).",
+            "patch_sha256": "d7c1e233f97f4ca98a72dc565d3133d301c4b3118dee9ead829d3ba18e06c1a3"
+          },
+          {
+            "action": {
+              "id": 37,
+              "schema_id": 1
+            },
+            "summary": "Apply the focused patch with a contract comment.",
+            "diff_excerpt": "--- a/turbovec/src/lib.rs\n+++ b/turbovec/src/lib.rs\n@@ -464,7 +464,8 @@\n /// patterns. Good enough for `assert_eq!` on results the index actually\n /// returns; not a substitute for comparing scores within a tolerance,\n /// and not enough to key a map.\n-#[derive(Debug, PartialEq)]\n+/// Cloning owns independent result buffers.\n+#[derive(Debug, Clone, PartialEq)]\n pub struct SearchResults {\n     /// Scores, row-major `nq × k`, sorted descending within each row\n     /// (best match first).",
+            "patch_sha256": "f1ca29b631625189ac005bac09f87b8ad604ae23f7aa132f716107ebcc6090d8"
+          },
+          {
+            "action": {
+              "id": 68,
+              "schema_id": 1
+            },
+            "summary": "Apply this plausible alternate change.",
+            "diff_excerpt": "--- a/turbovec/src/lib.rs\n+++ b/turbovec/src/lib.rs\n@@ -464,7 +464,7 @@\n /// patterns. Good enough for `assert_eq!` on results the index actually\n /// returns; not a substitute for comparing scores within a tolerance,\n /// and not enough to key a map.\n-#[derive(Debug, PartialEq)]\n+#[derive(Debug, Copy, Clone, PartialEq)]\n pub struct SearchResults {\n     /// Scores, row-major `nq × k`, sorted descending within each row\n     /// (best match first).",
+            "patch_sha256": "17bba2661ae4036b0ce69de7fe9345b59183020ce8ba2bfeec7e03edd7141a06"
+          },
+          {
+            "action": {
+              "id": 94,
+              "schema_id": 1
+            },
+            "summary": "Retain the current implementation.",
+            "diff_excerpt": "No source changes; keep the broken implementation.",
+            "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        ]
+      },
+      "blake3": "be58ec162c2406735f59c63d058d6d6dc496eba4df4c49e7ebadb7eabe190737",
+      "producer_ordinals": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "repository_id": "turbovec"
+    }
+  ]
+}

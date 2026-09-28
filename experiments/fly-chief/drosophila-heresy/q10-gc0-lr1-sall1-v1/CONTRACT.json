@@ -1,0 +1,1320 @@
+{
+  "chunk_size": 32,
+  "expected_singleton_records": 3696,
+  "final_gate": "all_source_records_reconstructed_and_verified",
+  "identity": "q10-gc0-lr1-sall1-v1",
+  "parent_bindings": [
+    {
+      "label": "LR1 contract",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/CONTRACT.json",
+      "sha256": "0592C33F18BD59F8BC7B21027370E3DC53D993BFCB070C5A45C4AB9FE1263FA5"
+    },
+    {
+      "label": "LR1 preexecution",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/PREEXECUTION.json",
+      "sha256": "B159B4129F8F8FC585801A9D36BCCFCF352E08E69EF693DF1D8B1F37C0BDAEEC"
+    },
+    {
+      "label": "LR1 adapter",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/scripts/lr1_adapter.py",
+      "sha256": "0F6D01F37106ACBBB60A3D401854016FEE7C16A606866334B68990FE9BDA0A13"
+    },
+    {
+      "label": "LR1 case runtime",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/scripts/run_lr1_case.py",
+      "sha256": "6F347446EAF20530F96200E3DB310D7B61B40CE46FBA095F87BB2109DFED5A3A"
+    },
+    {
+      "label": "PF5 contract",
+      "path": "experiments/drosophila-heresy/q10-pf5-v1/CONTRACT.json",
+      "sha256": "20995E1826A9C62E0E8689017A2F3E624CC9E63B76B210FBD4AB11D7E9E7D34F"
+    },
+    {
+      "label": "PAR8 execution",
+      "path": "experiments/drosophila-heresy/q10-gc1-par8-v1/qualification/execution.json",
+      "sha256": "A4304E70F7D32436109CD6F3367C298CD1227FBD5C4AA2578C28D14272721D6B"
+    },
+    {
+      "label": "GP1 palettes",
+      "path": "experiments/drosophila-heresy/q10-gc0-gp1-par2-v1/qualification/palettes.jsonl",
+      "sha256": "56A8BCFD950C2C796279556B03C4905622B1207023C1142076AE7147203477FA"
+    },
+    {
+      "label": "PAL2 reconciliation",
+      "path": "experiments/drosophila-heresy/q10-gc0-lr1-pal2-r1-v1/execution.json",
+      "sha256": "8408AF1D976780CE16F2D3CCF407ED97FAECF69740A10CE546B7960EF3A900B7"
+    },
+    {
+      "label": "LR1 singles completion seed9731-L-tau16__set2",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau16__set2/singles/COMPLETE.json",
+      "sha256": "93B8E6A5AB5890652EFC1AD18B2D090410119B704234611DCAC32955A0D41943"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau16__set2\\singles\\chunk-0000.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau16__set2/singles/chunk-0000.jsonl",
+      "sha256": "527B25FBF3C1E376838FF91A47C799C8A92FB874D1FB1BDC7D4A0AB21A10D0F3"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau16__set2\\singles\\chunk-0000.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau16__set2/singles/chunk-0000.COMPLETE.json",
+      "sha256": "6E88ED56633C2AF510C09DF15619513969A60108DD28E6A747DBE84DDEB4BFB4"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau16__set2\\singles\\chunk-0001.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau16__set2/singles/chunk-0001.jsonl",
+      "sha256": "ABE2CC49554B5F43F016AF39394128BE76A8F7061B58F039CAB7844D6DE3619F"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau16__set2\\singles\\chunk-0001.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau16__set2/singles/chunk-0001.COMPLETE.json",
+      "sha256": "6F1A8026FB1A62A4AE919ED42665FC6389EC4F3B169CADE42FBADEFD3BE37594"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau16__set2\\singles\\chunk-0002.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau16__set2/singles/chunk-0002.jsonl",
+      "sha256": "961482AE32872D04FAB13599B95C8E337BE9481741DA5B242B698E287AB507C0"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau16__set2\\singles\\chunk-0002.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau16__set2/singles/chunk-0002.COMPLETE.json",
+      "sha256": "CD5C15399090472814846B12A8787FD68E32FDD0F0E8152FA2749CE4C2F60E2B"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau16__set2\\singles\\chunk-0003.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau16__set2/singles/chunk-0003.jsonl",
+      "sha256": "E56DA5BB51790737B01A81A4B4EFEA29BA26734360371518D1B1C248EA0FBDC9"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau16__set2\\singles\\chunk-0003.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau16__set2/singles/chunk-0003.COMPLETE.json",
+      "sha256": "B839E4CCDD911A6AB84915DD3133EAE797B0550986219BF0D6FE1F199CA2F9B2"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau16__set2\\singles\\chunk-0004.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau16__set2/singles/chunk-0004.jsonl",
+      "sha256": "49D85CEB5C4125EF3F41A96DF39B84277A84B049E6DFB713F8C43529413182C7"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau16__set2\\singles\\chunk-0004.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau16__set2/singles/chunk-0004.COMPLETE.json",
+      "sha256": "284CC91669EF22D19E7C1BBE9BDDD3DDF6596BB9228D334C8C53B182378D7A41"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau16__set2\\singles\\chunk-0005.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau16__set2/singles/chunk-0005.jsonl",
+      "sha256": "10EE158EE6DE16CF61A07B7A84E91E6FCF53A289BD97E7991134CE96416F27CE"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau16__set2\\singles\\chunk-0005.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau16__set2/singles/chunk-0005.COMPLETE.json",
+      "sha256": "F8CFAF9464BCB92FF7677015A78F6706449964A08544B44A180A98BE8AD10127"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau16__set2\\singles\\chunk-0006.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau16__set2/singles/chunk-0006.jsonl",
+      "sha256": "98B55180C5DBBFD84FBDED7F1816462A50F77D6CF735726DEF727C99B624180B"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau16__set2\\singles\\chunk-0006.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau16__set2/singles/chunk-0006.COMPLETE.json",
+      "sha256": "08AD9BC9A01D80F2B96237612DB4B637B2CA8B222259CB76DA0BE6477495E192"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau16__set2\\singles\\chunk-0007.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau16__set2/singles/chunk-0007.jsonl",
+      "sha256": "A3C67A9BB49A11F82A6ED3E750B713F0AF79EAF9AA4044BC3DE09DAB4DED33EF"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau16__set2\\singles\\chunk-0007.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau16__set2/singles/chunk-0007.COMPLETE.json",
+      "sha256": "C13522483380FCFD4741C69DFC2E9ADB29965F44075C43845B4B42717567ADFC"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau16__set2\\singles\\chunk-0008.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau16__set2/singles/chunk-0008.jsonl",
+      "sha256": "98859C0BAD6472EF2302DDDB0663D8BDE502853161A6144E1F7A949A9A0E2829"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau16__set2\\singles\\chunk-0008.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau16__set2/singles/chunk-0008.COMPLETE.json",
+      "sha256": "87717BC60F020ADCE04FF9AA073D59E607DF5F427EF6EF78BAB7ACF9DCFD8F19"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau16__set2\\singles\\chunk-0009.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau16__set2/singles/chunk-0009.jsonl",
+      "sha256": "E90E2E396349903C24C4066C41700D71702AF3A833101437480D648F0FD8FE4B"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau16__set2\\singles\\chunk-0009.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau16__set2/singles/chunk-0009.COMPLETE.json",
+      "sha256": "4523432355DB0A75182DAA86ED01D74D64ED65C208B61EEAD6E75F9763593C21"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau16__set2\\singles\\chunk-0010.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau16__set2/singles/chunk-0010.jsonl",
+      "sha256": "7C936C916EB7E3820BFBC08E148CFC7096C49551BF1214807B4493C29BC630FC"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau16__set2\\singles\\chunk-0010.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau16__set2/singles/chunk-0010.COMPLETE.json",
+      "sha256": "60FDF11F75B18AB1375396CB3F45D5BA955978AB48411171109E9B8DED71973D"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau16__set2\\singles\\chunk-0011.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau16__set2/singles/chunk-0011.jsonl",
+      "sha256": "A5E7DE0BD987207006EC7BC8C0B7F2F43F3E9D036CD5687990A97F8B02762526"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau16__set2\\singles\\chunk-0011.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau16__set2/singles/chunk-0011.COMPLETE.json",
+      "sha256": "21685465F7822730930EB4C87DB82B582A46E7ED0CA215130AB084A6AAB38F96"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau16__set2\\singles\\chunk-0012.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau16__set2/singles/chunk-0012.jsonl",
+      "sha256": "37069F229958F08C0BE45A77D8A53EE60B3BFE6282CD6B876BFD271C6590D36B"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau16__set2\\singles\\chunk-0012.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau16__set2/singles/chunk-0012.COMPLETE.json",
+      "sha256": "1C7B130C5E2702927EF79E0DB0022F559C8258CB2DAA49256DD1860FE71F5791"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau16__set2\\singles\\chunk-0013.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau16__set2/singles/chunk-0013.jsonl",
+      "sha256": "C3D67FC69AD59C7CACA6AD188F00201BC99385E646A809B8B3809A28002CDADB"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau16__set2\\singles\\chunk-0013.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau16__set2/singles/chunk-0013.COMPLETE.json",
+      "sha256": "21535674CF8EC18AF1C6750867A9443FE68CAFB882A3D2324DDB0CDE6F2F3F24"
+    },
+    {
+      "label": "LR1 singleton domain seed9731-L-tau16__set2",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/inventory/singles-domain/seed9731-L-tau16__set2.json",
+      "sha256": "8E43E37686DEC96C083A2118ABA62A683E59022C199C5D0CF6CE61811FECB5BB"
+    },
+    {
+      "label": "LR1 singles completion seed9731-L-tau4__set3",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau4__set3/singles/COMPLETE.json",
+      "sha256": "9A71949E1F01222108FCBADF449B6350A6DF5C4CA1C6CA9AAEC1BB66B8018D3C"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau4__set3\\singles\\chunk-0000.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau4__set3/singles/chunk-0000.jsonl",
+      "sha256": "F2AE14A75F7AA6E509619B23E34C97388D5C96207E98486BD86195D4882E89F0"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau4__set3\\singles\\chunk-0000.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau4__set3/singles/chunk-0000.COMPLETE.json",
+      "sha256": "EA81BE85B021D075F03DAEC60BD06CAE22772B5C045C984F5A92B7EADE99BBF7"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau4__set3\\singles\\chunk-0001.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau4__set3/singles/chunk-0001.jsonl",
+      "sha256": "215724D2F7B245DB5633AC5D4AD77F4AF75C6D77815115D20EED3C2FD85B2B7B"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau4__set3\\singles\\chunk-0001.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau4__set3/singles/chunk-0001.COMPLETE.json",
+      "sha256": "FC37F7932C42D26AA3056FD39F285D2C43AB9281BC9F230C40FF62362E154BA6"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau4__set3\\singles\\chunk-0002.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau4__set3/singles/chunk-0002.jsonl",
+      "sha256": "42BF489727E0219CE5FB08E8FDD3D395D06A7695EB049E8EC182CE3131D1C27F"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau4__set3\\singles\\chunk-0002.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau4__set3/singles/chunk-0002.COMPLETE.json",
+      "sha256": "484140A761A2355457FD36774336A62209AD619E4FF3985D93B638FE2E3A20E0"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau4__set3\\singles\\chunk-0003.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau4__set3/singles/chunk-0003.jsonl",
+      "sha256": "559252CA7B7723F5FD063844090F51373B0B11E072DB8329B579A0817468496D"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau4__set3\\singles\\chunk-0003.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau4__set3/singles/chunk-0003.COMPLETE.json",
+      "sha256": "C3CCE3120BE5199FAA48155BC4167D4FE60A9F7AE7A6F7527A3318FE73BB8A03"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau4__set3\\singles\\chunk-0004.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau4__set3/singles/chunk-0004.jsonl",
+      "sha256": "BEDA7CF6746698F4A0F677720EE745B5F97922F360C1533126BC5F8BCA153876"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau4__set3\\singles\\chunk-0004.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau4__set3/singles/chunk-0004.COMPLETE.json",
+      "sha256": "1EFE3A9663FD9C0F3B43B3E07A5FED56C5B40B69A958B0B69D384296CF407599"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau4__set3\\singles\\chunk-0005.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau4__set3/singles/chunk-0005.jsonl",
+      "sha256": "FF109F934580CCC8E8B1123AFEF241C80DCDB7FBFFF571538F3001E2749742AA"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau4__set3\\singles\\chunk-0005.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau4__set3/singles/chunk-0005.COMPLETE.json",
+      "sha256": "48363304439F393DB378AF76D05012C2C4FC031EACD5270A6C30167CDC6E3766"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau4__set3\\singles\\chunk-0006.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau4__set3/singles/chunk-0006.jsonl",
+      "sha256": "A81E0A0232E95E395742A834303E1B4D466979A17BEF5723EAFD900FCD56167A"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau4__set3\\singles\\chunk-0006.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau4__set3/singles/chunk-0006.COMPLETE.json",
+      "sha256": "AD6AC3294A7F6F6FB6FEDBAA5813B5204FF1E70C5412EBF88D0895883154B1F6"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau4__set3\\singles\\chunk-0007.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau4__set3/singles/chunk-0007.jsonl",
+      "sha256": "5E7445256FA95568AF5D26160B0280AE64B803B3B3CA347B4756E686797008FA"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau4__set3\\singles\\chunk-0007.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau4__set3/singles/chunk-0007.COMPLETE.json",
+      "sha256": "64DB3396B5DE641CD445B538F7D1C705C75254B9B83DC20663F5321BD6B33768"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau4__set3\\singles\\chunk-0008.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau4__set3/singles/chunk-0008.jsonl",
+      "sha256": "5777FFA0BDF681079CE9E516F8D719AA85070D7C1B6EB9D0DE70D1D844C13A11"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau4__set3\\singles\\chunk-0008.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau4__set3/singles/chunk-0008.COMPLETE.json",
+      "sha256": "1EB74E8DD9D3611B9D96E9F530E090CE01751671EE0C53242F8514851B2E10F9"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau4__set3\\singles\\chunk-0009.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau4__set3/singles/chunk-0009.jsonl",
+      "sha256": "6C7D2BFF29EACF1E02E82B2FEB8366250304C5335A4BE1E166886E3740BCAD7F"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau4__set3\\singles\\chunk-0009.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau4__set3/singles/chunk-0009.COMPLETE.json",
+      "sha256": "0D9AE9E93FB08A8A51E7F79647E532E58740C2FE929E464669E853E9FFE49E9B"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau4__set3\\singles\\chunk-0010.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau4__set3/singles/chunk-0010.jsonl",
+      "sha256": "136DDBA9E5C100C2BB9C30806B108C3E7A1E04CD0F71E69A7D57C12624E1832E"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau4__set3\\singles\\chunk-0010.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau4__set3/singles/chunk-0010.COMPLETE.json",
+      "sha256": "FCAE5E2182D1D0BBBEBEDC97F7CAD201042BB69A9143C32A8EAD5AED32A0960C"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau4__set3\\singles\\chunk-0011.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau4__set3/singles/chunk-0011.jsonl",
+      "sha256": "06978B58A4EF710A6C15E68EFA253E03DA17AF452F51E774E2510DB713291835"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau4__set3\\singles\\chunk-0011.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau4__set3/singles/chunk-0011.COMPLETE.json",
+      "sha256": "D0892127CDF6E229FD1DD91D43D1E609E0B867A195BF7661C9C8254BA1CBE791"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau4__set3\\singles\\chunk-0012.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau4__set3/singles/chunk-0012.jsonl",
+      "sha256": "2838C7AB2907A29A3D2DF15CECABACE571B0A879A58E972AA393214596084168"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau4__set3\\singles\\chunk-0012.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau4__set3/singles/chunk-0012.COMPLETE.json",
+      "sha256": "65D2FB66B17DEE3827ED2EAD5AA923DE8557CF290E1B63B9B04EF07747E06433"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau4__set3\\singles\\chunk-0013.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau4__set3/singles/chunk-0013.jsonl",
+      "sha256": "DCE16BAA3AF8BFABB979E42751AA38CDD3DD2FBFF857D4A752371DBC7CB86887"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau4__set3\\singles\\chunk-0013.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau4__set3/singles/chunk-0013.COMPLETE.json",
+      "sha256": "9D9FB2B2719EC4270285E51F1FAB064B541E7097FE9AAB3645EF983BA66E55F0"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau4__set3\\singles\\chunk-0014.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau4__set3/singles/chunk-0014.jsonl",
+      "sha256": "1185C9BD69165AEB220CBF2C2F53A0C07C9324549E34FCD3320F8EE02538714A"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau4__set3\\singles\\chunk-0014.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau4__set3/singles/chunk-0014.COMPLETE.json",
+      "sha256": "36BEE2043CCFF982EA61CD67DAA13068E7C8D3416FB3F8485B24BE885925C77A"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau4__set3\\singles\\chunk-0015.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau4__set3/singles/chunk-0015.jsonl",
+      "sha256": "E3AA7C5BD4162512BB445177DA479F040588AD0DD5336F26A89D31CDB53752B0"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-L-tau4__set3\\singles\\chunk-0015.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-L-tau4__set3/singles/chunk-0015.COMPLETE.json",
+      "sha256": "654ACB8F3AB07E77692EAD933442567DC3F3402F42C9BB9FECF645CB2D5FF825"
+    },
+    {
+      "label": "LR1 singleton domain seed9731-L-tau4__set3",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/inventory/singles-domain/seed9731-L-tau4__set3.json",
+      "sha256": "CF07D3B6C21C21BC845929F5D672EB8A5C4A6AE33BCF9DEA4297F3F5E4D3F0A1"
+    },
+    {
+      "label": "LR1 singles completion seed9731-R-tau16__set1",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set1/singles/COMPLETE.json",
+      "sha256": "2393899D78896D9A9A5CA16CC0786ADC5171C021F2F9D556FE74F96407FC0CAD"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau16__set1\\singles\\chunk-0000.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set1/singles/chunk-0000.jsonl",
+      "sha256": "6E5F7274AC0CFD976CD785E4D2F56970A43EE9235BCCCF0B66D88E55B24EF1BA"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau16__set1\\singles\\chunk-0000.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set1/singles/chunk-0000.COMPLETE.json",
+      "sha256": "371EF3576A7054B754BE8CB945DEBCC2F60771508D80826C017590FA0E17A545"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau16__set1\\singles\\chunk-0001.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set1/singles/chunk-0001.jsonl",
+      "sha256": "34D81C4CEADD87448088BF97181D408AB9128D49E96212FB81838AF470AFA761"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau16__set1\\singles\\chunk-0001.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set1/singles/chunk-0001.COMPLETE.json",
+      "sha256": "6D2EE29A3BE163A8253AB354B6CEB001F93F3681990A2D3257222484B9194233"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau16__set1\\singles\\chunk-0002.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set1/singles/chunk-0002.jsonl",
+      "sha256": "D81F9438BC7031D63701B5C23CAA50F03109C8B5D0E06D6B11D34494EB24F184"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau16__set1\\singles\\chunk-0002.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set1/singles/chunk-0002.COMPLETE.json",
+      "sha256": "807C452275EF7F4E42760540F4FD0344E97B742D11094DF071C02FD48BD84F38"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau16__set1\\singles\\chunk-0003.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set1/singles/chunk-0003.jsonl",
+      "sha256": "BF06B19517A29AB391D3AA3CDA6463CEA9F51941298BE00FDE80FFD843830C17"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau16__set1\\singles\\chunk-0003.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set1/singles/chunk-0003.COMPLETE.json",
+      "sha256": "7413C6A152B10D8AB5CA05170FE64964DC6264F94224F27D60AD8B810760BA58"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau16__set1\\singles\\chunk-0004.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set1/singles/chunk-0004.jsonl",
+      "sha256": "EDCE1E6743360B13E8C36BCBAC21017C37B96A80C017644C176AD35AFBA10143"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau16__set1\\singles\\chunk-0004.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set1/singles/chunk-0004.COMPLETE.json",
+      "sha256": "6088FD41CB9EB6FC4D8C285603AB6946DE490C991E4F51CB87AEA85FD55224AC"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau16__set1\\singles\\chunk-0005.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set1/singles/chunk-0005.jsonl",
+      "sha256": "DA28C8A40E595168206D922964477284C88F102DE9CFEFD1B0DF6C363A7D7435"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau16__set1\\singles\\chunk-0005.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set1/singles/chunk-0005.COMPLETE.json",
+      "sha256": "A31C8FDBA7B32658729F5942DFDDD58399423D775AC8F25F941769DB0C7CA968"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau16__set1\\singles\\chunk-0006.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set1/singles/chunk-0006.jsonl",
+      "sha256": "49A95682B1531D7EEDA7501085863A59D0908DF74895795CDFE42324E7FC7B38"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau16__set1\\singles\\chunk-0006.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set1/singles/chunk-0006.COMPLETE.json",
+      "sha256": "F88147AEC8F6E908EB251AF7F23DFA71D9FF13CAC30A9F50A60062181261EF59"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau16__set1\\singles\\chunk-0007.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set1/singles/chunk-0007.jsonl",
+      "sha256": "B130D0B2D013F3917EF9F9F4C104E9F31C312E50C7AAC020160C92627EF136B1"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau16__set1\\singles\\chunk-0007.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set1/singles/chunk-0007.COMPLETE.json",
+      "sha256": "780667EE4C126CFCA9A01C671F156CD47920DD1C1876FEFBC7C4BE4DC33AB174"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau16__set1\\singles\\chunk-0008.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set1/singles/chunk-0008.jsonl",
+      "sha256": "823477E2275A1327C5C35B968858DFF9A0087BBF1AE822C35FB2CC76FFAF133F"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau16__set1\\singles\\chunk-0008.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set1/singles/chunk-0008.COMPLETE.json",
+      "sha256": "8BBC278F528AC6B4176A4149FC012251DB02C920447B3813410908532EF4F63F"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau16__set1\\singles\\chunk-0009.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set1/singles/chunk-0009.jsonl",
+      "sha256": "573CF5D648F8730B50BF313CB2F3447118CDBE52843F8F020198CBF4C06B4BF4"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau16__set1\\singles\\chunk-0009.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set1/singles/chunk-0009.COMPLETE.json",
+      "sha256": "1F84A66FB2F800504881C17186C0A93BC13401F281717496537802548F8E238F"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau16__set1\\singles\\chunk-0010.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set1/singles/chunk-0010.jsonl",
+      "sha256": "3B961940A59D8969DAAEE319105AA5A5ADA5A7E082FFAA33F0120BACF692BF0D"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau16__set1\\singles\\chunk-0010.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set1/singles/chunk-0010.COMPLETE.json",
+      "sha256": "265755A24B8D29479B7558D87A7A548246B1956BFA31231103825070CB867578"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau16__set1\\singles\\chunk-0011.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set1/singles/chunk-0011.jsonl",
+      "sha256": "3C3D76FC1D3BF734604660A81702183A43C1E6D5D333A42DFD95E545484947A1"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau16__set1\\singles\\chunk-0011.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set1/singles/chunk-0011.COMPLETE.json",
+      "sha256": "A243C9B63780F22E61F04F4F83DF3546063E3C6B1C74BE0CD58635E0FE5A6BDD"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau16__set1\\singles\\chunk-0012.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set1/singles/chunk-0012.jsonl",
+      "sha256": "17122B1BCEB4402D589D2B5CF9552579FBF60A47D8A5C14C93E1D16B8CAB7018"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau16__set1\\singles\\chunk-0012.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set1/singles/chunk-0012.COMPLETE.json",
+      "sha256": "25977F94060489323BD2619A7ABF8420332A7B518ECFAFE8C23760E102E23CE2"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau16__set1\\singles\\chunk-0013.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set1/singles/chunk-0013.jsonl",
+      "sha256": "4053E1F8DFCC813B5451E8A7E24802BBE86F51002C77035343E9E6D0DC229EA8"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau16__set1\\singles\\chunk-0013.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set1/singles/chunk-0013.COMPLETE.json",
+      "sha256": "6070CBDA831387F18B6E0823F94CE5EC5E4D7D9584AD218396247C6DC385AABA"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau16__set1\\singles\\chunk-0014.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set1/singles/chunk-0014.jsonl",
+      "sha256": "28E891AB95C14A37367E6F55C501E54EFEE5ADA45EC3B2F48D30F56AC6FAB169"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau16__set1\\singles\\chunk-0014.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set1/singles/chunk-0014.COMPLETE.json",
+      "sha256": "527DD9F8872AE6A76C3340819FF4BC7B4B0AE3FA682E809399A794EB86011888"
+    },
+    {
+      "label": "LR1 singleton domain seed9731-R-tau16__set1",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/inventory/singles-domain/seed9731-R-tau16__set1.json",
+      "sha256": "AE5DA63BACDB82460C0FC01F274B78A08BE7B784ACE2C600C7F5B9635A303623"
+    },
+    {
+      "label": "LR1 singles completion seed9731-R-tau16__set3",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set3/singles/COMPLETE.json",
+      "sha256": "86FA08B2672EBEA72A10DE3A38E6C462D416EE3EEB4C9BE25D08A48AF6AB2A51"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau16__set3\\singles\\chunk-0000.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set3/singles/chunk-0000.jsonl",
+      "sha256": "94C9F66597CF475D54BB375ECB3485FAB91BE08CF6D509099B988946F2CE73B2"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau16__set3\\singles\\chunk-0000.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set3/singles/chunk-0000.COMPLETE.json",
+      "sha256": "8D7A0C1721F5763CE20F0CB438223A9EE5C20406BC212F7B0DC8766A29C5F118"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau16__set3\\singles\\chunk-0001.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set3/singles/chunk-0001.jsonl",
+      "sha256": "F9499FA6EC32641CD33451068AAB384B445DED98EABD5DD11115209965B2F3F0"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau16__set3\\singles\\chunk-0001.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set3/singles/chunk-0001.COMPLETE.json",
+      "sha256": "FE4FC98B76DA05080927A5B0326F882F6494DC0EDB9F63C004562B0C4BF85BC5"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau16__set3\\singles\\chunk-0002.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set3/singles/chunk-0002.jsonl",
+      "sha256": "E3478A28536A80DAD75C873AEACC594D873ADA545D5483F53ADB78505BA0BD8F"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau16__set3\\singles\\chunk-0002.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set3/singles/chunk-0002.COMPLETE.json",
+      "sha256": "6ADB596AE72F9411268E413B79678E0CCD534DD6E237C306EF4F0FB676671FF1"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau16__set3\\singles\\chunk-0003.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set3/singles/chunk-0003.jsonl",
+      "sha256": "8D5767E279049386AE059A9E3E9B3ED9C166DFE7B708329E222A286E8E7CED38"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau16__set3\\singles\\chunk-0003.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set3/singles/chunk-0003.COMPLETE.json",
+      "sha256": "ABBE312929BFDF682DC9AEF2FD4F72BD53699B5F56D84CFC7CC5BE49B15EB584"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau16__set3\\singles\\chunk-0004.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set3/singles/chunk-0004.jsonl",
+      "sha256": "7A4602E654A9D41456E66EB5496434D7C3AA777E91423E36281C34B5AD657F25"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau16__set3\\singles\\chunk-0004.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set3/singles/chunk-0004.COMPLETE.json",
+      "sha256": "A5B3DA5E736991163CFBF89C0F7CB454D4100B0223DC0318CA7D23EAF58AA79A"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau16__set3\\singles\\chunk-0005.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set3/singles/chunk-0005.jsonl",
+      "sha256": "36DAE1C0C4FE948B6250C5FE1D758DF2D2465B2D920F0012BB3A3871AC128961"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau16__set3\\singles\\chunk-0005.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set3/singles/chunk-0005.COMPLETE.json",
+      "sha256": "1AC9A2BFB10767776E63E0E4B3B8CFFA2A7CF84D3D9AE2880F317CF3A2453F37"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau16__set3\\singles\\chunk-0006.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set3/singles/chunk-0006.jsonl",
+      "sha256": "B8F6901CE08A25B8B82601500C0B0B5469CB2382FAC7B99B30D8829A2C0584FC"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau16__set3\\singles\\chunk-0006.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set3/singles/chunk-0006.COMPLETE.json",
+      "sha256": "B4FE153A41E94615775F1099F7D9AF6DF1B1944ACE7ACAC37727F70536674B0E"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau16__set3\\singles\\chunk-0007.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set3/singles/chunk-0007.jsonl",
+      "sha256": "17E2C84153198C1F1B50025011AFB43B51994D64801B3D94D13B95AD1C71DF1E"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau16__set3\\singles\\chunk-0007.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set3/singles/chunk-0007.COMPLETE.json",
+      "sha256": "859CD9825817B35511D7F454040F8D4F972940F64783B2631D05C9DB5F3DAB99"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau16__set3\\singles\\chunk-0008.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set3/singles/chunk-0008.jsonl",
+      "sha256": "DA3549C88E9455F44D65D7E17CA9E55D9E620F5A8B3FC94F3C6FD3120047BBBD"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau16__set3\\singles\\chunk-0008.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set3/singles/chunk-0008.COMPLETE.json",
+      "sha256": "39BCC0E5057C4FA38FC0724B5CE0DFB9E21BF3F88A127322B9C17FDFD843683B"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau16__set3\\singles\\chunk-0009.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set3/singles/chunk-0009.jsonl",
+      "sha256": "E838A681E72904BEED95C1B466C62B484EBF27DF4F0E4FE1DC0577F151CC6026"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau16__set3\\singles\\chunk-0009.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set3/singles/chunk-0009.COMPLETE.json",
+      "sha256": "17128A681E7A0B520C64487B751DB109E74307BF9C91DB6DFFB2353612F3D535"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau16__set3\\singles\\chunk-0010.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set3/singles/chunk-0010.jsonl",
+      "sha256": "7A9FC1D096E8CDCB3E9BAB9896ECDFC8B1DCC57EFA94066DCC7601E71F3ABA28"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau16__set3\\singles\\chunk-0010.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set3/singles/chunk-0010.COMPLETE.json",
+      "sha256": "41378ABF696320D34039BF29BD59CDE86D7B2FC1A9FD003B0DF377E358383241"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau16__set3\\singles\\chunk-0011.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set3/singles/chunk-0011.jsonl",
+      "sha256": "DE5C8112A58DB83E3357E84F0FE60041C786BAFB8EE3E17DC50C589ADC712F35"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau16__set3\\singles\\chunk-0011.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set3/singles/chunk-0011.COMPLETE.json",
+      "sha256": "352AE4E2AA6F31319BA86864F14F52FEE30E4A058FB5AD874E2FE948AF6F5906"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau16__set3\\singles\\chunk-0012.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set3/singles/chunk-0012.jsonl",
+      "sha256": "10F0651353C9CBFCC401B5FE50B344B4BDB2C57CBFD54569691EA1521E63A920"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau16__set3\\singles\\chunk-0012.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set3/singles/chunk-0012.COMPLETE.json",
+      "sha256": "D05D2F4CFA7A39180748A803EF526AC17BC69F844712C95988425D711344C91F"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau16__set3\\singles\\chunk-0013.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set3/singles/chunk-0013.jsonl",
+      "sha256": "D47D37AF78D147C9EB50D7FB906613948B51B61C0A4544BA49834B42C9F9496D"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau16__set3\\singles\\chunk-0013.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau16__set3/singles/chunk-0013.COMPLETE.json",
+      "sha256": "6C8161E767C6ABDAC91561C2E2253BB2A262BF4432EBF4940E8A21C4F75CE285"
+    },
+    {
+      "label": "LR1 singleton domain seed9731-R-tau16__set3",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/inventory/singles-domain/seed9731-R-tau16__set3.json",
+      "sha256": "36FBCF92A1A636B31304AB234C19FA92D4205D9FF79E6EB5628907E5A9529F2B"
+    },
+    {
+      "label": "LR1 singles completion seed9731-R-tau4__set0",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set0/singles/COMPLETE.json",
+      "sha256": "FD43FE6A80F5B1086F3AAE4B0E9B3F54ECAF1FBA4F77B8D3A56C020529712238"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set0\\singles\\chunk-0000.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set0/singles/chunk-0000.jsonl",
+      "sha256": "77E929BB97E899ECB7EA84C81EAF1E3EDBE168078AB7BDCA340FA2B02699ED58"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set0\\singles\\chunk-0000.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set0/singles/chunk-0000.COMPLETE.json",
+      "sha256": "AE29A0036C365048204532416F4783639F37E7270E25B36871F20B639BCC2C73"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set0\\singles\\chunk-0001.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set0/singles/chunk-0001.jsonl",
+      "sha256": "758D7662C341EF7A30220BB9670C8112167CC425CB0ABD2C9AF86C0BF7223F1A"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set0\\singles\\chunk-0001.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set0/singles/chunk-0001.COMPLETE.json",
+      "sha256": "4E70904E37F50D95388A470A80E5E2DB7A850E2AEA4A2CFF61276BCD101C8A61"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set0\\singles\\chunk-0002.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set0/singles/chunk-0002.jsonl",
+      "sha256": "70A380909652274884341D8ACC9C50C0EFBA7F0AF485B01C75DFEC9DE40748B7"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set0\\singles\\chunk-0002.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set0/singles/chunk-0002.COMPLETE.json",
+      "sha256": "7724E0F0691834557935842DD40F14440DDFD6CE433C078A2E73BECAC3BB5123"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set0\\singles\\chunk-0003.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set0/singles/chunk-0003.jsonl",
+      "sha256": "3E9203C6753FBE8117A3B8A75BEA76892CF10286565C0BBD3FD73EDF36887E0B"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set0\\singles\\chunk-0003.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set0/singles/chunk-0003.COMPLETE.json",
+      "sha256": "ED5A57949E12693F179325104ACB73DBD6A23CD402FE7C3E00082A115D2E7696"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set0\\singles\\chunk-0004.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set0/singles/chunk-0004.jsonl",
+      "sha256": "45E7811A3C1A281E50655B743B806808AA877C8E040E12E3FE27EA85C53CD389"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set0\\singles\\chunk-0004.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set0/singles/chunk-0004.COMPLETE.json",
+      "sha256": "29C3CA7B86359F5B8DB5B451F21C23297F7435B2F103076802B18D3A201CC916"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set0\\singles\\chunk-0005.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set0/singles/chunk-0005.jsonl",
+      "sha256": "996B449C63F594C365D6659CC1B93EAD424915FF3B968B998EDEDA80F89DE31E"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set0\\singles\\chunk-0005.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set0/singles/chunk-0005.COMPLETE.json",
+      "sha256": "A61C571EE180EA46E2CDDCB3FDF5004B0B3A11AA0C2C3EA1F62A0FE82BBC6B45"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set0\\singles\\chunk-0006.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set0/singles/chunk-0006.jsonl",
+      "sha256": "0977AF655E0842CE2AECD92DF377FC8BCFC2A15C3E6BC2E8808FB9B3DDA35A83"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set0\\singles\\chunk-0006.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set0/singles/chunk-0006.COMPLETE.json",
+      "sha256": "B3F8454C6049AF7F31C8A73C62DE221CF7536C95CA466109BE41355AED11DE58"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set0\\singles\\chunk-0007.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set0/singles/chunk-0007.jsonl",
+      "sha256": "332CC98E8253E73350BE536FFB82A92DB3083F8D45204F2546C42254FDA62047"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set0\\singles\\chunk-0007.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set0/singles/chunk-0007.COMPLETE.json",
+      "sha256": "5E9BC670366BCDD05ED38A37B2D966EA52EE9528B586E80D53A1A2985FCDD8B2"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set0\\singles\\chunk-0008.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set0/singles/chunk-0008.jsonl",
+      "sha256": "84E641370A5D62EAF1D8A768552BF636292C0B43ECD8712605B2310D89F706A2"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set0\\singles\\chunk-0008.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set0/singles/chunk-0008.COMPLETE.json",
+      "sha256": "448E7480BC993D8C92FF9C5AF4E1D0B5DD1CEEA26FAA983DDE564BCC473A5854"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set0\\singles\\chunk-0009.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set0/singles/chunk-0009.jsonl",
+      "sha256": "8FFFFBE61F3742D4D3185971D8A6D0E07235964367EF5CF94ECA02EA8890FE63"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set0\\singles\\chunk-0009.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set0/singles/chunk-0009.COMPLETE.json",
+      "sha256": "E9E7E9E7E9A8481E93C80CEAFFD88530A87A30640CCAB696B0B3E0910192ACF4"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set0\\singles\\chunk-0010.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set0/singles/chunk-0010.jsonl",
+      "sha256": "C81D3B71DC180BB52973197CDB625115C9C2A078DFD7B95402E9F3391D3F67FB"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set0\\singles\\chunk-0010.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set0/singles/chunk-0010.COMPLETE.json",
+      "sha256": "5663C4DC26B96A7B3E28EC2A58C903F32ED69CD5FE0DADDE28767636E9DD554C"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set0\\singles\\chunk-0011.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set0/singles/chunk-0011.jsonl",
+      "sha256": "34796B0F1B961450A480CA4BB9F90FE85FB0698216A170FEB61CFCE9ADF1AD70"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set0\\singles\\chunk-0011.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set0/singles/chunk-0011.COMPLETE.json",
+      "sha256": "DC5973663F9213B746C82A8D80261D2453218F37D67B299C94AAAAC7A028DC6E"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set0\\singles\\chunk-0012.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set0/singles/chunk-0012.jsonl",
+      "sha256": "146308DE998555369CE9D80AD06A8CA5A23B685DA5F2D2DF2F164A3AF768CE0C"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set0\\singles\\chunk-0012.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set0/singles/chunk-0012.COMPLETE.json",
+      "sha256": "216CA01D552FA257D4FC76B356F381C69E5894DB91C118E9C03D18F485EE378F"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set0\\singles\\chunk-0013.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set0/singles/chunk-0013.jsonl",
+      "sha256": "E563D432D2BCD25E98A6E5AA9229C524D5049016FC6966BEE313DD0576C8D93C"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set0\\singles\\chunk-0013.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set0/singles/chunk-0013.COMPLETE.json",
+      "sha256": "E68602C4F68FD3A272C2FA1C7FB02369BFF4E442205A67B80EE56AE3A2F8FE28"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set0\\singles\\chunk-0014.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set0/singles/chunk-0014.jsonl",
+      "sha256": "672C10AED6163EB3889CB7EFFD429785612686B2E47BD06DF9590B983405451F"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set0\\singles\\chunk-0014.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set0/singles/chunk-0014.COMPLETE.json",
+      "sha256": "18C86423C368ED544D34442B756BA3E0AFBE4C785749C65CDADA0E88C3115484"
+    },
+    {
+      "label": "LR1 singleton domain seed9731-R-tau4__set0",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/inventory/singles-domain/seed9731-R-tau4__set0.json",
+      "sha256": "CF1CDCAD9097936AD72B0574C887857484C1ACB4AD95A148E0126CE2C57D942E"
+    },
+    {
+      "label": "LR1 singles completion seed9731-R-tau4__set1",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set1/singles/COMPLETE.json",
+      "sha256": "93DA3AA87CFB297A10CDB876EC90E62D38D6B71EA2347A652B481CBB9C6AC0D1"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set1\\singles\\chunk-0000.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set1/singles/chunk-0000.jsonl",
+      "sha256": "E61C8F8EA6D5637836559236B18743BA80BBC26EDC92F61A8DB5332A46C832B7"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set1\\singles\\chunk-0000.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set1/singles/chunk-0000.COMPLETE.json",
+      "sha256": "316AC2F887AA660987269A60088BDCA9DB0A8F41E789CEA90240C18ADCE7F4F7"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set1\\singles\\chunk-0001.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set1/singles/chunk-0001.jsonl",
+      "sha256": "13EDC3640E193958F8291BF3062D9CBC9E014CF628076C55CE0D32A783BA198F"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set1\\singles\\chunk-0001.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set1/singles/chunk-0001.COMPLETE.json",
+      "sha256": "DA1A51DE0481CE8883B66FEAB95E7CE3C0419F716FC9FBCDB43B8ACED9F8AEAD"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set1\\singles\\chunk-0002.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set1/singles/chunk-0002.jsonl",
+      "sha256": "75D001E8B6058E0DB6F16F713FC904B64DDEA4E2EA107F95B2C2DE2E2114D0D2"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set1\\singles\\chunk-0002.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set1/singles/chunk-0002.COMPLETE.json",
+      "sha256": "CB156A662D94C7108D68A324658ABB02F1AE000DAD516B71935850B21F328B0A"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set1\\singles\\chunk-0003.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set1/singles/chunk-0003.jsonl",
+      "sha256": "16FE7F3D41B05153245254E5D252D0D6BBB1E079908A5C1B3240FF693ADBE416"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set1\\singles\\chunk-0003.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set1/singles/chunk-0003.COMPLETE.json",
+      "sha256": "A7048892AF8CB2B809F880878C132C1574C0365948A250D540CD74D0DCBD6B0D"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set1\\singles\\chunk-0004.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set1/singles/chunk-0004.jsonl",
+      "sha256": "4A3C66F8670DDF41E3300E18DE3AAB11C26AECDB65F3A0E92F00952EF7E4FD22"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set1\\singles\\chunk-0004.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set1/singles/chunk-0004.COMPLETE.json",
+      "sha256": "AA6EEA447D81D01516DCD5BD1AA32BB18128F61D00DE4BCAAC4B09B8354D7773"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set1\\singles\\chunk-0005.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set1/singles/chunk-0005.jsonl",
+      "sha256": "0E33E62E675862E0F0D4B7AC7FE8DF83472296B28528DF2B716389D07A0D4C4E"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set1\\singles\\chunk-0005.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set1/singles/chunk-0005.COMPLETE.json",
+      "sha256": "3A61ED85F7D6D40407745E1DECD5FDD3B382AAED304128825A7414D9339A9920"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set1\\singles\\chunk-0006.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set1/singles/chunk-0006.jsonl",
+      "sha256": "C32A086A27F1419D07BB53CE03B1563C58060B60301E901919A2452EFBA4E59A"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set1\\singles\\chunk-0006.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set1/singles/chunk-0006.COMPLETE.json",
+      "sha256": "37294622B443E19A745D54713073E0BEFF458B671FAACDA1D61CAB52A46B8250"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set1\\singles\\chunk-0007.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set1/singles/chunk-0007.jsonl",
+      "sha256": "C89786DA7BB2F9BAD7A4298A140201C84351E1763717FCDB256D303158625EB1"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set1\\singles\\chunk-0007.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set1/singles/chunk-0007.COMPLETE.json",
+      "sha256": "7003C0CB691D819E59682A993885FCD6B47BC3A2F76B369BBB502F7FF7A89FB4"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set1\\singles\\chunk-0008.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set1/singles/chunk-0008.jsonl",
+      "sha256": "68754B304CE5A9AE7407F680C82E58E9BB3157919AEDE973015C359E3CA44CE1"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set1\\singles\\chunk-0008.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set1/singles/chunk-0008.COMPLETE.json",
+      "sha256": "C6FB53F1C1D1B2889D15D8D3E9D7C92D8C51679420453CCEA295BE2F90BAD80A"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set1\\singles\\chunk-0009.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set1/singles/chunk-0009.jsonl",
+      "sha256": "8BC433CF9D750CB193337EC2DAA2D74F30B74057592D28D860FFB57222B78465"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set1\\singles\\chunk-0009.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set1/singles/chunk-0009.COMPLETE.json",
+      "sha256": "457B9D2467E829FEADEB37B124A39C93B2FBBCEC8034B29469F779FD0385CA9C"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set1\\singles\\chunk-0010.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set1/singles/chunk-0010.jsonl",
+      "sha256": "ECB98BBB65FAB05FB590C8083786B178E22805EE59CBC2A95C8A6504DDDB2FA9"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set1\\singles\\chunk-0010.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set1/singles/chunk-0010.COMPLETE.json",
+      "sha256": "C4FA6449A7B3ED35AEE3A11EA6D8A65AC09735EC01C46B6D1F37BAE7AC694A3A"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set1\\singles\\chunk-0011.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set1/singles/chunk-0011.jsonl",
+      "sha256": "774F63459C54546828DB7948E38073B6FBFFCC3B4732BD7D8031A39EE4DECC9B"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set1\\singles\\chunk-0011.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set1/singles/chunk-0011.COMPLETE.json",
+      "sha256": "97B84253817A2A2C38932CC561AD468BD87E3D0C45696324E5B26B195DF9A538"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set1\\singles\\chunk-0012.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set1/singles/chunk-0012.jsonl",
+      "sha256": "F8CCC7D5A12646AEFE7346660CBC140C3A98C9BCC42E1640FCFD0A706276414B"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set1\\singles\\chunk-0012.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set1/singles/chunk-0012.COMPLETE.json",
+      "sha256": "4905E336497C63717D629C873975BE7D35095EC6FBA7E8AF2EFFF2FBEFA1ADFA"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set1\\singles\\chunk-0013.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set1/singles/chunk-0013.jsonl",
+      "sha256": "577C11D3EA30F163843F82ECDF25B23C59C77190AD18C27722A9289A813D30FD"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set1\\singles\\chunk-0013.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set1/singles/chunk-0013.COMPLETE.json",
+      "sha256": "E69DB6FD595AA6062098C3D4B29CFCA3DA5945612D058EB53A08B0C134F27EC0"
+    },
+    {
+      "label": "LR1 singleton domain seed9731-R-tau4__set1",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/inventory/singles-domain/seed9731-R-tau4__set1.json",
+      "sha256": "6B593EB4F66EC5E85E70EEED1A4A3E5AD2298BBB01367EBB23CF5EA29A242898"
+    },
+    {
+      "label": "LR1 singles completion seed9731-R-tau4__set2",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set2/singles/COMPLETE.json",
+      "sha256": "F69F9C78225B19BAFE5AB971F1C62E7F0A7FA5E28A38C2A24680D44F76CB8D70"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set2\\singles\\chunk-0000.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set2/singles/chunk-0000.jsonl",
+      "sha256": "F60155CDDD13981F0452E259267794450DCE9E7A2480614C2687351C1A50079B"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set2\\singles\\chunk-0000.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set2/singles/chunk-0000.COMPLETE.json",
+      "sha256": "98D5E530E802A7555263A4B568CB683FFE3835218630F0F481B88D9AC6224577"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set2\\singles\\chunk-0001.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set2/singles/chunk-0001.jsonl",
+      "sha256": "581766D385969B8AF0E0CE84DFB36DA76F1BFA9AF80D8CF3A2C0EA94C54C8008"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set2\\singles\\chunk-0001.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set2/singles/chunk-0001.COMPLETE.json",
+      "sha256": "59B10032446516FE7E002AA3DAB5B8FE276C415B6304878E5BA456E02B0B0FE6"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set2\\singles\\chunk-0002.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set2/singles/chunk-0002.jsonl",
+      "sha256": "A5CD637683DF8E13459621D332DD5AE27A9ACC1608BD173103C500CE924A6FDF"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set2\\singles\\chunk-0002.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set2/singles/chunk-0002.COMPLETE.json",
+      "sha256": "834EEC69BF8FC6A2D554AE937537B624306D9BD55A61BF163CDEAB915C23AF50"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set2\\singles\\chunk-0003.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set2/singles/chunk-0003.jsonl",
+      "sha256": "CF08E09DF95663D0C1D6446C087DA5CABDAD31BE52CE590EC09392F229207696"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set2\\singles\\chunk-0003.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set2/singles/chunk-0003.COMPLETE.json",
+      "sha256": "6558D7FD4D7F18CCE33B474C350E30FACD340695E7DE99350D2A580970EF2464"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set2\\singles\\chunk-0004.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set2/singles/chunk-0004.jsonl",
+      "sha256": "4BAB80D8E04803EF48F28C067E7F73C91A7F2432042385A22C044D95F82D3D6B"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set2\\singles\\chunk-0004.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set2/singles/chunk-0004.COMPLETE.json",
+      "sha256": "75D8C76AA19B4C2881DB827C4E6D6C25CB4DF560055DD1373CF09162F572941E"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set2\\singles\\chunk-0005.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set2/singles/chunk-0005.jsonl",
+      "sha256": "33322ABE33E47EFE96F8A69DC55184BEF3807FECC1379EC0249AD6F75A919D81"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set2\\singles\\chunk-0005.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set2/singles/chunk-0005.COMPLETE.json",
+      "sha256": "E52485BC536845FDC04512A5B41005EA369DCA639DE190F2D9AB7565AECFF90A"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set2\\singles\\chunk-0006.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set2/singles/chunk-0006.jsonl",
+      "sha256": "6F54D4035FE8EBB37CCBEC477DD6CFB1CCE5CA44952211D2B8AC1118A17829D1"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set2\\singles\\chunk-0006.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set2/singles/chunk-0006.COMPLETE.json",
+      "sha256": "131CB72D2B8570BB6C8BBD02AB448F3EC1F9E09D88246B8A0CC995E02779FE6D"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set2\\singles\\chunk-0007.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set2/singles/chunk-0007.jsonl",
+      "sha256": "BF34343CBD274B97044B59D24A46FEEADC51366E037E20204A8545F17EDA233B"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set2\\singles\\chunk-0007.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set2/singles/chunk-0007.COMPLETE.json",
+      "sha256": "0359ABEA5F7347FBD05C8FC3CC6725CC1CCA90BCD08E7785C0C858C2C25A1171"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set2\\singles\\chunk-0008.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set2/singles/chunk-0008.jsonl",
+      "sha256": "650E521FC3AFB1BC4499654D63DC9FF76C604CC1963E12D5EC272B40DEE8D01C"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set2\\singles\\chunk-0008.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set2/singles/chunk-0008.COMPLETE.json",
+      "sha256": "04B898085B6EE1787AD348D86C3263BC6DF25367D4F35EC3042D8D0D6E3D50BE"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set2\\singles\\chunk-0009.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set2/singles/chunk-0009.jsonl",
+      "sha256": "39AF8A80C385A3FC7C644A2803543E29DFEDA19CDE8A9127A66AB48990F6C647"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set2\\singles\\chunk-0009.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set2/singles/chunk-0009.COMPLETE.json",
+      "sha256": "AD45CF369471BD7EAE473E6EBCED689F0CE7E67C63C0E8F8376B57A789685F9D"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set2\\singles\\chunk-0010.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set2/singles/chunk-0010.jsonl",
+      "sha256": "15D3C6DD2B5E68109517820326332AC2E043E614DA8A951A23372DBDC4A000F6"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set2\\singles\\chunk-0010.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set2/singles/chunk-0010.COMPLETE.json",
+      "sha256": "E8775B2A04F344CB99E4CAC05261352919EEBDF8C85BF614FD23A45BF71A3473"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set2\\singles\\chunk-0011.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set2/singles/chunk-0011.jsonl",
+      "sha256": "AB92B16926C6513677C5069F584E89247E0814F3E1CCEAE683E5CE8CC0D76104"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set2\\singles\\chunk-0011.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set2/singles/chunk-0011.COMPLETE.json",
+      "sha256": "B09CF37CA975FEA47BBBED9B0E320A52063F302102523B80AC37B753F104683F"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set2\\singles\\chunk-0012.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set2/singles/chunk-0012.jsonl",
+      "sha256": "F4941E19F1ADA82348DDE28623AFF8A3D1656AD02F5D7003AEA576CBF28B5334"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set2\\singles\\chunk-0012.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set2/singles/chunk-0012.COMPLETE.json",
+      "sha256": "C9FA1680686FD3E4F93F14359C8620442AEF2CCEC81F90ABBC24260218898968"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set2\\singles\\chunk-0013.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set2/singles/chunk-0013.jsonl",
+      "sha256": "F7077BA8F007DF4641CAB932DFCF88C44B6DAF77E2FC5D9A52124F6931C3E8F7"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set2\\singles\\chunk-0013.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set2/singles/chunk-0013.COMPLETE.json",
+      "sha256": "DA82A154B2740850CE1366B52F7BD83A452684B19DEC2B5430D0D08A63C51BCA"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set2\\singles\\chunk-0014.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set2/singles/chunk-0014.jsonl",
+      "sha256": "791E497250D452D72F2CCD0E9EFFC1D7C4A40FB8D67314D9FB22840DDE1F73CB"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set2\\singles\\chunk-0014.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set2/singles/chunk-0014.COMPLETE.json",
+      "sha256": "D850C72D63F00E33D324280122D1CF0C2522901A46B6D185D200427B7A2F55AC"
+    },
+    {
+      "label": "LR1 singleton domain seed9731-R-tau4__set2",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/inventory/singles-domain/seed9731-R-tau4__set2.json",
+      "sha256": "AB4F223817329F3BC8EEBCB25899A1B828734689CEA469AD671E172B1FF42F7E"
+    },
+    {
+      "label": "LR1 singles completion seed9731-R-tau4__set3",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set3/singles/COMPLETE.json",
+      "sha256": "CBAD00EE47EDADCE8E414887655C0FD71AA266417BBEBFC135250C4CEA1F47F5"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set3\\singles\\chunk-0000.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set3/singles/chunk-0000.jsonl",
+      "sha256": "40DA133CE4A7D3C692D69D0C9E8CB04C7A0C2175D51CD96DD4E662142805BE04"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set3\\singles\\chunk-0000.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set3/singles/chunk-0000.COMPLETE.json",
+      "sha256": "63D7C6413AB1C0F4DB856C6187DA14730D14161901847533AEC7221A60DE0F1B"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set3\\singles\\chunk-0001.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set3/singles/chunk-0001.jsonl",
+      "sha256": "CCE637989AA65B1794529206D2ECB93F295FE79F54E74DC870036E8EEEFA0668"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set3\\singles\\chunk-0001.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set3/singles/chunk-0001.COMPLETE.json",
+      "sha256": "F4F3D11F37278BB0C3D0B13664D384DBA8E27F4FA86C267B61BCFEA20DFF6139"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set3\\singles\\chunk-0002.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set3/singles/chunk-0002.jsonl",
+      "sha256": "699DF2213D96B1A9907E7ECCBA00914A61F1F928C0129D5B2583D7AFA2D182AF"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set3\\singles\\chunk-0002.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set3/singles/chunk-0002.COMPLETE.json",
+      "sha256": "0C4460A8C820E4FB64084A239BA11F8C1DEA16BC651AFEDFAA978C89A91EF0B4"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set3\\singles\\chunk-0003.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set3/singles/chunk-0003.jsonl",
+      "sha256": "F7C968406DFFA5A01FD52EB01D72D1042014902D77D1CA34AEFFDE8475C797E6"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set3\\singles\\chunk-0003.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set3/singles/chunk-0003.COMPLETE.json",
+      "sha256": "B0027D7C3D31CA03C896D06F9DE6FEA3800263BAA4079A88F859C493FA54168A"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set3\\singles\\chunk-0004.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set3/singles/chunk-0004.jsonl",
+      "sha256": "803493F58E507F0C18432A2B2681643C6EB8712E460574B9EFE38BA187D604FB"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set3\\singles\\chunk-0004.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set3/singles/chunk-0004.COMPLETE.json",
+      "sha256": "67120F128A8D5DE2B185D4310ADBADD580D7CEEE1290413B7C744EB3AD4FBD4A"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set3\\singles\\chunk-0005.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set3/singles/chunk-0005.jsonl",
+      "sha256": "5074ACAED270DC13045F71D6A1BA8AD8539EA82D5126DC58E76C5C197665CE95"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set3\\singles\\chunk-0005.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set3/singles/chunk-0005.COMPLETE.json",
+      "sha256": "BA2F9C5D0042AB0DC8A64C323ECA92815A6B9B9820168E6AA12189E0D7BB8A79"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set3\\singles\\chunk-0006.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set3/singles/chunk-0006.jsonl",
+      "sha256": "D79FA96B0637BDE8F69FD5A95B7780C2656837B97303C2E357C7AEB1AEC46900"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set3\\singles\\chunk-0006.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set3/singles/chunk-0006.COMPLETE.json",
+      "sha256": "5DC9D4160D2435C51A046B48BC3026A467350CD80BBA4F9F78A9133452A7A67D"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set3\\singles\\chunk-0007.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set3/singles/chunk-0007.jsonl",
+      "sha256": "5A2C556F55B5527D2EAE6C806B1715A4D8D854F1245BD7B5629B329AF8475501"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set3\\singles\\chunk-0007.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set3/singles/chunk-0007.COMPLETE.json",
+      "sha256": "EC48AEC37DEFAD56C95733AAD84B061AB3B98B6E6548F08689FD434DAE50B8A1"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set3\\singles\\chunk-0008.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set3/singles/chunk-0008.jsonl",
+      "sha256": "42C9DA864CD540ACCA54B3B2BA996F01B4173DDB2D4CBC1BF15C2B53DACA8573"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set3\\singles\\chunk-0008.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set3/singles/chunk-0008.COMPLETE.json",
+      "sha256": "3E5923A768D41882CE88562F72B2EF38B480CD6BDA5238749B8C38FA91D735B2"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set3\\singles\\chunk-0009.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set3/singles/chunk-0009.jsonl",
+      "sha256": "E0FDC97265883CB62442E7B32A55CD593F92642092BAD82E3309285166534F23"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set3\\singles\\chunk-0009.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set3/singles/chunk-0009.COMPLETE.json",
+      "sha256": "77A03E2D14E9CC91A40CF8E4424C0D9706D58A81883F4596866A296489EAF0FF"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set3\\singles\\chunk-0010.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set3/singles/chunk-0010.jsonl",
+      "sha256": "AA2F810F584FADFBE655C0D7D8B0E720C5BE6BF98F041E00AB3566879ED451F6"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set3\\singles\\chunk-0010.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set3/singles/chunk-0010.COMPLETE.json",
+      "sha256": "E115456084174398DDEE1E801E98623B7693808F92018C01F880BEFFB526FFFF"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set3\\singles\\chunk-0011.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set3/singles/chunk-0011.jsonl",
+      "sha256": "FD94C0C711287A55570B20D495064F0DF43BBD871FF7D5119CAA9B75ED59ED40"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set3\\singles\\chunk-0011.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set3/singles/chunk-0011.COMPLETE.json",
+      "sha256": "C9588B60CA5B035727277649FECBE0B6E2F8CF697CCD685F1F50E35060756622"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set3\\singles\\chunk-0012.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set3/singles/chunk-0012.jsonl",
+      "sha256": "F4D2BA50767145000BF34F02EBFDCFDF9065840A90DD4BBABED6A3DCDFE1C073"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set3\\singles\\chunk-0012.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set3/singles/chunk-0012.COMPLETE.json",
+      "sha256": "958092C19044155B0ABDE0D11C5998EFC3E3048660A8089202E6147AFA359BEA"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set3\\singles\\chunk-0013.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set3/singles/chunk-0013.jsonl",
+      "sha256": "AC16EF99445DF4555AC8D91A8DF324B9C2F5B04F1774D30EAA436EE7CB9D2C7C"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set3\\singles\\chunk-0013.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set3/singles/chunk-0013.COMPLETE.json",
+      "sha256": "8A6CA147CAA8F4305010902C6592D94180407511EAC6822AABEDAE4D644C5349"
+    },
+    {
+      "label": "LR1 singleton chunk C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set3\\singles\\chunk-0014.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set3/singles/chunk-0014.jsonl",
+      "sha256": "F6204EC44C509250D44B7384A5EFCDBC1DB2BA72BAE8E8166A981DA8AFE67C17"
+    },
+    {
+      "label": "LR1 singleton chunk marker C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\cases\\seed9731-R-tau4__set3\\singles\\chunk-0014.jsonl",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/cases/seed9731-R-tau4__set3/singles/chunk-0014.COMPLETE.json",
+      "sha256": "4D32FB67A8A5FCAC5FE910D8F98B7D61183311951E86621CE26EF2DB4ADA80E4"
+    },
+    {
+      "label": "LR1 singleton domain seed9731-R-tau4__set3",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1/inventory/singles-domain/seed9731-R-tau4__set3.json",
+      "sha256": "7009B33D7D24A540858BADC43974D6F8BEC948C7FDCBBFA57492EC0653081805"
+    }
+  ],
+  "protocol": "SALL1_COMPLETE_SINGLETON_MATERIALIZATION",
+  "scope": "engineering_only_complete_frozen_lr1_singleton_materialization",
+  "source_cases": [
+    "seed9731-L-tau16__set2",
+    "seed9731-L-tau4__set3",
+    "seed9731-R-tau16__set1",
+    "seed9731-R-tau16__set3",
+    "seed9731-R-tau4__set0",
+    "seed9731-R-tau4__set1",
+    "seed9731-R-tau4__set2",
+    "seed9731-R-tau4__set3"
+  ]
+}

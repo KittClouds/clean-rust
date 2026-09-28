@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "kammi-ledger"
+version = "1.0.0"
+requires-python = ">=3.13"
+dependencies = [
+  "ladybug==0.20.2",
+  "jcs==0.2.1",
+  "fastapi==0.116.2",
+  "uvicorn==0.35.0",
+  "cryptography==50.0.1",
+  "fastembed==0.8.1",
+]
+
+[project.scripts]
+kammi-ledgerd = "ledgerd.api:main"
+kammi = "ledgerd.cli:main"
+kammi-mcp = "ledgerd.mcp:main"
+
+[tool.setuptools.packages.find]
+include = ["ledgerd*"]
+

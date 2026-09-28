@@ -1,0 +1,30 @@
+{
+  "allowed_scope": [
+    "verify completed artifacts",
+    "execute only pending predeclared fit IDs",
+    "write the original 144-fit prediction lock"
+  ],
+  "completed_fit_count_reused_unchanged": 62,
+  "fit_manifest_sha256": "f71d344c5bc58e86a68e7bd9163aed1ab5d945468bfe84f06a8981e6a1c2ce66",
+  "frozen_model_runner_sha256": "aa6a1c4b757c2209efae6aa859ba5d6b85ce59f0f918300dee02dac6000f3c52",
+  "identity": "F4-PRESENTATION-03-EXECUTION-RESUMPTION-v0.1.1",
+  "interruption_receipt_sha256": "1b32eb8d247cbc4bdf17fe00c83a286047e8aa206a9de4b0498f3be713f3b9bc",
+  "parent_run_id": "F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1",
+  "pending_fit_count_to_execute": 82,
+  "preparation_note": "A pre-seal helper check initially compared the manifest's internal tensor digest with the serialized-file digest. The check was corrected to validate each against its matching manifest/receipt field; no fit output or comparative metric was read or changed.",
+  "prohibited": [
+    "rerun completed fits",
+    "modify existing fit artifacts",
+    "change tasks/rows/features/models/normalization/initialization/optimizer/epochs/metrics",
+    "read held-out scoring truth",
+    "emit comparative results before prediction lock and integrity"
+  ],
+  "raw_predictor_sha256": "495c68070624e4b8eaeeba217aeb03bdac6636d75e6691292a59872c11a9455f",
+  "raw_scoring_truth_sha256": "ff9d000145fc503e83710ca99d65b0304d52c1f94533d92c78e28b9730214d50",
+  "resume_runner_sha256": "ca72e45aab9db2eae960a2b61e95e43f06163b391f6373c5bfd8e851e8def003",
+  "schema": "F4-PRESENTATION-03-execution-resumption-amendment-v0.1.1",
+  "source_tree_sha256_before_resumption": "8a0f79bac05372f3f62141ad162d370ef2a5d5c2e1c732416106006405397430",
+  "status": "PREFIT_RESUMPTION_FROZEN",
+  "task_bank_manifest_sha256": "ad339f4a710c9cb803e68a7076da923a68486f81b7552aa767c710f885deb0a1",
+  "truth_access_context": "target polarity and inclusion probability were previously opened for support accounting only; no comparative scoring fields were inspected"
+}

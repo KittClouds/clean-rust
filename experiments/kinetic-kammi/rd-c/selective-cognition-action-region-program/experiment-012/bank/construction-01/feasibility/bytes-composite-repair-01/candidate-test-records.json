@@ -1,0 +1,182 @@
+[
+  {
+    "candidate_id": 22115,
+    "candidate_role_hidden": "header_big_endian",
+    "case_id": "case-01",
+    "exit_code": 0,
+    "passed": true,
+    "stdout": "\nrunning 1 test\ntest check_contract ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Blocking waiting for file lock on build directory\n   Compiling e012-bytes-composite-harness v0.1.0 (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\task-harnesses\\bytes-composite-repair-01)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.96s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-1b82423bb9a56536.exe)\n"
+  },
+  {
+    "candidate_id": 22115,
+    "candidate_role_hidden": "header_big_endian",
+    "case_id": "case-02",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (20876) panicked at tests\\contract.rs:13:5:\nassertion `left == right` failed: selected frame field mismatch\n  left: 4660\n right: 13330\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.03s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-1b82423bb9a56536.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 22115,
+    "candidate_role_hidden": "header_big_endian",
+    "case_id": "case-03",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (25248) panicked at tests\\contract.rs:13:5:\nassertion `left == right` failed: selected frame field mismatch\n  left: 4660\n right: 22136\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.03s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-1b82423bb9a56536.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 22115,
+    "candidate_role_hidden": "header_big_endian",
+    "case_id": "case-04",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (14972) panicked at tests\\contract.rs:13:5:\nassertion `left == right` failed: selected frame field mismatch\n  left: 4660\n right: 30806\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Blocking waiting for file lock on build directory\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.09s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-1b82423bb9a56536.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 28666,
+    "candidate_role_hidden": "header_little_endian",
+    "case_id": "case-01",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (36236) panicked at tests\\contract.rs:13:5:\nassertion `left == right` failed: selected frame field mismatch\n  left: 13330\n right: 4660\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "   Compiling e012-bytes-composite-harness v0.1.0 (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\task-harnesses\\bytes-composite-repair-01)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.16s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-1b82423bb9a56536.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 28666,
+    "candidate_role_hidden": "header_little_endian",
+    "case_id": "case-02",
+    "exit_code": 0,
+    "passed": true,
+    "stdout": "\nrunning 1 test\ntest check_contract ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.03s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-1b82423bb9a56536.exe)\n"
+  },
+  {
+    "candidate_id": 28666,
+    "candidate_role_hidden": "header_little_endian",
+    "case_id": "case-03",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (16912) panicked at tests\\contract.rs:13:5:\nassertion `left == right` failed: selected frame field mismatch\n  left: 13330\n right: 22136\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.03s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-1b82423bb9a56536.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 28666,
+    "candidate_role_hidden": "header_little_endian",
+    "case_id": "case-04",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (18124) panicked at tests\\contract.rs:13:5:\nassertion `left == right` failed: selected frame field mismatch\n  left: 13330\n right: 30806\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Blocking waiting for file lock on build directory\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.80s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-1b82423bb9a56536.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 51145,
+    "candidate_role_hidden": "payload_big_endian",
+    "case_id": "case-01",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (29856) panicked at tests\\contract.rs:13:5:\nassertion `left == right` failed: selected frame field mismatch\n  left: 22136\n right: 4660\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "   Compiling e012-bytes-composite-harness v0.1.0 (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\task-harnesses\\bytes-composite-repair-01)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.99s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-1b82423bb9a56536.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 51145,
+    "candidate_role_hidden": "payload_big_endian",
+    "case_id": "case-02",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (31364) panicked at tests\\contract.rs:13:5:\nassertion `left == right` failed: selected frame field mismatch\n  left: 22136\n right: 13330\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.03s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-1b82423bb9a56536.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 51145,
+    "candidate_role_hidden": "payload_big_endian",
+    "case_id": "case-03",
+    "exit_code": 0,
+    "passed": true,
+    "stdout": "\nrunning 1 test\ntest check_contract ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.03s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-1b82423bb9a56536.exe)\n"
+  },
+  {
+    "candidate_id": 51145,
+    "candidate_role_hidden": "payload_big_endian",
+    "case_id": "case-04",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (33844) panicked at tests\\contract.rs:13:5:\nassertion `left == right` failed: selected frame field mismatch\n  left: 22136\n right: 30806\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Blocking waiting for file lock on build directory\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.76s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-1b82423bb9a56536.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 62972,
+    "candidate_role_hidden": "payload_little_endian",
+    "case_id": "case-01",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (31904) panicked at tests\\contract.rs:13:5:\nassertion `left == right` failed: selected frame field mismatch\n  left: 30806\n right: 4660\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Blocking waiting for file lock on package cache\n    Blocking waiting for file lock on package cache\n   Compiling e012-bytes-composite-harness v0.1.0 (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\task-harnesses\\bytes-composite-repair-01)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.94s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-1b82423bb9a56536.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 62972,
+    "candidate_role_hidden": "payload_little_endian",
+    "case_id": "case-02",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (42160) panicked at tests\\contract.rs:13:5:\nassertion `left == right` failed: selected frame field mismatch\n  left: 30806\n right: 13330\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.04s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-1b82423bb9a56536.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 62972,
+    "candidate_role_hidden": "payload_little_endian",
+    "case_id": "case-03",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (20868) panicked at tests\\contract.rs:13:5:\nassertion `left == right` failed: selected frame field mismatch\n  left: 30806\n right: 22136\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.03s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-1b82423bb9a56536.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 62972,
+    "candidate_role_hidden": "payload_little_endian",
+    "case_id": "case-04",
+    "exit_code": 0,
+    "passed": true,
+    "stdout": "\nrunning 1 test\ntest check_contract ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Blocking waiting for file lock on build directory\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.07s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-1b82423bb9a56536.exe)\n"
+  },
+  {
+    "candidate_id": null,
+    "candidate_role_hidden": "base_snapshot",
+    "case_id": "case-01",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (30072) panicked at tests\\contract.rs:13:5:\nassertion `left == right` failed: selected frame field mismatch\n  left: 0\n right: 4660\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "   Compiling e012-bytes-composite-harness v0.1.0 (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\task-harnesses\\bytes-composite-repair-01)\nwarning: unused import: `bytes::Buf`\n --> src\\lib.rs:1:5\n  |\n1 | use bytes::Buf;\n  |     ^^^^^^^^^^\n  |\n  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default\n\nwarning: `e012-bytes-composite-harness` (lib) generated 1 warning (run `cargo fix --lib -p e012-bytes-composite-harness` to apply 1 suggestion)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.75s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-1b82423bb9a56536.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": null,
+    "candidate_role_hidden": "base_snapshot",
+    "case_id": "case-02",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (38832) panicked at tests\\contract.rs:13:5:\nassertion `left == right` failed: selected frame field mismatch\n  left: 0\n right: 13330\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "warning: unused import: `bytes::Buf`\n --> src\\lib.rs:1:5\n  |\n1 | use bytes::Buf;\n  |     ^^^^^^^^^^\n  |\n  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default\n\nwarning: `e012-bytes-composite-harness` (lib) generated 1 warning (run `cargo fix --lib -p e012-bytes-composite-harness` to apply 1 suggestion)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.03s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-1b82423bb9a56536.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": null,
+    "candidate_role_hidden": "base_snapshot",
+    "case_id": "case-03",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (35996) panicked at tests\\contract.rs:13:5:\nassertion `left == right` failed: selected frame field mismatch\n  left: 0\n right: 22136\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "warning: unused import: `bytes::Buf`\n --> src\\lib.rs:1:5\n  |\n1 | use bytes::Buf;\n  |     ^^^^^^^^^^\n  |\n  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default\n\nwarning: `e012-bytes-composite-harness` (lib) generated 1 warning (run `cargo fix --lib -p e012-bytes-composite-harness` to apply 1 suggestion)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.03s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-1b82423bb9a56536.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": null,
+    "candidate_role_hidden": "base_snapshot",
+    "case_id": "case-04",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (25844) panicked at tests\\contract.rs:13:5:\nassertion `left == right` failed: selected frame field mismatch\n  left: 0\n right: 30806\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "warning: unused import: `bytes::Buf`\n --> src\\lib.rs:1:5\n  |\n1 | use bytes::Buf;\n  |     ^^^^^^^^^^\n  |\n  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default\n\nwarning: `e012-bytes-composite-harness` (lib) generated 1 warning (run `cargo fix --lib -p e012-bytes-composite-harness` to apply 1 suggestion)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.03s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-1b82423bb9a56536.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  }
+]

@@ -1,0 +1,44 @@
+{
+  "packet_id": "FAS_S09_AUTHORIZATION_PACKET_V02",
+  "authorization_basis": "Continuation of the active user authorization for FAS-S09. Version 01 stopped at preflight before model contact because the S01-3 sealed contract was referenced at the wrong path. This packet corrects only that input path and execution identity; all scientific parents and operations remain as authorized.",
+  "scope": [
+    "verify sealed S01 and S08 parents",
+    "copy and load only the pinned LFM revision",
+    "extract the two frozen views for all 16 layer outputs on sealed S01 inputs",
+    "run deterministic and terminal feature parity checks",
+    "fit the fixed exact-target linear probe recipe at each layer and surface after terminal gate",
+    "run native and cross-surface readouts, metrics, and subspace/convergence analyses",
+    "seal S09 result"
+  ],
+  "prohibitions": [
+    "FAS-00 data or artifact access",
+    "other model revisions, tokenizer calls, new corpus generation, altered splits",
+    "probe/solver/hyperparameter search or extra solver iterations",
+    "additional representation surfaces or layer selection",
+    "significance testing, nonlinear fitting, adaptation, SAE, or backbone updates",
+    "modification of any S01, S08, S07, or FAS-00 artifact"
+  ],
+  "stop_on": [
+    "any parent seal/hash mismatch",
+    "model or runtime identity mismatch",
+    "backbone parameter identity change",
+    "feature determinism or terminal feature parity failure",
+    "terminal S01-3 readout reproduction failure",
+    "S08 terminal plane mismatch above frozen tolerance",
+    "resource floor failure"
+  ],
+  "supersedes": {
+    "project_identity": "fas-s09-depthwise-decision-subspace-emergence",
+    "preflight_attempt_root": "D:\\codex-runs\\fas-s09-depthwise-decision-subspace-emergence-v01",
+    "failure": "S01-3 contract source path was incorrectly assumed to be at the run root instead of inputs/contracts/linear-accessibility-contract-v01.json",
+    "model_loaded": false,
+    "feature_extraction_started": false,
+    "parent_roots_unchanged": true
+  },
+  "terminal_states": {
+    "S09_RESULT_READY": false,
+    "S09_TERMINAL_REPRODUCED": false,
+    "FAS00_PHASE4_AUTHORIZED": false,
+    "ADAPTIVE_MECHANISMS_AUTHORIZED": false
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "protocol": "jev-information-density/v0.8p-r1-contract-seal-v01",
+  "identity": "v0.8P-R1-fresh-trajectory-instrumented-rerun-v01",
+  "status": "CONTRACTS_AND_IMPLEMENTATION_FROZEN_BEFORE_SUCCESSFUL_IDENTITY_REPLAY",
+  "execution_bundle_path": "experiments/jev-information-density-v08p-r1/contracts/r1-execution-bundle-v01.json",
+  "execution_bundle_sha256": "7b422b021279d88fe7df21ce516f5a328033fe810e6a98a2526f73b5a8295056",
+  "identity_schema_sha256": "a5d9bf108a1b14d05652b78021a55b74500ed55d6bdc759ff02c09560ea6f7ed",
+  "execution_contract_sha256": "d692acbef984c98d7f3ac6c5861112d4fbdcf162c4906a93bf548a84dc5e82fa",
+  "generator_source_sha256": "98204bc78fe2172f7780570395b9d87736b047a8c7bbc531ec183b0d7b666f2d",
+  "cargo_manifest_sha256": "66dc2975d37c55d2c7acdb918b27de23aabab03a1cabc249123085a8fd13994d",
+  "cargo_lock_sha256": "2aabb4c76436ae9f01655bf070fce1cf13c1ca9dba7fe2c016d820b7a66c9945",
+  "release_binary_sha256": "b41776e19ba68d5edba0216cd70a575790bf15d2526d6fa9e5d3c3dd998842ab",
+  "first_launch_disposition": "STACK_OVERFLOW_BEFORE_ANY_OUTPUT_FILE; source-byte read extent unknown; preserved as disclosed provenance",
+  "model_contact": false,
+  "training_identity_sidecars_emitted_before_seal": false,
+  "phoenix_access": false
+}

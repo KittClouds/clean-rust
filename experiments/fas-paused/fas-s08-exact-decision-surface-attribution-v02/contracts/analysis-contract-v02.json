@@ -1,0 +1,84 @@
+{
+  "contract_id": "FAS_S08_EXACT_DECISION_SURFACE_ATTRIBUTION_V02",
+  "experiment_id": "fas-s08-exact-decision-surface-attribution-v02",
+  "supersession": {
+    "supersedes_execution_identity": "fas-s08-exact-decision-surface-attribution-v01",
+    "v01_protocol_root_sha256": "8d215ec86d0029d0289669473d2b04b47ffc50fb86c3af5e7619a5c244882234",
+    "v01_failed_attempt_root_sha256": "db9319719bab147d3f755370455df0c11604fc6f85dfff72c9aa0380cef8c805",
+    "scope": "formula implementation correction only; same parents, populations, selectors, and analysis plan"
+  },
+  "question": "Characterize S06 matched observers in original feature coordinates through decision subspaces, complete four-factor margin decomposition, and training-selected coordinate contributions/interventions.",
+  "inputs": {
+    "s06_result_root_sha256": "b21e4cb026d0b3956f9a666c4928a79922e39ee33b9f64653181d6dbc9a0d1b0",
+    "s06_protocol_root_sha256": "ab2bbd4fc1918132e6674e97ef05e29e2eee52945a0ac37229e52c6f9e10b4e7",
+    "s01_2_feature_cache_root_sha256": "4964f35fb87a45a9447cd0f5f028668027ca3ad3a8f0d0c3f9eb7b9cbe7ccaaa",
+    "s01_3_result_root_sha256": "2581b50d75382c197793ea46400bf2b8a27508df22b2ff5bdbe82eb20a5238b7",
+    "s01_corpus_sha256": "51a55212ba89d55bd6df532673ad4546c95def1f5d75622661f7c17b3e4a7ad1",
+    "s06_s01_population_events": 19732,
+    "s06_fas00_population_events": 512,
+    "s01_feature_rows": 106496,
+    "s01_feature_width": 2048,
+    "s01_train_split_buckets": [1, 2, 3, 4],
+    "s01_expected_train_rows": 85224
+  },
+  "four_factor_order": ["R", "C", "D", "W"],
+  "factor_levels": {"M": -1, "F": 1},
+  "pair_order": [[0, 1], [0, 2], [1, 2]],
+  "walsh": {
+    "coefficient": "mean_cell(margin * product_of_subset_factor_signs)",
+    "high_minus_low_effect_for_nonempty_subset": "2 * coefficient",
+    "max_reconstruction_residual": 1e-10
+  },
+  "geometry": {
+    "rank_rule": "max(matrix_shape) * float64_epsilon * largest_singular_value",
+    "projection_origin": "zero in original hidden coordinates",
+    "self_plane_margin_abs_tolerance": 1e-8,
+    "analytical_margin_identity_abs_tolerance": 1e-8,
+    "required_equivalent_forms": [
+      "m_ab = dot(n_ab, h) + beta_ab",
+      "m_ab = dot(n_ab, h - mu) + delta_b_ab",
+      "beta_ab = delta_b_ab - dot(n_ab, mu)"
+    ],
+    "centered_bias_difference": "delta_b_ab = b_a - b_b"
+  },
+  "coordinate_census": {
+    "contribution": "effective_pair_normal[j] * (hidden_feature[j] - native_center[j])",
+    "centered_margin_identity": "pair_margin = sum_j contribution[j] + delta_b_ab; delta_b_ab = b_a - b_b",
+    "raw_affine_intercept": "beta_ab = (b_a - b_b) - dot(n_ab, mu); retain separately from delta_b_ab",
+    "concentration_fractions": [0.5, 0.8, 0.9, 0.95],
+    "top_coordinate_sizes": [8, 16, 32, 64, 128, 256],
+    "rank_stability_split": "quartet hash SHA256('FAS-S08-STABILITY-HALF-V01|' + quartet_id), low bit of first digest byte",
+    "zero_sign_policy": "exclude exact-zero paired contributions from sign agreement"
+  },
+  "selectors": {
+    "native_magnitude_M": "mean absolute contribution over S01 training rows and all three output-slot boundaries for M",
+    "native_magnitude_F": "mean absolute contribution over S01 training rows and all three output-slot boundaries for F",
+    "paired_surface_difference": "mean absolute paired F-minus-M contribution over S01 training rows and all three output-slot boundaries",
+    "effective_normal_disagreement": "RMS M/F native pair-normal difference over all three output-slot boundaries",
+    "stable_signed_M": "mean over boundaries of absolute signed-mean M contribution over S01 training rows",
+    "stable_signed_F": "mean over boundaries of absolute signed-mean F contribution over S01 training rows",
+    "tie_break": "ascending coordinate ID"
+  },
+  "matched_control": {
+    "features": ["log1p(training_variance_M)", "log1p(training_variance_F)", "log1p(training_mean_abs_contribution_M)", "log1p(training_mean_abs_contribution_F)"],
+    "standardization": "mean and population standard deviation across 2048 coordinates, training data only; zero std maps to one",
+    "algorithm": "greedy nearest unused unselected coordinate, selected coordinates visited by descending selector score then ascending ID; distance ties by ascending coordinate ID"
+  },
+  "intervention": {
+    "native_systems": ["M/M", "F/F"],
+    "operation": "set chosen coordinates in native-standardized representation to zero",
+    "s01_rows": 19732,
+    "fas00_rows": 512,
+    "fas00_slices": {"UNION": 512, "CONTEXT_TERM_3": 412, "ENTITY_TERM_7": 212},
+    "selection_uses_fas00": false,
+    "fas00_open_after_s01_seal": true
+  },
+  "prohibited": ["LFM/tokenizer contact", "feature extraction", "probe/scaler fitting", "SAE", "significance tests", "confidence intervals", "FAS-00-driven selection", "adaptive mechanisms", "layerwise analysis", "parent modification"],
+  "terminal_authority": {
+    "S08_MODEL_CONTACT": false,
+    "S08_PROBE_FITTING": false,
+    "S08_LAYERWISE_AUTHORIZED": false,
+    "FAS00_SENSOR_PASS": false,
+    "FAS00_PHASE4_AUTHORIZED": false
+  }
+}

@@ -1,0 +1,421 @@
+{
+  "status": "QUALIFICATION_FAILURE_INDEPENDENTLY_REPRODUCED",
+  "input_sha256": "b0807c8bcf6a3a0595570ac7215890276a5e7a21a74f79d6afea6e265796cfaa",
+  "source": "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\dh07\\qualification\\constructor-first-real-seed9000.json",
+  "method": "Python stdlib, f32 bit recovery, math.fsum",
+  "measured_samples_added": 0,
+  "results": [
+    {
+      "condition": "null_perpendicular",
+      "support_size": 8446,
+      "reversal_trial": 1,
+      "independently_computed_true_l2": 1.2357305702259713,
+      "independently_computed_true_axis_cosine": -0.0008165776171753412,
+      "base_lower_count": 228,
+      "agrees_with_rust_receipt": true
+    },
+    {
+      "condition": "parallel_null",
+      "support_size": 8446,
+      "reversal_trial": 1,
+      "independently_computed_true_l2": 1.2361914082838024,
+      "independently_computed_true_axis_cosine": -4.724477593250704e-09,
+      "base_lower_count": 0,
+      "agrees_with_rust_receipt": true,
+      "independent_candidate_replay": {
+        "attempts": 64,
+        "independently_reproduced_bound_rejections": 64,
+        "min_violating_coordinates": 175,
+        "max_violating_coordinates": 228,
+        "max_ideal_null_cosine": 5.43817734123704e-18,
+        "candidates": [
+          {
+            "attempt": 1,
+            "violating_coordinates": 180,
+            "min_target": -0.04868419271417007,
+            "max_target": 1.5499703510782494
+          },
+          {
+            "attempt": 2,
+            "violating_coordinates": 202,
+            "min_target": -0.04192957874054611,
+            "max_target": 1.552299986772421
+          },
+          {
+            "attempt": 3,
+            "violating_coordinates": 206,
+            "min_target": -0.03515420336043038,
+            "max_target": 1.5540340520764235
+          },
+          {
+            "attempt": 4,
+            "violating_coordinates": 222,
+            "min_target": -0.048853230099457585,
+            "max_target": 1.5820246275051248
+          },
+          {
+            "attempt": 5,
+            "violating_coordinates": 208,
+            "min_target": -0.03447021293238047,
+            "max_target": 1.5764094688061958
+          },
+          {
+            "attempt": 6,
+            "violating_coordinates": 200,
+            "min_target": -0.06475652973240845,
+            "max_target": 1.566389802326406
+          },
+          {
+            "attempt": 7,
+            "violating_coordinates": 202,
+            "min_target": -0.05023088038846061,
+            "max_target": 1.5521551294070302
+          },
+          {
+            "attempt": 8,
+            "violating_coordinates": 188,
+            "min_target": -0.03842983105316226,
+            "max_target": 1.536357056403217
+          },
+          {
+            "attempt": 9,
+            "violating_coordinates": 194,
+            "min_target": -0.06328156526614595,
+            "max_target": 1.5537617778862458
+          },
+          {
+            "attempt": 10,
+            "violating_coordinates": 198,
+            "min_target": -0.03879964744468335,
+            "max_target": 1.5583219594853879
+          },
+          {
+            "attempt": 11,
+            "violating_coordinates": 197,
+            "min_target": -0.048688254917615144,
+            "max_target": 1.5772025689680853
+          },
+          {
+            "attempt": 12,
+            "violating_coordinates": 217,
+            "min_target": -0.04925680258518519,
+            "max_target": 1.5587343856378293
+          },
+          {
+            "attempt": 13,
+            "violating_coordinates": 199,
+            "min_target": -0.044557758589083105,
+            "max_target": 1.5699570870000288
+          },
+          {
+            "attempt": 14,
+            "violating_coordinates": 196,
+            "min_target": -0.06333734775719947,
+            "max_target": 1.5508322227804032
+          },
+          {
+            "attempt": 15,
+            "violating_coordinates": 195,
+            "min_target": -0.045408791465847524,
+            "max_target": 1.5537865984298729
+          },
+          {
+            "attempt": 16,
+            "violating_coordinates": 199,
+            "min_target": -0.052911592434401425,
+            "max_target": 1.5793452764377343
+          },
+          {
+            "attempt": 17,
+            "violating_coordinates": 209,
+            "min_target": -0.03977860462338716,
+            "max_target": 1.5611577805433474
+          },
+          {
+            "attempt": 18,
+            "violating_coordinates": 209,
+            "min_target": -0.05282219251726014,
+            "max_target": 1.539949366370127
+          },
+          {
+            "attempt": 19,
+            "violating_coordinates": 180,
+            "min_target": -0.0514066742547409,
+            "max_target": 1.563365560181324
+          },
+          {
+            "attempt": 20,
+            "violating_coordinates": 199,
+            "min_target": -0.05345893707007659,
+            "max_target": 1.547823481124581
+          },
+          {
+            "attempt": 21,
+            "violating_coordinates": 204,
+            "min_target": -0.03503690767114346,
+            "max_target": 1.5248783931565884
+          },
+          {
+            "attempt": 22,
+            "violating_coordinates": 194,
+            "min_target": -0.053016192273117685,
+            "max_target": 1.5362600294640685
+          },
+          {
+            "attempt": 23,
+            "violating_coordinates": 175,
+            "min_target": -0.05029260734599415,
+            "max_target": 1.5556931798384532
+          },
+          {
+            "attempt": 24,
+            "violating_coordinates": 201,
+            "min_target": -0.04303982022750722,
+            "max_target": 1.5456474894746723
+          },
+          {
+            "attempt": 25,
+            "violating_coordinates": 205,
+            "min_target": -0.050109293966535295,
+            "max_target": 1.5547888788336406
+          },
+          {
+            "attempt": 26,
+            "violating_coordinates": 178,
+            "min_target": -0.050493438871255084,
+            "max_target": 1.5432015476833116
+          },
+          {
+            "attempt": 27,
+            "violating_coordinates": 201,
+            "min_target": -0.048027128425938974,
+            "max_target": 1.5573876045178172
+          },
+          {
+            "attempt": 28,
+            "violating_coordinates": 223,
+            "min_target": -0.04199104267836758,
+            "max_target": 1.5479536824120408
+          },
+          {
+            "attempt": 29,
+            "violating_coordinates": 216,
+            "min_target": -0.05643004498250643,
+            "max_target": 1.5567092388991342
+          },
+          {
+            "attempt": 30,
+            "violating_coordinates": 197,
+            "min_target": -0.0499162329617083,
+            "max_target": 1.5499680819318986
+          },
+          {
+            "attempt": 31,
+            "violating_coordinates": 217,
+            "min_target": -0.044583211303210794,
+            "max_target": 1.549393708532064
+          },
+          {
+            "attempt": 32,
+            "violating_coordinates": 206,
+            "min_target": -0.04974294297698467,
+            "max_target": 1.547912461933606
+          },
+          {
+            "attempt": 33,
+            "violating_coordinates": 181,
+            "min_target": -0.04184639929027736,
+            "max_target": 1.5543735875673788
+          },
+          {
+            "attempt": 34,
+            "violating_coordinates": 203,
+            "min_target": -0.043446074945085185,
+            "max_target": 1.5621931201535586
+          },
+          {
+            "attempt": 35,
+            "violating_coordinates": 209,
+            "min_target": -0.0499992351538147,
+            "max_target": 1.5651029668366672
+          },
+          {
+            "attempt": 36,
+            "violating_coordinates": 178,
+            "min_target": -0.04371050899468124,
+            "max_target": 1.5360378129627248
+          },
+          {
+            "attempt": 37,
+            "violating_coordinates": 199,
+            "min_target": -0.04965265584123704,
+            "max_target": 1.5452641702005232
+          },
+          {
+            "attempt": 38,
+            "violating_coordinates": 196,
+            "min_target": -0.046225882864019775,
+            "max_target": 1.5324493185945491
+          },
+          {
+            "attempt": 39,
+            "violating_coordinates": 194,
+            "min_target": -0.0422898036555997,
+            "max_target": 1.5807496593046233
+          },
+          {
+            "attempt": 40,
+            "violating_coordinates": 198,
+            "min_target": -0.04431208679423582,
+            "max_target": 1.5572710444537037
+          },
+          {
+            "attempt": 41,
+            "violating_coordinates": 228,
+            "min_target": -0.041581117008641755,
+            "max_target": 1.580267759460398
+          },
+          {
+            "attempt": 42,
+            "violating_coordinates": 184,
+            "min_target": -0.04443115158680978,
+            "max_target": 1.5580704923501794
+          },
+          {
+            "attempt": 43,
+            "violating_coordinates": 207,
+            "min_target": -0.04913107775099288,
+            "max_target": 1.557108812500829
+          },
+          {
+            "attempt": 44,
+            "violating_coordinates": 203,
+            "min_target": -0.044129827200148325,
+            "max_target": 1.5520755848201113
+          },
+          {
+            "attempt": 45,
+            "violating_coordinates": 207,
+            "min_target": -0.04303372029071845,
+            "max_target": 1.550662606785401
+          },
+          {
+            "attempt": 46,
+            "violating_coordinates": 196,
+            "min_target": -0.043655161713835,
+            "max_target": 1.5538278359030673
+          },
+          {
+            "attempt": 47,
+            "violating_coordinates": 199,
+            "min_target": -0.05279316002024437,
+            "max_target": 1.550689159843214
+          },
+          {
+            "attempt": 48,
+            "violating_coordinates": 195,
+            "min_target": -0.04092462063761537,
+            "max_target": 1.5546053773957365
+          },
+          {
+            "attempt": 49,
+            "violating_coordinates": 204,
+            "min_target": -0.04525240944692477,
+            "max_target": 1.5473487592050588
+          },
+          {
+            "attempt": 50,
+            "violating_coordinates": 210,
+            "min_target": -0.04450571313488021,
+            "max_target": 1.5593729482363607
+          },
+          {
+            "attempt": 51,
+            "violating_coordinates": 201,
+            "min_target": -0.03185197042036969,
+            "max_target": 1.5503722243896545
+          },
+          {
+            "attempt": 52,
+            "violating_coordinates": 199,
+            "min_target": -0.05154656822758639,
+            "max_target": 1.5512418669479715
+          },
+          {
+            "attempt": 53,
+            "violating_coordinates": 199,
+            "min_target": -0.0457694085363954,
+            "max_target": 1.5428161864143615
+          },
+          {
+            "attempt": 54,
+            "violating_coordinates": 196,
+            "min_target": -0.050067189758030005,
+            "max_target": 1.5601758118509825
+          },
+          {
+            "attempt": 55,
+            "violating_coordinates": 199,
+            "min_target": -0.06445328208933698,
+            "max_target": 1.551572131439486
+          },
+          {
+            "attempt": 56,
+            "violating_coordinates": 179,
+            "min_target": -0.048919266764295456,
+            "max_target": 1.5414362525662113
+          },
+          {
+            "attempt": 57,
+            "violating_coordinates": 196,
+            "min_target": -0.03705748273799982,
+            "max_target": 1.562537533200716
+          },
+          {
+            "attempt": 58,
+            "violating_coordinates": 204,
+            "min_target": -0.046641194257924866,
+            "max_target": 1.5372774593851943
+          },
+          {
+            "attempt": 59,
+            "violating_coordinates": 197,
+            "min_target": -0.049305517043936334,
+            "max_target": 1.5583673707205754
+          },
+          {
+            "attempt": 60,
+            "violating_coordinates": 203,
+            "min_target": -0.04414321398661895,
+            "max_target": 1.539648438691848
+          },
+          {
+            "attempt": 61,
+            "violating_coordinates": 195,
+            "min_target": -0.045233102559360104,
+            "max_target": 1.5515171015763036
+          },
+          {
+            "attempt": 62,
+            "violating_coordinates": 215,
+            "min_target": -0.04432641159862192,
+            "max_target": 1.551455694298224
+          },
+          {
+            "attempt": 63,
+            "violating_coordinates": 202,
+            "min_target": -0.048003442660759545,
+            "max_target": 1.5617181858123137
+          },
+          {
+            "attempt": 64,
+            "violating_coordinates": 184,
+            "min_target": -0.03143998367053239,
+            "max_target": 1.53600932370443
+          }
+        ],
+        "claim": "Specified 64 candidates fail; no claim of global infeasibility"
+      }
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+seed,n,mean_delta_selected_path_h64,mean_delta_control_path_h64,mean_source_interaction_h64,selected_better_selected_path,selected_better_control_path
+2b7e151628aed2a6,6,-1.786152521769e-5,1.067916552226e-6,-1.892944176992e-5,2,1
+77a19d3c4e280b51,4,2.865940332413e-4,5.916059017181e-4,-3.050118684769e-4,1,1
+1111222233334444,2,-3.687292337418e-4,-4.459321498871e-4,7.720291614532e-5,2,2

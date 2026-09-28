@@ -1,0 +1,26 @@
+{
+  "closure_id": "FAS00_TERMINAL_CLOSURE_V01",
+  "project_id": "fas-frozen-adaptive-substrate-v00",
+  "terminal_disposition": "SENSOR_FAIL_NO_SIGNAL",
+  "FAS00_SENSOR_PASS": false,
+  "FAS00_ONLINE_MECHANISMS_AUTHORIZED": false,
+  "FAS00_PHASE4_AUTHORIZED": false,
+  "FAS00_PHASE5_AUTHORIZED": false,
+  "phase2a_feature_cache_root_sha256": "9af2c6c73a2f21608e8a2dc912d8838968eaebffb32b4b1ea0a18364e488d217",
+  "phase2a_verifier_correction_root_sha256": "d2c84b22e141845392e6ad51ba9ca9584778cc283953bd137518b577e857360b",
+  "phase3_source_root_sha256": "11ce804afa9c68fb461a76e5f754dd21715eed3c0336d2b6676ac9f3b9a0f264",
+  "phase3_result_root_sha256": "09fd072754e3b149ac2a9564928209a792eba091064033ca0d7f455333dda0c5",
+  "phase3_report_sha256": "3f7e2dd59d5ee16149c7c870b0757fb6ac2bb0393f9b333427260c5f29a6bda1",
+  "phase3_disposition_sha256": "7e683044bab9f819c2686d7c9f88a42516fbafd11c01ddacd8c182c7c9c63741",
+  "failed_gate": {
+    "probe_id": "HELDOUT_TERM_EXACT_TARGET",
+    "slice": "HELDOUT_CONTEXT_TERM_3",
+    "metric": "three-class balanced accuracy",
+    "observed": 0.5654062449331388,
+    "minimum": 0.60,
+    "class_support": [212, 134, 66]
+  },
+  "interpretation_scope": "FAS_FEATURE_V1 final-layer global mean did not satisfy the frozen held-out context-term linear-transfer requirement; other positive gates and leakage controls passed.",
+  "supersession_allowed": false,
+  "new_experiment_required_for_sensor_cartography": true
+}

@@ -1,0 +1,27 @@
+{
+  "protocol": "AR-04A-continuation-conditioned-action-value-2026-09-21",
+  "parent_branch": "codex/ar-03d-r1-independent-5x5-20260921",
+  "parent_result_commit": "486b262cbd5c4eda6a217d897acccc0c25e60e6b",
+  "source_branch": "codex/ar-04a-continuation-conditioned-action-value-20260921",
+  "frozen_source_commit": "642b4261227c08d1cc1a1da1dfb154097e1c81d8",
+  "executable_sha256": "7ca376c3a474769ae71c978254daccef41c31419cde9c1492f88ee5b4e244d03",
+  "integrity_valid": true,
+  "source_clean_at_collection": true,
+  "branch_specific_replanning": false,
+  "measurement_objective": "independent held-out cross-entropy; measurement only",
+  "horizons": [0, 8, 32, 128],
+  "datasets": 5, "initializations": 5, "cells": 25, "states": 75,
+  "state_stages": [600, 2400, 4200],
+  "continuations_per_state": 8, "continuations": 600, "valid_continuations": 547, "bounds_censored_continuations": 53,
+  "minimum_valid_continuations_for_primary_summary": 6, "under_supported_state_count": 9,
+  "candidate_actions": 12750, "valid_action_continuation_pairs": 92990, "horizon_outcome_rows": 371960, "expected_horizon_outcome_rows": 371960,
+  "unique_seed_count": 715, "all_seed_roles_unique": true,
+  "max_h0_effect_consistency_error": 1.331791281700e-6,
+  "training_heldout_data_hashes": [
+    {"dataset_id":0,"training_seed":"a40441da00000001","heldout_seed":"a4044e7a00000001","training_sha256":"8a3e2714ff318afd27b3094beb80cae36ddbd9d38be36a7822126d7036f7eac2","heldout_sha256":"41df3e7b24aa088ba2a84820c23768250a1c5b0be2ea1d655a2df4287347c883"},
+    {"dataset_id":1,"training_seed":"a40441da00000002","heldout_seed":"a4044e7a00000002","training_sha256":"3193fc2041f8741e368170615995cd8195e81420e5b3b0b9fe9b7a9932a8eaa4","heldout_sha256":"ca810cf10ee50854be9f6d2b512be07dac1f06aa2138739cf70f21bcddef1bf5"},
+    {"dataset_id":2,"training_seed":"a40441da00000003","heldout_seed":"a4044e7a00000003","training_sha256":"cf7c4adf0e73ac98dc429c5e5c4eee224244f84406d8949031d0d727b96866f6","heldout_sha256":"cc8b33172b55308cca3ea84eb2853b22bfe00be4a0671e8c917d566b3eefc233"},
+    {"dataset_id":3,"training_seed":"a40441da00000004","heldout_seed":"a4044e7a00000004","training_sha256":"fdf1df911fccca15bee5cf2504b24ff445af17afd95c794119fe34c9413c30d5","heldout_sha256":"762548caac3b5c2116416dd5dc9fc2d012d393878689ea3dde8293646001c77f"},
+    {"dataset_id":4,"training_seed":"a40441da00000005","heldout_seed":"a4044e7a00000005","training_sha256":"c1f63564bf5486ea5f5df1a2e88eaf1ca76c3667cb7e03a0961d5e98ffda2977","heldout_sha256":"dc769d52271a5239b1d0ecec2e59368652c300cbf1b3cfd83d945ae1a76df104"}
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "schema": "CHIEF_KAMMI_CHAT_INTAKE_V1",
+  "source_thread_id": "01a09283-4813-7fc0-93e1-e6db6b0d75b4",
+  "source_title": "Fly Chief",
+  "received_date": "2026-09-27",
+  "status": "RECEIVED_NOT_INDEPENDENTLY_VERIFIED",
+  "scientific_authority_conferred": false,
+  "turns": [
+    {
+      "id": "01a0e41e-9aaa-7121-8cd6-c37dbded571d",
+      "status": "completed",
+      "error": null,
+      "startedAt": 1790533606,
+      "completedAt": 1790533734,
+      "durationMs": 128674,
+      "items": [
+        {
+          "type": "agentMessage",
+          "id": "msg_028b21c1315c9d1f016ab95fedf4fc87d1b5da657878fa86c0",
+          "text": "Acknowledged. I’ll keep ownership of the Heresy scientific/engineering work and raw outputs, leave sealed artifacts and any existing run state untouched, and route bookkeeping or Library matters to Chief Kammi. I’m reading the handoff notice now; I will not start or resume execution.",
+          "phase": "commentary"
+        },
+        {
+          "type": "agentMessage",
+          "id": "msg_028b21c1315c9d1f016ab960290c5887d187042ac8e3b66b3a",
+          "text": "I’m continuing under the current governance boundary: I will not start or resume any run. I’ll only inspect the already-authorized measure2 process and its metadata, then send the required handoff to Chief Kammi.",
+          "phase": "commentary"
+        },
+        {
+          "type": "agentMessage",
+          "id": "msg_028b21c1315c9d1f016ab96045735887d18e1c822414fd10d0",
+          "text": "The existing measure2 tree is intact, but its current metadata is inconsistent: 40 result chunks exist while the root `STATUS.json` and `execution.json` still say `PREFLIGHT_PASS` with `measurement_started=false`. PID 12976 now resolves to the Codex desktop process, so I’m treating the worker as not independently attributable and will not touch or resume it. I’m handing this exact state to Chief Kammi for bookkeeping and authorization review.",
+          "phase": "commentary"
+        },
+        {
+          "type": "mcpToolCall",
+          "id": "exec-6ad1c0d1-e164-4d52-b3aa-baa80d0cc472",
+          "server": "codex_app",
+          "tool": "send_message_to_thread",
+          "arguments": {
+            "threadId": "01a0de04-f3a7-7bb0-9dbe-e7e1a38bb339",
+            "prompt": "To: Chief Kammi — bookkeeping handoff\n\nLab / task / current stage:\nDrosophila Heresy, Q10-ALG4-COMP1 targeted order-4 compensation. The corrected measure2 identity was preflight-qualified; no new execution or resume is being started under your current governance notice.\n\nExisting instruction or authorization reference, if any:\nCurrent Chief Kammi bookkeeping handoff notice in program-infrastructure/governance/CHIEF-KAMMI-BOOKKEEPING-HANDOFF-v1.md. It requires preservation of existing artifacts, no new gated execution without Chief authorization, and an ordinary-language handoff at the next checkpoint. Deputy #2 monitoring was previously assigned on the Luna extra-high configuration; no new agent or run is being launched now.\n\nWhat changed or completed:\n- Prior R2-v3 remains complete and independently audited PASS:\n  experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-resid-invalid1-r2-v3\n- COMP1 preflight passed for the exact shared 31,596,544-candidate domain for COMP1A/B:\n  domain hash BA9AF9234D5FF129ED584DBAE6B4133C8572E042735E84FFF7C747F8E1971CD4\n  contract EC3792E75C1729C21C75690B94F2164F223AA86FEC7A030EC1EACCE64816F291\n  preexecution B655012F04552A53A29F26873ED351E408F914A14B80313EFA89AA7A848F4EC9\n- The corrected measure2 tree contains 40 result chunk files, totaling about 90,702,336 bytes.\n- Metadata inconsistency observed read-only: root STATUS.json and execution.json still report PREFLIGHT_PASS, measurement_started=false, replay_executed=false, while result chunks are present.\n- PID 12976 is no longer independently attributable to the measurement worker; the OS currently resolves it to the Codex desktop process. No process was killed or modified.\n\nArtifact paths / repository commit / existing manifest:\n- experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-alg4-comp1-measure2-v1/\n- plan hash A63BD01F9748A6583C9A6F594D51EB42A487E0F2732E842BD8CDEBA54BE1851E\n- runner hash 992463896C576382E517F4446A01F7658E6E827B37F077B0BEC12FC4DF84F4E6\n- static test hash 7A6222BA791A0F418B153A7543FD323858EB189380EE473D4D3F648F1BA9016B\n- preflight identity:\n  experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-alg4-comp1-v1/\n- aborted defective measure1 identity remains preserved:\n  experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-alg4-comp1-measure1-abort1-v1/\n\nWhat ran, and where the raw logs are:\nThe corrected measure2 command had previously been launched with Python bytecode disabled and the long-measure override. The current raw state is the measure2 tree and its results/comp1a and results/comp1b chunk directories. No final promoted receipt has been created. The current metadata does not establish that the chunks belong to a completed authoritative execution.\n\nObserved contacts or evidence openings; uncertainty if tracking is incomplete:\nNo model contact, AG1, behavior, or scientific promotion. No protected evidence was opened. Uncertainty is limited to the inconsistent measure2 worker/chunk state described above; do not infer completion, validity, or scientific outcome from the chunks until provenance is reconciled under Chief authorization.\n\nFailure, stop, or next gated action:\nCurrent status is a bookkeeping/provenance hold. Preserve the measure2 tree and all chunks byte-for-byte. Do not start, resume, finalize, rehash ancestors, or create a successor identity without Chief authorization. The next action should be Chief-directed read-only reconciliation of the chunk provenance and root metadata, followed by an explicit decision on whether the artifacts are promotable, historical/non-promotable, or require a fresh qualified identity.\n\nResource need, if a new lease is required:\nNone requested now.\n\nProtected material: classification and location only until access is authorized:\nNo protected material accessed in this checkpoint. Existing experiment artifacts are under experiments/drosophila-heresy/; keep them sealed and untouched."
+          },
+          "status": "completed",
+          "durationMs": 167
+        },
+        {
+          "type": "agentMessage",
+          "id": "msg_028b21c1315c9d1f016ab96062f4f887d1bed7943f8f87b5ba",
+          "text": "Continued under the governance hold.\n\n- No run was started, resumed, killed, or modified.\n- `measure2` contains 40 result chunks (~90.7 MB), but its root metadata still says `PREFLIGHT_PASS` and `measurement_started=false`.\n- PID 12976 now belongs to the Codex desktop process, so the worker cannot be independently attributed.\n- All artifacts remain untouched and non-promoted.\n- Deputy #2 remains assigned on Luna extra-high; no new agent was launched.\n- I sent Chief Kammi the required bookkeeping handoff with paths, hashes, uncertainty, and the required reconciliation gate.\n\nNext action is Chief-authorized read-only reconciliation only.\n\n",
+          "phase": "final_answer"
+        }
+      ]
+    }
+  ]
+}

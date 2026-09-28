@@ -1,0 +1,182 @@
+[
+  {
+    "candidate_id": 45190,
+    "candidate_role_hidden": "force_color",
+    "case_id": "case-01",
+    "exit_code": 0,
+    "passed": true,
+    "stdout": "\nrunning 1 test\ntest check_contract ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "   Compiling e012-clap-color-harness v0.1.0 (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\task-harnesses\\clap-color-repair-01)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.94s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\clap-harness\\debug\\deps\\contract-88ff4f2da850e451.exe)\n"
+  },
+  {
+    "candidate_id": 45190,
+    "candidate_role_hidden": "force_color",
+    "case_id": "case-02",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (18304) panicked at tests\\contract.rs:12:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.07s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\clap-harness\\debug\\deps\\contract-88ff4f2da850e451.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 45190,
+    "candidate_role_hidden": "force_color",
+    "case_id": "case-03",
+    "exit_code": 0,
+    "passed": true,
+    "stdout": "\nrunning 1 test\ntest check_contract ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.08s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\clap-harness\\debug\\deps\\contract-88ff4f2da850e451.exe)\n"
+  },
+  {
+    "candidate_id": 45190,
+    "candidate_role_hidden": "force_color",
+    "case_id": "case-04",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (16404) panicked at tests\\contract.rs:12:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.07s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\clap-harness\\debug\\deps\\contract-88ff4f2da850e451.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 63364,
+    "candidate_role_hidden": "suppress_color",
+    "case_id": "case-01",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (7468) panicked at tests\\contract.rs:12:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "   Compiling e012-clap-color-harness v0.1.0 (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\task-harnesses\\clap-color-repair-01)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.05s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\clap-harness\\debug\\deps\\contract-88ff4f2da850e451.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 63364,
+    "candidate_role_hidden": "suppress_color",
+    "case_id": "case-02",
+    "exit_code": 0,
+    "passed": true,
+    "stdout": "\nrunning 1 test\ntest check_contract ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.08s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\clap-harness\\debug\\deps\\contract-88ff4f2da850e451.exe)\n"
+  },
+  {
+    "candidate_id": 63364,
+    "candidate_role_hidden": "suppress_color",
+    "case_id": "case-03",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (38776) panicked at tests\\contract.rs:12:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.05s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\clap-harness\\debug\\deps\\contract-88ff4f2da850e451.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 63364,
+    "candidate_role_hidden": "suppress_color",
+    "case_id": "case-04",
+    "exit_code": 0,
+    "passed": true,
+    "stdout": "\nrunning 1 test\ntest check_contract ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.06s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\clap-harness\\debug\\deps\\contract-88ff4f2da850e451.exe)\n"
+  },
+  {
+    "candidate_id": 48831,
+    "candidate_role_hidden": "defer_to_process_tty",
+    "case_id": "case-01",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (14636) panicked at tests\\contract.rs:12:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "   Compiling e012-clap-color-harness v0.1.0 (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\task-harnesses\\clap-color-repair-01)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.92s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\clap-harness\\debug\\deps\\contract-88ff4f2da850e451.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 48831,
+    "candidate_role_hidden": "defer_to_process_tty",
+    "case_id": "case-02",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (17508) panicked at tests\\contract.rs:12:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.06s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\clap-harness\\debug\\deps\\contract-88ff4f2da850e451.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 48831,
+    "candidate_role_hidden": "defer_to_process_tty",
+    "case_id": "case-03",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (25416) panicked at tests\\contract.rs:12:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.05s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\clap-harness\\debug\\deps\\contract-88ff4f2da850e451.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 48831,
+    "candidate_role_hidden": "defer_to_process_tty",
+    "case_id": "case-04",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (34344) panicked at tests\\contract.rs:12:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.06s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\clap-harness\\debug\\deps\\contract-88ff4f2da850e451.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 33099,
+    "candidate_role_hidden": "suppress_color_narrow_help",
+    "case_id": "case-01",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (24568) panicked at tests\\contract.rs:12:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "   Compiling e012-clap-color-harness v0.1.0 (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\task-harnesses\\clap-color-repair-01)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.06s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\clap-harness\\debug\\deps\\contract-88ff4f2da850e451.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 33099,
+    "candidate_role_hidden": "suppress_color_narrow_help",
+    "case_id": "case-02",
+    "exit_code": 0,
+    "passed": true,
+    "stdout": "\nrunning 1 test\ntest check_contract ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.08s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\clap-harness\\debug\\deps\\contract-88ff4f2da850e451.exe)\n"
+  },
+  {
+    "candidate_id": 33099,
+    "candidate_role_hidden": "suppress_color_narrow_help",
+    "case_id": "case-03",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (21872) panicked at tests\\contract.rs:12:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.06s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\clap-harness\\debug\\deps\\contract-88ff4f2da850e451.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 33099,
+    "candidate_role_hidden": "suppress_color_narrow_help",
+    "case_id": "case-04",
+    "exit_code": 0,
+    "passed": true,
+    "stdout": "\nrunning 1 test\ntest check_contract ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.08s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\clap-harness\\debug\\deps\\contract-88ff4f2da850e451.exe)\n"
+  },
+  {
+    "candidate_id": null,
+    "candidate_role_hidden": "base_snapshot",
+    "case_id": "case-01",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (29160) panicked at tests\\contract.rs:12:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "   Compiling e012-clap-color-harness v0.1.0 (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\task-harnesses\\clap-color-repair-01)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.01s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\clap-harness\\debug\\deps\\contract-88ff4f2da850e451.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": null,
+    "candidate_role_hidden": "base_snapshot",
+    "case_id": "case-02",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (21684) panicked at tests\\contract.rs:12:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.09s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\clap-harness\\debug\\deps\\contract-88ff4f2da850e451.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": null,
+    "candidate_role_hidden": "base_snapshot",
+    "case_id": "case-03",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (29560) panicked at tests\\contract.rs:12:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.05s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\clap-harness\\debug\\deps\\contract-88ff4f2da850e451.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": null,
+    "candidate_role_hidden": "base_snapshot",
+    "case_id": "case-04",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (23716) panicked at tests\\contract.rs:12:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.05s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\clap-harness\\debug\\deps\\contract-88ff4f2da850e451.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  }
+]

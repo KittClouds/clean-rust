@@ -1,0 +1,728 @@
+use anyhow::{bail, Context, Result};
+use hashbrown::{HashMap, HashSet};
+use phoenix_scene_archive::{
+    ArchiveManifold, EdgeRecord, NodeIdentityRecord, NodeStyleRecord, PositionRecord,
+    TopologyRecord,
+};
+use phoenix_scene_contract::{
+    EntityKind, FamilyMask, RelationFamily, ReviewMask, ScopeMask, CAPS_WORLD_SCALE,
+    CHUNK_NODE_KIND, DOCUMENT_NODE_KIND, EPISODE_NODE_KIND,
+};
+use phoenix_scene_product_index::EntityNodeMappingRecord;
+use phoenix_scene_publisher::{
+    NativeScenePublication, SceneEdgeProduct, SceneNodeProduct, ScenePublicationKind,
+    ScenePublicationStore,
+};
+use serde::{Deserialize, Serialize};
+use std::fs;
+use std::path::Path;
+use std::sync::Arc;
+
+const MATERIALIZED_CONTRACT: &str = "PhoenixAngularMaterializedSceneV1";
+const MATERIALIZED_BUNDLE_CONTRACT: &str = "phoenix.native.materialized-scene-bundle/v2";
+const NO_REFERENCE: u32 = u32::MAX;
+const LEGACY_MANIFOLDS: [ArchiveManifold; 5] = [
+    ArchiveManifold::Hybrid,
+    ArchiveManifold::Torus,
+    ArchiveManifold::Caps,
+    ArchiveManifold::Transit,
+    ArchiveManifold::Siegel,
+];
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct MaterializedScene {
+    format: String,
+    key: String,
+    cohort: Cohort,
+    source_mode: String,
+    manifold_mode: String,
+    nodes: Vec<LegacyNode>,
+    edges: Vec<LegacyEdge>,
+}
+
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq)]
+#[serde(rename_all = "camelCase")]
+struct Cohort {
+    note_id: String,
+    note_sha256: String,
+    snapshot_id: String,
+    authority_hash: String,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct LegacyNode {
+    id: String,
+    label: String,
+    kind: String,
+    #[serde(default)]
+    total_mentions: u32,
+    position: [f32; 3],
+    color_hsl: String,
+    source_id: Option<String>,
+    family: Option<String>,
+    style_key: Option<String>,
+    review: Option<String>,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct LegacyEdge {
+    id: String,
+    source_id: String,
+    target_id: String,
+    #[serde(rename = "type")]
+    edge_type: String,
+    confidence: f32,
+    family: Option<String>,
+    review: Option<String>,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct PublishReceipt {
+    contract: &'static str,
+    note_id: String,
+    note_sha256: String,
+    snapshot_id: String,
+    authority_hash: String,
+    generation_id: u64,
+    node_count: usize,
+    edge_count: usize,
+    entity_mapping_count: usize,
+    archive_cohort_hash: String,
+    product_index_hash: String,
+    publication_root: String,
+}
+
+struct MaterializedSceneBundle {
+    scenes: [MaterializedScene; 5],
+}
+
+impl MaterializedSceneBundle {
+    fn load(root: &Path) -> Result<Self> {
+        if !root.is_dir() {
+            bail!(
+                "PHOENIX_MATERIALIZED_BUNDLE_REQUIRED: {} is not a five-manifold directory",
+                root.display()
+            );
+        }
+        let mut scenes = Vec::with_capacity(LEGACY_MANIFOLDS.len());
+        for manifold in LEGACY_MANIFOLDS {
+            let path = root.join(format!("{}.json", manifold_key(manifold)));
+            let bytes = fs::read(&path).with_context(|| {
+                format!(
+                    "PHOENIX_MATERIALIZED_PAGE_MISSING: read {} page {}",
+                    manifold_key(manifold),
+                    path.display()
+                )
+            })?;
+            let scene = serde_json::from_slice(&bytes).with_context(|| {
+                format!(
+                    "PHOENIX_MATERIALIZED_PAGE_INVALID: decode {}",
+                    path.display()
+                )
+            })?;
+            scenes.push(scene);
+        }
+        let scenes: [MaterializedScene; 5] = scenes
+            .try_into()
+            .map_err(|_| anyhow::anyhow!("materialized manifold inventory is not exactly five"))?;
+        let bundle = Self { scenes };
+        bundle.validate()?;
+        Ok(bundle)
+    }
+
+    fn validate(&self) -> Result<()> {
+        for (manifold, scene) in LEGACY_MANIFOLDS.into_iter().zip(&self.scenes) {
+            validate_scene(manifold, scene)?;
+        }
+        let canonical = self.canonical();
+        for (manifold, scene) in LEGACY_MANIFOLDS.into_iter().zip(&self.scenes) {
+            if scene.cohort != canonical.cohort {
+                bail!(
+                    "PHOENIX_MATERIALIZED_COHORT_MISMATCH: {} does not match the shared cohort",
+                    manifold_key(manifold)
+                );
+            }
+            validate_shared_graph(canonical, scene, manifold)?;
+        }
+        Ok(())
+    }
+
+    fn canonical(&self) -> &MaterializedScene {
+        &self.scenes[ArchiveManifold::Caps as usize]
+    }
+
+    fn scene(&self, manifold: ArchiveManifold) -> &MaterializedScene {
+        &self.scenes[manifold as usize]
+    }
+}
+
+pub(crate) fn publish(bundle_root: &Path, root: &Path) -> Result<PublishReceipt> {
+    let bundle = MaterializedSceneBundle::load(bundle_root)?;
+    let scene = bundle.canonical();
+    let store = ScenePublicationStore::at_root(root);
+    let generation_id = store.next_generation()?;
+    let publication = compile(&bundle, generation_id)?;
+    let entity_mapping_count = publication.entity_mappings.len();
+    let published = store.publish(publication)?;
+    Ok(PublishReceipt {
+        contract: MATERIALIZED_BUNDLE_CONTRACT,
+        note_id: scene.cohort.note_id.clone(),
+        note_sha256: scene.cohort.note_sha256.clone(),
+        snapshot_id: scene.cohort.snapshot_id.clone(),
+        authority_hash: scene.cohort.authority_hash.clone(),
+        generation_id,
+        node_count: scene.nodes.len(),
+        edge_count: scene.edges.len(),
+        entity_mapping_count,
+        archive_cohort_hash: hex(published.receipt.archive_cohort_hash),
+        product_index_hash: hex(published.receipt.product_index_hash),
+        publication_root: root.display().to_string(),
+    })
+}
+
+fn validate_scene(manifold: ArchiveManifold, scene: &MaterializedScene) -> Result<()> {
+    if scene.format != MATERIALIZED_CONTRACT {
+        bail!(
+            "PHOENIX_MATERIALIZED_FORMAT_UNSUPPORTED: {} uses {}",
+            manifold_key(manifold),
+            scene.format
+        );
+    }
+    if scene.key != manifold_key(manifold)
+        || scene.source_mode != "embeddings"
+        || scene.manifold_mode != manifold_mode(manifold)
+    {
+        bail!(
+            "PHOENIX_MATERIALIZED_PAGE_IDENTITY_MISMATCH: expected {}/{}/embeddings, got {}/{}/{}",
+            manifold_key(manifold),
+            manifold_mode(manifold),
+            scene.key,
+            scene.manifold_mode,
+            scene.source_mode
+        );
+    }
+    if scene.cohort.note_id.is_empty()
+        || scene.cohort.note_sha256.len() != 64
+        || scene.cohort.snapshot_id.is_empty()
+        || scene.cohort.authority_hash.is_empty()
+    {
+        bail!("materialized scene cohort identity is incomplete");
+    }
+    if scene.nodes.is_empty() || scene.edges.is_empty() {
+        bail!(
+            "PHOENIX_MATERIALIZED_PAGE_EMPTY: {} has {} nodes and {} edges",
+            manifold_key(manifold),
+            scene.nodes.len(),
+            scene.edges.len()
+        );
+    }
+    if scene
+        .nodes
+        .iter()
+        .any(|node| node.position.iter().any(|value| !value.is_finite()))
+    {
+        bail!(
+            "PHOENIX_MATERIALIZED_POSITION_INVALID: {} contains a non-finite position",
+            manifold_key(manifold)
+        );
+    }
+    Ok(())
+}
+
+fn compile(bundle: &MaterializedSceneBundle, generation_id: u64) -> Result<NativeScenePublication> {
+    let scene = bundle.canonical();
+    let mut node_ids = HashMap::with_capacity(scene.nodes.len());
+    let mut node_slots = HashMap::with_capacity(scene.nodes.len());
+    let mut stable_nodes = HashMap::<u64, &str>::with_capacity(scene.nodes.len());
+    for (slot, node) in scene.nodes.iter().enumerate() {
+        let stable = stable_id(b"phoenix.legacy.node/v1\0", &node.id);
+        if let Some(existing) = stable_nodes.insert(stable, &node.id) {
+            bail!(
+                "node identity collision between {existing:?} and {:?}",
+                node.id
+            );
+        }
+        if node_ids.insert(node.id.as_str(), stable).is_some() {
+            bail!("duplicate node identity {:?}", node.id);
+        }
+        node_slots.insert(node.id.as_str(), slot);
+    }
+    let mut degrees = HashMap::<u64, u32>::with_capacity(node_ids.len());
+    for edge in &scene.edges {
+        let source = *node_ids
+            .get(edge.source_id.as_str())
+            .with_context(|| format!("edge {:?} source is missing", edge.id))?;
+        let target = *node_ids
+            .get(edge.target_id.as_str())
+            .with_context(|| format!("edge {:?} target is missing", edge.id))?;
+        let source_degree = degrees.entry(source).or_default();
+        *source_degree = source_degree.saturating_add(1);
+        let target_degree = degrees.entry(target).or_default();
+        *target_degree = target_degree.saturating_add(1);
+    }
+
+    let mut identities = Vec::with_capacity(scene.nodes.len());
+    let mut styles = Vec::with_capacity(scene.nodes.len());
+    let mut node_products = Vec::with_capacity(scene.nodes.len());
+    let mut mappings = Vec::new();
+    let mut positions: [Vec<PositionRecord>; 6] =
+        std::array::from_fn(|_| Vec::with_capacity(scene.nodes.len()));
+    let hopf_fibers = phoenix_hopf_space::fiber_count(scene.nodes.len()).max(1);
+    for (ordinal, node) in scene.nodes.iter().enumerate() {
+        let id = node_ids[node.id.as_str()];
+        let family = node_family(node);
+        let degree = degrees.get(&id).copied().unwrap_or_default();
+        identities.push(NodeIdentityRecord { id });
+        styles.push(NodeStyleRecord {
+            color: parse_hsl(&node.color_hsl)?,
+            radius: node_radius(node, degree),
+            kind: node_kind(node),
+            flags: 0,
+        });
+        node_products.push(SceneNodeProduct {
+            node_id: id,
+            family_mask: family,
+            scope_mask: ScopeMask::NOTE.0,
+            review_mask: review_mask(node.review.as_deref()),
+            label: Arc::from(node.label.as_str()),
+            inspector_ref: NO_REFERENCE,
+            provenance_ref: NO_REFERENCE,
+        });
+        if node.kind == "entity" {
+            let source = node.source_id.as_deref().unwrap_or(node.id.as_str());
+            mappings.push(EntityNodeMappingRecord {
+                entity_id: stable_id(b"phoenix.legacy.entity/v1\0", source),
+                node_id: id,
+            });
+        }
+        for manifold in LEGACY_MANIFOLDS {
+            let position = bundle.scene(manifold).nodes[ordinal].position;
+            positions[manifold as usize].push(PositionRecord {
+                position: position.map(|value| value * manifold_world_scale(manifold)),
+            });
+        }
+        positions[ArchiveManifold::Hopf as usize].push(PositionRecord {
+            position: phoenix_hopf_space::fiber_point(
+                phoenix_hopf_space::base_direction(ordinal % hopf_fibers, hopf_fibers),
+                std::f32::consts::TAU
+                    * ((stable_unit(id.rotate_left(19)) + degree as f32 * 0.013).fract()),
+            ),
+        });
+    }
+
+    let mut edge_ids = HashSet::with_capacity(scene.edges.len());
+    let mut topology = Vec::with_capacity(scene.edges.len());
+    let mut edges = Vec::with_capacity(scene.edges.len());
+    let mut edge_products = Vec::with_capacity(scene.edges.len());
+    for edge in &scene.edges {
+        let id = stable_id(b"phoenix.legacy.edge/v1\0", &edge.id);
+        if !edge_ids.insert(id) {
+            bail!("duplicate or colliding edge identity {:?}", edge.id);
+        }
+        let source_id = node_ids[edge.source_id.as_str()];
+        let target_id = node_ids[edge.target_id.as_str()];
+        let relation = relation_family(edge);
+        topology.push(TopologyRecord {
+            source_id,
+            target_id,
+        });
+        let source_slot = node_slots[edge.source_id.as_str()];
+        let target_slot = node_slots[edge.target_id.as_str()];
+        edges.push(EdgeRecord {
+            id,
+            color: edge_color(styles[source_slot].color, styles[target_slot].color),
+            width: (0.24 + edge.confidence.clamp(0.0, 1.0) * 0.12).min(0.36),
+            kind: relation as u16,
+            flags: 0,
+        });
+        edge_products.push(SceneEdgeProduct {
+            edge_id: id,
+            family_mask: edge_family(edge),
+            scope_mask: ScopeMask::NOTE.0,
+            relation_mask: relation.mask().0,
+            review_mask: review_mask(edge.review.as_deref()),
+            inspector_ref: NO_REFERENCE,
+            provenance_ref: NO_REFERENCE,
+        });
+    }
+
+    Ok(NativeScenePublication {
+        generation_id,
+        kind: ScenePublicationKind::Full,
+        registry_revision: 1,
+        document_id: Some(stable_id(
+            b"phoenix.legacy.document/v1\0",
+            &scene.cohort.note_id,
+        )),
+        identities,
+        styles,
+        topology,
+        edges,
+        positions,
+        caps_guides: Vec::new(),
+        node_products,
+        edge_products,
+        entity_mappings: mappings,
+        references: Vec::new(),
+    })
+}
+
+fn validate_shared_graph(
+    canonical: &MaterializedScene,
+    scene: &MaterializedScene,
+    manifold: ArchiveManifold,
+) -> Result<()> {
+    if scene.nodes.len() != canonical.nodes.len() || scene.edges.len() != canonical.edges.len() {
+        bail!(
+            "PHOENIX_MATERIALIZED_GRAPH_INVENTORY_MISMATCH: {} has {}/{} nodes/edges; expected {}/{}",
+            manifold_key(manifold),
+            scene.nodes.len(),
+            scene.edges.len(),
+            canonical.nodes.len(),
+            canonical.edges.len()
+        );
+    }
+    for (ordinal, (expected, actual)) in canonical.nodes.iter().zip(&scene.nodes).enumerate() {
+        if !same_node_product(expected, actual) {
+            bail!(
+                "PHOENIX_MATERIALIZED_NODE_MISMATCH: {} node slot {} is {:?}; expected {:?}",
+                manifold_key(manifold),
+                ordinal,
+                actual.id,
+                expected.id
+            );
+        }
+    }
+    for (ordinal, (expected, actual)) in canonical.edges.iter().zip(&scene.edges).enumerate() {
+        if !same_edge_product(expected, actual) {
+            bail!(
+                "PHOENIX_MATERIALIZED_EDGE_MISMATCH: {} edge slot {} is {:?}; expected {:?}",
+                manifold_key(manifold),
+                ordinal,
+                actual.id,
+                expected.id
+            );
+        }
+    }
+    Ok(())
+}
+
+fn same_node_product(left: &LegacyNode, right: &LegacyNode) -> bool {
+    left.id == right.id
+        && left.label == right.label
+        && left.kind == right.kind
+        && left.total_mentions == right.total_mentions
+        && left.color_hsl == right.color_hsl
+        && left.source_id == right.source_id
+        && left.family == right.family
+        && left.style_key == right.style_key
+        && left.review == right.review
+}
+
+fn same_edge_product(left: &LegacyEdge, right: &LegacyEdge) -> bool {
+    left.id == right.id
+        && left.source_id == right.source_id
+        && left.target_id == right.target_id
+        && left.edge_type == right.edge_type
+        && left.confidence.to_bits() == right.confidence.to_bits()
+        && left.family == right.family
+        && left.review == right.review
+}
+
+const fn manifold_key(manifold: ArchiveManifold) -> &'static str {
+    match manifold {
+        ArchiveManifold::Hybrid => "hybrid",
+        ArchiveManifold::Torus => "hopf",
+        ArchiveManifold::Hopf => "hopf-native",
+        ArchiveManifold::Caps => "caps",
+        ArchiveManifold::Transit => "transit",
+        ArchiveManifold::Siegel => "siegel",
+    }
+}
+
+const fn manifold_mode(manifold: ArchiveManifold) -> &'static str {
+    match manifold {
+        ArchiveManifold::Hybrid => "hybrid",
+        ArchiveManifold::Torus => "hopf",
+        ArchiveManifold::Hopf => "hopf",
+        ArchiveManifold::Caps => "lorentz",
+        ArchiveManifold::Transit => "product",
+        ArchiveManifold::Siegel => "siegel",
+    }
+}
+
+const fn manifold_world_scale(manifold: ArchiveManifold) -> f32 {
+    match manifold {
+        ArchiveManifold::Caps => CAPS_WORLD_SCALE,
+        ArchiveManifold::Hybrid
+        | ArchiveManifold::Torus
+        | ArchiveManifold::Hopf
+        | ArchiveManifold::Transit
+        | ArchiveManifold::Siegel => 1.0,
+    }
+}
+
+fn stable_unit(value: u64) -> f32 {
+    let raw = value ^ (value >> 29) ^ value.rotate_left(17);
+    (raw >> 40) as f32 / ((1_u32 << 24) - 1) as f32
+}
+
+fn stable_id(domain: &[u8], value: &str) -> u64 {
+    let mut hasher = blake3::Hasher::new();
+    hasher.update(domain);
+    hasher.update(value.as_bytes());
+    let mut raw = [0_u8; 8];
+    raw.copy_from_slice(&hasher.finalize().as_bytes()[..8]);
+    u64::from_le_bytes(raw).max(1)
+}
+
+fn node_kind(node: &LegacyNode) -> u16 {
+    match node.kind.as_str() {
+        "note" => DOCUMENT_NODE_KIND,
+        "episode" => EPISODE_NODE_KIND,
+        "chunk" => CHUNK_NODE_KIND,
+        "entity" => match node.style_key.as_deref() {
+            Some("CHARACTER") => EntityKind::Character as u16,
+            Some("LOCATION") => EntityKind::Location as u16,
+            Some("NPC") => EntityKind::Npc as u16,
+            Some("NETWORK" | "FACTION") => EntityKind::Faction as u16,
+            _ => EntityKind::Custom as u16,
+        },
+        "event" => EntityKind::Event as u16,
+        _ => EntityKind::Custom as u16,
+    }
+}
+
+fn node_family(node: &LegacyNode) -> u64 {
+    match node.family.as_deref() {
+        Some("structure") => FamilyMask::STRUCTURE.0,
+        Some("discourse") => FamilyMask::DISCOURSE.0,
+        Some("fact" | "temporal" | "causal" | "memory") => FamilyMask::FACTS.0,
+        _ => match node.style_key.as_deref() {
+            Some("CHARACTER" | "NPC") => 1 << 0,
+            Some("LOCATION") => 1 << 1,
+            Some("NETWORK" | "FACTION") => 1 << 2,
+            Some("ITEM") => 1 << 3,
+            Some("CONCEPT") => 1 << 4,
+            Some("EVENT") => 1 << 5,
+            _ => 1 << 7,
+        },
+    }
+}
+
+fn edge_family(edge: &LegacyEdge) -> u64 {
+    match edge.family.as_deref() {
+        Some("structure") => FamilyMask::STRUCTURE.0,
+        Some("discourse") => FamilyMask::DISCOURSE.0,
+        Some("fact" | "temporal" | "causal" | "memory") => FamilyMask::FACTS.0,
+        _ => FamilyMask::ENTITIES.0,
+    }
+}
+
+fn relation_family(edge: &LegacyEdge) -> RelationFamily {
+    match edge.family.as_deref() {
+        Some("temporal") => RelationFamily::Temporal,
+        Some("causal") => RelationFamily::Causal,
+        Some("structure") => RelationFamily::Structural,
+        Some("discourse") => RelationFamily::Communication,
+        Some("registry") => RelationFamily::CoOccurrence,
+        _ => match edge.edge_type.as_str() {
+            "before" => RelationFamily::Temporal,
+            "causes_or_explains" => RelationFamily::Causal,
+            "co_occurs_with" | "anchored-cooccurrence" => RelationFamily::CoOccurrence,
+            _ => RelationFamily::Observation,
+        },
+    }
+}
+
+fn review_mask(review: Option<&str>) -> u32 {
+    match review {
+        Some("accepted") => ReviewMask::ACCEPTED.0,
+        Some("rejected") => ReviewMask::REJECTED.0,
+        _ => ReviewMask::PROPOSED.0,
+    }
+}
+
+fn node_radius(node: &LegacyNode, degree: u32) -> f32 {
+    match node.kind.as_str() {
+        "note" => 1.4,
+        "episode" => 1.25,
+        "chunk" => 0.8,
+        "structure-root" => 1.0,
+        "entity" => {
+            (0.38 + (degree as f32 + node.total_mentions as f32 + 1.0).ln() * 0.16).min(0.9)
+        }
+        _ => 0.46,
+    }
+}
+
+fn parse_hsl(value: &str) -> Result<[f32; 4]> {
+    let fields = value.split_ascii_whitespace().collect::<Vec<_>>();
+    if fields.len() != 3 {
+        bail!("invalid HSL color {value:?}");
+    }
+    let hue = fields[0].parse::<f32>()?.rem_euclid(360.0) / 360.0;
+    let saturation = percent(fields[1])?;
+    let lightness = percent(fields[2])?;
+    let chroma = (1.0 - (2.0 * lightness - 1.0).abs()) * saturation;
+    let sector = hue * 6.0;
+    let x = chroma * (1.0 - (sector.rem_euclid(2.0) - 1.0).abs());
+    let (red, green, blue) = match sector as u32 {
+        0 => (chroma, x, 0.0),
+        1 => (x, chroma, 0.0),
+        2 => (0.0, chroma, x),
+        3 => (0.0, x, chroma),
+        4 => (x, 0.0, chroma),
+        _ => (chroma, 0.0, x),
+    };
+    let offset = lightness - chroma * 0.5;
+    Ok([red + offset, green + offset, blue + offset, 1.0])
+}
+
+fn percent(value: &str) -> Result<f32> {
+    let parsed = value
+        .strip_suffix('%')
+        .context("HSL percentage is missing '%'")?
+        .parse::<f32>()?;
+    Ok((parsed / 100.0).clamp(0.0, 1.0))
+}
+
+fn edge_color(left: [f32; 4], right: [f32; 4]) -> [f32; 4] {
+    [
+        (left[0] + right[0]) * 0.42,
+        (left[1] + right[1]) * 0.42,
+        (left[2] + right[2]) * 0.42,
+        0.24,
+    ]
+}
+
+fn hex(bytes: [u8; 32]) -> String {
+    bytes.iter().map(|byte| format!("{byte:02x}")).collect()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn hsl_parser_preserves_saturated_red_without_pastel_shift() {
+        let color = parse_hsl("0 98% 50%").expect("valid HSL");
+        assert!((color[0] - 0.99).abs() < 0.001);
+        assert!((color[1] - 0.01).abs() < 0.001);
+        assert!((color[2] - 0.01).abs() < 0.001);
+        assert_eq!(color[3], 1.0);
+    }
+
+    #[test]
+    fn complete_bundle_preserves_five_legacy_pages_and_adds_native_hopf() {
+        let bundle = bundle();
+        bundle.validate().expect("complete bundle");
+        let publication = compile(&bundle, 7).expect("compile");
+        assert_eq!(publication.identities.len(), 2);
+        assert_eq!(publication.edges.len(), 1);
+        assert_eq!(publication.entity_mappings.len(), 1);
+        assert!(publication
+            .positions
+            .iter()
+            .all(|page| page.len() == publication.identities.len()));
+        for manifold in LEGACY_MANIFOLDS {
+            let source = bundle.scene(manifold).nodes[0].position;
+            let expected = source.map(|value| value * manifold_world_scale(manifold));
+            assert_eq!(
+                publication.positions[manifold as usize][0].position,
+                expected
+            );
+        }
+        assert!(publication.positions[ArchiveManifold::Hopf as usize][0]
+            .position
+            .iter()
+            .all(|value| value.is_finite()));
+    }
+
+    #[test]
+    fn incomplete_manifold_bundle_fails_closed() {
+        let mut bundle = bundle();
+        bundle.scenes[ArchiveManifold::Transit as usize]
+            .nodes
+            .clear();
+        let error = bundle
+            .validate()
+            .expect_err("empty Transit page must be rejected");
+        assert!(error
+            .to_string()
+            .contains("PHOENIX_MATERIALIZED_PAGE_EMPTY"));
+    }
+
+    #[test]
+    fn cross_manifold_identity_drift_fails_closed() {
+        let mut bundle = bundle();
+        bundle.scenes[ArchiveManifold::Torus as usize].nodes[0].id = "wrong-node".into();
+        let error = bundle
+            .validate()
+            .expect_err("node identity drift must be rejected");
+        assert!(error
+            .to_string()
+            .contains("PHOENIX_MATERIALIZED_NODE_MISMATCH"));
+    }
+
+    fn bundle() -> MaterializedSceneBundle {
+        MaterializedSceneBundle {
+            scenes: LEGACY_MANIFOLDS.map(scene),
+        }
+    }
+
+    fn scene(manifold: ArchiveManifold) -> MaterializedScene {
+        let offset = manifold as u8 as f32 + 1.0;
+        MaterializedScene {
+            format: MATERIALIZED_CONTRACT.into(),
+            key: manifold_key(manifold).into(),
+            cohort: Cohort {
+                note_id: "note-a".into(),
+                note_sha256: "00".repeat(32),
+                snapshot_id: "snapshot-a".into(),
+                authority_hash: "authority-a".into(),
+            },
+            source_mode: "embeddings".into(),
+            manifold_mode: manifold_mode(manifold).into(),
+            nodes: vec![
+                LegacyNode {
+                    id: "embed:entity:a".into(),
+                    label: "A".into(),
+                    kind: "entity".into(),
+                    total_mentions: 4,
+                    position: [offset, offset + 0.25, offset + 0.5],
+                    color_hsl: "160 90% 45%".into(),
+                    source_id: Some("entity-a".into()),
+                    family: Some("registry".into()),
+                    style_key: Some("CHARACTER".into()),
+                    review: Some("accepted".into()),
+                },
+                LegacyNode {
+                    id: "embed:chunk:0".into(),
+                    label: "Chunk 0".into(),
+                    kind: "chunk".into(),
+                    total_mentions: 1,
+                    position: [-offset, offset + 0.75, offset],
+                    color_hsl: "330 90% 60%".into(),
+                    source_id: Some("chunk-0".into()),
+                    family: Some("structure".into()),
+                    style_key: Some("chunk".into()),
+                    review: Some("accepted".into()),
+                },
+            ],
+            edges: vec![LegacyEdge {
+                id: "edge-a".into(),
+                source_id: "embed:entity:a".into(),
+                target_id: "embed:chunk:0".into(),
+                edge_type: "chunk-entity".into(),
+                confidence: 0.8,
+                family: Some("registry".into()),
+                review: Some("accepted".into()),
+            }],
+        }
+    }
+}

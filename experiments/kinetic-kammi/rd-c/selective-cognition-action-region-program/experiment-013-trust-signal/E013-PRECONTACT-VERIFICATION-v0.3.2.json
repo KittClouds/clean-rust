@@ -1,0 +1,38 @@
+{
+  "artifact_id": "E013-PRECONTACT-VERIFICATION-v0.3.2",
+  "banks_generated_by_agent": false,
+  "checked_sha256": {
+    "corrected_projections": "7f71d0dc6d619dfbeea03cd25a1c9dc3d7e80737f47558cb8fa47cad1e944c88",
+    "corrected_receipt": "f985535550542b454c150a3815dbdaaa30687ca3b1694df7b814f7fbe4a4bf21",
+    "correction_note": "dfd00ad2c48aed6dbeee8451bd7b13defcb9cf268d34cd33bda4f9503bcf5259",
+    "correction_script": "33ed505e90900324d1a4fe567c4671cd48612bd307ce1c8d070d91c86cc5acac",
+    "parent_lock_v031": "2dde2c7c2fd3baa6c7bc08debfd01f5118f9ac4348318a9f9be633a0f7357d17",
+    "parent_projections_v031": "fffd68e8d1c687cc648f81857cc3f593e8fa5c498884a5413a08d151e9b65f69",
+    "parent_receipt_v031": "c699207d35326e44d581c90a4e61caabb85412c0de6ad6e9d448bd9e4df6ea39",
+    "parent_verification_v031": "2d92f0f69f7531bf40e3d2d72703e7d599fffe0898efca27f069d67a1492e663"
+  },
+  "checks": {
+    "corrected_formula": true,
+    "exists:corrected_projections": true,
+    "exists:corrected_receipt": true,
+    "exists:correction_note": true,
+    "exists:correction_script": true,
+    "exists:parent_lock_v031": true,
+    "exists:parent_projections_v031": true,
+    "exists:parent_receipt_v031": true,
+    "exists:parent_verification_v031": true,
+    "finite_gate_preserved": true,
+    "scope_and_boundary": true,
+    "sha256:corrected_projections": true,
+    "sha256:corrected_receipt": true,
+    "sha256:correction_note": true,
+    "sha256:correction_script": true,
+    "sha256:parent_lock_v031": true,
+    "sha256:parent_projections_v031": true,
+    "sha256:parent_receipt_v031": true,
+    "sha256:parent_verification_v031": true
+  },
+  "lock_sha256": "fbac0d86ffd6a593793d2a35d00d2250ae63b52a0abec99864d36456d1af1adb",
+  "model_contact_performed": false,
+  "state": "PASS"
+}

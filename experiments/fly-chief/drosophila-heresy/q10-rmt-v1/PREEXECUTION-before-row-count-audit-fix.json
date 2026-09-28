@@ -1,0 +1,52 @@
+{
+  "protocol": "Q10-RMT",
+  "status": "FROZEN_PRE_EXECUTION",
+  "source_manifest": [
+    {
+      "path": "PLAN.md",
+      "sha256": "41DB8A90568A1BDA22DA1E7A3D8288967E24037FDCAD5C8B2518ED53D28511C5"
+    },
+    {
+      "path": "CONTRACT.json",
+      "sha256": "FFD057E2D2FB86CB8BBBE0F78EA66C10DF752ABB369448549430EDBF4595CC6E"
+    },
+    {
+      "path": "q10-rmt-config.json",
+      "sha256": "F39F2494ACA53FC3434CB4E73940838B10E7BF4FB08B228AEEFD6A9C39E0EFE3"
+    },
+    {
+      "path": "scripts/run_q10_rmt.py",
+      "sha256": "16EC3E13D8DB9C49934283FBC14B40470CCF32DBDA7F4213E57B223D12DC4C45"
+    },
+    {
+      "path": "scripts/audit_q10_rmt.py",
+      "sha256": "FA85A1304CDC066C0696838C337AF021E245DB3D576D4EC5C047B78ACA2E76EB"
+    },
+    {
+      "path": "scripts/seal_q10_rmt.py",
+      "sha256": "C66AA040EA7A6138E34B2A0F2C81C76D6B945FD10351DF9AA7121A37150BB372"
+    },
+    {
+      "path": "scripts/merge_q10_rmt.py",
+      "sha256": "9342400499943BCB9D693BC8E647192A28A9183A003EAF1B25DA34C7A45FA04D"
+    }
+  ],
+  "parent_root": "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-da2-geometry-v1",
+  "da2-results-sha256": "A76139A924D0D24EE5376378DBCDB12AAE539CE33182DE1050C741DC0475BB23",
+  "input_root": "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-distributed-additive-v1\\qualification\\sample-9731-9732",
+  "input_sha256": {
+    "seed9731-L-tau16.json": "3114A3B31C59A79D540F32C30FE1C217971418655CD8B13E17A91D8157AA1707",
+    "seed9731-L-tau4.json": "2974BF3A4CB5C80569EE73B2E46C8800D12D142DDA9B67EA572880F4EE9C3B5E",
+    "seed9731-R-tau16.json": "185769A85B1EA2FE8E596804C1FC3CB4F27A3D8318010FB8D739E56CBF554F73",
+    "seed9731-R-tau4.json": "8BA8EF71BF255B53769A6E50EB65408E19BD59743F932F3DF741AF3EB97DCE99",
+    "seed9732-L-tau16.json": "461269AF2C4B89F9DD9B589E6CA322A29CA9357FAA29627911E7FB5B85E8E1A3",
+    "seed9732-L-tau4.json": "36F042052DF02EEA4371C3C76F8AFA727FECF5450158CBFAEA731E7E43A60D28",
+    "seed9732-R-tau16.json": "2E6AF0C80578CD61214099D166D692007B431FF557D678AFBBAF2FFD8DC8BFC9",
+    "seed9732-R-tau4.json": "A53A3567E84CB753805409A92B1C350C5F2AC6173557D221C000C975BF19A135"
+  },
+  "primary_endpoint_rule": "all Q10-DA2 status DA2_GEOMETRY_PASS records",
+  "repair_applied": false,
+  "behavioral_inference": false,
+  "scientific_seed_bundles": 0,
+  "dh08b_authorized": false
+}

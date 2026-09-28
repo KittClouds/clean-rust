@@ -1,0 +1,44 @@
+{
+  "schema": "CHIEF_KAMMI_CHAT_INTAKE_V1",
+  "source_thread_id": "01a0b9cd-0bbf-71a0-87ca-2f2773e36e9c",
+  "source_title": "Drosophila Heresy — Deputy Scientific…",
+  "received_date": "2026-09-27",
+  "status": "RECEIVED_NOT_INDEPENDENTLY_VERIFIED",
+  "scientific_authority_conferred": false,
+  "turns": [
+    {
+      "id": "01a0e41e-dc46-7dd3-877a-32e992d777b1",
+      "status": "completed",
+      "error": null,
+      "startedAt": 1790533622,
+      "completedAt": 1790533648,
+      "durationMs": 25237,
+      "items": [
+        {
+          "type": "agentMessage",
+          "id": "msg_0d38e2e81d8d721f016ab95ffba00487d18b2148a4bbb7b23c",
+          "text": "I’m reading the authorized bookkeeping handoff notice, then I’ll acknowledge it to Chief Kammi without changing execution state.",
+          "phase": "commentary"
+        },
+        {
+          "type": "mcpToolCall",
+          "id": "exec-5e999806-bb21-4617-8bbf-314f60fca9e5",
+          "server": "codex_app",
+          "tool": "send_message_to_thread",
+          "arguments": {
+            "threadId": "01a0de04-f3a7-7bb0-9dbe-e7e1a38bb339",
+            "prompt": "To: Chief Kammi — bookkeeping handoff\n\nLab / task / current stage: Drosophila Heresy, q10-gc1-lr1-requal1-csc1-resid-invalid1-r2-v3; terminal read-only metadata sentinel stage.\nExisting instruction or authorization reference: user-authorized Deputy #2 heartbeat; parent task 01a09283-4813-7fc0-93e1-e6db6b0d75b4.\nWhat changed or completed: Authorized PID 8920 was observed exited; identity-specific heartbeat is paused. No intervention, restart, replay, or result-body inspection occurred.\nArtifact paths / repository commit / existing manifest: C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-lr1-requal1-csc1-resid-invalid1-r2-v3; existing CONTRACT.json, PREEXECUTION.json, PLAN.md, runner, static test, and results metadata remain in place.\nWhat ran, and where the raw logs are: Python -B experiments/.../scripts/run_resid_invalid1_r2.py; result metadata lists order1_hits.jsonl (2296 bytes), order2_hits.jsonl (0 bytes), order3_hits.jsonl (0 bytes). Measured bodies were not read.\nObserved contacts or evidence openings; uncertainty if tracking is incomplete: No protected evidence or model contact was opened; no exact-command successor was observed. Receipt/summary filenames were absent in the metadata listing. Chief should verify custody from existing artifacts.\nFailure, stop, or next gated action: Process stop observed; no success or promotion inferred. All order4/GC2/AG1/behavior/scientific gates remain closed. Parent authorization is required for any completion/content audit.\nResource need, if a new lease is required: None.\nProtected material: none opened; only identity/location metadata was handled."
+          },
+          "status": "completed",
+          "durationMs": 71
+        },
+        {
+          "type": "agentMessage",
+          "id": "msg_0d38e2e81d8d721f016ab9600f970487d1b77965bd6f643bd8",
+          "text": "Read and acknowledged the notice. I sent Chief Kammi the pointer-based handoff for the stopped r2-v3 sentinel stage; no execution state or scientific gates were changed.",
+          "phase": "final_answer"
+        }
+      ]
+    }
+  ]
+}

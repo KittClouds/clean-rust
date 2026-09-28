@@ -1,0 +1,9 @@
+{
+  "engineering_only": true,
+  "execution_sha256": "9DDE02DC9EF8CC6E26A031B7EFC4E820EBE6FE52200B6520B0C5190793041CDE",
+  "identity": "q10-gc1-lr1-requal1-csc1-resid-invalid1-r2-v3",
+  "protocol": "Q10-RESID-INVALID1-R2-V3",
+  "replay_executed": true,
+  "scientific_promotion": false,
+  "status": "RESID_INVALID1_R2_V3_COMPLETE"
+}

@@ -1,0 +1,18 @@
+[package]
+name = "adaptive-runtime-ar-02b-r1"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.96"
+publish = false
+
+[dependencies]
+adaptive-runtime-ar-02b = { path = "../ar-02b" }
+hashbrown = "0.16"
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+panic = "abort"
+
+[workspace]

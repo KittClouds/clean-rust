@@ -1,0 +1,138 @@
+{
+  "contexts": [
+    {
+      "context": "seed9731-L-tau16__set2",
+      "domain_sha256": "86B0133B81617CE2778F8EC535BEE88E10A2E4B264F9AC772085E139625ABBC4",
+      "groups": 55,
+      "singleton_actions": 440,
+      "structurally_eligible_pairs": 95040
+    },
+    {
+      "context": "seed9731-L-tau4__set3",
+      "domain_sha256": "ED08794AA61E19ABB23CB4504C4F17A84EC2DFEE78B572E86F83900F812BFB3F",
+      "groups": 62,
+      "singleton_actions": 496,
+      "structurally_eligible_pairs": 121024
+    },
+    {
+      "context": "seed9731-R-tau16__set1",
+      "domain_sha256": "440D602D0D8FB1CF48978D8A110B123614E41769AB054BB79D636CB9D6BB6000",
+      "groups": 59,
+      "singleton_actions": 472,
+      "structurally_eligible_pairs": 109504
+    },
+    {
+      "context": "seed9731-R-tau16__set3",
+      "domain_sha256": "428426C78B8E0E8B0618EC870E19DF6363C6C68FD187C46A9E178B2AE8DA4C8A",
+      "groups": 54,
+      "singleton_actions": 432,
+      "structurally_eligible_pairs": 91584
+    },
+    {
+      "context": "seed9731-R-tau4__set0",
+      "domain_sha256": "D8D2478BB94AE9E61A12A97C458494B5E9466C9F3FF0A18576DCF936CBC5BE85",
+      "groups": 59,
+      "singleton_actions": 472,
+      "structurally_eligible_pairs": 109504
+    },
+    {
+      "context": "seed9731-R-tau4__set1",
+      "domain_sha256": "0EE22EDC9F630887734CD8B86AC4576FE7B8925CB46D82659960ABD3E24C6ABC",
+      "groups": 55,
+      "singleton_actions": 440,
+      "structurally_eligible_pairs": 95040
+    },
+    {
+      "context": "seed9731-R-tau4__set2",
+      "domain_sha256": "E2C46F83E91F95F3FE11D2AFD6D26FD29BADF591A72A003DBB35E2D200D432D8",
+      "groups": 59,
+      "singleton_actions": 472,
+      "structurally_eligible_pairs": 109504
+    },
+    {
+      "context": "seed9731-R-tau4__set3",
+      "domain_sha256": "CE3BFE3AA8C7F09FEF0813EB95C5AD93715C95180E9304B5C8D8DE130804B19D",
+      "groups": 59,
+      "singleton_actions": 472,
+      "structurally_eligible_pairs": 109504
+    }
+  ],
+  "counts": {
+    "contexts": 8,
+    "singleton_actions": 3696,
+    "structurally_eligible_pairs": 840704
+  },
+  "domain_manifest": {
+    "contexts": [
+      {
+        "context": "seed9731-L-tau16__set2",
+        "domain_sha256": "86B0133B81617CE2778F8EC535BEE88E10A2E4B264F9AC772085E139625ABBC4",
+        "groups": 55,
+        "singleton_actions": 440,
+        "structurally_eligible_pairs": 95040
+      },
+      {
+        "context": "seed9731-L-tau4__set3",
+        "domain_sha256": "ED08794AA61E19ABB23CB4504C4F17A84EC2DFEE78B572E86F83900F812BFB3F",
+        "groups": 62,
+        "singleton_actions": 496,
+        "structurally_eligible_pairs": 121024
+      },
+      {
+        "context": "seed9731-R-tau16__set1",
+        "domain_sha256": "440D602D0D8FB1CF48978D8A110B123614E41769AB054BB79D636CB9D6BB6000",
+        "groups": 59,
+        "singleton_actions": 472,
+        "structurally_eligible_pairs": 109504
+      },
+      {
+        "context": "seed9731-R-tau16__set3",
+        "domain_sha256": "428426C78B8E0E8B0618EC870E19DF6363C6C68FD187C46A9E178B2AE8DA4C8A",
+        "groups": 54,
+        "singleton_actions": 432,
+        "structurally_eligible_pairs": 91584
+      },
+      {
+        "context": "seed9731-R-tau4__set0",
+        "domain_sha256": "D8D2478BB94AE9E61A12A97C458494B5E9466C9F3FF0A18576DCF936CBC5BE85",
+        "groups": 59,
+        "singleton_actions": 472,
+        "structurally_eligible_pairs": 109504
+      },
+      {
+        "context": "seed9731-R-tau4__set1",
+        "domain_sha256": "0EE22EDC9F630887734CD8B86AC4576FE7B8925CB46D82659960ABD3E24C6ABC",
+        "groups": 55,
+        "singleton_actions": 440,
+        "structurally_eligible_pairs": 95040
+      },
+      {
+        "context": "seed9731-R-tau4__set2",
+        "domain_sha256": "E2C46F83E91F95F3FE11D2AFD6D26FD29BADF591A72A003DBB35E2D200D432D8",
+        "groups": 59,
+        "singleton_actions": 472,
+        "structurally_eligible_pairs": 109504
+      },
+      {
+        "context": "seed9731-R-tau4__set3",
+        "domain_sha256": "CE3BFE3AA8C7F09FEF0813EB95C5AD93715C95180E9304B5C8D8DE130804B19D",
+        "groups": 59,
+        "singleton_actions": 472,
+        "structurally_eligible_pairs": 109504
+      }
+    ],
+    "identity": "q10-gc1-lr1-requal1-csc1-uvd0-v1",
+    "ordered_domain_sha256": "81D726536D57977DC6F4444BC750843C36B3E2FAEC416905AAC6255515EFF030",
+    "pair_count": 840704,
+    "pair_outcomes_consulted": false,
+    "pair_replay_performed": false,
+    "protocol": "Q10-CSC1-UVD0"
+  },
+  "engineering_only": true,
+  "identity": "q10-gc1-lr1-requal1-csc1-uvd0-v1",
+  "pair_outcomes_consulted": false,
+  "pair_replay_performed": false,
+  "protocol": "Q10-CSC1-UVD0",
+  "scientific_promotion": false,
+  "status": "UVD0_COMPLETE"
+}

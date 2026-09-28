@@ -1,0 +1,107 @@
+{
+  "protocol": "jev-decision-data-information-density/v0.8c-phase2c-support-mobility-census",
+  "status": "frozen_before_support_mobility_census",
+  "purpose": "metadata-only census of atom occupancy, alternative support, and exact one-unit cross-atom transfers; no candidate optimization",
+  "lineage": {
+    "phase2c_contract_sha256": "368169820144a5bb2de3a67089ea4f39262cffb591bd3977af1a700a16fecb3c",
+    "phase2c_freeze_receipt_sha256": "e54960a2f25e1ef9a0a3e4c46e4821d99bda851d5fc19560d0d4a5314331ddc1",
+    "training_equivalence_audit_sha256": "d8e2a7fbf2916b6df9b6bf5747f5e743b863aa9afdc3c5e2b437fdf8dbd32b3a"
+  },
+  "scope": {
+    "read_only_inputs": true,
+    "sqlite_open_mode": "read_only_immutable",
+    "model_or_tokenizer_access": false,
+    "feature_cache_access": false,
+    "optimizer_or_candidate_search": false,
+    "training_or_training_materialization": false,
+    "phoenix_access": false,
+    "prior_banks_or_phases_mutated": false,
+    "raw_text_written_to_outputs": false
+  },
+  "inputs": {
+    "training_equivalence_audit": {
+      "path": "D:\\codex-runs\\jev-information-density-v08c\\phase2c-v01\\training-equivalence-audit.json",
+      "sha256": "d8e2a7fbf2916b6df9b6bf5747f5e743b863aa9afdc3c5e2b437fdf8dbd32b3a"
+    },
+    "signature_sqlite": {
+      "path": "D:\\codex-runs\\jev-information-density-v08c\\phase2c-v01\\training-signatures.sqlite",
+      "sha256": "8c9614928ce4172665a2a0d7e6f8463b9a3cca4d7af971ad2da01e7710c9d901"
+    },
+    "phase2c_freeze_receipt": {
+      "path": "D:\\codex-runs\\jev-information-density-v08c\\phase2c-v01\\phase2c-freeze-receipt.json",
+      "sha256": "e54960a2f25e1ef9a0a3e4c46e4821d99bda851d5fc19560d0d4a5314331ddc1"
+    },
+    "R100": {
+      "path": "D:\\codex-runs\\jev-information-density-v08\\selection-v08-c100v12\\new-tight-r100-group-ids.jsonl",
+      "sha256": "0b9998d94e895e5f540c066bdc618d0d6378b9e9ce632380838b7a14beac008b",
+      "count": 100000
+    },
+    "C100": {
+      "path": "D:\\codex-runs\\jev-information-density-v08\\selection-v08-c100v12\\new-tight-c100-group-ids.jsonl",
+      "sha256": "860fbfef8283e707d41639ab970ef7257d116e3001a18a0b180feea9d72579c3",
+      "count": 100000
+    },
+    "CM100_atom": {
+      "path": "D:\\codex-runs\\jev-information-density-v08c\\phase2b-v01\\equivalent-substitution-v01\\cm100-provisional-ids.jsonl",
+      "sha256": "20e3c7c36ea10ceef2f23016d2e9ff438970c65afae11f6a1ada47af008904df",
+      "count": 100000
+    },
+    "RM100_atom": {
+      "path": "D:\\codex-runs\\jev-information-density-v08c\\phase2b-v01\\equivalent-substitution-v01\\rm100-provisional-ids.jsonl",
+      "sha256": "424b018937cf5a3ec4c5cdc7a00fd8acbbc85a2bb1cdb0a189dd067074aa82c5",
+      "count": 100000
+    },
+    "NewTight_Eval": {
+      "path": "D:\\codex-runs\\jev-information-density-v08\\selection-v08-c100v12\\new-tight-eval-group-ids.jsonl",
+      "sha256": "3e72cd7596fbf0b302501b88dd9dc645a5749de10884b57eceb5552bfc5ef8ae",
+      "count": 83328
+    }
+  },
+  "atom_definition": [
+    "selector_model_input_sha256",
+    "root_id",
+    "exact_joint_cell(world,bundle,query,cardinality,entropy_quintile,entropy_band)",
+    "sorted topology feature tuple",
+    "intervention_family"
+  ],
+  "historical_profile_constraints": {
+    "group_count": 100000,
+    "joint_cell_counts": "exact",
+    "unique_model_input_count_relative_error": 0.02,
+    "input_multiplicity_histogram_tv": 0.02,
+    "unique_root_count_relative_error": 0.02,
+    "root_multiplicity_histogram_tv": 0.02,
+    "topology_marginal_tv": 0.02,
+    "intervention_marginal_tv": 0.02,
+    "evaluation_and_protected_families": "excluded",
+    "no_exact_per_root_histogram": true,
+    "no_exact_per_cell_input_histogram": true
+  },
+  "census_definitions": {
+    "within_atom_slack": "eligible capacity minus selected count in the same exact atom; permits row substitution but not atom-allocation change",
+    "cell_only_transfer_potential": "selected atom mass and unselected capacity in the same exact joint cell; diagnostic only, ignores input/root/topology/intervention coupling",
+    "same_core_cross_atom": "different atoms sharing exact model-input digest, root ID, and exact joint cell; a one-unit swap preserves group count, cell count, model-input occurrence count, and root occurrence count",
+    "full_profile_one_swap": "same-core cross-atom one-unit swap that independently leaves topology and intervention marginal TV at or below 0.02 against the bank's frozen reference; other profile dimensions are invariant under the same-core definition",
+    "one_swap_treatment": "support witness only; no cumulative treatment-strength or candidate-feasibility claim",
+    "supervised_signature_change": "at least one selected source signature differs from an available unselected destination signature; excludes bank-level capped invariance-pair context and is not D_train",
+    "locked_selected_mass": "selected mass in atoms whose eligible capacity equals selected count; describes within-atom substitution only, not cross-atom immobility",
+    "gross_transfer_capacity": "sum over individually admissible directed atom edges of min(selected source count, destination slack); edges may compete and this is not jointly realizable capacity"
+  },
+  "bank_reference_map": {
+    "R100": "R100",
+    "CM100_atom": "R100",
+    "C100": "C100",
+    "RM100_atom": "C100"
+  },
+  "required_outputs": [
+    "support-mobility-report.json",
+    "atom-support.jsonl",
+    "freeze-receipt.json"
+  ],
+  "search_authorization": {
+    "support_mobility_census": true,
+    "cross_atom_optimizer": false,
+    "model_contact": false,
+    "training": false
+  }
+}

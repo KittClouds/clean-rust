@@ -1,0 +1,22 @@
+{
+  "protocol": "REQUAL1-RIS1-DOMAIN",
+  "identity": "q10-gc1-lr1-requal1-ris1-domain-v2",
+  "engineering_only": true,
+  "pair_replay_allowed": false,
+  "behavioral_probe": false,
+  "scientific_promotion": false,
+  "historical_counts_are_measurements": false,
+  "selector": {
+    "geometry_slots": 16,
+    "collateral_slots": 8,
+    "fill_limit": 32,
+    "pair_policy": "all selected cross-group pairs within each current context",
+    "tie_fields": ["group", "to"],
+    "reference": "current exact replay of matching PAR8 best_search mapping"
+  },
+  "required_statuses": {
+    "domain": "DOMAIN_READY_FOR_SMOKE",
+    "singles": "SINGLES_COMPLETE",
+    "parity": "PARITY_PASS"
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "bundles": [
+    {
+      "bundle_schema_version": 1,
+      "bundle_id": "minicpm5-2b-q8-local-v1",
+      "observer_interface_version": 1,
+      "implementation_id": "llama.cpp-chat-completions-json-schema-v1",
+      "input_schema": "rdc-real-coding-observation.v1",
+      "output_schema": "rdc-coding-observer-output.v1",
+      "backbone_name": "MiniCPM5-2B-Q8_0.gguf",
+      "backbone_revision": "2079a22f3beaa4e306449978533478fe0522f4b3",
+      "backbone_sha256": "c5415f8989bf88a8288f1b55a3cc371af53c07b0faa220a63bd7a990cfaba078",
+      "runtime_name": "llama-server.exe",
+      "runtime_revision": "llama.cpp-b10982",
+      "runtime_sha256": "ffaee576ad271ede87b92a7d8c3863dc8f331bbac666ee00099c250e8809e743",
+      "representation_surface_id": "system-observer-v1+canonical-task-frame-v1",
+      "representation_surface_sha256": "c0b29b1e1c1b88372e05ef33f6d92bc7a04dfaeb362e98e738a3dd4ea569c95a",
+      "normalization_contract": "line-endings-lf-v1",
+      "typed_head_id": "json-schema-output-head-v1",
+      "typed_head_kind": "constrained-json-generation-not-trained-weights",
+      "typed_head_schema_sha256": "d3e44b9964d52bb68384b83e17d9cb5699be96bae7dc98d576acaaabcf3eb8ef",
+      "temperature_milli": 0,
+      "top_p_milli": 1000,
+      "maximum_output_tokens": 1024,
+      "seed": 0
+    },
+    {
+      "bundle_schema_version": 1,
+      "bundle_id": "ternary-bonsai-2-27b-ptq1-local-v1",
+      "observer_interface_version": 1,
+      "implementation_id": "prism-llama.cpp-chat-completions-json-schema-v1",
+      "input_schema": "rdc-real-coding-observation.v1",
+      "output_schema": "rdc-coding-observer-output.v1",
+      "backbone_name": "Ternary-Bonsai-2-27B-PTQ1_0.gguf",
+      "backbone_revision": "6ed5e12bf84b7a63069882c91dd9e9218647d17b",
+      "backbone_sha256": "53107f530aa52eb00912263ab1ee29bd199261c87cd7b4ad4ca1318c1fe33ee3",
+      "runtime_name": "llama-server.exe",
+      "runtime_revision": "PrismML-llama.cpp-prism-b10685-7dffb15",
+      "runtime_sha256": "e0ea4fd53e6f0c741cbd28093b427f333ada0eb03b83073e1f99c483793ea976",
+      "representation_surface_id": "system-observer-v1+canonical-task-frame-v1",
+      "representation_surface_sha256": "c0b29b1e1c1b88372e05ef33f6d92bc7a04dfaeb362e98e738a3dd4ea569c95a",
+      "normalization_contract": "line-endings-lf-v1",
+      "typed_head_id": "json-schema-output-head-v1",
+      "typed_head_kind": "constrained-json-generation-not-trained-weights",
+      "typed_head_schema_sha256": "d3e44b9964d52bb68384b83e17d9cb5699be96bae7dc98d576acaaabcf3eb8ef",
+      "temperature_milli": 0,
+      "top_p_milli": 1000,
+      "maximum_output_tokens": 1024,
+      "seed": 0
+    }
+  ]
+}

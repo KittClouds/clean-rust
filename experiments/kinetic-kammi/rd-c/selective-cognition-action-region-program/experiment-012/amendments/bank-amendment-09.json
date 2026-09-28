@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "amendment_id": "E012-BANK-A09",
+  "state": "AUDIT_REPAIR_FROZEN_BEFORE_RERUN",
+  "model_contact_authorized": false,
+  "failed_attempt": "bank/construction-01/scored-bank-v1/attempts/precontact-audit-attempt-01.json",
+  "defect": "reverse-coordinate count audit expected same orientation",
+  "correct_predicate": "coordinate-control count vector equals the reversed producer count vector",
+  "changed": ["audit comparator"],
+  "projected_bank_mutated": false,
+  "observer_contact": false,
+  "retry_audit": "scripts/audit_task_bank_e012_v1_2.py"
+}

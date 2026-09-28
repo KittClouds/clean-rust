@@ -1,0 +1,44 @@
+{
+  "claim_scope": "causal dependence of the fixed LFM-plus-observer system under the specified intervention; not native LFM behavior or circuit causality",
+  "contract_id": "FAS_S12_ACCESSIBILITY_NECESSITY_DRAFT_V01",
+  "execution_authorized": false,
+  "interventions": {
+    "control": "rank-2 random orthonormal planes, event-wise L2 matched",
+    "layers": [
+      4,
+      8,
+      12
+    ],
+    "projector": "rank-2 span of sealed S09 effective raw-coordinate pair normals",
+    "random_controls_per_site": 8,
+    "strengths": [
+      0,
+      0.25,
+      0.5,
+      1.0
+    ],
+    "surfaces": [
+      "M",
+      "F"
+    ]
+  },
+  "model_contact_authorized": false,
+  "parents": {
+    "model_id": "LiquidAI/LFM2.5-1.2B-Base",
+    "model_revision": "7453bca97ca1e67754c4035a4b4c584e1c9dd725",
+    "s09_result_root_sha256": "664af5b22f071b28d52a67d748e9f6f93ae3e67d587edec80b921dd529945880",
+    "s11_panel_root_sha256": "9011d425faaac7c6c1bee0f619a696a4469816ebeae1c0df2c6d4f8516fde824",
+    "s11_result_root_sha256": "23758806537df1895772025e97824393dd4cd79ede7956360cd93f341c30740a"
+  },
+  "population": {
+    "quartets": 5318,
+    "rows": 21272,
+    "source": "sealed S11 v02 panel",
+    "status": "already revealed; mechanistic follow-up only, not independent confirmation"
+  },
+  "primary_contrast": "mean random-control terminal target margin minus target-plane-ablation terminal target margin at strength 1.0; positive means selective target-plane damage",
+  "primary_outcome": "paired target-vs-best-rival margin after intervention and frozen same-surface layer-16 S09 observer",
+  "review_decision": "accept fixed observer endpoint, or define a separate native LFM answer-generation endpoint and baseline competence gate",
+  "status": "DRAFT_FOR_REVIEW_NOT_SEALED",
+  "uncertainty": "shared whole-quartet bootstrap stratified by exact target; simultaneous intervals across six layer-by-surface contrasts"
+}

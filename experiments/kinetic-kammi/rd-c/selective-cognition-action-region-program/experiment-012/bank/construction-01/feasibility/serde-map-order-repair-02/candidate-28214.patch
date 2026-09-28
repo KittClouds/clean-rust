@@ -1,0 +1,16 @@
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -4,6 +4,11 @@
+     let value: Value = serde_json::from_str(input).ok()?;
+     let mut object = value.as_object()?.clone();
+     object.sort_keys();
+-    // E012 candidate slot.
+-    Some(object.keys().cloned().collect())
++    #[cfg(feature = "preserve_order")]
++    {
++        let original: Value = serde_json::from_str(input).ok()?;
++        Some(original.as_object()?.keys().cloned().collect())
++    }
++    #[cfg(not(feature = "preserve_order"))]
++    { None }
+ }

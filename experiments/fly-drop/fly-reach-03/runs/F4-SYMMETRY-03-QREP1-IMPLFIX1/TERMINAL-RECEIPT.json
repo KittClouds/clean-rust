@@ -1,0 +1,389 @@
+{
+  "artifact_sha256": {
+    "f4-symmetry-03/F4-SYMMETRY-03-CONTRACT-v0.1.json": {
+      "bytes": 3566,
+      "sha256": "afc606b66243e400123906367c01b02cc1d4391f473dbdfb6e6abfdd19490338"
+    },
+    "f4-symmetry-03/F4-SYMMETRY-03-CONTRACT-v0.1.md": {
+      "bytes": 8029,
+      "sha256": "7c49b8419896dca4418de3497ecd8566b2167d1c6bf24d7860d904d70f87afe0"
+    },
+    "f4-symmetry-03/artifacts/EMPTY-U-STAR-BLOCK-IMPLEMENTATION-AMENDMENT-v0.1.json": {
+      "bytes": 1390,
+      "sha256": "03c89295dac8cbedc2dcf1e50a3bbe9055f730935efbf75d3374fdf028f66c42"
+    },
+    "runs/F4-SYMMETRY-03-QREP1-IMPLFIX1/ANALYSIS-RECEIPT.json": {
+      "bytes": 715,
+      "sha256": "d6ed1f34d801520ae831017ff6210b6c5738eed21e606506ef1e36258aeb5d60"
+    },
+    "runs/F4-SYMMETRY-03-QREP1-IMPLFIX1/ANALYSIS.json": {
+      "bytes": 94230,
+      "sha256": "320ad945401889abe4de9a2c44b075399ca07a646c810e56c133ca0e57b8a959"
+    },
+    "runs/F4-SYMMETRY-03-QREP1-IMPLFIX1/BLOCK-PATTERN-SUMMARY.csv": {
+      "bytes": 7764,
+      "sha256": "fdb11a45c05a23515e584cb6a6788f1ff0c58857c554515e88b4da66c5c35872"
+    },
+    "runs/F4-SYMMETRY-03-QREP1-IMPLFIX1/COLLECTION-TRANSFER-RECEIPT.json": {
+      "bytes": 1257,
+      "sha256": "5103799cc8509120346ac0b860e5983f9063cdcb55915e920e3bd6a623db74f7"
+    },
+    "runs/F4-SYMMETRY-03-QREP1-IMPLFIX1/EXECUTION-MANIFEST.json": {
+      "bytes": 21303,
+      "sha256": "4a9db249ea7095dd735ac253ffcf8788fd8811f51a1c51fe6f33bc3a81e31a4d"
+    },
+    "runs/F4-SYMMETRY-03-QREP1-IMPLFIX1/FINAL-OUTCOMES.csv": {
+      "bytes": 4570,
+      "sha256": "468225839dc7abca4697902ee684af4d6ec119fa9b3cad2478a50e4947e128c5"
+    },
+    "runs/F4-SYMMETRY-03-QREP1-IMPLFIX1/FIT-MANIFEST.csv": {
+      "bytes": 9622,
+      "sha256": "df61e78119c3273b3333c3a6f1f01ebb659b57338ebb0981a15d6f77b40b5f27"
+    },
+    "runs/F4-SYMMETRY-03-QREP1-IMPLFIX1/FIT-PREPARATION-RECEIPT.json": {
+      "bytes": 10087,
+      "sha256": "aa2d595e7fb0550cfff5f74d38428a1b44e1bc2ba104ac282fc6c3763339c6fd"
+    },
+    "runs/F4-SYMMETRY-03-QREP1-IMPLFIX1/INTEGRITY-RECEIPT.json": {
+      "bytes": 5096,
+      "sha256": "8fee402e324a7bf79058f0db0da9f261db5adf28943428902efd40341a7beb86"
+    },
+    "runs/F4-SYMMETRY-03-QREP1-IMPLFIX1/NATIVE-COLLECTION-RECEIPT.json": {
+      "bytes": 32607,
+      "sha256": "950d770e09da362464237af7cb245d937548e0a2b0b5b6b3e233c3550f4ac187"
+    },
+    "runs/F4-SYMMETRY-03-QREP1-IMPLFIX1/PRE-FIT-GATES.json": {
+      "bytes": 10166,
+      "sha256": "f0abadfc79ef3c67ad8e3c835635da4d8d14f046c594638b72aee97294762705"
+    },
+    "runs/F4-SYMMETRY-03-QREP1-IMPLFIX1/PREDICTION-LOCK.json": {
+      "bytes": 4916,
+      "sha256": "f6c1ffd955dc73d83fd57bb64c3eea26b63fee1871d60fc767b6545abf092aea"
+    },
+    "runs/F4-SYMMETRY-03-QREP1-IMPLFIX1/PREEXECUTION-SEAL.json": {
+      "bytes": 1177,
+      "sha256": "36516740522acb0a8ba4e9dc31f0d48395e3357a79e07230c4fa58db63254f24"
+    },
+    "runs/F4-SYMMETRY-03-QREP1-IMPLFIX1/RESULTS.md": {
+      "bytes": 1898,
+      "sha256": "3d56207001a580899c9a3a89cfa0859a65acd88f67167f04b6f85d53e63444dd"
+    },
+    "runs/F4-SYMMETRY-03-QREP1-IMPLFIX1/SOURCE-INPUT-MANIFEST.json": {
+      "bytes": 13588,
+      "sha256": "f91be0db9088ae76751b989e5083505d6625487a76154a62cbeddc2c275573b6"
+    },
+    "runs/F4-SYMMETRY-03-QREP1/PREFIT-STOP-RECEIPT.json": {
+      "bytes": 627,
+      "sha256": "5f898b25186bff69e004d046531e1a6fede58c54efff7971b44f18f6b1d15379"
+    },
+    "runs/f4-symmetry-03-structural-screen/STRUCTURAL-SCREEN.json": {
+      "bytes": 55636,
+      "sha256": "55fed118e2b6442839a3bed9334b405590026b31882f1c3c39673baa46d46f4b"
+    },
+    "runs/f4-symmetry-03-structural-screen/TASK-BANK-MANIFEST.json": {
+      "bytes": 4388,
+      "sha256": "96217b4193964ee98ed9c9e2e3b6f7a2fc0422c20368bb103e71a3d279634e70"
+    },
+    "runs/f4-symmetry-03-structural-screen/TASK-BANK-RECEIPT.json": {
+      "bytes": 667,
+      "sha256": "c60df106038f4ac8b9bb5b3ca24881dce5c1500da2811c0303b58a840860a8e1"
+    },
+    "runs/f4-symmetry-03-structural-screen/training.json": {
+      "bytes": 13027663,
+      "sha256": "f91dac177eb5547fd2fb518a55b6156701f1ec3d5c876f3527cfa882f918a04e"
+    }
+  },
+  "contract_sha256": "7c49b8419896dca4418de3497ecd8566b2167d1c6bf24d7860d904d70f87afe0",
+  "disposition": {
+    "PHENO": "UNCHANGED",
+    "biological_promotion": false,
+    "controller_or_REACH04": "NOT_OPENED",
+    "cross_block_0011_support": "NOT_SUPPORTED",
+    "current_0011_anchored_canonicalization_hypothesis": "CLOSED_PER_CONTRACT",
+    "measured_REACH03": "REMAINS_CLOSED_AND_UNAUTHORIZED",
+    "new_representation_branch": "NOT_OPENED"
+  },
+  "execution_integrity": {
+    "actual_fits": 16,
+    "actual_prediction_streams": 16,
+    "common_Ustar_rows": 16342,
+    "empty_Ustar_blocks": [
+      304005
+    ],
+    "expected_fits": 16,
+    "expected_prediction_streams": 16,
+    "fit_receipt_count": 16,
+    "fit_update_count_total": 24000,
+    "heldout_truth_opened_after_integrity": true,
+    "missing_duplicate_extra_nonfinite_counts": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "paired_initialization": "PASS",
+    "status": "PASS"
+  },
+  "lineage": {
+    "RUN4_or_SYMMETRY02_outcome_slicing_performed": false,
+    "amendment_status": "IMPLEMENTATION_CLARIFICATION_NO_SCIENCE_CHANGE",
+    "corrected_identity": "F4-SYMMETRY-03-QREP1-IMPLFIX1",
+    "implementation_amendment": "EMPTY-U-STAR-BLOCK-IMPLEMENTATION-AMENDMENT-v0.1",
+    "initial_identity": "F4-SYMMETRY-03-QREP1",
+    "initial_identity_created_no_fits_or_predictions": true,
+    "initial_identity_disposition": "STOP_IMPLEMENTATION_GAP_BEFORE_FIT",
+    "native_data_reused_byte_identically": true,
+    "tasks_or_native_trajectories_regenerated": false,
+    "transfer_receipt_sha256": "5103799cc8509120346ac0b860e5983f9063cdcb55915e920e3bd6a623db74f7"
+  },
+  "parent_receipt_hashes": {
+    "analysis_file_sha256": "320ad945401889abe4de9a2c44b075399ca07a646c810e56c133ca0e57b8a959",
+    "analysis_receipt_file_sha256": "d6ed1f34d801520ae831017ff6210b6c5738eed21e606506ef1e36258aeb5d60",
+    "integrity_embedded_sha256": "8fee402e324a7bf79058f0db0da9f261db5adf28943428902efd40341a7beb86",
+    "integrity_receipt_file_sha256": "8fee402e324a7bf79058f0db0da9f261db5adf28943428902efd40341a7beb86",
+    "outcomes_file_sha256": "468225839dc7abca4697902ee684af4d6ec119fa9b3cad2478a50e4947e128c5",
+    "preexecution_seal_file_sha256": "36516740522acb0a8ba4e9dc31f0d48395e3357a79e07230c4fa58db63254f24",
+    "results_file_sha256": "3d56207001a580899c9a3a89cfa0859a65acd88f67167f04b6f85d53e63444dd",
+    "source_manifest_canonical_sha256": "3533208db71f8d031d39a7ff08c277c18b1054ad7f8b47bf7363e862a231b63c",
+    "source_manifest_file_sha256": "f91be0db9088ae76751b989e5083505d6625487a76154a62cbeddc2c275573b6"
+  },
+  "qualification_only": true,
+  "results": {
+    "blockwise_balanced_error_comparison": [
+      {
+        "block_id": 304000,
+        "error_C": 0.22685701915110693,
+        "error_D": 0.0,
+        "error_D_minus_C": -0.22685701915110693
+      },
+      {
+        "block_id": 304001,
+        "error_C": 0.09381413489410745,
+        "error_D": 0.0,
+        "error_D_minus_C": -0.09381413489410745
+      },
+      {
+        "block_id": 304003,
+        "error_C": 0.1773770605475056,
+        "error_D": 0.09076693224213304,
+        "error_D_minus_C": -0.08661012830537256
+      },
+      {
+        "block_id": 304004,
+        "error_C": 0.4897622084408389,
+        "error_D": 0.006817272780648817,
+        "error_D_minus_C": -0.4829449356601901
+      },
+      {
+        "block_id": 304006,
+        "error_C": 0.19952045391236073,
+        "error_D": 0.05733416301237195,
+        "error_D_minus_C": -0.14218629089998877
+      },
+      {
+        "block_id": 304007,
+        "error_C": 0.4867226886647648,
+        "error_D": 0.20613107822410148,
+        "error_D_minus_C": -0.28059161044066333
+      }
+    ],
+    "cross_block_0011_rule": {
+      "positive_count": 1,
+      "positive_delta_psi_blocks": [
+        304006
+      ],
+      "required_count": 6,
+      "status": "NOT_SUPPORTED",
+      "structurally_supported_blocks": [
+        304000,
+        304001,
+        304002,
+        304003,
+        304004,
+        304005,
+        304006,
+        304007
+      ]
+    },
+    "interpretation": "D improved pooled and all six two-class blockwise balanced-error results in this structurally selected qualification set. The named 0011 replication rule is not supported (1/8 positive); 0101 has no scored U-star rows, so the planned 0011-versus-0101 interaction is undefined. Treat the broad C/D result as qualification evidence and the RUN4-derived regime-specific hypothesis as not replicated.",
+    "leverage_concentration": {
+      "effective_sample_size": 312.81859604398636,
+      "leverage_total": 3.8025807090150088,
+      "top_1pct_share": 0.6091153677316522,
+      "top_20pct_share": 0.9988189058991617,
+      "top_5pct_share": 0.9357879140290993
+    },
+    "pattern_interaction_status": "UNDEFINED_NO_SCORED_0101_ROWS",
+    "pattern_interaction_values": [
+      {
+        "block": 304000,
+        "delta_psi_0011": null,
+        "delta_psi_0101": null,
+        "interaction_0011_minus_0101": null
+      },
+      {
+        "block": 304001,
+        "delta_psi_0011": null,
+        "delta_psi_0101": null,
+        "interaction_0011_minus_0101": null
+      },
+      {
+        "block": 304002,
+        "delta_psi_0011": null,
+        "delta_psi_0101": null,
+        "interaction_0011_minus_0101": null
+      },
+      {
+        "block": 304003,
+        "delta_psi_0011": null,
+        "delta_psi_0101": null,
+        "interaction_0011_minus_0101": null
+      },
+      {
+        "block": 304004,
+        "delta_psi_0011": null,
+        "delta_psi_0101": null,
+        "interaction_0011_minus_0101": null
+      },
+      {
+        "block": 304005,
+        "delta_psi_0011": null,
+        "delta_psi_0101": null,
+        "interaction_0011_minus_0101": null
+      },
+      {
+        "block": 304006,
+        "delta_psi_0011": 0.004921434318552298,
+        "delta_psi_0101": null,
+        "interaction_0011_minus_0101": null
+      },
+      {
+        "block": 304007,
+        "delta_psi_0011": null,
+        "delta_psi_0101": null,
+        "interaction_0011_minus_0101": null
+      }
+    ],
+    "pattern_scored_support": {
+      "0001": {
+        "Ustar_rows": 3987,
+        "blocks_with_defined_D_minus_C_Psi": 4,
+        "blocks_with_scored_rows": [
+          304000,
+          304003,
+          304004,
+          304007
+        ]
+      },
+      "0011": {
+        "Ustar_rows": 914,
+        "blocks_with_defined_D_minus_C_Psi": 1,
+        "blocks_with_scored_rows": [
+          304006
+        ]
+      },
+      "0100": {
+        "Ustar_rows": 1026,
+        "blocks_with_defined_D_minus_C_Psi": 3,
+        "blocks_with_scored_rows": [
+          304001,
+          304003,
+          304006
+        ]
+      },
+      "0101": {
+        "Ustar_rows": 0,
+        "blocks_with_defined_D_minus_C_Psi": 0,
+        "blocks_with_scored_rows": []
+      }
+    },
+    "pooled_DeltaPsi_D_minus_C": 0.15272738670747854,
+    "pooled_Psi_C": 0.7307531837069448,
+    "pooled_Psi_D": 0.8834805704144233,
+    "pooled_balanced_error_C": 0.3440403168469592,
+    "pooled_balanced_error_D": 0.07676804476014497,
+    "pooled_error_D_minus_C": -0.2672722720868142,
+    "pooled_eta_del_C": 0.13021635632765818,
+    "pooled_eta_del_D": 0.17575512407112223,
+    "pooled_rows": 16342,
+    "pooled_signed_margin_C": 2.2528568483848224,
+    "pooled_signed_margin_D": 5.18197681583994
+  },
+  "run_id": "F4-SYMMETRY-03-QREP1-IMPLFIX1",
+  "schema": "F4-SYMMETRY-03-terminal-receipt-v1",
+  "status": "CLOSED_QUALIFICATION_REPLICATION_0011_RULE_NOT_SUPPORTED",
+  "task_selection": {
+    "accepted_blocks": [
+      304000,
+      304001,
+      304002,
+      304003,
+      304004,
+      304005,
+      304006,
+      304007
+    ],
+    "note": "The structural gate counted cue-incidence in the fixed coordinate sample only; it did not guarantee common U-star rows after native trajectory and target filters.",
+    "screen_status": "PASS",
+    "screened_before_target_or_outcome_access": true,
+    "structural_gate_passed": true,
+    "structural_support_by_named_pattern": {
+      "0001": {
+        "blocks_with_pattern": 8,
+        "per_block_sampled_coordinate_count": {
+          "304000": 47,
+          "304001": 45,
+          "304002": 72,
+          "304003": 36,
+          "304004": 48,
+          "304005": 47,
+          "304006": 42,
+          "304007": 46
+        },
+        "required_blocks": 6
+      },
+      "0011": {
+        "blocks_with_pattern": 8,
+        "per_block_sampled_coordinate_count": {
+          "304000": 3,
+          "304001": 2,
+          "304002": 5,
+          "304003": 2,
+          "304004": 7,
+          "304005": 4,
+          "304006": 7,
+          "304007": 2
+        },
+        "required_blocks": 6
+      },
+      "0100": {
+        "blocks_with_pattern": 8,
+        "per_block_sampled_coordinate_count": {
+          "304000": 37,
+          "304001": 42,
+          "304002": 40,
+          "304003": 45,
+          "304004": 41,
+          "304005": 46,
+          "304006": 38,
+          "304007": 39
+        },
+        "required_blocks": 6
+      },
+      "0101": {
+        "blocks_with_pattern": 7,
+        "per_block_sampled_coordinate_count": {
+          "304000": 3,
+          "304001": 5,
+          "304002": 2,
+          "304003": 1,
+          "304004": 0,
+          "304005": 7,
+          "304006": 5,
+          "304007": 4
+        },
+        "required_blocks": 6
+      }
+    }
+  }
+}

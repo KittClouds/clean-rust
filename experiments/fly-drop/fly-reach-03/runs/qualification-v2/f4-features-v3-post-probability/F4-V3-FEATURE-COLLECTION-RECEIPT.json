@@ -1,0 +1,15 @@
+{
+  "added_channels": [
+    "sim.action_sign[coordinate.post]",
+    "cue_post_probability for each cue"
+  ],
+  "feature_identity": "f4-features-v3-post-probability",
+  "feature_width": 85,
+  "measured_namespace_created": false,
+  "native_simulator_mutated": false,
+  "reference_blind": true,
+  "rows": 13420,
+  "run_id": "qualification-v2",
+  "schema": "FLY-REACH-03-f4-feature-v3-collection-receipt-v1",
+  "status": "COLLECTION_COMPLETE"
+}

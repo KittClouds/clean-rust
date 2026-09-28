@@ -1,0 +1,20 @@
+{
+  "observe": true,
+  "seeds": [5000,5001,5002,5003,5004,5005,5006,5007,5008,5009,5010,5011,5012,5013,5014,5015,5016,5017,5018,5019,5020,5021,5022,5023],
+  "taus": [4.0,16.0],
+  "sides": ["R","L"],
+  "conditions": ["immediate","quiet","eligibility_retained","eligibility_suppressed"],
+  "arms": ["E","Z"],
+  "cues": 16,
+  "delay_steps": 12,
+  "trials": 512,
+  "eta": 0.05,
+  "glut_sign": -1.0,
+  "input_salt": 858980352,
+  "threads": 4,
+  "primary_side": "R",
+  "primary_arm": "E",
+  "primary_checkpoints": [0,16,32,64,128,256],
+  "bootstrap_seed": 2026091205,
+  "bootstrap_resamples": 20000
+}

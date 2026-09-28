@@ -1,0 +1,79 @@
+{
+  "schema": "jev-v08p-r2-panel-materialization-manifest-v01",
+  "identity": "v0.8P-R2-late-transition-localization-v01",
+  "status": "PANEL_CONSTRUCTED_AND_FIVE_FIELD_AUDIT_PASS",
+  "contract_sha256": "51cd8dee09688f1aa24ff575fa0a181d50b2a6ffc94dc6b7e7ed5b61c58ef14",
+  "panel_root": "D:/codex-runs/jev-information-density-v08p-r2/v0.8P-R2/panel",
+  "admission": {
+    "namespace": "eval_v08p_r2",
+    "seed_u32": 1648220319,
+    "candidate_ordinals_per_family": "ascending 0..699; fixed stream",
+    "admitted_per_family": 500,
+    "consumed_by_family": {
+      "exposure_control": 503,
+      "respiratory_monitoring": 505,
+      "salinity_control": 503,
+      "vibration_monitoring": 504
+    },
+    "rejected_by_family": {
+      "exposure_control": 3,
+      "respiratory_monitoring": 5,
+      "salinity_control": 3,
+      "vibration_monitoring": 4
+    },
+    "total_admitted": 2000,
+    "total_occurrences": 22000,
+    "admission_receipt_sha256": "3f87a5af6ce80d1d4f7f45d50e4381aff867053e4aa27a3a5064af68e265ba95",
+    "admission_log_sha256": "16ebea3f2d6740287841e5e4749d58d8497066d1b10da0e26d28d9582005b8a8",
+    "candidate_text_manifest_sha256": "2111eeedba30408863dd98c91ececf6a011a48f93b7c8266b8561aa0a958b8be"
+  },
+  "construction_outputs": [
+    {"name":"panel-canonical-episodes.jsonl","bytes":223382544,"rows":22000,"sha256":"9eef39a0f3967f06016b2a67c7b6699c66594236751ac8f07b7d69de83bfeae0"},
+    {"name":"panel-exact-world-episodes.jsonl","bytes":87532523,"rows":22000,"sha256":"7b93a6d90d65b20997454c995010bffc231620f4d10d63add9d98c5f71f78463"},
+    {"name":"panel-contrast-certificates.jsonl","bytes":8438093,"rows":2000,"sha256":"249dbf2a1990a8a7c71e3171fbc2255cb2658368f62e77ecab6797da632c5277"},
+    {"name":"panel-feature-scope.jsonl","bytes":14945050,"rows":22000,"sha256":"e8f36c8537e6b24c54baf205762ce1d915eeb91aa35786164ff820b778067853"},
+    {"name":"panel-neighborhoods.jsonl","bytes":642560,"rows":2000,"sha256":"8f274aade4afc9f943df88e8248c0b9a867b63878ad3bb7df120a00eb6be32df"},
+    {"name":"panel-occurrence-identities.jsonl","bytes":14527160,"rows":22000,"sha256":"08ba6f9676ad6ec816a946f9bb1be37086c7401d7e1c4413f8c09ffe1e6b7573"}
+  ],
+  "candidate_basis": {"rows":16,"source":"frozen family specifications","hash_sha256":"2111eeedba30408863dd98c91ececf6a011a48f93b7c8266b8561aa0a958b8be","training_catalog_overlap":0},
+  "exclusion_sets": {
+    "sha256":"b73d27013d316850a2ea48ac5bd44ddc99c1bfeb4f33a4669e68c6e89bbcf50d",
+    "receipt_sha256":"1a46749247bca36cea4232751f88666219dd5e7a687214e01badc6ed1edf29c8",
+    "training_rows":55000,
+    "prior_panel_rows":22000,
+    "e1_neighborhood_hashes":2000
+  },
+  "independent_final_audit": {
+    "path":"D:/codex-runs/jev-information-density-v08p-r2/v0.8P-R2/panel-audit/r2-final-panel-audit.json",
+    "sha256":"328650b3fd638bdf7eb147351e6c897abe8b36899b05af35ef5aa925851c5e89",
+    "status":"R2_FRESH_PANEL_FINAL_AUDIT_PASS",
+    "neighborhoods":2000,
+    "occurrences":22000,
+    "family_allocation_pass":true,
+    "training_intersections":0,
+    "prior_panel_intersections":0,
+    "internal_r2_cross_neighborhood_intersections":0,
+    "e1_neighborhood_id_collisions":0,
+    "online_admission_keys_equal_final_panel":true
+  },
+  "semantic_validation": {
+    "all_consumed_candidates_exact_world_validated_before_admission":true,
+    "all_admitted_neighborhoods_passed_11_role_and_single_edit_gates":true,
+    "fact_flip_exact_map_changes":true,
+    "sham_and_neutral_targets_preserved_within_1e-12":true,
+    "templates":"p0-p3 via frozen ordinal modulo 4",
+    "matching_and_radius_gate":"pending frozen LFM feature extraction"
+  },
+  "boundary": {
+    "r1_failed_panel_used":false,
+    "e1_panel_body_or_semantics_read":false,
+    "lfm_loaded":false,
+    "feature_extraction":false,
+    "head_loading":false,
+    "training":false,
+    "inference":false,
+    "evaluation":false,
+    "newtight":false,
+    "phoenix":false
+  }
+}

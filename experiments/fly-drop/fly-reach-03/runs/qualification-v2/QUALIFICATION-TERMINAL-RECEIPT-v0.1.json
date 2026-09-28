@@ -1,0 +1,94 @@
+{
+  "artifacts": {
+    "collection": {
+      "bytes": 615,
+      "path": "runs/qualification-v2/QUALIFICATION-COLLECTION-RECEIPT.json",
+      "sha256": "c8b48fa76acf6e3b25a57c02172e9246a1ec409e0d94aa2be1720207e07c4cfc"
+    },
+    "estimators": {
+      "bytes": 9116,
+      "path": "runs/qualification-v2/QUALIFICATION-ESTIMATOR-RECEIPT.json",
+      "sha256": "02d352ae6ab59dbf15a3359af9a3c41cb4ed58204e7606d552462ad8ef165a82"
+    },
+    "f4": {
+      "bytes": 417,
+      "path": "runs/qualification-v2/F4-RECONSTRUCTION-RECEIPT.json",
+      "sha256": "ceb58f3e593d2ad44133f1311886cbcddbc3123c277561a94cb2676989351a31"
+    },
+    "prep": {
+      "bytes": 737,
+      "path": "artifacts/preimplementation/QUALIFICATION-PREPARATION-RECEIPT.json",
+      "sha256": "de068755c06ccc33372bf5f89cd49e21b2853debe57536a68e0fd485a17115dc"
+    },
+    "qualification_contract": {
+      "bytes": 2209,
+      "path": "manifests/QUALIFICATION-CONTRACT-v0.1.json",
+      "sha256": "0e1b60f486ddc4b05ba43eb0ba28edeada4fd4c7d1b5b49c657ba4d23c3ed9e3"
+    },
+    "summary": {
+      "bytes": 117622,
+      "path": "runs/qualification-v2/QUALIFICATION-SUMMARY.json",
+      "sha256": "a03f194fa82f0423b9624c65a785ad701d971294c443f1c4f5a4a553f93dc3fd"
+    },
+    "v1_nonpromotable": {
+      "bytes": 499,
+      "path": "artifacts/qualification-v1/QUALIFICATION-V1-NONPROMOTABLE-RECEIPT.json",
+      "sha256": "d3620a761a07a3628cad4342e5c5f8c9e9689f6a29e6e028b9ee893dc924947f"
+    }
+  },
+  "biological_promotion": false,
+  "collection": {
+    "cells": 72,
+    "expected_rows": 37748736,
+    "f4_checkpoint_digests": 432,
+    "rows": 37748736,
+    "trials": 589824
+  },
+  "estimator_calibration": {
+    "cumulative_filtrations": true,
+    "f4_exact_reconstruction": "PASS; Omega(F4)=1 invariant audited separately",
+    "f4_learned_calibration": "NOT_RUN; v0.1 freezes no practical F4 encoder",
+    "levels": [
+      "F0",
+      "F1",
+      "F2",
+      "F3A",
+      "F3B"
+    ],
+    "rows_used": 13420,
+    "status": "STOP_F4_LEARNED_ENCODER_REQUIRED"
+  },
+  "measured_execution_authorized": false,
+  "measured_namespace_created": false,
+  "nonpromotable_history": "qualification-v1 omitted terminal F4 checkpoint 8192 and is preserved separately",
+  "phase_gates": {
+    "gate_0_authority": "PASS_HISTORICAL_PRECREATION_AUDIT",
+    "gate_1_contract_roundtrip": "PASS",
+    "gate_2_collector_fixture": "PASS",
+    "gate_3_f4_reconstruction_fixture": "PASS",
+    "gate_4_constant_baseline": {
+      "balanced_error": 0.5,
+      "omega_hat": 0.0
+    },
+    "gate_4_f0_f3b_calibration": "COMPLETE",
+    "gate_4_f4_replay": "PASS",
+    "gate_4_learned_f4_calibration": "NOT_RUN",
+    "gate_4_qualification_collection": "PASS"
+  },
+  "qualification_population": {
+    "ipw_finite_positive": true,
+    "negative_rows": 2308389,
+    "nonzero_target_rows": 4199713,
+    "positive_rows": 1891324,
+    "primary_support_rows": 13760767,
+    "rows": 37748736,
+    "same_rows_all_filtrations": true,
+    "zero_target_rows": 33549023
+  },
+  "required_next_amendment": "freeze a deterministic learned F4 encoder, add its schema and feature-generation hash, rerun qualification calibration, then reassess measured sealing",
+  "run_id": "qualification-v2",
+  "schema": "FLY-REACH-03-qualification-terminal-receipt-v1",
+  "scientific_interpretation_opened": false,
+  "status": "QUALIFICATION_STOP_F4_ENCODER_REQUIRED",
+  "study_id": "FLY-REACH-03"
+}

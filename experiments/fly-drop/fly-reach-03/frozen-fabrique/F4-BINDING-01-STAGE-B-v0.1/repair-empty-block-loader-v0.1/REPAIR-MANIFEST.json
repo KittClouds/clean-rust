@@ -1,0 +1,123 @@
+{
+  "biological_promotion": false,
+  "identity": "F4-BINDING-01-STAGE-B-EMPTY-BLOCK-REPAIR-v0.1",
+  "immutable_inputs": [
+    {
+      "byte_length": 36345,
+      "path": "experiments/fly-reach-03/frozen-fabrique/F4-BINDING-01-STAGE-B-v0.1/IMPLEMENTATION-FREEZE.json",
+      "sha256": "9469ac8b9ef7e0db530ec2febae15cf17677bd58c476886593b12e5a8d0da37b"
+    },
+    {
+      "byte_length": 44290,
+      "path": "experiments/fly-reach-03/frozen-fabrique/F4-BINDING-01-STAGE-B-v0.1/MODEL-REGISTRY.json",
+      "sha256": "8d936560fdf442e69e724f5bdf2898fad3a3b624f116ac385aca8a5b7d637713"
+    },
+    {
+      "byte_length": 14928,
+      "path": "experiments/fly-reach-03/frozen-fabrique/F4-BINDING-01-STAGE-B-v0.1/SOURCE-INPUT-MANIFEST.json",
+      "sha256": "461a959b099ad7cb555d6cfa5dfdc66c191f3ffcdadc79f874801abe36079752"
+    },
+    {
+      "byte_length": 29536,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/task-bank/TASK-SEED-MANIFEST.json",
+      "sha256": "42469f7872f8362456e6988e4f07453e211adae609f1bc393eadd5fe1ebe8ec3"
+    },
+    {
+      "byte_length": 397,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/task-bank/TASK-SEED-RECEIPT.json",
+      "sha256": "3f6c53d117456e870530702d7c5168f58526141f4a23575ad68b6fa4244e5253"
+    },
+    {
+      "byte_length": 16851,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/task-bank/TASK-BANK-MANIFEST.json",
+      "sha256": "9ed34090f909292cb67cd2ea59c6d43d2bf53899511284e08977dda7111e3bdd"
+    },
+    {
+      "byte_length": 464,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/task-bank/TASK-BANK-RECEIPT.json",
+      "sha256": "97277521a8e8ec9df2886326d9e4fce0f2b95010c4e2ba3dc02ed0c2178efbb3"
+    },
+    {
+      "byte_length": 39084919,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/task-bank/training.json",
+      "sha256": "8cac76b0618caaecca501e308eb9ffffe26d30c3980037385562fb53ed7c8188"
+    },
+    {
+      "byte_length": 15937916,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/native-collection/RAW-PREDICTORS.bin",
+      "sha256": "e3084483f7438298abe14bc09a16d243f9aa68c2622fa62e59d94d048c5817e8"
+    },
+    {
+      "byte_length": 1817510,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/native-collection/RAW-SCORING-TRUTH.bin",
+      "sha256": "3e382caa8bfc5b993cc0c4ec10fdf2d54e40bb3b912c6c9f670f004c794c099a"
+    },
+    {
+      "byte_length": 96562,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/native-collection/NATIVE-COLLECTION-RECEIPT.json",
+      "sha256": "394b2a5bc662dc96e884113f52bba5891667d3743d643053c4809ec230b19a1b"
+    },
+    {
+      "byte_length": 57230,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/COLLECTION-INTEGRITY-RECEIPT.json",
+      "sha256": "62ca3409dbeb6adfd401bf8dfaf3564eeeeb469b10257413e9270b155aea5a34"
+    },
+    {
+      "byte_length": 3371,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/INFERENCE-START-STOP-RECEIPT.json",
+      "sha256": "33a0cb7e32dd8ac6ce9d941e16ae2444fbcc233ab220052b6ee544f2e46adeb8"
+    }
+  ],
+  "measured_reach03_authorized": false,
+  "metrics_or_support_rules_changed": false,
+  "models_refit": false,
+  "native_collection_repeated": false,
+  "original_implementation_freeze_sha256": "9469ac8b9ef7e0db530ec2febae15cf17677bd58c476886593b12e5a8d0da37b",
+  "original_inference_stop_receipt_path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/INFERENCE-START-STOP-RECEIPT.json",
+  "original_inference_stop_receipt_sha256": "33a0cb7e32dd8ac6ce9d941e16ae2444fbcc233ab220052b6ee544f2e46adeb8",
+  "original_source_input_manifest_sha256": "461a959b099ad7cb555d6cfa5dfdc66c191f3ffcdadc79f874801abe36079752",
+  "pheno_status": "unchanged",
+  "prediction_outputs_existed_at_repair_freeze": false,
+  "repair_scope": "Only permit absence of an expected block ID when that block has zero U* rows; retain rejection of out-of-domain block IDs.",
+  "repair_sources": [
+    {
+      "byte_length": 2911,
+      "path": "experiments/fly-reach-03/frozen-fabrique/F4-BINDING-01-STAGE-B-v0.1/repair-empty-block-loader-v0.1/binding_stage_b_empty_block_loader.py",
+      "sha256": "cb77adc89bb95038c51272c3d6e7a5922518ad0d50a4349fe399f6b15c45f94d"
+    },
+    {
+      "byte_length": 2442,
+      "path": "experiments/fly-reach-03/frozen-fabrique/F4-BINDING-01-STAGE-B-v0.1/repair-empty-block-loader-v0.1/repair_common.py",
+      "sha256": "b41a75dcdf969542e9bd059a175cad5cef079327f31e49b85bedc8659d39c007"
+    },
+    {
+      "byte_length": 4700,
+      "path": "experiments/fly-reach-03/frozen-fabrique/F4-BINDING-01-STAGE-B-v0.1/repair-empty-block-loader-v0.1/prepare_empty_block_repair.py",
+      "sha256": "af53840d5a3451630136e5e163ea1430d970968d1c2364105671b6d5e464b5d9"
+    },
+    {
+      "byte_length": 2896,
+      "path": "experiments/fly-reach-03/frozen-fabrique/F4-BINDING-01-STAGE-B-v0.1/repair-empty-block-loader-v0.1/run_stage_b_inference_repair.py",
+      "sha256": "c0da33c618698134b2820c5fc721a87d5132e2f0fc5a2f3fe0c53db4f8921f6c"
+    },
+    {
+      "byte_length": 2918,
+      "path": "experiments/fly-reach-03/frozen-fabrique/F4-BINDING-01-STAGE-B-v0.1/repair-empty-block-loader-v0.1/verify_stage_b_integrity_repair.py",
+      "sha256": "068f526482d8b37f4c13e3de5a19f4cc5ba409cf6e93e33b6844893988aaf395"
+    },
+    {
+      "byte_length": 2532,
+      "path": "experiments/fly-reach-03/frozen-fabrique/F4-BINDING-01-STAGE-B-v0.1/repair-empty-block-loader-v0.1/analyze_stage_b_repair.py",
+      "sha256": "ea713d27530584e8458f304c5679872218bb3a91d027764c54f51531d176d3ad"
+    },
+    {
+      "byte_length": 1749,
+      "path": "experiments/fly-reach-03/frozen-fabrique/F4-BINDING-01-STAGE-B-v0.1/repair-empty-block-loader-v0.1/test_empty_block_loader.py",
+      "sha256": "b1d72dcf5ff5cd6f0bee846997f2af88184cdb24b2239fbc60f2a6baac82d7bb"
+    }
+  ],
+  "schema": "F4-BINDING-01-stage-b-empty-block-repair-manifest-v0.1",
+  "status": "PASS",
+  "task_regenerated": false,
+  "truth_values_opened": false
+}

@@ -1,0 +1,5 @@
+dataset_index,initialization_index,stream_seed,method,n_states,within_stratum_utility_variance,predicted_finite_population_rmse,observed_panel_rmse,sign_error_rate,cross_block_regret,selected_program_regret,false_authorization_rate
+,,,development_response_oracle,54,2.897015122368e-5,5.135315528714e-4,5.135769817961e-4,0.299087832,4.813238707954e-4,5.520929335121e-4,0.172743056
+,,,evaluation_state_response_comparator,54,2.670515791730e-5,4.884809378596e-4,4.895539724659e-4,0.290984393,4.669914279840e-4,5.360840707978e-4,0.160300926
+,,,gradient_full171,54,2.719962101225e-5,4.930030945578e-4,4.925053675354e-4,0.289811649,4.637715198016e-4,5.337744305241e-4,0.163773148
+,,,hash_placebo_mean,54,3.531999448068e-5,5.770532858641e-4,5.774848181163e-4,0.316902726,5.041513043757e-4,5.886073304722e-4,0.195782697

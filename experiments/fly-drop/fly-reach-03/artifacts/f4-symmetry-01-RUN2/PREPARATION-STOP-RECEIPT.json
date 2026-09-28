@@ -1,0 +1,7 @@
+{
+  "first_mismatch": "RuntimeError: FIT-MANIFEST row order mismatch",
+  "measured_namespace_created": false,
+  "phase": "prepare",
+  "schema": "F4-SYMMETRY-01-stop-receipt-v1",
+  "status": "STOP"
+}

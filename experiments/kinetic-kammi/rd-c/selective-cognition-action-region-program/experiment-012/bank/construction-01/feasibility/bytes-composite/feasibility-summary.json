@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "state": "OFFLINE_FEASIBILITY_ONLY",
+  "model_contact_authorized": false,
+  "family": "composite-frame-field",
+  "candidate_ids_hidden_role_map": {
+    "header_big_endian": 22115,
+    "header_little_endian": 28666,
+    "payload_big_endian": 51145,
+    "payload_little_endian": 62972
+  },
+  "baseline_pass_by_case": {
+    "case-01": false,
+    "case-02": false,
+    "case-03": false,
+    "case-04": false
+  },
+  "candidate_pass_matrix_hidden_roles": {
+    "header_big_endian": {
+      "case-01": true,
+      "case-02": false,
+      "case-03": false,
+      "case-04": false
+    },
+    "header_little_endian": {
+      "case-01": false,
+      "case-02": true,
+      "case-03": false,
+      "case-04": false
+    },
+    "payload_big_endian": {
+      "case-01": false,
+      "case-02": false,
+      "case-03": true,
+      "case-04": false
+    },
+    "payload_little_endian": {
+      "case-01": false,
+      "case-02": false,
+      "case-03": false,
+      "case-04": true
+    }
+  },
+  "code_sha256": {
+    "base": "477f4610a38ab141c051c3e6b78619cec523d1a9bd51486ce54b3c39c1019a16",
+    "header_big_endian": "405ea0849fc1d891eaef7f8ea8c8d20980cc0abf3b9bfdfa96440e0e9fcfe840",
+    "header_little_endian": "29aede04dbf2d9d258ab1125c5f13eaa33df57eb6126059d79ac446195fde6f4",
+    "payload_big_endian": "8c7ad97763d7784fa56ff4728e717926155d4558fcbe5ef61e6ab9fd4a6476a3",
+    "payload_little_endian": "84713d4c2be6a6bfa1ed5cb9f87d2343f63425d24a203e1ccc4244b9b85a97fa"
+  },
+  "intended_positive_sets": {
+    "case-01": [
+      "header_big_endian"
+    ],
+    "case-02": [
+      "header_little_endian"
+    ],
+    "case-03": [
+      "payload_big_endian"
+    ],
+    "case-04": [
+      "payload_little_endian"
+    ]
+  },
+  "joint_factorial": {
+    "case-01": {
+      "request": 0,
+      "execution": 0
+    },
+    "case-02": {
+      "request": 0,
+      "execution": 1
+    },
+    "case-03": {
+      "request": 1,
+      "execution": 0
+    },
+    "case-04": {
+      "request": 1,
+      "execution": 1
+    }
+  }
+}

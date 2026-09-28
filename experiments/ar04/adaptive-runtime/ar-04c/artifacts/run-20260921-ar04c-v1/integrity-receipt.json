@@ -1,0 +1,21 @@
+{
+  "protocol": "AR-04C-sentinel-reuse-2026-09-21",
+  "source_commit": "8ec93debec33935c9389013ea917c3813a4e8242",
+  "optimized_executable_sha256": "16ef71b31aa5f0c547c612cdef613afcdda1b32ec82fac2d0eab80e70b09bcd3",
+  "integrity_valid": true,
+  "cells": 25, "checkpoints": 300, "rotating_panels": 26250,
+  "datasets": 5, "all_role_seeds_unique": true,
+  "derived_output_sha256": [
+    {"path":"dataset-manifest.csv","sha256":"b4d5014e11ae14ebc3d48555632041415d1ebbaad224a18a74daff4bfbe4fe0d"},
+    {"path":"fixed-panel-manifest.csv","sha256":"8052c4800da43224a7da5b4f5bb8dfed572b99ed6968fc92300ede7672845ce2"},
+    {"path":"rotating-panel-manifest.csv","sha256":"c51923518eab059275366318671158606e35d51f64853bc0112e017702afbd83"},
+    {"path":"trajectory-decisions.csv","sha256":"43b962964752e77c064511097ebdbfd9c7e0130ec044aaa1b7e7229b8ef477f9"},
+    {"path":"checkpoint-manifest.csv","sha256":"610758ed8a38f267e42f62913449928fbf69bfefdbab1ce385d990bce7770c89"},
+    {"path":"checkpoint-models.bin","sha256":"3e294b9e7ccc9600691e12e47dce7ebd4bc87b9577711ff9e3ebd7c42f4ca4c7"},
+    {"path":"checkpoint-action-scores.csv","sha256":"7b9f5dccb61aa1e1ed65b66cfd356067ddb7974e955c25c386a653a1d149ec67"},
+    {"path":"ranking-metrics.csv","sha256":"394de8cdf2692db05fb3e7801a04f4e4ecec77aef38825515b04b80ffb187cb7"},
+    {"path":"checkpoint-outcomes.csv","sha256":"33ff3fddf94036b13a29620bebb3c3133e995c6f48fb0f70c2da02f29ec0b735"},
+    {"path":"cell-contrasts.csv","sha256":"66b44999ebc8a80c80219ab6bf24db833864664accca7cf85a7ec138973933db"},
+    {"path":"summary.json","sha256":"675d2a265cff131fe04c8290b06997f686f7411bac0df7ed46f5d57385059c24"}
+  ]
+}

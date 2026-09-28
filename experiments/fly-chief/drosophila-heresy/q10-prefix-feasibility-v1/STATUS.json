@@ -1,0 +1,34 @@
+{
+  "protocol": "Q10-PF1",
+  "status": "Q10_PF1_STAGE1_VALID__RELAXATION_PARTIAL_NO_EXACT_AUTHORIZATION",
+  "stage": "EXECUTION_COMPLETE__INDEPENDENT_REVIEW_VERIFIED",
+  "sample": {
+    "seeds": [9651, 9652],
+    "sides": ["R", "L"],
+    "taus": [4.0, 16.0],
+    "trials": [128],
+    "events": 8,
+    "prefix_steps": 16,
+    "relaxation_passes": 12
+  },
+  "aggregate": {
+    "relaxation_fit_events": 0,
+    "relaxation_partial_events": 8,
+    "final_residual_ratio_min": 0.1787314814,
+    "final_residual_ratio_max": 0.3323557831,
+    "curve_monotonicity_violations": 0,
+    "manifest_violations": 0,
+    "firewall_violations": 0
+  },
+  "firewall": {
+    "scientific_seed_bundles": 0,
+    "behavioral_inference": false,
+    "dh08b_authorized": false,
+    "independent_review": "VERIFIED"
+  },
+  "promotion": {
+    "exact_prefix_search": false,
+    "scientific": false,
+    "reason": "all eight finite-pass convex relaxations remained partial; the fixed relaxation is not a convex infeasibility certificate"
+  }
+}

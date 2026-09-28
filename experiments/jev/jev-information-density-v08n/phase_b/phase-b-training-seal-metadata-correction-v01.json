@@ -1,0 +1,45 @@
+{
+  "protocol": "jev-information-density/v0.8n-road-b-phase-b-training-seal-metadata-correction-v01",
+  "identity": "v0.8N-phase-b-training-seal-metadata-correction-v01",
+  "status": "SUPERSEDING_SEAL_METADATA_CORRECTION",
+  "authorization_event_sha256": "0cad8d2e45fe8e7e5eed7f9bcdeab406926f24605ad9f62396d83f9512bb0a09",
+  "implementation_correction_chain_sha256": [
+    "9b8118109a02c207d749d8344010350f8d79ccf66a452661c680110d0b075cb2",
+    "c1feb348594c9cdcd6404dc37e7125ea20289464dcd7fd4f2d3bd55f48e213c3",
+    "bff01924842eb1f0f91d12dd0d143842076a660852f5d9fadc44c8dada428c32",
+    "aee91c3f9e00440c344dde82c70425fc7bdd1cec1939f0468dcaa38658511aa1",
+    "fbbb22640da31ea83e55ad244c2abe9ccb943d8310115c83f1ce53d74e66119f",
+    "0f610fe31c538e87bcae9feead0532e3f3c8f1009df73344fd487a07d453c145",
+    "4f1bb30ede6703eda2907d3189782aee51472f2353e4d76069903569d17bb101"
+  ],
+  "superseded_training_seal_sha256": "b5e064e9d81be6b8a52f4673b84fdc42d4ea5158ee0d03095546fefdf2c55aa0",
+  "superseded_checkpoint_hash_tree_sha256": "6fd19f29a1400278086a94e0eb12a1daea19aaecd1f6d5cd55d018b197e331a9",
+  "observed_discrepancy": {
+    "detached_tree_entries": 77,
+    "seal_embedded_entries": 84,
+    "detached_tree_duplicate_paths": 0,
+    "seal_duplicate_paths": 7,
+    "duplicate_paths": [
+      "phase-b-implementation-correction-v01.json",
+      "phase-b-implementation-correction-v02.json",
+      "phase-b-implementation-correction-v03.json",
+      "phase-b-implementation-correction-v04.json",
+      "phase-b-implementation-correction-v05.json",
+      "phase-b-implementation-correction-v06.json",
+      "phase-b-implementation-correction-v07.json"
+    ],
+    "cause": "correction writer extended the seal's shared tree-entry list after it had already appended those receipts to the detached tree"
+  },
+  "preservation": {
+    "superseded_manifest_backup": "D:\\codex-runs\\jev-information-density-v08n\\v0.8N-base-v01\\phase-b-run-v01\\failed-attempts\\training-seal-manifest-pre-correction-v01.json",
+    "superseded_tree_backup": "D:\\codex-runs\\jev-information-density-v08n\\v0.8N-base-v01\\phase-b-run-v01\\failed-attempts\\checkpoint-hash-tree-pre-correction-v01.json",
+    "checkpoints_modified": false,
+    "run_artifacts_modified": false,
+    "feature_cache_modified": false,
+    "evaluation_panel_opened": false,
+    "newtight_access": false,
+    "phoenix_access": false
+  },
+  "correction_script": "experiments/jev-information-density-v08n/phase_b/repair_phase_b_seal_metadata_v01.py",
+  "correction_script_sha256": "fc8b6929957f88d6650e6953d3011a96de15d3caeac505deede4846de929e12f"
+}

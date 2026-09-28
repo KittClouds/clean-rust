@@ -1,0 +1,16 @@
+{
+  "schema": "FLY-REACH-03-collector-fixture-receipt-v1",
+  "status": "PASS",
+  "telemetry_on_off_identical": true,
+  "steps": 4,
+  "sampled_coordinates": [
+    0,
+    12177,
+    24354
+  ],
+  "row_count": 12,
+  "snapshot_count": 4,
+  "rows_sha256": "788832fa02cd193fa6115f38a6e663cb18fe064f96b950812a81d884fc7717f1",
+  "snapshots_sha256": "983a15ba56155daa6d0bdc0637e72f4f45d90934c6859d11049f37300470eeae",
+  "source_mapping": "pre_trace=per-trial presynaptic edge spike count; post_trace=post-baseline deviation; native proposal=proposed_delta_into before apply_delta"
+}

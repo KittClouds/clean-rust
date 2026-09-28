@@ -1,0 +1,9 @@
+{
+  "engineering_only": true,
+  "error": "fixed/damaged predicate self-test failed",
+  "error_type": "RuntimeError",
+  "identity": "q10-gc1-lr1-requal1-csc1-vmat1-v5",
+  "protocol": "Q10-CSC1-VMAT1",
+  "scientific_promotion": false,
+  "status": "BLOCKED_CSC1_VMAT1"
+}

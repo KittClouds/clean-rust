@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "state": "OFFLINE_FEASIBILITY_ONLY",
+  "model_contact_authorized": false,
+  "family": "raw-number-lossless",
+  "candidate_ids_hidden_role_map": {
+    "value_reserialize": 38796,
+    "f64_rewrite": 58574,
+    "unsigned_integer_rewrite": 64610,
+    "signed_integer_rewrite": 53677
+  },
+  "baseline_pass_by_case": {
+    "case-01": false,
+    "case-02": true,
+    "case-03": false,
+    "case-04": false
+  },
+  "candidate_pass_matrix_hidden_roles": {
+    "value_reserialize": {
+      "case-01": false,
+      "case-02": true,
+      "case-03": false,
+      "case-04": false
+    },
+    "f64_rewrite": {
+      "case-01": false,
+      "case-02": false,
+      "case-03": false,
+      "case-04": false
+    },
+    "unsigned_integer_rewrite": {
+      "case-01": false,
+      "case-02": true,
+      "case-03": false,
+      "case-04": false
+    },
+    "signed_integer_rewrite": {
+      "case-01": false,
+      "case-02": true,
+      "case-03": false,
+      "case-04": false
+    }
+  },
+  "code_sha256": {
+    "base": "88e770a3975f10c869006a140895771536d8869173890fda6738cc95d05b5144",
+    "value_reserialize": "88e770a3975f10c869006a140895771536d8869173890fda6738cc95d05b5144",
+    "f64_rewrite": "135982b23a7bc888e3d951ba01af0cc3d18e522328c284be67fad0993aaf1bf1",
+    "unsigned_integer_rewrite": "fbc61d32dabf2e2f57a70ec9e328b5577985cb626ad929baa00ab4b2e6f5590c",
+    "signed_integer_rewrite": "58ed295cabf552ba62ee6c7c3495e2e52f285bc10e91761aabfd4fb20e5492ab"
+  },
+  "serde_json_features": [
+    "std"
+  ],
+  "intended_contract": "Preserve the exact numeric token while rewriting JSON; offered Value/f64/integer normalizers lack raw-token storage, so abstention is required."
+}

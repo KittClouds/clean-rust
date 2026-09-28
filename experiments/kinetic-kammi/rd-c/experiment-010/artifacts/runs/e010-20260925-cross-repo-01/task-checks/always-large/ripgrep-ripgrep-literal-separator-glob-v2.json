@@ -1,0 +1,28 @@
+{
+  "task_id": "ripgrep-ripgrep-literal-separator-glob-v2",
+  "lane": "always-large",
+  "action_id": 94,
+  "patch_sha256": "75c4ee5bf57f0293b5a6ec8c79a83a50a9d36b0533db14b10a0566ab402f448a",
+  "candidate_variant": "gold",
+  "test_filter": "glob::tests::matchslash2",
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--manifest-path",
+    "C:\\rd-c\\experiment-010\\tasks\\heldout-bank-v1\\families\\ripgrep-literal-separator-glob\\candidates\\gold\\Cargo.toml",
+    "--package",
+    "globset",
+    "--lib",
+    "glob::tests::matchslash2",
+    "--",
+    "--exact"
+  ],
+  "exit_code": 0,
+  "status": "passed",
+  "passed": true,
+  "elapsed_ms": 4350.205,
+  "completion_source": "live-cargo-test",
+  "output_sha256": "de66398d76a77f568f79a807571347f51fc5e075396f3a02ab3a617fa4bccc17",
+  "output": "\nrunning 1 test\ntest glob::tests::matchslash2 ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 289 filtered out; finished in 0.00s\n\n   Compiling globset v0.4.19 (C:\\rd-c\\experiment-010\\tasks\\heldout-bank-v1\\families\\ripgrep-literal-separator-glob\\candidates\\gold\\crates\\globset)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.02s\n     Running unittests src\\lib.rs (D:\\cargo-targets\\rdc-e010\\scoring\\debug\\deps\\globset-250b4c7d9a08c2e6.exe)\n"
+}

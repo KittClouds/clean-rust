@@ -1,0 +1,22 @@
+{
+  "conclusion": "FRONT1 complete order-2 frontier is internally consistent and agrees with every overlapping valid UPAIR1 replay.",
+  "counts": {
+    "duplicate_front_keys": 0,
+    "exh_records": 9530,
+    "front_records": 9530,
+    "frontier_mismatches": 0,
+    "sample_mismatches": 0,
+    "sample_overlap": 202,
+    "upair_records": 17712
+  },
+  "engineering_only": true,
+  "identity": "q10-gc1-lr1-requal1-csc1-pair-front1-audit-v1",
+  "parent_sha256": {
+    "exh_execution": "13303BA195672CEB8D7971D44753CF5DF9F30FF822BE538901CF8AA40ED4C707",
+    "front_execution": "5EB2CC6BC10A21CE2497FEA927A0003A85B7BEDDB280D886EF11C9A4A9C8A3A9"
+  },
+  "protocol": "Q10-FRONT1-AUDIT",
+  "readout_performed": false,
+  "scientific_promotion": false,
+  "status": "FRONT1_AUDIT_COMPLETE"
+}

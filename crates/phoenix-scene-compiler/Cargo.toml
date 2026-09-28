@@ -1,0 +1,39 @@
+[package]
+name = "phoenix-scene-compiler"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+publish = false
+
+[dependencies]
+blake3.workspace = true
+bytemuck.workspace = true
+glam.workspace = true
+hashbrown.workspace = true
+memchr.workspace = true
+phoenix-analysis-contract = { path = "../phoenix-analysis-contract" }
+phoenix-graph-generation-v2 = { path = "../phoenix-graph-generation-v2" }
+phoenix-hybrid-space = { path = "../phoenix-hybrid-space" }
+phoenix-hopf-space = { path = "../phoenix-hopf-space" }
+phoenix-scene-archive = { path = "../phoenix-scene-archive" }
+phoenix-scene-contract = { path = "../phoenix-scene-contract" }
+phoenix-scene-product-index = { path = "../phoenix-scene-product-index" }
+phoenix-scene-publisher = { path = "../phoenix-scene-publisher" }
+phoenix-semantic-lens = { path = "../phoenix-semantic-lens" }
+phoenix-semantic-review = { path = "../phoenix-semantic-review" }
+phoenix-workspace = { path = "../phoenix-workspace" }
+smallvec.workspace = true
+thiserror.workspace = true
+
+[[bench]]
+name = "caps_layout"
+harness = false
+
+[[bench]]
+name = "hopf_layout"
+harness = false
+
+[[bench]]
+name = "semantic_layouts"
+harness = false

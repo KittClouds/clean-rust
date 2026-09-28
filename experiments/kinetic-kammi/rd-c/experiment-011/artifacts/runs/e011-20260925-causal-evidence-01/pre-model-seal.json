@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "state": "SEALED_BEFORE_MODEL_CONTACT",
+  "run_id": "e011-20260925-causal-evidence-01",
+  "created_utc": "2026-09-25T20:08:52.827440+00:00",
+  "frozen_input_lock_sha256": "3a91323be0abca07cd20ace84562cfbfb79a528cbd996811974eeb0eaa857b7a",
+  "code_sha256": {
+    "spec/E011-causal-evidence-dependence.md": "0a1a2417fd23f82339f39b8845150441db0923a39152332008438bb6aae7c631",
+    "scripts/prepare_e011.py": "dfffb94faf65654d7d1f894eca26adb573b9eda75d8511d6abcdaf47085ba560",
+    "scripts/run_observer_e011.py": "9a4162b6eb0d980101640cc285f5f9e6e5f3c197d7c49c58ff41977244ecc021",
+    "scripts/score_e011.py": "8872a5ad7a4f88427036744b410f6f773d5ddb84556b488942437d2681e1ae56",
+    "scripts/seal_e011.py": "fe34959e553289ce6d29a89e6654da26451de539ffe31e5cedab41b3e3841d2e",
+    "scripts/start_observer_e011.ps1": "59c042a206baa78c0b0ca48e2730c453e71466279877f0c474e7058362438dc1",
+    "scripts/stop_observer_e011.ps1": "409d706dcd8579fa58109a8903031a461236f32c697b1d415ae40b211b173900",
+    "tools/artifact-hash.exe": "516f0631a4df69297c7787ef424cc1b8c091b65571807ab926ff4bc2eb39fcf9"
+  },
+  "transformed_frame_locks_sha256": {
+    "evidence-masked": "23a4c606555e8cc1b9e7768d3f4fa2ead71bd9393b413eeee777bb0ca7eaeffd",
+    "evidence-swapped": "4f18b60e281f5e9943d2ecb39582400c96b6fb53da82455aed4ed2b93c7c4554",
+    "repository-neutralized": "2cf5b53efea5ae668f35d5d767369b32438d61dc6cc77408fe0e02f59419a227",
+    "candidate-permuted": "70f6c76971dbfff9a01aa1ab2a271b8055d5a0857fde6964985a642569eb7529"
+  },
+  "e010_baseline_tree_sha256": {
+    "small": "439c3224b9520abfc5d6ffabad38482f27c790b04f8323dfbc18406ce200ff84",
+    "large": "f04ff3629b84421e6afb28e7396155b52f1c8de108ad46310e9d5d02aab40e20"
+  },
+  "task_count_per_condition": 16,
+  "model_contact_started": false,
+  "transformation_audit": "PASS"
+}

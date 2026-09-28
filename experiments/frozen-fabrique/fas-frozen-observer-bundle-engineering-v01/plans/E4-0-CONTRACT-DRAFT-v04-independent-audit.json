@@ -1,0 +1,30 @@
+{
+  "receipt_id": "FAS_E4_0_CONTRACT_DRAFT_V04_INDEPENDENT_AUDIT",
+  "status": "DRAFT_AUDIT_PASS_WITH_IMPLEMENTATION_SOURCE_BLOCKERS",
+  "contract_path": "plans/E4-0-CONTRACT-DRAFT-v04.json",
+  "contract_sha256": "e70572102c04bc315bd3564e3f33cd4fd5e2a70097c10f66f864f512f9ddd4ca",
+  "predecessor_contract_sha256": "3c55e5778d3dd104c60a57286563d67d6a3906d2e2f7d217de39f409229e5bb4",
+  "support_plan_sha256": "808e6c167f877a9cbb926c4c989bc06dc74136d94fb9f3c02693ab99c72e3dfb",
+  "support_plan_source_sha256": "528139d84159f0c28c41755de12d631b717cf314e9f78ecdfa0b2e65b5f1721a",
+  "implementation_source_map_sha256": "1e5efbbd156f831ccfb03e990010387770cf5c6878ed38d7831c67327554ba80",
+  "implementation_source_map_bytes": 8885,
+  "selected_quartets": 18667,
+  "minimum_selected_class_support": 252,
+  "previous_prefix_minimum_support": 248,
+  "unique_feature_rows": 149336,
+  "projected_peak_bytes_before_free_space_reserve": 3902763008,
+  "execution_sources_pending": [
+    "e4_population_generator",
+    "e4_online_feature_and_parity_runner",
+    "e4_fresh_scorer",
+    "e4_independent_auditor"
+  ],
+  "auditor_source_path": "source/scripts/audit_e4_0_contract_draft_v04.py",
+  "auditor_source_sha256": "cd2ec1a8d3db3b84c44c467348191ed31584878a043876fd1fb1f81efb41b560",
+  "auditor_source_bytes": 10198,
+  "authorizations_open": false,
+  "population_rows_written": false,
+  "tokenizer_contacted": false,
+  "model_contacted": false,
+  "labels_opened": false
+}

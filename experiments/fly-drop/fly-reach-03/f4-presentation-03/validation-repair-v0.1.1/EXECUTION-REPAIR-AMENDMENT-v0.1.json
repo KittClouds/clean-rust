@@ -1,0 +1,29 @@
+{
+  "failed_attempt_receipt_sha256": "dd7a34ac67e2bd9d34b1fbcb212ea176a221a59fea2a47122c489b98d23b5f58",
+  "full_surface_required": {
+    "arms": {
+      "Cphi": 36,
+      "Cphi_shuffled": 36,
+      "Cphi_unshared": 36,
+      "D": 36
+    },
+    "fits": 144
+  },
+  "identity": "F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1",
+  "no_model_or_training_update_changes": true,
+  "no_reuse_of_partial_fits_for_scoring": true,
+  "no_task_or_collection_changes": true,
+  "no_truth_scoring_before_independent_integrity": true,
+  "parent_identity": "F4-PRESENTATION-03-EXECUTION-CONTINUATION-v0.1",
+  "preserved_inputs": {
+    "predictor_sha256": "495c68070624e4b8eaeeba217aeb03bdac6636d75e6691292a59872c11a9455f",
+    "task_bank_manifest_sha256": "ad339f4a710c9cb803e68a7076da923a68486f81b7552aa767c710f885deb0a1",
+    "truth_sha256": "ff9d000145fc503e83710ca99d65b0304d52c1f94533d92c78e28b9730214d50"
+  },
+  "repair_diagnostic": "checkpoint inference sorts raw tuples internally (canonical=false); repeated prediction now consumes the already canonical presented tuple array (canonical=true).",
+  "repaired_runner_sha256": "aa6a1c4b757c2209efae6aa859ba5d6b85ce59f0f918300dee02dac6000f3c52",
+  "runner_repair_receipt_sha256": "0ef36b60b0f4444bf0238e4b9a545d8ebdc2a9633a7732aef4458b75b719e1c0",
+  "schema": "F4-PRESENTATION-03-execution-repair-amendment-v0.1",
+  "status": "PREFIT_REPAIR_DECLARED",
+  "validation_identity": "F4-PRESENTATION-03-VALIDATION-REPAIR-v0.1.1"
+}

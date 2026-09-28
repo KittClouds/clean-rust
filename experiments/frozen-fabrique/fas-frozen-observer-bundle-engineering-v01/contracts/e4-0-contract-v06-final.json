@@ -1,0 +1,841 @@
+{
+  "contract_id": "FAS_FROZEN_CAPABILITY_FABRIC_E4_0_V06",
+  "status": "SEALED",
+  "draft_date_utc": "2026-09-26",
+  "purpose": "Fresh population qualification and exact online/cache parity for the frozen E3 capability fabric.",
+  "authorization": {
+    "population_generation_authorized": false,
+    "tokenizer_contact_authorized": false,
+    "model_contact_authorized": false,
+    "feature_extraction_authorized": false,
+    "evaluation_label_opening_authorized": false,
+    "scoring_authorized": false,
+    "fitting_authorized": false,
+    "E4_A_authorized": false
+  },
+  "design_inputs": {
+    "e4_0_design_v03_path": "experiments/fas-frozen-observer-bundle-engineering-v01/plans/E4-0-PRECONDITIONS-DESIGN-v03.md",
+    "e4_0_design_v03_sha256": "ce7ba083f359eb252a04e3c3971edf8251995dfe41d43f21a499c50727f5b42b",
+    "template_manifest_path": "experiments/fas-frozen-observer-bundle-engineering-v01/plans/E4-0-HELDOUT-TEMPLATES-v02.json",
+    "template_manifest_sha256": "e3b8a70b90b06fc4185d2e379cbfc7cf3724238d9505590add1cf8bba2e9b068",
+    "template_text_audit_path": "experiments/fas-frozen-observer-bundle-engineering-v01/plans/E4-0-HELDOUT-TEMPLATES-v02-audit.json",
+    "template_text_audit_sha256": "c5a6eb4412652122a5cfd126e50fc5c907d9fd9f94bd101d4549be2796535f87",
+    "template_structural_audit_path": "experiments/fas-frozen-observer-bundle-engineering-v01/plans/E4-0-TEMPLATE-STRUCTURAL-AUDIT-v01.md",
+    "template_structural_audit_sha256": "aeca3020f0cbcb779ddb7dac7aea1b9b9f6f4db0fa1abb8221740e2ff188b9ff",
+    "symbolic_support_plan_path": "plans/E4-0-SYMBOLIC-SUPPORT-PLAN-v11.json",
+    "symbolic_support_plan_sha256": "a15bca5d78867ea32905299fabd21f85cf6846a5a02a0c55dd32337e0396847f",
+    "symbolic_support_plan_bytes": 7785,
+    "support_plan_v11_validation_receipt_path": "audits/e4-0-support-plan-v11-source-tests.json",
+    "support_plan_v11_validation_receipt_sha256": "833c011ff9a9770756f106f390a275949751b9b71d46dbb4efa92f806a82b0c6",
+    "support_plan_v11_validation_receipt_bytes": 1889,
+    "implementation_source_map_v05_path": "experiments/fas-frozen-observer-bundle-engineering-v01/plans/E4-0-IMPLEMENTATION-SOURCE-MAP-v05.md",
+    "implementation_source_map_v05_sha256": "f9b5ea66486546de9534c9ed39524659baaeb69947842e985213ab3ac1d303c6",
+    "implementation_source_map_v05_bytes": 24331
+  },
+  "predecessors": {
+    "e0_v10_root_sha256": "899a131c09298fdafdcc6771ad01e8982857a1cd47900259800f97dd7bea7ccd",
+    "e1_v04_root_sha256": "6ba77a899363651e3ba119b005f59a22e86f011f83c86b873857cd3f9ab64b03",
+    "e1_term_inventory_sha256": "43b793068ad759a7ec77bd0027e7113a0145a35b1daacb8ea1cefa551803c672",
+    "e1_row_manifest_sha256": "ebfdf0064430ecae7a9ae2edd139f47c0c61291aa6c30c8ccb97daa195f835bc",
+    "e1_split_manifest_sha256": "fb20dd79b5d02a46e7ac65f8a69b621c19f47b193db4e9c5f898778032464e70",
+    "e1_fit_labels_sha256": "1c4223544ff8e164a393f6313db46dd814c50e3ea484a14ebdbed5070ebdfc15",
+    "e1_model_inputs_sha256": "9f0076daa147bac37aa80d4f9a55f9225289910ceb8acc41998354c5a166917a",
+    "e1_generator_source_sha256": "fa2bd0617135a0dce4e12f0e0967f82e461133b394a7d969daba5afb11e2cce1",
+    "e2_v07_root_sha256": "a2e2aa76f77904665b9abfa2a22f609c05219d8bc64c537bed41f5c634d1da8a",
+    "e2_v07_feature_cache_sha256": "8eb80df5f73e761fe6c025fc1c66abef2027d639b6c14f56d4177d6e6a7a45a4",
+    "e2_v07_feature_cache_bytes": 872415232,
+    "e3_v02_bundle_root_sha256": "899ff6a61272b86fdf1cd51d8c14100e77185157c242f27fbffe452803a435e1",
+    "e3_v02_bundle_manifest_sha256": "8fa86f8c9891949196844ca62522822a246e47b4185cc4ed45c45136ada6576f",
+    "e3_v02_score_replay_root_sha256": "a104bffedbc3e31268c0f1c0103ad4326add5a9da93816007904b70cdf3c7d1f"
+  },
+  "representation_abi": {
+    "abi_path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/representation-abi-v07.json",
+    "abi_sha256": "3b36b066111872290b9f37a877b9043650867fa81658476c783a5c7e7485d319",
+    "extractor_source_path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/extract_features_v07.py",
+    "extractor_source_sha256": "2b210d4f65c37d823b7060278c8a29db3a5c5f7fb535e6bb28d5147bc56b7b24",
+    "model_id": "LiquidAI/LFM2.5-1.2B-Base",
+    "model_revision": "7453bca97ca1e67754c4035a4b4c584e1c9dd725",
+    "model_config_sha256": "15d6157fb6df3f8272e2fe90e18f57727ccf02a125c94469198b0f3281510185",
+    "model_weights_sha256": "7678ab9546a0c51c1fca161876b1efc4f0906277f170b5822045f40fdaf9eeff",
+    "tokenizer_assets_manifest_sha256": "c5e9a5b08ec5658ef2a8760d8230bbe9367bea124451488e164baf0eeca95afc",
+    "surface_id": "V1_FINAL_POSITION",
+    "tensor_identity": "output.last_hidden_state[0, sequence_length - 1, :]",
+    "feature_dimension": 2048,
+    "serialization_dtype": "little-endian float32",
+    "runtime_and_loader": "Inherited exactly from the E2 v07 ABI; all local assets rehashed before eventual model loading."
+  },
+  "population": {
+    "population_id": "FAS_E4_0_FRESH_POPULATION_V01",
+    "namespace_in_quartet_identity": true,
+    "world_render_seed": 2026092605,
+    "seed_status": "PROPOSED_PROSPECTIVE_FIXED_VALUE",
+    "term_inventory": "Import E1 v04 context/entity ID-to-term tables byte-for-byte; do not reassign any of the 32 class IDs in either role.",
+    "schedule": "Reuse the frozen E1 factorial design and four-row A/C/E/P quartet semantics with a new deterministic namespaced world/render stream.",
+    "collisions": {
+      "keys": [
+        "quartet_id",
+        "row_id",
+        "rendered_input_sha256"
+      ],
+      "compare_against": [
+        "all E1 rows",
+        "all accepted E4 rows"
+      ],
+      "action": "Reject the entire candidate quartet, increment the candidate counter, regenerate, and receipt every skipped counter and collision class."
+    },
+    "strata": {
+      "primary_seen_rendering": "New semantic items rendered with the eight E1 observation/query templates.",
+      "primary_lexical": [
+        "in_domain",
+        "context_novel",
+        "entity_novel",
+        "both_novel"
+      ],
+      "heldout_template": "New observation/query template bytes from the bound template manifest; no E1 or fit overlap.",
+      "joint_template_lexical": "Held-out template combined with lexical novelty; intended population member if resource preflight passes."
+    },
+    "support": {
+      "construction_target_rows_per_required_class": 250,
+      "scoring_minimum_rows_per_class": 200,
+      "population_size_rule": "Smallest whole-quartet prefix of the deterministic schedule meeting the construction target for every class of all eight primary endpoints after E3 eligibility filters.",
+      "support_receipt_before_model_contact": true,
+      "symbolic_plan": {
+        "path": "plans/E4-0-SYMBOLIC-SUPPORT-PLAN-v11.json",
+        "sha256": "a15bca5d78867ea32905299fabd21f85cf6846a5a02a0c55dd32337e0396847f",
+        "status": "MODEL_FREE_PAIRED_SURFACE_COLLISION_AWARE_SYMBOLIC_PLAN_ONLY",
+        "selected_whole_quartet_prefix": 18667,
+        "previous_prefix_minimum_class_count": 248,
+        "previous_prefix_meets_target": false,
+        "primary_rows": 74668,
+        "heldout_template_rows": 74668,
+        "joint_lexical_rows_subset": 50092,
+        "per_class_counts": {
+          "context_identity": [
+            3072,
+            3072,
+            3072,
+            3072,
+            3072,
+            3072,
+            3072,
+            3072,
+            3072,
+            3072,
+            3072,
+            3072,
+            3072,
+            3072,
+            3072,
+            3072,
+            1596,
+            1596,
+            1595,
+            1595,
+            1595,
+            1595,
+            1595,
+            1596,
+            1596,
+            1596,
+            1596,
+            1593,
+            1593,
+            1593,
+            1593,
+            1593
+          ],
+          "entity_identity": [
+            3072,
+            3072,
+            3072,
+            3072,
+            3072,
+            3072,
+            3072,
+            3072,
+            3072,
+            3072,
+            3072,
+            3072,
+            3072,
+            3072,
+            3072,
+            3072,
+            1596,
+            1595,
+            1595,
+            1595,
+            1595,
+            1595,
+            1596,
+            1596,
+            1596,
+            1596,
+            1593,
+            1593,
+            1593,
+            1593,
+            1593,
+            1596
+          ],
+          "exact_target_by_stratum": [
+            [
+              8372,
+              8196,
+              8008
+            ],
+            [
+              8408,
+              7880,
+              8288
+            ],
+            [
+              8288,
+              7880,
+              8408
+            ],
+            [
+              360,
+              328,
+              252
+            ]
+          ],
+          "observed_state": [
+            8192,
+            8192,
+            8192
+          ],
+          "relation": [
+            12288,
+            12288
+          ]
+        },
+        "model_free": true,
+        "population_rows_written": false,
+        "e1_unique_quartet_ids": 26624,
+        "e1_unique_row_ids": 106496,
+        "e1_unique_rendered_input_hashes": 103206,
+        "all_three_collision_keys_checked": true,
+        "source_validation_receipt_sha256": "833c011ff9a9770756f106f390a275949751b9b71d46dbb4efa92f806a82b0c6"
+      }
+    },
+    "template_identity": {
+      "normalization": "Unicode NFKC, Unicode case-fold, trim, collapse internal Unicode whitespace runs to one ASCII space.",
+      "transfer_claim": "Unseen-template transfer with limited structural variation; do not claim broad structural invariance.",
+      "structural_audit_role": "Descriptive only; no new scoring endpoints or post-score strata.",
+      "freeze_before_population_generation": true,
+      "heldout_template_and_joint_truth_open_before_FF_BUNDLE_TEMPLATE_01_contract": false,
+      "precontract_feature_extraction": "Allowed only if the E4-0 contract and resource preflight bind it; predictions and class-support tables remain unopened."
+    },
+    "identity_serialization": {
+      "text_encoding": "UTF-8",
+      "unicode_normalization_for_rendered_inputs": "None; the exact byte sequence supplied to the tokenizer is hashed.",
+      "template_exclusion_normalization": "Unicode NFKC, Unicode case-fold, trim, collapse internal Unicode whitespace runs to one ASCII space.",
+      "namespace_ascii": "FAS-E4-0-POP-V01",
+      "seed_u64": 2026092605,
+      "seed_integer_encoding": "Unsigned 64-bit little-endian.",
+      "schedule_ordinal_encoding": "Unsigned 64-bit little-endian, zero-based in the exact E1 v04 factorial loop order.",
+      "quartet_id_preimage": "UTF8(ASCII FAS-E4-0-QUARTET-ID-v01) || 0x00 || ASCII namespace || 0x00 || u64le(seed) || u64le(shared_candidate_counter) || u64le(schedule_ordinal) || bytes(track_code, context_split, entity_split, family_id, relation_id, state_id, context_pair_id, entity_pair_id).",
+      "track_codes": {
+        "FACTORIAL_BALANCED": 0,
+        "BINDING_CONTEXT": 1,
+        "BINDING_ENTITY": 2
+      },
+      "quartet_id_digest": "SHA-256; lowercase 64-character hexadecimal encoding.",
+      "row_id": "lowercase quartet digest hex || ASCII ':' || two lowercase hex digits for surface code (00 seen, 01 held-out) || ASCII ':' || two lowercase hex digits for variant code (00 A, 01 C, 02 E, 03 P).",
+      "rendered_input_sha256": "SHA-256 of exact UTF-8 input_text bytes only; no JSON encoding or line terminator.",
+      "candidate_choice_domain_bytes": "ASCII domain tag including its trailing 0x00, followed by ASCII namespace, 0x00, u64le(seed), and u64le(schedule_ordinal). Primary and held-out surfaces use distinct frozen domain tags.",
+      "choice_permutation": "Read digest bytes 0..3 and 4..7 as u32 little-endian; start = first_u32 mod 384; step = second_u32 mod 384, incremented modulo 384 until gcd(step, 384)=1. For shared candidate counter k in 0..383, choice=(start+k*step) mod 384.",
+      "choice_index_fields": "query_id=floor(choice/48); observation_id=floor((choice mod 48)/6); candidate_order_id=choice mod 6. A/C/E use observation_id; P uses (observation_id+4) mod 8.",
+      "shared_collision_counter": "One counter per semantic quartet, shared by the primary and held-out render surfaces. At each counter test all eight row input hashes. Accept the whole semantic quartet only if all eight are pairwise distinct and absent from E1 and prior E4 rows. Fail closed after all 384 counters.",
+      "collision_retry_changes_rendering": true,
+      "row_order": "Surface order primary then held-out; within each surface A, C, E, P."
+    },
+    "collision": {
+      "keys": [
+        "semantic_quartet_id",
+        "surface-specific-row_id",
+        "exact-rendered-input-sha256"
+      ],
+      "compare_against": [
+        "all E1 rows",
+        "all earlier accepted E4 rows across both surfaces"
+      ],
+      "action": "Reject the entire paired-surface quartet and increment the shared candidate counter; the counter changes both surface render choices. Never change semantic labels or keep a subset of rows.",
+      "exhaustion": "If no collision-free pair exists among all 384 paired choices, preserve and stop before completing the population."
+    },
+    "strata_materialization": {
+      "primary_seen_and_lexical": "One four-row rendering per semantic quartet using E1's eight observation and eight query templates.",
+      "heldout_template": "One second four-row rendering per same semantic quartet using the frozen E4 template manifest.",
+      "joint_template_plus_lexical": "A truth stratum over held-out-template rows whose context or entity term is novel; it adds no duplicate row or feature vector.",
+      "template_and_joint_labels": "Stored in escrow; no support, predictions, or score output from these truth partitions before FF-BUNDLE-TEMPLATE-01 freezes its contract."
+    }
+  },
+  "parity": {
+    "panel": {
+      "source_partition": "E1 FIT",
+      "whole_quartets": 256,
+      "stratification": "8 query-template IDs by 4 quartiles of quartet maximum token count; select 8 per cell by domain-separated SHA-256 order.",
+      "quartile_assignment": "Sort E1 FIT quartets by (maximum token count, UTF-8 quartet ID). For N quartets and zero-based rank r, quartile k is the unique k in 0..3 satisfying floor(k*N/4) <= r < floor((k+1)*N/4).",
+      "ranking_digest_input": "UTF-8(FAS-E4-0-PARITY-v01) || 0x00 || ASCII decimal query-template ID (no leading zero) || 0x00 || ASCII decimal quartile ID (no leading zero) || 0x00 || UTF-8 quartet ID",
+      "ranking_order": "Raw SHA-256 digest bytes ascending; ties by UTF-8 quartet ID bytes; select 8 per cell.",
+      "coverage_stop": "If any cell contains fewer than 8 E1 FIT quartets, stop before model weights load and version the design.",
+      "tokenizer_call": "encode(input_text, add_special_tokens=true, truncation=false); no padding.",
+      "selection_receipt_before_online_extraction": true
+    },
+    "serving_configuration": {
+      "device": "cuda:0",
+      "dtype": "float32",
+      "batch_size": 1,
+      "padding": false,
+      "truncation": false,
+      "tensor": "last_hidden_state[0, sequence_length - 1, :]"
+    },
+    "gates": {
+      "feature_cache_byte_equality": true,
+      "maximum_absolute_feature_deviation": 0.0,
+      "prediction_agreement_each_of_five_heads": 1.0,
+      "alternate_batch_or_device_paths_in_scope": false
+    }
+  },
+  "fresh_qualification": {
+    "scorers": "Five E3 v02 observers read-only; no refit, scaler change, threshold change, or task selection.",
+    "metric": "balanced_accuracy",
+    "bootstrap": {
+      "replicates": 10000,
+      "seed": 2026092604,
+      "rng": "NumPy PCG64; one generator consumed in frozen endpoint order.",
+      "resampling_unit": "Whole quartet, stratified by the E3 task-specific A-variant label; sample the original eligible quartet count with replacement.",
+      "chunk_replicates": 64,
+      "quantile_method": "NumPy linear",
+      "lower_tail_alpha_per_endpoint": 0.00625
+    },
+    "gate": {
+      "simultaneous_familywise_confidence": 0.95,
+      "endpoint_count": 8,
+      "balanced_accuracy_lower_bound_minimum": 0.9,
+      "all_endpoints_must_pass": true,
+      "endpoint_order": [
+        "context_identity",
+        "entity_identity",
+        "relation",
+        "observed_state",
+        "exact_target_in_domain",
+        "exact_target_context_novel",
+        "exact_target_entity_novel",
+        "exact_target_both_novel"
+      ]
+    },
+    "scored_truth_partitions": [
+      "primary_seen_rendering",
+      "primary_lexical"
+    ],
+    "heldout_template_truth_scored": false,
+    "joint_template_lexical_truth_scored": false
+  },
+  "truth_access": {
+    "E1_FIT": "Available for later companion fitting under separate contracts.",
+    "E4_primary_labels": "Open once for E4-0 scoring only after the fresh feature cache, row identity, and parity receipts are sealed.",
+    "E4_template_and_joint_labels": "Escrowed until FF-BUNDLE-TEMPLATE-01 has a frozen analysis contract.",
+    "fresh_E4_labels_for_fitting": false
+  },
+  "resources": {
+    "target_volume": "D:",
+    "host_ram_peak_max_bytes": 25769803776,
+    "extractor_process_pytorch_cuda_reserved_peak_max_bytes": 10737418240,
+    "gpu_metric_scope": "torch.cuda.max_memory_reserved(cuda:0) in the extractor process; not total GPU memory.",
+    "total_gpu_memory_claimed": false,
+    "minimum_free_space_after_projected_peak_fraction": 0.1,
+    "feature_cache_bytes_formula": "8192 * all extracted E4 rows",
+    "feature_cache_atomic_staging_bytes_formula": "8192 * all extracted E4 rows",
+    "joint_stratum_resource_rule": "Include by default; if prospective resource preflight fails, stop and amend before generation rather than silently omitting it.",
+    "gpu_lease_required_before_model_contact": true,
+    "feature_rows": 149336,
+    "feature_cache_bytes": 1223360512,
+    "feature_cache_atomic_staging_bytes": 1223360512,
+    "feature_cache_final_plus_staging_bytes": 2446721024,
+    "panel_input_jsonl_max_bytes": 152920064,
+    "label_jsonl_max_bytes": 152920064,
+    "row_manifest_jsonl_max_bytes": 76460032,
+    "row_level_artifact_max_bytes": 382300160,
+    "other_persistent_artifact_max_bytes": 536870912,
+    "temporary_artifact_max_bytes": 536870912,
+    "projected_peak_bytes_before_free_space_reserve": 3902763008,
+    "free_space_reserve": "ceil(0.10 * live D: total bytes); contract preflight records volume size and requires free_before >= projected_peak_bytes_before_free_space_reserve + reserve_bytes.",
+    "row_size_caps_enforced_by_generator": {
+      "panel_input_jsonl_line_including_lf": 1024,
+      "label_jsonl_line_including_lf": 1024,
+      "row_manifest_jsonl_line_including_lf": 512
+    },
+    "resource_scope": "Conservative output-size ceiling, not a claim about actual eventual file sizes. Actual per-file byte counts and process RAM/GPU receipts remain required.",
+    "resource_preflight_model_contact": false,
+    "model_and_tokenizer_assets": "Existing pinned read-only assets; not duplicated into the E4 output tree."
+  },
+  "phase_gates": [
+    "Contract and all implementation source identities reviewed and sealed; no execution authority is conferred by the draft.",
+    "Model-free population generation under the bound generator, support/resource receipts, population seal, and independent audit.",
+    "Only after population audit and separate authorization: tokenizer-only parity selection; seal its concrete 256-quartet panel before model weights load.",
+    "After a separate model-contact authorization: online/cache parity and fresh feature extraction; held-out-template truth remains escrowed.",
+    "After parity receipts are sealed and a separate scoring authorization: one primary label opening and simultaneous scoring.",
+    "Independent replay and terminal disposition; E4-A remains a separate later decision."
+  ],
+  "stop_rule": "On identity, collision, support, resource, ABI, repeatability, parity, row-order, shape, dtype, finiteness, byte-integrity, truth-boundary, or scoring-integrity failure, preserve the attempt and stop. No in-place repair, dropped endpoint, or same-identity rerun.",
+  "E4_A_dependency": "Normal E4-A design eligibility requires parity pass and all eight simultaneous endpoints pass. If qualification fails, no normal E4-A; a systems-only benchmark requires a distinct decision and identity.",
+  "execution_identity": {
+    "model_contact_authorized": false,
+    "label_opening_authorized": false,
+    "scoring_authorized": false,
+    "E4_A_authorized": false,
+    "population_generation_authorized": false,
+    "tokenizer_contact_authorized": false,
+    "feature_extraction_authorized": false
+  },
+  "draft_revision": 5,
+  "draft_builder": {
+    "path": "source/scripts/build_e4_0_contract_draft_v05.py",
+    "sha256": "e980635bf79e7d33f07bf9cf35397101909247ec9c18cee3b2a183235da88eea",
+    "bytes": 7896,
+    "role": "Builds an unsealed v05 draft by rebinding the corrected v11 support plan and source validation; no execution authority is conferred."
+  },
+  "supersedes": {
+    "contract": {
+      "contract_id": "FAS_FROZEN_CAPABILITY_FABRIC_E4_0_V05",
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/e4-0-contract-v05-final.json",
+      "bytes": 39944,
+      "sha256": "ad709bd1496536e6fb1464bd89a06ec0eed552b89ef4159bfc1aa0f406fcc71a"
+    },
+    "seal": {
+      "seal_id": "FAS_E4_0_CONTRACT_V05_SEAL",
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/seals/e4-0-contract-v05-seal.json",
+      "manifest_bytes": 29668,
+      "manifest_sha256": "434e4472275adbd6514e5b6a0e8d905c7a283ea6ea294edc0068c050336cd9eb",
+      "root_sha256": "38fa25b9433319fc706a1d7fc1e56f20a267f30d467c42ac75ff0850ec656fd1",
+      "contract_member_artifact_id": "E4_0_CONTRACT_V05_FINAL"
+    }
+  },
+  "identity_collision_correction": {
+    "predecessor_support_plan": "E4-0-SYMBOLIC-SUPPORT-PLAN-v09",
+    "predecessor_issue": "The v09 planner enforced exact rendered-input hash disjointness but did not compare E1 quartet IDs or row IDs.",
+    "corrected_support_plan": "E4-0-SYMBOLIC-SUPPORT-PLAN-v10",
+    "corrected_support_sha256": "808e6c167f877a9cbb926c4c989bc06dc74136d94fb9f3c02693ab99c72e3dfb",
+    "checked_keys": [
+      "quartet_id",
+      "row_id",
+      "rendered_input_sha256"
+    ],
+    "selected_prefix_and_support_unchanged": true,
+    "population_rows_written": false,
+    "labels_opened": false,
+    "current_support_plan": "E4-0-SYMBOLIC-SUPPORT-PLAN-v11",
+    "current_support_sha256": "a15bca5d78867ea32905299fabd21f85cf6846a5a02a0c55dd32337e0396847f",
+    "v11_semantics_match_v10": true,
+    "v11_source_validation_receipt_sha256": "833c011ff9a9770756f106f390a275949751b9b71d46dbb4efa92f806a82b0c6"
+  },
+  "finalized_utc": "2026-09-26T22:42:26.517846+00:00",
+  "implementation_sources": {
+    "source_map": {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/plans/E4-0-IMPLEMENTATION-SOURCE-MAP-v05.md",
+      "bytes": 24331,
+      "sha256": "f9b5ea66486546de9534c9ed39524659baaeb69947842e985213ab3ac1d303c6"
+    },
+    "e4_population_generator": {
+      "files": [
+        {
+          "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/e4-population-v02/Cargo.lock",
+          "bytes": 19005,
+          "sha256": "ebe38c4657bf638886f81916734b31506ea535dd4840d36dba9d1974b208a9ca",
+          "role": "Track A v06 population generator / Rust build closure"
+        },
+        {
+          "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/e4-population-v02/Cargo.toml",
+          "bytes": 500,
+          "sha256": "faa0515d9a4308bd3e128c49131fdc3a95eb795e385518b2c47ae26f647e436c",
+          "role": "Track A v06 population generator / Rust build closure"
+        },
+        {
+          "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/e4-population-v02/benches/population_hot_path.rs",
+          "bytes": 2522,
+          "sha256": "c87bb976feea504935d8f3042f577d74f5809314294507f2881a8c192835deda",
+          "role": "Track A v06 population generator / Rust build closure"
+        },
+        {
+          "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/e4-population-v02/src/bin/e4-population-v02.rs",
+          "bytes": 16107,
+          "sha256": "ffa41e08ca9f5d06fe7eb9d414d470e208d864e679bce688b4b84c4d4c319ea7",
+          "role": "Track A v06 population generator / Rust build closure"
+        },
+        {
+          "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/e4-population-v02/src/identity.rs",
+          "bytes": 14033,
+          "sha256": "58e5c95ad5d00daeafc810b70d28aefa605f0320b2d7144651e85b5a598f3b5d",
+          "role": "Track A v06 population generator / Rust build closure"
+        },
+        {
+          "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/e4-population-v02/src/lib.rs",
+          "bytes": 3760,
+          "sha256": "8de3e3ddf932011d83ca3131310fb97607e0bb00535e395b36c6712407ce014c",
+          "role": "Track A v06 population generator / Rust build closure"
+        },
+        {
+          "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/e4-population-v02/src/population.rs",
+          "bytes": 30119,
+          "sha256": "674a610a29d5903ec34562d537fd45b573237d96b7a5450978545fc46d4363cf",
+          "role": "Track A v06 population generator / Rust build closure"
+        },
+        {
+          "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/e4-population-v02/src/render.rs",
+          "bytes": 9345,
+          "sha256": "4bfe046c905b19733f809bc59434db781245f5c7412d77723d5bc13358f6f984",
+          "role": "Track A v06 population generator / Rust build closure"
+        },
+        {
+          "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/e4-population-v02/src/schema.rs",
+          "bytes": 4529,
+          "sha256": "bc31c30b5f0bf512edcce7c306fd03fb1511cfe0c570cab03208b0707fdabef9",
+          "role": "Track A v06 population generator / Rust build closure"
+        },
+        {
+          "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/e4-population-v02/src/support.rs",
+          "bytes": 5793,
+          "sha256": "8cbb8b4c2b61238481dfbe0815eb35930c67d1bce1cb8b000358079a33992a88",
+          "role": "Track A v06 population generator / Rust build closure"
+        },
+        {
+          "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/e4-population-v02/src/writer.rs",
+          "bytes": 12143,
+          "sha256": "b9d70061432319991138f19585c2115555deabfbb372963edc56cd9c22a52997",
+          "role": "Track A v06 population generator / Rust build closure"
+        },
+        {
+          "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/e4-support-plan-v11/Cargo.lock",
+          "bytes": 6002,
+          "sha256": "8a84004756324303676bae7acc1bd041d54530a93e9e85b074d65b162e9e3a8c",
+          "role": "Model-free symbolic support planner"
+        },
+        {
+          "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/e4-support-plan-v11/Cargo.toml",
+          "bytes": 324,
+          "sha256": "5634d636df04da59a64d5e1ed890641ebc3823ec9971b94673ffd123f3591379",
+          "role": "Model-free symbolic support planner"
+        },
+        {
+          "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/e4-support-plan-v11/src/main.rs",
+          "bytes": 33181,
+          "sha256": "d3cc9b9c36bbcde3bfdaac07f571e53a88374c26d076fb808b273bae4d3155ae",
+          "role": "Model-free symbolic support planner"
+        },
+        {
+          "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/panel-generator-v04/Cargo.lock",
+          "bytes": 6015,
+          "sha256": "4ed5fca0a39c8869c082daf94cb0afd183533714a8253e44acf8d610129e17d7",
+          "role": "Frozen local E1 schedule dependency"
+        },
+        {
+          "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/panel-generator-v04/Cargo.toml",
+          "bytes": 321,
+          "sha256": "c7448c046ceb9722a96ef3318bbc0b55e459ecdf06f6ea1c87634b10a27d022a",
+          "role": "Frozen local E1 schedule dependency"
+        },
+        {
+          "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/panel-generator-v04/src/generate.rs",
+          "bytes": 25895,
+          "sha256": "fa2bd0617135a0dce4e12f0e0967f82e461133b394a7d969daba5afb11e2cce1",
+          "role": "Frozen local E1 schedule dependency"
+        },
+        {
+          "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/panel-generator-v04/src/lib.rs",
+          "bytes": 33,
+          "sha256": "e57ddf18054a9c7d049d849d28654bbf85419e13993bc917906cfef3d4669cc7",
+          "role": "Frozen local E1 schedule dependency"
+        },
+        {
+          "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/panel-generator-v04/src/main.rs",
+          "bytes": 31954,
+          "sha256": "7ce62779ddf8dd994ad9ace6a10dd5bda76de3bd87c1c0e19459cf38b428ec0f",
+          "role": "Frozen local E1 schedule dependency"
+        },
+        {
+          "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/panel-generator-v04/src/model.rs",
+          "bytes": 3680,
+          "sha256": "94cca0249f5508be13e186921bc2441a830fa4af695211cd7fb08126a79c11e2",
+          "role": "Frozen local E1 schedule dependency"
+        }
+      ]
+    },
+    "e4_online_feature_and_parity_runner": {
+      "files": [
+        {
+          "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_gpu_lease_v01.py",
+          "bytes": 23022,
+          "sha256": "e95a6e40f4e9128d8c15cc758e91254e51936cb6b1e8942bbd1e76f635d82c21",
+          "role": "Track B process lease and resource telemetry"
+        },
+        {
+          "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_online_parity_v02.py",
+          "bytes": 1375,
+          "sha256": "02a26b5f3b2b2327a2e21bdaadec5e250ecf9ba0381a6b7707882ab9302ecb16",
+          "role": "Track B v06 parity/feature runner entrypoint"
+        },
+        {
+          "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_runner_artifacts_v02.py",
+          "bytes": 15794,
+          "sha256": "9976bb9ece709631ab33dcecaf3caa59b99268fdd39d413ad38b28a8d959a4a3",
+          "role": "Track B v06 artifact custody and seals"
+        },
+        {
+          "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_runner_common_v02.py",
+          "bytes": 20575,
+          "sha256": "83d5a0a1dad9b9d56773bca7d38ae8ff98ada0e8ff46101c282e233ea1094899",
+          "role": "Track B v06 auth, identity, and parity selection"
+        },
+        {
+          "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_runner_modes_v02.py",
+          "bytes": 32754,
+          "sha256": "654974ee5c32c6482e868d9885ba9d92e4928ef25bc0713400cece253390f5af",
+          "role": "Track B v06 panel, parity, and feature modes"
+        },
+        {
+          "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/tests/test_e4_runner_v02.py",
+          "bytes": 16787,
+          "sha256": "4af0fcab1f33aa13d6d586c7cfe440675ec6c0e61b4ecb7b055759c30fc3edd6",
+          "role": "Track B v06 synthetic source tests"
+        }
+      ]
+    },
+    "e4_fresh_scorer": {
+      "files": [
+        {
+          "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_fresh_scorer_v02/README.md",
+          "bytes": 8585,
+          "sha256": "5a24f8ae2339cd972a3963c1ef3a81badf99270c4b451188e74ce025eb303b57",
+          "role": "Track C v06 scorer / synthetic tests"
+        },
+        {
+          "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_fresh_scorer_v02/output_artifacts.py",
+          "bytes": 5887,
+          "sha256": "73fbdd184d01df6de913676a0caa0be8f38f264bc9667e3985b52485425b33d4",
+          "role": "Track C v06 scorer / synthetic tests"
+        },
+        {
+          "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_fresh_scorer_v02/runner.py",
+          "bytes": 44491,
+          "sha256": "49c21eaee43b2e9d4d1f67b32ba299c0ed238fdc8783a020554517a745ed4e41",
+          "role": "Track C v06 scorer / synthetic tests"
+        },
+        {
+          "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_fresh_scorer_v02/scorer.py",
+          "bytes": 33616,
+          "sha256": "58bc957de63d430933570430ee0760a5833bc9c6ef5a82dae6dba78115b8b866",
+          "role": "Track C v06 scorer / synthetic tests"
+        },
+        {
+          "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_fresh_scorer_v02/test_runner.py",
+          "bytes": 27529,
+          "sha256": "51366268036367a3443925ad200e2035792c43a73a8ba1182ecc232b6c1dce89",
+          "role": "Track C v06 scorer / synthetic tests"
+        },
+        {
+          "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_fresh_scorer_v02/test_scorer.py",
+          "bytes": 11470,
+          "sha256": "49918704b151c9055432f4fb6199e3621a619b21acfb85d2a0427883283132c6",
+          "role": "Track C v06 scorer / synthetic tests"
+        }
+      ]
+    },
+    "e4_stage_authorization_issuer": {
+      "files": [
+        {
+          "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/issue_e4_stage_authorization_v02.py",
+          "bytes": 20639,
+          "sha256": "be597668d7a637d94a138dfccfc061066d484000818f69ee679a419f5c5c419c",
+          "role": "Normative v06 stage authorization issuer"
+        },
+        {
+          "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/tests/test_e4_stage_authorization_v02.py",
+          "bytes": 14259,
+          "sha256": "1ce5e19eb106b42f48828307c991cfb7298e64292a3c1a0b85a4c5c12b37c154",
+          "role": "v06 stage authorization issuer synthetic tests"
+        }
+      ]
+    },
+    "e4_independent_auditor": {
+      "files": [
+        {
+          "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/audit_e4_0_track_e_seal_v06.py",
+          "bytes": 12515,
+          "sha256": "397e999448aa5aac1252c8bb746301577d737653cd2e562523c0babf6a6d9647",
+          "role": "Independent Track E v06 seal-root/member auditor"
+        },
+        {
+          "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/audit_e4_0_track_e_v06.py",
+          "bytes": 45759,
+          "sha256": "86049aa4041922972690f4c7edc95411d095cab1266a04e95b493416f0c327f9",
+          "role": "Independent Track E v06 contract/source auditor"
+        },
+        {
+          "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/test_audit_e4_0_track_e_v06.py",
+          "bytes": 7083,
+          "sha256": "721fe632f2940dc1edd42f345565343de3602f9b150849b2cec4fa036a2cf141",
+          "role": "Independent Track E v06 source auditor tests"
+        },
+        {
+          "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v02/README.md",
+          "bytes": 1305,
+          "sha256": "95e71f621cd3ce2bfda319d32c27e8aed249d59cfa01ea884f2ea837be2d3ca4",
+          "role": "Track D independent population/parity/scoring replay auditor"
+        },
+        {
+          "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v02/__init__.py",
+          "bytes": 71,
+          "sha256": "c5c6939552ed8fc92be9b0dd26f6732123dcccc44ef316eb3ab685f8bf291f12",
+          "role": "Track D independent population/parity/scoring replay auditor"
+        },
+        {
+          "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v02/__main__.py",
+          "bytes": 48,
+          "sha256": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d",
+          "role": "Track D independent population/parity/scoring replay auditor"
+        },
+        {
+          "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v02/cli.py",
+          "bytes": 23715,
+          "sha256": "13ef86c35c6b853b0a889823fe7e2210c2114f4edfd9a4bf032ca89a19065b9a",
+          "role": "Track D independent population/parity/scoring replay auditor"
+        },
+        {
+          "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v02/constants.py",
+          "bytes": 3849,
+          "sha256": "32b4ff47c2ffcc4d7f34df5f152ab902e9cb0c17c70a2af6e21ba1f02ae0d9b4",
+          "role": "Track D independent population/parity/scoring replay auditor"
+        },
+        {
+          "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v02/features.py",
+          "bytes": 12661,
+          "sha256": "eb5d2ba1d94e932502db9b595f53e3e61da28ef8679ea8b95403e79fa909a4f0",
+          "role": "Track D independent population/parity/scoring replay auditor"
+        },
+        {
+          "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v02/integrity.py",
+          "bytes": 22115,
+          "sha256": "3c2f9f4e5eb6b9deada4eb367003ea477ab5dae0aff70214ca20734306676fbe",
+          "role": "Track D independent population/parity/scoring replay auditor"
+        },
+        {
+          "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v02/population.py",
+          "bytes": 16377,
+          "sha256": "455ccef43a2889610134442ffe5edcd2a460a32fd3b21201574093a9118f62cb",
+          "role": "Track D independent population/parity/scoring replay auditor"
+        },
+        {
+          "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v02/replay.py",
+          "bytes": 24720,
+          "sha256": "64c72105ce71c775395a8406366c7f1e8837d1c8da1b253f78b880c2122c1848",
+          "role": "Track D independent population/parity/scoring replay auditor"
+        },
+        {
+          "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v02/tests/test_audit.py",
+          "bytes": 30122,
+          "sha256": "aca08a95b71cbca4a72f4e10b47ceeda0a90a0d7c9121f08150b3ca5c2e5a6c0",
+          "role": "Track D independent population/parity/scoring replay auditor"
+        }
+      ]
+    }
+  },
+  "source_test_receipts": [
+    {
+      "track": "Track A v03",
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-a/track-a-receipt-v03.json",
+      "bytes": 4915,
+      "sha256": "1d992466421569ed1318ed9132c02902eefa9cc3341df150c857a26c69f6d51e",
+      "status": "TRACK_A_COMPLETE_PREAUTHORIZATION"
+    },
+    {
+      "track": "Track A history v02",
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-a/track-a-receipt-v02.json",
+      "bytes": 6821,
+      "sha256": "54e143b1657d5f99a8f730604e4095bc0ece2521492124e6bb5effc52da92dcb",
+      "status": "TRACK_A_COMPLETE_PREAUTHORIZATION"
+    },
+    {
+      "track": "Track A history v01",
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-a/track-a-receipt-v01.json",
+      "bytes": 5369,
+      "sha256": "6ff04e3eefae26d419560d30158fb863545f5d348478fdd59cc3013daba867d7",
+      "status": "TRACK_A_COMPLETE_PREAUTHORIZATION"
+    },
+    {
+      "track": "Track B v02",
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-b-v02/track-b-source-tests-v01.json",
+      "bytes": 2800,
+      "sha256": "a1e691405e3aea33845aacdf14dbe24617569b64f1a9450c63378d80d304dbbf",
+      "status": "PASS_SYNTHETIC_SOURCE_AND_CLI_TESTS"
+    },
+    {
+      "track": "Track B history v01",
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-b/track-b-source-tests-v01.json",
+      "bytes": 7170,
+      "sha256": "acba272c3eb177e8e15b178343a7fcc87ecc43e0bfb6bc665dda9ddf25e400a3",
+      "status": "PASS_SYNTHETIC_SOURCE_AND_CLI_TESTS"
+    },
+    {
+      "track": "Track C v02",
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-c-v02/track-c-source-tests-v01.json",
+      "bytes": 6584,
+      "sha256": "04514426de6e72ea0dcc63f2b5f1e72f37620da11ec01f297da1196fa11614a1",
+      "status": "PASS_SYNTHETIC_SOURCE_AND_CLI_TESTS"
+    },
+    {
+      "track": "Track C history v01",
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-c/track-c-source-tests-v02.json",
+      "bytes": 4768,
+      "sha256": "e8ada9ff5288baa87c4aefc07a5acb2a31e1227862c36876004da958d5ce571b",
+      "status": "PASS_SYNTHETIC_SOURCE_AND_CLI_TESTS"
+    },
+    {
+      "track": "Track D v02",
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-d/track-d-receipt-v06.json",
+      "bytes": 5510,
+      "sha256": "d53cf6bf67700746875fb1ead3572006bc36a12163156689b9c8287dfa3bfc0a",
+      "status": "TRACK_D_COMPLETE_PREAUTHORIZATION"
+    },
+    {
+      "track": "Track D history v05",
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-d/track-d-receipt-v05.json",
+      "bytes": 5241,
+      "sha256": "dfadc86ce0ec5d8e70c512b6980b4e66753659461ac7e555b6df006a0878d23b",
+      "status": "TRACK_D_COMPLETE_PREAUTHORIZATION"
+    },
+    {
+      "track": "Track E v06",
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-source-tests-v08.json",
+      "bytes": 2081,
+      "sha256": "7550268d61495c1a4bd211109d849c33490dafed36516b6cc4475a332f38df4a",
+      "status": "TRACK_E_SOURCE_TESTS_PASS_PREMAP_UNIT_TESTS"
+    },
+    {
+      "track": "Auth issuer v02",
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-auth-issuer-v02/source-tests-v01.json",
+      "bytes": 1565,
+      "sha256": "22c4d3137e9adb05f3312be638c02517f39f816bf50bb9711d8498c54c7291ff",
+      "status": "PASS_SYNTHETIC_TESTS"
+    },
+    {
+      "track": "Auth issuer history v01",
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-auth-issuer-source-tests-v01.json",
+      "bytes": 1334,
+      "sha256": "0b5d809100319ae8674e60732f76e606fa6d787335fcbf72bad84ca58866b9dc",
+      "status": "PASS_SYNTHETIC_TESTS"
+    }
+  ],
+  "finalization": {
+    "immutable_draft_path": "experiments/fas-frozen-observer-bundle-engineering-v01/plans/E4-0-CONTRACT-DRAFT-v05.json",
+    "immutable_draft_bytes": 24469,
+    "immutable_draft_sha256": "e2910965b53313a34c3a7d870075d83dbc9e035a230fc68f3c177c12c71e9fcf",
+    "source_map_path": "experiments/fas-frozen-observer-bundle-engineering-v01/plans/E4-0-IMPLEMENTATION-SOURCE-MAP-v05.md",
+    "source_map_bytes": 24331,
+    "source_map_sha256": "f9b5ea66486546de9534c9ed39524659baaeb69947842e985213ab3ac1d303c6",
+    "source_closure_entry_count": 59,
+    "source_test_receipt_count": 12,
+    "execution_authorization_conferred": false
+  }
+}

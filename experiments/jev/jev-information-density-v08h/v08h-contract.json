@@ -1,0 +1,60 @@
+{
+  "protocol": "jev-information-density/v0.8h-treatment-attribution",
+  "status": "frozen_posthoc_metadata_and_saved_prediction_analysis",
+  "scientific_question": "Which learner-visible training mass changed between R100-star and C100-star, and which observed v0.8G capability shifts are descriptively associated with those changes?",
+  "interpretation_boundary": "descriptive_candidate_mechanisms_only; no causal effect is identified",
+  "sealed_v08g": {
+    "run_manifest": {
+      "path": "D:\\codex-runs\\jev-information-density-v08g\\v08g-run-manifest.json",
+      "sha256": "5bf4156033ed2a56d8a337df82b9bebfcb5eca3e66b28b8d6f2abf4391f53eef"
+    },
+    "integrity_receipt": {
+      "path": "D:\\codex-runs\\jev-information-density-v08g\\reports\\integrity-receipt.json",
+      "sha256": "5b215ce8b688cf125e3a391b37f9c271ad9bc244f09e01534b5c7ef3a797f2fb"
+    },
+    "execution_scope": {
+      "path": "D:\\codex-runs\\jev-information-density-v08g\\reports\\v08g-execution-scope.json",
+      "sha256": "f78e139dea9270993f555c1fe073e5cf03fe693fc8b3ea1a9859ddedd430a4c3"
+    },
+    "contract_sha256": "34e9c367bedc78d2b759c85f036e4baf6f9a3c604162fe3a7acc8616d62c2040",
+    "materialization_receipt_sha256": "f9b845764a01c79584027265690823842f0d6d609008c5a95aacb1de8c97752e"
+  },
+  "expected": {
+    "groups_per_arm": 100000,
+    "new_tight_eval_occurrences": 83328,
+    "seeds": [20260927, 20260928, 20260929],
+    "epochs": 3,
+    "D_train": 0.13489,
+    "D_supervised_only": 0.13479,
+    "invariance_pair_cap_per_arm": 16,
+    "heldout_overlap_count": 0,
+    "phoenix_access_v08g": false,
+    "backbone_weight_updates_v08g": false
+  },
+  "analysis_rules": {
+    "training_unit": "exact_v0.5_training_signature_multiset_with_occurrence_multiplicity; supervised signature plus selected directed invariance-pair role events",
+    "D_train": "0.5 * L1(exact training-signature count vectors) / 100000; replay frozen attach_invariance_context(max_pairs=16)",
+    "D_supervised_only": "0.5 * L1(base supervised-signature count vectors) / 100000; report separately and do not substitute for sealed D_train",
+    "enriched_metadata_allocation": "For a changed signature, distribute its one-sided excess mass fractionally and uniformly over that arm's selected concrete rows in the signature class. Exact for signature-invariant fields; an accounting convention, not a unique raw-row match, for within-signature-varying metadata.",
+    "score_reconstruction": "Use exact SHA-verified frozen v0.8 policy source and immutable training-signature metadata; do not alter component definitions.",
+    "prediction_metrics": "Reproduce frozen v0.8G metric definitions before adding descriptive diagnostics.",
+    "cluster_unit": "root_id where available; report seed-level values and do not treat three seeds as causal identification.",
+    "contradictory_binding_semantics": "The saved probe changes opaque IDs while leaving definitions and gold targets fixed; analyze semantic-identity invariance, not a definition-change signed response.",
+    "unavailable_diagnostics": "Mark NOT_MEASURABLE_FROM_FROZEN_ARTIFACTS rather than loading a model or generating predictions."
+  },
+  "boundaries": {
+    "model_loading": false,
+    "lfm_inference": false,
+    "feature_extraction": false,
+    "head_training": false,
+    "head_inference": false,
+    "bank_reconstruction": false,
+    "bank_optimization": false,
+    "new_curation_scoring": false,
+    "pstar_modification": false,
+    "evaluation_definition_changes": false,
+    "phoenix_access": false,
+    "follow_on_training_authorized": false
+  },
+  "external_output": "D:\\codex-runs\\jev-information-density-v08h"
+}

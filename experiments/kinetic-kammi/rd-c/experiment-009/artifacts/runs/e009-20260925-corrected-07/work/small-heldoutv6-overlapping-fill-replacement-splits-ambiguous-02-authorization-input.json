@@ -1,0 +1,34 @@
+{
+  "task_id": "heldoutv6-overlapping-fill-replacement-splits-ambiguous-02",
+  "frame_hash_hex": "73d916281cc1c28ef29ebb547f5dbb40fc03a088f8256550bf549369031b4ad9",
+  "selected_patch_sha256": null,
+  "action_ledger_path": "C:\\rd-c\\experiment-009\\artifacts\\runs\\e009-20260925-corrected-07\\ledgers\\small\\heldoutv6-overlapping-fill-replacement-splits-ambiguous-02.actions.bin",
+  "actions": [
+    {
+      "id": 11,
+      "schema_id": 1
+    },
+    {
+      "id": 37,
+      "schema_id": 1
+    },
+    {
+      "id": 68,
+      "schema_id": 1
+    },
+    {
+      "id": 94,
+      "schema_id": 1
+    }
+  ],
+  "observer_output": {
+    "action_choice": null,
+    "applicability_milli": 0,
+    "abstention_milli": 1000
+  },
+  "thresholds": {
+    "minimum_applicability_milli": 850,
+    "maximum_abstention_milli": 150
+  },
+  "completion_check_passed": false
+}

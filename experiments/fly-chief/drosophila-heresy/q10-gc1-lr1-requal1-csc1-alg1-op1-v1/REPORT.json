@@ -1,0 +1,170 @@
+{
+  "contexts": [
+    {
+      "context": "seed9731-L-tau16__set2",
+      "exact_readout_hash_matches": {
+        "(A-S)+B": 0,
+        "A+(B-S)": 0,
+        "A+B-S": 0,
+        "S+((A-S)+(B-S))": 0,
+        "S+(A-S)+(B-S)": 0
+      },
+      "pairs": 2121,
+      "row_match_counts": {
+        "(A-S)+B": 1476216,
+        "A+(B-S)": 1476216,
+        "A+B-S": 1471403,
+        "S+((A-S)+(B-S))": 1476216,
+        "S+(A-S)+(B-S)": 1476216
+      }
+    },
+    {
+      "context": "seed9731-L-tau4__set3",
+      "exact_readout_hash_matches": {
+        "(A-S)+B": 0,
+        "A+(B-S)": 0,
+        "A+B-S": 0,
+        "S+((A-S)+(B-S))": 0,
+        "S+(A-S)+(B-S)": 0
+      },
+      "pairs": 2389,
+      "row_match_counts": {
+        "(A-S)+B": 1662742,
+        "A+(B-S)": 1662742,
+        "A+B-S": 1656198,
+        "S+((A-S)+(B-S))": 1662742,
+        "S+(A-S)+(B-S)": 1662742
+      }
+    },
+    {
+      "context": "seed9731-R-tau16__set1",
+      "exact_readout_hash_matches": {
+        "(A-S)+B": 0,
+        "A+(B-S)": 0,
+        "A+B-S": 0,
+        "S+((A-S)+(B-S))": 0,
+        "S+(A-S)+(B-S)": 0
+      },
+      "pairs": 2266,
+      "row_match_counts": {
+        "(A-S)+B": 1549942,
+        "A+(B-S)": 1549942,
+        "A+B-S": 1543933,
+        "S+((A-S)+(B-S))": 1549942,
+        "S+(A-S)+(B-S)": 1549942
+      }
+    },
+    {
+      "context": "seed9731-R-tau16__set3",
+      "exact_readout_hash_matches": {
+        "(A-S)+B": 0,
+        "A+(B-S)": 0,
+        "A+B-S": 0,
+        "S+((A-S)+(B-S))": 0,
+        "S+(A-S)+(B-S)": 0
+      },
+      "pairs": 2062,
+      "row_match_counts": {
+        "(A-S)+B": 1410407,
+        "A+(B-S)": 1410407,
+        "A+B-S": 1404045,
+        "S+((A-S)+(B-S))": 1410407,
+        "S+(A-S)+(B-S)": 1410407
+      }
+    },
+    {
+      "context": "seed9731-R-tau4__set0",
+      "exact_readout_hash_matches": {
+        "(A-S)+B": 0,
+        "A+(B-S)": 0,
+        "A+B-S": 0,
+        "S+((A-S)+(B-S))": 0,
+        "S+(A-S)+(B-S)": 0
+      },
+      "pairs": 2267,
+      "row_match_counts": {
+        "(A-S)+B": 1550628,
+        "A+(B-S)": 1550628,
+        "A+B-S": 1544050,
+        "S+((A-S)+(B-S))": 1550628,
+        "S+(A-S)+(B-S)": 1550628
+      }
+    },
+    {
+      "context": "seed9731-R-tau4__set1",
+      "exact_readout_hash_matches": {
+        "(A-S)+B": 0,
+        "A+(B-S)": 0,
+        "A+B-S": 0,
+        "S+((A-S)+(B-S))": 0,
+        "S+(A-S)+(B-S)": 0
+      },
+      "pairs": 2099,
+      "row_match_counts": {
+        "(A-S)+B": 1435715,
+        "A+(B-S)": 1435715,
+        "A+B-S": 1430147,
+        "S+((A-S)+(B-S))": 1435715,
+        "S+(A-S)+(B-S)": 1435715
+      }
+    },
+    {
+      "context": "seed9731-R-tau4__set2",
+      "exact_readout_hash_matches": {
+        "(A-S)+B": 0,
+        "A+(B-S)": 0,
+        "A+B-S": 0,
+        "S+((A-S)+(B-S))": 0,
+        "S+(A-S)+(B-S)": 0
+      },
+      "pairs": 2253,
+      "row_match_counts": {
+        "(A-S)+B": 1541051,
+        "A+(B-S)": 1541051,
+        "A+B-S": 1534770,
+        "S+((A-S)+(B-S))": 1541051,
+        "S+(A-S)+(B-S)": 1541051
+      }
+    },
+    {
+      "context": "seed9731-R-tau4__set3",
+      "exact_readout_hash_matches": {
+        "(A-S)+B": 0,
+        "A+(B-S)": 0,
+        "A+B-S": 0,
+        "S+((A-S)+(B-S))": 0,
+        "S+(A-S)+(B-S)": 0
+      },
+      "pairs": 2255,
+      "row_match_counts": {
+        "(A-S)+B": 1542418,
+        "A+(B-S)": 1542418,
+        "A+B-S": 1536388,
+        "S+((A-S)+(B-S))": 1542418,
+        "S+(A-S)+(B-S)": 1542418
+      }
+    }
+  ],
+  "counts": {
+    "contexts": 8,
+    "pairs": 17712
+  },
+  "engineering_only": true,
+  "identity": "q10-gc1-lr1-requal1-csc1-alg1-op1-v1",
+  "operators": [
+    "A+B-S",
+    "A+(B-S)",
+    "(A-S)+B",
+    "S+(A-S)+(B-S)",
+    "S+((A-S)+(B-S))"
+  ],
+  "pair_replay_performed": false,
+  "parent_sha256": {
+    "alg1_execution": "3E6BE728EBE220051637499227A7C8269D91B1BF68776743F19DB38657CAAA50",
+    "upair_contract": "07146C8E52424C954C3B0565B8575C295E80DE84DF34EA5A29F37D812AD28B0F",
+    "upair_execution": "68F6CDCA1B458E24466750C22C86FB4A3ED231BC1E52DB3921D8BD1DA019DB66"
+  },
+  "protocol": "Q10-CSC1-ALG1-OP1",
+  "scientific_promotion": false,
+  "status": "OP1_COMPLETE"
+}

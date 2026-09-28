@@ -1,0 +1,173 @@
+{
+  "protocol": "jev-information-density/v0.8p-r1-late-transition-localization-v01",
+  "identity": "v0.8P-R1-fresh-trajectory-instrumented-rerun-v01",
+  "status": "AUTHORIZED_PHASE_SIZED_EXECUTION_PACKET",
+  "authorization": {
+    "authority": "user explicit full R1 execution packet",
+    "scope": ["identity replay", "fresh panel construction", "frozen feature extraction", "nine P training trajectories", "one fresh-panel evaluation opening", "frozen analysis and sealing"],
+    "original_v08p_completed": false,
+    "original_v08p_terminal_disposition": "CLOSED_UNEXECUTABLE_UNDER_SEALED_OVERLAP_SCHEMA",
+    "v09_parser_caveat_inherited": false,
+    "v09_rows_or_mappings_as_inputs": false
+  },
+  "bindings": {
+    "identity_schema_sha256": "a5d9bf108a1b14d05652b78021a55b74500ed55d6bdc759ff02c09560ea6f7ed",
+    "original_p_run_contract_sha256": "e345225b4a17fc18eb35fcab24cbe1d72bd0e34bed9de272f927a7be461853e6",
+    "original_p_analysis_contract_sha256": "84111122033fda65c84344317cfe3b50639b23be4c71f480ba665c67a23cc939",
+    "original_p_panel_contract_sha256": "ce3b7b97caecb27f3ad99439c0e67dca6e40af5da3db9ca2e356ea5e9f06f823",
+    "original_p_contract_bundle_sha256": "67cd6b7902111000dc93a0f81f9f20bc05a9c084732705ed8f9ad82fe965fa85",
+    "original_p_phase_a_authorization_receipt_sha256": "f3a00a9f6ad0d4a667017c53425d2041f21a1446ba0b797b09bb8c0e25fe07a9",
+    "v08n_base_contract_sha256": "f72947a53c7df85d12c7d9f91620c0c32925c047b0c556d9298038c80c51f103",
+    "v08n_eval_panel_contract_sha256": "3fa547c0a2490c4cfb5d578a32dffeb8414c35daa5e59ef339ab1e148e2e9cd6",
+    "v08n_generator_source_sha256": {
+      "main.rs": "503d7cf9ddef1e42a4ef97cd9031ed23c3fabbac0060c0394d1c9919ebe32ea5",
+      "generator.rs": "f04a9b1d4f6682522e5957be3c0075db4bd7aa4e4e25968650f2ff24a42c7f5b",
+      "families.rs": "e56885005487b36b573c1bf4d47741413ca72df0992ff62bcf48891eecacb429",
+      "Cargo.toml": "b6203ad272dd973c14ab9c09aa5f15574a3ee95e466c1dce5475b6a3f1efcf98",
+      "Cargo.lock": "fff5f6d18141df5b3be89302460210c8ed1f3c3153fda2f1c849ec3306b61d2e"
+    },
+    "exact_world_library_source_sha256": {
+      "Cargo.toml": "69374c00d54dac2251239fb7b3bb289b61cb6a9bca93853e71f6f484691df401",
+      "Cargo.lock": "9b6d29d2e86f53360b1cf7226798eb04c9b790a935b6f024063f0e77cf0b6263",
+      "src/exact.rs": "8bd90086573eb93a27f8950f35eec994a3f5b51fdeeffc0e3042105b6657a4f3",
+      "src/lib.rs": "ace2147a281cb02ba2328ad5e9de84604a4e9b97606e26965ba906fd9b240470",
+      "src/generate.rs": "03e636fc35595ce8d2d701a57158cae5b18cf14809426908d1c92c0e71bed67d",
+      "src/families.rs": "da2ceacf7a1b921688e3e6dfcc1dc5af2d57c464bbf4d24322fe5e53fa157805",
+      "src/main.rs": "341918f219f8ef6fea833958c9b2d2690db80d9d16676611255ba3eb2fc3bf0e",
+      "src/types.rs": "49be9b4c2276c3cb9437a9a35295b583b08a13467835b29208f01fc975ea77ee",
+      "src/validate.rs": "89e67736bf94ade30a4da4c33ac27ad3f1a5b962509ecd02bc38569e773ba7f3"
+    },
+    "v08n_family_spec_sha256": "e56885005487b36b573c1bf4d47741413ca72df0992ff62bcf48891eecacb429",
+    "v08n_identity_constructor_sha256": "f04a9b1d4f6682522e5957be3c0075db4bd7aa4e4e25968650f2ff24a42c7f5b",
+    "v05_denylist_root_seal_sha256": "272a14e57c2dcf610568381c0c1c4673c7b40e368ac81b07d3e7160e4e5953a2",
+    "v05_denylist_sha256": "50eebeb5790c29b4a75c6f8df849eb4c2865d3c864932bbd7f636b7a0e52a2cd",
+    "v05_denylist_count": 2000
+  },
+  "old_training_corpus": {
+    "generator_seed": 20260922,
+    "train_families": 12,
+    "neighborhoods_per_family": 1000,
+    "raw_train_occurrences": 132000,
+    "original_selected_training_scope": 55000,
+    "selected_neighborhoods": 5000,
+    "roles_per_selected_neighborhood": 11,
+    "selection_contract_sha256": "ac02dfaf98f05caca1a1c98b67bcfc551ab182abba77565b24ee4abc232ac226",
+    "selection_manifest_sha256": "8e2a4a10790aac1e763b253e1fc6acc40022b9ff3b136061f0602e91219804ef",
+    "selection_receipt_sha256": "0096e87d0567cadb83ebdefaf74a5661b6950a182c9689ea34a246f19f08d473",
+    "scope_manifest_sha256": "aa8cba58f4a8ec46ed6ec8eaf0bfbe992b03b9fa58f815b4259d9fdfe2b009f3",
+    "scope_content_sha256": "40648e3bbf50e25f31e84d7656221171425cb6e71e07d4c07d4dc72650bb228e",
+    "raw_artifact_identities": {
+      "train-canonical-episodes.jsonl": {"sha256": "212a6caae513b53f014569c9d07aa0aac64b94b2a90f0b01b70aa9b3f6d1e3ff", "blake3": "9a4dc01d563e586ffe9c91dd4fac01bf94d9cafb4b9568c1e164de06105313fd", "bytes": 1313795720},
+      "train-exact-world-episodes.jsonl": {"sha256": "55ae450f349d591b21b4780cf5c7e88abfbfb4c97c77e6f38c78efd1e06914d7", "blake3": "b8f2b41e0fabcc16f9d2b59cd968cd350e738a9156fed3907d89bc721c45ef03", "bytes": 518925239},
+      "train-contrast-certificates.jsonl": {"sha256": "232f8132314a2a3555b499da6a70d07e82a591f072810d5132a0bf77c27be851", "blake3": "e1e10dbd9330a1b7c78af95e53fc307ca8b17accc438bc6faa36e49474aed7b7", "bytes": 48708000}
+    },
+    "prior_eval_reconstruction_authority": {
+      "generator_receipt_sha256": "78de428afb7318074179ff8f674dde055c519624bf78930ce5102b8541a8eae7",
+      "eval_canonical_blake3": "b8aef75bcd25a74e1b67bde5c912f065e850b0ec5228e1f68a74a3382ffb263b",
+      "eval_canonical_bytes": 221638270,
+      "eval_exact_blake3": "41824c47591eda8ff4b9bea449500cd78b57985e8c25e4dd05399e0211c215c6",
+      "eval_exact_bytes": 86859808,
+      "eval_certificates_blake3": "579141483b1ead71d30693493e44cbf62dc94c75690967c3fefb3101838186ba",
+      "eval_certificates_bytes": 8198000,
+      "use": "hash values are read from the bound generator-receipt object already present in lineage; R1 verifies the object hash only and never parses its episode-id arrays"
+    },
+    "source_paths": {
+      "root": "D:/codex-runs/jev-information-density-v08n/v0.8N-base-v01",
+      "canonical": "train-canonical-episodes.jsonl",
+      "exact": "train-exact-world-episodes.jsonl",
+      "certificates": "train-contrast-certificates.jsonl",
+      "selection_manifest": "selection/selected-training-neighborhoods.jsonl",
+      "scope_manifest": "shared-feature-cache/training-only-feature-scope.jsonl"
+    },
+    "training_streams": {
+      "common_primary_occurrence_manifest": {
+        "path": "phase-b-v03-inputs/common-primary-occurrence-manifest.jsonl",
+        "sha256": "773119294a51aa46487de26f9f253355187a7bfd1e75cb2f258c307c86f10b06",
+        "rows": 10000
+      },
+      "head_input_manifests": {
+        "B-DUP": {"path": "phase-b-v03-inputs/head-input-manifest-B-DUP.jsonl", "sha256": "f6f4ec519a04efeac02962c68c2d2d8ec92cf43d25bb9fd974f168e67c4d3b2b", "bytes": 13872634},
+        "B-MATCHED": {"path": "phase-b-v03-inputs/head-input-manifest-B-MATCHED.jsonl", "sha256": "bd38446c0328f8092dc3293090fd3041d7be5d53945df6f80fb3770244d87b0d", "bytes": 13942636},
+        "B-SHAM": {"path": "phase-b-v03-inputs/head-input-manifest-B-SHAM.jsonl", "sha256": "9dd346766856f56006be326c171e664dcbab23983cdd7501f480b6fabb6ff895", "bytes": 13867636}
+      },
+      "candidate_catalog": {"path": "phase-b-v03-inputs/candidate-catalog.json", "sha256": "1698ea2078951837b3cb780a3f873c3c099e5e3d001c714e1d58a41e2951487e", "rows": 48, "dimension": 2048},
+      "training_candidate_features": {"path": "../phase-b-run-v01/feature-cache/candidate-features.pt", "sha256": "3bb3036f455a83409361eb3e4150833bd8b255a2a783ec1218b00b12315c0590", "tensor_sha256": "f76e573779152fd3966845a39e29206c333eef388e0511c5f3e07f8f1b46d593", "shape": [48, 2048]},
+      "shared_state_features": {"path": "../shared-feature-cache/shared-training-features.pt", "sha256": "da946af90353c91c3b1298d2951eebc42b9f515708b628d3a053e700a960c4d6", "tensor_sha256": "d8f0f12296758f68c55b5e5660572dd48e4e90d1a3a1683844e59765826bafaa", "shape": [55000, 2048]}
+    },
+    "reader": "R1 replays the bound Rust generator directly; sidecar code accesses only the actual Episode identity/render fields and the actual selector request. Any parsing of existing JSONL scope rows is streaming and field-selective; gold_targets and unknown fields are ignored, never materialized into R1 sidecar structures. The v09 parser caveat remains attached to v09; v09-derived rows/mappings and files are not inputs or accessed."
+  },
+  "prior_panel_identity": {
+    "source_policy": "Do not open E1 panel body, candidate join, candidate features, targets, predictions, or metrics. Reconstruct the prior 2,000-neighborhood / 22,000-episode identity inventory by rerunning the exact bound v08N generator source at seed 20260922 for the sealed eval family/sequence partition; emit only R1 identity-schema sidecar rows and never persist generated targets or model inputs.",
+    "v05_denylist_source_path": "D:/codex-runs/jev-information-density-v08p-v05/identity/run-1/canonical-e1-neighborhood-hash-denylist.json",
+    "v05_denylist_source_sha256": "50eebeb5790c29b4a75c6f8df849eb4c2865d3c864932bbd7f636b7a0e52a2cd",
+    "reconstruction_acceptance": "The 2,000 hashed generated prior neighborhood identities must byte-match the sealed v05 set exactly before using the reconstructed five-field prior-panel identity inventory. If not, stop before panel generation."
+  },
+  "r1_panel": {
+    "partition_namespace": "eval_v08p_r1",
+    "seed_derivation": {"label": "jev-information-density-v08p-r1/generator-seed-v01", "sha256": "1f8e026be85cecf78279386f24cb771413d0e7c1e9a470d75f681d21f7b97a4f", "seed_u32": 1795329567},
+    "families": ["exposure_control", "respiratory_monitoring", "salinity_control", "vibration_monitoring"],
+    "accepted_neighborhoods_per_family": 500,
+    "roles_per_neighborhood": 11,
+    "candidate_sequences_per_family": 532,
+    "candidate_sequence_order": "ascending sequence 0..531; accept first 500 passing the frozen identity collision predicate; at most 32 rejected candidates per family; exhaustion is terminal with no replacement stream",
+    "views": ["anchor", "fact_flip", "sham", "matched_neutral"],
+    "semantic_contract": "original P fresh-panel contract unchanged except R1 namespace/seed; same exact-world validation and p0-p3 surfaces",
+    "E1_identity_denylist": "SHA256(canonical neighborhood_id) membership only; no text/semantic similarity rule",
+    "five_field_overlap": "independent set intersections for world_id, root_id, episode_id, full_rendered_input_hash, selector_input_hash against selected 55,000 training occurrences and the reconstructed 22,000-episode prior panel; zero required in every dimension",
+    "matching": "for each anchor choose argmin_j abs(||h_Nj-h_A||2 - ||h_S-h_A||2), j in neutral_1..neutral_8; deterministic tie-break SHA256(anchor_id + '|' + neutral_role), ascending lexical digest; no direction/cosine or outcomes",
+    "radius_gates": {"mean_relative_error_max": 0.10, "p95_absolute_error_max": 0.25, "per_family_mean_relative_error_max": 0.15},
+    "no_replacement_after_panel_validation": true
+  },
+  "feature_and_model": {
+    "backbone": "LiquidAI/LFM2.5-1.2B-Base",
+    "revision": "7453bca97ca1e67754c4035a4b4c584e1c9dd725",
+    "snapshot_sha256": {
+      "config.json": "15d6157fb6df3f8272e2fe90e18f57727ccf02a125c94469198b0f3281510185",
+      "model.safetensors": "7678ab9546a0c51c1fca161876b1efc4f0906277f170b5822045f40fdaf9eeff",
+      "tokenizer.json": "d7a0ab0fc22e41ec8c6d7450a9ff9ce40e196ec5e5a2fa6a2105e064e0514ed7",
+      "tokenizer_config.json": "8cba5b0c7acab23a0d4cc9ac587346c9220a1b6d288fc5346fe118202fd6f43e",
+      "special_tokens_map.json": "742aefe2b7dec496e8caffdba03a75d0c1a9925d53bd3f3e0d388c96b591b6f4"
+    },
+    "feature_extractor_source": {"path": "experiments/jev-lfm-variable-v07/extract_lfm.py", "sha256": "b8cd79a9a3265eca0fde5f509ba7c058bc2065d7747efe17ff7c7c1f6335b2d0"},
+    "backbone_frozen": true,
+    "state_feature": "final-layer mean_full@16, exact-length, single-row, no padding, max_length 1024, BF16 backbone, FP32 output, dimension 2048",
+    "candidate_feature": "name_definition surface, mean_full@16, exact-length, single-row, no padding, batch size 1, BF16 backbone, FP32 output, 48 training candidates + 16 fresh held-out candidates",
+    "feature_cache_count": 22016,
+    "feature_cache_composition": "22,000 fresh-panel role episodes plus 16 fresh candidate semantic features; exact row identities and input hashes are sealed"
+  },
+  "training": {
+    "arms": ["B-DUP", "B-MATCHED", "B-SHAM"],
+    "seeds": [3243871208, 669993655, 3076094663],
+    "paired_initialization": "one shared byte-identical head initialization per seed across three arms; old v0.8N heads are never initializations",
+    "head": "CompatibilityHead(2048, mlp, 128), 590081 trainable parameters, raw float32 state/candidate inputs",
+    "recipe": "frozen original P run contract: AdamW lr .002 wd .01 betas .9/.999 eps 1e-8; CE + .25 multiclass Brier; batch capacity 256; 40 steps/epoch; 3 epochs/120 steps; no scheduler, clipping, autocast, TF32 matmul, or gradient accumulation",
+    "occurrences": "sealed original common primary stream and arm head-input manifests; 10,000 primary + 5,000 auxiliary events per epoch",
+    "checkpoint_steps": [40, 80, "every global step 81 through 120 inclusive"],
+    "trained_snapshots_per_run": 42,
+    "runs": 9,
+    "trained_snapshot_total": 378,
+    "initial_templates": 3,
+    "execution_order": {"3243871208": ["B-DUP", "B-MATCHED", "B-SHAM"], "669993655": ["B-MATCHED", "B-SHAM", "B-DUP"], "3076094663": ["B-SHAM", "B-DUP", "B-MATCHED"]},
+    "no_early_stopping_or_checkpoint_promotion": true,
+    "resume": "only from last fully validated step checkpoint with optimizer and RNG; failed partial outputs preserved; no seed replacement"
+  },
+  "evaluation_and_analysis": {
+    "opening": "one fresh R1 panel opening, only after all nine runs, 378 checkpoints, three init templates, and telemetry hash tree are sealed",
+    "prediction_matrix": "381 cells x 8,000 rows = 3,048,000 raw prediction rows, all emitted before metrics are opened",
+    "metrics": "unchanged original P analysis contract; per-seed, arm, global step, family, full transition decomposition; step 80 baseline; simultaneous neighborhood-cluster bands and onset rules unchanged",
+    "fresh_world_scope": "new worlds/neighborhoods within four fixed held-out families and p0-p3 templates; not novel-template or novel-family generalization",
+    "intermediate_checkpoint": "descriptive trajectory only; no promotion, model recommendation, stopping decision, or operating-point claim"
+  },
+  "output": {
+    "workspace_root": "experiments/jev-information-density-v08p-r1",
+    "external_root": "D:/codex-runs/jev-information-density-v08p-r1/v0.8P-R1",
+    "fail_if_external_root_exists": true,
+    "target_dir": "D:/cargo-targets/jev-v08p-r1",
+    "no_phoenix": true
+  },
+  "pre_run_provenance_note": {
+    "incident": "During R1 pre-contract reconnaissance, an original v08N generator-receipt JSON object was converted for inspection and its identity-only train/eval episode ID arrays appeared in tool output. No targets, features, predictions, metrics, or E1 content were present in that object. Those arrays are not used as R1 inputs; R1 reconstructs identities from bound generator source. The access is disclosed and is not represented as a narrower read.",
+    "v09_caveat": "The disclosed v09 parser caveat remains attached only to v09; no v09-derived rows or mappings are inputs to R1."
+  },
+  "terminal_failures": ["TRAINING_IDENTITY_REPLAY_FAIL", "IDENTITY_SCHEMA_INCOMPLETE", "FORBIDDEN_SOURCE_ACQUISITION", "E1_IDENTITY_COLLISION_UNRESOLVED", "TRAINING_PANEL_OVERLAP", "PANEL_VALIDATION_FAIL", "LFM_IDENTITY_MISMATCH", "FEATURE_NONDETERMINISM", "TRAINING_INVARIANT_FAILURE", "EVALUATION_INPUT_MISMATCH"]
+}

@@ -1,0 +1,11 @@
+[package]
+name = "e012-serde-map-order-harness"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[features]
+preserve_order = ["serde_json/preserve_order"]
+
+[dependencies]
+serde_json = { package = "serde_json", path = "../../repositories/serde-json" }

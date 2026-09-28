@@ -1,0 +1,34 @@
+{
+  "status": "PLANNING_ONLY_NOT_SEALED",
+  "new_execution": false,
+  "records": [
+    {
+      "path": "experiments\\drosophila-heresy\\supervision\\gc1-next-program-20260918\\LONG_RUN_PLAN.md",
+      "sha256": "6109614BA4A5796EAE256BE97ED99037D943FCE8F443E56499366138D99C6743"
+    },
+    {
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-v1/PLAN.md",
+      "sha256": "2F4DC200F0D4A2CCBE54E8883F467E74AD8B1789A8F55787A70391EA3F2B6A4E"
+    },
+    {
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-v1/CONTRACT.json",
+      "sha256": "4AD04F0F3B6E1CB56A5C5C17F3984F370C4A9DF8DC6D47B786EB83541A625BF3"
+    },
+    {
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-v1/PREEXECUTION.json",
+      "sha256": "ABAD9812EA755AE6928AA66F68748DFBDC865F25D59051B04DC8E7E31ECF3340"
+    },
+    {
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-v1/scripts/run_cancel1.py",
+      "sha256": "2DC8F504628FC29BDBBAD8DDE22225765B3A3EC7A0C9623EDE7412F27700CA9D"
+    },
+    {
+      "path": "experiments/drosophila-heresy/q10-gc1-rq1-v1/scripts/run_rq1.py",
+      "sha256": "7820F43395EF6BFB82CC32838970CA7F404BC39BF7821B4B63DBE1AEB02585C7"
+    },
+    {
+      "path": "experiments/drosophila-heresy/q10-gc1-rq1-v1/qualification/execution.json",
+      "sha256": "251723BDA26FAA6005B75369E88444767784E82DB500D1EAEC5952446F9A67E5"
+    }
+  ]
+}

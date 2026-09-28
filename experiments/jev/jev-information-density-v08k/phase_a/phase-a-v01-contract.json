@@ -1,0 +1,50 @@
+{
+  "protocol": "jev-information-density/v0.8k-phase-a-v01",
+  "phase_a_identity": "phase-a-v01-clean",
+  "status": "CONSTRUCTION_ONLY_NO_MODEL_CONTACT",
+  "parent_protocol": "jev-information-density/v0.8j-phase-b-v01",
+  "parent_phase_a_identity": "phase-a-v01-clean",
+  "parent_phase_b_identity": "phase-b-v01-clean",
+  "parent_seal_required": true,
+  "forbidden_parent_identity": "phase-a-v01-quarantined",
+  "arms": {
+    "K-DUP": {"auxiliary_source_role": "anchor", "auxiliary_target": "anchor_gold"},
+    "K-SHAM": {"auxiliary_source_role": "sham", "auxiliary_target": "anchor_gold"}
+  },
+  "inputs": {
+    "primary_bank": "F100",
+    "triplets": 5000,
+    "auxiliary_events_per_arm": 5000,
+    "primary_rows": 100000,
+    "sham_gold_tolerance": 1e-12,
+    "fact_flip_required": true
+  },
+  "objective": {
+    "base_loss": "existing_v08j_L3_source_typed",
+    "auxiliary_loss": "existing_v08j_L3_source_typed",
+    "auxiliary_weight": 1.0,
+    "existing_invariance_weight": 0.10,
+    "existing_invariance_events": 4982,
+    "new_anchor_sham_edges": 0,
+    "formula": "(N_base*L_base + N_aux*L_aux)/(N_base + N_aux) + lambda_existing*L_existing",
+    "normalization_semantics": "same_as_v08j_J10_pointwise_sham_treatment",
+    "all_arms_compute_anchor_fact_sham": true,
+    "disabled_events_zero_gradient": true
+  },
+  "training_boundary": {
+    "model_contact": false,
+    "feature_extraction": false,
+    "training": false,
+    "evaluation_inference": false,
+    "Phoenix": false,
+    "LoRA": false,
+    "QLoRA": false
+  },
+  "lineage": {
+    "seal_required_before_construction": true,
+    "phase_b_separate_authorization_required": true,
+    "primary_bank_unchanged": true,
+    "triplet_identity_unchanged": true,
+    "only_auxiliary_source_role_differs": true
+  }
+}

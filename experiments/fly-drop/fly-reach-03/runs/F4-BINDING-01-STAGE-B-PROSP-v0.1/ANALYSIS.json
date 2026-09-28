@@ -1,0 +1,823 @@
+{
+  "assignment_support": [
+    {
+      "assignment": "1100",
+      "assignment_index": 0,
+      "block_ids": [
+        310013,
+        310016,
+        310017,
+        310023
+      ],
+      "condition_means_over_36_fixed_models": {
+        "cycle_4": {
+          "balanced_error": 0.5007847485854552,
+          "eta_delivery": 0.21612508073450465,
+          "leverage": {
+            "leverage_ess": 129.03703560483362,
+            "leverage_sum": 3.406770046737493,
+            "top_1pct_share": 0.7897294940402114,
+            "top_20pct_share": 0.9999544328066323,
+            "top_5pct_share": 0.9926985345264564
+          },
+          "mean_absolute_logit": 10.315705424493087,
+          "psi_prop": 0.8272587276435587,
+          "q_diagnostics": {
+            "count": 10613,
+            "ess": 10612.687938926414,
+            "max": 380.546875,
+            "mean": 378.6777404480354,
+            "min": 376.421875,
+            "sum": 4018906.859375
+          },
+          "signed_margin": -0.4963035711364285,
+          "weighted_sign_agreement": 0.9136293638217793
+        },
+        "intact": {
+          "balanced_error": 0.00033591088729099765,
+          "eta_delivery": 0.20333814050568969,
+          "leverage": {
+            "leverage_ess": 129.03703560483362,
+            "leverage_sum": 3.406770046737493,
+            "top_1pct_share": 0.7897294940402114,
+            "top_20pct_share": 0.9999544328066323,
+            "top_5pct_share": 0.9926985345264564
+          },
+          "mean_absolute_logit": 11.983682003889468,
+          "psi_prop": 0.9958876183672865,
+          "q_diagnostics": {
+            "count": 10613,
+            "ess": 10612.687938926414,
+            "max": 380.546875,
+            "mean": 378.6777404480354,
+            "min": 376.421875,
+            "sum": 4018906.859375
+          },
+          "signed_margin": 11.951277618341845,
+          "weighted_sign_agreement": 0.9979438091836431
+        },
+        "pair_swap": {
+          "balanced_error": 0.13626865311738218,
+          "eta_delivery": 0.15657719749770843,
+          "leverage": {
+            "leverage_ess": 129.03703560483362,
+            "leverage_sum": 3.406770046737493,
+            "top_1pct_share": 0.7897294940402114,
+            "top_20pct_share": 0.9999544328066323,
+            "top_5pct_share": 0.9926985345264564
+          },
+          "mean_absolute_logit": 6.778868818253392,
+          "psi_prop": 0.7760236306288042,
+          "q_diagnostics": {
+            "count": 10613,
+            "ess": 10612.687938926414,
+            "max": 380.546875,
+            "mean": 378.6777404480354,
+            "min": 376.421875,
+            "sum": 4018906.859375
+          },
+          "signed_margin": 6.015212347244893,
+          "weighted_sign_agreement": 0.8880118153144021
+        }
+      },
+      "evaluable": true,
+      "mean_model_paired_delta_balanced_error": {
+        "cycle_4": 0.5004488376981642,
+        "pair_swap": 0.1359327422300912
+      },
+      "mean_model_paired_delta_eta_delivery": {
+        "cycle_4": 0.012786940228814945,
+        "pair_swap": -0.046760943007981275
+      },
+      "mean_model_paired_delta_margin": {
+        "cycle_4": -12.447581189478274,
+        "pair_swap": -5.936065271096953
+      },
+      "mean_model_paired_delta_psi_prop": {
+        "cycle_4": -0.16862889072372766,
+        "pair_swap": -0.21986398773848212
+      },
+      "q_diagnostics": {
+        "count": 10613,
+        "ess": 10612.687938926414,
+        "max": 380.546875,
+        "mean": 378.6777404480354,
+        "min": 376.421875,
+        "sum": 4018906.859375
+      },
+      "support": {
+        "negative": 5424,
+        "positive": 5189,
+        "rows": 10613
+      }
+    },
+    {
+      "assignment": "1010",
+      "assignment_index": 1,
+      "block_ids": [
+        310005,
+        310007,
+        310012,
+        310022
+      ],
+      "condition_means_over_36_fixed_models": {
+        "cycle_4": {
+          "balanced_error": 0.5181128855717124,
+          "eta_delivery": 0.008163710944425188,
+          "leverage": {
+            "leverage_ess": 49.29951418314268,
+            "leverage_sum": 0.6337699538072219,
+            "top_1pct_share": 0.8546841539413108,
+            "top_20pct_share": 0.9988275992379507,
+            "top_5pct_share": 0.9902975990206744
+          },
+          "mean_absolute_logit": 7.729327347765712,
+          "psi_prop": 0.07843667237108601,
+          "q_diagnostics": {
+            "count": 10582,
+            "ess": 10581.69495478712,
+            "max": 380.546875,
+            "mean": 378.82624090436593,
+            "min": 376.421875,
+            "sum": 4008739.28125
+          },
+          "signed_margin": -1.2472429704253092,
+          "weighted_sign_agreement": 0.5392183361855429
+        },
+        "intact": {
+          "balanced_error": 0.000704294256456128,
+          "eta_delivery": 0.14739532919556786,
+          "leverage": {
+            "leverage_ess": 49.29951418314268,
+            "leverage_sum": 0.6337699538072219,
+            "top_1pct_share": 0.8546841539413108,
+            "top_20pct_share": 0.9988275992379507,
+            "top_5pct_share": 0.9902975990206744
+          },
+          "mean_absolute_logit": 12.023033540602334,
+          "psi_prop": 0.9748820024061445,
+          "q_diagnostics": {
+            "count": 10582,
+            "ess": 10581.69495478712,
+            "max": 380.546875,
+            "mean": 378.82624090436593,
+            "min": 376.421875,
+            "sum": 4008739.28125
+          },
+          "signed_margin": 11.21588301286226,
+          "weighted_sign_agreement": 0.9874410012030723
+        },
+        "pair_swap": {
+          "balanced_error": 0.15322048962295673,
+          "eta_delivery": 0.08508707207018575,
+          "leverage": {
+            "leverage_ess": 49.29951418314268,
+            "leverage_sum": 0.6337699538072219,
+            "top_1pct_share": 0.8546841539413108,
+            "top_20pct_share": 0.9988275992379507,
+            "top_5pct_share": 0.9902975990206744
+          },
+          "mean_absolute_logit": 5.188352462183096,
+          "psi_prop": 0.6631207995442173,
+          "q_diagnostics": {
+            "count": 10582,
+            "ess": 10581.69495478712,
+            "max": 380.546875,
+            "mean": 378.82624090436593,
+            "min": 376.421875,
+            "sum": 4008739.28125
+          },
+          "signed_margin": 6.161810333783194,
+          "weighted_sign_agreement": 0.8315603997721087
+        }
+      },
+      "evaluable": true,
+      "mean_model_paired_delta_balanced_error": {
+        "cycle_4": 0.5174085913152563,
+        "pair_swap": 0.1525161953665006
+      },
+      "mean_model_paired_delta_eta_delivery": {
+        "cycle_4": -0.1392316182511427,
+        "pair_swap": -0.06230825712538213
+      },
+      "mean_model_paired_delta_margin": {
+        "cycle_4": -12.46312598328757,
+        "pair_swap": -5.054072679079066
+      },
+      "mean_model_paired_delta_psi_prop": {
+        "cycle_4": -0.8964453300350586,
+        "pair_swap": -0.3117612028619271
+      },
+      "q_diagnostics": {
+        "count": 10582,
+        "ess": 10581.69495478712,
+        "max": 380.546875,
+        "mean": 378.82624090436593,
+        "min": 376.421875,
+        "sum": 4008739.28125
+      },
+      "support": {
+        "negative": 8801,
+        "positive": 1781,
+        "rows": 10582
+      }
+    },
+    {
+      "assignment": "0110",
+      "assignment_index": 2,
+      "block_ids": [
+        310003,
+        310009,
+        310015,
+        310018
+      ],
+      "condition_means_over_36_fixed_models": {
+        "cycle_4": {
+          "balanced_error": 0.626975617637334,
+          "eta_delivery": -0.1689833810416918,
+          "leverage": {
+            "leverage_ess": 56.646926300507,
+            "leverage_sum": 1.29689823705498,
+            "top_1pct_share": 0.815642448205848,
+            "top_20pct_share": 0.9999397553198295,
+            "top_5pct_share": 0.9963912347783497
+          },
+          "mean_absolute_logit": 8.05056615576745,
+          "psi_prop": -0.76231360603606,
+          "q_diagnostics": {
+            "count": 6947,
+            "ess": 6946.799068139071,
+            "max": 380.546875,
+            "mean": 378.1408724089535,
+            "min": 376.421875,
+            "sum": 2626944.640625
+          },
+          "signed_margin": -3.531090194743252,
+          "weighted_sign_agreement": 0.11884319698197
+        },
+        "intact": {
+          "balanced_error": 0.018038030329116685,
+          "eta_delivery": 0.24138404656272458,
+          "leverage": {
+            "leverage_ess": 56.646926300507,
+            "leverage_sum": 1.29689823705498,
+            "top_1pct_share": 0.815642448205848,
+            "top_20pct_share": 0.9999397553198295,
+            "top_5pct_share": 0.9963912347783497
+          },
+          "mean_absolute_logit": 11.815086175886655,
+          "psi_prop": 0.9324986925380014,
+          "q_diagnostics": {
+            "count": 6947,
+            "ess": 6946.799068139071,
+            "max": 380.546875,
+            "mean": 378.1408724089535,
+            "min": 376.421875,
+            "sum": 2626944.640625
+          },
+          "signed_margin": 11.829050985506633,
+          "weighted_sign_agreement": 0.9662493462690007
+        },
+        "pair_swap": {
+          "balanced_error": 0.16563903064156105,
+          "eta_delivery": 0.24286092474353962,
+          "leverage": {
+            "leverage_ess": 56.646926300507,
+            "leverage_sum": 1.29689823705498,
+            "top_1pct_share": 0.815642448205848,
+            "top_20pct_share": 0.9999397553198295,
+            "top_5pct_share": 0.9963912347783497
+          },
+          "mean_absolute_logit": 7.522870944502793,
+          "psi_prop": 0.965704969407695,
+          "q_diagnostics": {
+            "count": 6947,
+            "ess": 6946.799068139071,
+            "max": 380.546875,
+            "mean": 378.1408724089535,
+            "min": 376.421875,
+            "sum": 2626944.640625
+          },
+          "signed_margin": 7.2379744913008786,
+          "weighted_sign_agreement": 0.9828524847038476
+        }
+      },
+      "evaluable": true,
+      "mean_model_paired_delta_balanced_error": {
+        "cycle_4": 0.6089375873082173,
+        "pair_swap": 0.14760100031244439
+      },
+      "mean_model_paired_delta_eta_delivery": {
+        "cycle_4": -0.4103674276044164,
+        "pair_swap": 0.0014768781808150444
+      },
+      "mean_model_paired_delta_margin": {
+        "cycle_4": -15.360141180249883,
+        "pair_swap": -4.591076494205755
+      },
+      "mean_model_paired_delta_psi_prop": {
+        "cycle_4": -1.6948122985740615,
+        "pair_swap": 0.033206276869693706
+      },
+      "q_diagnostics": {
+        "count": 6947,
+        "ess": 6946.799068139071,
+        "max": 380.546875,
+        "mean": 378.1408724089535,
+        "min": 376.421875,
+        "sum": 2626944.640625
+      },
+      "support": {
+        "negative": 2333,
+        "positive": 4614,
+        "rows": 6947
+      }
+    },
+    {
+      "assignment": "1001",
+      "assignment_index": 3,
+      "block_ids": [
+        310010,
+        310019,
+        310020,
+        310021
+      ],
+      "condition_means_over_36_fixed_models": {
+        "cycle_4": {
+          "balanced_error": 0.4999022253536382,
+          "eta_delivery": -0.017618870386521965,
+          "leverage": {
+            "leverage_ess": 61.37012145070722,
+            "leverage_sum": 1.728800491884716,
+            "top_1pct_share": 0.8101278623802239,
+            "top_20pct_share": 0.9993564371718745,
+            "top_5pct_share": 0.9939627341285286
+          },
+          "mean_absolute_logit": 9.836663792566014,
+          "psi_prop": -0.05629819578943324,
+          "q_diagnostics": {
+            "count": 7552,
+            "ess": 7551.786537729089,
+            "max": 380.546875,
+            "mean": 378.9262612552966,
+            "min": 376.421875,
+            "sum": 2861651.125
+          },
+          "signed_margin": -0.4208818420040774,
+          "weighted_sign_agreement": 0.4718509021052834
+        },
+        "intact": {
+          "balanced_error": 0.002351435568885089,
+          "eta_delivery": 0.24800366132339377,
+          "leverage": {
+            "leverage_ess": 61.37012145070722,
+            "leverage_sum": 1.728800491884716,
+            "top_1pct_share": 0.8101278623802239,
+            "top_20pct_share": 0.9993564371718745,
+            "top_5pct_share": 0.9939627341285286
+          },
+          "mean_absolute_logit": 12.27392551619116,
+          "psi_prop": 0.9717158544278299,
+          "q_diagnostics": {
+            "count": 7552,
+            "ess": 7551.786537729089,
+            "max": 380.546875,
+            "mean": 378.9262612552966,
+            "min": 376.421875,
+            "sum": 2861651.125
+          },
+          "signed_margin": 12.326353267760481,
+          "weighted_sign_agreement": 0.9858579272139151
+        },
+        "pair_swap": {
+          "balanced_error": 0.11299558202898521,
+          "eta_delivery": 0.19893841191113293,
+          "leverage": {
+            "leverage_ess": 61.37012145070722,
+            "leverage_sum": 1.728800491884716,
+            "top_1pct_share": 0.8101278623802239,
+            "top_20pct_share": 0.9993564371718745,
+            "top_5pct_share": 0.9939627341285286
+          },
+          "mean_absolute_logit": 6.316975146318776,
+          "psi_prop": 0.7778322981080686,
+          "q_diagnostics": {
+            "count": 7552,
+            "ess": 7551.786537729089,
+            "max": 380.546875,
+            "mean": 378.9262612552966,
+            "min": 376.421875,
+            "sum": 2861651.125
+          },
+          "signed_margin": 5.634711450765143,
+          "weighted_sign_agreement": 0.8889161490540344
+        }
+      },
+      "evaluable": true,
+      "mean_model_paired_delta_balanced_error": {
+        "cycle_4": 0.49755078978475303,
+        "pair_swap": 0.11064414646010012
+      },
+      "mean_model_paired_delta_eta_delivery": {
+        "cycle_4": -0.2656225317099158,
+        "pair_swap": -0.049065249412260876
+      },
+      "mean_model_paired_delta_margin": {
+        "cycle_4": -12.747235109764558,
+        "pair_swap": -6.691641816995338
+      },
+      "mean_model_paired_delta_psi_prop": {
+        "cycle_4": -1.0280140502172632,
+        "pair_swap": -0.19388355631976126
+      },
+      "q_diagnostics": {
+        "count": 7552,
+        "ess": 7551.786537729089,
+        "max": 380.546875,
+        "mean": 378.9262612552966,
+        "min": 376.421875,
+        "sum": 2861651.125
+      },
+      "support": {
+        "negative": 3694,
+        "positive": 3858,
+        "rows": 7552
+      }
+    },
+    {
+      "assignment": "0101",
+      "assignment_index": 4,
+      "block_ids": [
+        310002,
+        310004,
+        310006,
+        310011
+      ],
+      "condition_means_over_36_fixed_models": {
+        "cycle_4": {
+          "balanced_error": 0.7457669248720212,
+          "eta_delivery": -0.31923804798339844,
+          "leverage": {
+            "leverage_ess": 43.956688416097364,
+            "leverage_sum": 0.7724272217194378,
+            "top_1pct_share": 0.9309756544147915,
+            "top_20pct_share": 0.9999554909305866,
+            "top_5pct_share": 0.9987228634138181
+          },
+          "mean_absolute_logit": 9.934438090406612,
+          "psi_prop": -0.9681685072200401,
+          "q_diagnostics": {
+            "count": 5819,
+            "ess": 5818.985433293855,
+            "max": 380.546875,
+            "mean": 376.50977670132323,
+            "min": 376.421875,
+            "sum": 2190910.390625
+          },
+          "signed_margin": -5.14196021893952,
+          "weighted_sign_agreement": 0.015915746389979925
+        },
+        "intact": {
+          "balanced_error": 0.4447101548544227,
+          "eta_delivery": 0.2629309782655359,
+          "leverage": {
+            "leverage_ess": 43.956688416097364,
+            "leverage_sum": 0.7724272217194378,
+            "top_1pct_share": 0.9309756544147915,
+            "top_20pct_share": 0.9999554909305866,
+            "top_5pct_share": 0.9987228634138181
+          },
+          "mean_absolute_logit": 6.5622231028023315,
+          "psi_prop": 0.7232189664386491,
+          "q_diagnostics": {
+            "count": 5819,
+            "ess": 5818.985433293855,
+            "max": 380.546875,
+            "mean": 376.50977670132323,
+            "min": 376.421875,
+            "sum": 2190910.390625
+          },
+          "signed_margin": 1.051888884444655,
+          "weighted_sign_agreement": 0.8616094832193245
+        },
+        "pair_swap": {
+          "balanced_error": 0.5253649429421667,
+          "eta_delivery": 0.19788076935366009,
+          "leverage": {
+            "leverage_ess": 43.956688416097364,
+            "leverage_sum": 0.7724272217194378,
+            "top_1pct_share": 0.9309756544147915,
+            "top_20pct_share": 0.9999554909305866,
+            "top_5pct_share": 0.9987228634138181
+          },
+          "mean_absolute_logit": 6.020533800391885,
+          "psi_prop": 0.5411756818101601,
+          "q_diagnostics": {
+            "count": 5819,
+            "ess": 5818.985433293855,
+            "max": 380.546875,
+            "mean": 376.50977670132323,
+            "min": 376.421875,
+            "sum": 2190910.390625
+          },
+          "signed_margin": -0.6102715597888227,
+          "weighted_sign_agreement": 0.77058784090508
+        }
+      },
+      "evaluable": true,
+      "mean_model_paired_delta_balanced_error": {
+        "cycle_4": 0.3010567700175984,
+        "pair_swap": 0.08065478808774394
+      },
+      "mean_model_paired_delta_eta_delivery": {
+        "cycle_4": -0.5821690262489344,
+        "pair_swap": -0.06505020891187584
+      },
+      "mean_model_paired_delta_margin": {
+        "cycle_4": -6.193849103384175,
+        "pair_swap": -1.6621604442334776
+      },
+      "mean_model_paired_delta_psi_prop": {
+        "cycle_4": -1.6913874736586891,
+        "pair_swap": -0.18204328462848907
+      },
+      "q_diagnostics": {
+        "count": 5819,
+        "ess": 5818.985433293855,
+        "max": 380.546875,
+        "mean": 376.50977670132323,
+        "min": 376.421875,
+        "sum": 2190910.390625
+      },
+      "support": {
+        "negative": 28,
+        "positive": 5791,
+        "rows": 5819
+      }
+    },
+    {
+      "assignment": "0011",
+      "assignment_index": 5,
+      "block_ids": [
+        310000,
+        310001,
+        310008,
+        310014
+      ],
+      "condition_means_over_36_fixed_models": {
+        "cycle_4": {
+          "balanced_error": 0.5041513857651376,
+          "eta_delivery": -0.07468344400536263,
+          "leverage": {
+            "leverage_ess": 18.957500552817883,
+            "leverage_sum": 0.3408081113415582,
+            "top_1pct_share": 0.9000140811938429,
+            "top_20pct_share": 0.9959428440985865,
+            "top_5pct_share": 0.9572180526037835
+          },
+          "mean_absolute_logit": 9.481352674659396,
+          "psi_prop": -0.40450681268264915,
+          "q_diagnostics": {
+            "count": 5089,
+            "ess": 5088.8506986593975,
+            "max": 380.546875,
+            "mean": 378.6995818186284,
+            "min": 376.421875,
+            "sum": 1927202.171875
+          },
+          "signed_margin": -1.4064489684359538,
+          "weighted_sign_agreement": 0.2977465936586754
+        },
+        "intact": {
+          "balanced_error": 0.00036182667973515785,
+          "eta_delivery": 0.19983881468853804,
+          "leverage": {
+            "leverage_ess": 18.957500552817883,
+            "leverage_sum": 0.3408081113415582,
+            "top_1pct_share": 0.9000140811938429,
+            "top_20pct_share": 0.9959428440985865,
+            "top_5pct_share": 0.9572180526037835
+          },
+          "mean_absolute_logit": 11.071900806796751,
+          "psi_prop": 0.9826979702361659,
+          "q_diagnostics": {
+            "count": 5089,
+            "ess": 5088.8506986593975,
+            "max": 380.546875,
+            "mean": 378.6995818186284,
+            "min": 376.421875,
+            "sum": 1927202.171875
+          },
+          "signed_margin": 11.068128542765365,
+          "weighted_sign_agreement": 0.9913489851180829
+        },
+        "pair_swap": {
+          "balanced_error": 0.13898994209482454,
+          "eta_delivery": 0.15740776063515372,
+          "leverage": {
+            "leverage_ess": 18.957500552817883,
+            "leverage_sum": 0.3408081113415582,
+            "top_1pct_share": 0.9000140811938429,
+            "top_20pct_share": 0.9959428440985865,
+            "top_5pct_share": 0.9572180526037835
+          },
+          "mean_absolute_logit": 6.39622501512268,
+          "psi_prop": 0.7829916560769405,
+          "q_diagnostics": {
+            "count": 5089,
+            "ess": 5088.8506986593975,
+            "max": 380.546875,
+            "mean": 378.6995818186284,
+            "min": 376.421875,
+            "sum": 1927202.171875
+          },
+          "signed_margin": 5.766256001631899,
+          "weighted_sign_agreement": 0.8914958280384702
+        }
+      },
+      "evaluable": true,
+      "mean_model_paired_delta_balanced_error": {
+        "cycle_4": 0.5037895590854025,
+        "pair_swap": 0.1386281154150894
+      },
+      "mean_model_paired_delta_eta_delivery": {
+        "cycle_4": -0.2745222586939007,
+        "pair_swap": -0.04243105405338432
+      },
+      "mean_model_paired_delta_margin": {
+        "cycle_4": -12.474577511201318,
+        "pair_swap": -5.3018725411334655
+      },
+      "mean_model_paired_delta_psi_prop": {
+        "cycle_4": -1.3872047829188152,
+        "pair_swap": -0.19970631415922538
+      },
+      "q_diagnostics": {
+        "count": 5089,
+        "ess": 5088.8506986593975,
+        "max": 380.546875,
+        "mean": 378.6995818186284,
+        "min": 376.421875,
+        "sum": 1927202.171875
+      },
+      "support": {
+        "negative": 2561,
+        "positive": 2528,
+        "rows": 5089
+      }
+    }
+  ],
+  "biological_promotion": false,
+  "classification": "FRESH_PROSPECTIVE_ENGINEERING_CONFIRMATION",
+  "identity": "F4-BINDING-01-STAGE-B-PROSP-v0.1",
+  "input_hashes": {
+    "collection_integrity_receipt_sha256": "62ca3409dbeb6adfd401bf8dfaf3564eeeeb469b10257413e9270b155aea5a34",
+    "implementation_freeze_sha256": "9469ac8b9ef7e0db530ec2febae15cf17677bd58c476886593b12e5a8d0da37b",
+    "model_registry_sha256": "8d936560fdf442e69e724f5bdf2898fad3a3b624f116ac385aca8a5b7d637713",
+    "pre_truth_integrity_receipt_sha256": "abf24df9b387be6739f1ee26d90261bca0415b18d4b0c02709094d861bd963dc",
+    "prediction_lock_sha256": "3dc0e1a68b33d02c45b86c2a948e8fa35fcbc08628e0f30468ea270a975a126c",
+    "predictor_sha256": "e3084483f7438298abe14bc09a16d243f9aa68c2622fa62e59d94d048c5817e8",
+    "source_manifest_sha256": "461a959b099ad7cb555d6cfa5dfdc66c191f3ffcdadc79f874801abe36079752",
+    "task_bank_manifest_sha256": "9ed34090f909292cb67cd2ea59c6d43d2bf53899511284e08977dda7111e3bdd",
+    "truth_sha256": "3e382caa8bfc5b993cc0c4ec10fdf2d54e40bb3b912c6c9f670f004c794c099a"
+  },
+  "measured_reach03_authorized": false,
+  "measures_kept_separate": [
+    "classification",
+    "proposed Psi",
+    "delivery-aware alignment",
+    "trajectory endpoint capability"
+  ],
+  "model_count": 36,
+  "pheno_status": "unchanged",
+  "primary": {
+    "assignment_order": [
+      "1100",
+      "1010",
+      "0110",
+      "1001",
+      "0101",
+      "0011"
+    ],
+    "bootstrap": {
+      "decision": "INCONCLUSIVE_BOOTSTRAP_SUPPORT",
+      "draws_evaluable": 6261,
+      "draws_nondevaluable": 3739,
+      "draws_requested": 10000,
+      "intervals": {
+        "cycle_4": null,
+        "pair_swap": null
+      },
+      "status": "BOOTSTRAP_SUPPORT_FAILURE"
+    },
+    "cycle_4_95_percent_block_cluster_interval": null,
+    "cycle_4_delta_error_vector": [
+      0.5004488376981642,
+      0.5174085913152563,
+      0.6089375873082173,
+      0.49755078978475303,
+      0.3010567700175984,
+      0.5037895590854025
+    ],
+    "equal_weight_assignment_mean_delta_error": {
+      "cycle_4": 0.4881986892015653,
+      "pair_swap": 0.12766283131199493
+    },
+    "evaluable_assignment_count": 6,
+    "pair_swap_95_percent_block_cluster_interval": null,
+    "pair_swap_delta_error_vector": [
+      0.1359327422300912,
+      0.1525161953665006,
+      0.14760100031244439,
+      0.11064414646010012,
+      0.08065478808774394,
+      0.1386281154150894
+    ],
+    "support_evaluable": true
+  },
+  "row_count": 46602,
+  "schema": "F4-BINDING-01-stage-b-analysis-v0.1",
+  "scientific_disposition": "INCONCLUSIVE_BOOTSTRAP_SUPPORT",
+  "secondary_pooled_model_mean_metrics": {
+    "cycle_4": {
+      "balanced_error": 0.5097052669583015,
+      "eta_delivery": 0.022987148836505458,
+      "leverage": {
+        "leverage_ess": 341.0262558007855,
+        "leverage_sum": 8.179474062545406,
+        "top_1pct_share": 0.8704663655247163,
+        "top_20pct_share": 0.9997985894630154,
+        "top_5pct_share": 0.99398785630852
+      },
+      "mean_absolute_logit": 9.174033359851457,
+      "psi_prop": 0.1095816944026286,
+      "q_diagnostics": {
+        "count": 46602,
+        "ess": 46600.61770940224,
+        "max": 380.546875,
+        "mean": 378.40338330436464,
+        "min": 376.421875,
+        "sum": 17634354.46875
+      },
+      "signed_margin": -1.1717418176516066,
+      "weighted_sign_agreement": 0.5547908472013143
+    },
+    "intact": {
+      "balanced_error": 0.03612832340484223,
+      "eta_delivery": 0.19369538594464408,
+      "leverage": {
+        "leverage_ess": 341.0262558007855,
+        "leverage_sum": 8.179474062545406,
+        "top_1pct_share": 0.8704663655247163,
+        "top_20pct_share": 0.9997985894630154,
+        "top_5pct_share": 0.99398785630852
+      },
+      "mean_absolute_logit": 11.241398891255567,
+      "psi_prop": 0.9528015106987913,
+      "q_diagnostics": {
+        "count": 46602,
+        "ess": 46600.61770940224,
+        "max": 380.546875,
+        "mean": 378.40338330436464,
+        "min": 376.421875,
+        "sum": 17634354.46875
+      },
+      "signed_margin": 10.846225182701343,
+      "weighted_sign_agreement": 0.9764007553493956
+    },
+    "pair_swap": {
+      "balanced_error": 0.16050170145744458,
+      "eta_delivery": 0.14725906737976976,
+      "leverage": {
+        "leverage_ess": 341.0262558007855,
+        "leverage_sum": 8.179474062545406,
+        "top_1pct_share": 0.8704663655247163,
+        "top_20pct_share": 0.9997985894630154,
+        "top_5pct_share": 0.99398785630852
+      },
+      "mean_absolute_logit": 6.317146922229831,
+      "psi_prop": 0.7758453316358147,
+      "q_diagnostics": {
+        "count": 46602,
+        "ess": 46600.61770940224,
+        "max": 380.546875,
+        "mean": 378.40338330436464,
+        "min": 376.421875,
+        "sum": 17634354.46875
+      },
+      "signed_margin": 5.443475293586271,
+      "weighted_sign_agreement": 0.8879226658179074
+    }
+  },
+  "secondary_pooled_q_diagnostics": {
+    "count": 46602,
+    "ess": 46600.61770940224,
+    "max": 380.546875,
+    "mean": 378.40338330436464,
+    "min": 376.421875,
+    "sum": 17634354.46875
+  },
+  "status": "ANALYSIS_COMPLETE",
+  "trajectory_endpoint_capability": "NOT_MEASURED",
+  "truth_access_provenance": "Scoring truth was opened only after prediction lock and independent integrity PASS in this Stage B identity; parent model-training outcomes were from the prior F4-PRESENTATION-03 lineage."
+}

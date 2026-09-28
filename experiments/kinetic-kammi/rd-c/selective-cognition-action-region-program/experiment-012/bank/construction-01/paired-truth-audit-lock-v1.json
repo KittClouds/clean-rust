@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "state": "FROZEN_BEFORE_PAIRED_TRUTH_DIAGNOSTIC",
+  "model_contact_authorized": false,
+  "audit": "scripts/audit_paired_truth_e012_v1.py",
+  "audit_sha256": "af52534dd1ddb703eb836f49049494f29755eef49474ad7ee30a4edfb6789ec6",
+  "files": [
+    {
+      "path": "scripts/audit_paired_truth_e012_v1.py",
+      "sha256": "af52534dd1ddb703eb836f49049494f29755eef49474ad7ee30a4edfb6789ec6",
+      "bytes": 11909
+    },
+    {
+      "path": "scripts/freeze_paired_truth_audit_e012_v1.py",
+      "sha256": "6dd39c7d9fada8fd78d7afaa840faa3c3bdbd9e8f1034083de7f9ecd410c50c7",
+      "bytes": 1804
+    },
+    {
+      "path": "bank/construction-01/scored-bank-v1/vault/task-source-fixtures-final-v1.json",
+      "sha256": "4f675c5a66caeef388866971f8a7be9d44916007c94c97266d8465111f40676e",
+      "bytes": 330122
+    },
+    {
+      "path": "bank/construction-01/scored-bank-v1/vault/candidate-check-labels-final-v1.json",
+      "sha256": "0268384c7a859467e5533b54e73a25eb09aedde2cd34205e22a8ea27fb4f04b7",
+      "bytes": 970000
+    },
+    {
+      "path": "bank/construction-01/scored-bank-v1/observer-frames.json",
+      "sha256": "77ef434369ad6addd43dafe9f7070182c34df003bda745295c9a3d9ffa61616f",
+      "bytes": 4247995
+    },
+    {
+      "path": "bank/construction-01/scored-bank-v1/vault/frame-truth-index.json",
+      "sha256": "8812e0eb0c4c6932140066c632e45e8693e792e6bc55baf7a70a0825cc0d9a15",
+      "bytes": 933977
+    },
+    {
+      "path": "bank/construction-01/scored-bank-v1/vault/presentation-receipts.json",
+      "sha256": "9c8b9c1d652e95fe530e269fd0e5e8660ac5563d6792585bec44e70bb3bf1f9d",
+      "bytes": 1225061
+    },
+    {
+      "path": "bank/construction-01/scored-bank-v1/vault/precontact-audit-v1.json",
+      "sha256": "59f7d54a955a368d3e97ca1328e5875fbc906d72b84765046f06d1399b0d5140",
+      "bytes": 4777
+    }
+  ],
+  "sha256_self_excluded": true
+}

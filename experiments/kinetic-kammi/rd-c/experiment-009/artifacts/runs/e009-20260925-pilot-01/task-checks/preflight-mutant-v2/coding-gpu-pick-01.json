@@ -1,0 +1,29 @@
+{
+  "task_id": "coding-gpu-pick-01",
+  "lane": "preflight-mutant-v2",
+  "action_id": 14,
+  "tests": [
+    {
+      "filter": "picking::e009_epoch_tests::stale_async_pick_is_rejected_after_either_epoch_changes",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "C:\\rd-c\\experiment-009\\tasks\\gpu-pick-invalidation-focused\\candidate-mutant\\phoenix-native\\Cargo.toml",
+        "-p",
+        "graph-render-wgpu",
+        "--lib",
+        "picking::e009_epoch_tests::stale_async_pick_is_rejected_after_either_epoch_changes",
+        "--",
+        "--exact"
+      ],
+      "exit_code": 101,
+      "tests_run": 1,
+      "passed": false,
+      "elapsed_ms": 1804.841,
+      "output": "\nrunning 1 test\ntest picking::e009_epoch_tests::stale_async_pick_is_rejected_after_either_epoch_changes ... FAILED\n\nfailures:\n\n---- picking::e009_epoch_tests::stale_async_pick_is_rejected_after_either_epoch_changes stdout ----\n\nthread 'picking::e009_epoch_tests::stale_async_pick_is_rejected_after_either_epoch_changes' (40744) panicked at crates\\graph-render-wgpu\\src\\picking.rs:390:9:\nassertion failed: !super::pick_is_current(4, 2, 5, 2)\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    picking::e009_epoch_tests::stale_async_pick_is_rejected_after_either_epoch_changes\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 38 filtered out; finished in 0.00s\n\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.60s\n     Running unittests src\\lib.rs (D:\\cargo-targets\\rdc-e009\\gpu-focused-real-mutant\\debug\\deps\\graph_render_wgpu-14d728d5e0579fc8.exe)\nerror: test failed, to rerun pass `-p graph-render-wgpu --lib`\n"
+    }
+  ],
+  "completed": false,
+  "status": "failed-or-mutated"
+}

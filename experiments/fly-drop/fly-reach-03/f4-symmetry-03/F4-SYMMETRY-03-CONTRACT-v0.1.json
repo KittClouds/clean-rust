@@ -1,0 +1,77 @@
+{
+  "schema": "F4-SYMMETRY-03-contract-v0.1",
+  "run_id": "F4-SYMMETRY-03-QREP1",
+  "status": "QUALIFICATION_ONLY_PROSPECTIVE",
+  "contract_markdown_sha256": "7c49b8419896dca4418de3497ecd8566b2167d1c6bf24d7860d904d70f87afe0",
+  "parent_contracts": [
+    {
+      "path": "experiments/fly-reach-03/F4-SYMMETRY-01-CONTRACT-v0.1.md",
+      "sha256": "cfef638aaeac1dfc0b768d13cc95afe7724861f74e3d3111d91401925bed6379"
+    },
+    {
+      "path": "experiments/fly-reach-03/F4-SYMMETRY-01-IMPLEMENTATION-SPEC-v0.1.md",
+      "sha256": "9ef769a80e4e5e91cd9af8b26bf22f8d1b49a940fe89c1f24f571333541ce0a4"
+    },
+    {
+      "path": "experiments/fly-reach-03/F4-SYMMETRY-01-IMPLEMENTATION-AMENDMENT-v0.2.md",
+      "sha256": "cf4b1a83922a08ec45b7e812cd1c39e8681940ff18c479bc0856bc18a9fa35f3"
+    }
+  ],
+  "qualification_only": true,
+  "measured_reach03_authorized": false,
+  "phenotype_recovery_authorized": false,
+  "arms": ["C", "D"],
+  "fresh_blocks": {
+    "count": 8,
+    "candidate_first": 304000,
+    "candidate_last": 304255,
+    "candidate_batch_size": 8,
+    "maximum_batches": 32,
+    "candidate_order": "ascending",
+    "acceptance": "first complete batch where each named incidence pattern is structurally present on at least one sampled coordinate in at least six of eight blocks"
+  },
+  "structural_patterns": {
+    "encoding": "four-bit cue incidence, integer bit c is cue slot c, displayed most-significant bit first",
+    "required": ["0011", "0101", "0001", "0100"],
+    "minimum_blocks_per_pattern": 6,
+    "source": "frozen 64 selected coordinates in each of nine substrate by two side cells",
+    "forbidden_inputs": ["g", "Y", "native proposed updates", "predictions", "performance outcomes"]
+  },
+  "task": {
+    "cues": 4,
+    "pretraining_trials": 8192,
+    "delay_steps": 12,
+    "task_pattern_seed": "accepted block ID",
+    "simulator_seed": "accepted block ID",
+    "schedule_seed": "accepted block ID XOR 0x545241494E",
+    "schedule_generator": "existing deterministic SplitMix64 qualification schedule procedure",
+    "label_balance": "two positive and two negative labels, shuffled deterministically"
+  },
+  "estimator": {
+    "architecture": [90, 128, 64, 1],
+    "dtype": "float32",
+    "epochs": 200,
+    "batch_size": 2048,
+    "optimizer": "Adam",
+    "learning_rate": 0.001,
+    "beta1": 0.9,
+    "beta2": 0.999,
+    "epsilon": 1e-8,
+    "minibatch_order": "frozen global row order, contiguous slices, no shuffle",
+    "cross_validation": "eight-fold leave-one-block-out",
+    "fit_count": 16
+  },
+  "primary_reporting": [
+    "paired pooled and blockwise IPW-balanced error_D_minus_error_C",
+    "blockwise signed margin",
+    "pooled, blockwise, and pattern-conditioned Psi_C, Psi_D, and DeltaPsi_D_minus_C",
+    "pattern-conditioned balanced error and signed margins for 0011, 0101, 0001, 0100",
+    "per-Psi leverage ESS and top 1, 5, and 20 percent leverage shares",
+    "complete block by pattern table, including empty cells"
+  ],
+  "interaction_diagnostic": "per-block DeltaPsi_D_minus_C(0011) minus DeltaPsi_D_minus_C(0101)",
+  "replication_rule": "cross-block 0011 support requires DeltaPsi_D_minus_C(0011) > 0 in at least six of the eight structurally supported blocks",
+  "inference_boundary": "qualification replication only; no confirmatory population claim",
+  "truth_firewall": "write and hash all held-out prediction streams, then pass independent integrity validation before joining held-out truth",
+  "run4_policy": "closed archaeology; no additional outcome slicing and no RUN4 data used for task or seed selection"
+}

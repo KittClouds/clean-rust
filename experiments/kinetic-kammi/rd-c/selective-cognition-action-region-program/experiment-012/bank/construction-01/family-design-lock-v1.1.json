@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "state": "FROZEN_BEFORE_SCORED_TASK_FIXTURES",
+  "model_contact_authorized": false,
+  "scored_task_frames_created": false,
+  "effective_bank_plan_version": "1.1",
+  "bank_amendment": {
+    "id": "E012-BANK-A01",
+    "markdown_sha256": "10c8996b05f6b6733f1a0204be8559d328c15aa9536b1545f72b21ebd02d7699",
+    "json_sha256": "27751a46d5fe4231b7b58928113adbc7036bbcead16f556204f5447fe8c58d2f"
+  },
+  "sha256": {
+    "effective_protocol_lock": "a40040b1616250f393c0f6972ded38c4be0002b367263adae6bd3bb8c49c5fe3",
+    "base_bank_design_lock": "24f1c88bf467989a53227998fc3707a9290f932b29fc9c711a23883b5ec0de5b",
+    "effective_bank_plan": "c1c78c439684547f80bbee96b688979e66ee3bb33252480a908dbe17c6a4db94",
+    "effective_family_design": "5cd029d0c636a61d092e7dd93392480573f716fe50a3059fdebad8dd2cf99efb",
+    "source_inventory": "f5a3268e2446f00b31b05a0dca887b79e08665010bd922206749f7257293b9bc",
+    "feasibility_records": {
+      "bytes_endian": "b2e251caa101978417b26bbede2d5a284c1017ca3b687264cbb6b03c6c48f91e",
+      "bytes_prefix": "e095a1eb4a778fa7c13a34c87223eb566b042e5b88c2e8726293d08ec90c1e09",
+      "bytes_cursor": "060fabf98c06abaf18efe5d06d2d64c70243d507a65961bb7ad22c39e27e7c18",
+      "bytes_composite": "866031d3b1869ecb81ab069065f940c0500368af8b42462897b4cc25ce0f91bd",
+      "clap_repeat": "a0158a5781bb642cfb8896874cd322e276e83705c1696521b2aa0b611c1bfa94",
+      "clap_color_failed_check": "c8ef077e0c0b2cb745b40117e6ad63fe4133eafebdf8af90d157dcf567351262",
+      "clap_color_repaired": "b2632c032773b1bbabd2056b3e26779af7c875fb7ddc0b8a739ad3f4764e3e26"
+    }
+  }
+}

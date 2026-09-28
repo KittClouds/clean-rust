@@ -1,0 +1,50 @@
+{
+  "contexts": [
+    [
+      "seed9731-L-tau16.json",
+      2
+    ],
+    [
+      "seed9731-L-tau4.json",
+      3
+    ],
+    [
+      "seed9731-R-tau16.json",
+      1
+    ],
+    [
+      "seed9731-R-tau16.json",
+      3
+    ],
+    [
+      "seed9731-R-tau4.json",
+      0
+    ],
+    [
+      "seed9731-R-tau4.json",
+      1
+    ],
+    [
+      "seed9731-R-tau4.json",
+      2
+    ],
+    [
+      "seed9731-R-tau4.json",
+      3
+    ]
+  ],
+  "orders": {
+    "1": {
+      "records": 3696,
+      "source": "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-lr1-requal1-sreplace-singles-v1"
+    },
+    "2": {
+      "records": 9530,
+      "source": "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-lr1-requal1-csc1-pair-front1-v2"
+    },
+    "3": {
+      "records": 1090580,
+      "source": "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-lr1-requal1-csc1-pair-alg3-front2-v3"
+    }
+  }
+}

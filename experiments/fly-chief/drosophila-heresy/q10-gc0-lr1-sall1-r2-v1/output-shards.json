@@ -1,0 +1,643 @@
+{
+  "identity": "q10-gc0-lr1-sall1-r2-v1",
+  "output_cases": [
+    {
+      "case": "seed9731-L-tau16__set2",
+      "count": 440,
+      "shards": [
+        {
+          "end": 32,
+          "shard": 0,
+          "start": 0
+        },
+        {
+          "end": 64,
+          "shard": 1,
+          "start": 32
+        },
+        {
+          "end": 96,
+          "shard": 2,
+          "start": 64
+        },
+        {
+          "end": 128,
+          "shard": 3,
+          "start": 96
+        },
+        {
+          "end": 160,
+          "shard": 4,
+          "start": 128
+        },
+        {
+          "end": 192,
+          "shard": 5,
+          "start": 160
+        },
+        {
+          "end": 224,
+          "shard": 6,
+          "start": 192
+        },
+        {
+          "end": 256,
+          "shard": 7,
+          "start": 224
+        },
+        {
+          "end": 288,
+          "shard": 8,
+          "start": 256
+        },
+        {
+          "end": 320,
+          "shard": 9,
+          "start": 288
+        },
+        {
+          "end": 352,
+          "shard": 10,
+          "start": 320
+        },
+        {
+          "end": 384,
+          "shard": 11,
+          "start": 352
+        },
+        {
+          "end": 416,
+          "shard": 12,
+          "start": 384
+        },
+        {
+          "end": 440,
+          "shard": 13,
+          "start": 416
+        }
+      ]
+    },
+    {
+      "case": "seed9731-L-tau4__set3",
+      "count": 496,
+      "shards": [
+        {
+          "end": 32,
+          "shard": 0,
+          "start": 0
+        },
+        {
+          "end": 64,
+          "shard": 1,
+          "start": 32
+        },
+        {
+          "end": 96,
+          "shard": 2,
+          "start": 64
+        },
+        {
+          "end": 128,
+          "shard": 3,
+          "start": 96
+        },
+        {
+          "end": 160,
+          "shard": 4,
+          "start": 128
+        },
+        {
+          "end": 192,
+          "shard": 5,
+          "start": 160
+        },
+        {
+          "end": 224,
+          "shard": 6,
+          "start": 192
+        },
+        {
+          "end": 256,
+          "shard": 7,
+          "start": 224
+        },
+        {
+          "end": 288,
+          "shard": 8,
+          "start": 256
+        },
+        {
+          "end": 320,
+          "shard": 9,
+          "start": 288
+        },
+        {
+          "end": 352,
+          "shard": 10,
+          "start": 320
+        },
+        {
+          "end": 384,
+          "shard": 11,
+          "start": 352
+        },
+        {
+          "end": 416,
+          "shard": 12,
+          "start": 384
+        },
+        {
+          "end": 448,
+          "shard": 13,
+          "start": 416
+        },
+        {
+          "end": 480,
+          "shard": 14,
+          "start": 448
+        },
+        {
+          "end": 496,
+          "shard": 15,
+          "start": 480
+        }
+      ]
+    },
+    {
+      "case": "seed9731-R-tau16__set1",
+      "count": 472,
+      "shards": [
+        {
+          "end": 32,
+          "shard": 0,
+          "start": 0
+        },
+        {
+          "end": 64,
+          "shard": 1,
+          "start": 32
+        },
+        {
+          "end": 96,
+          "shard": 2,
+          "start": 64
+        },
+        {
+          "end": 128,
+          "shard": 3,
+          "start": 96
+        },
+        {
+          "end": 160,
+          "shard": 4,
+          "start": 128
+        },
+        {
+          "end": 192,
+          "shard": 5,
+          "start": 160
+        },
+        {
+          "end": 224,
+          "shard": 6,
+          "start": 192
+        },
+        {
+          "end": 256,
+          "shard": 7,
+          "start": 224
+        },
+        {
+          "end": 288,
+          "shard": 8,
+          "start": 256
+        },
+        {
+          "end": 320,
+          "shard": 9,
+          "start": 288
+        },
+        {
+          "end": 352,
+          "shard": 10,
+          "start": 320
+        },
+        {
+          "end": 384,
+          "shard": 11,
+          "start": 352
+        },
+        {
+          "end": 416,
+          "shard": 12,
+          "start": 384
+        },
+        {
+          "end": 448,
+          "shard": 13,
+          "start": 416
+        },
+        {
+          "end": 472,
+          "shard": 14,
+          "start": 448
+        }
+      ]
+    },
+    {
+      "case": "seed9731-R-tau16__set3",
+      "count": 432,
+      "shards": [
+        {
+          "end": 32,
+          "shard": 0,
+          "start": 0
+        },
+        {
+          "end": 64,
+          "shard": 1,
+          "start": 32
+        },
+        {
+          "end": 96,
+          "shard": 2,
+          "start": 64
+        },
+        {
+          "end": 128,
+          "shard": 3,
+          "start": 96
+        },
+        {
+          "end": 160,
+          "shard": 4,
+          "start": 128
+        },
+        {
+          "end": 192,
+          "shard": 5,
+          "start": 160
+        },
+        {
+          "end": 224,
+          "shard": 6,
+          "start": 192
+        },
+        {
+          "end": 256,
+          "shard": 7,
+          "start": 224
+        },
+        {
+          "end": 288,
+          "shard": 8,
+          "start": 256
+        },
+        {
+          "end": 320,
+          "shard": 9,
+          "start": 288
+        },
+        {
+          "end": 352,
+          "shard": 10,
+          "start": 320
+        },
+        {
+          "end": 384,
+          "shard": 11,
+          "start": 352
+        },
+        {
+          "end": 416,
+          "shard": 12,
+          "start": 384
+        },
+        {
+          "end": 432,
+          "shard": 13,
+          "start": 416
+        }
+      ]
+    },
+    {
+      "case": "seed9731-R-tau4__set0",
+      "count": 472,
+      "shards": [
+        {
+          "end": 32,
+          "shard": 0,
+          "start": 0
+        },
+        {
+          "end": 64,
+          "shard": 1,
+          "start": 32
+        },
+        {
+          "end": 96,
+          "shard": 2,
+          "start": 64
+        },
+        {
+          "end": 128,
+          "shard": 3,
+          "start": 96
+        },
+        {
+          "end": 160,
+          "shard": 4,
+          "start": 128
+        },
+        {
+          "end": 192,
+          "shard": 5,
+          "start": 160
+        },
+        {
+          "end": 224,
+          "shard": 6,
+          "start": 192
+        },
+        {
+          "end": 256,
+          "shard": 7,
+          "start": 224
+        },
+        {
+          "end": 288,
+          "shard": 8,
+          "start": 256
+        },
+        {
+          "end": 320,
+          "shard": 9,
+          "start": 288
+        },
+        {
+          "end": 352,
+          "shard": 10,
+          "start": 320
+        },
+        {
+          "end": 384,
+          "shard": 11,
+          "start": 352
+        },
+        {
+          "end": 416,
+          "shard": 12,
+          "start": 384
+        },
+        {
+          "end": 448,
+          "shard": 13,
+          "start": 416
+        },
+        {
+          "end": 472,
+          "shard": 14,
+          "start": 448
+        }
+      ]
+    },
+    {
+      "case": "seed9731-R-tau4__set1",
+      "count": 440,
+      "shards": [
+        {
+          "end": 32,
+          "shard": 0,
+          "start": 0
+        },
+        {
+          "end": 64,
+          "shard": 1,
+          "start": 32
+        },
+        {
+          "end": 96,
+          "shard": 2,
+          "start": 64
+        },
+        {
+          "end": 128,
+          "shard": 3,
+          "start": 96
+        },
+        {
+          "end": 160,
+          "shard": 4,
+          "start": 128
+        },
+        {
+          "end": 192,
+          "shard": 5,
+          "start": 160
+        },
+        {
+          "end": 224,
+          "shard": 6,
+          "start": 192
+        },
+        {
+          "end": 256,
+          "shard": 7,
+          "start": 224
+        },
+        {
+          "end": 288,
+          "shard": 8,
+          "start": 256
+        },
+        {
+          "end": 320,
+          "shard": 9,
+          "start": 288
+        },
+        {
+          "end": 352,
+          "shard": 10,
+          "start": 320
+        },
+        {
+          "end": 384,
+          "shard": 11,
+          "start": 352
+        },
+        {
+          "end": 416,
+          "shard": 12,
+          "start": 384
+        },
+        {
+          "end": 440,
+          "shard": 13,
+          "start": 416
+        }
+      ]
+    },
+    {
+      "case": "seed9731-R-tau4__set2",
+      "count": 472,
+      "shards": [
+        {
+          "end": 32,
+          "shard": 0,
+          "start": 0
+        },
+        {
+          "end": 64,
+          "shard": 1,
+          "start": 32
+        },
+        {
+          "end": 96,
+          "shard": 2,
+          "start": 64
+        },
+        {
+          "end": 128,
+          "shard": 3,
+          "start": 96
+        },
+        {
+          "end": 160,
+          "shard": 4,
+          "start": 128
+        },
+        {
+          "end": 192,
+          "shard": 5,
+          "start": 160
+        },
+        {
+          "end": 224,
+          "shard": 6,
+          "start": 192
+        },
+        {
+          "end": 256,
+          "shard": 7,
+          "start": 224
+        },
+        {
+          "end": 288,
+          "shard": 8,
+          "start": 256
+        },
+        {
+          "end": 320,
+          "shard": 9,
+          "start": 288
+        },
+        {
+          "end": 352,
+          "shard": 10,
+          "start": 320
+        },
+        {
+          "end": 384,
+          "shard": 11,
+          "start": 352
+        },
+        {
+          "end": 416,
+          "shard": 12,
+          "start": 384
+        },
+        {
+          "end": 448,
+          "shard": 13,
+          "start": 416
+        },
+        {
+          "end": 472,
+          "shard": 14,
+          "start": 448
+        }
+      ]
+    },
+    {
+      "case": "seed9731-R-tau4__set3",
+      "count": 472,
+      "shards": [
+        {
+          "end": 32,
+          "shard": 0,
+          "start": 0
+        },
+        {
+          "end": 64,
+          "shard": 1,
+          "start": 32
+        },
+        {
+          "end": 96,
+          "shard": 2,
+          "start": 64
+        },
+        {
+          "end": 128,
+          "shard": 3,
+          "start": 96
+        },
+        {
+          "end": 160,
+          "shard": 4,
+          "start": 128
+        },
+        {
+          "end": 192,
+          "shard": 5,
+          "start": 160
+        },
+        {
+          "end": 224,
+          "shard": 6,
+          "start": 192
+        },
+        {
+          "end": 256,
+          "shard": 7,
+          "start": 224
+        },
+        {
+          "end": 288,
+          "shard": 8,
+          "start": 256
+        },
+        {
+          "end": 320,
+          "shard": 9,
+          "start": 288
+        },
+        {
+          "end": 352,
+          "shard": 10,
+          "start": 320
+        },
+        {
+          "end": 384,
+          "shard": 11,
+          "start": 352
+        },
+        {
+          "end": 416,
+          "shard": 12,
+          "start": 384
+        },
+        {
+          "end": 448,
+          "shard": 13,
+          "start": 416
+        },
+        {
+          "end": 472,
+          "shard": 14,
+          "start": 448
+        }
+      ]
+    }
+  ]
+}

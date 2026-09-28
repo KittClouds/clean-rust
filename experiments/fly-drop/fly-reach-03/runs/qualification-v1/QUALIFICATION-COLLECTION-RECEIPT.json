@@ -1,0 +1,16 @@
+{
+  "cells": 72,
+  "estimators_fit": false,
+  "expected_rows": 37748736,
+  "expected_trials": 589824,
+  "f4_physical_encoding": "deterministic_replay_descriptor_v1",
+  "lineage_root": "experiments/fly-reach-02-v0.1b",
+  "measured_namespace_created": false,
+  "native_only": true,
+  "qualification_only": true,
+  "rows": 37748736,
+  "schema": "FLY-REACH-03-qualification-collection-receipt-v1",
+  "scientific_execution_started": false,
+  "status": "COLLECTION_COMPLETE",
+  "trials": 589824
+}

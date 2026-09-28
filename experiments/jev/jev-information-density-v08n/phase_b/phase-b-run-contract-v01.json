@@ -1,0 +1,348 @@
+{
+  "protocol": "jev-information-density/v0.8n-road-b-phase-b-run-v01",
+  "identity": "v0.8N-phase-b-run-contract-v01",
+  "status": "FROZEN_NOT_AUTHORIZED",
+  "phase_b_ready": true,
+  "phase_b_authorized": false,
+  "scientific_meaning_changed": false,
+  "parents": {
+    "construction_receipt": {
+      "path": "D:/codex-runs/jev-information-density-v08n/v0.8N-base-v01/synthesis/v08n-synthesis-receipt-final-v09.json",
+      "sha256": "e86f3cd925841c4e68f8558696e68cb729b9b9ba49a644b9bc35e7e2bcde68a6"
+    },
+    "phase_b_execution_contract": {
+      "path": "experiments/jev-information-density-v08n/phase_b/phase_b-contract-v02.json",
+      "sha256": "efb2bbe59293d7899083927cc187a292b5dfd1dc2948a0b752b3d9cbae2fd18d"
+    },
+    "execution_input_receipt": {
+      "path": "D:/codex-runs/jev-information-density-v08n/v0.8N-base-v01/phase-b-v03-inputs/execution-inputs-receipt.json",
+      "sha256": "c022befafd49a1e317f692ff3b6f7efcccd11aee98285ca5f0071f6edbaf817c"
+    },
+    "execution_input_hash_tree": {
+      "path": "D:/codex-runs/jev-information-density-v08n/v0.8N-base-v01/phase-b-v03-inputs/execution-inputs-hash-tree.json",
+      "sha256": "f0fbae87a5e30902634108b0829d5da9a76bc691eb6a7551b0eebe4764cbbc77"
+    },
+    "preflight": {
+      "path": "D:/codex-runs/jev-information-density-v08n/v0.8N-base-v01/phase-b-preflight-v02/preflight-report.json",
+      "sha256": "b3101ce2c89df575628d5413f289a94f9fdee5a6e178ee77020143adaf15881c",
+      "status": "V08N_PHASE_B_PREFLIGHT_PASS_READY_NOT_AUTHORIZED"
+    }
+  },
+  "output": {
+    "root": "D:/codex-runs/jev-information-density-v08n/v0.8N-base-v01/phase-b-run-v01",
+    "creation_rule": "create only after explicit Phase-B authorization; fail if this identity path already contains run outputs",
+    "candidate_feature_artifacts": {
+      "directory": "D:/codex-runs/jev-information-density-v08n/v0.8N-base-v01/phase-b-run-v01/feature-cache",
+      "tensor_path": "D:/codex-runs/jev-information-density-v08n/v0.8N-base-v01/phase-b-run-v01/feature-cache/candidate-features.pt",
+      "token_length_receipt_path": "D:/codex-runs/jev-information-density-v08n/v0.8N-base-v01/phase-b-run-v01/feature-cache/candidate-token-lengths.json",
+      "feature_receipt_path": "D:/codex-runs/jev-information-density-v08n/v0.8N-base-v01/phase-b-run-v01/feature-cache/candidate-feature-receipt.json",
+      "materialization_rule": "create after explicit authorization as the first model-contact operation; fail if any destination already exists; preserve partial-attempt artifacts under a distinct failed-attempt identity"
+    },
+    "per_run_identity": "seed-{seed}/{arm}/",
+    "required_per_run_artifacts": ["run-config.json", "initial-head-template.sha256", "training-events.jsonl", "epoch-1.pt", "epoch-2.pt", "epoch-3-terminal.pt", "run-integrity.json"],
+    "aggregate_artifacts": ["execution-order.json", "checkpoint-hash-tree.json", "training-seal-manifest.json"]
+  },
+  "arms": {
+    "order": ["B-DUP", "B-MATCHED", "B-SHAM"],
+    "treatment_difference_only": "auxiliary_source_role and source feature pointer",
+    "B-DUP": "anchor feature receives its anchor target again",
+    "B-MATCHED": "radius-matched neutral feature receives the anchor target",
+    "B-SHAM": "certified sham feature receives the anchor target",
+    "explicit_relation_loss": false,
+    "all_other_training_events_identical": true
+  },
+  "model_and_representation": {
+    "repo_id": "LiquidAI/LFM2.5-1.2B-Base",
+    "revision": "7453bca97ca1e67754c4035a4b4c584e1c9dd725",
+    "snapshot_directory": "D:/codex-runs/jev-lfm-variable-v07/models/lfm2.5-1.2b-base",
+    "snapshot_file_sha256": {
+      "config.json": "15d6157fb6df3f8272e2fe90e18f57727ccf02a125c94469198b0f3281510185",
+      "model.safetensors": "7678ab9546a0c51c1fca161876b1efc4f0906277f170b5822045f40fdaf9eeff",
+      "tokenizer.json": "d7a0ab0fc22e41ec8c6d7450a9ff9ce40e196ec5e5a2fa6a2105e064e0514ed7",
+      "tokenizer_config.json": "8cba5b0c7acab23a0d4cc9ac587346c9220a1b6d288fc5346fe118202fd6f43e",
+      "special_tokens_map.json": "742aefe2b7dec496e8caffdba03a75d0c1a9925d53bd3f3e0d388c96b591b6f4"
+    },
+    "backbone_frozen": true,
+    "trust_remote_code": false,
+    "network_access": false,
+    "extractor": "experiments/jev-lfm-variable-v07/extract_lfm.py::encode_lfm_texts",
+    "extractor_sha256": "b8cd79a9a3265eca0fde5f509ba7c058bc2065d7747efe17ff7c7c1f6335b2d0",
+    "pooling": "final-layer mean_full over valid token positions",
+    "input_mode": "exact-length, single-row, no-padding",
+    "maximum_length": 1024,
+    "backbone_internal_dtype": "bfloat16",
+    "exported_feature_dtype": "float32",
+    "feature_key": "mean_full@16",
+    "state_feature_source_sha256": "da946af90353c91c3b1298d2951eebc42b9f515708b628d3a053e700a960c4d6",
+    "state_feature_scope_sha256": "aa8cba58f4a8ec46ed6ec8eaf0bfbe992b03b9fa58f815b4259d9fdfe2b009f3",
+    "state_feature_scope_receipt": {
+      "path": "D:/codex-runs/jev-information-density-v08n/v0.8N-base-v01/shared-feature-cache/shared-feature-cache-receipt.json",
+      "sha256": "d98ae657e28b976f187d4d67e58119ce80496e76c061c90362ac2e50ff7f720e",
+      "scope_rows": 55000,
+      "scope_dimensions": 2048,
+      "source_scope": "training_only"
+    }
+  },
+  "candidate_feature_extraction": {
+    "first_model_contact_after_explicit_authorization": true,
+    "only_input_source": "D:/codex-runs/jev-information-density-v08n/v0.8N-base-v01/phase-b-authorization-packet-v01/candidate-model-input-manifest.jsonl",
+    "candidate_text_manifest_sha256": "36e4bd10d7f35b9ffcb5344cae2ca26adea51647830faf4659890f0dc811485e",
+    "parent_candidate_catalog_sha256": "1698ea2078951837b3cb780a3f873c3c099e5e3d001c714e1d58a41e2951487e",
+    "text_serialization": "name + U+2014 EM DASH + one space + description; UTF-8 bytes exactly, no normalization",
+    "ordering": "lexicographic candidate_semantic_id; preserve all 48 rows without deduplication",
+    "tokenization": "pinned tokenizer files from the local model snapshot; add_special_tokens=true; padding=false; truncation=true; max_length=1024; production batch_size=1",
+    "truncation_disposition": "if any candidate input would be truncated, abort before feature tensor acceptance; do not alter text or length policy",
+    "token_length_receipt": "record per-candidate token count and min/median/p95/max before extraction, then bind those counts to the feature receipt",
+    "expected_tensor_shape": [48, 2048],
+    "expected_dtype": "contiguous float32",
+    "required_checks_before_head_initialization": [
+      "catalog and text-manifest hashes match",
+      "48 ordered semantic IDs and text hashes match the manifest",
+      "verify the pinned local snapshot file hashes and tokenizer identity before loading; network access is disabled",
+      "write a token-length receipt for all 48 rows and abort if any would be truncated",
+      "tensor shape is exactly 48x2048",
+      "tensor dtype is float32 and all values are finite",
+      "feature receipt binds model revision, snapshot file hashes, extractor hash, extraction settings, input-manifest hash, token-length receipt hash, tensor hash, and file hash",
+      "persist the tensor and receipts at the exact output paths declared in output.candidate_feature_artifacts; independently verify hashes before making them readable to trainers"
+    ],
+    "mismatch_disposition": "ABORT_BEFORE_HEAD_TRAINING; no candidate replacement or alternate extraction recipe"
+  },
+  "head_input_and_architecture": {
+    "candidate_profile": "name_definition",
+    "head_implementation": "experiments/jev-frozen-readout-v01/probe.py::CompatibilityHead",
+    "head_implementation_sha256": "a3049d52e1183c806c84522a617a05646eb86fbcb69af72b5bb26f4808852cb1",
+    "batch_assembly_implementation": "experiments/jev-frozen-scaling-v05/train_v05.py::fast_tensor_batch",
+    "batch_assembly_sha256": "52033950dab23835c13f4aa74a2f0d5867aec754f8a139a63a739a36b0cb62b9",
+    "head": "dynamic_mlp_compatibility",
+    "projection_width": 128,
+    "trainable_parameters": 590081,
+    "parameters": [
+      "bias-free state projection 2048->128",
+      "bias-free candidate projection 2048->128",
+      "concatenate state, candidate, elementwise product, and absolute difference (512 values)",
+      "linear 512->128, GELU, linear 128->1"
+    ],
+    "input_transform": "raw float32 frozen features; no feature normalization, centering, or scaling",
+    "candidate_order_training_transform": "reverse candidate indices and target values together for every primary and auxiliary row, matching fast_tensor_batch(reorder=true)",
+    "candidate_mask": "four true candidates per row; no padding candidates; any violation aborts",
+    "output": "four logits; closed-set softmax in canonical semantic-ID alignment",
+    "backbone_parameters_updated": false,
+    "arm_input_manifests": {
+      "common_primary_occurrence_manifest": {
+        "path": "D:/codex-runs/jev-information-density-v08n/v0.8N-base-v01/phase-b-v03-inputs/common-primary-occurrence-manifest.jsonl",
+        "sha256": "773119294a51aa46487de26f9f253355187a7bfd1e75cb2f258c307c86f10b06",
+        "rows": 10000,
+        "occurrence_identity": "occurrence_index plus group_id; exact immutable order"
+      },
+      "B-DUP": {
+        "path": "D:/codex-runs/jev-information-density-v08n/v0.8N-base-v01/phase-b-v03-inputs/head-input-manifest-B-DUP.jsonl",
+        "sha256": "f6f4ec519a04efeac02962c68c2d2d8ec92cf43d25bb9fd974f168e67c4d3b2b",
+        "rows": 15000,
+        "layout": "10000 common primary occurrences followed by 5000 auxiliary occurrences"
+      },
+      "B-MATCHED": {
+        "path": "D:/codex-runs/jev-information-density-v08n/v0.8N-base-v01/phase-b-v03-inputs/head-input-manifest-B-MATCHED.jsonl",
+        "sha256": "bd38446c0328f8092dc3293090fd3041d7be5d53945df6f80fb3770244d87b0d",
+        "rows": 15000,
+        "layout": "10000 common primary occurrences followed by 5000 auxiliary occurrences"
+      },
+      "B-SHAM": {
+        "path": "D:/codex-runs/jev-information-density-v08n/v0.8N-base-v01/phase-b-v03-inputs/head-input-manifest-B-SHAM.jsonl",
+        "sha256": "9dd346766856f56006be326c171e664dcbab23983cdd7501f480b6fabb6ff895",
+        "rows": 15000,
+        "layout": "10000 common primary occurrences followed by 5000 auxiliary occurrences"
+      }
+    },
+    "resolved_feature_contract": {
+      "state_feature_map": "training-only scope index -> one 2048-dimensional raw float32 state feature; source episode ID and input hash must resolve exactly",
+      "candidate_feature_map": "candidate index -> one of the 48 name_definition candidate features; each feature is 2048-dimensional raw float32",
+      "per_event_candidate_indices": "four indices in the sealed semantic candidate order; all four masks true",
+      "target_alignment": "four target probabilities remain paired to their candidate semantic IDs through the frozen reverse-order batch transform",
+      "auxiliary_target_source": "the anchor target for the same neighborhood in all three arms",
+      "feature_normalization": "none; model receives raw float32 state and candidate features",
+      "candidate_tensor_acceptance": "48x2048 contiguous finite float32; exact manifest/catalog/text/model/extractor hashes; no truncation"
+    },
+    "training_surface_audit": {
+      "status": "PASS_EDIT_MAGNITUDE_AND_SERIALIZATION; EDIT_LOCATION_AND_FIELD_IDENTITY_DIFFER_BY_TREATMENT",
+      "scope": "5000 training anchor/matched-neutral pairs and 5000 training anchor/certified-sham pairs; training-only feature-scope text",
+      "matched_neutral": {
+        "pairs": 5000,
+        "same_total_characters": 5000,
+        "same_whitespace_token_count": 5000,
+        "exactly_one_changed_line": 5000,
+        "exactly_one_changed_character": 5000,
+        "changed_field_distribution": {
+          "Neutral axis 4": 566,
+          "Neutral axis 5": 4434
+        },
+        "whitespace_tokens_before_edited_field": {
+          "Neutral axis 4": 25,
+          "Neutral axis 5": 30
+        },
+        "changed_line_numbers_one_based": {
+          "7": 566,
+          "8": 4434
+        }
+      },
+      "certified_sham": {
+        "pairs": 5000,
+        "same_total_characters": 5000,
+        "same_whitespace_token_count": 5000,
+        "exactly_one_changed_line": 5000,
+        "exactly_one_changed_character": 5000,
+        "changed_field_distribution": {
+          "Independent panel marker": 5000
+        },
+        "whitespace_tokens_before_edited_field": {
+          "Independent panel marker": 10
+        },
+        "changed_line_numbers_one_based": {
+          "3": 5000
+        }
+      },
+      "interpretation_limit": "surface edit magnitude and serialization size are matched; changed field identity and position relative to the fact-bearing line are not matched and remain part of the treatment contrast"
+    },
+    "head_input_manifest_contract": "for every primary and auxiliary event, resolve state feature by feature_scope_index; resolve candidate features by candidate_indices in row order; pair target values with those IDs; preserve all four true mask values; source and target hashes must match sealed arm manifest"
+  },
+  "training": {
+    "seed_set": [20260927, 20260928, 20260929],
+    "paired_initialization": "one seed-initialized CompatibilityHead template per seed; byte-identical state loaded into all three arms",
+    "initialization_procedure": "for each seed, initialize Python and torch CPU/CUDA RNGs to that seed, instantiate CompatibilityHead(2048, 'mlp', 128) using the frozen implementation on the pinned device, save one immutable CPU state-dict template and SHA-256, then load that exact template into each arm before creating a fresh AdamW optimizer; verify all three initial state hashes are identical",
+    "rng_reset_per_arm": "Python, torch CPU, and all CUDA generators reset to the paired seed before each arm; no dropout or stochastic augmentation",
+    "arm_execution_order": {
+      "20260927": ["B-DUP", "B-MATCHED", "B-SHAM"],
+      "20260928": ["B-SHAM", "B-DUP", "B-MATCHED"],
+      "20260929": ["B-MATCHED", "B-SHAM", "B-DUP"]
+    },
+    "global_execution_order": [
+      "20260927/B-DUP", "20260927/B-MATCHED", "20260927/B-SHAM",
+      "20260928/B-SHAM", "20260928/B-DUP", "20260928/B-MATCHED",
+      "20260929/B-MATCHED", "20260929/B-SHAM", "20260929/B-DUP"
+    ],
+    "concurrency": "one run process at a time; no concurrent training runs",
+    "gradient_accumulation_steps": 1,
+    "data_pipeline": {
+      "sampler": "none; consume the immutable schedule directly",
+      "runtime_shuffle": false,
+      "drop_last": false,
+      "data_loader_workers": 0,
+      "primary_batch_capacity": 256,
+      "auxiliary_events": "append the scheduled auxiliary events to the current primary minibatch; do not make separate optimizer updates"
+    },
+    "primary_occurrence_manifest_sha256": "773119294a51aa46487de26f9f253355187a7bfd1e75cb2f258c307c86f10b06",
+    "fixed_schedule_sha256": "4acfdc057ead9f07c310cfed452a385e5637bae2d367eac5d62343ceec892df7",
+    "primary_per_epoch": {
+      "total_occurrences": 10000,
+      "anchor_occurrences": 5000,
+      "fact_flip_occurrences": 5000,
+      "order": "use the exact occurrence indices in the schedule; do not reshuffle at runtime"
+    },
+    "auxiliary_per_epoch": {
+      "distinct_slots": 5000,
+      "one_per_anchor": true,
+      "reuse_across_epochs": "the same 5000 auxiliary manifest rows are each exposed exactly once in each epoch; 15000 auxiliary loss-event exposures per complete 3-epoch run",
+      "schedule_slot_semantics": "each auxiliary_anchor_batch_slots value is a zero-based anchor ordinal in the common primary manifest; the corresponding primary anchor occurrence index is exactly 2*slot, and the value resolves to the auxiliary row at auxiliary_manifest_offset + slot in each arm manifest",
+      "schedule_order": "auxiliary_anchor_batch_slots are listed in the same order as the anchor occurrences appear within that schedule row's primary_occurrence_indices; each slot must resolve to that anchor's auxiliary target/source row",
+      "source_mapping": "the fixed arm-specific source episode in the corresponding head-input manifest; DUP uses the anchor source, MATCHED uses its sealed radius-matched neutral, SHAM uses its certified sham",
+      "schedule_counts": "40 optimizer batches per epoch; each schedule row contains up to 256 primary occurrences plus exactly one auxiliary event for each anchor occurrence in that row; final primary batch contains 16 rows; sum of auxiliary slots is 5000 per epoch"
+    },
+    "batch_and_loss_execution": {
+      "one_optimizer_step_per_schedule_row": true,
+      "primary_event_order": "exact order in primary_occurrence_indices",
+      "auxiliary_event_order": "exact order in auxiliary_anchor_batch_slots",
+      "forward_row_order": "primary rows first in schedule order, followed by their auxiliary rows in auxiliary-slot order",
+      "candidate_order_transform": "reverse candidate IDs and target values together for every row before head scoring, as fast_tensor_batch(reorder=true); no random candidate permutation",
+      "loss_reduction": "one v05_loss call over the concatenated primary-then-auxiliary event batch; per-event categorical cross-entropy plus 0.25 multiclass Brier; arithmetic mean over all active events in that optimizer step",
+      "step_formula": "(N_base*L_base + N_aux*L_aux)/(N_base + N_aux), with unit event weights and no masked auxiliary losses"
+    },
+    "epochs": 3,
+    "primary_batch_size": 256,
+    "batches_per_epoch": 40,
+    "final_batch_size": 16,
+    "optimizer_steps_per_arm_seed": 120,
+    "total_runs": 9,
+    "epoch_checkpoints": 27,
+    "terminal_checkpoints": 9,
+    "optimizer": {
+      "name": "torch.optim.AdamW",
+      "learning_rate": 0.002,
+      "weight_decay": 0.01,
+      "betas": [0.9, 0.999],
+      "epsilon": 1e-8,
+      "amsgrad": false,
+      "maximize": false,
+      "foreach": null,
+      "fused": null,
+      "scheduler": "none",
+      "gradient_clipping": "none",
+      "zero_grad": "set_to_none=true"
+    },
+    "precision": {
+      "head_parameters": "float32",
+      "head_inputs": "float32",
+      "logits_and_loss": "float32",
+      "autocast": false,
+      "gradient_scaler": false,
+      "cuda_matmul_tf32": false
+    },
+    "loss": {
+      "implementation": "experiments/jev-frozen-scaling-v05/train_v05.py::v05_loss",
+      "implementation_sha256": "52033950dab23835c13f4aa74a2f0d5867aec754f8a139a63a739a36b0cb62b9",
+      "brier_weight": 0.25,
+      "per_event": "mean categorical cross-entropy plus 0.25 times mean multiclass Brier score",
+      "step_normalization": "(N_base*L_base + N_aux*L_aux)/(N_base + N_aux)",
+      "existing_invariance_loss": false,
+      "new_relation_loss": false,
+      "auxiliary_weight": 1.0
+    },
+    "checkpoint_policy": "save after each epoch; epoch 3 is the sole primary endpoint; retain all 27 checkpoints; no best-epoch selection",
+    "crash_policy": "for an infrastructure/process failure only, retain failed-attempt artifacts and restart the affected seed-arm run from epoch zero with the same frozen seed and contract; no seed replacement and no resume; any contract/hash mismatch, non-finite loss/gradient, or implementation-semantic discrepancy halts the full experiment for review and is not an infrastructure retry",
+    "telemetry": ["run start/end", "epoch start/end", "step loss components", "gradient norm", "learning rate", "throughput", "memory", "checkpoint hashes"]
+  },
+  "runtime_environment": {
+    "python": "3.13.15",
+    "torch": "2.11.0+cu128",
+    "transformers": "5.17.0",
+    "tokenizers": "0.23.2",
+    "numpy": "2.5.3",
+    "cuda_runtime": "12.8",
+    "cudnn": 91900,
+    "device": "NVIDIA GeForce RTX 3080",
+    "compute_capability": [8, 6],
+    "torch_matmul_tf32": false,
+    "torch_cudnn_tf32": true,
+    "torch_cudnn_benchmark": false,
+    "torch_deterministic_algorithms": false,
+    "runtime_mismatch_disposition": "ABORT_BEFORE_MODEL_LOAD; do not silently substitute hardware or software"
+  },
+  "evaluation_gate": {
+    "requires_all_nine_runs_complete": true,
+    "requires_all_27_checkpoint_hashes_and_training_telemetry_sealed": true,
+    "requires_checkpoint_tree_independent_validation": true,
+    "training_process_filesystem_scope": {
+      "readable": ["sealed training state-feature cache and scope receipt", "common primary manifest", "three sealed arm head-input manifests", "fixed training schedule", "pinned local model snapshot for candidate extraction only", "candidate model-input manifest during extraction only", "validated candidate-features.pt and its candidate-feature-receipt.json and candidate-token-lengths.json", "hashed frozen implementation files"],
+      "not_readable": ["held-out matched-panel manifest or bodies", "held-out feature-cache files", "NewTight", "legacy evaluation surfaces"],
+      "candidate_extractor_scope": "candidate text manifest plus pinned local model/tokenizer snapshot only; no training or evaluation rows",
+      "trainer_candidate_feature_scope": "after extraction receipt validation, trainers may read the candidate tensor and its receipts, but may not read the candidate text manifest, tokenizer, model snapshot, or any evaluation path"
+    },
+    "then_unlock_once": "v0.8N-eval-panel-v01 matched-panel-v02 only",
+    "opening_order": [
+      "explicit Phase-B authorization receipt",
+      "candidate feature extraction and validation; no head initialization until it passes",
+      "complete all nine runs and seal all 27 epoch checkpoints plus training telemetry",
+      "independently validate the checkpoint/hash tree",
+      "unlock the held-out matched-panel-v02 exactly once for frozen terminal inference"
+    ],
+    "newtight": false,
+    "legacy_evaluation": false,
+    "phoenix": false
+  },
+  "failure_boundaries": {
+    "any_parent_or_input_hash_mismatch": "abort before model load",
+    "candidate_feature_validation_failure": "abort before head initialization/training",
+    "training_process_panel_access": false,
+    "evaluation_before_training_seal": false,
+    "result_driven_changes": false,
+    "phase_b_authorized": false
+  }
+}

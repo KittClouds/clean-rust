@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "run_id": "e009-20260925-expanded-01",
+  "phase": "HELDOUT_PAIRED_LANES",
+  "state": "FROZEN_BEFORE_MODEL_CONTACT",
+  "development_input_lock_sha256": "84d23c603fc120d085288b3c2fbd8a3940b02dd93c7e30943cc36ec21621b828",
+  "heldout_labels_opened": false,
+  "heldout_input_lock_sha256": "def427389b4fac2b0b307e222b8c62d788eea02ea39e4e7d65643537b2c5968b"
+}

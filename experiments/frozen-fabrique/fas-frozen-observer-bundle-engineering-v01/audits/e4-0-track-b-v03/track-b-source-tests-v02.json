@@ -1,0 +1,77 @@
+{
+  "schema": "FAS_E4_0_TRACK_B_SOURCE_TESTS_V02",
+  "receipt_id": "FAS_E4_0_TRACK_B_V03_INHERITED_SEALS_AND_PANEL_FREEZE_TESTS_V02",
+  "status": "PASS_SYNTHETIC_SOURCE_AND_CLI_TESTS",
+  "recorded_utc": "2026-09-27T00:13:53.815426Z",
+  "source_unit": "E4-0 v03 online/parity runner: inherited v06 seals, exact v07 contract identity, and no v07 parity-panel rematerialization",
+  "repair_summary": "Inherited population and parity-panel seals validate against exact v06 contract identity while new parity/features stages bind v07. The sealed v06 parity panel cannot be rematerialized under v07. The contract seal verifier requires exact v07 seal ID, schema, contract member artifact ID/path/hash/length, canonical entry order, and independently recomputed root.",
+  "commands": [
+    "python -m py_compile source/scripts/e4_runner_common_v03.py source/scripts/e4_runner_artifacts_v03.py source/scripts/e4_gpu_lease_v03.py source/scripts/e4_runner_modes_v03.py source/e4_online_parity_v03.py source/tests/test_e4_runner_v03.py",
+    "python source/tests/test_e4_runner_v03.py",
+    "python source/scripts/e4_online_parity_v03.py --help"
+  ],
+  "results": {
+    "py_compile": "PASS",
+    "tests_run": 18,
+    "tests_passed": 18,
+    "tests_failed": 0,
+    "runner_cli_help_smoke": "PASS",
+    "available_modes": [
+      "parity",
+      "extract-e4"
+    ]
+  },
+  "focused_regressions": [
+    "inherited population and parity-panel stage seals retain exact v06 contract SHA/root while downstream v07 authorization names v07",
+    "altered inherited v06 contract identity fails closed",
+    "v07 contract seal requires exact seal/member identity and independently recomputed root",
+    "parity-panel rematerialization is unavailable and fails before tokenizer/model/CUDA contact"
+  ],
+  "supersedes": {
+    "path": "audits/e4-0-track-b-v03/track-b-source-tests-v01.json",
+    "bytes": 3190,
+    "sha256": "4d0d53e22944916f52ab6fe5c18cfdb27533a0ba39d19fbccad556f921ffac41"
+  },
+  "bound_sources": [
+    {
+      "path": "source/scripts/e4_runner_common_v03.py",
+      "bytes": 23451,
+      "sha256": "5bf0dea7ba6b1bdb2f295bd8fafcb0208ef4dabd8dd28d56b51d7ba08634d02f"
+    },
+    {
+      "path": "source/scripts/e4_runner_artifacts_v03.py",
+      "bytes": 16642,
+      "sha256": "25cd2900dd8c33d3b111649506c1e3973b13d13a1e42c05788d981a9fb3fe474"
+    },
+    {
+      "path": "source/scripts/e4_gpu_lease_v03.py",
+      "bytes": 23201,
+      "sha256": "c80e8aeae942e1d4c851822b2eb07f4a5b9eb7c3b819d7fe10a8a23a1d0d79d4"
+    },
+    {
+      "path": "source/scripts/e4_runner_modes_v03.py",
+      "bytes": 32820,
+      "sha256": "69b65332fb99381e0a4e30fd5dbf563f53d5622ea96eafd27e35cf9e5c196ff3"
+    },
+    {
+      "path": "source/scripts/e4_online_parity_v03.py",
+      "bytes": 1213,
+      "sha256": "0b7b547c912b0e3e32ba648ea3236c03d4b9bd35d4db804230e75928e79f6dd3"
+    },
+    {
+      "path": "source/tests/test_e4_runner_v03.py",
+      "bytes": 22412,
+      "sha256": "d77355829aa2a91e1bd61e36a236f86646e5a32dbc6d1cf6e7a7e106551d86ae"
+    }
+  ],
+  "boundary": {
+    "real_stage_authorization_issued": false,
+    "e4_population_materialized": false,
+    "labels_opened": false,
+    "tokenizer_contact": false,
+    "model_contact": false,
+    "cuda_initialized": false,
+    "feature_cache_opened": false,
+    "synthetic_tests_only": true
+  }
+}

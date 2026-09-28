@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "run_id": "e009-20260925-corrected-04",
+  "evaluation_class": "regression-only; held-out labels and outcomes were already inspected in e009-20260925-expanded-01",
+  "observation_run_id": "e009-20260925-corrected-02",
+  "observation_run_frozen_heldout_lock_sha256": "b57c1fa05882bd54185df2432fc482623e30c82869a0a68e5e4069dad545dcd7",
+  "heldout_frame_lock_sha256": "fea435d14ccf9cba99502a50efc1d7f95191c53bb271b7ed210bcb11dbfb0d67",
+  "heldout_labels_sha256": "0939a93ba7860b841a9b011c4f77efbe1c54afc1b279bd8272ac727c96dc2ee5",
+  "small_observer_outputs_sha256": "8a1b5dc93f329bf6fd2855a2ffeffd5e53402f55847ded5b137dd7e0f4a1bb59",
+  "large_observer_outputs_sha256": "116b9a2d5720bf5e231bcc07c73091d5b945d5f95adb50f59960b4231b4c22bb",
+  "thresholds_sha256": "846b0668db2a7796ac1ee90c190d45532a3065617ff1abca03df495496ddb173",
+  "bundle_lock_sha256": "a626836853bdb0755fd2e4e1569b6b91b33861306c7d1e4a51e3de54a9ee713d",
+  "evaluator_sha256": "9ea67e81ddf6b495a1094e21534b3b5d900ca361f6b7aafa057878c65ed33057",
+  "score_contract": "e002 execute guard 700; completion requires authorized Execute receipt and passing task test",
+  "hand_written_policy": "evidence-weighted-token-overlap-v2"
+}

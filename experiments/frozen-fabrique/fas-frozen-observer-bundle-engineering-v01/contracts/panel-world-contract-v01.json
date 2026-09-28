@@ -1,0 +1,163 @@
+{
+  "panel_contract_id": "FAS_FROZEN_OBSERVER_BUNDLE_PANEL_WORLD_V01",
+  "project_id": "fas-frozen-observer-bundle-engineering-v01",
+  "panel_id": "FAS_OBSERVER_BUNDLE_FRESH_PANEL_V01",
+  "generator_seed": 2026092501,
+  "quartets": 26624,
+  "rows_per_quartet": 4,
+  "input_rows": 106496,
+  "world_family_counts": {
+    "FACTORIAL_BALANCED": 24576,
+    "BINDING_CONTEXT": 1024,
+    "BINDING_ENTITY": 1024
+  },
+  "generator_lineage": {
+    "family": "S01 quartet construction schedule, freshly regenerated under this project identity",
+    "source_path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/panel-generator/src/generate.rs",
+    "generator_source_sha256": "18bf7526a0bbadf765b055c009501cd76a3540287ecd9f16c1b864cfe79e6c14",
+    "panel_builder_source_sha256": "4f9cdfd445e2ba763e7487f6e3758889eddb3fc69bf4c63c2648adcac7089647",
+    "term_inventory_rule": {
+      "prefixes": [
+        "doru",
+        "feka",
+        "gima",
+        "huzo",
+        "jare",
+        "lovi",
+        "muse",
+        "paku"
+      ],
+      "suffixes": [
+        "nex",
+        "bir",
+        "dov",
+        "kem",
+        "lus",
+        "mar",
+        "qin",
+        "vek"
+      ],
+      "term_set": "64 unique prefix+suffix combinations",
+      "allocation_order": "ascending SHA256 of UTF8(generator_seed|FAS_E1_FRESH_TERM_ALLOCATION|term)",
+      "context_terms": "first 32 sorted terms",
+      "entity_terms": "last 32 sorted terms",
+      "per_role_fit_term_ids": [
+        0,
+        15
+      ],
+      "per_role_novel_term_ids": [
+        16,
+        31
+      ],
+      "role_term_sets_disjoint": true,
+      "historical_s01_term_strings_reused": false
+    },
+    "relation_surfaces": [
+      "kelmori",
+      "vethaku"
+    ],
+    "state_surfaces": [
+      "brinok",
+      "saldem",
+      "tovira"
+    ],
+    "variants": [
+      "A",
+      "C",
+      "E",
+      "P"
+    ],
+    "input_fields": [
+      "row_id",
+      "quartet_id",
+      "variant_id",
+      "input_text"
+    ],
+    "labels_absent_from_model_input_file": true
+  },
+  "quartet_split": {
+    "split_seed": 2026092502,
+    "unit": "whole quartet; all four variants stay in one split",
+    "stratification_class": "quartet exact_target class 0, 1, or 2",
+    "ordering": "ascending SHA256 of UTF8(split_seed|EXACT_TARGET_STRATIFIED_TEST|quartet_id), then quartet_id",
+    "test_count_per_class": "floor(class_quartet_count / 5)",
+    "remaining_quartets": "FIT",
+    "fit_test_ratio_target": "80/20 within exact_target class, floor used for test selection"
+  },
+  "labels": {
+    "context_identity": {
+      "field": "context_term_id",
+      "classes": 32,
+      "fit_scope": "all FIT rows",
+      "evaluation_scope": "all TEST rows",
+      "task": "closed-set surface-term ID classification"
+    },
+    "entity_identity": {
+      "field": "entity_term_id",
+      "classes": 32,
+      "fit_scope": "all FIT rows",
+      "evaluation_scope": "all TEST rows",
+      "task": "closed-set surface-term ID classification"
+    },
+    "relation": {
+      "field": "relation_id",
+      "classes": 2,
+      "fit_scope": "rows whose context_term_id and entity_term_id are both below 16",
+      "evaluation_scope": "TEST rows whose context_term_id and entity_term_id are both below 16"
+    },
+    "observed_state": {
+      "field": "state_id",
+      "classes": 3,
+      "fit_scope": "rows whose context_term_id and entity_term_id are both below 16",
+      "evaluation_scope": "TEST rows whose context_term_id and entity_term_id are both below 16"
+    },
+    "exact_target": {
+      "field": "exact_target",
+      "classes": 3,
+      "fit_scope": "rows whose context_term_id and entity_term_id are both below 16",
+      "evaluation_endpoints": [
+        "in_domain",
+        "context_novel",
+        "entity_novel",
+        "both_novel"
+      ],
+      "novelty": "input surface terms excluded from this head's fit; target classes remain present in fit"
+    }
+  },
+  "support_gate": {
+    "minimum_fit_rows_per_class": 1,
+    "minimum_test_rows_per_class": 200,
+    "scored_endpoints": [
+      "context_identity",
+      "entity_identity",
+      "relation",
+      "observed_state",
+      "exact_target_in_domain",
+      "exact_target_context_novel",
+      "exact_target_entity_novel",
+      "exact_target_both_novel"
+    ],
+    "must_pass_before_feature_extraction": true
+  },
+  "storage_budget": {
+    "projected_peak_bytes": 3429093176,
+    "projected_peak_basis": {
+      "fresh_panel_inputs_max_bytes": 411171094,
+      "row_manifest_max_bytes": 736220706,
+      "feature_cache_plus_atomic_staging_max_bytes": 1744830464,
+      "labels_observers_predictions_receipts_and_scratch_reserve_bytes": 536870912,
+      "model_artifact_copied": false,
+      "historical_model_artifact_bytes_if_copy_becomes_required": 2340697936
+    },
+    "target_volume": "D:",
+    "required_free_capacity_fraction_after_projected_peak": 0.1,
+    "recompute_before_e2": true
+  },
+  "construction_authority": {
+    "model_contact_authorized": false,
+    "tokenizer_contact_authorized": false,
+    "feature_extraction_authorized": false,
+    "observer_fitting_authorized": false,
+    "historical_s01_corpus_labels_features_or_fits_reused": false
+  }
+}

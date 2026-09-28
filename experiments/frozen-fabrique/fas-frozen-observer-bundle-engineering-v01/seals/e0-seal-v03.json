@@ -1,0 +1,83 @@
+{
+  "seal_id": "FAS_FROZEN_OBSERVER_BUNDLE_E0_SEAL_V03",
+  "status": "E0_FROZEN_NOT_AUTHORIZED_FOR_MODEL_CONTACT",
+  "root_sha256": "1e42c8aa5eba7cd8f3d49c5f9f37cfbd277f9899bab750fa3b17dc0aea414a09",
+  "entry_count": 14,
+  "entries": [
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/e0-freeze-v03.json",
+      "bytes": 11021,
+      "sha256": "82c5530b2797dff54f419608c4389408809d4b7d4093c256caf3412999939055"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/panel-world-contract-v02.json",
+      "bytes": 5188,
+      "sha256": "b7aa7a643ed1ab9620413277177195806f3e512dc63a5c29b54d672490a6b5d3"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/representation-abi-v01.json",
+      "bytes": 2887,
+      "sha256": "d266d678147f895ed389e330496f261053deb2d82dd160ab82255899377a288f"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/seals/e0-seal-v02-audit-defect.json",
+      "bytes": 552,
+      "sha256": "ab01456670f745dfb5f2063a8679af72e6c4cffb63302f7d6e184bbcd1771fca"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/seals/e0-seal-v02.json",
+      "bytes": 3174,
+      "sha256": "a7567a4802ec948fa304d13896367d5fa30685e673f77fc21898098dfc80b9f7"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/panel-generator-v02/Cargo.lock",
+      "bytes": 6015,
+      "sha256": "c80640f3cebf6864a2c48125d1bbcd24e917b8f28442e42b200efcea9281786e"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/panel-generator-v02/Cargo.toml",
+      "bytes": 321,
+      "sha256": "7c5d53cc9fbdba2be296e4550599c08fb37dd80d319a4c0a9548c49f8f6921e5"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/panel-generator-v02/src/generate.rs",
+      "bytes": 25895,
+      "sha256": "a0da7c490b91ae776efcdb2631fd145e93d3ef6bf351c61465f50510b000dddb"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/panel-generator-v02/src/lib.rs",
+      "bytes": 33,
+      "sha256": "e57ddf18054a9c7d049d849d28654bbf85419e13993bc917906cfef3d4669cc7"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/panel-generator-v02/src/main.rs",
+      "bytes": 31270,
+      "sha256": "979f5da8b6f27337f95e8a962ad7d5ff7a78ace4d728f8499a881f117e9f7360"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/panel-generator-v02/src/model.rs",
+      "bytes": 3680,
+      "sha256": "94cca0249f5508be13e186921bc2441a830fa4af695211cd7fb08126a79c11e2"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/build_panel_v03.ps1",
+      "bytes": 3312,
+      "sha256": "6fb0b335394736f8664407dc94dbc56d1801285e1b9d7b3626af83307be4ff8d"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/extract_features_v01.py",
+      "bytes": 14657,
+      "sha256": "12c9803a3cfa3fa0b501e3a5068439f3fd75d558a13eb099c137a14262bbb38d"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/seal_e0_v03.py",
+      "bytes": 5849,
+      "sha256": "579d4e7667361907cd083d4ef5cc430ee1896bf2ab2c702061886aaf046f7ee3"
+    }
+  ],
+  "model_contact_authorized": false,
+  "tokenizer_contact_authorized": false,
+  "feature_extraction_authorized": false,
+  "observer_fitting_authorized": false,
+  "seal_created_utc": "2026-09-26T01:02:18.360714+00:00"
+}

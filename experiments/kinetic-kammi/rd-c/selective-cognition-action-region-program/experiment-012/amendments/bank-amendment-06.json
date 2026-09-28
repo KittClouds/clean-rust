@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "amendment_id": "E012-BANK-A06",
+  "state": "RUNNER_REPAIR_FROZEN_BEFORE_RETRY",
+  "model_contact_authorized": false,
+  "failed_attempt": "bank/construction-01/scored-bank-v1/attempts/scored-check-attempt-01.json",
+  "failure_class": "runner_error_no_candidate_result",
+  "root_cause": "empty no-op patch rejected before the empty-patch branch",
+  "repair": "return unchanged source for an empty patch before unified-diff header validation",
+  "changed": ["scored-check runner implementation"],
+  "unchanged": [
+    "task source fixtures",
+    "candidate patches and mappings",
+    "task tests and predicates",
+    "expected valid action sets",
+    "producer-order schedules",
+    "task and condition membership"
+  ],
+  "retry_runner": "scripts/run_scored_checks_e012_v1_1.py",
+  "retry_requires_distinct_lock": true
+}

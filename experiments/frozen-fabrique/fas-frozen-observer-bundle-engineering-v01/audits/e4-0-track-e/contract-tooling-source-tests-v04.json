@@ -1,0 +1,76 @@
+{
+  "schema": "FAS_E4_0_TRACK_E_CONTRACT_TOOLING_TEST_RECEIPT_V04",
+  "receipt_id": "FAS_E4_0_V07_CONTRACT_SOURCE_MAP_AND_SEAL_TOOLING_TESTS_V04",
+  "status": "PASS_SYNTHETIC_CONTRACT_AND_SOURCE_MAP_TESTS",
+  "issued_utc": "2026-09-27T00:31:31.363183+00:00",
+  "contract_baseline": {
+    "contract_id": "FAS_FROZEN_CAPABILITY_FABRIC_E4_0_V06",
+    "path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/e4-0-contract-v06-final.json",
+    "bytes": 43208,
+    "sha256": "ea4f11cec5d65a3be7716c77febf5d448d8ebf1a5a4049aee5d25d51c0c50958",
+    "seal_root_sha256": "7344badf07476d19d9c6228f80d026a112c339e93daa75593e61031f68456e64"
+  },
+  "commands": [
+    "python -m unittest -v source.scripts.test_e4_0_contract_v07",
+    "python -m py_compile source/scripts/build_e4_0_source_map_v06.py source/scripts/finalize_e4_0_contract_v07.py source/scripts/seal_e4_0_contract_v07.py source/scripts/test_e4_0_contract_v07.py"
+  ],
+  "unit_tests": {
+    "passed": 13,
+    "failed": 0,
+    "cases": [
+      "exact v06 science projection",
+      "exact receipt status and track status validation",
+      "source/test receipt closure equality and tamper detection",
+      "safe output parents and traversal including valid builder destination",
+      "resolved/casefolded seal-member alias rejection",
+      "v06 source/input/receipt table parsing"
+    ]
+  },
+  "py_compile": "PASS",
+  "inherited_v06_binding_preflight": {
+    "status": "PASS",
+    "verified_source_rows": 90,
+    "verified_input_rows": 33,
+    "population_truth_files_opened": false,
+    "terminal_labels_opened": false,
+    "tokenizer_loaded": false,
+    "model_loaded": false,
+    "cuda_initialized": false
+  },
+  "supersedes": {
+    "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/contract-tooling-source-tests-v03.json",
+    "bytes": 3067,
+    "sha256": "2a7e59c5a130189a03a4b704b87b7acaea1996ba3244d41c57dcfaeb969a9e07",
+    "reason": "Updates the registered Track E/tooling receipt versions and binds the final source-map builder; v03 remains unchanged history."
+  },
+  "source_bindings": [
+    {
+      "path": "source/scripts/build_e4_0_source_map_v06.py",
+      "bytes": 27215,
+      "sha256": "5202f36c9e4577b8bc2dbf8d69fb347d8b626243567047f93d557e2f20990a0e"
+    },
+    {
+      "path": "source/scripts/finalize_e4_0_contract_v07.py",
+      "bytes": 20376,
+      "sha256": "600491a97f94b810d0025f433aced2edce06751591925a58c2bb1a85dbf30344"
+    },
+    {
+      "path": "source/scripts/seal_e4_0_contract_v07.py",
+      "bytes": 11276,
+      "sha256": "3877605712d489df1d291e9b7c94514f700f152bf3d9216a0c584b7fe3cb8ece"
+    },
+    {
+      "path": "source/scripts/test_e4_0_contract_v07.py",
+      "bytes": 9817,
+      "sha256": "6c31a5f5dd94ff7c7aa9623800e2c510577e2679c715769b4c6d8b81600c52e6"
+    }
+  ],
+  "runtime_access": {
+    "tokenizer_loaded": false,
+    "model_loaded": false,
+    "cuda_initialized": false,
+    "feature_cache_opened": false,
+    "terminal_labels_opened": false
+  },
+  "execution_authorization_conferred": false
+}

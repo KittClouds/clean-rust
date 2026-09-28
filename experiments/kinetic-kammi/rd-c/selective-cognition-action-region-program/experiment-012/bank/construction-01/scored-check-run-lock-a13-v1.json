@@ -1,0 +1,536 @@
+{
+  "schema_version": 1,
+  "experiment": "E012 Prospective Frame Decomposition",
+  "amendment": "E012-BANK-A13-RETRY",
+  "state": "FROZEN_BEFORE_A13_RETRY_CANDIDATE_CHECKS",
+  "model_contact_authorized": false,
+  "runner": "scripts/run_scored_checks_e012_a13_v2.py",
+  "runner_sha256": "7283308a784f9df616b0a584c3fa1d460ae7ac98c12fd9a258e62c3f71b420f1",
+  "target_root": "D:/rdc-e012-target/scored-checks-a13-retry",
+  "cargo_incremental": false,
+  "files": [
+    {
+      "path": "scripts/freeze_scored_check_runner_e012_a13_v1.py",
+      "sha256": "cac25f3b20ab9beeca2545e14b1973a0db0d34d4a0981a74c53796d4837775b2",
+      "bytes": 5327
+    },
+    {
+      "path": "scripts/run_scored_checks_e012_a13_v2.py",
+      "sha256": "7283308a784f9df616b0a584c3fa1d460ae7ac98c12fd9a258e62c3f71b420f1",
+      "bytes": 13737
+    },
+    {
+      "path": "scripts/finalize_pair_locked_bank_e012_a13_v2.py",
+      "sha256": "911cd1af6eb3b19a31c57aa21c3f9bcdce3d62460af465935e239f17515ce1e8",
+      "bytes": 27984
+    },
+    {
+      "path": "scripts/test_finalize_pair_locked_bank_a13.py",
+      "sha256": "7c5f072768fbb6597d64f103950132d416c5327f17e7df685d4f08c1326f3ed8",
+      "bytes": 3068
+    },
+    {
+      "path": "bank/construction-01/a13-retry-design-lock-v1.json",
+      "sha256": "16ef32a216f6c29ea82fded7305570b788f260bca0c9b923091ea0acc49ee572",
+      "bytes": 8181
+    },
+    {
+      "path": "bank/construction-01/scored-bank-a12/vault/task-source-fixtures-precheck-v2.json",
+      "sha256": "df64849ea63743bbcb9fff281a7fbdc18fc25fa8425318d56a90fbefda02a25e",
+      "bytes": 331017
+    },
+    {
+      "path": "bank/construction-01/repository-source-inventory.json",
+      "sha256": "f5a3268e2446f00b31b05a0dca887b79e08665010bd922206749f7257293b9bc",
+      "bytes": 1929
+    },
+    {
+      "path": "bank/construction-01/repository-source-audit-v1.json",
+      "sha256": "1d3d7fc4a46f5233e81c44a6e22c91ae04db119896d95cbe48b140eb4bd69ade",
+      "bytes": 1820
+    },
+    {
+      "path": "bank/construction-01/task-construction-lock-v1.1.json",
+      "sha256": "fe90cb29fd0b6b9c233826188d3692124e14660f109065415a58015dbad54c28",
+      "bytes": 1049
+    },
+    {
+      "path": "bank/construction-01/label-finalization-lock-v1.json",
+      "sha256": "9080bd5aa4b7cc5974c7059c23f84519c5bb8b508ed688e44fd5f9765a2e394c",
+      "bytes": 2746
+    },
+    {
+      "path": "bank/construction-01/family-design-lock-v1.3.json",
+      "sha256": "af5b11a88df821cb9174a21abe1f3b1c829c278ff151151f6ed7cd6d7e018ea4",
+      "bytes": 2832
+    },
+    {
+      "path": "bank/construction-01/scored-check-run-lock-a12-v1.json",
+      "sha256": "d5fca1b37e154ad711a07f5fff924536598acebb4e64128c6142e298bd4218ea",
+      "bytes": 20850
+    },
+    {
+      "path": "bank/construction-01/scored-bank-a12/attempts/scored-check-attempt-01.json",
+      "sha256": "0d7009423815a8196cc0ea4ce8cfbd6108b1a0d7031e5b78c9bd764404ea2770",
+      "bytes": 1316
+    },
+    {
+      "path": "bank/construction-01/a12-design-lock-v1.json",
+      "sha256": "b4654fbc903397c75c6866975c06ebb9aa35065a790e80f967fb4cdd0c816f37",
+      "bytes": 5732
+    }
+  ],
+  "task_harnesses": [
+    {
+      "path": "bank/construction-01/task-harnesses/bytes-composite/Cargo.lock",
+      "sha256": "fe30c5e91be6e5a19a28d07368e3e007f418963215e5e6d68653eab22a0f1e4c",
+      "bytes": 248
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/bytes-composite/Cargo.toml",
+      "sha256": "6bff5088621bd9a98b4b145c8929276bd7bafa22b4003ee539c07283a43a7af1",
+      "bytes": 161
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/bytes-composite/src/lib.rs",
+      "sha256": "477f4610a38ab141c051c3e6b78619cec523d1a9bd51486ce54b3c39c1019a16",
+      "bytes": 122
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/bytes-composite/tests/contract.rs",
+      "sha256": "4da4777a60f13e1ab6500f49185b9e82cc2d9296e462382d47cf8e8a1ba53e79",
+      "bytes": 604
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/bytes-composite-repair-01/Cargo.lock",
+      "sha256": "fe30c5e91be6e5a19a28d07368e3e007f418963215e5e6d68653eab22a0f1e4c",
+      "bytes": 248
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/bytes-composite-repair-01/Cargo.toml",
+      "sha256": "6bff5088621bd9a98b4b145c8929276bd7bafa22b4003ee539c07283a43a7af1",
+      "bytes": 161
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/bytes-composite-repair-01/src/lib.rs",
+      "sha256": "477f4610a38ab141c051c3e6b78619cec523d1a9bd51486ce54b3c39c1019a16",
+      "bytes": 122
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/bytes-composite-repair-01/tests/contract.rs",
+      "sha256": "34a3693fc6510d2292b6e604b11be0510d295c77c9452bd109266283b430172d",
+      "bytes": 614
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/bytes-cursor/Cargo.lock",
+      "sha256": "bfff94860ca5f09470446ba3c8925918383c107a124c15a58fa768a04b4224bb",
+      "bytes": 245
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/bytes-cursor/Cargo.toml",
+      "sha256": "ae7e62ac7d1e9299930955dcbf7d6be6b9b08f34b9e99918bdb2f7b52273d182",
+      "bytes": 158
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/bytes-cursor/src/lib.rs",
+      "sha256": "480de3ae8476bd94178bb819350e7896353a6dea6cfa787705a294d5b3a2799c",
+      "bytes": 139
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/bytes-cursor/tests/contract.rs",
+      "sha256": "2b2a577e252f8fb3a7756572e5ba23f2f1ae6b98622a68a79f711fdbfe6d95da",
+      "bytes": 580
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/bytes-cursor-repair-01/Cargo.lock",
+      "sha256": "bfff94860ca5f09470446ba3c8925918383c107a124c15a58fa768a04b4224bb",
+      "bytes": 245
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/bytes-cursor-repair-01/Cargo.toml",
+      "sha256": "ae7e62ac7d1e9299930955dcbf7d6be6b9b08f34b9e99918bdb2f7b52273d182",
+      "bytes": 158
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/bytes-cursor-repair-01/src/lib.rs",
+      "sha256": "480de3ae8476bd94178bb819350e7896353a6dea6cfa787705a294d5b3a2799c",
+      "bytes": 139
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/bytes-cursor-repair-01/tests/contract.rs",
+      "sha256": "5a0f85f12d5636fa84912478794e61d9f692b1a31818fe6a09a6c20910bdc2c6",
+      "bytes": 588
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/bytes-endian/Cargo.lock",
+      "sha256": "c5b0f91363dc03e8427371716b2c6deaee60fb1479c3f15ebbdb710182cfa41e",
+      "bytes": 245
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/bytes-endian/Cargo.toml",
+      "sha256": "6d1ed6acf01613f0c032a0af890bb4b69557d1a96a503bdc99a0b0dd360de901",
+      "bytes": 158
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/bytes-endian/src/lib.rs",
+      "sha256": "1cf4b820f5c07d38ac8c0905e37e17883384ce4e394ba3bb08a9f653f53f2add",
+      "bytes": 228
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/bytes-endian/tests/contract.rs",
+      "sha256": "08091a8df4ec1eda974d49e262f850d8c259433f89f78df4ea6e1cb0ed2da422",
+      "bytes": 554
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/bytes-prefix/Cargo.lock",
+      "sha256": "0cdbe1c3929f02943f9f385a0bb1c4f5d1bdb5acd7ff298b0b151032ccf69210",
+      "bytes": 245
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/bytes-prefix/Cargo.toml",
+      "sha256": "93d1ccb0051210dd8f7cc3affb13c608acad275db93e3deb4dc387edf46efcb3",
+      "bytes": 158
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/bytes-prefix/src/lib.rs",
+      "sha256": "9294c6af20de0c37b9337ffc18d08222407f2b0b35e46286a780c6644b15cba0",
+      "bytes": 143
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/bytes-prefix/tests/contract.rs",
+      "sha256": "b99624d5a309f0b5893e381f2339350b97f8878e5f6bcb04dd3a9c0193076b35",
+      "bytes": 613
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/clap-alias/Cargo.lock",
+      "sha256": "cec19d02947f941dbb76710566163d78d6759b3e1d2264ba18cdcd18ac673006",
+      "bytes": 3117
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/clap-alias/Cargo.toml",
+      "sha256": "6e6d5c083478e446633c38f612d4d6e410fc4dccbe5fb92ae983ac0d37dffc40",
+      "bytes": 174
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/clap-alias/src/lib.rs",
+      "sha256": "5fd702ab2f2173f79ba8b3cde489fec28d2aac76903d30e01e7fe031c794151b",
+      "bytes": 706
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/clap-alias/tests/contract.rs",
+      "sha256": "196116daa638dff74dbbdf56dc73fc69d28e35795de5446e91f6bb572f1d9b05",
+      "bytes": 609
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/clap-color/Cargo.lock",
+      "sha256": "e76f8b5caddf3f318eae2b5652c3abd4ec65ad4b4b26b02987be0fbcce2317cb",
+      "bytes": 3117
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/clap-color/Cargo.toml",
+      "sha256": "05a712bba8137b536d2ae62ddc0573c95e801dfaa9780e83a958c5b3194456b1",
+      "bytes": 174
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/clap-color/src/lib.rs",
+      "sha256": "1af22d4651af8efbc6029ebc218d2a2b8a2bdb06ae45aabb0a0d7f764b52f47e",
+      "bytes": 331
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/clap-color/tests/contract.rs",
+      "sha256": "981b9a047cfffba19db87c3954d950e36265a49462d8692392817073a21a7e8e",
+      "bytes": 458
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/clap-color-repair-01/Cargo.lock",
+      "sha256": "e76f8b5caddf3f318eae2b5652c3abd4ec65ad4b4b26b02987be0fbcce2317cb",
+      "bytes": 3117
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/clap-color-repair-01/Cargo.toml",
+      "sha256": "05a712bba8137b536d2ae62ddc0573c95e801dfaa9780e83a958c5b3194456b1",
+      "bytes": 174
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/clap-color-repair-01/src/lib.rs",
+      "sha256": "6c4cc4cbbbe474e912ca500d6e439cb74dc1aea8ef50c2baaa25d0d73f88325e",
+      "bytes": 316
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/clap-color-repair-01/tests/contract.rs",
+      "sha256": "a41412fb9b1bd2248a5c972035936ee9992016e04a7123d1ca205f315bc3ab56",
+      "bytes": 463
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/clap-repeat/Cargo.lock",
+      "sha256": "616d261c5cfbcb58066a78a7c3face0121672fcee5a6a4e8a5c60df47f5043b2",
+      "bytes": 3118
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/clap-repeat/Cargo.toml",
+      "sha256": "13ee695cdb2fb9cb41409fb3000f3e60ccb44f95c75410d313deabdc99bf93ad",
+      "bytes": 175
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/clap-repeat/src/lib.rs",
+      "sha256": "a611a492584609f8f0632b15017243bd999b23bb6b8c00b62ca5702ee61d6c76",
+      "bytes": 473
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/clap-repeat/tests/contract.rs",
+      "sha256": "563a979a4afe81ca4b82b455d94f5a5cd222f55b846bae6d4d8aa6cfff70e4eb",
+      "bytes": 820
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/clap-repeat-repair-01/Cargo.lock",
+      "sha256": "616d261c5cfbcb58066a78a7c3face0121672fcee5a6a4e8a5c60df47f5043b2",
+      "bytes": 3118
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/clap-repeat-repair-01/Cargo.toml",
+      "sha256": "13ee695cdb2fb9cb41409fb3000f3e60ccb44f95c75410d313deabdc99bf93ad",
+      "bytes": 175
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/clap-repeat-repair-01/src/lib.rs",
+      "sha256": "a611a492584609f8f0632b15017243bd999b23bb6b8c00b62ca5702ee61d6c76",
+      "bytes": 473
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/clap-repeat-repair-01/tests/contract.rs",
+      "sha256": "563a979a4afe81ca4b82b455d94f5a5cd222f55b846bae6d4d8aa6cfff70e4eb",
+      "bytes": 820
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/clap-values/Cargo.lock",
+      "sha256": "9a0b8dff2f6aad0e99d75234f24461988a81283a8504b024987d69c89b42a88d",
+      "bytes": 3118
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/clap-values/Cargo.toml",
+      "sha256": "5fcd34d2e86948644f61cf55ab2d8becd66b30ee5593954bf70ccbc51f737af1",
+      "bytes": 175
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/clap-values/src/lib.rs",
+      "sha256": "383754cba3d4d4705b22ae301ff8a0b8a9833f3ff7d90b62c4bb9be5ac134667",
+      "bytes": 339
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/clap-values/tests/contract.rs",
+      "sha256": "a30fec0e406de3c262c6ad500448a50d9e36ee78abf3499d2ec04405f3091e9e",
+      "bytes": 493
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/serde-map-order/Cargo.lock",
+      "sha256": "d418578f47f850904e11b28a6f2ae15f630b825838dffad44baa8d66dd406866",
+      "bytes": 3157
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/serde-map-order/Cargo.toml",
+      "sha256": "be24c4768b4e5c1f55ce5f6c3d8a05fc4f4d106cf022050f2ac8da193db2c0df",
+      "bytes": 254
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/serde-map-order/src/lib.rs",
+      "sha256": "ca44d880552508ac318513aaf20902f8921b845b08379adad14b7f4a4d28d610",
+      "bytes": 250
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/serde-map-order/tests/contract.rs",
+      "sha256": "4d265a109bcb43c19b19287cc30356e972030053746cb372ec2237eb11fe61b5",
+      "bytes": 702
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/serde-map-order-repair-01/Cargo.lock",
+      "sha256": "d418578f47f850904e11b28a6f2ae15f630b825838dffad44baa8d66dd406866",
+      "bytes": 3157
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/serde-map-order-repair-01/Cargo.toml",
+      "sha256": "be24c4768b4e5c1f55ce5f6c3d8a05fc4f4d106cf022050f2ac8da193db2c0df",
+      "bytes": 254
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/serde-map-order-repair-01/src/lib.rs",
+      "sha256": "dfaace8b58ec06169f29dd2614894acdd4114255b8fced69baa5ea6b0b3a6950",
+      "bytes": 286
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/serde-map-order-repair-01/tests/contract.rs",
+      "sha256": "4d265a109bcb43c19b19287cc30356e972030053746cb372ec2237eb11fe61b5",
+      "bytes": 702
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/serde-map-order-repair-02/Cargo.lock",
+      "sha256": "d418578f47f850904e11b28a6f2ae15f630b825838dffad44baa8d66dd406866",
+      "bytes": 3157
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/serde-map-order-repair-02/Cargo.toml",
+      "sha256": "be24c4768b4e5c1f55ce5f6c3d8a05fc4f4d106cf022050f2ac8da193db2c0df",
+      "bytes": 254
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/serde-map-order-repair-02/src/lib.rs",
+      "sha256": "dfaace8b58ec06169f29dd2614894acdd4114255b8fced69baa5ea6b0b3a6950",
+      "bytes": 286
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/serde-map-order-repair-02/tests/contract.rs",
+      "sha256": "4d265a109bcb43c19b19287cc30356e972030053746cb372ec2237eb11fe61b5",
+      "bytes": 702
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/serde-numeric-joint/Cargo.lock",
+      "sha256": "e501993608aba9bcf228f8ba539721482e5d8fa5685d157bbde90ae8b80ea7e5",
+      "bytes": 2519
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/serde-numeric-joint/Cargo.toml",
+      "sha256": "563c9562f8e59166a16eee4a70b25d8d1c1265801799261d1b703c23307087ff",
+      "bytes": 199
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/serde-numeric-joint/src/lib.rs",
+      "sha256": "8ace0bc7ddd9ed630b8e61cf21deb61c01df6a333218769c2e536f6c8ff6250c",
+      "bytes": 196
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/serde-numeric-joint/tests/contract.rs",
+      "sha256": "f2866e879e8d03ac632fb9b74874cc40c5f6206446ee40194f9ccfdd5917b2c5",
+      "bytes": 604
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/serde-numeric-joint-repair-01/Cargo.lock",
+      "sha256": "e501993608aba9bcf228f8ba539721482e5d8fa5685d157bbde90ae8b80ea7e5",
+      "bytes": 2519
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/serde-numeric-joint-repair-01/Cargo.toml",
+      "sha256": "563c9562f8e59166a16eee4a70b25d8d1c1265801799261d1b703c23307087ff",
+      "bytes": 199
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/serde-numeric-joint-repair-01/src/lib.rs",
+      "sha256": "8ace0bc7ddd9ed630b8e61cf21deb61c01df6a333218769c2e536f6c8ff6250c",
+      "bytes": 196
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/serde-numeric-joint-repair-01/tests/contract.rs",
+      "sha256": "9ec7f1e60a13f44c7730e177c6427422df6a963165eff0ea69751fb8a21e8507",
+      "bytes": 606
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/serde-offset/Cargo.lock",
+      "sha256": "ed2b1dcdffa09c32a0e8a144fb64b28855df09753ac7a2468fa37b24d1513bba",
+      "bytes": 2512
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/serde-offset/Cargo.toml",
+      "sha256": "59e5d9d0fa3bd5a7c274993c14deecd6a5f42f2b140782f57244df9d756f392b",
+      "bytes": 192
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/serde-offset/src/lib.rs",
+      "sha256": "6fcc2114d7889d74ce2f79cef4f3dae3bb6e13eb83095cdf67f678c53a523bd0",
+      "bytes": 282
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/serde-offset/tests/contract.rs",
+      "sha256": "0e7e56e1d5940d804f90efa1ab87a567415fe5c6ab1a5738503247f2ebf92c27",
+      "bytes": 445
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/serde-offset-repair-01/Cargo.lock",
+      "sha256": "ed2b1dcdffa09c32a0e8a144fb64b28855df09753ac7a2468fa37b24d1513bba",
+      "bytes": 2512
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/serde-offset-repair-01/Cargo.toml",
+      "sha256": "59e5d9d0fa3bd5a7c274993c14deecd6a5f42f2b140782f57244df9d756f392b",
+      "bytes": 192
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/serde-offset-repair-01/src/lib.rs",
+      "sha256": "5d616695cc8c12b3d36e948fee43d5e83c50fa96f2796ea2e589e682ec83a857",
+      "bytes": 300
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/serde-offset-repair-01/tests/contract.rs",
+      "sha256": "0e7e56e1d5940d804f90efa1ab87a567415fe5c6ab1a5738503247f2ebf92c27",
+      "bytes": 445
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/serde-offset-repair-02/Cargo.lock",
+      "sha256": "ed2b1dcdffa09c32a0e8a144fb64b28855df09753ac7a2468fa37b24d1513bba",
+      "bytes": 2512
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/serde-offset-repair-02/Cargo.toml",
+      "sha256": "59e5d9d0fa3bd5a7c274993c14deecd6a5f42f2b140782f57244df9d756f392b",
+      "bytes": 192
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/serde-offset-repair-02/src/lib.rs",
+      "sha256": "5d616695cc8c12b3d36e948fee43d5e83c50fa96f2796ea2e589e682ec83a857",
+      "bytes": 300
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/serde-offset-repair-02/tests/contract.rs",
+      "sha256": "4bd97761093fb46b6ed3d84007266a51f5151a27ce97d9a34ce0d4b75df9504f",
+      "bytes": 466
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/serde-raw-number/Cargo.lock",
+      "sha256": "bbacb2c5060d0d2d0e76bc0e9fc5eccf5063557a51c7ecabfab2d96490bca22f",
+      "bytes": 2516
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/serde-raw-number/Cargo.toml",
+      "sha256": "6c2a618dcd0630160c3c9c072d3ad09b7bd0bbcc21bb61b36b87610d33e07436",
+      "bytes": 221
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/serde-raw-number/src/lib.rs",
+      "sha256": "88e770a3975f10c869006a140895771536d8869173890fda6738cc95d05b5144",
+      "bytes": 213
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/serde-raw-number/tests/contract.rs",
+      "sha256": "7073cc5e5639a87f4d7cbda3b725b8ff8709049a1b2a96012d75cebaeb31370e",
+      "bytes": 600
+    }
+  ],
+  "repositories": [
+    {
+      "repository_id": "bytes",
+      "commit": "417dccdeff249e0c011327de7d92e0d6fbe7cc43",
+      "source_archive_path": "bank/construction-01/source/repositories/bytes-v1.11.1-source.tar",
+      "archive_sha256": "e3503c834ebece95674c8586af32b8bd9c506e67bdc79449a7c355e7d2b6ed55",
+      "root_cargo_toml_sha256": "cc5543c243c68ff5cc169cced62e64bae3ad1fb4aa7a141d02a1ddc2f2e559c8",
+      "working_tree_clean": true
+    },
+    {
+      "repository_id": "clap",
+      "commit": "ac5fda6a799e4c640d671edd1111d4a5e723dc1a",
+      "source_archive_path": "bank/construction-01/source/repositories/clap-v4.6.1-source.tar",
+      "archive_sha256": "fa30cb380c1ba8def3554592cba41d5f73d5905e81669ecc69fdc5f87479c92b",
+      "root_cargo_toml_sha256": "4859b4d8617eb49e07b2da240a8186c9af03e3d74b2d65012e3739c2add6358d",
+      "working_tree_clean": true
+    },
+    {
+      "repository_id": "serde-json",
+      "commit": "4f6dbfac79647d032b0997b5ab73022340c6dab7",
+      "source_archive_path": "bank/construction-01/source/repositories/serde-json-v1.0.149-source.tar",
+      "archive_sha256": "80835a13241fa9ebe48ed59179444f2f4f176973ff8307a650ef605dccf3a170",
+      "root_cargo_toml_sha256": "804ff71fff564cb236aa600678d35c243e881651b10139c4d64b27a5483b0546",
+      "working_tree_clean": true
+    }
+  ],
+  "expected_candidate_rows": 192,
+  "expected_candidate_case_invocations": 384,
+  "expected_base_rows": 48,
+  "expected_base_case_invocations": 96,
+  "sha256_self_excluded": true
+}

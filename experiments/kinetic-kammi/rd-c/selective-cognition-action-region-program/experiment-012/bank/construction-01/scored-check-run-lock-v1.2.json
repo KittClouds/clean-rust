@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "state": "FROZEN_BEFORE_SCORED_CHECK_RETRY",
+  "model_contact_authorized": false,
+  "attempt_02_conflicts": 15,
+  "quarantined_result_sha256": "36793253689a43139c5e653b2e413348c5e4bc9ebbdeefd795ffa632ff451adc",
+  "source_fixture_sha256": "462937e9b9ae5787a016bbda7ab0939bf0a92dafdf9a7a5d72664583244e0b3c",
+  "runner": "scripts/run_scored_checks_e012_v1_2.py",
+  "runner_sha256": "93db1d3638badad683d59c27be58260a3045ba7e17fb5b418d763d3233172ea4",
+  "cargo_target_policy": "content-addressed by family, manifest hash, source hash, and test hash",
+  "files": [
+    {
+      "path": "amendments/bank-amendment-07.md",
+      "sha256": "6a5122e65ea0a391346e26a7c848ab1567f87982f1c533ee5030f1541a89fd7e",
+      "bytes": 1372
+    },
+    {
+      "path": "amendments/bank-amendment-07.json",
+      "sha256": "2d894ae5d87f8074ec1b7b5330d6d3142adc4366d38263b2dde763bad00fb814",
+      "bytes": 1166
+    },
+    {
+      "path": "scripts/run_scored_checks_e012_v1_2.py",
+      "sha256": "93db1d3638badad683d59c27be58260a3045ba7e17fb5b418d763d3233172ea4",
+      "bytes": 11987
+    },
+    {
+      "path": "scripts/freeze_scored_check_runner_e012_v1_2.py",
+      "sha256": "8ba262d83fa3769f4d9ede4c1decec85c6c7b5da61c47139f9f0fbf0e8ea25d0",
+      "bytes": 2921
+    },
+    {
+      "path": "bank/construction-01/task-construction-lock-v1.1.json",
+      "sha256": "fe90cb29fd0b6b9c233826188d3692124e14660f109065415a58015dbad54c28",
+      "bytes": 1049
+    },
+    {
+      "path": "bank/construction-01/scored-check-run-lock-v1.1.json",
+      "sha256": "aa249ccc96095efb691e94ec83376adc2c40449d697d215ade76b93961ebc7e9",
+      "bytes": 2166
+    },
+    {
+      "path": "bank/construction-01/scored-bank-v1/vault/task-source-fixtures.json",
+      "sha256": "462937e9b9ae5787a016bbda7ab0939bf0a92dafdf9a7a5d72664583244e0b3c",
+      "bytes": 336199
+    },
+    {
+      "path": "bank/construction-01/scored-bank-v1/attempts/scored-check-attempt-01.json",
+      "sha256": "cd476ceb894a70ca7b6f4ffda62df315a31b67e2f15a3fde0648e921c37dd369",
+      "bytes": 1694
+    },
+    {
+      "path": "bank/construction-01/scored-bank-v1/attempts/scored-check-attempt-02-audit.json",
+      "sha256": "673611b450b4e3028cd7d732e822f1c995dcc8389cf21d93aa32ceed008b3b85",
+      "bytes": 17702
+    },
+    {
+      "path": "bank/construction-01/scored-bank-v1/attempts/scored-check-results-attempt-02-quarantined.json",
+      "sha256": "36793253689a43139c5e653b2e413348c5e4bc9ebbdeefd795ffa632ff451adc",
+      "bytes": 793478
+    }
+  ],
+  "toolchain": {
+    "python": "3.13.15",
+    "cargo": "cargo 1.96.0 (30a34c682 2026-05-25)",
+    "rustc": "rustc 1.96.0 (ac68faa20 2026-05-25)",
+    "cargo_target_root": "D:\\rdc-e012-target\\scored-checks"
+  },
+  "sha256_self_excluded": true
+}

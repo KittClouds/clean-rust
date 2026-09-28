@@ -1,0 +1,22 @@
+{
+  "schema": "FAS_E4_0_TRACK_A_BUILD_ATTEMPT_V01",
+  "attempt": "E4_POPULATION_V02_INITIAL_COMPILE",
+  "status": "PRESERVED_PREAUTHORIZATION_BUILD_FAILURE",
+  "failure_class": "copied benchmark import retained the v01 Rust crate name after package versioning",
+  "compiler_diagnostic": "unresolved crate fas_frozen_capability_fabric_e4_population_v01 in benches/population_hot_path.rs; compiler suggested v02 crate name",
+  "failed_source_evidence": {
+    "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/e4-population-v01/benches/population_hot_path.rs",
+    "bytes": 2522,
+    "sha256": "97ec4da8c5df7c79395f79d1e9385b4871312cb7fcbd2d9d287c7df9d58f1eac",
+    "note": "This exact v01 bench file was the copied v02 bench before repair; it remains preserved in the sealed v01 source tree."
+  },
+  "repair": "Updated only the v02 bench crate import to fas_frozen_capability_fabric_e4_population_v02, then reran fmt, strict Clippy, and release all-target tests.",
+  "scope": {
+    "population_rows_written": false,
+    "tokenizer_contacted": false,
+    "model_contacted": false,
+    "cuda_initialized": false,
+    "authorization_issued": false
+  },
+  "created_utc": "2026-09-26T22:15:21.413784+00:00"
+}

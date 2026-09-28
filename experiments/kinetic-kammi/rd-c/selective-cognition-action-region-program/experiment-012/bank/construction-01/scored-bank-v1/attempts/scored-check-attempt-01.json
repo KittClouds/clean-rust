@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "attempt_id": "E012-SCORED-CHECK-ATTEMPT-01",
+  "state": "FAILED_RUNNER_ERROR_NO_CANDIDATE_RESULT_FILE",
+  "model_contact_authorized": false,
+  "runner": "scripts/run_scored_checks_e012_v1.py",
+  "runner_sha256": "c52ba7f735c4bb4217d6f1c0e43c086e07f0d5f2053138432ee0c7274c4634a3",
+  "task_construction_lock_sha256": "fe90cb29fd0b6b9c233826188d3692124e14660f109065415a58015dbad54c28",
+  "task_source_fixtures_sha256": "462937e9b9ae5787a016bbda7ab0939bf0a92dafdf9a7a5d72664583244e0b3c",
+  "elapsed_seconds_observed": 42.2,
+  "exit_code": 1,
+  "failure": "apply_unified_patch rejected an empty no-op candidate before the empty-patch branch; traceback surfaced ValueError: candidate patch does not target only src/lib.rs.",
+  "candidate_or_task_outcome_recorded": false,
+  "partial_result_rows_persisted": false,
+  "attempted_patch_inspection": [
+    {
+      "feasibility": "bytes-cursor-repair-01",
+      "candidate": "candidate-31099.patch",
+      "bytes": 0,
+      "meaning": "no-op candidate"
+    },
+    {
+      "feasibility": "clap-alias",
+      "candidate": "candidate-32916.patch",
+      "bytes": 0,
+      "meaning": "no-op candidate"
+    },
+    {
+      "feasibility": "clap-color-repair-01",
+      "candidate": "candidate-48831.patch",
+      "bytes": 0,
+      "meaning": "no-op candidate"
+    },
+    {
+      "feasibility": "serde-raw-number",
+      "candidate": "candidate-38796.patch",
+      "bytes": 0,
+      "meaning": "no-op candidate"
+    }
+  ],
+  "repair": "versioned runner v1.1 recognizes an empty patch as an unchanged source overlay before validating unified-diff headers; executable predicate is unchanged."
+}

@@ -1,0 +1,45 @@
+{
+  "protocol": "jev-information-density/v0.8p-v05-source-allowlist-v01",
+  "identity": "v0.8P-v05-direct-panel-identity-source-allowlist-v01",
+  "status": "FROZEN_BEFORE_EXTRACTION",
+  "v04_authority_trace_sha256": "050a24e85f45eaf8b70d382871b4aaa50f973b25c8494ad116531f0b152ed02e",
+  "v04_stage_a_seal_sha256": "e8c9154b9af87d098272fdde4ef6fb2e634010ef797cbfa3f6502848208d06ab",
+  "authority_artifacts": [
+    {
+      "path": "experiments/jev-information-density-v08p-v04/provenance/stage-a-authority-trace-v01.json",
+      "sha256": "050a24e85f45eaf8b70d382871b4aaa50f973b25c8494ad116531f0b152ed02e",
+      "purpose": "confirm the exact firewall-lock-to-panel-manifest path/hash chain"
+    },
+    {
+      "path": "experiments/jev-information-density-v08p-v04/provenance/v04-stage-a-seal-v01.json",
+      "sha256": "e8c9154b9af87d098272fdde4ef6fb2e634010ef797cbfa3f6502848208d06ab",
+      "purpose": "verify the Stage-A trace was sealed"
+    }
+  ],
+  "extractor": {
+    "path": "experiments/jev-information-density-v08p-v05/identity/extract_panel_identity_denylist_v05.py",
+    "sha256": "436c980977ca5a3bc1878e5c165d13e6733b835e87a31ff70ba2e0d2eb131e89"
+  },
+  "authorized_sources": [
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08n\\v0.8N-eval-panel-v01\\seal\\evaluation-firewall-lock.json",
+      "canonical_path_sha256": "53f6ff76ae0016c7f826c414b22889413f3d3d7b4f8b2c2799df644bf946f894",
+      "expected_sha256": "79d25ac82fba1bc6332e16d8bc5f877fadd11cccaed5ef3f07eacfe5e1877da2",
+      "purpose": "verify authority receipt and read only top-level panel_manifest_sha256",
+      "permitted_fields": ["panel_manifest_sha256"]
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08n\\v0.8N-eval-panel-v01\\matched-panel-v02\\heldout-matched-panel-manifest.jsonl",
+      "canonical_path_sha256": "9f134282815a7074dbc43960a8af03e632fe27be4ba8dd5f104ff696a521f972",
+      "expected_sha256": "80e09c0f203b8a6505e062a2091a594273dca808258ff2f4539ab8414db9eabe",
+      "purpose": "after full-object hash pass, extract only top-level neighborhood_id strings",
+      "permitted_fields": ["neighborhood_id"]
+    }
+  ],
+  "output_policy": {
+    "raw_neighborhood_ids_written": false,
+    "only_sorted_identity_hashes_written": true,
+    "expected_count": 2000,
+    "observed_source_set_equals_authorized_set": true
+  }
+}

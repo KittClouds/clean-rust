@@ -1,0 +1,202 @@
+[
+  {
+    "candidate_id": 28214,
+    "candidate_role_hidden": "preserve_order_only",
+    "case_id": "case-01",
+    "preserve_order": false,
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (41564) panicked at tests\\contract.rs:13:38:\nvalid map input\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "     Locking 14 packages to latest compatible versions\n   Compiling e012-serde-map-order-harness v0.1.0 (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\task-harnesses\\serde-map-order)\nwarning: unused variable: `object`\n --> src\\lib.rs:5:9\n  |\n5 |     let object = value.as_object()?;\n  |         ^^^^^^ help: if this is intentional, prefix it with an underscore: `_object`\n  |\n  = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default\n\nwarning: `e012-serde-map-order-harness` (lib) generated 1 warning (run `cargo fix --lib -p e012-serde-map-order-harness` to apply 1 suggestion)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.94s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\serde-json-harness\\debug\\deps\\contract-a35c4741fae22928.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 28214,
+    "candidate_role_hidden": "preserve_order_only",
+    "case_id": "case-02",
+    "preserve_order": true,
+    "exit_code": 0,
+    "passed": true,
+    "stdout": "\nrunning 1 test\ntest check_contract ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "   Compiling serde_json v1.0.149 (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\repositories\\serde-json)\n   Compiling hashbrown v0.17.1\n   Compiling equivalent v1.0.2\n   Compiling indexmap v2.14.2\n   Compiling e012-serde-map-order-harness v0.1.0 (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\task-harnesses\\serde-map-order)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.90s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\serde-json-harness\\debug\\deps\\contract-ebe8a50b06663ef0.exe)\n"
+  },
+  {
+    "candidate_id": 28214,
+    "candidate_role_hidden": "preserve_order_only",
+    "case_id": "case-03",
+    "preserve_order": false,
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (10952) panicked at tests\\contract.rs:13:38:\nvalid map input\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "warning: unused variable: `object`\n --> src\\lib.rs:5:9\n  |\n5 |     let object = value.as_object()?;\n  |         ^^^^^^ help: if this is intentional, prefix it with an underscore: `_object`\n  |\n  = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default\n\nwarning: `e012-serde-map-order-harness` (lib) generated 1 warning (run `cargo fix --lib -p e012-serde-map-order-harness` to apply 1 suggestion)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.04s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\serde-json-harness\\debug\\deps\\contract-a35c4741fae22928.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 28214,
+    "candidate_role_hidden": "preserve_order_only",
+    "case_id": "case-04",
+    "preserve_order": true,
+    "exit_code": 0,
+    "passed": true,
+    "stdout": "\nrunning 1 test\ntest check_contract ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.05s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\serde-json-harness\\debug\\deps\\contract-ebe8a50b06663ef0.exe)\n"
+  },
+  {
+    "candidate_id": 59171,
+    "candidate_role_hidden": "sorted_profile_only",
+    "case_id": "case-01",
+    "preserve_order": false,
+    "exit_code": 0,
+    "passed": true,
+    "stdout": "\nrunning 1 test\ntest check_contract ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "   Compiling e012-serde-map-order-harness v0.1.0 (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\task-harnesses\\serde-map-order)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.87s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\serde-json-harness\\debug\\deps\\contract-a35c4741fae22928.exe)\n"
+  },
+  {
+    "candidate_id": 59171,
+    "candidate_role_hidden": "sorted_profile_only",
+    "case_id": "case-02",
+    "preserve_order": true,
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (8088) panicked at tests\\contract.rs:13:38:\nvalid map input\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "   Compiling e012-serde-map-order-harness v0.1.0 (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\task-harnesses\\serde-map-order)\nwarning: unused variable: `object`\n --> src\\lib.rs:5:9\n  |\n5 |     let object = value.as_object()?;\n  |         ^^^^^^ help: if this is intentional, prefix it with an underscore: `_object`\n  |\n  = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default\n\nwarning: `e012-serde-map-order-harness` (lib) generated 1 warning (run `cargo fix --lib -p e012-serde-map-order-harness` to apply 1 suggestion)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.18s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\serde-json-harness\\debug\\deps\\contract-ebe8a50b06663ef0.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 59171,
+    "candidate_role_hidden": "sorted_profile_only",
+    "case_id": "case-03",
+    "preserve_order": false,
+    "exit_code": 0,
+    "passed": true,
+    "stdout": "\nrunning 1 test\ntest check_contract ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.06s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\serde-json-harness\\debug\\deps\\contract-a35c4741fae22928.exe)\n"
+  },
+  {
+    "candidate_id": 59171,
+    "candidate_role_hidden": "sorted_profile_only",
+    "case_id": "case-04",
+    "preserve_order": true,
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (7184) panicked at tests\\contract.rs:13:38:\nvalid map input\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "warning: unused variable: `object`\n --> src\\lib.rs:5:9\n  |\n5 |     let object = value.as_object()?;\n  |         ^^^^^^ help: if this is intentional, prefix it with an underscore: `_object`\n  |\n  = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default\n\nwarning: `e012-serde-map-order-harness` (lib) generated 1 warning (run `cargo fix --lib -p e012-serde-map-order-harness` to apply 1 suggestion)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.06s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\serde-json-harness\\debug\\deps\\contract-ebe8a50b06663ef0.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 31314,
+    "candidate_role_hidden": "canonical_sort",
+    "case_id": "case-01",
+    "preserve_order": false,
+    "exit_code": 0,
+    "passed": true,
+    "stdout": "\nrunning 1 test\ntest check_contract ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "   Compiling e012-serde-map-order-harness v0.1.0 (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\task-harnesses\\serde-map-order)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.13s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\serde-json-harness\\debug\\deps\\contract-a35c4741fae22928.exe)\n"
+  },
+  {
+    "candidate_id": 31314,
+    "candidate_role_hidden": "canonical_sort",
+    "case_id": "case-02",
+    "preserve_order": true,
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (11004) panicked at tests\\contract.rs:14:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "   Compiling e012-serde-map-order-harness v0.1.0 (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\task-harnesses\\serde-map-order)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.42s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\serde-json-harness\\debug\\deps\\contract-ebe8a50b06663ef0.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 31314,
+    "candidate_role_hidden": "canonical_sort",
+    "case_id": "case-03",
+    "preserve_order": false,
+    "exit_code": 0,
+    "passed": true,
+    "stdout": "\nrunning 1 test\ntest check_contract ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.06s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\serde-json-harness\\debug\\deps\\contract-a35c4741fae22928.exe)\n"
+  },
+  {
+    "candidate_id": 31314,
+    "candidate_role_hidden": "canonical_sort",
+    "case_id": "case-04",
+    "preserve_order": true,
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (37272) panicked at tests\\contract.rs:14:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.06s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\serde-json-harness\\debug\\deps\\contract-ebe8a50b06663ef0.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 38651,
+    "candidate_role_hidden": "reverse_native",
+    "case_id": "case-01",
+    "preserve_order": false,
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (47100) panicked at tests\\contract.rs:14:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "   Compiling e012-serde-map-order-harness v0.1.0 (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\task-harnesses\\serde-map-order)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.18s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\serde-json-harness\\debug\\deps\\contract-a35c4741fae22928.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 38651,
+    "candidate_role_hidden": "reverse_native",
+    "case_id": "case-02",
+    "preserve_order": true,
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (15076) panicked at tests\\contract.rs:14:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "   Compiling e012-serde-map-order-harness v0.1.0 (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\task-harnesses\\serde-map-order)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.30s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\serde-json-harness\\debug\\deps\\contract-ebe8a50b06663ef0.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 38651,
+    "candidate_role_hidden": "reverse_native",
+    "case_id": "case-03",
+    "preserve_order": false,
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (12788) panicked at tests\\contract.rs:14:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.07s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\serde-json-harness\\debug\\deps\\contract-a35c4741fae22928.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 38651,
+    "candidate_role_hidden": "reverse_native",
+    "case_id": "case-04",
+    "preserve_order": true,
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (44260) panicked at tests\\contract.rs:14:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.06s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\serde-json-harness\\debug\\deps\\contract-ebe8a50b06663ef0.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": null,
+    "candidate_role_hidden": "base_snapshot",
+    "case_id": "case-01",
+    "preserve_order": false,
+    "exit_code": 0,
+    "passed": true,
+    "stdout": "\nrunning 1 test\ntest check_contract ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "   Compiling e012-serde-map-order-harness v0.1.0 (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\task-harnesses\\serde-map-order)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.97s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\serde-json-harness\\debug\\deps\\contract-a35c4741fae22928.exe)\n"
+  },
+  {
+    "candidate_id": null,
+    "candidate_role_hidden": "base_snapshot",
+    "case_id": "case-02",
+    "preserve_order": true,
+    "exit_code": 0,
+    "passed": true,
+    "stdout": "\nrunning 1 test\ntest check_contract ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "   Compiling e012-serde-map-order-harness v0.1.0 (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\task-harnesses\\serde-map-order)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.16s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\serde-json-harness\\debug\\deps\\contract-ebe8a50b06663ef0.exe)\n"
+  },
+  {
+    "candidate_id": null,
+    "candidate_role_hidden": "base_snapshot",
+    "case_id": "case-03",
+    "preserve_order": false,
+    "exit_code": 0,
+    "passed": true,
+    "stdout": "\nrunning 1 test\ntest check_contract ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.06s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\serde-json-harness\\debug\\deps\\contract-a35c4741fae22928.exe)\n"
+  },
+  {
+    "candidate_id": null,
+    "candidate_role_hidden": "base_snapshot",
+    "case_id": "case-04",
+    "preserve_order": true,
+    "exit_code": 0,
+    "passed": true,
+    "stdout": "\nrunning 1 test\ntest check_contract ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.07s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\serde-json-harness\\debug\\deps\\contract-ebe8a50b06663ef0.exe)\n"
+  }
+]

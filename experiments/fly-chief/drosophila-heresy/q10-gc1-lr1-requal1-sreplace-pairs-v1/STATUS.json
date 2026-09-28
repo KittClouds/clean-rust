@@ -1,0 +1,9 @@
+{
+  "engineering_only": true,
+  "execution_sha256": "BB7B8601BC2622B532F4CC8AD01039B079001625A9F2F4E548F87B91974509D6",
+  "identity": "q10-gc1-lr1-requal1-sreplace-pairs-v1",
+  "pair_replay_executed": true,
+  "protocol": "REQUAL1-SREPLACE-PAIRS",
+  "scientific_promotion": false,
+  "status": "SREPLACE_PAIRS_COMPLETE"
+}

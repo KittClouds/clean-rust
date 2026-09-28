@@ -1,0 +1,14 @@
+{
+  "task_id": "heldoutv6-builtin-preset-duration-validation-ambiguous-02",
+  "lane": "always-large",
+  "action_id": 94,
+  "patch_sha256": "76d5f66c2025364d83b126c8b5d128e3e58ae1f430c5be0ecffce57cd3da43b3",
+  "candidate_variant": "gold_comment",
+  "test_filter": "preset::tests::builtins_are_valid_and_exportable",
+  "status": "passed",
+  "passed": true,
+  "elapsed_ms": 0.0,
+  "completion_source": "precontact-bank-build-receipt",
+  "completion_log_sha256": "55d01592fbaf70aa7098605049a47a21a53dd0765216d0a3f72b7e2ab490b0e6",
+  "bank_build_receipt_sha256": "1e8f063758e9d469041e2fa602389bf28478b415aa4c0fedcaa123af0241bc30"
+}

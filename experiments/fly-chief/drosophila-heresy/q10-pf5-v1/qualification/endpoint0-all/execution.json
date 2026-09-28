@@ -1,0 +1,388 @@
+{
+  "coverage_status_counts": {
+    "OVERSIZE_UNTESTED": 53,
+    "PARTIAL_FEASIBILITY_FOUND": 7
+  },
+  "declared_subset": {
+    "endpoint_keys": [
+      [
+        "seed9731-L-tau16.json",
+        0
+      ]
+    ],
+    "endpoint_limit": 1,
+    "group_keys": [
+      [
+        "seed9731-L-tau16.json",
+        0,
+        0
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        1
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        2
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        3
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        4
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        5
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        6
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        7
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        8
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        9
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        10
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        11
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        12
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        13
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        14
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        15
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        16
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        17
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        18
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        19
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        20
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        21
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        22
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        23
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        24
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        25
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        26
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        27
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        28
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        29
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        30
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        31
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        32
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        33
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        34
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        35
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        36
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        37
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        38
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        39
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        40
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        41
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        42
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        43
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        44
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        45
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        46
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        47
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        48
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        49
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        50
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        51
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        52
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        53
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        54
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        55
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        56
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        57
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        58
+      ],
+      [
+        "seed9731-L-tau16.json",
+        0,
+        59
+      ]
+    ],
+    "group_limit_per_endpoint": 100
+  },
+  "firewall": {
+    "behavioral_probe": false,
+    "canonical_state_updated": false,
+    "future_protocol_opened": false,
+    "scientific_bundle_count": 0,
+    "sealed_predecessor_writes": false
+  },
+  "parent_hashes": {
+    "da2_results_sha256": "A76139A924D0D24EE5376378DBCDB12AAE539CE33182DE1050C741DC0475BB23",
+    "rmt_config_sha256": "F39F2494ACA53FC3434CB4E73940838B10E7BF4FB08B228AEEFD6A9C39E0EFE3",
+    "rmt_contract_sha256": "FFD057E2D2FB86CB8BBBE0F78EA66C10DF752ABB369448549430EDBF4595CC6E",
+    "rmt_plan_sha256": "41DB8A90568A1BDA22DA1E7A3D8288967E24037FDCAD5C8B2518ED53D28511C5",
+    "rmt_preexecution_sha256": "F1A102DB83448EF6B1D9903329CCF38E34E730014BF3D37B10904036C9B61982",
+    "rmt_result_sha256": "938DC5384E8F64A3E2EB453256CADB188B4A35278330C758E175104FEE6989CD",
+    "rmt_status_sha256": "66EBF48C7AEEB2BBE414F6176E28291A4AAE83CE792876C3873D6AB734E62FFD"
+  },
+  "parent_protocol": "Q10-RMT",
+  "pf5_contract_sha256": "20995E1826A9C62E0E8689017A2F3E624CC9E63B76B210FBD4AB11D7E9E7D34F",
+  "pf5_plan_sha256": "91286F84241D120395905E1569218B4D4BA5EE682AE5C82B75879305FC88A75C",
+  "protocol": "Q10-PF5",
+  "receipt_manifest": [
+    {
+      "path": "qualification/sample-9731-9732/execution.json",
+      "sha256": "B371FD8D3EFCB2354F78D1152AFC884FC4A6D6CA5D595B5295103DC68FCC7B86"
+    },
+    {
+      "path": "qualification/sample-9731-9732/authority-summary.json",
+      "sha256": "3389B671F8A4B61D0EA6484654418BF02E83A42C02424D3263FB69BFDBDC40C9"
+    },
+    {
+      "path": "qualification/sample-9731-9732/components.json",
+      "sha256": "E873F1FAAA1C1D2093F5D90D483AF621D1B371FA205A52EBD3E74D0E7B841977"
+    },
+    {
+      "path": "qualification/sample-9731-9732/endpoints.json",
+      "sha256": "1BE006961358B748CE0ECBCE635347274326494D546F82E6F32CA1FAAC0A7A8C"
+    },
+    {
+      "path": "qualification/sample-9731-9732/excluded-noncontract.json",
+      "sha256": "02A7CDA89BFC68F6AEA8C556546BAEA77559386C2F78C239C6A849A1F846033E"
+    },
+    {
+      "path": "qualification/sample-9731-9732/moves.jsonl",
+      "sha256": "9FC2FB529A8EDA40F9F6AC1EB43DE1E76C8E7EB1331C2FD66CEC69AE7C1BF83F"
+    },
+    {
+      "path": "qualification/sample-9731-9732/rows.json",
+      "sha256": "A9AE4E5209E7BB32C4815666A32EA9C66B9E60A79C0E1A739C486E68DDE041C3"
+    }
+  ],
+  "receipt_root": "qualification/sample-9731-9732",
+  "reconstructed_primary_endpoints": 28,
+  "source_input_hashes": {
+    "seed9731-L-tau16.json": "3114A3B31C59A79D540F32C30FE1C217971418655CD8B13E17A91D8157AA1707",
+    "seed9731-L-tau4.json": "2974BF3A4CB5C80569EE73B2E46C8800D12D142DDA9B67EA572880F4EE9C3B5E",
+    "seed9731-R-tau16.json": "185769A85B1EA2FE8E596804C1FC3CB4F27A3D8318010FB8D739E56CBF554F73",
+    "seed9731-R-tau4.json": "8BA8EF71BF255B53769A6E50EB65408E19BD59743F932F3DF741AF3EB97DCE99",
+    "seed9732-L-tau16.json": "461269AF2C4B89F9DD9B589E6CA322A29CA9357FAA29627911E7FB5B85E8E1A3",
+    "seed9732-L-tau4.json": "36F042052DF02EEA4371C3C76F8AFA727FECF5450158CBFAEA731E7E43A60D28",
+    "seed9732-R-tau16.json": "2E6AF0C80578CD61214099D166D692007B431FF557D678AFBBAF2FFD8DC8BFC9",
+    "seed9732-R-tau4.json": "A53A3567E84CB753805409A92B1C350C5F2AC6173557D221C000C975BF19A135"
+  },
+  "status": "Q10_PF5_ENGINEERING_SLICE_COMPLETE",
+  "topology": {
+    "helpful_components": 2738,
+    "mismatch_rows": 7003,
+    "raw_support_groups_in_selected_endpoints": 60,
+    "raw_support_groups_selected": 60,
+    "serialized_moves": 168071
+  }
+}

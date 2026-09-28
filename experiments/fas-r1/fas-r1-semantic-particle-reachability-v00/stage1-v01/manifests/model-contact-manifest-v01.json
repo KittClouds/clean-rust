@@ -1,0 +1,43 @@
+{
+  "manifest": "FAS-R1-MODEL-CONTACT-v01",
+  "status": "AUTHORIZED_FOR_FROZEN_EXTRACTION_AND_EXTERNAL_PROBES",
+  "frozen_utc_date": "2026-09-26",
+  "model_id": "LiquidAI/LFM2.5-1.2B-Base",
+  "revision": "7453bca97ca1e67754c4035a4b4c584e1c9dd725",
+  "architecture": "Lfm2ForCausalLM",
+  "parameter_count": 1170340608,
+  "declared_weight_dtype": "BF16",
+  "hidden_size": 2048,
+  "local_snapshot": "D:\\r1-models\\lfm2.5-1.2b-base-7453bca97ca1e67754c4035a4b4c584e1c9dd725",
+  "files": {
+    "model.safetensors": {
+      "bytes": 2340697936,
+      "sha256": "7678AB9546A0C51C1FCA161876B1EFC4F0906277F170B5822045F40FDAF9EEFF"
+    },
+    "tokenizer.json": {
+      "sha256": "D7A0AB0FC22E41EC8C6D7450A9FF9CE40E196EC5E5A2FA6A2105E064E0514ED7"
+    }
+  },
+  "extraction_contract": {
+    "inputs": "each rendered clause independently; whole problem once",
+    "special_tokens": true,
+    "padding": false,
+    "truncation": false,
+    "representation": "arithmetic mean of final-layer hidden states over visible tokens",
+    "output_dtype": "float32",
+    "model_mode": "eval + inference_mode",
+    "device_dtype": "CUDA BF16 when supported, else CUDA FP16; CPU FP32 fallback",
+    "repeatability": "before corpus extraction, run the same small batch twice and require bitwise-equal float32 features on the selected device",
+    "weight_mutation": "forbidden; verify pinned file hash before and after extraction",
+    "training_boundary": "only external probes/controllers may be fit; no backbone gradients, fine-tuning, LoRA, or weight changes"
+  },
+  "software_observed": {
+    "python": "3.13.15",
+    "torch": "2.11.0+cu128",
+    "transformers": "5.17.0",
+    "safetensors": "0.8.0",
+    "huggingface_hub": "1.32.0",
+    "numpy": "2.5.3"
+  },
+  "provenance": "initial cache snapshot-link creation failed on Windows with WinError 1314; same pinned Hub revision was materialized using --local-dir and its model/tokenizer hashes recorded above"
+}

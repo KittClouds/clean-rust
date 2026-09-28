@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "copies": [
+    {
+      "role": "small",
+      "source_run_id": "e009-20260925-expanded-01",
+      "source_sha256": "dd40cfa991157422d8c64ec72c8706adf661707bd183a93b5713f5491c20fe98",
+      "copied_sha256": "dd40cfa991157422d8c64ec72c8706adf661707bd183a93b5713f5491c20fe98",
+      "bytes": 11884
+    },
+    {
+      "role": "large",
+      "source_run_id": "e009-20260925-expanded-01",
+      "source_sha256": "6d8c766868c225ba2fc53fab43e4889bbcb15371cf65c6ae88e24e72d3271672",
+      "copied_sha256": "6d8c766868c225ba2fc53fab43e4889bbcb15371cf65c6ae88e24e72d3271672",
+      "bytes": 11847
+    }
+  ]
+}

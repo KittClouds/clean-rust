@@ -1,0 +1,196 @@
+{
+  "behavioral_inference": false,
+  "dh08b_authorized": false,
+  "events": [
+    {
+      "base_error_norm": 0.000028440005076557815,
+      "bundle_count": 8,
+      "bundles": [
+        {
+          "category": "shared",
+          "coordinate_a": 2594,
+          "coordinate_b": 2745,
+          "coordinate_c": 2870,
+          "direction_a": "down",
+          "direction_b": "down",
+          "direction_c": "down",
+          "max_case_steps": [
+            0,
+            0,
+            0
+          ],
+          "max_i3_nonzero_rows": 0,
+          "max_i3_ratio_error": 0.0,
+          "max_pair_interaction_ratio_error": 0.03353284620867854,
+          "mean_i3_ratio_error": 0.0,
+          "nonzero_i3_cases": 0,
+          "shared_rows": 1,
+          "valid_grid": 125
+        },
+        {
+          "category": "shared",
+          "coordinate_a": 11131,
+          "coordinate_b": 11322,
+          "coordinate_c": 11517,
+          "direction_a": "up",
+          "direction_b": "down",
+          "direction_c": "up",
+          "max_case_steps": [
+            0,
+            0,
+            0
+          ],
+          "max_i3_nonzero_rows": 0,
+          "max_i3_ratio_error": 0.0,
+          "max_pair_interaction_ratio_error": 0.0,
+          "mean_i3_ratio_error": 0.0,
+          "nonzero_i3_cases": 0,
+          "shared_rows": 1,
+          "valid_grid": 125
+        },
+        {
+          "category": "shared",
+          "coordinate_a": 54,
+          "coordinate_b": 112,
+          "coordinate_c": 734,
+          "direction_a": "down",
+          "direction_b": "down",
+          "direction_c": "down",
+          "max_case_steps": [
+            0,
+            0,
+            0
+          ],
+          "max_i3_nonzero_rows": 0,
+          "max_i3_ratio_error": 0.0,
+          "max_pair_interaction_ratio_error": 0.06706569241735708,
+          "mean_i3_ratio_error": 0.0,
+          "nonzero_i3_cases": 0,
+          "shared_rows": 1,
+          "valid_grid": 125
+        },
+        {
+          "category": "shared",
+          "coordinate_a": 19903,
+          "coordinate_b": 20216,
+          "coordinate_c": 20812,
+          "direction_a": "up",
+          "direction_b": "down",
+          "direction_c": "down",
+          "max_case_steps": [
+            0,
+            0,
+            0
+          ],
+          "max_i3_nonzero_rows": 0,
+          "max_i3_ratio_error": 0.0,
+          "max_pair_interaction_ratio_error": 0.06706569241735708,
+          "mean_i3_ratio_error": 0.0,
+          "nonzero_i3_cases": 0,
+          "shared_rows": 1,
+          "valid_grid": 125
+        },
+        {
+          "category": "disjoint",
+          "coordinate_a": 748,
+          "coordinate_b": 18493,
+          "coordinate_c": 21739,
+          "direction_a": "down",
+          "direction_b": "up",
+          "direction_c": "up",
+          "max_case_steps": [
+            0,
+            0,
+            0
+          ],
+          "max_i3_nonzero_rows": 0,
+          "max_i3_ratio_error": 0.0,
+          "max_pair_interaction_ratio_error": 0.0,
+          "mean_i3_ratio_error": 0.0,
+          "nonzero_i3_cases": 0,
+          "shared_rows": 0,
+          "valid_grid": 125
+        },
+        {
+          "category": "disjoint",
+          "coordinate_a": 3470,
+          "coordinate_b": 3557,
+          "coordinate_c": 9513,
+          "direction_a": "down",
+          "direction_b": "up",
+          "direction_c": "up",
+          "max_case_steps": [
+            0,
+            0,
+            0
+          ],
+          "max_i3_nonzero_rows": 0,
+          "max_i3_ratio_error": 0.0,
+          "max_pair_interaction_ratio_error": 0.0,
+          "mean_i3_ratio_error": 0.0,
+          "nonzero_i3_cases": 0,
+          "shared_rows": 0,
+          "valid_grid": 125
+        },
+        {
+          "category": "disjoint",
+          "coordinate_a": 2729,
+          "coordinate_b": 9246,
+          "coordinate_c": 10094,
+          "direction_a": "down",
+          "direction_b": "up",
+          "direction_c": "up",
+          "max_case_steps": [
+            0,
+            0,
+            0
+          ],
+          "max_i3_nonzero_rows": 0,
+          "max_i3_ratio_error": 0.0,
+          "max_pair_interaction_ratio_error": 0.0,
+          "mean_i3_ratio_error": 0.0,
+          "nonzero_i3_cases": 0,
+          "shared_rows": 0,
+          "valid_grid": 125
+        },
+        {
+          "category": "disjoint",
+          "coordinate_a": 8501,
+          "coordinate_b": 18738,
+          "coordinate_c": 20880,
+          "direction_a": "up",
+          "direction_b": "up",
+          "direction_c": "up",
+          "max_case_steps": [
+            0,
+            0,
+            0
+          ],
+          "max_i3_nonzero_rows": 0,
+          "max_i3_ratio_error": 0.0,
+          "max_pair_interaction_ratio_error": 0.0,
+          "mean_i3_ratio_error": 0.0,
+          "nonzero_i3_cases": 0,
+          "shared_rows": 0,
+          "valid_grid": 125
+        }
+      ],
+      "disjoint_bundle_count": 4,
+      "initial_mismatch_count": 397,
+      "max_i3_ratio_error": 0.0,
+      "mean_i3_ratio_error": 0.0,
+      "parent_status": "Q10_SM_STAGE1_VALID__F32_SAFE_FREEDOM_PRESENT",
+      "seed": 9671,
+      "shared_bundle_count": 4,
+      "side": "R",
+      "status": "BUNDLE_ORDER_AUDIT_COMPLETE",
+      "tau": 16.0,
+      "trial": 128
+    }
+  ],
+  "protocol": "Q10-PF3",
+  "scientific_seed_bundles": 0,
+  "seed": 9671,
+  "side": "R",
+  "tau": 16.0
+}

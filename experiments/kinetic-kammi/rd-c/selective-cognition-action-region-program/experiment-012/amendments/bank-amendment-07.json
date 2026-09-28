@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "amendment_id": "E012-BANK-A07",
+  "state": "RUNNER_REPAIR_FROZEN_BEFORE_RETRY",
+  "model_contact_authorized": false,
+  "quarantined_attempt": "bank/construction-01/scored-bank-v1/attempts/scored-check-results-attempt-02-quarantined.json",
+  "quarantine_audit": "bank/construction-01/scored-bank-v1/attempts/scored-check-attempt-02-audit.json",
+  "observed_same_input_case_conflict_groups": 15,
+  "disposition": "exclude all attempt-02 results",
+  "root_cause_assessment": "the shared family target directory likely reused stale test artifacts across temporary overlays; the observed result is runner non-repeatability under identical content hashes",
+  "repair": "content-address CARGO_TARGET_DIR by family, Cargo manifest, source overlay, and test overlay; disable incremental compilation",
+  "changed": ["scored-check runner artifact isolation"],
+  "unchanged": [
+    "source fixtures",
+    "candidate patches",
+    "test predicates",
+    "candidate check schedule",
+    "expected labels prior to executable check reconciliation"
+  ],
+  "retry_runner": "scripts/run_scored_checks_e012_v1_2.py",
+  "retry_requires_distinct_lock": true
+}

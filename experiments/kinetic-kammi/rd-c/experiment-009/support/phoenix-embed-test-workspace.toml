@@ -1,0 +1,13 @@
+[workspace]
+resolver = "2"
+members = ["crates/phoenix-embed"]
+default-members = ["crates/phoenix-embed"]
+
+[workspace.package]
+version = "0.1.1"
+edition = "2021"
+license = "MIT"
+authors = ["KittClouds"]
+
+[workspace.dependencies]
+thiserror = "1.0"

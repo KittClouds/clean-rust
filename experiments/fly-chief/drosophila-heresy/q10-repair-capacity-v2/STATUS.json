@@ -1,0 +1,23 @@
+{
+  "protocol": "Q10-RC2",
+  "status": "Q10_RC_INVALID",
+  "stage": "STAGE_A_ABORTED",
+  "fresh_engineering_seed_opened": 9611,
+  "completed_side_tau_blocks": 1,
+  "completed_event_receipts": 256,
+  "stage_valid": false,
+  "scientific_seed_bundles": 0,
+  "behavioral_inference": false,
+  "repairs_applied": 0,
+  "multi_move_evaluations": 0,
+  "failure": {
+    "kind": "MOVE_BANK_SVD_NONCONVERGENCE",
+    "location": "seed 9611 after R/tau4 completed",
+    "frozen_svd_epsilon": 1e-14,
+    "frozen_svd_max_iterations": 100000
+  },
+  "interpretation": "The QR correction removed Q10-RC v1's retained-subspace reconstruction failure for the first complete block. Q10-RC2 still has no valid Stage A result because the next move-bank SVD did not converge.",
+  "same_identity_resume_authorized": false,
+  "stage_b_authorized": false,
+  "dh08b_authorized": false
+}

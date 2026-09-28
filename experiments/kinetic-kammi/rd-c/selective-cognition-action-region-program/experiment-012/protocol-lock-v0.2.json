@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "program": "Selective Cognition / Action Region Program",
+  "experiment": "E012 Prospective Frame Decomposition",
+  "effective_protocol_version": "0.2",
+  "state": "FROZEN_FOR_BANK_CONSTRUCTION",
+  "model_contact_authorized": false,
+  "task_construction_started": false,
+  "base_lock_sha256": "f36e0de7a79e73e96cb4ee9593d4b27fcf88bcea861040d458dbde74fdd4dd87",
+  "amendments": [
+    {
+      "id": "E012-PROTOCOL-A01",
+      "markdown_sha256": "7ad991b75d45922704419a1c5f9c3f416e89c9f6c1407820556d95847305cbd9",
+      "json_sha256": "4534e7273bab2f8668dc04eadd8c3ebb302ec932dee60f5d396a09b4f0c1c519"
+    },
+    {
+      "id": "E012-PROTOCOL-A02",
+      "markdown_sha256": "4fe961e4a3eb0fed9178466566181799166d00e7fc32c3fa9850a36d510856ba",
+      "json_sha256": "b4bb1c7d034728d91090c1254a78399f38db6314566bc0797c81dab8e7bfb608"
+    }
+  ],
+  "effective_repository_requirement": {
+    "repositories": 3,
+    "all_absent_as_evaluation_repositories_in": [
+      "E009",
+      "E010",
+      "E011"
+    ]
+  },
+  "effective_candidate_channel": {
+    "identity_envelope": "E_c.identity; invariant typed offered-action IDs/schema required by the frozen output contract",
+    "manipulated_content": "E_c.content; candidate summaries and patch evidence",
+    "opaque_ids_have_semantics": false,
+    "candidate_identity_remains_present_when_content_absent": true
+  },
+  "effective_support_sets": {
+    "task_request_dominant": [
+      "E_c.content",
+      "E_t"
+    ],
+    "candidate_action_dominant": [
+      "E_c.content"
+    ],
+    "pre_action_test_execution_dominant": [
+      "E_c.content",
+      "E_x"
+    ],
+    "joint_support": [
+      "E_c.content",
+      "E_t",
+      "E_x"
+    ],
+    "context_sensitive": [
+      "E_c.content",
+      "E_r"
+    ],
+    "abstention_positive": []
+  },
+  "effective_pair_sufficiency_cells": [
+    [
+      "E_c.content"
+    ],
+    [
+      "E_c.content",
+      "E_t"
+    ],
+    [
+      "E_c.content",
+      "E_x"
+    ],
+    [
+      "E_c.content",
+      "E_r"
+    ],
+    [
+      "E_c.content",
+      "E_t",
+      "E_x"
+    ],
+    [
+      "E_c.content",
+      "E_t",
+      "E_r"
+    ]
+  ],
+  "inherited_switchboard": {
+    "run_id": "e011-producer-order-integration-qual-01",
+    "bank_id": "e011-fresh-integration-bank-v1c",
+    "frozen_input_lock_sha256": "25156b4b2c0d4ed44700bef9fbf442b063a7574ddf424d961befcdc7948fd953",
+    "score_replay_lock_sha256": "5a7f380d92a8e08225b21a844aff68818455d42d3d2c2f562f20c47fe45c540c",
+    "runtime_source_tree_sha256": "b27d2ae30bbcb0a85837fee9c9278eae3a64969a16fda684c04db1ed6d51cbd9",
+    "thresholds": {
+      "minimum_applicability_milli": 850,
+      "maximum_abstention_milli": 150
+    },
+    "normalization_contract": "percent-0-100-to-milli-x10-v1+line-endings-lf-v1",
+    "reasoning_mode": "off",
+    "maximum_output_tokens": 1024,
+    "models": [
+      {
+        "role": "small",
+        "bundle_id": "minicpm5-2b-q8-local-v5",
+        "bundle_blake3": "03203842e1835233af8d9ef337bca1395be9c3828333c79eb96e199e52925842",
+        "bundle_lock_sha256": "a626836853bdb0755fd2e4e1569b6b91b33861306c7d1e4a51e3de54a9ee713d",
+        "bundle_lock_path": "models/bundle-lineage/v5-final/bundle-lock.json",
+        "server_alias": "e009-small-v5",
+        "model_sha256": "c5415f8989bf88a8288f1b55a3cc371af53c07b0faa220a63bd7a990cfaba078",
+        "runtime_sha256": "ffaee576ad271ede87b92a7d8c3863dc8f331bbac666ee00099c250e8809e743",
+        "chat_template_path": "models/chat-templates/minicpm5-2b-q8-local-v3.jinja"
+      },
+      {
+        "role": "large",
+        "bundle_id": "ternary-bonsai-2-27b-ptq1-local-v5",
+        "bundle_blake3": "6d933aba093307e0c333f022426af46f3f5b243a8a10a2e1bb2f4cfc93b17b9d",
+        "bundle_lock_sha256": "a626836853bdb0755fd2e4e1569b6b91b33861306c7d1e4a51e3de54a9ee713d",
+        "bundle_lock_path": "models/bundle-lineage/v5-final/bundle-lock.json",
+        "server_alias": "e009-large-v5",
+        "model_sha256": "53107f530aa52eb00912263ab1ee29bd199261c87cd7b4ad4ca1318c1fe33ee3",
+        "runtime_sha256": "e0ea4fd53e6f0c741cbd28093b427f333ada0eb03b83073e1f99c483793ea976",
+        "chat_template_path": "models/chat-templates/ternary-bonsai-2-27b-ptq1-local-v3.jinja"
+      }
+    ],
+    "routing": "small-then-large-on-abstention at frozen E009 v5 thresholds"
+  },
+  "freezer_source_sha256": "3d7ef2829d9c1006d8033458ee7b8a76e45648fc69cdeb5868aa95543fc1deac"
+}

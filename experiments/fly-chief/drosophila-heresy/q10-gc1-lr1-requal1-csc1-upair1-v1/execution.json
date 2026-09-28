@@ -1,0 +1,165 @@
+{
+  "alg1_predictions_consumed": true,
+  "contexts": [
+    {
+      "additive_readout_matches": 0,
+      "additive_weight_matches": 256,
+      "better_than_V": 119,
+      "context": [
+        "seed9731-L-tau16.json",
+        2
+      ],
+      "exact_alternative": 0,
+      "readout_interaction_nonzero_pairs": 0,
+      "records": 2121,
+      "shard": "seed9731-L-tau16__set2.jsonl",
+      "shard_sha256": "75A82D8BBCB9D6F9ED8ACE91EC313F66740225DDA677C6B6F8A5120ACBBF942D",
+      "structural_geometry_matches": 2121,
+      "structural_validity_matches": 2121,
+      "structural_weight_matches": 2121,
+      "valid": 160
+    },
+    {
+      "additive_readout_matches": 0,
+      "additive_weight_matches": 532,
+      "better_than_V": 0,
+      "context": [
+        "seed9731-L-tau4.json",
+        3
+      ],
+      "exact_alternative": 0,
+      "readout_interaction_nonzero_pairs": 2,
+      "records": 2389,
+      "shard": "seed9731-L-tau4__set3.jsonl",
+      "shard_sha256": "F3C0662CC070D80FF84EE0AF2FF450632A50DF7252E575AC57986D5D8224FE18",
+      "structural_geometry_matches": 2389,
+      "structural_validity_matches": 2389,
+      "structural_weight_matches": 2389,
+      "valid": 0
+    },
+    {
+      "additive_readout_matches": 0,
+      "additive_weight_matches": 460,
+      "better_than_V": 2,
+      "context": [
+        "seed9731-R-tau16.json",
+        1
+      ],
+      "exact_alternative": 0,
+      "readout_interaction_nonzero_pairs": 2,
+      "records": 2266,
+      "shard": "seed9731-R-tau16__set1.jsonl",
+      "shard_sha256": "6C2835AFE64B8A05BB451C3EEE6022E2186BD8B2029361F1D9BC8E4DFFCC3DDA",
+      "structural_geometry_matches": 2266,
+      "structural_validity_matches": 2266,
+      "structural_weight_matches": 2266,
+      "valid": 2
+    },
+    {
+      "additive_readout_matches": 0,
+      "additive_weight_matches": 363,
+      "better_than_V": 0,
+      "context": [
+        "seed9731-R-tau16.json",
+        3
+      ],
+      "exact_alternative": 0,
+      "readout_interaction_nonzero_pairs": 1,
+      "records": 2062,
+      "shard": "seed9731-R-tau16__set3.jsonl",
+      "shard_sha256": "D972D69CC3FC37F3B54C7AEEC7DAE3E59584CCC4BD770C6DD8FC45B7770F49DA",
+      "structural_geometry_matches": 2062,
+      "structural_validity_matches": 2062,
+      "structural_weight_matches": 2062,
+      "valid": 0
+    },
+    {
+      "additive_readout_matches": 0,
+      "additive_weight_matches": 404,
+      "better_than_V": 0,
+      "context": [
+        "seed9731-R-tau4.json",
+        0
+      ],
+      "exact_alternative": 0,
+      "readout_interaction_nonzero_pairs": 0,
+      "records": 2267,
+      "shard": "seed9731-R-tau4__set0.jsonl",
+      "shard_sha256": "04B20946350569DD4D4136A4321911162E5ECB0C232091EC13DFE7BFDA1DE2A9",
+      "structural_geometry_matches": 2267,
+      "structural_validity_matches": 2267,
+      "structural_weight_matches": 2267,
+      "valid": 0
+    },
+    {
+      "additive_readout_matches": 0,
+      "additive_weight_matches": 409,
+      "better_than_V": 8,
+      "context": [
+        "seed9731-R-tau4.json",
+        1
+      ],
+      "exact_alternative": 0,
+      "readout_interaction_nonzero_pairs": 1,
+      "records": 2099,
+      "shard": "seed9731-R-tau4__set1.jsonl",
+      "shard_sha256": "89DC71BE1D7B0AED5022F0F958BC7E6875625D713F0F3CAB576CD2B5578B266B",
+      "structural_geometry_matches": 2099,
+      "structural_validity_matches": 2099,
+      "structural_weight_matches": 2099,
+      "valid": 8
+    },
+    {
+      "additive_readout_matches": 0,
+      "additive_weight_matches": 356,
+      "better_than_V": 5,
+      "context": [
+        "seed9731-R-tau4.json",
+        2
+      ],
+      "exact_alternative": 0,
+      "readout_interaction_nonzero_pairs": 1,
+      "records": 2253,
+      "shard": "seed9731-R-tau4__set2.jsonl",
+      "shard_sha256": "C59D9396F4C4334FD5BEC4339B5D4F905FDCB3DCE2D06658FADD04A5C5055FF7",
+      "structural_geometry_matches": 2253,
+      "structural_validity_matches": 2253,
+      "structural_weight_matches": 2253,
+      "valid": 5
+    },
+    {
+      "additive_readout_matches": 0,
+      "additive_weight_matches": 540,
+      "better_than_V": 12,
+      "context": [
+        "seed9731-R-tau4.json",
+        3
+      ],
+      "exact_alternative": 0,
+      "readout_interaction_nonzero_pairs": 2,
+      "records": 2255,
+      "shard": "seed9731-R-tau4__set3.jsonl",
+      "shard_sha256": "69DDD60A41A093D0A91D48867DBAF53BF4E5ABB9135D637F0F33E18CB9B2107E",
+      "structural_geometry_matches": 2255,
+      "structural_validity_matches": 2255,
+      "structural_weight_matches": 2255,
+      "valid": 27
+    }
+  ],
+  "contract_sha256": "07146C8E52424C954C3B0565B8575C295E80DE84DF34EA5A29F37D812AD28B0F",
+  "counts": {
+    "better_than_V": 146,
+    "contexts": 8,
+    "exact_alternative": 0,
+    "pair_records": 17712,
+    "readout_interaction_nonzero_pairs": 9,
+    "valid": 202
+  },
+  "engineering_only": true,
+  "identity": "q10-gc1-lr1-requal1-csc1-upair1-v1",
+  "pair_outcomes_consulted": true,
+  "pair_replay_performed": true,
+  "protocol": "Q10-CSC1-UPAIR1",
+  "scientific_promotion": false,
+  "status": "UPAIR1_COMPLETE"
+}

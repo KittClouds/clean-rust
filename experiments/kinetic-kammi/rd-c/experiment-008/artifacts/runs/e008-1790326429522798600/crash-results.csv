@@ -1,0 +1,6 @@
+boundary,result,endpoint_attempts,retries,paid_charges,paid_cost_units,journal_paid_requests,endpoint_effects,duplicate_charges,replay_identity_ok
+paid_intent_before_call,resumed_from_stable_request_id,1,0,1,7,1,1,0,true
+paid_response_before_receipt,resumed_from_stable_request_id,2,1,1,7,1,1,0,true
+durable_outcome_receipt,resumed_from_stable_request_id,1,0,1,7,1,1,0,true
+offer_response_before_receipt,resumed_stable_quote_request_then_receipted_offer,2,1,1,2,1,1,0,true
+offer_receipt_durable,verified_then_resume_without_repurchase,0,0,0,0,0,0,0,true

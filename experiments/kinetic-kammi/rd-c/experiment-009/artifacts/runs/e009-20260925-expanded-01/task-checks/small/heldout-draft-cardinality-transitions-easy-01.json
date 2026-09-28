@@ -1,0 +1,26 @@
+{
+  "task_id": "heldout-draft-cardinality-transitions-easy-01",
+  "lane": "small",
+  "action_id": 11,
+  "patch_sha256": "090db41494971118b1e7d941bb599524ab15af6a311472986f52d3bda882b7bf",
+  "candidate_variant": "mutant",
+  "test_filter": "palette::tests::draft_supports_empty_solid_and_gradient_states",
+  "command": [
+    "cargo",
+    "test",
+    "--manifest-path",
+    "C:\\rd-c\\experiment-009\\tasks\\expanded\\heldout-bank-v5\\families\\draft-cardinality-transitions\\candidates\\mutant\\Cargo.toml",
+    "-p",
+    "gpui-animated-gradient-text",
+    "--lib",
+    "palette::tests::draft_supports_empty_solid_and_gradient_states",
+    "--",
+    "--exact"
+  ],
+  "exit_code": 101,
+  "status": "failed-test",
+  "passed": false,
+  "elapsed_ms": 7383.312,
+  "output_sha256": "8c36d41f0f86b86c9b7970a2e45c8c5a37f1cf85200995016e9ec6e68587c449",
+  "output": "\nrunning 1 test\ntest palette::tests::draft_supports_empty_solid_and_gradient_states ... FAILED\n\nfailures:\n\n---- palette::tests::draft_supports_empty_solid_and_gradient_states stdout ----\n\nthread 'palette::tests::draft_supports_empty_solid_and_gradient_states' (47288) panicked at crates\\gpui-animated-gradient-text\\src\\palette.rs:436:39:\ncalled `Result::unwrap()` on an `Err` value: TooFewColors { provided: 2 }\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    palette::tests::draft_supports_empty_solid_and_gradient_states\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 10 filtered out; finished in 0.00s\n\n   Compiling gpui-animated-gradient-text v0.2.0 (C:\\rd-c\\experiment-009\\tasks\\expanded\\heldout-bank-v5\\families\\draft-cardinality-transitions\\candidates\\mutant\\crates\\gpui-animated-gradient-text)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 7.16s\n     Running unittests src\\lib.rs (D:\\cargo-targets\\rdc-e009-expanded\\scoring\\debug\\deps\\gpui_animated_gradient_text-97c243e5a105215d.exe)\nerror: test failed, to rerun pass `-p gpui-animated-gradient-text --lib`\n"
+}

@@ -1,0 +1,16 @@
+{
+  "contract_id": "FAS_RESOURCE_V1",
+  "units": {"bytes": "u64 resident logical bytes at each scored step", "compute": "measured operations and wall nanoseconds per prediction/update"},
+  "fields_per_arm_per_step": ["transient_bytes", "persistent_bytes", "adaptive_parameter_bytes", "optimizer_state_bytes", "episodic_memory_bytes", "snapshot_bytes", "feature_cache_bytes_infrastructure", "prediction_operations", "update_operations", "prediction_wall_ns", "update_wall_ns"],
+  "formulas": {
+    "B_C": "transient_bytes",
+    "B_M": "episodic_memory_bytes + snapshot_bytes",
+    "B_phi": "adaptive_parameter_bytes + optimizer_state_bytes",
+    "B_adaptive": "B_M + B_phi"
+  },
+  "persistent_bytes_rule": "Report total persistent allocations, including fixed readout and explicit-state baselines, separately; do not double-add it to B_adaptive.",
+  "feature_cache_rule": "Offline feature cache is infrastructure and never counted as arm-accessible memory.",
+  "peak_rule": "Report peak and time curve for each byte category, not only final size.",
+  "budget_proposals": {"episodic_entries": [16, 64, 256, 1024], "snapshots": [1, 2, 4, 8]},
+  "sweep_authority": "Proposals only until a separate preregistered resource-sweep seal."
+}

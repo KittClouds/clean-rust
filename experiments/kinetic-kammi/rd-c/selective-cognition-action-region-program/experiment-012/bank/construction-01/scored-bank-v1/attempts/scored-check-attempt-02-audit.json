@@ -1,0 +1,643 @@
+{
+  "schema_version": 1,
+  "attempt_id": "E012-SCORED-CHECK-ATTEMPT-02",
+  "state": "QUARANTINED_NONDETERMINISTIC_OR_STALE_BUILD_OUTPUTS",
+  "model_contact_authorized": false,
+  "runner": "scripts/run_scored_checks_e012_v1_1.py",
+  "runner_sha256": "b1978dad292fdd3b0cb29ee1de86ed0d90b5848abd044d3dd9b5d9d5719d8083",
+  "task_construction_lock_sha256": "fe90cb29fd0b6b9c233826188d3692124e14660f109065415a58015dbad54c28",
+  "scored_check_runner_lock_sha256": "aa249ccc96095efb691e94ec83376adc2c40449d697d215ade76b93961ebc7e9",
+  "result_sha256": "36793253689a43139c5e653b2e413348c5e4bc9ebbdeefd795ffa632ff451adc",
+  "result_file": "attempts/scored-check-results-attempt-02-quarantined.json",
+  "candidate_rows": 192,
+  "base_rows": 48,
+  "same_input_case_conflict_groups": 15,
+  "conflict_groups": [
+    {
+      "family": "cursor-advance-observation",
+      "source_sha256": "480de3ae8476bd94178bb819350e7896353a6dea6cfa787705a294d5b3a2799c",
+      "test_sha256": "5a0f85f12d5636fa84912478794e61d9f692b1a31818fe6a09a6c20910bdc2c6",
+      "case_id": "case-01",
+      "outcomes": [
+        false,
+        true
+      ],
+      "rows": [
+        {
+          "task_id": "task-827381",
+          "action_id": 36737,
+          "base_snapshot": false,
+          "passed": false
+        },
+        {
+          "task_id": "task-827381",
+          "action_id": null,
+          "base_snapshot": true,
+          "passed": true
+        }
+      ]
+    },
+    {
+      "family": "conflicting-alias-requirement",
+      "source_sha256": "5fd702ab2f2173f79ba8b3cde489fec28d2aac76903d30e01e7fe031c794151b",
+      "test_sha256": "196116daa638dff74dbbdf56dc73fc69d28e35795de5446e91f6bb572f1d9b05",
+      "case_id": "case-01",
+      "outcomes": [
+        false,
+        true
+      ],
+      "rows": [
+        {
+          "task_id": "task-546859",
+          "action_id": 57213,
+          "base_snapshot": false,
+          "passed": true
+        },
+        {
+          "task_id": "task-894855",
+          "action_id": 57213,
+          "base_snapshot": false,
+          "passed": true
+        },
+        {
+          "task_id": "task-620950",
+          "action_id": 57213,
+          "base_snapshot": false,
+          "passed": true
+        },
+        {
+          "task_id": "task-569812",
+          "action_id": 57213,
+          "base_snapshot": false,
+          "passed": true
+        },
+        {
+          "task_id": "task-546859",
+          "action_id": null,
+          "base_snapshot": true,
+          "passed": false
+        },
+        {
+          "task_id": "task-894855",
+          "action_id": null,
+          "base_snapshot": true,
+          "passed": true
+        },
+        {
+          "task_id": "task-620950",
+          "action_id": null,
+          "base_snapshot": true,
+          "passed": true
+        },
+        {
+          "task_id": "task-569812",
+          "action_id": null,
+          "base_snapshot": true,
+          "passed": true
+        }
+      ]
+    },
+    {
+      "family": "conflicting-alias-requirement",
+      "source_sha256": "5fd702ab2f2173f79ba8b3cde489fec28d2aac76903d30e01e7fe031c794151b",
+      "test_sha256": "196116daa638dff74dbbdf56dc73fc69d28e35795de5446e91f6bb572f1d9b05",
+      "case_id": "case-02",
+      "outcomes": [
+        false,
+        true
+      ],
+      "rows": [
+        {
+          "task_id": "task-546859",
+          "action_id": 57213,
+          "base_snapshot": false,
+          "passed": false
+        },
+        {
+          "task_id": "task-894855",
+          "action_id": 57213,
+          "base_snapshot": false,
+          "passed": false
+        },
+        {
+          "task_id": "task-620950",
+          "action_id": 57213,
+          "base_snapshot": false,
+          "passed": false
+        },
+        {
+          "task_id": "task-569812",
+          "action_id": 57213,
+          "base_snapshot": false,
+          "passed": false
+        },
+        {
+          "task_id": "task-546859",
+          "action_id": null,
+          "base_snapshot": true,
+          "passed": true
+        },
+        {
+          "task_id": "task-894855",
+          "action_id": null,
+          "base_snapshot": true,
+          "passed": false
+        },
+        {
+          "task_id": "task-620950",
+          "action_id": null,
+          "base_snapshot": true,
+          "passed": false
+        },
+        {
+          "task_id": "task-569812",
+          "action_id": null,
+          "base_snapshot": true,
+          "passed": true
+        }
+      ]
+    },
+    {
+      "family": "conflicting-alias-requirement",
+      "source_sha256": "5fd702ab2f2173f79ba8b3cde489fec28d2aac76903d30e01e7fe031c794151b",
+      "test_sha256": "196116daa638dff74dbbdf56dc73fc69d28e35795de5446e91f6bb572f1d9b05",
+      "case_id": "case-03",
+      "outcomes": [
+        false,
+        true
+      ],
+      "rows": [
+        {
+          "task_id": "task-546859",
+          "action_id": 57213,
+          "base_snapshot": false,
+          "passed": false
+        },
+        {
+          "task_id": "task-894855",
+          "action_id": 57213,
+          "base_snapshot": false,
+          "passed": false
+        },
+        {
+          "task_id": "task-620950",
+          "action_id": 57213,
+          "base_snapshot": false,
+          "passed": false
+        },
+        {
+          "task_id": "task-569812",
+          "action_id": 57213,
+          "base_snapshot": false,
+          "passed": false
+        },
+        {
+          "task_id": "task-546859",
+          "action_id": null,
+          "base_snapshot": true,
+          "passed": true
+        },
+        {
+          "task_id": "task-894855",
+          "action_id": null,
+          "base_snapshot": true,
+          "passed": true
+        },
+        {
+          "task_id": "task-620950",
+          "action_id": null,
+          "base_snapshot": true,
+          "passed": false
+        },
+        {
+          "task_id": "task-569812",
+          "action_id": null,
+          "base_snapshot": true,
+          "passed": false
+        }
+      ]
+    },
+    {
+      "family": "conflicting-alias-requirement",
+      "source_sha256": "5fd702ab2f2173f79ba8b3cde489fec28d2aac76903d30e01e7fe031c794151b",
+      "test_sha256": "196116daa638dff74dbbdf56dc73fc69d28e35795de5446e91f6bb572f1d9b05",
+      "case_id": "case-04",
+      "outcomes": [
+        false,
+        true
+      ],
+      "rows": [
+        {
+          "task_id": "task-546859",
+          "action_id": 57213,
+          "base_snapshot": false,
+          "passed": false
+        },
+        {
+          "task_id": "task-894855",
+          "action_id": 57213,
+          "base_snapshot": false,
+          "passed": false
+        },
+        {
+          "task_id": "task-620950",
+          "action_id": 57213,
+          "base_snapshot": false,
+          "passed": false
+        },
+        {
+          "task_id": "task-569812",
+          "action_id": 57213,
+          "base_snapshot": false,
+          "passed": false
+        },
+        {
+          "task_id": "task-546859",
+          "action_id": null,
+          "base_snapshot": true,
+          "passed": false
+        },
+        {
+          "task_id": "task-894855",
+          "action_id": null,
+          "base_snapshot": true,
+          "passed": true
+        },
+        {
+          "task_id": "task-620950",
+          "action_id": null,
+          "base_snapshot": true,
+          "passed": false
+        },
+        {
+          "task_id": "task-569812",
+          "action_id": null,
+          "base_snapshot": true,
+          "passed": false
+        }
+      ]
+    },
+    {
+      "family": "help-color-capability",
+      "source_sha256": "6c4cc4cbbbe474e912ca500d6e439cb74dc1aea8ef50c2baaa25d0d73f88325e",
+      "test_sha256": "22f69a048ccefbcdb7a075cba1824f3b3b83141c73e85cf729992f40364adfc7",
+      "case_id": "case-02",
+      "outcomes": [
+        false,
+        true
+      ],
+      "rows": [
+        {
+          "task_id": "task-343379",
+          "action_id": 48831,
+          "base_snapshot": false,
+          "passed": false
+        },
+        {
+          "task_id": "task-343379",
+          "action_id": null,
+          "base_snapshot": true,
+          "passed": true
+        }
+      ]
+    },
+    {
+      "family": "help-color-capability",
+      "source_sha256": "6c4cc4cbbbe474e912ca500d6e439cb74dc1aea8ef50c2baaa25d0d73f88325e",
+      "test_sha256": "22f69a048ccefbcdb7a075cba1824f3b3b83141c73e85cf729992f40364adfc7",
+      "case_id": "case-04",
+      "outcomes": [
+        false,
+        true
+      ],
+      "rows": [
+        {
+          "task_id": "task-976226",
+          "action_id": 63364,
+          "base_snapshot": false,
+          "passed": false
+        },
+        {
+          "task_id": "task-976226",
+          "action_id": null,
+          "base_snapshot": true,
+          "passed": true
+        }
+      ]
+    },
+    {
+      "family": "raw-number-lossless",
+      "source_sha256": "88e770a3975f10c869006a140895771536d8869173890fda6738cc95d05b5144",
+      "test_sha256": "7073cc5e5639a87f4d7cbda3b725b8ff8709049a1b2a96012d75cebaeb31370e",
+      "case_id": "case-02",
+      "outcomes": [
+        false,
+        true
+      ],
+      "rows": [
+        {
+          "task_id": "task-479184",
+          "action_id": 38796,
+          "base_snapshot": false,
+          "passed": true
+        },
+        {
+          "task_id": "task-242065",
+          "action_id": 38796,
+          "base_snapshot": false,
+          "passed": true
+        },
+        {
+          "task_id": "task-555141",
+          "action_id": 38796,
+          "base_snapshot": false,
+          "passed": true
+        },
+        {
+          "task_id": "task-965856",
+          "action_id": 38796,
+          "base_snapshot": false,
+          "passed": true
+        },
+        {
+          "task_id": "task-479184",
+          "action_id": null,
+          "base_snapshot": true,
+          "passed": true
+        },
+        {
+          "task_id": "task-242065",
+          "action_id": null,
+          "base_snapshot": true,
+          "passed": true
+        },
+        {
+          "task_id": "task-555141",
+          "action_id": null,
+          "base_snapshot": true,
+          "passed": true
+        },
+        {
+          "task_id": "task-965856",
+          "action_id": null,
+          "base_snapshot": true,
+          "passed": false
+        }
+      ]
+    },
+    {
+      "family": "bounded-prefix-copy",
+      "source_sha256": "9294c6af20de0c37b9337ffc18d08222407f2b0b35e46286a780c6644b15cba0",
+      "test_sha256": "479b1c5a61af5ca18528c0882a94e7ae917659648f70ee9a04b32dc7003b421d",
+      "case_id": "case-01",
+      "outcomes": [
+        false,
+        true
+      ],
+      "rows": [
+        {
+          "task_id": "task-348504",
+          "action_id": null,
+          "base_snapshot": true,
+          "passed": true
+        },
+        {
+          "task_id": "task-742866",
+          "action_id": null,
+          "base_snapshot": true,
+          "passed": true
+        },
+        {
+          "task_id": "task-724742",
+          "action_id": null,
+          "base_snapshot": true,
+          "passed": false
+        },
+        {
+          "task_id": "task-809202",
+          "action_id": null,
+          "base_snapshot": true,
+          "passed": true
+        }
+      ]
+    },
+    {
+      "family": "bounded-prefix-copy",
+      "source_sha256": "9294c6af20de0c37b9337ffc18d08222407f2b0b35e46286a780c6644b15cba0",
+      "test_sha256": "479b1c5a61af5ca18528c0882a94e7ae917659648f70ee9a04b32dc7003b421d",
+      "case_id": "case-02",
+      "outcomes": [
+        false,
+        true
+      ],
+      "rows": [
+        {
+          "task_id": "task-348504",
+          "action_id": null,
+          "base_snapshot": true,
+          "passed": true
+        },
+        {
+          "task_id": "task-742866",
+          "action_id": null,
+          "base_snapshot": true,
+          "passed": true
+        },
+        {
+          "task_id": "task-724742",
+          "action_id": null,
+          "base_snapshot": true,
+          "passed": false
+        },
+        {
+          "task_id": "task-809202",
+          "action_id": null,
+          "base_snapshot": true,
+          "passed": true
+        }
+      ]
+    },
+    {
+      "family": "bounded-prefix-copy",
+      "source_sha256": "9294c6af20de0c37b9337ffc18d08222407f2b0b35e46286a780c6644b15cba0",
+      "test_sha256": "479b1c5a61af5ca18528c0882a94e7ae917659648f70ee9a04b32dc7003b421d",
+      "case_id": "case-03",
+      "outcomes": [
+        false,
+        true
+      ],
+      "rows": [
+        {
+          "task_id": "task-348504",
+          "action_id": null,
+          "base_snapshot": true,
+          "passed": true
+        },
+        {
+          "task_id": "task-742866",
+          "action_id": null,
+          "base_snapshot": true,
+          "passed": true
+        },
+        {
+          "task_id": "task-724742",
+          "action_id": null,
+          "base_snapshot": true,
+          "passed": false
+        },
+        {
+          "task_id": "task-809202",
+          "action_id": null,
+          "base_snapshot": true,
+          "passed": true
+        }
+      ]
+    },
+    {
+      "family": "bounded-prefix-copy",
+      "source_sha256": "9294c6af20de0c37b9337ffc18d08222407f2b0b35e46286a780c6644b15cba0",
+      "test_sha256": "479b1c5a61af5ca18528c0882a94e7ae917659648f70ee9a04b32dc7003b421d",
+      "case_id": "case-04",
+      "outcomes": [
+        false,
+        true
+      ],
+      "rows": [
+        {
+          "task_id": "task-348504",
+          "action_id": null,
+          "base_snapshot": true,
+          "passed": true
+        },
+        {
+          "task_id": "task-742866",
+          "action_id": null,
+          "base_snapshot": true,
+          "passed": true
+        },
+        {
+          "task_id": "task-724742",
+          "action_id": null,
+          "base_snapshot": true,
+          "passed": false
+        },
+        {
+          "task_id": "task-809202",
+          "action_id": null,
+          "base_snapshot": true,
+          "passed": true
+        }
+      ]
+    },
+    {
+      "family": "possible-value-validation",
+      "source_sha256": "383754cba3d4d4705b22ae301ff8a0b8a9833f3ff7d90b62c4bb9be5ac134667",
+      "test_sha256": "a30fec0e406de3c262c6ad500448a50d9e36ee78abf3499d2ec04405f3091e9e",
+      "case_id": "case-01",
+      "outcomes": [
+        false,
+        true
+      ],
+      "rows": [
+        {
+          "task_id": "task-538216",
+          "action_id": null,
+          "base_snapshot": true,
+          "passed": true
+        },
+        {
+          "task_id": "task-440067",
+          "action_id": null,
+          "base_snapshot": true,
+          "passed": false
+        },
+        {
+          "task_id": "task-312377",
+          "action_id": null,
+          "base_snapshot": true,
+          "passed": false
+        },
+        {
+          "task_id": "task-342767",
+          "action_id": null,
+          "base_snapshot": true,
+          "passed": true
+        }
+      ]
+    },
+    {
+      "family": "possible-value-validation",
+      "source_sha256": "383754cba3d4d4705b22ae301ff8a0b8a9833f3ff7d90b62c4bb9be5ac134667",
+      "test_sha256": "a30fec0e406de3c262c6ad500448a50d9e36ee78abf3499d2ec04405f3091e9e",
+      "case_id": "case-03",
+      "outcomes": [
+        false,
+        true
+      ],
+      "rows": [
+        {
+          "task_id": "task-538216",
+          "action_id": null,
+          "base_snapshot": true,
+          "passed": true
+        },
+        {
+          "task_id": "task-440067",
+          "action_id": null,
+          "base_snapshot": true,
+          "passed": true
+        },
+        {
+          "task_id": "task-312377",
+          "action_id": null,
+          "base_snapshot": true,
+          "passed": true
+        },
+        {
+          "task_id": "task-342767",
+          "action_id": null,
+          "base_snapshot": true,
+          "passed": false
+        }
+      ]
+    },
+    {
+      "family": "possible-value-validation",
+      "source_sha256": "383754cba3d4d4705b22ae301ff8a0b8a9833f3ff7d90b62c4bb9be5ac134667",
+      "test_sha256": "a30fec0e406de3c262c6ad500448a50d9e36ee78abf3499d2ec04405f3091e9e",
+      "case_id": "case-04",
+      "outcomes": [
+        false,
+        true
+      ],
+      "rows": [
+        {
+          "task_id": "task-538216",
+          "action_id": null,
+          "base_snapshot": true,
+          "passed": true
+        },
+        {
+          "task_id": "task-440067",
+          "action_id": null,
+          "base_snapshot": true,
+          "passed": false
+        },
+        {
+          "task_id": "task-312377",
+          "action_id": null,
+          "base_snapshot": true,
+          "passed": false
+        },
+        {
+          "task_id": "task-342767",
+          "action_id": null,
+          "base_snapshot": true,
+          "passed": false
+        }
+      ]
+    }
+  ],
+  "root_cause_assessment": "shared Cargo target directory allowed stale harness/test artifacts across distinct temporary source overlays; same source/test hash and E012_CASE yielded different pass outcomes.",
+  "disposition": "all pass labels and aggregate counts excluded from bank construction and analysis; preserve raw bytes for diagnosis only."
+}

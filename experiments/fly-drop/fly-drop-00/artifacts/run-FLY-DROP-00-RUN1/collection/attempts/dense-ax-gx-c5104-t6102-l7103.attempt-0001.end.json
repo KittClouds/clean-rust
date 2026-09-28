@@ -1,0 +1,8 @@
+{
+  "attempt": 1,
+  "finished_unix_ms": 1790021648529,
+  "fit_id": "dense-ax-gx-c5104-t6102-l7103",
+  "receipt_path": "experiments/fly-drop-00/artifacts/run-FLY-DROP-00-RUN1\\collection\\fit-receipts\\dense-ax-gx-c5104-t6102-l7103.attempt-0001.json",
+  "receipt_sha256": "8ce7b58a714bdc5e99891bd51a9e8c7b58747a249b1615846150fca5d1840103",
+  "status": "complete"
+}

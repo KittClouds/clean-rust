@@ -1,0 +1,473 @@
+{
+  "seal_id": "FAS_FROZEN_OBSERVER_BUNDLE_E0_SEAL_V08",
+  "status": "E0_FROZEN_NOT_AUTHORIZED_FOR_MODEL_CONTACT",
+  "root_sha256": "a782f0baaf04b97c00c64f5c63a5b954ce0df1b2d1cf1665833c374d568a9bf4",
+  "entry_count": 90,
+  "entries": [
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/README.md",
+      "bytes": 31604,
+      "sha256": "d3106a98fbb9facbf0a9be5d5e463f7dac4d6244456711e8e3276623fba9db65"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e0-e2-compatibility-amendment-v06-v03-v01.json",
+      "bytes": 2881,
+      "sha256": "25a1dad326d6d3fad0f27987701f615d1f77012121099f48caf77f62aac71862"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e0-e2-draft-integrity-receipt-v06.json",
+      "bytes": 4991,
+      "sha256": "5631f3dd30f50307c589aaaf48d3d7fa338910cfebf0704329448c03a9149c3a"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e0-e2-draft-integrity-receipt-v07.json",
+      "bytes": 4856,
+      "sha256": "c54323e32362e4ecb8454d19ddc8982b4eabb24a4470ab6db0f1d15bce1bbd50"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e0-e2-draft-integrity-receipt-v08.json",
+      "bytes": 5050,
+      "sha256": "6b7f06b9c9a42f888803116d065231df2efd8373417637ce5f840c8ceaaa0da7"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e0-e2-process-gpu-update-v05-draft.md",
+      "bytes": 6184,
+      "sha256": "5e51b39c58c553b60ddaca03bf294732aa280b8e6e0e3b5f4c10127e3368c979"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e0-v05-independent-seal-audit-v01.json",
+      "bytes": 2008,
+      "sha256": "2aa175a40e73a883266953ea8f5ff196399efa6669a76798d55a9ff08959a565"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e0-v05-seal-attempt-failure-v01.json",
+      "bytes": 1557,
+      "sha256": "6184950a3561f8bb9f38720db1da9ed792e41e952023a26f0236b512013ec044"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e0-v06-independent-audit-v03.json",
+      "bytes": 3607,
+      "sha256": "7ac528a1ba705c095e22c7ec24dd4f167dcb347fa02aa8330dd269690e6b4f21"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e0-v06-seal-attempt-failure-v01.json",
+      "bytes": 2166,
+      "sha256": "3ccd35fd76eb0c82cfda8c7c83b4bd7d88a872ad2a418140e1d25d117673864b"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e0-v06-seal-attempt-failure-v02.json",
+      "bytes": 1157,
+      "sha256": "cb6bf4a44044efe684872402f573a6e95882ff5eef0c56a850d6d8e43b3822f6"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e0-v07-independent-audit-failure-v01.json",
+      "bytes": 1448,
+      "sha256": "f49e5daeef030468123babf9d5c2cea6fa3088ef60262369d511dd844286b26b"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e2-v02-authorized-attempt-stop-v01.json",
+      "bytes": 2392,
+      "sha256": "93c4ebfa24c5abcf525b90d29e3e9034f319e2edc3f71c39a2f80c4be0e3184f"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e2-v02-concurrent-wait-complete-v01.json",
+      "bytes": 226321,
+      "sha256": "b926124f9aa55b1b9fec2d794d0ac6a7a808128d43df9d53babb6cf143454b80"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e2-v02-model-contact-authorization-v01.json",
+      "bytes": 4158,
+      "sha256": "cf714fbfcd5c29d6233c8a7c4c2c3be5e9b3932b432df44353a7a5af0812ab14"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e2-v02-operator-preflight-v01.ps1",
+      "bytes": 13746,
+      "sha256": "9cfa129d5101b33296ba98c5bf76e6504b7120820a0724374c3bf1c863645174"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e2-v02-operator-preflight-v02.ps1",
+      "bytes": 13748,
+      "sha256": "f01621b6a27d4f9c35fc5c6982a7a3dc78849743a9f8aae4c7eb8297eb2ae4ac"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e2-v02-operator-preflight-v03.ps1",
+      "bytes": 13962,
+      "sha256": "77e80f0f722958d6c8529c8b6c84c2bfa39ef8c00d97beee7316449dbad36158"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e2-v02-operator-preflight-v04.ps1",
+      "bytes": 14017,
+      "sha256": "1600c9a087fd5ac8401d0500ee132f8cc91056cfd0c671b9b6c774736fe6b471"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e2-v02-post-wait-gpu-diagnostic-v01.json",
+      "bytes": 660,
+      "sha256": "2e4b1a4c5d400790d9cd71fb615c867535483f6dd46496390c28083f8f76192f"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e2-v02-preflight-checker-incidents-v01.json",
+      "bytes": 1149,
+      "sha256": "61371e4533b3f3bc2222af0272fa1e40518cd168b9486db39df0838709579965"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e2-v02-preflight-checker-incidents-v02.json",
+      "bytes": 978,
+      "sha256": "1e6dfba53d4770732f796c956506c077358b98cd7260692f37796002bed31acc"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e2-v02-preflight-checker-incidents-v03.json",
+      "bytes": 1042,
+      "sha256": "77a3998167062da8b7eea533a1b8cabeb2d0ed267af970f7540972a044c965a9"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e2-v03-authorized-attempt-stop-v01.json",
+      "bytes": 2362,
+      "sha256": "c9a0a3c571a338e626b12ebe2ae6c2b605adee31aa2aae80e2b37ef837e042d8"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e2-v03-model-contact-authorization-v01.json",
+      "bytes": 4140,
+      "sha256": "6f881c13ab1a8d334431650904cc3eae6983947b38e6da1c078e98108ceee719"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/e0-freeze-v04.json",
+      "bytes": 10920,
+      "sha256": "a2f015bbd4222e4a3e61d306b7bcea0d344961ad18eec10b0b026a03d3f7fe7e"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/e0-freeze-v05-draft.json",
+      "bytes": 20078,
+      "sha256": "c54dd574f3391f2b1c8785149ade7cf5b40623978f0fead9ad766b7517aa0823"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/e0-freeze-v05-sealed-v02.json",
+      "bytes": 21318,
+      "sha256": "b03e8f7e1ea9a4efd0f8292b9934a7a94c0b55a81fc4280ecbe14f3759659b10"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/e0-freeze-v05.json",
+      "bytes": 20904,
+      "sha256": "590668bdf3ded4837d542e6c829f8dbe7defb93ab7e4e69ecab4e6c1f32a9d5a"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/e0-freeze-v06-sealed-v02.json",
+      "bytes": 27543,
+      "sha256": "f15785cdf37196081d271e3437a4254d6feace44cf3321b66cdad7eb48e71e3f"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/e0-freeze-v06-sealed-v03.json",
+      "bytes": 29231,
+      "sha256": "6455ee4b3010c895be390edd2e9189fa64ef377dca0b6083ad257cf2da1e3c96"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/e0-freeze-v06.json",
+      "bytes": 25399,
+      "sha256": "1ff2eccf344da774f9fb11ee2d5d7b6612adfe6aaffe438ccfd5c704af04cc67"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/e0-freeze-v07-sealed-v01.json",
+      "bytes": 30165,
+      "sha256": "fbd434ea1226014c8a4ddaa88d9ed848510ed031e073791d998012ad79dbf86c"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/e0-freeze-v08-sealed-v01.json",
+      "bytes": 31403,
+      "sha256": "cc0aa96f2a53cf52f049d458ed33c9699d14833521b45f6bdd14ed4276745ec3"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/e2-run-v02-draft.json",
+      "bytes": 10902,
+      "sha256": "b77382a674c857600eacc2ef1978b0300fd926b49c32b51b279a10dd53b9743e"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/e2-run-v02-sealed-v02.json",
+      "bytes": 11026,
+      "sha256": "36ec221031ee7438a53cf272ff9b92ceb2b4d0f66e3c741e24b75f9f8ea1c817"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/e2-run-v02.json",
+      "bytes": 11026,
+      "sha256": "36ec221031ee7438a53cf272ff9b92ceb2b4d0f66e3c741e24b75f9f8ea1c817"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/e2-run-v03.json",
+      "bytes": 11511,
+      "sha256": "d88bbf9342918f5a1db4e42190128e2adf9d0c726bcddd568ddb9498ab25181d"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/e2-run-v04.json",
+      "bytes": 14962,
+      "sha256": "3b4e5728f4c17fd0b5a65334480c4689ab559a1b0101e8417216851e41372073"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/e2-run-v05.json",
+      "bytes": 15084,
+      "sha256": "7568ee3d367e1303806e9e79d25e10dc2b8f86dbd532208ec2ee731061193c48"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/panel-world-contract-v03.json",
+      "bytes": 5188,
+      "sha256": "1a2ba8795ec34434c8e1c0c43937a999195bd04ca5284a8e83d12578908a86cb"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/representation-abi-v01.json",
+      "bytes": 2887,
+      "sha256": "d266d678147f895ed389e330496f261053deb2d82dd160ab82255899377a288f"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/representation-abi-v02.json",
+      "bytes": 3452,
+      "sha256": "17089e961446035a706b3c1c627e7877dfb6905b1b2b28f746844660fad6fbb4"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/representation-abi-v03.json",
+      "bytes": 3452,
+      "sha256": "db41d64f872c1fe8ec9b76e2aa5caf00a5fc1ec966c23a590d2cce6d5dc27a14"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/representation-abi-v04.json",
+      "bytes": 3673,
+      "sha256": "15b7c5953a8a06e4d07723360f46762e5992677ac8291ce30f1f12cd4a9e6990"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/representation-abi-v05.json",
+      "bytes": 3640,
+      "sha256": "52c85a67ab1c0c0425923f8d5a8252c282ee34289533a6430c6b50f5533d564e"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/seals/e0-seal-v03.json",
+      "bytes": 3611,
+      "sha256": "69a0126c81076af95049e24dc09fd76c3de0d0b8a9559b3fcaaab783f6665091"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/seals/e0-seal-v04.json",
+      "bytes": 3831,
+      "sha256": "a6bfffbf292fae8809622710b3f45125f1c4b49f163153dc9b0f3e5b9125c4e6"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/seals/e0-seal-v05.json",
+      "bytes": 9992,
+      "sha256": "4f88a6219723aeff6adfbf134ad9163f895e662a1ebbdce60857b683c4c1d3b4"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/seals/e0-seal-v06.json",
+      "bytes": 16734,
+      "sha256": "1b4135c011591ffe6769daab46369b35a94d6783989c2dd84944d7eb2fdce31e"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/seals/e0-seal-v07.json",
+      "bytes": 19870,
+      "sha256": "ba8e0875c2016fa8d465149aa73ea37ac182cf87341845e417baa944071ee1a7"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/seals/e1-attempt-failure-v01.json",
+      "bytes": 871,
+      "sha256": "d5181cbd62a873225af34c9bd4f9b4463c80151db8228e8e46fe394511e1f01e"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/seals/e1-attempt-failure-v03.json",
+      "bytes": 874,
+      "sha256": "1992ff6095bdcb761070708e63d0a3607a9b9cc66c927749bf1874cb469ff3c5"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/panel-generator-v04/Cargo.lock",
+      "bytes": 6015,
+      "sha256": "4ed5fca0a39c8869c082daf94cb0afd183533714a8253e44acf8d610129e17d7"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/panel-generator-v04/Cargo.toml",
+      "bytes": 321,
+      "sha256": "c7448c046ceb9722a96ef3318bbc0b55e459ecdf06f6ea1c87634b10a27d022a"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/panel-generator-v04/src/generate.rs",
+      "bytes": 25895,
+      "sha256": "fa2bd0617135a0dce4e12f0e0967f82e461133b394a7d969daba5afb11e2cce1"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/panel-generator-v04/src/lib.rs",
+      "bytes": 33,
+      "sha256": "e57ddf18054a9c7d049d849d28654bbf85419e13993bc917906cfef3d4669cc7"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/panel-generator-v04/src/main.rs",
+      "bytes": 31954,
+      "sha256": "7ce62779ddf8dd994ad9ace6a10dd5bda76de3bd87c1c0e19459cf38b428ec0f"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/panel-generator-v04/src/model.rs",
+      "bytes": 3680,
+      "sha256": "94cca0249f5508be13e186921bc2441a830fa4af695211cd7fb08126a79c11e2"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/audit_e0_v06.py",
+      "bytes": 16167,
+      "sha256": "9ac75f2dc7a98beacea70fe38a79ee863ab19f3e77f5e7246b619a0fe39eeac8"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/audit_e0_v06_v02.py",
+      "bytes": 18451,
+      "sha256": "3912d34002770df6cabe4ae53d839f824884e1da279fbbbaf58a0a507d6455d2"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/audit_e0_v06_v03.py",
+      "bytes": 19913,
+      "sha256": "2ad992791b5ee10d4169bf3997911af917e9a19ff67292c5cfbfcbadcc809e93"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/audit_e0_v07.py",
+      "bytes": 13256,
+      "sha256": "5e1bb23dd762565a0635bfb0554eb190f8e66b39b1debcb42eab7d8eb77b6226"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/audit_e0_v08.py",
+      "bytes": 13817,
+      "sha256": "256a30c03a709839cefc3420cce9956aaad0604d3fac28de831e8b75df814999"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/build_e0_v06.py",
+      "bytes": 20618,
+      "sha256": "2b294d7404408f1c1f6b967539d3c15ea39a567e55769bacab87f9c6759b9315"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/build_e0_v06_v02.py",
+      "bytes": 5560,
+      "sha256": "223380147e10a82a20f12d4a383a1d8670bf6c23b7a222b40de98b6b52ed5021"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/build_e0_v06_v03.py",
+      "bytes": 5521,
+      "sha256": "8396aaa2decbef6b85ee218e114fd32585dfb992fc515faf17b7fa5f4cd7f04b"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/build_e0_v07.py",
+      "bytes": 14554,
+      "sha256": "2b3f18b615177487c3cb2e80a460c0ee7d6801d109db210b04119225127b205c"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/build_e0_v08.py",
+      "bytes": 15172,
+      "sha256": "81b472e6bf92d739cc4f56a8cbfb1b39736c3e239c99136b2d9178789ea04c40"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/build_panel_v04.ps1",
+      "bytes": 3312,
+      "sha256": "b18b401da22b6dffb623c0ea858bc38278111484c8fcf587310f399d5f32d56a"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e2_execution_identity_v04.py",
+      "bytes": 38238,
+      "sha256": "857c09eff8f0b69a768db7e832c4e0be9f4bc9c6d428aa2e91710c9d11bdc2b5"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e2_execution_identity_v05.py",
+      "bytes": 39267,
+      "sha256": "bfaa9be022d6c6235c923820e249b332baff9e79a52e75ab6aef1142f360217b"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/extract_features_v01.py",
+      "bytes": 14657,
+      "sha256": "12c9803a3cfa3fa0b501e3a5068439f3fd75d558a13eb099c137a14262bbb38d"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/extract_features_v02.py",
+      "bytes": 31593,
+      "sha256": "c026bc682503c2357fcbabaa27a3f9208eb24ad9e0bd554e8887645cdd2c5567"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/extract_features_v03.py",
+      "bytes": 31912,
+      "sha256": "f677d0927bde71f146ce8e7f6f4df83b70864a464a1f009888f52bcd2c59787b"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/extract_features_v04.py",
+      "bytes": 21527,
+      "sha256": "3b02d6d78b4a0eaf6bc2d25e1a3d8871c7be1e6a31b5665620452d7046c72304"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/extract_features_v05.py",
+      "bytes": 21962,
+      "sha256": "a4d24e3a7fd8e2b4030b857560a5a2ff439e6c788baf3a7f47ac41065e93bb6e"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/sample_e2_resources_v02.ps1",
+      "bytes": 3706,
+      "sha256": "dda73c48afd804b2d3253bf38b498141a75e4123c2d357526f336a78b2d20754"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/seal_e0_v04.py",
+      "bytes": 6305,
+      "sha256": "5a0c8391eee09d55dd0930cc3c981c5c007b1c0e38379df4602feb29e1c2d615"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/seal_e0_v05.py",
+      "bytes": 16864,
+      "sha256": "d4cae50fd007d61457043fb9dab750d9ff4e762dbbbeb5eea7ebc39721f09d52"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/seal_e0_v05_v02.py",
+      "bytes": 9353,
+      "sha256": "f5a59c46f010252a6f8a9aa4779d5981d8aea769aa938459a047dc5717ce42be"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/seal_e0_v06.py",
+      "bytes": 8703,
+      "sha256": "f11b654a0015eb19a949cf133b707075cca888a6c80a29ba00b9f42365eae978"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/seal_e0_v06_v02.py",
+      "bytes": 11178,
+      "sha256": "29786cb76a2d27dce0bc1a1ff65b34476301aa46ef86065d464bda5e44e819f0"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/seal_e0_v06_v03.py",
+      "bytes": 13869,
+      "sha256": "aeaa0c6333e700d3f4f8052c6de9ff67587f7f480db59f36861f4833a9d84b2c"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/seal_e0_v07.py",
+      "bytes": 8755,
+      "sha256": "00054ee0d5c87c71bcc9f9944838a47ffd21dfc58996a74b4db2aea90ba50fe5"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/seal_e0_v08.py",
+      "bytes": 8895,
+      "sha256": "d1e6c47367c10dbe06a5542695fd2af94bbe42c4a78b1e6961963a524b8537ed"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/wait_for_concurrent_gpu_job_v01.ps1",
+      "bytes": 4916,
+      "sha256": "9a41e083b638e09411ad2143375d180730a25d1b42937e330eb0373788acd216"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/tests/test_e2_execution_identity_v04.py",
+      "bytes": 3197,
+      "sha256": "01e279ce68b2a9139caabc7f20fa5282169038ac6fc2c7f587b760cc6b007d04"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/tests/test_e2_execution_identity_v05.py",
+      "bytes": 3261,
+      "sha256": "cb19ee2ccb037426554c8c2fe0ed04fb72ae7ae3e51ad3956cec6498e0336aca"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/tests/test_e2_resource_v02.py",
+      "bytes": 7899,
+      "sha256": "3e8ca1c5e2fe644902d85c25d7e5308b8eadb1d1dc4e47f9dad31eecdbe8a0b8"
+    }
+  ],
+  "model_contact_authorized": false,
+  "tokenizer_contact_authorized": false,
+  "feature_extraction_authorized": false,
+  "observer_fitting_authorized": false,
+  "evaluation_scoring_authorized": false,
+  "total_gpu_memory_claimed": false,
+  "freeze_contract_path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/e0-freeze-v08-sealed-v01.json",
+  "e2_protocol_path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/e2-run-v05.json",
+  "representation_abi_path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/representation-abi-v05.json",
+  "predecessor_e0_root_sha256": "0849d205a5df13c905619cd1612a7d94cfb9c380ce7519390b8702df5a83417b",
+  "predecessor_e0_seal_manifest_sha256": "ba8e0875c2016fa8d465149aa73ea37ac182cf87341845e417baa944071ee1a7",
+  "e1_v04_root_sha256": "6ba77a899363651e3ba119b005f59a22e86f011f83c86b873857cd3f9ab64b03",
+  "e2_v01_preservation_root_sha256": "0ff309d833cd87017f7384247e4420a508f582ad9f375c5637f586d73b703f4c",
+  "e0_v07_audit_failure_receipt_sha256": "f49e5daeef030468123babf9d5c2cea6fa3088ef60262369d511dd844286b26b",
+  "seal_created_utc": "2026-09-26T10:24:02.460780+00:00"
+}

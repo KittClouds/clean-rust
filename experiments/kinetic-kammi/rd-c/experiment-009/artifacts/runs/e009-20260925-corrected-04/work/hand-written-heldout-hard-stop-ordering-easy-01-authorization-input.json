@@ -1,0 +1,34 @@
+{
+  "task_id": "heldout-hard-stop-ordering-easy-01",
+  "frame_hash_hex": "8d50a31893ead8746a2d059185fe6d6eaad9f1e2babbafbacda5f56bda504241",
+  "selected_patch_sha256": "0632928157e6c4f114b66981a35995a0c6e3c69d86b019f0bbc0a71f2e45bc5c",
+  "action_ledger_path": "C:\\rd-c\\experiment-009\\artifacts\\runs\\e009-20260925-corrected-04\\ledgers\\hand-written\\heldout-hard-stop-ordering-easy-01.actions.bin",
+  "actions": [
+    {
+      "id": 11,
+      "schema_id": 1
+    },
+    {
+      "id": 37,
+      "schema_id": 1
+    },
+    {
+      "id": 68,
+      "schema_id": 1
+    },
+    {
+      "id": 94,
+      "schema_id": 1
+    }
+  ],
+  "observer_output": {
+    "action_choice": 37,
+    "applicability_milli": 900,
+    "abstention_milli": 0
+  },
+  "thresholds": {
+    "minimum_applicability_milli": 850,
+    "maximum_abstention_milli": 150
+  },
+  "completion_check_passed": true
+}

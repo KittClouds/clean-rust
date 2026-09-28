@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "state": "OUTPUTS_SEALED_BEFORE_SCORING",
+  "run_id": "e011-r3-20260925-order-robust-prompt-01",
+  "created_utc": "2026-09-25T21:20:27.519428+00:00",
+  "pre_model_seal_sha256": "d6623d1778d1d0d9b28f67d3ae0fc39a1b957f54cf3a06f1297dd42f729ca858",
+  "conditions": {
+    "full-frame": {
+      "record_count": 16,
+      "tree_sha256": "8bc6fbced4861893757f3a1de5c506090f996ce539592f2797284dd2abddccc2"
+    },
+    "order-only": {
+      "record_count": 16,
+      "tree_sha256": "596f4d7b90af2508e0247022fb2759b3402ea18a0ce9d23e6531263f11bb69ad"
+    }
+  }
+}

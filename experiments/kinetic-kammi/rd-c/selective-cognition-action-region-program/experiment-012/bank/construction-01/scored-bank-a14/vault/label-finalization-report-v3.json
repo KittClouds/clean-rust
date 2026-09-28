@@ -1,0 +1,415 @@
+{
+  "schema_version": 1,
+  "state": "A14_LABEL_FINALIZATION_COMPLETE_NO_MODEL_CONTACT",
+  "model_contact_authorized": false,
+  "precheck_source_sha256": "51e9f8f59c49ffe57c5f19a4d062dceb974d53ffe6acf74e6153069a63ff827e",
+  "candidate_check_result_sha256": "372625d7828eed2fa10580acb8d1b548bddc0cbfa559649fde10414cb44de2f0",
+  "final_source_sha256": "5c74f424906f618e817a1cd1f2ba020f5ab02c0c9e39737631b4983e70847bea",
+  "final_labels_sha256": "45b357bb7b443c84b75d11ce9d56b4f6e1051bfbd3e6a9ec94fd572fc3d187f3",
+  "construction_lock_sha256": "9601c8742240bec28b6c7372539d3b57756155f4a9ee8475d73cedbc2ab17726",
+  "primary_gold_fallbacks": {
+    "task-343379": "reselected_suppress_color_narrow_help_to_unique_executable_role",
+    "task-976226": "reselected_suppress_color_narrow_help_to_unique_executable_role",
+    "task-798417": "reselected_reverse_native_to_unique_executable_role",
+    "task-582475": "reselected_canonical_sort_to_unique_executable_role"
+  },
+  "family_balance": {
+    "bounded-prefix-copy": {
+      "valid_candidate_rows": 8,
+      "valid_count_by_action_id": {
+        "42559": 2,
+        "47505": 2,
+        "51536": 2,
+        "64060": 2
+      },
+      "valid_count_by_position": [
+        2,
+        2,
+        2,
+        2
+      ],
+      "primary_gold_positions": [
+        3,
+        2,
+        1,
+        0
+      ]
+    },
+    "composite-frame-field": {
+      "valid_candidate_rows": 4,
+      "valid_count_by_action_id": {
+        "22115": 1,
+        "28666": 1,
+        "51145": 1,
+        "62972": 1
+      },
+      "valid_count_by_position": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "primary_gold_positions": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    "conflicting-alias-requirement": {
+      "valid_candidate_rows": 0,
+      "valid_count_by_action_id": {
+        "22012": 0,
+        "32916": 0,
+        "52980": 0,
+        "57213": 0
+      },
+      "valid_count_by_position": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "primary_gold_positions": []
+    },
+    "cursor-advance-observation": {
+      "valid_candidate_rows": 4,
+      "valid_count_by_action_id": {
+        "31099": 1,
+        "34154": 1,
+        "36737": 1,
+        "64124": 1
+      },
+      "valid_count_by_position": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "primary_gold_positions": [
+        1,
+        3,
+        2,
+        0
+      ]
+    },
+    "help-color-capability": {
+      "valid_candidate_rows": 4,
+      "valid_count_by_action_id": {
+        "33099": 1,
+        "45190": 1,
+        "48831": 1,
+        "63364": 1
+      },
+      "valid_count_by_position": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "primary_gold_positions": [
+        1,
+        2,
+        0,
+        3
+      ]
+    },
+    "map-order-feature-contract": {
+      "valid_candidate_rows": 4,
+      "valid_count_by_action_id": {
+        "28214": 1,
+        "31314": 1,
+        "38651": 1,
+        "59171": 1
+      },
+      "valid_count_by_position": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "primary_gold_positions": [
+        3,
+        1,
+        2,
+        0
+      ]
+    },
+    "number-mode-plus-error-site": {
+      "valid_candidate_rows": 4,
+      "valid_count_by_action_id": {
+        "29284": 1,
+        "31026": 1,
+        "49443": 1,
+        "52928": 1
+      },
+      "valid_count_by_position": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "primary_gold_positions": [
+        1,
+        0,
+        3,
+        2
+      ]
+    },
+    "possible-value-validation": {
+      "valid_candidate_rows": 4,
+      "valid_count_by_action_id": {
+        "22012": 1,
+        "32916": 1,
+        "52980": 1,
+        "57213": 1
+      },
+      "valid_count_by_position": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "primary_gold_positions": [
+        2,
+        3,
+        1,
+        0
+      ]
+    },
+    "raw-number-lossless": {
+      "valid_candidate_rows": 0,
+      "valid_count_by_action_id": {
+        "38796": 0,
+        "53677": 0,
+        "58574": 0,
+        "64610": 0
+      },
+      "valid_count_by_position": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "primary_gold_positions": []
+    },
+    "repeated-option-policy": {
+      "valid_candidate_rows": 4,
+      "valid_count_by_action_id": {
+        "22252": 1,
+        "27088": 1,
+        "35639": 1,
+        "44597": 1
+      },
+      "valid_count_by_position": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "primary_gold_positions": [
+        0,
+        2,
+        1,
+        3
+      ]
+    },
+    "stream-byte-offset": {
+      "valid_candidate_rows": 4,
+      "valid_count_by_action_id": {
+        "31157": 1,
+        "40696": 1,
+        "54579": 1,
+        "58080": 1
+      },
+      "valid_count_by_position": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "primary_gold_positions": [
+        2,
+        1,
+        0,
+        3
+      ]
+    },
+    "wire-endian-contract": {
+      "valid_candidate_rows": 4,
+      "valid_count_by_action_id": {
+        "25335": 1,
+        "34126": 1,
+        "43520": 1,
+        "56199": 1
+      },
+      "valid_count_by_position": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "primary_gold_positions": [
+        0,
+        1,
+        3,
+        2
+      ]
+    }
+  },
+  "family_assignment_summary": {
+    "bounded-prefix-copy": {
+      "state": "PAIRED_ACTION_FAMILY",
+      "blocks": [
+        {
+          "target": "E_c.content",
+          "pair_id": "pair-3129-1"
+        },
+        {
+          "target": "E_c.content",
+          "pair_id": "pair-3129-2"
+        }
+      ],
+      "candidate_assignments_examined_by_block": [
+        11520,
+        11520
+      ]
+    },
+    "composite-frame-field": {
+      "state": "JOINT_FACTORIAL",
+      "candidate_assignments_examined": 576
+    },
+    "conflicting-alias-requirement": {
+      "state": "ABSTENTION_CONTROL",
+      "blocks": 1
+    },
+    "cursor-advance-observation": {
+      "state": "PAIRED_ACTION_FAMILY",
+      "blocks": [
+        {
+          "target": "E_x",
+          "pair_id": "pair-9358-1"
+        },
+        {
+          "target": "E_x",
+          "pair_id": "pair-9358-2"
+        }
+      ],
+      "candidate_assignments_examined_by_block": [
+        576,
+        576
+      ]
+    },
+    "help-color-capability": {
+      "state": "PAIRED_ACTION_FAMILY",
+      "blocks": [
+        {
+          "target": "E_r",
+          "pair_id": "pair-8973-1"
+        },
+        {
+          "target": "E_r",
+          "pair_id": "pair-8973-2"
+        }
+      ],
+      "candidate_assignments_examined_by_block": [
+        576,
+        576
+      ]
+    },
+    "map-order-feature-contract": {
+      "state": "PAIRED_ACTION_FAMILY",
+      "blocks": [
+        {
+          "target": "E_r",
+          "pair_id": "pair-5333-1"
+        },
+        {
+          "target": "E_r",
+          "pair_id": "pair-5333-2"
+        }
+      ],
+      "candidate_assignments_examined_by_block": [
+        576,
+        576
+      ]
+    },
+    "number-mode-plus-error-site": {
+      "state": "JOINT_FACTORIAL",
+      "candidate_assignments_examined": 576
+    },
+    "possible-value-validation": {
+      "state": "PAIRED_ACTION_FAMILY",
+      "blocks": [
+        {
+          "target": "E_c.content",
+          "pair_id": "pair-4846-1"
+        },
+        {
+          "target": "E_c.content",
+          "pair_id": "pair-4846-2"
+        }
+      ],
+      "candidate_assignments_examined_by_block": [
+        10368,
+        10368
+      ]
+    },
+    "raw-number-lossless": {
+      "state": "ABSTENTION_CONTROL",
+      "blocks": 1
+    },
+    "repeated-option-policy": {
+      "state": "PAIRED_ACTION_FAMILY",
+      "blocks": [
+        {
+          "target": "E_t",
+          "pair_id": "pair-8072-1"
+        },
+        {
+          "target": "E_t",
+          "pair_id": "pair-8072-2"
+        }
+      ],
+      "candidate_assignments_examined_by_block": [
+        576,
+        576
+      ]
+    },
+    "stream-byte-offset": {
+      "state": "PAIRED_ACTION_FAMILY",
+      "blocks": [
+        {
+          "target": "E_x",
+          "pair_id": "pair-2372-1"
+        },
+        {
+          "target": "E_x",
+          "pair_id": "pair-2372-2"
+        }
+      ],
+      "candidate_assignments_examined_by_block": [
+        576,
+        576
+      ]
+    },
+    "wire-endian-contract": {
+      "state": "PAIRED_ACTION_FAMILY",
+      "blocks": [
+        {
+          "target": "E_t",
+          "pair_id": "pair-6397-1"
+        },
+        {
+          "target": "E_t",
+          "pair_id": "pair-6397-2"
+        }
+      ],
+      "candidate_assignments_examined_by_block": [
+        576,
+        576
+      ]
+    }
+  },
+  "model_contact": false
+}

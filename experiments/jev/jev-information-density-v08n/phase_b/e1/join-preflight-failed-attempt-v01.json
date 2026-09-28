@@ -1,0 +1,27 @@
+{
+  "protocol": "jev-information-density/v0.8n-e1-target-free-join-failed-attempt-v01",
+  "identity": "v0.8N-E1-target-free-join-preflight-attempt-01",
+  "timestamp_utc": "2026-09-23T11:18:24Z",
+  "status": "IMPLEMENTATION_SCHEMA_MISMATCH_BEFORE_JOIN_OUTPUT",
+  "join_script_sha256": "a0429553e03c24b8b63336b7dd031430832f713c04c56970737f63e43bdc6141",
+  "failure": {
+    "exception_type": "KeyError",
+    "message": "'output_row'",
+    "location": "run_e1_target_free_join_v01.py: feature receipt row reconciliation",
+    "cause": "The sealed extracted token/feature row record uses candidate_vector_index; the first audit implementation expected output_row. This is a receipt-field naming mismatch, not an ambiguous candidate identity or data mismatch."
+  },
+  "effects": {
+    "candidate_feature_tensor_modified": false,
+    "candidate_text_manifest_modified": false,
+    "join_manifest_created": false,
+    "join_receipt_created": false,
+    "basis_seal_created": false,
+    "heldout_target_or_body_field_decoded_or_used": false,
+    "head_checkpoints_loaded": false,
+    "predictions_or_metrics": false,
+    "panel_unlock_changed": false,
+    "panel_opening_count": 1,
+    "second_panel_opening": false
+  },
+  "disposition": "Preserve this attempt. Correct only the join audit to verify candidate_vector_index against the manifest index; do not alter candidate identity, candidate order, extraction output, or the frozen repair contract."
+}

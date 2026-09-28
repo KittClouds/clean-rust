@@ -1,0 +1,30 @@
+{
+  "experiment": "RDC-C-004",
+  "run_id": "e004-1790274789302722900",
+  "seed": "0xE40420260924",
+  "episode_count": 128,
+  "budgets": [16, 32, 48, 64],
+  "experiment002_baseline_manifest_blake3": "c23e2ff0133c9be9780863598d3dfa9ce82fb8af16db28321961c44538722ff3",
+  "cargo_lock_blake3": "c36d3438369ea35ffef58ba4791c5cf698127f1aff0f5698060a429a9c04b147",
+  "artifacts_blake3": {
+    "inputs/episodes.csv": "3f7b8dfa34dc1aa3e928684cc721efa7c85832e7a81fee5e52a1827342a9e5bd",
+    "evaluation/hidden-labels.csv": "0a051f18debd931e79f7ed95192ac45e5d99a247caa04df613d7df961463c4e5",
+    "routing-plans.csv": "24a9bf9312732021ed2296efc3a6e695af3240e58d220fa0d4ae767bb4166c44",
+    "run-trace.csv": "e877b9bea9032e13479f52581361e4757b4b5c4fcafd3eb997ea58440a730737",
+    "benchmark-report.md": "8123e885ad176cd4db18c6abbd315297c357616b1e7b876f5a29cd37ebf3a460",
+    "source/Cargo.toml": "f75c4e0653e4ee56a0fa3b88a80aef1d1caed18abcbd3d1bed57d05701d0435c",
+    "source/Cargo.lock": "c36d3438369ea35ffef58ba4791c5cf698127f1aff0f5698060a429a9c04b147",
+    "source/src/lib.rs": "985c8134dcfd20c835a989ea7f99f5d01dc2734ee40f2cdb0f0dfd8f5e0af34d",
+    "source/src/domain.rs": "dea6e1a3be7afa2fa606c660913aabbf0168e9dbdd8894ad431a60b8373f57f5",
+    "source/src/episodes.rs": "c62658bcb6a4eb47ca26f6b0565c04cc004edeb2bacd8836b3f6b4867f5f8760",
+    "source/src/routing.rs": "7ad0d7924b1537f15fd87c201dbb6db79ec3285084484d242cc671cc106f3654",
+    "source/src/runtime.rs": "8287e5612a248c3e1b35c712f0d71835b61e32d08b1d272807e24418070d19ad",
+    "source/src/scoring.rs": "f223ee671257f49bdb1af8ac544c9a481cd6b81d0d8d3de2ad4f5add2ec97e47",
+    "source/src/report.rs": "195ccee21eb90f9f0b5e97696904038729203bb44932cd1ae8ea44d6f610adbb",
+    "source/src/bin/bench.rs": "fc88f4eeb53b8100ac9f34fc2459ff65c05cfd44f7f7310c87d28115c299f280",
+    "source/src/evaluation.rs": "029fe39b97436d45914d81c7ec23b0b129c33ce78246e427603a02cfee03624b",
+    "source/README.md": "5c1d8c603bc71f832f21bf3b145bf4575b1a5dd997328a774bd3392ccdf3b9e3",
+    "source/tests/experiment004.rs": "5cd4e69bc097935c5eaebe08f72bf6bee3d78ce520df09accfc050caf573436c",
+    "source/BASELINE.md": "7c7c6edb4118286cd16419583ad188a266c86627f08dae94ffc9251ed6efc3b9"
+  }
+}

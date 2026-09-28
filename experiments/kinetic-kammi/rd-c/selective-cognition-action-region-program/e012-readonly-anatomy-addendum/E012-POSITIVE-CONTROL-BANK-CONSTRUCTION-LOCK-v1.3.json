@@ -1,0 +1,64 @@
+{
+  "artifact_id": "E012-PC-BANK-CONSTRUCTION-v1.3",
+  "artifact_paths": {
+    "construction_spec": "C:\\rd-c\\selective-cognition-action-region-program\\e012-readonly-anatomy-addendum\\E012-POSITIVE-CONTROL-BANK-CONSTRUCTION-SPEC-v1.3.md",
+    "generator": "C:\\Users\\shuga\\.codex\\worktrees\\e013-episode-factory\\clean-rust\\experiments\\e013-episode-factory\\precontact-v031\\seal_pc_buildspec_v13.py",
+    "parent_e013_v034_amendment": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-013-trust-signal\\E013-PROTOCOL-AMENDMENT-v0.3.4.md",
+    "parent_e013_v034_lock": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-013-trust-signal\\E013-PROTOCOL-LOCK-v0.3.4.json",
+    "parent_e013_v034_verification": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-013-trust-signal\\E013-PRECONTACT-VERIFICATION-v0.3.4.json",
+    "parent_positive_control_v12": "C:\\rd-c\\selective-cognition-action-region-program\\e012-readonly-anatomy-addendum\\E012-POSITIVE-CONTROL-DESIGN-v1.2.md"
+  },
+  "bank_generated_by_agent": false,
+  "bank_owner": "USER",
+  "difficulty_cohort_empty_valid": {
+    "cell_allocation": "five distinct repo-family cells, split 2/3 across repositories",
+    "count": 5,
+    "nearest_integer_quota": "5/32",
+    "target_rate": "8/48",
+    "total": 32
+  },
+  "e013_d_c_model_contact_authorized": false,
+  "parent_e013_v034_lock_sha256": "85c0b4e4c13fae800ecb42f5742d1a53e89f7388ce3c2fd42789c8759e613f38",
+  "parent_positive_control_v12_sha256": "be69ee36702e2c94cf0f5187aa0fe5f76d512b59d3df645cb407ce4ab2a1c0ad",
+  "position_seed": {
+    "algorithm": "NumPy SeedSequence.spawn(5) with PCG64",
+    "difficulty_nonempty_counts_by_ordinal": [
+      6,
+      7,
+      7,
+      7
+    ],
+    "positive_counts_by_ordinal": [
+      8,
+      8,
+      8,
+      8
+    ],
+    "seed": 13064,
+    "streams": [
+      "empty_cells",
+      "empty_task_slots",
+      "ordinal_assignment",
+      "candidate_slot_order",
+      "opaque_ids"
+    ]
+  },
+  "positive_control_bank_status": "USER_BUILD_PENDING",
+  "positive_control_model_contact_authorized": true,
+  "positive_control_run_status": "NOT_RUN",
+  "schema_version": 1,
+  "self_hash_note": "Lock excludes itself and the post-lock verification receipt.",
+  "sha256": {
+    "construction_spec": "7d4be952441f9619c876a2080d19d0d1d7ce57bf52d59f7f12a84a4ac7a3b254",
+    "generator": "381c98bc19509cb4293f09a27322a10fae217aaf3b7d108518efe08a85b329f9",
+    "parent_e013_v034_amendment": "79a2475857f7d7ec72a61bdf65500b2744865a9951958870ab6ca05be78710e1",
+    "parent_e013_v034_lock": "85c0b4e4c13fae800ecb42f5742d1a53e89f7388ce3c2fd42789c8759e613f38",
+    "parent_e013_v034_verification": "7f9ca73a8a67317f125d0499aa37ec97a2a754fc543844ded4b5a2e852c130f5",
+    "parent_positive_control_v12": "be69ee36702e2c94cf0f5187aa0fe5f76d512b59d3df645cb407ce4ab2a1c0ad"
+  },
+  "state": "CONSTRUCTION_SPEC_SEALED_BANK_NOT_BUILT",
+  "visible_screen_policy": {
+    "cache": "warm repository-local Cargo cache, primed from clean base snapshot",
+    "per_sequence_timeout_seconds": 120
+  }
+}

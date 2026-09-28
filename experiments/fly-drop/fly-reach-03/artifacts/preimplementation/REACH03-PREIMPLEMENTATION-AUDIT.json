@@ -1,0 +1,145 @@
+{
+  "schema": "FLY-REACH-03-preimplementation-audit-v1",
+  "study_id": "FLY-REACH-03",
+  "status": "PASS",
+  "checks": {
+    "contract_sha256": {
+      "expected": "6beb47c4784a7d6e37a91e45688dd86e50b15291a8f0dbf07c56c71aefbe47a7",
+      "actual": "6beb47c4784a7d6e37a91e45688dd86e50b15291a8f0dbf07c56c71aefbe47a7",
+      "pass": true
+    },
+    "seal_schema": {
+      "actual": "FLY-REACH-03-v0.3-precode-seal-v2",
+      "pass": true
+    },
+    "seal_status": {
+      "status": "SEALED_PRE_CODE",
+      "execution_authorized": false,
+      "implementation_authorized": false,
+      "pass": true
+    },
+    "machine_semantics": {
+      "schema": "FLY-REACH-03-math-objects-v0.3",
+      "version": "0.3",
+      "pass": true
+    },
+    "controlling_artifacts": [
+      {
+        "path": "MATH-CONTRACT-v0.3-AUTHORITATIVE.md",
+        "exists": true,
+        "bytes": 43057,
+        "sha256": "6beb47c4784a7d6e37a91e45688dd86e50b15291a8f0dbf07c56c71aefbe47a7",
+        "expected_sha256": "6beb47c4784a7d6e37a91e45688dd86e50b15291a8f0dbf07c56c71aefbe47a7",
+        "matches": true
+      },
+      {
+        "path": "math-objects-v0.3.json",
+        "exists": true,
+        "bytes": 3116,
+        "sha256": "7dca0f687258531743014b7ac55681f7324566f40d9497c4a5e303771f6c7c2c",
+        "expected_sha256": "7dca0f687258531743014b7ac55681f7324566f40d9497c4a5e303771f6c7c2c",
+        "matches": true
+      }
+    ],
+    "historical_artifacts": [
+      {
+        "path": "MATH-CONTRACT.md",
+        "exists": true,
+        "bytes": 24667,
+        "sha256": "0908c55d1c349b722af95375f79bc3b4d892989a3942af2294e1f10e4d9e585a",
+        "expected_sha256": "0908c55d1c349b722af95375f79bc3b4d892989a3942af2294e1f10e4d9e585a",
+        "matches": true
+      },
+      {
+        "path": "MATH-CONTRACT-v0.2-AMENDMENT.md",
+        "exists": true,
+        "bytes": 12881,
+        "sha256": "9a083a2c7980e6a5b0135b1ecde952115cf9cde988c1d0b40ee1e9ae728b80bf",
+        "expected_sha256": "9a083a2c7980e6a5b0135b1ecde952115cf9cde988c1d0b40ee1e9ae728b80bf",
+        "matches": true
+      },
+      {
+        "path": "MATH-CONTRACT-v0.3-TIGHTENING.md",
+        "exists": true,
+        "bytes": 3820,
+        "sha256": "327a2e2ad585c71dd65274031b6272a15683c791b41469d1e0257c22ebdaf0ff",
+        "expected_sha256": "327a2e2ad585c71dd65274031b6272a15683c791b41469d1e0257c22ebdaf0ff",
+        "matches": true
+      },
+      {
+        "path": "math-objects.json",
+        "exists": true,
+        "bytes": 6122,
+        "sha256": "2367e9130ac16d2ee71f97b4a78d471f807f5545520999d9359da75ca62954fd",
+        "expected_sha256": "2367e9130ac16d2ee71f97b4a78d471f807f5545520999d9359da75ca62954fd",
+        "matches": true
+      },
+      {
+        "path": "math-objects.sha256",
+        "exists": true,
+        "bytes": 85,
+        "sha256": "a9d1b32e0ff8399e2fe5ec84e673f0289382c379c686cad07980f1797daf780c",
+        "expected_sha256": "a9d1b32e0ff8399e2fe5ec84e673f0289382c379c686cad07980f1797daf780c",
+        "matches": true
+      }
+    ],
+    "reach02_receipts": [
+      {
+        "path": "experiments/fly-reach-02-v0.1b/artifacts/REACH02-RUN2/REACH02-V0.1B-TERMINAL-RECEIPT.json",
+        "exists": true,
+        "bytes": 11294,
+        "sha256": "099b19cf57926981017d6eb708685b4252ff9e2b8674145fd7feae78963de990",
+        "expected_sha256": "099b19cf57926981017d6eb708685b4252ff9e2b8674145fd7feae78963de990",
+        "matches": true
+      },
+      {
+        "path": "experiments/fly-reach-02/artifacts/REACH02-RUN1/REACH02-RUN1-NONPROMOTABLE-RECEIPT.json",
+        "exists": true,
+        "bytes": 644,
+        "sha256": "eaef92b327607ce19b41e0fd64cf90d04dc8f7fc6be8a0b0349e688056731fda",
+        "expected_sha256": "eaef92b327607ce19b41e0fd64cf90d04dc8f7fc6be8a0b0349e688056731fda",
+        "matches": true
+      }
+    ],
+    "artifact_hashes": {
+      "pass": true
+    },
+    "run1_boundary": {
+      "path": "C:\\code land\\clean-rust\\experiments\\fly-reach-02\\artifacts\\REACH02-RUN1\\REACH02-RUN1-NONPROMOTABLE-RECEIPT.json",
+      "receipt_status": "NONPROMOTABLE_CONTRACT_DEFECT",
+      "nonpromotable": null,
+      "pass": true
+    },
+    "fresh_namespace": {
+      "paths": [
+        {
+          "path": "C:\\code land\\clean-rust\\experiments\\fly-reach-03\\executor",
+          "exists": false
+        },
+        {
+          "path": "C:\\code land\\clean-rust\\experiments\\fly-reach-03\\inputs\\measured",
+          "exists": false
+        },
+        {
+          "path": "C:\\code land\\clean-rust\\experiments\\fly-reach-03\\seeds",
+          "exists": false
+        },
+        {
+          "path": "C:\\code land\\clean-rust\\experiments\\fly-reach-03\\runs",
+          "exists": false
+        },
+        {
+          "path": "C:\\code land\\clean-rust\\experiments\\fly-reach-03\\artifacts\\measured",
+          "exists": false
+        }
+      ],
+      "pass": true
+    },
+    "historical_markdown_not_scraped": {
+      "pass": true,
+      "basis": "sealed JSON and named receipt hashes only"
+    },
+    "pass": true
+  },
+  "no_runner_or_measurement_namespace_created": true
+}

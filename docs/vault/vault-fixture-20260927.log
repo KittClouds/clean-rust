@@ -1,0 +1,12 @@
+warning: profiles for the non root package will be ignored, specify profiles at the workspace root:
+package:   D:\phoenix-vault-product-20260927\vendor\kammi-client-0.1.0\Cargo.toml
+workspace: D:\phoenix-vault-product-20260927\Cargo.toml
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.79s
+     Running tests\fixture_service.rs (D:\phoenix-target-product-20260923\debug\deps\fixture_service-e3e78008d59594df.exe)
+
+running 1 test
+fixture_vault=phoenix.fixture.b57cbb0b8b9246d7a4d13936c7bb5087 sources=3 source_epoch=3 reader=ok package_root=present
+test local_library_source_reader_and_stream_fixture ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 14.40s
+

@@ -1,0 +1,36 @@
+[[query]]
+id = "character_identity_lookup"
+text = "Who is the main character and what defines their role?"
+must_include_kinds = ["character", "identity"]
+forbidden_contexts = ["random_location"]
+
+[[query]]
+id = "event_causal_chain"
+text = "What caused the major rupture event?"
+must_include_contexts = ["causal", "event", "temporal"]
+must_have_path = true
+
+[[query]]
+id = "relationship_context"
+text = "How does the protagonist's relationship with their closest allies change?"
+must_include_contexts = ["relationship", "temporal"]
+
+[[query]]
+id = "setting_lookup"
+text = "What are the major locations and why do they matter?"
+must_include_contexts = ["location", "worldbuilding"]
+
+[[query]]
+id = "contradiction_probe"
+text = "Where do two accounts of the same event disagree?"
+must_include_contexts = ["contradiction", "evidence"]
+allow_empty = true
+
+[metrics]
+precision_at_k = true
+context_lane_accuracy = true
+wrong_context_rate = true
+unsupported_bridge_rate = true
+evidence_coverage = true
+cone_trace_validity = true
+top_k_stability = true

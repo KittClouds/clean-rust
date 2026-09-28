@@ -1,0 +1,27 @@
+{
+  "observe": true,
+  "seeds": [
+    9200
+  ],
+  "taus": [
+    4.0
+  ],
+  "sides": [
+    "R",
+    "L"
+  ],
+  "conditions": [
+    "true_perpendicular"
+  ],
+  "arms": [
+    "E",
+    "Z"
+  ],
+  "cues": 16,
+  "delay_steps": 12,
+  "trials": 512,
+  "eta": 0.05,
+  "glut_sign": -1.0,
+  "input_salt": 858980352,
+  "threads": 1
+}

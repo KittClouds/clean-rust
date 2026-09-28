@@ -1,0 +1,143 @@
+{
+  "schema_version": 1,
+  "run_id": "e011-r2-20260925-presentation-factorial-01",
+  "condition": "order-only",
+  "role": "large",
+  "bundle_id": "ternary-bonsai-2-27b-ptq1-local-v5",
+  "server_alias": "e009-large-v5",
+  "server_process_id": 15144,
+  "model_sha256": "53107f530aa52eb00912263ab1ee29bd199261c87cd7b4ad4ca1318c1fe33ee3",
+  "runtime_sha256": "e0ea4fd53e6f0c741cbd28093b427f333ada0eb03b83073e1f99c483793ea976",
+  "reasoning_mode": "off",
+  "input_lock_sha256": "145ed40927e766f5da6db06c9beff573564a23bc54211872b24b79b8dddf12ca",
+  "pre_model_seal_sha256": "b230fd385ad5907eb7b3a7c287f33af3abed884d3e71608d29e4aef2f9e94122",
+  "frame_lock_sha256": "2bc405878bcb9f85d1ea6c4d62239a276b17697f799bd1a6d4360847ddb8ccad",
+  "frame_sha256": "5f3f3b13bec1cdfc59b7e5d47770943ed7d138a2d24e9973d8bea99570427c1f",
+  "task_id": "ripgrep-ripgrep-case-insensitive-glob-v2",
+  "request_sha256": "61de4a622c2c45fa0c6b7d51b9d3cdcd49169efd50c5c0b78c94ffaca4adc065",
+  "request": {
+    "model": "e009-large-v5",
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a typed observer in a deterministic coding workflow. The runtime owns workflow state and will execute only one action from the offered action_options after validating your output.\n\nRead the task_prompt and evidence, then compare the offered actions. Choose the action most likely to satisfy the task while preserving the repository's stated constraints. Do not write or propose code outside the offered choices. Do not claim to have executed tests. If no offered action is sufficiently supported, use null for action_choice and express uncertainty with abstention_percent.\n\nReturn exactly one JSON object matching the provided schema. action_choice must be an offered numeric action ID or null. applicability_percent is your estimate from 0 to 100 that this observer can handle the task from the available evidence. abstention_percent is your estimate from 0 to 100 that the runtime should defer this choice. Use integer percentage points only. Do not add prose or fields.\n"
+      },
+      {
+        "role": "user",
+        "content": "{\"schema_id\":\"rdc-real-coding-observation.v1\",\"task_id\":\"ripgrep-ripgrep-case-insensitive-glob-v2\",\"task_family\":\"ripgrep-case-insensitive-glob\",\"repository_id\":\"ripgrep\",\"task_variant\":2,\"task_prompt\":\"A caller enables case-insensitive matching for a mixed-case pattern. Select the patch that makes the lowercase candidate match in the exact regression test.\",\"repository_revision\":\"e89fff89ac9af12e8d4ce9d5fd07beb408ca730f\",\"snapshot_sha256\":\"903dac98a558a3233b1671db0b60dc0293c7e56fbcd88bf9d13927763960b1a2\",\"evidence\":[{\"kind\":\"source_excerpt\",\"source_id\":\"crates/globset/src/glob.rs\",\"content_blake3\":\"89500240e7784a870e6b18f27f681038c546255659612a7dc36cbeaab44ee5ab\",\"content\":\"    /// This is disabled by default.\\n    pub fn case_insensitive(&mut self, yes: bool) -> &mut GlobBuilder<'a> {\\n        self.opts.case_insensitive = !yes;\\n        self\\n    }\"},{\"kind\":\"baseline_tool_result\",\"source_id\":\"cargo-test::glob::tests::matchcasei2\",\"content_blake3\":\"2960f397f49ea81a55a4d3f4f808c6cc2fe0729da5fc1069356f5018cca89842\",\"content\":\"Exact test `glob::tests::matchcasei2` failed on the frozen snapshot. Candidate patches have not been run in this task.\\n\\nrunning 1 test\\ntest glob::tests::matchcasei2 ... FAILED\\n\\nfailures:\\n\\n---- glob::tests::matchcasei2 stdout ----\\n\\nthread 'glob::tests::matchcasei2' (39748) panicked at crates\\\\globset\\\\src\\\\glob.rs:1461:5:\\nassertion failed: matcher.is_match(\\\"abcdefg\\\")\\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\\n\\n\\nfailures:\\n    glob::tests::matchcasei2\\n\\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 289 filtered out; finished in 0.00s\\n\\n   Compiling globset v0.4.19 (<frozen-repository-snapshot>\\\\crates\\\\globset)\\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.62s\\n     Running unittests src\\\\lib.rs (<cargo-target>\\\\debug\\\\deps\\\\globset-250b4c7d9a08c2e6.exe)\\nerror: test failed, to rerun pass `-p globset --lib`\\n\"}],\"action_options\":[{\"action\":{\"id\":94,\"schema_id\":1},\"summary\":\"Leave the current implementation unchanged.\",\"diff_excerpt\":\"No source line changes are included.\",\"patch_sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"},{\"action\":{\"id\":68,\"schema_id\":1},\"summary\":\"Apply this alternative change in the same code path.\",\"diff_excerpt\":\"@@ -613,7 +613,7 @@\\n-        self.opts.case_insensitive = !yes;\\n+        self.opts.case_insensitive = false;\",\"patch_sha256\":\"645c24ac169e883eb1d6e47aa9032257ed6c19a9dc10e6fcacea938ffee66814\"},{\"action\":{\"id\":37,\"schema_id\":1},\"summary\":\"Apply the focused source change shown here.\",\"diff_excerpt\":\"@@ -613,7 +613,7 @@\\n-        self.opts.case_insensitive = !yes;\\n+        self.opts.case_insensitive = yes;\",\"patch_sha256\":\"41fb794fb6ac8f8b265fa9bfe17155da8d26a63cbaee3c9fb70ed63c05a76cd5\"},{\"action\":{\"id\":11,\"schema_id\":1},\"summary\":\"Apply the source change and add a contract comment.\",\"diff_excerpt\":\"@@ -613,7 +613,8 @@\\n-        self.opts.case_insensitive = !yes;\\n+        // Preserve the caller's requested matching mode.\\n+        self.opts.case_insensitive = yes;\",\"patch_sha256\":\"ba2df6b3963a2e63bf04e89df67f324cd81986cda5b521dff1061b12d9bf2648\"}]}"
+      }
+    ],
+    "temperature": 0,
+    "top_p": 1,
+    "seed": 0,
+    "max_tokens": 1024,
+    "stream": false,
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rdc_coding_observer_output_v1",
+        "strict": true,
+        "schema": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "rdc-coding-observer-output.v2",
+          "title": "RDC Coding Observer Output v2",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "action_choice",
+            "applicability_percent",
+            "abstention_percent"
+          ],
+          "properties": {
+            "action_choice": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 65535
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "applicability_percent": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "abstention_percent": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            }
+          }
+        }
+      }
+    }
+  },
+  "normalization_contract": "percent-0-100-to-milli-x10-v1+line-endings-lf-v1",
+  "thresholds": {
+    "minimum_applicability_milli": 850,
+    "maximum_abstention_milli": 150
+  },
+  "http_status": 200,
+  "response": {
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "{\n  \"action_choice\": 37,\n  \"applicability_percent\": 95,\n  \"abstention_percent\": 5\n}"
+        }
+      }
+    ],
+    "created": 1790369395,
+    "model": "e009-large-v5",
+    "system_fingerprint": "b10685-7dffb158d",
+    "object": "chat.completion",
+    "usage": {
+      "completion_tokens": 35,
+      "prompt_tokens": 1405,
+      "total_tokens": 1440,
+      "prompt_tokens_details": {
+        "cached_tokens": 192
+      }
+    },
+    "id": "chatcmpl-DkYKHZuQYdiBOpAGZXpQ5es1NcRffBLX",
+    "timings": {
+      "cache_n": 192,
+      "prompt_n": 1213,
+      "prompt_ms": 2424.173,
+      "prompt_per_token_ms": 1.9984938169826874,
+      "prompt_per_second": 500.376829541456,
+      "predicted_n": 35,
+      "predicted_ms": 732.145,
+      "predicted_per_token_ms": 21.533676470588233,
+      "predicted_per_second": 46.43888847154594
+    }
+  },
+  "content": "{\n  \"action_choice\": 37,\n  \"applicability_percent\": 95,\n  \"abstention_percent\": 5\n}",
+  "output": {
+    "action_choice": 37,
+    "applicability_percent": 95,
+    "abstention_percent": 5
+  },
+  "normalized_output": {
+    "action_choice": 37,
+    "applicability_milli": 950,
+    "abstention_milli": 50
+  },
+  "normalization_error": null,
+  "usage": {
+    "completion_tokens": 35,
+    "prompt_tokens": 1405,
+    "total_tokens": 1440,
+    "prompt_tokens_details": {
+      "cached_tokens": 192
+    }
+  },
+  "finish_reason": "stop",
+  "elapsed_ms": 3434.152
+}

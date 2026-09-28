@@ -1,0 +1,26 @@
+{
+  "audited_states": 1024,
+  "behavioral_inference": false,
+  "bundle_count": 4,
+  "contract_sha256": "a98b4f48513fef92809642866a037443a3f82d88d7ceb2e10665fa37c0bee4f4",
+  "counters": {
+    "ambiguous": 0,
+    "capacity_exact": 0,
+    "capacity_gated": 1002,
+    "eligible": 1002,
+    "equal": 0,
+    "exhausted": 0,
+    "gate_failures": 0,
+    "mismatched": 1002,
+    "repaired": 0,
+    "search_entered": 0
+  },
+  "dh08b_authorized": false,
+  "execution_status": "Q10_SR3_STAGE2A_VALID__CAPACITY_GATED_MIXTURE",
+  "plan_sha256": "36160a4f2bd55dca1dcd9c7d26baf650fa8932401752d9e00750097555c818fb",
+  "protocol": "Q10-SR3",
+  "replay_count": 4,
+  "scientific_seed_bundles": 0,
+  "stage": "stage1-a",
+  "status": "VERIFIED"
+}

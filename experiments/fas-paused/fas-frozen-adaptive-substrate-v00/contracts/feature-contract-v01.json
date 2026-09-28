@@ -1,0 +1,21 @@
+{
+  "contract_id": "FAS_FEATURE_V1",
+  "model_id": "LiquidAI/LFM2.5-1.2B-Base",
+  "model_revision": "7453bca97ca1e67754c4035a4b4c584e1c9dd725",
+  "backbone_parameter_delta": 0,
+  "tokenizer_identity": "Must record resolved tokenizer revision and file SHA-256 before extraction; no unpinned tokenizer allowed.",
+  "input_utf8_formation": "Observation: <observation or [none]>\nQuery: <query>\nCandidates: safe | risky | idle",
+  "candidate_order_in_feature_input": "canonical; display permutation is metadata only",
+  "model_visible_positions": "all returned non-special and special input positions actually consumed by model, no padding",
+  "batch_size": 1,
+  "padding": false,
+  "mixed_length_batching": false,
+  "sequence_length": "exact tokenized input length",
+  "layer": "final hidden layer only",
+  "pooling": "arithmetic mean over model-visible input positions",
+  "serialized_dtype": "float32 little-endian",
+  "feature_cache": "new FAS-only cache; infrastructure, unavailable as adaptive memory",
+  "row_receipt_fields": ["row_id", "event_id", "input_utf8_sha256", "input_utf8_bytes", "token_ids", "sequence_length", "hidden_dimension", "pooling_rule", "feature_shape", "feature_sha256", "model_id", "model_revision", "tokenizer_identity"],
+  "determinism_smoke": "Repeat extraction of fixed rows and require byte-identical float32 features and identical SHA-256 before corpus extraction.",
+  "first_pass_model_contact": false
+}

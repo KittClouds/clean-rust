@@ -1,0 +1,13 @@
+{
+  "contract_sha256": "192b0c3c01b2b7978aedfe55e5490012226e62e0b7660c4410797a08b44a01b8",
+  "execution_manifest_file_sha256": "c02bc813d9780fbfc31b497bae1fc281ca0a18539bbeb4f94d21a9b8bf6304df",
+  "heldout_truth_opened": false,
+  "measured_reach03_authorized": false,
+  "native_collection_started": false,
+  "preexecution_seal_sha256": "5eabdcfef3410c0ae0724c1a2240f4710354d4223ad990c946c823b9f712ab11",
+  "schema": "F4-CALIBRATION-02-v0.2-implementation-preflight-v1",
+  "source_entry_count": 56,
+  "source_manifest_canonical_sha256": "c6c3feacdbd63325fd0c484abae28b486f6cdc284e5deebc02851b5552bda110",
+  "status": "PASS",
+  "task_bank_passed": true
+}

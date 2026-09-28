@@ -1,0 +1,74 @@
+{
+  "identity": "q10-gc1-lr1-requal1-csc1-front-div1-r1-v1",
+  "protocol": "Q10-FRONT-DIV1-R1",
+  "context": [
+    "seed9731-R-tau4.json",
+    3
+  ],
+  "replay_executed": false,
+  "scientific_promotion": false,
+  "band_rule": "mismatch_count <= 128",
+  "all_order3_records": 225429,
+  "near_frontier_records": 198965,
+  "mismatch_count_distribution": {
+    "123": 33538,
+    "124": 40838,
+    "125": 44232,
+    "126": 38638,
+    "127": 23961,
+    "128": 17758
+  },
+  "reference_mismatch_count": 123,
+  "reference_residual_rows": 123,
+  "hamming_stats": {
+    "mode": "deterministic_unique_mask_pair_sample",
+    "unique_masks": 19460,
+    "pair_count": 189336070,
+    "sample_count": 1000000,
+    "min": 1,
+    "max": 29,
+    "mean": 10.521531,
+    "median": 10.0,
+    "mask_multiplicity_max": 16781
+  },
+  "one_bit_components": {
+    "adjacency": "Hamming distance exactly 1",
+    "unique_masks": 19460,
+    "edges_counted_directed": 55012,
+    "component_count": 2505,
+    "largest_component": 2949,
+    "component_sizes_desc": [
+      2949,
+      2206,
+      997,
+      934,
+      422,
+      291,
+      288,
+      262,
+      214,
+      208,
+      202,
+      171,
+      170,
+      156,
+      155,
+      149,
+      148,
+      135,
+      134,
+      127
+    ]
+  },
+  "co_error_nonzero_off_diagonal_pairs": 7503,
+  "co_error_max_count": 198965,
+  "row_stats_sha256": "F4EC94691C79AC52E9154ABEA26A9530D14B1E7AC0BB85146621A65ED2120E7A",
+  "co_error_matrix_sha256": "20AC5BA3074010216E5639E844AD7B20C93FB11E6512A8F287DC81E2E578B305",
+  "parent_sha256": {
+    "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-lr1-requal1-csc1-o3-maskmat1-v1\\semantic.jsonl": "6435788E00ED56E124B9844733CD5CED586C678516486079F63B980ED82B0B2E",
+    "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-lr1-requal1-csc1-o3-maskmat1-v1\\semantic.bin": "0747C9928B96295A688381E4FF5A70C1E1FD75B4C30AA883B16B976CC40849B6",
+    "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-lr1-requal1-csc1-o3-maskmat1-v1\\schema.json": "54A926C86F1D5DCBA59A4122316611263FB084EBE23BA44DF7A92F1BB40DBF2E",
+    "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-lr1-requal1-csc1-pair-front1-v2\\shards\\seed9731-R-tau4__set3.jsonl": "C56E924387CE319038150A481D485EF188B8380E87CB9A7BB3EEA0DC8A594695"
+  },
+  "status": "FRONT_DIV1_R1_COMPLETE"
+}

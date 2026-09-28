@@ -1,0 +1,163 @@
+{
+  "schema_version": 1,
+  "run_id": "e009-20260925-corrected-02",
+  "stage": "dev-shadow-large",
+  "role": "large",
+  "bundle_id": "ternary-bonsai-2-27b-ptq1-local-v5-calibration",
+  "bundle_blake3": "d8a2abe6384173d033becaf094e0f5b69bdb836b2a834c77a3c503e05a4f6ef9",
+  "bundle_lock_sha256": "485c1b613e1f5d2b03d4c8696363986645946e7983ed21919354d2ff5e1b0ec8",
+  "frozen_input_lock_sha256": "49f89c62d6a505562f1152c4692540edbb0f57bd9e0e5b03f3b8d808f7758c51",
+  "frame_lock_sha256": "f25338bdd754898de614d1aa57445acc8a04a35a97d2785bfba628da7038430b",
+  "frame_blake3": "97214aa877246fff6b4aca8dee26de43080e2d9b2368273b3a8057e20879958e",
+  "task_id": "dev-color-interpolation-endpoints-ambiguous-02",
+  "server_alias": "e009-large-v5",
+  "server_process_id": 14192,
+  "server_runtime_args": [
+    "--model",
+    "D:\\phoenix-models\\candidates\\ternary-bonsai-2-27b\\6ed5e12bf84b7a63069882c91dd9e9218647d17b\\Ternary-Bonsai-2-27B-PTQ1_0.gguf",
+    "--host",
+    "127.0.0.1",
+    "--port",
+    "18090",
+    "--alias",
+    "e009-large-v5",
+    "--ctx-size",
+    "4096",
+    "--n-gpu-layers",
+    "99",
+    "--reasoning",
+    "off"
+  ],
+  "reasoning_mode": "off",
+  "chat_template_sha256": "c3cf9e34abf4f9e36c2d72165aa9c132d3e2a725b6c2586aaa3a8af9d7a81041",
+  "maximum_output_tokens": 1024,
+  "system_prompt_sha256": "976ef1cd914bacb366c64418825010124338a626a0400d459858acc7e48f5a48",
+  "output_schema_sha256": "97170fa0d6a44681f680ad0ac533a3f3913709757e4ee6cbf96d9c9f40d1b2fb",
+  "normalization_contract": "percent-0-100-to-milli-x10-v1+line-endings-lf-v1",
+  "thresholds": {
+    "minimum_applicability_milli": 700,
+    "maximum_abstention_milli": 600
+  },
+  "model": "e009-large-v5",
+  "request_sha256": "8937dd7c7a4f73cd91ef432bcb7ddd1bf93fdfc70d7bfe3a4a9060c28ceb956e",
+  "request": {
+    "model": "e009-large-v5",
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a typed observer in a deterministic coding workflow. The runtime owns workflow state and will execute only one action from the offered action_options after validating your output.\n\nRead the task_prompt and evidence, then compare the offered actions. Choose the action most likely to satisfy the task while preserving the repository's stated constraints. Do not write or propose code outside the offered choices. Do not claim to have executed tests. If no offered action is sufficiently supported, use null for action_choice and express uncertainty with abstention_percent.\n\nReturn exactly one JSON object matching the provided schema. action_choice must be an offered numeric action ID or null. applicability_percent is your estimate from 0 to 100 that this observer can handle the task from the available evidence. abstention_percent is your estimate from 0 to 100 that the runtime should defer this choice. Use integer percentage points only. Do not add prose or fields.\n"
+      },
+      {
+        "role": "user",
+        "content": "{\"schema_id\":\"rdc-real-coding-observation.v1\",\"task_id\":\"dev-color-interpolation-endpoints-ambiguous-02\",\"task_family\":\"color-interpolation-endpoints\",\"task_prompt\":\"Repair endpoint clamping from the frozen test. The correct range must admit both 0 and 1 exactly, while still bounding values outside the interval. Either passing repair is valid.\",\"repository_revision\":\"9a88547372cd35f8dc31f026f0cd8dd8fca8e641\",\"snapshot_sha256\":\"b194c47c6e52eb8a8df673a5aa0a01ae8dde09f04da83787ddedeb9b5ec28e60\",\"evidence\":[{\"kind\":\"source_excerpt\",\"source_id\":\"phoenix-native/crates/gpui-animated-gradient-text/src/color.rs\",\"content_blake3\":\"a21cd6cc72b478f35765fc393f17fce79884681bc42579ef8e735794da890ff1\",\"content\":\"The current task snapshot clamps interpolation to 0.01..0.99. The frozen test checks that amount 0 returns the first color and amount 1 returns the second in sRGB, linear sRGB, and Oklab.\\nCurrent task-snapshot code: `let amount = amount.clamp(0.01, 0.99);`\"},{\"kind\":\"baseline_tool_result\",\"source_id\":\"cargo-test-color::tests::interpolation_preserves_endpoints_in_every_space-frozen-base\",\"content_blake3\":\"ca44f8b157e930c0485adc2406db5ca5af50038962d1af4858e5ad2c2cf26841\",\"content\":\"Task snapshot b194c47c6e52eb8a8df673a5aa0a01ae8dde09f04da83787ddedeb9b5ec28e60: exact test `color::tests::interpolation_preserves_endpoints_in_every_space` ran on the current snapshot and failed 1/1. No candidate repair has been executed in this episode.\"}],\"action_options\":[{\"action\":{\"id\":11,\"schema_id\":1},\"summary\":\"Apply the focused patch with an explanatory source comment.\",\"diff_excerpt\":\"Patch lines:\\n+// E009 candidate: behavior-preserving repair note.\\n-        let amount = amount.clamp(0.01, 0.99);\\n+        let amount = amount.clamp(0.0, 1.0);\",\"patch_sha256\":\"6b5f5dbbcff29d73a24d3bcda9da830d5e9067d828784189909fe799db7b74f3\"},{\"action\":{\"id\":37,\"schema_id\":1},\"summary\":\"Apply the alternate implementation patch.\",\"diff_excerpt\":\"Patch lines:\\n-        let amount = amount.clamp(0.01, 0.99);\\n+        let amount = amount.clamp(0.1, 0.9);\",\"patch_sha256\":\"54cc7809697514be4784f01b1efe30cee364e899bc6de9254b325da143d5497d\"},{\"action\":{\"id\":68,\"schema_id\":1},\"summary\":\"Apply the focused implementation patch.\",\"diff_excerpt\":\"Patch lines:\\n-        let amount = amount.clamp(0.01, 0.99);\\n+        let amount = amount.clamp(0.0, 1.0);\",\"patch_sha256\":\"dd9aa930c77eacc9b21381b16dedf3491cc00cd3104ee88a24e6c17c9bc05b9b\"},{\"action\":{\"id\":94,\"schema_id\":1},\"summary\":\"Retain the current implementation.\",\"diff_excerpt\":\"No source changes; retain the current expression.\",\"patch_sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"}]}"
+      }
+    ],
+    "temperature": 0,
+    "top_p": 1,
+    "seed": 0,
+    "max_tokens": 1024,
+    "stream": false,
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rdc_coding_observer_output_v1",
+        "strict": true,
+        "schema": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "rdc-coding-observer-output.v2",
+          "title": "RDC Coding Observer Output v2",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "action_choice",
+            "applicability_percent",
+            "abstention_percent"
+          ],
+          "properties": {
+            "action_choice": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 65535
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "applicability_percent": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "abstention_percent": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            }
+          }
+        }
+      }
+    }
+  },
+  "http_status": 200,
+  "response": {
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "{\n  \"action_choice\": 68,\n  \"applicability_percent\": 95,\n  \"abstention_percent\": 5\n}"
+        }
+      }
+    ],
+    "created": 1790355645,
+    "model": "e009-large-v5",
+    "system_fingerprint": "b10685-7dffb158d",
+    "object": "chat.completion",
+    "usage": {
+      "completion_tokens": 35,
+      "prompt_tokens": 1243,
+      "total_tokens": 1278,
+      "prompt_tokens_details": {
+        "cached_tokens": 192
+      }
+    },
+    "id": "chatcmpl-SQ9fTM4RpLSiP8SWPm9n0VQt3ZeWNB2T",
+    "timings": {
+      "cache_n": 192,
+      "prompt_n": 1051,
+      "prompt_ms": 1955.572,
+      "prompt_per_token_ms": 1.8606774500475736,
+      "prompt_per_second": 537.4386624476113,
+      "predicted_n": 35,
+      "predicted_ms": 658.099,
+      "predicted_per_token_ms": 19.355852941176472,
+      "predicted_per_second": 51.66395937389359
+    }
+  },
+  "content": "{\n  \"action_choice\": 68,\n  \"applicability_percent\": 95,\n  \"abstention_percent\": 5\n}",
+  "output": {
+    "action_choice": 68,
+    "applicability_percent": 95,
+    "abstention_percent": 5
+  },
+  "normalized_output": {
+    "action_choice": 68,
+    "applicability_milli": 950,
+    "abstention_milli": 50
+  },
+  "normalization_error": null,
+  "usage": {
+    "completion_tokens": 35,
+    "prompt_tokens": 1243,
+    "total_tokens": 1278,
+    "prompt_tokens_details": {
+      "cached_tokens": 192
+    }
+  },
+  "finish_reason": "stop",
+  "elapsed_ms": 2932.835
+}

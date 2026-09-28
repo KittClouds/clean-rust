@@ -1,0 +1,45 @@
+{
+  "task_digest_hex": "f657868d37e91cb9959ff0d4f0c82ec7c2c43e71ebfcec9ebc6518f76372b1c8",
+  "options": [
+    {
+      "producer_ordinal": 2,
+      "action": {
+        "id": 68,
+        "schema_id": 1
+      },
+      "summary": "Apply this plausible alternate change.",
+      "diff_excerpt": "--- a/turbovec/src/lib.rs\n+++ b/turbovec/src/lib.rs\n@@ -464,7 +464,7 @@\n /// patterns. Good enough for `assert_eq!` on results the index actually\n /// returns; not a substitute for comparing scores within a tolerance,\n /// and not enough to key a map.\n-#[derive(Debug, PartialEq)]\n+#[derive(Debug, Copy, Clone, PartialEq)]\n pub struct SearchResults {\n     /// Scores, row-major `nq × k`, sorted descending within each row\n     /// (best match first).",
+      "patch_sha256": "17bba2661ae4036b0ce69de7fe9345b59183020ce8ba2bfeec7e03edd7141a06"
+    },
+    {
+      "producer_ordinal": 3,
+      "action": {
+        "id": 94,
+        "schema_id": 1
+      },
+      "summary": "Retain the current implementation.",
+      "diff_excerpt": "No source changes; keep the broken implementation.",
+      "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "producer_ordinal": 0,
+      "action": {
+        "id": 11,
+        "schema_id": 1
+      },
+      "summary": "Apply the focused implementation patch.",
+      "diff_excerpt": "--- a/turbovec/src/lib.rs\n+++ b/turbovec/src/lib.rs\n@@ -464,7 +464,7 @@\n /// patterns. Good enough for `assert_eq!` on results the index actually\n /// returns; not a substitute for comparing scores within a tolerance,\n /// and not enough to key a map.\n-#[derive(Debug, PartialEq)]\n+#[derive(Debug, Clone, PartialEq)]\n pub struct SearchResults {\n     /// Scores, row-major `nq × k`, sorted descending within each row\n     /// (best match first).",
+      "patch_sha256": "d7c1e233f97f4ca98a72dc565d3133d301c4b3118dee9ead829d3ba18e06c1a3"
+    },
+    {
+      "producer_ordinal": 1,
+      "action": {
+        "id": 37,
+        "schema_id": 1
+      },
+      "summary": "Apply the focused patch with a contract comment.",
+      "diff_excerpt": "--- a/turbovec/src/lib.rs\n+++ b/turbovec/src/lib.rs\n@@ -464,7 +464,8 @@\n /// patterns. Good enough for `assert_eq!` on results the index actually\n /// returns; not a substitute for comparing scores within a tolerance,\n /// and not enough to key a map.\n-#[derive(Debug, PartialEq)]\n+/// Cloning owns independent result buffers.\n+#[derive(Debug, Clone, PartialEq)]\n pub struct SearchResults {\n     /// Scores, row-major `nq × k`, sorted descending within each row\n     /// (best match first).",
+      "patch_sha256": "f1ca29b631625189ac005bac09f87b8ad604ae23f7aa132f716107ebcc6090d8"
+    }
+  ]
+}

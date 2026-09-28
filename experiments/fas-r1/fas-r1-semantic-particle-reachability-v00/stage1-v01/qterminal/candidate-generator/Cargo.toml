@@ -1,0 +1,19 @@
+[package]
+name = "r1-qterminal-candidates"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+r1-search = { path = "../../../stage0-v01/search" }
+r1-world = { path = "../../../stage0-v01/world" }
+hashbrown = "0.14"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+panic = "abort"

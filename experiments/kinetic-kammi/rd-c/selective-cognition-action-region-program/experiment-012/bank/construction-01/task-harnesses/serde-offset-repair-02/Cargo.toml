@@ -1,0 +1,8 @@
+[package]
+name = "e012-serde-offset-harness"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+serde_json = { package = "serde_json", path = "../../repositories/serde-json" }

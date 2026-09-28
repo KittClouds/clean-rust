@@ -1,0 +1,34 @@
+{
+  "task_id": "ripgrep-ripgrep-case-insensitive-glob-v1",
+  "frame_hash_hex": "572a7049bbd04e65e3fcabf85871b9cb575d4029209c8853fe15275ee80ac488",
+  "selected_patch_sha256": "ba2df6b3963a2e63bf04e89df67f324cd81986cda5b521dff1061b12d9bf2648",
+  "action_ledger_path": "C:\\rd-c\\experiment-010\\artifacts\\runs\\e010-20260925-cross-repo-01\\ledgers\\hand-written\\ripgrep-ripgrep-case-insensitive-glob-v1.actions.bin",
+  "actions": [
+    {
+      "id": 11,
+      "schema_id": 1
+    },
+    {
+      "id": 37,
+      "schema_id": 1
+    },
+    {
+      "id": 68,
+      "schema_id": 1
+    },
+    {
+      "id": 94,
+      "schema_id": 1
+    }
+  ],
+  "observer_output": {
+    "action_choice": 37,
+    "applicability_milli": 900,
+    "abstention_milli": 0
+  },
+  "thresholds": {
+    "minimum_applicability_milli": 850,
+    "maximum_abstention_milli": 150
+  },
+  "completion_check_passed": true
+}

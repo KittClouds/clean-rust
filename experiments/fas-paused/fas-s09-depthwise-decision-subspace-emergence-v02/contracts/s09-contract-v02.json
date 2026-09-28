@@ -1,0 +1,97 @@
+{
+  "contract_id": "FAS_S09_DEPTHWISE_DECISION_SUBSPACE_EMERGENCE_V02",
+  "status": "FROZEN_BEFORE_MODEL_LOAD",
+  "project_id": "fas-s09-depthwise-decision-subspace-emergence",
+  "run_id": "fas-s09-depthwise-decision-subspace-emergence-v02",
+  "supersedes": {
+    "contract_id": "FAS_S09_DEPTHWISE_DECISION_SUBSPACE_EMERGENCE_V01",
+    "protocol_root_sha256": "5e2a63be0f4f76f88c62c056dcee80055292aa757c93f7fa1775e93f742d0af8",
+    "preflight_run": "D:\\codex-runs\\fas-s09-depthwise-decision-subspace-emergence-v01",
+    "failure": "preflight looked for the S01-3 contract outside its sealed inputs/contracts snapshot",
+    "model_contact_occurred": false,
+    "scientific_parents_changed": false
+  },
+  "backbone": {
+    "model_id": "LiquidAI/LFM2.5-1.2B-Base",
+    "revision": "7453bca97ca1e67754c4035a4b4c584e1c9dd725",
+    "model_type": "lfm2",
+    "transformer_layers": 16,
+    "hidden_dimension": 2048,
+    "load_dtype": "float32",
+    "output_dtype": "float32",
+    "attention_implementation": "sdpa",
+    "device": "CUDA:0 NVIDIA GeForce RTX 3080",
+    "mutable_parameters": false
+  },
+  "input": {
+    "source": "sealed S01-2 token feature-row manifest; token IDs only during extraction",
+    "corpus_sha256": "51a55212ba89d55bd6df532673ad4546c95def1f5d75622661f7c17b3e4a7ad1",
+    "events": 106496,
+    "quartets": 26624,
+    "row_order": "sealed S01-2 feature row order",
+    "processing": "single event per forward; exact length; no padding; no tokenizer; no mixed-length batch",
+    "test_split": "S01-3 sealed grouped quartet bucket 0; no split changes"
+  },
+  "views": {
+    "layer_indices": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
+    "hidden_state_tuple_index_zero": "embedding output, excluded",
+    "M": "mean H_l across all model-visible positions [0, sequence_length)",
+    "F": "H_l at sequence_length - 1",
+    "dimension": 2048,
+    "serialization": "little-endian float32 row-major matrix, shape [106496, 2048] per layer and surface",
+    "terminal_parity": "layer 16 M/F arrays must be byte-identical to sealed S01-2 V0/V1 arrays over all events",
+    "repeat": "first 256 sealed row indices, exact byte identity for all 16 layers and both surfaces"
+  },
+  "probe": {
+    "task": "EXACT_TARGET",
+    "classes": [0, 1, 2],
+    "fit_count": 32,
+    "fit_rows": "S01-3 transfer fit mask: train quartet buckets 1-4, observation and query templates <6, context and entity terms TRAIN_SIDE_STYLE",
+    "test_rows": "all rows in S01-3 test quartet bucket 0; report all contracted exact-target conditions",
+    "implementation": "byte-identical copy of sealed S01-3 linear_core.py",
+    "standardization": "fit-only float64 population mean and standard deviation, zero scale becomes 1, transform to float32",
+    "optimizer": "torch.optim.LBFGS, zero initialization, intercept enabled/unregularized, mean cross entropy + 0.5*1e-4*sum(W^2), lr=1, max_iter=300, max_eval=375, tolerance_grad=1e-7, tolerance_change=1e-9, history_size=10, strong_wolfe",
+    "randomness": "none",
+    "validation_or_tuning": false,
+    "terminal_gate_order": "fit layer 16 M and F first; compare to sealed S01-3 probe states, scaler, probabilities, and metrics exactly; compare planes to S08 within 1e-7 degrees; only then fit layers 1-15"
+  },
+  "analysis": {
+    "native_and_cross_cells": ["M_l/M_pipeline_l", "F_l/F_pipeline_l", "M_l/F_pipeline_l", "F_l/M_pipeline_l"],
+    "cross_transport": "full donor scaler plus probe; no refit",
+    "metrics": ["accuracy", "balanced_accuracy", "per_class_recall", "confusion_matrix", "multiclass_log_loss", "multiclass_brier_score", "target_vs_best_rival_margin", "all_pairwise_class_margins", "paired_prediction_transitions"],
+    "subspace": "S08 effective raw-coordinate pair normals, SVD rank tolerance max(shape)*float64_epsilon*sigma_max, principal angles, normalized squared-cosine overlap",
+    "terminal_plane_tolerance_degrees": 1e-6,
+    "terminal_pair_normal_max_abs_residual": 1e-12,
+    "depth_convergence": "compare each same-surface plane with the sealed S08 layer-16 native plane",
+    "categorical_emergence_threshold": null,
+    "inferential_statistics": false,
+    "fas00_transfer": false
+  },
+  "runtime": {
+    "python": "3.13.15",
+    "torch": "2.11.0+cu128",
+    "transformers": "5.17.0",
+    "numpy": "2.5.3",
+    "huggingface_hub": "1.32.0",
+    "cublas_workspace_config": ":4096:8",
+    "omp_threads": 1,
+    "mkl_threads": 1,
+    "openblas_threads": 1,
+    "tf32": false,
+    "deterministic_algorithms": true,
+    "minimum_free_disk_bytes": 38000000000,
+    "expected_feature_cache_bytes": 27917287424,
+    "pinned_model_copy_bytes": 2340699160,
+    "post_copy_extraction_reserve_bytes": 5368709120
+  },
+  "authority": {
+    "S09_model_contact_authorized": true,
+    "S09_all_layer_feature_extraction_authorized": true,
+    "S09_fixed_exact_target_probe_fits_authorized": true,
+    "S09_cross_surface_replay_authorized": true,
+    "S09_subspace_analysis_authorized": true,
+    "FAS00_access": false,
+    "FAS00_PHASE4_AUTHORIZED": false,
+    "adaptive_mechanisms_authorized": false
+  }
+}

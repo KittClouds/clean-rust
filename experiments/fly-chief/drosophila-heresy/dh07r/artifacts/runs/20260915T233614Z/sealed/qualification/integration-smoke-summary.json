@@ -1,0 +1,22 @@
+{
+  "protocol": "DH-07R",
+  "kind": "non_measured_exact_orchestration_qualification",
+  "seed": 9006,
+  "side": "R",
+  "tau": 4.0,
+  "fresh_measured_seeds_used": 0,
+  "result_cells": 16,
+  "null_events": 512,
+  "all_manipulations_passed": true,
+  "observed_maxima": {
+    "axial_error_over_total_norm": 2.0650636578247695e-08,
+    "norm_relative_error": 1.4287899497315804e-08,
+    "residual_norm_relative_error": 1.4292383789422176e-08,
+    "residual_abs_cosine": 1.5243521197756753e-08,
+    "boundary_symmetric_difference": 0,
+    "outside_support_changes": 0,
+    "max_bound_violation": 0.0,
+    "hot_allocations": 0
+  },
+  "jsonl_sha256": "e0b012e99b41bf194de7f3efa4f3aa8662aa31e91bd99e93916b3fd4d4cd4460"
+}

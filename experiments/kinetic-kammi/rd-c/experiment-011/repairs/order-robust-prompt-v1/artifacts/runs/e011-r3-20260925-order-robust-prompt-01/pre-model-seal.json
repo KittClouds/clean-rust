@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "state": "SEALED_BEFORE_MODEL_CONTACT",
+  "run_id": "e011-r3-20260925-order-robust-prompt-01",
+  "created_utc": "2026-09-25T21:17:52.727900+00:00",
+  "input_lock_sha256": "519c96fb51adab9e736b8a978504373e3d8517679dbdaa86839523079df09a97",
+  "code_sha256": {
+    "spec.md": "0dd6844386125254bf0f70c348dd9e88438d620b283de63093be6349a574b9c6",
+    "scripts/prompt_repair.py": "8716f531ed6f55faaa09c009a2d5fbdc84249471353a43cf439bdf380b342b43",
+    "scripts/start_small_observer.ps1": "29a5c3613ffc1698f3630334293fed8d758c24b53a2118a5dbe12d779b1fa300",
+    "scripts/stop_small_observer.ps1": "e1b90ae96face5f86c093c31ab7149c8f8485692e8460e61077b3bacad784deb"
+  },
+  "condition_frame_locks_sha256": {
+    "full-frame": "e8de47cb4452eb36ab40b6e82650467dcd578a697a086b9c998ed4f20d9a6f6d",
+    "order-only": "8bcb8e379a5929be964969bc9fe9397aa66731f5c339695653b6d6c2fcc21ce6"
+  },
+  "model_contact_started": false
+}

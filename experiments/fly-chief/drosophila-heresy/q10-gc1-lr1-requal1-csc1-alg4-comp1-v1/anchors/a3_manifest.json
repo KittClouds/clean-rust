@@ -1,0 +1,45 @@
+{
+  "anchor_ordinals": [
+    360,
+    362
+  ],
+  "anchor_rows": [
+    161,
+    357,
+    749
+  ],
+  "anchors": [
+    {
+      "action_keys": [
+        "45:045C1D68008DBE9B1CECC7C67BDB1456AF0B8C008F5E36AEA6EAA183A22E82B7"
+      ],
+      "ordinal": 360,
+      "readout_sha256": "2BE1E805E17FECA29AECC081D1548F67B4DD368E8F247B81983EBDA42BF650AA",
+      "target_rows": [
+        161,
+        749
+      ],
+      "weight_state_sha256": "3B6AB3C2073433485D200F1EB1402DC8DFD516104686A9E6D5BD709E715628B9"
+    },
+    {
+      "action_keys": [
+        "45:323EE17CD9392A5DDD28CDF0A99809B6C18828715353C54EBA2C81CBC286FDF3"
+      ],
+      "ordinal": 362,
+      "readout_sha256": "ECCCAD311099EA7E570A756824B183BFC2FB5F89BE8FCD06E24100AC19AF11C9",
+      "target_rows": [
+        357
+      ],
+      "weight_state_sha256": "27E93737DA0A65736BC1356D51EE276EAA67699A0F08842F9BADBD1723524B4B"
+    }
+  ],
+  "context": [
+    "seed9731-R-tau4.json",
+    3
+  ],
+  "derivation": "R2-v3 results/order1_hits.jsonl only",
+  "source_bytes": 2296,
+  "source_line_count": 2,
+  "source_path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-resid-invalid1-r2-v3/results/order1_hits.jsonl",
+  "source_sha256": "BD647DD064F904F084268AD91047D2A07492BAB91BF748213747690D63682CF7"
+}

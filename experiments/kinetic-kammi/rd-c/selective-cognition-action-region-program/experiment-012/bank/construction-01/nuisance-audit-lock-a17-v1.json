@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "experiment": "E012 Prospective Frame Decomposition",
+  "amendment": "E012-AUDIT-A17",
+  "state": "FROZEN_BEFORE_A17_NUISANCE_AUDIT",
+  "model_contact_authorized": false,
+  "audit": "scripts/audit_nuisance_baselines_e012_a17_v1.py",
+  "audit_sha256": "e4425d8bb441e92c71ed3131670a3f8b3329c576e105a6ae30fd6ab94ca2a5e1",
+  "files": [
+    {
+      "path": "amendments/bank-amendment-17.md",
+      "sha256": "f762369d1e0b8b93c91e88f4ff7d69bc5725e1c03da2499049ea7488e9e63132",
+      "bytes": 518
+    },
+    {
+      "path": "amendments/bank-amendment-17.json",
+      "sha256": "6e30bc2a28af08cf026a31806ded34e89a496665ecdf506c3131ee620c655523",
+      "bytes": 349
+    },
+    {
+      "path": "scripts/audit_nuisance_baselines_e012_a17_v1.py",
+      "sha256": "e4425d8bb441e92c71ed3131670a3f8b3329c576e105a6ae30fd6ab94ca2a5e1",
+      "bytes": 15798
+    },
+    {
+      "path": "scripts/freeze_nuisance_audit_e012_a17_v1.py",
+      "sha256": "479d3f360e3705cc2518d0f8653ff068d0ce59168e1a35ec33c3c4ff7da634dd",
+      "bytes": 2076
+    },
+    {
+      "path": "bank/construction-01/a14-design-lock-v1.json",
+      "sha256": "9601c8742240bec28b6c7372539d3b57756155f4a9ee8475d73cedbc2ab17726",
+      "bytes": 24943
+    },
+    {
+      "path": "bank/construction-01/scored-check-run-lock-a14-v1.json",
+      "sha256": "d2298083e389b02a9ee158cacaf8a1cc6da41da898a7bec15c388bc1bdd79514",
+      "bytes": 22212
+    },
+    {
+      "path": "bank/construction-01/frame-projection-lock-a14-v1.json",
+      "sha256": "dad661916cd060a8870c898c24136e5f09b55f1cb93d6749e45940d2762e17e5",
+      "bytes": 2593
+    },
+    {
+      "path": "bank/construction-01/paired-truth-audit-lock-a16-v1.json",
+      "sha256": "094d910e7b438f08fa6c3d6c942fd93e0d880546e91353179737e75bd4c25c59",
+      "bytes": 3624
+    },
+    {
+      "path": "bank/construction-01/scored-bank-a14/attempts/nuisance-audit-attempt-a14-01.json",
+      "sha256": "8918e9d1d6e3d95f970731ff961942b58201ac06c4da7e9f674869de9c153d16",
+      "bytes": 440
+    },
+    {
+      "path": "bank/construction-01/scored-bank-a14/vault/paired-truth-audit-a14-v1.json",
+      "sha256": "122a5df44b298e444a9be39a87d2dfba42897e30a25e621c4c9c3d1f39f9d8a4",
+      "bytes": 16426
+    },
+    {
+      "path": "bank/construction-01/scored-bank-a14/vault/paired-truth-audit-a16-v1.json",
+      "sha256": "96429c2a362fe9b74bc124807ebd864f1b51a56e81a9f7ed37c275914575d460",
+      "bytes": 14087
+    },
+    {
+      "path": "bank/construction-01/scored-bank-a14/vault/task-source-fixtures-final-v3.json",
+      "sha256": "5c74f424906f618e817a1cd1f2ba020f5ab02c0c9e39737631b4983e70847bea",
+      "bytes": 336595
+    },
+    {
+      "path": "bank/construction-01/scored-bank-a14/vault/candidate-check-labels-final-v3.json",
+      "sha256": "45b357bb7b443c84b75d11ce9d56b4f6e1051bfbd3e6a9ec94fd572fc3d187f3",
+      "bytes": 943366
+    },
+    {
+      "path": "bank/construction-01/scored-bank-a14/observer-frames.json",
+      "sha256": "e17bb4b06a34c5636789c6e7fb338c84ca89252069425470634ff27da939c3b4",
+      "bytes": 4254101
+    },
+    {
+      "path": "bank/construction-01/scored-bank-a14/vault/frame-truth-index.json",
+      "sha256": "3ab3df48b2d609f9c0d877955e94ffcbf5b570465a00feb5617c47cc76661ca3",
+      "bytes": 989149
+    }
+  ],
+  "sha256_self_excluded": true
+}

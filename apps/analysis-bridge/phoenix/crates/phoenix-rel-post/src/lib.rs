@@ -1,0 +1,111 @@
+pub mod api;
+
+mod advisor_probe;
+mod advisor_probe_packets;
+mod bench;
+mod execution_plan;
+mod execution_runtime;
+mod gliclass;
+mod gliclass_instruct;
+mod gliclass_instruct_format;
+mod gliclass_instruct_runtime;
+mod gliner_bi;
+mod gliner_bi_tensors;
+mod gliner_relex;
+mod gliner_relex_decode;
+mod gliner_seed;
+mod gliner_x;
+mod gliner_x_tensors;
+mod glirel;
+mod lens_consumer;
+mod model_split;
+mod nli;
+mod nli_claim;
+mod nli_stage;
+mod ort_cache;
+mod ort_runtime;
+mod seed_worker;
+#[cfg(test)]
+mod tests;
+mod worker;
+
+pub use advisor_probe::{
+    build_advisor_probe_tasks, missing_required_keys, parse_advisor_output, summarize_report,
+    AdvisorProbeTask, AdvisorReportSummary,
+};
+pub use advisor_probe_packets::{
+    build_advisor_packet_tasks_from_value, evaluate_packet_output, AdvisorEvidencePacket,
+    AdvisorPacketEvaluation, AdvisorPacketExpectation, AdvisorPacketSuite,
+};
+pub use bench::{
+    benchmark_scope_review_pipeline, RelationBenchmarkCounts, RelationBenchmarkReport,
+};
+pub use execution_plan::{
+    RelationExecutionPlan, RelationExecutionSchemaGroup, RelationExecutionWindow,
+};
+pub use execution_runtime::{
+    prepare_stage_input as prepare_relation_stage_input, relation_spec_signature, RelationModelJob,
+    RelationPreparedStageInput,
+};
+pub use gliclass::{
+    GliclassClassificationType, GliclassError, GliclassLabelScore, GliclassModel,
+    GliclassModelMetadata, GliclassPredictOptions, GliclassPrediction,
+};
+pub use gliclass_instruct::{
+    GliclassInstructError, GliclassInstructMetadata, GliclassInstructModel,
+    GliclassInstructPredictOptions,
+};
+pub use gliclass_instruct_format::{
+    build_hierarchical_scores as build_gliclass_instruct_hierarchical_scores,
+    flatten_hierarchical_labels as flatten_gliclass_instruct_hierarchical_labels,
+    GliclassInstructExample, GliclassInstructLabel,
+};
+pub use gliner_bi::{
+    GlinerBiError, GlinerBiInputSpan, GlinerBiLabelSet, GlinerBiModel, GlinerBiModelMetadata,
+    GlinerBiOverlapPolicy, GlinerBiPredictOptions, GlinerBiPrediction, GlinerBiSequencePrediction,
+};
+pub use gliner_relex::{
+    GlinerRelexEntity, GlinerRelexError, GlinerRelexLabel, GlinerRelexMetadata, GlinerRelexModel,
+    GlinerRelexPredictOptions, GlinerRelexPrediction,
+};
+pub use gliner_seed::{RelationMentionSeeder, RelationSeededSpan};
+pub use gliner_x::{GlinerXError, GlinerXMetadata, GlinerXModel, GlinerXPrediction};
+pub use glirel::{
+    extract_heuristic_relations, finalize_relation_predictions, repair_relation_directions,
+    seed_relation_pairs, split_sentence_windows, suppress_relation_conflicts, GlirelEntity,
+    GlirelError, GlirelModel, GlirelPairSeed, GlirelProposalConfig, GlirelRelationPrediction,
+    GlirelRelationTypeSpec, GlirelSentenceWindow,
+};
+pub use lens_consumer::RelationshipLensChunkConsumer;
+pub use model_split::{
+    default_model_split_contract, model_lane_for_role, PhoenixModelLane, PhoenixModelRole,
+    PhoenixModelSplitRule,
+};
+pub use nli::{
+    nli_attention_work_budget, NliError, NliModel, NliModelMetadata, NliPairJudgment, NliScorer,
+    NliScores,
+};
+pub use nli_claim::{
+    adjudicate_claims_with_nli, ClassificationVote, NliClaimAdjudication,
+    NliClaimAdjudicationOptions, NliClaimDecisionKind, NliClaimInput, NliClaimPurpose,
+    NliClaimVote, NLI_CLAIM_INPUT_SCHEMA_VERSION,
+};
+pub use nli_stage::NliAdjudicationBatchOptions;
+pub use ort_cache::{OrtCacheStatus, OrtSessionLoadInfo};
+pub use seed_worker::{
+    build_relation_mention_seed_sidecar, build_relation_mention_seed_sidecar_from_store,
+    persist_relation_mention_seed_sidecar, RelationSeedConfig, RelationSeedReport,
+};
+pub use worker::{
+    adjudicate_relation_decisions_with_nli, apply_relation_patch_sidecar,
+    build_relation_hypotheses, build_relation_patch_sidecar, default_relation_type_specs,
+    derive_dirty_scope_review_batches, derive_dirty_scope_review_batches_with_seeder,
+    derive_relation_entity_profiles, derive_scope_review_batch,
+    derive_scope_review_batch_from_analysis, derive_scope_review_batch_from_store,
+    derive_scope_review_batch_from_store_with_seeder, derive_scope_review_batch_with_seeder,
+    draft_relation_decisions, persist_relation_patch_sidecar,
+    persist_relation_patch_sidecar_with_existing, run_glirel_over_batch, run_primary_relation_lane,
+    GlirelWorkerError, RelationDecision, RelationDecisionKind, RelationEntityProfile,
+    RelationReviewCase, RelationScopeReviewBatch, RelationWindowBuildStats, RelationWindowEntity,
+    RelationWindowRecord,
+};

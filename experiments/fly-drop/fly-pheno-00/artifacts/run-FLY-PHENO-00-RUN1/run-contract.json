@@ -1,0 +1,108 @@
+{
+  "analysis_receipt_sha256": "f8adebad780cdc6570c7d4f15bf32bf5f7b88f741c7d03d445604abfd54e0ee3",
+  "collection_policy": {
+    "comparative_outcomes_opened_after_integrity": true,
+    "comparative_summaries_printed": false,
+    "criterion_failures_replaced": false,
+    "integrity_gate_before_analysis": true,
+    "integrity_gate_passed": true,
+    "nonfinite_imputed": false
+  },
+  "created_utc": "2026-09-22T02:32:50.124879Z",
+  "execution_manifest": {
+    "path": "execution-manifest.csv",
+    "rows": 11232,
+    "sha256": "b1718c980f9bbeedb34f5fa6c540dc7a63483a924cebd753f022853bc9e51261"
+  },
+  "executor": {
+    "bytes": 638464,
+    "path": "sealed/fly-pheno-00-run1.exe",
+    "sha256": "65e174a943997832422950a6c390db1da36e02d1247a9a49d65d82ec3e7a0e87",
+    "source_entries": [
+      {
+        "bytes": 8068,
+        "path": "executor/Cargo.lock",
+        "sha256": "6d3e435ad879c8e7b83b6c1b6622a304cc6792faa0f1745f180ddc2b2a7482bf"
+      },
+      {
+        "bytes": 393,
+        "path": "executor/Cargo.toml",
+        "sha256": "5671ec296d0d18c600913e80beb357d8714466226cf4c321485a3d59950d62eb"
+      },
+      {
+        "bytes": 4937,
+        "path": "executor/src/graph.rs",
+        "sha256": "81089baa10b4d27f0cd5a9ac3726643e95eba5da2d2b7e8da722b90940374348"
+      },
+      {
+        "bytes": 14093,
+        "path": "executor/src/main.rs",
+        "sha256": "de9df495b55798a81063d5d310be7dad0743de87652ba152af7d316fffe94ad0"
+      },
+      {
+        "bytes": 976,
+        "path": "executor/src/rng.rs",
+        "sha256": "e18ae9832519a211983d401d111f6685c76988375e29d150f2a8355e504a07f4"
+      },
+      {
+        "bytes": 8020,
+        "path": "executor/src/sim.rs",
+        "sha256": "7f30e2f815475c0adf84f0dcd64518342078cc58a666562d536fd2d2f9dfbb18"
+      },
+      {
+        "bytes": 2120,
+        "path": "executor/src/task.rs",
+        "sha256": "4caf4ae19bb42582aa776cdc9a649f3c6f2797be7253c05befa61dd844f26561"
+      }
+    ],
+    "target": "D:\\fly-pheno-00-run1-target"
+  },
+  "output_contract": {
+    "collection_receipt": "collection-receipt.json",
+    "fit_receipts": "fit-receipts.jsonl",
+    "integrity_receipt": "integrity-receipt.json",
+    "outcomes": "final-outcomes.jsonl"
+  },
+  "preexecution_seal_sha256": "8bfacdbe6548956c26939f7f2ed4f92309cafa3442e4c91a290b498a1bb571d1",
+  "run_config": {
+    "checkpoints": [
+      0,
+      1,
+      2,
+      4,
+      8,
+      16,
+      32,
+      64,
+      128,
+      256,
+      512
+    ],
+    "collection_blind": true,
+    "comparative_summaries_printed": false,
+    "eta": 0.05,
+    "fit_manifest_sha256": "b1718c980f9bbeedb34f5fa6c540dc7a63483a924cebd753f022853bc9e51261",
+    "fit_rows": 11232,
+    "glut_sign": -1.0,
+    "learner_task_blocks": 12,
+    "measured_execution_authorized": true,
+    "null_graph_realizations": 8,
+    "outcome_analysis_authorized_after_integrity_pass": true,
+    "preexecution_seal_sha256": "8bfacdbe6548956c26939f7f2ed4f92309cafa3442e4c91a290b498a1bb571d1",
+    "pretraining_trials": 512,
+    "primary_rows": 1728,
+    "random_lesion_permutations": 4,
+    "recovery_trials": 512,
+    "run_config_sha256": "b3c9cd921704b1ca2c01868c5932197ffc3fb926124a02473d437fb5388f5515",
+    "run_id": "FLY-PHENO-00-RUN1",
+    "schema": "FLY-PHENO-00-run-config-v1",
+    "sides": 2,
+    "study_id": "FLY-PHENO-00",
+    "tau": 16.0,
+    "threads": 4
+  },
+  "run_id": "FLY-PHENO-00-RUN1",
+  "schema": "FLY-PHENO-00-run-contract-v1",
+  "status": "CLOSED_PRIMARY_NOT_EVALUABLE",
+  "terminal_receipt_sha256": "671aa2bed087c0b16647b4b262fb470f7f3751eec82b505ca43509b75a4ba64d"
+}

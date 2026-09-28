@@ -1,0 +1,915 @@
+{
+  "schema_version": 1,
+  "state": "PAIRED_TRUTH_AUDIT_COMPLETE_NO_MODEL_CONTACT",
+  "model_contact_authorized": false,
+  "task_count": 48,
+  "pair_group_count": 20,
+  "paired_truth_groups_passed": 0,
+  "paired_truth_groups_failed": 20,
+  "paired_truth_groups": [
+    {
+      "pair_id": "abstain-1137",
+      "family": "raw-number-lossless",
+      "declared_change": [
+        "none"
+      ],
+      "task_ids": [
+        "task-479184",
+        "task-242065",
+        "task-555141",
+        "task-965856"
+      ],
+      "paired_twin_pass": false,
+      "mismatches": [
+        "unexpected_pair_cardinality_or_factor"
+      ]
+    },
+    {
+      "pair_id": "abstain-7432",
+      "family": "conflicting-alias-requirement",
+      "declared_change": [
+        "none"
+      ],
+      "task_ids": [
+        "task-546859",
+        "task-894855",
+        "task-620950",
+        "task-569812"
+      ],
+      "paired_twin_pass": false,
+      "mismatches": [
+        "unexpected_pair_cardinality_or_factor"
+      ]
+    },
+    {
+      "pair_id": "factorial-2921",
+      "family": "composite-frame-field",
+      "declared_change": "E_t+E_x factorial",
+      "task_ids": [
+        "task-943194",
+        "task-104800",
+        "task-215890",
+        "task-299379"
+      ],
+      "factorial_pairs": [
+        {
+          "varying_channel": "E_t",
+          "pairs": [
+            {
+              "task_ids": [
+                "task-104800",
+                "task-943194"
+              ],
+              "changed_channels_observed": [
+                "E_x",
+                "action_ids_by_role"
+              ],
+              "valid_set_changed": true,
+              "pass": false
+            },
+            {
+              "task_ids": [
+                "task-299379",
+                "task-215890"
+              ],
+              "changed_channels_observed": [
+                "E_x",
+                "E_p",
+                "action_ids_by_role"
+              ],
+              "valid_set_changed": true,
+              "pass": false
+            }
+          ]
+        },
+        {
+          "varying_channel": "E_x",
+          "pairs": [
+            {
+              "task_ids": [
+                "task-943194",
+                "task-215890"
+              ],
+              "changed_channels_observed": [
+                "E_t",
+                "E_p",
+                "action_ids_by_role"
+              ],
+              "valid_set_changed": true,
+              "pass": false
+            },
+            {
+              "task_ids": [
+                "task-104800",
+                "task-299379"
+              ],
+              "changed_channels_observed": [
+                "E_t",
+                "E_p",
+                "action_ids_by_role"
+              ],
+              "valid_set_changed": true,
+              "pass": false
+            }
+          ]
+        }
+      ],
+      "paired_twin_pass": false,
+      "mismatches": [
+        "E_t:task-104800,task-943194",
+        "E_t:task-299379,task-215890",
+        "E_x:task-943194,task-215890",
+        "E_x:task-104800,task-299379"
+      ]
+    },
+    {
+      "pair_id": "factorial-9476",
+      "family": "number-mode-plus-error-site",
+      "declared_change": "E_t+E_x factorial",
+      "task_ids": [
+        "task-401405",
+        "task-582537",
+        "task-261550",
+        "task-395319"
+      ],
+      "factorial_pairs": [
+        {
+          "varying_channel": "E_t",
+          "pairs": [
+            {
+              "task_ids": [
+                "task-582537",
+                "task-401405"
+              ],
+              "changed_channels_observed": [
+                "E_t",
+                "E_p",
+                "action_ids_by_role"
+              ],
+              "valid_set_changed": true,
+              "pass": false
+            },
+            {
+              "task_ids": [
+                "task-395319",
+                "task-261550"
+              ],
+              "changed_channels_observed": [
+                "E_t",
+                "E_p"
+              ],
+              "valid_set_changed": true,
+              "pass": false
+            }
+          ]
+        },
+        {
+          "varying_channel": "E_x",
+          "pairs": [
+            {
+              "task_ids": [
+                "task-401405",
+                "task-261550"
+              ],
+              "changed_channels_observed": [
+                "E_x",
+                "E_p",
+                "action_ids_by_role"
+              ],
+              "valid_set_changed": true,
+              "pass": false
+            },
+            {
+              "task_ids": [
+                "task-582537",
+                "task-395319"
+              ],
+              "changed_channels_observed": [
+                "E_x",
+                "E_p",
+                "action_ids_by_role"
+              ],
+              "valid_set_changed": true,
+              "pass": false
+            }
+          ]
+        }
+      ],
+      "paired_twin_pass": false,
+      "mismatches": [
+        "E_t:task-582537,task-401405",
+        "E_t:task-395319,task-261550",
+        "E_x:task-401405,task-261550",
+        "E_x:task-582537,task-395319"
+      ]
+    },
+    {
+      "pair_id": "pair-2372-1",
+      "family": "stream-byte-offset",
+      "declared_change": "E_x",
+      "task_ids": [
+        "task-131190",
+        "task-180180"
+      ],
+      "changed_channels_observed": [
+        "E_x",
+        "E_p"
+      ],
+      "valid_roles": [
+        [
+          "report_consumed_json_bytes"
+        ],
+        [
+          "include_following_separator"
+        ]
+      ],
+      "valid_set_changed": true,
+      "paired_twin_pass": false,
+      "mismatches": [
+        "E_p"
+      ]
+    },
+    {
+      "pair_id": "pair-2372-2",
+      "family": "stream-byte-offset",
+      "declared_change": "E_x",
+      "task_ids": [
+        "task-192782",
+        "task-922800"
+      ],
+      "changed_channels_observed": [
+        "E_x",
+        "E_p",
+        "action_ids_by_role"
+      ],
+      "valid_roles": [
+        [
+          "exclude_last_consumed_byte"
+        ],
+        [
+          "reset_offset"
+        ]
+      ],
+      "valid_set_changed": true,
+      "paired_twin_pass": false,
+      "mismatches": [
+        "E_p",
+        "action_ids_by_role"
+      ]
+    },
+    {
+      "pair_id": "pair-3129-1",
+      "family": "bounded-prefix-copy",
+      "declared_change": "E_c.content",
+      "task_ids": [
+        "task-348504",
+        "task-742866"
+      ],
+      "changed_channels_observed": [
+        "E_p",
+        "action_ids_by_role"
+      ],
+      "valid_roles": [
+        [
+          "copy_prefix",
+          "slice_prefix"
+        ],
+        [
+          "copy_prefix",
+          "slice_prefix"
+        ]
+      ],
+      "valid_set_changed": false,
+      "paired_twin_pass": false,
+      "mismatches": [
+        "E_p",
+        "action_ids_by_role",
+        "target_channel_unchanged"
+      ]
+    },
+    {
+      "pair_id": "pair-3129-2",
+      "family": "bounded-prefix-copy",
+      "declared_change": "E_c.content",
+      "task_ids": [
+        "task-724742",
+        "task-809202"
+      ],
+      "changed_channels_observed": [
+        "E_p",
+        "action_ids_by_role"
+      ],
+      "valid_roles": [
+        [
+          "copy_prefix",
+          "slice_prefix"
+        ],
+        [
+          "copy_prefix",
+          "slice_prefix"
+        ]
+      ],
+      "valid_set_changed": false,
+      "paired_twin_pass": false,
+      "mismatches": [
+        "E_p",
+        "action_ids_by_role",
+        "target_channel_unchanged"
+      ]
+    },
+    {
+      "pair_id": "pair-4846-1",
+      "family": "possible-value-validation",
+      "declared_change": "E_c.content",
+      "task_ids": [
+        "task-538216",
+        "task-440067"
+      ],
+      "changed_channels_observed": [
+        "E_p",
+        "action_ids_by_role"
+      ],
+      "valid_roles": [
+        [
+          "allow_fast_and_safe"
+        ],
+        [
+          "allow_fast_and_safe"
+        ]
+      ],
+      "valid_set_changed": false,
+      "paired_twin_pass": false,
+      "mismatches": [
+        "E_p",
+        "action_ids_by_role",
+        "target_channel_unchanged"
+      ]
+    },
+    {
+      "pair_id": "pair-4846-2",
+      "family": "possible-value-validation",
+      "declared_change": "E_c.content",
+      "task_ids": [
+        "task-312377",
+        "task-342767"
+      ],
+      "changed_channels_observed": [
+        "E_p",
+        "action_ids_by_role"
+      ],
+      "valid_roles": [
+        [
+          "allow_fast_and_safe"
+        ],
+        [
+          "allow_fast_and_safe"
+        ]
+      ],
+      "valid_set_changed": false,
+      "paired_twin_pass": false,
+      "mismatches": [
+        "E_p",
+        "action_ids_by_role",
+        "target_channel_unchanged"
+      ]
+    },
+    {
+      "pair_id": "pair-5333-1",
+      "family": "map-order-feature-contract",
+      "declared_change": "E_r",
+      "task_ids": [
+        "task-294600",
+        "task-798417"
+      ],
+      "changed_channels_observed": [
+        "E_r",
+        "E_p",
+        "action_ids_by_role"
+      ],
+      "valid_roles": [
+        [
+          "canonical_sort",
+          "sorted_profile_only"
+        ],
+        [
+          "preserve_order_only",
+          "reverse_native"
+        ]
+      ],
+      "valid_set_changed": true,
+      "paired_twin_pass": false,
+      "mismatches": [
+        "E_p",
+        "action_ids_by_role"
+      ]
+    },
+    {
+      "pair_id": "pair-5333-2",
+      "family": "map-order-feature-contract",
+      "declared_change": "E_r",
+      "task_ids": [
+        "task-582475",
+        "task-544502"
+      ],
+      "changed_channels_observed": [
+        "E_r",
+        "E_p",
+        "action_ids_by_role"
+      ],
+      "valid_roles": [
+        [
+          "canonical_sort",
+          "sorted_profile_only"
+        ],
+        [
+          "preserve_order_only"
+        ]
+      ],
+      "valid_set_changed": true,
+      "paired_twin_pass": false,
+      "mismatches": [
+        "E_p",
+        "action_ids_by_role"
+      ]
+    },
+    {
+      "pair_id": "pair-6397-1",
+      "family": "wire-endian-contract",
+      "declared_change": "E_t",
+      "task_ids": [
+        "task-409437",
+        "task-979490"
+      ],
+      "changed_channels_observed": [
+        "E_t",
+        "E_p",
+        "action_ids_by_role"
+      ],
+      "valid_roles": [
+        [
+          "emit_big_endian_word"
+        ],
+        [
+          "emit_little_endian_word"
+        ]
+      ],
+      "valid_set_changed": true,
+      "paired_twin_pass": false,
+      "mismatches": [
+        "E_p",
+        "action_ids_by_role"
+      ]
+    },
+    {
+      "pair_id": "pair-6397-2",
+      "family": "wire-endian-contract",
+      "declared_change": "E_t",
+      "task_ids": [
+        "task-109830",
+        "task-459976"
+      ],
+      "changed_channels_observed": [
+        "E_t",
+        "E_p",
+        "action_ids_by_role"
+      ],
+      "valid_roles": [
+        [
+          "emit_little_endian_word"
+        ],
+        [
+          "emit_big_endian_word"
+        ]
+      ],
+      "valid_set_changed": true,
+      "paired_twin_pass": false,
+      "mismatches": [
+        "E_p",
+        "action_ids_by_role"
+      ]
+    },
+    {
+      "pair_id": "pair-8072-1",
+      "family": "repeated-option-policy",
+      "declared_change": "E_t",
+      "task_ids": [
+        "task-626801",
+        "task-366887"
+      ],
+      "changed_channels_observed": [
+        "E_t",
+        "E_p",
+        "action_ids_by_role"
+      ],
+      "valid_roles": [
+        [
+          "append_all"
+        ],
+        [
+          "last_value_wins"
+        ]
+      ],
+      "valid_set_changed": true,
+      "paired_twin_pass": false,
+      "mismatches": [
+        "E_p",
+        "action_ids_by_role"
+      ]
+    },
+    {
+      "pair_id": "pair-8072-2",
+      "family": "repeated-option-policy",
+      "declared_change": "E_t",
+      "task_ids": [
+        "task-893694",
+        "task-702830"
+      ],
+      "changed_channels_observed": [
+        "E_t",
+        "E_p",
+        "action_ids_by_role"
+      ],
+      "valid_roles": [
+        [
+          "append_all"
+        ],
+        [
+          "last_value_wins"
+        ]
+      ],
+      "valid_set_changed": true,
+      "paired_twin_pass": false,
+      "mismatches": [
+        "E_p",
+        "action_ids_by_role"
+      ]
+    },
+    {
+      "pair_id": "pair-8973-1",
+      "family": "help-color-capability",
+      "declared_change": "E_r",
+      "task_ids": [
+        "task-962261",
+        "task-343379"
+      ],
+      "changed_channels_observed": [
+        "E_r",
+        "E_p",
+        "action_ids_by_role"
+      ],
+      "valid_roles": [
+        [
+          "force_color"
+        ],
+        [
+          "suppress_color",
+          "suppress_color_narrow_help"
+        ]
+      ],
+      "valid_set_changed": true,
+      "paired_twin_pass": false,
+      "mismatches": [
+        "E_p",
+        "action_ids_by_role"
+      ]
+    },
+    {
+      "pair_id": "pair-8973-2",
+      "family": "help-color-capability",
+      "declared_change": "E_r",
+      "task_ids": [
+        "task-825317",
+        "task-976226"
+      ],
+      "changed_channels_observed": [
+        "E_r",
+        "E_p",
+        "action_ids_by_role"
+      ],
+      "valid_roles": [
+        [
+          "force_color"
+        ],
+        [
+          "suppress_color",
+          "suppress_color_narrow_help"
+        ]
+      ],
+      "valid_set_changed": true,
+      "paired_twin_pass": false,
+      "mismatches": [
+        "E_p",
+        "action_ids_by_role"
+      ]
+    },
+    {
+      "pair_id": "pair-9358-1",
+      "family": "cursor-advance-observation",
+      "declared_change": "E_x",
+      "task_ids": [
+        "task-827381",
+        "task-334405"
+      ],
+      "changed_channels_observed": [
+        "E_x",
+        "E_p",
+        "action_ids_by_role"
+      ],
+      "valid_roles": [
+        [
+          "skip_one"
+        ],
+        [
+          "skip_two"
+        ]
+      ],
+      "valid_set_changed": true,
+      "paired_twin_pass": false,
+      "mismatches": [
+        "E_p",
+        "action_ids_by_role"
+      ]
+    },
+    {
+      "pair_id": "pair-9358-2",
+      "family": "cursor-advance-observation",
+      "declared_change": "E_x",
+      "task_ids": [
+        "task-580656",
+        "task-711391"
+      ],
+      "changed_channels_observed": [
+        "E_x",
+        "E_p",
+        "action_ids_by_role"
+      ],
+      "valid_roles": [
+        [
+          "skip_two"
+        ],
+        [
+          "skip_three"
+        ]
+      ],
+      "valid_set_changed": true,
+      "paired_twin_pass": false,
+      "mismatches": [
+        "E_p",
+        "action_ids_by_role"
+      ]
+    }
+  ],
+  "leave_one_out_frame_preservation": {
+    "checked_tasks": 48,
+    "condition_cells": 192,
+    "mismatches": [
+      {
+        "task_id": "task-104800",
+        "condition": "leave_out_E_c",
+        "error": "candidate_or_order_drift"
+      },
+      {
+        "task_id": "task-109830",
+        "condition": "leave_out_E_c",
+        "error": "candidate_or_order_drift"
+      },
+      {
+        "task_id": "task-131190",
+        "condition": "leave_out_E_c",
+        "error": "candidate_or_order_drift"
+      },
+      {
+        "task_id": "task-180180",
+        "condition": "leave_out_E_c",
+        "error": "candidate_or_order_drift"
+      },
+      {
+        "task_id": "task-192782",
+        "condition": "leave_out_E_c",
+        "error": "candidate_or_order_drift"
+      },
+      {
+        "task_id": "task-215890",
+        "condition": "leave_out_E_c",
+        "error": "candidate_or_order_drift"
+      },
+      {
+        "task_id": "task-242065",
+        "condition": "leave_out_E_c",
+        "error": "candidate_or_order_drift"
+      },
+      {
+        "task_id": "task-261550",
+        "condition": "leave_out_E_c",
+        "error": "candidate_or_order_drift"
+      },
+      {
+        "task_id": "task-294600",
+        "condition": "leave_out_E_c",
+        "error": "candidate_or_order_drift"
+      },
+      {
+        "task_id": "task-299379",
+        "condition": "leave_out_E_c",
+        "error": "candidate_or_order_drift"
+      },
+      {
+        "task_id": "task-312377",
+        "condition": "leave_out_E_c",
+        "error": "candidate_or_order_drift"
+      },
+      {
+        "task_id": "task-334405",
+        "condition": "leave_out_E_c",
+        "error": "candidate_or_order_drift"
+      },
+      {
+        "task_id": "task-342767",
+        "condition": "leave_out_E_c",
+        "error": "candidate_or_order_drift"
+      },
+      {
+        "task_id": "task-343379",
+        "condition": "leave_out_E_c",
+        "error": "candidate_or_order_drift"
+      },
+      {
+        "task_id": "task-348504",
+        "condition": "leave_out_E_c",
+        "error": "candidate_or_order_drift"
+      },
+      {
+        "task_id": "task-366887",
+        "condition": "leave_out_E_c",
+        "error": "candidate_or_order_drift"
+      },
+      {
+        "task_id": "task-395319",
+        "condition": "leave_out_E_c",
+        "error": "candidate_or_order_drift"
+      },
+      {
+        "task_id": "task-401405",
+        "condition": "leave_out_E_c",
+        "error": "candidate_or_order_drift"
+      },
+      {
+        "task_id": "task-409437",
+        "condition": "leave_out_E_c",
+        "error": "candidate_or_order_drift"
+      },
+      {
+        "task_id": "task-440067",
+        "condition": "leave_out_E_c",
+        "error": "candidate_or_order_drift"
+      },
+      {
+        "task_id": "task-459976",
+        "condition": "leave_out_E_c",
+        "error": "candidate_or_order_drift"
+      },
+      {
+        "task_id": "task-479184",
+        "condition": "leave_out_E_c",
+        "error": "candidate_or_order_drift"
+      },
+      {
+        "task_id": "task-538216",
+        "condition": "leave_out_E_c",
+        "error": "candidate_or_order_drift"
+      },
+      {
+        "task_id": "task-544502",
+        "condition": "leave_out_E_c",
+        "error": "candidate_or_order_drift"
+      },
+      {
+        "task_id": "task-546859",
+        "condition": "leave_out_E_c",
+        "error": "candidate_or_order_drift"
+      },
+      {
+        "task_id": "task-555141",
+        "condition": "leave_out_E_c",
+        "error": "candidate_or_order_drift"
+      },
+      {
+        "task_id": "task-569812",
+        "condition": "leave_out_E_c",
+        "error": "candidate_or_order_drift"
+      },
+      {
+        "task_id": "task-580656",
+        "condition": "leave_out_E_c",
+        "error": "candidate_or_order_drift"
+      },
+      {
+        "task_id": "task-582475",
+        "condition": "leave_out_E_c",
+        "error": "candidate_or_order_drift"
+      },
+      {
+        "task_id": "task-582537",
+        "condition": "leave_out_E_c",
+        "error": "candidate_or_order_drift"
+      },
+      {
+        "task_id": "task-620950",
+        "condition": "leave_out_E_c",
+        "error": "candidate_or_order_drift"
+      },
+      {
+        "task_id": "task-626801",
+        "condition": "leave_out_E_c",
+        "error": "candidate_or_order_drift"
+      },
+      {
+        "task_id": "task-702830",
+        "condition": "leave_out_E_c",
+        "error": "candidate_or_order_drift"
+      },
+      {
+        "task_id": "task-711391",
+        "condition": "leave_out_E_c",
+        "error": "candidate_or_order_drift"
+      },
+      {
+        "task_id": "task-724742",
+        "condition": "leave_out_E_c",
+        "error": "candidate_or_order_drift"
+      },
+      {
+        "task_id": "task-742866",
+        "condition": "leave_out_E_c",
+        "error": "candidate_or_order_drift"
+      },
+      {
+        "task_id": "task-798417",
+        "condition": "leave_out_E_c",
+        "error": "candidate_or_order_drift"
+      },
+      {
+        "task_id": "task-809202",
+        "condition": "leave_out_E_c",
+        "error": "candidate_or_order_drift"
+      },
+      {
+        "task_id": "task-825317",
+        "condition": "leave_out_E_c",
+        "error": "candidate_or_order_drift"
+      },
+      {
+        "task_id": "task-827381",
+        "condition": "leave_out_E_c",
+        "error": "candidate_or_order_drift"
+      },
+      {
+        "task_id": "task-893694",
+        "condition": "leave_out_E_c",
+        "error": "candidate_or_order_drift"
+      },
+      {
+        "task_id": "task-894855",
+        "condition": "leave_out_E_c",
+        "error": "candidate_or_order_drift"
+      },
+      {
+        "task_id": "task-922800",
+        "condition": "leave_out_E_c",
+        "error": "candidate_or_order_drift"
+      },
+      {
+        "task_id": "task-943194",
+        "condition": "leave_out_E_c",
+        "error": "candidate_or_order_drift"
+      },
+      {
+        "task_id": "task-962261",
+        "condition": "leave_out_E_c",
+        "error": "candidate_or_order_drift"
+      },
+      {
+        "task_id": "task-965856",
+        "condition": "leave_out_E_c",
+        "error": "candidate_or_order_drift"
+      },
+      {
+        "task_id": "task-976226",
+        "condition": "leave_out_E_c",
+        "error": "candidate_or_order_drift"
+      },
+      {
+        "task_id": "task-979490",
+        "condition": "leave_out_E_c",
+        "error": "candidate_or_order_drift"
+      }
+    ]
+  },
+  "input_hashes": {
+    "task_source_sha256": "4f675c5a66caeef388866971f8a7be9d44916007c94c97266d8465111f40676e",
+    "candidate_labels_sha256": "0268384c7a859467e5533b54e73a25eb09aedde2cd34205e22a8ea27fb4f04b7",
+    "observer_frames_sha256": "77ef434369ad6addd43dafe9f7070182c34df003bda745295c9a3d9ffa61616f",
+    "truth_index_sha256": "8812e0eb0c4c6932140066c632e45e8693e792e6bc55baf7a70a0825cc0d9a15"
+  },
+  "interpretation_boundary": "precontact bank-construction diagnostic; no model outputs or tuning"
+}

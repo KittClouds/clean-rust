@@ -1,0 +1,17 @@
+{
+  "schema": "F4-PRESENTATION-03-validation-attempt-stop-v1",
+  "status": "PRESERVED_VALIDATOR_ATTEMPT_FAILURE",
+  "identity": "F4-PRESENTATION-03-VALIDATION-REPAIR-v01",
+  "parent_run_id": "F4-PRESENTATION-03-ENG1",
+  "phase": "predictor_key_domain_audit",
+  "error": "RuntimeError: predictor key outside frozen domain at row 0",
+  "cause": "The first independent audit incorrectly assumed graph coordinate IDs were contiguous 0..63; the frozen cell manifest instead declares 64 coordinate IDs per cell.",
+  "validator_sha256": "7ae3e4518433d27c41bffe588152a4c357da8e26f3769f5a56ffab8d2b09fa76",
+  "amendment_sha256": "637fe813c93dbed3b81d885b4e31c1e2853207e038a5d4af410524f5c510be0b",
+  "raw_collection_modified": false,
+  "truth_payload_opened": false,
+  "native_collector_rerun": false,
+  "fit_manifest_created": false,
+  "fits_executed": false,
+  "comparative_outcomes_emitted": false
+}

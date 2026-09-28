@@ -1,0 +1,419 @@
+{
+  "protocol": "Q10-PF6",
+  "group_index": 6,
+  "rows": [
+    504
+  ],
+  "coordinates": [
+    16470,
+    16298,
+    16344,
+    16350
+  ],
+  "ranked_coordinates": [
+    {
+      "coordinate": 16470,
+      "residual_mass": 1.4210854715202004e-14,
+      "mismatched_rows": 1,
+      "replayed_prefix_count": 6
+    },
+    {
+      "coordinate": 16298,
+      "residual_mass": 1.4210854715202004e-14,
+      "mismatched_rows": 1,
+      "replayed_prefix_count": 4
+    },
+    {
+      "coordinate": 16344,
+      "residual_mass": 1.4210854715202004e-14,
+      "mismatched_rows": 1,
+      "replayed_prefix_count": 4
+    },
+    {
+      "coordinate": 16350,
+      "residual_mass": 1.4210854715202004e-14,
+      "mismatched_rows": 1,
+      "replayed_prefix_count": 4
+    }
+  ],
+  "status": "INCONCLUSIVE_BOUNDED_SEARCH",
+  "coverage_state": "partial",
+  "nodes_replayed": 761,
+  "exact_target": false,
+  "improved_over_baseline": true,
+  "candidate_prefix": [
+    -16,
+    -1,
+    0,
+    -8
+  ],
+  "final_geometry_pass": false,
+  "final_geometry": {
+    "axis_absolute_error": 3.835998620420507e-09,
+    "axis_normalized_error": 5.173146990017863e-06,
+    "norm_absolute_error": 4.237610395918523e-08,
+    "norm_normalized_error": 1.993402282331775e-08,
+    "cue_linear_absolute_error": 5.788581388712159e-06,
+    "cue_linear_normalized_error": 1.0129727448266077e-06,
+    "final_axis": 0.000741517452266042,
+    "target_axis": 0.0007415212882646624,
+    "final_norm": 2.125818013729881,
+    "target_norm": 2.125817971353777
+  },
+  "trajectory": [
+    {
+      "round": 0,
+      "mismatch_count": 243,
+      "total_ulp_distance": 339,
+      "residual_l2": 1.7269822252172234e-05,
+      "max_residual": 3.814697265625e-06,
+      "geometry_debt": {
+        "axis": -9.237664630385386e-07,
+        "norm": 1.8615356206841537e-08,
+        "cue_linear": 1.0139275750344521e-06
+      },
+      "active_coordinate_count": 0,
+      "selected_coordinate_ids": [],
+      "unselected_coordinate_ids": [
+        16470,
+        16298,
+        16344,
+        16350
+      ]
+    },
+    {
+      "round": 1,
+      "mismatch_count": 242,
+      "total_ulp_distance": 338,
+      "residual_l2": 1.726941081122654e-05,
+      "max_residual": 3.814697265625e-06,
+      "geometry_debt": {
+        "axis": -2.9345816929957624e-07,
+        "norm": 1.904394107873825e-08,
+        "cue_linear": 1.0133184264075554e-06
+      },
+      "active_coordinate_count": 1,
+      "selected_coordinate_ids": [
+        16470
+      ],
+      "unselected_coordinate_ids": [
+        16298,
+        16344,
+        16350
+      ]
+    },
+    {
+      "round": 2,
+      "mismatch_count": 242,
+      "total_ulp_distance": 338,
+      "residual_l2": 1.726941081122654e-05,
+      "max_residual": 3.814697265625e-06,
+      "geometry_debt": {
+        "axis": -5.803455283756826e-06,
+        "norm": 1.9117858181559253e-08,
+        "cue_linear": 1.0130452702648327e-06
+      },
+      "active_coordinate_count": 2,
+      "selected_coordinate_ids": [
+        16470,
+        16298
+      ],
+      "unselected_coordinate_ids": [
+        16344,
+        16350
+      ]
+    },
+    {
+      "round": 3,
+      "mismatch_count": 242,
+      "total_ulp_distance": 338,
+      "residual_l2": 1.726941081122654e-05,
+      "max_residual": 3.814697265625e-06,
+      "geometry_debt": {
+        "axis": -5.803455283756826e-06,
+        "norm": 1.9117858181559253e-08,
+        "cue_linear": 1.0130452702648327e-06
+      },
+      "active_coordinate_count": 2,
+      "selected_coordinate_ids": [
+        16470,
+        16298,
+        16344
+      ],
+      "unselected_coordinate_ids": [
+        16350
+      ]
+    },
+    {
+      "round": 4,
+      "mismatch_count": 242,
+      "total_ulp_distance": 338,
+      "residual_l2": 1.726941081122654e-05,
+      "max_residual": 3.814697265625e-06,
+      "geometry_debt": {
+        "axis": -5.173146990017863e-06,
+        "norm": 1.993402282331775e-08,
+        "cue_linear": 1.0129727448266077e-06
+      },
+      "active_coordinate_count": 3,
+      "selected_coordinate_ids": [
+        16470,
+        16298,
+        16344,
+        16350
+      ],
+      "unselected_coordinate_ids": []
+    },
+    {
+      "round": 5,
+      "mismatch_count": 242,
+      "total_ulp_distance": 338,
+      "residual_l2": 1.726941081122654e-05,
+      "max_residual": 3.814697265625e-06,
+      "geometry_debt": {
+        "axis": -5.173146990017863e-06,
+        "norm": 1.993402282331775e-08,
+        "cue_linear": 1.0129727448266077e-06
+      },
+      "active_coordinate_count": 3,
+      "selected_coordinate_ids": [
+        16470,
+        16298,
+        16344,
+        16350
+      ],
+      "unselected_coordinate_ids": []
+    },
+    {
+      "round": 6,
+      "mismatch_count": 242,
+      "total_ulp_distance": 338,
+      "residual_l2": 1.726941081122654e-05,
+      "max_residual": 3.814697265625e-06,
+      "geometry_debt": {
+        "axis": -5.173146990017863e-06,
+        "norm": 1.993402282331775e-08,
+        "cue_linear": 1.0129727448266077e-06
+      },
+      "active_coordinate_count": 3,
+      "selected_coordinate_ids": [
+        16470,
+        16298,
+        16344,
+        16350
+      ],
+      "unselected_coordinate_ids": []
+    },
+    {
+      "round": 7,
+      "mismatch_count": 242,
+      "total_ulp_distance": 338,
+      "residual_l2": 1.726941081122654e-05,
+      "max_residual": 3.814697265625e-06,
+      "geometry_debt": {
+        "axis": -5.173146990017863e-06,
+        "norm": 1.993402282331775e-08,
+        "cue_linear": 1.0129727448266077e-06
+      },
+      "active_coordinate_count": 3,
+      "selected_coordinate_ids": [
+        16470,
+        16298,
+        16344,
+        16350
+      ],
+      "unselected_coordinate_ids": []
+    },
+    {
+      "round": 8,
+      "mismatch_count": 242,
+      "total_ulp_distance": 338,
+      "residual_l2": 1.726941081122654e-05,
+      "max_residual": 3.814697265625e-06,
+      "geometry_debt": {
+        "axis": -5.173146990017863e-06,
+        "norm": 1.993402282331775e-08,
+        "cue_linear": 1.0129727448266077e-06
+      },
+      "active_coordinate_count": 3,
+      "selected_coordinate_ids": [
+        16470,
+        16298,
+        16344,
+        16350
+      ],
+      "unselected_coordinate_ids": []
+    },
+    {
+      "round": 9,
+      "mismatch_count": 242,
+      "total_ulp_distance": 338,
+      "residual_l2": 1.726941081122654e-05,
+      "max_residual": 3.814697265625e-06,
+      "geometry_debt": {
+        "axis": -5.173146990017863e-06,
+        "norm": 1.993402282331775e-08,
+        "cue_linear": 1.0129727448266077e-06
+      },
+      "active_coordinate_count": 3,
+      "selected_coordinate_ids": [
+        16470,
+        16298,
+        16344,
+        16350
+      ],
+      "unselected_coordinate_ids": []
+    },
+    {
+      "round": 10,
+      "mismatch_count": 242,
+      "total_ulp_distance": 338,
+      "residual_l2": 1.726941081122654e-05,
+      "max_residual": 3.814697265625e-06,
+      "geometry_debt": {
+        "axis": -5.173146990017863e-06,
+        "norm": 1.993402282331775e-08,
+        "cue_linear": 1.0129727448266077e-06
+      },
+      "active_coordinate_count": 3,
+      "selected_coordinate_ids": [
+        16470,
+        16298,
+        16344,
+        16350
+      ],
+      "unselected_coordinate_ids": []
+    },
+    {
+      "round": 11,
+      "mismatch_count": 242,
+      "total_ulp_distance": 338,
+      "residual_l2": 1.726941081122654e-05,
+      "max_residual": 3.814697265625e-06,
+      "geometry_debt": {
+        "axis": -5.173146990017863e-06,
+        "norm": 1.993402282331775e-08,
+        "cue_linear": 1.0129727448266077e-06
+      },
+      "active_coordinate_count": 3,
+      "selected_coordinate_ids": [
+        16470,
+        16298,
+        16344,
+        16350
+      ],
+      "unselected_coordinate_ids": []
+    },
+    {
+      "round": 12,
+      "mismatch_count": 242,
+      "total_ulp_distance": 338,
+      "residual_l2": 1.726941081122654e-05,
+      "max_residual": 3.814697265625e-06,
+      "geometry_debt": {
+        "axis": -5.173146990017863e-06,
+        "norm": 1.993402282331775e-08,
+        "cue_linear": 1.0129727448266077e-06
+      },
+      "active_coordinate_count": 3,
+      "selected_coordinate_ids": [
+        16470,
+        16298,
+        16344,
+        16350
+      ],
+      "unselected_coordinate_ids": []
+    },
+    {
+      "round": 13,
+      "mismatch_count": 242,
+      "total_ulp_distance": 338,
+      "residual_l2": 1.726941081122654e-05,
+      "max_residual": 3.814697265625e-06,
+      "geometry_debt": {
+        "axis": -5.173146990017863e-06,
+        "norm": 1.993402282331775e-08,
+        "cue_linear": 1.0129727448266077e-06
+      },
+      "active_coordinate_count": 3,
+      "selected_coordinate_ids": [
+        16470,
+        16298,
+        16344,
+        16350
+      ],
+      "unselected_coordinate_ids": []
+    },
+    {
+      "round": 14,
+      "mismatch_count": 242,
+      "total_ulp_distance": 338,
+      "residual_l2": 1.726941081122654e-05,
+      "max_residual": 3.814697265625e-06,
+      "geometry_debt": {
+        "axis": -5.173146990017863e-06,
+        "norm": 1.993402282331775e-08,
+        "cue_linear": 1.0129727448266077e-06
+      },
+      "active_coordinate_count": 3,
+      "selected_coordinate_ids": [
+        16470,
+        16298,
+        16344,
+        16350
+      ],
+      "unselected_coordinate_ids": []
+    },
+    {
+      "round": 15,
+      "mismatch_count": 242,
+      "total_ulp_distance": 338,
+      "residual_l2": 1.726941081122654e-05,
+      "max_residual": 3.814697265625e-06,
+      "geometry_debt": {
+        "axis": -5.173146990017863e-06,
+        "norm": 1.993402282331775e-08,
+        "cue_linear": 1.0129727448266077e-06
+      },
+      "active_coordinate_count": 3,
+      "selected_coordinate_ids": [
+        16470,
+        16298,
+        16344,
+        16350
+      ],
+      "unselected_coordinate_ids": []
+    },
+    {
+      "round": 16,
+      "mismatch_count": 242,
+      "total_ulp_distance": 338,
+      "residual_l2": 1.726941081122654e-05,
+      "max_residual": 3.814697265625e-06,
+      "geometry_debt": {
+        "axis": -5.173146990017863e-06,
+        "norm": 1.993402282331775e-08,
+        "cue_linear": 1.0129727448266077e-06
+      },
+      "active_coordinate_count": 3,
+      "selected_coordinate_ids": [
+        16470,
+        16298,
+        16344,
+        16350
+      ],
+      "unselected_coordinate_ids": []
+    }
+  ],
+  "tested_zero_label": "tested_zero",
+  "unselected_zero_label": "unselected_zero_by_horizon",
+  "slice": {
+    "endpoint": [
+      "seed9731-L-tau16.json",
+      0
+    ],
+    "groups_in_endpoint": 59,
+    "selected_group_is_oversize": true,
+    "pf5_helper_sha256": "A00078787DB732906416B3C7158DC777CD41C2E71C3AAE660D1AE525446FB82A"
+  }
+}

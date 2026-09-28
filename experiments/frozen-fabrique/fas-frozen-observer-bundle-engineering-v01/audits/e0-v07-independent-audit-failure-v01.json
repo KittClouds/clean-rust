@@ -1,0 +1,21 @@
+{
+  "receipt_id": "FAS_FROZEN_OBSERVER_BUNDLE_E0_V07_INDEPENDENT_AUDIT_FAILURE_V01",
+  "status": "E0_V07_AUDIT_FAILED_PRESERVED_NO_MODEL_CONTACT",
+  "recorded_utc": "2026-09-26T10:16:32Z",
+  "seal_path": "experiments/fas-frozen-observer-bundle-engineering-v01/seals/e0-seal-v07.json",
+  "seal_root_sha256": "0849d205a5df13c905619cd1612a7d94cfb9c380ce7519390b8702df5a83417b",
+  "failed_check": "protocol_and_abi_hashes_bound",
+  "cause": "Builder hashed canonical LF JSON bytes but Windows text-mode output wrote CRLF; freeze contract SHA fields therefore disagreed with on-disk E2 protocol and representation ABI bytes.",
+  "protocol_hash_recorded_in_freeze": "d9d9937993342818f3f9a0bc0ad10f5eb339408611f957dd161db934d225c672",
+  "protocol_hash_on_disk": "3b4e5728f4c17fd0b5a65334480c4689ab559a1b0101e8417216851e41372073",
+  "abi_hash_recorded_in_freeze": "49e8423db9cfddbc71b90a7687ca03a1b28a3cbcd69372a6999b78938c3341b2",
+  "abi_hash_on_disk": "15b7c5953a8a06e4d07723360f46762e5992677ac8291ce30f1f12cd4a9e6990",
+  "model_contact_performed": false,
+  "tokenizer_contact_performed": false,
+  "torch_imported": false,
+  "transformers_imported": false,
+  "tokenizers_imported": false,
+  "cuda_allocator_initialized": false,
+  "feature_output_root_created": false,
+  "disposition": "Preserve E0 v07 seal and failed independent audit. Repair by versioning the corrected byte-canonical contract writer and seal as E0 v08; do not edit E0 v07 members."
+}

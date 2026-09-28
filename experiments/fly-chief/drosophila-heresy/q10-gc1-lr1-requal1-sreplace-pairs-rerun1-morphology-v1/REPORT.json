@@ -1,0 +1,91 @@
+{
+  "behavioral_probe": false,
+  "counts": {
+    "ab_equal_best_single": 1281,
+    "ab_worse_than_both": 3718,
+    "at_least_one_single_invalid": 4084,
+    "at_least_one_single_not_better_V": 597,
+    "both_single_invalid": 1986,
+    "both_single_not_better_V": 12,
+    "pair_II": 1986,
+    "pair_II_BETTER_V": 1752,
+    "pair_II_WORSE_V": 234,
+    "pair_IV": 1399,
+    "pair_IV_BETTER_V": 964,
+    "pair_IV_WORSE_V": 435,
+    "pair_VI": 699,
+    "pair_VI_BETTER_V": 577,
+    "pair_VI_WORSE_V": 122,
+    "pair_VV": 915,
+    "pair_VV_BETTER_V": 675,
+    "pair_VV_WORSE_V": 240,
+    "pairs": 4999,
+    "success_at_least_one_single_invalid": 3293,
+    "success_both_single_invalid": 1752,
+    "success_pairs": 3968
+  },
+  "identity": "q10-gc1-lr1-requal1-sreplace-pairs-rerun1-morphology-v1",
+  "parent_execution_sha256": "F160638BF6009ED4050A1427D3A3D8C8F56DE777CBBE2AFEEAB1704FE28B6B0E",
+  "per_context": {
+    "seed9731-L-tau16.json|2": {
+      "pair_II": 1665,
+      "pair_II_BETTER_V": 1477,
+      "pair_II_WORSE_V": 188,
+      "pair_IV": 538,
+      "pair_IV_BETTER_V": 413,
+      "pair_IV_WORSE_V": 125,
+      "pair_VI": 593,
+      "pair_VI_BETTER_V": 515,
+      "pair_VI_WORSE_V": 78,
+      "pair_VV": 915,
+      "pair_VV_BETTER_V": 675,
+      "pair_VV_WORSE_V": 240,
+      "pairs": 3711
+    },
+    "seed9731-L-tau4.json|3": {
+      "pair_II": 7,
+      "pair_II_BETTER_V": 7,
+      "pairs": 7
+    },
+    "seed9731-R-tau16.json|1": {
+      "pair_II": 68,
+      "pair_II_BETTER_V": 68,
+      "pairs": 68
+    },
+    "seed9731-R-tau4.json|1": {
+      "pair_II": 83,
+      "pair_II_BETTER_V": 83,
+      "pair_IV": 78,
+      "pair_IV_BETTER_V": 78,
+      "pair_VI": 8,
+      "pair_VI_BETTER_V": 8,
+      "pairs": 169
+    },
+    "seed9731-R-tau4.json|2": {
+      "pair_II": 20,
+      "pair_II_BETTER_V": 20,
+      "pair_IV": 149,
+      "pair_IV_BETTER_V": 149,
+      "pair_VI": 15,
+      "pair_VI_BETTER_V": 15,
+      "pairs": 184
+    },
+    "seed9731-R-tau4.json|3": {
+      "pair_II": 143,
+      "pair_II_BETTER_V": 97,
+      "pair_II_WORSE_V": 46,
+      "pair_IV": 634,
+      "pair_IV_BETTER_V": 324,
+      "pair_IV_WORSE_V": 310,
+      "pair_VI": 83,
+      "pair_VI_BETTER_V": 39,
+      "pair_VI_WORSE_V": 44,
+      "pairs": 860
+    }
+  },
+  "protocol": "REQUAL1-SREPLACE-PAIRS-RERUN1-MORPHOLOGY",
+  "reference_execution_sha256": "9C47DBA6BF576FC6696E70153F0CE80FB0163B538794BE82158710C1064A04E5",
+  "replay_performed": false,
+  "scientific_promotion": false,
+  "status": "MORPHOLOGY_COMPLETE"
+}

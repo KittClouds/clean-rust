@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "tasks": [
+    {
+      "task_id": "fresh-ripgrep-unclosed-class-single-v1",
+      "task_family": "ripgrep-unclosed-class-opt-in",
+      "repository_id": "ripgrep",
+      "snapshot_path": "repositories/ripgrep-broken-source.tar",
+      "manifest": "Cargo.toml",
+      "test_args": [
+        "-p",
+        "globset",
+        "--lib"
+      ],
+      "test_filter": "glob::tests::allow_unclosed_class_single",
+      "compile_failure_is_task_failure": false,
+      "candidate_patch_directory": "patches/ripgrep-unclosed-class-opt-in"
+    },
+    {
+      "task_id": "fresh-ripgrep-unclosed-class-many-v2",
+      "task_family": "ripgrep-unclosed-class-opt-in",
+      "repository_id": "ripgrep",
+      "snapshot_path": "repositories/ripgrep-broken-source.tar",
+      "manifest": "Cargo.toml",
+      "test_args": [
+        "-p",
+        "globset",
+        "--lib"
+      ],
+      "test_filter": "glob::tests::allow_unclosed_class_many",
+      "compile_failure_is_task_failure": false,
+      "candidate_patch_directory": "patches/ripgrep-unclosed-class-opt-in"
+    },
+    {
+      "task_id": "fresh-turbovec-search-results-clone-contract-v1",
+      "task_family": "turbovec-search-results-clone-contract",
+      "repository_id": "turbovec",
+      "snapshot_path": "repositories/turbovec-broken-source.tar",
+      "manifest": "turbovec/Cargo.toml",
+      "test_args": [
+        "-p",
+        "turbovec",
+        "--test",
+        "crate_api"
+      ],
+      "test_filter": "search_results_clone_is_independent_of_its_source",
+      "compile_failure_is_task_failure": true,
+      "candidate_patch_directory": "patches/turbovec-search-results-clone-contract"
+    },
+    {
+      "task_id": "fresh-turbovec-search-results-trait-set-v2",
+      "task_family": "turbovec-search-results-clone-contract",
+      "repository_id": "turbovec",
+      "snapshot_path": "repositories/turbovec-broken-source.tar",
+      "manifest": "turbovec/Cargo.toml",
+      "test_args": [
+        "-p",
+        "turbovec",
+        "--test",
+        "crate_api"
+      ],
+      "test_filter": "search_results_implements_the_downstream_derive_set",
+      "compile_failure_is_task_failure": true,
+      "candidate_patch_directory": "patches/turbovec-search-results-clone-contract"
+    }
+  ]
+}

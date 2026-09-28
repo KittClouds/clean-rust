@@ -1,0 +1,93 @@
+{
+  "artifact_hashes": [
+    {
+      "bytes": 6641,
+      "path": "manifests/QTASK-CONTRACT.json",
+      "sha256": "342f39886488a41101c355ddf9126e88be3e88b0ccd78480d5eedf88819e79b3"
+    },
+    {
+      "bytes": 5537,
+      "path": "manifests/QTASK-MANIFEST.json",
+      "sha256": "e2292bf72f6c88d65f151283027b2342ed8bcb3e126dfbbe05f80f949de76f0e"
+    },
+    {
+      "bytes": 24330,
+      "path": "manifests/NULL-GRAPH-MANIFEST.json",
+      "sha256": "e5384be523ba387b3486f7e8498b6c3529fdd8e5a27160bea3d4f2d2233b19f1"
+    },
+    {
+      "bytes": 96505164,
+      "path": "inputs/banks/training.json",
+      "sha256": "6430401a96752530fc764f3e9d476b970a25850b4ac64374bd6b206b580d963c"
+    },
+    {
+      "bytes": 120230,
+      "path": "inputs/banks/competence.json",
+      "sha256": "1ae24e4d20e45f36d0c36de1393599a7bb1120184f11965ae11d7561fa6fa3a8"
+    },
+    {
+      "bytes": 937673,
+      "path": "artifacts/QTASK-RUN1/task-frontier.jsonl",
+      "sha256": "89c0b871a930c1153cbabe6e587f1ce1814ceb76249a78916d81ab5e94ece250"
+    },
+    {
+      "bytes": 613,
+      "path": "artifacts/QTASK-RUN1/collection-receipt.json",
+      "sha256": "5cc749f282cd4f901387ca644e323336932d0f8f9517bcf24611f857893f2614"
+    },
+    {
+      "bytes": 203,
+      "path": "artifacts/QTASK-RUN1/integrity-receipt.json",
+      "sha256": "22f58980d8319388a9b3aa6eb7f1f1e368dac794042f47a48fad1c86512a846a"
+    },
+    {
+      "bytes": 4130,
+      "path": "artifacts/QTASK-RUN1/task-analysis.json",
+      "sha256": "f43c2d08ce3c984d2c56dd99af717b29c4c5fb42475a67ba4efa8c1874867197"
+    },
+    {
+      "bytes": 1657,
+      "path": "artifacts/QTASK-RUN1/task-summary.csv",
+      "sha256": "0f56f839fb2e9617d2f43c8988d3e4dc5e5dfad25c42c829e65373aca5e61415"
+    },
+    {
+      "bytes": 1069,
+      "path": "artifacts/QTASK-RUN1/RESULTS.md",
+      "sha256": "2c868042936b8ac0119123c2862bba1f2f0d2a7559273e10301b01a09a98a8a6"
+    },
+    {
+      "bytes": 607232,
+      "path": "sealed/fly-pheno-00-v0.3-qtask.exe",
+      "sha256": "801583ee23ba0ee4db5585454d636959205d925438aef6e6ffa2ca6df01faeee"
+    },
+    {
+      "bytes": 1026,
+      "path": "provenance/PROTECTED-DH08A-TREE-RECEIPT.json",
+      "sha256": "5a8f4beb9a9a4d50c35bbb73455d14551a23ff79f58e4ebcb00e07faedce0466"
+    }
+  ],
+  "closed_at_utc": "2026-09-22T03:57:23.349093+00:00",
+  "disposition": "B_NO_LADDER_RUNG_REACHES_SUPPORT",
+  "integrity_status": "INTEGRITY_PASS",
+  "interpretation": "No prospective ladder rung reached the frozen support and safety-margin rule across the substrate set.",
+  "margin_threshold": 0.2,
+  "measured_pheno_reseal_authorized": false,
+  "no_lesion_outcomes": true,
+  "no_recovery_comparison": true,
+  "no_seed_replacement": true,
+  "no_threshold_relaxation": true,
+  "passes_by_rung": {
+    "T1": false,
+    "T2": false,
+    "T3": false,
+    "T4": false
+  },
+  "protected_dh08a_receipt_sha256": "5a8f4beb9a9a4d50c35bbb73455d14551a23ff79f58e4ebcb00e07faedce0466",
+  "run_id": "FLY-PHENO-00-v0.3-QTASK-RUN1",
+  "schema": "FLY-PHENO-00-v0.3-QTASK-terminal-receipt-v1",
+  "selected_rung": null,
+  "status": "CLOSED_QUALIFICATION_ONLY",
+  "study_id": "FLY-PHENO-00-v0.3-QTASK",
+  "support_requirement": 0.8,
+  "threshold": 0.25
+}

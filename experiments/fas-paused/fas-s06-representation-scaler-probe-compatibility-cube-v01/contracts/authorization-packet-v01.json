@@ -1,0 +1,16 @@
+{
+  "authorization_id": "FAS_S06_FIXED_COMPATIBILITY_CUBE_V01",
+  "status": "AUTHORIZED_BY_USER_IN_CURRENT_TASK",
+  "scope": "Read and replay only the sealed S05 v07 populations, S01/S02/FAS-00 feature arrays, and their four sealed scaler-plus-probe states; compute the declared 16-cell algebraic replay and summary outputs.",
+  "model_contact": false,
+  "tokenizer_load": false,
+  "feature_extraction": false,
+  "probe_fitting": false,
+  "scaler_fitting": false,
+  "optimizer_continuation": false,
+  "significance_tests": false,
+  "confidence_intervals": false,
+  "SAE_analysis": false,
+  "adaptive_mechanisms": false,
+  "FAS00_PHASE4_AUTHORIZED": false
+}

@@ -1,0 +1,11 @@
+{
+  "project_id": "fas-s08-exact-decision-surface-attribution-v01",
+  "project_family": "FAS-S",
+  "phase": "S08",
+  "identity_version": 1,
+  "scientific_scope": "Exact attribution of the sealed S06 matched-observer decision surfaces in existing feature coordinates.",
+  "parent_project_modification": false,
+  "new_model_contact": false,
+  "new_feature_extraction": false,
+  "new_probe_fitting": false
+}

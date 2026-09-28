@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "state": "FROZEN_BEFORE_MODEL_CONTACT",
+  "run_id": "e010-20260925-cross-repo-01",
+  "selection_source": "E009 v5 frozen observer bundles and thresholds; no E010 fit",
+  "sha256": {
+    "heldout_frame_lock": "de330f467dfe8d14d66dba428211b8a27c3eb8a62dd175ba01cf5847728eb587",
+    "system_prompt": "976ef1cd914bacb366c64418825010124338a626a0400d459858acc7e48f5a48",
+    "output_schema": "97170fa0d6a44681f680ad0ac533a3f3913709757e4ee6cbf96d9c9f40d1b2fb",
+    "thresholds": "846b0668db2a7796ac1ee90c190d45532a3065617ff1abca03df495496ddb173",
+    "bundle_lock": "a626836853bdb0755fd2e4e1569b6b91b33861306c7d1e4a51e3de54a9ee713d",
+    "bank_freeze": "149816a7839766d66e1a8fad51d246e36d961e60354c70ab0528caa22dfbc504"
+  },
+  "models": [
+    {
+      "role": "small",
+      "bundle_id": "minicpm5-2b-q8-local-v5",
+      "bundle_blake3": "03203842e1835233af8d9ef337bca1395be9c3828333c79eb96e199e52925842",
+      "bundle_lock_sha256": "a626836853bdb0755fd2e4e1569b6b91b33861306c7d1e4a51e3de54a9ee713d",
+      "bundle_lock_path": "models/bundle-lineage/v5-final/bundle-lock.json",
+      "server_alias": "e009-small-v5",
+      "chat_template_path": "models/chat-templates/minicpm5-2b-q8-local-v3.jinja",
+      "model_sha256": "c5415f8989bf88a8288f1b55a3cc371af53c07b0faa220a63bd7a990cfaba078",
+      "runtime_sha256": "ffaee576ad271ede87b92a7d8c3863dc8f331bbac666ee00099c250e8809e743",
+      "thresholds": {
+        "minimum_applicability_milli": 850,
+        "maximum_abstention_milli": 150
+      }
+    },
+    {
+      "role": "large",
+      "bundle_id": "ternary-bonsai-2-27b-ptq1-local-v5",
+      "bundle_blake3": "6d933aba093307e0c333f022426af46f3f5b243a8a10a2e1bb2f4cfc93b17b9d",
+      "bundle_lock_sha256": "a626836853bdb0755fd2e4e1569b6b91b33861306c7d1e4a51e3de54a9ee713d",
+      "bundle_lock_path": "models/bundle-lineage/v5-final/bundle-lock.json",
+      "server_alias": "e009-large-v5",
+      "chat_template_path": "models/chat-templates/ternary-bonsai-2-27b-ptq1-local-v3.jinja",
+      "model_sha256": "53107f530aa52eb00912263ab1ee29bd199261c87cd7b4ad4ca1318c1fe33ee3",
+      "runtime_sha256": "e0ea4fd53e6f0c741cbd28093b427f333ada0eb03b83073e1f99c483793ea976",
+      "thresholds": {
+        "minimum_applicability_milli": 850,
+        "maximum_abstention_milli": 150
+      }
+    }
+  ],
+  "routing": {
+    "kind": "small-then-large-on-abstention",
+    "minimum_applicability_milli": 850,
+    "maximum_abstention_milli": 150
+  },
+  "authority": {
+    "source_root": "C:\\rd-c\\experiment-009",
+    "binary_name": "e009-authorize",
+    "contract": "E002 standard compiled authority"
+  }
+}

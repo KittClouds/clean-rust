@@ -1,0 +1,24 @@
+{
+  "contract": "phoenix-active-gliner-bi-benchmark-v1",
+  "model_path": "D:\\hf-models\\gliner-bi-base-v2.0-onnx\\model_label_embeds_quantized.onnx",
+  "labels": [
+    "Person",
+    "Location",
+    "Organization",
+    "Creature",
+    "Item",
+    "Concept",
+    "Event"
+  ],
+  "workload": "Sam Altman works at OpenAI in San Francisco.",
+  "warmups": 5,
+  "runs": 100,
+  "engine_load_ms": 1374,
+  "prediction_count": 3,
+  "prepared_min_ms": 15.2397,
+  "prepared_mean_ms": 17.11094,
+  "prepared_median_ms": 16.8962,
+  "prepared_p95_ms": 19.5191,
+  "prepared_max_ms": 22.9537,
+  "graph_publications": 0
+}

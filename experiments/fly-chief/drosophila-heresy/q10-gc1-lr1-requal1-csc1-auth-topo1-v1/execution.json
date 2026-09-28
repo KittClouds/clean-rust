@@ -1,0 +1,170 @@
+{
+  "conclusion": "Exact order-2 validity topology and sampled order-3 pairwise-validity morphology were computed read-only.",
+  "contexts": [
+    {
+      "components": 12,
+      "context": [
+        "seed9731-L-tau16.json",
+        2
+      ],
+      "degree_max": 123,
+      "degree_mean": 34.33181818181818,
+      "degree_min": 0,
+      "isolated_vertices": 10,
+      "largest_component": 423,
+      "sampled_triples": 256,
+      "sampled_valid_triple_morphology": {
+        "higher_order_rescue": 17,
+        "missing_pair_edges": 28,
+        "pairwise_valid_triangle": 1
+      },
+      "sampled_valid_triples": 18,
+      "valid_edges": 7553,
+      "valid_graph_triangles": 72267,
+      "vertices": 440
+    },
+    {
+      "components": 489,
+      "context": [
+        "seed9731-L-tau4.json",
+        3
+      ],
+      "degree_max": 6,
+      "degree_mean": 0.028225806451612902,
+      "degree_min": 0,
+      "isolated_vertices": 487,
+      "largest_component": 7,
+      "sampled_triples": 256,
+      "sampled_valid_triple_morphology": {},
+      "sampled_valid_triples": 0,
+      "valid_edges": 7,
+      "valid_graph_triangles": 0,
+      "vertices": 496
+    },
+    {
+      "components": 428,
+      "context": [
+        "seed9731-R-tau16.json",
+        1
+      ],
+      "degree_max": 14,
+      "degree_mean": 0.288135593220339,
+      "degree_min": 0,
+      "isolated_vertices": 425,
+      "largest_component": 25,
+      "sampled_triples": 256,
+      "sampled_valid_triple_morphology": {},
+      "sampled_valid_triples": 0,
+      "valid_edges": 68,
+      "valid_graph_triangles": 0,
+      "vertices": 472
+    },
+    {
+      "components": 432,
+      "context": [
+        "seed9731-R-tau16.json",
+        3
+      ],
+      "degree_max": 0,
+      "degree_mean": 0.0,
+      "degree_min": 0,
+      "isolated_vertices": 432,
+      "largest_component": 1,
+      "sampled_triples": 256,
+      "sampled_valid_triple_morphology": {},
+      "sampled_valid_triples": 0,
+      "valid_edges": 0,
+      "valid_graph_triangles": 0,
+      "vertices": 432
+    },
+    {
+      "components": 472,
+      "context": [
+        "seed9731-R-tau4.json",
+        0
+      ],
+      "degree_max": 0,
+      "degree_mean": 0.0,
+      "degree_min": 0,
+      "isolated_vertices": 472,
+      "largest_component": 1,
+      "sampled_triples": 256,
+      "sampled_valid_triple_morphology": {},
+      "sampled_valid_triples": 0,
+      "valid_edges": 0,
+      "valid_graph_triangles": 0,
+      "vertices": 472
+    },
+    {
+      "components": 258,
+      "context": [
+        "seed9731-R-tau4.json",
+        1
+      ],
+      "degree_max": 140,
+      "degree_mean": 1.0136363636363637,
+      "degree_min": 0,
+      "isolated_vertices": 253,
+      "largest_component": 159,
+      "sampled_triples": 256,
+      "sampled_valid_triple_morphology": {},
+      "sampled_valid_triples": 0,
+      "valid_edges": 223,
+      "valid_graph_triangles": 5,
+      "vertices": 440
+    },
+    {
+      "components": 231,
+      "context": [
+        "seed9731-R-tau4.json",
+        2
+      ],
+      "degree_max": 221,
+      "degree_mean": 1.021186440677966,
+      "degree_min": 0,
+      "isolated_vertices": 226,
+      "largest_component": 222,
+      "sampled_triples": 256,
+      "sampled_valid_triple_morphology": {},
+      "sampled_valid_triples": 0,
+      "valid_edges": 241,
+      "valid_graph_triangles": 0,
+      "vertices": 472
+    },
+    {
+      "components": 91,
+      "context": [
+        "seed9731-R-tau4.json",
+        3
+      ],
+      "degree_max": 245,
+      "degree_mean": 6.093220338983051,
+      "degree_min": 0,
+      "isolated_vertices": 88,
+      "largest_component": 371,
+      "sampled_triples": 256,
+      "sampled_valid_triple_morphology": {
+        "higher_order_rescue": 2,
+        "missing_pair_edges": 2
+      },
+      "sampled_valid_triples": 2,
+      "valid_edges": 1438,
+      "valid_graph_triangles": 54,
+      "vertices": 472
+    }
+  ],
+  "contract_sha256": "A7C87D2668E3D804444C33B56ABCAEC114BCCBE1FC3D8EAE030B979C23144DAA",
+  "counts": {
+    "contexts": 8,
+    "graph_triangles": 72326,
+    "higher_order_rescue_sample": 19,
+    "sampled_valid_triples": 20,
+    "valid_edges": 9530
+  },
+  "engineering_only": true,
+  "identity": "q10-gc1-lr1-requal1-csc1-auth-topo1-v1",
+  "protocol": "Q10-AUTH-TOPO1",
+  "readout_executed": false,
+  "scientific_promotion": false,
+  "status": "AUTH_TOPO1_COMPLETE"
+}

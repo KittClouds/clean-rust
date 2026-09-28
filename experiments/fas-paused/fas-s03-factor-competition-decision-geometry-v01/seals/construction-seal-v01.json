@@ -1,0 +1,39 @@
+{
+  "adaptive_mechanisms_authorized": false,
+  "experiment_id": "fas-s03-factor-competition-decision-geometry-v01",
+  "files": [
+    {
+      "path": "README.md",
+      "sha256": "d89b5fae8290e5aca58b92f9ad9d935223039bbd0aec9366e8c570251d14887a"
+    },
+    {
+      "path": "S03-PROTOCOL.md",
+      "sha256": "9290c499e4c6093063cd1723e1db07b82d191d4d198bf194f0880ef93884bcde"
+    },
+    {
+      "path": "contracts/analysis-contract-v01.json",
+      "sha256": "bd77ccf4c79238f54893edf57b949989eec3070e567025aa432b7600295c6b44"
+    },
+    {
+      "path": "contracts/parent-binding-v01.json",
+      "sha256": "7f47bf224b85a8e6e155bef05c71cd5a28232553f75328a19a367549a20dcd19"
+    },
+    {
+      "path": "contracts/authorization-v01.json",
+      "sha256": "e88e201572811ac11257b5ea6b5c0c89a9e262da9da27440d7cd66cc4cd9ed12"
+    },
+    {
+      "path": "scripts/analyze_s03.py",
+      "sha256": "3c7ff8ee55903c25adcbc34feeec93ce281fb8e0d6dca02829eefede32205bb5"
+    },
+    {
+      "path": "scripts/seal_construction.py",
+      "sha256": "f3e04b96bc34b2579b6858d1111d81867abe5889f4772416d5f0d16f791e4c4a"
+    }
+  ],
+  "model_contact_authorized": false,
+  "probe_fitting_authorized": false,
+  "root_sha256": "86e7f2e94b8e376b4a78f228db9ba97615478b74079e057b3ecb67fc68891015",
+  "seal_id": "FAS_S03_CONSTRUCTION_V01",
+  "significance_testing_authorized": false
+}

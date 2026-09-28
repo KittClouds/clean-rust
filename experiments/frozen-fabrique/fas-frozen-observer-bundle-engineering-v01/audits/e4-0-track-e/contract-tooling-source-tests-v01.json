@@ -1,0 +1,70 @@
+{
+  "schema": "FAS_E4_0_TRACK_E_CONTRACT_TOOLING_TEST_RECEIPT_V01",
+  "receipt_id": "FAS_E4_0_V07_CONTRACT_SOURCE_MAP_AND_SEAL_TOOLING_TESTS_V01",
+  "status": "PASS_SYNTHETIC_CONTRACT_AND_SOURCE_MAP_TESTS",
+  "issued_utc": "2026-09-26T23:53:09Z",
+  "contract_baseline": {
+    "contract_id": "FAS_FROZEN_CAPABILITY_FABRIC_E4_0_V06",
+    "path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/e4-0-contract-v06-final.json",
+    "bytes": 43208,
+    "sha256": "ea4f11cec5d65a3be7716c77febf5d448d8ebf1a5a4049aee5d25d51c0c50958",
+    "seal_root_sha256": "7344badf07476d19d9c6228f80d026a112c339e93daa75593e61031f68456e64"
+  },
+  "commands": [
+    "python -m unittest experiments.fas-frozen-observer-bundle-engineering-v01.source.scripts.test_e4_0_contract_v07 -v",
+    "python -m py_compile build_e4_0_source_map_v06.py finalize_e4_0_contract_v07.py seal_e4_0_contract_v07.py test_e4_0_contract_v07.py"
+  ],
+  "unit_tests": {
+    "passed": 6,
+    "failed": 0,
+    "cases": [
+      "v06 baseline exact hash and sealed identity",
+      "source-map metadata excluded from scientific projection",
+      "every registered scientific field fails closed on mutation",
+      "non-map design input mutation fails closed",
+      "predecessor source/input/receipt table parsing",
+      "missing requested table fails closed"
+    ]
+  },
+  "py_compile": "PASS",
+  "inherited_v06_binding_preflight": {
+    "status": "PASS",
+    "verified_source_rows": 90,
+    "verified_input_rows": 33,
+    "population_truth_files_opened": false,
+    "terminal_labels_opened": false,
+    "tokenizer_loaded": false,
+    "model_loaded": false,
+    "cuda_initialized": false
+  },
+  "source_bindings": [
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/build_e4_0_source_map_v06.py",
+      "bytes": 18985,
+      "sha256": "9feb6b1991f9f92a8431fe9bfe0f51a0e642702794224a141ab8beb7fc9c8f1c"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/finalize_e4_0_contract_v07.py",
+      "bytes": 14006,
+      "sha256": "4e2161f7f63b75d659b9fcc1f8538a0bbe383699bd0aaed5ed0a7cafd913d838"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/seal_e4_0_contract_v07.py",
+      "bytes": 9887,
+      "sha256": "04767b7e96b5a09f2a751691846af8d11adf94e2084789d1981c575b1ee2cca7"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/test_e4_0_contract_v07.py",
+      "bytes": 3724,
+      "sha256": "2af3500fc7dc5ee6f7890b61060c817cc09094ddb2de9639de683ce6a1cf9838"
+    }
+  ],
+  "runtime_access": {
+    "tokenizer_loaded": false,
+    "model_loaded": false,
+    "cuda_initialized": false,
+    "feature_cache_opened": false,
+    "terminal_labels_opened": false
+  },
+  "execution_authorization_conferred": false
+}

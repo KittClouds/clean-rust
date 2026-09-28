@@ -1,0 +1,34 @@
+{
+  "task_id": "heldoutv6-preset-json-version-integrity-easy-01",
+  "frame_hash_hex": "613dcb52818b45ce4bc7682e07de0cbeee1fc328f1d06b98bc52f4006bcfcf27",
+  "selected_patch_sha256": "efb6b0f8d72d2734898638bf5dddba0c8b9c0f98cefeb273d4a7980ffa46204b",
+  "action_ledger_path": "C:\\rd-c\\experiment-009\\artifacts\\runs\\e009-20260925-corrected-07\\ledgers\\always-large\\heldoutv6-preset-json-version-integrity-easy-01.actions.bin",
+  "actions": [
+    {
+      "id": 11,
+      "schema_id": 1
+    },
+    {
+      "id": 37,
+      "schema_id": 1
+    },
+    {
+      "id": 68,
+      "schema_id": 1
+    },
+    {
+      "id": 94,
+      "schema_id": 1
+    }
+  ],
+  "observer_output": {
+    "action_choice": 11,
+    "applicability_milli": 950,
+    "abstention_milli": 50
+  },
+  "thresholds": {
+    "minimum_applicability_milli": 850,
+    "maximum_abstention_milli": 150
+  },
+  "completion_check_passed": true
+}

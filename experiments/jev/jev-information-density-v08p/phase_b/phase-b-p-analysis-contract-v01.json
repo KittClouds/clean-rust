@@ -1,0 +1,186 @@
+{
+  "protocol": "jev-information-density/v0.8p-late-transition-localization-analysis-v01",
+  "identity": "v0.8P-fresh-panel-optimizer-step-trajectory-analysis-v01",
+  "status": "SEALED_FOR_REVIEW_NOT_AUTHORIZED",
+  "registration": "prospective analysis for a new training trajectory and a separately sealed fresh panel; not an analysis of intermediate states from v0.8N",
+  "authorization_state": {
+    "contract_sealed": true,
+    "panel_opening_authorized": false,
+    "inference_authorized": false,
+    "analysis_authorized": false,
+    "E1_primary_analysis": false,
+    "checkpoint_selection_or_promotion": false
+  },
+  "parents_and_bindings": {
+    "run_contract_identity": "v0.8P-fresh-trajectory-instrumented-rerun-v01",
+    "fresh_panel_contract_identity": "v0.8P-fresh-eval-panel-v01",
+    "v08o_result_seal_sha256": "6327e2c3e83bbff7d511c5ba4bfd09792d5adad6aa95ae4d2abfce351e224ff7",
+    "metric_implementation": {
+      "path": "experiments/jev-information-density-v08n/phase_b/analyze_phase_b_v01.py",
+      "sha256": "dbde07fe1ec009f2bca7f1f22ad913a2a79f4f8dfb8120a1f31ebf37d5f59b70",
+      "use": "unchanged neighborhood metric definitions and candidate-semantic-ID alignment"
+    },
+    "inference_implementation_reference": {
+      "path": "experiments/jev-information-density-v08n/phase_b/evaluate_phase_b_v01.py",
+      "sha256": "fa22bc8febff89d2b635091c6cb40be6f3beba4549c4a135d16e213f6fd3dda4",
+      "use": "reference only; P evaluator must bind its exact source hash before evaluation authorization"
+    },
+    "E1_exclusion": "No E1 neighborhood, target, feature cache, candidate join, prediction, or metric is a P evaluation input. O is cited only as the sealed prior study motivating the P question."
+  },
+  "evaluation_design": {
+    "fresh_panel_identity": "v0.8P-fresh-eval-panel-v01",
+    "arms": ["B-DUP", "B-MATCHED", "B-SHAM"],
+    "seeds": [3243871208, 669993655, 3076094663],
+    "epoch_1_terminal_global_step": 40,
+    "epoch_2_terminal_global_step": 80,
+    "epoch_3_steps": [81, 120],
+    "checkpoint_cells": {
+      "trained_per_run": 42,
+      "runs": 9,
+      "trained_total": 378,
+      "initialization_baselines": 3,
+      "initialization_label": "COMMON_INIT; one shared template evaluated once per seed, not duplicated as three arm outcomes",
+      "total_evaluation_cells": 381
+    },
+    "panel_neighborhoods_per_cell": 2000,
+    "views_per_neighborhood": ["anchor", "fact_flip", "sham", "matched_neutral"],
+    "prediction_rows_per_cell": 8000,
+    "expected_prediction_rows": 3048000,
+    "inference_order": "seed ascending; common initialization once per seed; then global steps ascending within each seed and arm; fixed arm ordering B-DUP, B-MATCHED, B-SHAM; neighborhoods in lexical neighborhood_id order",
+    "analysis_after_full_raw_prediction_seal": true,
+    "reuse_existing_e1_predictions": false
+  },
+  "neighborhood_capability_vector": {
+    "fields": [
+      "sham_l1",
+      "sham_map_flip",
+      "matched_l1",
+      "matched_map_flip",
+      "anchor_old_map",
+      "fact_new_map",
+      "strict_transition",
+      "correct_direction",
+      "new_probability_delta",
+      "delta_mae",
+      "anchor_nll",
+      "anchor_brier",
+      "anchor_gold_map_accuracy",
+      "sham_gold_probability_movement",
+      "sham_margin_movement",
+      "matched_gold_probability_movement",
+      "matched_margin_movement"
+    ],
+    "implementation": "Call unchanged neighborhood_metrics from analyze_phase_b_v01.py; no metric-definition or tie-break change.",
+    "aggregation": "Report each metric separately by seed, arm, global optimizer step, and each of four families; overall aggregates retain the equal 500-neighborhood family allocation. No composite score."
+  },
+  "transition_decomposition": {
+    "events": [
+      {"cell": "A_AND_F", "anchor_old_map": true, "fact_new_map": true, "meaning": "successful strict transition"},
+      {"cell": "A_AND_NOT_F", "anchor_old_map": true, "fact_new_map": false, "meaning": "fact-response failure"},
+      {"cell": "NOT_A_AND_F", "anchor_old_map": false, "fact_new_map": true, "meaning": "anchor-preservation failure"},
+      {"cell": "NOT_A_AND_NOT_F", "anchor_old_map": false, "fact_new_map": false, "meaning": "joint/broad failure"}
+    ],
+    "report": "Counts and proportions per seed, arm, global step, overall and separately by family.",
+    "partition_invariant": "The four counts sum to 2,000 for each cell and 500 within each family."
+  },
+  "primary_longitudinal_estimands": {
+    "question": "Where within global optimizer steps 81-120 do the separate capability coordinates change on fresh held-out neighborhoods, and does treatment alter their timing or form?",
+    "paired_unit": "same fresh neighborhood_id across arms and checkpoints within a seed",
+    "primary_arm_contrast": "B-SHAM minus B-MATCHED trajectories, displayed per seed and step",
+    "primary_coordinates": [
+      "sham_l1 and sham_map_flip",
+      "anchor_old_map",
+      "fact_new_map",
+      "strict_transition",
+      "new_probability_delta",
+      "delta_mae",
+      "anchor_nll and anchor_brier"
+    ],
+    "context_coordinates": ["B-DUP trajectories", "matched-neutral locality", "correct_direction", "anchor_gold_map_accuracy", "four-cell transition decomposition"],
+    "claim_unit": "which auxiliary examples trained the frozen-substrate decision head; not capability change in the frozen backbone"
+  },
+  "descriptive_event_time_rules": {
+    "scope": "Timing descriptors, not pass criteria, winner scores, or checkpoint-promotion rules.",
+    "reference_point": "epoch-2 terminal at global_step=80 on the same fresh held-out neighborhoods",
+    "bootstrap": {
+      "resampling_unit": "whole neighborhood trajectory; all four views and all measured checkpoint steps move together",
+      "stratification": "resample 500 neighborhoods with replacement independently within each of the four families",
+      "replicates": 10000,
+      "rng": "numpy.random.Generator(PCG64(2773025982))",
+      "seed_derivation": "SHA-256(UTF-8('jev-information-density-v08p-analysis-v01/bootstrap')); first four bytes unsigned little-endian u32",
+      "simultaneity": "one-sided 95% max-deviation bootstrap band across the 40 epoch-3 steps for each seed-arm-coordinate series",
+      "band_formula": "For each time k, let d_hat[k] be the observed mean change from step 80 and d_b[k] the same change in bootstrap replicate b. Set e_b[k]=d_b[k]-d_hat[k]. The lower band is d_hat[k]-Q95(max_k(-e_b[k])); the upper band is d_hat[k]+Q95(max_k(e_b[k])). Use the lower band for positive onsets and upper band for negative onsets.",
+      "seed_scope": "conditional neighborhood uncertainty for one trained seed; no pooled optimizer-seed inference"
+    },
+    "persistence": "A continuous-coordinate onset requires the relevant one-sided simultaneous band to remain beyond zero for three consecutive optimizer-step checkpoints.",
+    "fact_probability_movement_rise": "First step where the lower simultaneous band for new_probability_delta minus its step-80 value is above zero for three consecutive steps.",
+    "anchor_loss": "First step where the upper simultaneous band for anchor_old_map minus its step-80 value is below zero for three consecutive steps.",
+    "sham_locality_change": "Report separately the first sustained decrease and first sustained increase in sham_l1 relative to step 80, using the corresponding simultaneous band; do not assume a direction.",
+    "matched_locality_change": "Apply the same separate decrease/increase rule to matched_l1.",
+    "fact_new_map_appearance": "Report first step with at least one neighborhood at fact_new_map=1 and first three-consecutive-step run with a nonzero rate; if already nonzero at step 80, mark PRESENT_AT_BASELINE. Always include event counts, so one case is not mistaken for broad acquisition.",
+    "strict_transition_appearance": "Report first nonzero and first three-consecutive-step nonzero strict_transition rate, with counts; descriptive only.",
+    "censoring": "If no defined event occurs by global_step=120, report NOT_OBSERVED_BY_STEP_120; do not extrapolate.",
+    "legacy_v08n_0_37_floor": "Not a P success, failure, authorization, or checkpoint rule. Do not use the old terminal floor to classify P trajectories.",
+    "family_scope": "Show family trajectories at every step. Family-specific event times are descriptive only and do not receive confirmatory labels or multiplicity-adjusted claims."
+  },
+  "uncertainty_and_seed_heterogeneity": {
+    "neighborhood_bootstrap": "10,000 stratified cluster resamples as specified above; intervals are conditional on the fixed seed trajectory and fresh panel.",
+    "seed_reporting": "Show all three complete trajectories and event times individually; three seeds are three trajectories, not a population estimate.",
+    "seed_summary": "A mean or median across the three trajectories may be shown descriptively alongside every individual value; no population CI, population p-value, or universal mechanism claim.",
+    "family_reporting": "All four families remain visible; no outcome-driven exclusions, subgrouping, or reweighting.",
+    "multiplicity": "No confirmatory p-values across the many trajectory coordinates or steps. Simultaneous bands are used only for the predeclared descriptive onset rules within each series."
+  },
+  "parameter_path": {
+    "initial_reference": "new shared per-seed P initialization template",
+    "global_displacement": "float64 L2 norm of concatenated state_dict deltas from that seed's initial template at every sealed checkpoint",
+    "per_tensor_displacement": "float64 L2 norm for each exact state_dict tensor key; no regrouping or dropping",
+    "paired_update_cosines": "cosines among DUP/MATCHED/SHAM update vectors from the same seed initialization at each saved checkpoint",
+    "role": "descriptive only; do not infer mechanism, basin identity, or causal mediation from parameter-space geometry"
+  },
+  "interpretation_limits": {
+    "fresh_panel_scope": "Fresh generated world instances within the four held-out semantic families and frozen p0-p3 template surfaces; not a new-template generalization claim.",
+    "intermediate_checkpoint": "No intermediate checkpoint is a validated operating point, promoted model, or duration recommendation.",
+    "timing_claim": "P locates coordinate changes on a new training trajectory at saved optimizer-step resolution; it does not insert states into or reinterpret the sealed v0.8N/O trajectories.",
+    "trajectory_claim": "Results characterize these three new paired seeds; seed-specific paths must remain visible.",
+    "mechanism_claim": "No claim that semantic identity, representation direction, higher-order geometry, or a particular optimizer mechanism caused the observed timing."
+  },
+  "prohibitions": {
+    "training_or_extra_steps_during_analysis": true,
+    "checkpoint_selection_or_promotion": true,
+    "early_stopping": true,
+    "new_seeds_or_rescue_runs": true,
+    "evaluation_feedback_to_trainer": true,
+    "threshold_or_metric_changes": true,
+    "E1_primary_reuse": true,
+    "newtight_or_legacy": true,
+    "phoenix": true,
+    "result_driven_family_exclusion_or_reweighting": true
+  },
+  "required_outputs": [
+    "raw-predictions.jsonl",
+    "raw-prediction-hash-tree.json",
+    "trajectory-response-matrix.json",
+    "transition-four-cell-decomposition.json",
+    "paired-arm-trajectories.json",
+    "descriptive-event-times.json",
+    "parameter-trajectories.json",
+    "family-trajectories.json",
+    "trajectory-cartography.md",
+    "result-seal.json"
+  ],
+  "future_evaluation_order": [
+    "fresh panel is independently constructed, validated, and sealed before training",
+    "train all nine runs without panel access or evaluation feedback",
+    "seal all 378 trained checkpoints, all three initial templates, telemetry, and complete hash tree",
+    "independently verify training seal and all panel/contract hashes",
+    "obtain separate explicit P evaluation authorization",
+    "open the P panel once and run the entire 381-cell prediction matrix",
+    "seal every raw prediction before calculating or inspecting metrics",
+    "run the frozen analysis exactly once and seal results"
+  ],
+  "output": {
+    "root": "D:/codex-runs/jev-information-density-v08p/v0.8P-late-transition-localization-v01/evaluation",
+    "create_during_contract_drafting": false,
+    "fail_if_root_exists": true
+  }
+}

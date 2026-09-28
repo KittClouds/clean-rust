@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "as_of": "2026-09-26",
+  "program": "Selective Cognition / Action Region Program",
+  "lab": "System 1.5 Lab / Frozen Fabrique",
+  "lab_law_access": {
+    "status": "BOTH_USER_FILES_READ_FROM_EXACT_PATHS",
+    "lab_law_sha256": "a6f85e7a2cc09b9762c17763f03c2eee51b27e099d8faaeeac548452c2c52026",
+    "lab_law_grant_sha256": "9380672300b9d8b7c2e21e1fb6a5a4136a159df6c5351f4438aab6c0a09cc600",
+    "classification": "Lab Law is the System 1.5 charter; lab law grant is a strategic/funding portfolio note, not an operational E013 protocol."
+  },
+  "E012": {
+    "sealed_failure_preserved": true,
+    "read_only_anatomy_ready": true,
+    "raw_proposal_yield_addendum": "SEALED_READ_ONLY",
+    "raw_small_proposals": {
+      "tasks": 48,
+      "correct": 7,
+      "wrong": 11,
+      "null": 30,
+      "v5_accepted_correct": 6,
+      "v5_accepted_wrong": 10
+    },
+    "source_run_modified": false,
+    "model_contact_performed": false,
+    "raw_proposal_yield_seal": "C:\\rd-c\\selective-cognition-action-region-program\\e012-readonly-anatomy-addendum\\E012-RAW-PROPOSAL-YIELD-SEAL-v1.0.json"
+  },
+  "E012_positive_control": {
+    "model_contact_authorized": true,
+    "bank": "USER_OWNED_NOT_SUPPLIED_HERE",
+    "run_status": "PENDING",
+    "design": "E012-PC-01-v1.2",
+    "independent_review": "NOT_RUN_IN_THIS_TURN"
+  },
+  "E013": {
+    "protocol": "E013-TRUST-SIGNAL-DEVELOPMENT-v0.3",
+    "protocol_state": "SEALED_PRECONTACT_DESIGN_ONLY",
+    "feasibility_receipt": "COMPLETE",
+    "development_tasks": 864,
+    "confirmation_tasks": 1120,
+    "bank_owner": "USER",
+    "banks": "NOT_BUILT_BY_AGENT",
+    "model_contact_authorized": false,
+    "model_contact_performed": false,
+    "signal_scoring_adapters": "NOT_BUILT",
+    "feasibility_calculator": "BUILT_AND_SELF_CHECKED",
+    "precontact_integrity_verifier": "PASS",
+    "independent_review": "NOT_RUN_IN_THIS_TURN",
+    "protocol_lock_sha256": "422efcda45938c5aa1258c49afd101ef30fa4f4405ed3b7a70945a4716aec788",
+    "current_artifacts": {
+      "protocol": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-013-trust-signal\\E013-TRUST-SIGNAL-DEVELOPMENT-PROTOCOL-v0.3.md",
+      "receipt": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-013-trust-signal\\E013-FEASIBILITY-RECEIPT-v0.3.md",
+      "projections": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-013-trust-signal\\E013-FEASIBILITY-PROJECTIONS-v0.3.json",
+      "lock": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-013-trust-signal\\E013-PROTOCOL-LOCK-v0.3.json",
+      "verification": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-013-trust-signal\\E013-PRECONTACT-VERIFICATION-v0.3.json"
+    },
+    "verification_sha256": "fb64f08c69fbcccdc3d018a353a4a400710d92811625264bb66163e271f81659"
+  },
+  "positive_control_and_e013_contact_are_separate": true,
+  "E014": "DEFERRED",
+  "no_bank_created": true,
+  "no_model_or_API_call": true
+}

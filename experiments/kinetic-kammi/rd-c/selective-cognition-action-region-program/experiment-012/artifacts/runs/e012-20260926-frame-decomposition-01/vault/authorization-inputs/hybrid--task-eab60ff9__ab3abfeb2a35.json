@@ -1,0 +1,62 @@
+{
+  "task_id": "hybrid-task-eab60ff9__ab3abfeb2a35",
+  "frame_digest_hex": "ab3abfeb2a3578814d769622656f52afd40eb9f2a6fec85f49acfa721a698273",
+  "request_id_hex": "15318688b1824c2512e0eb2d5e62a088c921b688f2df11477e6ba0c9d767415b",
+  "response_request_id_hex": "15318688b1824c2512e0eb2d5e62a088c921b688f2df11477e6ba0c9d767415b",
+  "request_receipt_digest_hex": "f8c9956a3f6af093eda06bf89c0e3500066b34dbada4a35e63be7c4c225ac0ca",
+  "response_receipt_digest_hex": "f8c9956a3f6af093eda06bf89c0e3500066b34dbada4a35e63be7c4c225ac0ca",
+  "presentation_receipt_hex": "52444351010004000000ab3abfeb2a3578814d769622656f52afd40eb9f2a6fec85f49acfa721a698273fdff7a456e614f4cb39aa869a4e0851bac2aa366b985c9ace6522043fda4427e6472dec92b69ae8f1056b059c6c4917703b9b76f1deabc635f1ecc59524c4e09ade93279d547dc4a9c707bef78f3c4a4407e66ceb2f321242ab82478d5eaabc82d4195b723c1754d2d0717617a36ce92aac85ee9121c2e73ed803ee3ad7638952e08e2bf124dc0ceb10b4f028454b6ba5b3395fdb25ad2a3c95b339fd800a5feb29daa74eb31d023",
+  "action_ledger_path": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\artifacts\\runs\\e012-20260926-frame-decomposition-01\\action-ledgers\\hybrid\\task-eab60ff9__ab3abfeb2a35.bin",
+  "ordered_options": [
+    {
+      "producer_ordinal": 0,
+      "action": {
+        "id": 29284,
+        "schema_id": 1
+      },
+      "summary": "Apply the candidate change shown in the code excerpt.",
+      "diff_excerpt": "@@ -2,7 +2,5 @@\n \n pub fn selected_numeric(input: &str) -> Option<Value> {\n     let value: Value = serde_json::from_str(input).ok()?;\n-    // E012 candidate slot.\n-    let _ = value;\n-    None\n+    value.pointer(\"/header/ratio\").cloned()\n }",
+      "patch_sha256": "dec92b69ae8f1056b059c6c4917703b9b76f1deabc635f1ecc59524c4e09ade9"
+    },
+    {
+      "producer_ordinal": 1,
+      "action": {
+        "id": 31026,
+        "schema_id": 1
+      },
+      "summary": "Apply the candidate change shown in the code excerpt.",
+      "diff_excerpt": "@@ -2,7 +2,5 @@\n \n pub fn selected_numeric(input: &str) -> Option<Value> {\n     let value: Value = serde_json::from_str(input).ok()?;\n-    // E012 candidate slot.\n-    let _ = value;\n-    None\n+    value.pointer(\"/header/whole\").cloned()\n }",
+      "patch_sha256": "d547dc4a9c707bef78f3c4a4407e66ceb2f321242ab82478d5eaabc82d4195b7"
+    },
+    {
+      "producer_ordinal": 2,
+      "action": {
+        "id": 49443,
+        "schema_id": 1
+      },
+      "summary": "Apply the candidate change shown in the code excerpt.",
+      "diff_excerpt": "@@ -2,7 +2,5 @@\n \n pub fn selected_numeric(input: &str) -> Option<Value> {\n     let value: Value = serde_json::from_str(input).ok()?;\n-    // E012 candidate slot.\n-    let _ = value;\n-    None\n+    value.pointer(\"/payload/ratio\").cloned()\n }",
+      "patch_sha256": "754d2d0717617a36ce92aac85ee9121c2e73ed803ee3ad7638952e08e2bf124d"
+    },
+    {
+      "producer_ordinal": 3,
+      "action": {
+        "id": 52928,
+        "schema_id": 1
+      },
+      "summary": "Apply the candidate change shown in the code excerpt.",
+      "diff_excerpt": "@@ -2,7 +2,5 @@\n \n pub fn selected_numeric(input: &str) -> Option<Value> {\n     let value: Value = serde_json::from_str(input).ok()?;\n-    // E012 candidate slot.\n-    let _ = value;\n-    None\n+    value.pointer(\"/payload/whole\").cloned()\n }",
+      "patch_sha256": "b10b4f028454b6ba5b3395fdb25ad2a3c95b339fd800a5feb29daa74eb31d023"
+    }
+  ],
+  "observer_output": {
+    "action_choice": 31026,
+    "applicability_milli": 1000,
+    "abstention_milli": 0
+  },
+  "thresholds": {
+    "minimum_applicability_milli": 850,
+    "maximum_abstention_milli": 150
+  },
+  "completion_check_passed": false
+}

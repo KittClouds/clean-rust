@@ -1,0 +1,18 @@
+{
+  "protocol": "jev-information-density/v0.8p-v02-identity-denylist-preflight-v01",
+  "attempted_contract": "experiments/jev-information-density-v08p-v02/identity/e1-identity-denylist-extraction-contract-v01.json",
+  "attempted_contract_sha256": "46275891bacfcf1fcb77ca69a21ab2ac7e5fba82e6c7d416ac6c9eed42a17ff1",
+  "status": "PREFLIGHT_ABORTED_BEFORE_E1_SOURCE_ACCESS",
+  "failure": "KeyError: contract schema used extraction.extractor_sha256 while v01 extractor expected extractor.sha256",
+  "source_access": {
+    "e1_panel_manifest_opened": false,
+    "e1_seal_manifest_opened": false,
+    "e1_firewall_lock_opened": false,
+    "e1_candidate_join_opened": false
+  },
+  "output": {
+    "directory": "D:/codex-runs/jev-information-density-v08p-v02/identity-denylist-v01",
+    "files_written": 0
+  },
+  "disposition": "v01 extraction contract and extractor remain byte-preserved; use a new v02 extraction contract and output identity"
+}

@@ -1,0 +1,43 @@
+{
+  "evidence_access_global_conclusion": "UNKNOWN_OUTSIDE_EXPLICIT_RECEIPT_SCOPES",
+  "examined_json_entries": 163,
+  "fact_count": 158,
+  "fact_counts": {
+    "attempt_pass": 8,
+    "attempt_stop": 23,
+    "attempt_unknown": 7,
+    "contact_no_attested": 30,
+    "evidence_no_attested": 64,
+    "head": 1,
+    "nested_attempt_pass": 1,
+    "nested_attempt_stop": 1,
+    "nested_contact_no_attested": 6,
+    "supersession": 17
+  },
+  "flight_authorization_conferred": false,
+  "history_graph_count": 158,
+  "model_contact_global_conclusion": "UNKNOWN_OUTSIDE_EXPLICIT_RECEIPT_SCOPES",
+  "projection": {
+    "counts": {
+      "artifacts": 433,
+      "custodyfacts": 158,
+      "events": 610,
+      "runs": 1,
+      "seals": 2
+    },
+    "flight_gate": "CLOSED_PENDING_ACCEPTANCE",
+    "journal_events": 610,
+    "journal_head": "sha256:264eea2afd4cf8a7fd08a904138a63ce59531613f329d78b6a3b896979ab0f57",
+    "projection_head": "sha256:264eea2afd4cf8a7fd08a904138a63ce59531613f329d78b6a3b896979ab0f57",
+    "projection_seq": 610
+  },
+  "run_id": "E4-0-legacy-snapshot",
+  "schema": "KAMMI_E4_HISTORY_IMPORT_V2",
+  "source_entries": 447,
+  "source_legacy_root": "sha256:278ae16eeb6852d3efad44221556a87be6df54964471f0870931fe2e99b305d1",
+  "source_merkle_root": "sha256:234e568989f6c0e71fb69fa634b2e0bf085e7fb63336654202d3b221ef33f6fc",
+  "status": "PASS",
+  "unresolved_declared_predecessors": [
+    "sha256:ad709bd1496536e6fb1464bd89a06ec0eed552b89ef4159bfc1aa0f406fcc71a"
+  ]
+}

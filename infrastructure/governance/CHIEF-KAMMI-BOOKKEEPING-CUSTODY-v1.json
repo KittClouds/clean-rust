@@ -1,0 +1,36 @@
+{
+  "status": "RECORDED",
+  "artifact_receipts": [
+    {
+      "artifact_id": "sha256:4991bd412af311cbdc0eb3996e708ea84ee499589d262915297bd3ef969bb9b0",
+      "event_id": "sha256:23fce5432c6083d9b2e2fd20d022996d63bb390775f814c450d0575a70a4788e"
+    },
+    {
+      "artifact_id": "sha256:00011ba555819fe0e4d9c8c198a3751740eb35dbbc507332777aad236427fbfe",
+      "event_id": "sha256:778af91d116d84494728f54ad212fb488c686f3e315fe2193a92895e4c482e7b"
+    }
+  ],
+  "seal": {
+    "root": "sha256:fcf0b905c299cdb6dccb57b7965622e3198ab47ad18602ad4730f13809956820",
+    "event_id": "sha256:71b6e304ee8399c51bc41a604c723092267b6a8e910fc5549b8e00880fd0c1cd"
+  },
+  "memory": {
+    "memory_id": "sha256:bc0739f2b6a58cb1ef8eaa4aee4c6ad2e39ede977418813df6ae7a7c726dc663",
+    "event_id": "sha256:7b43b1a3e2656b99fc22aeb834290f6cb0adde1d744725beed8237d24ddc031e"
+  },
+  "trace": {
+    "memory_id": "sha256:bc0739f2b6a58cb1ef8eaa4aee4c6ad2e39ede977418813df6ae7a7c726dc663",
+    "authority": "CONTEXTUAL_NOT_CUSTODY",
+    "references": [
+      {
+        "custody_ref": "sha256:00011ba555819fe0e4d9c8c198a3751740eb35dbbc507332777aad236427fbfe",
+        "verified": true
+      },
+      {
+        "custody_ref": "sha256:4991bd412af311cbdc0eb3996e708ea84ee499589d262915297bd3ef969bb9b0",
+        "verified": true
+      }
+    ]
+  },
+  "flight_gate": "OPEN"
+}

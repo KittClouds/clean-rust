@@ -1,0 +1,149 @@
+{
+  "schema_version": 1,
+  "run_id": "e012-20260926-frame-decomposition-01",
+  "role": "large",
+  "sample_id": "task-17dc5b28__4e39603942aa",
+  "task_id": "task-17dc5b28",
+  "bundle_id": "ternary-bonsai-2-27b-ptq1-local-v5",
+  "bundle_blake3": "6d933aba093307e0c333f022426af46f3f5b243a8a10a2e1bb2f4cfc93b17b9d",
+  "frozen_input_lock_sha256": "4bab6fd945248b6209fa33e3a1df10786298ac620342ce167251411c6a258cd8",
+  "model_contact_gate_sha256": "c41c0145221be561310f74ba8fe3c2342ce0d942290f1b03229a2ae67e848483",
+  "frame_lock_sha256": "e4d9c2e0c668bfa60445ac476ad1f1b695fe8f1bfc9fd07b5746c7b31dbbeb0b",
+  "frame_sha256": "4e39603942aaed13b71e7b76db04a5578a44c1c4908e895eead6a3fcf03d5bf0",
+  "server_alias": "e009-large-v5",
+  "server_process_id": 18052,
+  "runtime_sha256": "e0ea4fd53e6f0c741cbd28093b427f333ada0eb03b83073e1f99c483793ea976",
+  "model_sha256": "53107f530aa52eb00912263ab1ee29bd199261c87cd7b4ad4ca1318c1fe33ee3",
+  "reasoning_mode": "off",
+  "maximum_output_tokens": 1024,
+  "chat_template_sha256": "c3cf9e34abf4f9e36c2d72165aa9c132d3e2a725b6c2586aaa3a8af9d7a81041",
+  "system_prompt_sha256": "976ef1cd914bacb366c64418825010124338a626a0400d459858acc7e48f5a48",
+  "output_schema_sha256": "97170fa0d6a44681f680ad0ac533a3f3913709757e4ee6cbf96d9c9f40d1b2fb",
+  "normalization_contract": "percent-0-100-to-milli-x10-v1+line-endings-lf-v1",
+  "thresholds": {
+    "minimum_applicability_milli": 850,
+    "maximum_abstention_milli": 150
+  },
+  "request_sha256": "0c858ca71878f831f93d4cb10f711e1bdd97264cb7a76a654ae1f7b710083cb2",
+  "request_bytes": 5084,
+  "request": {
+    "model": "e009-large-v5",
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a typed observer in a deterministic coding workflow. The runtime owns workflow state and will execute only one action from the offered action_options after validating your output.\n\nRead the task_prompt and evidence, then compare the offered actions. Choose the action most likely to satisfy the task while preserving the repository's stated constraints. Do not write or propose code outside the offered choices. Do not claim to have executed tests. If no offered action is sufficiently supported, use null for action_choice and express uncertainty with abstention_percent.\n\nReturn exactly one JSON object matching the provided schema. action_choice must be an offered numeric action ID or null. applicability_percent is your estimate from 0 to 100 that this observer can handle the task from the available evidence. abstention_percent is your estimate from 0 to 100 that the runtime should defer this choice. Use integer percentage points only. Do not add prose or fields.\n"
+      },
+      {
+        "role": "user",
+        "content": "{\"schema_id\":\"rdc-real-coding-observation.v1\",\"task_id\":\"task-17dc5b28\",\"task_family\":\"fam-3129\",\"repository_id\":\"repo-01\",\"task_variant\":1226540094,\"task_prompt\":\"Review the code-local API contract included with the offered changes. Select the conforming patch.\",\"repository_revision\":\"417dccdeff249e0c011327de7d92e0d6fbe7cc43\",\"snapshot_sha256\":\"e3503c834ebece95674c8586af32b8bd9c506e67bdc79449a7c355e7d2b6ed55\",\"evidence\":[{\"kind\":\"baseline_tool_result\",\"source_id\":\"pre-action-test\",\"content_blake3\":\"0e6c7d6e52cc4ce77f5e4df0ed179af2a27b0292ce8ebd8e3a48fc6f43831423\",\"content\":\"The untouched base snapshot produced no task-relevant pre-action execution observation.\"},{\"kind\":\"repository_context\",\"source_id\":\"repository-context\",\"content_blake3\":\"383d360f6917115830568cb7f3e1a7e7f73a4e15075229e73fd7f9346d70b7b6\",\"content\":\"{\\\"build_features\\\": \\\"baseline\\\", \\\"dependency_release\\\": \\\"v1.11.1\\\", \\\"language\\\": \\\"Rust\\\", \\\"repository_code\\\": \\\"repo-01\\\", \\\"target\\\": \\\"host\\\", \\\"toolchain\\\": \\\"stable\\\"}\"}],\"action_options\":[{\"action\":{\"id\":51536,\"schema_id\":1},\"summary\":\"Apply the candidate change shown in the code excerpt.\",\"diff_excerpt\":\"API context: take_prefix returns a bounded zero-copy view; the result shares the input Bytes backing storage.\\n@@ -1,7 +1,5 @@\\n use bytes::{Buf, Bytes};\\n \\n pub fn take_prefix(input: Bytes, count: usize) -> Bytes {\\n-    // E012 candidate slot.\\n-    let _ = count;\\n-    input\\n+    input.slice(..count)\\n }\",\"patch_sha256\":\"94f7811e08ca85382a09aba3f3969fd556c8f0d289ecb41e84cd28487ad38942\"},{\"action\":{\"id\":64060,\"schema_id\":1},\"summary\":\"Apply the candidate change shown in the code excerpt.\",\"diff_excerpt\":\"API context: take_prefix returns a bounded zero-copy view; the result shares the input Bytes backing storage.\\n@@ -1,7 +1,5 @@\\n use bytes::{Buf, Bytes};\\n \\n pub fn take_prefix(input: Bytes, count: usize) -> Bytes {\\n-    // E012 candidate slot.\\n-    let _ = count;\\n-    input\\n+    input.slice(count..)\\n }\",\"patch_sha256\":\"94dbb9c92a5e0a86e6df0a1924b686e2742efae6312941da06fa39b7eb3df9b0\"},{\"action\":{\"id\":42559,\"schema_id\":1},\"summary\":\"Apply the candidate change shown in the code excerpt.\",\"diff_excerpt\":\"API context: take_prefix returns a bounded zero-copy view; the result shares the input Bytes backing storage.\\n@@ -1,7 +1,5 @@\\n use bytes::{Buf, Bytes};\\n \\n pub fn take_prefix(input: Bytes, count: usize) -> Bytes {\\n-    // E012 candidate slot.\\n-    let _ = count;\\n     input\\n }\",\"patch_sha256\":\"be9583bd2d2773b831a0ce608e4f92164c556947747e7167961b656ff18ab3fc\"},{\"action\":{\"id\":47505,\"schema_id\":1},\"summary\":\"Apply the candidate change shown in the code excerpt.\",\"diff_excerpt\":\"API context: take_prefix returns a bounded zero-copy view; the result shares the input Bytes backing storage.\\n@@ -1,7 +1,6 @@\\n use bytes::{Buf, Bytes};\\n \\n pub fn take_prefix(input: Bytes, count: usize) -> Bytes {\\n-    // E012 candidate slot.\\n-    let _ = count;\\n-    input\\n+    let mut input = input;\\n+    input.copy_to_bytes(count)\\n }\",\"patch_sha256\":\"b74671f4136107f20040054ad65e9f2c8edc4a836f161fbd7716a2f2e52e3d06\"}]}"
+      }
+    ],
+    "temperature": 0,
+    "top_p": 1,
+    "seed": 0,
+    "max_tokens": 1024,
+    "stream": false,
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rdc_coding_observer_output_v1",
+        "strict": true,
+        "schema": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "rdc-coding-observer-output.v2",
+          "title": "RDC Coding Observer Output v2",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "action_choice",
+            "applicability_percent",
+            "abstention_percent"
+          ],
+          "properties": {
+            "action_choice": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 65535
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "applicability_percent": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "abstention_percent": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            }
+          }
+        }
+      }
+    }
+  },
+  "http_status": 200,
+  "response": {
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "{\n  \"action_choice\": 51536,\n  \"applicability_percent\": 95,\n  \"abstention_percent\": 5\n}"
+        }
+      }
+    ],
+    "created": 1790400349,
+    "model": "e009-large-v5",
+    "system_fingerprint": "b10685-7dffb158d",
+    "object": "chat.completion",
+    "usage": {
+      "completion_tokens": 38,
+      "prompt_tokens": 1374,
+      "total_tokens": 1412,
+      "prompt_tokens_details": {
+        "cached_tokens": 192
+      }
+    },
+    "id": "chatcmpl-NtaM3d3wn4hLhAR6YW4XMkPddA7HGZLW",
+    "timings": {
+      "cache_n": 192,
+      "prompt_n": 1182,
+      "prompt_ms": 2007.113,
+      "prompt_per_token_ms": 1.698065143824027,
+      "prompt_per_second": 588.9055573851597,
+      "predicted_n": 38,
+      "predicted_ms": 689.442,
+      "predicted_per_token_ms": 18.633567567567567,
+      "predicted_per_second": 53.66658834245665
+    }
+  },
+  "content": "{\n  \"action_choice\": 51536,\n  \"applicability_percent\": 95,\n  \"abstention_percent\": 5\n}",
+  "output": {
+    "action_choice": 51536,
+    "applicability_percent": 95,
+    "abstention_percent": 5
+  },
+  "normalized_output": {
+    "action_choice": 51536,
+    "applicability_milli": 950,
+    "abstention_milli": 50
+  },
+  "normalization_error": null,
+  "usage": {
+    "completion_tokens": 38,
+    "prompt_tokens": 1374,
+    "total_tokens": 1412,
+    "prompt_tokens_details": {
+      "cached_tokens": 192
+    }
+  },
+  "finish_reason": "stop",
+  "elapsed_ms": 2703.58
+}

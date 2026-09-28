@@ -1,0 +1,116 @@
+{
+  "schema": "FAS_E4_0_LEDGER_FEATURE_EXTRACTION_RECEIPT_V01",
+  "status": "FEATURE_EXTRACTION_PASS_ARTIFACTS_VERIFIED_NO_SCORING",
+  "created_local_date": "2026-09-28",
+  "research_day": 7,
+  "scope": "E4-0 fresh feature extraction only",
+  "authority": {
+    "authorization_id": "sha256:64e6c203995bfcb0df21389b7780538ccc6eedb2649b3eab5da2b8a4f42b39c1",
+    "lease_id": "lease-4a09edb80a32b53705bcff3de272cccde9e3d4f93bdff9acb2ff2c3806820d50",
+    "fencing_token": 2,
+    "resource_id": "gpu.local.cuda0.e850fbf0",
+    "worker_request_sha256": "815d2e90534d5f8e5f70b19f5a8f3451f3410c65ba9c3f7fa7f29113cd9fc140",
+    "library_acceptance": "sha256:f98dcd6743c5e8b7ff091cef2d69aa361e53c252711c7b001f3a71d322744602"
+  },
+  "identity": {
+    "run_id": "frozen-fabrique.e4-0.supervised.v1",
+    "attempt_id": "frozen-fabrique.e4-0.extract.supervised.v1",
+    "stage_id": "E4_0_FRESH_FEATURE_EXTRACTION_V1",
+    "contract_seal_root_sha256": "278ae16eeb6852d3efad44221556a87be6df54964471f0870931fe2e99b305d1",
+    "execution_binding_sha256": "9187f72c460ef0ad095f4fca4f602107b9d9e881ff2169a4bff301fe3ed498fc",
+    "parity_predecessor_root_sha256": "21b5cdd1f1dfbaaa132ffc8cea38f31bb26612bc438fb7e10ac3bffcb673ae73",
+    "model_launch_contact_event": "sha256:adfd9cf7ad7cfdbe1394e7738c876bc581088ee8d537efc0d22eb34da9a4de70"
+  },
+  "runner_disposition": {
+    "status": "FEATURE_CACHE_COMPLETE_GATE_PASS",
+    "exit_code": 0,
+    "row_count": 149336,
+    "ordered_row_identity_match": true,
+    "quartet_atomicity_and_order_verified": true,
+    "finite_scan_passed": true,
+    "dtype": "<f4",
+    "layout": "C_ROW_MAJOR",
+    "dimension": 2048,
+    "row_mapping": "row i maps to manifest row_index i",
+    "labels_opened": false,
+    "predictions_emitted": false,
+    "class_support_emitted": false,
+    "scoring_performed": false,
+    "observer_fitting_performed": false,
+    "heldout_template_or_joint_labels_opened": false,
+    "heldout_template_or_joint_predictions_emitted": false
+  },
+  "sealed_feature_cache": {
+    "bytes": 1223360512,
+    "expected_bytes_from_rows_dimension_dtype": 149336,
+    "expected_byte_formula": "149336 * 2048 * 4",
+    "sha256": "49236412bf7409bd5f8d2c15f43436afa17940d51cc4bfdcdaf9d773029deac4",
+    "stage_seal_root_sha256": "b0395dd693fb115c74540647722c2e8f36c624fb5621097e9eb197b39acff17a",
+    "stage_seal_root_recomputed": true,
+    "local_entry_hashes_and_lengths_verified": true
+  },
+  "input_identity": {
+    "population_root_sha256": "27731b483b8242aaef15ca22b97796b7b305a79db9bbb235765e13dcd9d08967",
+    "population_inputs_sha256": "ed8ca6ac10f2008c49b9460890e0595ad2e573e0b0af488763f52e0f9cfc4d9f",
+    "population_row_manifest_sha256": "234a616bbbe1e392704e21c3d1b6402067d836b9f47a59d5432d01cd92c261b6",
+    "output_row_manifest_matches_source": true,
+    "representation_abi_sha256": "3b36b066111872290b9f37a877b9043650867fa81658476c783a5c7e7485d319"
+  },
+  "resource_receipt": {
+    "allocator_baseline_pre_reset_bytes": 0,
+    "allocator_baseline_post_reset_bytes": 0,
+    "pytorch_cuda_allocated_peak_bytes": 4697651712,
+    "pytorch_cuda_reserved_peak_bytes": 4708106240,
+    "pytorch_cuda_reserved_peak_limit_bytes": 10737418240,
+    "pytorch_cuda_reserved_peak_within_limit": true,
+    "allocator_scope": "extractor-process PyTorch CUDA caching allocator only",
+    "total_gpu_memory_claimed": false,
+    "extractor_process_peak_working_set_bytes": 5888626688,
+    "extractor_process_working_set_limit_bytes": 26843545600
+  },
+  "ledger_return": {
+    "result_status": "OUTPUTS_REGISTERED",
+    "result_exit_code": 0,
+    "result_sha256": "f4714491d0b7376db00b30d0556047ac0be1b84d001601992e7e4ecd44738bb2",
+    "finish_outcome": "COMPLETE",
+    "finish_receipt_artifact_id": "sha256:4b3870ecfbeab8a214dc0ec06bdbde9fb9fe1399af6df0817ab62f03f67c4ce0",
+    "finish_receipt_sha256": "c0888e587333079b3e07e5b9d4e24083390fea602b4045cb6f5f582ecb7ecbb8",
+    "release_event_id": "sha256:daed8458d4fab8ebeecaa211a5b7d594178aa7a98c480f6719757fd70984827a",
+    "release_receipt_sha256": "cb71be4f3e347e4aa1c1c8fa7cf9cd02568f0fb3d5a6aedf1603f79ca4560024"
+  },
+  "registered_outputs": {
+    "feature_cache": {
+      "bytes": 1223360512,
+      "sha256": "49236412bf7409bd5f8d2c15f43436afa17940d51cc4bfdcdaf9d773029deac4",
+      "ledger_event_id": "sha256:0c1b957244feeb125503d3da71f7b6294716ea553571a3a0fb622bf2aeb8dbef"
+    },
+    "feature_extraction_receipt": {
+      "bytes": 5282,
+      "sha256": "c9940764af2e18ff2eb05bc2f35a72e29b107112a5ad21ce1f5552af47379ede",
+      "ledger_event_id": "sha256:f1ada2ecb4d12ecd75f27ab63308e55407d1e48d065e87a49ea1f9d102acbb05"
+    },
+    "population_row_manifest": {
+      "bytes": 39686934,
+      "sha256": "234a616bbbe1e392704e21c3d1b6402067d836b9f47a59d5432d01cd92c261b6",
+      "ledger_event_id": "sha256:0400948b84ae0ef13e11f7c89751be23e55dce947c3d703d69ad8f9743e57d3f"
+    },
+    "stage_seal": {
+      "bytes": 2094,
+      "sha256": "98e5804e087d057386e6c399ba262ade930482088e52a2371595384d75d7e99f",
+      "ledger_event_id": "sha256:01001d21c5e038c0640122bee5828ca5a0e8d947b6cc3151de2db51d8f30dbc6"
+    }
+  },
+  "diagnostics": [
+    "Transformers emitted a torch_dtype deprecation notice.",
+    "causal_conv1d was absent and Transformers used its reference PyTorch implementation, which is slower."
+  ],
+  "audit_boundary": {
+    "output_file_hashes_lengths_and_stage_root_recomputed": true,
+    "ledger_outputs_registered_and_lease_released": true,
+    "independent_scientific_metric_replay": "NOT_APPLICABLE_TO_FEATURE_EXTRACTION_STAGE",
+    "e4_0_terminal_disposition": "NOT_REACHED",
+    "fresh_qualification_labels_opened": false,
+    "e4_01_entry_gate": "CLOSED"
+  },
+  "next_authorized_action": "Await Chief Kammi's separately authorized E4-0 fresh qualification scoring and truth-opening stage."
+}

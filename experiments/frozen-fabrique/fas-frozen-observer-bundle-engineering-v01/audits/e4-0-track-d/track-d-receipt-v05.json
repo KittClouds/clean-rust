@@ -1,0 +1,110 @@
+{
+  "schema": "FAS_E4_0_SOURCE_TEST_RECEIPT_V01",
+  "receipt_version": "v05",
+  "supersedes": "audits/e4-0-track-d/track-d-receipt-v04.json",
+  "supersession_reason": "Replaced the brittle source-map prose-token guard with exact bound path-family checks for the population generator, online runner, fresh scorer, and independent auditor; synthetic v04-path fixtures verify prose changes pass and missing source paths fail. This source change requires a new source-map and contract seal before the independent contract audit can pass.",
+  "track": "D",
+  "source_unit": "e4_independent_auditor",
+  "status": "TRACK_D_COMPLETE_PREAUTHORIZATION",
+  "experiment_root": "C:\\Users\\shuga\\.codex\\worktrees\\e4-0-contract-work\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01",
+  "created_utc": "2026-09-26T22:03:12.672840+00:00",
+  "implementation_files": [
+    {
+      "path": "source/scripts/e4_independent_audit_v01/__init__.py",
+      "bytes": 71,
+      "sha256": "c5c6939552ed8fc92be9b0dd26f6732123dcccc44ef316eb3ab685f8bf291f12",
+      "lines": 2
+    },
+    {
+      "path": "source/scripts/e4_independent_audit_v01/__main__.py",
+      "bytes": 48,
+      "sha256": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d",
+      "lines": 3
+    },
+    {
+      "path": "source/scripts/e4_independent_audit_v01/cli.py",
+      "bytes": 23715,
+      "sha256": "7da687bf0ce195748d4f5f44547d26a975cacac838d9f8fdf1c3632844d382ec",
+      "lines": 408
+    },
+    {
+      "path": "source/scripts/e4_independent_audit_v01/constants.py",
+      "bytes": 2884,
+      "sha256": "3456f9367f908fc3d6a6664bfa5047c969f18bcc8945733ace27f6ba3a2d0253",
+      "lines": 80
+    },
+    {
+      "path": "source/scripts/e4_independent_audit_v01/features.py",
+      "bytes": 12661,
+      "sha256": "eb5d2ba1d94e932502db9b595f53e3e61da28ef8679ea8b95403e79fa909a4f0",
+      "lines": 235
+    },
+    {
+      "path": "source/scripts/e4_independent_audit_v01/integrity.py",
+      "bytes": 18535,
+      "sha256": "a1bc8feaa9426853e7ec5eb41503f072997418dfeafc522be7175a65e8153d8d",
+      "lines": 404
+    },
+    {
+      "path": "source/scripts/e4_independent_audit_v01/population.py",
+      "bytes": 16377,
+      "sha256": "455ccef43a2889610134442ffe5edcd2a460a32fd3b21201574093a9118f62cb",
+      "lines": 282
+    },
+    {
+      "path": "source/scripts/e4_independent_audit_v01/README.md",
+      "bytes": 1305,
+      "sha256": "22e53a1c05a299ad559218381c45d0251fe03f49854991d2d66d8a03d17c56ea",
+      "lines": 18
+    },
+    {
+      "path": "source/scripts/e4_independent_audit_v01/replay.py",
+      "bytes": 24720,
+      "sha256": "64c72105ce71c775395a8406366c7f1e8837d1c8da1b253f78b880c2122c1848",
+      "lines": 480
+    },
+    {
+      "path": "source/scripts/e4_independent_audit_v01/tests/test_audit.py",
+      "bytes": 25688,
+      "sha256": "9f5f280178f78bb508477b01959432bc0b5fbadc52b66db2e487753cd14783a5",
+      "lines": 525
+    }
+  ],
+  "tests": {
+    "unit_command": "python -m unittest discover -s source\\scripts\\e4_independent_audit_v01\\tests -v",
+    "unit_result": "PASS",
+    "unit_tests_passed": 14,
+    "compile_command": "python -m compileall -q source\\scripts\\e4_independent_audit_v01",
+    "compile_result": "PASS",
+    "cli_smoke_command": "PYTHONPATH=source/scripts python -m e4_independent_audit_v01 --help",
+    "cli_smoke_result": "PASS",
+    "coverage": [
+      "auditor source has no scorer imports",
+      "source-map hash, byte-length and path-traversal validation",
+      "runtime authorization exact fields, artifact map, contract/seal/audit binding, exact roots, paths and GPU lease gates across all four pre-scoring stages",
+      "FRESH_SCORING authorization requires exactly the base 14 fields and forbids runtime extensions",
+      "repository-root resolution from the nested CLI path",
+      "contract seal binds its repository-root-relative project contract path",
+      "cache and receipt tamper rejection",
+      "escrow sentinel deferred and never opened",
+      "synthetic qualification pass and deterministic whole-quartet bootstrap reproduction",
+      "single endpoint failure remains visible",
+      "support failure skips bootstrap",
+      "scorer/auditor metric and bootstrap disagreement rejection",
+      "Markdown source-map parser accepts exact workspace-root experiments/fas-frozen-observer-bundle-engineering-v01 paths and verifies canonical path, byte length, and SHA-256",
+      "Markdown v04 source-map semantics are derived from the exact bound path families, independent of human-readable role labels",
+      "v04 source-map fixture fails closed when a required Track D source path is omitted"
+    ]
+  },
+  "scope": {
+    "actual_e4_population_generated": false,
+    "actual_primary_terminal_labels_opened": false,
+    "actual_template_or_joint_escrow_opened": false,
+    "actual_e4_feature_cache_opened": false,
+    "model_or_tokenizer_contacted": false,
+    "cuda_initialized": false,
+    "scorer_imported": false,
+    "score_or_performance_outcome_produced": false
+  },
+  "pending_pre_execution_check": "Rebuild the E4 implementation source map and contract seal to bind the updated Track D integrity.py and Track D receipt v05; rerun contract mode before any population stage."
+}

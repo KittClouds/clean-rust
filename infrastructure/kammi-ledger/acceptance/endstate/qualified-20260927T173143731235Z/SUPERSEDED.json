@@ -1,0 +1,8 @@
+{
+  "preserves": "Original acceptance/report/journal bytes remain immutable",
+  "successor_qualification": "qualified-20260927T174510740676Z",
+  "current_state": "CLOSED_PENDING_ACCEPTANCE",
+  "schema": "KAMMI_ACCEPTANCE_SUPERSESSION_NOTICE_V1",
+  "prior_acceptance": "sha256:7038435760079a4be053d2f18fa7ad0b49ed9c18adba020a828e43d95fcf4e14",
+  "reason": "Protected remote-input firewall strengthened; current bytes require fresh qualification"
+}

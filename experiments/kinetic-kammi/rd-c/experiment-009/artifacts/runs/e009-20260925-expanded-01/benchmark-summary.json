@@ -1,0 +1,667 @@
+{
+  "schema_version": 1,
+  "run_id": "e009-20260925-expanded-01",
+  "task_bank": {
+    "task_count": 8,
+    "family_count": 4,
+    "unit_for_variation": "task family; two prompt variants per family are not independent worlds",
+    "same_repository_as_development": true,
+    "cross_repository_generalization_claim": false
+  },
+  "frozen_thresholds": {
+    "minimum_applicability_milli": 50,
+    "maximum_abstention_milli": 180
+  },
+  "development_fit": {
+    "minimum_applicability_milli": 50,
+    "maximum_abstention_milli": 180,
+    "development_task_count": 8,
+    "hybrid_completions": 8,
+    "hybrid_completion_rate": 1.0,
+    "large_calls": 2,
+    "large_call_rate": 0.25,
+    "small_accepted": 6,
+    "small_correct_among_accepted": 6,
+    "input_plus_generated_tokens": 11385,
+    "modeled_observer_wall_ms": 9266.576
+  },
+  "lanes": {
+    "hand-written": {
+      "task_count": 8,
+      "completions": 0,
+      "completion_rate": 0.0,
+      "wrong_legal_actions": 0,
+      "abstentions": 8,
+      "small_calls": 0,
+      "large_calls": 0,
+      "input_tokens": 0,
+      "generated_tokens": 0,
+      "total_tokens": 0,
+      "observer_model_wall_ms": 0.0,
+      "completion_check_wall_ms": 0.0,
+      "authority_wall_ms": 726.732,
+      "total_elapsed_wall_ms": 726.732,
+      "small_confident_wrong_actions": 0,
+      "illegal_commits": 0,
+      "duplicate_action_effects": 0,
+      "replay_identity_all_equal": true,
+      "billed_api_usd": 0.0
+    },
+    "small": {
+      "task_count": 8,
+      "completions": 5,
+      "completion_rate": 0.625,
+      "wrong_legal_actions": 1,
+      "abstentions": 2,
+      "small_calls": 8,
+      "large_calls": 0,
+      "input_tokens": 8502,
+      "generated_tokens": 184,
+      "total_tokens": 8686,
+      "observer_model_wall_ms": 2721.125,
+      "completion_check_wall_ms": 215158.123,
+      "authority_wall_ms": 165.695,
+      "total_elapsed_wall_ms": 218044.943,
+      "small_confident_wrong_actions": 1,
+      "illegal_commits": 6,
+      "duplicate_action_effects": 0,
+      "replay_identity_all_equal": true,
+      "billed_api_usd": 0.0
+    },
+    "small-then-large-on-abstention": {
+      "task_count": 8,
+      "completions": 7,
+      "completion_rate": 0.875,
+      "wrong_legal_actions": 1,
+      "abstentions": 0,
+      "small_calls": 8,
+      "large_calls": 2,
+      "input_tokens": 10990,
+      "generated_tokens": 262,
+      "total_tokens": 11252,
+      "observer_model_wall_ms": 9139.001,
+      "completion_check_wall_ms": 65506.43,
+      "authority_wall_ms": 170.039,
+      "total_elapsed_wall_ms": 74815.47,
+      "small_confident_wrong_actions": 1,
+      "illegal_commits": 6,
+      "duplicate_action_effects": 0,
+      "replay_identity_all_equal": true,
+      "billed_api_usd": 0.0
+    },
+    "always-large": {
+      "task_count": 8,
+      "completions": 8,
+      "completion_rate": 1.0,
+      "wrong_legal_actions": 0,
+      "abstentions": 0,
+      "small_calls": 0,
+      "large_calls": 8,
+      "input_tokens": 9809,
+      "generated_tokens": 312,
+      "total_tokens": 10121,
+      "observer_model_wall_ms": 24638.559,
+      "completion_check_wall_ms": 75676.434,
+      "authority_wall_ms": 1327.781,
+      "total_elapsed_wall_ms": 101642.774,
+      "small_confident_wrong_actions": 0,
+      "illegal_commits": 0,
+      "duplicate_action_effects": 0,
+      "replay_identity_all_equal": true,
+      "billed_api_usd": 0.0
+    }
+  },
+  "by_family": {
+    "draft-cardinality-transitions": {
+      "hand-written": {
+        "tasks": 2,
+        "completions": 0,
+        "wrong_legal_actions": 0,
+        "abstentions": 2,
+        "large_calls": 0
+      },
+      "small": {
+        "tasks": 2,
+        "completions": 1,
+        "wrong_legal_actions": 1,
+        "abstentions": 0,
+        "large_calls": 0
+      },
+      "small-then-large-on-abstention": {
+        "tasks": 2,
+        "completions": 1,
+        "wrong_legal_actions": 1,
+        "abstentions": 0,
+        "large_calls": 0
+      },
+      "always-large": {
+        "tasks": 2,
+        "completions": 2,
+        "wrong_legal_actions": 0,
+        "abstentions": 0,
+        "large_calls": 2
+      }
+    },
+    "fill-clear-intervals": {
+      "hand-written": {
+        "tasks": 2,
+        "completions": 0,
+        "wrong_legal_actions": 0,
+        "abstentions": 2,
+        "large_calls": 0
+      },
+      "small": {
+        "tasks": 2,
+        "completions": 1,
+        "wrong_legal_actions": 0,
+        "abstentions": 1,
+        "large_calls": 0
+      },
+      "small-then-large-on-abstention": {
+        "tasks": 2,
+        "completions": 2,
+        "wrong_legal_actions": 0,
+        "abstentions": 0,
+        "large_calls": 1
+      },
+      "always-large": {
+        "tasks": 2,
+        "completions": 2,
+        "wrong_legal_actions": 0,
+        "abstentions": 0,
+        "large_calls": 2
+      }
+    },
+    "hard-stop-ordering": {
+      "hand-written": {
+        "tasks": 2,
+        "completions": 0,
+        "wrong_legal_actions": 0,
+        "abstentions": 2,
+        "large_calls": 0
+      },
+      "small": {
+        "tasks": 2,
+        "completions": 2,
+        "wrong_legal_actions": 0,
+        "abstentions": 0,
+        "large_calls": 0
+      },
+      "small-then-large-on-abstention": {
+        "tasks": 2,
+        "completions": 2,
+        "wrong_legal_actions": 0,
+        "abstentions": 0,
+        "large_calls": 0
+      },
+      "always-large": {
+        "tasks": 2,
+        "completions": 2,
+        "wrong_legal_actions": 0,
+        "abstentions": 0,
+        "large_calls": 2
+      }
+    },
+    "inherited-style-preservation": {
+      "hand-written": {
+        "tasks": 2,
+        "completions": 0,
+        "wrong_legal_actions": 0,
+        "abstentions": 2,
+        "large_calls": 0
+      },
+      "small": {
+        "tasks": 2,
+        "completions": 1,
+        "wrong_legal_actions": 0,
+        "abstentions": 1,
+        "large_calls": 0
+      },
+      "small-then-large-on-abstention": {
+        "tasks": 2,
+        "completions": 2,
+        "wrong_legal_actions": 0,
+        "abstentions": 0,
+        "large_calls": 1
+      },
+      "always-large": {
+        "tasks": 2,
+        "completions": 2,
+        "wrong_legal_actions": 0,
+        "abstentions": 0,
+        "large_calls": 2
+      }
+    }
+  },
+  "differences_from_always_large": {
+    "hand-written": {
+      "completion_difference_from_always_large": -8,
+      "total_token_difference_from_always_large": -10121,
+      "elapsed_ms_difference_from_always_large": -100916.042,
+      "large_call_difference_from_always_large": -8
+    },
+    "small": {
+      "completion_difference_from_always_large": -3,
+      "total_token_difference_from_always_large": -1435,
+      "elapsed_ms_difference_from_always_large": 116402.169,
+      "large_call_difference_from_always_large": -8
+    },
+    "small-then-large-on-abstention": {
+      "completion_difference_from_always_large": -1,
+      "total_token_difference_from_always_large": 1131,
+      "elapsed_ms_difference_from_always_large": -26827.304,
+      "large_call_difference_from_always_large": -6
+    },
+    "always-large": {
+      "completion_difference_from_always_large": 0,
+      "total_token_difference_from_always_large": 0,
+      "elapsed_ms_difference_from_always_large": 0.0,
+      "large_call_difference_from_always_large": 0
+    }
+  },
+  "small_coverage_error_curve": {
+    "scope": "post-hoc descriptive curve on held-out outputs; no threshold selection or bundle change",
+    "at_fixed_selected_maximum_abstention": [
+      {
+        "minimum_applicability_milli": 0,
+        "maximum_abstention_milli": 180,
+        "covered": 6,
+        "coverage": 0.75,
+        "correct": 5,
+        "wrong": 1,
+        "error_rate_when_covered": 0.16666666666666666
+      },
+      {
+        "minimum_applicability_milli": 50,
+        "maximum_abstention_milli": 180,
+        "covered": 6,
+        "coverage": 0.75,
+        "correct": 5,
+        "wrong": 1,
+        "error_rate_when_covered": 0.16666666666666666
+      },
+      {
+        "minimum_applicability_milli": 100,
+        "maximum_abstention_milli": 180,
+        "covered": 0,
+        "coverage": 0.0,
+        "correct": 0,
+        "wrong": 0,
+        "error_rate_when_covered": null
+      },
+      {
+        "minimum_applicability_milli": 150,
+        "maximum_abstention_milli": 180,
+        "covered": 0,
+        "coverage": 0.0,
+        "correct": 0,
+        "wrong": 0,
+        "error_rate_when_covered": null
+      },
+      {
+        "minimum_applicability_milli": 200,
+        "maximum_abstention_milli": 180,
+        "covered": 0,
+        "coverage": 0.0,
+        "correct": 0,
+        "wrong": 0,
+        "error_rate_when_covered": null
+      },
+      {
+        "minimum_applicability_milli": 250,
+        "maximum_abstention_milli": 180,
+        "covered": 0,
+        "coverage": 0.0,
+        "correct": 0,
+        "wrong": 0,
+        "error_rate_when_covered": null
+      },
+      {
+        "minimum_applicability_milli": 300,
+        "maximum_abstention_milli": 180,
+        "covered": 0,
+        "coverage": 0.0,
+        "correct": 0,
+        "wrong": 0,
+        "error_rate_when_covered": null
+      },
+      {
+        "minimum_applicability_milli": 350,
+        "maximum_abstention_milli": 180,
+        "covered": 0,
+        "coverage": 0.0,
+        "correct": 0,
+        "wrong": 0,
+        "error_rate_when_covered": null
+      },
+      {
+        "minimum_applicability_milli": 400,
+        "maximum_abstention_milli": 180,
+        "covered": 0,
+        "coverage": 0.0,
+        "correct": 0,
+        "wrong": 0,
+        "error_rate_when_covered": null
+      },
+      {
+        "minimum_applicability_milli": 450,
+        "maximum_abstention_milli": 180,
+        "covered": 0,
+        "coverage": 0.0,
+        "correct": 0,
+        "wrong": 0,
+        "error_rate_when_covered": null
+      },
+      {
+        "minimum_applicability_milli": 500,
+        "maximum_abstention_milli": 180,
+        "covered": 0,
+        "coverage": 0.0,
+        "correct": 0,
+        "wrong": 0,
+        "error_rate_when_covered": null
+      },
+      {
+        "minimum_applicability_milli": 550,
+        "maximum_abstention_milli": 180,
+        "covered": 0,
+        "coverage": 0.0,
+        "correct": 0,
+        "wrong": 0,
+        "error_rate_when_covered": null
+      },
+      {
+        "minimum_applicability_milli": 600,
+        "maximum_abstention_milli": 180,
+        "covered": 0,
+        "coverage": 0.0,
+        "correct": 0,
+        "wrong": 0,
+        "error_rate_when_covered": null
+      },
+      {
+        "minimum_applicability_milli": 650,
+        "maximum_abstention_milli": 180,
+        "covered": 0,
+        "coverage": 0.0,
+        "correct": 0,
+        "wrong": 0,
+        "error_rate_when_covered": null
+      },
+      {
+        "minimum_applicability_milli": 700,
+        "maximum_abstention_milli": 180,
+        "covered": 0,
+        "coverage": 0.0,
+        "correct": 0,
+        "wrong": 0,
+        "error_rate_when_covered": null
+      },
+      {
+        "minimum_applicability_milli": 750,
+        "maximum_abstention_milli": 180,
+        "covered": 0,
+        "coverage": 0.0,
+        "correct": 0,
+        "wrong": 0,
+        "error_rate_when_covered": null
+      },
+      {
+        "minimum_applicability_milli": 800,
+        "maximum_abstention_milli": 180,
+        "covered": 0,
+        "coverage": 0.0,
+        "correct": 0,
+        "wrong": 0,
+        "error_rate_when_covered": null
+      },
+      {
+        "minimum_applicability_milli": 850,
+        "maximum_abstention_milli": 180,
+        "covered": 0,
+        "coverage": 0.0,
+        "correct": 0,
+        "wrong": 0,
+        "error_rate_when_covered": null
+      },
+      {
+        "minimum_applicability_milli": 900,
+        "maximum_abstention_milli": 180,
+        "covered": 0,
+        "coverage": 0.0,
+        "correct": 0,
+        "wrong": 0,
+        "error_rate_when_covered": null
+      },
+      {
+        "minimum_applicability_milli": 950,
+        "maximum_abstention_milli": 180,
+        "covered": 0,
+        "coverage": 0.0,
+        "correct": 0,
+        "wrong": 0,
+        "error_rate_when_covered": null
+      },
+      {
+        "minimum_applicability_milli": 1000,
+        "maximum_abstention_milli": 180,
+        "covered": 0,
+        "coverage": 0.0,
+        "correct": 0,
+        "wrong": 0,
+        "error_rate_when_covered": null
+      }
+    ],
+    "at_fixed_selected_minimum_applicability": [
+      {
+        "minimum_applicability_milli": 50,
+        "maximum_abstention_milli": 0,
+        "covered": 6,
+        "coverage": 0.75,
+        "correct": 5,
+        "wrong": 1,
+        "error_rate_when_covered": 0.16666666666666666
+      },
+      {
+        "minimum_applicability_milli": 50,
+        "maximum_abstention_milli": 50,
+        "covered": 6,
+        "coverage": 0.75,
+        "correct": 5,
+        "wrong": 1,
+        "error_rate_when_covered": 0.16666666666666666
+      },
+      {
+        "minimum_applicability_milli": 50,
+        "maximum_abstention_milli": 100,
+        "covered": 6,
+        "coverage": 0.75,
+        "correct": 5,
+        "wrong": 1,
+        "error_rate_when_covered": 0.16666666666666666
+      },
+      {
+        "minimum_applicability_milli": 50,
+        "maximum_abstention_milli": 150,
+        "covered": 6,
+        "coverage": 0.75,
+        "correct": 5,
+        "wrong": 1,
+        "error_rate_when_covered": 0.16666666666666666
+      },
+      {
+        "minimum_applicability_milli": 50,
+        "maximum_abstention_milli": 180,
+        "covered": 6,
+        "coverage": 0.75,
+        "correct": 5,
+        "wrong": 1,
+        "error_rate_when_covered": 0.16666666666666666
+      },
+      {
+        "minimum_applicability_milli": 50,
+        "maximum_abstention_milli": 200,
+        "covered": 6,
+        "coverage": 0.75,
+        "correct": 5,
+        "wrong": 1,
+        "error_rate_when_covered": 0.16666666666666666
+      },
+      {
+        "minimum_applicability_milli": 50,
+        "maximum_abstention_milli": 250,
+        "covered": 6,
+        "coverage": 0.75,
+        "correct": 5,
+        "wrong": 1,
+        "error_rate_when_covered": 0.16666666666666666
+      },
+      {
+        "minimum_applicability_milli": 50,
+        "maximum_abstention_milli": 300,
+        "covered": 6,
+        "coverage": 0.75,
+        "correct": 5,
+        "wrong": 1,
+        "error_rate_when_covered": 0.16666666666666666
+      },
+      {
+        "minimum_applicability_milli": 50,
+        "maximum_abstention_milli": 350,
+        "covered": 6,
+        "coverage": 0.75,
+        "correct": 5,
+        "wrong": 1,
+        "error_rate_when_covered": 0.16666666666666666
+      },
+      {
+        "minimum_applicability_milli": 50,
+        "maximum_abstention_milli": 400,
+        "covered": 6,
+        "coverage": 0.75,
+        "correct": 5,
+        "wrong": 1,
+        "error_rate_when_covered": 0.16666666666666666
+      },
+      {
+        "minimum_applicability_milli": 50,
+        "maximum_abstention_milli": 450,
+        "covered": 6,
+        "coverage": 0.75,
+        "correct": 5,
+        "wrong": 1,
+        "error_rate_when_covered": 0.16666666666666666
+      },
+      {
+        "minimum_applicability_milli": 50,
+        "maximum_abstention_milli": 500,
+        "covered": 6,
+        "coverage": 0.75,
+        "correct": 5,
+        "wrong": 1,
+        "error_rate_when_covered": 0.16666666666666666
+      },
+      {
+        "minimum_applicability_milli": 50,
+        "maximum_abstention_milli": 550,
+        "covered": 6,
+        "coverage": 0.75,
+        "correct": 5,
+        "wrong": 1,
+        "error_rate_when_covered": 0.16666666666666666
+      },
+      {
+        "minimum_applicability_milli": 50,
+        "maximum_abstention_milli": 600,
+        "covered": 6,
+        "coverage": 0.75,
+        "correct": 5,
+        "wrong": 1,
+        "error_rate_when_covered": 0.16666666666666666
+      },
+      {
+        "minimum_applicability_milli": 50,
+        "maximum_abstention_milli": 650,
+        "covered": 6,
+        "coverage": 0.75,
+        "correct": 5,
+        "wrong": 1,
+        "error_rate_when_covered": 0.16666666666666666
+      },
+      {
+        "minimum_applicability_milli": 50,
+        "maximum_abstention_milli": 700,
+        "covered": 6,
+        "coverage": 0.75,
+        "correct": 5,
+        "wrong": 1,
+        "error_rate_when_covered": 0.16666666666666666
+      },
+      {
+        "minimum_applicability_milli": 50,
+        "maximum_abstention_milli": 750,
+        "covered": 6,
+        "coverage": 0.75,
+        "correct": 5,
+        "wrong": 1,
+        "error_rate_when_covered": 0.16666666666666666
+      },
+      {
+        "minimum_applicability_milli": 50,
+        "maximum_abstention_milli": 800,
+        "covered": 6,
+        "coverage": 0.75,
+        "correct": 5,
+        "wrong": 1,
+        "error_rate_when_covered": 0.16666666666666666
+      },
+      {
+        "minimum_applicability_milli": 50,
+        "maximum_abstention_milli": 850,
+        "covered": 6,
+        "coverage": 0.75,
+        "correct": 5,
+        "wrong": 1,
+        "error_rate_when_covered": 0.16666666666666666
+      },
+      {
+        "minimum_applicability_milli": 50,
+        "maximum_abstention_milli": 900,
+        "covered": 6,
+        "coverage": 0.75,
+        "correct": 5,
+        "wrong": 1,
+        "error_rate_when_covered": 0.16666666666666666
+      },
+      {
+        "minimum_applicability_milli": 50,
+        "maximum_abstention_milli": 950,
+        "covered": 6,
+        "coverage": 0.75,
+        "correct": 5,
+        "wrong": 1,
+        "error_rate_when_covered": 0.16666666666666666
+      },
+      {
+        "minimum_applicability_milli": 50,
+        "maximum_abstention_milli": 1000,
+        "covered": 6,
+        "coverage": 0.75,
+        "correct": 5,
+        "wrong": 1,
+        "error_rate_when_covered": 0.16666666666666666
+      }
+    ]
+  },
+  "authority_gates": {
+    "illegal_commits": 12,
+    "duplicate_action_effects": 0,
+    "replay_identity_all_equal": true
+  },
+  "model_call_accounting": {
+    "shadow_calls_per_model_for_data_capture": 8,
+    "lane_costs_use_only_calls_that_lane_would_make": true,
+    "input_tokens_and_generated_tokens_separate": true
+  },
+  "cost_limits": "Local model calls are unbilled; GPU energy and hardware-dollar cost are not measured."
+}

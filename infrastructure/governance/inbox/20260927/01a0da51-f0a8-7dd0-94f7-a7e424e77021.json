@@ -1,0 +1,26 @@
+{
+  "schema": "CHIEF_KAMMI_CHAT_INTAKE_V1",
+  "source_thread_id": "01a0da51-f0a8-7dd0-94f7-a7e424e77021",
+  "source_title": "Frozen Fabrique",
+  "received_date": "2026-09-27",
+  "status": "RECEIVED_NOT_INDEPENDENTLY_VERIFIED",
+  "scientific_authority_conferred": false,
+  "turns": [
+    {
+      "id": "01a0e41f-d44b-7bf2-917a-a2bfb75a259f",
+      "status": "completed",
+      "error": null,
+      "startedAt": 1790533686,
+      "completedAt": 1790533694,
+      "durationMs": 7979,
+      "items": [
+        {
+          "type": "agentMessage",
+          "id": "msg_08a827dc54ebd9d9016ab9603d202c87d19fda803abe1d5b5d",
+          "text": "Acknowledged. I’ll preserve the E4-1 plan as written and keep it design-only. The Ledger gate is now reported open, but that does not grant E4-0 or E4-1 execution authority. No edits or runs started.",
+          "phase": "final_answer"
+        }
+      ]
+    }
+  ]
+}

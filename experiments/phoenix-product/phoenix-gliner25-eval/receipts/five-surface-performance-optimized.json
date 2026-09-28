@@ -1,0 +1,162 @@
+{
+  "contract": "phoenix-gliner25-five-surface-performance-comparison-v1",
+  "baseline": "bench-five-novels-summary.json",
+  "candidate": "bench-five-novels-summary.json",
+  "documents": [
+    "endrun.md",
+    "laterun.md",
+    "midrun.md",
+    "shortrun.md"
+  ],
+  "stable_output_counts_exact": true,
+  "per_feature": {
+    "long_context": {
+      "documents": {
+        "endrun.md": {
+          "baseline_p50_ms": 1419.0036,
+          "candidate_p50_ms": 1488.6278,
+          "change_percent": 4.906555557716685
+        },
+        "laterun.md": {
+          "baseline_p50_ms": 1397.8525,
+          "candidate_p50_ms": 1431.0039,
+          "change_percent": 2.371595000187776
+        },
+        "midrun.md": {
+          "baseline_p50_ms": 214.2574,
+          "candidate_p50_ms": 248.9401,
+          "change_percent": 16.187398894974002
+        },
+        "shortrun.md": {
+          "baseline_p50_ms": 1430.2399,
+          "candidate_p50_ms": 1436.8702,
+          "change_percent": 0.46357957151104134
+        }
+      },
+      "geometric_mean_change_percent": 5.812614108634562,
+      "median_change_percent": 3.6390752789522196,
+      "minimum_change_percent": 0.46357957151104134,
+      "maximum_change_percent": 16.187398894974002
+    },
+    "wide_span_entities": {
+      "documents": {
+        "endrun.md": {
+          "baseline_p50_ms": 389.8717,
+          "candidate_p50_ms": 365.33979999999997,
+          "change_percent": -6.29230077484465
+        },
+        "laterun.md": {
+          "baseline_p50_ms": 360.4959,
+          "candidate_p50_ms": 355.6112,
+          "change_percent": -1.3549946060412932
+        },
+        "midrun.md": {
+          "baseline_p50_ms": 226.1136,
+          "candidate_p50_ms": 259.84069999999997,
+          "change_percent": 14.915997976238483
+        },
+        "shortrun.md": {
+          "baseline_p50_ms": 381.6347,
+          "candidate_p50_ms": 375.2742,
+          "change_percent": -1.6666461409300615
+        }
+      },
+      "geometric_mean_change_percent": 1.0957573709712287,
+      "median_change_percent": -1.5108203734856773,
+      "minimum_change_percent": -6.29230077484465,
+      "maximum_change_percent": 14.915997976238483
+    },
+    "span_attributes": {
+      "documents": {
+        "endrun.md": {
+          "baseline_p50_ms": 447.2795,
+          "candidate_p50_ms": 466.1254,
+          "change_percent": 4.213450426411236
+        },
+        "laterun.md": {
+          "baseline_p50_ms": 428.5175,
+          "candidate_p50_ms": 429.7084,
+          "change_percent": 0.2779116372143564
+        },
+        "midrun.md": {
+          "baseline_p50_ms": 279.1673,
+          "candidate_p50_ms": 258.7652,
+          "change_percent": -7.308198345579875
+        },
+        "shortrun.md": {
+          "baseline_p50_ms": 434.7701,
+          "candidate_p50_ms": 408.90130000000005,
+          "change_percent": -5.949995181361356
+        }
+      },
+      "geometric_mean_change_percent": -2.3027587296898133,
+      "median_change_percent": -2.8360417720735054,
+      "minimum_change_percent": -7.308198345579875,
+      "maximum_change_percent": 4.213450426411236
+    },
+    "constrained_classification": {
+      "documents": {
+        "endrun.md": {
+          "baseline_p50_ms": 353.3815,
+          "candidate_p50_ms": 326.05600000000004,
+          "change_percent": -7.732577964607645
+        },
+        "laterun.md": {
+          "baseline_p50_ms": 318.51030000000003,
+          "candidate_p50_ms": 322.7674,
+          "change_percent": 1.336565881856866
+        },
+        "midrun.md": {
+          "baseline_p50_ms": 215.8255,
+          "candidate_p50_ms": 217.8697,
+          "change_percent": 0.9471540665954681
+        },
+        "shortrun.md": {
+          "baseline_p50_ms": 327.4683,
+          "candidate_p50_ms": 335.2272,
+          "change_percent": 2.369359110484881
+        }
+      },
+      "geometric_mean_change_percent": -0.8552645369509393,
+      "median_change_percent": 1.141859974226156,
+      "minimum_change_percent": -7.732577964607645,
+      "maximum_change_percent": 2.369359110484881
+    },
+    "joint_information_extraction": {
+      "documents": {
+        "endrun.md": {
+          "baseline_p50_ms": 514.2852999999999,
+          "candidate_p50_ms": 455.9286,
+          "change_percent": -11.347145251866985
+        },
+        "laterun.md": {
+          "baseline_p50_ms": 358.02139999999997,
+          "candidate_p50_ms": 392.2713,
+          "change_percent": 9.566439324576702
+        },
+        "midrun.md": {
+          "baseline_p50_ms": 291.2545,
+          "candidate_p50_ms": 341.4893,
+          "change_percent": 17.247733511413553
+        },
+        "shortrun.md": {
+          "baseline_p50_ms": 500.0899,
+          "candidate_p50_ms": 468.5418,
+          "change_percent": -6.308485734264979
+        }
+      },
+      "geometric_mean_change_percent": 1.635106579323553,
+      "median_change_percent": 1.6289767951558565,
+      "minimum_change_percent": -11.347145251866985,
+      "maximum_change_percent": 17.247733511413553
+    }
+  },
+  "all_matched_p50_geometric_mean_change_percent": 1.0399717084772497,
+  "maximum_peak_working_set": {
+    "baseline_bytes": 1291980800,
+    "candidate_bytes": 1227059200,
+    "change_percent": -5.024966315288893
+  },
+  "graph_publications": 0,
+  "interpretation": "Matched release p50 ratios; no quality claim."
+}

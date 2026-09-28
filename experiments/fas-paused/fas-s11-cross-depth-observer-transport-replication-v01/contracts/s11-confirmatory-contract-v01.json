@@ -1,0 +1,140 @@
+{
+  "contract_id": "FAS_S11_CONFIRMATORY_CROSS_DEPTH_OBSERVER_TRANSPORT_V01",
+  "status": "FROZEN_PROTOCOL_ONLY_NO_PANEL_OR_MODEL_AUTHORIZED",
+  "question": "On a fresh held-out population generated under the same fixed world families and surface templates, do final-position observers retain greater cross-depth predictive transport than mean-full observers, while raw transport accuracy decays with layer separation on both surfaces?",
+  "claim_scope": "Fresh generated quartets under the fixed FAS-S01 measurement distribution and existing eight families/eight observation templates/eight query templates. No claim of novel-family, novel-template, new-task, circuit, or semantic-feature generalization.",
+  "parents": {
+    "S01_2_construction_root_sha256": "f6065b8163799239e0d7b1200b5dda4aad169772ead14b999130a473ff9d9049",
+    "S01_2_corpus_sha256": "51a55212ba89d55bd6df532673ad4546c95def1f5d75622661f7c17b3e4a7ad1",
+    "S01_2_world_contract_sha256": "d886932c92068432b8f670c3a43c1ef604485ebf626c2babae8179b506847c87",
+    "S01_generator_generate_rs_sha256": "abcef47903120e3d82e8904da65e4f863803ecdeb89462151f24f7aa0f997018",
+    "S01_generator_model_rs_sha256": "94cca0249f5508be13e186921bc2441a830fa4af695211cd7fb08126a79c11e2",
+    "S01_generator_validate_rs_sha256": "58b0c4d40d1560d62eeb6caafecec853eb8a698a1a723598ed62e45394633f2e",
+    "S09_protocol_root_sha256": "c1cf07e8b04ac1a3deff583e10257dcd3c5f3040e48bd4b05738cb3c4d4794b2",
+    "S09_result_tree_root_sha256": "664af5b22f071b28d52a67d748e9f6f93ae3e67d587edec80b921dd529945880",
+    "S09_feature_cache_root_sha256": "82f9eb6ba0b9c37e58c415b03ec1bc4be00032f73cc43e70b3987ac4108f7653",
+    "S09_analysis_seal_file_sha256": "44518d3901bf578a417d8897dda3485e9741262e80a676857d48297736cdcefc",
+    "S10_protocol_root_sha256": "3df14974035839db8f58bd96c5063127a3a30680cfa3572cdce47a6df170982e",
+    "S10_result_tree_root_sha256": "549d906042979261ec68fd0727486c21f0d132d6281940cb9222993f3f1357b1",
+    "S10_results_json_sha256": "50767e14745d8ae805c78afb2533f3ab8171796a33d1198adfa98ec8952ab62d",
+    "S10_linear_core_py_sha256": "b44ce0a2f8c31e5aebb2f13dde4e208424a29a98928d18aa31c6aa081aef2b50",
+    "S10_run_transport_py_sha256": "c2a294bd38d6df040df82b4d5948062540dbcf9035db68e34c1570d6b47bc68b",
+    "S09_math_py_sha256": "88fb8b771ca0d861ad111c10fefb370e7021b1836655171055762a11057daa92"
+  },
+  "fresh_panel": {
+    "panel_id": "fas-s11-fresh-quartet-panel-v01",
+    "generator_seed_label": "FAS-S11-V01-WORLD-SEED",
+    "generator_seed_label_sha256": "dc6ba106053b430501713ebcc4f4d5963bfa861a5b2c1d4ca4b0ac58e81c178a",
+    "generator_seed_u64": 379211686401371100,
+    "seed_derivation": "SHA-256 of the exact UTF-8 seed label; interpret digest bytes 0..8 as one unsigned little-endian u64. Do not use wall clock, environment state, or an alternate RNG seed.",
+    "generator_namespace": "FAS-S11-V01",
+    "candidate_universe": {
+      "construction": "The complete 26,624-quartet S01-2 design, in the frozen FACTORIAL_BALANCED, BINDING_CONTEXT, BINDING_ENTITY order and with the frozen S01-2 factor, template, pair, candidate-order, and quartet semantics. S11 uses new lexical terms and S11-scoped world/quartet/event identities. No candidate may depend on S09/S10 features, probe outputs, errors, or metrics.",
+      "track_quartets": {
+        "FACTORIAL_BALANCED": 24576,
+        "BINDING_CONTEXT": 1024,
+        "BINDING_ENTITY": 1024
+      },
+      "total_quartets": 26624,
+      "variants_per_quartet": ["A", "C", "E", "P"],
+      "total_candidate_rows": 106496
+    },
+    "term_inventory": {
+      "algorithm": "Ordered Cartesian product, prefix outer and suffix inner; product index i is assigned to role-local term ID i for IDs 0..31 and role-local ID i-32 for IDs 32..63. Context uses product indices 0..31 and entity uses 32..63. Within each role IDs 0..15 are train-side-style and 16..31 are novel-heldout-style, preserving the parent split structure.",
+      "prefixes": ["cavu", "dome", "feka", "giru", "hano", "jupi", "luse", "moti"],
+      "suffixes": ["bex", "cif", "dun", "fap", "gok", "hiv", "mek", "puz"],
+      "context_term_ids": [0, 31],
+      "entity_term_ids": [0, 31],
+      "train_side_style_ids": [0, 15],
+      "novel_heldout_style_ids": [16, 31],
+      "partner_rule": "For role-local index i in 0..15, partner=(i+7) mod 16 within the same term split.",
+      "freshness_basis": "All 64 S11 surface terms are distinct from all 64 sealed S01-2 surface terms; exact input-byte SHA-256 freshness is checked separately against the complete authorized ancestry denylist before panel admission."
+    },
+    "selection": {
+      "method": "Class-stratified deterministic sampling without replacement from the complete candidate universe. Target class is the frozen exact target/state ID.",
+      "per_class_quartet_quota": {"0": 1733, "1": 1815, "2": 1770},
+      "total_selected_quartets": 5318,
+      "total_selected_rows": 21272,
+      "candidate_sort_key": "SHA-256(UTF-8('FAS-S11-V01|SELECT|' + decimal_target_id + '|' + canonical_candidate_key)); sort ascending by lowercase hex digest, then by ordinal ascending for a theoretical digest tie; take the exact quota for that target class.",
+      "canonical_candidate_key": "ASCII fields joined with '|', in this order: track_id, context_split, entity_split, family_index, relation_id, state_id, observation_template_id, query_template_id, context_pair_id, entity_pair_id, candidate_order_index, ordinal. Null pair IDs are the empty field.",
+      "no_replacement": true,
+      "on_quota_or_support_failure": "Fail closed and preserve the failed construction. No reseeding, replacement, quota relaxation, or post-hoc selection is permitted.",
+      "minimum_panel_support": "All three exact-target class quotas must match exactly; every one of the eight world-family IDs, eight observation-template IDs, and eight query-template IDs must occur at least once. Report class-by-family, class-by-track, all 64 observation/query template-pair counts, and both lexical split marginals without a post-hoc threshold."
+    },
+    "identity_and_freshness": {
+      "world_id": "fas-s11-v01-world-{ordinal:06d}",
+      "quartet_id": "fas-s11-v01-quartet-{ordinal:06d}",
+      "event_id": "fas-s11-v01-event-{ordinal:06d}-{variant_id}",
+      "render_seed": "SplitMix64(generator_seed_u64 XOR ordinal), using the exact S01-2 SplitMix64 implementation.",
+      "denylist": "Before admission, compare namespace-qualified world, quartet, episode, and event IDs plus exact model-visible rendered-input SHA-256 against hash-only sets from S01-2, S09, and S10 ancestry. Do not expose prior labels, features, predictions, metrics, or raw identity strings to selection.",
+      "required_collisions": 0,
+      "if_exact_denylist_unavailable": "Fail closed; no freshness claim and no panel seal."
+    },
+    "pre_extraction_gates": [
+      "independent target reconstruction from serialized latent state and query semantics",
+      "A/C/E/P target, latent rule, relation, state, candidate identity/order, and quartet-isolation invariants",
+      "all exact class quotas and minimum family/template presence",
+      "unique S11 row/world/quartet/event identities",
+      "zero exact rendered-input hash collisions against ancestry and within the selected panel",
+      "deterministic regeneration parity from the frozen seed and selection rule",
+      "complete support and rejection accounting"
+    ]
+  },
+  "feature_and_observer_path": {
+    "model_id": "LiquidAI/LFM2.5-1.2B-Base",
+    "model_revision": "7453bca97ca1e67754c4035a4b4c584e1c9dd725",
+    "backbone_mutation": false,
+    "layers": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
+    "surfaces": {"M": "mean_full at each layer", "F": "final model-visible position at each layer"},
+    "dimension": 2048,
+    "feature_dtype": "little-endian float32",
+    "extraction": "Reuse the sealed S09 layer extraction semantics and exact-length single-row/no-padding discipline; one sequence per forward call; record input/token identities, row order, shape, feature hashes, revision, and contract hashes. Run the S09 deterministic repeat rule and verify backbone state identity before/after.",
+    "observer_bank": "The exact 32 sealed S09 scaler-plus-linear-observer states (16 layers x M/F), loaded read-only after the fresh feature-cache seal. No fitting or modification.",
+    "transport_cell": "For a surface s, T_s[i,j] is balanced accuracy of the unchanged source-layer i scaler-plus-probe on the fresh target representation at layer j; rows are source observer layers, columns are target representation layers; class order is [0,1,2].",
+    "cell_count": 512,
+    "arithmetic_and_metrics": "Use the exact frozen S10/S09 numerical path, metric implementation, batch semantics, class order, and deterministic settings bound by the parent hashes. No substitute evaluator or floating-point policy."
+  },
+  "primary_estimands": {
+    "off_diagonal_transport_advantage": "D_off = equally weighted mean over all 240 ordered pairs i != j of T_F[i,j] - T_M[i,j].",
+    "distance_curve": "For each surface s, B_s(d)=mean of T_s[i,j] over every ordered cell with abs(i-j)=d, for each integer d=1..15.",
+    "distance_slope": "Ordinary least-squares slope of the 15 B_s(d) values against integer d=1..15, each distance equally weighted.",
+    "confirmatory_joint_rule": "Replication is supported only if the simultaneous 95% interval lower bound for D_off is >0 and the simultaneous 95% interval upper bounds for both M and F distance slopes are <0. Report all three components and their intervals even if the joint rule is not met."
+  },
+  "uncertainty": {
+    "bootstrap_replicates": 10000,
+    "resampling_unit": "Whole quartets; all four A/C/E/P event rows remain together.",
+    "stratification": "Resample independently within exact-target classes 0, 1, and 2, with replacement, retaining the exact observed class quartet counts 1733, 1815, and 1770 per replicate.",
+    "shared_plan": "Use the same resampled quartet indices for every surface, source layer, target layer, and primary summary.",
+    "rng": "NumPy 2.5.3 Generator(PCG64(seed)); seed label FAS-S11-V01-BOOTSTRAP-SEED; SHA-256 f6594b9d435e14fa866626043f8898ec73c499eae05a08ce54c3538bfd595b92; seed integer 18020131653510978038 derived from digest bytes 0..8 as unsigned little-endian u64.",
+    "interval": "For each of three primary summaries k, compute bootstrap SD s_k with ddof=1. For replicate b compute z_b=max_k(abs(theta_bk-theta_hat_k)/s_k). q is the 0.95 quantile of z using NumPy quantile(method='linear'). The simultaneous interval for k is [theta_hat_k-q*s_k, theta_hat_k+q*s_k]. Any non-finite statistic or zero/non-finite s_k fails closed.",
+    "scope": "Intervals quantify quartet sampling uncertainty for this fixed observer bank and fixed generator. They do not quantify observer-training, model-seed, or generator-family variation."
+  },
+  "required_reporting": [
+    "complete M and F 16x16 balanced-accuracy and accuracy matrices",
+    "all 512 cell prediction hashes, support counts, class recalls, and confusion matrices",
+    "native diagonal performance and per-class recall",
+    "forward and backward transport for each distance and adjacent bidirectional transport",
+    "all 15 raw BA distance means for M/F and their paired contrasts",
+    "D_off, M slope, F slope, shared-plan simultaneous intervals, and joint rule outcome",
+    "S10-compatible observer-retention matrices, descriptive only",
+    "fresh-population layerwise principal-angle trajectory for unchanged observer planes, clearly labeled fixed-observer geometry rather than a resampled outcome",
+    "identity, feature, prediction, bootstrap-plan, result-tree, and independent-verification hashes"
+  ],
+  "forbidden": [
+    "S11 panel generation or feature extraction before separate explicit authorization",
+    "S01/S10 test-row reuse as S11 data",
+    "FAS-00 access",
+    "observer fitting or modification",
+    "adaptive mechanisms, SAE, nonlinear analysis, or circuit interpretation",
+    "new representation views, layers, templates, world families, or tasks",
+    "threshold/window selection, selective reporting, or post-result reseeding"
+  ],
+  "authority": {
+    "S11_PROTOCOL_FROZEN": true,
+    "S11_PANEL_CONSTRUCTION_AUTHORIZED": false,
+    "S11_MODEL_CONTACT_AUTHORIZED": false,
+    "S11_FEATURE_EXTRACTION_AUTHORIZED": false,
+    "S11_OBSERVER_REPLAY_AUTHORIZED": false,
+    "S11_RESULT_READY": false
+  }
+}

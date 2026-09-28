@@ -1,0 +1,29 @@
+{
+  "task_id": "ripgrep-ripgrep-gitignore-bom-v1",
+  "lane": "hand-written",
+  "action_id": 37,
+  "patch_sha256": "48fa64eaccc75e7448cc9bd2806c6344120c775dc45a53944cce0c7f7f443fd2",
+  "candidate_variant": "gold_comment",
+  "test_filter": "gitignore_skip_bom",
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--manifest-path",
+    "C:\\rd-c\\experiment-010\\tasks\\heldout-bank-v1\\families\\ripgrep-gitignore-bom\\candidates\\gold_comment\\Cargo.toml",
+    "--package",
+    "ignore",
+    "--test",
+    "gitignore_skip_bom",
+    "gitignore_skip_bom",
+    "--",
+    "--exact"
+  ],
+  "exit_code": 0,
+  "status": "passed",
+  "passed": true,
+  "elapsed_ms": 13898.443,
+  "completion_source": "live-cargo-test",
+  "output_sha256": "a003ee0e67899067f1377ad10b93a397ed5824948ae4036dc02366f63e905217",
+  "output": "\nrunning 1 test\ntest gitignore_skip_bom ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n   Compiling crossbeam-utils v0.8.22\n   Compiling memchr v2.8.3\n   Compiling windows-link v0.2.1\n   Compiling crossbeam-epoch v0.9.20\n   Compiling crossbeam-deque v0.8.7\n   Compiling windows-sys v0.61.2\n   Compiling aho-corasick v1.1.4\n   Compiling bstr v1.13.0\n   Compiling winapi-util v0.1.11\n   Compiling crossbeam-channel v0.5.16\n   Compiling regex-automata v0.4.15\n   Compiling same-file v1.0.6\n   Compiling walkdir v2.5.0\n   Compiling globset v0.4.19 (C:\\rd-c\\experiment-010\\tasks\\heldout-bank-v1\\families\\ripgrep-gitignore-bom\\candidates\\gold_comment\\crates\\globset)\n   Compiling ignore v0.4.29 (C:\\rd-c\\experiment-010\\tasks\\heldout-bank-v1\\families\\ripgrep-gitignore-bom\\candidates\\gold_comment\\crates\\ignore)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 13.57s\n     Running tests\\gitignore_skip_bom.rs (D:\\cargo-targets\\rdc-e010\\scoring\\debug\\deps\\gitignore_skip_bom-7042e8b063b131d9.exe)\n"
+}

@@ -1,0 +1,74 @@
+{
+  "protocol": "jev-information-density/v0.8n-eval-panel-v01",
+  "identity": "v0.8N-eval-panel-v01",
+  "parent": "v0.8N-base-v01",
+  "purpose": "Construct and seal a held-out radius-matched neutral evaluation panel before any Road-B Phase-B authorization.",
+  "source_scope": {
+    "partition": "eval",
+    "families_and_templates": "held-out-only",
+    "training_sources_allowed": false,
+    "newtight_or_legacy_sources_allowed": false,
+    "source_files": [
+      "eval-contrast-certificates.jsonl",
+      "eval-exact-world-episodes.jsonl"
+    ]
+  },
+  "panel": {
+    "neighborhood_count": 2000,
+    "families": 4,
+    "episodes_per_neighborhood": 11,
+    "roles": [
+      "anchor",
+      "fact_flip",
+      "sham",
+      "neutral_1",
+      "neutral_2",
+      "neutral_3",
+      "neutral_4",
+      "neutral_5",
+      "neutral_6",
+      "neutral_7",
+      "neutral_8"
+    ],
+    "selected_neutral_per_neighborhood": 1,
+    "selected_neutral_role": "matched_neutral"
+  },
+  "semantic_gates": {
+    "target_component_abs_error_max": 1e-12,
+    "fact_map_winner_must_change": true,
+    "sham_and_neutral_axis_must_differ": true,
+    "surface_edit_must_match": true,
+    "neutral_generation_outcome_blind": true
+  },
+  "representation": {
+    "model_repo_id": "LiquidAI/LFM2.5-1.2B-Base",
+    "model_revision": "7453bca97ca1e67754c4035a4b4c584e1c9dd725",
+    "pooling": "final-layer mean_full",
+    "input_mode": "exact-length, single-row, no padding",
+    "feature_point": "state feature h",
+    "matching": "absolute sham-radius mismatch only",
+    "direction_or_cosine_matching": false,
+    "gates": {
+      "mean_relative_radius_difference_max": 0.10,
+      "p95_absolute_radius_difference_max": 0.25,
+      "per_family_mean_relative_difference_max": 0.15
+    }
+  },
+  "boundaries": {
+    "head_load": false,
+    "head_training": false,
+    "evaluation_inference": false,
+    "newtight_access": false,
+    "legacy_evaluation_access": false,
+    "phoenix_access": false,
+    "replacement_selection_after_geometry": false,
+    "panel_unlock_before_seal": false,
+    "phase_b_authorized": false
+  },
+  "firewall": {
+    "panel_materialization_is_restricted": true,
+    "panel_ids_and_hashes_must_be_frozen": true,
+    "seal_required_before_future_evaluation_unlock": true,
+    "training_process_may_not_read_panel": true
+  }
+}

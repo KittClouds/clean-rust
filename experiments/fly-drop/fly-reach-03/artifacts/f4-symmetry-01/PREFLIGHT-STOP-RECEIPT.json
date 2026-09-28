@@ -1,0 +1,7 @@
+{
+  "first_mismatch": "NameError: name 'require' is not defined",
+  "measured_namespace_created": false,
+  "phase": "preflight",
+  "schema": "F4-SYMMETRY-01-stop-receipt-v1",
+  "status": "STOP"
+}

@@ -1,0 +1,9 @@
+{
+  "attempt_id": "freeze-input-attempt-01",
+  "state": "FAILED_PRECONTACT_ENGINEERING_CHECK",
+  "model_contact": false,
+  "failure": "Freeze manifest named a design-lock helper that does not exist in the E012 script set.",
+  "repair": "Use the actual frozen task-construction, scored-check, label-finalization, frame-projection, and audit scripts.",
+  "frozen_lock_created": false,
+  "preserved": true
+}

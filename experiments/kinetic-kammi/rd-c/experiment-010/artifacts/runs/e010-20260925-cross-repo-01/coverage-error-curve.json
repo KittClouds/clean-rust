@@ -1,0 +1,385 @@
+{
+  "scope": "post-hoc descriptive curve on held-out outputs; no threshold selection or bundle change",
+  "at_fixed_selected_maximum_abstention": [
+    {
+      "minimum_applicability_milli": 0,
+      "maximum_abstention_milli": 150,
+      "covered": 13,
+      "coverage": 0.8125,
+      "correct": 13,
+      "wrong": 0,
+      "error_rate_when_covered": 0.0
+    },
+    {
+      "minimum_applicability_milli": 50,
+      "maximum_abstention_milli": 150,
+      "covered": 13,
+      "coverage": 0.8125,
+      "correct": 13,
+      "wrong": 0,
+      "error_rate_when_covered": 0.0
+    },
+    {
+      "minimum_applicability_milli": 100,
+      "maximum_abstention_milli": 150,
+      "covered": 13,
+      "coverage": 0.8125,
+      "correct": 13,
+      "wrong": 0,
+      "error_rate_when_covered": 0.0
+    },
+    {
+      "minimum_applicability_milli": 150,
+      "maximum_abstention_milli": 150,
+      "covered": 13,
+      "coverage": 0.8125,
+      "correct": 13,
+      "wrong": 0,
+      "error_rate_when_covered": 0.0
+    },
+    {
+      "minimum_applicability_milli": 200,
+      "maximum_abstention_milli": 150,
+      "covered": 13,
+      "coverage": 0.8125,
+      "correct": 13,
+      "wrong": 0,
+      "error_rate_when_covered": 0.0
+    },
+    {
+      "minimum_applicability_milli": 250,
+      "maximum_abstention_milli": 150,
+      "covered": 13,
+      "coverage": 0.8125,
+      "correct": 13,
+      "wrong": 0,
+      "error_rate_when_covered": 0.0
+    },
+    {
+      "minimum_applicability_milli": 300,
+      "maximum_abstention_milli": 150,
+      "covered": 13,
+      "coverage": 0.8125,
+      "correct": 13,
+      "wrong": 0,
+      "error_rate_when_covered": 0.0
+    },
+    {
+      "minimum_applicability_milli": 350,
+      "maximum_abstention_milli": 150,
+      "covered": 13,
+      "coverage": 0.8125,
+      "correct": 13,
+      "wrong": 0,
+      "error_rate_when_covered": 0.0
+    },
+    {
+      "minimum_applicability_milli": 400,
+      "maximum_abstention_milli": 150,
+      "covered": 13,
+      "coverage": 0.8125,
+      "correct": 13,
+      "wrong": 0,
+      "error_rate_when_covered": 0.0
+    },
+    {
+      "minimum_applicability_milli": 450,
+      "maximum_abstention_milli": 150,
+      "covered": 13,
+      "coverage": 0.8125,
+      "correct": 13,
+      "wrong": 0,
+      "error_rate_when_covered": 0.0
+    },
+    {
+      "minimum_applicability_milli": 500,
+      "maximum_abstention_milli": 150,
+      "covered": 13,
+      "coverage": 0.8125,
+      "correct": 13,
+      "wrong": 0,
+      "error_rate_when_covered": 0.0
+    },
+    {
+      "minimum_applicability_milli": 550,
+      "maximum_abstention_milli": 150,
+      "covered": 13,
+      "coverage": 0.8125,
+      "correct": 13,
+      "wrong": 0,
+      "error_rate_when_covered": 0.0
+    },
+    {
+      "minimum_applicability_milli": 600,
+      "maximum_abstention_milli": 150,
+      "covered": 13,
+      "coverage": 0.8125,
+      "correct": 13,
+      "wrong": 0,
+      "error_rate_when_covered": 0.0
+    },
+    {
+      "minimum_applicability_milli": 650,
+      "maximum_abstention_milli": 150,
+      "covered": 13,
+      "coverage": 0.8125,
+      "correct": 13,
+      "wrong": 0,
+      "error_rate_when_covered": 0.0
+    },
+    {
+      "minimum_applicability_milli": 700,
+      "maximum_abstention_milli": 150,
+      "covered": 13,
+      "coverage": 0.8125,
+      "correct": 13,
+      "wrong": 0,
+      "error_rate_when_covered": 0.0
+    },
+    {
+      "minimum_applicability_milli": 750,
+      "maximum_abstention_milli": 150,
+      "covered": 13,
+      "coverage": 0.8125,
+      "correct": 13,
+      "wrong": 0,
+      "error_rate_when_covered": 0.0
+    },
+    {
+      "minimum_applicability_milli": 800,
+      "maximum_abstention_milli": 150,
+      "covered": 13,
+      "coverage": 0.8125,
+      "correct": 13,
+      "wrong": 0,
+      "error_rate_when_covered": 0.0
+    },
+    {
+      "minimum_applicability_milli": 850,
+      "maximum_abstention_milli": 150,
+      "covered": 13,
+      "coverage": 0.8125,
+      "correct": 13,
+      "wrong": 0,
+      "error_rate_when_covered": 0.0
+    },
+    {
+      "minimum_applicability_milli": 900,
+      "maximum_abstention_milli": 150,
+      "covered": 13,
+      "coverage": 0.8125,
+      "correct": 13,
+      "wrong": 0,
+      "error_rate_when_covered": 0.0
+    },
+    {
+      "minimum_applicability_milli": 950,
+      "maximum_abstention_milli": 150,
+      "covered": 13,
+      "coverage": 0.8125,
+      "correct": 13,
+      "wrong": 0,
+      "error_rate_when_covered": 0.0
+    },
+    {
+      "minimum_applicability_milli": 1000,
+      "maximum_abstention_milli": 150,
+      "covered": 12,
+      "coverage": 0.75,
+      "correct": 12,
+      "wrong": 0,
+      "error_rate_when_covered": 0.0
+    }
+  ],
+  "at_fixed_selected_minimum_applicability": [
+    {
+      "minimum_applicability_milli": 850,
+      "maximum_abstention_milli": 0,
+      "covered": 12,
+      "coverage": 0.75,
+      "correct": 12,
+      "wrong": 0,
+      "error_rate_when_covered": 0.0
+    },
+    {
+      "minimum_applicability_milli": 850,
+      "maximum_abstention_milli": 50,
+      "covered": 13,
+      "coverage": 0.8125,
+      "correct": 13,
+      "wrong": 0,
+      "error_rate_when_covered": 0.0
+    },
+    {
+      "minimum_applicability_milli": 850,
+      "maximum_abstention_milli": 100,
+      "covered": 13,
+      "coverage": 0.8125,
+      "correct": 13,
+      "wrong": 0,
+      "error_rate_when_covered": 0.0
+    },
+    {
+      "minimum_applicability_milli": 850,
+      "maximum_abstention_milli": 150,
+      "covered": 13,
+      "coverage": 0.8125,
+      "correct": 13,
+      "wrong": 0,
+      "error_rate_when_covered": 0.0
+    },
+    {
+      "minimum_applicability_milli": 850,
+      "maximum_abstention_milli": 200,
+      "covered": 13,
+      "coverage": 0.8125,
+      "correct": 13,
+      "wrong": 0,
+      "error_rate_when_covered": 0.0
+    },
+    {
+      "minimum_applicability_milli": 850,
+      "maximum_abstention_milli": 250,
+      "covered": 13,
+      "coverage": 0.8125,
+      "correct": 13,
+      "wrong": 0,
+      "error_rate_when_covered": 0.0
+    },
+    {
+      "minimum_applicability_milli": 850,
+      "maximum_abstention_milli": 300,
+      "covered": 13,
+      "coverage": 0.8125,
+      "correct": 13,
+      "wrong": 0,
+      "error_rate_when_covered": 0.0
+    },
+    {
+      "minimum_applicability_milli": 850,
+      "maximum_abstention_milli": 350,
+      "covered": 13,
+      "coverage": 0.8125,
+      "correct": 13,
+      "wrong": 0,
+      "error_rate_when_covered": 0.0
+    },
+    {
+      "minimum_applicability_milli": 850,
+      "maximum_abstention_milli": 400,
+      "covered": 13,
+      "coverage": 0.8125,
+      "correct": 13,
+      "wrong": 0,
+      "error_rate_when_covered": 0.0
+    },
+    {
+      "minimum_applicability_milli": 850,
+      "maximum_abstention_milli": 450,
+      "covered": 13,
+      "coverage": 0.8125,
+      "correct": 13,
+      "wrong": 0,
+      "error_rate_when_covered": 0.0
+    },
+    {
+      "minimum_applicability_milli": 850,
+      "maximum_abstention_milli": 500,
+      "covered": 13,
+      "coverage": 0.8125,
+      "correct": 13,
+      "wrong": 0,
+      "error_rate_when_covered": 0.0
+    },
+    {
+      "minimum_applicability_milli": 850,
+      "maximum_abstention_milli": 550,
+      "covered": 13,
+      "coverage": 0.8125,
+      "correct": 13,
+      "wrong": 0,
+      "error_rate_when_covered": 0.0
+    },
+    {
+      "minimum_applicability_milli": 850,
+      "maximum_abstention_milli": 600,
+      "covered": 13,
+      "coverage": 0.8125,
+      "correct": 13,
+      "wrong": 0,
+      "error_rate_when_covered": 0.0
+    },
+    {
+      "minimum_applicability_milli": 850,
+      "maximum_abstention_milli": 650,
+      "covered": 13,
+      "coverage": 0.8125,
+      "correct": 13,
+      "wrong": 0,
+      "error_rate_when_covered": 0.0
+    },
+    {
+      "minimum_applicability_milli": 850,
+      "maximum_abstention_milli": 700,
+      "covered": 13,
+      "coverage": 0.8125,
+      "correct": 13,
+      "wrong": 0,
+      "error_rate_when_covered": 0.0
+    },
+    {
+      "minimum_applicability_milli": 850,
+      "maximum_abstention_milli": 750,
+      "covered": 13,
+      "coverage": 0.8125,
+      "correct": 13,
+      "wrong": 0,
+      "error_rate_when_covered": 0.0
+    },
+    {
+      "minimum_applicability_milli": 850,
+      "maximum_abstention_milli": 800,
+      "covered": 13,
+      "coverage": 0.8125,
+      "correct": 13,
+      "wrong": 0,
+      "error_rate_when_covered": 0.0
+    },
+    {
+      "minimum_applicability_milli": 850,
+      "maximum_abstention_milli": 850,
+      "covered": 13,
+      "coverage": 0.8125,
+      "correct": 13,
+      "wrong": 0,
+      "error_rate_when_covered": 0.0
+    },
+    {
+      "minimum_applicability_milli": 850,
+      "maximum_abstention_milli": 900,
+      "covered": 13,
+      "coverage": 0.8125,
+      "correct": 13,
+      "wrong": 0,
+      "error_rate_when_covered": 0.0
+    },
+    {
+      "minimum_applicability_milli": 850,
+      "maximum_abstention_milli": 950,
+      "covered": 13,
+      "coverage": 0.8125,
+      "correct": 13,
+      "wrong": 0,
+      "error_rate_when_covered": 0.0
+    },
+    {
+      "minimum_applicability_milli": 850,
+      "maximum_abstention_milli": 1000,
+      "covered": 13,
+      "coverage": 0.8125,
+      "correct": 13,
+      "wrong": 0,
+      "error_rate_when_covered": 0.0
+    }
+  ]
+}

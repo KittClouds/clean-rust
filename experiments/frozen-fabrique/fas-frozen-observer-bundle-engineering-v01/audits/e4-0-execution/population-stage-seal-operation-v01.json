@@ -1,0 +1,43 @@
+{
+  "receipt_id": "FAS_E4_0_POPULATION_STAGE_SEAL_OPERATION_V01",
+  "status": "POPULATION_STAGE_SEALED",
+  "authorization_sha256": "7cba2693e9a9e8864bbe2a896d036bdd979888ffa92973a62ff6c6ad01a1a58f",
+  "stage_seal_path": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e4-0-v01\\stage-seal-v01.json",
+  "stage_seal_root_sha256": "27731b483b8242aaef15ca22b97796b7b305a79db9bbb235765e13dcd9d08967",
+  "stage_seal_entry_count": 5,
+  "seal_helper_path": "C:\\Users\\shuga\\.codex\\worktrees\\e4-0-contract-work\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\source\\scripts\\e4_runner_artifacts_v02.py",
+  "seal_helper_sha256": "9976bb9ece709631ab33dcecaf3caa59b99268fdd39d413ad38b28a8d959a4a3",
+  "truth_handling": "label and escrow files were included by byte length and SHA-256 only; no label records were parsed or opened for analysis",
+  "members": [
+    {
+      "artifact_id": "E4_POPULATION_GENERATION_RECEIPT_V01",
+      "path": "receipts/population-generation-receipt-v01.json",
+      "bytes": 1147803,
+      "sha256": "1b9b6ce0fe2cf81ecae30c0d48ea84477b6662cd8da0e9b18b19ccddf4f02d7b"
+    },
+    {
+      "artifact_id": "E4_POPULATION_INPUTS_V01",
+      "path": "population/panel-inputs-v01.jsonl",
+      "bytes": 50057501,
+      "sha256": "ed8ca6ac10f2008c49b9460890e0595ad2e573e0b0af488763f52e0f9cfc4d9f"
+    },
+    {
+      "artifact_id": "E4_POPULATION_ROW_MANIFEST_V01",
+      "path": "population/row-manifest-v01.jsonl",
+      "bytes": 39686934,
+      "sha256": "234a616bbbe1e392704e21c3d1b6402067d836b9f47a59d5432d01cd92c261b6"
+    },
+    {
+      "artifact_id": "E4_PRIMARY_TERMINAL_LABELS_V01",
+      "path": "labels/primary-terminal-labels-v01.jsonl",
+      "bytes": 39363264,
+      "sha256": "225787239ffb3d3920e2c299f0f05cdb59df88a89ddc11ed22edde9ac312a365"
+    },
+    {
+      "artifact_id": "E4_TEMPLATE_JOINT_ESCROW_LABELS_V01",
+      "path": "labels/template-joint-escrow-v01.jsonl",
+      "bytes": 41627880,
+      "sha256": "427b1ceda1fb23ee468f124f19355b8b471a3788a44771bf4a19e24f51c94c1c"
+    }
+  ]
+}

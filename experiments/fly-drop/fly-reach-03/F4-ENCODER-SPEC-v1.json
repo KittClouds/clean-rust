@@ -1,0 +1,110 @@
+{
+  "encoder": {
+    "architecture": [
+      80,
+      128,
+      "GELU",
+      64,
+      "GELU",
+      1
+    ],
+    "batch_size": 2048,
+    "class_handling": "binary Y in {-1,+1} only; no zero-channel rows",
+    "epochs": 200,
+    "family": "numpy_mlp",
+    "hyperparameter_search": "none; all fields frozen",
+    "initialization_seed_base": 304000,
+    "learning_rate": 0.001,
+    "optimizer": "Adam",
+    "output": "binary polarity logit",
+    "scoring": "IPW-balanced error, q=1/p_inclusion",
+    "training_order": "row order in concatenated lexicographic feature streams; no shuffle"
+  },
+  "exact_ceiling": "Omega(F4)=1 by deterministic replay reconstruction",
+  "feature_map": {
+    "dtype": "float32",
+    "feature_groups": [
+      {
+        "name": "coordinate_graph_local_state",
+        "offset": 0,
+        "width": 21
+      },
+      {
+        "name": "task_labels",
+        "offset": 21,
+        "width": 4
+      },
+      {
+        "name": "expected_task_scores",
+        "offset": 25,
+        "width": 4
+      },
+      {
+        "name": "cue_edge_incidence",
+        "offset": 29,
+        "width": 4
+      },
+      {
+        "name": "current_schedule_pattern_ids",
+        "offset": 33,
+        "width": 13
+      },
+      {
+        "name": "fixed_coordinate_task_sketches",
+        "offset": 53,
+        "width": 24
+      },
+      {
+        "name": "reserved_zero_padding",
+        "offset": 77,
+        "width": 3
+      }
+    ],
+    "normalization": "per-fold training-mean-and-standard-deviation; std below 1e-6 replaced by 1",
+    "row_universe": "qualification-v2 common U* rows; target nonzero; S_N_signarm; row_index mod 256 == 0",
+    "schema": "f4_ref_blind_coordinate_task_v1",
+    "sketches": {
+      "buckets_per_family": 6,
+      "families": 4,
+      "kind": "deterministic_signed_count_sketch",
+      "reference_blind": true,
+      "seed_rule": "stable_mix(coordinate + cue*0x9e3779b97f4a7c15 + pattern_edge_count*2^17 + family*2^32)"
+    },
+    "width": 80
+  },
+  "feature_source": {
+    "descriptor_schema": "FLY-REACH-03-f4-replay-descriptor-v1",
+    "encoding": "deterministic_replay_descriptor_v1",
+    "feature_generation_source": "executor/src/qualification.rs::f4_features",
+    "forbidden_inputs": [
+      "reference_delta_into outputs",
+      "reference vector values",
+      "reference logits",
+      "target values",
+      "sample_reference_sha256",
+      "sample_target_sha256"
+    ],
+    "reference_blind": true
+  },
+  "implementation_hashes": {
+    "feature_collection_receipt_sha256": "f011722b24cb2afa7178fa2c44201026f3c1f1c6f3390fadd8e1d637d071a13d",
+    "feature_collector_source_sha256": "94d3e911a93e5ebcf9c78d8937a85e65ee4e6da5a1a00168f623091bb114837d"
+  },
+  "not_a_filtration_rung": true,
+  "qualification": {
+    "folds": "four leave-one-Q-block-out folds, blocks 303000,303001,303002,303003",
+    "gate": {
+      "fold_failure_disposition": "ESTIMATOR_CAPACITY_STOP",
+      "per_fold_omega_hat_min": 0.7,
+      "pooled_balanced_error_max": 0.1,
+      "pooled_omega_hat_min": 0.8
+    },
+    "measured_blocks_allowed": false,
+    "measured_namespace_created": false,
+    "run_id": "qualification-v2"
+  },
+  "schema": "FLY-REACH-03-F4-encoder-spec-v1",
+  "scientific_role": "estimator_capacity_calibration_ceiling",
+  "status": "FROZEN_QUALIFICATION_ONLY",
+  "version": "1.0"
+}

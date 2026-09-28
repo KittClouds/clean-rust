@@ -1,0 +1,189 @@
+{
+  "schema_version": 1,
+  "run_id": "e011-r3-20260925-order-robust-prompt-01",
+  "scored_utc": "2026-09-25T21:20:28.524761+00:00",
+  "classification": "posthoc same-bank prompt repair diagnostic; shadow-only",
+  "prompt_sha256": "3a673a9843cd1fb965ebd411d550bdb5a9b0019989cae727a0f67e7a62d073a6",
+  "thresholds": {
+    "minimum_applicability_milli": 850,
+    "maximum_abstention_milli": 150
+  },
+  "conditions": {
+    "full-frame": [
+      {
+        "repository": "ripgrep",
+        "tasks": 8,
+        "v5_small": {
+          "coverage": 8,
+          "direct_correct": 8,
+          "wrong_accepted": 0,
+          "reasons": {
+            "accepted": 8
+          },
+          "tokens": 11363,
+          "observer_ms": 2160.575
+        },
+        "repair_small": {
+          "coverage": 4,
+          "direct_correct": 4,
+          "wrong_accepted": 0,
+          "reasons": {
+            "accepted": 4,
+            "explicit-abstention": 4
+          },
+          "tokens": 12123,
+          "observer_ms": 2466.621
+        },
+        "large": {
+          "coverage": 8,
+          "direct_correct": 8,
+          "wrong_accepted": 0,
+          "reasons": {
+            "accepted": 8
+          },
+          "tokens": 12627,
+          "observer_ms": 45213.661
+        },
+        "v5_hybrid_completions": 8,
+        "repair_hybrid_completions": 8,
+        "repair_hybrid_large_calls": 4,
+        "repair_hybrid_large_calls_avoided": 4,
+        "repair_hybrid_tokens": 18595,
+        "repair_hybrid_observer_ms": 25376.678,
+        "always_large_completions": 8
+      },
+      {
+        "repository": "turbovec",
+        "tasks": 8,
+        "v5_small": {
+          "coverage": 5,
+          "direct_correct": 5,
+          "wrong_accepted": 0,
+          "reasons": {
+            "accepted": 5,
+            "explicit-abstention": 3
+          },
+          "tokens": 11749,
+          "observer_ms": 3042.024
+        },
+        "repair_small": {
+          "coverage": 2,
+          "direct_correct": 2,
+          "wrong_accepted": 0,
+          "reasons": {
+            "accepted": 2,
+            "explicit-abstention": 6
+          },
+          "tokens": 12509,
+          "observer_ms": 3588.049
+        },
+        "large": {
+          "coverage": 6,
+          "direct_correct": 5,
+          "wrong_accepted": 1,
+          "reasons": {
+            "accepted": 6,
+            "explicit-abstention": 2
+          },
+          "tokens": 13715,
+          "observer_ms": 47051.825
+        },
+        "v5_hybrid_completions": 8,
+        "repair_hybrid_completions": 5,
+        "repair_hybrid_large_calls": 6,
+        "repair_hybrid_large_calls_avoided": 2,
+        "repair_hybrid_tokens": 23135,
+        "repair_hybrid_observer_ms": 40242.65,
+        "always_large_completions": 5
+      }
+    ],
+    "order-only": [
+      {
+        "repository": "ripgrep",
+        "tasks": 8,
+        "v5_small": {
+          "coverage": 8,
+          "direct_correct": 7,
+          "wrong_accepted": 1,
+          "reasons": {
+            "accepted": 8
+          },
+          "tokens": 11363,
+          "observer_ms": 1861.089
+        },
+        "repair_small": {
+          "coverage": 7,
+          "direct_correct": 6,
+          "wrong_accepted": 1,
+          "reasons": {
+            "accepted": 7,
+            "explicit-abstention": 1
+          },
+          "tokens": 12123,
+          "observer_ms": 1919.71
+        },
+        "large": {
+          "coverage": 8,
+          "direct_correct": 8,
+          "wrong_accepted": 0,
+          "reasons": {
+            "accepted": 8
+          },
+          "tokens": 12629,
+          "observer_ms": 30494.868
+        },
+        "v5_hybrid_completions": 7,
+        "repair_hybrid_completions": 7,
+        "repair_hybrid_large_calls": 1,
+        "repair_hybrid_large_calls_avoided": 7,
+        "repair_hybrid_tokens": 13722,
+        "repair_hybrid_observer_ms": 5887.976,
+        "always_large_completions": 8
+      },
+      {
+        "repository": "turbovec",
+        "tasks": 8,
+        "v5_small": {
+          "coverage": 7,
+          "direct_correct": 5,
+          "wrong_accepted": 2,
+          "reasons": {
+            "abstention-threshold": 1,
+            "accepted": 7
+          },
+          "tokens": 11749,
+          "observer_ms": 2190.654
+        },
+        "repair_small": {
+          "coverage": 4,
+          "direct_correct": 3,
+          "wrong_accepted": 1,
+          "reasons": {
+            "accepted": 4,
+            "explicit-abstention": 4
+          },
+          "tokens": 12509,
+          "observer_ms": 2013.378
+        },
+        "large": {
+          "coverage": 6,
+          "direct_correct": 5,
+          "wrong_accepted": 1,
+          "reasons": {
+            "accepted": 6,
+            "explicit-abstention": 2
+          },
+          "tokens": 13715,
+          "observer_ms": 33988.381
+        },
+        "v5_hybrid_completions": 5,
+        "repair_hybrid_completions": 4,
+        "repair_hybrid_large_calls": 4,
+        "repair_hybrid_large_calls_avoided": 4,
+        "repair_hybrid_tokens": 20077,
+        "repair_hybrid_observer_ms": 20584.328,
+        "always_large_completions": 5
+      }
+    ]
+  }
+}

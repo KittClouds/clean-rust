@@ -1,0 +1,55 @@
+{
+  "protocol": "jev-information-density/v0.8p-v06-training-scope-overlap-preflight-root-v01",
+  "identity": "v0.8P-v06-training-scope-overlap-preflight-v01",
+  "disposition": "NOT_EVALUABLE",
+  "artifacts": {
+    "sealed_v06_contract": {
+      "path": "experiments/jev-information-density-v08p-v06/phase_a/fresh-panel-contract-v01.json",
+      "sha256": "28b7878c9d68026254b8db734959387857b7eafb7b083d658d30d4cca6636a00"
+    },
+    "v06_input_binding_root": {
+      "path": "experiments/jev-information-density-v08p-v06/provenance/v06-input-binding-root-v01.json",
+      "sha256": "447176e523947eab718721c953db16a51102f91a812d0d73c99712f110c21c32"
+    },
+    "overlap_preflight": {
+      "path": "experiments/jev-information-density-v08p-v06/provenance/training-scope-overlap-preflight-v01.json",
+      "sha256": "3c8c262214896a0c8888f043caba604ac0e50e6b5b1eac4de2de776c7099d1f3"
+    },
+    "source_access_receipt": {
+      "path": "experiments/jev-information-density-v08p-v06/provenance/training-scope-overlap-source-access-receipt-v01.json",
+      "sha256": "9fe3799bb9018aee5cef1b1bab7a34f07c0773c24fa0518d1f8b6027fd654f92"
+    }
+  },
+  "original_overlap_semantics": {
+    "source_contract_sha256": "ce3b7b97caecb27f3ad99439c0e67dca6e40af5da3db9ca2e356ea5e9f06f823",
+    "dimensions": [
+      "world_id",
+      "root_id",
+      "episode_id",
+      "full_rendered_input_hash",
+      "selector_input_hash"
+    ],
+    "changed": false
+  },
+  "evidence_state": {
+    "training_scope_values_available": false,
+    "fresh_p_candidate_values_available": false,
+    "exact_intersection_attempted": false,
+    "overlap_count": null,
+    "outcome": "NOT_EVALUABLE_FROM_CURRENTLY_AUTHORIZED_INPUTS",
+    "source_boundary": "PASS; only the five explicitly listed contract/root files were content-read for this preflight"
+  },
+  "stop_state": {
+    "v06_contract_sealed": true,
+    "training_scope_overlap_check": "NOT_EVALUABLE",
+    "panel_generation_authorized": false,
+    "panel_generated": false,
+    "lfm_contact": false,
+    "training": false,
+    "inference": false,
+    "evaluation": false,
+    "phoenix": false,
+    "further_action_authorized": false
+  },
+  "root_hash_rule": "SHA-256 of the exact bytes of this receipt; no self-referential hash field"
+}

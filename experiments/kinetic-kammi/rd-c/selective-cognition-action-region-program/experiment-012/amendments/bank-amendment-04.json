@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "amendment_id": "E012-BANK-A04",
+  "state": "FROZEN_BEFORE_SCORED_TASK_FIXTURES",
+  "base_bank_design_lock": "family-design-lock-v1.3.json",
+  "model_contact_authorized": false,
+  "task_scope": {
+    "type": "isolated_rust_consumer_code_integration_tasks",
+    "repositories": ["bytes", "clap", "serde-json"],
+    "patch_boundary": "task-owned adapter/test overlay only; pinned upstream library source is immutable",
+    "claim_boundary": "bounded executable workflows; not upstream library repair or broad repository coding competence",
+    "bounded_prefix_contract": "bounded zero-copy Bytes prefix view; assert prefix value and shared backing storage",
+    "prior_feasibility_relation": "prior prefix checks tested values only; preserve them as feasibility evidence and run the stricter scored contract separately"
+  },
+  "condition_accounting": {
+    "effective_positive_cells": [
+      ["E_c.content"],
+      ["E_c.content", "E_t"],
+      ["E_c.content", "E_x"],
+      ["E_c.content", "E_r"],
+      ["E_c.content", "E_t", "E_x"],
+      ["E_c.content", "E_t", "E_r"]
+    ],
+    "diagnostic_cells": [
+      ["E_t"], ["E_x"], ["E_r"], ["E_t", "E_x"], []
+    ],
+    "diagnostic_names": [
+      "task_only", "execution_only", "context_only", "task_plus_execution_diagnostic", "identity_only_diagnostic"
+    ],
+    "truth_channel_presence_masks": 10,
+    "identity_only_diagnostic_mask": "all truth-bearing content absent; E_c.identity retained",
+    "full_frame_count": 1,
+    "leave_one_out_count": 4,
+    "noninformative_control_count": 4,
+    "isomorphic_swap_count": 4,
+    "coordinate_condition_count": 2,
+    "conditions_per_task": 26,
+    "task_count": 48,
+    "frame_count": 1248,
+    "candidate_task_rows": 192,
+    "candidate_case_invocations": 384,
+    "base_task_rows": 48,
+    "base_case_invocations": 96,
+    "candidate_check_schedule": "case-specific for 8 request/execution/joint/context families; full four-case suite for 2 candidate-action and 2 abstention families",
+    "position_absence": "NOT_APPLICABLE"
+  },
+  "joint_projection": {
+    "bytes-composite-frame-field": {
+      "E_t": "target field: header|payload",
+      "E_x": "observed byte order: big|little"
+    },
+    "serde-json-number-mode-plus-error-site": {
+      "E_t": "requested numeric mode: whole|ratio",
+      "E_x": "observed failing path: /header|/payload"
+    },
+    "raw_assertion_values_in_frames": false
+  },
+  "presentation_runtime": {
+    "source": "E011 producer-order integration runtime; source and tests copied unchanged",
+    "cargo_manifest_only_change": "relative dependency paths adjusted for E012 nesting",
+    "condition_specific_receipts": true,
+    "observer_contact": false
+  },
+  "supersedes": [],
+  "sha256_self_excluded": true
+}

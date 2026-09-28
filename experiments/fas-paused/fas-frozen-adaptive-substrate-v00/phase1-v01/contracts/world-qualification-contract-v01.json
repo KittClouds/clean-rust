@@ -1,0 +1,19 @@
+{
+  "contract_id": "FAS00_WORLD_QUALIFICATION_V01",
+  "project_id": "fas-frozen-adaptive-substrate-v00",
+  "parent_pre_model_seal_sha256": "c7227d2a10da05f902ed5d16e94a8e12866d2e0ae6b2b2a357ed2da93431b3e6",
+  "qualification_only": true,
+  "phase5_reuse_authorized": false,
+  "model_contact_authorized": false,
+  "design": {"families": 8, "task_structures": 2, "feedback_conditions": 2, "world_seeds": 32, "events_per_world": 32, "world_count": 1024, "scored_event_count": 32768},
+  "seed_policy": {"world_seed_values": "0 through 31", "label_rotation": "world_seed mod 3", "held_out_leakage_partition": {"train": "0 through 15", "test": "16 through 31"}},
+  "transition_policy": {"qualification_schedule_shift": 1, "stable": "phase A throughout", "single_switch": "A to B once", "return": "A to B to A", "cyclic": "A to B to C to A", "gradual_drift": "truth A to B once; observation distribution moves progressively A to B", "temporary_rule": "B for exactly four adjusted steps", "contradictory_noise": "constant latent state; false observation on every ninth step", "poison_burst": "constant latent state; false observations on steps 12 through 17"},
+  "context_binding": "Context 0 follows regime transitions; context 1 remains at initial A. For context-bound tasks, changing either context at fixed entity/relation or entity at fixed context/relation changes the class under the frozen offset table.",
+  "feedback_visibility": "visible_feedback_ids_after_score lists only examples whose reveal step equals this scored event's step. Immediate includes current event after its score; delayed8 includes source t-8 after current score; labels are absent from the ID list.",
+  "hashing": {"latent": "SHA-256 of canonical per-step regime ID/phase/world-state/target records", "rendered_event": "SHA-256 of serialized event record with rendered_event_sha256 set to empty", "rendered_world": "SHA-256 of serialized event lines including per-event rendered hash"},
+  "surface_leakage": {"classifier": "train-only categorical majority maps; unseen categories use training prior", "partition": "world seeds 0-15 train; 16-31 test", "gate": "maximum held-out accuracy for cheap feature groups at most 0.45", "features": ["template_id", "candidate_order", "query length bucket", "word count bucket", "punctuation pattern", "invented term ID", "region name ID", "relation ID", "time-position bucket", "feedback condition", "world-family label", "public-surface bundle", "family/time/key bundle"]},
+  "baseline_definitions": {"GLOBAL_MAJORITY": "Most frequent visible observation label so far across keys, including current exposed observation; tie to canonical lowest label.", "LAST_GLOBAL_OBSERVATION": "Most recently exposed observation regardless of key; default canonical label 0.", "LAST_OBSERVATION_PER_KEY": "Most recent exposed observation for current key; default label 0.", "PER_KEY_COUNTER": "Majority of exposed observation labels for current key; include current exposure; ties to canonical lowest label.", "ORACLE_REGIME_ID": "Initial key mapping plus current hidden regime ID under the frozen transition table; explicitly diagnostic and privileged."},
+  "resource_basis": {"keys": 8, "possible_current_facts": 24, "current_facts": 8, "regime_identities": 3, "generator_regime_bits": 2, "arbitrary_per_key_state_bits_lower_bound": 13, "arbitrary_per_key_state_bytes_lower_bound": 2, "feedback_events_delivered_within_world": {"IMMEDIATE": 32, "DELAYED8": 24}},
+  "reset_contract": "reset-contract-v01.json",
+  "disposition": "Phase 1 readiness remains false until every scientific gate and the separate qualification hash-tree gate pass."
+}

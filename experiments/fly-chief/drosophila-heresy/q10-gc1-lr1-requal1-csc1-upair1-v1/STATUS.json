@@ -1,0 +1,9 @@
+{
+  "engineering_only": true,
+  "execution_sha256": "68F6CDCA1B458E24466750C22C86FB4A3ED231BC1E52DB3921D8BD1DA019DB66",
+  "identity": "q10-gc1-lr1-requal1-csc1-upair1-v1",
+  "pair_replay_performed": true,
+  "protocol": "Q10-CSC1-UPAIR1",
+  "scientific_promotion": false,
+  "status": "UPAIR1_COMPLETE"
+}

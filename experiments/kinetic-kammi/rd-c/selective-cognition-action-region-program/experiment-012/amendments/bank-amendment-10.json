@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "amendment_id": "E012-BANK-A10",
+  "state": "AUDIT_REPAIR_FROZEN_BEFORE_RERUN",
+  "model_contact_authorized": false,
+  "failed_attempt": "bank/construction-01/scored-bank-v1/attempts/precontact-audit-attempt-02.json",
+  "defect": "expected mask was applied to actual masked frame",
+  "correct_predicate": "apply absence transforms to full-frame copy, compare against projected condition",
+  "projected_bank_mutated": false,
+  "retry_audit": "scripts/audit_task_bank_e012_v1_3.py"
+}

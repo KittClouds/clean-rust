@@ -1,0 +1,53 @@
+{
+  "artifact_id": "E012-PC-RESERVE-POLICY-v1.3.1",
+  "artifact_paths": {
+    "amendment": "C:\\rd-c\\selective-cognition-action-region-program\\e012-readonly-anatomy-addendum\\E012-POSITIVE-CONTROL-RESERVE-POLICY-AMENDMENT-v1.3.1.md",
+    "generator": "C:\\Users\\shuga\\.codex\\worktrees\\e013-episode-factory\\clean-rust\\experiments\\e013-episode-factory\\precontact-v031\\seal_pc_reserve_v131.py",
+    "parent_lock_v13": "C:\\rd-c\\selective-cognition-action-region-program\\e012-readonly-anatomy-addendum\\E012-POSITIVE-CONTROL-BANK-CONSTRUCTION-LOCK-v1.3.json",
+    "parent_spec_v13": "C:\\rd-c\\selective-cognition-action-region-program\\e012-readonly-anatomy-addendum\\E012-POSITIVE-CONTROL-BANK-CONSTRUCTION-SPEC-v1.3.md",
+    "parent_verification_v13": "C:\\rd-c\\selective-cognition-action-region-program\\e012-readonly-anatomy-addendum\\E012-POSITIVE-CONTROL-BANK-CONSTRUCTION-VERIFICATION-v1.3.json"
+  },
+  "bank_generated_by_agent": false,
+  "bank_owner": "USER",
+  "e013_d_c_model_contact_authorized": false,
+  "model_contact_performed": false,
+  "parent_lock_sha256": "0659c005ca2ea03d76164d423f14fd785fb1066cc34d9d1a7b0fcb629a2f958b",
+  "parent_spec_sha256": "7d4be952441f9619c876a2080d19d0d1d7ce57bf52d59f7f12a84a4ac7a3b254",
+  "positive_control_contact_authorization": "unchanged from v1.2; pending user-built sealed bank and dry run",
+  "reserve_policy": {
+    "candidate_and_label_checks": "reserve must pass every v1.3 reference, leakage, execution-label, determinism, and runtime-bound check before substitution",
+    "cell_count": 16,
+    "cell_key_order": [
+      "repository_index ascending",
+      "cohort order PC then difficulty",
+      "family_index ascending"
+    ],
+    "consumption": "replace only primary task slot 0 in its own cell; consume at most once; preserve the slot, cell, task class, rubric vector, and valid-anchor ordinal",
+    "eligible_primary_slot": 0,
+    "id_assignment": "use Generator(PCG64(opaque_ids_child)) and 16-byte draws rendered as lowercase hex; core IDs are drawn first in cell_key_order, task_slot ascending, task ID then candidate IDs by producer ordinal; then reserve IDs are drawn in cell_key_order, reserve_rank order, reserve task ID then candidate IDs by producer ordinal; retry collisions by consuming the next 16-byte draw; record NumPy version and the full ID map before label access",
+    "other_primary_failure": "any rejected primary task outside slot 0 fails bank construction; no cross-slot or cross-cell borrowing",
+    "rejected_artifacts": "retain rejected primary/reserve bytes, checks, labels, and reasons in the construction failure ledger; never overwrite",
+    "replacement_trigger": "eligible primary slot 0 fails a task-local check (reference/candidate execution, determinism, leakage, or per-task T1 runtime) before any observer contact; bank-level quota failures are not replaceable",
+    "reserve_count_per_cell": 1,
+    "reserve_failure_or_exhaustion": "if the reserve fails any acceptance check, or a second failure occurs in a cell after its one reserve is consumed, bank construction fails; no reserve is generated, repaired, or selected after inspecting observer outputs",
+    "reserve_rank_per_cell": 0,
+    "structural_match": [
+      "same repository/cohort/family cell",
+      "same empty-valid status",
+      "same six-dimension independent-rater score vector",
+      "same preassigned valid-anchor ordinal when nonempty"
+    ],
+    "total_reserves": 16,
+    "unused_reserve": "seal in construction archive as UNUSED_RESERVE; exclude from the 64-task run manifest and all task-level run analyses"
+  },
+  "schema_version": 1,
+  "self_hash_note": "Lock excludes itself and post-lock verification receipt.",
+  "sha256": {
+    "amendment": "ed37d45de3dcb51367ba5f0bc56d82b318e0096682008766a9dbf4b4a9cdbde8",
+    "generator": "d832a125d0b09dd709dacb7c305f83af86459accaa27e27e60ff9f391261fe23",
+    "parent_lock_v13": "0659c005ca2ea03d76164d423f14fd785fb1066cc34d9d1a7b0fcb629a2f958b",
+    "parent_spec_v13": "7d4be952441f9619c876a2080d19d0d1d7ce57bf52d59f7f12a84a4ac7a3b254",
+    "parent_verification_v13": "94b6be68800241d2adfee8037af11503628091e8303d41ce1a5b67edea244352"
+  },
+  "state": "PREAUTHORING_AMENDMENT_SEALED_BANK_NOT_BUILT"
+}

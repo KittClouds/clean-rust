@@ -1,0 +1,118 @@
+{
+  "receipt_id": "FAS_FROZEN_OBSERVER_BUNDLE_E0_E2_DRAFT_INTEGRITY_RECEIPT_V06",
+  "status": "DRAFT_INTEGRITY_PASS_WAIT_COMPLETE_NOT_SEALED_NOT_AUTHORIZED",
+  "created_utc": "2026-09-26T07:14:49.740528+00:00",
+  "draft_tree_sha256": "548325114bab08612b170da4b87ad5238e851f508c94a92d6102f99c01c6d23b",
+  "entries": [
+    {
+      "path": "README.md",
+      "bytes": 31308,
+      "sha256": "074e16da42c83d7da8ad06f9f37fa8d65840efafeff1c60b59ef6fd8fe8907f2"
+    },
+    {
+      "path": "audits/e0-e2-process-gpu-update-v05-draft.md",
+      "bytes": 6184,
+      "sha256": "5e51b39c58c553b60ddaca03bf294732aa280b8e6e0e3b5f4c10127e3368c979"
+    },
+    {
+      "path": "audits/e2-v02-concurrent-wait-complete-v01.json",
+      "bytes": 226321,
+      "sha256": "b926124f9aa55b1b9fec2d794d0ac6a7a808128d43df9d53babb6cf143454b80"
+    },
+    {
+      "path": "audits/e2-v02-post-wait-gpu-diagnostic-v01.json",
+      "bytes": 660,
+      "sha256": "2e4b1a4c5d400790d9cd71fb615c867535483f6dd46496390c28083f8f76192f"
+    },
+    {
+      "path": "contracts/e0-freeze-v05-draft.json",
+      "bytes": 19989,
+      "sha256": "f38bd1dfa8af325fe307c96ad975bd7c5a5494f302db7c0946721ab276c0f44c"
+    },
+    {
+      "path": "contracts/e2-run-v02-draft.json",
+      "bytes": 10819,
+      "sha256": "e48ad8043f8ab6a87baac327337ed5a280c4edbf65c4150943bc25c2db9a31b5"
+    },
+    {
+      "path": "contracts/representation-abi-v02.json",
+      "bytes": 3452,
+      "sha256": "2605aa76d8560f80db574bf81d478c6201eb15459785244602b8bf1aec60b437"
+    },
+    {
+      "path": "source/scripts/extract_features_v02.py",
+      "bytes": 31583,
+      "sha256": "49956203a130a0faa1532e9b0017f40574f00327d4b51d58bd5be5daae04b706"
+    },
+    {
+      "path": "source/scripts/sample_e2_resources_v02.ps1",
+      "bytes": 3706,
+      "sha256": "dda73c48afd804b2d3253bf38b498141a75e4123c2d357526f336a78b2d20754"
+    },
+    {
+      "path": "source/scripts/wait_for_concurrent_gpu_job_v01.ps1",
+      "bytes": 4916,
+      "sha256": "9a41e083b638e09411ad2143375d180730a25d1b42937e330eb0373788acd216"
+    },
+    {
+      "path": "source/tests/test_e2_resource_v02.py",
+      "bytes": 7899,
+      "sha256": "3e8ca1c5e2fe644902d85c25d7e5308b8eadb1d1dc4e47f9dad31eecdbe8a0b8"
+    }
+  ],
+  "predecessor_roots": {
+    "e0_v04": "fef50e3d7efe6ff35adf671940ee73112caf8ba6192596094aa6bb3e69ae9ab2",
+    "e1_v04": "6ba77a899363651e3ba119b005f59a22e86f011f83c86b873857cd3f9ab64b03",
+    "e2_v01_preservation": "0ff309d833cd87017f7384247e4420a508f582ad9f375c5637f586d73b703f4c"
+  },
+  "concurrent_run_wait": {
+    "status": "WAIT_COMPLETE_STABLE_ABSENCE",
+    "pid": 34332,
+    "script": "D:\\codex-runs\\fas-s12-observer-plane-causal-dependence-v01\\run-v02\\source\\run_s12_v02.py",
+    "process_creation_time_local": "2026-09-25T20:08:43",
+    "wait_started_utc": "2026-09-26T03:36:44.7652960Z",
+    "completed_utc": "2026-09-26T05:18:12.9062436Z",
+    "stable_absent_samples": 2,
+    "sample_interval_seconds": 30,
+    "wait_receipt_sha256": "b926124f9aa55b1b9fec2d794d0ac6a7a808128d43df9d53babb6cf143454b80",
+    "model_contact_performed_by_waiter": false
+  },
+  "post_wait_gpu_diagnostic": {
+    "status": "DEVICE_WIDE_DIAGNOSTIC_ONLY",
+    "captured_utc": "2026-09-26T05:19:27.6825337Z",
+    "observation": {
+      "device": "NVIDIA GeForce RTX 3080",
+      "total_mib": 12288,
+      "used_mib": 2084,
+      "free_mib": 10008,
+      "utilization_percent": 9
+    },
+    "process_attribution": "none; device-wide diagnostic only",
+    "receipt_sha256": "2e4b1a4c5d400790d9cd71fb615c867535483f6dd46496390c28083f8f76192f"
+  },
+  "reference_cache_verification": {
+    "path": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e2-v01\\cache\\V1_FINAL_POSITION.f32le",
+    "sha256": "8eb80df5f73e761fe6c025fc1c66abef2027d639b6c14f56d4177d6e6a7a45a4",
+    "bytes": 872415232,
+    "read_only_comparator_only": true,
+    "model_or_tokenizer_contact_performed_for_verification": false
+  },
+  "changes_since_v05_integrity_receipt": [
+    "GPU terminal receipt now states the process-local PyTorch caching-allocator reserved-peak scope and explicitly denies a total-E2-GPU-memory claim.",
+    "Extractor records all four allocator counters before and after peak reset and stops with a preserved receipt unless both baselines are exactly zero.",
+    "E2 v02 now requires exact cache SHA-256 and byte-length equality to the preserved E2 v01 cache, which is used only as a read-only comparator.",
+    "README and draft update document the unchanged authority boundary and historical E2 v01 disposition."
+  ],
+  "validation": {
+    "extractor_and_unit_test_py_compile": "PASS",
+    "focused_unit_tests": "PASS_8_TESTS",
+    "contract_and_source_hash_bindings": "PASS",
+    "reference_cache_pinned_hash_and_length": "PASS",
+    "wait_receipt_stable_absence_gate": "PASS",
+    "model_or_tokenizer_contact_performed": "false",
+    "e2_v02_extraction_performed": "false",
+    "e0_v05_sealed": "false",
+    "e2_v02_authorized": "false"
+  },
+  "not_a_seal": true
+}

@@ -1,0 +1,159 @@
+{
+  "schema_version": 1,
+  "run_id": "e009-20260925-expanded-01",
+  "phase": "DEVELOPMENT_SHADOW_CALIBRATION",
+  "state": "FROZEN_BEFORE_MODEL_CONTACT",
+  "frozen_at_utc": "2026-09-25T16:22:29.191440+00:00",
+  "task_bank": {
+    "selection": "pre-existing targeted unit-test families and controlled candidate mutations; selected before observer output",
+    "development_families": [
+      "color-interpolation-endpoints",
+      "cyclic-palette-seam",
+      "unicode-fill-boundaries",
+      "unicode-pointer-selection"
+    ],
+    "heldout_families": [
+      "draft-cardinality-transitions",
+      "fill-clear-intervals",
+      "hard-stop-ordering",
+      "inherited-style-preservation"
+    ],
+    "development_task_count": 8,
+    "heldout_task_count": 8,
+    "heldout_unit": "four disjoint task families within the same product repository; not a repository holdout",
+    "previously_scored_pilot_families_excluded": [
+      "asynchronous-gpu-picking",
+      "embedding-length-batched-execution"
+    ],
+    "labels_are_scoring_only": true,
+    "development_labels_sha256": "a5ee26fdd05d9b96561d8c670c24afbc58874dbed61474fd74ef3f2951025dbf",
+    "heldout_labels_sha256": "0939a93ba7860b841a9b011c4f77efbe1c54afc1b279bd8272ac727c96dc2ee5"
+  },
+  "contracts": {
+    "authority": "E002 compiled authority and action simulator",
+    "runtime_contracts": "rdc-runtime-contracts-v1",
+    "runtime_authority": "observer proposes; deterministic authority owns state and action authorization",
+    "normalization": "line-endings-lf-v1",
+    "paid_inspection_default": "disabled",
+    "lanes": [
+      "hand-written",
+      "small",
+      "small-then-large-on-abstention",
+      "always-large"
+    ]
+  },
+  "authority_dependencies": {
+    "rdc-experiment-002": "7d9ebd82de77f916956f1385b67aa4b0d7054b553809d9c817d49b7e4998ca2f",
+    "rdc-experiment-001": "890ae20b9888f8c2d582722ab6414a7561805be50b91d213a85d7f72d8047973",
+    "rdc-runtime-contracts-v1": "18257d85b477dca9962a536b975e97730aa73d05a2af282af6d60e74641c3e3b"
+  },
+  "models": [
+    {
+      "role": "small",
+      "bundle_id": "minicpm5-2b-q8-local-v3-calibration",
+      "bundle_blake3": "1d6b13f629c7f86c8206c6df81dda81d5ee81db20c0f4c25f696a5ca9990009f",
+      "bundle_lock_path": "models/bundle-lineage/v3-calibration/bundle-lock.json",
+      "bundle_lock_sha256": "f75534c90de209c7d2d31e8e67337b0355c85b8bb7bbd5d3913d33ffc5acb2ca",
+      "backbone_sha256": "c5415f8989bf88a8288f1b55a3cc371af53c07b0faa220a63bd7a990cfaba078",
+      "runtime_sha256": "ffaee576ad271ede87b92a7d8c3863dc8f331bbac666ee00099c250e8809e743",
+      "reasoning_mode": "off",
+      "maximum_output_tokens": 1024,
+      "minimum_applicability_milli": 700,
+      "maximum_abstention_milli": 600,
+      "chat_template_id": "e009-small-v3:b10982-fc82583e6:model-embedded",
+      "chat_template_sha256": "6e54652d84d698ebb3b7b2172204b6eeafd7f27533e006c8c1ebf8e743a7fd99",
+      "chat_template_path": "models/chat-templates/minicpm5-2b-q8-local-v3.jinja",
+      "server_alias": "e009-small-v3"
+    },
+    {
+      "role": "large",
+      "bundle_id": "ternary-bonsai-2-27b-ptq1-local-v3-calibration",
+      "bundle_blake3": "611c5f7d735f0eeef2d38e770ffb8d534de44b9836040f5855653f8c376b29a5",
+      "bundle_lock_path": "models/bundle-lineage/v3-calibration/bundle-lock.json",
+      "bundle_lock_sha256": "f75534c90de209c7d2d31e8e67337b0355c85b8bb7bbd5d3913d33ffc5acb2ca",
+      "backbone_sha256": "53107f530aa52eb00912263ab1ee29bd199261c87cd7b4ad4ca1318c1fe33ee3",
+      "runtime_sha256": "e0ea4fd53e6f0c741cbd28093b427f333ada0eb03b83073e1f99c483793ea976",
+      "reasoning_mode": "off",
+      "maximum_output_tokens": 1024,
+      "minimum_applicability_milli": 700,
+      "maximum_abstention_milli": 600,
+      "chat_template_id": "e009-large-v3:b10685-7dffb158d:model-embedded",
+      "chat_template_sha256": "c3cf9e34abf4f9e36c2d72165aa9c132d3e2a725b6c2586aaa3a8af9d7a81041",
+      "chat_template_path": "models/chat-templates/ternary-bonsai-2-27b-ptq1-local-v3.jinja",
+      "server_alias": "e009-large-v3"
+    }
+  ],
+  "threshold_contract": {
+    "method": "full integer grid evaluated on development tasks only",
+    "minimum_applicability_milli": {
+      "min": 0,
+      "max": 1000,
+      "step": 1
+    },
+    "maximum_abstention_milli": {
+      "min": 0,
+      "max": 1000,
+      "step": 1
+    },
+    "objective": [
+      "maximize hybrid completions",
+      "minimize large fallback calls",
+      "minimize input plus generated tokens",
+      "minimize measured observer wall time",
+      "prefer higher minimum applicability",
+      "prefer lower maximum abstention"
+    ]
+  },
+  "runtime_environment": {
+    "inference": "local loopback only",
+    "hardware": "RTX 3080 12GB; serial observer services",
+    "small_loopback_port": 18089,
+    "large_loopback_port": 18090,
+    "small_target_path": "D:\\cargo-targets\\rdc-e009-expanded\\dev",
+    "completion_target_path": "D:\\cargo-targets\\rdc-e009-expanded\\scoring",
+    "authority_target_path": "D:\\cargo-targets\\rdc-e009",
+    "billed_api_usd": 0,
+    "cost_proxy": "input/generated tokens and measured wall time; energy/hardware-dollar cost not measured"
+  },
+  "sha256": {
+    "system_prompt": "2b97ece95d1afb065fed7287d5125e8e032196c209610c9bc9931841aa1db7e6",
+    "output_schema": "d3e44b9964d52bb68384b83e17d9cb5699be96bae7dc98d576acaaabcf3eb8ef",
+    "split_manifest": "1ebd37a99608f152506c09ce15f7ab52bdda965429ed0723a784cc87b7df7528",
+    "dev_frame_lock": "f25338bdd754898de614d1aa57445acc8a04a35a97d2785bfba628da7038430b",
+    "heldout_frame_lock": "fea435d14ccf9cba99502a50efc1d7f95191c53bb271b7ed210bcb11dbfb0d67",
+    "dev_candidate_lock": "5c07a6faee1c1751c60227a157f7ad56bed6952afda018f0dd62fffc9d4dd261",
+    "heldout_candidate_lock": "1376bd6ca3792510178aae447cfceb681f1865571c86491237b580e72a32d6e4",
+    "dev_bank_tree": "ec8531caec5e293cf07e2d31a779c9236eeec200537e3e64d94832d8ecd2fa1a",
+    "heldout_bank_tree": "b5e16247b071ad030a9ce0474df1978bda646eb6ceb8eb0c0844988d463334ae",
+    "dev_labels": "a5ee26fdd05d9b96561d8c670c24afbc58874dbed61474fd74ef3f2951025dbf",
+    "heldout_labels": "0939a93ba7860b841a9b011c4f77efbe1c54afc1b279bd8272ac727c96dc2ee5",
+    "bundle_lock": "f75534c90de209c7d2d31e8e67337b0355c85b8bb7bbd5d3913d33ffc5acb2ca",
+    "v1_original_bundle_lock": "e3a719ac2644ec6dfde0c45e6820cc7f4c4a567e7d003196b46df355f3cac2bf",
+    "bundle_lineage_record": "8dba70a1ec50c900d865341d1ea5ff70df89dd845b04e335378febf1b7fde6df",
+    "chat_template_capture_receipt": "cf649d0674ebaa8f8baa4cebd4ebe053aa015f175131c9948e7bc6e250bf9144",
+    "small_runtime_props": "dd40cfa991157422d8c64ec72c8706adf661707bd183a93b5713f5491c20fe98",
+    "large_runtime_props": "6d8c766868c225ba2fc53fab43e4889bbcb15371cf65c6ae88e24e72d3271672",
+    "small_chat_template": "6e54652d84d698ebb3b7b2172204b6eeafd7f27533e006c8c1ebf8e743a7fd99",
+    "large_chat_template": "c3cf9e34abf4f9e36c2d72165aa9c132d3e2a725b6c2586aaa3a8af9d7a81041",
+    "e009_cargo_manifest": "a5793bf4500bcc6a224833307f2dcc7da72aea6c142248cc9697cd64172a6f90",
+    "e009_cargo_lock": "49d73a570a9d58c6531be4eeaaa33ab6c929c774147ba4822a4414299ae0e9cb",
+    "bundle_schema_source": "5ee8e36e2ec5a1a0d1d2c2c2b80c7df62e1da859b3f234b0afeb546554369f8c",
+    "frame_schema_source": "4fc7b14de4c00812ba820ef9cd0b9ec0b004f56b7bd1bf89cbdf0e016b3892e3",
+    "authorizer_source": "dbe3f9848bb88b414911e199f579749d41acf96b5c3238d9025e99b2ca2bbb11",
+    "expanded_observer_runner": "a5decc7c30604cd8cb85712b2c26b16a07b04f20d62a7fac40a338b4c9e6df8f",
+    "expanded_evaluator": "c92148bf3d3ae7d1896de7a5f3af7cb2114c31f568718cc493a5130b49383ff0",
+    "expanded_lock_builder": "a664a398c1b77d334a402ee2d4339f8863d400f0b98039d3a30d4a30548831ad",
+    "server_starter": "221a9e6e77f446d1c0c0998fcb83469ef7f049884a4b8ed6910b0092d1391897",
+    "server_stopper": "03bf1b8391d6f203fe0cfa788388623b802953fdbcd1a2d0d35ff59c406dd200"
+  },
+  "chat_template_runtime_properties": {
+    "small": {
+      "runtime_props_sha256": "dd40cfa991157422d8c64ec72c8706adf661707bd183a93b5713f5491c20fe98",
+      "captured_template_sha256": "6e54652d84d698ebb3b7b2172204b6eeafd7f27533e006c8c1ebf8e743a7fd99"
+    },
+    "large": {
+      "runtime_props_sha256": "6d8c766868c225ba2fc53fab43e4889bbcb15371cf65c6ae88e24e72d3271672",
+      "captured_template_sha256": "c3cf9e34abf4f9e36c2d72165aa9c132d3e2a725b6c2586aaa3a8af9d7a81041"
+    }
+  }
+}

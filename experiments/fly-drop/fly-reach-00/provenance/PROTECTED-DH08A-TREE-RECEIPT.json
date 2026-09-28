@@ -1,0 +1,27 @@
+{
+  "schema": "FLY-PHENO-00-protected-dh08a-tree-receipt-v1",
+  "prepared_utc": "2026-09-22T01:44:17.6485076Z",
+  "protected_root": "experiments/drosophila-heresy/dh08a",
+  "result_artifacts_copied": false,
+  "outcome_files_opened_for_inspection": false,
+  "before": {
+    "root": "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\dh08a",
+    "excluded": [
+      "target/**"
+    ],
+    "file_count": 133,
+    "total_bytes": 80314253.0,
+    "root_sha256": "08e0c854ab0b2f0988fe0d35a47529aebd45c9379f65b67eb89674e290e26ba6"
+  },
+  "after": {
+    "root": "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\dh08a",
+    "excluded": [
+      "target/**"
+    ],
+    "file_count": 133,
+    "total_bytes": 80314253.0,
+    "root_sha256": "08e0c854ab0b2f0988fe0d35a47529aebd45c9379f65b67eb89674e290e26ba6"
+  },
+  "unchanged": true,
+  "source_copy_policy": "only Cargo manifests, requirements lock, and src/** were copied; DH-08A artifacts, posthoc, qualification, and target were excluded"
+}

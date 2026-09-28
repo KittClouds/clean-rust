@@ -1,0 +1,40 @@
+{
+  "schema": "jev-v08p-r2-feature-instrument-seal-v01",
+  "status": "SEALED_BEFORE_LFM_CONTACT",
+  "panel_materialization_manifest_sha256": "565d5e2650db375230fed15eb94471c92a25810c1644d629e7bb9d1490bf4822",
+  "panel_materialization_receipt_sha256": "cdd68eee06ef9b4239cfbc3ffbb4f65f18c4ced655e474cba1a3981dbb2c0cb5",
+  "r2_execution_contract_sha256": "51cd8dee09688f1aa24ff575fa0a181d50b2a6ffc94dc6b7e7ed5b61c58ef14",
+  "feature_extractor": {
+    "path": "experiments/jev-information-density-v08p-r2/runner/extract_r2_panel_features.py",
+    "sha256": "52fe40b0e890288e24b146db1b3f3dbf0e7b5c5ee6d33e9552916d590160bbc7",
+    "frozen_adapter_path": "experiments/jev-lfm-variable-v07/extract_lfm.py",
+    "frozen_adapter_sha256": "b8cd79a9a3265eca0fde5f509ba7c058bc2065d7747efe17ff7c7c1f6335b2d0",
+    "state_scope_rows": 22000,
+    "candidate_basis_rows": 16,
+    "expected_shapes": {"state": [22000, 2048], "candidate": [16, 2048]},
+    "pooling": "final-layer mean_full@16; exact-length, single-row, no padding; BF16 backbone; FP32 output",
+    "repeat_smoke_tolerance": 0.00001,
+    "output_root": "D:/codex-runs/jev-information-density-v08p-r2/v0.8P-R2/features"
+  },
+  "radius_matcher": {
+    "path": "experiments/jev-information-density-v08p-r2/runner/match_r2_panel_radius.py",
+    "sha256": "f3f55099c4fcbbb45194d2e8d09014c532b5a69e1683d5eaf5036dc1e098e9bd",
+    "frozen_reference_sha256": "1036f3242c24bbc5d2d1f8112b2129b6454960591d3ea8f003d71ccec7cc9640",
+    "selection": "radius-only argmin with frozen SHA-256(anchor_id|'|'|neutral_role) tie-break",
+    "gates": {"mean_relative_error_max": 0.1, "p95_absolute_error_max": 0.25, "per_family_mean_relative_error_max": 0.15},
+    "outputs": ["matched-neutral-selection.jsonl", "radius-gate-report.json", "semantic-axis-composition.json", "whole-panel-candidate-join.jsonl", "whole-panel-join-preflight.json"]
+  },
+  "tests": {
+    "extractor_cli_import_smoke": "PASS; help only, no model loaded",
+    "matcher_self_test": "PASS",
+    "training_or_evaluation_code_invoked": false
+  },
+  "boundary": {
+    "model_loaded": false,
+    "head_loaded": false,
+    "training": false,
+    "inference": false,
+    "evaluation": false,
+    "phoenix_access": false
+  }
+}

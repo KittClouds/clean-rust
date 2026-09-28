@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "attempt_id": "A12-scored-check-01",
+  "state": "ABORTED_NO_RESULT_ARTIFACT",
+  "model_contact": false,
+  "runner": "scripts/run_scored_checks_e012_a12_v1.py",
+  "runner_sha256": "2cb2f143946a602a5f0ef553090c7e2e87daba02339ffea7ee80763743b04a54",
+  "run_lock_sha256": "d5fca1b37e154ad711a07f5fff924536598acebb4e64128c6142e298bd4218ea",
+  "precheck_fixture_sha256": "778cc600c2aac4f07921d9983ebb14c12ac090359c8d8b2f636e01e13a7c343e",
+  "exit_code": 1,
+  "started_local": "2026-09-26T00:01:06-04:00",
+  "finished_local": "2026-09-26T00:07:26.5466276-04:00",
+  "failure": "apply_unified_patch rejected map-order canonical_sort candidate patch because the A12 edit changed a context line instead of expressing a removal/addition",
+  "failing_tasks": [
+    "task-294600",
+    "task-798417",
+    "task-582475",
+    "task-544502"
+  ],
+  "completed_harness_cache_roots": [
+    "bytes-composite-repair-01",
+    "bytes-cursor-repair-01",
+    "bytes-endian",
+    "bytes-prefix",
+    "clap-alias",
+    "clap-color-repair-01",
+    "clap-repeat-repair-01",
+    "clap-values"
+  ],
+  "candidate_result_file_written": false,
+  "raw_error": "ValueError: candidate patch context does not match frozen task source",
+  "target_root": "D:/rdc-e012-target/scored-checks-a12"
+}
+

@@ -1,0 +1,102 @@
+{
+  "arm_support": {
+    "native": false,
+    "native_direction_reference_magnitude": false,
+    "reference_direction_full_support": false,
+    "reference_direction_native_support": false,
+    "weight_oracle": false
+  },
+  "artifact_hashes": [
+    {
+      "bytes": 6416,
+      "path": "manifests/REACH-CONTRACT.json",
+      "sha256": "4629ca75748439b5fce20684393c2f9a9e6643367ded9af1f836a9694c447548"
+    },
+    {
+      "bytes": 5222,
+      "path": "manifests/REACH-MANIFEST.json",
+      "sha256": "0af7506e1eb0be60cd314c9c45b747ab45529d313f9e56676675e15e163c866a"
+    },
+    {
+      "bytes": 24329,
+      "path": "manifests/NULL-GRAPH-MANIFEST.json",
+      "sha256": "b22ab6731e681bfc8a872710147f7378e7d1527a129de7f5a2eded5281e8df78"
+    },
+    {
+      "bytes": 21014742,
+      "path": "inputs/banks/training.json",
+      "sha256": "dc58ff7241b4ae2eb18ee347742860c95928f35bca4fd5fa709c18fd37d9455e"
+    },
+    {
+      "bytes": 120030,
+      "path": "inputs/banks/competence.json",
+      "sha256": "8ce74b456c1965972796bf81aa0ee297baf0c58c7e0e60612a308ba80ca38932"
+    },
+    {
+      "bytes": 1918512,
+      "path": "inputs/banks/evaluator-large.json",
+      "sha256": "2939bf5a56c9b17070ca5c7ebc00266c183d95694407a7717825e4d5a12f8de0"
+    },
+    {
+      "bytes": 1482296,
+      "path": "artifacts/REACH-RUN1/outcomes.jsonl",
+      "sha256": "acaaa47baa755b30e6506fe1408ad217bbc8ce47d6abace952aae49038ee2550"
+    },
+    {
+      "bytes": 502448,
+      "path": "artifacts/REACH-RUN1/diagnostics.jsonl",
+      "sha256": "eb1312078b9c18e274a71373f5606212c0d2889140bd218699a982f100d98767"
+    },
+    {
+      "bytes": 624,
+      "path": "artifacts/REACH-RUN1/collection-receipt.json",
+      "sha256": "03bc8729cd230f47be07ce360de39ee0d035bb56c1689dc73d29a967e16a3d28"
+    },
+    {
+      "bytes": 179,
+      "path": "artifacts/REACH-RUN1/integrity-receipt.json",
+      "sha256": "5dd49377c433ab520f19a0b7e47b4df2921bcfc86633da93b1ac04257938c5d9"
+    },
+    {
+      "bytes": 49810,
+      "path": "artifacts/REACH-RUN1/reach-analysis.json",
+      "sha256": "a8fc658918c3ad2f523769f4f43f5e7e3b72575cf766ccb9fddd9406e788147e"
+    },
+    {
+      "bytes": 4375,
+      "path": "artifacts/REACH-RUN1/reach-summary.csv",
+      "sha256": "1ad1480dca7e2290c1e52c7cca73dfd070df96b09b9bc90093fee1ecefa60460"
+    },
+    {
+      "bytes": 3253,
+      "path": "artifacts/REACH-RUN1/RESULTS.md",
+      "sha256": "d955fc56020b357a5050d795380634676e23678000fdba01048649ca6244e9e0"
+    },
+    {
+      "bytes": 612352,
+      "path": "sealed/fly-reach-00.exe",
+      "sha256": "cb7e08910e54717c65119130b3bfd62db78d61663d62064b738291be07afbb28"
+    },
+    {
+      "bytes": 1026,
+      "path": "provenance/PROTECTED-DH08A-TREE-RECEIPT.json",
+      "sha256": "5a8f4beb9a9a4d50c35bbb73455d14551a23ff79f58e4ebcb00e07faedce0466"
+    }
+  ],
+  "closed_at_utc": "2026-09-22T10:14:00.265126+00:00",
+  "disposition": "PARTIAL_DIRECTION_SUPPORT_SHORTFALL_WITH_EVALUATOR_FLOOR",
+  "full_support_reference_large_mean": 0.2435418588143808,
+  "integrity_status": "INTEGRITY_PASS",
+  "interpretation": "Native updates have near-zero alignment with the reference direction; reference directions improve the endpoint and full support improves further, but the stochastic evaluator prevents the frozen per-cell support rule from closing.",
+  "native_large_mean": 0.2960897375036169,
+  "native_support_reference_large_mean": 0.24879031711154515,
+  "no_biological_promotion": true,
+  "no_lesions": true,
+  "oracle_large_mean_pass": true,
+  "pheno_reseal_authorized": false,
+  "protected_dh08a_receipt_sha256": "5a8f4beb9a9a4d50c35bbb73455d14551a23ff79f58e4ebcb00e07faedce0466",
+  "run_id": "FLY-REACH-00-RUN1",
+  "schema": "FLY-REACH-00-terminal-receipt-v1",
+  "status": "CLOSED_ENGINEERING_ONLY",
+  "study_id": "FLY-REACH-00"
+}

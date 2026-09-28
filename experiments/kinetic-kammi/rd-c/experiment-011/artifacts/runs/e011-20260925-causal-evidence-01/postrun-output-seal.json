@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "state": "OUTPUTS_SEALED_BEFORE_SCORING",
+  "run_id": "e011-20260925-causal-evidence-01",
+  "created_utc": "2026-09-25T20:17:20.479255+00:00",
+  "pre_model_seal_sha256": "8cf6424be08142364117ec43e1d70a2b3529815369ec2b9705cead308cb2d7ce",
+  "output_tree_sha256": {
+    "small": {
+      "evidence-masked": {
+        "record_count": 16,
+        "http_success_count": 16,
+        "normalized_output_count": 16,
+        "tree_sha256": "cbb3f97ab6cd42fdd27f5185f1b3a7301b4df26465bb840b793e80f831558a35"
+      },
+      "evidence-swapped": {
+        "record_count": 16,
+        "http_success_count": 16,
+        "normalized_output_count": 16,
+        "tree_sha256": "5d6544dbd8cfb16852bd8e48c1667136a606cc1b856ddcee2977b8a19b7b6f51"
+      },
+      "repository-neutralized": {
+        "record_count": 16,
+        "http_success_count": 16,
+        "normalized_output_count": 16,
+        "tree_sha256": "20d6cd4e5b056363012cac18848d962409d6fbfae80776d273a69ccbaa589097"
+      },
+      "candidate-permuted": {
+        "record_count": 16,
+        "http_success_count": 16,
+        "normalized_output_count": 16,
+        "tree_sha256": "056534373873cb7d1e4b282ede9d5fa7042e476d54532543af5a7419ff506b61"
+      }
+    },
+    "large": {
+      "evidence-masked": {
+        "record_count": 16,
+        "http_success_count": 16,
+        "normalized_output_count": 16,
+        "tree_sha256": "e0d2ff919c3b12516de8018a21e008412d55b154739b4214e73dad2cd5bce805"
+      },
+      "evidence-swapped": {
+        "record_count": 16,
+        "http_success_count": 16,
+        "normalized_output_count": 16,
+        "tree_sha256": "e62ab7320555313fc4a14bf1234b76da870bb7837e550cb6fd5720a7f089d6c3"
+      },
+      "repository-neutralized": {
+        "record_count": 16,
+        "http_success_count": 16,
+        "normalized_output_count": 16,
+        "tree_sha256": "deeb7944d58ffab16c6c3949ab87d31d0a8c489883387204549fc9f9e457efed"
+      },
+      "candidate-permuted": {
+        "record_count": 16,
+        "http_success_count": 16,
+        "normalized_output_count": 16,
+        "tree_sha256": "4bb9f42c0a2965cd5b52fd22bb5bed95a8e5deef980544cb52619c1ab4816f21"
+      }
+    }
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "e013_confirmation_bank_built": false,
+  "e013_development_bank_built": false,
+  "e013_model_contact_performed": false,
+  "e013_scoring_code_built": false,
+  "e014_authorized": false,
+  "freeze_boundary": [
+    "No E012 run files were changed.",
+    "No model/API calls, threshold fitting, signal fitting, or E013 scoring were performed.",
+    "The positive control is designed but not run.",
+    "E013 development and confirmation banks and executable analysis code are not built.",
+    "E013 model contact and E014 remain unauthorized."
+  ],
+  "model_contact_authorized": false,
+  "predecessor": {
+    "lock_sha256": "6544f0b33606d8c0e5cf4e6cbd13a1b295738bc702ea29e0f37ee6bc9c1955c3",
+    "protocol_id": "E013-TRUST-SIGNAL-DEVELOPMENT-v0.1",
+    "protocol_sha256": "ebe79c6cf554c48aca70515e0ab84a4fa3fff48f48e1a15cede14ba88d69e786"
+  },
+  "protocol_id": "E013-TRUST-SIGNAL-DEVELOPMENT-v0.2",
+  "protocol_sha256": "840be748b8aed6b9b642c3c622f079a61c847c61d0e5c9842b04a2a229aa6bdc",
+  "review_amendments": [
+    "Primary routing risk includes candidate proposals on empty-valid-set tasks; candidate-selection-only risk is secondary.",
+    "T3 and T4 calculations are fully specified; executable scorer and analysis code must be hashed before future contact.",
+    "Positive control has an outcome-blind difficulty-matched cohort and remains diagnostic only.",
+    "Pooled confirmation does not imply per-repository portability; each claimed repository needs its own support and risk gate."
+  ],
+  "schema_version": 1,
+  "self_hash_note": "This lock binds the protocol bytes and predecessor/upstream artifacts; it does not hash itself.",
+  "state": "SEALED_PROTOCOL_DESIGN_ONLY",
+  "upstream_artifacts": {
+    "cross_review_synthesis_sha256": "62ba217ce200d02e827eec560a3bad1b925ca1a8557f3873930bd1df71f2dcaa",
+    "e012_anatomy_v1_1_seal_sha256": "ac6ee4fe67c48022d8e2c385ade4a196145be351bee7bfc0626e5c49214d9034",
+    "e012_anatomy_v1_1_sha256": "b2b93a99193ddad6067ece2fd703ec708230e79143f1f83beea8499ec71ba0a0",
+    "e012_anatomy_v1_seal_sha256": "fc35eb76c074daebc2c6c82958c889a11334608968dd8e51878ed896ee90735a",
+    "e012_anatomy_v1_sha256": "70846f29d13a122518ce47d1fb5ded28cf484255aa6dff59621a222d0075bc63",
+    "e012_autopsy_sha256": "17dfc2e69a146e569d895500e3cc43f8852c60d1e274f48f28dc4745a87ea694",
+    "e012_baseline_report_sha256": "2155e62daf0650da8e44fb3c44704deb8c4bd2aff615e859ec215aabd6e1a6ed",
+    "e012_closeout_v1_1_sha256": "90f6ac51ca85acf23e1d07e911bd7391fc6cf228f16a536def0717d1fd8ce183",
+    "e012_frozen_input_lock_sha256": "4bab6fd945248b6209fa33e3a1df10786298ac620342ce167251411c6a258cd8",
+    "e012_run_id": "e012-20260926-frame-decomposition-01",
+    "positive_control_v1_1_sha256": "10bafb793cba27191069fb7aa34bae01a61c3aaa5044d2d84276297e411dad13"
+  }
+}

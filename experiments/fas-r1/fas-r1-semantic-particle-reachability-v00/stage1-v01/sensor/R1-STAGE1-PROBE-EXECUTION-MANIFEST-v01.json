@@ -1,0 +1,183 @@
+{
+  "evaluation_truth_scoring_performed": false,
+  "execution_contract": {
+    "action": {
+      "bootstrap_seed_domain": "R1-ACTION-FAMILY-BOOTSTRAP-v1",
+      "confidence_level": 0.95,
+      "family_cluster_bootstrap_replicates": 2000,
+      "gate_each_condition_balanced_accuracy": 0.55,
+      "gate_equal_condition_mean_balanced_accuracy": 0.6,
+      "gate_mean_margin_over_each_control": 0.1,
+      "input_dim": 4180,
+      "output_dim": 3
+    },
+    "arms": [
+      "real",
+      "shuffled",
+      "surface",
+      "template"
+    ],
+    "binding": {
+      "gate_margin_over_shuffled": 0.2,
+      "gate_margin_over_surface": 0.05,
+      "gate_per_condition_micro_f1": 0.9,
+      "input_dim": 4102,
+      "output_dim": 1,
+      "threshold_objective": "validation micro-F1; ties closest to 0.50 then lower threshold",
+      "thresholds": [
+        0.1,
+        0.15,
+        0.2,
+        0.25,
+        0.3,
+        0.35,
+        0.4,
+        0.45,
+        0.5,
+        0.55,
+        0.6,
+        0.65,
+        0.7,
+        0.75,
+        0.8,
+        0.85,
+        0.9
+      ]
+    },
+    "determinism": {
+      "cublas_workspace_config": ":4096:8",
+      "cudnn_benchmark": false,
+      "deterministic_algorithms": true,
+      "tf32": false,
+      "torch_interop_threads": 1,
+      "torch_intraop_threads": 1
+    },
+    "early_stopping": "highest validation rung metric, earliest epoch wins ties; stop after six non-improving epochs",
+    "evaluation_conditions": [
+      "id_seen",
+      "template_ood",
+      "vocabulary_ood",
+      "joint_ood"
+    ],
+    "head": {
+      "activation": "GELU",
+      "dropout": 0.1,
+      "hidden": 128,
+      "layers": 2
+    },
+    "normalization": "per-arm, train-only population mean/std; std below 1e-6 set to 1",
+    "optimizer": {
+      "batch_size": 256,
+      "gradient_norm_cap": 1.0,
+      "learning_rate": 0.0003,
+      "maximum_epochs": 40,
+      "name": "AdamW",
+      "patience": 6,
+      "weight_decay": 0.0001
+    },
+    "seeds": [
+      20260926,
+      20260927,
+      20260928
+    ],
+    "semantic": {
+      "gate_min_margin_over_shuffled": 0.2,
+      "gate_per_condition_balanced_accuracy": 0.9,
+      "input_dim": 2048,
+      "output_dim": 6
+    },
+    "training_weights": "inverse class frequency on train, then equal total weight per task family"
+  },
+  "extraction_integrity_receipt_path": "D:\\codex-runs\\fas-r1-semantic-particle-reachability-v00\\stage1-v01\\sensor-qualification-v01\\sensor-extraction-v03\\EXTRACTION-INTEGRITY-RECEIPT-v04.json",
+  "extraction_integrity_receipt_sha256": "c5bf43f3bc142dfa1589655439593ba77ee9011028d0db3c092e46600c01c296",
+  "extraction_output_hashes": {
+    "constraint_H.float32.npy": "ddd6a9e7928c8dc5f7b2728d15fe661b4584547e4a7f49ba0369c15c00923520",
+    "global_h.float32.npy": "f13a8e2cc249fa7eb15ec216b120ea58cb766f33f0f07f006cb91736d47a329f",
+    "name_H.float32.npy": "bb101fd94caa5d1db169fde0695c91adeb8d3b9ff6c433f24bdef2e0e3c48e9d",
+    "rows.jsonl": "25bd2ac06b272b13901535285487b64200eb3aad374928c580bf9c158465af8a"
+  },
+  "extraction_receipt_sha256": "79f4d74a644e437c1f806d9fc47a42cca24b17f3a2f1c301ca6435df2a4c04f4",
+  "gate_policy": "A later rung fit requires the immediately previous RUNG-GATE status PASS. No rescue, seed replacement, or threshold changes.",
+  "identity": "R1-STAGE1-SENSOR-PROBES-v01",
+  "model_inventory_sha256": "84142f95653f8f0f1c60934d6c5c711747b89e48e8ff3181c67dc437becef103",
+  "parent_stage0_root_sha256": "2078a366082a358275fa2b10d9f657967ef71a7c259a709822e631f01ce929d7",
+  "planned_outputs": {
+    "arms": [
+      "real",
+      "shuffled",
+      "surface",
+      "template"
+    ],
+    "run_root": "D:\\codex-runs\\fas-r1-semantic-particle-reachability-v00\\stage1-v01\\sensor-qualification-v01\\probe-execution-v01",
+    "rung_fit_count": 12,
+    "rung_order": [
+      "semantic",
+      "binding",
+      "action"
+    ],
+    "seeds": [
+      20260926,
+      20260927,
+      20260928
+    ]
+  },
+  "prepared_input_hashes": {
+    "family-split.jsonl": {
+      "bytes": 32452,
+      "sha256": "83d94095bb5aa0c16f6f8673c160c5b3fe87f3609682ce24483219b9450d3f2e"
+    },
+    "name-queries.jsonl": {
+      "bytes": 2046,
+      "sha256": "4c99835235c9b2efb15712123b0adeffe863a1d3a817b25dfdf94b4898ee03d2"
+    },
+    "private-action-examples.jsonl": {
+      "bytes": 20592464,
+      "sha256": "21a0bb7c90a2c01107b70e286873022997fa6b1b929c7ac06da7a65c5315e19d"
+    },
+    "private-probe-targets.jsonl": {
+      "bytes": 505342,
+      "sha256": "1c159f78a9147cb56668857f4674f43cfa5192eb59b1875eb34f8c1ff8a15fdb"
+    },
+    "public-probe-tasks.jsonl": {
+      "bytes": 301728,
+      "sha256": "8fa9a27eef4cb01505cef252b97982a5d6418b6ad3a4c0063fc24dfb48b644bc"
+    }
+  },
+  "prepared_input_root": "D:\\codex-runs\\fas-r1-semantic-particle-reachability-v00\\stage1-v01\\sensor-qualification-v01\\qualification-data-v02",
+  "probe_fitting_performed": false,
+  "protocol_path": "R1-STAGE1-SENSOR-QUALIFICATION-PROTOCOL-v02.md",
+  "protocol_sha256": "a22e889e02d59fa272e304bbd732d6036f03130587c95bc1a6dde313fb312365",
+  "qualification_manifest_path": "C:\\code land\\clean-rust\\experiments\\fas-r1-semantic-particle-reachability-v00\\stage1-v01\\sensor\\R1-STAGE1-SENSOR-QUALIFICATION-MANIFEST-v03.json",
+  "qualification_manifest_sha256": "ae755731c8b377b2672e9ce1aae3be0a1d8469b5e453475fc1297102a23190b0",
+  "row_audit_receipt_path": "D:\\codex-runs\\fas-r1-semantic-particle-reachability-v00\\stage1-v01\\sensor-qualification-v01\\probe-execution-v01\\PROBE-ROW-AUDIT-v01.json",
+  "row_audit_receipt_sha256": "d198df324b55c53a9a69140b6dea26a550fe899bbfe43733f6a0aa399c683b4e",
+  "runtime": {
+    "cublas_workspace_config": ":4096:8",
+    "device": "cuda",
+    "device_name": "NVIDIA GeForce RTX 3080",
+    "mkl_threads": "1",
+    "numexpr_threads": "1",
+    "numpy": "2.5.3",
+    "omp_threads": "1",
+    "openblas_threads": "1",
+    "python": "3.13.15",
+    "torch": "2.11.0+cu128",
+    "torch_interop_threads": 1,
+    "torch_intraop_threads": 1
+  },
+  "schema": "R1_STAGE1_PROBE_EXECUTION_MANIFEST_V01",
+  "source_evidence": {
+    "R1-STAGE1-PROBE-EXECUTION-SPEC-v01.md": "55f281d3da3156c3c4a45c0e01e58f26eb398820a9b86f78aa3d9b2a1abbef50",
+    "test_r1_sensor_probe_v01.py": "f421695781c9c3542765ae2e0129c5dd88fa61a8284a9551df2b2b00651eff94"
+  },
+  "sources": {
+    "audit_r1_probe_rows_v01.py": "76550a73744da3751eefb022ef3c3d9a4c27b34d1829cd6f11b591772cd9ace8",
+    "r1_sensor_probe_data_v01.py": "c2153f5f3a099f32f8777dfabd7ef28be80ce3dbec75fd173e47cfc98bfd9c31",
+    "r1_sensor_probe_fit_v01.py": "25f3f39e3988c4122fe10b1e44ec873222c88cc44c01173243539f6c3c5ccee2",
+    "r1_sensor_probe_score_v01.py": "367cb885de78369f2867a3d86f3fc0445b3bec322d939c3fda851fb7101a1764",
+    "validate_sensor_extraction_v04.py": "b05cf7d701e4818b983607c6852acf2d5c6481e056f6737fbf359cab728bf874"
+  },
+  "status": "FROZEN_PRE_FIT",
+  "support_audit_sha256": "70bea2804531446e2c309526f318ffd5630f7132bd9304818652639967fe0110",
+  "truth_access_rule": "Held-out targets are not consumed by fit/epoch/threshold selection. Scorer opens a rung target only after all 12 fit outputs for that rung are prediction-locked."
+}

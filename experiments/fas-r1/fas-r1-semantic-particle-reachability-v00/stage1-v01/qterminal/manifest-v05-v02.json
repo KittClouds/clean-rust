@@ -1,0 +1,57 @@
+{
+  "schema": "R1_QTERMINAL_V05_TRAINING_MANIFEST_V02",
+  "purpose": "Fit a common clausewise validation-only terminal assignment selector with conjunction-aware aggregation.",
+  "roster": {
+    "authority": "V241 physically filtered train/validation family roster",
+    "train_tasks": 64,
+    "validation_tasks": 16,
+    "test_split_present": false,
+    "qualification_rows": 0
+  },
+  "features": {
+    "authority": "V246 physically filtered frozen feature receipt",
+    "hidden_dim": 2048,
+    "max_entities": 20,
+    "max_roles": 6,
+    "max_constraints": 512,
+    "inputs": ["constraint embeddings", "global embedding", "public entity mentions", "public role mentions", "complete assignment"]
+  },
+  "candidate_sampling": {
+    "requested_per_class_per_task": 32,
+    "source": "V01 candidates retained exactly; V02 adds clause-aligned targets after public/private semantic-pair verification",
+    "inherited_positive_sampler": "randomized constraint-guided backtracking; unique complete solutions retained; not uniform over solutions",
+    "inherited_negative_sampler": "near-miss one-entity edits plus modulo-bounded invalid assignments; not claimed uniform",
+    "training_and_validation_labels": "independent typed validator",
+    "candidate_assignment_visibility": "selector input",
+    "clause_targets": "offline typed-Different clause satisfaction aligned to public clause order; training target only"
+  },
+  "model": {
+    "architecture": "ClausewiseQTerminal",
+    "hidden_size": 128,
+    "clause_loss_weight": 0.5,
+    "conjunction_aggregation": "sum_log_clause_satisfaction_then_log_odds",
+    "checkpoint_schema": "R1_QTERMINAL_CHECKPOINT_V05_V02"
+  },
+  "training": {
+    "seed": 18051,
+    "learning_rate": 0.0003,
+    "weight_decay": 0.0001,
+    "batch_size": 16,
+    "maximum_epochs": 40,
+    "early_stopping_patience": 7,
+    "validation_selection": "minimum uncalibrated validation binary cross-entropy",
+    "calibration": "single scalar temperature fit on validation labels after checkpoint freeze"
+  },
+  "compute": {
+    "max_clause_feature_elements_per_batch": 4194304,
+    "deterministic_algorithms": true,
+    "cuda_workspace_config": ":4096:8"
+  },
+  "scope": {
+    "engineering_iteration": true,
+    "scientific_confirmation": false,
+    "qualification_targets_generated": false,
+    "qualification_target_paths_or_hashes_recorded": false,
+    "test_labels_read": false
+  }
+}

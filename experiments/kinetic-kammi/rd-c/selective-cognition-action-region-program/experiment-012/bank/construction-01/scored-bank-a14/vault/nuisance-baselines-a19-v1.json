@@ -1,0 +1,2236 @@
+{
+  "schema_version": 1,
+  "state": "A19_NUISANCE_BASELINE_AUDIT_COMPLETE_NO_MODEL_CONTACT",
+  "model_contact_authorized": false,
+  "task_count": 48,
+  "candidate_rows": 192,
+  "input_hashes": {
+    "final_task_source_sha256": "5c74f424906f618e817a1cd1f2ba020f5ab02c0c9e39737631b4983e70847bea",
+    "derived_candidate_labels_sha256": "45b357bb7b443c84b75d11ce9d56b4f6e1051bfbd3e6a9ec94fd572fc3d187f3",
+    "observer_frames_sha256": "e17bb4b06a34c5636789c6e7fb338c84ca89252069425470634ff27da939c3b4",
+    "truth_index_sha256": "3ab3df48b2d609f9c0d877955e94ffcbf5b570465a00feb5617c47cc76661ca3"
+  },
+  "categorical_nuisance_feature_audits": {
+    "action_id": {
+      "repeated_values": 44,
+      "repeated_single_label_values": [
+        {
+          "value": "38796",
+          "rows": 4,
+          "label": false
+        },
+        {
+          "value": "53677",
+          "rows": 4,
+          "label": false
+        },
+        {
+          "value": "58574",
+          "rows": 4,
+          "label": false
+        },
+        {
+          "value": "64610",
+          "rows": 4,
+          "label": false
+        }
+      ],
+      "leave_one_family_out": {
+        "split": "leave-one-task-family-out",
+        "rows": 192,
+        "balanced_accuracy": 0.5,
+        "accuracy": 0.7708,
+        "majority_baseline_accuracy": 0.7708,
+        "folds": [
+          {
+            "heldout_family": "bounded-prefix-copy",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.5
+          },
+          {
+            "heldout_family": "composite-frame-field",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "conflicting-alias-requirement",
+            "test_rows": 16,
+            "balanced_accuracy": 0.0,
+            "accuracy": 1.0
+          },
+          {
+            "heldout_family": "cursor-advance-observation",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "help-color-capability",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "map-order-feature-contract",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "number-mode-plus-error-site",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "possible-value-validation",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "raw-number-lossless",
+            "test_rows": 16,
+            "balanced_accuracy": 0.0,
+            "accuracy": 1.0
+          },
+          {
+            "heldout_family": "repeated-option-policy",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "stream-byte-offset",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "wire-endian-contract",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          }
+        ]
+      }
+    },
+    "position": {
+      "repeated_values": 4,
+      "repeated_single_label_values": [],
+      "leave_one_family_out": {
+        "split": "leave-one-task-family-out",
+        "rows": 192,
+        "balanced_accuracy": 0.5,
+        "accuracy": 0.7708,
+        "majority_baseline_accuracy": 0.7708,
+        "folds": [
+          {
+            "heldout_family": "bounded-prefix-copy",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.5
+          },
+          {
+            "heldout_family": "composite-frame-field",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "conflicting-alias-requirement",
+            "test_rows": 16,
+            "balanced_accuracy": 0.0,
+            "accuracy": 1.0
+          },
+          {
+            "heldout_family": "cursor-advance-observation",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "help-color-capability",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "map-order-feature-contract",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "number-mode-plus-error-site",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "possible-value-validation",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "raw-number-lossless",
+            "test_rows": 16,
+            "balanced_accuracy": 0.0,
+            "accuracy": 1.0
+          },
+          {
+            "heldout_family": "repeated-option-policy",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "stream-byte-offset",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "wire-endian-contract",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          }
+        ]
+      }
+    },
+    "patch_sha256": {
+      "repeated_values": 45,
+      "repeated_single_label_values": [
+        {
+          "value": "b74671f4136107f20040054ad65e9f2c8edc4a836f161fbd7716a2f2e52e3d06",
+          "rows": 4,
+          "label": true
+        },
+        {
+          "value": "be9583bd2d2773b831a0ce608e4f92164c556947747e7167961b656ff18ab3fc",
+          "rows": 4,
+          "label": false
+        },
+        {
+          "value": "94dbb9c92a5e0a86e6df0a1924b686e2742efae6312941da06fa39b7eb3df9b0",
+          "rows": 4,
+          "label": false
+        },
+        {
+          "value": "94f7811e08ca85382a09aba3f3969fd556c8f0d289ecb41e84cd28487ad38942",
+          "rows": 4,
+          "label": true
+        },
+        {
+          "value": "8b05d58595f1cc9354bf0c82ea82fb173d96b4d2f415bf0079feccaca58e40ed",
+          "rows": 4,
+          "label": false
+        },
+        {
+          "value": "2ab88607f65106a128e8bcc7e7ef5869f8ea0c16112f653ec8120661675356cb",
+          "rows": 4,
+          "label": false
+        },
+        {
+          "value": "2f0b77319d88b3d5b0b27dc7e2aec0a1a1cf49ae37c3367f5e4d86440889aa8a",
+          "rows": 4,
+          "label": false
+        },
+        {
+          "value": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "rows": 16,
+          "label": false
+        },
+        {
+          "value": "b3a0f673d012daf64cf2b9d8c19eefd817f41ecf1b743181f9ded20ff7b8541f",
+          "rows": 4,
+          "label": false
+        },
+        {
+          "value": "4ede4cf382e3b67c2f749059bc855f6f471c37ea9b575f08a242be2916826303",
+          "rows": 4,
+          "label": false
+        },
+        {
+          "value": "6b15dc6b9f7739c4bfefcd95f1ad263938d90733617aa22bf7849267319d2d5e",
+          "rows": 4,
+          "label": false
+        },
+        {
+          "value": "32f04a35e766db2d826146eeb206e34ec8a99c5dcccc41e7be2618bd188cb689",
+          "rows": 4,
+          "label": false
+        },
+        {
+          "value": "c5f029b1f62eab215d28324ddfc371590c95fb734be62842c561de7e13b2663f",
+          "rows": 4,
+          "label": false
+        },
+        {
+          "value": "1bf1161b5e7665a124206c541db0bbbfac7ebec5dc218f3fa8d2cad77eebc566",
+          "rows": 4,
+          "label": true
+        },
+        {
+          "value": "532101a0e648fc7227514311d95b57e78a2478ed90592ca58222350b2dd35218",
+          "rows": 4,
+          "label": false
+        },
+        {
+          "value": "e302707b08567d567b78a09f3b395f43094799e6ed30e7f8ddde8292aa4b8cec",
+          "rows": 4,
+          "label": false
+        },
+        {
+          "value": "9dda7358956abbedc67edfc1336d052d79764104f7ab5179eac58b5870e5583a",
+          "rows": 4,
+          "label": false
+        },
+        {
+          "value": "a282cab037ef26dc3ca7ba6b46abfd38f5d9e65713a31e1d67262a649cabe6c2",
+          "rows": 4,
+          "label": false
+        },
+        {
+          "value": "bcbd82f2c55fb15aa17a4d5394bad7e25072fc5ee554d80dcf6b016dd82e49ee",
+          "rows": 4,
+          "label": false
+        },
+        {
+          "value": "f9152f572091dc98e7dbb137f4c167186cde3f00908633188ee32df81131c7f3",
+          "rows": 4,
+          "label": false
+        },
+        {
+          "value": "2f62c9c05f1a041390bfa6652ec91da034e7d16e8a01de9b60781f000b028cb4",
+          "rows": 4,
+          "label": false
+        },
+        {
+          "value": "d9001cb88c8fc6e83bf897ecbedcb0eeb04cc1fb61dd916b5ae21146c638f996",
+          "rows": 4,
+          "label": false
+        }
+      ],
+      "leave_one_family_out": {
+        "split": "leave-one-task-family-out",
+        "rows": 192,
+        "balanced_accuracy": 0.5,
+        "accuracy": 0.7708,
+        "majority_baseline_accuracy": 0.7708,
+        "folds": [
+          {
+            "heldout_family": "bounded-prefix-copy",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.5
+          },
+          {
+            "heldout_family": "composite-frame-field",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "conflicting-alias-requirement",
+            "test_rows": 16,
+            "balanced_accuracy": 0.0,
+            "accuracy": 1.0
+          },
+          {
+            "heldout_family": "cursor-advance-observation",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "help-color-capability",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "map-order-feature-contract",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "number-mode-plus-error-site",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "possible-value-validation",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "raw-number-lossless",
+            "test_rows": 16,
+            "balanced_accuracy": 0.0,
+            "accuracy": 1.0
+          },
+          {
+            "heldout_family": "repeated-option-policy",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "stream-byte-offset",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "wire-endian-contract",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          }
+        ]
+      }
+    },
+    "task_id": {
+      "repeated_values": 48,
+      "repeated_single_label_values": [
+        {
+          "value": "task-546859",
+          "rows": 4,
+          "label": false
+        },
+        {
+          "value": "task-894855",
+          "rows": 4,
+          "label": false
+        },
+        {
+          "value": "task-620950",
+          "rows": 4,
+          "label": false
+        },
+        {
+          "value": "task-569812",
+          "rows": 4,
+          "label": false
+        },
+        {
+          "value": "task-479184",
+          "rows": 4,
+          "label": false
+        },
+        {
+          "value": "task-242065",
+          "rows": 4,
+          "label": false
+        },
+        {
+          "value": "task-555141",
+          "rows": 4,
+          "label": false
+        },
+        {
+          "value": "task-965856",
+          "rows": 4,
+          "label": false
+        }
+      ],
+      "leave_one_family_out": {
+        "split": "leave-one-task-family-out",
+        "rows": 192,
+        "balanced_accuracy": 0.5,
+        "accuracy": 0.7708,
+        "majority_baseline_accuracy": 0.7708,
+        "folds": [
+          {
+            "heldout_family": "bounded-prefix-copy",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.5
+          },
+          {
+            "heldout_family": "composite-frame-field",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "conflicting-alias-requirement",
+            "test_rows": 16,
+            "balanced_accuracy": 0.0,
+            "accuracy": 1.0
+          },
+          {
+            "heldout_family": "cursor-advance-observation",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "help-color-capability",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "map-order-feature-contract",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "number-mode-plus-error-site",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "possible-value-validation",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "raw-number-lossless",
+            "test_rows": 16,
+            "balanced_accuracy": 0.0,
+            "accuracy": 1.0
+          },
+          {
+            "heldout_family": "repeated-option-policy",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "stream-byte-offset",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "wire-endian-contract",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          }
+        ]
+      }
+    },
+    "family_code": {
+      "repeated_values": 12,
+      "repeated_single_label_values": [
+        {
+          "value": "fam-7432",
+          "rows": 16,
+          "label": false
+        },
+        {
+          "value": "fam-1137",
+          "rows": 16,
+          "label": false
+        }
+      ],
+      "leave_one_family_out": {
+        "split": "leave-one-task-family-out",
+        "rows": 192,
+        "balanced_accuracy": 0.5,
+        "accuracy": 0.7708,
+        "majority_baseline_accuracy": 0.7708,
+        "folds": [
+          {
+            "heldout_family": "bounded-prefix-copy",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.5
+          },
+          {
+            "heldout_family": "composite-frame-field",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "conflicting-alias-requirement",
+            "test_rows": 16,
+            "balanced_accuracy": 0.0,
+            "accuracy": 1.0
+          },
+          {
+            "heldout_family": "cursor-advance-observation",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "help-color-capability",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "map-order-feature-contract",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "number-mode-plus-error-site",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "possible-value-validation",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "raw-number-lossless",
+            "test_rows": 16,
+            "balanced_accuracy": 0.0,
+            "accuracy": 1.0
+          },
+          {
+            "heldout_family": "repeated-option-policy",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "stream-byte-offset",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "wire-endian-contract",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          }
+        ]
+      }
+    },
+    "repository_code": {
+      "repeated_values": 3,
+      "repeated_single_label_values": [],
+      "leave_one_family_out": {
+        "split": "leave-one-task-family-out",
+        "rows": 192,
+        "balanced_accuracy": 0.5,
+        "accuracy": 0.7708,
+        "majority_baseline_accuracy": 0.7708,
+        "folds": [
+          {
+            "heldout_family": "bounded-prefix-copy",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.5
+          },
+          {
+            "heldout_family": "composite-frame-field",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "conflicting-alias-requirement",
+            "test_rows": 16,
+            "balanced_accuracy": 0.0,
+            "accuracy": 1.0
+          },
+          {
+            "heldout_family": "cursor-advance-observation",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "help-color-capability",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "map-order-feature-contract",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "number-mode-plus-error-site",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "possible-value-validation",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "raw-number-lossless",
+            "test_rows": 16,
+            "balanced_accuracy": 0.0,
+            "accuracy": 1.0
+          },
+          {
+            "heldout_family": "repeated-option-policy",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "stream-byte-offset",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "wire-endian-contract",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          }
+        ]
+      }
+    },
+    "candidate_bytes": {
+      "repeated_values": 34,
+      "repeated_single_label_values": [
+        {
+          "value": "389",
+          "rows": 4,
+          "label": true
+        },
+        {
+          "value": "329",
+          "rows": 12,
+          "label": false
+        },
+        {
+          "value": "412",
+          "rows": 4,
+          "label": false
+        },
+        {
+          "value": "415",
+          "rows": 4,
+          "label": false
+        },
+        {
+          "value": "416",
+          "rows": 4,
+          "label": false
+        },
+        {
+          "value": "54",
+          "rows": 16,
+          "label": false
+        },
+        {
+          "value": "343",
+          "rows": 4,
+          "label": false
+        },
+        {
+          "value": "394",
+          "rows": 4,
+          "label": false
+        },
+        {
+          "value": "463",
+          "rows": 4,
+          "label": false
+        },
+        {
+          "value": "440",
+          "rows": 4,
+          "label": false
+        },
+        {
+          "value": "432",
+          "rows": 4,
+          "label": true
+        },
+        {
+          "value": "433",
+          "rows": 4,
+          "label": false
+        },
+        {
+          "value": "360",
+          "rows": 12,
+          "label": false
+        },
+        {
+          "value": "726",
+          "rows": 4,
+          "label": false
+        },
+        {
+          "value": "311",
+          "rows": 4,
+          "label": false
+        },
+        {
+          "value": "287",
+          "rows": 4,
+          "label": false
+        }
+      ],
+      "leave_one_family_out": {
+        "split": "leave-one-task-family-out",
+        "rows": 192,
+        "balanced_accuracy": 0.5,
+        "accuracy": 0.7708,
+        "majority_baseline_accuracy": 0.7708,
+        "folds": [
+          {
+            "heldout_family": "bounded-prefix-copy",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.5
+          },
+          {
+            "heldout_family": "composite-frame-field",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "conflicting-alias-requirement",
+            "test_rows": 16,
+            "balanced_accuracy": 0.0,
+            "accuracy": 1.0
+          },
+          {
+            "heldout_family": "cursor-advance-observation",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "help-color-capability",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "map-order-feature-contract",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "number-mode-plus-error-site",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "possible-value-validation",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "raw-number-lossless",
+            "test_rows": 16,
+            "balanced_accuracy": 0.0,
+            "accuracy": 1.0
+          },
+          {
+            "heldout_family": "repeated-option-policy",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "stream-byte-offset",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "wire-endian-contract",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          }
+        ]
+      }
+    },
+    "candidate_32byte_bin": {
+      "repeated_values": 13,
+      "repeated_single_label_values": [
+        {
+          "value": "1",
+          "rows": 16,
+          "label": false
+        },
+        {
+          "value": "14",
+          "rows": 4,
+          "label": false
+        },
+        {
+          "value": "22",
+          "rows": 4,
+          "label": false
+        }
+      ],
+      "leave_one_family_out": {
+        "split": "leave-one-task-family-out",
+        "rows": 192,
+        "balanced_accuracy": 0.5,
+        "accuracy": 0.7708,
+        "majority_baseline_accuracy": 0.7708,
+        "folds": [
+          {
+            "heldout_family": "bounded-prefix-copy",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.5
+          },
+          {
+            "heldout_family": "composite-frame-field",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "conflicting-alias-requirement",
+            "test_rows": 16,
+            "balanced_accuracy": 0.0,
+            "accuracy": 1.0
+          },
+          {
+            "heldout_family": "cursor-advance-observation",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "help-color-capability",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "map-order-feature-contract",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "number-mode-plus-error-site",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "possible-value-validation",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "raw-number-lossless",
+            "test_rows": 16,
+            "balanced_accuracy": 0.0,
+            "accuracy": 1.0
+          },
+          {
+            "heldout_family": "repeated-option-policy",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "stream-byte-offset",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "wire-endian-contract",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          }
+        ]
+      }
+    },
+    "evidence_count": {
+      "repeated_values": 1,
+      "repeated_single_label_values": [],
+      "leave_one_family_out": {
+        "split": "leave-one-task-family-out",
+        "rows": 192,
+        "balanced_accuracy": 0.5,
+        "accuracy": 0.7708,
+        "majority_baseline_accuracy": 0.7708,
+        "folds": [
+          {
+            "heldout_family": "bounded-prefix-copy",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.5
+          },
+          {
+            "heldout_family": "composite-frame-field",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "conflicting-alias-requirement",
+            "test_rows": 16,
+            "balanced_accuracy": 0.0,
+            "accuracy": 1.0
+          },
+          {
+            "heldout_family": "cursor-advance-observation",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "help-color-capability",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "map-order-feature-contract",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "number-mode-plus-error-site",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "possible-value-validation",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "raw-number-lossless",
+            "test_rows": 16,
+            "balanced_accuracy": 0.0,
+            "accuracy": 1.0
+          },
+          {
+            "heldout_family": "repeated-option-policy",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "stream-byte-offset",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "wire-endian-contract",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          }
+        ]
+      }
+    },
+    "execution_bytes": {
+      "repeated_values": 6,
+      "repeated_single_label_values": [],
+      "leave_one_family_out": {
+        "split": "leave-one-task-family-out",
+        "rows": 192,
+        "balanced_accuracy": 0.5,
+        "accuracy": 0.7708,
+        "majority_baseline_accuracy": 0.7708,
+        "folds": [
+          {
+            "heldout_family": "bounded-prefix-copy",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.5
+          },
+          {
+            "heldout_family": "composite-frame-field",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "conflicting-alias-requirement",
+            "test_rows": 16,
+            "balanced_accuracy": 0.0,
+            "accuracy": 1.0
+          },
+          {
+            "heldout_family": "cursor-advance-observation",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "help-color-capability",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "map-order-feature-contract",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "number-mode-plus-error-site",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "possible-value-validation",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "raw-number-lossless",
+            "test_rows": 16,
+            "balanced_accuracy": 0.0,
+            "accuracy": 1.0
+          },
+          {
+            "heldout_family": "repeated-option-policy",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "stream-byte-offset",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "wire-endian-contract",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          }
+        ]
+      }
+    },
+    "execution_word_count": {
+      "repeated_values": 3,
+      "repeated_single_label_values": [],
+      "leave_one_family_out": {
+        "split": "leave-one-task-family-out",
+        "rows": 192,
+        "balanced_accuracy": 0.5,
+        "accuracy": 0.7708,
+        "majority_baseline_accuracy": 0.7708,
+        "folds": [
+          {
+            "heldout_family": "bounded-prefix-copy",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.5
+          },
+          {
+            "heldout_family": "composite-frame-field",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "conflicting-alias-requirement",
+            "test_rows": 16,
+            "balanced_accuracy": 0.0,
+            "accuracy": 1.0
+          },
+          {
+            "heldout_family": "cursor-advance-observation",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "help-color-capability",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "map-order-feature-contract",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "number-mode-plus-error-site",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "possible-value-validation",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "raw-number-lossless",
+            "test_rows": 16,
+            "balanced_accuracy": 0.0,
+            "accuracy": 1.0
+          },
+          {
+            "heldout_family": "repeated-option-policy",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "stream-byte-offset",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "wire-endian-contract",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          }
+        ]
+      }
+    },
+    "execution_status_signature": {
+      "repeated_values": 3,
+      "repeated_single_label_values": [],
+      "leave_one_family_out": {
+        "split": "leave-one-task-family-out",
+        "rows": 192,
+        "balanced_accuracy": 0.5,
+        "accuracy": 0.7708,
+        "majority_baseline_accuracy": 0.7708,
+        "folds": [
+          {
+            "heldout_family": "bounded-prefix-copy",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.5
+          },
+          {
+            "heldout_family": "composite-frame-field",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "conflicting-alias-requirement",
+            "test_rows": 16,
+            "balanced_accuracy": 0.0,
+            "accuracy": 1.0
+          },
+          {
+            "heldout_family": "cursor-advance-observation",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "help-color-capability",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "map-order-feature-contract",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "number-mode-plus-error-site",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "possible-value-validation",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "raw-number-lossless",
+            "test_rows": 16,
+            "balanced_accuracy": 0.0,
+            "accuracy": 1.0
+          },
+          {
+            "heldout_family": "repeated-option-policy",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "stream-byte-offset",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "wire-endian-contract",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          }
+        ]
+      }
+    },
+    "task_prompt_bytes": {
+      "repeated_values": 18,
+      "repeated_single_label_values": [
+        {
+          "value": "173",
+          "rows": 4,
+          "label": false
+        },
+        {
+          "value": "162",
+          "rows": 4,
+          "label": false
+        },
+        {
+          "value": "164",
+          "rows": 4,
+          "label": false
+        },
+        {
+          "value": "174",
+          "rows": 4,
+          "label": false
+        },
+        {
+          "value": "111",
+          "rows": 4,
+          "label": false
+        },
+        {
+          "value": "106",
+          "rows": 4,
+          "label": false
+        }
+      ],
+      "leave_one_family_out": {
+        "split": "leave-one-task-family-out",
+        "rows": 192,
+        "balanced_accuracy": 0.5,
+        "accuracy": 0.7708,
+        "majority_baseline_accuracy": 0.7708,
+        "folds": [
+          {
+            "heldout_family": "bounded-prefix-copy",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.5
+          },
+          {
+            "heldout_family": "composite-frame-field",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "conflicting-alias-requirement",
+            "test_rows": 16,
+            "balanced_accuracy": 0.0,
+            "accuracy": 1.0
+          },
+          {
+            "heldout_family": "cursor-advance-observation",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "help-color-capability",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "map-order-feature-contract",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "number-mode-plus-error-site",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "possible-value-validation",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "raw-number-lossless",
+            "test_rows": 16,
+            "balanced_accuracy": 0.0,
+            "accuracy": 1.0
+          },
+          {
+            "heldout_family": "repeated-option-policy",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "stream-byte-offset",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "wire-endian-contract",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          }
+        ]
+      }
+    },
+    "task_prompt_word_count": {
+      "repeated_values": 9,
+      "repeated_single_label_values": [
+        {
+          "value": "24",
+          "rows": 8,
+          "label": false
+        },
+        {
+          "value": "23",
+          "rows": 8,
+          "label": false
+        },
+        {
+          "value": "18",
+          "rows": 4,
+          "label": false
+        }
+      ],
+      "leave_one_family_out": {
+        "split": "leave-one-task-family-out",
+        "rows": 192,
+        "balanced_accuracy": 0.5,
+        "accuracy": 0.7708,
+        "majority_baseline_accuracy": 0.7708,
+        "folds": [
+          {
+            "heldout_family": "bounded-prefix-copy",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.5
+          },
+          {
+            "heldout_family": "composite-frame-field",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "conflicting-alias-requirement",
+            "test_rows": 16,
+            "balanced_accuracy": 0.0,
+            "accuracy": 1.0
+          },
+          {
+            "heldout_family": "cursor-advance-observation",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "help-color-capability",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "map-order-feature-contract",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "number-mode-plus-error-site",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "possible-value-validation",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "raw-number-lossless",
+            "test_rows": 16,
+            "balanced_accuracy": 0.0,
+            "accuracy": 1.0
+          },
+          {
+            "heldout_family": "repeated-option-policy",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "stream-byte-offset",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "wire-endian-contract",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          }
+        ]
+      }
+    },
+    "task_variant": {
+      "repeated_values": 26,
+      "repeated_single_label_values": [
+        {
+          "value": "886843179",
+          "rows": 4,
+          "label": false
+        },
+        {
+          "value": "533687695",
+          "rows": 4,
+          "label": false
+        },
+        {
+          "value": "1502699532",
+          "rows": 4,
+          "label": false
+        },
+        {
+          "value": "1685432036",
+          "rows": 4,
+          "label": false
+        },
+        {
+          "value": "1789845673",
+          "rows": 4,
+          "label": false
+        },
+        {
+          "value": "1090578783",
+          "rows": 4,
+          "label": false
+        },
+        {
+          "value": "1723572774",
+          "rows": 4,
+          "label": false
+        },
+        {
+          "value": "1718574783",
+          "rows": 4,
+          "label": false
+        }
+      ],
+      "leave_one_family_out": {
+        "split": "leave-one-task-family-out",
+        "rows": 192,
+        "balanced_accuracy": 0.5,
+        "accuracy": 0.7708,
+        "majority_baseline_accuracy": 0.7708,
+        "folds": [
+          {
+            "heldout_family": "bounded-prefix-copy",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.5
+          },
+          {
+            "heldout_family": "composite-frame-field",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "conflicting-alias-requirement",
+            "test_rows": 16,
+            "balanced_accuracy": 0.0,
+            "accuracy": 1.0
+          },
+          {
+            "heldout_family": "cursor-advance-observation",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "help-color-capability",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "map-order-feature-contract",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "number-mode-plus-error-site",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "possible-value-validation",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "raw-number-lossless",
+            "test_rows": 16,
+            "balanced_accuracy": 0.0,
+            "accuracy": 1.0
+          },
+          {
+            "heldout_family": "repeated-option-policy",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "stream-byte-offset",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          },
+          {
+            "heldout_family": "wire-endian-contract",
+            "test_rows": 16,
+            "balanced_accuracy": 0.5,
+            "accuracy": 0.75
+          }
+        ]
+      }
+    }
+  },
+  "task_level_family_grouped_audits": {
+    "repository_code": {
+      "split": "leave-one-task-family-out",
+      "rows": 48,
+      "balanced_accuracy": 0.5,
+      "accuracy": 0.8333,
+      "majority_baseline_accuracy": 0.8333,
+      "folds": [
+        {
+          "heldout_family": "bounded-prefix-copy",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 1.0
+        },
+        {
+          "heldout_family": "composite-frame-field",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 1.0
+        },
+        {
+          "heldout_family": "conflicting-alias-requirement",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 0.0
+        },
+        {
+          "heldout_family": "cursor-advance-observation",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 1.0
+        },
+        {
+          "heldout_family": "help-color-capability",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 1.0
+        },
+        {
+          "heldout_family": "map-order-feature-contract",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 1.0
+        },
+        {
+          "heldout_family": "number-mode-plus-error-site",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 1.0
+        },
+        {
+          "heldout_family": "possible-value-validation",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 1.0
+        },
+        {
+          "heldout_family": "raw-number-lossless",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 0.0
+        },
+        {
+          "heldout_family": "repeated-option-policy",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 1.0
+        },
+        {
+          "heldout_family": "stream-byte-offset",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 1.0
+        },
+        {
+          "heldout_family": "wire-endian-contract",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 1.0
+        }
+      ]
+    },
+    "family_code": {
+      "split": "leave-one-task-family-out",
+      "rows": 48,
+      "balanced_accuracy": 0.5,
+      "accuracy": 0.8333,
+      "majority_baseline_accuracy": 0.8333,
+      "folds": [
+        {
+          "heldout_family": "bounded-prefix-copy",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 1.0
+        },
+        {
+          "heldout_family": "composite-frame-field",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 1.0
+        },
+        {
+          "heldout_family": "conflicting-alias-requirement",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 0.0
+        },
+        {
+          "heldout_family": "cursor-advance-observation",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 1.0
+        },
+        {
+          "heldout_family": "help-color-capability",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 1.0
+        },
+        {
+          "heldout_family": "map-order-feature-contract",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 1.0
+        },
+        {
+          "heldout_family": "number-mode-plus-error-site",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 1.0
+        },
+        {
+          "heldout_family": "possible-value-validation",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 1.0
+        },
+        {
+          "heldout_family": "raw-number-lossless",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 0.0
+        },
+        {
+          "heldout_family": "repeated-option-policy",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 1.0
+        },
+        {
+          "heldout_family": "stream-byte-offset",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 1.0
+        },
+        {
+          "heldout_family": "wire-endian-contract",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 1.0
+        }
+      ]
+    },
+    "task_prompt_bytes": {
+      "split": "leave-one-task-family-out",
+      "rows": 48,
+      "balanced_accuracy": 0.425,
+      "accuracy": 0.7083,
+      "majority_baseline_accuracy": 0.8333,
+      "folds": [
+        {
+          "heldout_family": "bounded-prefix-copy",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 1.0
+        },
+        {
+          "heldout_family": "composite-frame-field",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 1.0
+        },
+        {
+          "heldout_family": "conflicting-alias-requirement",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 0.0
+        },
+        {
+          "heldout_family": "cursor-advance-observation",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 1.0
+        },
+        {
+          "heldout_family": "help-color-capability",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 1.0
+        },
+        {
+          "heldout_family": "map-order-feature-contract",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 1.0
+        },
+        {
+          "heldout_family": "number-mode-plus-error-site",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 1.0
+        },
+        {
+          "heldout_family": "possible-value-validation",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 0.0
+        },
+        {
+          "heldout_family": "raw-number-lossless",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 0.0
+        },
+        {
+          "heldout_family": "repeated-option-policy",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 0.5
+        },
+        {
+          "heldout_family": "stream-byte-offset",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 1.0
+        },
+        {
+          "heldout_family": "wire-endian-contract",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 1.0
+        }
+      ]
+    },
+    "task_prompt_word_count": {
+      "split": "leave-one-task-family-out",
+      "rows": 48,
+      "balanced_accuracy": 0.425,
+      "accuracy": 0.7083,
+      "majority_baseline_accuracy": 0.8333,
+      "folds": [
+        {
+          "heldout_family": "bounded-prefix-copy",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 1.0
+        },
+        {
+          "heldout_family": "composite-frame-field",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 1.0
+        },
+        {
+          "heldout_family": "conflicting-alias-requirement",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 0.0
+        },
+        {
+          "heldout_family": "cursor-advance-observation",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 1.0
+        },
+        {
+          "heldout_family": "help-color-capability",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 1.0
+        },
+        {
+          "heldout_family": "map-order-feature-contract",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 1.0
+        },
+        {
+          "heldout_family": "number-mode-plus-error-site",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 0.0
+        },
+        {
+          "heldout_family": "possible-value-validation",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 1.0
+        },
+        {
+          "heldout_family": "raw-number-lossless",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 0.0
+        },
+        {
+          "heldout_family": "repeated-option-policy",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 0.5
+        },
+        {
+          "heldout_family": "stream-byte-offset",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 1.0
+        },
+        {
+          "heldout_family": "wire-endian-contract",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 1.0
+        }
+      ]
+    },
+    "evidence_count": {
+      "split": "leave-one-task-family-out",
+      "rows": 48,
+      "balanced_accuracy": 0.5,
+      "accuracy": 0.8333,
+      "majority_baseline_accuracy": 0.8333,
+      "folds": [
+        {
+          "heldout_family": "bounded-prefix-copy",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 1.0
+        },
+        {
+          "heldout_family": "composite-frame-field",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 1.0
+        },
+        {
+          "heldout_family": "conflicting-alias-requirement",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 0.0
+        },
+        {
+          "heldout_family": "cursor-advance-observation",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 1.0
+        },
+        {
+          "heldout_family": "help-color-capability",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 1.0
+        },
+        {
+          "heldout_family": "map-order-feature-contract",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 1.0
+        },
+        {
+          "heldout_family": "number-mode-plus-error-site",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 1.0
+        },
+        {
+          "heldout_family": "possible-value-validation",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 1.0
+        },
+        {
+          "heldout_family": "raw-number-lossless",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 0.0
+        },
+        {
+          "heldout_family": "repeated-option-policy",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 1.0
+        },
+        {
+          "heldout_family": "stream-byte-offset",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 1.0
+        },
+        {
+          "heldout_family": "wire-endian-contract",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 1.0
+        }
+      ]
+    },
+    "task_variant": {
+      "split": "leave-one-task-family-out",
+      "rows": 48,
+      "balanced_accuracy": 0.5,
+      "accuracy": 0.8333,
+      "majority_baseline_accuracy": 0.8333,
+      "folds": [
+        {
+          "heldout_family": "bounded-prefix-copy",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 1.0
+        },
+        {
+          "heldout_family": "composite-frame-field",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 1.0
+        },
+        {
+          "heldout_family": "conflicting-alias-requirement",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 0.0
+        },
+        {
+          "heldout_family": "cursor-advance-observation",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 1.0
+        },
+        {
+          "heldout_family": "help-color-capability",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 1.0
+        },
+        {
+          "heldout_family": "map-order-feature-contract",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 1.0
+        },
+        {
+          "heldout_family": "number-mode-plus-error-site",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 1.0
+        },
+        {
+          "heldout_family": "possible-value-validation",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 1.0
+        },
+        {
+          "heldout_family": "raw-number-lossless",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 0.0
+        },
+        {
+          "heldout_family": "repeated-option-policy",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 1.0
+        },
+        {
+          "heldout_family": "stream-byte-offset",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 1.0
+        },
+        {
+          "heldout_family": "wire-endian-contract",
+          "test_rows": 4,
+          "balanced_accuracy": 0.0,
+          "accuracy": 1.0
+        }
+      ]
+    }
+  },
+  "lexical_naive_bayes_leave_one_family_out": {
+    "E_c": {
+      "split": "leave-one-task-family-out",
+      "channels": [
+        "E_c"
+      ],
+      "candidate_binary_balanced_accuracy": 0.5049,
+      "candidate_binary_accuracy": 0.7292,
+      "candidate_majority_accuracy": 0.7708,
+      "action_tasks": 40,
+      "selected_action_tasks": 4,
+      "correct_top_action_tasks": 1,
+      "abstention_tasks": 8,
+      "correct_abstentions": 8,
+      "task_completion": 0.1875,
+      "task_count": 48
+    },
+    "E_c+E_t": {
+      "split": "leave-one-task-family-out",
+      "channels": [
+        "E_c",
+        "E_t"
+      ],
+      "candidate_binary_balanced_accuracy": 0.5872,
+      "candidate_binary_accuracy": 0.5729,
+      "candidate_majority_accuracy": 0.7708,
+      "action_tasks": 40,
+      "selected_action_tasks": 24,
+      "correct_top_action_tasks": 8,
+      "abstention_tasks": 8,
+      "correct_abstentions": 8,
+      "task_completion": 0.3333,
+      "task_count": 48
+    },
+    "E_c+E_x": {
+      "split": "leave-one-task-family-out",
+      "channels": [
+        "E_c",
+        "E_x"
+      ],
+      "candidate_binary_balanced_accuracy": 0.5049,
+      "candidate_binary_accuracy": 0.7292,
+      "candidate_majority_accuracy": 0.7708,
+      "action_tasks": 40,
+      "selected_action_tasks": 4,
+      "correct_top_action_tasks": 1,
+      "abstention_tasks": 8,
+      "correct_abstentions": 8,
+      "task_completion": 0.1875,
+      "task_count": 48
+    },
+    "E_c+E_r": {
+      "split": "leave-one-task-family-out",
+      "channels": [
+        "E_c",
+        "E_r"
+      ],
+      "candidate_binary_balanced_accuracy": 0.5049,
+      "candidate_binary_accuracy": 0.7292,
+      "candidate_majority_accuracy": 0.7708,
+      "action_tasks": 40,
+      "selected_action_tasks": 4,
+      "correct_top_action_tasks": 1,
+      "abstention_tasks": 8,
+      "correct_abstentions": 8,
+      "task_completion": 0.1875,
+      "task_count": 48
+    },
+    "E_c+E_r+E_t+E_x": {
+      "split": "leave-one-task-family-out",
+      "channels": [
+        "E_c",
+        "E_r",
+        "E_t",
+        "E_x"
+      ],
+      "candidate_binary_balanced_accuracy": 0.5012,
+      "candidate_binary_accuracy": 0.625,
+      "candidate_majority_accuracy": 0.7708,
+      "action_tasks": 40,
+      "selected_action_tasks": 16,
+      "correct_top_action_tasks": 3,
+      "abstention_tasks": 8,
+      "correct_abstentions": 8,
+      "task_completion": 0.2292,
+      "task_count": 48
+    }
+  },
+  "interpretation_boundary": "descriptive construction diagnostics; no model outputs or tuning"
+}

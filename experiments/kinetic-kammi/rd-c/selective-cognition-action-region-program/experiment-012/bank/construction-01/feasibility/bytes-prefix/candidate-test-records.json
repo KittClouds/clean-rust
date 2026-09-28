@@ -1,0 +1,182 @@
+[
+  {
+    "candidate_id": 42559,
+    "candidate_role_hidden": "slice_prefix",
+    "case_id": "case-01",
+    "exit_code": 0,
+    "passed": true,
+    "stdout": "\nrunning 1 test\ntest check_contract ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "     Locking 1 package to latest compatible version\n   Compiling e012-bytes-prefix-harness v0.1.0 (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\task-harnesses\\bytes-prefix)\nwarning: unused import: `Buf`\n --> src\\lib.rs:1:13\n  |\n1 | use bytes::{Buf, Bytes};\n  |             ^^^\n  |\n  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default\n\nwarning: `e012-bytes-prefix-harness` (lib) generated 1 warning (run `cargo fix --lib -p e012-bytes-prefix-harness` to apply 1 suggestion)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.86s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-3488381085e55686.exe)\n"
+  },
+  {
+    "candidate_id": 42559,
+    "candidate_role_hidden": "slice_prefix",
+    "case_id": "case-02",
+    "exit_code": 0,
+    "passed": true,
+    "stdout": "\nrunning 1 test\ntest check_contract ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "warning: unused import: `Buf`\n --> src\\lib.rs:1:13\n  |\n1 | use bytes::{Buf, Bytes};\n  |             ^^^\n  |\n  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default\n\nwarning: `e012-bytes-prefix-harness` (lib) generated 1 warning (run `cargo fix --lib -p e012-bytes-prefix-harness` to apply 1 suggestion)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.03s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-3488381085e55686.exe)\n"
+  },
+  {
+    "candidate_id": 42559,
+    "candidate_role_hidden": "slice_prefix",
+    "case_id": "case-03",
+    "exit_code": 0,
+    "passed": true,
+    "stdout": "\nrunning 1 test\ntest check_contract ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "warning: unused import: `Buf`\n --> src\\lib.rs:1:13\n  |\n1 | use bytes::{Buf, Bytes};\n  |             ^^^\n  |\n  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default\n\nwarning: `e012-bytes-prefix-harness` (lib) generated 1 warning (run `cargo fix --lib -p e012-bytes-prefix-harness` to apply 1 suggestion)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.02s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-3488381085e55686.exe)\n"
+  },
+  {
+    "candidate_id": 42559,
+    "candidate_role_hidden": "slice_prefix",
+    "case_id": "case-04",
+    "exit_code": 0,
+    "passed": true,
+    "stdout": "\nrunning 1 test\ntest check_contract ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "warning: unused import: `Buf`\n --> src\\lib.rs:1:13\n  |\n1 | use bytes::{Buf, Bytes};\n  |             ^^^\n  |\n  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default\n\nwarning: `e012-bytes-prefix-harness` (lib) generated 1 warning (run `cargo fix --lib -p e012-bytes-prefix-harness` to apply 1 suggestion)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.03s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-3488381085e55686.exe)\n"
+  },
+  {
+    "candidate_id": 64060,
+    "candidate_role_hidden": "copy_prefix",
+    "case_id": "case-01",
+    "exit_code": 0,
+    "passed": true,
+    "stdout": "\nrunning 1 test\ntest check_contract ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "   Compiling e012-bytes-prefix-harness v0.1.0 (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\task-harnesses\\bytes-prefix)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.80s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-3488381085e55686.exe)\n"
+  },
+  {
+    "candidate_id": 64060,
+    "candidate_role_hidden": "copy_prefix",
+    "case_id": "case-02",
+    "exit_code": 0,
+    "passed": true,
+    "stdout": "\nrunning 1 test\ntest check_contract ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.03s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-3488381085e55686.exe)\n"
+  },
+  {
+    "candidate_id": 64060,
+    "candidate_role_hidden": "copy_prefix",
+    "case_id": "case-03",
+    "exit_code": 0,
+    "passed": true,
+    "stdout": "\nrunning 1 test\ntest check_contract ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.03s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-3488381085e55686.exe)\n"
+  },
+  {
+    "candidate_id": 64060,
+    "candidate_role_hidden": "copy_prefix",
+    "case_id": "case-04",
+    "exit_code": 0,
+    "passed": true,
+    "stdout": "\nrunning 1 test\ntest check_contract ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.03s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-3488381085e55686.exe)\n"
+  },
+  {
+    "candidate_id": 51536,
+    "candidate_role_hidden": "return_suffix",
+    "case_id": "case-01",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (45852) panicked at tests\\contract.rs:14:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "   Compiling e012-bytes-prefix-harness v0.1.0 (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\task-harnesses\\bytes-prefix)\nwarning: unused import: `Buf`\n --> src\\lib.rs:1:13\n  |\n1 | use bytes::{Buf, Bytes};\n  |             ^^^\n  |\n  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default\n\nwarning: `e012-bytes-prefix-harness` (lib) generated 1 warning (run `cargo fix --lib -p e012-bytes-prefix-harness` to apply 1 suggestion)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.87s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-3488381085e55686.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 51536,
+    "candidate_role_hidden": "return_suffix",
+    "case_id": "case-02",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (37608) panicked at tests\\contract.rs:14:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "warning: unused import: `Buf`\n --> src\\lib.rs:1:13\n  |\n1 | use bytes::{Buf, Bytes};\n  |             ^^^\n  |\n  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default\n\nwarning: `e012-bytes-prefix-harness` (lib) generated 1 warning (run `cargo fix --lib -p e012-bytes-prefix-harness` to apply 1 suggestion)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.02s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-3488381085e55686.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 51536,
+    "candidate_role_hidden": "return_suffix",
+    "case_id": "case-03",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (9584) panicked at tests\\contract.rs:14:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "warning: unused import: `Buf`\n --> src\\lib.rs:1:13\n  |\n1 | use bytes::{Buf, Bytes};\n  |             ^^^\n  |\n  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default\n\nwarning: `e012-bytes-prefix-harness` (lib) generated 1 warning (run `cargo fix --lib -p e012-bytes-prefix-harness` to apply 1 suggestion)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.02s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-3488381085e55686.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 51536,
+    "candidate_role_hidden": "return_suffix",
+    "case_id": "case-04",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (46340) panicked at tests\\contract.rs:14:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "warning: unused import: `Buf`\n --> src\\lib.rs:1:13\n  |\n1 | use bytes::{Buf, Bytes};\n  |             ^^^\n  |\n  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default\n\nwarning: `e012-bytes-prefix-harness` (lib) generated 1 warning (run `cargo fix --lib -p e012-bytes-prefix-harness` to apply 1 suggestion)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.03s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-3488381085e55686.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 47505,
+    "candidate_role_hidden": "return_full_input",
+    "case_id": "case-01",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (4076) panicked at tests\\contract.rs:14:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "   Compiling e012-bytes-prefix-harness v0.1.0 (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\task-harnesses\\bytes-prefix)\nwarning: unused import: `Buf`\n --> src\\lib.rs:1:13\n  |\n1 | use bytes::{Buf, Bytes};\n  |             ^^^\n  |\n  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default\n\nwarning: unused variable: `count`\n --> src\\lib.rs:3:34\n  |\n3 | pub fn take_prefix(input: Bytes, count: usize) -> Bytes {\n  |                                  ^^^^^ help: if this is intentional, prefix it with an underscore: `_count`\n  |\n  = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default\n\nwarning: `e012-bytes-prefix-harness` (lib) generated 2 warnings (run `cargo fix --lib -p e012-bytes-prefix-harness` to apply 2 suggestions)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.80s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-3488381085e55686.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 47505,
+    "candidate_role_hidden": "return_full_input",
+    "case_id": "case-02",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (5100) panicked at tests\\contract.rs:14:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "warning: unused import: `Buf`\n --> src\\lib.rs:1:13\n  |\n1 | use bytes::{Buf, Bytes};\n  |             ^^^\n  |\n  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default\n\nwarning: unused variable: `count`\n --> src\\lib.rs:3:34\n  |\n3 | pub fn take_prefix(input: Bytes, count: usize) -> Bytes {\n  |                                  ^^^^^ help: if this is intentional, prefix it with an underscore: `_count`\n  |\n  = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default\n\nwarning: `e012-bytes-prefix-harness` (lib) generated 2 warnings (run `cargo fix --lib -p e012-bytes-prefix-harness` to apply 2 suggestions)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.03s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-3488381085e55686.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 47505,
+    "candidate_role_hidden": "return_full_input",
+    "case_id": "case-03",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (12820) panicked at tests\\contract.rs:14:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "warning: unused import: `Buf`\n --> src\\lib.rs:1:13\n  |\n1 | use bytes::{Buf, Bytes};\n  |             ^^^\n  |\n  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default\n\nwarning: unused variable: `count`\n --> src\\lib.rs:3:34\n  |\n3 | pub fn take_prefix(input: Bytes, count: usize) -> Bytes {\n  |                                  ^^^^^ help: if this is intentional, prefix it with an underscore: `_count`\n  |\n  = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default\n\nwarning: `e012-bytes-prefix-harness` (lib) generated 2 warnings (run `cargo fix --lib -p e012-bytes-prefix-harness` to apply 2 suggestions)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.02s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-3488381085e55686.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 47505,
+    "candidate_role_hidden": "return_full_input",
+    "case_id": "case-04",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (10328) panicked at tests\\contract.rs:14:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "warning: unused import: `Buf`\n --> src\\lib.rs:1:13\n  |\n1 | use bytes::{Buf, Bytes};\n  |             ^^^\n  |\n  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default\n\nwarning: unused variable: `count`\n --> src\\lib.rs:3:34\n  |\n3 | pub fn take_prefix(input: Bytes, count: usize) -> Bytes {\n  |                                  ^^^^^ help: if this is intentional, prefix it with an underscore: `_count`\n  |\n  = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default\n\nwarning: `e012-bytes-prefix-harness` (lib) generated 2 warnings (run `cargo fix --lib -p e012-bytes-prefix-harness` to apply 2 suggestions)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.03s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-3488381085e55686.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": null,
+    "candidate_role_hidden": "base_snapshot",
+    "case_id": "case-01",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (424) panicked at tests\\contract.rs:14:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "   Compiling e012-bytes-prefix-harness v0.1.0 (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\task-harnesses\\bytes-prefix)\nwarning: unused import: `Buf`\n --> src\\lib.rs:1:13\n  |\n1 | use bytes::{Buf, Bytes};\n  |             ^^^\n  |\n  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default\n\nwarning: `e012-bytes-prefix-harness` (lib) generated 1 warning (run `cargo fix --lib -p e012-bytes-prefix-harness` to apply 1 suggestion)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.78s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-3488381085e55686.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": null,
+    "candidate_role_hidden": "base_snapshot",
+    "case_id": "case-02",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (18996) panicked at tests\\contract.rs:14:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "warning: unused import: `Buf`\n --> src\\lib.rs:1:13\n  |\n1 | use bytes::{Buf, Bytes};\n  |             ^^^\n  |\n  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default\n\nwarning: `e012-bytes-prefix-harness` (lib) generated 1 warning (run `cargo fix --lib -p e012-bytes-prefix-harness` to apply 1 suggestion)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.02s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-3488381085e55686.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": null,
+    "candidate_role_hidden": "base_snapshot",
+    "case_id": "case-03",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (37748) panicked at tests\\contract.rs:14:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "warning: unused import: `Buf`\n --> src\\lib.rs:1:13\n  |\n1 | use bytes::{Buf, Bytes};\n  |             ^^^\n  |\n  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default\n\nwarning: `e012-bytes-prefix-harness` (lib) generated 1 warning (run `cargo fix --lib -p e012-bytes-prefix-harness` to apply 1 suggestion)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.03s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-3488381085e55686.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": null,
+    "candidate_role_hidden": "base_snapshot",
+    "case_id": "case-04",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (39304) panicked at tests\\contract.rs:14:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "warning: unused import: `Buf`\n --> src\\lib.rs:1:13\n  |\n1 | use bytes::{Buf, Bytes};\n  |             ^^^\n  |\n  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default\n\nwarning: `e012-bytes-prefix-harness` (lib) generated 1 warning (run `cargo fix --lib -p e012-bytes-prefix-harness` to apply 1 suggestion)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.02s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-3488381085e55686.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  }
+]

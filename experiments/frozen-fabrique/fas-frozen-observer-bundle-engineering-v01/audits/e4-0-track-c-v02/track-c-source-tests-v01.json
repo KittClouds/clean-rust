@@ -1,0 +1,146 @@
+{
+  "schema": "FAS_E4_0_TRACK_C_V02_SOURCE_TESTS_V01",
+  "status": "PASS_SYNTHETIC_SOURCE_AND_CLI_TESTS",
+  "source_unit": "E4 fresh scorer v02; E4-0 contract v06 identity successor",
+  "predecessor_source_test_receipt": {
+    "path": "audits/e4-0-track-c/track-c-source-tests-v02.json",
+    "sha256": "e8ada9ff5288baa87c4aefc07a5acb2a31e1227862c36876004da958d5ce571b"
+  },
+  "recorded_utc_date": "2026-09-26",
+  "commands": [
+    "python -m py_compile scorer.py runner.py output_artifacts.py test_scorer.py test_runner.py",
+    "python -m unittest -v",
+    "python -c \"import sys,numpy,torch; print('python='+sys.version.split()[0]); print('numpy='+numpy.__version__); print('torch='+torch.__version__); print('torch_cuda_initialized='+str(torch.cuda.is_initialized()))\""
+  ],
+  "results": {
+    "py_compile": "PASS",
+    "unittest": "PASS",
+    "tests_run": 16,
+    "tests_passed": 16,
+    "tests_failed": 0,
+    "test_names": [
+      "test_authorized_reader_opens_synthetic_labels_once_and_verifies_identity",
+      "test_balanced_accuracy_and_support_match_expected_values",
+      "test_bootstrap_is_deterministic_and_uses_linear_tail_quantile",
+      "test_cli_rejects_broader_scope_before_creating_score_or_opening_labels",
+      "test_cli_rejects_tampered_feature_bytes_before_label_open",
+      "test_feature_inference_excludes_escrow_rows",
+      "test_frozen_bootstrap_and_endpoint_constants",
+      "test_invalid_auth_fails_before_synthetic_label_file_is_opened",
+      "test_perfect_synthetic_bundle_passes_all_eight_endpoints",
+      "test_preflight_only_cli_smoke_leaves_labels_unopened_and_score_absent",
+      "test_single_endpoint_failure_cannot_be_hidden_by_bundle_average",
+      "test_support_failure_is_recorded_and_fails_bundle",
+      "test_synthetic_seal_chain_opens_only_primary_once_and_seals_outputs",
+      "test_synthetic_stages_use_exact_track_b_member_ids",
+      "test_synthetic_suite_keeps_cuda_uninitialized",
+      "test_v06_contract_successor_and_v05_lineage_identities_are_frozen"
+    ],
+    "synthetic_v06_contract_and_seal_preflight": "PASS",
+    "torch_cuda_is_initialized_after_tests": false
+  },
+  "runtime": {
+    "python": "3.13.15",
+    "numpy": "2.5.3",
+    "torch": "2.11.0+cu128",
+    "ruff_available": false
+  },
+  "v06_contract_identity": {
+    "contract_path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/e4-0-contract-v06-final.json",
+    "seal_path": "experiments/fas-frozen-observer-bundle-engineering-v01/seals/e4-0-contract-v06-seal.json",
+    "contract_id": "FAS_FROZEN_CAPABILITY_FABRIC_E4_0_V06",
+    "contract_member_artifact_id": "E4_0_CONTRACT_V06_FINAL",
+    "seal_id": "FAS_E4_0_CONTRACT_V06_SEAL",
+    "seal_schema": "FAS_E4_0_ARTIFACT_SEAL_V01",
+    "supersedes_contract": {
+      "contract_id": "FAS_FROZEN_CAPABILITY_FABRIC_E4_0_V05",
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/e4-0-contract-v05-final.json",
+      "bytes": 39944,
+      "sha256": "ad709bd1496536e6fb1464bd89a06ec0eed552b89ef4159bfc1aa0f406fcc71a",
+      "contract_member_artifact_id": "E4_0_CONTRACT_V05_FINAL"
+    },
+    "supersedes_seal": {
+      "seal_id": "FAS_E4_0_CONTRACT_V05_SEAL",
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/seals/e4-0-contract-v05-seal.json",
+      "manifest_bytes": 29668,
+      "manifest_sha256": "434e4472275adbd6514e5b6a0e8d905c7a283ea6ea294edc0068c050336cd9eb",
+      "root_sha256": "38fa25b9433319fc706a1d7fc1e56f20a267f30d467c42ac75ff0850ec656fd1",
+      "contract_member_artifact_id": "E4_0_CONTRACT_V05_FINAL"
+    },
+    "v06_seal_superseded_member_ids": [
+      "E4_0_CONTRACT_V05_SUPERSEDED",
+      "E4_0_CONTRACT_V05_SEAL_SUPERSEDED"
+    ],
+    "base_scientific_predecessor_roots": [
+      "e0_v10_root_sha256",
+      "e1_v04_root_sha256",
+      "e2_v07_root_sha256",
+      "e3_v02_bundle_root_sha256"
+    ]
+  },
+  "stage_seal_member_ids": {
+    "parity_panel": [
+      "panel_inputs",
+      "panel_row_manifest",
+      "selection_receipt"
+    ],
+    "online_parity": [
+      "gpu_lease_receipt",
+      "parity_receipt",
+      "online_feature_cache"
+    ],
+    "fresh_features": [
+      "gpu_lease_receipt",
+      "feature_extraction_receipt",
+      "feature_cache",
+      "population_row_manifest"
+    ]
+  },
+  "boundary": {
+    "actual_e4_population_or_feature_data_read": false,
+    "actual_e4_terminal_labels_read": false,
+    "actual_e4_escrow_labels_read": false,
+    "actual_e3_head_files_read": false,
+    "synthetic_e3_head_files_read": true,
+    "synthetic_primary_labels_opened_by_cli_fixture": true,
+    "synthetic_escrow_file_opened_by_runner": false,
+    "sealed_v05_contract_and_seal_read_only_as_lineage_fixtures": true,
+    "live_v06_contract_or_seal_available": false,
+    "tokenizer_contact": false,
+    "backbone_model_contact": false,
+    "cuda_initialization": false,
+    "real_e4_scoring_execution": false
+  },
+  "source_files": {
+    "scorer.py": {
+      "bytes": 33616,
+      "sha256": "58bc957de63d430933570430ee0760a5833bc9c6ef5a82dae6dba78115b8b866"
+    },
+    "runner.py": {
+      "bytes": 44491,
+      "sha256": "49c21eaee43b2e9d4d1f67b32ba299c0ed238fdc8783a020554517a745ed4e41"
+    },
+    "output_artifacts.py": {
+      "bytes": 5887,
+      "sha256": "73fbdd184d01df6de913676a0caa0be8f38f264bc9667e3985b52485425b33d4"
+    },
+    "test_scorer.py": {
+      "bytes": 11470,
+      "sha256": "49918704b151c9055432f4fb6199e3621a619b21acfb85d2a0427883283132c6"
+    },
+    "test_runner.py": {
+      "bytes": 27529,
+      "sha256": "51366268036367a3443925ad200e2035792c43a73a8ba1182ecc232b6c1dce89"
+    },
+    "README.md": {
+      "bytes": 8585,
+      "sha256": "5a24f8ae2339cd972a3963c1ef3a81badf99270c4b451188e74ce025eb303b57"
+    }
+  },
+  "notes": [
+    "Scoring algorithms and frozen gate constants are copied unchanged from source package v01; this successor only changes contract-v06 identity/lineage bindings and synthetic fixtures/docs.",
+    "Synthetic CLI fixtures build E0-E3/E4 run artifacts in temporary directories and copy the sealed v05 contract and seal read-only to exercise v06 supersedes/member binding; no dataset/labels/model tensors are read from live experiment paths.",
+    "The preflight-only CLI smoke opens no synthetic primary or escrow label file and creates no score directory.",
+    "The authorized synthetic CLI path opens its synthetic primary labels once; the synthetic escrow file is never opened by the runner."
+  ]
+}

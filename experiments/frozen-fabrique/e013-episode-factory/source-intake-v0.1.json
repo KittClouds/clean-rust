@@ -1,0 +1,37 @@
+{
+  "schema": "e013-source-intake/v0.1",
+  "observed_date": "2026-09-26",
+  "role": "design_reference_only",
+  "released_benchmark_rows_imported": 0,
+  "model_observer_contact": false,
+  "sources": [
+    {
+      "id": "swe-rebench-v2",
+      "url": "https://github.com/SWE-rebench/SWE-rebench-V2",
+      "observed_head": "c71902a8cf8d2b725f63d51f199f4d3e56f68d2d",
+      "patterns": ["repository_revision", "patch_task", "executable_test_harness"],
+      "imported_code_or_data": false
+    },
+    {
+      "id": "swe-smith",
+      "url": "https://github.com/SWE-bench/SWE-smith",
+      "observed_head": "9b74ac08118a85c39c356802f7961893af73e07f",
+      "patterns": ["bug_mutation", "candidate_validation"],
+      "imported_code_or_data": false
+    },
+    {
+      "id": "r2e-gym",
+      "url": "https://github.com/agentica-project/R2E-Gym",
+      "observed_head": "353348a0ff690f2592025eff41b3fef4201a4d8b",
+      "patterns": ["procedural_task", "environment_verifier_separation"],
+      "imported_code_or_data": false
+    },
+    {
+      "id": "open-jev",
+      "url": "https://github.com/Zefan-Cai/Open-Jev",
+      "observed_head": "3308a15ccd7eea1df7a37d6ddc39b023b801ba16",
+      "patterns": ["grouped_counterfactual", "none_action", "typed_choice"],
+      "imported_code_or_data": false
+    }
+  ]
+}

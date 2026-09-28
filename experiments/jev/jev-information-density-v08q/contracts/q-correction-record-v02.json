@@ -1,0 +1,20 @@
+{
+  "identity": "JEV-V08Q-CORRECTION-RECORD-V02",
+  "supersedes": "q-contrast-proposal-v01.md draft status only; scientific values are unchanged",
+  "corrections": [
+    {
+      "id": "SAME_SEED_JOINT_GATE",
+      "normative_rule": "For a seed, Q_OPERATING_POINT_SEED_PASS is true only when material continuous gain AND direction AND material locality advantage over concurrent DUP AND preservation all pass for that same seed. Q_STIFF_COUPLING_SEED is true only when material continuous gain AND DUP-like locality both pass for that same seed.",
+      "cohort_rule": "Each cohort label requires at least two of exactly three seeds whose complete same-seed predicate is true. No component may be combined across seeds."
+    },
+    {
+      "id": "LOCALITY_MEANS_ADVANTAGE_OVER_DUP",
+      "normative_rule": "Retains locality means material locality advantage over the concurrent DUP arm under the frozen sham and matched-neutral L1 and MAP-flip criteria. It does not mean retention of SHAM-level locality.",
+      "zero_reference_rule": "If either concurrent DUP L1 is zero, the corresponding relative advantage or coupling channel is unclassifiable and the seed fails the applicable locality conjunction."
+    }
+  ],
+  "no_scientific_threshold_changed": true,
+  "no_data_or_panel_materialized": true,
+  "no_model_loaded": true,
+  "no_training_or_evaluation": true
+}

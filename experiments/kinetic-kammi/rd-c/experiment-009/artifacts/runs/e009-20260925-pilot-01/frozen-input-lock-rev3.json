@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "run_id": "e009-20260925-pilot-01",
+  "state": "FROZEN_BEFORE_MODEL_CONTACT",
+  "frozen_at_utc": "2026-09-25T14:28:55.244430+00:00",
+  "task_bank": {
+    "selection": "frozen local commit tasks, user-selected",
+    "tasks": [
+      {
+        "task_id": "coding-gpu-pick-01",
+        "family": "asynchronous-gpu-picking",
+        "frame_blake3": "a0e87b5e175688f611d808b9d0f5e76981535bce86cde2ddfd450d08a887bbcd"
+      },
+      {
+        "task_id": "coding-embedding-batch-01",
+        "family": "embedding-length-batched-execution",
+        "frame_blake3": "0b2cb36975a5440848a351f905363805d4b36dc06d48118e5fdfa84343afe0e3"
+      }
+    ],
+    "development_task_count": 0,
+    "heldout_unit": "task family; two families total",
+    "labels_file_sha256": "173c9af67dc4ae7494910c118a3e73e3c0464633824ed357f4e139b3baf71e64"
+  },
+  "contracts": {
+    "authority": "E002 compiled authority and action simulator",
+    "runtime_contracts": "rdc-runtime-contracts-v1",
+    "paid_inspection_default": "disabled",
+    "thresholds": {
+      "minimum_applicability_milli": 700,
+      "maximum_abstention_milli": 600
+    },
+    "normalization": "line-endings-lf-v1"
+  },
+  "lanes": [
+    "hand-written",
+    "small",
+    "small-then-large-on-abstention",
+    "always-large"
+  ],
+  "models": [
+    {
+      "bundle_id": "minicpm5-2b-q8-local-v1",
+      "bundle_blake3": "3df2f05a5eb3641fb6b40c86b56366364e97a79360b5c3005b5f118964ed4b1c",
+      "backbone_sha256": "c5415f8989bf88a8288f1b55a3cc371af53c07b0faa220a63bd7a990cfaba078",
+      "runtime_sha256": "ffaee576ad271ede87b92a7d8c3863dc8f331bbac666ee00099c250e8809e743",
+      "qualification_status": "qualified_for_live_trial"
+    },
+    {
+      "bundle_id": "ternary-bonsai-2-27b-ptq1-local-v1",
+      "bundle_blake3": "ee98900f3d1c23069759baf1c001cd9cd7f211bd7001c7c9f94358872f107a1c",
+      "backbone_sha256": "53107f530aa52eb00912263ab1ee29bd199261c87cd7b4ad4ca1318c1fe33ee3",
+      "runtime_sha256": "e0ea4fd53e6f0c741cbd28093b427f333ada0eb03b83073e1f99c483793ea976",
+      "qualification_status": "experimental_runtime_only"
+    }
+  ],
+  "decoding": {
+    "temperature": 0,
+    "top_p": 1,
+    "seed": 0,
+    "maximum_output_tokens": 128
+  },
+  "runtime_environment": {
+    "inference": "local loopback only",
+    "hardware": "RTX 3080 12GB; serial model service use",
+    "small_target_path": "D:\\cargo-targets\\rdc-e009\\mini",
+    "large_target_path": "D:\\cargo-targets\\rdc-e009\\large",
+    "small_loopback_port": 18089,
+    "large_loopback_port": 18090,
+    "billed_api_usd": 0,
+    "cost_proxy": "tokens and measured wall time; energy and hardware-dollar cost not measured"
+  },
+  "sha256": {
+    "spec": "93d14887e1b3e20273ef82149cd03788c39433c19061fbb99c3ece458368ebb8",
+    "e008_closeout": "a89c9ffda75ba68665585e4f540a2e812b0aa0743c1d6260bee53021bf49cfa9",
+    "system_prompt": "2b97ece95d1afb065fed7287d5125e8e032196c209610c9bc9931841aa1db7e6",
+    "output_schema": "d3e44b9964d52bb68384b83e17d9cb5699be96bae7dc98d576acaaabcf3eb8ef",
+    "frame_lock": "08b58ec3f96929714d6b83eecc3caccd319cbb3385e41a4d1a51565eaa0648db",
+    "candidate_lock": "6614643822d9362d546b01518b1fe63f2c44f989eebb1135eb3f06258a413780",
+    "bundle_lock": "e3a719ac2644ec6dfde0c45e6820cc7f4c4a567e7d003196b46df355f3cac2bf",
+    "model_artifact_locations": "95b79ad0285bfe05397ffdf4b9f66798aef0991fc3fa376a6a050d6651e7bc8b",
+    "task_artifacts": {
+      "coding-gpu-pick-01": {
+        "snapshot.tar": "74d13fae05ee4a59dd85c0822b3334bb120339446d9a1ab4acd48ab3aea72e69",
+        "reference.patch": "29e8722b801f66a2ccad73226f0c1f66579b3363b6e4993b945c06a9074edb77",
+        "mutant.patch": "b25a2eb0ca67d88c1e9a808ee4ff7f36c0aea68e44b8ecdb01c8bb96239e6f35",
+        "noop.patch": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "completion-gold.log": "3f77416b4c1c68e654c89c31d7e5b19ee50b8b7396c73e04f886956ab07cae09",
+        "completion-mutant.log": "c0fe6fffe5b66ce4f8ec46758e06f1a46566cf184ecf5602c1c28497129ff1cf"
+      },
+      "coding-embedding-batch-01": {
+        "snapshot.tar": "2b4c1dccca270c26243164476a8e74f854bb6b3398fe2892d82d038936668235",
+        "reference.patch": "f1ce1e32ff544355ead558bddf8a681e47be3db064f2f13b8cb2b85d60561a16",
+        "mutant.patch": "172cf9ef3cb693e16e4200ced496b06755f20b13512bfd5f491727d07f3333fd",
+        "noop.patch": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "completion-gold.log": "81ffd0abb3847b89eba2394bd79f92ef101ae074d0d210aab88d3b90b794ad3f",
+        "completion-mutant.log": "a3452e03854113d3d662f1ce85cd3a6792fd32c2a5e881b5b779edd268f9339f"
+      }
+    },
+    "cargo_lock": "49d73a570a9d58c6531be4eeaaa33ab6c929c774147ba4822a4414299ae0e9cb",
+    "label_ledger": "173c9af67dc4ae7494910c118a3e73e3c0464633824ed357f4e139b3baf71e64",
+    "input_audit": "8ddfff6fdb07e2dbd1fab7001f2c826b3c7658d1409baced15b288690d8a7c1c",
+    "observer_runner": "ea104fd7fe10290ae5994663ae0a6ef27f4b3bc257c5b14eefc7b27f08827bb4",
+    "lane_scorer": "3f8303bb1e77d7545fe479c423911cf19e88b0736894dd3b0fab0c9c7e322af0",
+    "frame_freezer": "22b64441afd0f9e787106f920f571ac36d015944df93c4b95b6064346e578f2c",
+    "bundle_freezer": "a4cb057ae667aa6bc48d6acc18744cb902c53fd1a5c8f973ad87aaf529526824",
+    "run_lock_builder": "04cf125359a0923d1b11efda68d078cba9e977647f79a520baede9e93d5678e0",
+    "authority_preflight": "106523673740c6529ef05a5653b3c4f6502450e9e4665cd3b47cabdfbd4dfc9c",
+    "input_auditor": "468a821a671248e74da639d1bf24b283ac84d6a36893d77d2e60dfe0e0c7ae36",
+    "server_starter": "4d35f9fbf51fb26380da3eb526eae84018cf8645c364f489332103f84dca7104",
+    "server_stopper": "0548e140aefda14429eb1a3d2f5628cb4b27162967ee1d9dffbedd4963bea725",
+    "authorizer_source": "dbe3f9848bb88b414911e199f579749d41acf96b5c3238d9025e99b2ca2bbb11",
+    "frame_schema_source": "4fc7b14de4c00812ba820ef9cd0b9ec0b004f56b7bd1bf89cbdf0e016b3892e3",
+    "observer_schema_source": "e20131fc10c511235349b6bc4db6e62d20be4445a6574bd8439ca27c3e68f7b7",
+    "bundle_schema_source": "331b0b3a864632b5b8cae5676b3b49ebcdd0fd9750c738cab8aed9e43cc668ee",
+    "preflight_receipt": "154a91c6de41af7ac209263109748a72d7a15b08eb31171244070348c2efb3d1"
+  }
+}

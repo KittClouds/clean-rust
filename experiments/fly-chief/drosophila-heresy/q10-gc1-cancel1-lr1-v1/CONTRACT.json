@@ -1,0 +1,90 @@
+{
+  "campaign": {
+    "cumulative_worker_cap_minutes": 120,
+    "invocation_cap_minutes": 10,
+    "invocation_cap_records": 128,
+    "pair_domain_upper_bound": 3968,
+    "single_domain_exact": 3696,
+    "workers": 1
+  },
+  "firewall": {
+    "behavioral_probe": false,
+    "competing_campaign": false,
+    "engineering_only": true,
+    "force_overwrite": false,
+    "parent_writes": false,
+    "s_updated": false,
+    "scientific_promotion": false,
+    "write_root": "experiments/drosophila-heresy/q10-gc1-cancel1-lr1-v1"
+  },
+  "identity": "q10-gc1-cancel1-lr1-v1",
+  "parent_bindings": [
+    {
+      "label": "par8_execution",
+      "path": "experiments/drosophila-heresy/q10-gc1-par8-v1/qualification/execution.json",
+      "sha256": "A4304E70F7D32436109CD6F3367C298CD1227FBD5C4AA2578C28D14272721D6B"
+    },
+    {
+      "label": "par2_palettes",
+      "path": "experiments/drosophila-heresy/q10-gc0-gp1-par2-v1/qualification/palettes.jsonl",
+      "sha256": "56A8BCFD950C2C796279556B03C4905622B1207023C1142076AE7147203477FA"
+    },
+    {
+      "label": "pf0_execution",
+      "path": "experiments/drosophila-heresy/q10-gc1-pf0-v1/qualification/execution.json",
+      "sha256": "47DB038381C9ACB0C98E7D933AA40864F779584CC635178BDF775FDAB5598762"
+    },
+    {
+      "label": "pf5_contract",
+      "path": "experiments/drosophila-heresy/q10-pf5-v1/CONTRACT.json",
+      "sha256": "20995E1826A9C62E0E8689017A2F3E624CC9E63B76B210FBD4AB11D7E9E7D34F"
+    },
+    {
+      "label": "cancel1_plan",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-v1/PLAN.md",
+      "sha256": "2F4DC200F0D4A2CCBE54E8883F467E74AD8B1789A8F55787A70391EA3F2B6A4E"
+    },
+    {
+      "label": "cancel1_contract",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-v1/CONTRACT.json",
+      "sha256": "4AD04F0F3B6E1CB56A5C5C17F3984F370C4A9DF8DC6D47B786EB83541A625BF3"
+    },
+    {
+      "label": "cancel1_runner",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-v1/scripts/run_cancel1.py",
+      "sha256": "2DC8F504628FC29BDBBAD8DDE22225765B3A3EC7A0C9623EDE7412F27700CA9D"
+    },
+    {
+      "label": "rq1_runner",
+      "path": "experiments/drosophila-heresy/q10-gc1-rq1-v1/scripts/run_rq1.py",
+      "sha256": "7820F43395EF6BFB82CC32838970CA7F404BC39BF7821B4B63DBE1AEB02585C7"
+    },
+    {
+      "label": "rq1_contract",
+      "path": "experiments/drosophila-heresy/q10-gc1-rq1-v1/CONTRACT.json",
+      "sha256": "B976E87228BE823D029C119D67D1BE9593AF929381EEFEA9C4B36F9525348E03"
+    },
+    {
+      "label": "rq1_execution",
+      "path": "experiments/drosophila-heresy/q10-gc1-rq1-v1/qualification/execution.json",
+      "sha256": "251723BDA26FAA6005B75369E88444767784E82DB500D1EAEC5952446F9A67E5"
+    }
+  ],
+  "plan_sha256": "C4E856FFF0443B91165DEFAA12C375B623D6741F4F059F8E7FEFDC1C2B2590CB",
+  "protocol": "Q10-GC1-CANCEL1-LR1",
+  "sealed_scripts": {
+    "freeze_inventory.py": "226BB244CAD72457F53A7EB8DD1DA7F1C2D5106C5E5D80D97B8FE049D4598CBA",
+    "lr1_adapter.py": "0F6D01F37106ACBBB60A3D401854016FEE7C16A606866334B68990FE9BDA0A13",
+    "qualify_lr1.py": "5C8D60A989DCF20DB24FEDB2E60EC2EA43D00136504F374E06779C4712E68AAE",
+    "run_lr1_case.py": "6F347446EAF20530F96200E3DB310D7B61B40CE46FBA095F87BB2109DFED5A3A"
+  },
+  "sealed_inventory": {
+    "cases.json": "DF1BF7931D1E38E917C8494A47A08A84C0E0579414E29AB5CA443AAED8B2FFBE",
+    "source-hashes.json": "FBA3B0D99942F28AA4913AA03C936F2A4C962F492615EE106E3C6D3638FA232E"
+  },
+  "sealed_qualification": {
+    "recovery-tests.json": "D2BB88F18A608654410DD78B3855C36A9404C9D88AB3F373E2F5B422B47CE47F",
+    "runtime-equivalence.json": "5F393143E95D7A5E81933C29A5966463918F7AB6D22B7A73166A2453E9894979"
+  },
+  "status": "QUALIFIED_NO_CAMPAIGN"
+}

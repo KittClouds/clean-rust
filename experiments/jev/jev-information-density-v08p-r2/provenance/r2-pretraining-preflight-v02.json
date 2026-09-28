@@ -1,0 +1,134 @@
+{
+  "status": "P_R2_RECOVERY_PREFLIGHT_PASS_ZERO_OPTIMIZER_STEPS",
+  "supersedes_preflight_v01_sha256": "142cd2ab5b83686803b57a753a92f3cddad7b46ecd33a39c861093fffd624046",
+  "preupdate_restart_evidence": {
+    "status": "ZERO_OPTIMIZER_STEPS_EXACT_INITIALIZATION_RESTART",
+    "superseded_preflight_v01_sha256": "142cd2ab5b83686803b57a753a92f3cddad7b46ecd33a39c861093fffd624046",
+    "root_failure_receipt": {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\training-failure-receipt.json",
+      "sha256": "9b28eaade42865be1f28fdd5e930599b4f657a948f8b11e9d492017fa700ad2d"
+    },
+    "first_attempt": {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\attempts\\seed-3243871208\\B-DUP\\attempt-cef31e33174a43389b0468e6763e1744",
+      "files": [
+        {
+          "name": "failure-receipt.json",
+          "sha256": "bf68e68e67b74c743868af469339bd7c6dc464b0181786f369975a25d13f1b1d",
+          "bytes": 414
+        },
+        {
+          "name": "run-config.json",
+          "sha256": "02e5aabac50c10a2a99f6b6df28ac0e2a4e00ed2b457fea5f14b2df44218ad22",
+          "bytes": 1104
+        },
+        {
+          "name": "training-events.jsonl",
+          "sha256": "8bccac64621feb3387f299d54d6467a44e22c07cdaafa66551242b95584b8cbd",
+          "bytes": 192
+        }
+      ],
+      "optimizer_steps_committed": 0,
+      "checkpoint_count": 0
+    },
+    "paired_initial_templates": [
+      {
+        "seed": 3243871208,
+        "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\initial-templates\\seed-3243871208.pt",
+        "file_sha256": "1e23bbaca5646d399a247406557fa82fda101da4ccd486729a68692f1a4d9554",
+        "state_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166"
+      },
+      {
+        "seed": 669993655,
+        "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\initial-templates\\seed-669993655.pt",
+        "file_sha256": "dcc7e961e6b194b188812b24c4fc7ae48c126fdcbc8cc698e649b0e12a614f36",
+        "state_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee"
+      },
+      {
+        "seed": 3076094663,
+        "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\initial-templates\\seed-3076094663.pt",
+        "file_sha256": "d2fcba81f83feeb048d51531c9bd072719c8dad836800e069977ca36bbb11b14",
+        "state_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0"
+      }
+    ],
+    "evaluation_access": false
+  },
+  "run_contract_sha256": "e345225b4a17fc18eb35fcab24cbe1d72bd0e34bed9de272f927a7be461853e6",
+  "analysis_contract_sha256": "84111122033fda65c84344317cfe3b50639b23be4c71f480ba665c67a23cc939",
+  "analysis_addendum_sha256": "4cd14671ffe7c032864fdc0bd5f75db1d1edea666cc58eb43aae0e6c820d0431",
+  "r2_execution_contract_sha256": "51cd8dee09688f1aae24ff575fa0a181d50b2a6ffc94dc6b7e7ed5b61c58ef14",
+  "r2_panel_ready_manifest_sha256": "c0d48381356113451bc72f9578204ade4ef7449a75264cd5018a34d002b313ac",
+  "schedule_sha256": "455d2f8fd709cb0c617f652f7b4ed447fcaaaa30e3e8d2ff1c5cadf358480933",
+  "trainer_sha256": "fc2624f64bffcf03156da7625322ecd8051668d11ac85dc7a443cd7e5defd45c",
+  "probe_sha256": "a3049d52e1183c806c84522a617a05646eb86fbcb69af72b5bb26f4808852cb1",
+  "loss_batcher_sha256": "52033950dab23835c13f4aa74a2f0d5867aec754f8a139a63a739a36b0cb62b9",
+  "metric_implementation_sha256": "dbde07fe1ec009f2bca7f1f22ad913a2a79f4f8dfb8120a1f31ebf37d5f59b70",
+  "trajectory_helper_sha256": "706b8987b3fd637d03f07a0efffe34efde6370dbb4ae6c9b94f66bbb42b3ca70",
+  "analysis_adapter_sha256": "4e86d2ae412982a2a6ac30952517a00105807568000e0d2c764ea696342d1535",
+  "synthetic_test_sha256": "de9d3a4d769d14305d02ccac5ce1c0c68eb06b3ae0ede5beddddfbf5ac8e44c2",
+  "analysis_addendum": "outcome-blind and sealed before head initialization",
+  "source_hashes": {
+    "common_primary_manifest": "773119294a51aa46487de26f9f253355187a7bfd1e75cb2f258c307c86f10b06",
+    "candidate_catalog": "1698ea2078951837b3cb780a3f873c3c099e5e3d001c714e1d58a41e2951487e",
+    "training_state_scope": "aa8cba58f4a8ec46ed6ec8eaf0bfbe992b03b9fa58f815b4259d9fdfe2b009f3",
+    "training_state_features": "da946af90353c91c3b1298d2951eebc42b9f515708b628d3a053e700a960c4d6",
+    "training_candidate_features": "3bb3036f455a83409361eb3e4150833bd8b255a2a783ec1218b00b12315c0590",
+    "training_candidate_feature_receipt": "29f8d67b24fd2a554500e1cfe2e0fe0b4311d32fad7052ad8ffb3464b7835f44",
+    "fixed_schedule": "455d2f8fd709cb0c617f652f7b4ed447fcaaaa30e3e8d2ff1c5cadf358480933",
+    "fixed_schedule_seal": "de9d8ec6957f3db931f6420f405212066dc55f50adf96d0ac33ec232f9f1a7df"
+  },
+  "instrument_source_hashes": {
+    "trainer": "fc2624f64bffcf03156da7625322ecd8051668d11ac85dc7a443cd7e5defd45c",
+    "evaluator": "dc139cf1ff29740eb9a8117eb92f35fa90cac5178a364f38b71b43b710cbb68a",
+    "analysis": "ba62d0f494fe788e929120d07a50c427d9e3cb7a7f7689b308695f79d81409e9",
+    "analysis_adapter": "4e86d2ae412982a2a6ac30952517a00105807568000e0d2c764ea696342d1535",
+    "analysis_test": "de9d3a4d769d14305d02ccac5ce1c0c68eb06b3ae0ede5beddddfbf5ac8e44c2",
+    "evaluator_test": "60e2199d734b536e2e45c7db9fc6491278785ff9ab9b41d4ec34439dacfdacda",
+    "trajectory_helper": "706b8987b3fd637d03f07a0efffe34efde6370dbb4ae6c9b94f66bbb42b3ca70",
+    "metric_analyzer": "dbde07fe1ec009f2bca7f1f22ad913a2a79f4f8dfb8120a1f31ebf37d5f59b70"
+  },
+  "runtime": {
+    "python": "3.13.15",
+    "torch": "2.11.0+cu128",
+    "transformers": "5.17.0",
+    "tokenizers": "0.23.2",
+    "numpy": "2.5.3",
+    "cuda_runtime": "12.8",
+    "cudnn": 91900,
+    "device": "NVIDIA GeForce RTX 3080",
+    "compute_capability": [
+      8,
+      6
+    ]
+  },
+  "synthetic_tests": {
+    "status": "PASS",
+    "paired_init_hash": "753784ba038df090f3050816bec2ec1256994cab1bc3e67ec678923092ac3f77",
+    "head_parameters": 590081,
+    "checkpoint_continuation_exact_cpu_fixture": true,
+    "first_step_loss": 1.4397791624069214,
+    "second_step_loss": 1.6683584451675415
+  },
+  "primary_rows": 10000,
+  "schedule_rows": 360,
+  "arm_manifest_rows": {
+    "B-DUP": 15000,
+    "B-MATCHED": 15000,
+    "B-SHAM": 15000
+  },
+  "state_feature_shape": [
+    55000,
+    2048
+  ],
+  "candidate_feature_shape": [
+    48,
+    2048
+  ],
+  "head_initialized_for_experiment": true,
+  "head_training_started": false,
+  "optimizer_steps_committed_before_recovery": 0,
+  "synthetic_head_fixture_only": true,
+  "heldout_panel_or_features_read": false,
+  "E1_access": false,
+  "newtight_access": false,
+  "phoenix_access": false
+}

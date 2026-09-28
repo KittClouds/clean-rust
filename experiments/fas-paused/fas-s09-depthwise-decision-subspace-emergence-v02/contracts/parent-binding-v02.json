@@ -1,0 +1,23 @@
+{
+  "binding_id": "FAS_S09_PARENT_BINDING_V02",
+  "parents": {
+    "S01_2_CONSTRUCTION": {"root_sha256": "f6065b8163799239e0d7b1200b5dda4aad169772ead14b999130a473ff9d9049", "path": "D:\\codex-runs\\fas-s01-frozen-sensor-transfer-cartography\\s01-2-v01-sealed"},
+    "S01_2_EXTRACTION_RESULT": {"root_sha256": "1fc3aeb432ecdbef21a35aea8fed5b0d59671681eb8eb8032533c9ce751a4384", "path": "D:\\codex-runs\\fas-s01-frozen-sensor-transfer-cartography\\s01-2-feature-geometry-v01"},
+    "S01_2_FEATURE_CACHE": {"root_sha256": "4964f35fb87a45a9447cd0f5f028668027ca3ad3a8f0d0c3f9eb7b9cbe7ccaaa", "path": "D:\\codex-runs\\fas-s01-frozen-sensor-transfer-cartography\\s01-2-feature-geometry-v01"},
+    "S01_3_LINEAR_ACCESSIBILITY": {"root_sha256": "2581b50d75382c197793ea46400bf2b8a27508df22b2ff5bdbe82eb20a5238b7", "path": "D:\\codex-runs\\fas-s01-frozen-sensor-transfer-cartography\\s01-3-linear-accessibility-v01"},
+    "S08_S01_ANALYSIS": {"root_sha256": "96be631597a6eddac8624d6dd744927577eb90921f7d07dda509ab4260bbd1fc", "path": "D:\\codex-runs\\fas-s08-exact-decision-surface-attribution-v02\\s01-analysis"}
+  },
+  "specific_inputs": {
+    "corpus_sha256": "51a55212ba89d55bd6df532673ad4546c95def1f5d75622661f7c17b3e4a7ad1",
+    "S01_2_feature_rows_sha256": "a8ea72310c0926962a0783d90eb3ceda19ca0b334bd2c00aafdd226e8aaaa40b",
+    "S01_3_metadata_sha256": "8452759c748fc0b17fb20fd246d522e0dfa5521058f72226397f47baa74e38ec",
+    "S08_native_geometry_sha256": "9a4a2d442b936df40e1e1e4f6385c646925a4060a37e2a63eba6634943f78f82",
+    "S01_model_asset_root_sha256": "9dd7a164ce9e75b12cf50e16cc75692a38642b2f39ffd41c147aef7f9613b952",
+    "S01_model_weights_sha256": "7678ab9546a0c51c1fca161876b1efc4f0906277f170b5822045f40fdaf9eeff",
+    "model_revision": "7453bca97ca1e67754c4035a4b4c584e1c9dd725"
+  },
+  "s01_split_id": "FASS01-S01-3-GROUPSPLIT-V01",
+  "reused_primary_evaluation": true,
+  "fas00_access": false,
+  "scientific_parents_unchanged_from_v01": true
+}

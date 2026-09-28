@@ -1,0 +1,18 @@
+{
+  "receipt_id": "FAS_FROZEN_OBSERVER_BUNDLE_E0_V08_INDEPENDENT_AUDIT_FAILURE_V01",
+  "status": "E0_V08_AUDIT_FAILED_PRESERVED_NO_MODEL_CONTACT",
+  "recorded_utc": "2026-09-26T10:18:00Z",
+  "seal_path": "experiments/fas-frozen-observer-bundle-engineering-v01/seals/e0-seal-v08.json",
+  "seal_root_sha256": "a782f0baaf04b97c00c64f5c63a5b954ce0df1b2d1cf1665833c374d568a9bf4",
+  "failed_check": "wait_identity_and_e3_boundary_preserved",
+  "cause": "E2 v05 wait verifier required a bound wait receipt SHA-256 and status, but the normalized protocol omitted those receipt fields.",
+  "model_contact_performed": false,
+  "tokenizer_contact_performed": false,
+  "torch_imported": false,
+  "transformers_imported": false,
+  "tokenizers_imported": false,
+  "cuda_allocator_initialized": false,
+  "feature_output_root_created": false,
+  "e2_v01_comparator_modified": false,
+  "disposition": "Preserve E0 v08 seal and failed audit. Add the already sealed wait receipt digest/status to the next protocol version, keep the wait verification in the pre-model path, and seal a new E0 v09 identity."
+}

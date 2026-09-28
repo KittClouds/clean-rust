@@ -1,0 +1,11 @@
+{
+  "completed_contexts": [],
+  "engineering_only": true,
+  "error": "'<' not supported between instances of 'tuple' and 'list'",
+  "error_type": "TypeError",
+  "identity": "q10-gc1-lr1-requal1-csc1-pair-alg3-front2-v2",
+  "localized_readout": true,
+  "protocol": "Q10-ALG3-FRONT2",
+  "scientific_promotion": false,
+  "status": "BLOCKED_ALG3_FRONT2"
+}

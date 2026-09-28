@@ -1,0 +1,73 @@
+{
+  "protocol": "DH-08A",
+  "status": "QUALIFIED_FOR_SINGLE_MEASURED_EXECUTION",
+  "fresh_measured_seeds_used": 0,
+  "qualification_behavior_used_for_protocol_tuning": false,
+  "parent_dh07r": {
+    "run": "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\dh07r\\artifacts\\runs\\20260915T233614Z",
+    "seal_sha256": "18508e8fc6b3e86a7f8d56cde0413fd43b436c06de056f7f7a20a155225b060d"
+  },
+  "constructor_qualification": {
+    "protocol": "Q07-BoundedNull-v1",
+    "closed_loop_events": 12288,
+    "failures": 0,
+    "measured_seeds_used": 0,
+    "qualification_seal_sha256": "db08125d2041865f91d8d443fc8a2fad795c7e5b499cda352ffd29cc081de688",
+    "policy_summary_sha256": "c75c9af3b6d3470933e24bc3ff0746ebd8e1e741c53e236a8c9000c441c55334",
+    "independent_checks": 384
+  },
+  "exact_orchestration_smoke": {
+    "mode": "qualify",
+    "seed": 9100,
+    "sides": [
+      "R",
+      "L"
+    ],
+    "taus": [
+      4.0,
+      16.0
+    ],
+    "event_count": 1024,
+    "result_cells": 8,
+    "all_events_passed": true,
+    "fresh_measured_seeds_used": 0,
+    "observed_maxima": {
+      "axial_error_over_total_norm": 1.9784089141689937e-08,
+      "norm_relative_error": 1.4499982700809832e-08,
+      "residual_norm_relative_error": 1.4500330524323943e-08,
+      "residual_abs_cosine": 1.58515429822845e-08
+    },
+    "output_hashes": {
+      "L-tau16.jsonl": "8336c00fae7be28b025598ba2057d901756faf37006c57c6d3e5e4e60011db33",
+      "L-tau4.jsonl": "c6d2cfd7e4aa15d4a5af5fe9d568bb52e1f3ed0d556716ba474647cdd6d5524d",
+      "R-tau16.jsonl": "d2cab0dcf532fe1e2778d392c24bed6e30141f2b8aa8fb8463a97a18ca7acd68",
+      "R-tau4.jsonl": "756aefc82251ed7d2152030f51bcfd5fb3ee66745a93a84d8468bccf1033f9c3"
+    }
+  },
+  "rust": {
+    "release_tests_passed": 56,
+    "tests_failed": 0,
+    "tests_ignored": 9,
+    "clippy_warnings": 0,
+    "release_build": "PASSED"
+  },
+  "analysis": {
+    "tests_passed": 9,
+    "tests_failed": 0,
+    "bootstrap_resamples": 20000,
+    "bootstrap_seed": 2026091608,
+    "fail_closed_fixtures": "PASSED"
+  },
+  "runtime": {
+    "python": "3.13.15 (tags/v3.13.15:4061bc4, Aug  5 2026, 13:05:39) [MSC v.1944 64 bit (AMD64)]",
+    "interpreter": "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\dh06\\.dh06-venv\\Scripts\\python.exe",
+    "interpreter_sha256": "72b29481593c5da37c99248c82777fbfb56217ea7809b771bc760d0a9ecb179b",
+    "numpy": "2.3.3"
+  },
+  "scope": {
+    "specimens": 1,
+    "fresh_seed_bundles": 32,
+    "measured_seed_range": "8000..8031",
+    "estimand": "event-local true minus Q07-matched-null old-map margin on endogenous true-policy states"
+  }
+}

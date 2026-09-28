@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "amendment_id": "E012-BANK-A14",
+  "state": "TASK_CHECK_DISAMBIGUATION_NO_MODEL_CONTACT",
+  "diagnostic_parent": "E012-BANK-A13-RETRY",
+  "failed_finalization": "bank/construction-01/scored-bank-a12/attempts/label-finalization-attempt-a13-01.json",
+  "change": "case-02 map-order test uses three insertion-ordered keys b,a,c; expected output remains b,a,c",
+  "candidate_patch_semantics_changed": false,
+  "model_contact_authorized": false
+}

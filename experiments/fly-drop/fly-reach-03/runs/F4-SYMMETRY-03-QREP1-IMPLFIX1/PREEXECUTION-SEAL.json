@@ -1,0 +1,29 @@
+{
+  "biological_promotion": false,
+  "block_ids": [
+    304000,
+    304001,
+    304002,
+    304003,
+    304004,
+    304005,
+    304006,
+    304007
+  ],
+  "contract_sha256": "7c49b8419896dca4418de3497ecd8566b2167d1c6bf24d7860d904d70f87afe0",
+  "execution_manifest_canonical_sha256": "ef5e7861ba634969ac34b952eb7cea5e5ae50097bc905a77474ff20b6ff45c38",
+  "execution_manifest_file_sha256": "4a9db249ea7095dd735ac253ffcf8788fd8811f51a1c51fe6f33bc3a81e31a4d",
+  "expected_fit_count": 16,
+  "expected_native_stream_count": 144,
+  "fit_grid_frozen": true,
+  "fit_manifest_semantics": "all C/D by held-out-block identities are frozen; data-dependent row counts and hashes are recorded after native collection",
+  "heldout_truth_opened": false,
+  "measured_reach03_authorized": false,
+  "native_collection_reused": true,
+  "new_native_collection_started": false,
+  "run_id": "F4-SYMMETRY-03-QREP1-IMPLFIX1",
+  "schema": "F4-SYMMETRY-03-preexecution-seal-v1",
+  "source_manifest_canonical_sha256": "3533208db71f8d031d39a7ff08c277c18b1054ad7f8b47bf7363e862a231b63c",
+  "source_manifest_file_sha256": "f91be0db9088ae76751b989e5083505d6625487a76154a62cbeddc2c275573b6",
+  "status": "PASS"
+}

@@ -1,0 +1,19 @@
+{
+  "counts": {
+    "executed": 1309,
+    "preflight": 1309,
+    "unique": 982
+  },
+  "engineering_only": true,
+  "gate": {
+    "behavioral_probe": false,
+    "complete_maps": true,
+    "exact_replay": true,
+    "parents_unchanged": true
+  },
+  "identity": "q10-gc1-d1-r1-v1",
+  "interpretation": "Leave-one-group-out contextual effects for saved coalitions; association only, not causal allocation.",
+  "protocol": "Q10-GC1-D1-R1",
+  "scientific_promotion": false,
+  "status": "D1_R1_REMOVAL_COMPLETE"
+}

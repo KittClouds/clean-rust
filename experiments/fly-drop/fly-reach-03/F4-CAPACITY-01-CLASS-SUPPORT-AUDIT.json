@@ -1,0 +1,59 @@
+{
+  "identity": "F4-CAPACITY-01",
+  "interpretation_boundary": "temporal Omega_hat is not comparable as balanced two-class evidence when a validation split contains one class only",
+  "measured_namespace_created": false,
+  "schema": "FLY-REACH-03-F4-CAPACITY-01-class-support-audit-v1",
+  "scientific_interpretation_opened": false,
+  "split_rule": "trial < 6144 versus trial >= 6144",
+  "status": "PASS_WITH_DEGENERATE_TEMPORAL_HOLDS",
+  "support": {
+    "303000:train": {
+      "both_classes": 1,
+      "negative": 2923,
+      "positive": 153,
+      "rows": 3076
+    },
+    "303000:validation": {
+      "both_classes": 0,
+      "negative": 653,
+      "positive": 0,
+      "rows": 653
+    },
+    "303001:train": {
+      "both_classes": 1,
+      "negative": 893,
+      "positive": 1453,
+      "rows": 2346
+    },
+    "303001:validation": {
+      "both_classes": 0,
+      "negative": 0,
+      "positive": 469,
+      "rows": 469
+    },
+    "303002:train": {
+      "both_classes": 1,
+      "negative": 2227,
+      "positive": 1530,
+      "rows": 3757
+    },
+    "303002:validation": {
+      "both_classes": 1,
+      "negative": 774,
+      "positive": 478,
+      "rows": 1252
+    },
+    "303003:train": {
+      "both_classes": 0,
+      "negative": 1410,
+      "positive": 0,
+      "rows": 1410
+    },
+    "303003:validation": {
+      "both_classes": 0,
+      "negative": 457,
+      "positive": 0,
+      "rows": 457
+    }
+  }
+}

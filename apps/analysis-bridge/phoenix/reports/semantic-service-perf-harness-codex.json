@@ -1,0 +1,318 @@
+{
+  "schemaVersion": 1,
+  "status": "pass",
+  "corpus": "docs/shortrun.md",
+  "storePath": "C:\\code land\\clean-rust\\rust-native\\phoenix\\reports\\semantic-perf-store-68068-1782531233361763700",
+  "cacheDir": "C:\\code land\\clean-rust\\rust-native\\phoenix\\reports\\semantic-perf-cache-68068-1782531233361763700",
+  "modelId": "jinaai/jina-embeddings-v5-text-nano-retrieval",
+  "modelRoot": "D:\\phoenix-models\\jina-embeddings-v5-text-nano-retrieval",
+  "embeddingProfile": "768",
+  "embeddingDim": 768,
+  "executionProvider": "directml",
+  "batchSize": 64,
+  "maxLength": 512,
+  "timings": {
+    "ingestMs": 3030,
+    "profileMs": 1148,
+    "totalMs": 16018
+  },
+  "ingest": {
+    "documentId": "shortrun-full",
+    "timings": {
+      "totalBodyUs": 3028928,
+      "prepareIngestContextUs": 694,
+      "documentOutcomeUs": 2630814,
+      "scanBundleUs": 1144420,
+      "structureRowsUs": 72324,
+      "resolveUs": 49953,
+      "preparedDocumentUs": 1436435,
+      "persistPreparedDocumentsUs": 38691,
+      "graphTruthCommitPrepareUs": 67603,
+      "graphTruthCommitAppendUs": 284120
+    },
+    "bytes": {
+      "preparedManifestBytes": 2059,
+      "preparedSegmentCompressedBytes": 3702874,
+      "preparedSegmentUncompressedBytes": 29264960,
+      "dirtyScopeRecordBytes": 153,
+      "graphTruthCommitRecordBytes": 884733,
+      "graphTruthJournalRecordBytes": 380,
+      "graphTruthBatchRecordBytes": 883694
+    },
+    "counts": {
+      "textBytes": 161490,
+      "sentenceCount": 2361,
+      "mentionCount": 4006,
+      "chunkCount": 358,
+      "relationSeedCount": 4629,
+      "entityCount": 326,
+      "relationCount": 607,
+      "aliasConfirmationCount": 13,
+      "corefClusterCount": 0,
+      "causalPropositionCount": 0,
+      "causalLinkCount": 0,
+      "temporalPropositionCount": 0,
+      "temporalAnchorCount": 0,
+      "eventIdentitySeedCount": 0,
+      "lexicalSpanCount": 358,
+      "lexicalAliasEntryCount": 0,
+      "segmentCount": 0,
+      "segmentBytes": 0,
+      "graphVertexCount": 698,
+      "graphEdgeCount": 697,
+      "dirtyScopeCount": 1,
+      "graphTruthCommitCount": 2
+    },
+    "preparedPersist": {
+      "totalUs": 38691,
+      "documentCount": 1,
+      "segmentCount": 8,
+      "dirtyScopeCount": 1,
+      "nodeCount": 13,
+      "manifestPrepareUs": 158,
+      "segmentPrepareUs": 125,
+      "segmentPayloadWriteUs": 21053,
+      "dirtyScopePrepareUs": 34,
+      "batchUpsertUs": 2346,
+      "sessionArchiveUs": 0,
+      "cacheInvalidateUs": 8,
+      "manifestRecordBytes": 2059,
+      "manifestStoredBytes": 4118,
+      "segmentPayloadBytes": 3702874,
+      "segmentExternalBytes": 3702874,
+      "segmentInlineBytes": 0,
+      "segmentUncompressedBytes": 29264960,
+      "documentIndexShardCount": 1,
+      "documentIndexShardsWritten": 1,
+      "documentIndexShardsReused": 0,
+      "documentIndexBytes": 41668,
+      "documentIndexWriteUs": 14925,
+      "dirtyScopeRecordBytes": 153,
+      "segments": [
+        {
+          "documentId": "shortrun-full",
+          "kind": "alias-confirmation-table",
+          "ordinal": 0,
+          "rowCount": 13,
+          "compressedBytes": 748,
+          "uncompressedBytes": 1883,
+          "prepareUs": 24,
+          "payloadWriteUs": 3320,
+          "storage": "external"
+        },
+        {
+          "documentId": "shortrun-full",
+          "kind": "chunk-table",
+          "ordinal": 1,
+          "rowCount": 358,
+          "compressedBytes": 111776,
+          "uncompressedBytes": 209567,
+          "prepareUs": 14,
+          "payloadWriteUs": 2022,
+          "storage": "external"
+        },
+        {
+          "documentId": "shortrun-full",
+          "kind": "entity-table",
+          "ordinal": 2,
+          "rowCount": 326,
+          "compressedBytes": 14114,
+          "uncompressedBytes": 59885,
+          "prepareUs": 13,
+          "payloadWriteUs": 2339,
+          "storage": "external"
+        },
+        {
+          "documentId": "shortrun-full",
+          "kind": "relation-table",
+          "ordinal": 3,
+          "rowCount": 607,
+          "compressedBytes": 10908,
+          "uncompressedBytes": 81745,
+          "prepareUs": 14,
+          "payloadWriteUs": 1893,
+          "storage": "external"
+        },
+        {
+          "documentId": "shortrun-full",
+          "kind": "causal-substrate-table",
+          "ordinal": 4,
+          "rowCount": 14781,
+          "compressedBytes": 622875,
+          "uncompressedBytes": 4109584,
+          "prepareUs": 17,
+          "payloadWriteUs": 2562,
+          "storage": "external"
+        },
+        {
+          "documentId": "shortrun-full",
+          "kind": "temporal-substrate-table",
+          "ordinal": 5,
+          "rowCount": 47631,
+          "compressedBytes": 2215968,
+          "uncompressedBytes": 20405292,
+          "prepareUs": 14,
+          "payloadWriteUs": 4037,
+          "storage": "external"
+        },
+        {
+          "documentId": "shortrun-full",
+          "kind": "event-identity-substrate-table",
+          "ordinal": 6,
+          "rowCount": 4621,
+          "compressedBytes": 610266,
+          "uncompressedBytes": 4110918,
+          "prepareUs": 15,
+          "payloadWriteUs": 2778,
+          "storage": "external"
+        },
+        {
+          "documentId": "shortrun-full",
+          "kind": "lexical-postings",
+          "ordinal": 7,
+          "rowCount": 603,
+          "compressedBytes": 116219,
+          "uncompressedBytes": 286086,
+          "prepareUs": 14,
+          "payloadWriteUs": 2102,
+          "storage": "external"
+        }
+      ]
+    }
+  },
+  "profile": {
+    "scope": {
+      "worldId": null,
+      "narrativeId": null,
+      "folderId": null,
+      "folderPath": null
+    },
+    "scopeKey": "__global__::__global__::__global__::__global__",
+    "nodeCount": 3076,
+    "uniqueTextCount": 1724,
+    "duplicateTextCount": 1352,
+    "totalTextBytes": 424517,
+    "maxTextBytes": 531,
+    "nodeKindCounts": {
+      "chunk": 358,
+      "claim": 7,
+      "event": 2653,
+      "state": 58
+    },
+    "uniqueTextCountsByKind": {
+      "chunk": 358,
+      "claim": 7,
+      "event": 1351,
+      "state": 58
+    }
+  },
+  "truthReview": {
+    "cold": {
+      "lane": "truth-review-cold",
+      "deriveMs": 9457,
+      "cacheHits": 0,
+      "cacheMisses": 65,
+      "nodeCount": 65,
+      "edgeCount": 178,
+      "summary": {
+        "nodeCount": 65,
+        "edgeCount": 178,
+        "reviewedSupportCount": 0,
+        "reviewedContradictionCount": 0,
+        "generatedCount": 178,
+        "deferredCount": 0,
+        "rejectedCount": 0,
+        "expiredCount": 27,
+        "supersededAssertedCount": 0,
+        "nodeKindCounts": {
+          "claim": 7,
+          "state": 58
+        },
+        "edgeFamilyCounts": {
+          "claim_support": 6,
+          "same_process": 64,
+          "state_support": 108
+        }
+      }
+    },
+    "warm": {
+      "lane": "truth-review-warm",
+      "deriveMs": 1243,
+      "cacheHits": 65,
+      "cacheMisses": 0,
+      "nodeCount": 65,
+      "edgeCount": 178,
+      "summary": {
+        "nodeCount": 65,
+        "edgeCount": 178,
+        "reviewedSupportCount": 0,
+        "reviewedContradictionCount": 0,
+        "generatedCount": 178,
+        "deferredCount": 0,
+        "rejectedCount": 0,
+        "expiredCount": 27,
+        "supersededAssertedCount": 0,
+        "nodeKindCounts": {
+          "claim": 7,
+          "state": 58
+        },
+        "edgeFamilyCounts": {
+          "claim_support": 6,
+          "same_process": 64,
+          "state_support": 108
+        }
+      }
+    }
+  },
+  "budgets": [
+    {
+      "name": "ingestMs",
+      "actual": 3030,
+      "limit": 30000,
+      "ok": true,
+      "kind": "maximum"
+    },
+    {
+      "name": "profileMs",
+      "actual": 1148,
+      "limit": 2000,
+      "ok": true,
+      "kind": "maximum"
+    },
+    {
+      "name": "truthReviewColdMs",
+      "actual": 9457,
+      "limit": 30000,
+      "ok": true,
+      "kind": "maximum"
+    },
+    {
+      "name": "truthReviewWarmMs",
+      "actual": 1243,
+      "limit": 5000,
+      "ok": true,
+      "kind": "maximum"
+    },
+    {
+      "name": "truthReviewColdMisses",
+      "actual": 65,
+      "limit": 1,
+      "ok": true,
+      "kind": "minimum"
+    },
+    {
+      "name": "truthReviewWarmMisses",
+      "actual": 0,
+      "limit": 0,
+      "ok": true,
+      "kind": "maximum"
+    },
+    {
+      "name": "truthReviewWarmHits",
+      "actual": 65,
+      "limit": 65,
+      "ok": true,
+      "kind": "minimum"
+    }
+  ]
+}

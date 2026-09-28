@@ -1,0 +1,122 @@
+{
+  "contexts": [
+    {
+      "actions": 440,
+      "additive_valid_predictions": 145,
+      "context": [
+        "seed9731-L-tau16.json",
+        2
+      ],
+      "descriptor_sha256": "65AC0D26B6A478C10AC8136220F54D2F3D3F3F1FB15CF38612EF926F66081771",
+      "prediction_sha256": "88E75E8B0A01FB46521D88FF8DDDEB8F62C5CDCA96FC51F60D85A3D7D999A7B2",
+      "predictions": 2121,
+      "structural_additive_weight_hash_disagreements": 1865,
+      "structural_valid_predictions": 160
+    },
+    {
+      "actions": 496,
+      "additive_valid_predictions": 0,
+      "context": [
+        "seed9731-L-tau4.json",
+        3
+      ],
+      "descriptor_sha256": "D6A5207DAE3E3B11709D2F805295EEE98FA03F660B026DA46AFBE4DF71512E35",
+      "prediction_sha256": "5683542262ED6BC6D4112968394004433A6C4C81D332C9EBD5FAD3888F74B5C6",
+      "predictions": 2389,
+      "structural_additive_weight_hash_disagreements": 1857,
+      "structural_valid_predictions": 0
+    },
+    {
+      "actions": 472,
+      "additive_valid_predictions": 2,
+      "context": [
+        "seed9731-R-tau16.json",
+        1
+      ],
+      "descriptor_sha256": "7868CC11E61535E560794A93E059CA8CC043DA8E23F11FF2062476C8402988A5",
+      "prediction_sha256": "FD05D0EE8FF2676841596AED37CB9887428C5DA2DD038201E63173838C4711AF",
+      "predictions": 2266,
+      "structural_additive_weight_hash_disagreements": 1806,
+      "structural_valid_predictions": 2
+    },
+    {
+      "actions": 432,
+      "additive_valid_predictions": 0,
+      "context": [
+        "seed9731-R-tau16.json",
+        3
+      ],
+      "descriptor_sha256": "D566E81E161AE54C733E2AFD1CD308FAF1352F83DB371F0AFA6B54328864DD11",
+      "prediction_sha256": "F876591BAF0DEF9A885456A5080CC76601520BEFB8B040EE02474BF97D6DBE13",
+      "predictions": 2062,
+      "structural_additive_weight_hash_disagreements": 1699,
+      "structural_valid_predictions": 0
+    },
+    {
+      "actions": 472,
+      "additive_valid_predictions": 0,
+      "context": [
+        "seed9731-R-tau4.json",
+        0
+      ],
+      "descriptor_sha256": "A873C80B7FABCC3C2417C762FDFEF94F73D623EDAE080880E93516C194E8B3AE",
+      "prediction_sha256": "EFD7339FA36CFFD3246ADD740DD85DA64970B44FF9FFB2479DDF4F8546A7D79A",
+      "predictions": 2267,
+      "structural_additive_weight_hash_disagreements": 1863,
+      "structural_valid_predictions": 0
+    },
+    {
+      "actions": 440,
+      "additive_valid_predictions": 4,
+      "context": [
+        "seed9731-R-tau4.json",
+        1
+      ],
+      "descriptor_sha256": "4821E2D7B5AA953787E0822121E463872F694660D9E223CB642D9ACB59F17866",
+      "prediction_sha256": "770315592758EA3973C1A76BF9E628C2B3B1964D4362644576A64D4350F550C6",
+      "predictions": 2099,
+      "structural_additive_weight_hash_disagreements": 1690,
+      "structural_valid_predictions": 8
+    },
+    {
+      "actions": 472,
+      "additive_valid_predictions": 5,
+      "context": [
+        "seed9731-R-tau4.json",
+        2
+      ],
+      "descriptor_sha256": "8243C560F920200BE1E6A3D8F6E2536B894252D6A4D81290ED88A2715EEEA801",
+      "prediction_sha256": "61387BA1E2ECA7EB70815899513CC862D0080EA0883B2D5B55745AC72BCEE9EF",
+      "predictions": 2253,
+      "structural_additive_weight_hash_disagreements": 1897,
+      "structural_valid_predictions": 5
+    },
+    {
+      "actions": 472,
+      "additive_valid_predictions": 35,
+      "context": [
+        "seed9731-R-tau4.json",
+        3
+      ],
+      "descriptor_sha256": "9ACA7A84D85B1098AC6A23C8DFC31F137B79C1770899FCE05F973FC6C3AC2112",
+      "prediction_sha256": "EAB89EA38AFA79C0805ED50C214C5B64F3D584F81546D798A77301062CD31D34",
+      "predictions": 2255,
+      "structural_additive_weight_hash_disagreements": 1715,
+      "structural_valid_predictions": 27
+    }
+  ],
+  "contract_sha256": "89CD2FD65A610D6CBFC2FF2142C2685B878982F98AA82D83F6C69E54356A44E8",
+  "counts": {
+    "contexts": 8,
+    "predictions": 17712,
+    "singleton_actions": 3696
+  },
+  "engineering_only": true,
+  "identity": "q10-gc1-lr1-requal1-csc1-alg1-v2",
+  "pair_outcomes_consulted": false,
+  "pair_replay_performed": false,
+  "predictions_sealed_before_upair_replay": true,
+  "protocol": "Q10-CSC1-ALG1",
+  "scientific_promotion": false,
+  "status": "ALG1_COMPLETE"
+}

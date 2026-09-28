@@ -1,0 +1,49 @@
+{
+  "schema": "F4-INVARIANT-01-prefit-tooling-amendment-v0.1",
+  "identity": "F4-INVARIANT-01",
+  "status": "IMPLEMENTATION_ONLY",
+  "created_after_task_bank": true,
+  "applies_to_collection_run": "F4-INVARIANT-01-COLLECT2",
+  "task_bank_run": "F4-INVARIANT-01-RUN2",
+  "task_bank_sha256": "8e49f61018255fa32d4328056d46a0b5a14b70306ccfa98733849dcac245c02c",
+  "purpose": "Complete the pre-fit execution tooling omitted from the original frozen implementation package. This amendment authorizes no scientific reinterpretation and no fitting by itself.",
+  "adds_only": [
+    "72-fit orchestration using frozen D/S model and input modules",
+    "FIT-MANIFEST generation and deterministic initial tensor bundles",
+    "prediction stream and prediction-lock generation",
+    "independent pre-truth integrity verification",
+    "post-integrity scoring and terminal disposition",
+    "synthetic tooling tests"
+  ],
+  "frozen_unchanged": [
+    "task bank and task seeds",
+    "native trajectories and Ustar rows",
+    "feature generation and tuple contents",
+    "D model semantics",
+    "S model semantics",
+    "fold normalization",
+    "initializer domain and tensor values",
+    "optimizer and update rule",
+    "200 epochs and batch size 2048",
+    "frozen global training row order",
+    "support rule and 72-fit grid",
+    "prediction format",
+    "scoring definitions and analysis order",
+    "advancement rule and claim ceiling"
+  ],
+  "prohibited": [
+    "task regeneration or replacement",
+    "new seeds",
+    "feature or model changes",
+    "fitting before a sealed FIT-MANIFEST",
+    "held-out target access by the fit executor",
+    "comparative scoring by the fit executor or integrity verifier",
+    "measured REACH-03 authorization",
+    "biological promotion",
+    "PHENO status change"
+  ],
+  "heldout_support_recorded": 7,
+  "heldout_support_used_to_change_fit_grid": false,
+  "qualification_only": true,
+  "measured_reach03_authorized": false
+}

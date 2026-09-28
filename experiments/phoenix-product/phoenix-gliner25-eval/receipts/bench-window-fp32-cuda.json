@@ -1,0 +1,17 @@
+{
+  "contract": "phoenix-gliner25-benchmark-v1",
+  "device_intent": "cuda",
+  "engine_load_ms": 9165.3588,
+  "graph_publications": 0,
+  "model_words": 313,
+  "p50_ms": 486.761,
+  "p95_ms": 510.4514,
+  "p99_ms": 520.9163,
+  "peak_working_set_bytes": 1088868352,
+  "runs": 30,
+  "warmup": 3,
+  "whitespace_words": 270,
+  "working_set_after_bytes": 1088884736,
+  "working_set_before_bytes": 1088479232,
+  "working_set_delta_bytes": 405504
+}

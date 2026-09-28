@@ -1,0 +1,341 @@
+{
+  "schema_version": 1,
+  "tasks": {
+    "turbovec-turbovec-mask-allowlist-v1": {
+      "actions_by_patch_sha256": {
+        "0351d46c399b62825821094c90c92701d18d5e56718bc7af4825e6dc9b13ac74": {
+          "expected_task_completion": true,
+          "candidate_variant": "gold"
+        },
+        "f977765cc076a1eb302b0c9310a0770c7c74035912ad92214d0a70ffb5325974": {
+          "expected_task_completion": true,
+          "candidate_variant": "gold_comment"
+        },
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855": {
+          "expected_task_completion": false,
+          "candidate_variant": "keep"
+        },
+        "027c3f06e442faa979b6e9381ceb566b4a2d4028837c4747ddad6f91984801ab": {
+          "expected_task_completion": false,
+          "candidate_variant": "mutant"
+        }
+      },
+      "difficulty": "heldout"
+    },
+    "turbovec-turbovec-mask-allowlist-v2": {
+      "actions_by_patch_sha256": {
+        "0351d46c399b62825821094c90c92701d18d5e56718bc7af4825e6dc9b13ac74": {
+          "expected_task_completion": true,
+          "candidate_variant": "gold"
+        },
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855": {
+          "expected_task_completion": false,
+          "candidate_variant": "keep"
+        },
+        "027c3f06e442faa979b6e9381ceb566b4a2d4028837c4747ddad6f91984801ab": {
+          "expected_task_completion": false,
+          "candidate_variant": "mutant"
+        },
+        "f977765cc076a1eb302b0c9310a0770c7c74035912ad92214d0a70ffb5325974": {
+          "expected_task_completion": true,
+          "candidate_variant": "gold_comment"
+        }
+      },
+      "difficulty": "heldout"
+    },
+    "turbovec-turbovec-id-remove-readd-v1": {
+      "actions_by_patch_sha256": {
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855": {
+          "expected_task_completion": false,
+          "candidate_variant": "keep"
+        },
+        "c38e076a8bc156f51817b22c9d46c450421eb8586893ca918d5cf68a3aab2c91": {
+          "expected_task_completion": true,
+          "candidate_variant": "gold"
+        },
+        "206a716d47a60ca5e1b0de9ccd26c71c9a1a710134b4a703b06af6fc81a87c5b": {
+          "expected_task_completion": false,
+          "candidate_variant": "mutant"
+        },
+        "5071ceeede54082f166a1d50243cbc910e06dbc783b9911323ebe22c8d67ee7c": {
+          "expected_task_completion": true,
+          "candidate_variant": "gold_comment"
+        }
+      },
+      "difficulty": "heldout"
+    },
+    "turbovec-turbovec-id-remove-readd-v2": {
+      "actions_by_patch_sha256": {
+        "206a716d47a60ca5e1b0de9ccd26c71c9a1a710134b4a703b06af6fc81a87c5b": {
+          "expected_task_completion": false,
+          "candidate_variant": "mutant"
+        },
+        "5071ceeede54082f166a1d50243cbc910e06dbc783b9911323ebe22c8d67ee7c": {
+          "expected_task_completion": true,
+          "candidate_variant": "gold_comment"
+        },
+        "c38e076a8bc156f51817b22c9d46c450421eb8586893ca918d5cf68a3aab2c91": {
+          "expected_task_completion": true,
+          "candidate_variant": "gold"
+        },
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855": {
+          "expected_task_completion": false,
+          "candidate_variant": "keep"
+        }
+      },
+      "difficulty": "heldout"
+    },
+    "turbovec-turbovec-id-swap-repair-v1": {
+      "actions_by_patch_sha256": {
+        "4e9f6d2ebebddf364cc4cd528d7822e691de77588fe01a1afc0152cd5f5003e4": {
+          "expected_task_completion": false,
+          "candidate_variant": "mutant"
+        },
+        "f92aef127b434ce4962d0cf28b159dfe3049b0572d67553880f97da5ced86edd": {
+          "expected_task_completion": true,
+          "candidate_variant": "gold_comment"
+        },
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855": {
+          "expected_task_completion": false,
+          "candidate_variant": "keep"
+        },
+        "3f16db25c03d7158b34d061e6a263bff6dcbd7977dee404cc7028c9b7a185f9b": {
+          "expected_task_completion": true,
+          "candidate_variant": "gold"
+        }
+      },
+      "difficulty": "heldout"
+    },
+    "turbovec-turbovec-id-swap-repair-v2": {
+      "actions_by_patch_sha256": {
+        "f92aef127b434ce4962d0cf28b159dfe3049b0572d67553880f97da5ced86edd": {
+          "expected_task_completion": true,
+          "candidate_variant": "gold_comment"
+        },
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855": {
+          "expected_task_completion": false,
+          "candidate_variant": "keep"
+        },
+        "3f16db25c03d7158b34d061e6a263bff6dcbd7977dee404cc7028c9b7a185f9b": {
+          "expected_task_completion": true,
+          "candidate_variant": "gold"
+        },
+        "4e9f6d2ebebddf364cc4cd528d7822e691de77588fe01a1afc0152cd5f5003e4": {
+          "expected_task_completion": false,
+          "candidate_variant": "mutant"
+        }
+      },
+      "difficulty": "heldout"
+    },
+    "turbovec-turbovec-rotation-wire-format-v1": {
+      "actions_by_patch_sha256": {
+        "0f250400d060f791524f689a9a43a98af396f0da5dc2daf3b3f492ac9d3353d4": {
+          "expected_task_completion": false,
+          "candidate_variant": "mutant"
+        },
+        "620ba171f88123de86b3582f0b41b48c45f3820f4aa76105319ba60f286a8f76": {
+          "expected_task_completion": true,
+          "candidate_variant": "gold_comment"
+        },
+        "007e449ffd08981da2a14e8ad064b052c3b914a91563dddfcaf8b08d8d89f579": {
+          "expected_task_completion": true,
+          "candidate_variant": "gold"
+        },
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855": {
+          "expected_task_completion": false,
+          "candidate_variant": "keep"
+        }
+      },
+      "difficulty": "heldout"
+    },
+    "turbovec-turbovec-rotation-wire-format-v2": {
+      "actions_by_patch_sha256": {
+        "620ba171f88123de86b3582f0b41b48c45f3820f4aa76105319ba60f286a8f76": {
+          "expected_task_completion": true,
+          "candidate_variant": "gold_comment"
+        },
+        "0f250400d060f791524f689a9a43a98af396f0da5dc2daf3b3f492ac9d3353d4": {
+          "expected_task_completion": false,
+          "candidate_variant": "mutant"
+        },
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855": {
+          "expected_task_completion": false,
+          "candidate_variant": "keep"
+        },
+        "007e449ffd08981da2a14e8ad064b052c3b914a91563dddfcaf8b08d8d89f579": {
+          "expected_task_completion": true,
+          "candidate_variant": "gold"
+        }
+      },
+      "difficulty": "heldout"
+    },
+    "ripgrep-ripgrep-case-insensitive-glob-v1": {
+      "actions_by_patch_sha256": {
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855": {
+          "expected_task_completion": false,
+          "candidate_variant": "keep"
+        },
+        "ba2df6b3963a2e63bf04e89df67f324cd81986cda5b521dff1061b12d9bf2648": {
+          "expected_task_completion": true,
+          "candidate_variant": "gold_comment"
+        },
+        "645c24ac169e883eb1d6e47aa9032257ed6c19a9dc10e6fcacea938ffee66814": {
+          "expected_task_completion": false,
+          "candidate_variant": "mutant"
+        },
+        "41fb794fb6ac8f8b265fa9bfe17155da8d26a63cbaee3c9fb70ed63c05a76cd5": {
+          "expected_task_completion": true,
+          "candidate_variant": "gold"
+        }
+      },
+      "difficulty": "heldout"
+    },
+    "ripgrep-ripgrep-case-insensitive-glob-v2": {
+      "actions_by_patch_sha256": {
+        "ba2df6b3963a2e63bf04e89df67f324cd81986cda5b521dff1061b12d9bf2648": {
+          "expected_task_completion": true,
+          "candidate_variant": "gold_comment"
+        },
+        "41fb794fb6ac8f8b265fa9bfe17155da8d26a63cbaee3c9fb70ed63c05a76cd5": {
+          "expected_task_completion": true,
+          "candidate_variant": "gold"
+        },
+        "645c24ac169e883eb1d6e47aa9032257ed6c19a9dc10e6fcacea938ffee66814": {
+          "expected_task_completion": false,
+          "candidate_variant": "mutant"
+        },
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855": {
+          "expected_task_completion": false,
+          "candidate_variant": "keep"
+        }
+      },
+      "difficulty": "heldout"
+    },
+    "ripgrep-ripgrep-literal-separator-glob-v1": {
+      "actions_by_patch_sha256": {
+        "75c4ee5bf57f0293b5a6ec8c79a83a50a9d36b0533db14b10a0566ab402f448a": {
+          "expected_task_completion": true,
+          "candidate_variant": "gold"
+        },
+        "65bd186d034e483ee8e56fde06f3ea4f20665eb6a920922c1c2bf87625467ffe": {
+          "expected_task_completion": true,
+          "candidate_variant": "gold_comment"
+        },
+        "943ccba73ac87d1fabb3c88f78a4812aff99bb9246779665de9b69f3711a0342": {
+          "expected_task_completion": false,
+          "candidate_variant": "mutant"
+        },
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855": {
+          "expected_task_completion": false,
+          "candidate_variant": "keep"
+        }
+      },
+      "difficulty": "heldout"
+    },
+    "ripgrep-ripgrep-literal-separator-glob-v2": {
+      "actions_by_patch_sha256": {
+        "943ccba73ac87d1fabb3c88f78a4812aff99bb9246779665de9b69f3711a0342": {
+          "expected_task_completion": false,
+          "candidate_variant": "mutant"
+        },
+        "65bd186d034e483ee8e56fde06f3ea4f20665eb6a920922c1c2bf87625467ffe": {
+          "expected_task_completion": true,
+          "candidate_variant": "gold_comment"
+        },
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855": {
+          "expected_task_completion": false,
+          "candidate_variant": "keep"
+        },
+        "75c4ee5bf57f0293b5a6ec8c79a83a50a9d36b0533db14b10a0566ab402f448a": {
+          "expected_task_completion": true,
+          "candidate_variant": "gold"
+        }
+      },
+      "difficulty": "heldout"
+    },
+    "ripgrep-ripgrep-recursive-glob-v1": {
+      "actions_by_patch_sha256": {
+        "8203baf35e2cb5d2e1edf344f977b04891aa2508439c978d2e4203b69620060f": {
+          "expected_task_completion": true,
+          "candidate_variant": "gold_comment"
+        },
+        "1c12b124f8575708682a41748896ab7424fc398835f5b33879fb378939813db9": {
+          "expected_task_completion": false,
+          "candidate_variant": "mutant"
+        },
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855": {
+          "expected_task_completion": false,
+          "candidate_variant": "keep"
+        },
+        "141751f0596f2515235db26a90bd3ffe4cdf8edf586f4f01e29631341392b1ca": {
+          "expected_task_completion": true,
+          "candidate_variant": "gold"
+        }
+      },
+      "difficulty": "heldout"
+    },
+    "ripgrep-ripgrep-recursive-glob-v2": {
+      "actions_by_patch_sha256": {
+        "8203baf35e2cb5d2e1edf344f977b04891aa2508439c978d2e4203b69620060f": {
+          "expected_task_completion": true,
+          "candidate_variant": "gold_comment"
+        },
+        "141751f0596f2515235db26a90bd3ffe4cdf8edf586f4f01e29631341392b1ca": {
+          "expected_task_completion": true,
+          "candidate_variant": "gold"
+        },
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855": {
+          "expected_task_completion": false,
+          "candidate_variant": "keep"
+        },
+        "1c12b124f8575708682a41748896ab7424fc398835f5b33879fb378939813db9": {
+          "expected_task_completion": false,
+          "candidate_variant": "mutant"
+        }
+      },
+      "difficulty": "heldout"
+    },
+    "ripgrep-ripgrep-gitignore-bom-v1": {
+      "actions_by_patch_sha256": {
+        "5000d6bc36df5a03c4f167b335cc6d248a22bac17ad2b7041182b31fa05e97af": {
+          "expected_task_completion": true,
+          "candidate_variant": "gold"
+        },
+        "48fa64eaccc75e7448cc9bd2806c6344120c775dc45a53944cce0c7f7f443fd2": {
+          "expected_task_completion": true,
+          "candidate_variant": "gold_comment"
+        },
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855": {
+          "expected_task_completion": false,
+          "candidate_variant": "keep"
+        },
+        "ab2085ede44153fec30518b5ed0ab39d5ca6857004a7998783ce2a91a936fecd": {
+          "expected_task_completion": false,
+          "candidate_variant": "mutant"
+        }
+      },
+      "difficulty": "heldout"
+    },
+    "ripgrep-ripgrep-gitignore-bom-v2": {
+      "actions_by_patch_sha256": {
+        "5000d6bc36df5a03c4f167b335cc6d248a22bac17ad2b7041182b31fa05e97af": {
+          "expected_task_completion": true,
+          "candidate_variant": "gold"
+        },
+        "ab2085ede44153fec30518b5ed0ab39d5ca6857004a7998783ce2a91a936fecd": {
+          "expected_task_completion": false,
+          "candidate_variant": "mutant"
+        },
+        "48fa64eaccc75e7448cc9bd2806c6344120c775dc45a53944cce0c7f7f443fd2": {
+          "expected_task_completion": true,
+          "candidate_variant": "gold_comment"
+        },
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855": {
+          "expected_task_completion": false,
+          "candidate_variant": "keep"
+        }
+      },
+      "difficulty": "heldout"
+    }
+  }
+}

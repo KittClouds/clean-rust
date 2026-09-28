@@ -1,0 +1,15 @@
+{
+  "protocol": "Q10-DA1",
+  "status": "ENGINEERING_COMPLETE_READOUT_AUTHORITY_GEOMETRY_FAILED",
+  "declared_events": 8,
+  "available_events": 8,
+  "coalitions": 32,
+  "full_sequential_replay_parity": 32,
+  "geometry_gate_passes": 0,
+  "scientific_seed_bundles_used": 0,
+  "behavioral_inference": false,
+  "future_dh08b_authorized": false,
+  "mean_mismatch_reduction": 125.53125,
+  "mean_final_to_initial_l2_ratio": 0.8746956821,
+  "next_decision": "Constrain distributed additive selection by the Q10-SM linear geometry contract before any DH08B work."
+}

@@ -1,0 +1,127 @@
+{
+  "schema_version": 1,
+  "stage": "shadow-small-1024",
+  "run_id": "e009-20260925-pilot-01",
+  "protocol_amendment_id": "DECODING_AMENDMENT.md#v2",
+  "prior_output_budget_tokens": 128,
+  "output_budget_tokens": 1024,
+  "original_frozen_bundle_blake3": "3df2f05a5eb3641fb6b40c86b56366364e97a79360b5c3005b5f118964ed4b1c",
+  "amended_bundle_lock_sha256": "12bb804e3d26d479f8f539cea42ba2430a821db161acd9f3ed0f4f5a1f3ef03d",
+  "role": "minicpm5-2b-q8-local-v1",
+  "model": "e009-small-v1",
+  "bundle_id": "minicpm5-2b-q8-local-v1",
+  "bundle_blake3": "076e993a91a522a20a4c555006462d9dcf176ed3b7778a78c0cc15f99d1d538f",
+  "task_id": "coding-gpu-pick-01",
+  "frame_blake3": "a0e87b5e175688f611d808b9d0f5e76981535bce86cde2ddfd450d08a887bbcd",
+  "request_sha256": "658c68d2d3158b41fa00b7b60c4306eda0aa1cdf44335ec2fa0892b6834e6fb5",
+  "request": {
+    "model": "e009-small-v1",
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a typed observer in a deterministic coding workflow. The runtime owns workflow state and will execute only one action from the offered action_options after validating your output.\n\nRead the task_prompt and evidence, then compare the offered actions. Choose the action most likely to satisfy the task while preserving the repository's stated constraints. Do not write or propose code outside the offered choices. Do not claim to have executed tests. If no offered action is sufficiently supported, use null for action_choice and express uncertainty with abstention_milli.\n\nReturn exactly one JSON object matching the provided schema. action_choice must be an offered numeric action ID or null. applicability_milli is your 0-to-1000 estimate that this observer can handle the task from the available evidence. abstention_milli is your 0-to-1000 estimate that the runtime should defer this choice. Use integer values only. Do not add prose or fields.\n"
+      },
+      {
+        "role": "user",
+        "content": "{\"schema_id\":\"rdc-real-coding-observation.v1\",\"task_id\":\"coding-gpu-pick-01\",\"task_family\":\"asynchronous-gpu-picking\",\"task_prompt\":\"Update asynchronous GPU picking so a readback cannot apply after a newer pick request or viewport resize makes it stale. Preserve hover/selection behavior, fail closed on stale results, and add regression tests. Choose one offered patch.\",\"repository_revision\":\"1344f4710148679f7cf0301f57c25b15b23188d4\",\"snapshot_sha256\":\"74d13fae05ee4a59dd85c0822b3334bb120339446d9a1ab4acd48ab3aea72e69\",\"evidence\":[{\"kind\":\"source_excerpt\",\"source_id\":\"phoenix-native/crates/graph-render-wgpu/src/picking.rs\",\"content_blake3\":\"1f01bdf5954eb931733c1ab288168984e07abe45f779250bca93149ddfc2f867\",\"content\":\"PickRequest currently stores x, y, and intent. PickingPass stores a pending request and an inflight intent. resize recreates pick textures and clears pending work. poll maps the encoded slot and returns PickResult without checking whether the readback still belongs to the current request or viewport.\"},{\"kind\":\"baseline_tool_result\",\"source_id\":\"cargo-test-graph-render-wgpu-base\",\"content_blake3\":\"a66546595dc1d52fd032050cdd21da50eafc4d9a7691ad128c4f2a33f0665077\",\"content\":\"Frozen base commit: graph-render-wgpu library tests passed 38/38 and scene_contract integration tests passed 8/8. The task-specific stale-readback regression is absent from the base.\"}],\"action_options\":[{\"action\":{\"id\":23,\"schema_id\":1},\"summary\":\"Track request and viewport generations and return a mapped result only when both still match.\",\"diff_excerpt\":\"Store request_epoch and viewport_revision on each PickRequest. In poll, require `request_epoch == epoch && request_viewport_revision == viewport_revision` before producing PickResult.\",\"patch_sha256\":\"29e8722b801f66a2ccad73226f0c1f66579b3363b6e4993b945c06a9074edb77\"},{\"action\":{\"id\":71,\"schema_id\":1},\"summary\":\"Keep the current asynchronous readback behavior.\",\"diff_excerpt\":\"No generation values are attached to the in-flight readback; poll returns the mapped slot as a PickResult.\",\"patch_sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"},{\"action\":{\"id\":14,\"schema_id\":1},\"summary\":\"Track request and viewport generations and return a mapped result when either still matches.\",\"diff_excerpt\":\"Store request_epoch and viewport_revision on each PickRequest. In poll, require `request_epoch == epoch || request_viewport_revision == viewport_revision` before producing PickResult.\",\"patch_sha256\":\"b25a2eb0ca67d88c1e9a808ee4ff7f36c0aea68e44b8ecdb01c8bb96239e6f35\"}]}"
+      }
+    ],
+    "temperature": 0,
+    "top_p": 1,
+    "seed": 0,
+    "max_tokens": 1024,
+    "stream": false,
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rdc_coding_observer_output_v1",
+        "strict": true,
+        "schema": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "rdc-coding-observer-output.v1",
+          "title": "RDC Coding Observer Output v1",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "action_choice",
+            "applicability_milli",
+            "abstention_milli"
+          ],
+          "properties": {
+            "action_choice": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 65535
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "applicability_milli": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1000
+            },
+            "abstention_milli": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1000
+            }
+          }
+        }
+      }
+    }
+  },
+  "http_status": 200,
+  "response": {
+    "choices": [
+      {
+        "finish_reason": "length",
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "",
+          "reasoning_content": "We need to choose an action from the offered options (ids 23, 71, 14) or null. The task: \"Update asynchronous GPU picking so a readback cannot apply after a newer pick request or viewport resize makes it stale. Preserve hover/selection behavior, fail closed on stale results, and add regression tests. Choose one offered patch.\"\n\nWe have evidence: source excerpt from picking.rs says: \"PickRequest currently stores x, y, and intent. PickingPass stores a pending request and an inflight intent. resize recreates pick textures and clears pending work. poll maps the encoded slot and returns PickResult without checking whether the readback still belongs to the current request or viewport.\"\n\nBaseline: tests passed, but regression absent.\n\nWe need to pick a patch that ensures readback cannot apply after a newer pick request or viewport resize makes it stale. \"fail closed on stale results\" means if stale, should not produce result? Or fail closed means if something fails, default to no result? The task says \"fail closed on stale results\". So we want to ensure that if the readback is stale (i.e., belongs to a newer request or viewport resize), we should not apply it? Or we should fail closed (i.e., return no result or error). The patch options:\n\n- id 23: \"Track request and viewport generations and return a mapped result only when both still match.\" diff: require request_epoch == epoch && request_viewport_revision == viewport_revision before producing PickResult. This is strict: both must match. If either doesn't match, stale, so no result? That seems to \"fail closed\" on stale results: if stale, don't produce result. It preserves hover/selection behavior? Possibly. It adds regression tests? The task says add regression tests, but the patch itself is just code. The observer must choose one offered patch. The patch should satisfy the requirement.\n\n- id 71: \"Keep the current asynchronous readback behavior.\" No generation values attached; poll returns mapped slot as PickResult. This does not solve the stale readback problem. So not suitable.\n\n- id 14: \"Track request and viewport generations and return a mapped result when either still matches.\" diff: require request_epoch == epoch || request_viewport_revision == viewport_revision before producing PickResult. This is less strict: if either matches, produce result. That would allow stale results if one of them matches but the other doesn't. For example, if request_epoch matches but viewport_revision doesn't, it would still produce result, which is not stale? Actually, if request_epoch matches but viewport_revision doesn't, the readback might be stale due to viewport resize. So this patch would not prevent stale results. The task says \"a readback cannot apply after a newer pick request or viewport resize makes it stale.\" So we need to ensure that if either the request is newer or viewport resized, the readback is stale. So we need to check both? Or check that the readback belongs to the current request and current viewport. If either is stale, fail closed. So id 23 seems correct: require both match. That ensures readback is not stale from either newer request or viewport resize. If either doesn't match, fail closed (no result). That matches \"fail closed on stale results\". It also \"preserve hover/selection behavior\"? Possibly, because it just adds checks. The baseline tests pass, and we need to add regression tests, but the patch itself doesn't include tests. The task says \"add regression tests\", but the offered patches are code diffs. The observer must choose one patch; maybe the patch includes tests? The diff excerpt doesn't mention tests. But the task says \"Choose one offered patch.\" So we pick the patch that best satisfies the requirement.\n\nThus id 23 is most likely. applicability_milli: high, maybe 95. abstention_milli: low, maybe 0. But we need to estimate 0-1000. Since we are confident, 0. But the instruction says \"If no offered action is sufficiently supported, use null for action_choice and express uncertainty with abstention_milli.\" Here it is supported. So action_choice = 23.\n\nWe need to output JSON with action_choice, applicability_milli, abstention_milli. Exactly one JSON object.\n\nLet's double-check: The task says \"Update asynchronous GPU picking so a readback cannot apply after a newer pick request or viewport resize makes it stale.\" The current poll returns PickResult without checking. So we need to add checks. The patch id 23 adds request_epoch and viewport_revision, and requires both match. That ensures that if a newer pick request (different epoch) or viewport resize (different revision) occurs, the readback won't match, so no result. That is fail closed. It also preserves hover/selection behavior? Possibly, because it doesn't change the mapping"
+        }
+      }
+    ],
+    "created": 1790347912,
+    "model": "e009-small-v1",
+    "system_fingerprint": "b10982-fc82583e6",
+    "object": "chat.completion",
+    "usage": {
+      "completion_tokens": 1024,
+      "prompt_tokens": 919,
+      "total_tokens": 1943,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "id": "chatcmpl-aCJvYtvNKslT1rFk8lQffu0IhMwEmaJ3",
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 919,
+      "prompt_ms": 372.752,
+      "prompt_per_token_ms": 0.40560609357997823,
+      "prompt_per_second": 2465.4461947890286,
+      "predicted_n": 1024,
+      "predicted_ms": 8017.544,
+      "predicted_per_token_ms": 7.837286412512219,
+      "predicted_per_second": 127.59518376200992
+    }
+  },
+  "content": "",
+  "output": null,
+  "usage": {
+    "completion_tokens": 1024,
+    "prompt_tokens": 919,
+    "total_tokens": 1943,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "elapsed_ms": 8443.688
+}

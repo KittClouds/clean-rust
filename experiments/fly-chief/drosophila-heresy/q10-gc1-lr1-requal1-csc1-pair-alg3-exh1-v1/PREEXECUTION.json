@@ -1,0 +1,9 @@
+{
+  "contract_sha256": "1BE8E1C73B1FD26ED0900328C399866E57CBD688C4EB3198CFBD8A6C70B99712",
+  "identity": "q10-gc1-lr1-requal1-csc1-pair-alg3-exh1-v1",
+  "pair_validity_pruning": false,
+  "protocol": "Q10-ALG3-EXH1",
+  "readout_executed": false,
+  "status": "PREEXECUTION_SEALED",
+  "structural_triples": 125506560
+}

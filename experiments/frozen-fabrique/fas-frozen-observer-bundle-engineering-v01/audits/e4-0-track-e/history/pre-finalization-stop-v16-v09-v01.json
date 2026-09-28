@@ -1,0 +1,42 @@
+{
+  "schema": "E4_0_V16_FINALIZER_PREMATERIALIZATION_STOP_V01",
+  "receipt_id": "E4_0_V16_V09_PREMATERIALIZATION_STOP_V01",
+  "recorded_utc": "2026-09-27T08:51:38.888049+00:00",
+  "status": "E4_0_V16_V09_PREMATERIALIZATION_STOP_NO_CONTACT",
+  "stop_class": "PRESEAL_HISTORY_SCHEMA_EXPECTATION_MISMATCH",
+  "mode": "IN_MEMORY_CONTRACT_VALIDATION",
+  "source_map": {
+    "path": "experiments/fas-frozen-observer-bundle-engineering-v01/plans/E4-0-IMPLEMENTATION-SOURCE-MAP-v16-v09.md",
+    "bytes": 127133,
+    "sha256": "fa4cf7dbdf5518e12432e9779264988128bf07fa091f55179ebf77be62317c0f"
+  },
+  "finalizer_source": {
+    "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/finalize_e4_0_contract_v16_v09.py",
+    "bytes": 109398,
+    "sha256": "1d386e7b372a8f09c40bfe7045492bbe0d37bf0b026063d75652b119dd3c1ecd"
+  },
+  "diagnostic": {
+    "exception_class": "RuntimeError",
+    "message": "preserved v16-v08 candidate/stop does not match exact no-contact history"
+  },
+  "contract_candidate": {
+    "path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/e4-0-contract-v16-v07-final.json",
+    "exists": false
+  },
+  "seal": {
+    "path": "experiments/fas-frozen-observer-bundle-engineering-v01/seals/e4-0-contract-v16-v07-seal.json",
+    "exists": false
+  },
+  "contract_candidate_written": false,
+  "seal_written": false,
+  "authorization_written": false,
+  "tokenizer_contact": false,
+  "model_contact": false,
+  "cuda_initialized": false,
+  "gpu_lease_acquired": false,
+  "feature_cache_created": false,
+  "labels_opened": false,
+  "population_truth_files_opened": false,
+  "template_or_joint_truth_opened": false,
+  "scope": "The v16-v09 finalizer in-memory validation stopped because it required runtime-contact fields on the v16-v08 preseal receipt, whose schema does not contain them; the append-only preservation receipt holds those no-contact fields. No candidate contract, seal, authorization, tokenizer/model/CUDA contact, lease, cache, or label access occurred."
+}

@@ -1,0 +1,50 @@
+{
+  "contract": "phoenix-gliner25-shadow-census-v1",
+  "model_dir": "D:\\phoenix-models\\gliner2.5-base-v1-onnx-a639bad",
+  "model_manifest_sha256": "51da4d7492257862566a77c3d39ef4b68052b4c06aebe58fd257992631e6528a",
+  "schema_id": "phoenix-story-boundary-shadow-v1",
+  "schema_sha256": "9b768cce2c46c3acb65e27d8916914a54b973a76c4930bce17880d8404633f3f",
+  "precision": "fp32",
+  "chunk_words": 384,
+  "overlap_words": 64,
+  "documents": [
+    {
+      "path": ".\\docs\\shortrun.md",
+      "sha256": "21470d2874e061b29baeb1cd2f41a989c598170e025ee063362d8b815a3ea977",
+      "bytes": 161490,
+      "words": 26182,
+      "chapters": 10
+    },
+    {
+      "path": ".\\docs\\midrun.md",
+      "sha256": "1b50582ea26e4ccf2fd2aaa20c471cc93aa18649363345a6ae311b054607d512",
+      "bytes": 522922,
+      "words": 84883,
+      "chapters": 31
+    },
+    {
+      "path": ".\\docs\\laterun.md",
+      "sha256": "f89ceb8be1ac55f3c09a80e7e612d8ea67f5ae54989bcfc69eae894d6974603e",
+      "bytes": 481465,
+      "words": 78231,
+      "chapters": 21
+    },
+    {
+      "path": ".\\docs\\endrun.md",
+      "sha256": "62dea5a12399961f831d9797f353ecb8094eaaf8e6a7a2d1a792e828c4bedcb3",
+      "bytes": 786148,
+      "words": 128090,
+      "chapters": 31
+    }
+  ],
+  "chunks": 1323,
+  "model_words_processed": 491613,
+  "mentions": 29159,
+  "duplicate_mentions": 3523,
+  "invalid_ranges": 0,
+  "elapsed_ms": 797402.5559,
+  "warm_words_per_second": 616.5179636841442,
+  "peak_working_set_bytes": 1207242752,
+  "output_blake3": "54b527a8b2e969df5a3f0ddc3cd5aa1347553d508b821e9ecc823de94dfe344b",
+  "graph_publications": 0
+}

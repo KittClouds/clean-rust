@@ -1,0 +1,32 @@
+{
+  "context_tokens": 4096,
+  "runtime_sha256": "ffaee576ad271ede87b92a7d8c3863dc8f331bbac666ee00099c250e8809e743",
+  "runtime_args": [
+    "--model",
+    "D:\\phoenix-models\\candidates\\minicpm5-2b\\2079a22f3beaa4e306449978533478fe0522f4b3\\MiniCPM5-2B-Q8_0.gguf",
+    "--host",
+    "127.0.0.1",
+    "--port",
+    "18389",
+    "--alias",
+    "e009-small-v5",
+    "--ctx-size",
+    "4096",
+    "--n-gpu-layers",
+    "99",
+    "--reasoning",
+    "off"
+  ],
+  "model_sha256": "c5415f8989bf88a8288f1b55a3cc371af53c07b0faa220a63bd7a990cfaba078",
+  "run_id": "e012-20260926-frame-decomposition-01",
+  "started_at": "2026-09-26T05:24:07.7221824Z",
+  "process_id": 32972,
+  "frozen_input_lock_sha256": "4bab6fd945248b6209fa33e3a1df10786298ac620342ce167251411c6a258cd8",
+  "role": "small",
+  "alias": "e009-small-v5",
+  "base_url": "http://127.0.0.1:18389",
+  "reasoning_mode": "off",
+  "runtime_path": "D:\\phoenix-runtimes\\llama.cpp\\b10982\\runtime\\llama-server.exe",
+  "gpu_layers": 99,
+  "model_path": "D:\\phoenix-models\\candidates\\minicpm5-2b\\2079a22f3beaa4e306449978533478fe0522f4b3\\MiniCPM5-2B-Q8_0.gguf"
+}

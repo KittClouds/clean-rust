@@ -1,0 +1,324 @@
+{
+  "attempt": "cumulative-filtration-v2",
+  "constant_baseline": {
+    "balanced_error": 0.5,
+    "omega_hat": 0.0
+  },
+  "f0_f3b_results": {
+    "F0": {
+      "candidate_grid": [
+        {
+          "balanced_error": 0.24212133331260285,
+          "batch_size": 2048,
+          "learning_rate": 0.0003,
+          "omega_hat": 0.5157573333747942
+        },
+        {
+          "balanced_error": 0.0,
+          "batch_size": 4096,
+          "learning_rate": 0.0003,
+          "omega_hat": 1.0
+        },
+        {
+          "balanced_error": 0.24212133331260285,
+          "batch_size": 2048,
+          "learning_rate": 0.001,
+          "omega_hat": 0.5157573333747942
+        },
+        {
+          "balanced_error": 0.24212133331260285,
+          "batch_size": 4096,
+          "learning_rate": 0.001,
+          "omega_hat": 0.5157573333747942
+        }
+      ],
+      "feature_width": 6,
+      "leave_block_out": [
+        {
+          "balanced_error": 0.7164442862996838,
+          "holdout_block": 303000,
+          "omega_hat": 0.0,
+          "rows": 3729
+        },
+        {
+          "balanced_error": 0.5,
+          "holdout_block": 303001,
+          "omega_hat": 0.0,
+          "rows": 2815
+        },
+        {
+          "balanced_error": 0.7608904509910273,
+          "holdout_block": 303002,
+          "omega_hat": 0.0,
+          "rows": 5009
+        },
+        {
+          "balanced_error": 0.24212133331260285,
+          "holdout_block": 303003,
+          "omega_hat": 0.5157573333747942,
+          "rows": 1867
+        }
+      ],
+      "selected": {
+        "balanced_error": 0.0,
+        "batch_size": 4096,
+        "learning_rate": 0.0003,
+        "omega_hat": 1.0
+      }
+    },
+    "F1": {
+      "candidate_grid": [
+        {
+          "balanced_error": 0.028542394108640335,
+          "batch_size": 2048,
+          "learning_rate": 0.0003,
+          "omega_hat": 0.9429152117827193
+        },
+        {
+          "balanced_error": 0.10665188875616322,
+          "batch_size": 4096,
+          "learning_rate": 0.0003,
+          "omega_hat": 0.7866962224876736
+        },
+        {
+          "balanced_error": 0.12927209730402142,
+          "batch_size": 2048,
+          "learning_rate": 0.001,
+          "omega_hat": 0.7414558053919571
+        },
+        {
+          "balanced_error": 0.2361962283817049,
+          "batch_size": 4096,
+          "learning_rate": 0.001,
+          "omega_hat": 0.5276075432365902
+        }
+      ],
+      "feature_width": 12,
+      "leave_block_out": [
+        {
+          "balanced_error": 0.7132387366635649,
+          "holdout_block": 303000,
+          "omega_hat": 0.0,
+          "rows": 3729
+        },
+        {
+          "balanced_error": 0.5,
+          "holdout_block": 303001,
+          "omega_hat": 0.0,
+          "rows": 2815
+        },
+        {
+          "balanced_error": 0.7598899789253972,
+          "holdout_block": 303002,
+          "omega_hat": 0.0,
+          "rows": 5009
+        },
+        {
+          "balanced_error": 0.23188706115923366,
+          "holdout_block": 303003,
+          "omega_hat": 0.5362258776815327,
+          "rows": 1867
+        }
+      ],
+      "selected": {
+        "balanced_error": 0.028542394108640335,
+        "batch_size": 2048,
+        "learning_rate": 0.0003,
+        "omega_hat": 0.9429152117827193
+      }
+    },
+    "F2": {
+      "candidate_grid": [
+        {
+          "balanced_error": 0.024508388577805185,
+          "batch_size": 2048,
+          "learning_rate": 0.0003,
+          "omega_hat": 0.9509832228443896
+        },
+        {
+          "balanced_error": 0.00834901149353803,
+          "batch_size": 4096,
+          "learning_rate": 0.0003,
+          "omega_hat": 0.983301977012924
+        },
+        {
+          "balanced_error": 0.04659287059297029,
+          "batch_size": 2048,
+          "learning_rate": 0.001,
+          "omega_hat": 0.9068142588140594
+        },
+        {
+          "balanced_error": 0.03743589024521891,
+          "batch_size": 4096,
+          "learning_rate": 0.001,
+          "omega_hat": 0.9251282195095621
+        }
+      ],
+      "feature_width": 108,
+      "leave_block_out": [
+        {
+          "balanced_error": 0.5418145715887592,
+          "holdout_block": 303000,
+          "omega_hat": 0.0,
+          "rows": 3729
+        },
+        {
+          "balanced_error": 0.7188672913270401,
+          "holdout_block": 303001,
+          "omega_hat": 0.0,
+          "rows": 2815
+        },
+        {
+          "balanced_error": 0.7003208633604576,
+          "holdout_block": 303002,
+          "omega_hat": 0.0,
+          "rows": 5009
+        },
+        {
+          "balanced_error": 0.015351408230053796,
+          "holdout_block": 303003,
+          "omega_hat": 0.9692971835398924,
+          "rows": 1867
+        }
+      ],
+      "selected": {
+        "balanced_error": 0.00834901149353803,
+        "batch_size": 4096,
+        "learning_rate": 0.0003,
+        "omega_hat": 0.983301977012924
+      }
+    },
+    "F3A": {
+      "candidate_grid": [
+        {
+          "balanced_error": 0.01050359510477365,
+          "batch_size": 2048,
+          "learning_rate": 0.0003,
+          "omega_hat": 0.9789928097904527
+        },
+        {
+          "balanced_error": 0.010769998686062283,
+          "batch_size": 4096,
+          "learning_rate": 0.0003,
+          "omega_hat": 0.9784600026278755
+        },
+        {
+          "balanced_error": 0.004309167222471241,
+          "batch_size": 2048,
+          "learning_rate": 0.001,
+          "omega_hat": 0.9913816655550575
+        },
+        {
+          "balanced_error": 0.007810365590729124,
+          "batch_size": 4096,
+          "learning_rate": 0.001,
+          "omega_hat": 0.9843792688185418
+        }
+      ],
+      "feature_width": 113,
+      "leave_block_out": [
+        {
+          "balanced_error": 0.5071553041252873,
+          "holdout_block": 303000,
+          "omega_hat": 0.0,
+          "rows": 3729
+        },
+        {
+          "balanced_error": 0.7182013416875153,
+          "holdout_block": 303001,
+          "omega_hat": 0.0,
+          "rows": 2815
+        },
+        {
+          "balanced_error": 0.5531950091199573,
+          "holdout_block": 303002,
+          "omega_hat": 0.0,
+          "rows": 5009
+        },
+        {
+          "balanced_error": 0.002693229514044526,
+          "holdout_block": 303003,
+          "omega_hat": 0.9946135409719109,
+          "rows": 1867
+        }
+      ],
+      "selected": {
+        "balanced_error": 0.004309167222471241,
+        "batch_size": 2048,
+        "learning_rate": 0.001,
+        "omega_hat": 0.9913816655550575
+      }
+    },
+    "F3B": {
+      "candidate_grid": [
+        {
+          "balanced_error": 0.007257122837341124,
+          "batch_size": 2048,
+          "learning_rate": 0.0003,
+          "omega_hat": 0.9854857543253177
+        },
+        {
+          "balanced_error": 0.019921140293582034,
+          "batch_size": 4096,
+          "learning_rate": 0.0003,
+          "omega_hat": 0.9601577194128359
+        },
+        {
+          "balanced_error": 0.002962552465448978,
+          "batch_size": 2048,
+          "learning_rate": 0.001,
+          "omega_hat": 0.9940748950691021
+        },
+        {
+          "balanced_error": 0.009695626250560292,
+          "batch_size": 4096,
+          "learning_rate": 0.001,
+          "omega_hat": 0.9806087474988794
+        }
+      ],
+      "feature_width": 117,
+      "leave_block_out": [
+        {
+          "balanced_error": 0.5010866756222888,
+          "holdout_block": 303000,
+          "omega_hat": 0.0,
+          "rows": 3729
+        },
+        {
+          "balanced_error": 0.8113512660034747,
+          "holdout_block": 303001,
+          "omega_hat": 0.0,
+          "rows": 2815
+        },
+        {
+          "balanced_error": 0.3603040444543403,
+          "holdout_block": 303002,
+          "omega_hat": 0.27939191109131944,
+          "rows": 5009
+        },
+        {
+          "balanced_error": 0.005655781979493504,
+          "holdout_block": 303003,
+          "omega_hat": 0.988688436041013,
+          "rows": 1867
+        }
+      ],
+      "selected": {
+        "balanced_error": 0.002962552465448978,
+        "batch_size": 2048,
+        "learning_rate": 0.001,
+        "omega_hat": 0.9940748950691021
+      }
+    }
+  },
+  "f4_exact_reconstruction": "PASS; Omega(F4)=1 invariant audited separately",
+  "f4_learned_calibration": "NOT_RUN; v0.1 freezes no practical F4 encoder",
+  "measured_namespace_created": false,
+  "measured_seal_created": false,
+  "next_required_amendment": "freeze a deterministic F4 encoder and rerun qualification calibration before measured sealing",
+  "row_modulus": 256,
+  "rows_used": 13420,
+  "run_id": "qualification-v2",
+  "schema": "FLY-REACH-03-qualification-estimator-receipt-v1",
+  "status": "STOP_F4_LEARNED_ENCODER_REQUIRED"
+}

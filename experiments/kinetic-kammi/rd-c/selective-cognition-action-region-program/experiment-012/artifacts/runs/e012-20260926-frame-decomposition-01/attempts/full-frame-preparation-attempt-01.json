@@ -1,0 +1,10 @@
+{
+  "attempt_id": "full-frame-preparation-01",
+  "state": "FAILED_PRECONTACT_ENGINEERING_CHECK",
+  "model_contact": false,
+  "failure": "Public task IDs recur across intervention conditions; preparation attempted a non-unique public-ID-only frame index.",
+  "repair": "Join frame by public task ID and canonical frame SHA256, then verify presentation receipt order.",
+  "source_script": "scripts/prepare_full_frame_lock_e012.py",
+  "preserved": true
+}
+

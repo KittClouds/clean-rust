@@ -1,0 +1,37 @@
+{
+  "protocol": "jev-information-density/v0.8n-road-b-phase-b-evaluator-runtime-correction-v01",
+  "identity": "v0.8N-phase-b-evaluator-runtime-correction-v01",
+  "status": "IMPLEMENTATION_ONLY_EVALUATOR_RUNTIME_ALIAS_CORRECTION",
+  "authorization_event_sha256": "0cad8d2e45fe8e7e5eed7f9bcdeab406926f24605ad9f62396d83f9512bb0a09",
+  "run_contract_sha256": "da538aa03355732a2ba362da45d947e169b87aa644d0efd6ba7ef7a546306c1f",
+  "analysis_contract_sha256": "0072c44903ea253cd8ad288cda8c100270f19d909ddced098af32d388ac29e1f",
+  "training_seal_sha256": "43932fc963b150167972e81b1c1bb93f6989e9b93faa65ab1eee3ecf55c7b727",
+  "checkpoint_hash_tree_sha256": "add6dfd013c936b100e7cbdb205018bf91b95e91ed11ca854b26aed998c66923",
+  "frozen_evaluator": {
+    "path": "experiments/jev-information-density-v08n/phase_b/evaluate_phase_b_v01.py",
+    "sha256": "fa22bc8febff89d2b635091c6cb40be6f3beba4549c4a135d16e213f6fd3dda4"
+  },
+  "correction": {
+    "cause": "Frozen evaluator passed the run-contract human-readable GPU identity to PyTorch Tensor.to/map_location, which is not a valid PyTorch device locator.",
+    "bounded_change": "An external adapter maps the exact contract identity NVIDIA GeForce RTX 3080 to cuda:0 only after checking the live CUDA device name, count, and compute capability against the frozen environment contract.",
+    "semantic_impact": "none; tensor values, model, candidate ordering, prediction code, metrics, aggregation, and evaluation surface are unchanged",
+    "frozen_evaluator_modified": false,
+    "run_contract_modified": false,
+    "analysis_contract_modified": false,
+    "panel_selection_or_matching_modified": false,
+    "panel_opening_count": 1,
+    "newtight_access": false,
+    "legacy_evaluation_access": false,
+    "phoenix_access": false
+  },
+  "preflight_development_record": {
+    "attempts": 1,
+    "disposition": "FIRST_ADAPTER_PREFLIGHT_FAILED_CLOSED_BEFORE_PANEL_UNLOCK",
+    "cause": "adapter looked up feature_path instead of the frozen contract key tensor_path",
+    "corrected_before_evaluation": true,
+    "panel_unlocked_or_opened": false,
+    "evaluation_outputs_created": false
+  },
+  "adapter_path": "experiments/jev-information-density-v08n/phase_b/evaluate_phase_b_runtime_corrected_v01.py",
+  "adapter_sha256": "3ff0f993c80a09923fe589964932e57496c5e574cd43ab1bdb7c94116922eb43"
+}

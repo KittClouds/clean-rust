@@ -1,0 +1,28 @@
+{
+  "task_id": "ripgrep-ripgrep-recursive-glob-v1",
+  "lane": "always-large",
+  "action_id": 94,
+  "patch_sha256": "141751f0596f2515235db26a90bd3ffe4cdf8edf586f4f01e29631341392b1ca",
+  "candidate_variant": "gold",
+  "test_filter": "glob::tests::re22",
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--manifest-path",
+    "C:\\rd-c\\experiment-010\\tasks\\heldout-bank-v1\\families\\ripgrep-recursive-glob\\candidates\\gold\\Cargo.toml",
+    "--package",
+    "globset",
+    "--lib",
+    "glob::tests::re22",
+    "--",
+    "--exact"
+  ],
+  "exit_code": 0,
+  "status": "passed",
+  "passed": true,
+  "elapsed_ms": 53694.864,
+  "completion_source": "live-cargo-test",
+  "output_sha256": "5aa9101c173a07eb146e7eb471e59bb4a8c4b1989491347f9daccf013b70ca3f",
+  "output": "\nrunning 1 test\ntest glob::tests::re22 ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 289 filtered out; finished in 0.00s\n\n   Compiling globset v0.4.19 (C:\\rd-c\\experiment-010\\tasks\\heldout-bank-v1\\families\\ripgrep-recursive-glob\\candidates\\gold\\crates\\globset)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 53.36s\n     Running unittests src\\lib.rs (D:\\cargo-targets\\rdc-e010\\scoring\\debug\\deps\\globset-250b4c7d9a08c2e6.exe)\n"
+}

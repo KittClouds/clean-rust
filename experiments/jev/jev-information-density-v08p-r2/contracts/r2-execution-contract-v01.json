@@ -1,0 +1,120 @@
+{
+  "protocol": "jev-information-density/v0.8p-r2-online-freshness-admission-v01",
+  "identity": "v0.8P-R2-late-transition-localization-v01",
+  "authorization": "User-authorized phase-sized execution packet through sealed behavioral result, conditional only on frozen gates passing",
+  "scientific_question": "Where between optimizer steps 81 and 120 do behavioral coordinates change on a fresh trajectory, and how do those trajectories differ across DUP, MATCHED, and SHAM?",
+  "claim_boundary": "Fresh model-visible inputs within the same four held-out families and p0-p3 templates; not novel-family or novel-template generalization.",
+  "r1_disposition": {
+    "status": "CLOSED_TRAINING_PANEL_OVERLAP",
+    "receipt_sha256": "151e28a629cc6877084b5c4d5395309c3a73e346f5b589d1b0cc588027a6596b",
+    "failed_panel_inputs": false,
+    "training_and_prior_identity_manifests_reused_for_exclusion_only": true
+  },
+  "frozen_scientific_bindings": {
+    "original_p_run_contract_sha256": "e345225b4a17fc18eb35fcab24cbe1d72bd0e34bed9de272f927a7be461853e6",
+    "original_p_analysis_contract_sha256": "84111122033fda65c84344317cfe3b50639b23be4c71f480ba665c67a23cc939",
+    "original_p_panel_contract_sha256": "ce3b7b97caecb27f3ad99439c0e67dca6e40af5da3db9ca2e356ea5e9f06f823",
+    "original_p_bundle_sha256": "67cd6b7902111000dc93a0f81f9f20bc05a9c084732705ed8f9ad82fe965fa85",
+    "v08n_base_contract_sha256": "f72947a53c7df85d12c7d9f91620c0c32925c047b0c556d9298038c80c51f103",
+    "v08n_eval_panel_contract_sha256": "3fa547c0a2490c4cfb5d578a32dffeb8414c35daa5e59ef339ab1e148e2e9cd6",
+    "identity_schema_r1_sha256": "a5d9bf108a1b14d05652b78021a55b74500ed55d6bdc759ff02c09560ea6f7ed",
+    "v05_e1_denylist_sha256": "50eebeb5790c29b4a75c6f8df849eb4c2865d3c864932bbd7f636b7a0e52a2cd",
+    "v05_e1_denylist_root_sha256": "272a14e57c2dcf610568381c0c1c4673c7b40e368ac81b07d3e7160e4e5953a2"
+  },
+  "exclusion_set_inputs": {
+    "training_selected_identity_manifest": {
+      "path": "D:/codex-runs/jev-information-density-v08p-r1/v0.8P-R1/replay-attempt-03/training-scope-identities.jsonl",
+      "sha256": "0f5cd945f965c291b13375b16367085a8c4f3dced4e5996b0e1ffbadf279d191",
+      "rows": 55000,
+      "scope": "original selected training-scope overlap authority"
+    },
+    "prior_panel_identity_manifest": {
+      "path": "D:/codex-runs/jev-information-density-v08p-r1/v0.8P-R1/prior-reconstruction/prior-panel-identities.jsonl",
+      "sha256": "5936d6b4e9d6f651edc0406d844709c99108352459ae90494fa327ed7b110ebf",
+      "rows": 22000,
+      "scope": "five-field prior held-out panel exclusion; reconstructed from bound generator, no panel body"
+    },
+    "forbidden": ["R1 provisional panel", "E1 panel body", "E1 candidate join or features", "E1 labels, targets, predictions, metrics", "v09 rows or mappings", "Phoenix"]
+  },
+  "panel_admission": {
+    "namespace": "eval_v08p_r2",
+    "seed_derivation": {
+      "label": "jev-information-density-v08p-r2/generator-seed-v01",
+      "sha256": "9fd83d6204c651353040738cea47c5673c31d25936e6745675bd8fe645d8810b",
+      "seed_u32": 1648220319
+    },
+    "families": ["exposure_control", "respiratory_monitoring", "salinity_control", "vibration_monitoring"],
+    "admitted_per_family": 500,
+    "candidate_ordinal_stream": "ascending ordinal 0 through 699 independently within each family; no reseed, stream splice, or ordinal reuse",
+    "maximum_candidates_per_family": 700,
+    "budget_failure": "PANEL_ADMISSION_BUDGET_EXHAUSTED",
+    "roles_per_neighborhood": 11,
+    "p_surfaces": ["p0", "p1", "p2", "p3"],
+    "scientific_panel_semantics": "original sealed P panel contract unchanged except fresh R2 namespace/seed and online admission; same exact-world target, schema, edit, and feature definitions",
+    "admission_predicate": "Before any candidate becomes a panel member, compute its 11 occurrence identity rows and reject the entire neighborhood if any of the five identity dimensions intersects the sealed selected-training set, prior-panel set, or any already-admitted R2 occurrence set. Independently reject if SHA256(canonical(neighborhood_id)) is in the v05 E1 denylist.",
+    "online_rejection": "Continue only to the next ordinal in the already-frozen family stream; rejected candidates are not panel members and cannot be manually replaced or reordered.",
+    "internal_set_semantics": "Within a candidate neighborhood, repeated world_id/root_id values across its 11 roles are expected; collision checks compare each candidate's field-value sets to the external and already-admitted sets. Add those values only after whole-neighborhood admission.",
+    "admission_log": "One row for each consumed ordinal: ordinal, family, accepted/rejected, collision field/scope, and SHA256 of each colliding identity value; no raw excluded identity is emitted.",
+    "matching": "Unchanged radius-only argmin absolute difference ||h_N-h_A||2 versus ||h_S-h_A||2 over neutral_1..neutral_8; frozen hash tie-break; no direction/cosine/outcome use.",
+    "radius_gates": {"mean_relative_error_max": 0.10, "p95_absolute_error_max": 0.25, "per_family_mean_relative_error_max": 0.15},
+    "replacement_after_budget_or_gate_failure": false
+  },
+  "post_admission_validation": {
+    "family_counts": [500, 500, 500, 500],
+    "five_field_overlap_against_training_and_prior": "zero separately in every field",
+    "internal_r2_overlap": "zero between admitted neighborhoods in every field",
+    "e1_neighborhood_id_collisions": 0,
+    "semantic_exact_world_and_p0_p3_integrity": "all original P gates pass",
+    "online_admission_vs_final_audit": "exact agreement required; any disagreement is an instrumentation failure",
+    "failure": "seal non-promotable; no regeneration or replacement"
+  },
+  "frozen_lfm": {
+    "model": "LiquidAI/LFM2.5-1.2B-Base",
+    "revision": "7453bca97ca1e67754c4035a4b4c584e1c9dd725",
+    "snapshot_sha256": {
+      "config.json": "15d6157fb6df3f8272e2fe90e18f57727ccf02a125c94469198b0f3281510185",
+      "model.safetensors": "7678ab9546a0c51c1fca161876b1efc4f0906277f170b5822045f40fdaf9eeff",
+      "tokenizer.json": "d7a0ab0fc22e41ec8c6d7450a9ff9ce40e196ec5e5a2fa6a2105e064e0514ed7",
+      "tokenizer_config.json": "8cba5b0c7acab23a0d4cc9ac587346c9220a1b6d288fc5346fe118202fd6f43e",
+      "special_tokens_map.json": "742aefe2b7dec496e8caffdba03a75d0c1a9925d53bd3f3e0d388c96b591b6f4"
+    },
+    "extractor": "experiments/jev-lfm-variable-v07/extract_lfm.py",
+    "extractor_sha256": "b8cd79a9a3265eca0fde5f509ba7c058bc2065d7747efe17ff7c7c1f6335b2d0",
+    "state_feature": "final-layer mean_full@16; exact length; single row; no padding; max 1024; BF16 backbone; FP32 2048-vector",
+    "candidate_feature": "name — description; exact length; single row; no padding; batch size 1; mean_full@16; BF16 backbone; FP32 2048-vector",
+    "feature_repeat_tolerance_max_abs": 0.00001
+  },
+  "training": {
+    "arms": ["B-DUP", "B-MATCHED", "B-SHAM"],
+    "seeds": [3243871208, 669993655, 3076094663],
+    "head": "CompatibilityHead(2048, mlp, 128); 590081 trainable parameters",
+    "optimizer": "AdamW lr 0.002, weight_decay 0.01, betas 0.9/0.999, eps 1e-8",
+    "loss": "cross entropy + 0.25 multiclass Brier",
+    "batch": 256,
+    "epochs": 3,
+    "steps_per_epoch": 40,
+    "total_steps": 120,
+    "precision": "float32 head/features; no autocast; no TF32 matmul",
+    "no_scheduler_clipping_accumulation_early_stop_seed_replacement": true,
+    "checkpoint_steps": [40, 80, "each step 81..120"],
+    "runs": 9,
+    "trained_checkpoints": 378,
+    "execution_order": {"3243871208": ["B-DUP", "B-MATCHED", "B-SHAM"], "669993655": ["B-MATCHED", "B-SHAM", "B-DUP"], "3076094663": ["B-SHAM", "B-DUP", "B-MATCHED"]},
+    "training_data": "unchanged sealed P common primary occurrence stream and three original head-input manifests; same init per seed; new R2 fresh panel only for frozen training-source feature mapping as required"
+  },
+  "evaluation": {
+    "firewall": "No fresh R2 panel evaluation until all nine runs, 378 checkpoints, three init templates, training telemetry, and complete checkpoint hash tree are sealed.",
+    "predictions_before_metrics": true,
+    "matrix": "381 checkpoints x 8000 view rows = 3048000 rows",
+    "analysis": "original sealed P analysis contract and trajectory metric semantics unchanged",
+    "no_checkpoint_selection_or_intermediate_feedback": true
+  },
+  "output": {
+    "workspace_root": "experiments/jev-information-density-v08p-r2",
+    "external_root": "D:/codex-runs/jev-information-density-v08p-r2/v0.8P-R2",
+    "fail_if_exists": true,
+    "target_dir": "D:/cargo-targets/jev-v08p-r2",
+    "phoenix": false
+  },
+  "prohibitions": ["E1 evaluation inputs", "NewTight", "legacy evaluation", "Phoenix", "model adaptation", "head search", "extra seed", "candidate replacement", "metric change", "checkpoint selection", "evaluation-guided training"]
+}

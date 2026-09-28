@@ -1,0 +1,62 @@
+{
+  "analysis_path": "runs/qualification-v2/f4-precision-01-analysis-v0.1.8/F4-PRECISION-01-ANALYSIS.json",
+  "analysis_sha256": "de77a7805e8a44bedb90508303b151b46c734d94c871ee9d8e935ea12f949aba",
+  "arm_a_parent_anchor_match": true,
+  "artifacts": {
+    "arm_b_collection_receipt": {
+      "path": "runs/qualification-v2/f4-precision-01-attempt-02/arm-b-f64/F64-COLLECTION-RECEIPT.json",
+      "sha256": "4873abb29ddd0b24d1fb5d65b6bfb20af09246de3baee3d88271a38afd134412"
+    },
+    "c_quantization_receipt": {
+      "path": "runs/qualification-v2/f4-precision-01-analysis-v0.1.8/C-QUANTIZATION-RECEIPT.json",
+      "sha256": "c1a64549207ebe778f4a661747a184fcbd4b2dba8b25a71c7a1a9eeb0cdd2971"
+    },
+    "preflight_receipt": {
+      "path": "artifacts/qualification-f4-precision-01/F4-PRECISION-01-PREFLIGHT-RECEIPT-v0.1.3.json",
+      "sha256": "642a3139b57dab058568a7d8a5f870ab9b53fb649720100929bb6c7315cb741c"
+    },
+    "row_pairing_receipt": {
+      "path": "runs/qualification-v2/f4-precision-01-attempt-02/ROW-PAIRING-RECEIPT.json",
+      "sha256": "f903d5173edbbeae78a3bd5e46a6dc0158457f307412cd38d7e9b6328648b78c"
+    }
+  },
+  "biological_promotion": false,
+  "claim_disposition": "F32_QUANTIZATION_AS_CAUSE_NOT_SUPPORTED_UNDER_FROZEN_80D_MAP_AND_ESTIMATOR; HIGH_PRECISION_DID_NOT_RESTORE_EXTRACTABLE_CROSS_BLOCK_POLARITY",
+  "contract_path": "F4-PRECISION-01-CONTRACT-v0.1.8.json",
+  "contract_sha256": "5d421392c7d07d0d6c9692033ceb22e311016ddf2efc3bce3f6ba35f6461aada",
+  "expected_actual_rows": {
+    "A": 13420,
+    "B": 13420,
+    "C": 13420
+  },
+  "expected_actual_streams": {
+    "A": 72,
+    "B": 72,
+    "C": 72
+  },
+  "fits": 12,
+  "identity": "F4-PRECISION-01-ANALYSIS-01",
+  "integrity_receipt_path": "runs/qualification-v2/f4-precision-01-analysis-v0.1.8/INTEGRITY-RECEIPT.json",
+  "integrity_receipt_sha256": "7eb7a1ee0fa3da61d9729fc88f22aabfd9ae741fc2b589f0f505e6644202aad6",
+  "integrity_status": "PASS_WITH_OUTCOME_ACCESS_SEQUENCE_DEVIATION",
+  "measured_execution_authorized": false,
+  "measured_namespace_created": false,
+  "outcome_access_before_integrity_receipt": true,
+  "parent_f4_capacity_terminal_receipt_sha256": "16bddc34dfb0adf91e5e6f55e41629b3022eacddd3bd4af12bff6fcc7247d403",
+  "pheno_status_unchanged": true,
+  "preflight_contract_versions_superseded": [
+    "0.1",
+    "0.1.1",
+    "0.1.2",
+    "0.1.3",
+    "0.1.4",
+    "0.1.5",
+    "0.1.6",
+    "0.1.7"
+  ],
+  "qualification_only": true,
+  "results_path": "runs/qualification-v2/f4-precision-01-analysis-v0.1.8/RESULTS.md",
+  "results_sha256": "66b643d321b1d2b0ee5a42d138a9fa86ab8df229a0dd5a30fe0349b32db39623",
+  "schema": "FLY-REACH-03-F4-PRECISION-01-terminal-receipt-v1",
+  "status": "QUALIFICATION_DIAGNOSTIC_COMPLETE_WITH_SEQUENCE_DEVIATION"
+}

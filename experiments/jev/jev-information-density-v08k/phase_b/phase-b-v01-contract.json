@@ -1,0 +1,95 @@
+{
+  "protocol": "jev-information-density/v0.8k-phase-b-v01",
+  "run_identity": "phase-b-v01-clean",
+  "status": "authorized_by_user_2026-09-21_before_model_contact",
+  "phase_a_identity": "phase-a-v01-clean",
+  "objective_graph_sha256": "bd574cd15bc0630ecfcc91116dda5554696313c5b3d03fd161940242f6518670",
+  "quarantined_parent_forbidden": "phase-a-v01-quarantined",
+  "arms": {
+    "K-DUP": {"auxiliary_source_role": "anchor", "auxiliary_target": "anchor_gold"},
+    "K-SHAM": {"auxiliary_source_role": "sham", "auxiliary_target": "anchor_gold"}
+  },
+  "model": {
+    "repo_id": "LiquidAI/LFM2.5-1.2B-Base",
+    "revision": "7453bca97ca1e67754c4035a4b4c584e1c9dd725",
+    "snapshot_directory": "D:\\codex-runs\\jev-lfm-variable-v07\\models\\lfm2.5-1.2b-base",
+    "hidden_dim": 2048,
+    "layer_count": 16,
+    "backbone_frozen": true,
+    "trust_remote_code": false
+  },
+  "representation": {
+    "adapter": "experiments/jev-lfm-variable-v07/extract_lfm.py::encode_lfm_texts",
+    "layer": "final",
+    "pooling": "mean_full",
+    "dtype": "bfloat16_backbone_float32_features",
+    "max_length": 1024,
+    "batch_size": 1,
+    "padding": false,
+    "exact_length": true,
+    "single_row": true
+  },
+  "compiler": {
+    "head": "dynamic_mlp_compatibility",
+    "projection_width": 128,
+    "trainable_parameters": 590081,
+    "candidate_profile": "name_definition",
+    "loss": "existing_v08i_L3_source_typed",
+    "brier_weight": 0.25,
+    "existing_invariance_weight": 0.10,
+    "auxiliary_weight": 1.0,
+    "normalization": {
+      "base_event_weight": 1.0,
+      "auxiliary_event_weight": 1.0,
+      "existing_invariance_events_per_step": 16,
+      "existing_pair_policy": "v08i_first_16_pairs_each_optimizer_step",
+      "formula": "(N_base*L_base + N_aux*L_aux)/(N_base + N_aux) + lambda_existing*L_existing",
+      "disabled_events_forwarded_then_zero_weighted": false
+    }
+  },
+  "training": {
+    "optimizer": "AdamW(head_only)",
+    "learning_rate": 0.002,
+    "weight_decay": 0.01,
+    "batch_size_groups": 256,
+    "epochs": 3,
+    "scheduler": "none",
+    "gradient_clipping": "none",
+    "paired_seeds": [20260927, 20260928, 20260929],
+    "primary_groups": 100000,
+    "triplet_count": 5000,
+    "auxiliary_events_per_arm": 5000,
+    "existing_invariance_pairs": 4982,
+    "existing_invariance_max_pairs_per_step": 16,
+    "arm_schedule": [
+      ["seed-1", "K-DUP"], ["seed-1", "K-SHAM"],
+      ["seed-2", "K-SHAM"], ["seed-2", "K-DUP"],
+      ["seed-3", "K-DUP"], ["seed-3", "K-SHAM"]
+    ],
+    "terminal_epoch": 3,
+    "best_epoch_selection": false
+  },
+  "evaluation": {
+    "primary": "held-out exact-world controlled contrast triplets",
+    "pair_count": 2000,
+    "families": 4,
+    "secondary": "unchanged NewTight typed panels",
+    "result_driven_tuning": false
+  },
+  "boundaries": {
+    "phase_a_mutation": false,
+    "bank_regeneration": false,
+    "backbone_updates": false,
+    "LoRA": false,
+    "QLoRA": false,
+    "pooling_search": false,
+    "head_search": false,
+    "lambda_search": false,
+    "temperature_fitting": false,
+    "epoch_selection": false,
+    "new_families": false,
+    "Phoenix": false,
+    "follow_on_experiment": false
+  },
+  "external_output_root": "D:/codex-runs/jev-information-density-v08k/phase-b-v01"
+}

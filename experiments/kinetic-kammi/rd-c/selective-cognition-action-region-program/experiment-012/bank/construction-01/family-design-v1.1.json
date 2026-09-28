@@ -1,0 +1,863 @@
+{
+  "schema_version": 1,
+  "program": "Selective Cognition / Action Region Program",
+  "experiment": "E012 Prospective Frame Decomposition",
+  "state": "PRETASK_FAMILY_DESIGN",
+  "model_contact_authorized": false,
+  "seed": 20260925,
+  "task_count": 48,
+  "family_count": 12,
+  "sha256_self_excluded": true,
+  "families": [
+    {
+      "repository_id": "bytes",
+      "hidden_family_name": "bounded-prefix-copy",
+      "observer_family_code": "fam-3129",
+      "stratum": "candidate_action_dominant",
+      "truth_support": [
+        "E_c.content"
+      ],
+      "pairing_design": "candidate_pairs",
+      "tasks": [
+        {
+          "task_id": "task-809202",
+          "pair_id": "pair-3129-2",
+          "within_family_index": 4,
+          "truth_support": [
+            "E_c.content"
+          ],
+          "pairing_design": "candidate_pairs",
+          "counterfactual_change_channel": "E_c.content",
+          "latent_gold_candidate_role": "action-b",
+          "latent_request_bit": null,
+          "latent_execution_bit": null,
+          "full_frame_direct_decision": "ACT"
+        },
+        {
+          "task_id": "task-724742",
+          "pair_id": "pair-3129-2",
+          "within_family_index": 3,
+          "truth_support": [
+            "E_c.content"
+          ],
+          "pairing_design": "candidate_pairs",
+          "counterfactual_change_channel": "E_c.content",
+          "latent_gold_candidate_role": "action-a",
+          "latent_request_bit": null,
+          "latent_execution_bit": null,
+          "full_frame_direct_decision": "ACT"
+        },
+        {
+          "task_id": "task-348504",
+          "pair_id": "pair-3129-1",
+          "within_family_index": 1,
+          "truth_support": [
+            "E_c.content"
+          ],
+          "pairing_design": "candidate_pairs",
+          "counterfactual_change_channel": "E_c.content",
+          "latent_gold_candidate_role": "action-a",
+          "latent_request_bit": null,
+          "latent_execution_bit": null,
+          "full_frame_direct_decision": "ACT"
+        },
+        {
+          "task_id": "task-742866",
+          "pair_id": "pair-3129-1",
+          "within_family_index": 2,
+          "truth_support": [
+            "E_c.content"
+          ],
+          "pairing_design": "candidate_pairs",
+          "counterfactual_change_channel": "E_c.content",
+          "latent_gold_candidate_role": "action-b",
+          "latent_request_bit": null,
+          "latent_execution_bit": null,
+          "full_frame_direct_decision": "ACT"
+        }
+      ]
+    },
+    {
+      "repository_id": "bytes",
+      "hidden_family_name": "cursor-advance-observation",
+      "observer_family_code": "fam-9358",
+      "stratum": "pre_action_test_execution_dominant",
+      "truth_support": [
+        "E_c.content",
+        "E_x"
+      ],
+      "pairing_design": "execution_pairs",
+      "tasks": [
+        {
+          "task_id": "task-711391",
+          "pair_id": "pair-9358-2",
+          "within_family_index": 4,
+          "truth_support": [
+            "E_c.content",
+            "E_x"
+          ],
+          "pairing_design": "execution_pairs",
+          "counterfactual_change_channel": "E_x",
+          "latent_gold_candidate_role": "action-b",
+          "latent_request_bit": null,
+          "latent_execution_bit": null,
+          "full_frame_direct_decision": "ACT"
+        },
+        {
+          "task_id": "task-827381",
+          "pair_id": "pair-9358-1",
+          "within_family_index": 1,
+          "truth_support": [
+            "E_c.content",
+            "E_x"
+          ],
+          "pairing_design": "execution_pairs",
+          "counterfactual_change_channel": "E_x",
+          "latent_gold_candidate_role": "action-a",
+          "latent_request_bit": null,
+          "latent_execution_bit": null,
+          "full_frame_direct_decision": "ACT"
+        },
+        {
+          "task_id": "task-334405",
+          "pair_id": "pair-9358-1",
+          "within_family_index": 2,
+          "truth_support": [
+            "E_c.content",
+            "E_x"
+          ],
+          "pairing_design": "execution_pairs",
+          "counterfactual_change_channel": "E_x",
+          "latent_gold_candidate_role": "action-b",
+          "latent_request_bit": null,
+          "latent_execution_bit": null,
+          "full_frame_direct_decision": "ACT"
+        },
+        {
+          "task_id": "task-580656",
+          "pair_id": "pair-9358-2",
+          "within_family_index": 3,
+          "truth_support": [
+            "E_c.content",
+            "E_x"
+          ],
+          "pairing_design": "execution_pairs",
+          "counterfactual_change_channel": "E_x",
+          "latent_gold_candidate_role": "action-a",
+          "latent_request_bit": null,
+          "latent_execution_bit": null,
+          "full_frame_direct_decision": "ACT"
+        }
+      ]
+    },
+    {
+      "repository_id": "bytes",
+      "hidden_family_name": "composite-frame-field",
+      "observer_family_code": "fam-2921",
+      "stratum": "joint_support",
+      "truth_support": [
+        "E_c.content",
+        "E_t",
+        "E_x"
+      ],
+      "pairing_design": "xor_four_way",
+      "tasks": [
+        {
+          "task_id": "task-943194",
+          "pair_id": "factorial-2921",
+          "within_family_index": 1,
+          "truth_support": [
+            "E_c.content",
+            "E_t",
+            "E_x"
+          ],
+          "pairing_design": "xor_four_way",
+          "counterfactual_change_channel": "E_t+E_x",
+          "latent_gold_candidate_role": "action-a",
+          "latent_request_bit": 0,
+          "latent_execution_bit": 0,
+          "full_frame_direct_decision": "ACT"
+        },
+        {
+          "task_id": "task-104800",
+          "pair_id": "factorial-2921",
+          "within_family_index": 2,
+          "truth_support": [
+            "E_c.content",
+            "E_t",
+            "E_x"
+          ],
+          "pairing_design": "xor_four_way",
+          "counterfactual_change_channel": "E_t+E_x",
+          "latent_gold_candidate_role": "action-b",
+          "latent_request_bit": 0,
+          "latent_execution_bit": 1,
+          "full_frame_direct_decision": "ACT"
+        },
+        {
+          "task_id": "task-215890",
+          "pair_id": "factorial-2921",
+          "within_family_index": 3,
+          "truth_support": [
+            "E_c.content",
+            "E_t",
+            "E_x"
+          ],
+          "pairing_design": "xor_four_way",
+          "counterfactual_change_channel": "E_t+E_x",
+          "latent_gold_candidate_role": "action-c",
+          "latent_request_bit": 1,
+          "latent_execution_bit": 0,
+          "full_frame_direct_decision": "ACT"
+        },
+        {
+          "task_id": "task-299379",
+          "pair_id": "factorial-2921",
+          "within_family_index": 4,
+          "truth_support": [
+            "E_c.content",
+            "E_t",
+            "E_x"
+          ],
+          "pairing_design": "xor_four_way",
+          "counterfactual_change_channel": "E_t+E_x",
+          "latent_gold_candidate_role": "action-d",
+          "latent_request_bit": 1,
+          "latent_execution_bit": 1,
+          "full_frame_direct_decision": "ACT"
+        }
+      ]
+    },
+    {
+      "repository_id": "bytes",
+      "hidden_family_name": "wire-endian-contract",
+      "observer_family_code": "fam-6397",
+      "stratum": "task_request_dominant",
+      "truth_support": [
+        "E_c.content",
+        "E_t"
+      ],
+      "pairing_design": "request_pairs",
+      "tasks": [
+        {
+          "task_id": "task-109830",
+          "pair_id": "pair-6397-2",
+          "within_family_index": 3,
+          "truth_support": [
+            "E_c.content",
+            "E_t"
+          ],
+          "pairing_design": "request_pairs",
+          "counterfactual_change_channel": "E_t",
+          "latent_gold_candidate_role": "action-a",
+          "latent_request_bit": null,
+          "latent_execution_bit": null,
+          "full_frame_direct_decision": "ACT"
+        },
+        {
+          "task_id": "task-459976",
+          "pair_id": "pair-6397-2",
+          "within_family_index": 4,
+          "truth_support": [
+            "E_c.content",
+            "E_t"
+          ],
+          "pairing_design": "request_pairs",
+          "counterfactual_change_channel": "E_t",
+          "latent_gold_candidate_role": "action-b",
+          "latent_request_bit": null,
+          "latent_execution_bit": null,
+          "full_frame_direct_decision": "ACT"
+        },
+        {
+          "task_id": "task-979490",
+          "pair_id": "pair-6397-1",
+          "within_family_index": 2,
+          "truth_support": [
+            "E_c.content",
+            "E_t"
+          ],
+          "pairing_design": "request_pairs",
+          "counterfactual_change_channel": "E_t",
+          "latent_gold_candidate_role": "action-b",
+          "latent_request_bit": null,
+          "latent_execution_bit": null,
+          "full_frame_direct_decision": "ACT"
+        },
+        {
+          "task_id": "task-409437",
+          "pair_id": "pair-6397-1",
+          "within_family_index": 1,
+          "truth_support": [
+            "E_c.content",
+            "E_t"
+          ],
+          "pairing_design": "request_pairs",
+          "counterfactual_change_channel": "E_t",
+          "latent_gold_candidate_role": "action-a",
+          "latent_request_bit": null,
+          "latent_execution_bit": null,
+          "full_frame_direct_decision": "ACT"
+        }
+      ]
+    },
+    {
+      "repository_id": "serde-json",
+      "hidden_family_name": "number-mode-plus-error-site",
+      "observer_family_code": "fam-9476",
+      "stratum": "joint_support",
+      "truth_support": [
+        "E_c.content",
+        "E_t",
+        "E_x"
+      ],
+      "pairing_design": "xor_four_way",
+      "tasks": [
+        {
+          "task_id": "task-261550",
+          "pair_id": "factorial-9476",
+          "within_family_index": 3,
+          "truth_support": [
+            "E_c.content",
+            "E_t",
+            "E_x"
+          ],
+          "pairing_design": "xor_four_way",
+          "counterfactual_change_channel": "E_t+E_x",
+          "latent_gold_candidate_role": "action-c",
+          "latent_request_bit": 1,
+          "latent_execution_bit": 0,
+          "full_frame_direct_decision": "ACT"
+        },
+        {
+          "task_id": "task-582537",
+          "pair_id": "factorial-9476",
+          "within_family_index": 2,
+          "truth_support": [
+            "E_c.content",
+            "E_t",
+            "E_x"
+          ],
+          "pairing_design": "xor_four_way",
+          "counterfactual_change_channel": "E_t+E_x",
+          "latent_gold_candidate_role": "action-b",
+          "latent_request_bit": 0,
+          "latent_execution_bit": 1,
+          "full_frame_direct_decision": "ACT"
+        },
+        {
+          "task_id": "task-401405",
+          "pair_id": "factorial-9476",
+          "within_family_index": 1,
+          "truth_support": [
+            "E_c.content",
+            "E_t",
+            "E_x"
+          ],
+          "pairing_design": "xor_four_way",
+          "counterfactual_change_channel": "E_t+E_x",
+          "latent_gold_candidate_role": "action-a",
+          "latent_request_bit": 0,
+          "latent_execution_bit": 0,
+          "full_frame_direct_decision": "ACT"
+        },
+        {
+          "task_id": "task-395319",
+          "pair_id": "factorial-9476",
+          "within_family_index": 4,
+          "truth_support": [
+            "E_c.content",
+            "E_t",
+            "E_x"
+          ],
+          "pairing_design": "xor_four_way",
+          "counterfactual_change_channel": "E_t+E_x",
+          "latent_gold_candidate_role": "action-d",
+          "latent_request_bit": 1,
+          "latent_execution_bit": 1,
+          "full_frame_direct_decision": "ACT"
+        }
+      ]
+    },
+    {
+      "repository_id": "clap",
+      "hidden_family_name": "repeated-option-policy",
+      "observer_family_code": "fam-8072",
+      "stratum": "task_request_dominant",
+      "truth_support": [
+        "E_c.content",
+        "E_t"
+      ],
+      "pairing_design": "request_pairs",
+      "tasks": [
+        {
+          "task_id": "task-626801",
+          "pair_id": "pair-8072-1",
+          "within_family_index": 1,
+          "truth_support": [
+            "E_c.content",
+            "E_t"
+          ],
+          "pairing_design": "request_pairs",
+          "counterfactual_change_channel": "E_t",
+          "latent_gold_candidate_role": "action-a",
+          "latent_request_bit": null,
+          "latent_execution_bit": null,
+          "full_frame_direct_decision": "ACT"
+        },
+        {
+          "task_id": "task-702830",
+          "pair_id": "pair-8072-2",
+          "within_family_index": 4,
+          "truth_support": [
+            "E_c.content",
+            "E_t"
+          ],
+          "pairing_design": "request_pairs",
+          "counterfactual_change_channel": "E_t",
+          "latent_gold_candidate_role": "action-b",
+          "latent_request_bit": null,
+          "latent_execution_bit": null,
+          "full_frame_direct_decision": "ACT"
+        },
+        {
+          "task_id": "task-893694",
+          "pair_id": "pair-8072-2",
+          "within_family_index": 3,
+          "truth_support": [
+            "E_c.content",
+            "E_t"
+          ],
+          "pairing_design": "request_pairs",
+          "counterfactual_change_channel": "E_t",
+          "latent_gold_candidate_role": "action-a",
+          "latent_request_bit": null,
+          "latent_execution_bit": null,
+          "full_frame_direct_decision": "ACT"
+        },
+        {
+          "task_id": "task-366887",
+          "pair_id": "pair-8072-1",
+          "within_family_index": 2,
+          "truth_support": [
+            "E_c.content",
+            "E_t"
+          ],
+          "pairing_design": "request_pairs",
+          "counterfactual_change_channel": "E_t",
+          "latent_gold_candidate_role": "action-b",
+          "latent_request_bit": null,
+          "latent_execution_bit": null,
+          "full_frame_direct_decision": "ACT"
+        }
+      ]
+    },
+    {
+      "repository_id": "serde-json",
+      "hidden_family_name": "map-order-feature-contract",
+      "observer_family_code": "fam-5333",
+      "stratum": "context_sensitive",
+      "truth_support": [
+        "E_c.content",
+        "E_r"
+      ],
+      "pairing_design": "context_pairs",
+      "tasks": [
+        {
+          "task_id": "task-294600",
+          "pair_id": "pair-5333-1",
+          "within_family_index": 1,
+          "truth_support": [
+            "E_c.content",
+            "E_r"
+          ],
+          "pairing_design": "context_pairs",
+          "counterfactual_change_channel": "E_r",
+          "latent_gold_candidate_role": "action-a",
+          "latent_request_bit": null,
+          "latent_execution_bit": null,
+          "full_frame_direct_decision": "ACT"
+        },
+        {
+          "task_id": "task-798417",
+          "pair_id": "pair-5333-1",
+          "within_family_index": 2,
+          "truth_support": [
+            "E_c.content",
+            "E_r"
+          ],
+          "pairing_design": "context_pairs",
+          "counterfactual_change_channel": "E_r",
+          "latent_gold_candidate_role": "action-b",
+          "latent_request_bit": null,
+          "latent_execution_bit": null,
+          "full_frame_direct_decision": "ACT"
+        },
+        {
+          "task_id": "task-582475",
+          "pair_id": "pair-5333-2",
+          "within_family_index": 3,
+          "truth_support": [
+            "E_c.content",
+            "E_r"
+          ],
+          "pairing_design": "context_pairs",
+          "counterfactual_change_channel": "E_r",
+          "latent_gold_candidate_role": "action-a",
+          "latent_request_bit": null,
+          "latent_execution_bit": null,
+          "full_frame_direct_decision": "ACT"
+        },
+        {
+          "task_id": "task-544502",
+          "pair_id": "pair-5333-2",
+          "within_family_index": 4,
+          "truth_support": [
+            "E_c.content",
+            "E_r"
+          ],
+          "pairing_design": "context_pairs",
+          "counterfactual_change_channel": "E_r",
+          "latent_gold_candidate_role": "action-b",
+          "latent_request_bit": null,
+          "latent_execution_bit": null,
+          "full_frame_direct_decision": "ACT"
+        }
+      ]
+    },
+    {
+      "repository_id": "clap",
+      "hidden_family_name": "conflicting-alias-requirement",
+      "observer_family_code": "fam-7432",
+      "stratum": "abstention_positive",
+      "truth_support": [],
+      "pairing_design": "always_abstain",
+      "tasks": [
+        {
+          "task_id": "task-894855",
+          "pair_id": "abstain-7432",
+          "within_family_index": 2,
+          "truth_support": [],
+          "pairing_design": "always_abstain",
+          "counterfactual_change_channel": "none",
+          "latent_gold_candidate_role": null,
+          "latent_request_bit": null,
+          "latent_execution_bit": null,
+          "full_frame_direct_decision": "ABSTAIN"
+        },
+        {
+          "task_id": "task-546859",
+          "pair_id": "abstain-7432",
+          "within_family_index": 1,
+          "truth_support": [],
+          "pairing_design": "always_abstain",
+          "counterfactual_change_channel": "none",
+          "latent_gold_candidate_role": null,
+          "latent_request_bit": null,
+          "latent_execution_bit": null,
+          "full_frame_direct_decision": "ABSTAIN"
+        },
+        {
+          "task_id": "task-620950",
+          "pair_id": "abstain-7432",
+          "within_family_index": 3,
+          "truth_support": [],
+          "pairing_design": "always_abstain",
+          "counterfactual_change_channel": "none",
+          "latent_gold_candidate_role": null,
+          "latent_request_bit": null,
+          "latent_execution_bit": null,
+          "full_frame_direct_decision": "ABSTAIN"
+        },
+        {
+          "task_id": "task-569812",
+          "pair_id": "abstain-7432",
+          "within_family_index": 4,
+          "truth_support": [],
+          "pairing_design": "always_abstain",
+          "counterfactual_change_channel": "none",
+          "latent_gold_candidate_role": null,
+          "latent_request_bit": null,
+          "latent_execution_bit": null,
+          "full_frame_direct_decision": "ABSTAIN"
+        }
+      ]
+    },
+    {
+      "repository_id": "clap",
+      "hidden_family_name": "possible-value-validation",
+      "observer_family_code": "fam-4846",
+      "stratum": "candidate_action_dominant",
+      "truth_support": [
+        "E_c.content"
+      ],
+      "pairing_design": "candidate_pairs",
+      "tasks": [
+        {
+          "task_id": "task-538216",
+          "pair_id": "pair-4846-1",
+          "within_family_index": 1,
+          "truth_support": [
+            "E_c.content"
+          ],
+          "pairing_design": "candidate_pairs",
+          "counterfactual_change_channel": "E_c.content",
+          "latent_gold_candidate_role": "action-a",
+          "latent_request_bit": null,
+          "latent_execution_bit": null,
+          "full_frame_direct_decision": "ACT"
+        },
+        {
+          "task_id": "task-312377",
+          "pair_id": "pair-4846-2",
+          "within_family_index": 3,
+          "truth_support": [
+            "E_c.content"
+          ],
+          "pairing_design": "candidate_pairs",
+          "counterfactual_change_channel": "E_c.content",
+          "latent_gold_candidate_role": "action-a",
+          "latent_request_bit": null,
+          "latent_execution_bit": null,
+          "full_frame_direct_decision": "ACT"
+        },
+        {
+          "task_id": "task-342767",
+          "pair_id": "pair-4846-2",
+          "within_family_index": 4,
+          "truth_support": [
+            "E_c.content"
+          ],
+          "pairing_design": "candidate_pairs",
+          "counterfactual_change_channel": "E_c.content",
+          "latent_gold_candidate_role": "action-b",
+          "latent_request_bit": null,
+          "latent_execution_bit": null,
+          "full_frame_direct_decision": "ACT"
+        },
+        {
+          "task_id": "task-440067",
+          "pair_id": "pair-4846-1",
+          "within_family_index": 2,
+          "truth_support": [
+            "E_c.content"
+          ],
+          "pairing_design": "candidate_pairs",
+          "counterfactual_change_channel": "E_c.content",
+          "latent_gold_candidate_role": "action-b",
+          "latent_request_bit": null,
+          "latent_execution_bit": null,
+          "full_frame_direct_decision": "ACT"
+        }
+      ]
+    },
+    {
+      "repository_id": "serde-json",
+      "hidden_family_name": "stream-byte-offset",
+      "observer_family_code": "fam-2372",
+      "stratum": "pre_action_test_execution_dominant",
+      "truth_support": [
+        "E_c.content",
+        "E_x"
+      ],
+      "pairing_design": "execution_pairs",
+      "tasks": [
+        {
+          "task_id": "task-192782",
+          "pair_id": "pair-2372-2",
+          "within_family_index": 3,
+          "truth_support": [
+            "E_c.content",
+            "E_x"
+          ],
+          "pairing_design": "execution_pairs",
+          "counterfactual_change_channel": "E_x",
+          "latent_gold_candidate_role": "action-a",
+          "latent_request_bit": null,
+          "latent_execution_bit": null,
+          "full_frame_direct_decision": "ACT"
+        },
+        {
+          "task_id": "task-180180",
+          "pair_id": "pair-2372-1",
+          "within_family_index": 2,
+          "truth_support": [
+            "E_c.content",
+            "E_x"
+          ],
+          "pairing_design": "execution_pairs",
+          "counterfactual_change_channel": "E_x",
+          "latent_gold_candidate_role": "action-b",
+          "latent_request_bit": null,
+          "latent_execution_bit": null,
+          "full_frame_direct_decision": "ACT"
+        },
+        {
+          "task_id": "task-922800",
+          "pair_id": "pair-2372-2",
+          "within_family_index": 4,
+          "truth_support": [
+            "E_c.content",
+            "E_x"
+          ],
+          "pairing_design": "execution_pairs",
+          "counterfactual_change_channel": "E_x",
+          "latent_gold_candidate_role": "action-b",
+          "latent_request_bit": null,
+          "latent_execution_bit": null,
+          "full_frame_direct_decision": "ACT"
+        },
+        {
+          "task_id": "task-131190",
+          "pair_id": "pair-2372-1",
+          "within_family_index": 1,
+          "truth_support": [
+            "E_c.content",
+            "E_x"
+          ],
+          "pairing_design": "execution_pairs",
+          "counterfactual_change_channel": "E_x",
+          "latent_gold_candidate_role": "action-a",
+          "latent_request_bit": null,
+          "latent_execution_bit": null,
+          "full_frame_direct_decision": "ACT"
+        }
+      ]
+    },
+    {
+      "repository_id": "clap",
+      "hidden_family_name": "help-color-capability",
+      "observer_family_code": "fam-8973",
+      "stratum": "context_sensitive",
+      "truth_support": [
+        "E_c.content",
+        "E_r"
+      ],
+      "pairing_design": "context_pairs",
+      "tasks": [
+        {
+          "task_id": "task-343379",
+          "pair_id": "pair-8973-1",
+          "within_family_index": 2,
+          "truth_support": [
+            "E_c.content",
+            "E_r"
+          ],
+          "pairing_design": "context_pairs",
+          "counterfactual_change_channel": "E_r",
+          "latent_gold_candidate_role": "action-b",
+          "latent_request_bit": null,
+          "latent_execution_bit": null,
+          "full_frame_direct_decision": "ACT"
+        },
+        {
+          "task_id": "task-825317",
+          "pair_id": "pair-8973-2",
+          "within_family_index": 3,
+          "truth_support": [
+            "E_c.content",
+            "E_r"
+          ],
+          "pairing_design": "context_pairs",
+          "counterfactual_change_channel": "E_r",
+          "latent_gold_candidate_role": "action-a",
+          "latent_request_bit": null,
+          "latent_execution_bit": null,
+          "full_frame_direct_decision": "ACT"
+        },
+        {
+          "task_id": "task-962261",
+          "pair_id": "pair-8973-1",
+          "within_family_index": 1,
+          "truth_support": [
+            "E_c.content",
+            "E_r"
+          ],
+          "pairing_design": "context_pairs",
+          "counterfactual_change_channel": "E_r",
+          "latent_gold_candidate_role": "action-a",
+          "latent_request_bit": null,
+          "latent_execution_bit": null,
+          "full_frame_direct_decision": "ACT"
+        },
+        {
+          "task_id": "task-976226",
+          "pair_id": "pair-8973-2",
+          "within_family_index": 4,
+          "truth_support": [
+            "E_c.content",
+            "E_r"
+          ],
+          "pairing_design": "context_pairs",
+          "counterfactual_change_channel": "E_r",
+          "latent_gold_candidate_role": "action-b",
+          "latent_request_bit": null,
+          "latent_execution_bit": null,
+          "full_frame_direct_decision": "ACT"
+        }
+      ],
+      "family_amendment": "E012-BANK-A01",
+      "predeclared_task_focus": "Configure ColorChoice from typed ANSI capability context"
+    },
+    {
+      "repository_id": "serde-json",
+      "hidden_family_name": "raw-number-lossless",
+      "observer_family_code": "fam-1137",
+      "stratum": "abstention_positive",
+      "truth_support": [],
+      "pairing_design": "always_abstain",
+      "tasks": [
+        {
+          "task_id": "task-555141",
+          "pair_id": "abstain-1137",
+          "within_family_index": 3,
+          "truth_support": [],
+          "pairing_design": "always_abstain",
+          "counterfactual_change_channel": "none",
+          "latent_gold_candidate_role": null,
+          "latent_request_bit": null,
+          "latent_execution_bit": null,
+          "full_frame_direct_decision": "ABSTAIN"
+        },
+        {
+          "task_id": "task-479184",
+          "pair_id": "abstain-1137",
+          "within_family_index": 1,
+          "truth_support": [],
+          "pairing_design": "always_abstain",
+          "counterfactual_change_channel": "none",
+          "latent_gold_candidate_role": null,
+          "latent_request_bit": null,
+          "latent_execution_bit": null,
+          "full_frame_direct_decision": "ABSTAIN"
+        },
+        {
+          "task_id": "task-965856",
+          "pair_id": "abstain-1137",
+          "within_family_index": 4,
+          "truth_support": [],
+          "pairing_design": "always_abstain",
+          "counterfactual_change_channel": "none",
+          "latent_gold_candidate_role": null,
+          "latent_request_bit": null,
+          "latent_execution_bit": null,
+          "full_frame_direct_decision": "ABSTAIN"
+        },
+        {
+          "task_id": "task-242065",
+          "pair_id": "abstain-1137",
+          "within_family_index": 2,
+          "truth_support": [],
+          "pairing_design": "always_abstain",
+          "counterfactual_change_channel": "none",
+          "latent_gold_candidate_role": null,
+          "latent_request_bit": null,
+          "latent_execution_bit": null,
+          "full_frame_direct_decision": "ABSTAIN"
+        }
+      ]
+    }
+  ],
+  "effective_bank_plan_version": "1.1",
+  "bank_design_amendment": "E012-BANK-A01"
+}

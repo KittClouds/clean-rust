@@ -1,0 +1,37 @@
+{
+  "actual_v07_contract_and_map_audited": false,
+  "command": "python -m unittest audits.e4-0-track-e.test_audit_e4_0_track_e_v07 -v; python -m py_compile audits/e4-0-track-e/audit_e4_0_track_e_v07.py audits/e4-0-track-e/test_audit_e4_0_track_e_v07.py",
+  "created_utc": "2026-09-26T23:58:35.340128+00:00",
+  "model_tokenizer_cuda_contact": false,
+  "python_compile": "PASS",
+  "schema": "FAS_E4_0_TRACK_E_SOURCE_TESTS_V03",
+  "scope": "Synthetic-only v07 contract/source/seal auditor: exact full v06 immutable science projection and supersession, v07 engineering-amendment lineage, source-map/source/receipt identity, inherited population and parity-panel seal/audit/authorization identities, exact seal member set and root recomputation, preseal/postseal status shape, and tamper rejection. Truth fixture intentionally absent. No actual v07 map/contract, E4 labels/population, model, tokenizer, or CUDA were accessed.",
+  "sources": [
+    {
+      "bytes": 41789,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/audit_e4_0_track_e_v07.py",
+      "sha256": "6869dcf1b2e969b7e28a71ecdff57b6935186dd692558edf2bd068a976228683"
+    },
+    {
+      "bytes": 20026,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/test_audit_e4_0_track_e_v07.py",
+      "sha256": "1dc1a29c06b808a833728bfb5eca88ed87599969c7a5260cae12dd3ee71f6099"
+    }
+  ],
+  "status": "TRACK_E_SOURCE_TESTS_PASS_V07_PREMAP_SYNTHETIC_AUDITOR",
+  "supersedes": [
+    {
+      "bytes": 1564,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-source-tests-v09.json",
+      "reason": "Superseded after adding exact v06 engineering-amendment and preserved precontact-stop lineage checks; source hash remains preserved as attempt history.",
+      "sha256": "06f991cc621702c5c81a4b7b160cba4270d1df82729ecb8893e504d33c585ff4"
+    }
+  ],
+  "tests": {
+    "discovered": 8,
+    "failed": 0,
+    "passed": 8,
+    "skipped": 0
+  },
+  "truth_payloads_opened": false
+}

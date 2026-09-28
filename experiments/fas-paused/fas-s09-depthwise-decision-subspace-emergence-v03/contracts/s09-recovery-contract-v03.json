@@ -1,0 +1,60 @@
+{
+  "contract_id": "FAS_S09_DEPTHWISE_DECISION_SUBSPACE_EMERGENCE_V03_RECOVERY",
+  "status": "FROZEN_BEFORE_RECOVERY_REQUALIFICATION",
+  "project_id": "fas-s09-depthwise-decision-subspace-emergence",
+  "run_id": "fas-s09-depthwise-decision-subspace-emergence-v03",
+  "supersedes": {
+    "run_id": "fas-s09-depthwise-decision-subspace-emergence-v02",
+    "protocol_root_sha256": "274b8291e208017555f922544f43694e9d30cab6141f47d4d8a68772c3a76c19",
+    "preflight_root_sha256": "3fad97ccd593a508ca3dc1e5a8ae87998e490338d8a95fd1facb084c0343e946",
+    "failure": "receipt assembly raised NameError because QUARTETS was not imported; the failure occurred after the full extraction loop, terminal parity, deterministic repeat, backbone before/after identity, and feature file hashing, before any receipt or cache seal was written",
+    "scientific_artifacts_mutated": false,
+    "probe_fitting_started": false
+  },
+  "recovery_inputs": {
+    "source_run": "D:\\codex-runs\\fas-s09-depthwise-decision-subspace-emergence-v02",
+    "feature_cache": "D:\\codex-runs\\fas-s09-depthwise-decision-subspace-emergence-v02\\feature-cache-v02",
+    "token_manifest_sha256": "591e86a5ba01006d77a25299ce6606daaa1cf6bfcf26ace92352abdff29e6aed",
+    "source_model_asset_manifest_sha256": "9760947e0c2840829e6553d73ac2108adbf7db845cc99da9e0bfe91cce6d12f3",
+    "v02_extractor_source_sha256": "2c4c586bab5d5f027d07683df1699da9cc666b2edebb5708f5d72ec047b2989a",
+    "s01_linear_core_sha256": "771bf4a235639cbd8ed5a0f0078339da65ad6fb10e46406646473bfc8df5ffbe",
+    "source_project_protocol_root_sha256": "274b8291e208017555f922544f43694e9d30cab6141f47d4d8a68772c3a76c19"
+  },
+  "parent_roots": {
+    "S01_2_CONSTRUCTION": "f6065b8163799239e0d7b1200b5dda4aad169772ead14b999130a473ff9d9049",
+    "S01_2_EXTRACTION_RESULT": "1fc3aeb432ecdbef21a35aea8fed5b0d59671681eb8eb8032533c9ce751a4384",
+    "S01_2_FEATURE_CACHE": "4964f35fb87a45a9447cd0f5f028668027ca3ad3a8f0d0c3f9eb7b9cbe7ccaaa",
+    "S01_3_LINEAR_ACCESSIBILITY": "2581b50d75382c197793ea46400bf2b8a27508df22b2ff5bdbe82eb20a5238b7",
+    "S08_S01_ANALYSIS": "96be631597a6eddac8624d6dd744927577eb90921f7d07dda509ab4260bbd1fc"
+  },
+  "qualification": {
+    "matrix_count": 32,
+    "rows": 106496,
+    "width": 2048,
+    "dtype": "<f4",
+    "expected_bytes_each": 872415232,
+    "required": [
+      "stream_sha256",
+      "finite_value_scan",
+      "exact_layer_16_M_F_parent_parity_all_rows",
+      "pinned_model_asset_hashes",
+      "deterministic_repeat_first_256_rows_all_32_views",
+      "backbone_state_identity_before_after_repeat"
+    ]
+  },
+  "downstream_analysis": {
+    "authorized_by_parent_packet": true,
+    "probe_fits": 32,
+    "terminal_gate_before_layers_1_to_15": true,
+    "same_s01_3_fixed_probe_recipe": true,
+    "fas00_access": false,
+    "adaptive_mechanisms": false,
+    "additional_views_or_search": false
+  },
+  "authority": {
+    "S09_RECOVERY_REQUALIFICATION_AUTHORIZED": true,
+    "S09_FIXED_ANALYSIS_AUTHORIZED": true,
+    "FAS00_PHASE4_AUTHORIZED": false,
+    "ADAPTIVE_MECHANISMS_AUTHORIZED": false
+  }
+}

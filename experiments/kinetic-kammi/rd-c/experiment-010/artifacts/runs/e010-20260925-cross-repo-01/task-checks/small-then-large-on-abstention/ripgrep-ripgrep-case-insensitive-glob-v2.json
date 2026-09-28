@@ -1,0 +1,28 @@
+{
+  "task_id": "ripgrep-ripgrep-case-insensitive-glob-v2",
+  "lane": "small-then-large-on-abstention",
+  "action_id": 37,
+  "patch_sha256": "41fb794fb6ac8f8b265fa9bfe17155da8d26a63cbaee3c9fb70ed63c05a76cd5",
+  "candidate_variant": "gold",
+  "test_filter": "glob::tests::matchcasei2",
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--manifest-path",
+    "C:\\rd-c\\experiment-010\\tasks\\heldout-bank-v1\\families\\ripgrep-case-insensitive-glob\\candidates\\gold\\Cargo.toml",
+    "--package",
+    "globset",
+    "--lib",
+    "glob::tests::matchcasei2",
+    "--",
+    "--exact"
+  ],
+  "exit_code": 0,
+  "status": "passed",
+  "passed": true,
+  "elapsed_ms": 4382.478,
+  "completion_source": "live-cargo-test",
+  "output_sha256": "98d6d2050c710cddc9d64df695bfcda6d31fd607d72988e9f12a5d5a6ef023e9",
+  "output": "\nrunning 1 test\ntest glob::tests::matchcasei2 ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 289 filtered out; finished in 0.00s\n\n   Compiling globset v0.4.19 (C:\\rd-c\\experiment-010\\tasks\\heldout-bank-v1\\families\\ripgrep-case-insensitive-glob\\candidates\\gold\\crates\\globset)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.04s\n     Running unittests src\\lib.rs (D:\\cargo-targets\\rdc-e010\\scoring\\debug\\deps\\globset-250b4c7d9a08c2e6.exe)\n"
+}

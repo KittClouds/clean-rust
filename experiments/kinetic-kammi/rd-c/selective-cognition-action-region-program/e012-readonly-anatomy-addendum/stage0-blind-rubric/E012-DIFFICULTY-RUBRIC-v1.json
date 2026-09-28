@@ -1,0 +1,65 @@
+{
+  "schema": "e012-construction-difficulty-rubric.v1",
+  "instruction": "Score the task materials only. Do not infer model performance or task labels. Use ordinal integer scores 0-3 for each dimension and provide one concise rationale per score.",
+  "dimensions": [
+    {
+      "name": "operative_constraints",
+      "anchors": {
+        "0": "one clear constraint",
+        "1": "two constraints",
+        "2": "three constraints",
+        "3": "four or more interacting constraints"
+      }
+    },
+    {
+      "name": "wording_ambiguity",
+      "anchors": {
+        "0": "one clear interpretation",
+        "1": "minor ambiguity resolved by normal context",
+        "2": "multiple plausible readings",
+        "3": "materially underspecified or conflicting request"
+      }
+    },
+    {
+      "name": "candidate_similarity",
+      "anchors": {
+        "0": "one candidate clearly distinct",
+        "1": "some meaningful differences",
+        "2": "several close alternatives",
+        "3": "near-identical alternatives require fine discrimination"
+      }
+    },
+    {
+      "name": "evidence_conflict",
+      "anchors": {
+        "0": "task, code, and exposed checks align",
+        "1": "one weakly inconsistent cue",
+        "2": "multiple cues disagree",
+        "3": "material conflict changes the plausible action"
+      }
+    },
+    {
+      "name": "reasoning_depth",
+      "anchors": {
+        "0": "one local edit",
+        "1": "local change with a short consequence chain",
+        "2": "cross-file or multi-step behavior",
+        "3": "nonlocal lifecycle/API interaction or several dependent consequences"
+      }
+    },
+    {
+      "name": "distractor_plausibility",
+      "anchors": {
+        "0": "malformed/straw distractor",
+        "1": "obvious miss",
+        "2": "plausible partial/wrong-place/over-broad fix",
+        "3": "all candidates plausible; visible success can hide a hidden-edge failure"
+      }
+    }
+  ],
+  "output_schema": {
+    "case_id": "string",
+    "scores": "object mapping all six dimension names to integers 0-3",
+    "rationales": "object mapping the same names to short rationales"
+  }
+}

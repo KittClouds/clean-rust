@@ -1,0 +1,72 @@
+{
+  "protocol": "jev-information-density/v0.8p-r1-execution-bundle-v01",
+  "identity": "v0.8P-R1-fresh-trajectory-instrumented-rerun-v01",
+  "status": "FROZEN_BEFORE_SUCCESSFUL_TRAINING_IDENTITY_REPLAY; FIRST_LAUNCH_FAILED_PREOUTPUT",
+  "contracts": {
+    "identity_schema_r1_v01": {
+      "path": "experiments/jev-information-density-v08p-r1/contracts/identity-schema-r1-v01.json",
+      "sha256": "a5d9bf108a1b14d05652b78021a55b74500ed55d6bdc759ff02c09560ea6f7ed"
+    },
+    "r1_execution_contract_v01": {
+      "path": "experiments/jev-information-density-v08p-r1/contracts/r1-execution-contract-v01.json",
+      "sha256": "d692acbef984c98d7f3ac6c5861112d4fbdcf162c4906a93bf548a84dc5e82fa"
+    },
+    "original_p_run": "e345225b4a17fc18eb35fcab24cbe1d72bd0e34bed9de272f927a7be461853e6",
+    "original_p_analysis": "84111122033fda65c84344317cfe3b50639b23be4c71f480ba665c67a23cc939",
+    "original_p_panel": "ce3b7b97caecb27f3ad99439c0e67dca6e40af5da3db9ca2e356ea5e9f06f823",
+    "original_p_bundle": "67cd6b7902111000dc93a0f81f9f20bc05a9c084732705ed8f9ad82fe965fa85",
+    "v05_e1_identity_denylist_root": "272a14e57c2dcf610568381c0c1c4673c7b40e368ac81b07d3e7160e4e5953a2",
+    "v05_e1_identity_denylist": "50eebeb5790c29b4a75c6f8df849eb4c2865d3c864932bbd7f636b7a0e52a2cd",
+    "prior_generator_receipt_hash_only": "78de428afb7318074179ff8f674dde055c519624bf78930ce5102b8541a8eae7"
+  },
+  "implementation": {
+    "generator_source": {
+      "path": "experiments/jev-information-density-v08p-r1/generator-r1/src/main.rs",
+      "sha256": "98204bc78fe2172f7780570395b9d87736b047a8c7bbc531ec183b0d7b666f2d"
+    },
+    "cargo_manifest_sha256": "66dc2975d37c55d2c7acdb918b27de23aabab03a1cabc249123085a8fd13994d",
+    "cargo_lock_sha256": "2aabb4c76436ae9f01655bf070fce1cf13c1ca9dba7fe2c016d820b7a66c9945",
+    "package": "jev-information-density-v08p-r1-generator",
+    "release_binary": {
+      "path": "D:/cargo-targets/jev-v08p-r1/release/jev-information-density-v08p-r1-generator.exe",
+      "sha256": "b41776e19ba68d5edba0216cd70a575790bf15d2526d6fa9e5d3c3dd998842ab",
+      "bytes": 811520
+    },
+    "rustc": "1.96.0 (ac68faa20 2026-05-25)",
+    "cargo": "1.96.0 (30a34c682 2026-05-25)",
+    "tests": {
+      "command": "cargo test --locked",
+      "passed": 5,
+      "failed": 0,
+      "model_contact": false,
+      "training_data_replay": false
+    }
+  },
+  "parent_code": {
+    "v08n_generator_main": "503d7cf9ddef1e42a4ef97cd9031ed23c3fabbac0060c0394d1c9919ebe32ea5",
+    "v08n_generator_identity": "f04a9b1d4f6682522e5957be3c0075db4bd7aa4e4e25968650f2ff24a42c7f5b",
+    "v08n_family_spec": "e56885005487b36b573c1bf4d47741413ca72df0992ff62bcf48891eecacb429",
+    "exact_world_library_sources": [
+      "69374c00d54dac2251239fb7b3bb289b61cb6a9bca93853e71f6f484691df401",
+      "9b6d29d2e86f53360b1cf7226798eb04c9b790a935b6f024063f0e77cf0b6263",
+      "8bd90086573eb93a27f8950f35eec994a3f5b51fdeeffc0e3042105b6657a4f3",
+      "ace2147a281cb02ba2328ad5e9de84604a4e9b97606e26965ba906fd9b240470",
+      "03e636fc35595ce8d2d701a57158cae5b18cf14809426908d1c92c0e71bed67d",
+      "da2ceacf7a1b921688e3e6dfcc1dc5af2d57c464bbf4d24322fe5e53fa157805",
+      "341918f219f8ef6fea833958c9b2d2690db80d9d16676611255ba3eb2fc3bf0e",
+      "49be9b4c2276c3cb9437a9a35295b583b08a13467835b29208f01fc975ea77ee",
+      "89e67736bf94ade30a4da4c33ac27ad3f1a5b962509ecd02bc38569e773ba7f3"
+    ]
+  },
+  "execution_boundary": {
+    "data_replay_status": "one launch reached replay-training and ended in a stack overflow before any output file was written; exact source read extent was not instrumented, so no claim of zero source-byte reads is made",
+    "model_contact": false,
+    "training_identity_sidecars_emitted": false,
+    "first_attempt_output_directory_empty": true,
+    "external_output_root_was_absent": true,
+    "v09_rows_or_mappings_are_inputs": false,
+    "e1_predictions_metrics_features_or_candidate_join_are_inputs": false,
+    "phoenix_access": false,
+    "next_authorized_operation": "field-selective deterministic training identity replay"
+  }
+}

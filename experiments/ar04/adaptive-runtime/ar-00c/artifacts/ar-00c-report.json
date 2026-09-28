@@ -1,0 +1,118 @@
+{
+  "schema": "adaptive-runtime-ar-00c/v1",
+  "scope": "engineering-only",
+  "frozen_from": "adaptive-runtime-ar-00/v1",
+  "epochs": 3000,
+  "action_step": 0.02,
+  "bounds": [-3.0, 3.0],
+  "action_magnitudes": [0.02, 0.01, 0.005, 0.0025, 0.00125],
+  "final_loss_by_arm": {
+    "C0-linear": 0.01905420,
+    "C1-action-cost": 0.01353482,
+    "C2-quadratic": 0.01347704,
+    "C3-oracle": 0.34660476
+  },
+  "final_accuracy_by_arm": {
+    "C0-linear": 1.00000000,
+    "C1-action-cost": 1.00000000,
+    "C2-quadratic": 1.00000000,
+    "C3-oracle": 0.50000000
+  },
+  "arms": {
+    "C0-linear": {
+      "final_loss": 0.01905420,
+      "final_accuracy": 1.00000000,
+      "final_mse": 0.00063685,
+      "selected": 21931,
+      "no_op": 29069,
+      "blocked": 87916,
+      "selected_positive": 10957,
+      "selected_negative": 10974,
+      "sign_reversals": 20432,
+      "min_selected_magnitude": 0.01000000,
+      "selected_by_level": [21929, 2, 0, 0, 0],
+      "predicted_utility": 6.53521204,
+      "realized_utility": 0.68627727,
+      "composition_error": 5.84893513,
+      "absolute_composition_error": 5.84893513,
+      "final_probabilities": [0.00403547, 0.95257401, 0.99016178, 0.01360538],
+      "final_logits": [-5.50858974, 2.99999762, 4.61159325, -4.28359127],
+      "final_margins": [5.50858974, 2.99999762, 4.61159325, 4.28359127],
+      "vs_c3_choice_agreement": {
+        "exact": 0.56900001,
+        "sign": 0.57429409,
+        "magnitude": 0.57462746
+      }
+    },
+    "C1-action-cost": {
+      "final_loss": 0.01353482,
+      "final_accuracy": 1.00000000,
+      "final_mse": 0.00056577,
+      "selected": 3690,
+      "no_op": 47310,
+      "blocked": 110037,
+      "selected_positive": 1832,
+      "selected_negative": 1858,
+      "sign_reversals": 2064,
+      "min_selected_magnitude": 0.01000000,
+      "selected_by_level": [3687, 3, 0, 0, 0],
+      "predicted_utility": 2.75320363,
+      "realized_utility": 0.69179660,
+      "composition_error": 2.06140637,
+      "absolute_composition_error": 2.06695724,
+      "final_probabilities": [0.00262515, 0.95257401, 0.99970549, 0.00262515],
+      "final_logits": [-5.93998909, 2.99999762, 8.12991524, -5.93998814],
+      "final_margins": [5.93998909, 2.99999762, 8.12991524, 5.93998814],
+      "vs_c3_choice_agreement": {
+        "exact": 0.92313725,
+        "sign": 0.92615688,
+        "magnitude": 0.92827451
+      }
+    },
+    "C2-quadratic": {
+      "final_loss": 0.01347704,
+      "final_accuracy": 1.00000000,
+      "final_mse": 0.00057146,
+      "selected": 11068,
+      "no_op": 39932,
+      "blocked": 121191,
+      "selected_positive": 8066,
+      "selected_negative": 3002,
+      "sign_reversals": 3033,
+      "min_selected_magnitude": 0.00125000,
+      "selected_by_level": [2340, 598, 859, 3780, 3491],
+      "predicted_utility": 2.30017018,
+      "realized_utility": 0.69185573,
+      "composition_error": 1.60833240,
+      "absolute_composition_error": 1.65325832,
+      "final_probabilities": [0.00247865, 0.95231837, 0.99990952, 0.00247697],
+      "final_logits": [-5.99755764, 2.99435306, 9.31029320, -5.99823856],
+      "final_margins": [5.99755764, 2.99435306, 9.31029320, 5.99823856],
+      "vs_c3_choice_agreement": {
+        "exact": 0.77778429,
+        "sign": 0.78309804,
+        "magnitude": 0.78184313
+      }
+    },
+    "C3-oracle": {
+      "final_loss": 0.34660476,
+      "final_accuracy": 0.50000000,
+      "final_mse": 0.12500006,
+      "selected": 2325,
+      "no_op": 48675,
+      "blocked": 71517,
+      "selected_positive": 897,
+      "selected_negative": 1428,
+      "sign_reversals": 385,
+      "min_selected_magnitude": 0.00125000,
+      "selected_by_level": [1898, 26, 31, 56, 314],
+      "predicted_utility": 2.74177265,
+      "realized_utility": 0.35872656,
+      "composition_error": 2.38304472,
+      "absolute_composition_error": 2.38304472,
+      "final_probabilities": [0.00012340, 0.49999982, 0.99999899, 0.50000000],
+      "final_logits": [-8.99998760, -0.00000072, 13.80231762, 0.00000000],
+      "final_margins": [8.99998760, -0.00000072, 13.80231762, -0.00000000]
+    }
+  }
+}

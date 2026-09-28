@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "experiment": "E012 Prospective Frame Decomposition",
+  "state": "FROZEN_BEFORE_SCORED_TASK_FIXTURES",
+  "model_contact_authorized": false,
+  "bank_amendment": "E012-BANK-A04",
+  "task_count": 48,
+  "family_count": 12,
+  "repository_count": 3,
+  "conditions_per_task": 26,
+  "frame_count": 1248,
+  "candidate_task_check_rows": 192,
+  "candidate_case_invocations": 384,
+  "base_task_check_rows": 48,
+  "base_case_invocations": 96,
+  "patch_boundary": "task-owned adapter and test overlay; frozen upstream library source is immutable",
+  "selected_feasibility_directories": [
+    "bytes-endian",
+    "bytes-prefix",
+    "bytes-cursor-repair-01",
+    "bytes-composite-repair-01",
+    "clap-repeat-repair-01",
+    "clap-values",
+    "clap-color-repair-01",
+    "clap-alias",
+    "serde-offset-repair-02",
+    "serde-numeric-joint-repair-01",
+    "serde-map-order-repair-02",
+    "serde-raw-number"
+  ],
+  "truth_channel_masks": [
+    {"condition": "E_c_only", "present": ["E_c.content"]},
+    {"condition": "E_t_only_diagnostic", "present": ["E_t"]},
+    {"condition": "E_x_only_diagnostic", "present": ["E_x"]},
+    {"condition": "E_r_only_diagnostic", "present": ["E_r"]},
+    {"condition": "E_t_plus_E_c", "present": ["E_t", "E_c.content"]},
+    {"condition": "E_c_plus_E_x", "present": ["E_c.content", "E_x"]},
+    {"condition": "E_c_plus_E_r", "present": ["E_c.content", "E_r"]},
+    {"condition": "E_t_plus_E_x_diagnostic", "present": ["E_t", "E_x"]},
+    {"condition": "E_t_plus_E_c_plus_E_x", "present": ["E_t", "E_c.content", "E_x"]},
+    {"condition": "E_t_plus_E_c_plus_E_r", "present": ["E_t", "E_c.content", "E_r"]}
+  ],
+  "other_conditions": [
+    "full_frame",
+    "leave_out_E_t",
+    "leave_out_E_c",
+    "leave_out_E_x",
+    "leave_out_E_r",
+    "control_E_t",
+    "control_E_c_content",
+    "control_E_x",
+    "control_E_r",
+    "swap_E_t",
+    "swap_E_c_content",
+    "swap_E_x",
+    "swap_E_r",
+    "E_p_balanced_coordinate_control",
+    "E_p_isomorphic_donor_coordinate",
+    "identity_only_diagnostic"
+  ],
+  "joint_projection": {
+    "bytes-composite-frame-field": {
+      "request": "target field header|payload",
+      "execution": "observed byte order big|little",
+      "raw_numeric_assertion_excluded": true
+    },
+    "number-mode-plus-error-site": {
+      "request": "numeric mode whole|ratio",
+      "execution": "failing path /header|/payload",
+      "raw_numeric_assertion_excluded": true
+    }
+  },
+  "bounded_prefix_contract": {
+    "task": "bounded zero-copy prefix view",
+    "scored_check": "prefix bytes and shared backing storage",
+    "feasibility_trial_remains_value_only": true
+  },
+  "observer_shape": "rdc-real-coding-observation.v1",
+  "observer_contact_gate": "separate FROZEN_BEFORE_MODEL_CONTACT lock after completed bank and passing audits"
+}

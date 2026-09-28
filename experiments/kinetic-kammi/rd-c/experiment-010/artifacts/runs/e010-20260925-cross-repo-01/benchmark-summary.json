@@ -1,0 +1,841 @@
+{
+  "schema_version": 1,
+  "run_id": "e010-20260925-cross-repo-01",
+  "observer_run_id": "e010-20260925-cross-repo-01",
+  "task_bank": {
+    "bank_name": "heldout-bank-v1",
+    "task_count": 16,
+    "family_count": 8,
+    "unit_for_variation": "repository; two prompt variants per family are paired task variants",
+    "same_repository_as_development": false,
+    "cross_repository_generalization_claim": true,
+    "promotion_eligible": true
+  },
+  "frozen_thresholds": {
+    "minimum_applicability_milli": 850,
+    "maximum_abstention_milli": 150
+  },
+  "completion_check_mode": "live",
+  "completion_check_wall_time_in_task_latency": true,
+  "hand_written_policy": "evidence-weighted-token-overlap-v2; unique top score >=5 and margin >=2",
+  "development_fit": {
+    "minimum_applicability_milli": 850,
+    "maximum_abstention_milli": 150,
+    "development_task_count": 8,
+    "hybrid_completions": 8,
+    "hybrid_completion_rate": 1.0,
+    "large_calls": 3,
+    "large_call_rate": 0.375,
+    "small_accepted": 5,
+    "small_correct_among_accepted": 5,
+    "input_plus_generated_tokens": 12564,
+    "modeled_observer_wall_ms": 11991.8
+  },
+  "lanes": {
+    "hand-written": {
+      "task_count": 16,
+      "completions": 13,
+      "completion_rate": 0.8125,
+      "wrong_legal_actions": 0,
+      "authority_rejected_proposals": 0,
+      "abstentions": 3,
+      "small_calls": 0,
+      "large_calls": 0,
+      "input_tokens": 0,
+      "generated_tokens": 0,
+      "total_tokens": 0,
+      "observer_model_wall_ms": 0.0,
+      "observer_time_p50_ms": 0.0,
+      "observer_time_p95_ms": 0.0,
+      "completion_check_wall_ms": 135802.668,
+      "authority_wall_ms": 927.318,
+      "total_elapsed_wall_ms": 136729.986,
+      "task_time_p50_ms": 5067.886,
+      "task_time_p95_ms": 40345.094,
+      "small_confident_wrong_actions": 0,
+      "illegal_commits": 0,
+      "rejected_transitions": 0,
+      "duplicate_action_effects": 0,
+      "replay_identity_all_equal": true,
+      "billed_api_usd": 0.0
+    },
+    "small": {
+      "task_count": 16,
+      "completions": 13,
+      "completion_rate": 0.8125,
+      "wrong_legal_actions": 0,
+      "authority_rejected_proposals": 0,
+      "abstentions": 3,
+      "small_calls": 16,
+      "large_calls": 0,
+      "input_tokens": 22776,
+      "generated_tokens": 336,
+      "total_tokens": 23112,
+      "observer_model_wall_ms": 5202.599,
+      "observer_time_p50_ms": 268.316,
+      "observer_time_p95_ms": 1026.896,
+      "completion_check_wall_ms": 91671.684,
+      "authority_wall_ms": 539.541,
+      "total_elapsed_wall_ms": 97413.824,
+      "task_time_p50_ms": 5037.797,
+      "task_time_p95_ms": 11630.147,
+      "small_confident_wrong_actions": 0,
+      "illegal_commits": 0,
+      "rejected_transitions": 0,
+      "duplicate_action_effects": 0,
+      "replay_identity_all_equal": true,
+      "billed_api_usd": 0.0
+    },
+    "small-then-large-on-abstention": {
+      "task_count": 16,
+      "completions": 16,
+      "completion_rate": 1.0,
+      "wrong_legal_actions": 0,
+      "authority_rejected_proposals": 0,
+      "abstentions": 0,
+      "small_calls": 16,
+      "large_calls": 3,
+      "input_tokens": 27211,
+      "generated_tokens": 441,
+      "total_tokens": 27652,
+      "observer_model_wall_ms": 21543.895,
+      "observer_time_p50_ms": 271.558,
+      "observer_time_p95_ms": 7173.403,
+      "completion_check_wall_ms": 122996.787,
+      "authority_wall_ms": 625.179,
+      "total_elapsed_wall_ms": 145165.861,
+      "task_time_p50_ms": 8048.863,
+      "task_time_p95_ms": 18225.708,
+      "small_confident_wrong_actions": 0,
+      "illegal_commits": 0,
+      "rejected_transitions": 0,
+      "duplicate_action_effects": 0,
+      "replay_identity_all_equal": true,
+      "billed_api_usd": 0.0
+    },
+    "always-large": {
+      "task_count": 16,
+      "completions": 13,
+      "completion_rate": 0.8125,
+      "wrong_legal_actions": 1,
+      "authority_rejected_proposals": 0,
+      "abstentions": 2,
+      "small_calls": 0,
+      "large_calls": 16,
+      "input_tokens": 25783,
+      "generated_tokens": 559,
+      "total_tokens": 26342,
+      "observer_model_wall_ms": 92265.486,
+      "observer_time_p50_ms": 5262.701,
+      "observer_time_p95_ms": 8041.308,
+      "completion_check_wall_ms": 149299.922,
+      "authority_wall_ms": 571.198,
+      "total_elapsed_wall_ms": 242136.606,
+      "task_time_p50_ms": 11146.045,
+      "task_time_p95_ms": 60067.042,
+      "small_confident_wrong_actions": 0,
+      "illegal_commits": 0,
+      "rejected_transitions": 0,
+      "duplicate_action_effects": 0,
+      "replay_identity_all_equal": true,
+      "billed_api_usd": 0.0
+    }
+  },
+  "by_family": {
+    "ripgrep-case-insensitive-glob": {
+      "hand-written": {
+        "tasks": 2,
+        "completions": 2,
+        "wrong_legal_actions": 0,
+        "authority_rejected_proposals": 0,
+        "abstentions": 0,
+        "large_calls": 0
+      },
+      "small": {
+        "tasks": 2,
+        "completions": 2,
+        "wrong_legal_actions": 0,
+        "authority_rejected_proposals": 0,
+        "abstentions": 0,
+        "large_calls": 0
+      },
+      "small-then-large-on-abstention": {
+        "tasks": 2,
+        "completions": 2,
+        "wrong_legal_actions": 0,
+        "authority_rejected_proposals": 0,
+        "abstentions": 0,
+        "large_calls": 0
+      },
+      "always-large": {
+        "tasks": 2,
+        "completions": 2,
+        "wrong_legal_actions": 0,
+        "authority_rejected_proposals": 0,
+        "abstentions": 0,
+        "large_calls": 2
+      }
+    },
+    "ripgrep-gitignore-bom": {
+      "hand-written": {
+        "tasks": 2,
+        "completions": 2,
+        "wrong_legal_actions": 0,
+        "authority_rejected_proposals": 0,
+        "abstentions": 0,
+        "large_calls": 0
+      },
+      "small": {
+        "tasks": 2,
+        "completions": 2,
+        "wrong_legal_actions": 0,
+        "authority_rejected_proposals": 0,
+        "abstentions": 0,
+        "large_calls": 0
+      },
+      "small-then-large-on-abstention": {
+        "tasks": 2,
+        "completions": 2,
+        "wrong_legal_actions": 0,
+        "authority_rejected_proposals": 0,
+        "abstentions": 0,
+        "large_calls": 0
+      },
+      "always-large": {
+        "tasks": 2,
+        "completions": 2,
+        "wrong_legal_actions": 0,
+        "authority_rejected_proposals": 0,
+        "abstentions": 0,
+        "large_calls": 2
+      }
+    },
+    "ripgrep-literal-separator-glob": {
+      "hand-written": {
+        "tasks": 2,
+        "completions": 2,
+        "wrong_legal_actions": 0,
+        "authority_rejected_proposals": 0,
+        "abstentions": 0,
+        "large_calls": 0
+      },
+      "small": {
+        "tasks": 2,
+        "completions": 2,
+        "wrong_legal_actions": 0,
+        "authority_rejected_proposals": 0,
+        "abstentions": 0,
+        "large_calls": 0
+      },
+      "small-then-large-on-abstention": {
+        "tasks": 2,
+        "completions": 2,
+        "wrong_legal_actions": 0,
+        "authority_rejected_proposals": 0,
+        "abstentions": 0,
+        "large_calls": 0
+      },
+      "always-large": {
+        "tasks": 2,
+        "completions": 2,
+        "wrong_legal_actions": 0,
+        "authority_rejected_proposals": 0,
+        "abstentions": 0,
+        "large_calls": 2
+      }
+    },
+    "ripgrep-recursive-glob": {
+      "hand-written": {
+        "tasks": 2,
+        "completions": 2,
+        "wrong_legal_actions": 0,
+        "authority_rejected_proposals": 0,
+        "abstentions": 0,
+        "large_calls": 0
+      },
+      "small": {
+        "tasks": 2,
+        "completions": 2,
+        "wrong_legal_actions": 0,
+        "authority_rejected_proposals": 0,
+        "abstentions": 0,
+        "large_calls": 0
+      },
+      "small-then-large-on-abstention": {
+        "tasks": 2,
+        "completions": 2,
+        "wrong_legal_actions": 0,
+        "authority_rejected_proposals": 0,
+        "abstentions": 0,
+        "large_calls": 0
+      },
+      "always-large": {
+        "tasks": 2,
+        "completions": 2,
+        "wrong_legal_actions": 0,
+        "authority_rejected_proposals": 0,
+        "abstentions": 0,
+        "large_calls": 2
+      }
+    },
+    "turbovec-id-remove-readd": {
+      "hand-written": {
+        "tasks": 2,
+        "completions": 1,
+        "wrong_legal_actions": 0,
+        "authority_rejected_proposals": 0,
+        "abstentions": 1,
+        "large_calls": 0
+      },
+      "small": {
+        "tasks": 2,
+        "completions": 1,
+        "wrong_legal_actions": 0,
+        "authority_rejected_proposals": 0,
+        "abstentions": 1,
+        "large_calls": 0
+      },
+      "small-then-large-on-abstention": {
+        "tasks": 2,
+        "completions": 2,
+        "wrong_legal_actions": 0,
+        "authority_rejected_proposals": 0,
+        "abstentions": 0,
+        "large_calls": 1
+      },
+      "always-large": {
+        "tasks": 2,
+        "completions": 1,
+        "wrong_legal_actions": 1,
+        "authority_rejected_proposals": 0,
+        "abstentions": 0,
+        "large_calls": 2
+      }
+    },
+    "turbovec-id-swap-repair": {
+      "hand-written": {
+        "tasks": 2,
+        "completions": 1,
+        "wrong_legal_actions": 0,
+        "authority_rejected_proposals": 0,
+        "abstentions": 1,
+        "large_calls": 0
+      },
+      "small": {
+        "tasks": 2,
+        "completions": 1,
+        "wrong_legal_actions": 0,
+        "authority_rejected_proposals": 0,
+        "abstentions": 1,
+        "large_calls": 0
+      },
+      "small-then-large-on-abstention": {
+        "tasks": 2,
+        "completions": 2,
+        "wrong_legal_actions": 0,
+        "authority_rejected_proposals": 0,
+        "abstentions": 0,
+        "large_calls": 1
+      },
+      "always-large": {
+        "tasks": 2,
+        "completions": 2,
+        "wrong_legal_actions": 0,
+        "authority_rejected_proposals": 0,
+        "abstentions": 0,
+        "large_calls": 2
+      }
+    },
+    "turbovec-mask-allowlist": {
+      "hand-written": {
+        "tasks": 2,
+        "completions": 1,
+        "wrong_legal_actions": 0,
+        "authority_rejected_proposals": 0,
+        "abstentions": 1,
+        "large_calls": 0
+      },
+      "small": {
+        "tasks": 2,
+        "completions": 1,
+        "wrong_legal_actions": 0,
+        "authority_rejected_proposals": 0,
+        "abstentions": 1,
+        "large_calls": 0
+      },
+      "small-then-large-on-abstention": {
+        "tasks": 2,
+        "completions": 2,
+        "wrong_legal_actions": 0,
+        "authority_rejected_proposals": 0,
+        "abstentions": 0,
+        "large_calls": 1
+      },
+      "always-large": {
+        "tasks": 2,
+        "completions": 2,
+        "wrong_legal_actions": 0,
+        "authority_rejected_proposals": 0,
+        "abstentions": 0,
+        "large_calls": 2
+      }
+    },
+    "turbovec-rotation-wire-format": {
+      "hand-written": {
+        "tasks": 2,
+        "completions": 2,
+        "wrong_legal_actions": 0,
+        "authority_rejected_proposals": 0,
+        "abstentions": 0,
+        "large_calls": 0
+      },
+      "small": {
+        "tasks": 2,
+        "completions": 2,
+        "wrong_legal_actions": 0,
+        "authority_rejected_proposals": 0,
+        "abstentions": 0,
+        "large_calls": 0
+      },
+      "small-then-large-on-abstention": {
+        "tasks": 2,
+        "completions": 2,
+        "wrong_legal_actions": 0,
+        "authority_rejected_proposals": 0,
+        "abstentions": 0,
+        "large_calls": 0
+      },
+      "always-large": {
+        "tasks": 2,
+        "completions": 0,
+        "wrong_legal_actions": 0,
+        "authority_rejected_proposals": 0,
+        "abstentions": 2,
+        "large_calls": 2
+      }
+    }
+  },
+  "differences_from_always_large": {
+    "hand-written": {
+      "completion_difference_from_always_large": 0,
+      "total_token_difference_from_always_large": -26342,
+      "elapsed_ms_difference_from_always_large": -105406.62,
+      "large_call_difference_from_always_large": -16
+    },
+    "small": {
+      "completion_difference_from_always_large": 0,
+      "total_token_difference_from_always_large": -3230,
+      "elapsed_ms_difference_from_always_large": -144722.782,
+      "large_call_difference_from_always_large": -16
+    },
+    "small-then-large-on-abstention": {
+      "completion_difference_from_always_large": 3,
+      "total_token_difference_from_always_large": 1310,
+      "elapsed_ms_difference_from_always_large": -96970.745,
+      "large_call_difference_from_always_large": -13
+    },
+    "always-large": {
+      "completion_difference_from_always_large": 0,
+      "total_token_difference_from_always_large": 0,
+      "elapsed_ms_difference_from_always_large": 0.0,
+      "large_call_difference_from_always_large": 0
+    }
+  },
+  "small_coverage_error_curve": {
+    "scope": "post-hoc descriptive curve on held-out outputs; no threshold selection or bundle change",
+    "at_fixed_selected_maximum_abstention": [
+      {
+        "minimum_applicability_milli": 0,
+        "maximum_abstention_milli": 150,
+        "covered": 13,
+        "coverage": 0.8125,
+        "correct": 13,
+        "wrong": 0,
+        "error_rate_when_covered": 0.0
+      },
+      {
+        "minimum_applicability_milli": 50,
+        "maximum_abstention_milli": 150,
+        "covered": 13,
+        "coverage": 0.8125,
+        "correct": 13,
+        "wrong": 0,
+        "error_rate_when_covered": 0.0
+      },
+      {
+        "minimum_applicability_milli": 100,
+        "maximum_abstention_milli": 150,
+        "covered": 13,
+        "coverage": 0.8125,
+        "correct": 13,
+        "wrong": 0,
+        "error_rate_when_covered": 0.0
+      },
+      {
+        "minimum_applicability_milli": 150,
+        "maximum_abstention_milli": 150,
+        "covered": 13,
+        "coverage": 0.8125,
+        "correct": 13,
+        "wrong": 0,
+        "error_rate_when_covered": 0.0
+      },
+      {
+        "minimum_applicability_milli": 200,
+        "maximum_abstention_milli": 150,
+        "covered": 13,
+        "coverage": 0.8125,
+        "correct": 13,
+        "wrong": 0,
+        "error_rate_when_covered": 0.0
+      },
+      {
+        "minimum_applicability_milli": 250,
+        "maximum_abstention_milli": 150,
+        "covered": 13,
+        "coverage": 0.8125,
+        "correct": 13,
+        "wrong": 0,
+        "error_rate_when_covered": 0.0
+      },
+      {
+        "minimum_applicability_milli": 300,
+        "maximum_abstention_milli": 150,
+        "covered": 13,
+        "coverage": 0.8125,
+        "correct": 13,
+        "wrong": 0,
+        "error_rate_when_covered": 0.0
+      },
+      {
+        "minimum_applicability_milli": 350,
+        "maximum_abstention_milli": 150,
+        "covered": 13,
+        "coverage": 0.8125,
+        "correct": 13,
+        "wrong": 0,
+        "error_rate_when_covered": 0.0
+      },
+      {
+        "minimum_applicability_milli": 400,
+        "maximum_abstention_milli": 150,
+        "covered": 13,
+        "coverage": 0.8125,
+        "correct": 13,
+        "wrong": 0,
+        "error_rate_when_covered": 0.0
+      },
+      {
+        "minimum_applicability_milli": 450,
+        "maximum_abstention_milli": 150,
+        "covered": 13,
+        "coverage": 0.8125,
+        "correct": 13,
+        "wrong": 0,
+        "error_rate_when_covered": 0.0
+      },
+      {
+        "minimum_applicability_milli": 500,
+        "maximum_abstention_milli": 150,
+        "covered": 13,
+        "coverage": 0.8125,
+        "correct": 13,
+        "wrong": 0,
+        "error_rate_when_covered": 0.0
+      },
+      {
+        "minimum_applicability_milli": 550,
+        "maximum_abstention_milli": 150,
+        "covered": 13,
+        "coverage": 0.8125,
+        "correct": 13,
+        "wrong": 0,
+        "error_rate_when_covered": 0.0
+      },
+      {
+        "minimum_applicability_milli": 600,
+        "maximum_abstention_milli": 150,
+        "covered": 13,
+        "coverage": 0.8125,
+        "correct": 13,
+        "wrong": 0,
+        "error_rate_when_covered": 0.0
+      },
+      {
+        "minimum_applicability_milli": 650,
+        "maximum_abstention_milli": 150,
+        "covered": 13,
+        "coverage": 0.8125,
+        "correct": 13,
+        "wrong": 0,
+        "error_rate_when_covered": 0.0
+      },
+      {
+        "minimum_applicability_milli": 700,
+        "maximum_abstention_milli": 150,
+        "covered": 13,
+        "coverage": 0.8125,
+        "correct": 13,
+        "wrong": 0,
+        "error_rate_when_covered": 0.0
+      },
+      {
+        "minimum_applicability_milli": 750,
+        "maximum_abstention_milli": 150,
+        "covered": 13,
+        "coverage": 0.8125,
+        "correct": 13,
+        "wrong": 0,
+        "error_rate_when_covered": 0.0
+      },
+      {
+        "minimum_applicability_milli": 800,
+        "maximum_abstention_milli": 150,
+        "covered": 13,
+        "coverage": 0.8125,
+        "correct": 13,
+        "wrong": 0,
+        "error_rate_when_covered": 0.0
+      },
+      {
+        "minimum_applicability_milli": 850,
+        "maximum_abstention_milli": 150,
+        "covered": 13,
+        "coverage": 0.8125,
+        "correct": 13,
+        "wrong": 0,
+        "error_rate_when_covered": 0.0
+      },
+      {
+        "minimum_applicability_milli": 900,
+        "maximum_abstention_milli": 150,
+        "covered": 13,
+        "coverage": 0.8125,
+        "correct": 13,
+        "wrong": 0,
+        "error_rate_when_covered": 0.0
+      },
+      {
+        "minimum_applicability_milli": 950,
+        "maximum_abstention_milli": 150,
+        "covered": 13,
+        "coverage": 0.8125,
+        "correct": 13,
+        "wrong": 0,
+        "error_rate_when_covered": 0.0
+      },
+      {
+        "minimum_applicability_milli": 1000,
+        "maximum_abstention_milli": 150,
+        "covered": 12,
+        "coverage": 0.75,
+        "correct": 12,
+        "wrong": 0,
+        "error_rate_when_covered": 0.0
+      }
+    ],
+    "at_fixed_selected_minimum_applicability": [
+      {
+        "minimum_applicability_milli": 850,
+        "maximum_abstention_milli": 0,
+        "covered": 12,
+        "coverage": 0.75,
+        "correct": 12,
+        "wrong": 0,
+        "error_rate_when_covered": 0.0
+      },
+      {
+        "minimum_applicability_milli": 850,
+        "maximum_abstention_milli": 50,
+        "covered": 13,
+        "coverage": 0.8125,
+        "correct": 13,
+        "wrong": 0,
+        "error_rate_when_covered": 0.0
+      },
+      {
+        "minimum_applicability_milli": 850,
+        "maximum_abstention_milli": 100,
+        "covered": 13,
+        "coverage": 0.8125,
+        "correct": 13,
+        "wrong": 0,
+        "error_rate_when_covered": 0.0
+      },
+      {
+        "minimum_applicability_milli": 850,
+        "maximum_abstention_milli": 150,
+        "covered": 13,
+        "coverage": 0.8125,
+        "correct": 13,
+        "wrong": 0,
+        "error_rate_when_covered": 0.0
+      },
+      {
+        "minimum_applicability_milli": 850,
+        "maximum_abstention_milli": 200,
+        "covered": 13,
+        "coverage": 0.8125,
+        "correct": 13,
+        "wrong": 0,
+        "error_rate_when_covered": 0.0
+      },
+      {
+        "minimum_applicability_milli": 850,
+        "maximum_abstention_milli": 250,
+        "covered": 13,
+        "coverage": 0.8125,
+        "correct": 13,
+        "wrong": 0,
+        "error_rate_when_covered": 0.0
+      },
+      {
+        "minimum_applicability_milli": 850,
+        "maximum_abstention_milli": 300,
+        "covered": 13,
+        "coverage": 0.8125,
+        "correct": 13,
+        "wrong": 0,
+        "error_rate_when_covered": 0.0
+      },
+      {
+        "minimum_applicability_milli": 850,
+        "maximum_abstention_milli": 350,
+        "covered": 13,
+        "coverage": 0.8125,
+        "correct": 13,
+        "wrong": 0,
+        "error_rate_when_covered": 0.0
+      },
+      {
+        "minimum_applicability_milli": 850,
+        "maximum_abstention_milli": 400,
+        "covered": 13,
+        "coverage": 0.8125,
+        "correct": 13,
+        "wrong": 0,
+        "error_rate_when_covered": 0.0
+      },
+      {
+        "minimum_applicability_milli": 850,
+        "maximum_abstention_milli": 450,
+        "covered": 13,
+        "coverage": 0.8125,
+        "correct": 13,
+        "wrong": 0,
+        "error_rate_when_covered": 0.0
+      },
+      {
+        "minimum_applicability_milli": 850,
+        "maximum_abstention_milli": 500,
+        "covered": 13,
+        "coverage": 0.8125,
+        "correct": 13,
+        "wrong": 0,
+        "error_rate_when_covered": 0.0
+      },
+      {
+        "minimum_applicability_milli": 850,
+        "maximum_abstention_milli": 550,
+        "covered": 13,
+        "coverage": 0.8125,
+        "correct": 13,
+        "wrong": 0,
+        "error_rate_when_covered": 0.0
+      },
+      {
+        "minimum_applicability_milli": 850,
+        "maximum_abstention_milli": 600,
+        "covered": 13,
+        "coverage": 0.8125,
+        "correct": 13,
+        "wrong": 0,
+        "error_rate_when_covered": 0.0
+      },
+      {
+        "minimum_applicability_milli": 850,
+        "maximum_abstention_milli": 650,
+        "covered": 13,
+        "coverage": 0.8125,
+        "correct": 13,
+        "wrong": 0,
+        "error_rate_when_covered": 0.0
+      },
+      {
+        "minimum_applicability_milli": 850,
+        "maximum_abstention_milli": 700,
+        "covered": 13,
+        "coverage": 0.8125,
+        "correct": 13,
+        "wrong": 0,
+        "error_rate_when_covered": 0.0
+      },
+      {
+        "minimum_applicability_milli": 850,
+        "maximum_abstention_milli": 750,
+        "covered": 13,
+        "coverage": 0.8125,
+        "correct": 13,
+        "wrong": 0,
+        "error_rate_when_covered": 0.0
+      },
+      {
+        "minimum_applicability_milli": 850,
+        "maximum_abstention_milli": 800,
+        "covered": 13,
+        "coverage": 0.8125,
+        "correct": 13,
+        "wrong": 0,
+        "error_rate_when_covered": 0.0
+      },
+      {
+        "minimum_applicability_milli": 850,
+        "maximum_abstention_milli": 850,
+        "covered": 13,
+        "coverage": 0.8125,
+        "correct": 13,
+        "wrong": 0,
+        "error_rate_when_covered": 0.0
+      },
+      {
+        "minimum_applicability_milli": 850,
+        "maximum_abstention_milli": 900,
+        "covered": 13,
+        "coverage": 0.8125,
+        "correct": 13,
+        "wrong": 0,
+        "error_rate_when_covered": 0.0
+      },
+      {
+        "minimum_applicability_milli": 850,
+        "maximum_abstention_milli": 950,
+        "covered": 13,
+        "coverage": 0.8125,
+        "correct": 13,
+        "wrong": 0,
+        "error_rate_when_covered": 0.0
+      },
+      {
+        "minimum_applicability_milli": 850,
+        "maximum_abstention_milli": 1000,
+        "covered": 13,
+        "coverage": 0.8125,
+        "correct": 13,
+        "wrong": 0,
+        "error_rate_when_covered": 0.0
+      }
+    ]
+  },
+  "authority_gates": {
+    "illegal_commits": 0,
+    "rejected_transitions": 0,
+    "duplicate_action_effects": 0,
+    "replay_identity_all_equal": true
+  },
+  "model_call_accounting": {
+    "shadow_calls_per_model_for_data_capture": 16,
+    "lane_costs_use_only_calls_that_lane_would_make": true,
+    "input_tokens_and_generated_tokens_separate": true
+  },
+  "cost_limits": "Local model calls are unbilled; GPU energy and hardware-dollar cost are not measured."
+}

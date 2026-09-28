@@ -1,0 +1,118 @@
+{
+  "entries": [
+    {
+      "bytes": 75,
+      "path": "ledgerd/__init__.py",
+      "sha256": "36219aa1cd59fef7d6baa36db459cd14d3877d5de972f7e4851c38bbb25b0458"
+    },
+    {
+      "bytes": 5472,
+      "path": "ledgerd/api.py",
+      "sha256": "6f46c6f738b293c9f2f8dac530ae12afaba67ce27ed9fcfce8d211617325ccc1"
+    },
+    {
+      "bytes": 2609,
+      "path": "ledgerd/cas.py",
+      "sha256": "9e5e3532894c26bf03b957cf2b87f90b3209d2dc8b14309b5642a3b28b06307e"
+    },
+    {
+      "bytes": 1947,
+      "path": "ledgerd/cli.py",
+      "sha256": "2d7e4783d7cdf6dd18057562acbe06f4a3975192ecde17893df7272252d94a52"
+    },
+    {
+      "bytes": 2825,
+      "path": "ledgerd/client.py",
+      "sha256": "971399bb9e361e8720e141c55b5447e1e8a2623b2ba02b4cdafdb4951466098d"
+    },
+    {
+      "bytes": 9512,
+      "path": "ledgerd/core.py",
+      "sha256": "551bee25605e936a3775e1010b7d7051da94c0606c9f84c644efc9221ba0f756"
+    },
+    {
+      "bytes": 1574,
+      "path": "ledgerd/facts.py",
+      "sha256": "45639072c2b8be8f5ab6fb54c9f319aadcc6f2bbfd83f2ef18de00819762bd7f"
+    },
+    {
+      "bytes": 7124,
+      "path": "ledgerd/graph.py",
+      "sha256": "b483245b932813ed60fb0ab77ab053b598b78c143073641cdbe7442e3dd69f1f"
+    },
+    {
+      "bytes": 1598,
+      "path": "ledgerd/history.py",
+      "sha256": "964deba9bfeaccb587b914d3fda38b1a456c3dcc068196070faed9e8babbddba"
+    },
+    {
+      "bytes": 2839,
+      "path": "ledgerd/identity.py",
+      "sha256": "3b0ce893d95df80ea1b52001a68b1d87f58878e1e4f1ee34a5528b7a3f0c7b0a"
+    },
+    {
+      "bytes": 4360,
+      "path": "ledgerd/journal.py",
+      "sha256": "14022ea64957be491891f7f81fa6fb55d77f980e4ec78662be0657c1091d5d7b"
+    },
+    {
+      "bytes": 2813,
+      "path": "ledgerd/legacy_flat.py",
+      "sha256": "6e575361535b9350993598ca2dba9ea70fc3c5e3a75d21ee486843ef782ad1c2"
+    },
+    {
+      "bytes": 1873,
+      "path": "ledgerd/seals.py",
+      "sha256": "33ea8b99ece028ba64744ca3a44bc411e33301cc91e0ce26e978be76b305f1d8"
+    },
+    {
+      "bytes": 400,
+      "path": "pyproject.toml",
+      "sha256": "7890244b377f5810fea3e0655efec2ca957dae3bc163650624b082b161136dda"
+    },
+    {
+      "bytes": 3348,
+      "path": "scripts/audit_e4_history.py",
+      "sha256": "0734c63ccde752922ef7c72267c4989beb99352335010eb131669872a6711c7b"
+    },
+    {
+      "bytes": 3787,
+      "path": "scripts/capture_e4_history_supplement.py",
+      "sha256": "a474dde9b37a7761eb2335e5e36c76c9b93841e7820098c71c6d71d63df32d1e"
+    },
+    {
+      "bytes": 3621,
+      "path": "scripts/import_e4_fixture.py",
+      "sha256": "b28aceac48099b4e3b6f6689f025636f7f787aedcd5dd407c6664608e67ab4a4"
+    },
+    {
+      "bytes": 10224,
+      "path": "scripts/import_e4_history.py",
+      "sha256": "ee162f17cba9bce4f311cec9a7aa656c3ecbf58f4f771398013b2fafff85c529"
+    },
+    {
+      "bytes": 2024,
+      "path": "scripts/rebuild_e4_projection.py",
+      "sha256": "214f6b1924c9fcd251c11d045568629beec421aaa19eed1b1eed69f35c856fa3"
+    },
+    {
+      "bytes": 1327,
+      "path": "scripts/source_manifest.py",
+      "sha256": "b20aef3598b8548e71fe2c9db7122967e9acf9fed5853bf9f9452b7ffce4b7bc"
+    },
+    {
+      "bytes": 1623,
+      "path": "scripts/verify_e4_fixture.py",
+      "sha256": "8d4d4847b2592e84699edfe8100dfc42f3956687e50d51b4e378962181a63156"
+    },
+    {
+      "bytes": 7282,
+      "path": "tests/test_custody.py",
+      "sha256": "9edb6f9dfc9d5eb881f63b04c5f79403eccb5f25ee5a24b2e5ab929d9a8e7043"
+    }
+  ],
+  "entry_count": 22,
+  "schema": "KAMMI_SOURCE_MANIFEST_V0_2",
+  "source_root_sha256": "ee50c3de1537345363ae9eb3de2753fbbcab9636afc61635a2ee9bcffa03907d",
+  "status": "DEVELOPMENT_SNAPSHOT"
+}

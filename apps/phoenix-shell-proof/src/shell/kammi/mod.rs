@@ -1,0 +1,248 @@
+pub mod provider;
+pub mod session;
+pub mod settings;
+mod settings_ui;
+pub mod store;
+pub mod ui;
+
+use gpui::{AppContext as _, Entity, ScrollHandle, Task, Window};
+use gpui_component::input::InputState;
+use gpui_component::slider::{SliderEvent, SliderState, SliderValue};
+use provider::{KammiProviderRuntime, LocalServerState, spawn_provider_runtime};
+use session::{KammiSession, MessageState};
+use settings::{KammiSettings, ProviderBackend, load_openrouter_key};
+use std::collections::VecDeque;
+
+#[derive(Clone, Copy, Debug, Default, serde::Deserialize, Eq, PartialEq, serde::Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum RightSidebarPage {
+    #[default]
+    Inspector,
+    Analytics,
+    Kammi,
+}
+
+impl RightSidebarPage {
+    pub const fn label(self) -> &'static str {
+        match self {
+            Self::Inspector => "INSPECTOR",
+            Self::Analytics => "ANALYTICS",
+            Self::Kammi => "KAMMI",
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+pub enum KammiTab {
+    #[default]
+    Session,
+    Context,
+}
+
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+pub enum KammiPanel {
+    #[default]
+    Chat,
+    History,
+    Settings,
+}
+
+#[derive(Clone, Debug, Default)]
+pub enum GenerationState {
+    #[default]
+    Idle,
+    Streaming {
+        request_id: u64,
+    },
+    Failed {
+        message: String,
+    },
+}
+
+#[allow(dead_code)]
+pub enum ProviderStatus {
+    Unconfigured,
+    Ready { model: String },
+    Generating { model: String },
+    Error { message: String },
+}
+
+pub struct KammiState {
+    pub tab: KammiTab,
+    pub panel: KammiPanel,
+    pub composer: Entity<InputState>,
+    pub model_input: Entity<InputState>,
+    pub api_key_input: Entity<InputState>,
+    pub llama_server_input: Entity<InputState>,
+    pub llama_model_input: Entity<InputState>,
+    pub llama_endpoint_input: Entity<InputState>,
+    pub system_prompt_input: Entity<InputState>,
+    pub reasoning_slider: Entity<SliderState>,
+    pub session: KammiSession,
+    pub history: VecDeque<KammiSession>,
+    pub provider: KammiProviderRuntime,
+    pub provider_task: Option<Task<()>>,
+    pub generation: GenerationState,
+    pub local_server_state: LocalServerState,
+    pub next_request_id: u64,
+    pub has_api_key: bool,
+    pub settings: KammiSettings,
+    #[allow(dead_code)]
+    pub scroll: ScrollHandle,
+    pub error_banner: Option<String>,
+}
+
+impl KammiState {
+    pub fn new(
+        window: &mut Window,
+        cx: &mut gpui::Context<crate::shell::PhoenixShell>,
+    ) -> anyhow::Result<Self> {
+        let composer = cx.new(|cx| {
+            InputState::new(window, cx)
+                .auto_grow(2, 8)
+                .placeholder("Message Kammi...")
+        });
+        let model_input = cx.new(|cx| {
+            InputState::new(window, cx).placeholder("provider/model (e.g. openai/gpt-4o)")
+        });
+        let api_key_input = cx.new(|cx| {
+            InputState::new(window, cx)
+                .masked(true)
+                .placeholder("OpenRouter API key")
+        });
+        let llama_server_input =
+            cx.new(|cx| InputState::new(window, cx).placeholder(r"C:\llama.cpp\llama-server.exe"));
+        let llama_model_input =
+            cx.new(|cx| InputState::new(window, cx).placeholder(r"D:\models\model.gguf"));
+        let llama_endpoint_input =
+            cx.new(|cx| InputState::new(window, cx).placeholder("http://127.0.0.1:8080/v1"));
+        let system_prompt_input = cx.new(|cx| {
+            InputState::new(window, cx)
+                .auto_grow(4, 12)
+                .placeholder("Define Kammi's role, voice, boundaries, and working style...")
+        });
+        let reasoning_slider = cx.new(|_| {
+            SliderState::new()
+                .min(0.0)
+                .max((settings::ReasoningLevel::ALL.len() - 1) as f32)
+                .step(1.0)
+                .default_value(settings::ReasoningLevel::Auto.slider_index())
+        });
+        cx.subscribe(&reasoning_slider, |shell, _, event: &SliderEvent, cx| {
+            if let SliderEvent::Change(SliderValue::Single(index)) = event {
+                shell.set_kammi_reasoning(settings::ReasoningLevel::from_slider_index(*index), cx);
+            }
+        })
+        .detach();
+
+        let provider = spawn_provider_runtime()?;
+        let has_api_key = load_openrouter_key().ok().flatten().is_some();
+        let scroll = ScrollHandle::new();
+
+        Ok(Self {
+            tab: KammiTab::Session,
+            panel: KammiPanel::Chat,
+            composer,
+            model_input,
+            api_key_input,
+            llama_server_input,
+            llama_model_input,
+            llama_endpoint_input,
+            system_prompt_input,
+            reasoning_slider,
+            session: KammiSession::new(1),
+            history: VecDeque::new(),
+            provider,
+            provider_task: None,
+            generation: GenerationState::Idle,
+            local_server_state: LocalServerState::Stopped,
+            next_request_id: 2,
+            has_api_key,
+            settings: KammiSettings::default(),
+            scroll,
+            error_banner: None,
+        })
+    }
+
+    pub fn provider_status(&self) -> ProviderStatus {
+        if matches!(self.generation, GenerationState::Streaming { .. }) {
+            return ProviderStatus::Generating {
+                model: self.settings.active_model_label(),
+            };
+        }
+        if let GenerationState::Failed { message } = &self.generation {
+            return ProviderStatus::Error {
+                message: message.clone(),
+            };
+        }
+        let configured = match self.settings.backend {
+            ProviderBackend::OpenRouter => {
+                self.has_api_key && !self.settings.model.trim().is_empty()
+            }
+            ProviderBackend::LlamaCpp => {
+                !self.settings.llama_cpp.server_path.trim().is_empty()
+                    && !self.settings.llama_cpp.model_path.trim().is_empty()
+            }
+        };
+        if configured {
+            ProviderStatus::Ready {
+                model: self.settings.active_model_label(),
+            }
+        } else {
+            ProviderStatus::Unconfigured
+        }
+    }
+
+    pub fn active_request_id(&self) -> Option<u64> {
+        match self.generation {
+            GenerationState::Streaming { request_id } => Some(request_id),
+            _ => None,
+        }
+    }
+
+    pub fn take_next_identity(&mut self) -> Option<u64> {
+        let identity = self.next_request_id;
+        self.next_request_id = identity.checked_add(1)?;
+        Some(identity)
+    }
+
+    pub fn archive_current_session(&mut self) {
+        if self.session.messages.is_empty() {
+            return;
+        }
+        self.history.retain(|session| session.id != self.session.id);
+        self.history.push_front(self.session.clone());
+        self.history.truncate(store::MAX_SESSIONS);
+    }
+
+    pub fn finish(&mut self, request_id: u64) {
+        if self.active_request_id() == Some(request_id) {
+            self.generation = GenerationState::Idle;
+            if let Some(msg) = self.session.streaming_assistant_mut(request_id) {
+                msg.state = MessageState::Complete;
+            }
+            self.session.update_title_from_first_message();
+        }
+    }
+
+    pub fn fail(&mut self, request_id: u64, error: String) {
+        if self.active_request_id() == Some(request_id) {
+            self.generation = GenerationState::Failed {
+                message: error.clone(),
+            };
+            self.error_banner = Some(error);
+            if let Some(msg) = self.session.streaming_assistant_mut(request_id) {
+                msg.state = MessageState::Failed;
+            }
+        }
+    }
+
+    pub fn cancelled(&mut self, request_id: u64) {
+        if self.active_request_id() == Some(request_id) {
+            self.generation = GenerationState::Idle;
+            if let Some(msg) = self.session.streaming_assistant_mut(request_id) {
+                msg.state = MessageState::Interrupted;
+            }
+        }
+    }
+}

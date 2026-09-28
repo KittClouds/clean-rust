@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "state": "FROZEN_BEFORE_MODEL_CONTACT",
+  "run_id": "e011-r2-20260925-presentation-factorial-01",
+  "created_utc": "2026-09-25T20:46:03.230096+00:00",
+  "purpose": "same-bank input-factor autopsy; no fitting or promotion",
+  "labels": "E010 already-opened labels reused for diagnostic only",
+  "observer_bundles": {
+    "small": "minicpm5-2b-q8-local-v5",
+    "large": "ternary-bonsai-2-27b-ptq1-local-v5",
+    "adapter": "none; original E009 v5 action wire contract",
+    "thresholds": {
+      "minimum_applicability_milli": 850,
+      "maximum_abstention_milli": 150
+    }
+  },
+  "conditions": [
+    "ids-only",
+    "order-only"
+  ],
+  "routing": "small first; large on small rejection or abstention",
+  "parent_e011_hashes": {
+    "e011_pre_model_seal_sha256": "8cf6424be08142364117ec43e1d70a2b3529815369ec2b9705cead308cb2d7ce",
+    "e011_output_seal_sha256": "a4d5321d6622f8cbe6027437e076bc712c1bec4b5f5e20219d628245279436f8",
+    "e011_score_sha256": "61ae20328b50aa0808613eadb4858b20b9c64559c38989e887f83975c958ca4e",
+    "e011_candidate_permuted_frame_sha256": "70f6c76971dbfff9a01aa1ab2a271b8055d5a0857fde6964985a642569eb7529",
+    "r1_score_sha256": "b60794faec482d4863cf68e907f6e38fdf9f12196c5d23d7e30ff2655e947c69",
+    "r1_output_seal_sha256": "a506f051154d0c969b957129effa0747761332e9d910d201915b77ea7aaa4ec5"
+  },
+  "sha256": {
+    "inputs": {
+      "inputs/chat-template-large.jinja": "c3cf9e34abf4f9e36c2d72165aa9c132d3e2a725b6c2586aaa3a8af9d7a81041",
+      "inputs/chat-template-small.jinja": "6e54652d84d698ebb3b7b2172204b6eeafd7f27533e006c8c1ebf8e743a7fd99",
+      "inputs/e009-v5-bundle-lock.json": "a626836853bdb0755fd2e4e1569b6b91b33861306c7d1e4a51e3de54a9ee713d",
+      "inputs/e010-frozen-input-lock.json": "323f14b07c698d289af6f11a2e894014538bd6be0644de8786b30b1e954f8165",
+      "inputs/e010-heldout-frame-lock.json": "de330f467dfe8d14d66dba428211b8a27c3eb8a62dd175ba01cf5847728eb587",
+      "inputs/e010-heldout-sealed-labels.json": "4bd1a3984a9c54ecd36c2caf1e09d9b28bc0656a73f0714e9d8b388873dbc0d2",
+      "inputs/observer-output.v2.json": "97170fa0d6a44681f680ad0ac533a3f3913709757e4ee6cbf96d9c9f40d1b2fb",
+      "inputs/system-observer-v2.txt": "976ef1cd914bacb366c64418825010124338a626a0400d459858acc7e48f5a48",
+      "spec.md": "456c2323d1da87e098a22f4b60ae20454e43513389ca22b27fe9a71665dd3c7b",
+      "scripts/factorial.py": "bac0140848f5971cbcc1a3da0200222b87201a5b84a63b805a3b8a49ed9bb6d0"
+    },
+    "condition_frame_locks": {
+      "ids-only": "af319c25cc3f6cf11ecac2d506ad4e8cdd8606501d42de4a4d7564c252a8c319",
+      "order-only": "2bc405878bcb9f85d1ea6c4d62239a276b17697f799bd1a6d4360847ddb8ccad"
+    }
+  }
+}

@@ -1,0 +1,1426 @@
+{
+  "fits_executed": false,
+  "run_id": "F4-PRESENTATION-03-ENG1",
+  "runtime": {
+    "cargo_version": "cargo 1.96.0 (30a34c682 2026-05-25)",
+    "native_executable_bytes": 435712,
+    "native_executable_sha256": "14326f499675abe3870fe344e3f300ab92ab6dfe6434b617dbcc3026819ef591",
+    "numpy_version": "2.5.3",
+    "python_executable": "C:\\Users\\shuga\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+    "python_executable_sha256": "85b71d8c6ec1905935f74be0c9869aae198d00e98f39df699ec66f9c5a84cecd",
+    "python_version": "3.13.15 (tags/v3.13.15:4061bc4, Aug  5 2026, 13:05:39) [MSC v.1944 64 bit (AMD64)]",
+    "rustc_version": "rustc 1.96.0 (ac68faa20 2026-05-25)",
+    "target_dir": "D:/cargo-targets/f4-presentation-03-v1",
+    "thread_environment": {
+      "BLIS_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "NUMEXPR_MAXIMUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1"
+    }
+  },
+  "schema": "F4-PRESENTATION-03-implementation-freeze-v1",
+  "source_files": [
+    {
+      "byte_length": 5717837,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/anatomy/edges-L.tsv",
+      "sha256": "ed6044a5de43b2c6acd58aa034967ac80a595ab55456a04f505ecb764d36b0de"
+    },
+    {
+      "byte_length": 5725623,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/anatomy/edges-R.tsv",
+      "sha256": "42b602cd95cf169e86cee7fdc3b28f59e068677aa63e382b845af30c2bffa573"
+    },
+    {
+      "byte_length": 58761,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/anatomy/nodes-L.tsv",
+      "sha256": "3fc14bc6bf33e6a1fc2af7f377b7a23f6700ff916030b840bab4259d76e5232f"
+    },
+    {
+      "byte_length": 58949,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/anatomy/nodes-R.tsv",
+      "sha256": "871cf14a0daf569139b2a880f1927a0f3be7b4d11f5feb47bd435178b74d347f"
+    },
+    {
+      "byte_length": 5255578,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g001/edges-L.tsv",
+      "sha256": "eb92e858b4b07534abc8763e3b8f92bd139b02d95d4bb3cc6b2c9ae2807c28c9"
+    },
+    {
+      "byte_length": 5262051,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g001/edges-R.tsv",
+      "sha256": "7de3749f1a0fc8a03a5ed760650db2526ebaf391aa29a30c5b8ddeb461e3b223"
+    },
+    {
+      "byte_length": 5255578,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g002/edges-L.tsv",
+      "sha256": "655a2e71a0f1da4b82ee8560c2b1e20570a04a9e34eb018ebb4c5aebf0568c54"
+    },
+    {
+      "byte_length": 5262051,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g002/edges-R.tsv",
+      "sha256": "108ffd074903a08d801371027b6662503fc0e2a7814ec95e6fac7718e7ae601e"
+    },
+    {
+      "byte_length": 5255578,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g003/edges-L.tsv",
+      "sha256": "5d4b14cab55df828c61c0f13abc73a5d4ed9171ea5b743cb9623b34c084cfa19"
+    },
+    {
+      "byte_length": 5262051,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g003/edges-R.tsv",
+      "sha256": "1d5578e048b7ba567a909337988234c8dd3721e23905419826c664ee8e14f332"
+    },
+    {
+      "byte_length": 5255578,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g004/edges-L.tsv",
+      "sha256": "c2c0cfef2e4b5006e7d0bebc5a222ea0bb2d925ee79c4088566f1adf23bcc17e"
+    },
+    {
+      "byte_length": 5262051,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g004/edges-R.tsv",
+      "sha256": "c26d834b276648dfc9b529bd8ce6d1f2d3db61c22cdd3563a75b4801da4590ac"
+    },
+    {
+      "byte_length": 5255578,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g005/edges-L.tsv",
+      "sha256": "94cf106a1dd66c161a18bcba31d5e62c89dce378d4bf4fd8c70e604000fd3e74"
+    },
+    {
+      "byte_length": 5262051,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g005/edges-R.tsv",
+      "sha256": "ad73539b78bd22232dc73f9e6d94e4ebcea547a9d4109861e07c6da4f0d5c3d2"
+    },
+    {
+      "byte_length": 5255578,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g006/edges-L.tsv",
+      "sha256": "165ef118059d023b9a4db2346aa6ed044a0f80e601a5850dd42ea6e5634e5662"
+    },
+    {
+      "byte_length": 5262051,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g006/edges-R.tsv",
+      "sha256": "41f9bef7b72386177e02dd9979f2801970fd99176d48335a9a7f4c8eb86dc0c0"
+    },
+    {
+      "byte_length": 5255578,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g007/edges-L.tsv",
+      "sha256": "6c966396aef86b7280cbda592604c4e111a3c7a80792b861c6f486ddc3df93b1"
+    },
+    {
+      "byte_length": 5262051,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g007/edges-R.tsv",
+      "sha256": "2a4fcd636b3bb6a62ae56395e499631586e439b4808780275d48412abef0582e"
+    },
+    {
+      "byte_length": 5255578,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g008/edges-L.tsv",
+      "sha256": "bd0444ddc71c8fb02f59777190c9c2610ed79fa4b9572ddaeb367dda75213927"
+    },
+    {
+      "byte_length": 5262051,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g008/edges-R.tsv",
+      "sha256": "da63f56a22074bb72a1b6b7aaf75602470f4b92c98a6007ef86e7a8b3242a59d"
+    },
+    {
+      "byte_length": 43057,
+      "path": "experiments/fly-reach-03/MATH-CONTRACT-v0.3-AUTHORITATIVE.md",
+      "sha256": "6beb47c4784a7d6e37a91e45688dd86e50b15291a8f0dbf07c56c71aefbe47a7"
+    },
+    {
+      "byte_length": 17997,
+      "path": "experiments/fly-reach-03/executor/src/collector.rs",
+      "sha256": "f551c86875b6ec7f5d9fe7327adbfcfc4a66810640cf70c72aaa234822a4a258"
+    },
+    {
+      "byte_length": 5250,
+      "path": "experiments/fly-reach-03/executor/src/graph.rs",
+      "sha256": "8977281a6f5a3cceaf1783f8099b7d49db81fd51f9a83bec144327e02f56ebad"
+    },
+    {
+      "byte_length": 11933,
+      "path": "experiments/fly-reach-03/executor/src/reach_sim.rs",
+      "sha256": "b487e23da9ab85164b79bad40f2802a89f1d660a68c97d7728ea8af52d1f0790"
+    },
+    {
+      "byte_length": 976,
+      "path": "experiments/fly-reach-03/executor/src/rng.rs",
+      "sha256": "e18ae9832519a211983d401d111f6685c76988375e29d150f2a8355e504a07f4"
+    },
+    {
+      "byte_length": 2403,
+      "path": "experiments/fly-reach-03/executor/src/task.rs",
+      "sha256": "c19e955138cded658382216e947c1d381d11fab2e258b32f29176934a2e2c4be"
+    },
+    {
+      "byte_length": 5137,
+      "path": "experiments/fly-reach-03/f4-invariant-01-impl-v2/f4_invariant_01_inputs.py",
+      "sha256": "32f5301842e9e5ec0463276dc507a69522e6bd08989d08cf625678296136d2a9"
+    },
+    {
+      "byte_length": 15762,
+      "path": "experiments/fly-reach-03/f4-invariant-01-impl-v2/f4_invariant_01_model.py",
+      "sha256": "2882482311355f5729fb3922d0b51fdef960f24a49d793a77ce855d903939f02"
+    },
+    {
+      "byte_length": 10369,
+      "path": "experiments/fly-reach-03/f4-invariant-01-prefit-v2/fit_contract.py",
+      "sha256": "b9856dd30721f9ca38adedd3c73fa657b7ead48ddb9ee43cae638fd73d8e0b48"
+    },
+    {
+      "byte_length": 3499,
+      "path": "experiments/fly-reach-03/f4-presentation-02-v2/F4-PRESENTATION-02-ENGINEERING-SCREEN-v0.1.json",
+      "sha256": "00ba470d9f0ef9d3a7be81dc078d2fd580994e9a84f2aa7811ce2b8bbd5032af"
+    },
+    {
+      "byte_length": 13602,
+      "path": "experiments/fly-reach-03/f4-presentation-02-v2/cphi_model.py",
+      "sha256": "d50521285235db36b062f9eda9a90eb4182a836e2ccb8ab292c04e9e74158099"
+    },
+    {
+      "byte_length": 13043,
+      "path": "experiments/fly-reach-03/f4-presentation-03/F4-PRESENTATION-03-ENGINEERING-SCREEN-v0.1.md",
+      "sha256": "1e5c5b5960ae00f5f3ce9bf9027a433ec8941f03fea8e64eced4e3a928ec53f6"
+    },
+    {
+      "byte_length": 26952,
+      "path": "experiments/fly-reach-03/f4-presentation-03/analyze_results.py",
+      "sha256": "be2c5198713ccbc47bc0ee83870c318460f75f0530e0db56d459345798c6e7a9"
+    },
+    {
+      "byte_length": 13719,
+      "path": "experiments/fly-reach-03/f4-presentation-03/collect_native.py",
+      "sha256": "82c7d807a6f99ebc4204efdf3edc9b8b36b6d16f5deff17e90a3175c04d47166"
+    },
+    {
+      "byte_length": 10319,
+      "path": "experiments/fly-reach-03/f4-presentation-03/freeze_implementation.py",
+      "sha256": "1b85a105cfa6e6f5986a005d14eb9130ef978083d3efe947df2ad1b36ef13629"
+    },
+    {
+      "byte_length": 112736,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/INITIALIZER-MANIFEST.json",
+      "sha256": "4fe74735648fb49eba9c31bb79ef20e4d8b4e7a82c1f65feb31c065789b23b98"
+    },
+    {
+      "byte_length": 435712,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/bin/f4-presentation-03-native-collector.exe",
+      "sha256": "14326f499675abe3870fe344e3f300ab92ab6dfe6434b617dbcc3026819ef591"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F00-R00-Cphi.bin",
+      "sha256": "839cacd84253e862449de5fb01b6f6eebbf5fb9170ff92f5d3aa1ca0647ebd5e"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F00-R00-Cphi_shuffled.bin",
+      "sha256": "839cacd84253e862449de5fb01b6f6eebbf5fb9170ff92f5d3aa1ca0647ebd5e"
+    },
+    {
+      "byte_length": 81247,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F00-R00-Cphi_unshared.bin",
+      "sha256": "eb584e05de5cb3390821bf44612da429af5a26256d7b8acb3dcad05795e751c8"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F00-R00-D.bin",
+      "sha256": "8450e9d7053d0dfd7d21197249e1baba997b42cd356b52e99460cfd7deca209e"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F00-R01-Cphi.bin",
+      "sha256": "58d833beb39579d823307ad6325ee02fe9fddcea7ae09f5a8c89258272e89762"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F00-R01-Cphi_shuffled.bin",
+      "sha256": "58d833beb39579d823307ad6325ee02fe9fddcea7ae09f5a8c89258272e89762"
+    },
+    {
+      "byte_length": 81247,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F00-R01-Cphi_unshared.bin",
+      "sha256": "7b2b3c9aaf93242a3c24c1e7b9b6200d675969387b03b29af7dfb48954530d32"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F00-R01-D.bin",
+      "sha256": "6a8da7947352da200e3b017beefbb92cfba34953264486d959e62cf0a5b51636"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F00-R02-Cphi.bin",
+      "sha256": "a4f3d6ca410811658d4d0f227cbba59999c34a77d3437421e8fd0088b6e813cc"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F00-R02-Cphi_shuffled.bin",
+      "sha256": "a4f3d6ca410811658d4d0f227cbba59999c34a77d3437421e8fd0088b6e813cc"
+    },
+    {
+      "byte_length": 81247,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F00-R02-Cphi_unshared.bin",
+      "sha256": "425f102cf4e97b847d0f185930ae2b6ccfeacbe3dab406393dbed03ec41c36d5"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F00-R02-D.bin",
+      "sha256": "badb870f82ce42e882fc669b45c4bab936c130276645d3d5778a0be60912a6ff"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F01-R00-Cphi.bin",
+      "sha256": "f681fce37c92119b8926d542ebd808572b78300d2a3e439b0e0d7b265c7d88b0"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F01-R00-Cphi_shuffled.bin",
+      "sha256": "f681fce37c92119b8926d542ebd808572b78300d2a3e439b0e0d7b265c7d88b0"
+    },
+    {
+      "byte_length": 81247,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F01-R00-Cphi_unshared.bin",
+      "sha256": "32acf8148fddb5f72712d2250deba6a97efb3278db6095e51dddaf16fe8ee2c6"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F01-R00-D.bin",
+      "sha256": "2d342476718fe79250fa1b11e638af65a22ade7e9c508ccd0b961c7d0d78b084"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F01-R01-Cphi.bin",
+      "sha256": "f042465d392f209c0283febefcaf412998815b13b8edacbf55af446d04df1293"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F01-R01-Cphi_shuffled.bin",
+      "sha256": "f042465d392f209c0283febefcaf412998815b13b8edacbf55af446d04df1293"
+    },
+    {
+      "byte_length": 81247,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F01-R01-Cphi_unshared.bin",
+      "sha256": "aac8ae546cd2cc88ca7ece2a4f5bb8141f819adbd2af3f291140ef13d5235191"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F01-R01-D.bin",
+      "sha256": "99bdc3b58b7c4ca266cf0e6cbc546f768917dfbe31b49abce3dcfd59815e837a"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F01-R02-Cphi.bin",
+      "sha256": "7d68490d80a55f2f60aae2c9da868b720cb229ef5698b3c80aeab9c75dd5a1e0"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F01-R02-Cphi_shuffled.bin",
+      "sha256": "7d68490d80a55f2f60aae2c9da868b720cb229ef5698b3c80aeab9c75dd5a1e0"
+    },
+    {
+      "byte_length": 81247,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F01-R02-Cphi_unshared.bin",
+      "sha256": "ecc48c1b0ba30133a8dc98732226d5e4027e5ae30fbec76755742e8a221e3e01"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F01-R02-D.bin",
+      "sha256": "8567235281d0a73f48b9202fe7e1c00b473159d579cf87f289076fe8692120c5"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F02-R00-Cphi.bin",
+      "sha256": "c59d059326530934b050afaa41a433433aa279e7bedbe9136b2cac484e8f3eb6"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F02-R00-Cphi_shuffled.bin",
+      "sha256": "c59d059326530934b050afaa41a433433aa279e7bedbe9136b2cac484e8f3eb6"
+    },
+    {
+      "byte_length": 81247,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F02-R00-Cphi_unshared.bin",
+      "sha256": "9fbb4ae083635b718233c4677bb75bfcaecb21339a24aa03a1e3985a45b50bda"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F02-R00-D.bin",
+      "sha256": "60b202292f065afdc7372cc7eaad74af44885eeebd2ab7037fabeb7449fcc958"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F02-R01-Cphi.bin",
+      "sha256": "4c3b0b290d6b3f534dc48c531238772d13bde76544525e942a666fafd028ea96"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F02-R01-Cphi_shuffled.bin",
+      "sha256": "4c3b0b290d6b3f534dc48c531238772d13bde76544525e942a666fafd028ea96"
+    },
+    {
+      "byte_length": 81247,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F02-R01-Cphi_unshared.bin",
+      "sha256": "1f49af1589d137146c63b5bf47a723b310db75c20bedfbab983d8d18ba60f930"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F02-R01-D.bin",
+      "sha256": "0aa8f94d8d040fd98a3720423646b34e21a9c39ba004b9646b987248fcf02eb1"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F02-R02-Cphi.bin",
+      "sha256": "f6b5a65ae29eb4635484963b95dd1bae05df00b5138f0819e0f1b2f75848a116"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F02-R02-Cphi_shuffled.bin",
+      "sha256": "f6b5a65ae29eb4635484963b95dd1bae05df00b5138f0819e0f1b2f75848a116"
+    },
+    {
+      "byte_length": 81247,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F02-R02-Cphi_unshared.bin",
+      "sha256": "f97cc260cf469450cb8285e7b922379b4016a0adf5db62315e73aba163945b2e"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F02-R02-D.bin",
+      "sha256": "6a1540dc58aa443c32a6b052a040ebddc9d5c07bdaf171f2c34013fdbd4fb382"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F03-R00-Cphi.bin",
+      "sha256": "7579ea40bdf80470779f34bbd5f26462b8d55f03bcdc50ccaaec2c83f1dc182f"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F03-R00-Cphi_shuffled.bin",
+      "sha256": "7579ea40bdf80470779f34bbd5f26462b8d55f03bcdc50ccaaec2c83f1dc182f"
+    },
+    {
+      "byte_length": 81247,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F03-R00-Cphi_unshared.bin",
+      "sha256": "ecd15de331d9a82e20f4eb910d6907ad4550526076954708178f39c7e4ec4bbe"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F03-R00-D.bin",
+      "sha256": "6c44b22359a0840dbe785089fa254299734bb23da9dbdb6352002f98604b0d3d"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F03-R01-Cphi.bin",
+      "sha256": "bded3ab2d251c76e48daa8c044d35706ac22e8ad901428abe75ff4bc0e267142"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F03-R01-Cphi_shuffled.bin",
+      "sha256": "bded3ab2d251c76e48daa8c044d35706ac22e8ad901428abe75ff4bc0e267142"
+    },
+    {
+      "byte_length": 81247,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F03-R01-Cphi_unshared.bin",
+      "sha256": "90e56e12d58d5aa83969f84d4a5136a13a8e25c9176b09caf3d478bc21a59177"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F03-R01-D.bin",
+      "sha256": "4a170b16730f9be7ed5720347d8af4a4dae76022bb5c94d71b375f7440e11e22"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F03-R02-Cphi.bin",
+      "sha256": "db844f438e16b853786c7025447fef9465136f7cbf75afcf2d3a7fecf4c6b279"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F03-R02-Cphi_shuffled.bin",
+      "sha256": "db844f438e16b853786c7025447fef9465136f7cbf75afcf2d3a7fecf4c6b279"
+    },
+    {
+      "byte_length": 81247,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F03-R02-Cphi_unshared.bin",
+      "sha256": "8b9f6fb72c2e929f04a3e33c5aae6aadf9ac700ea36579853f4e659a559b8f7d"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F03-R02-D.bin",
+      "sha256": "1de734ab7f3b82b6577a5424ac4ecdca9e6337274853a0c35ff5f1e645d0a1ee"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F04-R00-Cphi.bin",
+      "sha256": "ac14113476fa4fa259d9b8e3815cda1319a6cd8302b9e812bab1d4f228c07bd9"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F04-R00-Cphi_shuffled.bin",
+      "sha256": "ac14113476fa4fa259d9b8e3815cda1319a6cd8302b9e812bab1d4f228c07bd9"
+    },
+    {
+      "byte_length": 81247,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F04-R00-Cphi_unshared.bin",
+      "sha256": "327abab6c04979fddd6a0c1ae9d58250828461461f086c26a9ef3e0f8ae73aa2"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F04-R00-D.bin",
+      "sha256": "81bd38efcfe25b48bfa64b6c924deeeeb93b655c1e05ec1d415735dd18fc38b5"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F04-R01-Cphi.bin",
+      "sha256": "86bd2385a018d920548ff810c212aa323a38f053c88c9e9293c3fba907261aa9"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F04-R01-Cphi_shuffled.bin",
+      "sha256": "86bd2385a018d920548ff810c212aa323a38f053c88c9e9293c3fba907261aa9"
+    },
+    {
+      "byte_length": 81247,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F04-R01-Cphi_unshared.bin",
+      "sha256": "59ffe75cb6c4561b7eeeccd06f53c3a20282aaf1d83b6412dde3a41cf2f149df"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F04-R01-D.bin",
+      "sha256": "1a983391401256e7264323c997e41b05466685805b4d465f78ef929d9a15ec74"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F04-R02-Cphi.bin",
+      "sha256": "bac7e986c223433d23a159f3ac89d97d5d4357275025339a8d084acfd6da8867"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F04-R02-Cphi_shuffled.bin",
+      "sha256": "bac7e986c223433d23a159f3ac89d97d5d4357275025339a8d084acfd6da8867"
+    },
+    {
+      "byte_length": 81247,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F04-R02-Cphi_unshared.bin",
+      "sha256": "9471db3363efefaed9ac406844c28e0793cb2bbaafb64062b0c1e79ec146e493"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F04-R02-D.bin",
+      "sha256": "1d5313d4267e2347ed0b917880789d3885b7e18bac505bf9eba0c0ea2ef11960"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F05-R00-Cphi.bin",
+      "sha256": "e73c9b8ace0286feb0efa5656286e43f0780a214578500a073d7b4ba743ae94c"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F05-R00-Cphi_shuffled.bin",
+      "sha256": "e73c9b8ace0286feb0efa5656286e43f0780a214578500a073d7b4ba743ae94c"
+    },
+    {
+      "byte_length": 81247,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F05-R00-Cphi_unshared.bin",
+      "sha256": "9b47aab0c0b28bdf6797c55175c3b013cb6fc14b735e6f30092640c17db70412"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F05-R00-D.bin",
+      "sha256": "41e3ad0952facf44eec96712a6e559a418a0bd57c9cd5d217e2809c03e73269c"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F05-R01-Cphi.bin",
+      "sha256": "03d88ad2044ea1337dc11f738f14c1f26d068e39e8f3349cbd800d8032d5478b"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F05-R01-Cphi_shuffled.bin",
+      "sha256": "03d88ad2044ea1337dc11f738f14c1f26d068e39e8f3349cbd800d8032d5478b"
+    },
+    {
+      "byte_length": 81247,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F05-R01-Cphi_unshared.bin",
+      "sha256": "8f0914c928e157de18c5b9b1a57f2b9d9e76d62f8ffe0dc3c27ba984bf3ee5bb"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F05-R01-D.bin",
+      "sha256": "48474f51ceec61e9d7b9df49f632952ffad4cc1fbd87752c3194dfa32cd0a4af"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F05-R02-Cphi.bin",
+      "sha256": "185bc43592affc1251c1b1050ee073071b8cee93171c6fb64e93a4dcbde5e4a4"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F05-R02-Cphi_shuffled.bin",
+      "sha256": "185bc43592affc1251c1b1050ee073071b8cee93171c6fb64e93a4dcbde5e4a4"
+    },
+    {
+      "byte_length": 81247,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F05-R02-Cphi_unshared.bin",
+      "sha256": "973783b2f9a59190a2f8b7d3f067dfd33ab2a8b1ab3023bcd5f5d9fd5d897a50"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F05-R02-D.bin",
+      "sha256": "c069b813852f5b8fc7051f6a7c95cba7138dc3fb7fa90acc0f405cd38c2162d0"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F06-R00-Cphi.bin",
+      "sha256": "3384edcd84c0282b85a9d5a3aad5237868cc78cd0dd458caff2a46b3a68de91c"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F06-R00-Cphi_shuffled.bin",
+      "sha256": "3384edcd84c0282b85a9d5a3aad5237868cc78cd0dd458caff2a46b3a68de91c"
+    },
+    {
+      "byte_length": 81247,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F06-R00-Cphi_unshared.bin",
+      "sha256": "33b36f4f5cb305c2ed45cb1853f753a07a2d8beababe0752da18743c22133839"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F06-R00-D.bin",
+      "sha256": "8125c85944b8a822b677aabbd7cba437bb0790bef0fa10d95c5e7e2c41477fd2"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F06-R01-Cphi.bin",
+      "sha256": "d7e1e9bae64e5af84948919572b6b0b456edbd065ad09cf9848a22836a711b57"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F06-R01-Cphi_shuffled.bin",
+      "sha256": "d7e1e9bae64e5af84948919572b6b0b456edbd065ad09cf9848a22836a711b57"
+    },
+    {
+      "byte_length": 81247,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F06-R01-Cphi_unshared.bin",
+      "sha256": "e563ae0a00207b6121496b046c14921319da9b67410119d6fd91a3ba06bf3f9f"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F06-R01-D.bin",
+      "sha256": "ca24a6df9199fc173dc216c06e7b776444538ae17017a56bfcba1980b4ff9e6b"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F06-R02-Cphi.bin",
+      "sha256": "4d3d768f0e5689b0e5bf7d2130a05a05b6556ceb7ed097b966fb3342e5a6b967"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F06-R02-Cphi_shuffled.bin",
+      "sha256": "4d3d768f0e5689b0e5bf7d2130a05a05b6556ceb7ed097b966fb3342e5a6b967"
+    },
+    {
+      "byte_length": 81247,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F06-R02-Cphi_unshared.bin",
+      "sha256": "1844dabb6f47e682bccc47a8764cd98ff4d5ac7a3c5f47dde53e3b951d1d7a43"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F06-R02-D.bin",
+      "sha256": "95d58108ac43e547eb7333de8d2e5a439052a042f7439e35b9480b353f1eab5c"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F07-R00-Cphi.bin",
+      "sha256": "02234608c8e76c4a8105c70c5578119aab08290c05bf05d42ea5cac3a3357021"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F07-R00-Cphi_shuffled.bin",
+      "sha256": "02234608c8e76c4a8105c70c5578119aab08290c05bf05d42ea5cac3a3357021"
+    },
+    {
+      "byte_length": 81247,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F07-R00-Cphi_unshared.bin",
+      "sha256": "342f3fa32ad1d7903a35277cb0c1e6520362dd0294398171eb1f0a48cbb2b0eb"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F07-R00-D.bin",
+      "sha256": "f12cc3fef49ef3ac43cfeecf48683cb380d67dcc9ada77e1ad5e00f62d72c850"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F07-R01-Cphi.bin",
+      "sha256": "2d9182bc78b03cf7656f1ea79cc3cf318b17ad090141af0dea3938149db25f95"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F07-R01-Cphi_shuffled.bin",
+      "sha256": "2d9182bc78b03cf7656f1ea79cc3cf318b17ad090141af0dea3938149db25f95"
+    },
+    {
+      "byte_length": 81247,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F07-R01-Cphi_unshared.bin",
+      "sha256": "3c77ae772b3790daa9f0d0d63a738efdfd5f3ca2558654eab8d21100239f16ba"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F07-R01-D.bin",
+      "sha256": "e69a3431444d64f0679968ce87abdcc70c0461d130356d5dac82ca487e7fddcc"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F07-R02-Cphi.bin",
+      "sha256": "f43d97720e6959db1d5883e09dd551b41966d9229da1f5a98a5f1ab4293e2c0e"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F07-R02-Cphi_shuffled.bin",
+      "sha256": "f43d97720e6959db1d5883e09dd551b41966d9229da1f5a98a5f1ab4293e2c0e"
+    },
+    {
+      "byte_length": 81247,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F07-R02-Cphi_unshared.bin",
+      "sha256": "da669b8d73ae93e675bd916d164e988b0d65e2ed4f2d3461d2fed86c0c1e80e0"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F07-R02-D.bin",
+      "sha256": "fbc8a4b1eb583f52842bc7e23da1bd6cc2f57322fa568843d9cd758fc4ab3723"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F08-R00-Cphi.bin",
+      "sha256": "40a3d880d77ff09e7cc46e871fa265556078215349888511773cc995c5d15b11"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F08-R00-Cphi_shuffled.bin",
+      "sha256": "40a3d880d77ff09e7cc46e871fa265556078215349888511773cc995c5d15b11"
+    },
+    {
+      "byte_length": 81247,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F08-R00-Cphi_unshared.bin",
+      "sha256": "4aa8dfdc394443a9b4770ac05540f5acd0ea07b362fa29208013a136e80a5c16"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F08-R00-D.bin",
+      "sha256": "8b691d94897bfd2d0713d4401356e69dc011235dcea91c3b1d507600d54417a4"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F08-R01-Cphi.bin",
+      "sha256": "8683baa270da86d49f711395205de443bf9b3ef8e3e5e7de2548acc26265a4cb"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F08-R01-Cphi_shuffled.bin",
+      "sha256": "8683baa270da86d49f711395205de443bf9b3ef8e3e5e7de2548acc26265a4cb"
+    },
+    {
+      "byte_length": 81247,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F08-R01-Cphi_unshared.bin",
+      "sha256": "1075df08c9cf2c52ac3132b21535d7b4f34221afd931ea7200c112c13d761e12"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F08-R01-D.bin",
+      "sha256": "c831bf482bd4e8ecc6afa7c630896338cc0298c8fc86d427af3cdb6046126ff6"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F08-R02-Cphi.bin",
+      "sha256": "5ea8f2466e04e5020df67e8ff3ad8f40df6ca1fbc88b74ce97cda4bc4f437019"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F08-R02-Cphi_shuffled.bin",
+      "sha256": "5ea8f2466e04e5020df67e8ff3ad8f40df6ca1fbc88b74ce97cda4bc4f437019"
+    },
+    {
+      "byte_length": 81247,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F08-R02-Cphi_unshared.bin",
+      "sha256": "cb6f1c5bbe5daeb2fb6e75b344c840ca8a77feac935eb83b5f171705cf7c741d"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F08-R02-D.bin",
+      "sha256": "9a9ff12405fcc7423a8e2473b1d72c0a35895181f0775c9b6660658df0bca5fa"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F09-R00-Cphi.bin",
+      "sha256": "4b015194a34ed9daa8b046dda9ca2689d08b626b7989ff4594213b7a394e15bb"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F09-R00-Cphi_shuffled.bin",
+      "sha256": "4b015194a34ed9daa8b046dda9ca2689d08b626b7989ff4594213b7a394e15bb"
+    },
+    {
+      "byte_length": 81247,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F09-R00-Cphi_unshared.bin",
+      "sha256": "9a789396616ed1243f602fa23cfcadc00ae4eaf6da844306809fa5861d381aa5"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F09-R00-D.bin",
+      "sha256": "252f7e7709069a998e5c91ec27958ce7ee9ef24771c063ac52c4ef0825f70d28"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F09-R01-Cphi.bin",
+      "sha256": "251577345b4404ede0278d08754fc9cb35da54e9c7e59f1542d6063a722eb71e"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F09-R01-Cphi_shuffled.bin",
+      "sha256": "251577345b4404ede0278d08754fc9cb35da54e9c7e59f1542d6063a722eb71e"
+    },
+    {
+      "byte_length": 81247,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F09-R01-Cphi_unshared.bin",
+      "sha256": "ca012bb8840a5383220e238bb01f763c1d4d362c03feabe3b28153c7b58f9c3d"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F09-R01-D.bin",
+      "sha256": "b8263702a1f26900ffa6aa719d8fea897cd0dd9d7333f07557d04e3e19bbc8e2"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F09-R02-Cphi.bin",
+      "sha256": "8f12d351fb469027b8e5223894937912eec1e70c2713c02502b717377e8f24b1"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F09-R02-Cphi_shuffled.bin",
+      "sha256": "8f12d351fb469027b8e5223894937912eec1e70c2713c02502b717377e8f24b1"
+    },
+    {
+      "byte_length": 81247,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F09-R02-Cphi_unshared.bin",
+      "sha256": "47fd74cb290e0812393db38accca74c3d9ed0c85a2fb895a07b38624e99ce288"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F09-R02-D.bin",
+      "sha256": "c91df7e7be1858970595e77ca70735f9cbf3676f77b72fa0763ffe6413d8ac60"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F10-R00-Cphi.bin",
+      "sha256": "39eb3026e8dfad94fc53c17fe83a37e61ce9ca2babbf76ef0786c7761d5334d4"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F10-R00-Cphi_shuffled.bin",
+      "sha256": "39eb3026e8dfad94fc53c17fe83a37e61ce9ca2babbf76ef0786c7761d5334d4"
+    },
+    {
+      "byte_length": 81247,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F10-R00-Cphi_unshared.bin",
+      "sha256": "a4602d08d431e9ab3ff846b991b4ccecc4c995b1a347f41b7c49b1e63abed51f"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F10-R00-D.bin",
+      "sha256": "2e636bb36067e25c8737f14e223d1c51b30b00d8fcb05817ee7b53add4448e8a"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F10-R01-Cphi.bin",
+      "sha256": "a043f6f8673f21f5f0d9609fdd0d5f8701bd944b9eaaa97a485fe1fc746e9c03"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F10-R01-Cphi_shuffled.bin",
+      "sha256": "a043f6f8673f21f5f0d9609fdd0d5f8701bd944b9eaaa97a485fe1fc746e9c03"
+    },
+    {
+      "byte_length": 81247,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F10-R01-Cphi_unshared.bin",
+      "sha256": "a74bf85c6df57175102b98951bfe2c446051f26407ef8cf7622a393b67f1297b"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F10-R01-D.bin",
+      "sha256": "60767c18074e10fcfba4d8b08f025b8681827b5bb461ba75226b33844e2c4d6d"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F10-R02-Cphi.bin",
+      "sha256": "e7f07fa97638aa248c2336294f29929d8d5509974f09abafa50204b12a2b0441"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F10-R02-Cphi_shuffled.bin",
+      "sha256": "e7f07fa97638aa248c2336294f29929d8d5509974f09abafa50204b12a2b0441"
+    },
+    {
+      "byte_length": 81247,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F10-R02-Cphi_unshared.bin",
+      "sha256": "2ec289e789fb7039ecf850d412c0be71072ee40213cdd6b6f4cf55e312f0aa40"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F10-R02-D.bin",
+      "sha256": "b2d60fb65dcf208781c8715586f126f7cdcbf2c76c9c202b306a615c60fe6c1b"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F11-R00-Cphi.bin",
+      "sha256": "d51f0ca2e47aa397d7615256eecb0ddcab1609753071234e80ed99a553450d7a"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F11-R00-Cphi_shuffled.bin",
+      "sha256": "d51f0ca2e47aa397d7615256eecb0ddcab1609753071234e80ed99a553450d7a"
+    },
+    {
+      "byte_length": 81247,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F11-R00-Cphi_unshared.bin",
+      "sha256": "05dbc2f499c589fcef662a992c80c6c2d3735c302cb7c3324353dafb49af6b60"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F11-R00-D.bin",
+      "sha256": "5620793e2df98c3253bef00d443f92bceab0f18a5b5ddefb90b0da8235c90aa7"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F11-R01-Cphi.bin",
+      "sha256": "e541ce9263ed6f051da7fc3a4cb11b115a50625cb4a3efc63f7a02138b420d22"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F11-R01-Cphi_shuffled.bin",
+      "sha256": "e541ce9263ed6f051da7fc3a4cb11b115a50625cb4a3efc63f7a02138b420d22"
+    },
+    {
+      "byte_length": 81247,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F11-R01-Cphi_unshared.bin",
+      "sha256": "c24d47ae5fe59bf036e3c05513d3f55a8b7d7abca75cfcfc174092952e021238"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F11-R01-D.bin",
+      "sha256": "a32905194c4be9d82b45f33401a64152a2e64da246c11d2ca9b3b2d605243c83"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F11-R02-Cphi.bin",
+      "sha256": "d7f9005fdd726f2b345d9c2498af2e5d0fd836ed82c01f625fd3fa83bb838e4c"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F11-R02-Cphi_shuffled.bin",
+      "sha256": "d7f9005fdd726f2b345d9c2498af2e5d0fd836ed82c01f625fd3fa83bb838e4c"
+    },
+    {
+      "byte_length": 81247,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F11-R02-Cphi_unshared.bin",
+      "sha256": "5765d3590287fd438628775c201d661adad4f0ace3a61012db3c9d03df32f362"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/f4-presentation-03/implementation-artifacts/initial-tensors/F11-R02-D.bin",
+      "sha256": "dc7a21a3e149f3669b7518ed6bd18cf2dcd1843241027480d5277212e7f21017"
+    },
+    {
+      "byte_length": 6020,
+      "path": "experiments/fly-reach-03/f4-presentation-03/native-collector/Cargo.lock",
+      "sha256": "502e658ccd873cee7d6f2f58d67c34cf12eaab5de51bafb28d1cc74141afd966"
+    },
+    {
+      "byte_length": 392,
+      "path": "experiments/fly-reach-03/f4-presentation-03/native-collector/Cargo.toml",
+      "sha256": "d28f83ed0ce7fce1afee23292d115160604e4972db11204fa62eee5c761fef9a"
+    },
+    {
+      "byte_length": 1058,
+      "path": "experiments/fly-reach-03/f4-presentation-03/native-collector/src/main.rs",
+      "sha256": "a9e210c23b49a98c9a8aef332f9f0daaf66e193faca535aaeb091949cb78d68c"
+    },
+    {
+      "byte_length": 17862,
+      "path": "experiments/fly-reach-03/f4-presentation-03/native-collector/src/native_collect.rs",
+      "sha256": "58593cc3a25dc4b4a691c92f1b58cc46dcee3e12d53fdcdcdb06812f3fffbedd"
+    },
+    {
+      "byte_length": 15640,
+      "path": "experiments/fly-reach-03/f4-presentation-03/prepare_fit_surface.py",
+      "sha256": "654c6e364585b6e609708a4cda3f7134e00c59a2dcb68bc1d805feda089dd2d7"
+    },
+    {
+      "byte_length": 9146,
+      "path": "experiments/fly-reach-03/f4-presentation-03/prepare_initializers.py",
+      "sha256": "81a481c76f93139ab420c1c3f84a272ab5b85e38fe6339728d0892a4d2d9dd7c"
+    },
+    {
+      "byte_length": 14046,
+      "path": "experiments/fly-reach-03/f4-presentation-03/prepare_tasks.py",
+      "sha256": "5803c1cb9c332345687b9c26321479a4fdd934c34a4e25224d91103fe45abd91"
+    },
+    {
+      "byte_length": 7537,
+      "path": "experiments/fly-reach-03/f4-presentation-03/presentation03_data.py",
+      "sha256": "a3d21f7d9379046fe42530eafa0f0523662422be946241ec14207900191c13e5"
+    },
+    {
+      "byte_length": 18461,
+      "path": "experiments/fly-reach-03/f4-presentation-03/presentation03_model.py",
+      "sha256": "80ce81ab2a75cd512804352fb74c2400b1c0898f7078b543c90064f35cdc792d"
+    },
+    {
+      "byte_length": 23746,
+      "path": "experiments/fly-reach-03/f4-presentation-03/run_fits.py",
+      "sha256": "551683dcca848b9caf76612729c1f6ec964e806aeb072bcaed2b85b6b0904b74"
+    },
+    {
+      "byte_length": 5609,
+      "path": "experiments/fly-reach-03/f4-presentation-03/test_initializers.py",
+      "sha256": "368cdd75a6d9f9104d5ed04ee92a24743627722fc39f77eb74cc17b6a719c4f7"
+    },
+    {
+      "byte_length": 5925,
+      "path": "experiments/fly-reach-03/f4-presentation-03/test_presentation03_model.py",
+      "sha256": "2e6950521975d26afe5a0ea01e5c319940ba1d99017f888045a3b40b0b2b66b0"
+    },
+    {
+      "byte_length": 6451,
+      "path": "experiments/fly-reach-03/f4-presentation-03/test_run_contract.py",
+      "sha256": "15a9088cfe5b7e1ccf2e8a5a58e2a2abd3ff5636814e5e222ca06691afef3faf"
+    },
+    {
+      "byte_length": 2123,
+      "path": "experiments/fly-reach-03/f4-presentation-03/test_task_design.py",
+      "sha256": "3e4918d0da63149a162b11c0794746bb349922ddc2e1d025f122fd87a80c2586"
+    },
+    {
+      "byte_length": 33738,
+      "path": "experiments/fly-reach-03/f4-presentation-03/verify_integrity.py",
+      "sha256": "7f602ac210f1ef4c2fba45a18687faf84240e55102baeeea097ece0359e74eae"
+    },
+    {
+      "byte_length": 32126,
+      "path": "experiments/fly-reach-03/manifests/QUALIFICATION-MANIFEST.json",
+      "sha256": "9ea9048d424698212b5a14eecdadef56987a93c54ed28e3ef40a9508431014e5"
+    },
+    {
+      "byte_length": 3116,
+      "path": "experiments/fly-reach-03/math-objects-v0.3.json",
+      "sha256": "7dca0f687258531743014b7ac55681f7324566f40d9497c4a5e303771f6c7c2c"
+    },
+    {
+      "byte_length": 61851,
+      "path": "experiments/fly-reach-03/runs/F4-INVARIANT-01-COLLECT2-EXEC2/FIT-MANIFEST.csv",
+      "sha256": "47b440bb4f9f4d93c897b0835dfe4159e7579a92d2fa5e0e41d93b3084bf8048"
+    },
+    {
+      "byte_length": 29808,
+      "path": "experiments/fly-reach-03/runs/F4-INVARIANT-01-COLLECT2-EXEC2/INITIAL-TENSOR-BUNDLE-MANIFEST.json",
+      "sha256": "4d9ed75096c010d40ceff324f0f44daaec00dbbf4e6cc9a53da74909146a5bea"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/runs/F4-INVARIANT-01-COLLECT2-EXEC2/initial-tensors/D-H306000-I0.bin",
+      "sha256": "8450e9d7053d0dfd7d21197249e1baba997b42cd356b52e99460cfd7deca209e"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/runs/F4-INVARIANT-01-COLLECT2-EXEC2/initial-tensors/D-H306000-I1.bin",
+      "sha256": "6a8da7947352da200e3b017beefbb92cfba34953264486d959e62cf0a5b51636"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/runs/F4-INVARIANT-01-COLLECT2-EXEC2/initial-tensors/D-H306000-I2.bin",
+      "sha256": "badb870f82ce42e882fc669b45c4bab936c130276645d3d5778a0be60912a6ff"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/runs/F4-INVARIANT-01-COLLECT2-EXEC2/initial-tensors/D-H306001-I0.bin",
+      "sha256": "2d342476718fe79250fa1b11e638af65a22ade7e9c508ccd0b961c7d0d78b084"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/runs/F4-INVARIANT-01-COLLECT2-EXEC2/initial-tensors/D-H306001-I1.bin",
+      "sha256": "99bdc3b58b7c4ca266cf0e6cbc546f768917dfbe31b49abce3dcfd59815e837a"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/runs/F4-INVARIANT-01-COLLECT2-EXEC2/initial-tensors/D-H306001-I2.bin",
+      "sha256": "8567235281d0a73f48b9202fe7e1c00b473159d579cf87f289076fe8692120c5"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/runs/F4-INVARIANT-01-COLLECT2-EXEC2/initial-tensors/D-H306002-I0.bin",
+      "sha256": "60b202292f065afdc7372cc7eaad74af44885eeebd2ab7037fabeb7449fcc958"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/runs/F4-INVARIANT-01-COLLECT2-EXEC2/initial-tensors/D-H306002-I1.bin",
+      "sha256": "0aa8f94d8d040fd98a3720423646b34e21a9c39ba004b9646b987248fcf02eb1"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/runs/F4-INVARIANT-01-COLLECT2-EXEC2/initial-tensors/D-H306002-I2.bin",
+      "sha256": "6a1540dc58aa443c32a6b052a040ebddc9d5c07bdaf171f2c34013fdbd4fb382"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/runs/F4-INVARIANT-01-COLLECT2-EXEC2/initial-tensors/D-H306003-I0.bin",
+      "sha256": "6c44b22359a0840dbe785089fa254299734bb23da9dbdb6352002f98604b0d3d"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/runs/F4-INVARIANT-01-COLLECT2-EXEC2/initial-tensors/D-H306003-I1.bin",
+      "sha256": "4a170b16730f9be7ed5720347d8af4a4dae76022bb5c94d71b375f7440e11e22"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/runs/F4-INVARIANT-01-COLLECT2-EXEC2/initial-tensors/D-H306003-I2.bin",
+      "sha256": "1de734ab7f3b82b6577a5424ac4ecdca9e6337274853a0c35ff5f1e645d0a1ee"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/runs/F4-INVARIANT-01-COLLECT2-EXEC2/initial-tensors/D-H306004-I0.bin",
+      "sha256": "81bd38efcfe25b48bfa64b6c924deeeeb93b655c1e05ec1d415735dd18fc38b5"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/runs/F4-INVARIANT-01-COLLECT2-EXEC2/initial-tensors/D-H306004-I1.bin",
+      "sha256": "1a983391401256e7264323c997e41b05466685805b4d465f78ef929d9a15ec74"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/runs/F4-INVARIANT-01-COLLECT2-EXEC2/initial-tensors/D-H306004-I2.bin",
+      "sha256": "1d5313d4267e2347ed0b917880789d3885b7e18bac505bf9eba0c0ea2ef11960"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/runs/F4-INVARIANT-01-COLLECT2-EXEC2/initial-tensors/D-H306005-I0.bin",
+      "sha256": "41e3ad0952facf44eec96712a6e559a418a0bd57c9cd5d217e2809c03e73269c"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/runs/F4-INVARIANT-01-COLLECT2-EXEC2/initial-tensors/D-H306005-I1.bin",
+      "sha256": "48474f51ceec61e9d7b9df49f632952ffad4cc1fbd87752c3194dfa32cd0a4af"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/runs/F4-INVARIANT-01-COLLECT2-EXEC2/initial-tensors/D-H306005-I2.bin",
+      "sha256": "c069b813852f5b8fc7051f6a7c95cba7138dc3fb7fa90acc0f405cd38c2162d0"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/runs/F4-INVARIANT-01-COLLECT2-EXEC2/initial-tensors/D-H306006-I0.bin",
+      "sha256": "8125c85944b8a822b677aabbd7cba437bb0790bef0fa10d95c5e7e2c41477fd2"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/runs/F4-INVARIANT-01-COLLECT2-EXEC2/initial-tensors/D-H306006-I1.bin",
+      "sha256": "ca24a6df9199fc173dc216c06e7b776444538ae17017a56bfcba1980b4ff9e6b"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/runs/F4-INVARIANT-01-COLLECT2-EXEC2/initial-tensors/D-H306006-I2.bin",
+      "sha256": "95d58108ac43e547eb7333de8d2e5a439052a042f7439e35b9480b353f1eab5c"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/runs/F4-INVARIANT-01-COLLECT2-EXEC2/initial-tensors/D-H306007-I0.bin",
+      "sha256": "f12cc3fef49ef3ac43cfeecf48683cb380d67dcc9ada77e1ad5e00f62d72c850"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/runs/F4-INVARIANT-01-COLLECT2-EXEC2/initial-tensors/D-H306007-I1.bin",
+      "sha256": "e69a3431444d64f0679968ce87abdcc70c0461d130356d5dac82ca487e7fddcc"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/runs/F4-INVARIANT-01-COLLECT2-EXEC2/initial-tensors/D-H306007-I2.bin",
+      "sha256": "fbc8a4b1eb583f52842bc7e23da1bd6cc2f57322fa568843d9cd758fc4ab3723"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/runs/F4-INVARIANT-01-COLLECT2-EXEC2/initial-tensors/D-H306008-I0.bin",
+      "sha256": "8b691d94897bfd2d0713d4401356e69dc011235dcea91c3b1d507600d54417a4"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/runs/F4-INVARIANT-01-COLLECT2-EXEC2/initial-tensors/D-H306008-I1.bin",
+      "sha256": "c831bf482bd4e8ecc6afa7c630896338cc0298c8fc86d427af3cdb6046126ff6"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/runs/F4-INVARIANT-01-COLLECT2-EXEC2/initial-tensors/D-H306008-I2.bin",
+      "sha256": "9a9ff12405fcc7423a8e2473b1d72c0a35895181f0775c9b6660658df0bca5fa"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/runs/F4-INVARIANT-01-COLLECT2-EXEC2/initial-tensors/D-H306009-I0.bin",
+      "sha256": "252f7e7709069a998e5c91ec27958ce7ee9ef24771c063ac52c4ef0825f70d28"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/runs/F4-INVARIANT-01-COLLECT2-EXEC2/initial-tensors/D-H306009-I1.bin",
+      "sha256": "b8263702a1f26900ffa6aa719d8fea897cd0dd9d7333f07557d04e3e19bbc8e2"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/runs/F4-INVARIANT-01-COLLECT2-EXEC2/initial-tensors/D-H306009-I2.bin",
+      "sha256": "c91df7e7be1858970595e77ca70735f9cbf3676f77b72fa0763ffe6413d8ac60"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/runs/F4-INVARIANT-01-COLLECT2-EXEC2/initial-tensors/D-H306010-I0.bin",
+      "sha256": "2e636bb36067e25c8737f14e223d1c51b30b00d8fcb05817ee7b53add4448e8a"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/runs/F4-INVARIANT-01-COLLECT2-EXEC2/initial-tensors/D-H306010-I1.bin",
+      "sha256": "60767c18074e10fcfba4d8b08f025b8681827b5bb461ba75226b33844e2c4d6d"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/runs/F4-INVARIANT-01-COLLECT2-EXEC2/initial-tensors/D-H306010-I2.bin",
+      "sha256": "b2d60fb65dcf208781c8715586f126f7cdcbf2c76c9c202b306a615c60fe6c1b"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/runs/F4-INVARIANT-01-COLLECT2-EXEC2/initial-tensors/D-H306011-I0.bin",
+      "sha256": "5620793e2df98c3253bef00d443f92bceab0f18a5b5ddefb90b0da8235c90aa7"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/runs/F4-INVARIANT-01-COLLECT2-EXEC2/initial-tensors/D-H306011-I1.bin",
+      "sha256": "a32905194c4be9d82b45f33401a64152a2e64da246c11d2ca9b3b2d605243c83"
+    },
+    {
+      "byte_length": 79954,
+      "path": "experiments/fly-reach-03/runs/F4-INVARIANT-01-COLLECT2-EXEC2/initial-tensors/D-H306011-I2.bin",
+      "sha256": "dc7a21a3e149f3669b7518ed6bd18cf2dcd1843241027480d5277212e7f21017"
+    },
+    {
+      "byte_length": 47108,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-02-CPHI-ENG1-V2/CPHI-INITIALIZER-MANIFEST.json",
+      "sha256": "f954143995f6c08d0e99a94010d4e9dfac0ac1f802f98e4f5ebb1d3d42f7ce43"
+    },
+    {
+      "byte_length": 1339,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-02-CPHI-ENG1-V2/F4-PRESENTATION-02-TERMINAL-RECEIPT-v1.json",
+      "sha256": "754dd444fe408fd0001eeb0dc20ea36d2b255620be70909181010b06bae77eec"
+    },
+    {
+      "byte_length": 92429,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-02-CPHI-ENG1-V2/FIT-MANIFEST.json",
+      "sha256": "91c4c2c3362acb52dfac739bf4794bc3e8e1022550be11f8c5d8b3e0e10c3b49"
+    },
+    {
+      "byte_length": 4298,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-02-CPHI-ENG1-V2/SOURCE-MANIFEST.json",
+      "sha256": "b4798ced6fa806abae373ea1daa05f477b23fcf127d5aa4e2e7e3880887b2041"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-02-CPHI-ENG1-V2/initial-tensors/CPHI-H306000-I0.bin",
+      "sha256": "839cacd84253e862449de5fb01b6f6eebbf5fb9170ff92f5d3aa1ca0647ebd5e"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-02-CPHI-ENG1-V2/initial-tensors/CPHI-H306000-I1.bin",
+      "sha256": "58d833beb39579d823307ad6325ee02fe9fddcea7ae09f5a8c89258272e89762"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-02-CPHI-ENG1-V2/initial-tensors/CPHI-H306000-I2.bin",
+      "sha256": "a4f3d6ca410811658d4d0f227cbba59999c34a77d3437421e8fd0088b6e813cc"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-02-CPHI-ENG1-V2/initial-tensors/CPHI-H306001-I0.bin",
+      "sha256": "f681fce37c92119b8926d542ebd808572b78300d2a3e439b0e0d7b265c7d88b0"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-02-CPHI-ENG1-V2/initial-tensors/CPHI-H306001-I1.bin",
+      "sha256": "f042465d392f209c0283febefcaf412998815b13b8edacbf55af446d04df1293"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-02-CPHI-ENG1-V2/initial-tensors/CPHI-H306001-I2.bin",
+      "sha256": "7d68490d80a55f2f60aae2c9da868b720cb229ef5698b3c80aeab9c75dd5a1e0"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-02-CPHI-ENG1-V2/initial-tensors/CPHI-H306002-I0.bin",
+      "sha256": "c59d059326530934b050afaa41a433433aa279e7bedbe9136b2cac484e8f3eb6"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-02-CPHI-ENG1-V2/initial-tensors/CPHI-H306002-I1.bin",
+      "sha256": "4c3b0b290d6b3f534dc48c531238772d13bde76544525e942a666fafd028ea96"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-02-CPHI-ENG1-V2/initial-tensors/CPHI-H306002-I2.bin",
+      "sha256": "f6b5a65ae29eb4635484963b95dd1bae05df00b5138f0819e0f1b2f75848a116"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-02-CPHI-ENG1-V2/initial-tensors/CPHI-H306003-I0.bin",
+      "sha256": "7579ea40bdf80470779f34bbd5f26462b8d55f03bcdc50ccaaec2c83f1dc182f"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-02-CPHI-ENG1-V2/initial-tensors/CPHI-H306003-I1.bin",
+      "sha256": "bded3ab2d251c76e48daa8c044d35706ac22e8ad901428abe75ff4bc0e267142"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-02-CPHI-ENG1-V2/initial-tensors/CPHI-H306003-I2.bin",
+      "sha256": "db844f438e16b853786c7025447fef9465136f7cbf75afcf2d3a7fecf4c6b279"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-02-CPHI-ENG1-V2/initial-tensors/CPHI-H306004-I0.bin",
+      "sha256": "ac14113476fa4fa259d9b8e3815cda1319a6cd8302b9e812bab1d4f228c07bd9"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-02-CPHI-ENG1-V2/initial-tensors/CPHI-H306004-I1.bin",
+      "sha256": "86bd2385a018d920548ff810c212aa323a38f053c88c9e9293c3fba907261aa9"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-02-CPHI-ENG1-V2/initial-tensors/CPHI-H306004-I2.bin",
+      "sha256": "bac7e986c223433d23a159f3ac89d97d5d4357275025339a8d084acfd6da8867"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-02-CPHI-ENG1-V2/initial-tensors/CPHI-H306005-I0.bin",
+      "sha256": "e73c9b8ace0286feb0efa5656286e43f0780a214578500a073d7b4ba743ae94c"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-02-CPHI-ENG1-V2/initial-tensors/CPHI-H306005-I1.bin",
+      "sha256": "03d88ad2044ea1337dc11f738f14c1f26d068e39e8f3349cbd800d8032d5478b"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-02-CPHI-ENG1-V2/initial-tensors/CPHI-H306005-I2.bin",
+      "sha256": "185bc43592affc1251c1b1050ee073071b8cee93171c6fb64e93a4dcbde5e4a4"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-02-CPHI-ENG1-V2/initial-tensors/CPHI-H306006-I0.bin",
+      "sha256": "3384edcd84c0282b85a9d5a3aad5237868cc78cd0dd458caff2a46b3a68de91c"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-02-CPHI-ENG1-V2/initial-tensors/CPHI-H306006-I1.bin",
+      "sha256": "d7e1e9bae64e5af84948919572b6b0b456edbd065ad09cf9848a22836a711b57"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-02-CPHI-ENG1-V2/initial-tensors/CPHI-H306006-I2.bin",
+      "sha256": "4d3d768f0e5689b0e5bf7d2130a05a05b6556ceb7ed097b966fb3342e5a6b967"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-02-CPHI-ENG1-V2/initial-tensors/CPHI-H306007-I0.bin",
+      "sha256": "02234608c8e76c4a8105c70c5578119aab08290c05bf05d42ea5cac3a3357021"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-02-CPHI-ENG1-V2/initial-tensors/CPHI-H306007-I1.bin",
+      "sha256": "2d9182bc78b03cf7656f1ea79cc3cf318b17ad090141af0dea3938149db25f95"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-02-CPHI-ENG1-V2/initial-tensors/CPHI-H306007-I2.bin",
+      "sha256": "f43d97720e6959db1d5883e09dd551b41966d9229da1f5a98a5f1ab4293e2c0e"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-02-CPHI-ENG1-V2/initial-tensors/CPHI-H306008-I0.bin",
+      "sha256": "40a3d880d77ff09e7cc46e871fa265556078215349888511773cc995c5d15b11"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-02-CPHI-ENG1-V2/initial-tensors/CPHI-H306008-I1.bin",
+      "sha256": "8683baa270da86d49f711395205de443bf9b3ef8e3e5e7de2548acc26265a4cb"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-02-CPHI-ENG1-V2/initial-tensors/CPHI-H306008-I2.bin",
+      "sha256": "5ea8f2466e04e5020df67e8ff3ad8f40df6ca1fbc88b74ce97cda4bc4f437019"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-02-CPHI-ENG1-V2/initial-tensors/CPHI-H306009-I0.bin",
+      "sha256": "4b015194a34ed9daa8b046dda9ca2689d08b626b7989ff4594213b7a394e15bb"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-02-CPHI-ENG1-V2/initial-tensors/CPHI-H306009-I1.bin",
+      "sha256": "251577345b4404ede0278d08754fc9cb35da54e9c7e59f1542d6063a722eb71e"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-02-CPHI-ENG1-V2/initial-tensors/CPHI-H306009-I2.bin",
+      "sha256": "8f12d351fb469027b8e5223894937912eec1e70c2713c02502b717377e8f24b1"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-02-CPHI-ENG1-V2/initial-tensors/CPHI-H306010-I0.bin",
+      "sha256": "39eb3026e8dfad94fc53c17fe83a37e61ce9ca2babbf76ef0786c7761d5334d4"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-02-CPHI-ENG1-V2/initial-tensors/CPHI-H306010-I1.bin",
+      "sha256": "a043f6f8673f21f5f0d9609fdd0d5f8701bd944b9eaaa97a485fe1fc746e9c03"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-02-CPHI-ENG1-V2/initial-tensors/CPHI-H306010-I2.bin",
+      "sha256": "e7f07fa97638aa248c2336294f29929d8d5509974f09abafa50204b12a2b0441"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-02-CPHI-ENG1-V2/initial-tensors/CPHI-H306011-I0.bin",
+      "sha256": "d51f0ca2e47aa397d7615256eecb0ddcab1609753071234e80ed99a553450d7a"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-02-CPHI-ENG1-V2/initial-tensors/CPHI-H306011-I1.bin",
+      "sha256": "e541ce9263ed6f051da7fc3a4cb11b115a50625cb4a3efc63f7a02138b420d22"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-02-CPHI-ENG1-V2/initial-tensors/CPHI-H306011-I2.bin",
+      "sha256": "d7f9005fdd726f2b345d9c2498af2e5d0fd836ed82c01f625fd3fa83bb838e4c"
+    },
+    {
+      "byte_length": 12239,
+      "path": "experiments/fly-reach-03/scripts/f4_symmetry_01_common.py",
+      "sha256": "47ddbeca65ee2b0a94f1712915c8df17fc5855fddfb160c1ac59b9bc48afbeca"
+    },
+    {
+      "byte_length": 3811,
+      "path": "experiments/fly-reach-03/scripts/f4_symmetry_01_model.py",
+      "sha256": "92e260bd0057115867bf69b343d8193bab141035f3338af4586c5e0af61c47f8"
+    },
+    {
+      "byte_length": 10956,
+      "path": "experiments/fly-reach-03/scripts/prepare_qualification.py",
+      "sha256": "d1de1bb9f1d0a82e0bd9ca3a9520a6d38e696fa686d0dbcda46bced17561923a"
+    }
+  ],
+  "source_manifest_canonical_sha256": "55116183bb73dc8df42d7427221c311fe88b3cabc82efb42695ab856f29bda2c",
+  "source_manifest_file_sha256": "7310de650f0efd5bb7ccb5342bf30e9cc8ae11a16da968e656512bda0e1b7305",
+  "source_manifest_path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-ENG1/SOURCE-INPUT-MANIFEST.json",
+  "status": "PASS",
+  "task_bank_created": false
+}

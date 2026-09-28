@@ -1,0 +1,30 @@
+{
+  "process_id": 47156,
+  "alias": "e009-large-v5",
+  "runtime_args": [
+    "--model",
+    "D:\\phoenix-models\\candidates\\ternary-bonsai-2-27b\\6ed5e12bf84b7a63069882c91dd9e9218647d17b\\Ternary-Bonsai-2-27B-PTQ1_0.gguf",
+    "--host",
+    "127.0.0.1",
+    "--port",
+    "18290",
+    "--alias",
+    "e009-large-v5",
+    "--ctx-size",
+    "4096",
+    "--n-gpu-layers",
+    "99",
+    "--reasoning",
+    "off"
+  ],
+  "reasoning_mode": "off",
+  "model_sha256": "53107f530aa52eb00912263ab1ee29bd199261c87cd7b4ad4ca1318c1fe33ee3",
+  "context_tokens": 4096,
+  "role": "large",
+  "gpu_layers": 99,
+  "runtime_sha256": "e0ea4fd53e6f0c741cbd28093b427f333ada0eb03b83073e1f99c483793ea976",
+  "runtime_path": "D:\\phoenix-runtimes\\prism-llama.cpp\\prism-b10685-7dffb15\\win-cuda-12.4\\runtime\\llama-server.exe",
+  "model_path": "D:\\phoenix-models\\candidates\\ternary-bonsai-2-27b\\6ed5e12bf84b7a63069882c91dd9e9218647d17b\\Ternary-Bonsai-2-27B-PTQ1_0.gguf",
+  "started_at": "2026-09-25T20:12:47.1670419Z",
+  "base_url": "http://127.0.0.1:18290"
+}

@@ -1,0 +1,15 @@
+{
+  "cause": "numeric (substrate_id, side_id) cell_order keys were queried with named (substrate, side) values",
+  "comparative_outcomes_emitted": false,
+  "error": "KeyError: ('fly', 'L')",
+  "fit_manifest_created": false,
+  "fits_executed": false,
+  "native_collector_rerun": false,
+  "original_validator_path": "C:\\code land\\clean-rust\\experiments\\fly-reach-03\\f4-presentation-03\\collect_native.py",
+  "original_validator_sha256": "82c7d807a6f99ebc4204efdf3edc9b8b36b6d16f5deff17e90a3175c04d47166",
+  "phase": "wrapper_predictor_order_audit",
+  "run_id": "F4-PRESENTATION-03-ENG1",
+  "schema": "F4-PRESENTATION-03-wrapper-validation-stop-v1",
+  "status": "PRESERVED_IMPLEMENTATION_STOP",
+  "truth_key_audit_had_run": false
+}

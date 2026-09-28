@@ -1,0 +1,42 @@
+{
+  "schema": "FAS_E4_0_CONTRACT_TOOLING_SOURCE_TESTS_V10",
+  "receipt_id": "E4_0_CONTRACT_TOOLING_V10_SOURCE_TESTS_V09",
+  "status": "PASS_SYNTHETIC_CONTRACT_AND_SOURCE_MAP_TESTS",
+  "commands": [
+    "python -m py_compile source/scripts/build_e4_0_source_map_v09.py source/scripts/finalize_e4_0_contract_v10.py source/scripts/seal_e4_0_contract_v10.py source/scripts/test_e4_0_contract_v10.py",
+    "python -m unittest experiments.fas-frozen-observer-bundle-engineering-v01.source.scripts.test_e4_0_contract_v10"
+  ],
+  "unit_test_count": 19,
+  "py_compile": "PASS",
+  "source_bindings": [
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/build_e4_0_source_map_v09.py",
+      "bytes": 39952,
+      "sha256": "b360b4f7cbbad3b5b5a40a095d24c22a1fb23992034c9477b75bbc3ef1cb71b8"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/finalize_e4_0_contract_v10.py",
+      "bytes": 32666,
+      "sha256": "8aea5c19ac837e2b84050b22fd038e34c7e19664c586fcb7829b7911cf553cf4"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/seal_e4_0_contract_v10.py",
+      "bytes": 12807,
+      "sha256": "f36db6dc6aa6b6788dd5bddb372d61015cadb530eb13d7899467fa4d897b036f"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/test_e4_0_contract_v10.py",
+      "bytes": 15546,
+      "sha256": "edf01c9c88597170c04f770af0fc7ab599234bfeaa88f810384b53c0cfc5d6b3"
+    }
+  ],
+  "runtime_access": {
+    "model_contact": false,
+    "tokenizer_contact": false,
+    "cuda_initialized": false,
+    "gpu_lease_acquired": false,
+    "truth_opened": false
+  },
+  "execution_authorization_conferred": false,
+  "recorded_utc": "2026-09-27T02:27:36.910259+00:00"
+}

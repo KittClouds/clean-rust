@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "state": "SEALED_BEFORE_MODEL_CONTACT",
+  "run_id": "e011-r1-20260925-candidate-canonicalization-01",
+  "created_utc": "2026-09-25T20:34:36.835443+00:00",
+  "input_lock_sha256": "0d9e9ddb3ff6d9a57c13ab586b4dac8dec6ac734fe5cc74ab02fb679a7a29d5a",
+  "code_sha256": {
+    "spec.md": "01861037c999a0bc83b8f7a8c9326e22dcd5d21d2c41c83f3f9098cfa0a0698a",
+    "scripts/prepare_repair.py": "253b82e9d2e300badfd5b5771caa1eae77d4135da4d509c44d9720ebbbb8ea6a",
+    "scripts/seal_repair_inputs.py": "22e791f99656ed33d163fef914d65858ae866673b96307de4483d1c5462d1efe",
+    "scripts/run_repair_observer.py": "ef179ef6bafe80e1eb92b99002c499a23935ea60f83d9dc7d4ef3e2186712993",
+    "scripts/seal_repair_outputs.py": "6a4e9cf109e28f18434c9abc539d0133b974afaaac1d01c5b8144428f6a231d7",
+    "scripts/score_repair.py": "dda3845a4e0b96f7880b40064cd3d0d70ffcebe96165b3b7ca2b20ccad4c9dc7",
+    "scripts/start_repair_observer.ps1": "fe63bedc05c55e19032a5eaab62cb3a70104f3e1e704aae9e25e19eb41c4e387",
+    "scripts/stop_repair_observer.ps1": "b8a3e09bf3cd9ee42871f15d0324a4f5b4008e42a84374ecbbcf5a49f0237005",
+    "adapter/Cargo.toml": "83b321613d6f69c242ba4c166aa4b9a5517f01d3b43171406cd29797f030d67b",
+    "adapter/Cargo.lock": "2091b6e64039d921a659b78030aea4812bcf68f412e8f3c29d237b3fd330498c",
+    "adapter/src/lib.rs": "5c24ad00ab53fbe4df9db15f0df4dda75378ba5ac332741b570d2b93886c3147",
+    "adapter/src/main.rs": "9b03bfec882e5a20b7f111497d71df936e17279d2a48b98dbfb6dd0854995fab",
+    "rdc-candidate-canonicalizer.exe": "493364e572511cc0198b295d1703aee94af6155a6d8668a191645f334ebc69d7"
+  },
+  "canonical_frame_lock_sha256": "0f2c5d570b7c1f7a4c9eaf38ba14142246803490d1c7b6a3c6c7eef1afcdc2e8",
+  "model_contact_started": false,
+  "authority_mode": "shadow-only"
+}

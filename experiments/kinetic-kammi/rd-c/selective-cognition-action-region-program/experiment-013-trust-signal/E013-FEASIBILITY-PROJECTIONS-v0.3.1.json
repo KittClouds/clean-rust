@@ -1,0 +1,425 @@
+{
+  "E012_yield": {
+    "all": {
+      "correct": 7,
+      "no_proposal": 30,
+      "tasks": 48,
+      "wrong": 11
+    },
+    "candidate_selection": {
+      "correct": 7,
+      "no_proposal": 24,
+      "tasks": 40,
+      "wrong": 9
+    },
+    "empty_valid": {
+      "correct": 0,
+      "no_proposal": 6,
+      "tasks": 8,
+      "wrong": 2
+    }
+  },
+  "E013_model_contact": false,
+  "artifact_id": "E013-FEASIBILITY-PROJECTIONS-v0.3.1",
+  "bank_owner": "USER",
+  "banks": {
+    "C": {
+      "E012_stratum_standardized_sensitivity_only": {
+        "T1_screen_jobs": 1753.6,
+        "T2_full_small_call_proxy_seconds": 318.42337339999995,
+        "T2_small_evaluations": 1315.1999999999998,
+        "T3_candidate_score_evaluations": 1753.6,
+        "T3_full_small_call_proxy_seconds_not_teacher_forced_actual": 424.56449786666656,
+        "T4_full_small_call_proxy_seconds": 1273.6934935999998,
+        "T4_pairwise_evaluations": 5260.799999999999,
+        "expected_correct_raw": 184.79999999999998,
+        "expected_no_proposal": 681.5999999999999,
+        "expected_nonnull": 438.4,
+        "expected_wrong_raw": 253.6,
+        "p_correct": 0.16499999999999998,
+        "p_no_proposal": 0.6085714285714285,
+        "p_wrong": 0.22642857142857142,
+        "prob_T5_at_least_100_correct_and_wrong": 0.9999999999998622,
+        "tasks": 1120
+      },
+      "design": {
+        "candidate_selection": 1056,
+        "empty_valid": 64,
+        "tasks": 1120
+      },
+      "nominal_assumption": {
+        "T1_screen_jobs": 2240.0,
+        "T2_full_small_call_proxy_seconds": 406.74518499999994,
+        "T2_small_evaluations": 1680.0,
+        "T3_candidate_score_evaluations": 2240.0,
+        "T3_full_small_call_proxy_seconds_not_teacher_forced_actual": 542.3269133333333,
+        "T4_full_small_call_proxy_seconds": 1626.9807399999997,
+        "T4_pairwise_evaluations": 6720.0,
+        "expected_correct_raw": 280.0,
+        "expected_no_proposal": 560.0,
+        "expected_nonnull": 560.0,
+        "expected_wrong_raw": 280.0,
+        "p_correct": 0.25,
+        "p_no_proposal": 0.5,
+        "p_wrong": 0.25,
+        "prob_T5_at_least_100_correct_and_wrong": 0.9999999999999852,
+        "tasks": 1120
+      },
+      "pooled_E012_conservative": {
+        "T1_screen_jobs": 1680.0,
+        "T2_full_small_call_proxy_seconds": 305.05888875,
+        "T2_small_evaluations": 1260.0,
+        "T3_candidate_score_evaluations": 1680.0,
+        "T3_full_small_call_proxy_seconds_not_teacher_forced_actual": 406.74518499999994,
+        "T4_full_small_call_proxy_seconds": 1220.235555,
+        "T4_pairwise_evaluations": 5040.0,
+        "expected_correct_raw": 163.33333333333334,
+        "expected_no_proposal": 700.0,
+        "expected_nonnull": 420.0,
+        "expected_wrong_raw": 256.66666666666663,
+        "p_correct": 0.14583333333333334,
+        "p_no_proposal": 0.625,
+        "p_wrong": 0.22916666666666666,
+        "prob_T5_at_least_100_correct_and_wrong": 0.9999999955651878,
+        "tasks": 1120
+      }
+    },
+    "D": {
+      "E012_stratum_standardized_sensitivity_only": {
+        "T1_screen_jobs": 1353.6,
+        "T2_full_small_call_proxy_seconds": 245.79030464999994,
+        "T2_small_evaluations": 1015.1999999999999,
+        "T3_candidate_score_evaluations": 1353.6,
+        "T3_full_small_call_proxy_seconds_not_teacher_forced_actual": 327.72040619999996,
+        "T4_full_small_call_proxy_seconds": 983.1612185999998,
+        "T4_pairwise_evaluations": 4060.7999999999997,
+        "expected_correct_raw": 142.79999999999998,
+        "expected_no_proposal": 525.6,
+        "expected_nonnull": 338.4,
+        "expected_wrong_raw": 195.6,
+        "p_correct": 0.16527777777777775,
+        "p_no_proposal": 0.6083333333333334,
+        "p_wrong": 0.2263888888888889,
+        "prob_T5_at_least_100_correct_and_wrong": 0.999982824646966,
+        "tasks": 864
+      },
+      "design": {
+        "candidate_selection": 816,
+        "empty_valid": 48,
+        "tasks": 864
+      },
+      "nominal_assumption": {
+        "T1_screen_jobs": 1728.0,
+        "T2_full_small_call_proxy_seconds": 313.77485699999994,
+        "T2_small_evaluations": 1296.0,
+        "T3_candidate_score_evaluations": 1728.0,
+        "T3_full_small_call_proxy_seconds_not_teacher_forced_actual": 418.366476,
+        "T4_full_small_call_proxy_seconds": 1255.0994279999998,
+        "T4_pairwise_evaluations": 5184.0,
+        "expected_correct_raw": 216.0,
+        "expected_no_proposal": 432.0,
+        "expected_nonnull": 432.0,
+        "expected_wrong_raw": 216.0,
+        "p_correct": 0.25,
+        "p_no_proposal": 0.5,
+        "p_wrong": 0.25,
+        "prob_T5_at_least_100_correct_and_wrong": 0.9999999999999876,
+        "tasks": 864
+      },
+      "pooled_E012_conservative": {
+        "T1_screen_jobs": 1296.0,
+        "T2_full_small_call_proxy_seconds": 235.33114274999997,
+        "T2_small_evaluations": 972.0,
+        "T3_candidate_score_evaluations": 1296.0,
+        "T3_full_small_call_proxy_seconds_not_teacher_forced_actual": 313.77485699999994,
+        "T4_full_small_call_proxy_seconds": 941.3245709999999,
+        "T4_pairwise_evaluations": 3888.0,
+        "expected_correct_raw": 126.00000000000001,
+        "expected_no_proposal": 540.0,
+        "expected_nonnull": 324.0,
+        "expected_wrong_raw": 198.0,
+        "p_correct": 0.14583333333333334,
+        "p_no_proposal": 0.625,
+        "p_wrong": 0.22916666666666666,
+        "prob_T5_at_least_100_correct_and_wrong": 0.9956620479042714,
+        "tasks": 864
+      }
+    }
+  },
+  "banks_built_by_agent": false,
+  "confirmation_support": {
+    "C1120": [
+      {
+        "P_at_least_59_CP_only": 1.0,
+        "P_at_least_60_combined_zero_error_gate": 1.0,
+        "P_at_least_93_one_error_support": 0.9999999999396199,
+        "expected_correct_accepts": 163.33333333333334,
+        "recall": 1.0,
+        "scenario": "E012_pooled_conservative",
+        "tasks": 1120
+      },
+      {
+        "P_at_least_59_CP_only": 0.9972629713647158,
+        "P_at_least_60_combined_zero_error_gate": 0.9959856064911748,
+        "P_at_least_93_one_error_support": 0.10804600890672511,
+        "expected_correct_accepts": 81.66666666666667,
+        "recall": 0.5,
+        "scenario": "E012_pooled_conservative",
+        "tasks": 1120
+      },
+      {
+        "P_at_least_59_CP_only": 0.9999999990775373,
+        "P_at_least_60_combined_zero_error_gate": 0.9999999980814875,
+        "P_at_least_93_one_error_support": 0.9863631677846693,
+        "expected_correct_accepts": 114.33333333333333,
+        "recall": 0.7,
+        "scenario": "E012_pooled_conservative",
+        "tasks": 1120
+      },
+      {
+        "P_at_least_59_CP_only": 1.0,
+        "P_at_least_60_combined_zero_error_gate": 1.0,
+        "P_at_least_93_one_error_support": 0.9999998443107123,
+        "expected_correct_accepts": 147.0,
+        "recall": 0.9,
+        "scenario": "E012_pooled_conservative",
+        "tasks": 1120
+      },
+      {
+        "P_at_least_59_CP_only": 1.0,
+        "P_at_least_60_combined_zero_error_gate": 1.0,
+        "P_at_least_93_one_error_support": 1.0,
+        "expected_correct_accepts": 280.0,
+        "recall": 1.0,
+        "scenario": "nominal",
+        "tasks": 1120
+      },
+      {
+        "P_at_least_59_CP_only": 0.9999999999999999,
+        "P_at_least_60_combined_zero_error_gate": 0.9999999999999997,
+        "P_at_least_93_one_error_support": 0.9999969933719117,
+        "expected_correct_accepts": 140.0,
+        "recall": 0.5,
+        "scenario": "nominal",
+        "tasks": 1120
+      },
+      {
+        "P_at_least_59_CP_only": 1.0,
+        "P_at_least_60_combined_zero_error_gate": 1.0,
+        "P_at_least_93_one_error_support": 1.0,
+        "expected_correct_accepts": 196.0,
+        "recall": 0.7,
+        "scenario": "nominal",
+        "tasks": 1120
+      },
+      {
+        "P_at_least_59_CP_only": 1.0,
+        "P_at_least_60_combined_zero_error_gate": 1.0,
+        "P_at_least_93_one_error_support": 1.0,
+        "expected_correct_accepts": 252.0,
+        "recall": 0.9,
+        "scenario": "nominal",
+        "tasks": 1120
+      }
+    ],
+    "old_512_comparison": {
+      "P_at_least_59_CP_only": 0.9810511748635307,
+      "P_at_least_59_at_70pct_recall": 0.18046970223042946,
+      "P_at_least_60_at_70pct_recall": 0.14586208347422558,
+      "P_at_least_60_combined_zero_error_gate": 0.9739509669172152
+    }
+  },
+  "exact_gate": {
+    "CP_only_zero_error_minimum": 59,
+    "combined_zero_error_minimum": 60,
+    "epsilon": 0.05,
+    "minimums_by_errors": [
+      {
+        "errors": 0,
+        "min_n": 59,
+        "upper_error_bound": 0.049507609888226944
+      },
+      {
+        "errors": 1,
+        "min_n": 93,
+        "upper_error_bound": 0.0499939783879883
+      },
+      {
+        "errors": 2,
+        "min_n": 124,
+        "upper_error_bound": 0.049900171228312085
+      },
+      {
+        "errors": 3,
+        "min_n": 153,
+        "upper_error_bound": 0.04989503037896342
+      },
+      {
+        "errors": 4,
+        "min_n": 181,
+        "upper_error_bound": 0.049855317948884814
+      }
+    ],
+    "n_min": 60
+  },
+  "fixed_recall_FAR": {
+    "E012_pooled_C1120": [
+      {
+        "actual_gate_uses_realized_integer_counts": true,
+        "asymptotic_FAR_ceiling_for_5pct_empirical_risk": 6.045454545454545,
+        "expected_correct_accepts": 81.66666666666667,
+        "expected_wrong_raw_pool": 256.66666666666663,
+        "finite_gate_FAR_among_wrong_raw_pool": 0.0,
+        "max_wrong_accepts_at_rounded_expected_support": 0,
+        "rounded_expected_correct_accepts_for_gate_illustration": 82,
+        "scenario": "E012_pooled",
+        "target_correct_proposal_recall": 0.5
+      },
+      {
+        "actual_gate_uses_realized_integer_counts": true,
+        "asymptotic_FAR_ceiling_for_5pct_empirical_risk": 8.463636363636363,
+        "expected_correct_accepts": 114.33333333333333,
+        "expected_wrong_raw_pool": 256.66666666666663,
+        "finite_gate_FAR_among_wrong_raw_pool": 0.0038961038961038965,
+        "max_wrong_accepts_at_rounded_expected_support": 1,
+        "rounded_expected_correct_accepts_for_gate_illustration": 114,
+        "scenario": "E012_pooled",
+        "target_correct_proposal_recall": 0.7
+      },
+      {
+        "actual_gate_uses_realized_integer_counts": true,
+        "asymptotic_FAR_ceiling_for_5pct_empirical_risk": 10.881818181818181,
+        "expected_correct_accepts": 147.0,
+        "expected_wrong_raw_pool": 256.66666666666663,
+        "finite_gate_FAR_among_wrong_raw_pool": 0.007792207792207793,
+        "max_wrong_accepts_at_rounded_expected_support": 2,
+        "rounded_expected_correct_accepts_for_gate_illustration": 147,
+        "scenario": "E012_pooled",
+        "target_correct_proposal_recall": 0.9
+      }
+    ],
+    "E012_stratum_sensitivity_C1120": [
+      {
+        "actual_gate_uses_realized_integer_counts": true,
+        "asymptotic_FAR_ceiling_for_5pct_empirical_risk": 6.9227129337539415,
+        "expected_correct_accepts": 92.39999999999999,
+        "expected_wrong_raw_pool": 253.6,
+        "finite_gate_FAR_among_wrong_raw_pool": 0.003943217665615142,
+        "max_wrong_accepts_at_rounded_expected_support": 1,
+        "rounded_expected_correct_accepts_for_gate_illustration": 92,
+        "scenario": "E012_stratum_standardized",
+        "target_correct_proposal_recall": 0.5
+      },
+      {
+        "actual_gate_uses_realized_integer_counts": true,
+        "asymptotic_FAR_ceiling_for_5pct_empirical_risk": 9.691798107255517,
+        "expected_correct_accepts": 129.35999999999999,
+        "expected_wrong_raw_pool": 253.6,
+        "finite_gate_FAR_among_wrong_raw_pool": 0.007886435331230283,
+        "max_wrong_accepts_at_rounded_expected_support": 2,
+        "rounded_expected_correct_accepts_for_gate_illustration": 129,
+        "scenario": "E012_stratum_standardized",
+        "target_correct_proposal_recall": 0.7
+      },
+      {
+        "actual_gate_uses_realized_integer_counts": true,
+        "asymptotic_FAR_ceiling_for_5pct_empirical_risk": 12.460883280757095,
+        "expected_correct_accepts": 166.32,
+        "expected_wrong_raw_pool": 253.6,
+        "finite_gate_FAR_among_wrong_raw_pool": 0.011829652996845427,
+        "max_wrong_accepts_at_rounded_expected_support": 3,
+        "rounded_expected_correct_accepts_for_gate_illustration": 166,
+        "scenario": "E012_stratum_standardized",
+        "target_correct_proposal_recall": 0.9
+      }
+    ],
+    "nominal_C1120": [
+      {
+        "actual_gate_uses_realized_integer_counts": true,
+        "asymptotic_FAR_ceiling_for_5pct_empirical_risk": 9.499999999999998,
+        "expected_correct_accepts": 140.0,
+        "expected_wrong_raw_pool": 280.0,
+        "finite_gate_FAR_among_wrong_raw_pool": 0.007142857142857143,
+        "max_wrong_accepts_at_rounded_expected_support": 2,
+        "rounded_expected_correct_accepts_for_gate_illustration": 140,
+        "scenario": "nominal",
+        "target_correct_proposal_recall": 0.5
+      },
+      {
+        "actual_gate_uses_realized_integer_counts": true,
+        "asymptotic_FAR_ceiling_for_5pct_empirical_risk": 13.299999999999997,
+        "expected_correct_accepts": 196.0,
+        "expected_wrong_raw_pool": 280.0,
+        "finite_gate_FAR_among_wrong_raw_pool": 0.014285714285714285,
+        "max_wrong_accepts_at_rounded_expected_support": 4,
+        "rounded_expected_correct_accepts_for_gate_illustration": 196,
+        "scenario": "nominal",
+        "target_correct_proposal_recall": 0.7
+      },
+      {
+        "actual_gate_uses_realized_integer_counts": true,
+        "asymptotic_FAR_ceiling_for_5pct_empirical_risk": 17.099999999999998,
+        "expected_correct_accepts": 252.0,
+        "expected_wrong_raw_pool": 280.0,
+        "finite_gate_FAR_among_wrong_raw_pool": 0.02142857142857143,
+        "max_wrong_accepts_at_rounded_expected_support": 6,
+        "rounded_expected_correct_accepts_for_gate_illustration": 252,
+        "scenario": "nominal",
+        "target_correct_proposal_recall": 0.9
+      }
+    ]
+  },
+  "planning_scenarios": {
+    "iid_limitation": "planning probabilities ignore repository/family clustering",
+    "nominal_not_empirical": "25% correct, 25% wrong, 50% no-proposal",
+    "pooled_E012_is_conservative_reference": "applies 7/48 correct, 11/48 wrong, 30/48 no-proposal to every bank task",
+    "stratum_standardized_sensitivity": "reweights E012 candidate-selection and empty-valid rates to E013 fixed strata; not an E013 yield claim"
+  },
+  "positive_control": {
+    "E013_C_scale_ratio": 17.5,
+    "E013_D_scale_ratio": 13.5,
+    "c_use": "lineage only; does not update E013 planning projections or bank construction",
+    "criterion": "at least 8 accepts and >=80% observed precision per cohort; coarse recurrence diagnostic only",
+    "id": "E012-PC-01-v1.2",
+    "tasks": 64
+  },
+  "schema_version": 1,
+  "time_planning": {
+    "E012_nonnull_rate": 0.375,
+    "break_even_headroom": [
+      {
+        "assumes_zero_wrong_accepts_and_excludes_semantic_harm": true,
+        "correct_proposal_recall": 0.5,
+        "large_time_saved_ms_per_task": 224.3341254340278,
+        "remaining_budget_ms_per_nonnull_proposal_at_E012_rate": -47.402943287036884,
+        "remaining_trust_and_screen_budget_ms_per_task": -17.77610373263883,
+        "small_base_call_ms_per_task": 242.11022916666664
+      },
+      {
+        "assumes_zero_wrong_accepts_and_excludes_semantic_harm": true,
+        "correct_proposal_recall": 0.7,
+        "large_time_saved_ms_per_task": 314.0677756076389,
+        "remaining_budget_ms_per_nonnull_proposal_at_E012_rate": 191.88679050925938,
+        "remaining_trust_and_screen_budget_ms_per_task": 71.95754644097227,
+        "small_base_call_ms_per_task": 242.11022916666664
+      },
+      {
+        "assumes_zero_wrong_accepts_and_excludes_semantic_harm": true,
+        "correct_proposal_recall": 0.9,
+        "large_time_saved_ms_per_task": 403.8014257812501,
+        "remaining_budget_ms_per_nonnull_proposal_at_E012_rate": 431.17652430555586,
+        "remaining_trust_and_screen_budget_ms_per_task": 161.69119661458345,
+        "small_base_call_ms_per_task": 242.11022916666664
+      }
+    ],
+    "full_call_equivalent_ms_per_task": {
+      "T1_runtime_screen_cost": "UNMEASURED; must be timed and charged",
+      "T2_three_extra_small_evals": 272.3740078125,
+      "T3_four_small_full_calls_not_actual_teacher_forced_cost": 363.16534375,
+      "T4_twelve_extra_small_evals": 1089.49603125,
+      "T5_extra_model_calls_if_inline_hook_passes_identity": 0
+    },
+    "large_full_call_ms": 3076.582291666667,
+    "small_full_call_ms": 242.11022916666664
+  }
+}

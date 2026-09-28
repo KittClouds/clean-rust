@@ -1,0 +1,1181 @@
+{
+  "block_ids": [
+    304000,
+    304001,
+    304002,
+    304003,
+    304004,
+    304005,
+    304006,
+    304007
+  ],
+  "comparative_metrics_emitted": false,
+  "expected_stream_count": 144,
+  "measured_namespace_created": false,
+  "p_forward_fixture_comparisons": 192,
+  "p_forward_fixture_status": "PASS",
+  "predictor_bytes": 5588996,
+  "predictor_sha256": "41bb93ca9a20036aaff513f220b7511442b83eb22d12cac9709adc1fc839e525",
+  "row_count": 16342,
+  "runtime_seconds": 203.9509539,
+  "schema": "F4-SYMMETRY-03-native-collection-v1",
+  "status": "PASS",
+  "stream_count": 144,
+  "streams": [
+    {
+      "block_id": 304000,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "fly"
+    },
+    {
+      "block_id": 304001,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "fly"
+    },
+    {
+      "block_id": 304002,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "fly"
+    },
+    {
+      "block_id": 304003,
+      "ordered_key_sha256": "be949504a3fd04a4de5e5566749bfd4b672306a98fece953d325d0a01cef0860",
+      "rows": 1345,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "fly"
+    },
+    {
+      "block_id": 304004,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "fly"
+    },
+    {
+      "block_id": 304005,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "fly"
+    },
+    {
+      "block_id": 304006,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "fly"
+    },
+    {
+      "block_id": 304007,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "fly"
+    },
+    {
+      "block_id": 304000,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "fly"
+    },
+    {
+      "block_id": 304001,
+      "ordered_key_sha256": "6c3d64a8df19ed27cc56ad47bbd7e44a7a1d72b22d61a3bf233383cb9cf4bbee",
+      "rows": 7,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "fly"
+    },
+    {
+      "block_id": 304002,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "fly"
+    },
+    {
+      "block_id": 304003,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "fly"
+    },
+    {
+      "block_id": 304004,
+      "ordered_key_sha256": "709199603f9810b0db841e47be864449ed8e7edd8ad2196ae86131e7af2353a6",
+      "rows": 1709,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "fly"
+    },
+    {
+      "block_id": 304005,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "fly"
+    },
+    {
+      "block_id": 304006,
+      "ordered_key_sha256": "1e707aa07e753c9d2f8cde7f0bf2958b6a99fc6cd0d78f85b402c9d20079482e",
+      "rows": 28,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "fly"
+    },
+    {
+      "block_id": 304007,
+      "ordered_key_sha256": "f4917d624f173f61c700b54511de740277261a7bc51d96adf23c1816467fc054",
+      "rows": 135,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "fly"
+    },
+    {
+      "block_id": 304000,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g001"
+    },
+    {
+      "block_id": 304001,
+      "ordered_key_sha256": "0e4ddfc9336fddb1b25f4f7f30915441e56f8d0f57798d99a906f0251b8975af",
+      "rows": 479,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g001"
+    },
+    {
+      "block_id": 304002,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g001"
+    },
+    {
+      "block_id": 304003,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g001"
+    },
+    {
+      "block_id": 304004,
+      "ordered_key_sha256": "2a7e1e956ef7014a0041da2220b1ad24df5bf245e571a6c2d9ce2ee14c2b1fad",
+      "rows": 771,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g001"
+    },
+    {
+      "block_id": 304005,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g001"
+    },
+    {
+      "block_id": 304006,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g001"
+    },
+    {
+      "block_id": 304007,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g001"
+    },
+    {
+      "block_id": 304000,
+      "ordered_key_sha256": "2e4b3ccf235825cbac69f5cea5113cecef308358497a4bdc49d73f2d072314bb",
+      "rows": 1006,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g001"
+    },
+    {
+      "block_id": 304001,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g001"
+    },
+    {
+      "block_id": 304002,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g001"
+    },
+    {
+      "block_id": 304003,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g001"
+    },
+    {
+      "block_id": 304004,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g001"
+    },
+    {
+      "block_id": 304005,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g001"
+    },
+    {
+      "block_id": 304006,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g001"
+    },
+    {
+      "block_id": 304007,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g001"
+    },
+    {
+      "block_id": 304000,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g002"
+    },
+    {
+      "block_id": 304001,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g002"
+    },
+    {
+      "block_id": 304002,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g002"
+    },
+    {
+      "block_id": 304003,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g002"
+    },
+    {
+      "block_id": 304004,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g002"
+    },
+    {
+      "block_id": 304005,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g002"
+    },
+    {
+      "block_id": 304006,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g002"
+    },
+    {
+      "block_id": 304007,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g002"
+    },
+    {
+      "block_id": 304000,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g002"
+    },
+    {
+      "block_id": 304001,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g002"
+    },
+    {
+      "block_id": 304002,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g002"
+    },
+    {
+      "block_id": 304003,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g002"
+    },
+    {
+      "block_id": 304004,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g002"
+    },
+    {
+      "block_id": 304005,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g002"
+    },
+    {
+      "block_id": 304006,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g002"
+    },
+    {
+      "block_id": 304007,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g002"
+    },
+    {
+      "block_id": 304000,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g003"
+    },
+    {
+      "block_id": 304001,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g003"
+    },
+    {
+      "block_id": 304002,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g003"
+    },
+    {
+      "block_id": 304003,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g003"
+    },
+    {
+      "block_id": 304004,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g003"
+    },
+    {
+      "block_id": 304005,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g003"
+    },
+    {
+      "block_id": 304006,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g003"
+    },
+    {
+      "block_id": 304007,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g003"
+    },
+    {
+      "block_id": 304000,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g003"
+    },
+    {
+      "block_id": 304001,
+      "ordered_key_sha256": "137b5cbcd9c16a5ef23734916e91131f2559500b7315a1d16c3a455285e87b06",
+      "rows": 240,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g003"
+    },
+    {
+      "block_id": 304002,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g003"
+    },
+    {
+      "block_id": 304003,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g003"
+    },
+    {
+      "block_id": 304004,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g003"
+    },
+    {
+      "block_id": 304005,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g003"
+    },
+    {
+      "block_id": 304006,
+      "ordered_key_sha256": "4be910d8e29bb0b9981153bda187156fef790370ffa31540af12cfe859c52d43",
+      "rows": 1865,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g003"
+    },
+    {
+      "block_id": 304007,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g003"
+    },
+    {
+      "block_id": 304000,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g004"
+    },
+    {
+      "block_id": 304001,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g004"
+    },
+    {
+      "block_id": 304002,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g004"
+    },
+    {
+      "block_id": 304003,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g004"
+    },
+    {
+      "block_id": 304004,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g004"
+    },
+    {
+      "block_id": 304005,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g004"
+    },
+    {
+      "block_id": 304006,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g004"
+    },
+    {
+      "block_id": 304007,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g004"
+    },
+    {
+      "block_id": 304000,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g004"
+    },
+    {
+      "block_id": 304001,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g004"
+    },
+    {
+      "block_id": 304002,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g004"
+    },
+    {
+      "block_id": 304003,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g004"
+    },
+    {
+      "block_id": 304004,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g004"
+    },
+    {
+      "block_id": 304005,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g004"
+    },
+    {
+      "block_id": 304006,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g004"
+    },
+    {
+      "block_id": 304007,
+      "ordered_key_sha256": "e7691499f1123f57af738d7469f347488eda3b7e04269ed67f1ca9da914b93b4",
+      "rows": 86,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g004"
+    },
+    {
+      "block_id": 304000,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g005"
+    },
+    {
+      "block_id": 304001,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g005"
+    },
+    {
+      "block_id": 304002,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g005"
+    },
+    {
+      "block_id": 304003,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g005"
+    },
+    {
+      "block_id": 304004,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g005"
+    },
+    {
+      "block_id": 304005,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g005"
+    },
+    {
+      "block_id": 304006,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g005"
+    },
+    {
+      "block_id": 304007,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g005"
+    },
+    {
+      "block_id": 304000,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g005"
+    },
+    {
+      "block_id": 304001,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g005"
+    },
+    {
+      "block_id": 304002,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g005"
+    },
+    {
+      "block_id": 304003,
+      "ordered_key_sha256": "2a3c5954398882434d837082d39a6d51b3ba569df2b186ce2356a802613fab53",
+      "rows": 512,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g005"
+    },
+    {
+      "block_id": 304004,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g005"
+    },
+    {
+      "block_id": 304005,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g005"
+    },
+    {
+      "block_id": 304006,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g005"
+    },
+    {
+      "block_id": 304007,
+      "ordered_key_sha256": "b979ed3b344f772c0ca2425ea8394a974dbc18943082c22f86d56e84b51d0588",
+      "rows": 387,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g005"
+    },
+    {
+      "block_id": 304000,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g006"
+    },
+    {
+      "block_id": 304001,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g006"
+    },
+    {
+      "block_id": 304002,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g006"
+    },
+    {
+      "block_id": 304003,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g006"
+    },
+    {
+      "block_id": 304004,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g006"
+    },
+    {
+      "block_id": 304005,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g006"
+    },
+    {
+      "block_id": 304006,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g006"
+    },
+    {
+      "block_id": 304007,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g006"
+    },
+    {
+      "block_id": 304000,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g006"
+    },
+    {
+      "block_id": 304001,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g006"
+    },
+    {
+      "block_id": 304002,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g006"
+    },
+    {
+      "block_id": 304003,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g006"
+    },
+    {
+      "block_id": 304004,
+      "ordered_key_sha256": "525e015a4d593e8e02ea4ac11a48daa5b48d779268d98eed10755b29724e0f09",
+      "rows": 1028,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g006"
+    },
+    {
+      "block_id": 304005,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g006"
+    },
+    {
+      "block_id": 304006,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g006"
+    },
+    {
+      "block_id": 304007,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g006"
+    },
+    {
+      "block_id": 304000,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g007"
+    },
+    {
+      "block_id": 304001,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g007"
+    },
+    {
+      "block_id": 304002,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g007"
+    },
+    {
+      "block_id": 304003,
+      "ordered_key_sha256": "cb3ca441df3b5e0c862a69d6672a61f04a99eb8e0f88710c6b330709fbd9290d",
+      "rows": 1555,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g007"
+    },
+    {
+      "block_id": 304004,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g007"
+    },
+    {
+      "block_id": 304005,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g007"
+    },
+    {
+      "block_id": 304006,
+      "ordered_key_sha256": "211f0e3f6fc319081c85cafbdff57e048f6481e06f3cb087375010fb38900cf4",
+      "rows": 914,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g007"
+    },
+    {
+      "block_id": 304007,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g007"
+    },
+    {
+      "block_id": 304000,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g007"
+    },
+    {
+      "block_id": 304001,
+      "ordered_key_sha256": "66c9dbe1158ee9051b414d5ea032bb9d1db5312b51bf6af15de3783bb36dcc81",
+      "rows": 973,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g007"
+    },
+    {
+      "block_id": 304002,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g007"
+    },
+    {
+      "block_id": 304003,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g007"
+    },
+    {
+      "block_id": 304004,
+      "ordered_key_sha256": "5eff658531834c2f4ded158be1d48566c516cfbcb425a79b6eb8ebeb23b60d3a",
+      "rows": 24,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g007"
+    },
+    {
+      "block_id": 304005,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g007"
+    },
+    {
+      "block_id": 304006,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g007"
+    },
+    {
+      "block_id": 304007,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g007"
+    },
+    {
+      "block_id": 304000,
+      "ordered_key_sha256": "e7486564d04ac30347449aab46cbc094c951f9ef2beaf81336b2563e6f6d27d4",
+      "rows": 1327,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g008"
+    },
+    {
+      "block_id": 304001,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g008"
+    },
+    {
+      "block_id": 304002,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g008"
+    },
+    {
+      "block_id": 304003,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g008"
+    },
+    {
+      "block_id": 304004,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g008"
+    },
+    {
+      "block_id": 304005,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g008"
+    },
+    {
+      "block_id": 304006,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g008"
+    },
+    {
+      "block_id": 304007,
+      "ordered_key_sha256": "1ef33278952dc1eb2870f5a42e61810c1c89652ba33475219f8ea34f6e651a45",
+      "rows": 520,
+      "side": "L",
+      "status": "PASS",
+      "substrate": "g008"
+    },
+    {
+      "block_id": 304000,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g008"
+    },
+    {
+      "block_id": 304001,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g008"
+    },
+    {
+      "block_id": 304002,
+      "ordered_key_sha256": "18304711ac6a98cb5dabe957e38be3dcb8b904dcfb48282f847c1717589e7ec1",
+      "rows": 422,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g008"
+    },
+    {
+      "block_id": 304003,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g008"
+    },
+    {
+      "block_id": 304004,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g008"
+    },
+    {
+      "block_id": 304005,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g008"
+    },
+    {
+      "block_id": 304006,
+      "ordered_key_sha256": "2fa4a8a9502c6837cf1088adc7ad1d67e59c64d5c4b1cae5f9e864b1b39846f5",
+      "rows": 1009,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g008"
+    },
+    {
+      "block_id": 304007,
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rows": 0,
+      "side": "R",
+      "status": "PASS",
+      "substrate": "g008"
+    }
+  ],
+  "target_read_for_Ustar_collection": true,
+  "truth_bytes": 637370,
+  "truth_sha256": "4f0609d5f80f43c7f3d5eefefb496c0329e21c50430f08b7b74b826bd307a218"
+}

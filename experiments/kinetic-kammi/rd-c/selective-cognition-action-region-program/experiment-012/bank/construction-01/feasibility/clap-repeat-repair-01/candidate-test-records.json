@@ -1,0 +1,182 @@
+[
+  {
+    "candidate_id": 35639,
+    "candidate_role_hidden": "append_all",
+    "case_id": "case-01",
+    "exit_code": 0,
+    "passed": true,
+    "stdout": "\nrunning 1 test\ntest check_contract ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "   Compiling e012-clap-repeat-harness v0.1.0 (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\task-harnesses\\clap-repeat-repair-01)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.91s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\clap-harness\\debug\\deps\\contract-90f7b68a8528048b.exe)\n"
+  },
+  {
+    "candidate_id": 35639,
+    "candidate_role_hidden": "append_all",
+    "case_id": "case-02",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (23908) panicked at tests\\contract.rs:14:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.07s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\clap-harness\\debug\\deps\\contract-90f7b68a8528048b.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 35639,
+    "candidate_role_hidden": "append_all",
+    "case_id": "case-03",
+    "exit_code": 0,
+    "passed": true,
+    "stdout": "\nrunning 1 test\ntest check_contract ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.06s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\clap-harness\\debug\\deps\\contract-90f7b68a8528048b.exe)\n"
+  },
+  {
+    "candidate_id": 35639,
+    "candidate_role_hidden": "append_all",
+    "case_id": "case-04",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (31296) panicked at tests\\contract.rs:14:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.07s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\clap-harness\\debug\\deps\\contract-90f7b68a8528048b.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 27088,
+    "candidate_role_hidden": "last_value_wins",
+    "case_id": "case-01",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (12212) panicked at tests\\contract.rs:14:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "   Compiling e012-clap-repeat-harness v0.1.0 (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\task-harnesses\\clap-repeat-repair-01)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.41s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\clap-harness\\debug\\deps\\contract-90f7b68a8528048b.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 27088,
+    "candidate_role_hidden": "last_value_wins",
+    "case_id": "case-02",
+    "exit_code": 0,
+    "passed": true,
+    "stdout": "\nrunning 1 test\ntest check_contract ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.07s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\clap-harness\\debug\\deps\\contract-90f7b68a8528048b.exe)\n"
+  },
+  {
+    "candidate_id": 27088,
+    "candidate_role_hidden": "last_value_wins",
+    "case_id": "case-03",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (30876) panicked at tests\\contract.rs:14:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.08s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\clap-harness\\debug\\deps\\contract-90f7b68a8528048b.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 27088,
+    "candidate_role_hidden": "last_value_wins",
+    "case_id": "case-04",
+    "exit_code": 0,
+    "passed": true,
+    "stdout": "\nrunning 1 test\ntest check_contract ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.08s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\clap-harness\\debug\\deps\\contract-90f7b68a8528048b.exe)\n"
+  },
+  {
+    "candidate_id": 22252,
+    "candidate_role_hidden": "first_value_only",
+    "case_id": "case-01",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (29544) panicked at tests\\contract.rs:14:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "   Compiling e012-clap-repeat-harness v0.1.0 (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\task-harnesses\\clap-repeat-repair-01)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.38s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\clap-harness\\debug\\deps\\contract-90f7b68a8528048b.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 22252,
+    "candidate_role_hidden": "first_value_only",
+    "case_id": "case-02",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (44804) panicked at tests\\contract.rs:14:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.08s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\clap-harness\\debug\\deps\\contract-90f7b68a8528048b.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 22252,
+    "candidate_role_hidden": "first_value_only",
+    "case_id": "case-03",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (18172) panicked at tests\\contract.rs:14:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.06s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\clap-harness\\debug\\deps\\contract-90f7b68a8528048b.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 22252,
+    "candidate_role_hidden": "first_value_only",
+    "case_id": "case-04",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (35976) panicked at tests\\contract.rs:14:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.08s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\clap-harness\\debug\\deps\\contract-90f7b68a8528048b.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 44597,
+    "candidate_role_hidden": "single_occurrence_only",
+    "case_id": "case-01",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (7496) panicked at src\\lib.rs:8:10:\nvalid task arguments: ErrorInner { kind: ArgumentConflict, context: FlatMap { keys: [InvalidArg, PriorArg, Usage], values: [String(\"--tag <tag>\"), String(\"--tag <tag>\"), StyledStr(StyledStr(\"\\u{1b}[1m\\u{1b}[4mUsage:\\u{1b}[0m \\u{1b}[1mdemo\\u{1b}[0m [OPTIONS]\"))] }, message: None, source: None, help_flag: Some(\"--help\"), styles: Styles { header: Style { fg: None, bg: None, underline: None, effects: Effects(BOLD | UNDERLINE) }, error: Style { fg: Some(Ansi(Red)), bg: None, underline: None, effects: Effects(BOLD) }, usage: Style { fg: None, bg: None, underline: None, effects: Effects(BOLD | UNDERLINE) }, literal: Style { fg: None, bg: None, underline: None, effects: Effects(BOLD) }, placeholder: Style { fg: None, bg: None, underline: None, effects: Effects() }, valid: Style { fg: Some(Ansi(Green)), bg: None, underline: None, effects: Effects() }, invalid: Style { fg: Some(Ansi(Yellow)), bg: None, underline: None, effects: Effects() }, context: Style { fg: None, bg: None, underline: None, effects: Effects() }, context_value: None }, color_when: Auto, color_help_when: Auto, backtrace: None }\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "   Compiling e012-clap-repeat-harness v0.1.0 (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\task-harnesses\\clap-repeat-repair-01)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.40s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\clap-harness\\debug\\deps\\contract-90f7b68a8528048b.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 44597,
+    "candidate_role_hidden": "single_occurrence_only",
+    "case_id": "case-02",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (18904) panicked at src\\lib.rs:8:10:\nvalid task arguments: ErrorInner { kind: ArgumentConflict, context: FlatMap { keys: [InvalidArg, PriorArg, Usage], values: [String(\"--tag <tag>\"), String(\"--tag <tag>\"), StyledStr(StyledStr(\"\\u{1b}[1m\\u{1b}[4mUsage:\\u{1b}[0m \\u{1b}[1mdemo\\u{1b}[0m [OPTIONS]\"))] }, message: None, source: None, help_flag: Some(\"--help\"), styles: Styles { header: Style { fg: None, bg: None, underline: None, effects: Effects(BOLD | UNDERLINE) }, error: Style { fg: Some(Ansi(Red)), bg: None, underline: None, effects: Effects(BOLD) }, usage: Style { fg: None, bg: None, underline: None, effects: Effects(BOLD | UNDERLINE) }, literal: Style { fg: None, bg: None, underline: None, effects: Effects(BOLD) }, placeholder: Style { fg: None, bg: None, underline: None, effects: Effects() }, valid: Style { fg: Some(Ansi(Green)), bg: None, underline: None, effects: Effects() }, invalid: Style { fg: Some(Ansi(Yellow)), bg: None, underline: None, effects: Effects() }, context: Style { fg: None, bg: None, underline: None, effects: Effects() }, context_value: None }, color_when: Auto, color_help_when: Auto, backtrace: None }\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.06s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\clap-harness\\debug\\deps\\contract-90f7b68a8528048b.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 44597,
+    "candidate_role_hidden": "single_occurrence_only",
+    "case_id": "case-03",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (21848) panicked at src\\lib.rs:8:10:\nvalid task arguments: ErrorInner { kind: ArgumentConflict, context: FlatMap { keys: [InvalidArg, PriorArg, Usage], values: [String(\"--tag <tag>\"), String(\"--tag <tag>\"), StyledStr(StyledStr(\"\\u{1b}[1m\\u{1b}[4mUsage:\\u{1b}[0m \\u{1b}[1mdemo\\u{1b}[0m [OPTIONS]\"))] }, message: None, source: None, help_flag: Some(\"--help\"), styles: Styles { header: Style { fg: None, bg: None, underline: None, effects: Effects(BOLD | UNDERLINE) }, error: Style { fg: Some(Ansi(Red)), bg: None, underline: None, effects: Effects(BOLD) }, usage: Style { fg: None, bg: None, underline: None, effects: Effects(BOLD | UNDERLINE) }, literal: Style { fg: None, bg: None, underline: None, effects: Effects(BOLD) }, placeholder: Style { fg: None, bg: None, underline: None, effects: Effects() }, valid: Style { fg: Some(Ansi(Green)), bg: None, underline: None, effects: Effects() }, invalid: Style { fg: Some(Ansi(Yellow)), bg: None, underline: None, effects: Effects() }, context: Style { fg: None, bg: None, underline: None, effects: Effects() }, context_value: None }, color_when: Auto, color_help_when: Auto, backtrace: None }\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.06s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\clap-harness\\debug\\deps\\contract-90f7b68a8528048b.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 44597,
+    "candidate_role_hidden": "single_occurrence_only",
+    "case_id": "case-04",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (15036) panicked at src\\lib.rs:8:10:\nvalid task arguments: ErrorInner { kind: ArgumentConflict, context: FlatMap { keys: [InvalidArg, PriorArg, Usage], values: [String(\"--tag <tag>\"), String(\"--tag <tag>\"), StyledStr(StyledStr(\"\\u{1b}[1m\\u{1b}[4mUsage:\\u{1b}[0m \\u{1b}[1mdemo\\u{1b}[0m [OPTIONS]\"))] }, message: None, source: None, help_flag: Some(\"--help\"), styles: Styles { header: Style { fg: None, bg: None, underline: None, effects: Effects(BOLD | UNDERLINE) }, error: Style { fg: Some(Ansi(Red)), bg: None, underline: None, effects: Effects(BOLD) }, usage: Style { fg: None, bg: None, underline: None, effects: Effects(BOLD | UNDERLINE) }, literal: Style { fg: None, bg: None, underline: None, effects: Effects(BOLD) }, placeholder: Style { fg: None, bg: None, underline: None, effects: Effects() }, valid: Style { fg: Some(Ansi(Green)), bg: None, underline: None, effects: Effects() }, invalid: Style { fg: Some(Ansi(Yellow)), bg: None, underline: None, effects: Effects() }, context: Style { fg: None, bg: None, underline: None, effects: Effects() }, context_value: None }, color_when: Auto, color_help_when: Auto, backtrace: None }\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.08s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\clap-harness\\debug\\deps\\contract-90f7b68a8528048b.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": null,
+    "candidate_role_hidden": "base_snapshot",
+    "case_id": "case-01",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (25832) panicked at src\\lib.rs:9:10:\nvalid task arguments: ErrorInner { kind: ArgumentConflict, context: FlatMap { keys: [InvalidArg, PriorArg, Usage], values: [String(\"--tag <tag>\"), String(\"--tag <tag>\"), StyledStr(StyledStr(\"\\u{1b}[1m\\u{1b}[4mUsage:\\u{1b}[0m \\u{1b}[1mdemo\\u{1b}[0m [OPTIONS]\"))] }, message: None, source: None, help_flag: Some(\"--help\"), styles: Styles { header: Style { fg: None, bg: None, underline: None, effects: Effects(BOLD | UNDERLINE) }, error: Style { fg: Some(Ansi(Red)), bg: None, underline: None, effects: Effects(BOLD) }, usage: Style { fg: None, bg: None, underline: None, effects: Effects(BOLD | UNDERLINE) }, literal: Style { fg: None, bg: None, underline: None, effects: Effects(BOLD) }, placeholder: Style { fg: None, bg: None, underline: None, effects: Effects() }, valid: Style { fg: Some(Ansi(Green)), bg: None, underline: None, effects: Effects() }, invalid: Style { fg: Some(Ansi(Yellow)), bg: None, underline: None, effects: Effects() }, context: Style { fg: None, bg: None, underline: None, effects: Effects() }, context_value: None }, color_when: Auto, color_help_when: Auto, backtrace: None }\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "   Compiling e012-clap-repeat-harness v0.1.0 (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\task-harnesses\\clap-repeat-repair-01)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.33s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\clap-harness\\debug\\deps\\contract-90f7b68a8528048b.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": null,
+    "candidate_role_hidden": "base_snapshot",
+    "case_id": "case-02",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (33828) panicked at src\\lib.rs:9:10:\nvalid task arguments: ErrorInner { kind: ArgumentConflict, context: FlatMap { keys: [InvalidArg, PriorArg, Usage], values: [String(\"--tag <tag>\"), String(\"--tag <tag>\"), StyledStr(StyledStr(\"\\u{1b}[1m\\u{1b}[4mUsage:\\u{1b}[0m \\u{1b}[1mdemo\\u{1b}[0m [OPTIONS]\"))] }, message: None, source: None, help_flag: Some(\"--help\"), styles: Styles { header: Style { fg: None, bg: None, underline: None, effects: Effects(BOLD | UNDERLINE) }, error: Style { fg: Some(Ansi(Red)), bg: None, underline: None, effects: Effects(BOLD) }, usage: Style { fg: None, bg: None, underline: None, effects: Effects(BOLD | UNDERLINE) }, literal: Style { fg: None, bg: None, underline: None, effects: Effects(BOLD) }, placeholder: Style { fg: None, bg: None, underline: None, effects: Effects() }, valid: Style { fg: Some(Ansi(Green)), bg: None, underline: None, effects: Effects() }, invalid: Style { fg: Some(Ansi(Yellow)), bg: None, underline: None, effects: Effects() }, context: Style { fg: None, bg: None, underline: None, effects: Effects() }, context_value: None }, color_when: Auto, color_help_when: Auto, backtrace: None }\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.07s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\clap-harness\\debug\\deps\\contract-90f7b68a8528048b.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": null,
+    "candidate_role_hidden": "base_snapshot",
+    "case_id": "case-03",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (25456) panicked at src\\lib.rs:9:10:\nvalid task arguments: ErrorInner { kind: ArgumentConflict, context: FlatMap { keys: [InvalidArg, PriorArg, Usage], values: [String(\"--tag <tag>\"), String(\"--tag <tag>\"), StyledStr(StyledStr(\"\\u{1b}[1m\\u{1b}[4mUsage:\\u{1b}[0m \\u{1b}[1mdemo\\u{1b}[0m [OPTIONS]\"))] }, message: None, source: None, help_flag: Some(\"--help\"), styles: Styles { header: Style { fg: None, bg: None, underline: None, effects: Effects(BOLD | UNDERLINE) }, error: Style { fg: Some(Ansi(Red)), bg: None, underline: None, effects: Effects(BOLD) }, usage: Style { fg: None, bg: None, underline: None, effects: Effects(BOLD | UNDERLINE) }, literal: Style { fg: None, bg: None, underline: None, effects: Effects(BOLD) }, placeholder: Style { fg: None, bg: None, underline: None, effects: Effects() }, valid: Style { fg: Some(Ansi(Green)), bg: None, underline: None, effects: Effects() }, invalid: Style { fg: Some(Ansi(Yellow)), bg: None, underline: None, effects: Effects() }, context: Style { fg: None, bg: None, underline: None, effects: Effects() }, context_value: None }, color_when: Auto, color_help_when: Auto, backtrace: None }\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.09s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\clap-harness\\debug\\deps\\contract-90f7b68a8528048b.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": null,
+    "candidate_role_hidden": "base_snapshot",
+    "case_id": "case-04",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (42904) panicked at src\\lib.rs:9:10:\nvalid task arguments: ErrorInner { kind: ArgumentConflict, context: FlatMap { keys: [InvalidArg, PriorArg, Usage], values: [String(\"--tag <tag>\"), String(\"--tag <tag>\"), StyledStr(StyledStr(\"\\u{1b}[1m\\u{1b}[4mUsage:\\u{1b}[0m \\u{1b}[1mdemo\\u{1b}[0m [OPTIONS]\"))] }, message: None, source: None, help_flag: Some(\"--help\"), styles: Styles { header: Style { fg: None, bg: None, underline: None, effects: Effects(BOLD | UNDERLINE) }, error: Style { fg: Some(Ansi(Red)), bg: None, underline: None, effects: Effects(BOLD) }, usage: Style { fg: None, bg: None, underline: None, effects: Effects(BOLD | UNDERLINE) }, literal: Style { fg: None, bg: None, underline: None, effects: Effects(BOLD) }, placeholder: Style { fg: None, bg: None, underline: None, effects: Effects() }, valid: Style { fg: Some(Ansi(Green)), bg: None, underline: None, effects: Effects() }, invalid: Style { fg: Some(Ansi(Yellow)), bg: None, underline: None, effects: Effects() }, context: Style { fg: None, bg: None, underline: None, effects: Effects() }, context_value: None }, color_when: Auto, color_help_when: Auto, backtrace: None }\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.08s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\clap-harness\\debug\\deps\\contract-90f7b68a8528048b.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  }
+]

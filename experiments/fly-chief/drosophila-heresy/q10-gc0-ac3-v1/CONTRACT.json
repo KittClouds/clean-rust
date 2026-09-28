@@ -1,0 +1,114 @@
+{
+  "authority": {
+    "complete_requires": [
+      "all declared prefixes are legal or illegal exactly once",
+      "every legal prefix has finite u32 effect bits for the current physical support",
+      "effect physical support equals current PF5 support",
+      "feature legal and illegal prefixes form the declared vocabulary",
+      "feature and effect records are present"
+    ],
+    "declared_prefix_vocabulary": [
+      0,
+      -1,
+      1,
+      -2,
+      2,
+      -4,
+      4,
+      -8,
+      8,
+      -16,
+      16
+    ],
+    "effect_key": "endpoint/set/coordinate",
+    "expansion_rule": "measure every RA1 partial or missing context; no candidate replay",
+    "feature_key": "endpoint/set/group_index/coordinate",
+    "reuse_rule": "reuse only RA1-complete AC2 contexts"
+  },
+  "firewall": {
+    "behavioral_probe": false,
+    "candidate_generation": false,
+    "constructor_run": false,
+    "engineering_only": true,
+    "gc1_authorized": false,
+    "parent_writes": false,
+    "scientific_promotion": false,
+    "write_root": "experiments/drosophila-heresy/q10-gc0-ac3-v1"
+  },
+  "identity": "q10-gc0-ac3-v1",
+  "parent_bindings": [
+    {
+      "label": "ra1_plan",
+      "path": "experiments/drosophila-heresy/q10-gc0-ra1-v1/PLAN.md",
+      "sha256": "D47A94E78404659BAA0829A55BD8CF4E43B41F2F0B60B183EC966EA085A57B70"
+    },
+    {
+      "label": "ra1_contract",
+      "path": "experiments/drosophila-heresy/q10-gc0-ra1-v1/CONTRACT.json",
+      "sha256": "C08EFD38EEC6EFD54DEF82DAF2F69D1E5BF09B837A2189DA68179AB9B974B945"
+    },
+    {
+      "label": "ra1_preexecution",
+      "path": "experiments/drosophila-heresy/q10-gc0-ra1-v1/PREEXECUTION.json",
+      "sha256": "D8DD1C63A4886701CA7D51E3797DF9B5B86F6806A7020CCD9AF34E9BA0CE4AE2"
+    },
+    {
+      "label": "ra1_runner",
+      "path": "experiments/drosophila-heresy/q10-gc0-ra1-v1/scripts/run_ra1.py",
+      "sha256": "4588E2FAEC420222C105B5778BBB34A584CD22D96B382C846C4E92CD53F01A05"
+    },
+    {
+      "label": "ra1_execution",
+      "path": "experiments/drosophila-heresy/q10-gc0-ra1-v1/qualification/execution.json",
+      "sha256": "CED3F7CF5CA76D91A1DCD95739A77831501A5B5C8BA53C035B72748CD5E97020"
+    },
+    {
+      "label": "ra1_summary",
+      "path": "experiments/drosophila-heresy/q10-gc0-ra1-v1/qualification/derived/SUMMARY.json",
+      "sha256": "E072A18346861BBC9B91ACA3454E4314E9E62ECB7EA4DA98C2CBE7F56165D2C3"
+    },
+    {
+      "label": "ra1_status",
+      "path": "experiments/drosophila-heresy/q10-gc0-ra1-v1/qualification/derived/STATUS.json",
+      "sha256": "65B1F1811C7C7F10FB8CC238DA34AE662BF3962C5008C214AD95565475B3B71C"
+    },
+    {
+      "label": "ac2_features",
+      "path": "experiments/drosophila-heresy/q10-rh1-ac2-v1/qualification/features.jsonl",
+      "sha256": "7EC54C783A97078243D4AA5B1AEDC65AC5FBE0475C8F11561D84FF4D8120C2F2"
+    },
+    {
+      "label": "ac2_effects",
+      "path": "experiments/drosophila-heresy/q10-rh1-ac2-v1/qualification/effects.jsonl",
+      "sha256": "4D45D48375385AE8886A744BF9CE8E926140F9181C30966316D7350608327EE5"
+    }
+  ],
+  "plan_sha256": "ED4D3715184D1168E222A78EA186377FDF2103E046BC1C915942C9892200F450",
+  "protocol": "Q10-GC0-AC3",
+  "purpose": "Expand sealed AC2 authority coverage to every raw PF5 group-coordinate context",
+  "required_outputs": [
+    "PLAN.md",
+    "CONTRACT.json",
+    "PREEXECUTION.json",
+    "scripts/run_ac3.py",
+    "scripts/test_ac3.py",
+    "qualification/expanded_effects.jsonl",
+    "qualification/expanded_features.jsonl",
+    "qualification/execution.json",
+    "qualification/derived/RESULT.md",
+    "qualification/derived/SUMMARY.json",
+    "qualification/derived/STATUS.json"
+  ],
+  "sample": {
+    "expected_complete_ac2_contexts": 1281,
+    "expected_endpoint_count": 4,
+    "expected_endpoint_set_count": 14,
+    "expected_expansion_contexts": 25794,
+    "expected_raw_coordinate_record_count": 27075,
+    "expected_raw_group_count": 801,
+    "selection_is_not_post_outcome": true,
+    "selection_is_sealed": true,
+    "source": "sealed RA1 sample"
+  },
+  "status": "PREEXECUTION_SEALED_NO_EXECUTION"
+}

@@ -1,0 +1,898 @@
+{
+  "identity": "F4-BINDING-01-STAGE-B-PROSP-v0.1",
+  "model_count": 36,
+  "models": [
+    {
+      "fit_id": "Cphi-H309000-I0",
+      "fold_index": 0,
+      "heldout_block": 309000,
+      "normalization": {
+        "byte_length": 576,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-00.bin",
+        "sha256": "710cf55b18c1051f6ac325ff7a9fab9cf8fe696ca4bd51798a969a10afbd5a0d"
+      },
+      "normalization_sha256": "710cf55b18c1051f6ac325ff7a9fab9cf8fe696ca4bd51798a969a10afbd5a0d",
+      "parent_fit_receipt_sha256": "20539742523332ca5702a568ccfe14f6d16c2c0076cf7cb99e2a9bd8495230d6",
+      "parent_heldout_state": {
+        "byte_length": 3156090,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309000-I0.npz",
+        "sha256": "7f15303a128507507a87ab969b165e0950d9569c50e4304612af37b65684df42"
+      },
+      "replicate_index": 0,
+      "tensor": {
+        "byte_length": 79895,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309000-I0.bin",
+        "sha256": "62b9a6c75d3e784df9611fae2a1b3ca27ad8f9e038da8799368b7315530b668a"
+      }
+    },
+    {
+      "fit_id": "Cphi-H309000-I1",
+      "fold_index": 0,
+      "heldout_block": 309000,
+      "normalization": {
+        "byte_length": 576,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-00.bin",
+        "sha256": "710cf55b18c1051f6ac325ff7a9fab9cf8fe696ca4bd51798a969a10afbd5a0d"
+      },
+      "normalization_sha256": "710cf55b18c1051f6ac325ff7a9fab9cf8fe696ca4bd51798a969a10afbd5a0d",
+      "parent_fit_receipt_sha256": "b0679906207d4c465d4ef1014bf52c8cdaf83901e5394ffb2d0734e6a3945d10",
+      "parent_heldout_state": {
+        "byte_length": 3156090,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309000-I1.npz",
+        "sha256": "deed32f0b5ef9f94272d426d7fa0cca3fa31ffb2054670844bd907d06e4ee332"
+      },
+      "replicate_index": 1,
+      "tensor": {
+        "byte_length": 79895,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309000-I1.bin",
+        "sha256": "dc04b2fa5b32e411ebcc8e5aed4741f4d6d42f5af4fbe656c8e27d21453ac09d"
+      }
+    },
+    {
+      "fit_id": "Cphi-H309000-I2",
+      "fold_index": 0,
+      "heldout_block": 309000,
+      "normalization": {
+        "byte_length": 576,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-00.bin",
+        "sha256": "710cf55b18c1051f6ac325ff7a9fab9cf8fe696ca4bd51798a969a10afbd5a0d"
+      },
+      "normalization_sha256": "710cf55b18c1051f6ac325ff7a9fab9cf8fe696ca4bd51798a969a10afbd5a0d",
+      "parent_fit_receipt_sha256": "387852ab74214571b6af6ba372695860040743e2832ed570be930b81ec292ef5",
+      "parent_heldout_state": {
+        "byte_length": 3156090,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309000-I2.npz",
+        "sha256": "db6e46376febfb13bd3c77fdfc7df42ad05262a52cdc15c5bd3100ce31595c08"
+      },
+      "replicate_index": 2,
+      "tensor": {
+        "byte_length": 79895,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309000-I2.bin",
+        "sha256": "cf54ebcb7cf60ba42bbe149a855234a824a0cb1a2264fcd89dac03ef63b3a469"
+      }
+    },
+    {
+      "fit_id": "Cphi-H309001-I0",
+      "fold_index": 1,
+      "heldout_block": 309001,
+      "normalization": {
+        "byte_length": 576,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-01.bin",
+        "sha256": "5f69dd52aca323fac49593a883835b8122424193067cd0bce6cdfe26554b7bf9"
+      },
+      "normalization_sha256": "5f69dd52aca323fac49593a883835b8122424193067cd0bce6cdfe26554b7bf9",
+      "parent_fit_receipt_sha256": "3388c414221ba921f515de8365209b4e41c1204862c4ba4f5518732be6caab04",
+      "parent_heldout_state": {
+        "byte_length": 5811660,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309001-I0.npz",
+        "sha256": "58ff26ab5f3f48153b779df47d1a36a1f7b96022cd1ae9123faf0621043934f1"
+      },
+      "replicate_index": 0,
+      "tensor": {
+        "byte_length": 79895,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309001-I0.bin",
+        "sha256": "4fb321cf04f426353256f94828f545e520ae75e4d466c2f522f6c4520b29e084"
+      }
+    },
+    {
+      "fit_id": "Cphi-H309001-I1",
+      "fold_index": 1,
+      "heldout_block": 309001,
+      "normalization": {
+        "byte_length": 576,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-01.bin",
+        "sha256": "5f69dd52aca323fac49593a883835b8122424193067cd0bce6cdfe26554b7bf9"
+      },
+      "normalization_sha256": "5f69dd52aca323fac49593a883835b8122424193067cd0bce6cdfe26554b7bf9",
+      "parent_fit_receipt_sha256": "99673ac6fa4649282f38c560280af5e6ee38f321ec71459e24673c18610915e5",
+      "parent_heldout_state": {
+        "byte_length": 5811660,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309001-I1.npz",
+        "sha256": "7734f74bf979ca3b0ee1caaaa3bf701784ab27e26493a36b2755107a36c7c73a"
+      },
+      "replicate_index": 1,
+      "tensor": {
+        "byte_length": 79895,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309001-I1.bin",
+        "sha256": "89a1de7f394a9d986b2e659d0f65af9e6797f7f84d55b8e1bd53d3501cfdca5d"
+      }
+    },
+    {
+      "fit_id": "Cphi-H309001-I2",
+      "fold_index": 1,
+      "heldout_block": 309001,
+      "normalization": {
+        "byte_length": 576,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-01.bin",
+        "sha256": "5f69dd52aca323fac49593a883835b8122424193067cd0bce6cdfe26554b7bf9"
+      },
+      "normalization_sha256": "5f69dd52aca323fac49593a883835b8122424193067cd0bce6cdfe26554b7bf9",
+      "parent_fit_receipt_sha256": "9e2dacf1247daeea4efda39c312500c6b70ee63315d281788e3b1c96d39c8c54",
+      "parent_heldout_state": {
+        "byte_length": 5811660,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309001-I2.npz",
+        "sha256": "1737ec6367249b25ec799e00c84cd22ff08e34cb72a6ea54654262d4eb54a549"
+      },
+      "replicate_index": 2,
+      "tensor": {
+        "byte_length": 79895,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309001-I2.bin",
+        "sha256": "66210c98cc7461b35af89c1139c554342a8fc33d65c37bcef17af9a63f86fa75"
+      }
+    },
+    {
+      "fit_id": "Cphi-H309002-I0",
+      "fold_index": 2,
+      "heldout_block": 309002,
+      "normalization": {
+        "byte_length": 576,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-02.bin",
+        "sha256": "b974207ffdebb7f37d2f997b74e58c892c59e839ca68f1fab580c6d37e9c3590"
+      },
+      "normalization_sha256": "b974207ffdebb7f37d2f997b74e58c892c59e839ca68f1fab580c6d37e9c3590",
+      "parent_fit_receipt_sha256": "39f205891e65f92fda08d9878da1449d925c2d4fa999d484800fa584acfbc4de",
+      "parent_heldout_state": {
+        "byte_length": 2180700,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309002-I0.npz",
+        "sha256": "6f845a0a215d495320051c5bdb2d3526b5c378f36b2267c990e7e353c7c551ae"
+      },
+      "replicate_index": 0,
+      "tensor": {
+        "byte_length": 79895,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309002-I0.bin",
+        "sha256": "e6a424920a07f7558647263cee39b9b9889ccad7f68e2dbd2ccffc6ab7b9222b"
+      }
+    },
+    {
+      "fit_id": "Cphi-H309002-I1",
+      "fold_index": 2,
+      "heldout_block": 309002,
+      "normalization": {
+        "byte_length": 576,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-02.bin",
+        "sha256": "b974207ffdebb7f37d2f997b74e58c892c59e839ca68f1fab580c6d37e9c3590"
+      },
+      "normalization_sha256": "b974207ffdebb7f37d2f997b74e58c892c59e839ca68f1fab580c6d37e9c3590",
+      "parent_fit_receipt_sha256": "a27bca8ab16f16257c0d2d7a55e47f3bc176da6c6072f8afa56d02869a579f7f",
+      "parent_heldout_state": {
+        "byte_length": 2180700,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309002-I1.npz",
+        "sha256": "0264e28d9365c039fc363d33f2f6107715545962e3a0916090dad4d55353eeab"
+      },
+      "replicate_index": 1,
+      "tensor": {
+        "byte_length": 79895,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309002-I1.bin",
+        "sha256": "58705c73de8e04ffaf8687d6012a0e4a9a5fd6b75793fbe201029dc1b94cfb24"
+      }
+    },
+    {
+      "fit_id": "Cphi-H309002-I2",
+      "fold_index": 2,
+      "heldout_block": 309002,
+      "normalization": {
+        "byte_length": 576,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-02.bin",
+        "sha256": "b974207ffdebb7f37d2f997b74e58c892c59e839ca68f1fab580c6d37e9c3590"
+      },
+      "normalization_sha256": "b974207ffdebb7f37d2f997b74e58c892c59e839ca68f1fab580c6d37e9c3590",
+      "parent_fit_receipt_sha256": "0bd36086de2aed5bf5fa1c3b5ad4b2ca11e1a246665d0bdbe51542fdbfe6ab9d",
+      "parent_heldout_state": {
+        "byte_length": 2180700,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309002-I2.npz",
+        "sha256": "d001e2116e417f5df5c96637490df1f1df3e235367f480e95a42e9b092de38a9"
+      },
+      "replicate_index": 2,
+      "tensor": {
+        "byte_length": 79895,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309002-I2.bin",
+        "sha256": "b4e50848b2f454452cb135ff6cffcf3020be18a904cb12db72c747f32f0c4719"
+      }
+    },
+    {
+      "fit_id": "Cphi-H309003-I0",
+      "fold_index": 3,
+      "heldout_block": 309003,
+      "normalization": {
+        "byte_length": 576,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-03.bin",
+        "sha256": "339bf2b1be4ab7a13296a88b1a34e98087bb90643cb03e98ace91b558124b021"
+      },
+      "normalization_sha256": "339bf2b1be4ab7a13296a88b1a34e98087bb90643cb03e98ace91b558124b021",
+      "parent_fit_receipt_sha256": "fd57344d0e6c4bc7649af4a2d72262cb6f38e92d3ff2de1de69309382ba28e63",
+      "parent_heldout_state": {
+        "byte_length": 3885480,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309003-I0.npz",
+        "sha256": "ba2187423d16a851c52fdbb363538509e18ba36189289ad4b007c9ef916331de"
+      },
+      "replicate_index": 0,
+      "tensor": {
+        "byte_length": 79895,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309003-I0.bin",
+        "sha256": "577b4fa6f96fec5f52acb99d022037f56fcedae29c9c6d474f148deedfde760b"
+      }
+    },
+    {
+      "fit_id": "Cphi-H309003-I1",
+      "fold_index": 3,
+      "heldout_block": 309003,
+      "normalization": {
+        "byte_length": 576,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-03.bin",
+        "sha256": "339bf2b1be4ab7a13296a88b1a34e98087bb90643cb03e98ace91b558124b021"
+      },
+      "normalization_sha256": "339bf2b1be4ab7a13296a88b1a34e98087bb90643cb03e98ace91b558124b021",
+      "parent_fit_receipt_sha256": "9965fc25936ab04f4f4292e3c1df36089def4aca296a11274195bcfdda744b04",
+      "parent_heldout_state": {
+        "byte_length": 3885480,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309003-I1.npz",
+        "sha256": "b26349298c88aea94d278b50e1265a933a892764fa226dd08a0f1bc1ec1bb5d4"
+      },
+      "replicate_index": 1,
+      "tensor": {
+        "byte_length": 79895,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309003-I1.bin",
+        "sha256": "b431dfd901db4164bcc3dd1d63017db9fc5062f1f4f95610592464f9534611eb"
+      }
+    },
+    {
+      "fit_id": "Cphi-H309003-I2",
+      "fold_index": 3,
+      "heldout_block": 309003,
+      "normalization": {
+        "byte_length": 576,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-03.bin",
+        "sha256": "339bf2b1be4ab7a13296a88b1a34e98087bb90643cb03e98ace91b558124b021"
+      },
+      "normalization_sha256": "339bf2b1be4ab7a13296a88b1a34e98087bb90643cb03e98ace91b558124b021",
+      "parent_fit_receipt_sha256": "6c50e87e12a7ed69a7f47ee6464c596edfce5655af2694d2d40864cd4275f288",
+      "parent_heldout_state": {
+        "byte_length": 3885480,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309003-I2.npz",
+        "sha256": "78112c1e836a4f84a067e51b36ce5515a0da58f276d16441f5b87e03cd2fc330"
+      },
+      "replicate_index": 2,
+      "tensor": {
+        "byte_length": 79895,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309003-I2.bin",
+        "sha256": "ac50c6028ade164ec73672391b087e9afc1ea42f04f8b62ccd4cf9d207b0e724"
+      }
+    },
+    {
+      "fit_id": "Cphi-H309004-I0",
+      "fold_index": 4,
+      "heldout_block": 309004,
+      "normalization": {
+        "byte_length": 576,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-04.bin",
+        "sha256": "ce8e97f0686999b21a34331529ef3c12116a2bb396e9de5d2afd709bdf3b3e57"
+      },
+      "normalization_sha256": "ce8e97f0686999b21a34331529ef3c12116a2bb396e9de5d2afd709bdf3b3e57",
+      "parent_fit_receipt_sha256": "6c44e85a4e27b659ec20c2255e3bd701d796a8bdc931a3cc0f0e2116f4b1e191",
+      "parent_heldout_state": {
+        "byte_length": 5411910,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309004-I0.npz",
+        "sha256": "9e795cdb2dd531bab68c65bb4ed0132f7002338877f6be13a31bab37e91462fd"
+      },
+      "replicate_index": 0,
+      "tensor": {
+        "byte_length": 79895,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309004-I0.bin",
+        "sha256": "f5a7eb009735197b67c2d2bc69fae14fbaeb52c4a494500a7a01125a29f64412"
+      }
+    },
+    {
+      "fit_id": "Cphi-H309004-I1",
+      "fold_index": 4,
+      "heldout_block": 309004,
+      "normalization": {
+        "byte_length": 576,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-04.bin",
+        "sha256": "ce8e97f0686999b21a34331529ef3c12116a2bb396e9de5d2afd709bdf3b3e57"
+      },
+      "normalization_sha256": "ce8e97f0686999b21a34331529ef3c12116a2bb396e9de5d2afd709bdf3b3e57",
+      "parent_fit_receipt_sha256": "f396dd2ccb9dfea7677ba3f1c3ec08ea17903497f26088818842fa05705134bb",
+      "parent_heldout_state": {
+        "byte_length": 5411910,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309004-I1.npz",
+        "sha256": "247ff34341792af5ccdf1e05acd3a2c95d969ad558f0878e64d16c5ebbf41840"
+      },
+      "replicate_index": 1,
+      "tensor": {
+        "byte_length": 79895,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309004-I1.bin",
+        "sha256": "bbe38e70be4734daf741a0c34e3ac88d3ba4abf8dd85af457e0cb475730bce1d"
+      }
+    },
+    {
+      "fit_id": "Cphi-H309004-I2",
+      "fold_index": 4,
+      "heldout_block": 309004,
+      "normalization": {
+        "byte_length": 576,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-04.bin",
+        "sha256": "ce8e97f0686999b21a34331529ef3c12116a2bb396e9de5d2afd709bdf3b3e57"
+      },
+      "normalization_sha256": "ce8e97f0686999b21a34331529ef3c12116a2bb396e9de5d2afd709bdf3b3e57",
+      "parent_fit_receipt_sha256": "eeded8e30f2e63a8a9314ebda7dd27ae0692bd064b3a024c57d236b2468f5d34",
+      "parent_heldout_state": {
+        "byte_length": 5411910,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309004-I2.npz",
+        "sha256": "0980e9a42a133bf5789a575b1be24b5f8c86c863e63242d9d9ce98b450afd312"
+      },
+      "replicate_index": 2,
+      "tensor": {
+        "byte_length": 79895,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309004-I2.bin",
+        "sha256": "c6ee4dd880b386d88e3416a80c5c6affecf670fa2e06556320f86f7163ed250b"
+      }
+    },
+    {
+      "fit_id": "Cphi-H309005-I0",
+      "fold_index": 5,
+      "heldout_block": 309005,
+      "normalization": {
+        "byte_length": 576,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-05.bin",
+        "sha256": "0bbb4db87e95c4b112b4529c488d91f6d490786fb92058b2e8d67298577f9904"
+      },
+      "normalization_sha256": "0bbb4db87e95c4b112b4529c488d91f6d490786fb92058b2e8d67298577f9904",
+      "parent_fit_receipt_sha256": "040812107774251d5bdc2c1ce0ec9656fac3b78fabb60cf3e05edd50a450cc25",
+      "parent_heldout_state": {
+        "byte_length": 5105640,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309005-I0.npz",
+        "sha256": "15715ddf2dd7814adf5b8aa2d850bdf41816478adeeb930526b8b051001df5a5"
+      },
+      "replicate_index": 0,
+      "tensor": {
+        "byte_length": 79895,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309005-I0.bin",
+        "sha256": "1dba7dde471b4933b40a8384f569ad8ea534deea0a3ec8767981d482bd4cff6e"
+      }
+    },
+    {
+      "fit_id": "Cphi-H309005-I1",
+      "fold_index": 5,
+      "heldout_block": 309005,
+      "normalization": {
+        "byte_length": 576,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-05.bin",
+        "sha256": "0bbb4db87e95c4b112b4529c488d91f6d490786fb92058b2e8d67298577f9904"
+      },
+      "normalization_sha256": "0bbb4db87e95c4b112b4529c488d91f6d490786fb92058b2e8d67298577f9904",
+      "parent_fit_receipt_sha256": "92005e7d7bbba92f29e7bb897838d653d1234cd874551e84eb45408b46093a7b",
+      "parent_heldout_state": {
+        "byte_length": 5105640,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309005-I1.npz",
+        "sha256": "a08b231f57d6d6c945e8eb4243122d6a8f9090960bee8bd72cd4fdbea5029b9e"
+      },
+      "replicate_index": 1,
+      "tensor": {
+        "byte_length": 79895,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309005-I1.bin",
+        "sha256": "fb883dc579fc6568e6f4c21fce0224427cd092614a87b38e8b86b1c8d53b2574"
+      }
+    },
+    {
+      "fit_id": "Cphi-H309005-I2",
+      "fold_index": 5,
+      "heldout_block": 309005,
+      "normalization": {
+        "byte_length": 576,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-05.bin",
+        "sha256": "0bbb4db87e95c4b112b4529c488d91f6d490786fb92058b2e8d67298577f9904"
+      },
+      "normalization_sha256": "0bbb4db87e95c4b112b4529c488d91f6d490786fb92058b2e8d67298577f9904",
+      "parent_fit_receipt_sha256": "0f96ce1e2c3b0dfa7955b5de067d4667e21b9342861ea4ffefde8a0d27af0249",
+      "parent_heldout_state": {
+        "byte_length": 5105640,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309005-I2.npz",
+        "sha256": "7844aefd3d638c1f57ef1373dd825b0667074a9d663ae517958db32e5dc72e92"
+      },
+      "replicate_index": 2,
+      "tensor": {
+        "byte_length": 79895,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309005-I2.bin",
+        "sha256": "06acb0646174fc6431fb1c08f324895ccbb00d54187e7c27a2bc80dd8fb5ae60"
+      }
+    },
+    {
+      "fit_id": "Cphi-H309006-I0",
+      "fold_index": 6,
+      "heldout_block": 309006,
+      "normalization": {
+        "byte_length": 576,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-06.bin",
+        "sha256": "38bd89f28fa4d21bae6edbf798e8bcb7ac2e56677a79a13056590074b47fccc9"
+      },
+      "normalization_sha256": "38bd89f28fa4d21bae6edbf798e8bcb7ac2e56677a79a13056590074b47fccc9",
+      "parent_fit_receipt_sha256": "875cacee489e928141ddacbc773d391768559a15cb945db7e63d9cf100df9ef4",
+      "parent_heldout_state": {
+        "byte_length": 2881800,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309006-I0.npz",
+        "sha256": "e30fc739a494131fc66d5abea3033a657d2eb2bdb5f470dc92c03d669be30468"
+      },
+      "replicate_index": 0,
+      "tensor": {
+        "byte_length": 79895,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309006-I0.bin",
+        "sha256": "d20ba8d8c660ec11a9e99dd71825ebb81d792d711d50995d766fdd24d16c63d9"
+      }
+    },
+    {
+      "fit_id": "Cphi-H309006-I1",
+      "fold_index": 6,
+      "heldout_block": 309006,
+      "normalization": {
+        "byte_length": 576,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-06.bin",
+        "sha256": "38bd89f28fa4d21bae6edbf798e8bcb7ac2e56677a79a13056590074b47fccc9"
+      },
+      "normalization_sha256": "38bd89f28fa4d21bae6edbf798e8bcb7ac2e56677a79a13056590074b47fccc9",
+      "parent_fit_receipt_sha256": "4ba1e30ac10294b7402103916249cf0475a36ba878c9f098942bfbe51be9eba0",
+      "parent_heldout_state": {
+        "byte_length": 2881800,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309006-I1.npz",
+        "sha256": "46104364aa3f11c29d9054dfaea0499c91af9b8c6f61cb74b09a88fa61b046a2"
+      },
+      "replicate_index": 1,
+      "tensor": {
+        "byte_length": 79895,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309006-I1.bin",
+        "sha256": "fc729f029acd01ff034757fba023eaf2e7f78f5e3d88b8abcb8587b5fd408821"
+      }
+    },
+    {
+      "fit_id": "Cphi-H309006-I2",
+      "fold_index": 6,
+      "heldout_block": 309006,
+      "normalization": {
+        "byte_length": 576,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-06.bin",
+        "sha256": "38bd89f28fa4d21bae6edbf798e8bcb7ac2e56677a79a13056590074b47fccc9"
+      },
+      "normalization_sha256": "38bd89f28fa4d21bae6edbf798e8bcb7ac2e56677a79a13056590074b47fccc9",
+      "parent_fit_receipt_sha256": "9eea448cb4e9da4a41aec7833dd76481375531ea6ef14eda3f10fe6699698802",
+      "parent_heldout_state": {
+        "byte_length": 2881800,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309006-I2.npz",
+        "sha256": "43c11f59f1989105789974aac0d11b43ba37d6c1b188dea1abc3e164cb90707f"
+      },
+      "replicate_index": 2,
+      "tensor": {
+        "byte_length": 79895,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309006-I2.bin",
+        "sha256": "01feb53e945b098f0fd1fd6a853a03e33f768bf6ee96fd61fb26ee3f5c034af9"
+      }
+    },
+    {
+      "fit_id": "Cphi-H309007-I0",
+      "fold_index": 7,
+      "heldout_block": 309007,
+      "normalization": {
+        "byte_length": 576,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-07.bin",
+        "sha256": "3b95e9df81b1645ec25293e083af2fd7c79dedc4819912d95eafe630b05679c7"
+      },
+      "normalization_sha256": "3b95e9df81b1645ec25293e083af2fd7c79dedc4819912d95eafe630b05679c7",
+      "parent_fit_receipt_sha256": "fe96e448add6bf2c43060eaddc2987b5a8651521ebca665d5129918c2da41de0",
+      "parent_heldout_state": {
+        "byte_length": 2163480,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309007-I0.npz",
+        "sha256": "c53edce3a6bf5bc1ef37d66dbc910df64b50cae3bd7e1018a9ad5f701dde0802"
+      },
+      "replicate_index": 0,
+      "tensor": {
+        "byte_length": 79895,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309007-I0.bin",
+        "sha256": "25268b385e9bc9431c05898c4e38bc52fd3495acf330530a2200490938a3592b"
+      }
+    },
+    {
+      "fit_id": "Cphi-H309007-I1",
+      "fold_index": 7,
+      "heldout_block": 309007,
+      "normalization": {
+        "byte_length": 576,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-07.bin",
+        "sha256": "3b95e9df81b1645ec25293e083af2fd7c79dedc4819912d95eafe630b05679c7"
+      },
+      "normalization_sha256": "3b95e9df81b1645ec25293e083af2fd7c79dedc4819912d95eafe630b05679c7",
+      "parent_fit_receipt_sha256": "04f1aac63bb7dec05c166fdf69f8e4197a181fa8c2e56d96506b1ccf76f8f69f",
+      "parent_heldout_state": {
+        "byte_length": 2163480,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309007-I1.npz",
+        "sha256": "8b799f58bfe04a62a570b677f6ae36ffeaa8d535ee704b30ccb77f2770604c69"
+      },
+      "replicate_index": 1,
+      "tensor": {
+        "byte_length": 79895,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309007-I1.bin",
+        "sha256": "41b5024cf1bbb1d49c36b9bf42aef431ca213b09cc8011f515cbdcb023f9eae8"
+      }
+    },
+    {
+      "fit_id": "Cphi-H309007-I2",
+      "fold_index": 7,
+      "heldout_block": 309007,
+      "normalization": {
+        "byte_length": 576,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-07.bin",
+        "sha256": "3b95e9df81b1645ec25293e083af2fd7c79dedc4819912d95eafe630b05679c7"
+      },
+      "normalization_sha256": "3b95e9df81b1645ec25293e083af2fd7c79dedc4819912d95eafe630b05679c7",
+      "parent_fit_receipt_sha256": "87ecbbf904482e11bd9553dc102b25e887906e06e70c1d2dbbf924964f646527",
+      "parent_heldout_state": {
+        "byte_length": 2163480,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309007-I2.npz",
+        "sha256": "d54cb2172c98b0ab5f4f1da0e73ed62c71f8e39639b650c989f169857e43bc6b"
+      },
+      "replicate_index": 2,
+      "tensor": {
+        "byte_length": 79895,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309007-I2.bin",
+        "sha256": "da4bc1c82ab7c5eb80c240e5ceaeda7e4fe950f4dda061fdd70bd20fb259fda6"
+      }
+    },
+    {
+      "fit_id": "Cphi-H309008-I0",
+      "fold_index": 8,
+      "heldout_block": 309008,
+      "normalization": {
+        "byte_length": 576,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-08.bin",
+        "sha256": "5a9ea8ae51aad377c6db8ed073c560dd6239d49f4f96ac84ed5df5024d3a60cc"
+      },
+      "normalization_sha256": "5a9ea8ae51aad377c6db8ed073c560dd6239d49f4f96ac84ed5df5024d3a60cc",
+      "parent_fit_receipt_sha256": "b134eea9991a60ea343d59c456f6c9f5c1b6b186b19dbd3e298bac12c93bb052",
+      "parent_heldout_state": {
+        "byte_length": 2634570,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309008-I0.npz",
+        "sha256": "92101b14b2d61b4350433d311d3b626a9e82dbd805146c3ef133b2bd94208b55"
+      },
+      "replicate_index": 0,
+      "tensor": {
+        "byte_length": 79895,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309008-I0.bin",
+        "sha256": "4f16d95cb4053f4d233a53146a081c4d6cc01cbd4dfd5985ec9adc9edf899cf0"
+      }
+    },
+    {
+      "fit_id": "Cphi-H309008-I1",
+      "fold_index": 8,
+      "heldout_block": 309008,
+      "normalization": {
+        "byte_length": 576,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-08.bin",
+        "sha256": "5a9ea8ae51aad377c6db8ed073c560dd6239d49f4f96ac84ed5df5024d3a60cc"
+      },
+      "normalization_sha256": "5a9ea8ae51aad377c6db8ed073c560dd6239d49f4f96ac84ed5df5024d3a60cc",
+      "parent_fit_receipt_sha256": "81035e047684766b651164f8b7e671293c1a9e6186acf29e1ad117252114e64a",
+      "parent_heldout_state": {
+        "byte_length": 2634570,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309008-I1.npz",
+        "sha256": "c573974c8bc1e7fb09bf4babcaf6be52ec94c9b9b7f8bdb930270405e2fef8e8"
+      },
+      "replicate_index": 1,
+      "tensor": {
+        "byte_length": 79895,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309008-I1.bin",
+        "sha256": "a08ed6dff0e07f4105e46807d6548a9ccac652abac50d8710064acfd1fafe0a5"
+      }
+    },
+    {
+      "fit_id": "Cphi-H309008-I2",
+      "fold_index": 8,
+      "heldout_block": 309008,
+      "normalization": {
+        "byte_length": 576,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-08.bin",
+        "sha256": "5a9ea8ae51aad377c6db8ed073c560dd6239d49f4f96ac84ed5df5024d3a60cc"
+      },
+      "normalization_sha256": "5a9ea8ae51aad377c6db8ed073c560dd6239d49f4f96ac84ed5df5024d3a60cc",
+      "parent_fit_receipt_sha256": "5341e6b7127e67921dc4598c9da1726543f4dd7374ea21259d4d340e3966aacf",
+      "parent_heldout_state": {
+        "byte_length": 2634570,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309008-I2.npz",
+        "sha256": "819597d7fec01fa311b743d1e9d6f36c0b790dfc568098158f775c897e0f8a28"
+      },
+      "replicate_index": 2,
+      "tensor": {
+        "byte_length": 79895,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309008-I2.bin",
+        "sha256": "a3e4f1675a6ee9ab59883d39a1d774618ea7b8261b2aedf5d8357aaabe22b86e"
+      }
+    },
+    {
+      "fit_id": "Cphi-H309009-I0",
+      "fold_index": 9,
+      "heldout_block": 309009,
+      "normalization": {
+        "byte_length": 576,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-09.bin",
+        "sha256": "896f1e8038b86d2f94bc7c86c52314a5e33f4398a01fbc72ca88332e368f41ba"
+      },
+      "normalization_sha256": "896f1e8038b86d2f94bc7c86c52314a5e33f4398a01fbc72ca88332e368f41ba",
+      "parent_fit_receipt_sha256": "38971e84f426c5442d3006c4dda63fad74a927b6e459cae7c0c29496c353a03f",
+      "parent_heldout_state": {
+        "byte_length": 498060,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309009-I0.npz",
+        "sha256": "9328cb7e18daf187ebe97fb5b55a796fe397f4f235a15a702a8e34a9a1f64a5e"
+      },
+      "replicate_index": 0,
+      "tensor": {
+        "byte_length": 79895,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309009-I0.bin",
+        "sha256": "e5f2ac8e1027344fca54fa7f05dbb30d02c9df11c509b4bd6353cb0a6008f5c3"
+      }
+    },
+    {
+      "fit_id": "Cphi-H309009-I1",
+      "fold_index": 9,
+      "heldout_block": 309009,
+      "normalization": {
+        "byte_length": 576,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-09.bin",
+        "sha256": "896f1e8038b86d2f94bc7c86c52314a5e33f4398a01fbc72ca88332e368f41ba"
+      },
+      "normalization_sha256": "896f1e8038b86d2f94bc7c86c52314a5e33f4398a01fbc72ca88332e368f41ba",
+      "parent_fit_receipt_sha256": "81444b973272502e81ce188f22fcb7add2aaccf7d39ff4ddc7488021f4a203c3",
+      "parent_heldout_state": {
+        "byte_length": 498060,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309009-I1.npz",
+        "sha256": "5fa029fbe615939f0a149207995bed46babd089e86adecbce9c1a4fb92ac6d6d"
+      },
+      "replicate_index": 1,
+      "tensor": {
+        "byte_length": 79895,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309009-I1.bin",
+        "sha256": "19cebc18cba6e480f6fc9a1a110e867beef20570658a73cb39023eb9a7d525d6"
+      }
+    },
+    {
+      "fit_id": "Cphi-H309009-I2",
+      "fold_index": 9,
+      "heldout_block": 309009,
+      "normalization": {
+        "byte_length": 576,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-09.bin",
+        "sha256": "896f1e8038b86d2f94bc7c86c52314a5e33f4398a01fbc72ca88332e368f41ba"
+      },
+      "normalization_sha256": "896f1e8038b86d2f94bc7c86c52314a5e33f4398a01fbc72ca88332e368f41ba",
+      "parent_fit_receipt_sha256": "4f47a889e9b9c178e3768916a592c09c3d301c99561c874da1d51e8c94565cbb",
+      "parent_heldout_state": {
+        "byte_length": 498060,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309009-I2.npz",
+        "sha256": "cf276dad6afe3299ee394bc6d3e1ab0068ac409e8dd1537cc2b9f85b4ec8ce71"
+      },
+      "replicate_index": 2,
+      "tensor": {
+        "byte_length": 79895,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309009-I2.bin",
+        "sha256": "9a03341bb66209b2f53a3199db859271682a3edf2b763bba20eb74781b84cec9"
+      }
+    },
+    {
+      "fit_id": "Cphi-H309010-I0",
+      "fold_index": 10,
+      "heldout_block": 309010,
+      "normalization": {
+        "byte_length": 576,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-10.bin",
+        "sha256": "cd597b5dfe7cf0176e76456dc4de1cc326bd8de11d1432106c7374d63945b468"
+      },
+      "normalization_sha256": "cd597b5dfe7cf0176e76456dc4de1cc326bd8de11d1432106c7374d63945b468",
+      "parent_fit_receipt_sha256": "a9a5cc65d2943020087ea294fa0f7f143bf7e1f5b30117967523ffd7b8850ffd",
+      "parent_heldout_state": {
+        "byte_length": 2206530,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309010-I0.npz",
+        "sha256": "113152b7b4687d5759a2789b125db523617f6f734ff869cd728d252bdf918268"
+      },
+      "replicate_index": 0,
+      "tensor": {
+        "byte_length": 79895,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309010-I0.bin",
+        "sha256": "4ec42791c30c696af6d12bae7c65908a26525f004d9d55113fb82cab71fc4b5d"
+      }
+    },
+    {
+      "fit_id": "Cphi-H309010-I1",
+      "fold_index": 10,
+      "heldout_block": 309010,
+      "normalization": {
+        "byte_length": 576,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-10.bin",
+        "sha256": "cd597b5dfe7cf0176e76456dc4de1cc326bd8de11d1432106c7374d63945b468"
+      },
+      "normalization_sha256": "cd597b5dfe7cf0176e76456dc4de1cc326bd8de11d1432106c7374d63945b468",
+      "parent_fit_receipt_sha256": "d084f50d7f4441630390afd74cf99b3cafc38431af1f5621cef399f576a5a856",
+      "parent_heldout_state": {
+        "byte_length": 2206530,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309010-I1.npz",
+        "sha256": "12fcb21450111b117e02c814b78a1714c4933aa73465377248bff9fdf1f08926"
+      },
+      "replicate_index": 1,
+      "tensor": {
+        "byte_length": 79895,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309010-I1.bin",
+        "sha256": "e2707033f2bb0397c4d431f1c8bd87ecd15f948a84dad8339ce0e7ee37dd5da7"
+      }
+    },
+    {
+      "fit_id": "Cphi-H309010-I2",
+      "fold_index": 10,
+      "heldout_block": 309010,
+      "normalization": {
+        "byte_length": 576,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-10.bin",
+        "sha256": "cd597b5dfe7cf0176e76456dc4de1cc326bd8de11d1432106c7374d63945b468"
+      },
+      "normalization_sha256": "cd597b5dfe7cf0176e76456dc4de1cc326bd8de11d1432106c7374d63945b468",
+      "parent_fit_receipt_sha256": "936975d9287bf1e0356e792b8c2c4283d4acc0d0312769106082fa99210b2df7",
+      "parent_heldout_state": {
+        "byte_length": 2206530,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309010-I2.npz",
+        "sha256": "53ac9fa95c6516801c98a2b2eb64192ae7e6c598589bdc8c11aba000d8319d14"
+      },
+      "replicate_index": 2,
+      "tensor": {
+        "byte_length": 79895,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309010-I2.bin",
+        "sha256": "8d8e7e45989262714817b5f7c3786d37abdbf1718b4de5358e8a28519a7b085a"
+      }
+    },
+    {
+      "fit_id": "Cphi-H309011-I0",
+      "fold_index": 11,
+      "heldout_block": 309011,
+      "normalization": {
+        "byte_length": 576,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-11.bin",
+        "sha256": "f3099cda6890113631e75701a0fa4d9b889975f66916edd17907fdd282ae6787"
+      },
+      "normalization_sha256": "f3099cda6890113631e75701a0fa4d9b889975f66916edd17907fdd282ae6787",
+      "parent_fit_receipt_sha256": "e68b522a175f92c709153dc5f832d517e402e2c79ed52eefc2f05ea02110ec4d",
+      "parent_heldout_state": {
+        "byte_length": 100770,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309011-I0.npz",
+        "sha256": "e8b99afff3eca8f70ad0987ff75ae08b59e637706eeb245b0d87d89d51d01bb0"
+      },
+      "replicate_index": 0,
+      "tensor": {
+        "byte_length": 79895,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309011-I0.bin",
+        "sha256": "73015e889018ea74fdfb4e0a3f88aadb6fe3303320cc6ec27d83c9addf2e1cb5"
+      }
+    },
+    {
+      "fit_id": "Cphi-H309011-I1",
+      "fold_index": 11,
+      "heldout_block": 309011,
+      "normalization": {
+        "byte_length": 576,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-11.bin",
+        "sha256": "f3099cda6890113631e75701a0fa4d9b889975f66916edd17907fdd282ae6787"
+      },
+      "normalization_sha256": "f3099cda6890113631e75701a0fa4d9b889975f66916edd17907fdd282ae6787",
+      "parent_fit_receipt_sha256": "21416cd2d87a62933f61491854bfb028f6aa1c7826e901812708e42b29913083",
+      "parent_heldout_state": {
+        "byte_length": 100770,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309011-I1.npz",
+        "sha256": "d1d22f1c35996aad02ac1c36aaf0f807272bd524c885b9d158a38417326150eb"
+      },
+      "replicate_index": 1,
+      "tensor": {
+        "byte_length": 79895,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309011-I1.bin",
+        "sha256": "6aa86c0a6b09e1593a70b0b968729f72682aad86539b4de3d61efa0b383e4df3"
+      }
+    },
+    {
+      "fit_id": "Cphi-H309011-I2",
+      "fold_index": 11,
+      "heldout_block": 309011,
+      "normalization": {
+        "byte_length": 576,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-11.bin",
+        "sha256": "f3099cda6890113631e75701a0fa4d9b889975f66916edd17907fdd282ae6787"
+      },
+      "normalization_sha256": "f3099cda6890113631e75701a0fa4d9b889975f66916edd17907fdd282ae6787",
+      "parent_fit_receipt_sha256": "80a24dc74dbadf74462d505d7db54d2a8ee4dbe9de3437f998b96a25b46bb7f9",
+      "parent_heldout_state": {
+        "byte_length": 100770,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309011-I2.npz",
+        "sha256": "7a5ae226afc9bb9c007f490f517856af86c6147fdf14cc668f4fe3489958616e"
+      },
+      "replicate_index": 2,
+      "tensor": {
+        "byte_length": 79895,
+        "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309011-I2.bin",
+        "sha256": "d2fc472361b086c92cfee31d6c440de58a62a7bcc9b25c53565afdc16f0e0908"
+      }
+    }
+  ],
+  "normalizers_by_fold": {
+    "0": {
+      "byte_length": 576,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-00.bin",
+      "sha256": "710cf55b18c1051f6ac325ff7a9fab9cf8fe696ca4bd51798a969a10afbd5a0d"
+    },
+    "1": {
+      "byte_length": 576,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-01.bin",
+      "sha256": "5f69dd52aca323fac49593a883835b8122424193067cd0bce6cdfe26554b7bf9"
+    },
+    "10": {
+      "byte_length": 576,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-10.bin",
+      "sha256": "cd597b5dfe7cf0176e76456dc4de1cc326bd8de11d1432106c7374d63945b468"
+    },
+    "11": {
+      "byte_length": 576,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-11.bin",
+      "sha256": "f3099cda6890113631e75701a0fa4d9b889975f66916edd17907fdd282ae6787"
+    },
+    "2": {
+      "byte_length": 576,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-02.bin",
+      "sha256": "b974207ffdebb7f37d2f997b74e58c892c59e839ca68f1fab580c6d37e9c3590"
+    },
+    "3": {
+      "byte_length": 576,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-03.bin",
+      "sha256": "339bf2b1be4ab7a13296a88b1a34e98087bb90643cb03e98ace91b558124b021"
+    },
+    "4": {
+      "byte_length": 576,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-04.bin",
+      "sha256": "ce8e97f0686999b21a34331529ef3c12116a2bb396e9de5d2afd709bdf3b3e57"
+    },
+    "5": {
+      "byte_length": 576,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-05.bin",
+      "sha256": "0bbb4db87e95c4b112b4529c488d91f6d490786fb92058b2e8d67298577f9904"
+    },
+    "6": {
+      "byte_length": 576,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-06.bin",
+      "sha256": "38bd89f28fa4d21bae6edbf798e8bcb7ac2e56677a79a13056590074b47fccc9"
+    },
+    "7": {
+      "byte_length": 576,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-07.bin",
+      "sha256": "3b95e9df81b1645ec25293e083af2fd7c79dedc4819912d95eafe630b05679c7"
+    },
+    "8": {
+      "byte_length": 576,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-08.bin",
+      "sha256": "5a9ea8ae51aad377c6db8ed073c560dd6239d49f4f96ac84ed5df5024d3a60cc"
+    },
+    "9": {
+      "byte_length": 576,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-09.bin",
+      "sha256": "896f1e8038b86d2f94bc7c86c52314a5e33f4398a01fbc72ca88332e368f41ba"
+    }
+  },
+  "schema": "F4-BINDING-01-frozen-cphi-model-registry-v0.1",
+  "selection": "all and only parent Cphi fits; no model selection or weight averaging"
+}

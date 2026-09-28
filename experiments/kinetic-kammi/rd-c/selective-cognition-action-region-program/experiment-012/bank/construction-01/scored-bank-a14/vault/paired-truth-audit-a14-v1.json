@@ -1,0 +1,744 @@
+{
+  "schema_version": 1,
+  "state": "A14_PAIRED_TRUTH_AUDIT_FAIL_REQUIRES_REPAIR",
+  "model_contact_authorized": false,
+  "task_count": 48,
+  "pair_group_count": 20,
+  "pair_groups_passed": 19,
+  "pair_groups_failed": 1,
+  "pair_groups": [
+    {
+      "pair_id": "abstain-1137",
+      "family": "raw-number-lossless",
+      "kind": "abstention_control",
+      "applicable": false,
+      "all_candidates_fail": true,
+      "pass": true
+    },
+    {
+      "pair_id": "abstain-7432",
+      "family": "conflicting-alias-requirement",
+      "kind": "abstention_control",
+      "applicable": false,
+      "all_candidates_fail": true,
+      "pass": true
+    },
+    {
+      "pair_id": "factorial-2921",
+      "family": "composite-frame-field",
+      "kind": "two_by_two_joint_counterfactual",
+      "applicable": true,
+      "factor_pairs": [
+        {
+          "varying_channel": "E_t",
+          "fixed_factor": 0,
+          "task_ids": [
+            "task-943194",
+            "task-215890"
+          ],
+          "changed_fields": [
+            "E_t"
+          ],
+          "valid_action_ids": [
+            [
+              22115
+            ],
+            [
+              51145
+            ]
+          ],
+          "pass": true
+        },
+        {
+          "varying_channel": "E_t",
+          "fixed_factor": 1,
+          "task_ids": [
+            "task-104800",
+            "task-299379"
+          ],
+          "changed_fields": [
+            "E_t"
+          ],
+          "valid_action_ids": [
+            [
+              28666
+            ],
+            [
+              62972
+            ]
+          ],
+          "pass": true
+        },
+        {
+          "varying_channel": "E_x",
+          "fixed_factor": 0,
+          "task_ids": [
+            "task-943194",
+            "task-104800"
+          ],
+          "changed_fields": [
+            "E_x"
+          ],
+          "valid_action_ids": [
+            [
+              22115
+            ],
+            [
+              28666
+            ]
+          ],
+          "pass": true
+        },
+        {
+          "varying_channel": "E_x",
+          "fixed_factor": 1,
+          "task_ids": [
+            "task-215890",
+            "task-299379"
+          ],
+          "changed_fields": [
+            "E_x"
+          ],
+          "valid_action_ids": [
+            [
+              51145
+            ],
+            [
+              62972
+            ]
+          ],
+          "pass": true
+        }
+      ],
+      "pass": true,
+      "errors": []
+    },
+    {
+      "pair_id": "factorial-9476",
+      "family": "number-mode-plus-error-site",
+      "kind": "two_by_two_joint_counterfactual",
+      "applicable": true,
+      "factor_pairs": [
+        {
+          "varying_channel": "E_t",
+          "fixed_factor": 0,
+          "task_ids": [
+            "task-401405",
+            "task-261550"
+          ],
+          "changed_fields": [
+            "E_x"
+          ],
+          "valid_action_ids": [
+            [
+              31026
+            ],
+            [
+              52928
+            ]
+          ],
+          "pass": false
+        },
+        {
+          "varying_channel": "E_t",
+          "fixed_factor": 1,
+          "task_ids": [
+            "task-582537",
+            "task-395319"
+          ],
+          "changed_fields": [
+            "E_x"
+          ],
+          "valid_action_ids": [
+            [
+              29284
+            ],
+            [
+              49443
+            ]
+          ],
+          "pass": false
+        },
+        {
+          "varying_channel": "E_x",
+          "fixed_factor": 0,
+          "task_ids": [
+            "task-401405",
+            "task-582537"
+          ],
+          "changed_fields": [
+            "E_t"
+          ],
+          "valid_action_ids": [
+            [
+              31026
+            ],
+            [
+              29284
+            ]
+          ],
+          "pass": false
+        },
+        {
+          "varying_channel": "E_x",
+          "fixed_factor": 1,
+          "task_ids": [
+            "task-261550",
+            "task-395319"
+          ],
+          "changed_fields": [
+            "E_t"
+          ],
+          "valid_action_ids": [
+            [
+              52928
+            ],
+            [
+              49443
+            ]
+          ],
+          "pass": false
+        }
+      ],
+      "pass": false,
+      "errors": [
+        "factor_pair_failed:E_t:0",
+        "factor_pair_failed:E_t:1",
+        "factor_pair_failed:E_x:0",
+        "factor_pair_failed:E_x:1"
+      ]
+    },
+    {
+      "pair_id": "pair-2372-1",
+      "family": "stream-byte-offset",
+      "kind": "single_channel_counterfactual",
+      "target": "E_x",
+      "task_ids": [
+        "task-131190",
+        "task-180180"
+      ],
+      "presentation_task_ids": [
+        "task-e8fdd1f4",
+        "task-e8fdd1f4"
+      ],
+      "changed_fields": [
+        "E_x"
+      ],
+      "valid_action_ids": [
+        [
+          54579
+        ],
+        [
+          40696
+        ]
+      ],
+      "test_suites_equal": false,
+      "pass": true,
+      "errors": []
+    },
+    {
+      "pair_id": "pair-2372-2",
+      "family": "stream-byte-offset",
+      "kind": "single_channel_counterfactual",
+      "target": "E_x",
+      "task_ids": [
+        "task-192782",
+        "task-922800"
+      ],
+      "presentation_task_ids": [
+        "task-8f66a11b",
+        "task-8f66a11b"
+      ],
+      "changed_fields": [
+        "E_x"
+      ],
+      "valid_action_ids": [
+        [
+          31157
+        ],
+        [
+          58080
+        ]
+      ],
+      "test_suites_equal": false,
+      "pass": true,
+      "errors": []
+    },
+    {
+      "pair_id": "pair-3129-1",
+      "family": "bounded-prefix-copy",
+      "kind": "single_channel_counterfactual",
+      "target": "E_c.content",
+      "task_ids": [
+        "task-348504",
+        "task-742866"
+      ],
+      "presentation_task_ids": [
+        "task-8c717407",
+        "task-8c717407"
+      ],
+      "changed_fields": [
+        "E_c.content"
+      ],
+      "valid_action_ids": [
+        [
+          42559,
+          64060
+        ],
+        [
+          47505,
+          51536
+        ]
+      ],
+      "test_suites_equal": true,
+      "pass": true,
+      "errors": []
+    },
+    {
+      "pair_id": "pair-3129-2",
+      "family": "bounded-prefix-copy",
+      "kind": "single_channel_counterfactual",
+      "target": "E_c.content",
+      "task_ids": [
+        "task-724742",
+        "task-809202"
+      ],
+      "presentation_task_ids": [
+        "task-17dc5b28",
+        "task-17dc5b28"
+      ],
+      "changed_fields": [
+        "E_c.content"
+      ],
+      "valid_action_ids": [
+        [
+          42559,
+          64060
+        ],
+        [
+          47505,
+          51536
+        ]
+      ],
+      "test_suites_equal": true,
+      "pass": true,
+      "errors": []
+    },
+    {
+      "pair_id": "pair-4846-1",
+      "family": "possible-value-validation",
+      "kind": "single_channel_counterfactual",
+      "target": "E_c.content",
+      "task_ids": [
+        "task-538216",
+        "task-440067"
+      ],
+      "presentation_task_ids": [
+        "task-f4b5a75d",
+        "task-f4b5a75d"
+      ],
+      "changed_fields": [
+        "E_c.content"
+      ],
+      "valid_action_ids": [
+        [
+          52980
+        ],
+        [
+          57213
+        ]
+      ],
+      "test_suites_equal": true,
+      "pass": true,
+      "errors": []
+    },
+    {
+      "pair_id": "pair-4846-2",
+      "family": "possible-value-validation",
+      "kind": "single_channel_counterfactual",
+      "target": "E_c.content",
+      "task_ids": [
+        "task-312377",
+        "task-342767"
+      ],
+      "presentation_task_ids": [
+        "task-b7f8545e",
+        "task-b7f8545e"
+      ],
+      "changed_fields": [
+        "E_c.content"
+      ],
+      "valid_action_ids": [
+        [
+          32916
+        ],
+        [
+          22012
+        ]
+      ],
+      "test_suites_equal": true,
+      "pass": true,
+      "errors": []
+    },
+    {
+      "pair_id": "pair-5333-1",
+      "family": "map-order-feature-contract",
+      "kind": "single_channel_counterfactual",
+      "target": "E_r",
+      "task_ids": [
+        "task-294600",
+        "task-798417"
+      ],
+      "presentation_task_ids": [
+        "task-5befee37",
+        "task-5befee37"
+      ],
+      "changed_fields": [
+        "E_r"
+      ],
+      "valid_action_ids": [
+        [
+          59171
+        ],
+        [
+          31314
+        ]
+      ],
+      "test_suites_equal": false,
+      "pass": true,
+      "errors": []
+    },
+    {
+      "pair_id": "pair-5333-2",
+      "family": "map-order-feature-contract",
+      "kind": "single_channel_counterfactual",
+      "target": "E_r",
+      "task_ids": [
+        "task-582475",
+        "task-544502"
+      ],
+      "presentation_task_ids": [
+        "task-bbc69658",
+        "task-bbc69658"
+      ],
+      "changed_fields": [
+        "E_r"
+      ],
+      "valid_action_ids": [
+        [
+          38651
+        ],
+        [
+          28214
+        ]
+      ],
+      "test_suites_equal": false,
+      "pass": true,
+      "errors": []
+    },
+    {
+      "pair_id": "pair-6397-1",
+      "family": "wire-endian-contract",
+      "kind": "single_channel_counterfactual",
+      "target": "E_t",
+      "task_ids": [
+        "task-409437",
+        "task-979490"
+      ],
+      "presentation_task_ids": [
+        "task-4c1e6cb6",
+        "task-4c1e6cb6"
+      ],
+      "changed_fields": [
+        "E_t"
+      ],
+      "valid_action_ids": [
+        [
+          25335
+        ],
+        [
+          34126
+        ]
+      ],
+      "test_suites_equal": false,
+      "pass": true,
+      "errors": []
+    },
+    {
+      "pair_id": "pair-6397-2",
+      "family": "wire-endian-contract",
+      "kind": "single_channel_counterfactual",
+      "target": "E_t",
+      "task_ids": [
+        "task-109830",
+        "task-459976"
+      ],
+      "presentation_task_ids": [
+        "task-555bd5d9",
+        "task-555bd5d9"
+      ],
+      "changed_fields": [
+        "E_t"
+      ],
+      "valid_action_ids": [
+        [
+          56199
+        ],
+        [
+          43520
+        ]
+      ],
+      "test_suites_equal": false,
+      "pass": true,
+      "errors": []
+    },
+    {
+      "pair_id": "pair-8072-1",
+      "family": "repeated-option-policy",
+      "kind": "single_channel_counterfactual",
+      "target": "E_t",
+      "task_ids": [
+        "task-626801",
+        "task-366887"
+      ],
+      "presentation_task_ids": [
+        "task-6309c722",
+        "task-6309c722"
+      ],
+      "changed_fields": [
+        "E_t"
+      ],
+      "valid_action_ids": [
+        [
+          22252
+        ],
+        [
+          35639
+        ]
+      ],
+      "test_suites_equal": false,
+      "pass": true,
+      "errors": []
+    },
+    {
+      "pair_id": "pair-8072-2",
+      "family": "repeated-option-policy",
+      "kind": "single_channel_counterfactual",
+      "target": "E_t",
+      "task_ids": [
+        "task-893694",
+        "task-702830"
+      ],
+      "presentation_task_ids": [
+        "task-a16e1f5c",
+        "task-a16e1f5c"
+      ],
+      "changed_fields": [
+        "E_t"
+      ],
+      "valid_action_ids": [
+        [
+          27088
+        ],
+        [
+          44597
+        ]
+      ],
+      "test_suites_equal": false,
+      "pass": true,
+      "errors": []
+    },
+    {
+      "pair_id": "pair-8973-1",
+      "family": "help-color-capability",
+      "kind": "single_channel_counterfactual",
+      "target": "E_r",
+      "task_ids": [
+        "task-962261",
+        "task-343379"
+      ],
+      "presentation_task_ids": [
+        "task-e3f5bd9b",
+        "task-e3f5bd9b"
+      ],
+      "changed_fields": [
+        "E_r"
+      ],
+      "valid_action_ids": [
+        [
+          45190
+        ],
+        [
+          48831
+        ]
+      ],
+      "test_suites_equal": false,
+      "pass": true,
+      "errors": []
+    },
+    {
+      "pair_id": "pair-8973-2",
+      "family": "help-color-capability",
+      "kind": "single_channel_counterfactual",
+      "target": "E_r",
+      "task_ids": [
+        "task-825317",
+        "task-976226"
+      ],
+      "presentation_task_ids": [
+        "task-a1425719",
+        "task-a1425719"
+      ],
+      "changed_fields": [
+        "E_r"
+      ],
+      "valid_action_ids": [
+        [
+          33099
+        ],
+        [
+          63364
+        ]
+      ],
+      "test_suites_equal": false,
+      "pass": true,
+      "errors": []
+    },
+    {
+      "pair_id": "pair-9358-1",
+      "family": "cursor-advance-observation",
+      "kind": "single_channel_counterfactual",
+      "target": "E_x",
+      "task_ids": [
+        "task-827381",
+        "task-334405"
+      ],
+      "presentation_task_ids": [
+        "task-2c0d08b1",
+        "task-2c0d08b1"
+      ],
+      "changed_fields": [
+        "E_x"
+      ],
+      "valid_action_ids": [
+        [
+          34154
+        ],
+        [
+          64124
+        ]
+      ],
+      "test_suites_equal": false,
+      "pass": true,
+      "errors": []
+    },
+    {
+      "pair_id": "pair-9358-2",
+      "family": "cursor-advance-observation",
+      "kind": "single_channel_counterfactual",
+      "target": "E_x",
+      "task_ids": [
+        "task-580656",
+        "task-711391"
+      ],
+      "presentation_task_ids": [
+        "task-16eda64b",
+        "task-16eda64b"
+      ],
+      "changed_fields": [
+        "E_x"
+      ],
+      "valid_action_ids": [
+        [
+          36737
+        ],
+        [
+          31099
+        ]
+      ],
+      "test_suites_equal": false,
+      "pass": true,
+      "errors": []
+    }
+  ],
+  "projection_receipt_audit": {
+    "frame_count": 1248,
+    "receipt_count": 1248,
+    "unique_presentation_task_ids": 26,
+    "errors": [
+      "frame_order_mismatch:23",
+      "frame_order_mismatch:24",
+      "frame_order_mismatch:49",
+      "frame_order_mismatch:50",
+      "frame_order_mismatch:75",
+      "frame_order_mismatch:76",
+      "frame_order_mismatch:101",
+      "frame_order_mismatch:102",
+      "frame_order_mismatch:127",
+      "frame_order_mismatch:153",
+      "frame_order_mismatch:179",
+      "frame_order_mismatch:205",
+      "frame_order_mismatch:231",
+      "frame_order_mismatch:232",
+      "frame_order_mismatch:257",
+      "frame_order_mismatch:258",
+      "frame_order_mismatch:283",
+      "frame_order_mismatch:284",
+      "frame_order_mismatch:309",
+      "frame_order_mismatch:310",
+      "frame_order_mismatch:335",
+      "frame_order_mismatch:361",
+      "frame_order_mismatch:387",
+      "frame_order_mismatch:413",
+      "frame_order_mismatch:439",
+      "frame_order_mismatch:465",
+      "frame_order_mismatch:491",
+      "frame_order_mismatch:517",
+      "frame_order_mismatch:543",
+      "frame_order_mismatch:569",
+      "frame_order_mismatch:595",
+      "frame_order_mismatch:621",
+      "frame_order_mismatch:647",
+      "frame_order_mismatch:673",
+      "frame_order_mismatch:699",
+      "frame_order_mismatch:725",
+      "frame_order_mismatch:751",
+      "frame_order_mismatch:752",
+      "frame_order_mismatch:777",
+      "frame_order_mismatch:778",
+      "frame_order_mismatch:803",
+      "frame_order_mismatch:804",
+      "frame_order_mismatch:829",
+      "frame_order_mismatch:830",
+      "frame_order_mismatch:855",
+      "frame_order_mismatch:856",
+      "frame_order_mismatch:881",
+      "frame_order_mismatch:882",
+      "frame_order_mismatch:907",
+      "frame_order_mismatch:908",
+      "frame_order_mismatch:933",
+      "frame_order_mismatch:934",
+      "frame_order_mismatch:959",
+      "frame_order_mismatch:985",
+      "frame_order_mismatch:1011",
+      "frame_order_mismatch:1037",
+      "frame_order_mismatch:1063",
+      "frame_order_mismatch:1089",
+      "frame_order_mismatch:1115",
+      "frame_order_mismatch:1141",
+      "frame_order_mismatch:1167",
+      "frame_order_mismatch:1193",
+      "frame_order_mismatch:1219",
+      "frame_order_mismatch:1245"
+    ],
+    "pass": false
+  },
+  "input_hashes": {
+    "source_sha256": "5c74f424906f618e817a1cd1f2ba020f5ab02c0c9e39737631b4983e70847bea",
+    "labels_sha256": "45b357bb7b443c84b75d11ce9d56b4f6e1051bfbd3e6a9ec94fd572fc3d187f3",
+    "frames_sha256": "e17bb4b06a34c5636789c6e7fb338c84ca89252069425470634ff27da939c3b4",
+    "truth_index_sha256": "3ab3df48b2d609f9c0d877955e94ffcbf5b570465a00feb5617c47cc76661ca3",
+    "receipts_sha256": "1a8ccb1a72fa9cf21660d61ba2bee3241323c0c8d9302cba7028a78baf1816a8"
+  },
+  "interpretation_boundary": "precontact construction qualification; no observer outputs or tuning"
+}

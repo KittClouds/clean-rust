@@ -1,0 +1,201 @@
+{
+  "arms": [
+    "native",
+    "sign_ref_native_mag",
+    "mag_ref_native_sign",
+    "reference_direction_native_support",
+    "reference_direction_full_support",
+    "weight_oracle"
+  ],
+  "bank_files": [
+    {
+      "bytes": 120122,
+      "path": "inputs/banks/competence.json",
+      "sha256": "93f987163214fefd8c4ea5d25e91c2f5ca8a6dd176fd038d79df08266366b850"
+    },
+    {
+      "bytes": 1918361,
+      "path": "inputs/banks/evaluator-large.json",
+      "sha256": "dcb8dceafe4768a56fb48499189c4d85422ce69dc804fb5ebaef25453d415a3e"
+    },
+    {
+      "bytes": 21014594,
+      "path": "inputs/banks/training.json",
+      "sha256": "1e8b718def045c0352c3305c399b3582c89758c730c1d89659fbe838f6e8b993"
+    }
+  ],
+  "blocks": [
+    62000,
+    62001,
+    62002,
+    62003,
+    62004,
+    62005,
+    62006,
+    62007,
+    62008,
+    62009,
+    62010,
+    62011
+  ],
+  "checkpoints": [
+    0,
+    512,
+    1024,
+    2048,
+    4096,
+    8192
+  ],
+  "graph_seeds": [
+    63000,
+    63001,
+    63002,
+    63003,
+    63004,
+    63005,
+    63006,
+    63007
+  ],
+  "no_biological_promotion": true,
+  "no_lesions": true,
+  "no_pheno_reseal": true,
+  "null_files": [
+    {
+      "bytes": 5255578,
+      "path": "inputs/null-graphs/g001/edges-L.tsv",
+      "sha256": "1c318c907c40d26d2cc0301c93e5b73c15e4e218382ccdb07e7195513fdc12cb"
+    },
+    {
+      "bytes": 5262051,
+      "path": "inputs/null-graphs/g001/edges-R.tsv",
+      "sha256": "e4eed76163c743eedcb20f0a32bf1865258bf6a2988c20cb86ff2dfb51f82149"
+    },
+    {
+      "bytes": 5255578,
+      "path": "inputs/null-graphs/g002/edges-L.tsv",
+      "sha256": "20ed3e802a8a3c57839cecb35369c0f9d3081f23658cc84519864cd29f909cdb"
+    },
+    {
+      "bytes": 5262051,
+      "path": "inputs/null-graphs/g002/edges-R.tsv",
+      "sha256": "98858d3b62e4856cb675b8830da827d61471414fc40976e5254c18227bee12c2"
+    },
+    {
+      "bytes": 5255578,
+      "path": "inputs/null-graphs/g003/edges-L.tsv",
+      "sha256": "0dd03bf7ce9d7924747d89ab66635d6e706558bfc5641922c34de6da1652d48d"
+    },
+    {
+      "bytes": 5262051,
+      "path": "inputs/null-graphs/g003/edges-R.tsv",
+      "sha256": "d05329f02e8fdf9d233e3606d531a4f3e29cd7fda30732c2e9326df9074770ba"
+    },
+    {
+      "bytes": 5255578,
+      "path": "inputs/null-graphs/g004/edges-L.tsv",
+      "sha256": "0ce4c7278c58378101ed61eb759d71576ffb229dbd6542d56ee6f971bf6896f3"
+    },
+    {
+      "bytes": 5262051,
+      "path": "inputs/null-graphs/g004/edges-R.tsv",
+      "sha256": "85d4fd587c003b86098fc58c39f0fe7cc047c6c0fc5c8c919be412bd9bd53ad0"
+    },
+    {
+      "bytes": 5255578,
+      "path": "inputs/null-graphs/g005/edges-L.tsv",
+      "sha256": "d80b94efd7d86f3b15ab4c49ab4be65964be052674e61a465b6f68e48c9c3fb3"
+    },
+    {
+      "bytes": 5262051,
+      "path": "inputs/null-graphs/g005/edges-R.tsv",
+      "sha256": "aa6a05a70b9b41ab8d80db76db509667afd45c1e253420dead02aab72706fcc0"
+    },
+    {
+      "bytes": 5255578,
+      "path": "inputs/null-graphs/g006/edges-L.tsv",
+      "sha256": "2cb01059c684378a04ab9fd026901a98e42a9ca8cdc974b539ea1c06f94d2c19"
+    },
+    {
+      "bytes": 5262051,
+      "path": "inputs/null-graphs/g006/edges-R.tsv",
+      "sha256": "f91ce3b21dd2a77478c4ab892109ec016ca2b0064921d98c47a6064370fa2daa"
+    },
+    {
+      "bytes": 5255578,
+      "path": "inputs/null-graphs/g007/edges-L.tsv",
+      "sha256": "b75973119accc9efdfcab28b9a731cfc1eee702c4fc3cbdea4a1b00b9fc8a03e"
+    },
+    {
+      "bytes": 5262051,
+      "path": "inputs/null-graphs/g007/edges-R.tsv",
+      "sha256": "58745c3a563ceb9f2be708796ae7e970f7b578ef6a9161f9544cd9ca7b3888bc"
+    },
+    {
+      "bytes": 5255578,
+      "path": "inputs/null-graphs/g008/edges-L.tsv",
+      "sha256": "5b4f70518a00868a3a5435f1ad603959c425aca9eb3e069010aff3d63ca32f70"
+    },
+    {
+      "bytes": 5262051,
+      "path": "inputs/null-graphs/g008/edges-R.tsv",
+      "sha256": "65c4f7e3c5c0301e53a061b8bac44701c56bbfddc994ce82d2a78bf6d3a77875"
+    }
+  ],
+  "oracle_lr": 0.5,
+  "oracle_steps": 128,
+  "pretraining_trials": 8192,
+  "primary_task": "four_cue",
+  "purpose": "engineering-only anatomy of native adaptive direction failure",
+  "reference_lr": 0.05,
+  "schema": "FLY-REACH-01-manifest-v1",
+  "sides": [
+    "L",
+    "R"
+  ],
+  "source_files": [
+    {
+      "bytes": 5717837,
+      "path": "inputs/anatomy/edges-L.tsv",
+      "sha256": "ed6044a5de43b2c6acd58aa034967ac80a595ab55456a04f505ecb764d36b0de"
+    },
+    {
+      "bytes": 5725623,
+      "path": "inputs/anatomy/edges-R.tsv",
+      "sha256": "42b602cd95cf169e86cee7fdc3b28f59e068677aa63e382b845af30c2bffa573"
+    },
+    {
+      "bytes": 58761,
+      "path": "inputs/anatomy/nodes-L.tsv",
+      "sha256": "3fc14bc6bf33e6a1fc2af7f377b7a23f6700ff916030b840bab4259d76e5232f"
+    },
+    {
+      "bytes": 58949,
+      "path": "inputs/anatomy/nodes-R.tsv",
+      "sha256": "871cf14a0daf569139b2a880f1927a0f3be7b4d11f5feb47bd435178b74d347f"
+    }
+  ],
+  "stage_diagnostics": [
+    "eligibility",
+    "modulation",
+    "aggregation",
+    "delivered",
+    "cosine",
+    "support_fraction",
+    "reference_mass_on_native_support",
+    "sign_agreement",
+    "magnitude_pearson"
+  ],
+  "study_id": "FLY-REACH-01",
+  "substrates": [
+    "fly",
+    "g001",
+    "g002",
+    "g003",
+    "g004",
+    "g005",
+    "g006",
+    "g007",
+    "g008"
+  ],
+  "threshold": 0.25
+}

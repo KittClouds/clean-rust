@@ -1,0 +1,17 @@
+{
+  "schema": "F4-INVARIANT-01-RUN2-precollection-stop-v1",
+  "status": "STOP",
+  "gate": "NATIVE_COLLECTOR_INVOCATION",
+  "detail": "The frozen wrapper omitted the required --collect command switch. The executable rejected invocation before native_collect::run.",
+  "native_exit_code": 1,
+  "task_bank_sha256": "8e49f61018255fa32d4328056d46a0b5a14b70306ccfa98733849dcac245c02c",
+  "task_bank_manifest_sha256": "29cfb77356f9ad0a637d1e7e1d5cbb935c4d6c7f28451ae184d9e44d1d9cb745",
+  "native_output_directory_empty": true,
+  "raw_predictors_created": false,
+  "scoring_truth_created": false,
+  "native_collection_started": false,
+  "fit_manifest_created": false,
+  "fits_executed": false,
+  "scientific_outcomes_opened": false,
+  "task_bank_will_be_reused_byte_identically": true
+}

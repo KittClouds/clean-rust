@@ -1,0 +1,125 @@
+{
+  "schema_version": 1,
+  "classification": "postrun deterministic input-adapter check; no model contact or labels",
+  "created_utc": "2026-09-25T21:26:48.206258+00:00",
+  "inputs": {
+    "e010_frame_lock_sha256": "de330f467dfe8d14d66dba428211b8a27c3eb8a62dd175ba01cf5847728eb587",
+    "e011_r2_order_only_frame_lock_sha256": "2bc405878bcb9f85d1ea6c4d62239a276b17697f799bd1a6d4360847ddb8ccad"
+  },
+  "task_count": 16,
+  "exact_frame_reconstruction_count": 16,
+  "tasks": [
+    {
+      "task_id": "turbovec-turbovec-mask-allowlist-v1",
+      "repository_id": "turbovec",
+      "producer_order_restored": true,
+      "baseline_frame_sha256": "45e8fd20226a136874c4e43bcbf6ae4c6906b2ced0786b0f646a80349884c216",
+      "restored_frame_sha256": "45e8fd20226a136874c4e43bcbf6ae4c6906b2ced0786b0f646a80349884c216"
+    },
+    {
+      "task_id": "turbovec-turbovec-mask-allowlist-v2",
+      "repository_id": "turbovec",
+      "producer_order_restored": true,
+      "baseline_frame_sha256": "84f68eef9c5a3623d50f1a1ce3856936ebc877c8edecd825c8096f9c3c252ff6",
+      "restored_frame_sha256": "84f68eef9c5a3623d50f1a1ce3856936ebc877c8edecd825c8096f9c3c252ff6"
+    },
+    {
+      "task_id": "turbovec-turbovec-id-remove-readd-v1",
+      "repository_id": "turbovec",
+      "producer_order_restored": true,
+      "baseline_frame_sha256": "919e0d0f41ded647b8584f198ea8a80b02ca992766f60f60226866d5bde9cd8e",
+      "restored_frame_sha256": "919e0d0f41ded647b8584f198ea8a80b02ca992766f60f60226866d5bde9cd8e"
+    },
+    {
+      "task_id": "turbovec-turbovec-id-remove-readd-v2",
+      "repository_id": "turbovec",
+      "producer_order_restored": true,
+      "baseline_frame_sha256": "4372b85b4c5197566dfd32846228c25236af74008830a4746efdb122ad0ad596",
+      "restored_frame_sha256": "4372b85b4c5197566dfd32846228c25236af74008830a4746efdb122ad0ad596"
+    },
+    {
+      "task_id": "turbovec-turbovec-id-swap-repair-v1",
+      "repository_id": "turbovec",
+      "producer_order_restored": true,
+      "baseline_frame_sha256": "f099d2a2993467843e26500cd26a3ecf647eff7855308a7831c397efd670a272",
+      "restored_frame_sha256": "f099d2a2993467843e26500cd26a3ecf647eff7855308a7831c397efd670a272"
+    },
+    {
+      "task_id": "turbovec-turbovec-id-swap-repair-v2",
+      "repository_id": "turbovec",
+      "producer_order_restored": true,
+      "baseline_frame_sha256": "63f8380194e45a234eabfd66e9655904bf8a4aa84db368c65462d61c143242ef",
+      "restored_frame_sha256": "63f8380194e45a234eabfd66e9655904bf8a4aa84db368c65462d61c143242ef"
+    },
+    {
+      "task_id": "turbovec-turbovec-rotation-wire-format-v1",
+      "repository_id": "turbovec",
+      "producer_order_restored": true,
+      "baseline_frame_sha256": "f1c6e2b3dd82b3235c87f7da9a6d769e644ea4f9873c7a068a706cdfba96c16d",
+      "restored_frame_sha256": "f1c6e2b3dd82b3235c87f7da9a6d769e644ea4f9873c7a068a706cdfba96c16d"
+    },
+    {
+      "task_id": "turbovec-turbovec-rotation-wire-format-v2",
+      "repository_id": "turbovec",
+      "producer_order_restored": true,
+      "baseline_frame_sha256": "13c3927f204cc01c6e8fd52796bc4c4d78b84273b6c954b429030f805a0e317c",
+      "restored_frame_sha256": "13c3927f204cc01c6e8fd52796bc4c4d78b84273b6c954b429030f805a0e317c"
+    },
+    {
+      "task_id": "ripgrep-ripgrep-case-insensitive-glob-v1",
+      "repository_id": "ripgrep",
+      "producer_order_restored": true,
+      "baseline_frame_sha256": "5c7620d4d3bedabc3c03ee702e47ff6461a12e0b08ed6a7792de9024dc589f3d",
+      "restored_frame_sha256": "5c7620d4d3bedabc3c03ee702e47ff6461a12e0b08ed6a7792de9024dc589f3d"
+    },
+    {
+      "task_id": "ripgrep-ripgrep-case-insensitive-glob-v2",
+      "repository_id": "ripgrep",
+      "producer_order_restored": true,
+      "baseline_frame_sha256": "770ff24c7bdb2b93bf9740b6ebd1018543222dc297a0e31d02016c7e32212c56",
+      "restored_frame_sha256": "770ff24c7bdb2b93bf9740b6ebd1018543222dc297a0e31d02016c7e32212c56"
+    },
+    {
+      "task_id": "ripgrep-ripgrep-literal-separator-glob-v1",
+      "repository_id": "ripgrep",
+      "producer_order_restored": true,
+      "baseline_frame_sha256": "174085d310ca9b48650872cc3c5e3373b5cfc5bd737f443531767f1fc2dc98c3",
+      "restored_frame_sha256": "174085d310ca9b48650872cc3c5e3373b5cfc5bd737f443531767f1fc2dc98c3"
+    },
+    {
+      "task_id": "ripgrep-ripgrep-literal-separator-glob-v2",
+      "repository_id": "ripgrep",
+      "producer_order_restored": true,
+      "baseline_frame_sha256": "f25d99152d20640f20c3b21d8912c80c683add13c94dca22906ba8d8cf7f882c",
+      "restored_frame_sha256": "f25d99152d20640f20c3b21d8912c80c683add13c94dca22906ba8d8cf7f882c"
+    },
+    {
+      "task_id": "ripgrep-ripgrep-recursive-glob-v1",
+      "repository_id": "ripgrep",
+      "producer_order_restored": true,
+      "baseline_frame_sha256": "7085e2648a10e782c87069a1214b40f3f3e397f145e1ae44cbafebc7dc6ad498",
+      "restored_frame_sha256": "7085e2648a10e782c87069a1214b40f3f3e397f145e1ae44cbafebc7dc6ad498"
+    },
+    {
+      "task_id": "ripgrep-ripgrep-recursive-glob-v2",
+      "repository_id": "ripgrep",
+      "producer_order_restored": true,
+      "baseline_frame_sha256": "d86715cadc0dae3034015d8a9adbe304980c1f4701ba5d3d4c2e7170f64d54d1",
+      "restored_frame_sha256": "d86715cadc0dae3034015d8a9adbe304980c1f4701ba5d3d4c2e7170f64d54d1"
+    },
+    {
+      "task_id": "ripgrep-ripgrep-gitignore-bom-v1",
+      "repository_id": "ripgrep",
+      "producer_order_restored": true,
+      "baseline_frame_sha256": "b9298fde00409c3aa133426ff4158d000c62881c1ac77b604a897fc00a2953f6",
+      "restored_frame_sha256": "b9298fde00409c3aa133426ff4158d000c62881c1ac77b604a897fc00a2953f6"
+    },
+    {
+      "task_id": "ripgrep-ripgrep-gitignore-bom-v2",
+      "repository_id": "ripgrep",
+      "producer_order_restored": true,
+      "baseline_frame_sha256": "fd993d830e5fe36566f33e38ad8b0b7bb9361e6fbb62c0f6bbbb4563f84fd102",
+      "restored_frame_sha256": "fd993d830e5fe36566f33e38ad8b0b7bb9361e6fbb62c0f6bbbb4563f84fd102"
+    }
+  ]
+}

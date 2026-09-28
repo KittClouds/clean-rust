@@ -1,0 +1,166 @@
+{
+  "behavioral_inference": false,
+  "dh08b_authorized": false,
+  "events": [
+    {
+      "base_error_norm": 0.000026824623226716822,
+      "best_disjoint_residual_ratio": 0.9966765856529168,
+      "best_shared_residual_ratio": 0.9998814968425858,
+      "block_count": 6,
+      "blocks": [
+        {
+          "base_error_norm": 0.000026824623226716822,
+          "best_bitwise_mismatch_count": 354,
+          "best_residual_norm": 0.00002682144442416801,
+          "best_residual_ratio": 0.9998814968425858,
+          "best_steps": [
+            1,
+            8,
+            1
+          ],
+          "candidate_count": 125,
+          "category": "shared",
+          "coordinate_a": 14443,
+          "coordinate_b": 14589,
+          "coordinate_c": 19162,
+          "direction_a": "up",
+          "direction_b": "down",
+          "direction_c": "down",
+          "residual_reduction": 0.00011850315741424033,
+          "shared_rows": 1,
+          "threshold_row": 324000003,
+          "threshold_score": 0.0
+        },
+        {
+          "base_error_norm": 0.000026824623226716822,
+          "best_bitwise_mismatch_count": 352,
+          "best_residual_norm": 0.000026824623226716822,
+          "best_residual_ratio": 1.0,
+          "best_steps": [
+            1,
+            1,
+            1
+          ],
+          "candidate_count": 125,
+          "category": "shared",
+          "coordinate_a": 10421,
+          "coordinate_b": 23565,
+          "coordinate_c": 23661,
+          "direction_a": "up",
+          "direction_b": "up",
+          "direction_c": "up",
+          "residual_reduction": 0.0,
+          "shared_rows": 1,
+          "threshold_row": 781000003,
+          "threshold_score": 0.0
+        },
+        {
+          "base_error_norm": 0.000026824623226716822,
+          "best_bitwise_mismatch_count": 351,
+          "best_residual_norm": 0.000026823563667724218,
+          "best_residual_ratio": 0.9999605005079233,
+          "best_steps": [
+            1,
+            1,
+            1
+          ],
+          "candidate_count": 125,
+          "category": "shared",
+          "coordinate_a": 43,
+          "coordinate_b": 21458,
+          "coordinate_c": 21693,
+          "direction_a": "up",
+          "direction_b": "down",
+          "direction_c": "down",
+          "residual_reduction": 0.00003949949207671111,
+          "shared_rows": 3,
+          "threshold_row": 138000001,
+          "threshold_score": 0.0
+        },
+        {
+          "base_error_norm": 0.000026824623226716822,
+          "best_bitwise_mismatch_count": 352,
+          "best_residual_norm": 0.000026824623226716822,
+          "best_residual_ratio": 1.0,
+          "best_steps": [
+            1,
+            1,
+            1
+          ],
+          "candidate_count": 125,
+          "category": "disjoint",
+          "coordinate_a": 2046,
+          "coordinate_b": 3448,
+          "coordinate_c": 9287,
+          "direction_a": "up",
+          "direction_b": "down",
+          "direction_c": "up",
+          "residual_reduction": 0.0,
+          "shared_rows": 0,
+          "threshold_row": 18446744073709551615,
+          "threshold_score": 0.0
+        },
+        {
+          "base_error_norm": 0.000026824623226716822,
+          "best_bitwise_mismatch_count": 351,
+          "best_residual_norm": 0.000026807665257413646,
+          "best_residual_ratio": 0.9993678207831719,
+          "best_steps": [
+            16,
+            1,
+            1
+          ],
+          "candidate_count": 125,
+          "category": "disjoint",
+          "coordinate_a": 915,
+          "coordinate_b": 3866,
+          "coordinate_c": 20398,
+          "direction_a": "up",
+          "direction_b": "up",
+          "direction_c": "up",
+          "residual_reduction": 0.0006321792168281215,
+          "shared_rows": 0,
+          "threshold_row": 18446744073709551615,
+          "threshold_score": 0.0
+        },
+        {
+          "base_error_norm": 0.000026824623226716822,
+          "best_bitwise_mismatch_count": 351,
+          "best_residual_norm": 0.00002673547388903005,
+          "best_residual_ratio": 0.9966765856529168,
+          "best_steps": [
+            1,
+            16,
+            4
+          ],
+          "candidate_count": 125,
+          "category": "disjoint",
+          "coordinate_a": 119,
+          "coordinate_b": 4509,
+          "coordinate_c": 21545,
+          "direction_a": "down",
+          "direction_b": "down",
+          "direction_c": "up",
+          "residual_reduction": 0.0033234143470831645,
+          "shared_rows": 0,
+          "threshold_row": 18446744073709551615,
+          "threshold_score": 0.0
+        }
+      ],
+      "disjoint_block_count": 3,
+      "initial_mismatch_count": 352,
+      "parent_status": "Q10_SM_STAGE1_VALID__F32_SAFE_FREEDOM_PRESENT",
+      "seed": 9711,
+      "shared_block_count": 3,
+      "side": "R",
+      "status": "BLOCK_ORDER_AUDIT_COMPLETE",
+      "tau": 16.0,
+      "trial": 128
+    }
+  ],
+  "protocol": "Q10-JBR3",
+  "scientific_seed_bundles": 0,
+  "seed": 9711,
+  "side": "R",
+  "tau": 16.0
+}

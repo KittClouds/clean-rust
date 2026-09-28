@@ -1,0 +1,22 @@
+{
+  "artifact_id": "E012-PC-ACTION-ID-SCHEMA-VERIFICATION-v1.3.2",
+  "bank_generated_by_agent": false,
+  "checks": {
+    "exists:amendment": true,
+    "exists:generator": true,
+    "exists:parent_amendment_v131": true,
+    "exists:parent_lock_v131": true,
+    "exists:parent_verification_v131": true,
+    "no_contact": true,
+    "owner_boundary": true,
+    "schema_range": true,
+    "sha256:amendment": true,
+    "sha256:generator": true,
+    "sha256:parent_amendment_v131": true,
+    "sha256:parent_lock_v131": true,
+    "sha256:parent_verification_v131": true
+  },
+  "lock_sha256": "2bdc000c757440dae73319f276bfa76ed7ddf4210478bcd72b21e787bfbae187",
+  "model_contact_performed": false,
+  "state": "PASS"
+}

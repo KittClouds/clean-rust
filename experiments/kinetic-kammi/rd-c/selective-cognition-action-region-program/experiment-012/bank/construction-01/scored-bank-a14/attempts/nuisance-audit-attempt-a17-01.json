@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "attempt": "A17_NUISANCE_AUDIT_LAUNCH_01",
+  "state": "AUDIT_FAILED_BEFORE_REPORT_DUE_TO_HELDOUT_FEATURE_LOOKUP",
+  "model_contact_authorized": false,
+  "nuisance_audit_lock_sha256": "fdf03de2ed401d0ddec7067f93515184b2fd875aab070cd93ef6e612ebbaa1f7",
+  "audit_script_sha256": "e4425d8bb441e92c71ed3131670a3f8b3329c576e105a6ae30fd6ab94ca2a5e1",
+  "error": "KeyError: action_id in held-out prediction lookup; training branch had been adapted but prediction branch still indexed row by feature name",
+  "audit_output_written": false
+}

@@ -1,0 +1,80 @@
+{
+  "schema": "jev-v08q-r1-packet-seal-and-authorization-v01",
+  "identity": "JEV-V08Q-R1-FIXED-DOSE-RESPONSE-PHENOTYPE-REPLICATION-V01",
+  "status": "SEALED_AUTHORIZED_PENDING_EXECUTION",
+  "contracts": [
+    {
+      "path": "contracts/q-r1-analysis-contract-v01.json",
+      "bytes": 8229,
+      "sha256": "98d5f781d8f98a9a2e6f3737ddbcb2765bbb1f174c25a01292db1e3e5cc4e81b"
+    },
+    {
+      "path": "contracts/q-r1-panel-contract-v01.json",
+      "bytes": 8799,
+      "sha256": "f81ea3fcb3445434dd2f9bfc92bf3c7aa6118efc605c157475b77d75b8e813b1"
+    },
+    {
+      "path": "contracts/q-r1-run-contract-v01.json",
+      "bytes": 8932,
+      "sha256": "e5fb3bd147bd5866849266937dc5b060abd8047c13faf2dea48908af518c1317"
+    }
+  ],
+  "contract_bundle_root_sha256": "dfc1f1c9d1e59a1a9abd930f437f3227261e9fa91f85a70ff3ed4c849e6833c0",
+  "authorization": {
+    "source": "user direction in the current conversation: make the listed contract changes, seal the packet, and authorize one phase-sized run",
+    "scope": "one complete frozen Q-R1 execution from fresh panel construction through independent result verification and result sealing",
+    "panel_construction": true,
+    "model_contact_and_feature_extraction": true,
+    "head_initialization_and_training": true,
+    "heldout_evaluation_and_analysis": true,
+    "automatic_advancement": "Continue through already-contracted phases while all invariants pass; stop only on a contract-bound fail-closed condition. No intermediate user authorization checkpoints.",
+    "forbidden": [
+      "dose changes or sweeps",
+      "seed replacement or extension",
+      "checkpoint selection",
+      "extra checkpoints or steps",
+      "evaluation feedback during training",
+      "NewTight or legacy evaluation",
+      "Phoenix access",
+      "post-hoc threshold or metric changes"
+    ]
+  },
+  "normative_run": {
+    "arms": ["B-DUP", "B-MATCHED", "B-SHAM", "B-SHAM-LOW"],
+    "paired_seeds": [
+      77720160,
+      4245719435,
+      3815947415,
+      3112928194,
+      4241626823,
+      534474641,
+      3124582801,
+      4247677041,
+      811956520,
+      3972258,
+      950790373,
+      949206414
+    ],
+    "scientific_checkpoints": [40, 80, 100, 120],
+    "run_count": 48,
+    "trained_checkpoint_count": 192,
+    "shared_initialization_count": 12,
+    "evaluation_cells": 204,
+    "expected_prediction_rows": 1632000
+  },
+  "ancestry_freshness": {
+    "fields": ["world_id", "root_id", "episode_id", "full_rendered_input_hash", "selector_input_hash"],
+    "required_sets": ["training", "E1", "P-R2", "Q", "already-admitted-R1"],
+    "e1_neighborhood_id_denylist_sha256": "50eebeb5790c29b4a75c6f8df849eb4c2865d3c864932bbd7f636b7a0e52a2cd",
+    "missing_required_set": "fail closed before candidate generation"
+  },
+  "execution_boundary_at_seal": {
+    "panel_generated": false,
+    "feature_extraction": false,
+    "head_initialization": false,
+    "training": false,
+    "heldout_inference": false,
+    "metrics": false,
+    "phoenix_access": false
+  }
+}

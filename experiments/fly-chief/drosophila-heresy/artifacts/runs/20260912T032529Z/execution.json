@@ -1,0 +1,9 @@
+{
+  "autodiff": false,
+  "complete": true,
+  "config": "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\artifacts\\runs\\20260912T032529Z\\sealed\\config.json",
+  "learning_rule_search": false,
+  "outcome_rows": 1728,
+  "threads": 4,
+  "wall_seconds": 24.4730298
+}

@@ -1,0 +1,23 @@
+{
+  "audited_states": 1024,
+  "behavioral_inference": false,
+  "capacity_exact": 0,
+  "capacity_gated": 999,
+  "complete": true,
+  "cumulative_audited_states": 1024,
+  "dh08b_authorized": false,
+  "eligible_states": 999,
+  "final_gate_failures": 0,
+  "initially_equal": 0,
+  "initially_mismatched": 999,
+  "numerically_ambiguous": 0,
+  "parent_constructor_ineligible": 25,
+  "protocol": "Q10-SR4",
+  "repair_valid": 0,
+  "schema_version": 1,
+  "scientific_seed_bundles": 0,
+  "search_entered": 0,
+  "search_exhausted": 0,
+  "stage": "stage1-a",
+  "status": "Q10_SR4_STAGE2A_VALID__CAPACITY_GATED_MIXTURE"
+}

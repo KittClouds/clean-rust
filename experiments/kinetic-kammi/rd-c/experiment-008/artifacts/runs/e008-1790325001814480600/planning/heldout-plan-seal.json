@@ -1,0 +1,14 @@
+{
+  "hashes": {
+    "heldout/current-offers.csv": "6046b34d9fc0ce8b5afd78c8e4437f83f73b4a51711017f57484ecf4e6a0c511",
+    "heldout/public.csv": "e187c6c9a9e1e8e1da45e9d12811ba5d228051888fb4f924af6f4e72231f24f8",
+    "heldout/source-offers.csv": "a98920c8a22f679e82d2f41f1666e7c3bc69f8d674bb08570eed2a3276883628",
+    "heldout/world-recipes.json": "d4ea06d8f7425f1ae559ac875ceefd02c8a0808e6e93ea93bed2c8f58ad5eaf4",
+    "planning/frozen-router-plans.csv": "99eb0be91a53c2d7d904bbcb3a2fa078dd87881c96920b11d628858ca9df40a1"
+  },
+  "labels_or_replies_used": false,
+  "oracle_not_included": true,
+  "ordinary_plan_count": 1216,
+  "ordinary_route_plans_frozen": true,
+  "run_id": "e008-1790325001814480600"
+}

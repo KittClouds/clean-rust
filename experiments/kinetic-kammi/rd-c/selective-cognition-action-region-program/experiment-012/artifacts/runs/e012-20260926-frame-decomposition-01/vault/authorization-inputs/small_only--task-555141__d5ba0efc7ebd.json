@@ -1,0 +1,62 @@
+{
+  "task_id": "small_only-task-555141__d5ba0efc7ebd",
+  "frame_digest_hex": "d5ba0efc7ebd8f2004172fb4734cf683c6921d401c42000405ff8174ab0d9b95",
+  "request_id_hex": "5f72aeaada3cce13629f485c18d17aea4bfc37117dde6bd29eb646d4bbde41d4",
+  "response_request_id_hex": "5f72aeaada3cce13629f485c18d17aea4bfc37117dde6bd29eb646d4bbde41d4",
+  "request_receipt_digest_hex": "90bd23d723435809b7e450dad27054f898531a39d410e7935d38b970e8465548",
+  "response_receipt_digest_hex": "90bd23d723435809b7e450dad27054f898531a39d410e7935d38b970e8465548",
+  "presentation_receipt_hex": "52444351010004000000d5ba0efc7ebd8f2004172fb4734cf683c6921d401c42000405ff8174ab0d9b95db49e998fe4aae57465f45bb650a685e0f904a17c1dd684bcc0fbcbcc304485ccee49dda7358956abbedc67edfc1336d052d79764104f7ab5179eac58b5870e5583a62fca282cab037ef26dc3ca7ba6b46abfd38f5d9e65713a31e1d67262a649cabe6c28c97e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855add1e302707b08567d567b78a09f3b395f43094799e6ed30e7f8ddde8292aa4b8cec",
+  "action_ledger_path": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\artifacts\\runs\\e012-20260926-frame-decomposition-01\\action-ledgers\\small_only\\task-555141__d5ba0efc7ebd.bin",
+  "ordered_options": [
+    {
+      "producer_ordinal": 0,
+      "action": {
+        "id": 58574,
+        "schema_id": 1
+      },
+      "summary": "Apply the candidate change shown in the code excerpt.",
+      "diff_excerpt": "@@ -3,5 +3,6 @@\n pub fn normalize_json_number(input: &str) -> Option<String> {\n     let value: Value = serde_json::from_str(input).ok()?;\n     // E012 candidate slot.\n-    serde_json::to_string(&value).ok()\n+    let number = value.get(\"n\")?.as_u64()?;\n+    Some(format!(r#\"{{\"n\":{number},\"tag\":\"x\"}}\"#))\n }",
+      "patch_sha256": "9dda7358956abbedc67edfc1336d052d79764104f7ab5179eac58b5870e5583a"
+    },
+    {
+      "producer_ordinal": 1,
+      "action": {
+        "id": 64610,
+        "schema_id": 1
+      },
+      "summary": "Apply the candidate change shown in the code excerpt.",
+      "diff_excerpt": "@@ -3,5 +3,6 @@\n pub fn normalize_json_number(input: &str) -> Option<String> {\n     let value: Value = serde_json::from_str(input).ok()?;\n     // E012 candidate slot.\n-    serde_json::to_string(&value).ok()\n+    let number = value.get(\"n\")?.as_i64()?;\n+    Some(format!(r#\"{{\"n\":{number},\"tag\":\"x\"}}\"#))\n }",
+      "patch_sha256": "a282cab037ef26dc3ca7ba6b46abfd38f5d9e65713a31e1d67262a649cabe6c2"
+    },
+    {
+      "producer_ordinal": 2,
+      "action": {
+        "id": 38796,
+        "schema_id": 1
+      },
+      "summary": "Apply the candidate change shown in the code excerpt.",
+      "diff_excerpt": "",
+      "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "producer_ordinal": 3,
+      "action": {
+        "id": 53677,
+        "schema_id": 1
+      },
+      "summary": "Apply the candidate change shown in the code excerpt.",
+      "diff_excerpt": "@@ -3,5 +3,6 @@\n pub fn normalize_json_number(input: &str) -> Option<String> {\n     let value: Value = serde_json::from_str(input).ok()?;\n     // E012 candidate slot.\n-    serde_json::to_string(&value).ok()\n+    let number = value.get(\"n\")?.as_f64()?;\n+    Some(format!(r#\"{{\"n\":{number},\"tag\":\"x\"}}\"#))\n }",
+      "patch_sha256": "e302707b08567d567b78a09f3b395f43094799e6ed30e7f8ddde8292aa4b8cec"
+    }
+  ],
+  "observer_output": {
+    "action_choice": null,
+    "applicability_milli": 0,
+    "abstention_milli": 1000
+  },
+  "thresholds": {
+    "minimum_applicability_milli": 850,
+    "maximum_abstention_milli": 150
+  },
+  "completion_check_passed": false
+}

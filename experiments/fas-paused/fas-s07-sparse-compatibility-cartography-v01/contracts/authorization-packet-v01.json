@@ -1,0 +1,7 @@
+{
+  "authorization_id":"FAS_S07_AUTHORIZATION_V01",
+  "source":"Explicit user direction: S06 earns the SAE; execute the S07 sparse compatibility cartography golden path.",
+  "authorized":true,
+  "allowed":["verify bound parent seals","fit three fixed shared TopK SAEs on S01 training-side standardized feature rows","evaluate frozen reconstruction gate on sealed S01 test and FAS00 external rows","if gate passes, encode and analyze the prospectively defined sparse activations, couplings, groups, ablations, and coupling swaps","seal outputs"],
+  "forbidden":["load LFM or tokenizer","new feature extraction","probe fitting or modification","use S01 heldout or FAS00 for SAE fitting/group selection","change frozen hyperparameters after fitting","continue or select checkpoints based on evaluation","semantic feature naming","layerwise analysis","adaptive mechanisms","modify parent artifacts"]
+}

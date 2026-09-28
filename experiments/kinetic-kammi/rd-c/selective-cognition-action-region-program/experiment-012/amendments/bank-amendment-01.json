@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "amendment_id": "E012-BANK-A01",
+  "base_bank_plan": "1.0",
+  "state": "PRETASK_FIXTURE_FAMILY_REPAIR",
+  "model_contact_authorized": false,
+  "scored_task_frames_created": false,
+  "replaced_family": {
+    "old_id": "clap/derive-feature-compatibility",
+    "old_support": ["E_c.content", "E_r"],
+    "reason": "The proposed completion test did not isolate context; the render_help string view discards ANSI styling."
+  },
+  "effective_family": {
+    "id": "clap/help-color-capability",
+    "stratum": "context_sensitive",
+    "support": ["E_c.content", "E_r"],
+    "task_contract": "ColorChoice::Always when typed context supports ANSI, otherwise ColorChoice::Never",
+    "paired_counterfactual": "change only E_r capability state and the expected action role",
+    "check": "Command::get_color equals the context-required ColorChoice",
+    "actual_terminal_rendering_claim": false
+  },
+  "preserved": [
+    "repository set and commits",
+    "task count and family count",
+    "four tasks per family",
+    "all other family assignments",
+    "candidate/action identity rules",
+    "condition matrix, authority, scoring, and no-contact gate"
+  ]
+}

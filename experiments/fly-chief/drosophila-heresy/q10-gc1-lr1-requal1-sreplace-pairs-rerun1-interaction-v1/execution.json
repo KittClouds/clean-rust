@@ -1,0 +1,41 @@
+{
+  "behavioral_probe": false,
+  "counts": {
+    "axis_nonzero": 0,
+    "contexts": 8,
+    "linear_drive_nonzero": 0,
+    "norm_nonzero": 1878,
+    "pair_records": 4999,
+    "readout_nonzero": 0,
+    "weight_nonzero": 0
+  },
+  "engineering_only": true,
+  "execution_hygiene": {
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "preflight_no_pycache": true,
+    "python_flag_B": true,
+    "unexpected_path_policy": "FAIL_PROMOTION",
+    "write_allowlist": [
+      "shards/*.jsonl",
+      "execution.json",
+      "STATUS.json"
+    ]
+  },
+  "historical_lr1_results_used_as_evidence": false,
+  "identity": "q10-gc1-lr1-requal1-sreplace-pairs-rerun1-interaction-v1",
+  "parent_morphology_report_sha256": "8C58E33BAFB3A0B23417EDF88C08AF1249EA8274731225BB7F8EB952DDE93D29",
+  "parent_rerun_execution_sha256": "F160638BF6009ED4050A1427D3A3D8C8F56DE777CBBE2AFEEAB1704FE28B6B0E",
+  "protocol": "REQUAL1-SREPLACE-PAIRS-RERUN1-INTERACTION",
+  "scientific_promotion": false,
+  "shard_hashes": {
+    "seed9731-L-tau16__set2": "3DFA0B931419CB17CE203DA853E03E2C758C46413AFC2A956FC82D62C63F8760",
+    "seed9731-L-tau4__set3": "BC03F7B5CFF8D0685F87BE9DA241D26BFACAD128A6D3E3CF9E6F3546220B0B92",
+    "seed9731-R-tau16__set1": "F30C82FB97217CF2F2EC48D0B41CDCC66A96FA5DF301DA7ED4DFDD5E41C4DDA3",
+    "seed9731-R-tau16__set3": "37517E5F3DC66819F61F5A7BB8ACE1921282415F10551D2DEFA5C3EB0985B570",
+    "seed9731-R-tau4__set0": "37517E5F3DC66819F61F5A7BB8ACE1921282415F10551D2DEFA5C3EB0985B570",
+    "seed9731-R-tau4__set1": "5089B9A7A377DCB77CDF19CFC5A8047D35B6B15301338D54332A283D565E1B88",
+    "seed9731-R-tau4__set2": "949573F3C913D29605308F5770F84C850BF5DECB9B1A80F4CEEBCEA6E955AAFD",
+    "seed9731-R-tau4__set3": "81173A0B785823F3D943AEFA33B2F544B0A3C8DE836E17B4607D7277DF9772A2"
+  },
+  "status": "INTERACTION_REPLAY_COMPLETE"
+}

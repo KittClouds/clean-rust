@@ -1,0 +1,294 @@
+{
+  "freeze_id": "FAS_FROZEN_OBSERVER_BUNDLE_E0_FREEZE_V05",
+  "project_id": "fas-frozen-observer-bundle-engineering-v01",
+  "status": "E0_V05_DRAFT_NOT_FROZEN",
+  "frozen_utc_date": "2026-09-25",
+  "starting_history": {
+    "cross_lab_snapshot": "docs/day-06-research-state-2026-09-25.md",
+    "fas_historical_record": "FAS-00 -> S01 accessibility -> S05 representation/readout match -> S11 fresh-world transport",
+    "engineering_question": "Can one pinned frozen representation cache support five independent narrow observers with useful task performance and lower repeated extraction/storage cost?",
+    "historical_metrics_are_motivation_only": true,
+    "historical_s01_panel_labels_features_and_fits_reused": false
+  },
+  "representation_abi_path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/representation-abi-v02.json",
+  "representation_abi_sha256": "17089e961446035a706b3c1c627e7877dfb6905b1b2b28f746844660fad6fbb4",
+  "panel_world_contract_path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/panel-world-contract-v03.json",
+  "panel_world_contract_sha256": "1a2ba8795ec34434c8e1c0c43937a999195bd04ca5284a8e83d12578908a86cb",
+  "extractor_source_path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/extract_features_v02.py",
+  "extractor_source_sha256": "c026bc682503c2357fcbabaa27a3f9208eb24ad9e0bd554e8887645cdd2c5567",
+  "panel_generator": {
+    "source_sha256": "fa2bd0617135a0dce4e12f0e0967f82e461133b394a7d969daba5afb11e2cce1",
+    "entrypoint_source_sha256": "7ce62779ddf8dd994ad9ace6a10dd5bda76de3bd87c1c0e19459cf38b428ec0f",
+    "cargo_manifest_sha256": "c7448c046ceb9722a96ef3318bbc0b55e459ecdf06f6ea1c87634b10a27d022a",
+    "cargo_lock_sha256": "4ed5fca0a39c8869c082daf94cb0afd183533714a8253e44acf8d610129e17d7",
+    "versioned_source_root": "experiments/fas-frozen-observer-bundle-engineering-v01/source/panel-generator-v04"
+  },
+  "task_endpoints": {
+    "context_identity": "closed-set context_term_id classification over all 32 fitted classes",
+    "entity_identity": "closed-set entity_term_id classification over all 32 fitted classes",
+    "relation": "2-way relation_id classification; fit and score only both terms in train-side ID ranges",
+    "observed_state": "3-way state_id classification; fit and score only both terms in train-side ID ranges",
+    "exact_target": "3-way exact_target prediction; fit only both terms in train-side ID ranges; score in-domain and the three frozen novel-term slices"
+  },
+  "performance_gates": {
+    "primary_metric": "balanced_accuracy",
+    "gate": "one-sided 95 percent whole-quartet-bootstrap lower bound >= 0.90 for each endpoint",
+    "individual_endpoints": [
+      "context_identity",
+      "entity_identity",
+      "relation",
+      "observed_state",
+      "exact_target_in_domain",
+      "exact_target_context_novel",
+      "exact_target_entity_novel",
+      "exact_target_both_novel"
+    ],
+    "multiplicity_statement": "These are eight individual engineering gates. They do not provide a simultaneous 95 percent guarantee over the bundle; no familywise or multiplicity-adjusted claim is made.",
+    "minimum_test_rows_per_class": 200,
+    "no_cross_endpoint_rescue": true,
+    "no_s01_metric_inherited": true
+  },
+  "bootstrap": {
+    "replicates": 10000,
+    "seed": 2026092503,
+    "resampling_unit": "whole quartet; all four rows are sampled together",
+    "lower_bound": "5th percentile of bootstrap balanced-accuracy values",
+    "identity_strata": "quartet baseline A-variant context_term_id for context identity; baseline A-variant entity_term_id for entity identity",
+    "relation_strata": "relation_id",
+    "state_strata": "state_id",
+    "target_strata": "exact_target within each predeclared evaluation endpoint",
+    "sampling": "within each task-specific class stratum, sample the original number of eligible test quartets with replacement"
+  },
+  "observer_fit": {
+    "count": 5,
+    "independent_fits": true,
+    "shared_trainable_parameters": false,
+    "multitask_loss": false,
+    "view_search": false,
+    "scaler": "train-only float64 chunked Welford population mean/scale, chunk_rows=2048; zero scales become 1; persist mean and scale as little-endian float32",
+    "linear_model": "multinomial linear readout; zero-initialized float32 weights and bias; mean cross-entropy plus 0.5 * 1e-4 * sum(weights squared); no bias regularization",
+    "optimizer": {
+      "name": "PyTorch LBFGS",
+      "learning_rate": 1.0,
+      "max_iter": 300,
+      "max_eval": 375,
+      "tolerance_grad": 1e-07,
+      "tolerance_change": 1e-09,
+      "history_size": 10,
+      "line_search": "strong_wolfe"
+    },
+    "determinism_seed": 0,
+    "expected_linear_parameters": 147528,
+    "expected_linear_parameter_bytes_f32": 590112,
+    "expected_scaler_bytes_f32": 81920,
+    "expected_total_observer_bytes_before_metadata": 672032
+  },
+  "serving_workloads": {
+    "declared_bundle_serving_workload": "one raw input -> one backbone extraction -> all five requested heads",
+    "single_head_workload": "one raw input -> one requested head",
+    "single_head_claim": "B1 and B2 each require one backbone extraction for a single-head request; no shared-compute advantage is claimed for this workload.",
+    "five_output_fanout_claim": "B1 performs one extraction plus five readouts; B2 performs five separate pipeline extractions plus five readouts. Label B2 fanout costs as receipt-derived counterfactual arithmetic unless executed.",
+    "readout_latency_batches": [
+      1,
+      32,
+      256,
+      4096
+    ],
+    "report_backbone_extraction_separately": true
+  },
+  "economics": {
+    "B1_SHARED": "one measured full-panel extraction, one feature cache and row manifest, five independent heads",
+    "B2_FIVE_PIPELINES": "five pipeline extractions over the same rows, five identical task caches and manifests, one input corpus shared read-only; primary offline counterfactual",
+    "B3_FIVE_DEPLOYED_BACKBONES": "five separately stored/loaded backbone copies; deployment-context arithmetic only",
+    "B1_and_B2_head_state_equal": true,
+    "historical_panel_feature_cache_bytes": 872415232,
+    "historical_panel_row_manifest_bytes": 368110353,
+    "historical_B2_minus_B1_cache_manifest_bytes": 4962102340,
+    "historical_model_file_bytes": 2340697936,
+    "historical_B3_five_model_file_bytes": 11703489680,
+    "all_historical_sizes_are_budget_arithmetic_not_v01_receipts": true
+  },
+  "integration_parity": {
+    "predicted_label_agreement": 1.0,
+    "logit_atol": 1e-06,
+    "logit_rtol": 1e-06,
+    "standalone_and_bundle_use_identical_feature_rows": true
+  },
+  "resource_limits": {
+    "workspace_target_volume": "D:",
+    "observed_host_ram_bytes_at_freeze": 34239672320,
+    "observed_gpu": "NVIDIA GeForce RTX 3080",
+    "observed_gpu_vram_bytes": 12884901888,
+    "peak_host_ram_bytes_max": 25769803776,
+    "peak_gpu_memory_bytes_max": 10737418240,
+    "fresh_panel_inputs_max_bytes": 411171094,
+    "row_manifest_max_bytes": 736220706,
+    "feature_cache_plus_atomic_staging_max_bytes": 1744830464,
+    "labels_observers_predictions_receipts_scratch_max_bytes": 536870912,
+    "projected_peak_bytes": 3429093176,
+    "model_weights_referenced_read_only": true,
+    "if_model_copy_is_required_add_bytes": 2340697936,
+    "minimum_free_space_after_projected_peak_fraction": 0.1,
+    "recheck_free_space_before_e2": true,
+    "peak_gpu_memory_gate_metric": "extractor-process PyTorch CUDA caching-allocator reserved peak; not total GPU memory used by E2",
+    "gpu_measurement_protocol": {
+      "reset_call": "torch.cuda.reset_peak_memory_stats(cuda:0)",
+      "reset_timing": "after CUDA device availability check and before tokenizer/model loading or model transfer",
+      "required_counters": [
+        "torch.cuda.memory_allocated(cuda:0)",
+        "torch.cuda.memory_reserved(cuda:0)",
+        "torch.cuda.max_memory_allocated(cuda:0)",
+        "torch.cuda.max_memory_reserved(cuda:0)"
+      ],
+      "ceiling_bytes": 10737418240,
+      "pass_gate": "max_memory_reserved <= ceiling_bytes and max_memory_allocated <= max_memory_reserved",
+      "final_sampling": "torch.cuda.synchronize(cuda:0) followed by current allocated, current reserved, peak allocated, and peak reserved after extraction and repeat gate",
+      "process_identity": [
+        "PID",
+        "parent PID",
+        "resolved Python executable",
+        "extractor command line"
+      ],
+      "device_wide_diagnostic": "nvidia-smi used/free memory sampled approximately every 10 seconds, plus before/after snapshots; reported separately and never attributed to the extractor PID",
+      "scope_limit": "PyTorch caching-allocator metrics exclude CUDA context and any non-PyTorch driver allocations; the extractor uses PyTorch for model and tensor allocations",
+      "e2_v01_retroactive_reclassification": "none; the preserved v01 GPU resource gate remains UNVERIFIED",
+      "device_wide_sampler_source": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/sample_e2_resources_v02.ps1",
+      "device_wide_sampler_sha256": "dda73c48afd804b2d3253bf38b498141a75e4123c2d357526f336a78b2d20754",
+      "device_wide_snapshot_command": "nvidia-smi --query-gpu=name,memory.total,memory.used,memory.free,utilization.gpu --format=csv,noheader,nounits",
+      "device_wide_preflight_path": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e2-v02\\receipts\\gpu-device-preflight-v02.csv",
+      "device_wide_postflight_path": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e2-v02\\receipts\\gpu-device-postflight-v02.csv",
+      "scope_claim_exact": "E2 GPU gate = extractor-process PyTorch CUDA caching-allocator reserved peak; not total GPU memory used by E2.",
+      "scope_definition": "torch.cuda.max_memory_reserved(cuda:0), sampled in the extractor process after resetting PyTorch CUDA peak statistics; process-local allocator-reserved peak only.",
+      "total_gpu_memory_claimed": false,
+      "excluded_allocations": [
+        "CUDA context",
+        "non-PyTorch CUDA driver allocations"
+      ],
+      "pre_reset_sample_timing": "after CUDA initialization and device availability check, before any tokenizer load, model load, or model transfer",
+      "pre_reset_clean_baseline_gate": "record current allocated, current reserved, peak allocated, and peak reserved; require all four counters exactly zero or preserve a stop receipt and stop before model/tokenizer loading",
+      "post_reset_sample_timing": "immediately after torch.cuda.reset_peak_memory_stats(cuda:0) and before tokenizer load or model transfer",
+      "post_reset_clean_baseline_gate": "record the same four counters and require all four exactly zero or preserve a stop receipt and stop before model/tokenizer loading",
+      "terminal_receipt_required_fields": [
+        "scope_claim_exact",
+        "total_gpu_memory_claimed",
+        "pre_reset_allocator_counters",
+        "post_reset_allocator_counters",
+        "final_and_process_peak"
+      ],
+      "terminal_receipt_required_values": {
+        "total_gpu_memory_claimed": false
+      }
+    },
+    "peak_gpu_measurement_is_process_specific": true,
+    "device_wide_gpu_telemetry_is_diagnostic_only": true,
+    "process_host_memory_sampler_source": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/sample_e2_resources_v02.ps1"
+  },
+  "phases": {
+    "E0": "E0 v05 proposes a resource-measurement amendment only; it remains draft until explicitly frozen and sealed.",
+    "E1": "fresh panel, whole-quartet split, separate labels, support receipt, resource preflight, and seal",
+    "E2": "E2 v02 requires a new explicit model-contact authorization after E0 v05 is sealed and the E2 v02 wait receipt passes; records clean pre-reset and post-reset process allocator baselines, captures process-scoped PyTorch allocator peaks, requires exact cache SHA/length equality to the read-only E2 v01 comparator, and writes one V1_FINAL_POSITION cache only.",
+    "E3": "Fit and score remain separately unauthorized; E2 v02 success does not grant E3.",
+    "E4": "standalone/bundle parity and result seal"
+  },
+  "program_boundary": {
+    "immediate_downstream_option": "routing integration only after v01 closes and passes",
+    "deferred": [
+      "geometry",
+      "fly/shared-head work",
+      "scale fan-out",
+      "multi-model comparison",
+      "universal capability cartography until v01 closes"
+    ],
+    "no_causal_claim": true
+  },
+  "frozen_source_sha256": {
+    "experiments/fas-frozen-observer-bundle-engineering-v01/source/panel-generator-v04/Cargo.toml": "c7448c046ceb9722a96ef3318bbc0b55e459ecdf06f6ea1c87634b10a27d022a",
+    "experiments/fas-frozen-observer-bundle-engineering-v01/source/panel-generator-v04/Cargo.lock": "4ed5fca0a39c8869c082daf94cb0afd183533714a8253e44acf8d610129e17d7",
+    "experiments/fas-frozen-observer-bundle-engineering-v01/source/panel-generator-v04/src/lib.rs": "e57ddf18054a9c7d049d849d28654bbf85419e13993bc917906cfef3d4669cc7",
+    "experiments/fas-frozen-observer-bundle-engineering-v01/source/panel-generator-v04/src/generate.rs": "fa2bd0617135a0dce4e12f0e0967f82e461133b394a7d969daba5afb11e2cce1",
+    "experiments/fas-frozen-observer-bundle-engineering-v01/source/panel-generator-v04/src/model.rs": "94cca0249f5508be13e186921bc2441a830fa4af695211cd7fb08126a79c11e2",
+    "experiments/fas-frozen-observer-bundle-engineering-v01/source/panel-generator-v04/src/main.rs": "7ce62779ddf8dd994ad9ace6a10dd5bda76de3bd87c1c0e19459cf38b428ec0f",
+    "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/build_panel_v04.ps1": "b18b401da22b6dffb623c0ea858bc38278111484c8fcf587310f399d5f32d56a",
+    "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/seal_e0_v04.py": "5a0c8391eee09d55dd0930cc3c981c5c007b1c0e38379df4602feb29e1c2d615",
+    "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/extract_features_v02.py": "c026bc682503c2357fcbabaa27a3f9208eb24ad9e0bd554e8887645cdd2c5567",
+    "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/wait_for_concurrent_gpu_job_v01.ps1": "9a41e083b638e09411ad2143375d180730a25d1b42937e330eb0373788acd216",
+    "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/sample_e2_resources_v02.ps1": "dda73c48afd804b2d3253bf38b498141a75e4123c2d357526f336a78b2d20754"
+  },
+  "model_contact_authorized": false,
+  "tokenizer_contact_authorized": false,
+  "feature_extraction_authorized": false,
+  "observer_fitting_authorized": false,
+  "amendment": {
+    "amendment_id": "FAS_FROZEN_OBSERVER_BUNDLE_E0_V05_PROCESS_SCOPED_GPU_MEASUREMENT_AND_CONCURRENT_WAIT",
+    "predecessor_e0_root_sha256": "fef50e3d7efe6ff35adf671940ee73112caf8ba6192596094aa6bb3e69ae9ab2",
+    "predecessor_e0_seal_manifest_sha256": "a6bfffbf292fae8809622710b3f45125f1c4b49f163153dc9b0f3e5b9125c4e6",
+    "e1_v04_root_sha256_preserved": "6ba77a899363651e3ba119b005f59a22e86f011f83c86b873857cd3f9ab64b03",
+    "e2_v01_preservation_root_sha256_preserved": "0ff309d833cd87017f7384247e4420a508f582ad9f375c5637f586d73b703f4c",
+    "reason": "E2 v01 telemetry was device-wide while an independently identified FAS-S12 workload ran concurrently; process attribution and the 10 GiB per-process GPU gate therefore remain unverified.",
+    "scientific_design_changed": false,
+    "panel_seed_or_split_changed": false,
+    "task_definitions_or_performance_gates_changed": false,
+    "representation_surface_changed": false,
+    "representation_abi_revision_changed_only_to_bind_v02_extractor_source": true,
+    "resource_gate_measurement_scope_made_explicit": true,
+    "wait_gate_added_before_any_future_model_contact": true,
+    "e2_v01_attempt_modified_or_reclassified": false,
+    "new_model_contact_or_extraction_authorized_by_this_draft": false,
+    "requires_review_then_separate_e0_seal_and_e2_authorization": true,
+    "gpu_gate_scope_claim_narrowed_in_terminal_receipt": true,
+    "clean_allocator_baselines_required_before_and_after_peak_reset": true,
+    "exact_cache_equivalence_gate_added": true,
+    "e2_v01_cache_used_only_as_read_only_hash_comparator": true,
+    "model_contact_or_extraction_authorized_by_this_draft": false
+  },
+  "concurrent_gpu_wait_gate": {
+    "wait_before": "runtime/model/tokenizer import or CUDA model contact in E2 v02",
+    "target_process": {
+      "pid": 34332,
+      "executable": "C:\\Users\\shuga\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "script": "D:\\codex-runs\\fas-s12-observer-plane-causal-dependence-v01\\run-v02\\source\\run_s12_v02.py",
+      "creation_time_local": "2026-09-25T20:08:43"
+    },
+    "also_wait_for": "any process whose command line contains the exact canonical run_s12_v02.py script path, including relaunches under another PID",
+    "success_condition": "zero matching script processes on two consecutive Win32_Process snapshots at least 30 seconds apart",
+    "pid_reuse": "record exact PID reuse and continue matching by canonical script path",
+    "operator_action": "observe and wait; do not terminate, suspend, reprioritize, or otherwise alter the concurrent process",
+    "receipt": "status WAIT_COMPLETE_STABLE_ABSENCE, exact process identity observed, final matching process list empty, stable absence samples and interval recorded, model_contact_performed_by_waiter=false",
+    "implementation_source": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/wait_for_concurrent_gpu_job_v01.ps1",
+    "receipt_path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e2-v02-concurrent-wait-complete-v01.json"
+  },
+  "amendment_history": [
+    {
+      "amendment_id": "FAS_FROZEN_OBSERVER_BUNDLE_E0_V04_NESTED_SUPPORT_GATE_VALIDATOR_FIX",
+      "supersedes_e0_root_sha256": "1e42c8aa5eba7cd8f3d49c5f9f37cfbd277f9899bab750fa3b17dc0aea414a09",
+      "prior_e0_v03_manifest_sha256": "69a0126c81076af95049e24dc09fd76c3de0d0b8a9559b3fcaaab783f6665091",
+      "prior_e1_v01_failure_receipt_sha256": "d5181cbd62a873225af34c9bd4f9b4463c80151db8228e8e46fe394511e1f01e",
+      "prior_e1_v03_failure_receipt_sha256": "1992ff6095bdcb761070708e63d0a3607a9b9cc66c927749bf1874cb469ff3c5",
+      "reason": "The v03 validator read minimum_test_rows_per_class at the top level while the frozen panel contract nests it under support_gate. Both previous E1 attempts stopped before any panel rows were written.",
+      "contract_to_validator_unit_check_added": true,
+      "scientific_design_changed": false,
+      "panel_seed_changed": false,
+      "representation_abi_changed": false,
+      "model_or_tokenizer_contact_occurred": false
+    }
+  ],
+  "e2_v02_protocol_path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/e2-run-v02-draft.json",
+  "e2_v02_protocol_sha256": "b77382a674c857600eacc2ef1978b0300fd926b49c32b51b279a10dd53b9743e",
+  "proposal_document_path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e0-e2-process-gpu-update-v05-draft.md",
+  "proposal_document_sha256": "5e51b39c58c553b60ddaca03bf294732aa280b8e6e0e3b5f4c10127e3368c979",
+  "validation_source_sha256": {
+    "source/tests/test_e2_resource_v02.py": "3e8ca1c5e2fe644902d85c25d7e5308b8eadb1d1dc4e47f9dad31eecdbe8a0b8"
+  },
+  "representation_equivalence_gate": {
+    "gate_id": "E2_V02_EXACT_CACHE_EQUIVALENCE_TO_PRESERVED_E2_V01",
+    "reference_cache_path": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e2-v01\\cache\\V1_FINAL_POSITION.f32le",
+    "reference_cache_sha256": "8eb80df5f73e761fe6c025fc1c66abef2027d639b6c14f56d4177d6e6a7a45a4",
+    "reference_cache_bytes": 872415232,
+    "reference_role": "read-only hash comparator only; not reused as v02 feature input and not eligible for fitting",
+    "check_reference_before_model_or_tokenizer_contact": true,
+    "recheck_reference_after_extraction": true,
+    "output_gate": "exact SHA-256 equality and exact byte length equality",
+    "mismatch_disposition": "preserve v02 cache and failure receipt; stop; no tolerance comparison or in-place repair",
+    "scientific_or_representation_surface_change": false
+  }
+}

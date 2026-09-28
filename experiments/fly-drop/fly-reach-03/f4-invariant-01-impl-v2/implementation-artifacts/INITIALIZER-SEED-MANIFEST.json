@@ -1,0 +1,3772 @@
+{
+  "cells": [
+    {
+      "architecture_id": "sorted_tuple_mlp_v1",
+      "arm": "D",
+      "fold_index": 0,
+      "initial_tensor_sha256": "8450e9d7053d0dfd7d21197249e1baba997b42cd356b52e99460cfd7deca209e",
+      "layers": [
+        {
+          "fan_in": 90,
+          "layer_name": "w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100000000000000000044007731",
+          "seed_u64": 8620741454389749446,
+          "sha256_digest": "c6a66299ad06a377b22fe9ca47eb98acf97869e15a27d90de2937ae12bf5a0cd",
+          "shape": [
+            90,
+            128
+          ],
+          "tensor_sha256": "84d89e0f0785d82f18b8cb6219ffc8f8239f7e81db7c0a4c2e0d8d4e1578b0f8"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100000000000000000044007732",
+          "seed_u64": 13009712936737332343,
+          "sha256_digest": "775c08d0fcc88bb43357e5792d23608d369b45ccd4fc1c3e7600145b7acc7065",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "80b5e588362a7f9403d8a5734d9d5d699eaf4d73a88050427fefa9b4fd8b67f1"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100000000000000000044007733",
+          "seed_u64": 2669902266787251928,
+          "sha256_digest": "d846dd44f7650d251bb0d8fb21f0092e2a63438d689f1f1a75b94b617c79973f",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "ef12f2c4c64673cf89f0653ed0561938248994ebeadc39be0c409af68e7341a9"
+        }
+      ],
+      "parameter_count": 19969,
+      "replicate_index": 0
+    },
+    {
+      "architecture_id": "shared_set_encoder_v1",
+      "arm": "S",
+      "fold_index": 0,
+      "initial_tensor_sha256": "96a97aa4895f1eab69a506c0b0b7e8d4362ede26c8e5e50c694ef1dcd134729e",
+      "layers": [
+        {
+          "fan_in": 6,
+          "layer_name": "phi.w",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100000000000000000053007068692e77",
+          "seed_u64": 1616019063336553705,
+          "sha256_digest": "e94c6facc6406d16779814603522dc0a301ae29335a646531703c9a4b8fca533",
+          "shape": [
+            6,
+            16
+          ],
+          "tensor_sha256": "e1736e17d320e32ececa4899c2929dc7c0c816f3d4e7b217d9459470783283dd"
+        },
+        {
+          "fan_in": 82,
+          "layer_name": "rho.w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000000000000000000530072686f2e7731",
+          "seed_u64": 17766901160632156973,
+          "sha256_digest": "2d83f4f678b690f6e0fdee890bf0aff350c595f6c4b26bacf658394cc2fcdf32",
+          "shape": [
+            82,
+            128
+          ],
+          "tensor_sha256": "382cb015a9de08f5089a3d2b4d2a6d35b6f0ab7f8a6bcb62d3da755c2a868a8e"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "rho.w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000000000000000000530072686f2e7732",
+          "seed_u64": 18405492378399230230,
+          "sha256_digest": "1649a53acd716dff92d2a0813732c6edbe14f67655b0ccd60a4c07d3667ff0d4",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "1b32cd4c4089fddfd1c7b437a5468a91bbc8cac099543b08bafde9625027d977"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "rho.w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000000000000000000530072686f2e7733",
+          "seed_u64": 10702170816092808971,
+          "sha256_digest": "0ba7c39aa7bf859471520caeaf297839f998dbce60ac4d3eac3ceb73914a691d",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "b8b5f8fe35a663791e5c8bb43474506d72953f2b50be2e114ada428091417d92"
+        }
+      ],
+      "parameter_count": 19057,
+      "replicate_index": 0
+    },
+    {
+      "architecture_id": "sorted_tuple_mlp_v1",
+      "arm": "D",
+      "fold_index": 0,
+      "initial_tensor_sha256": "6a8da7947352da200e3b017beefbb92cfba34953264486d959e62cf0a5b51636",
+      "layers": [
+        {
+          "fan_in": 90,
+          "layer_name": "w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100000000000100000044007731",
+          "seed_u64": 10506920469671514147,
+          "sha256_digest": "23100dc67f14d09154ab11fa6621e16668584f2782a58757efd25112f71a8864",
+          "shape": [
+            90,
+            128
+          ],
+          "tensor_sha256": "005bda71f62015b0c438856fdbc0002e9a35b2b071a5b2741d396231bc765ca5"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100000000000100000044007732",
+          "seed_u64": 18217562295104904870,
+          "sha256_digest": "a61e47f962c8d1fc4405b22fa0d3cf01b17e8f5a0bdccebcbd862924c5165a8b",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "ff50ac808424193df3c59d9faf698022acec26f779f7a1dd7d9191ce8d0dabab"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100000000000100000044007733",
+          "seed_u64": 9826668437408211092,
+          "sha256_digest": "94604241e1565f882ce881303325dcbb1cde8313301d1bd01c8c3c051f663781",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "11b5493a7be472b2e7cf584834d1165c2665dfa9d59dc205b3ded270d1e1eddb"
+        }
+      ],
+      "parameter_count": 19969,
+      "replicate_index": 1
+    },
+    {
+      "architecture_id": "shared_set_encoder_v1",
+      "arm": "S",
+      "fold_index": 0,
+      "initial_tensor_sha256": "0a12039acb908219b154b80bb8f589129501f429a37f6c5611e45db72798372f",
+      "layers": [
+        {
+          "fan_in": 6,
+          "layer_name": "phi.w",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100000000000100000053007068692e77",
+          "seed_u64": 2299746996309060158,
+          "sha256_digest": "3eea4564b557ea1f3ea4603be6985796b381fda035148d806b96f213b8dbc12c",
+          "shape": [
+            6,
+            16
+          ],
+          "tensor_sha256": "fb936ddad2da8500b07e53472b245b9cdd353393192d57daa3555dbec7e9d74b"
+        },
+        {
+          "fan_in": 82,
+          "layer_name": "rho.w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000000000001000000530072686f2e7731",
+          "seed_u64": 37479295358474390,
+          "sha256_digest": "9618467638278500d2c2f3abd57b4562efebb98f97830efa70f881c80b069341",
+          "shape": [
+            82,
+            128
+          ],
+          "tensor_sha256": "6f4e60c69fb76df169d0156885b1146edcd8430dd3537884c0a8c93a8b6255d5"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "rho.w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000000000001000000530072686f2e7732",
+          "seed_u64": 5091920716931399106,
+          "sha256_digest": "c2fd25f5e922aa467de77e7edac92b35fa53374817673c50c20764e161d179e2",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "604c44347f9c784c360bda80ddd976e3817ad645e7d316ceb3ca7a8855b52f33"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "rho.w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000000000001000000530072686f2e7733",
+          "seed_u64": 16567524263963139282,
+          "sha256_digest": "d21c30218aabebe5388b1b79af99e3b15997fe05f6950193a151b3b874e61b32",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "82d64e6de431dca79be6514886d00ec1b349d48166e7df695d04443205abd2a4"
+        }
+      ],
+      "parameter_count": 19057,
+      "replicate_index": 1
+    },
+    {
+      "architecture_id": "sorted_tuple_mlp_v1",
+      "arm": "D",
+      "fold_index": 0,
+      "initial_tensor_sha256": "badb870f82ce42e882fc669b45c4bab936c130276645d3d5778a0be60912a6ff",
+      "layers": [
+        {
+          "fan_in": 90,
+          "layer_name": "w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100000000000200000044007731",
+          "seed_u64": 6275361398032493570,
+          "sha256_digest": "02ecec76f18f1657abe25ac8391a10b47d3d461495c94287a61dd86dcd78aa4b",
+          "shape": [
+            90,
+            128
+          ],
+          "tensor_sha256": "8d596bced99ffb4c4779dde621052e8a7f04713a0375d131ef5dd6b274624c31"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100000000000200000044007732",
+          "seed_u64": 1262684094107904811,
+          "sha256_digest": "2b6bd65c7ef48511a73391d8168b59d052283abe568523be6dcf4f63e13c7a7e",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "295d766d25fca97cd9418e7c74619c7b15ca914f44bbe33a5dbc5acd45aa8130"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100000000000200000044007733",
+          "seed_u64": 10466484716131437586,
+          "sha256_digest": "12cc1140656c4091751ebaa2f990a109b5e87991af61998e0fc236412db70d45",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "f59e3a999c664d0f8a0902bb08f698e436a0fd5226e468c87f4f98ac9999d5fb"
+        }
+      ],
+      "parameter_count": 19969,
+      "replicate_index": 2
+    },
+    {
+      "architecture_id": "shared_set_encoder_v1",
+      "arm": "S",
+      "fold_index": 0,
+      "initial_tensor_sha256": "b2711f38709d477be06a9d1d6a8847a2b7a457693cccc34b7465e83db5d487c4",
+      "layers": [
+        {
+          "fan_in": 6,
+          "layer_name": "phi.w",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100000000000200000053007068692e77",
+          "seed_u64": 16121972224162945488,
+          "sha256_digest": "d059f2eb51c0bcdfb6890e2752198ff2657bc828a4e001cb27560882fb4f8603",
+          "shape": [
+            6,
+            16
+          ],
+          "tensor_sha256": "c869eb857eaa11a643193bc15be73928ed84e3a51da123f09a570b5f1b4d81ae"
+        },
+        {
+          "fan_in": 82,
+          "layer_name": "rho.w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000000000002000000530072686f2e7731",
+          "seed_u64": 7079367205948335995,
+          "sha256_digest": "7ba71939f7f63e62945f2485e8a26043b69aea0ef5dcab29ab51ac085e4488f1",
+          "shape": [
+            82,
+            128
+          ],
+          "tensor_sha256": "a81439549d416166c32b3d7859862cf0c48b14d3eae291fff067257adefa2e88"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "rho.w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000000000002000000530072686f2e7732",
+          "seed_u64": 6291687545114586384,
+          "sha256_digest": "10ed4dcc7c9050574ee958821346b935a47b3a3ead55a95a5aa2f1d6956db857",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "51c21c5cde95ab8038c38ffe4768d3f657063167b43093a2518e6142cdfc14a4"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "rho.w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000000000002000000530072686f2e7733",
+          "seed_u64": 17941975608152769069,
+          "sha256_digest": "2d42ab44c1b3fef8afb7ed824eff486ae459d3a320692dc5fab9cb56007b37e7",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "d022abf2f5636c690d6b39d366cf552596bc0fe95e1217340967e7992797b76a"
+        }
+      ],
+      "parameter_count": 19057,
+      "replicate_index": 2
+    },
+    {
+      "architecture_id": "sorted_tuple_mlp_v1",
+      "arm": "D",
+      "fold_index": 1,
+      "initial_tensor_sha256": "2d342476718fe79250fa1b11e638af65a22ade7e9c508ccd0b961c7d0d78b084",
+      "layers": [
+        {
+          "fan_in": 90,
+          "layer_name": "w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100010000000000000044007731",
+          "seed_u64": 15170628847711720774,
+          "sha256_digest": "4695263f8fe688d20dc394e03793613bee2477359f013270521ed1eb11ca961c",
+          "shape": [
+            90,
+            128
+          ],
+          "tensor_sha256": "bc22e610016e0f440a2c188551f0dfe7f87b71b5269f5c25eab0d0e2fd6d22b6"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100010000000000000044007732",
+          "seed_u64": 9371712774551487944,
+          "sha256_digest": "c8c521701d030f828ad046644065027a8fa686feeb24d4b7e6d7963e8527eee1",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "faa2accc10d2e20a9d4a91805abd50236f948aff73fbecf7147a29e7117a2184"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100010000000000000044007733",
+          "seed_u64": 727209483197800022,
+          "sha256_digest": "56de4c0b2c91170ab377b8fd26ce7be84781488864344d521733a78dc7e819f4",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "7faa0b9183e91829040eb30688277ade84ba072b1fe28a93b425d1ce215f56a3"
+        }
+      ],
+      "parameter_count": 19969,
+      "replicate_index": 0
+    },
+    {
+      "architecture_id": "shared_set_encoder_v1",
+      "arm": "S",
+      "fold_index": 1,
+      "initial_tensor_sha256": "6e57997e91fad2b2b8e1ea347bf18ae91fe1a95c07d8fde82051ce6cbe4ea61d",
+      "layers": [
+        {
+          "fan_in": 6,
+          "layer_name": "phi.w",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100010000000000000053007068692e77",
+          "seed_u64": 7465822599024506566,
+          "sha256_digest": "c676f02219ee9b674290cced795ecd2e5d1cc991e343fe2bfc0bbcbebe448fa0",
+          "shape": [
+            6,
+            16
+          ],
+          "tensor_sha256": "f8438fc96b542381df03e76181196f02b3cb29b0802594491c6090ef52fb5e5e"
+        },
+        {
+          "fan_in": 82,
+          "layer_name": "rho.w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000100000000000000530072686f2e7731",
+          "seed_u64": 15832213348286441008,
+          "sha256_digest": "30a6cf582852b7db4a7fcebc7c8955090be971f8169b67ca12d5f38a4a536e32",
+          "shape": [
+            82,
+            128
+          ],
+          "tensor_sha256": "bb38cf7bed4673107e9ce2545ecc7c6a6ba4fb8b94390b6fefc25b131a971d57"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "rho.w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000100000000000000530072686f2e7732",
+          "seed_u64": 15499567251717253327,
+          "sha256_digest": "cf68e2924b8619d7ee1a59ae78289c90a1aa6e93ac7a3ff22ea7f20e46c9a4cf",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "4ac7f31f7c06386dec5dfeaf9691a6a57bbc83d66620318bfe3142182761d813"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "rho.w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000100000000000000530072686f2e7733",
+          "seed_u64": 8224710837437475563,
+          "sha256_digest": "eb2ac425ee0a247264ae7d081d41c7cdb8a5521c871e8473afa26864e86e559d",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "4af55f08ef9692882bf4191c502acbbc1db7b022f9ec0aa4a0daa1834dae5157"
+        }
+      ],
+      "parameter_count": 19057,
+      "replicate_index": 0
+    },
+    {
+      "architecture_id": "sorted_tuple_mlp_v1",
+      "arm": "D",
+      "fold_index": 1,
+      "initial_tensor_sha256": "99bdc3b58b7c4ca266cf0e6cbc546f768917dfbe31b49abce3dcfd59815e837a",
+      "layers": [
+        {
+          "fan_in": 90,
+          "layer_name": "w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100010000000100000044007731",
+          "seed_u64": 14329602484638375202,
+          "sha256_digest": "22dd6ccd89f9dcc6aed7808d4ce5f0184c0a65e286bbe5358c7f6610922163aa",
+          "shape": [
+            90,
+            128
+          ],
+          "tensor_sha256": "c8919c5b098f6bc35df9a23d988ca0300934fe8d4ffdf6fa30518b69e919b721"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100010000000100000044007732",
+          "seed_u64": 12192418753774149643,
+          "sha256_digest": "0be08423422c34a94b9a7c78cd1ccd35bacd55840663924324efb281a014e212",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "c4e0464e87df5c8baf87618a14d9ebb3b03a57a92ec54bb7fa72899c2841b853"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100010000000100000044007733",
+          "seed_u64": 3461872058584153621,
+          "sha256_digest": "153ec2a54b0a0b30c7861374face27ae7d7f39dbeadca9d211915290c5934be9",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "255aef3042ab3b791cf4af9069185200978f7321a9ad3b5ebc30c3af642d8e4a"
+        }
+      ],
+      "parameter_count": 19969,
+      "replicate_index": 1
+    },
+    {
+      "architecture_id": "shared_set_encoder_v1",
+      "arm": "S",
+      "fold_index": 1,
+      "initial_tensor_sha256": "69492ccc0a372c4d8edae8fd65b5535207abb203d9298c4c8e7b1de3f31bcd43",
+      "layers": [
+        {
+          "fan_in": 6,
+          "layer_name": "phi.w",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100010000000100000053007068692e77",
+          "seed_u64": 5673195080515018879,
+          "sha256_digest": "7f60972bde3cbb4e1132dcc8381341b96f3aafdd06375de6b5aa915cf8826f27",
+          "shape": [
+            6,
+            16
+          ],
+          "tensor_sha256": "0b64c4947d5db69a8657f9ea7e6539ef210fd9ff1790bb792747283a4131b6a4"
+        },
+        {
+          "fan_in": 82,
+          "layer_name": "rho.w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000100000001000000530072686f2e7731",
+          "seed_u64": 14797380604647223795,
+          "sha256_digest": "f3b1409242db5acd5a0cef80c9a450c6e06f86a1fa5967992fc44bf188cb6482",
+          "shape": [
+            82,
+            128
+          ],
+          "tensor_sha256": "622232feb10c015b001f202c99509dc3defb94125b7f98f0565190e942c46a8a"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "rho.w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000100000001000000530072686f2e7732",
+          "seed_u64": 14191732518436273570,
+          "sha256_digest": "a2fdc0d48829f3c4665a7a7bac5fda61702b65faf08bfa18685fc1eeef6fe204",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "b38da261260388e8b8fca1401475c64fc2db247f6f1c01a25d3dc82e3d40c5c4"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "rho.w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000100000001000000530072686f2e7733",
+          "seed_u64": 12092459098297638298,
+          "sha256_digest": "9a9df8367b0bd1a78d429453670dfc2fa2bd0015f99c3950022d12d4812f3128",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "e1dc2dbbd29b6eb4119e3ec5274397d5f2c00b0634b5c2d125a750de3de790b4"
+        }
+      ],
+      "parameter_count": 19057,
+      "replicate_index": 1
+    },
+    {
+      "architecture_id": "sorted_tuple_mlp_v1",
+      "arm": "D",
+      "fold_index": 1,
+      "initial_tensor_sha256": "8567235281d0a73f48b9202fe7e1c00b473159d579cf87f289076fe8692120c5",
+      "layers": [
+        {
+          "fan_in": 90,
+          "layer_name": "w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100010000000200000044007731",
+          "seed_u64": 504766351751495365,
+          "sha256_digest": "c5beb792524a01072de9e30495f418c62e3aafd72bb7aa57d4d0ae084c0eb6e4",
+          "shape": [
+            90,
+            128
+          ],
+          "tensor_sha256": "78c77705cbd13df719af8a3edee2dbbc8896a09cde65a5d26c18c5363a2b8a23"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100010000000200000044007732",
+          "seed_u64": 9787390465136656934,
+          "sha256_digest": "260284b0c5cbd38753dbd99da8e769652208ea5f99a81cee3e01a84e0aa33e48",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "9edd7d17775ac7913c7940d02d57073b8a87dce6a4f0e5a3e7214bdce9671e0c"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100010000000200000044007733",
+          "seed_u64": 9721733208952527026,
+          "sha256_digest": "b2d8bb78d888ea86e978a0b93b7e5cc4b4d68180384e06eb2f460991a65784d4",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "a192db07500820bf328102fb8b619615c2dcc5dfa2492643b0ec2970ced09afc"
+        }
+      ],
+      "parameter_count": 19969,
+      "replicate_index": 2
+    },
+    {
+      "architecture_id": "shared_set_encoder_v1",
+      "arm": "S",
+      "fold_index": 1,
+      "initial_tensor_sha256": "9970b4f72245580588b4a9784c1cb71a26c1ccdcb4b1078bd8eac8cc49bbbdb5",
+      "layers": [
+        {
+          "fan_in": 6,
+          "layer_name": "phi.w",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100010000000200000053007068692e77",
+          "seed_u64": 5683942332415904265,
+          "sha256_digest": "098a74bf6f6be14eee456af9f9ec22bde6a42608245accc3de9eecbbadcc9fb3",
+          "shape": [
+            6,
+            16
+          ],
+          "tensor_sha256": "7c2a982fd1ce1e64ab60d143f5d094cc208400e482a35817641b2a2fd3c92fd8"
+        },
+        {
+          "fan_in": 82,
+          "layer_name": "rho.w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000100000002000000530072686f2e7731",
+          "seed_u64": 17619765889360864308,
+          "sha256_digest": "3424e60cb9fb85f4f93af43b2e2ec6d250b3fec3af94d71290f182360289986f",
+          "shape": [
+            82,
+            128
+          ],
+          "tensor_sha256": "c4c55ec33764f3d75cb7e4537f4ce041a9622eeec1dc2a36ce019098539fccfc"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "rho.w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000100000002000000530072686f2e7732",
+          "seed_u64": 5437015753614714830,
+          "sha256_digest": "ce6768780529744bbbfe20cdcd2ff4e0047d77fef0c3d1a7bb441801f3c07648",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "534fdbd04f70e2dee1959771a96e7e6fdfae8b4fa2479f3c17f1984750b66bd9"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "rho.w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000100000002000000530072686f2e7733",
+          "seed_u64": 10612227247212078951,
+          "sha256_digest": "6727cc917434469376c391b07ce6403994e19d99398519672ae5a0d3eaeb122d",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "09dc8bc2c3f2dd349ede66bf11f08cef2d988880315898252d942d980a6bfbe8"
+        }
+      ],
+      "parameter_count": 19057,
+      "replicate_index": 2
+    },
+    {
+      "architecture_id": "sorted_tuple_mlp_v1",
+      "arm": "D",
+      "fold_index": 2,
+      "initial_tensor_sha256": "60b202292f065afdc7372cc7eaad74af44885eeebd2ab7037fabeb7449fcc958",
+      "layers": [
+        {
+          "fan_in": 90,
+          "layer_name": "w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100020000000000000044007731",
+          "seed_u64": 12327729179209587219,
+          "sha256_digest": "135a01965fe414ab2260641fd5b6e6eea41c3c51bf1ee86bf34a2652babca4de",
+          "shape": [
+            90,
+            128
+          ],
+          "tensor_sha256": "90c40fcd5d6d7e5d21ff2867045e326ada7126e7e154430879ef9775320102ca"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100020000000000000044007732",
+          "seed_u64": 16948309436092967657,
+          "sha256_digest": "e9eab8d9a27d34eb89f07560b400db853902540ff29135f2157820b122b113ee",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "4654c13f9a7cdd08202e107a25e925fe371ca2fa9883d92c6ca4576fc9a98ffd"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100020000000000000044007733",
+          "seed_u64": 16877520820786437170,
+          "sha256_digest": "321c3cfcc3ff38ea5314caed10408eeec7cca78b75e69bff173042ee5c3e5832",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "a69bd8065dbe9b45d38fc80d6b9bab1a8e1ce2075630d5759ac659c26cf84e4f"
+        }
+      ],
+      "parameter_count": 19969,
+      "replicate_index": 0
+    },
+    {
+      "architecture_id": "shared_set_encoder_v1",
+      "arm": "S",
+      "fold_index": 2,
+      "initial_tensor_sha256": "7899f5ebc4e1194daa1790d6eeb86621a55ba498436307028e8a01cddc92b899",
+      "layers": [
+        {
+          "fan_in": 6,
+          "layer_name": "phi.w",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100020000000000000053007068692e77",
+          "seed_u64": 11508559379895744224,
+          "sha256_digest": "e0f62cf3c79db69ffeefa5441144d596f2571465236d29a8df402e1211d7e422",
+          "shape": [
+            6,
+            16
+          ],
+          "tensor_sha256": "1964cb4506f1d3e0cc336dc845cccaf88795cfab87cdae086c2675f60397b92f"
+        },
+        {
+          "fan_in": 82,
+          "layer_name": "rho.w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000200000000000000530072686f2e7731",
+          "seed_u64": 7250666464959691128,
+          "sha256_digest": "7879c2f4bb8a9f644ebd7dadf3aea213bd1d73add3e538bfa63b22034f876bbe",
+          "shape": [
+            82,
+            128
+          ],
+          "tensor_sha256": "91bc120c775aee82dc77407ec1af9624c8444970876d222a54a555d8cbd28c63"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "rho.w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000200000000000000530072686f2e7732",
+          "seed_u64": 17633520915530314169,
+          "sha256_digest": "b9f19aa5d8d9b6f4c22074e52458d5a3b51dcb5a3015dbb8c204268a87222f25",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "6215fae62965516fc1092ec6e834737b19789dd1ce5c7ff0069e2e06b797f9d1"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "rho.w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000200000000000000530072686f2e7733",
+          "seed_u64": 16183909330225515323,
+          "sha256_digest": "3bcb3831cacb98e0e1eba7bf24a959f5bec85cc5632506cf5e180a30c75863be",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "53af7d1dca34a63e84b93b8ce2eac0b83f02c450e4abb32aab904de535fc9c81"
+        }
+      ],
+      "parameter_count": 19057,
+      "replicate_index": 0
+    },
+    {
+      "architecture_id": "sorted_tuple_mlp_v1",
+      "arm": "D",
+      "fold_index": 2,
+      "initial_tensor_sha256": "0aa8f94d8d040fd98a3720423646b34e21a9c39ba004b9646b987248fcf02eb1",
+      "layers": [
+        {
+          "fan_in": 90,
+          "layer_name": "w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100020000000100000044007731",
+          "seed_u64": 149140532271950068,
+          "sha256_digest": "f4a8ae1f86da1102e59807e0765f9a3cd4cb97831a84f65466a5bf5036ec6e28",
+          "shape": [
+            90,
+            128
+          ],
+          "tensor_sha256": "b7dd9a988025aee946f322fe35282f517aba989a0bc2141173903a62a9a60c6a"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100020000000100000044007732",
+          "seed_u64": 15468763666431338438,
+          "sha256_digest": "c6e71bfc9816acd6e09e228e131c4470a25d11582d960f99fd6bedbf52435307",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "a6c5fce000ff0cbe658097b35d4b72006d86ab9a6985cd49d56e3eb2b1a66486"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100020000000100000044007733",
+          "seed_u64": 153269863038115702,
+          "sha256_digest": "76df28dd20862002a27cd21d5bc1e6717e01e7751186c7b269fbce48a1c9e060",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "4c48b42a7ef953e52e77423708a1743c6c3b88f0cf5449495e2b231340b1bd2f"
+        }
+      ],
+      "parameter_count": 19969,
+      "replicate_index": 1
+    },
+    {
+      "architecture_id": "shared_set_encoder_v1",
+      "arm": "S",
+      "fold_index": 2,
+      "initial_tensor_sha256": "280873d74582e7e079af8a577a474781cb00346126b52b2033396fbb769b5e0b",
+      "layers": [
+        {
+          "fan_in": 6,
+          "layer_name": "phi.w",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100020000000100000053007068692e77",
+          "seed_u64": 12987618771134592493,
+          "sha256_digest": "ed35ac03764a3db41d75d6eb15abd60aa5a7422f06c52a95e014676d12e56861",
+          "shape": [
+            6,
+            16
+          ],
+          "tensor_sha256": "445215f067ed4565c61f69cdc14284704e68b88352a28aa9744b3e4bc2bc9d9a"
+        },
+        {
+          "fan_in": 82,
+          "layer_name": "rho.w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000200000001000000530072686f2e7731",
+          "seed_u64": 9276786960088155114,
+          "sha256_digest": "eac307f596c4bd8018384faf2397a4b000acbc5c28f15934f8a867fbb03d28b5",
+          "shape": [
+            82,
+            128
+          ],
+          "tensor_sha256": "67173ca59d2db9307f9e20a469588bc4e61e36eb8dff78b83a1851337090a5e1"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "rho.w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000200000001000000530072686f2e7732",
+          "seed_u64": 16297388566129817108,
+          "sha256_digest": "1436aeba8df42be22443b3df5fa1cc88edb87df11f298972f8d33e1fba217c52",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "83cd101f28521703498874a781930a97b534ae8f08fc5a1f75f89037d13c7d85"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "rho.w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000200000001000000530072686f2e7733",
+          "seed_u64": 905687508754985574,
+          "sha256_digest": "6672d99cfda5910cbd832b1b24ec6c05aa06402d344e0bd3e787e12113277324",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "067930c439a827ec22bab2578ca57ed588a8d507c6bdb125ad2f86a725af5d25"
+        }
+      ],
+      "parameter_count": 19057,
+      "replicate_index": 1
+    },
+    {
+      "architecture_id": "sorted_tuple_mlp_v1",
+      "arm": "D",
+      "fold_index": 2,
+      "initial_tensor_sha256": "6a1540dc58aa443c32a6b052a040ebddc9d5c07bdaf171f2c34013fdbd4fb382",
+      "layers": [
+        {
+          "fan_in": 90,
+          "layer_name": "w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100020000000200000044007731",
+          "seed_u64": 16182951890182587380,
+          "sha256_digest": "f4c391cf006595e0ddd9ff27a6ea0b84c2eac184a6053e35fa21847c73d108ba",
+          "shape": [
+            90,
+            128
+          ],
+          "tensor_sha256": "ca50168d39ee9bb3a82914b862e26a25deef0112b3b8fdecd8a9ed148b9d7a52"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100020000000200000044007732",
+          "seed_u64": 3830349173311799313,
+          "sha256_digest": "1100f6704722283584cecea7da4c3216feab29514e796a961d14be78b93cb6e3",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "fd412c6f62b97d299f6d9acb4c81a35c9a4148c21bc4226d45981c4284ee29cc"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100020000000200000044007733",
+          "seed_u64": 10195207154916278452,
+          "sha256_digest": "b4404e10e4a67c8d309fc5936b46ca8a68d300fb4f645ab7e443a9f4261e8734",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "ced892435d81bc7c96638e8a46df90f10d7fb7ebd8e7b09db72c8563e7adb8ba"
+        }
+      ],
+      "parameter_count": 19969,
+      "replicate_index": 2
+    },
+    {
+      "architecture_id": "shared_set_encoder_v1",
+      "arm": "S",
+      "fold_index": 2,
+      "initial_tensor_sha256": "6f24d8b5def4ac3996ecd1975a9723381e7ce5ae0534acf259c2a336bb56e60c",
+      "layers": [
+        {
+          "fan_in": 6,
+          "layer_name": "phi.w",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100020000000200000053007068692e77",
+          "seed_u64": 15503112336060906615,
+          "sha256_digest": "77fce2d7871e26d79572297e03266dd1dc076d161b4be3444b6cf263db9990fb",
+          "shape": [
+            6,
+            16
+          ],
+          "tensor_sha256": "d04d659f37d1e8121e2fc1b3b52b6d9dc7cf3ff682dcde2635b82de0c6b9df11"
+        },
+        {
+          "fan_in": 82,
+          "layer_name": "rho.w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000200000002000000530072686f2e7731",
+          "seed_u64": 3453559945796027456,
+          "sha256_digest": "4084b0137982ed2fb98af8103cac8faf9ade91cc6568f984bddcf82ffd4081f3",
+          "shape": [
+            82,
+            128
+          ],
+          "tensor_sha256": "4a1b03e10dd35e940ff68f5909ea4ecd2096b9d392297f826ca577251340e275"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "rho.w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000200000002000000530072686f2e7732",
+          "seed_u64": 2237311669466880286,
+          "sha256_digest": "1ed9680e1c870c1f43dc248d005bd965627c7506dae2da316573df66a5128ece",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "44af1f53da3d7cbd3c892a2451b49de1783f6d63836b712a233560c20023ee4a"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "rho.w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000200000002000000530072686f2e7733",
+          "seed_u64": 675006391128361643,
+          "sha256_digest": "ab0a5384bc1a5e0919d6158731b62997fc4e4ea10095d27aa337c2884ead08df",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "e034b0128da6b9b3012d3bf0bcb166a370f32bf84e0d96d852d4dd516d972446"
+        }
+      ],
+      "parameter_count": 19057,
+      "replicate_index": 2
+    },
+    {
+      "architecture_id": "sorted_tuple_mlp_v1",
+      "arm": "D",
+      "fold_index": 3,
+      "initial_tensor_sha256": "6c44b22359a0840dbe785089fa254299734bb23da9dbdb6352002f98604b0d3d",
+      "layers": [
+        {
+          "fan_in": 90,
+          "layer_name": "w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100030000000000000044007731",
+          "seed_u64": 9986065947030144682,
+          "sha256_digest": "aa465b0412a2958aa510028e888f71a92e0d0d5acf4ea0c77b474fef8b06af0c",
+          "shape": [
+            90,
+            128
+          ],
+          "tensor_sha256": "5fd0b1f82e2e7db25a2d7b33b88bcddd0ac7ffd6cd120653d650d17aa04e6db5"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100030000000000000044007732",
+          "seed_u64": 4429789122228672336,
+          "sha256_digest": "50575494bcc5793d55e9f4d1d7dd3b5df1a4814643df46b986654ca55129f445",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "7bf222ce2d9704a071525814efd290385b543aaa41c3c6be028fbbf1ed0093f1"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100030000000000000044007733",
+          "seed_u64": 11694269359917353223,
+          "sha256_digest": "07c99b2106644aa243fd1b6676b6a28ac7d30a9bd84303f71fd2fb9ba725ec96",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "bdd2a478cdf3d33e8047898c804e3b04b6ae7467502c0c87c5d493ecd42244c9"
+        }
+      ],
+      "parameter_count": 19969,
+      "replicate_index": 0
+    },
+    {
+      "architecture_id": "shared_set_encoder_v1",
+      "arm": "S",
+      "fold_index": 3,
+      "initial_tensor_sha256": "a368892080ca272b94d9063dd8aab04671df2db4d718e94461ed7c97337b1f64",
+      "layers": [
+        {
+          "fan_in": 6,
+          "layer_name": "phi.w",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100030000000000000053007068692e77",
+          "seed_u64": 11371555590807090899,
+          "sha256_digest": "d3f6a98d8fe1cf9d4c53cb58c2c5858d6be05fb0fab1e6b848900cc173ded8ab",
+          "shape": [
+            6,
+            16
+          ],
+          "tensor_sha256": "e9e58261475d201991d3ca35ff846fdcbc2ad1236b59c667359393ebd2ad97b1"
+        },
+        {
+          "fan_in": 82,
+          "layer_name": "rho.w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000300000000000000530072686f2e7731",
+          "seed_u64": 3346865554500184002,
+          "sha256_digest": "c267f9467d74722e83dd9b30830a13205fce6a25f0f2a8eea5cd2b669dafe370",
+          "shape": [
+            82,
+            128
+          ],
+          "tensor_sha256": "29b05c09ea6b0333a1c751843db96b4f2cbd6aa8a81c498467abb7fa4a8f7f36"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "rho.w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000300000000000000530072686f2e7732",
+          "seed_u64": 3492540513596337096,
+          "sha256_digest": "c8eb91c417ff77301edfd73f748b118e6a7fc3ff6ef580fa76410040e34069a9",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "d6333265bb5b5a0baf9735d3387efcced28706c7cbcc8f1864ad1b8be2eb508c"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "rho.w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000300000000000000530072686f2e7733",
+          "seed_u64": 5571582850733411438,
+          "sha256_digest": "6e8c9f4e153d524db2dbca63993b9841bff542435e8ca0a87c2fee1705536f43",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "96bfdc7b88e7a719e7124a747d822595e1f18ab38892be960b5e1f9db464498d"
+        }
+      ],
+      "parameter_count": 19057,
+      "replicate_index": 0
+    },
+    {
+      "architecture_id": "sorted_tuple_mlp_v1",
+      "arm": "D",
+      "fold_index": 3,
+      "initial_tensor_sha256": "4a170b16730f9be7ed5720347d8af4a4dae76022bb5c94d71b375f7440e11e22",
+      "layers": [
+        {
+          "fan_in": 90,
+          "layer_name": "w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100030000000100000044007731",
+          "seed_u64": 15851752251085275799,
+          "sha256_digest": "97c26fa9afbcfcdb32ada2afb23f09cd604eeb2e433225d2cf3040a15d51e499",
+          "shape": [
+            90,
+            128
+          ],
+          "tensor_sha256": "f5d9b3e2d5b090d857dd79cdc5d126bb39605af21b28082f9fb10c6620f869a4"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100030000000100000044007732",
+          "seed_u64": 6124722250259188847,
+          "sha256_digest": "6f4ca1ba6f62ff54d14eb9d8a5c102df24ffd4171e54e14ea22f383d12fb837e",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "7ff35fc334ed89f4a614271872285c6a8900dd17e66391265375a6aea5b9aee0"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100030000000100000044007733",
+          "seed_u64": 9421159182066415443,
+          "sha256_digest": "53777a535caebe82ac0eb8b6d565037033ee4ddc3235f1ad07f90ad375c8c861",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "31360939d2a238b4182ffe1264c0d53def2896212cb2299b1e953916ed540fad"
+        }
+      ],
+      "parameter_count": 19969,
+      "replicate_index": 1
+    },
+    {
+      "architecture_id": "shared_set_encoder_v1",
+      "arm": "S",
+      "fold_index": 3,
+      "initial_tensor_sha256": "4a42903c2b3b063a30c6489ec4931df0c16e7565fd13d2b576f68d5964b46532",
+      "layers": [
+        {
+          "fan_in": 6,
+          "layer_name": "phi.w",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100030000000100000053007068692e77",
+          "seed_u64": 10548545017294898891,
+          "sha256_digest": "cb4614fdcdf5639239955b3c6c88223f51fdae87e7a88db0517701be582803d1",
+          "shape": [
+            6,
+            16
+          ],
+          "tensor_sha256": "72221bc3e457b8d63d1d719c1caead0f943d5e0f947289902294b740a18e9c0f"
+        },
+        {
+          "fan_in": 82,
+          "layer_name": "rho.w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000300000001000000530072686f2e7731",
+          "seed_u64": 4399338409415960205,
+          "sha256_digest": "8d66f883f9960d3d3aeed8f138f417016f2e1bda59492777e7914a47233aa382",
+          "shape": [
+            82,
+            128
+          ],
+          "tensor_sha256": "f36e666ff58931c31a2e69d0dfb6586bc62d3e50bac3011e21b843e7d84bc416"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "rho.w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000300000001000000530072686f2e7732",
+          "seed_u64": 17419714279517656332,
+          "sha256_digest": "0c1573f7d741bff14726c06e265d1e05648be1726afbfc31341384e7cd65dbec",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "6440fc3d4f20fec57c1156e3c360399a16d2075d360968c4e7c59efcf4df9c37"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "rho.w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000300000001000000530072686f2e7733",
+          "seed_u64": 6192809375330426260,
+          "sha256_digest": "945d47e25047f155137c161a6cc7aedf7717f9db4f028ac60cba957173fbeeb5",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "5281ba7f73284155280032d91cd2b2879f714edf7d90135639ade43623ceb182"
+        }
+      ],
+      "parameter_count": 19057,
+      "replicate_index": 1
+    },
+    {
+      "architecture_id": "sorted_tuple_mlp_v1",
+      "arm": "D",
+      "fold_index": 3,
+      "initial_tensor_sha256": "1de734ab7f3b82b6577a5424ac4ecdca9e6337274853a0c35ff5f1e645d0a1ee",
+      "layers": [
+        {
+          "fan_in": 90,
+          "layer_name": "w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100030000000200000044007731",
+          "seed_u64": 15971749526352746911,
+          "sha256_digest": "9fd9c47f920da7dd62f0ac7d40a1dba12993518cdf9cfe6a7bea07a33c658eb4",
+          "shape": [
+            90,
+            128
+          ],
+          "tensor_sha256": "03fc24e7377926be185861ac75fb5ed92e213490694bb1257dc966f1d8344697"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100030000000200000044007732",
+          "seed_u64": 4324476495330823716,
+          "sha256_digest": "244eb8df75a0033c8570592c66369262235c43f54e6857f6dae343c48c224a05",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "4fc9c36bb126ee3edb3a8840a075bb09a7d2ff289873acfa8717ec3683a32521"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100030000000200000044007733",
+          "seed_u64": 4498226073871409720,
+          "sha256_digest": "38628114c8e86c3e83add95a2dea4ed853245dd44bb2b532dea69013c88e77f1",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "3c689f6fededfb64befb755128643ce2de2c55ccf2c87bd42390f06f0abfc4b5"
+        }
+      ],
+      "parameter_count": 19969,
+      "replicate_index": 2
+    },
+    {
+      "architecture_id": "shared_set_encoder_v1",
+      "arm": "S",
+      "fold_index": 3,
+      "initial_tensor_sha256": "6c1f7dfe62027239ae5af2edff879b1f823c5ee836d5e443a685e9ed4d61af2d",
+      "layers": [
+        {
+          "fan_in": 6,
+          "layer_name": "phi.w",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100030000000200000053007068692e77",
+          "seed_u64": 363304495775977929,
+          "sha256_digest": "c991079883b70a05fe05630eab748ce2e7abb157e1389bebd5d8ef87c557e48e",
+          "shape": [
+            6,
+            16
+          ],
+          "tensor_sha256": "1133d8d93f98473ce8b6c7f76f2076ae9f13256534e19ffa4811f5b975a07e11"
+        },
+        {
+          "fan_in": 82,
+          "layer_name": "rho.w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000300000002000000530072686f2e7731",
+          "seed_u64": 12220477114048265135,
+          "sha256_digest": "af3ba33830db97a9556045ffe7841f07e2fa0912ed51c280018dfd66ebea0968",
+          "shape": [
+            82,
+            128
+          ],
+          "tensor_sha256": "d541cae97ea1bdc6c52737ad2057c002d8ddc9e292180a802fa9dd1277e3d0dd"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "rho.w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000300000002000000530072686f2e7732",
+          "seed_u64": 9314938503099427303,
+          "sha256_digest": "e7a9d945374f4581c5a6ed4c4aa08ce25be9426109ea6a8930836bec8c882a2f",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "776229c582544ed797ab1964a70a9863e558e00d4e771621cec883b1766617a2"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "rho.w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000300000002000000530072686f2e7733",
+          "seed_u64": 10899645232224197223,
+          "sha256_digest": "67da8004975143974244cf391a4a23fd84934515572d5ca929d63e548487a31c",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "0055d25f3401df11dd088e83931ade75ac285321adf966a9483d91a1334b1c71"
+        }
+      ],
+      "parameter_count": 19057,
+      "replicate_index": 2
+    },
+    {
+      "architecture_id": "sorted_tuple_mlp_v1",
+      "arm": "D",
+      "fold_index": 4,
+      "initial_tensor_sha256": "81bd38efcfe25b48bfa64b6c924deeeeb93b655c1e05ec1d415735dd18fc38b5",
+      "layers": [
+        {
+          "fan_in": 90,
+          "layer_name": "w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100040000000000000044007731",
+          "seed_u64": 8683954344919028288,
+          "sha256_digest": "40d29b96779a8378c998d1bc79ac687d378ff7688c68e27463f6ea694e4ccd71",
+          "shape": [
+            90,
+            128
+          ],
+          "tensor_sha256": "34e5b160f603d877229dda8ee40a7ca70585a94ab0ff286f2d99f9c8f6771198"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100040000000000000044007732",
+          "seed_u64": 6591493319235175160,
+          "sha256_digest": "f8825f2840b0795b7fe4847f450a2554fd9f4668a2e37626d24db24d5b732863",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "d83b4b55d76303885f178fdb5027be3060ee67f1e5b8932f2356a4c05f12979c"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100040000000000000044007733",
+          "seed_u64": 228727646524417082,
+          "sha256_digest": "3a246629959a2c03b9277ec4ba9ab2a6482e7aff62c66e07bd1217eb1d6902b4",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "7e6891c63582b6d97001366564a780e36c5731ac4d9894bb6fd04f20c0befaed"
+        }
+      ],
+      "parameter_count": 19969,
+      "replicate_index": 0
+    },
+    {
+      "architecture_id": "shared_set_encoder_v1",
+      "arm": "S",
+      "fold_index": 4,
+      "initial_tensor_sha256": "e2317fff782d29cb4329e0d2a4081178ba1fa6c95aa3ba9118bf8187776ae524",
+      "layers": [
+        {
+          "fan_in": 6,
+          "layer_name": "phi.w",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100040000000000000053007068692e77",
+          "seed_u64": 13107408870484146158,
+          "sha256_digest": "eef702f3ebdee6b511750fd040eab028e7894b596a524ea3eaca5906da67e1de",
+          "shape": [
+            6,
+            16
+          ],
+          "tensor_sha256": "a2e1ab08cbbdfd06f1d863ff8a034af69e1a6f6520e69817e66f057590eb8846"
+        },
+        {
+          "fan_in": 82,
+          "layer_name": "rho.w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000400000000000000530072686f2e7731",
+          "seed_u64": 6043502518855631015,
+          "sha256_digest": "a780916385d5de53a5e6a0add32c8696418d9d252c07992882f4161da3283f6d",
+          "shape": [
+            82,
+            128
+          ],
+          "tensor_sha256": "79b1d806cf5956c2960b4770154ef5c2dba859d8989e6a03f9b5b6578dab85f3"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "rho.w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000400000000000000530072686f2e7732",
+          "seed_u64": 11847847257546735910,
+          "sha256_digest": "26c128e34e026ca44546f3260078921b60952a9bfe02e79d6515c63c667e9959",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "d77776eccdf36339acd0b90a46af07ab371ad8044f5721aa33a9f016c5680261"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "rho.w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000400000000000000530072686f2e7733",
+          "seed_u64": 14607863971726555055,
+          "sha256_digest": "aff7fcf1e28eb9ca90909d698d3b4bbdfcd60f4930215fd805d0c5cc53631354",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "4a7ed1ef25038d2f4ae6b7c9513ef1a5b8152e85f852a335319d3743381d2de3"
+        }
+      ],
+      "parameter_count": 19057,
+      "replicate_index": 0
+    },
+    {
+      "architecture_id": "sorted_tuple_mlp_v1",
+      "arm": "D",
+      "fold_index": 4,
+      "initial_tensor_sha256": "1a983391401256e7264323c997e41b05466685805b4d465f78ef929d9a15ec74",
+      "layers": [
+        {
+          "fan_in": 90,
+          "layer_name": "w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100040000000100000044007731",
+          "seed_u64": 13369241356727810940,
+          "sha256_digest": "7cfb38402e1689b96a1ba7b294cdb7f9d05e70cab7bb3ae5c5906c8c6b5bf99d",
+          "shape": [
+            90,
+            128
+          ],
+          "tensor_sha256": "6074f4b0ff0f7af278c5d034137f1772ec46ea151e88d820c034ccba7641696c"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100040000000100000044007732",
+          "seed_u64": 15448917443074404663,
+          "sha256_digest": "3731c906909465d665b7d5e004b2bd264cbfb320d118711988f460c8708b8c51",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "b67530f4586f97e4243cd7e852f077b474cd8781aeb1260634d70f44eb6c9140"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100040000000100000044007733",
+          "seed_u64": 2651368370371998168,
+          "sha256_digest": "d8b1ba3c7c8dcb24f1c4376893abd2b3eefabeb8483a655ec2655678b73cd30d",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "7c2dfd11c290bab9423d157807e113cd88065efcbbbd65ca265fb806bc0ed4b8"
+        }
+      ],
+      "parameter_count": 19969,
+      "replicate_index": 1
+    },
+    {
+      "architecture_id": "shared_set_encoder_v1",
+      "arm": "S",
+      "fold_index": 4,
+      "initial_tensor_sha256": "988cdfd98499a0ba5deb7718a597a368ea4fcde82e4d8238149dffc7dc13367b",
+      "layers": [
+        {
+          "fan_in": 6,
+          "layer_name": "phi.w",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100040000000100000053007068692e77",
+          "seed_u64": 10804914346323836491,
+          "sha256_digest": "4b7e27e159c4f295b6f99e980599021e441c7dd5cc4f1297d0c67aee1dae24bb",
+          "shape": [
+            6,
+            16
+          ],
+          "tensor_sha256": "a991283f026d5a9b676ac5e1424da4f36f96024e47b61538f716568a74d523b3"
+        },
+        {
+          "fan_in": 82,
+          "layer_name": "rho.w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000400000001000000530072686f2e7731",
+          "seed_u64": 13986394019902483213,
+          "sha256_digest": "0d6bef0c42a719c20b21d3489807c7f428f8d19aa7a8495a09ebc0c690aa821d",
+          "shape": [
+            82,
+            128
+          ],
+          "tensor_sha256": "98c238ac8e2b1da3e12ff61616be4b5069a9217717f9e6c87c8ced0c0d2e8a13"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "rho.w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000400000001000000530072686f2e7732",
+          "seed_u64": 13524145932885135144,
+          "sha256_digest": "288f296c126bafbbb206030cc5d95448d2bea2c1b98cbe066eeef659b6421bbe",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "293eef331cee01455ef6f248f1d43b1779aa223efec35b5a9f025f64df6cdde2"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "rho.w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000400000001000000530072686f2e7733",
+          "seed_u64": 12100147526557673534,
+          "sha256_digest": "3ea84aea105ceca74fda6f3be4d6746563b47c9a31ad5bb9a6b9a4cd5912f82a",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "5bdc18ae7fc3500583bcb9ba192a1af23ca7f05cbb870b98fde15d7a2f7651a2"
+        }
+      ],
+      "parameter_count": 19057,
+      "replicate_index": 1
+    },
+    {
+      "architecture_id": "sorted_tuple_mlp_v1",
+      "arm": "D",
+      "fold_index": 4,
+      "initial_tensor_sha256": "1d5313d4267e2347ed0b917880789d3885b7e18bac505bf9eba0c0ea2ef11960",
+      "layers": [
+        {
+          "fan_in": 90,
+          "layer_name": "w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100040000000200000044007731",
+          "seed_u64": 662792795582256664,
+          "sha256_digest": "18565e3489b6320937cebfb300562e680a6e5eadd06f7e4b70bd5d75a39a8cbf",
+          "shape": [
+            90,
+            128
+          ],
+          "tensor_sha256": "f0314406c532b4625800a670c58c607ce43ef8d311991224e69874e610deab19"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100040000000200000044007732",
+          "seed_u64": 17013742418995990712,
+          "sha256_digest": "b850406096f41cec3b7c0767db28dd57fdcf81cdbc8a85f256fc1e47736c37b8",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "290f0310efda51e3c839dc5bba6c3c9aca23a8c6686dda1aa705d75436138a51"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100040000000200000044007733",
+          "seed_u64": 1986440119415801176,
+          "sha256_digest": "58055d95c340911bdbca613cf328605cea91efae24934d61e971eb985357b611",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "fb9c00366b6df3e9855d1b2914dd40fb81ad1c34b9cbd6a0e33c2dbc6de6d1c5"
+        }
+      ],
+      "parameter_count": 19969,
+      "replicate_index": 2
+    },
+    {
+      "architecture_id": "shared_set_encoder_v1",
+      "arm": "S",
+      "fold_index": 4,
+      "initial_tensor_sha256": "6132808c5f68f876b4311281a7d11866c0bf66ebe4f6ba1c71638c47d512b68d",
+      "layers": [
+        {
+          "fan_in": 6,
+          "layer_name": "phi.w",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100040000000200000053007068692e77",
+          "seed_u64": 13157065305441969983,
+          "sha256_digest": "3f277ca92f4997b6791ce10dcfce6696d71be76d89742096cd7abebfb112b6d4",
+          "shape": [
+            6,
+            16
+          ],
+          "tensor_sha256": "4d35872dc75ec87d49f91a1b293fb43612a8c3dc25718b7b58b363fe034af1a0"
+        },
+        {
+          "fan_in": 82,
+          "layer_name": "rho.w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000400000002000000530072686f2e7731",
+          "seed_u64": 17703509394651002307,
+          "sha256_digest": "c3b5f649ff7faff5d59d7c09d8c6ce7354ccb36dbf47aada705533df50397fd4",
+          "shape": [
+            82,
+            128
+          ],
+          "tensor_sha256": "5be9cdc69eaec8f215eb85a1ddb0905f29addd643090a7c21d07c30af63f8393"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "rho.w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000400000002000000530072686f2e7732",
+          "seed_u64": 12280591630646705728,
+          "sha256_digest": "40fe54d0056d6daa45b62150a9f0d51b1d146b75ef0616698000df8b766593a1",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "96b97f56bb4bbc29b05243bb359d85b0fe1a6b15f8da8aa42ef951f28325ff56"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "rho.w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000400000002000000530072686f2e7733",
+          "seed_u64": 8101632511150558524,
+          "sha256_digest": "3c8de237d8c76e70b44a8f4d3e2f7ac2a56d7dd168f699fd61d814f6f55306ac",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "f1f4afc538af920f7c6a10743df1c9177d5692017c868dd62e43029d40b44bcb"
+        }
+      ],
+      "parameter_count": 19057,
+      "replicate_index": 2
+    },
+    {
+      "architecture_id": "sorted_tuple_mlp_v1",
+      "arm": "D",
+      "fold_index": 5,
+      "initial_tensor_sha256": "41e3ad0952facf44eec96712a6e559a418a0bd57c9cd5d217e2809c03e73269c",
+      "layers": [
+        {
+          "fan_in": 90,
+          "layer_name": "w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100050000000000000044007731",
+          "seed_u64": 4127284617803331159,
+          "sha256_digest": "57f6191b7e0f47395cb7e57a360f1913d75aae1b0d74978d930818e586ef8847",
+          "shape": [
+            90,
+            128
+          ],
+          "tensor_sha256": "4fabcfa0a31728c823c5844984dd847b2254431a8f637a1bd782327f13a1852d"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100050000000000000044007732",
+          "seed_u64": 4032663162376900049,
+          "sha256_digest": "d14d47bcc7e5f6374686cc5cbf3359c50c53777e23ba174c963aae525fa8d0cd",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "a7d07850c072c428ccd3844157217d6bc8ef7887eb39dbf831232618188aac5a"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100050000000000000044007733",
+          "seed_u64": 10660061352520968065,
+          "sha256_digest": "81e7e1185225f093162466ffba8fdc5433493dfe0a740038da347262bf866761",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "306f6389b18b9f3cdafead446fb0144b7f7fd94e7c2b5aa009080a41d5a32cbd"
+        }
+      ],
+      "parameter_count": 19969,
+      "replicate_index": 0
+    },
+    {
+      "architecture_id": "shared_set_encoder_v1",
+      "arm": "S",
+      "fold_index": 5,
+      "initial_tensor_sha256": "a5eaf89fd52ed7bb292596a505bfab38149b91d513f12e853897b93a92d44d49",
+      "layers": [
+        {
+          "fan_in": 6,
+          "layer_name": "phi.w",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100050000000000000053007068692e77",
+          "seed_u64": 16333981617013461008,
+          "sha256_digest": "1010d951bdf5ade259f3f23bd3fd2ef27b4d1420430babb60e1bd93912c4d680",
+          "shape": [
+            6,
+            16
+          ],
+          "tensor_sha256": "d6d94c1ffe92dfb875e6df56c12a327242dadf373c028218cfb62ccddca47c6b"
+        },
+        {
+          "fan_in": 82,
+          "layer_name": "rho.w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000500000000000000530072686f2e7731",
+          "seed_u64": 5933472473114957628,
+          "sha256_digest": "3c579304c7ed57523c8e126978f1c7ca5b9bb140d7c6dc4de941a1f8c8fb68f9",
+          "shape": [
+            82,
+            128
+          ],
+          "tensor_sha256": "9ffbeb40d584376b873a90dbdfcca5d52525c61733281ad49363e7e994740b19"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "rho.w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000500000000000000530072686f2e7732",
+          "seed_u64": 11999640148037158208,
+          "sha256_digest": "40454548234987a6c8df8df27cf6f48b423dc9df4e4782e3398d4f6f63b71f2f",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "655db4e8b2e7dde000eec593dc09925b5df4c11c8a4fdbfe60a91dacee7dc1ef"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "rho.w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000500000000000000530072686f2e7733",
+          "seed_u64": 8525661375420799360,
+          "sha256_digest": "8099399dd93b517619ef9268574a1b5508688e79c98e447fc6c4700f71c8e069",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "029147e78576c811461fef00f6636ae4d5403d7922f93cfb67b22b2e27aea09b"
+        }
+      ],
+      "parameter_count": 19057,
+      "replicate_index": 0
+    },
+    {
+      "architecture_id": "sorted_tuple_mlp_v1",
+      "arm": "D",
+      "fold_index": 5,
+      "initial_tensor_sha256": "48474f51ceec61e9d7b9df49f632952ffad4cc1fbd87752c3194dfa32cd0a4af",
+      "layers": [
+        {
+          "fan_in": 90,
+          "layer_name": "w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100050000000100000044007731",
+          "seed_u64": 10112877469912823084,
+          "sha256_digest": "2c7534837a28588c9c956454b8a0968184316cc9399646c7cbca3bd3ba1fe725",
+          "shape": [
+            90,
+            128
+          ],
+          "tensor_sha256": "c04a6bcd0e3e3dc5407233fb5695c487a2638b430b4e287bf7e3ee386c0d7d0e"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100050000000100000044007732",
+          "seed_u64": 10158024672192819463,
+          "sha256_digest": "07f1b4ad9e8df88c350dbe355ae0d48c7c90d2f6a7caa125e3ab1d6e5e3af11a",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "126f46145b68e46c3f7be30f58604a3f8a4414ee2f6c14f2ded7b787faf5a468"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100050000000100000044007733",
+          "seed_u64": 17750983898829425569,
+          "sha256_digest": "a10b68a7ce2958f657d2c1c70edd76050739e658e0e48823b8682832f3ea8f50",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "748f65bf3b9b99eab90a1e13261703a822ad4390a443f2fe97e5a0045eefdff0"
+        }
+      ],
+      "parameter_count": 19969,
+      "replicate_index": 1
+    },
+    {
+      "architecture_id": "shared_set_encoder_v1",
+      "arm": "S",
+      "fold_index": 5,
+      "initial_tensor_sha256": "1f694800268042fb6cec9382a77c57e6fe429cb42cc24ca5cede5a810195750c",
+      "layers": [
+        {
+          "fan_in": 6,
+          "layer_name": "phi.w",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100050000000100000053007068692e77",
+          "seed_u64": 8467301680155935470,
+          "sha256_digest": "ee42c33304e6817506606c813ee047baa9b2691b135ea95f7a4770e7d0eed000",
+          "shape": [
+            6,
+            16
+          ],
+          "tensor_sha256": "21e956a17b7fa1faec9f9c68cc3787e0a98877aadfbf667976e673be68037995"
+        },
+        {
+          "fan_in": 82,
+          "layer_name": "rho.w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000500000001000000530072686f2e7731",
+          "seed_u64": 5341145473023381454,
+          "sha256_digest": "ce8f3e55828f1f4a5e24e16c0873b2b2690b52d68e74c1f58205af2848f4134f",
+          "shape": [
+            82,
+            128
+          ],
+          "tensor_sha256": "81bea0e1303488892821998dbf03d9f641461b7c27813be3a615a281e6c3f914"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "rho.w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000500000001000000530072686f2e7732",
+          "seed_u64": 15623752542717866454,
+          "sha256_digest": "d6f14dcf28b8d2d8762cc8ffe773229f1a7390a85365fea47e9fc93436bd019b",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "ff304ca5be84c5e4de2713b179992e9c0c1e24159d298d5ca1b828d96c1f3dc5"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "rho.w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000500000001000000530072686f2e7733",
+          "seed_u64": 797247180038046566,
+          "sha256_digest": "668359141664100bcf193f4494be8c6f13844b6f7ca8b9154cfa67d1064bb295",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "c46d7ead34240f4825b06febdff730793c140fb0db75f9ed96028efce111dbd3"
+        }
+      ],
+      "parameter_count": 19057,
+      "replicate_index": 1
+    },
+    {
+      "architecture_id": "sorted_tuple_mlp_v1",
+      "arm": "D",
+      "fold_index": 5,
+      "initial_tensor_sha256": "c069b813852f5b8fc7051f6a7c95cba7138dc3fb7fa90acc0f405cd38c2162d0",
+      "layers": [
+        {
+          "fan_in": 90,
+          "layer_name": "w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100050000000200000044007731",
+          "seed_u64": 6192398687976338246,
+          "sha256_digest": "46b36c48ccd1ef55909f4f3ecfea06759808eb934e2437d893b7aa386865c6ca",
+          "shape": [
+            90,
+            128
+          ],
+          "tensor_sha256": "a2af1ffb0fe2ce108c9a8d07845b150f3646ddd2e2a5ec4d54466251ff14dff4"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100050000000200000044007732",
+          "seed_u64": 7455562046774921324,
+          "sha256_digest": "6c48e7262e7a7767ea4a108897d65d9263c208dc932cd325b6865e595840d789",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "138b794854553c813426b0eb7585fd34c3db835f2b773edebbcd9a8c85d83437"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100050000000200000044007733",
+          "seed_u64": 12850216288953700597,
+          "sha256_digest": "f51006a6a12355b2acb1062865b3e1b7b7b7606d6a99dd67e79ad94dbcbb4fee",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "a53fb4305cde5da0a481b2f713170994d8f281ea98d738a9f9a58e6468251f60"
+        }
+      ],
+      "parameter_count": 19969,
+      "replicate_index": 2
+    },
+    {
+      "architecture_id": "shared_set_encoder_v1",
+      "arm": "S",
+      "fold_index": 5,
+      "initial_tensor_sha256": "66a0cfc9c7803002aa8e4edeb4455ddbbd3fede05472836d63f3f203a17ac563",
+      "layers": [
+        {
+          "fan_in": 6,
+          "layer_name": "phi.w",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100050000000200000053007068692e77",
+          "seed_u64": 12801037066899308972,
+          "sha256_digest": "ac4124b9636ba6b1ebb6515de8813da35357bed4bc68004ee7afee66671b8cd6",
+          "shape": [
+            6,
+            16
+          ],
+          "tensor_sha256": "d64e9a6004f24ef5538903e649f4e8dc3028e42db3dad942cd8870c2d0e1f4d3"
+        },
+        {
+          "fan_in": 82,
+          "layer_name": "rho.w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000500000002000000530072686f2e7731",
+          "seed_u64": 6208117821095092631,
+          "sha256_digest": "9721252a44aa27563a1344a95abda56031b590919fe51d0dcaf7c9e0d582a6fa",
+          "shape": [
+            82,
+            128
+          ],
+          "tensor_sha256": "4ef2a4a08b61124097746768727d576f316b88759d45b6f98b793addb6422707"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "rho.w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000500000002000000530072686f2e7732",
+          "seed_u64": 1498032104785625468,
+          "sha256_digest": "7cc1e02b4314ca14f37e3f9758f77ce9292b841ba8db26b8f5190aad550fec32",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "b5d1881e340ace5b66876a4b48fe9bc79ebe09196935bc0427fd9af234921dc8"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "rho.w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000500000002000000530072686f2e7733",
+          "seed_u64": 5516949556419838959,
+          "sha256_digest": "ef43273a6424904c378a632294a5e0b895bb7bf68b1e97ee849892c845833bd0",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "e69dc13dbff0bd66833ba3cfd7bb2abed37e7855b63fa47a6d1371d6d6c18db9"
+        }
+      ],
+      "parameter_count": 19057,
+      "replicate_index": 2
+    },
+    {
+      "architecture_id": "sorted_tuple_mlp_v1",
+      "arm": "D",
+      "fold_index": 6,
+      "initial_tensor_sha256": "8125c85944b8a822b677aabbd7cba437bb0790bef0fa10d95c5e7e2c41477fd2",
+      "layers": [
+        {
+          "fan_in": 90,
+          "layer_name": "w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100060000000000000044007731",
+          "seed_u64": 14410639514982659352,
+          "sha256_digest": "18b5bfbc49e0fcc757cbb8b61eecd8b1754558cd8cba8412a0dbbdec358ca974",
+          "shape": [
+            90,
+            128
+          ],
+          "tensor_sha256": "a137c14c7d0295824edb33d12c97c5d84cfd8f115ac14de70da96e0e83ca378a"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100060000000000000044007732",
+          "seed_u64": 15756526212868874870,
+          "sha256_digest": "76222ee41b6daadafa59180205dcb7681550c2754e5fb4bce08b523f2b84a545",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "c0c93517a33aa59012ad3bf5c02f78b301c8ee6cc9a86d10080ebbf6c023065e"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100060000000000000044007733",
+          "seed_u64": 7474863333778143515,
+          "sha256_digest": "1b39703a990cbc675ae835575b6178ae7191866779a16ad2a333e77496853b7d",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "90ad0609ca680b175624015fa07bb3cf07c04f9239bdf9f4ff183587b9bc8ffb"
+        }
+      ],
+      "parameter_count": 19969,
+      "replicate_index": 0
+    },
+    {
+      "architecture_id": "shared_set_encoder_v1",
+      "arm": "S",
+      "fold_index": 6,
+      "initial_tensor_sha256": "0f2589c8acd5c25b3f444482df47ce54a795875c94cc5dbe8428e65ecbbb3df2",
+      "layers": [
+        {
+          "fan_in": 6,
+          "layer_name": "phi.w",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100060000000000000053007068692e77",
+          "seed_u64": 7463936121088106375,
+          "sha256_digest": "87dfa9435b3a956744b1f26b65a8b362862be88a251f034cb6549e22c4e5d944",
+          "shape": [
+            6,
+            16
+          ],
+          "tensor_sha256": "975e3dc3fa7fc2e1262e31b395e90d05844b3cfe7f0b67bba6e5ac76cebb9e1a"
+        },
+        {
+          "fan_in": 82,
+          "layer_name": "rho.w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000600000000000000530072686f2e7731",
+          "seed_u64": 9013665010418266965,
+          "sha256_digest": "5533590e92f8167d4cd80553798e1f3b19d89ab5e2019b104a1e162dd76f847c",
+          "shape": [
+            82,
+            128
+          ],
+          "tensor_sha256": "f1396c9c14c160c35c169f71eb465140e3861c70bf71695b4af75d6558a2f3ce"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "rho.w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000600000000000000530072686f2e7732",
+          "seed_u64": 11123169172093731373,
+          "sha256_digest": "2d0239cf6d6f5d9ab4af5e77140a5360e40976d5a804bba4ba3fedd5aa70a63b",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "19aa4f98bdca1bf07b375748858feb8c6e25125c01abfc62c71817b9c85c2ff6"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "rho.w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000600000000000000530072686f2e7733",
+          "seed_u64": 6794143709182998153,
+          "sha256_digest": "89b6cee2b4a5495e876423776773165c45b0df1933b4d0fe79443709693495de",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "01cd02cc2c9b7ec8446035a8830e4b80da9ae9eef0c4518b74d4ba61b7bc60fa"
+        }
+      ],
+      "parameter_count": 19057,
+      "replicate_index": 0
+    },
+    {
+      "architecture_id": "sorted_tuple_mlp_v1",
+      "arm": "D",
+      "fold_index": 6,
+      "initial_tensor_sha256": "ca24a6df9199fc173dc216c06e7b776444538ae17017a56bfcba1980b4ff9e6b",
+      "layers": [
+        {
+          "fan_in": 90,
+          "layer_name": "w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100060000000100000044007731",
+          "seed_u64": 17170668881176816416,
+          "sha256_digest": "20eb65925f784aee19b132470ce99fb61e96781d960ee49389c5ea5792590d2c",
+          "shape": [
+            90,
+            128
+          ],
+          "tensor_sha256": "c8db8462aad4f61b6404df23ea1abb3d2867b8781428b4e4958dd378f5b055b0"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100060000000100000044007732",
+          "seed_u64": 15055318999704528548,
+          "sha256_digest": "a4e6931ddd3cefd0d7b30f031c020b32acce7c54f6ac50c3c67ac986acec8f45",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "b789228058e4cbd942305f098601ca7c7cc82c6f1230f20dddec514b3052a2e6"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100060000000100000044007733",
+          "seed_u64": 8507277123632124757,
+          "sha256_digest": "5553e66f78eb0f76baa49f8152807af7ca1dba770cddfc55141f19b4ae808d2f",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "6363edf188cad576c95bd86dfbd7e79c55942a92ac49170ca154f534eb688033"
+        }
+      ],
+      "parameter_count": 19969,
+      "replicate_index": 1
+    },
+    {
+      "architecture_id": "shared_set_encoder_v1",
+      "arm": "S",
+      "fold_index": 6,
+      "initial_tensor_sha256": "8f62650a39bd93e7ed7dbd5d3a17f5b72063c40dd10da8c5041a0a24690b0f11",
+      "layers": [
+        {
+          "fan_in": 6,
+          "layer_name": "phi.w",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100060000000100000053007068692e77",
+          "seed_u64": 14587629828013729553,
+          "sha256_digest": "11a7a63d0aac71ca04472756e6db7c1f5f2783f8d71e7a2864fea8f010f07dfa",
+          "shape": [
+            6,
+            16
+          ],
+          "tensor_sha256": "2d182bd870e55b176b643367c55eed6e847af3b413183e510839951d1630227b"
+        },
+        {
+          "fan_in": 82,
+          "layer_name": "rho.w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000600000001000000530072686f2e7731",
+          "seed_u64": 6500434451864948034,
+          "sha256_digest": "420d1f75b12e365a671e4481028ee35928b4bb4c8b5dc47115d025591241994e",
+          "shape": [
+            82,
+            128
+          ],
+          "tensor_sha256": "0e5bbda68af1dcb4dbe6a08b9c16f0654a87660c0ef3e6e8ea6018a2bbe2ea05"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "rho.w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000600000001000000530072686f2e7732",
+          "seed_u64": 988015897106734613,
+          "sha256_digest": "155e7c433923b60d115a26433a843a78dbc656e1edf3c9817fd46d7a123c9657",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "6a3b517eebc90ec44a0f31864bbdf9ecd5434f7452e74853947ee5fcd02ee7a6"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "rho.w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000600000001000000530072686f2e7733",
+          "seed_u64": 1237182240617338455,
+          "sha256_digest": "57166b66b15a2b11b57023df6091e5517695a29ea1fabbdabb9eead8eb3f9d6d",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "fd2d2b1e624ec466d2e82d8794146641da93836e67f81ae04becdbf2bdc827f6"
+        }
+      ],
+      "parameter_count": 19057,
+      "replicate_index": 1
+    },
+    {
+      "architecture_id": "sorted_tuple_mlp_v1",
+      "arm": "D",
+      "fold_index": 6,
+      "initial_tensor_sha256": "95d58108ac43e547eb7333de8d2e5a439052a042f7439e35b9480b353f1eab5c",
+      "layers": [
+        {
+          "fan_in": 90,
+          "layer_name": "w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100060000000200000044007731",
+          "seed_u64": 17496688824018334872,
+          "sha256_digest": "98f428b5c8b9d0f22dc5462c5fd00715f67984432a0b6b7cf485bacac27e589c",
+          "shape": [
+            90,
+            128
+          ],
+          "tensor_sha256": "d2c35e08506a4e3df7076dacf9c331ad6636217cb6403e25c865463b41a9bb53"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100060000000200000044007732",
+          "seed_u64": 5038342259560712187,
+          "sha256_digest": "fb87f43d97c9eb4547c785cd85c28f44157abcfcde800e40ea870d492414a60f",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "7669dad66b9f984a85ae77c04986efca5aa4f8d2e5dd5734904bd2f4ea181ee7"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100060000000200000044007733",
+          "seed_u64": 2950966810637245396,
+          "sha256_digest": "d41b00ecadf0f32817c16679bd29201a2c587e9b14bf4b812c08a32186ed6b59",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "e6f6ed6345be448753fe9f471553a701ac055420bf6027fdfc45977b782d54eb"
+        }
+      ],
+      "parameter_count": 19969,
+      "replicate_index": 2
+    },
+    {
+      "architecture_id": "shared_set_encoder_v1",
+      "arm": "S",
+      "fold_index": 6,
+      "initial_tensor_sha256": "c6a74ebdb41ce1c6ea58fe98c76b3ac202baf8c2985b5db31226dc2eb0c356de",
+      "layers": [
+        {
+          "fan_in": 6,
+          "layer_name": "phi.w",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100060000000200000053007068692e77",
+          "seed_u64": 9687331362663512632,
+          "sha256_digest": "383a0f758c507086a4d8e1dcd14d8fff0a158448183fbc1f5be687fb5dcf13f5",
+          "shape": [
+            6,
+            16
+          ],
+          "tensor_sha256": "8568468db0d83ca1eab52cfdfb49a1a59dab23390e3d88fcb95ca78126fc18ca"
+        },
+        {
+          "fan_in": 82,
+          "layer_name": "rho.w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000600000002000000530072686f2e7731",
+          "seed_u64": 18277340293136768723,
+          "sha256_digest": "d3de59bb2828a6fd42b5691f04846a419fe812aafc871af38f39046d8935d91c",
+          "shape": [
+            82,
+            128
+          ],
+          "tensor_sha256": "f49c3a88568eadcec68d4e1502bef08dd1eff3cfd4e7d564d5d67e556bcc2d64"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "rho.w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000600000002000000530072686f2e7732",
+          "seed_u64": 17225475667784841996,
+          "sha256_digest": "0c3b73f9da2e0def93bfb7b78d20bbbfe6138d69c18ca996806798d36456aa5d",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "73c09b34d437e4109e2c13bacdf6f38fa85ade6273c2a274a2437479043a6c2c"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "rho.w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000600000002000000530072686f2e7733",
+          "seed_u64": 10769874236442688117,
+          "sha256_digest": "753acc8a8e47769511d0c38e8d6e8e3c71da85d61b36862823b34655295a2908",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "1a7c84b5d3c06fd86f0f4b1e63dcc3b276af71cef7b552259f9c180390fb4065"
+        }
+      ],
+      "parameter_count": 19057,
+      "replicate_index": 2
+    },
+    {
+      "architecture_id": "sorted_tuple_mlp_v1",
+      "arm": "D",
+      "fold_index": 7,
+      "initial_tensor_sha256": "f12cc3fef49ef3ac43cfeecf48683cb380d67dcc9ada77e1ad5e00f62d72c850",
+      "layers": [
+        {
+          "fan_in": 90,
+          "layer_name": "w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100070000000000000044007731",
+          "seed_u64": 15255148606104979381,
+          "sha256_digest": "b5c7aefed42cb5d318672a7425266a35b26d08772c3116c30cd88abae7d71d22",
+          "shape": [
+            90,
+            128
+          ],
+          "tensor_sha256": "59af6481b30c66bef8cea973c14df77192f17cc2d580fb3de7be1ec5fedaeb41"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100070000000000000044007732",
+          "seed_u64": 5853032845703024657,
+          "sha256_digest": "1190d2ca5c263a511875133908c37d8e65b2ffed9aaf2b6a8650244d2d71d8dd",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "579c9f9610d10770b9c96ecc91a8b8a54489963d2d0b017c1a638493cf8d3d55"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100070000000000000044007733",
+          "seed_u64": 2143757821560092074,
+          "sha256_digest": "aaf58d6e6128c01dc5eb0c4dcfefc394b2000294f507e751d2dcf32f34026ee9",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "fe6df754f93251867400516b77f4ef6d8263fcd08c14d2011d763e0571b6c4a5"
+        }
+      ],
+      "parameter_count": 19969,
+      "replicate_index": 0
+    },
+    {
+      "architecture_id": "shared_set_encoder_v1",
+      "arm": "S",
+      "fold_index": 7,
+      "initial_tensor_sha256": "4046154d0ba14855b7ec9069fb689a507446a4ecae21dacb84740121ec9e68ae",
+      "layers": [
+        {
+          "fan_in": 6,
+          "layer_name": "phi.w",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100070000000000000053007068692e77",
+          "seed_u64": 7724398693585731708,
+          "sha256_digest": "7c40abaaaf93326b345df60789cea016cdf1d4fe52b339ed910c44494623902e",
+          "shape": [
+            6,
+            16
+          ],
+          "tensor_sha256": "a2a92b304921b191edfdfe52c9292229c1e9d7e0480224517c44c8c257b831a7"
+        },
+        {
+          "fan_in": 82,
+          "layer_name": "rho.w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000700000000000000530072686f2e7731",
+          "seed_u64": 9660644850499704547,
+          "sha256_digest": "e3d63da74e81118697fbbcc80b54cfbdcbb0bbf73ad91ebb378a9903199de55d",
+          "shape": [
+            82,
+            128
+          ],
+          "tensor_sha256": "763b8b248c00e1d4cc8d3f4d27272a07c660e9d0e18fda2548097c93d5a13d41"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "rho.w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000700000000000000530072686f2e7732",
+          "seed_u64": 15762875788803897594,
+          "sha256_digest": "faf842be03fcc0da77cb5fd5aebcf090e5661a0237f24225654a4f912904ca02",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "717268024a746d0614655711f829de582ffd239d081d45d9aa98ebb859754ea5"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "rho.w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000700000000000000530072686f2e7733",
+          "seed_u64": 15629049371982853098,
+          "sha256_digest": "ea7314fa9889e5d812ed6246c35e1a4923716e34d184c426388ce24589a635a5",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "d1effcbe30a0ee7326b8dfc8ebe45f827a3cbf6f7d99196491a6a292dbb783a5"
+        }
+      ],
+      "parameter_count": 19057,
+      "replicate_index": 0
+    },
+    {
+      "architecture_id": "sorted_tuple_mlp_v1",
+      "arm": "D",
+      "fold_index": 7,
+      "initial_tensor_sha256": "e69a3431444d64f0679968ce87abdcc70c0461d130356d5dac82ca487e7fddcc",
+      "layers": [
+        {
+          "fan_in": 90,
+          "layer_name": "w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100070000000100000044007731",
+          "seed_u64": 8134834650807911390,
+          "sha256_digest": "dec3f1c303bde470a10f5ee3c632b13c9913d7956c1be014b20fc222e4bb516f",
+          "shape": [
+            90,
+            128
+          ],
+          "tensor_sha256": "87889efdcce49e4bdec901f16f47ecc72d945efc9802a9e7282c573217b0233a"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100070000000100000044007732",
+          "seed_u64": 18402671628820069716,
+          "sha256_digest": "54bdfa49586c63ffcb115f45f33975d17f383ac1c0c04834f16ac618774aaafe",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "daa53e9e6b0b5ffa869840ecd24da9fa2cc087619254ab7199a4e526811769be"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100070000000100000044007733",
+          "seed_u64": 12813567008422220672,
+          "sha256_digest": "80d3ab124eefd2b107b9e4a127c8306960db152fcf2c36228c720c9a4a235e7b",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "fb9080f321db6025c2468aa9a5c188833408c4b8a956bd185eb9ed35eb827e17"
+        }
+      ],
+      "parameter_count": 19969,
+      "replicate_index": 1
+    },
+    {
+      "architecture_id": "shared_set_encoder_v1",
+      "arm": "S",
+      "fold_index": 7,
+      "initial_tensor_sha256": "94687ccdf86bdb44144ce4ee894131769125261711761bd2b7b5d6ada898ccc0",
+      "layers": [
+        {
+          "fan_in": 6,
+          "layer_name": "phi.w",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100070000000100000053007068692e77",
+          "seed_u64": 1320276002556745201,
+          "sha256_digest": "f115de79079052120d9059e4b64c56ac55802d2eab2a64d1183df6f7e343306a",
+          "shape": [
+            6,
+            16
+          ],
+          "tensor_sha256": "0ef8dde7f9c6ed95cd322582fb9e90f46660902ec33c4907b0b1c6ab01957962"
+        },
+        {
+          "fan_in": 82,
+          "layer_name": "rho.w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000700000001000000530072686f2e7731",
+          "seed_u64": 1200451808211723656,
+          "sha256_digest": "88656f2e8fdca810c91dd5191cba3769b012093526637836d2979efa5fb0ebd0",
+          "shape": [
+            82,
+            128
+          ],
+          "tensor_sha256": "c8ec73a9770fe6ab632aa1153b80e6c8d66aa470595830e8a9fa51a8965a936c"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "rho.w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000700000001000000530072686f2e7732",
+          "seed_u64": 12757271083518872727,
+          "sha256_digest": "974c81a475ee0ab149136cf2d6a3b80783c34489d9e0e1c35b93e9ea6c182a86",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "6cbe55d3d7f90678956c684f2603cca18394c3d2c0d13a3db1dc50187971bc62"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "rho.w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000700000001000000530072686f2e7733",
+          "seed_u64": 17779059003921971482,
+          "sha256_digest": "1ab97a71f7e7bbf658ed1b99b9f0cb9346bfa72b1996fab5a491537d34445534",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "b1be0691625311efdc210af7891cd2175a61b0379dae517e76b2a124d080f6d5"
+        }
+      ],
+      "parameter_count": 19057,
+      "replicate_index": 1
+    },
+    {
+      "architecture_id": "sorted_tuple_mlp_v1",
+      "arm": "D",
+      "fold_index": 7,
+      "initial_tensor_sha256": "fbc8a4b1eb583f52842bc7e23da1bd6cc2f57322fa568843d9cd758fc4ab3723",
+      "layers": [
+        {
+          "fan_in": 90,
+          "layer_name": "w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100070000000200000044007731",
+          "seed_u64": 6660217202885629029,
+          "sha256_digest": "6594f13842d86d5c2b0798b0589615e8e206953a72453667aa85b891821823bc",
+          "shape": [
+            90,
+            128
+          ],
+          "tensor_sha256": "e7c4091584c04e241f8ba35a6a4a4d4838d90bdee786e4d8c71a4ab6bcbf0032"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100070000000200000044007732",
+          "seed_u64": 6473562926291599520,
+          "sha256_digest": "a0c0bfdc2eb7d65965fa534b08f320a47ef9de10c95ca210fc159e06d7208930",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "db5ff5f29ff04a74f6202035886a0407ab8d144c661ec381f8276ca428b01e0f"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100070000000200000044007733",
+          "seed_u64": 16143803487904513766,
+          "sha256_digest": "e6be421cbd4f0ae0bfaff3244ffb9c875736750452ed127a6674cdd1bba376f2",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "a174be1300a56efc1ffaab7089dec41a7a1584c3c06903340b25780a74e127c5"
+        }
+      ],
+      "parameter_count": 19969,
+      "replicate_index": 2
+    },
+    {
+      "architecture_id": "shared_set_encoder_v1",
+      "arm": "S",
+      "fold_index": 7,
+      "initial_tensor_sha256": "9c5bd6e7ef5fbca7ec5aa751575d569c2af87efd9971994ea1156d8ec10300f0",
+      "layers": [
+        {
+          "fan_in": 6,
+          "layer_name": "phi.w",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100070000000200000053007068692e77",
+          "seed_u64": 14524267506109705574,
+          "sha256_digest": "66ed6a0c589090c94e362efa4662233fe8b3fe01e7dda2ceda93857644c38f55",
+          "shape": [
+            6,
+            16
+          ],
+          "tensor_sha256": "fb9b8650e3af5a12b6959538fb521440da14d7f04fdb64e16f92ff7fbf654963"
+        },
+        {
+          "fan_in": 82,
+          "layer_name": "rho.w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000700000002000000530072686f2e7731",
+          "seed_u64": 2627784815180997068,
+          "sha256_digest": "cc6107e75dc4772496702ac49c10c1e34dc08181c7fadd0e71bdeb87ceec0da0",
+          "shape": [
+            82,
+            128
+          ],
+          "tensor_sha256": "55d5133b44fe5003c34bfced0c781f348305df2aa647d51f58d1ef690df9c760"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "rho.w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000700000002000000530072686f2e7732",
+          "seed_u64": 12717230237889139571,
+          "sha256_digest": "73133dc885ad7cb044e91ebcb7abc6eafa5c73eaab524009876053f989cdf5f7",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "e5bccf4f2ea0b5e68391fb8963c8b0ce142bea50a5d61e5c1523f821b32658e8"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "rho.w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000700000002000000530072686f2e7733",
+          "seed_u64": 14477248498328423782,
+          "sha256_digest": "664dec33ce84e9c8210bdbe36068d464548f99d03a44c1212db4da91570a9123",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "6a26570f6974f1a5df303e10c92b28abe751f5a93943446f0a7cb09323095927"
+        }
+      ],
+      "parameter_count": 19057,
+      "replicate_index": 2
+    },
+    {
+      "architecture_id": "sorted_tuple_mlp_v1",
+      "arm": "D",
+      "fold_index": 8,
+      "initial_tensor_sha256": "8b691d94897bfd2d0713d4401356e69dc011235dcea91c3b1d507600d54417a4",
+      "layers": [
+        {
+          "fan_in": 90,
+          "layer_name": "w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100080000000000000044007731",
+          "seed_u64": 15398700629422235487,
+          "sha256_digest": "5fdf4bfba22cb3d5428cda29d2e807a332a08b5d29663e7d2358516b4bde9cb0",
+          "shape": [
+            90,
+            128
+          ],
+          "tensor_sha256": "a7a81b5882779f01589a0eeccee7be6c45c97a72936e37dc0733ee0311a0bcb7"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100080000000000000044007732",
+          "seed_u64": 3489183509777913975,
+          "sha256_digest": "77987668ea116c30c920adbde6c8dbdfaf5ca75fd0948c7ade8fc0f3644fbc60",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "5789c3b3a6ffbc5a6fbb9955690f1694e2ce8eabd2dcb9f92c6d42d6e8c4a4de"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100080000000000000044007733",
+          "seed_u64": 2339835927395838611,
+          "sha256_digest": "932a200561c478204030bfcfe22d4b2fef32c4790c65321016bf3fc7f2994878",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "c9e409b2ce0eb7e4dbcb89db3fe6aaf7587b70cc8ea00c7ff1a19a1fe0227538"
+        }
+      ],
+      "parameter_count": 19969,
+      "replicate_index": 0
+    },
+    {
+      "architecture_id": "shared_set_encoder_v1",
+      "arm": "S",
+      "fold_index": 8,
+      "initial_tensor_sha256": "60b6ce55af435ceb578dcd5cb2d5e18f4898060561cdcd82a5aa9ab6ebba5709",
+      "layers": [
+        {
+          "fan_in": 6,
+          "layer_name": "phi.w",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100080000000000000053007068692e77",
+          "seed_u64": 5804423390320569851,
+          "sha256_digest": "fbad060252748d5072cb3702265b8f13f41937289e4e42f8a70684dd37bf3443",
+          "shape": [
+            6,
+            16
+          ],
+          "tensor_sha256": "5468e3d328f9d990a0991a3d12efc56303e5e540890b86ff0bb56f08d7827b7a"
+        },
+        {
+          "fan_in": 82,
+          "layer_name": "rho.w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000800000000000000530072686f2e7731",
+          "seed_u64": 8657413344258650585,
+          "sha256_digest": "d9714352914f25784da3af7eee88579dd785b4e1b69f5119a6cc3fc544e573e4",
+          "shape": [
+            82,
+            128
+          ],
+          "tensor_sha256": "c45b9b891e3209dcff965e5ca9894c13d0bb86bb9bd54dc962451eaa0d908d88"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "rho.w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000800000000000000530072686f2e7732",
+          "seed_u64": 16620241330539806488,
+          "sha256_digest": "183f17ac6ef5a6e6a96499d5e41cbd49751f3aae8149f13e53a2287f63c80911",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "bc110ca6419a8aaaeefb135bbc1b2e48bab9a3ceb36f59487f2ef3c9da931566"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "rho.w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000800000000000000530072686f2e7733",
+          "seed_u64": 5217865800136777439,
+          "sha256_digest": "dfdecfbe4c956948ba861d8cd7c16ba7c6b7ffa25185ecd6e005936ccc36317d",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "f7ea394c08d2bd82122f407512e9de257399159ff20172348975e65c45b7f98f"
+        }
+      ],
+      "parameter_count": 19057,
+      "replicate_index": 0
+    },
+    {
+      "architecture_id": "sorted_tuple_mlp_v1",
+      "arm": "D",
+      "fold_index": 8,
+      "initial_tensor_sha256": "c831bf482bd4e8ecc6afa7c630896338cc0298c8fc86d427af3cdb6046126ff6",
+      "layers": [
+        {
+          "fan_in": 90,
+          "layer_name": "w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100080000000100000044007731",
+          "seed_u64": 14978882937722171296,
+          "sha256_digest": "a0ef169babaedfcfe48d178ce665944fc02345a77a39c246d39470a99cea66e6",
+          "shape": [
+            90,
+            128
+          ],
+          "tensor_sha256": "1970f7fb47320e30d8eaefac643158f35aef0c47bce70366c37e40f2fdc6c05a"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100080000000100000044007732",
+          "seed_u64": 14441248842192721366,
+          "sha256_digest": "d615eb174f9f69c88513c61d3746f7a22b99c4850f69a115ccbd011163a3d34a",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "40709989706f31543de7c94b1af051673abc603155052119875f75affc257812"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100080000000100000044007733",
+          "seed_u64": 17328738525228539717,
+          "sha256_digest": "459fdf89e00b7cf02733d925ae5a299bcab97e49ad1322029f5a4f1abc28630e",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "e7c8a0707b3f859f16a214324578579b20307ba8975be264928b920f510a6d9b"
+        }
+      ],
+      "parameter_count": 19969,
+      "replicate_index": 1
+    },
+    {
+      "architecture_id": "shared_set_encoder_v1",
+      "arm": "S",
+      "fold_index": 8,
+      "initial_tensor_sha256": "d71bbcd2b185d34336da1698b6e4b56a2b31179406386d5efe0b5ee77bb4e0f1",
+      "layers": [
+        {
+          "fan_in": 6,
+          "layer_name": "phi.w",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100080000000100000053007068692e77",
+          "seed_u64": 947868225549194689,
+          "sha256_digest": "c155bd0d2181270d172f66baf22ebfac64ddc6b8142517d3a8bf73d6f5da328d",
+          "shape": [
+            6,
+            16
+          ],
+          "tensor_sha256": "722a45072c3faef4829accc42857deeb9539764141f653641874b67d6edaf288"
+        },
+        {
+          "fan_in": 82,
+          "layer_name": "rho.w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000800000001000000530072686f2e7731",
+          "seed_u64": 17715870981463371456,
+          "sha256_digest": "c06ec680cb6adbf5aa402eb829c2f29fd404856b2ab69b28863f1148b6e3bde1",
+          "shape": [
+            82,
+            128
+          ],
+          "tensor_sha256": "83a2fc78002c41870144e347a790d182ce50f1bf0ded58525e54314d5e922901"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "rho.w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000800000001000000530072686f2e7732",
+          "seed_u64": 6102439808092409543,
+          "sha256_digest": "c70e8d60ac38b0541fbf450abcf05fde9fd73903d92dfb704e44a8792e73aded",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "bc8e11c2b8d067b906d3bc871ccc50d2a4f05edad68d832d7732ea459504daf5"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "rho.w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000800000001000000530072686f2e7733",
+          "seed_u64": 9075082069296610038,
+          "sha256_digest": "f6faf0670f2bf17d0e8df1a02173e61a09931495af8ffa3ca26ed6656e427e6c",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "18dbfb2d07d33eb39a7801029fab701ae049d3195cfd29be202f6764f27dfdda"
+        }
+      ],
+      "parameter_count": 19057,
+      "replicate_index": 1
+    },
+    {
+      "architecture_id": "sorted_tuple_mlp_v1",
+      "arm": "D",
+      "fold_index": 8,
+      "initial_tensor_sha256": "9a9ff12405fcc7423a8e2473b1d72c0a35895181f0775c9b6660658df0bca5fa",
+      "layers": [
+        {
+          "fan_in": 90,
+          "layer_name": "w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100080000000200000044007731",
+          "seed_u64": 13654922115157790480,
+          "sha256_digest": "100f9b1d510780bd02fc082cff6c3a1e1e276f2dcf9384e30f7f1ad5b800b360",
+          "shape": [
+            90,
+            128
+          ],
+          "tensor_sha256": "6e4d4075d23e1e1b74b8d268e15bca19516ad75ecd8e6aed25558416d45d6852"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100080000000200000044007732",
+          "seed_u64": 1103047383822012976,
+          "sha256_digest": "3092225bc0cf4e0f9bab8177f5791eea13d4846ae693fc07145150ffbf262d1f",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "cbcf9c13d5d675cb165387a9c7d0f1feac9be989cbcfcc2aabe1cc219d3112d0"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100080000000200000044007733",
+          "seed_u64": 2426645076923264565,
+          "sha256_digest": "352ef62dd72cad21554eee618ee2c76a5993b489e480a9a7a9692b4cdbe2fc25",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "f95d884b81016c9d181003b88c2af5a16a4c77d22e1e3284cfa77f34b2a1520e"
+        }
+      ],
+      "parameter_count": 19969,
+      "replicate_index": 2
+    },
+    {
+      "architecture_id": "shared_set_encoder_v1",
+      "arm": "S",
+      "fold_index": 8,
+      "initial_tensor_sha256": "5ffd75fc50e2285940b9fc65560607cd247ff66262e7c9651f4f46fa44769060",
+      "layers": [
+        {
+          "fan_in": 6,
+          "layer_name": "phi.w",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100080000000200000053007068692e77",
+          "seed_u64": 14988702561846556504,
+          "sha256_digest": "58f7d902919102d0f103667f8d10f67a64899d857c1d8491a684333b1ce558ad",
+          "shape": [
+            6,
+            16
+          ],
+          "tensor_sha256": "fccc29bc69abda11d4d6cc2fab83b1d43876a6f21d55f8d262644a3d49bff467"
+        },
+        {
+          "fan_in": 82,
+          "layer_name": "rho.w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000800000002000000530072686f2e7731",
+          "seed_u64": 14644426264702368983,
+          "sha256_digest": "d73cfc2619743bcb01b269ffb827a6ce1a6b799739bb729e3e78bfc75c30e95e",
+          "shape": [
+            82,
+            128
+          ],
+          "tensor_sha256": "b71a9c9adb9d47a66e6aacf0ddbc54387a095561a8407c67151696342c5d9500"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "rho.w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000800000002000000530072686f2e7732",
+          "seed_u64": 8067103227692822008,
+          "sha256_digest": "f8ad09eda41bf46f306879dc5058cf813d05a06d8ebc1849e2f773734abd2378",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "8ff8f409ed1de1e52f431cec76f7628a9956406774d9abc3a03cb5df1d061ccf"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "rho.w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000800000002000000530072686f2e7733",
+          "seed_u64": 3207063218298337470,
+          "sha256_digest": "beb8e45a01c7812c485f58747af0128a7e346916da96ef836dd3d2662301f034",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "93ea77b02fe82a003110e3baff9e5f38cfe32da675fef766c7edd4a0a41bb32f"
+        }
+      ],
+      "parameter_count": 19057,
+      "replicate_index": 2
+    },
+    {
+      "architecture_id": "sorted_tuple_mlp_v1",
+      "arm": "D",
+      "fold_index": 9,
+      "initial_tensor_sha256": "252f7e7709069a998e5c91ec27958ce7ee9ef24771c063ac52c4ef0825f70d28",
+      "layers": [
+        {
+          "fan_in": 90,
+          "layer_name": "w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100090000000000000044007731",
+          "seed_u64": 16816181590672331045,
+          "sha256_digest": "25d17c8e0f145fe9ab3437f2b3c352f83e893ab98b648ebd0ba6a8c8ace24bba",
+          "shape": [
+            90,
+            128
+          ],
+          "tensor_sha256": "1acef6838a13bd4dd6b270cf96dd325f088b7d24543c9149b972bc34f398d1e4"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100090000000000000044007732",
+          "seed_u64": 631589049417264566,
+          "sha256_digest": "b6ed8ae6e4dac308208f085400aad5303b7016e3371e44c7f9af200d7abd7902",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "a5a34de8eb2ba6121e780e6cc726845b4d07520891b905b58b4fbc377ac26d52"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100090000000000000044007733",
+          "seed_u64": 9799209421963831567,
+          "sha256_digest": "0fa9d0030dc9fd878b78cda9a8a58982106d0bc4c2b569db00c66369c1f72667",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "e952149705bf4497caa058c25696fdf5e53ca1c476eb0c4aeff0443412334ed7"
+        }
+      ],
+      "parameter_count": 19969,
+      "replicate_index": 0
+    },
+    {
+      "architecture_id": "shared_set_encoder_v1",
+      "arm": "S",
+      "fold_index": 9,
+      "initial_tensor_sha256": "920d369b14b3bc80e8a68b47290d67907ffe8824e7bbdaf1167d97158c5e1d01",
+      "layers": [
+        {
+          "fan_in": 6,
+          "layer_name": "phi.w",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100090000000000000053007068692e77",
+          "seed_u64": 13965733558104968625,
+          "sha256_digest": "b14d996ead40d0c1051ccaecef3a5f2a5ccc597a5bc2ed3730a62599bd511e69",
+          "shape": [
+            6,
+            16
+          ],
+          "tensor_sha256": "610a7939450f47f4cd5d067485931206fcab56eb82d29b2c06bb4fd46570bd2e"
+        },
+        {
+          "fan_in": 82,
+          "layer_name": "rho.w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000900000000000000530072686f2e7731",
+          "seed_u64": 17182897946706632409,
+          "sha256_digest": "d9de3cc5a4ea75ee1dcdbdc2ab1723db5e626d148f21e1380584ad95f2aeb133",
+          "shape": [
+            82,
+            128
+          ],
+          "tensor_sha256": "6129cfcc82d94c38cb9b09f9f28b8f233daf1b43754fa43569172d10346a658e"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "rho.w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000900000000000000530072686f2e7732",
+          "seed_u64": 12872034960969777267,
+          "sha256_digest": "7340031999a7a2b24b5491d9dcc106437216f85c186834a8e75c94c6fc5c2333",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "331650018e2ad5325733d0a439a177207711fcb743e0e985b109e2786ed7985b"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "rho.w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000900000000000000530072686f2e7733",
+          "seed_u64": 2072004252148158573,
+          "sha256_digest": "6dd063aee33cc11c6e6ab1fd93f17a635fbd9212a7a9d7c03edfe1bf407944ea",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "2bea4f7a93ed64bfe2ec9511c110ad7469065cd231bdeac9b719404dc4df44fe"
+        }
+      ],
+      "parameter_count": 19057,
+      "replicate_index": 0
+    },
+    {
+      "architecture_id": "sorted_tuple_mlp_v1",
+      "arm": "D",
+      "fold_index": 9,
+      "initial_tensor_sha256": "b8263702a1f26900ffa6aa719d8fea897cd0dd9d7333f07557d04e3e19bbc8e2",
+      "layers": [
+        {
+          "fan_in": 90,
+          "layer_name": "w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100090000000100000044007731",
+          "seed_u64": 2430672215383837751,
+          "sha256_digest": "378c5d6b807bbb21b4d07ec7a5c287bc793da48fc7f86af4d330548e0e312177",
+          "shape": [
+            90,
+            128
+          ],
+          "tensor_sha256": "795d221ae009252a531982e5eecab4bc075136c89b369fe2ff3312e7e58a6e0a"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100090000000100000044007732",
+          "seed_u64": 4645869660643120599,
+          "sha256_digest": "d7d5656bd7717940e1c3d82ae2902fe462701382abf486176f1845e764744762",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "a61b3aefc6846e8babfccc5046256027f76f6560a0cb74fda26e477c1e7545ed"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100090000000100000044007733",
+          "seed_u64": 11333926892447532161,
+          "sha256_digest": "8104957e75324a9dc4e587379c241ab74b72a7c86028654fcd290e29e77fb9f4",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "8ae26900801ee3bc13421102cb95e206ecaa1872442c6da2cf3963fe64f82dfe"
+        }
+      ],
+      "parameter_count": 19969,
+      "replicate_index": 1
+    },
+    {
+      "architecture_id": "shared_set_encoder_v1",
+      "arm": "S",
+      "fold_index": 9,
+      "initial_tensor_sha256": "67e02f2ffc7b33b19e6d3e58cb78bfc793e86e5809de25fb6692bddf00021896",
+      "layers": [
+        {
+          "fan_in": 6,
+          "layer_name": "phi.w",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100090000000100000053007068692e77",
+          "seed_u64": 6447007140750493880,
+          "sha256_digest": "b808d738d65e7859ca5336f5dd8c76bcb6473cb8ef1d3672f024b2c459b8ca26",
+          "shape": [
+            6,
+            16
+          ],
+          "tensor_sha256": "16be643c23ccd42033c3da633cf98a89afdba2933da60d4d059b8ee7affa75b3"
+        },
+        {
+          "fan_in": 82,
+          "layer_name": "rho.w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000900000001000000530072686f2e7731",
+          "seed_u64": 8620593732483026426,
+          "sha256_digest": "fa0d9c695380a277903c8c801d83d423bb93cb7435036f22e8a980a39f8468ce",
+          "shape": [
+            82,
+            128
+          ],
+          "tensor_sha256": "bccc61c8e75514811f86885371bae1f45bf0a61234fb91bc5b185bb50852155b"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "rho.w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000900000001000000530072686f2e7732",
+          "seed_u64": 3405425263531300923,
+          "sha256_digest": "3b98ec053c80422f18902ef0b3ed7bb320d0dbe27dba794014b7c3d0470bbb93",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "c2c72526eddc21aeec64f2ca04acf4a0b3ab2dba2449ccbb18c512fa50efaea1"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "rho.w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000900000001000000530072686f2e7733",
+          "seed_u64": 2822531431373954951,
+          "sha256_digest": "875f6be661a52b278311101f8badc719781b75c6077b03d8dd0d51ef3dc910a2",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "0c201b943c8551d876d47b316b349f68c8455db0b9f76b6ffafbcf225054168f"
+        }
+      ],
+      "parameter_count": 19057,
+      "replicate_index": 1
+    },
+    {
+      "architecture_id": "sorted_tuple_mlp_v1",
+      "arm": "D",
+      "fold_index": 9,
+      "initial_tensor_sha256": "c91df7e7be1858970595e77ca70735f9cbf3676f77b72fa0763ffe6413d8ac60",
+      "layers": [
+        {
+          "fan_in": 90,
+          "layer_name": "w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100090000000200000044007731",
+          "seed_u64": 1582342537178055374,
+          "sha256_digest": "ce027d69279cf515bc053446d176a0a1699b29737ada46d5e3013a3d0f12aeff",
+          "shape": [
+            90,
+            128
+          ],
+          "tensor_sha256": "08c5d4e57f35b3162ee4e8d7aa8811f5d1890ba341d71aeba3a95b9b888e3c79"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100090000000200000044007732",
+          "seed_u64": 12210578466327561642,
+          "sha256_digest": "aa057db36bb074a9b7ffd5371621aca01f2e2381ebaef00ba28c1d3aba8e98f4",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "4357eb1da2bf726195ae74ae6d1c94e44a61932d8b21b7a21e6a9c7f666a18e5"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100090000000200000044007733",
+          "seed_u64": 2552922606764404992,
+          "sha256_digest": "00b141bb95cd6d233469d67b4915de6a9eb76c7e38d559801e52bdd609b60311",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "19e0a3741362538af07a1094a86b39f5a3d64da11d6a4f8b2f0ce9c00ce67af5"
+        }
+      ],
+      "parameter_count": 19969,
+      "replicate_index": 2
+    },
+    {
+      "architecture_id": "shared_set_encoder_v1",
+      "arm": "S",
+      "fold_index": 9,
+      "initial_tensor_sha256": "511338f4048385e4098ca7c26fa818f39623b5206164e5e0f8e134a1539215cb",
+      "layers": [
+        {
+          "fan_in": 6,
+          "layer_name": "phi.w",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100090000000200000053007068692e77",
+          "seed_u64": 13236243169697024755,
+          "sha256_digest": "f34a7bc20895b0b78c4be52483318c929abef20931c6b137ca46edbf8bd4bbd0",
+          "shape": [
+            6,
+            16
+          ],
+          "tensor_sha256": "25709062c00ad741f2d795ba4d5bbcf639c035a0f260216c64425eddb686e1c2"
+        },
+        {
+          "fan_in": 82,
+          "layer_name": "rho.w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000900000002000000530072686f2e7731",
+          "seed_u64": 15946124884008425125,
+          "sha256_digest": "a5d6568718044cdd57596f53da120ea0401f31df8562fe71d5614d36e0813d82",
+          "shape": [
+            82,
+            128
+          ],
+          "tensor_sha256": "c7f736f7750a1a228fb3f6d3066d3520fd4defedb3c0bc88ea5b156fc14539ab"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "rho.w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000900000002000000530072686f2e7732",
+          "seed_u64": 8308172629399712803,
+          "sha256_digest": "2334fee3fc8e4c735a5f01d8a05ac96990cc0b5bb330fa20ca5517e96694d141",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "44daa44e8bbf057eeeb49764841482496e8889322d5b495e7c5d1cf6af07afb9"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "rho.w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000900000002000000530072686f2e7733",
+          "seed_u64": 6888990353223389156,
+          "sha256_digest": "e40ff9103a9c9a5f9598ca54786b116290433c13052cf9b0bd9042a85545d543",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "06d44684f8b31d44744938ca407a6021d0cff137ea04ff369b0bc237f0086b75"
+        }
+      ],
+      "parameter_count": 19057,
+      "replicate_index": 2
+    },
+    {
+      "architecture_id": "sorted_tuple_mlp_v1",
+      "arm": "D",
+      "fold_index": 10,
+      "initial_tensor_sha256": "2e636bb36067e25c8737f14e223d1c51b30b00d8fcb05817ee7b53add4448e8a",
+      "layers": [
+        {
+          "fan_in": 90,
+          "layer_name": "w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000a0000000000000044007731",
+          "seed_u64": 17651437074092488029,
+          "sha256_digest": "5d7571607f80f6f45d95e56ec5e72a57f2eabe727f4be02c9249be1848fce4da",
+          "shape": [
+            90,
+            128
+          ],
+          "tensor_sha256": "a319dd8b22e2499674b8c92b0f0cecb1d5d516b4bae9bea30c945d8175009d14"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000a0000000000000044007732",
+          "seed_u64": 9726186936187056464,
+          "sha256_digest": "507179a67c5bfa866ab568161d1de9b57c3bfd78ae9aaa754511fb4b7cd54749",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "78468b7218cf54c623afa0dbea9365e969671c02758a22bf0452dd5fe82bfc5a"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000a0000000000000044007733",
+          "seed_u64": 17211240951435657555,
+          "sha256_digest": "5381facd749cdaee54c590610db32dbd8b4f646d9d083338242ff7badd6121b7",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "7c8738f662b3b228fe10c82eefebf6a4e9fff8ee74e957db142fc8f92838ac19"
+        }
+      ],
+      "parameter_count": 19969,
+      "replicate_index": 0
+    },
+    {
+      "architecture_id": "shared_set_encoder_v1",
+      "arm": "S",
+      "fold_index": 10,
+      "initial_tensor_sha256": "8d20a548758c17f06fe7c7c280ededd43387afe07261d43f6e13602fb456476f",
+      "layers": [
+        {
+          "fan_in": 6,
+          "layer_name": "phi.w",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000a0000000000000053007068692e77",
+          "seed_u64": 12621230747899345656,
+          "sha256_digest": "f83ac7bc7e9e27af3d3d394eaf23c55277058d5ab6964fac8fa25096deea1897",
+          "shape": [
+            6,
+            16
+          ],
+          "tensor_sha256": "fc8448bfae3f98d427910e7b1c8dceb82139f39d263128df18ebba3beaf5dbfe"
+        },
+        {
+          "fan_in": 82,
+          "layer_name": "rho.w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000a00000000000000530072686f2e7731",
+          "seed_u64": 4849299749495265393,
+          "sha256_digest": "71580ef26d2c4c43a7d499e14b0097c3fcdabbf0c82b91912a78c4067dfbb8b2",
+          "shape": [
+            82,
+            128
+          ],
+          "tensor_sha256": "0397f5282609a3279a5370dbfdbdea7715f0182487b6bd208ca963ba2284e4a1"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "rho.w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000a00000000000000530072686f2e7732",
+          "seed_u64": 5486960373035183504,
+          "sha256_digest": "902d685b6399254c581921b78268ffec2271526d9ff3294c42e1e5bff57deb7b",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "e15c6b0320a91eed42a8ab9b79fc5210eae1efb28a3240ef8d5eb963b6b9d2d3"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "rho.w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000a00000000000000530072686f2e7733",
+          "seed_u64": 16389974051974020102,
+          "sha256_digest": "06fcc7fd8fe274e37f513b55c31898c9e7cc52385f7ef10fa3e2b53b894e1d25",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "6f38e77b527c23c9ad841a2ef514e5e187d42fa35c4678bdcd02bf3f057392dc"
+        }
+      ],
+      "parameter_count": 19057,
+      "replicate_index": 0
+    },
+    {
+      "architecture_id": "sorted_tuple_mlp_v1",
+      "arm": "D",
+      "fold_index": 10,
+      "initial_tensor_sha256": "60767c18074e10fcfba4d8b08f025b8681827b5bb461ba75226b33844e2c4d6d",
+      "layers": [
+        {
+          "fan_in": 90,
+          "layer_name": "w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000a0000000100000044007731",
+          "seed_u64": 17232725280816155553,
+          "sha256_digest": "a1cbf00a57f026efb59812041f988075eb71e57c50a1c10229bd70ab6dc73715",
+          "shape": [
+            90,
+            128
+          ],
+          "tensor_sha256": "74348ec8e75915506b17306390fe6f98c81668f945cbf4ec96d2887d7ea8c87c"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000a0000000100000044007732",
+          "seed_u64": 14686794453804743091,
+          "sha256_digest": "b37935e4bdf9d1cb6c9a58829e7231dc6bb9e1ee85f4403bbb32561880606b1b",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "ffea6596034fd08b713b49daf07d9ae2493748cbdfd11e89af23dd3140587266"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000a0000000100000044007733",
+          "seed_u64": 15126091666157420755,
+          "sha256_digest": "d3404f993aacead1fa0e1c799992c222645bf39bd99272b41b3316eb9e73d591",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "fa4274cd85aad896034ad8f7710d2e9676c0c0bb9352db4c06e647a4b763abfa"
+        }
+      ],
+      "parameter_count": 19969,
+      "replicate_index": 1
+    },
+    {
+      "architecture_id": "shared_set_encoder_v1",
+      "arm": "S",
+      "fold_index": 10,
+      "initial_tensor_sha256": "c5b5339348cdf57e5cc5f62cd8f318d52c5335f4675a34213f981f16add727a9",
+      "layers": [
+        {
+          "fan_in": 6,
+          "layer_name": "phi.w",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000a0000000100000053007068692e77",
+          "seed_u64": 16618750504536328205,
+          "sha256_digest": "0d48bbb188a9a1e630077acd8496ac6d73d41daf8f4d53d1c03ec6b235fa1de9",
+          "shape": [
+            6,
+            16
+          ],
+          "tensor_sha256": "2404eab19b9f67af95da8b69d816d9a6e0347f595b4e3fae41082fcec4d5b1fb"
+        },
+        {
+          "fan_in": 82,
+          "layer_name": "rho.w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000a00000001000000530072686f2e7731",
+          "seed_u64": 13361339763891864289,
+          "sha256_digest": "e182134eb9036db98dd4e875077cc6b83afbd262f42cfac89723252f9be2489c",
+          "shape": [
+            82,
+            128
+          ],
+          "tensor_sha256": "440bf50b1f6bc8644e91574cccfc60da40e224db95e2ccad97445e9680265548"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "rho.w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000a00000001000000530072686f2e7732",
+          "seed_u64": 8183498186423569450,
+          "sha256_digest": "2a8cd4153ea091717004f0449c13b589a36217875958c6d21aa7b63f70a4a0a5",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "5cbfcc3bb63e95a03d7f6ad3a37cef4bfd2816d3467fcfd51c809338a1ad0678"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "rho.w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000a00000001000000530072686f2e7733",
+          "seed_u64": 11534082716207698304,
+          "sha256_digest": "805188c51e4b11a05f8394f7aa72fd89a68b311abf1c79569030625205bc1bb9",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "7d37466999c5a0358b0946ba9c0454756e1a262104fe5ded23705c1e41bddc8f"
+        }
+      ],
+      "parameter_count": 19057,
+      "replicate_index": 1
+    },
+    {
+      "architecture_id": "sorted_tuple_mlp_v1",
+      "arm": "D",
+      "fold_index": 10,
+      "initial_tensor_sha256": "b2d60fb65dcf208781c8715586f126f7cdcbf2c76c9c202b306a615c60fe6c1b",
+      "layers": [
+        {
+          "fan_in": 90,
+          "layer_name": "w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000a0000000200000044007731",
+          "seed_u64": 7242235968504361006,
+          "sha256_digest": "2e70420a3e978164122b321ed388c4375428a050413f219fd1807dd61c8a94c2",
+          "shape": [
+            90,
+            128
+          ],
+          "tensor_sha256": "cef0ddf0b114a9330dd5cfaeb415b7e429596acd1b9c2945c383055c05abb361"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000a0000000200000044007732",
+          "seed_u64": 18036528664849534427,
+          "sha256_digest": "dbcd8151429f4efa415918baa78651482866c9cb514ea3bac6369d7a180908f4",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "e47261070675e6de05adec9a56e4ec9172edc7278101f863bdbb00b6b707b0a9"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000a0000000200000044007733",
+          "seed_u64": 17005067801366978467,
+          "sha256_digest": "a35fe9911123feeb087a9b10ddd0a7c0e297c01f383bbf38357bc1feb0850528",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "f18f2348320193acc436091f26562d3221a1a29606f02cab62fe9aba884e7236"
+        }
+      ],
+      "parameter_count": 19969,
+      "replicate_index": 2
+    },
+    {
+      "architecture_id": "shared_set_encoder_v1",
+      "arm": "S",
+      "fold_index": 10,
+      "initial_tensor_sha256": "9d3e1b57c51ddd3b3b593356509283d743474dbbda2614894ba65eec985568bd",
+      "layers": [
+        {
+          "fan_in": 6,
+          "layer_name": "phi.w",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000a0000000200000053007068692e77",
+          "seed_u64": 5974360644142975258,
+          "sha256_digest": "1a4937325a31e9528ef9c3062ecfb4dd7f1bf805c1cc6faa3dd8aca653784aed",
+          "shape": [
+            6,
+            16
+          ],
+          "tensor_sha256": "48cc5f9337255d597f7e5c6f48e39154a9fe25dd267fa914d8d620200db21865"
+        },
+        {
+          "fan_in": 82,
+          "layer_name": "rho.w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000a00000002000000530072686f2e7731",
+          "seed_u64": 16480203684091887456,
+          "sha256_digest": "607f6150ef71b5e4e459828909467334861843b9bc75170b691884fdf85531c4",
+          "shape": [
+            82,
+            128
+          ],
+          "tensor_sha256": "9b3ca9ab81dc45fc13b005dbfa738c1345e6f91bddd3277ae2e36e46e9691e08"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "rho.w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000a00000002000000530072686f2e7732",
+          "seed_u64": 4283154458139670804,
+          "sha256_digest": "14b98b5b49d2703b327ff2336a94727b9720fe5e892b97f5740734705bdc31f8",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "be246970e368d780abd33c9d6ceb17874898ef8ac791b5b42974eb77ee06f178"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "rho.w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000a00000002000000530072686f2e7733",
+          "seed_u64": 15471439916601930351,
+          "sha256_digest": "6f72db08a298b5d6ff5b17e920f3175d6407440a050016899c535d229c8e66b1",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "ff3221393ec3c7a98a873c3c8652e564d5e3bbf6ef7658cb65f0eaa2e8484c56"
+        }
+      ],
+      "parameter_count": 19057,
+      "replicate_index": 2
+    },
+    {
+      "architecture_id": "sorted_tuple_mlp_v1",
+      "arm": "D",
+      "fold_index": 11,
+      "initial_tensor_sha256": "5620793e2df98c3253bef00d443f92bceab0f18a5b5ddefb90b0da8235c90aa7",
+      "layers": [
+        {
+          "fan_in": 90,
+          "layer_name": "w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000b0000000000000044007731",
+          "seed_u64": 9591114000386312952,
+          "sha256_digest": "f84a4d115e7b1a85d1bc9333239b71644d001ba85be9c1abe52dfe7e5dddb619",
+          "shape": [
+            90,
+            128
+          ],
+          "tensor_sha256": "89dfd53f4dc47d85a5a1cb52cb884732a945df63395e974f1c781a03dc615170"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000b0000000000000044007732",
+          "seed_u64": 15646602572360945677,
+          "sha256_digest": "0d9049eb23e623d95f8d051fa2140c7d0b29062e95790404bf67dacaf00e34b6",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "6bb7cc5fdf86e43f458fd8e9eeaa6ef1649c35153bb40da795591eeab7821c8a"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000b0000000000000044007733",
+          "seed_u64": 15520964889912171695,
+          "sha256_digest": "af5c8672558b65d70565b7e7e4839af6970c1e5ac92b5b7d0f7a3ffc5594fc83",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "4a6032598e02db7a272075d7d53d6a9e3eb2a9e506a8889285a059dad4897eac"
+        }
+      ],
+      "parameter_count": 19969,
+      "replicate_index": 0
+    },
+    {
+      "architecture_id": "shared_set_encoder_v1",
+      "arm": "S",
+      "fold_index": 11,
+      "initial_tensor_sha256": "9444e925af4522ee7c92706caf7d79115c0cccc4e0387038570c813b84e8178a",
+      "layers": [
+        {
+          "fan_in": 6,
+          "layer_name": "phi.w",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000b0000000000000053007068692e77",
+          "seed_u64": 7120916962637841757,
+          "sha256_digest": "5d0515d13f94d2623d6b6aff9e0d3d72442b6006a06a5ce5904084962e7cd619",
+          "shape": [
+            6,
+            16
+          ],
+          "tensor_sha256": "aa97e77f0f7dc342f8ca9745e530b0e638620f70fc4ba8e7acbb1486653c04da"
+        },
+        {
+          "fan_in": 82,
+          "layer_name": "rho.w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000b00000000000000530072686f2e7731",
+          "seed_u64": 13944770776134774870,
+          "sha256_digest": "56f0c26923c785c18244c0d143d3e019cde60f9334404e70aa66c4994249247c",
+          "shape": [
+            82,
+            128
+          ],
+          "tensor_sha256": "0cdfb93d43365147762c5117b78dde13fd04afe5fcf55fa847e0d828a8140a8c"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "rho.w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000b00000000000000530072686f2e7732",
+          "seed_u64": 10321931510406762218,
+          "sha256_digest": "eaceb45105de3e8ff727f8c76a10ea10886b147256515aad7f00c6e5b836cbad",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "c4644ae1abab728041f8403b1e15eee0034979f38a851a625a7bb272be90e0c5"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "rho.w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000b00000000000000530072686f2e7733",
+          "seed_u64": 557826050537669537,
+          "sha256_digest": "a1c3c164d6cbbd07b8e3bd2db606abfd30a2d4d307f7de3587f182efdf203ba1",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "aeb40e0e41e8e6627f826ffe1b1f29c1334936ff326e8fb8af8a8c5b7330b11a"
+        }
+      ],
+      "parameter_count": 19057,
+      "replicate_index": 0
+    },
+    {
+      "architecture_id": "sorted_tuple_mlp_v1",
+      "arm": "D",
+      "fold_index": 11,
+      "initial_tensor_sha256": "a32905194c4be9d82b45f33401a64152a2e64da246c11d2ca9b3b2d605243c83",
+      "layers": [
+        {
+          "fan_in": 90,
+          "layer_name": "w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000b0000000100000044007731",
+          "seed_u64": 3154732343552931010,
+          "sha256_digest": "c274e81a5adcc72bddb40cf97ecc04b8e40c6e7dc35102785b634c347e43128c",
+          "shape": [
+            90,
+            128
+          ],
+          "tensor_sha256": "5a386ee5830ac6b78e40fa24eb2442ac0eaf02a9ed5b2a298e9f2cb8f7c0af97"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000b0000000100000044007732",
+          "seed_u64": 7461521960724233696,
+          "sha256_digest": "e07dbec0b0a68c67b648520b8dbe55ce8c6f1e5c27cb9f5a95035499d812da75",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "1619c9a08683e7a554a9d481ab99e877a6b5a08ebd79885a2140e2b4702929d9"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000b0000000100000044007733",
+          "seed_u64": 16158101881320305872,
+          "sha256_digest": "d0f4aa400d1c3de0db8838fc6213f692f70f6241b872e4036ca5f110a7e6716d",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "a3fea5aa93fc51886f37ad3df8bb5d7ba6d6ea2072c7a5fee1f0955873176c02"
+        }
+      ],
+      "parameter_count": 19969,
+      "replicate_index": 1
+    },
+    {
+      "architecture_id": "shared_set_encoder_v1",
+      "arm": "S",
+      "fold_index": 11,
+      "initial_tensor_sha256": "abadab19d1525462cf3634d3bacc443cbb2909f67ea269baa125db854c7be332",
+      "layers": [
+        {
+          "fan_in": 6,
+          "layer_name": "phi.w",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000b0000000100000053007068692e77",
+          "seed_u64": 8320488838781116021,
+          "sha256_digest": "759e26d983507873b022a7f5cd460dc94029f21ec4c6fe1dc500de9a1549f41f",
+          "shape": [
+            6,
+            16
+          ],
+          "tensor_sha256": "37d6fafb1f20c3c335c86173d9b7154115df3c63dff72cfdee48f3536e7f53d6"
+        },
+        {
+          "fan_in": 82,
+          "layer_name": "rho.w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000b00000001000000530072686f2e7731",
+          "seed_u64": 6745698283314240056,
+          "sha256_digest": "385ae832d9889d5d76ea1fc9500699ba6377433a2ab9b971b934b1f77faa177a",
+          "shape": [
+            82,
+            128
+          ],
+          "tensor_sha256": "343364683065390e6b4519a00014cb3239f2f4be1e4261cf4ce0288570f6a174"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "rho.w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000b00000001000000530072686f2e7732",
+          "seed_u64": 752697189534805593,
+          "sha256_digest": "592ea81d1b1e720a5f820fd320c81890263fe49aa556c07fd905b41ea20577c0",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "e9a027492f2367796bfdaeb02ac02e47854baebf5d29eb7b7a52d5bc91b86515"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "rho.w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000b00000001000000530072686f2e7733",
+          "seed_u64": 16152152890851014914,
+          "sha256_digest": "0239f9f879f927e0d025c104501e4271cc41517979c6e339af674c3def2050ea",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "06b7736678d7e84f4bf106cea2469a7aad1981486d4d4baf10347812123b1ed4"
+        }
+      ],
+      "parameter_count": 19057,
+      "replicate_index": 1
+    },
+    {
+      "architecture_id": "sorted_tuple_mlp_v1",
+      "arm": "D",
+      "fold_index": 11,
+      "initial_tensor_sha256": "dc7a21a3e149f3669b7518ed6bd18cf2dcd1843241027480d5277212e7f21017",
+      "layers": [
+        {
+          "fan_in": 90,
+          "layer_name": "w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000b0000000200000044007731",
+          "seed_u64": 3115658096671076449,
+          "sha256_digest": "6130a60d880a3d2baa72a8f010baa351309630fe9a240163d40f09efd9a0e3b7",
+          "shape": [
+            90,
+            128
+          ],
+          "tensor_sha256": "eac7b065e0df96737f03c84303d4bac5c6d72043acfe1e93e50bbe16f45efd14"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000b0000000200000044007732",
+          "seed_u64": 1449199460005650444,
+          "sha256_digest": "0c20530e3b971c148e8ae268c02c6a50343400eb2352aa585de873b1eb477d06",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "8bbbf1895e70f463c6c98fab28822564fd2250e39c2a475cae1f2fe345fba85a"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000b0000000200000044007733",
+          "seed_u64": 1030833844911712078,
+          "sha256_digest": "4ea7699ceb414e0ecd8f143b0675fb777ae72aad3a97b924b9d7dab710fc3c1b",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "5895cf52d020f562ce7228b4866f969ad37855402e27e8f4e13c49632f4a18c7"
+        }
+      ],
+      "parameter_count": 19969,
+      "replicate_index": 2
+    },
+    {
+      "architecture_id": "shared_set_encoder_v1",
+      "arm": "S",
+      "fold_index": 11,
+      "initial_tensor_sha256": "5a3e93c109a5eb558f61e7f89cd330a5e6007b55e5c2fa42d956ab2ce4e8ea96",
+      "layers": [
+        {
+          "fan_in": 6,
+          "layer_name": "phi.w",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000b0000000200000053007068692e77",
+          "seed_u64": 11363329233479252541,
+          "sha256_digest": "3dba577bbba7b29db695728252e4e04e70ddda97a4c6f677365e6cbe9344b749",
+          "shape": [
+            6,
+            16
+          ],
+          "tensor_sha256": "3acd65e0abd4db49dc90f5fe1d51f729171a0f14393075f830943a5e807ef044"
+        },
+        {
+          "fan_in": 82,
+          "layer_name": "rho.w1",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000b00000002000000530072686f2e7731",
+          "seed_u64": 3656665351163521608,
+          "sha256_digest": "48aa9456c315bf328a316e2f3f5282833a1a70c5db6d57f97525c3920c91591a",
+          "shape": [
+            82,
+            128
+          ],
+          "tensor_sha256": "341f2f60915e4657737f0b57ed626c56ae56ed49ca921037628887539f48a9a0"
+        },
+        {
+          "fan_in": 128,
+          "layer_name": "rho.w2",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000b00000002000000530072686f2e7732",
+          "seed_u64": 5684313414941249997,
+          "sha256_digest": "cd918f21efbce24e3a56843694fa6e6953b14222017bd1eb743f3203c2863133",
+          "shape": [
+            128,
+            64
+          ],
+          "tensor_sha256": "6c363e300c22210be377dfeff2b03a93f8c16521865df4038710b08d50f03579"
+        },
+        {
+          "fan_in": 64,
+          "layer_name": "rho.w3",
+          "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000b00000002000000530072686f2e7733",
+          "seed_u64": 4122542190296945897,
+          "sha256_digest": "e9d435a8473636392d5f8a57f4a6deb21be02f233543ef07ed32accadabd2a68",
+          "shape": [
+            64,
+            1
+          ],
+          "tensor_sha256": "71406084c8c532f9b0e1431a385fdf72542929fad7e471039a79d884a73631e9"
+        }
+      ],
+      "parameter_count": 19057,
+      "replicate_index": 2
+    }
+  ],
+  "fold_indices": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11
+  ],
+  "initializer_domain": "F4-INVARIANT-01-INIT-v1",
+  "measured_namespace_created": false,
+  "replicate_indices": [
+    0,
+    1,
+    2
+  ],
+  "schema": "F4-INVARIANT-01-initializer-seed-manifest-v1",
+  "task_bank_created": false,
+  "task_ids_or_task_seeds_used": false
+}

@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "state": "OFFLINE_FEASIBILITY_ONLY",
+  "model_contact_authorized": false,
+  "family": "help-color-capability",
+  "candidate_ids_hidden_role_map": {
+    "force_color": 31389,
+    "suppress_color": 34566,
+    "defer_to_process_tty": 43552,
+    "suppress_color_narrow_help": 34111
+  },
+  "baseline_pass_by_case": {
+    "case-01": false,
+    "case-02": true,
+    "case-03": false,
+    "case-04": true
+  },
+  "candidate_pass_matrix_hidden_roles": {
+    "force_color": {
+      "case-01": false,
+      "case-02": true,
+      "case-03": false,
+      "case-04": true
+    },
+    "suppress_color": {
+      "case-01": false,
+      "case-02": true,
+      "case-03": false,
+      "case-04": true
+    },
+    "defer_to_process_tty": {
+      "case-01": false,
+      "case-02": true,
+      "case-03": false,
+      "case-04": true
+    },
+    "suppress_color_narrow_help": {
+      "case-01": false,
+      "case-02": true,
+      "case-03": false,
+      "case-04": true
+    }
+  },
+  "code_sha256": {
+    "base": "1af22d4651af8efbc6029ebc218d2a2b8a2bdb06ae45aabb0a0d7f764b52f47e",
+    "force_color": "73a7c9c2c3e5500421789db8e1d1a61ba3eea4a503db1b9c56363bbf6eb55526",
+    "suppress_color": "f838fa8c883ec9131ce198eea2c960f5e7c0a7ac9064988c2c799a8bdc22a666",
+    "defer_to_process_tty": "1af22d4651af8efbc6029ebc218d2a2b8a2bdb06ae45aabb0a0d7f764b52f47e",
+    "suppress_color_narrow_help": "e39c78cea48af59a4f7d4b03afbb1dc4580cbc2f8bac2e08556921f50f9bbffe"
+  },
+  "intended_positive_sets": {
+    "case-01": [
+      "force_color"
+    ],
+    "case-02": [
+      "suppress_color",
+      "defer_to_process_tty",
+      "suppress_color_narrow_help"
+    ],
+    "case-03": [
+      "force_color"
+    ],
+    "case-04": [
+      "suppress_color",
+      "defer_to_process_tty",
+      "suppress_color_narrow_help"
+    ]
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "protocol": "Q10-PF6-RH1-Q1",
+  "status": "PREEXECUTION_SEALED_NO_FACTORIAL",
+  "plan_sha256": "6843D7364ABB549BA1071BDF94607A00DFAC7C80E94DDF5F884A764DD9FB5C83",
+  "contract_sha256": "336E6A8EAE7F72804906206FE5808A24A5726B7652E0DD6B145483B0FF9DD3F5",
+  "selected_cohort": "lexicographically first eight frozen RH1 primary identities",
+  "scientific_seed_bundles": 0,
+  "measured_factorial_started": false,
+  "behavioral_probe": false,
+  "dh08b_authorized": false
+}

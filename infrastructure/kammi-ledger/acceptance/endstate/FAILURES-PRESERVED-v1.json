@@ -1,0 +1,12 @@
+{
+  "schema": "KAMMI_ACCEPTANCE_FAILURE_HISTORY_V1",
+  "authority": "implementation attempt history; not scientific results",
+  "failures": [
+    {"id":"writer-test-v1","failure":"initial subprocess syntax/teardown errors","repair":"corrected subprocess probe and explicit close","evidence":"prior build transcript"},
+    {"id":"memory-probe-v1","failure":"Ladybug DLL dependencies unavailable without OpenSSL directory handle","repair":"retain os.add_dll_directory handle before loading native library","evidence":"current build transcript"},
+    {"id":"embedding-manifest-v1","failure":"ResourceWarning from unclosed model hash file handles","repair":"context-managed file hashing; snapshot assets only","evidence":"current build transcript"},
+    {"id":"rust-link-v1","failure":"file symlink required Administrator privilege","repair":"directory junction from C test path to G release target","evidence":"current build transcript"},
+    {"id":"external-client-v1","failure":"missing Rust test link and Windows launcher-child cleanup left a transient locked writer file","repair":"junction path and owned process-tree termination","evidence":"current build transcript; repaired external-client test passed"}
+  ],
+  "preserved_legacy_attempt":"acceptance/e4-0/history-import-v3-failed-attempt-v1.json"
+}

@@ -1,0 +1,16 @@
+[package]
+name = "e013-bank-runner"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[dependencies]
+e013_episode_factory = { path = "../factory" }
+e013-bank-d = { path = "../families/d" }
+e013-bank-c = { path = "../families/c" }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"
+
+[dev-dependencies]
+tempfile = "3"

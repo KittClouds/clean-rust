@@ -1,0 +1,14 @@
+{
+  "task_id": "heldoutv6-preset-json-version-integrity-easy-01",
+  "lane": "always-large",
+  "action_id": 11,
+  "patch_sha256": "efb6b0f8d72d2734898638bf5dddba0c8b9c0f98cefeb273d4a7980ffa46204b",
+  "candidate_variant": "gold",
+  "test_filter": "preset::tests::json_round_trip_is_exact",
+  "status": "passed",
+  "passed": true,
+  "elapsed_ms": 0.0,
+  "completion_source": "precontact-bank-build-receipt",
+  "completion_log_sha256": "e14991716b32bdad4c5251a1fdc9c314f251df797f465b8d9ca839e364c3e62f",
+  "bank_build_receipt_sha256": "1e8f063758e9d469041e2fa602389bf28478b415aa4c0fedcaa123af0241bc30"
+}

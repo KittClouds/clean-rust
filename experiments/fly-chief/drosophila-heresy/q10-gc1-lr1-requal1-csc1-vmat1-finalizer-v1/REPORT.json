@@ -1,0 +1,67 @@
+{
+  "context_reports": {
+    "seed9731-L-tau16__set2": {
+      "records": 3711,
+      "shard_sha256": "0F665F150F5F676DA847DE93221FB6B580ECA7BC481C220D43047CDD9A3DE41F",
+      "state_index_sha256": "D2E1837C65039F6D798B6FF9CE60B247CCAED37E8019B92060476ED9A1354847",
+      "state_records": 4021
+    },
+    "seed9731-L-tau4__set3": {
+      "records": 7,
+      "shard_sha256": "BAEFA85E70C2DF3D8F49BAC728DCA60060D5AACDB4A1AD1824E2B89DC9446051",
+      "state_index_sha256": "606BDFC311012815C2A82AE931CC1B09F906236F44EB9FC32684B6455D0A1F14",
+      "state_records": 17
+    },
+    "seed9731-R-tau16__set1": {
+      "records": 68,
+      "shard_sha256": "662DCAFC7CC30E087F5E0257446BF6EC2C240B87DE0B5740DF5910DF9653CF50",
+      "state_index_sha256": "0121B5E822DBC8748BD847801CBB62BF706C022FFF5541A189FDCF82AC98707E",
+      "state_records": 116
+    },
+    "seed9731-R-tau16__set3": {
+      "records": 0,
+      "shard_sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "state_index_sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "state_records": 0
+    },
+    "seed9731-R-tau4__set0": {
+      "records": 0,
+      "shard_sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "state_index_sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "state_records": 0
+    },
+    "seed9731-R-tau4__set1": {
+      "records": 169,
+      "shard_sha256": "33600E193109FB9BBC7E17FBD2CA94991C8848E2A416FD02CD4BA567FB80DCCD",
+      "state_index_sha256": "1168B78FE2BC772EA6B507A49764F96690E6905B09553E098DAB8D4E56D6280D",
+      "state_records": 303
+    },
+    "seed9731-R-tau4__set2": {
+      "records": 184,
+      "shard_sha256": "1E68819641EB252A2A9E7BD15BC8777518FDC5C0BAF83EAEDF394D79BFD5862B",
+      "state_index_sha256": "40F4A2F281B14450FC4E64B65D187DB6B0E0EEFA2404BFC89775A234D04DD747",
+      "state_records": 374
+    },
+    "seed9731-R-tau4__set3": {
+      "records": 860,
+      "shard_sha256": "32528903F3738F2F106E09363A7CF829EE300229E16860C5101487D743210891",
+      "state_index_sha256": "D9DE222B42852B23A4518B6B5C92C004CEBAF58E2C954D4D1697BB0362A6A474",
+      "state_records": 1100
+    }
+  },
+  "coverage": {
+    "contexts": 8,
+    "pair_records": 4999,
+    "sampled_pairs": 18,
+    "sampled_state_checks": 72,
+    "unique_state_records": 5931
+  },
+  "identity": "q10-gc1-lr1-requal1-csc1-vmat1-finalizer-v1",
+  "independent_replay_scope": "stratified sample across all contexts and pair outcomes",
+  "parent_vmat_identity": "q10-gc1-lr1-requal1-csc1-vmat1-v6",
+  "protocol": "Q10-CSC1-VMAT1-FINALIZER",
+  "routing_conclusion": false,
+  "scientific_promotion": false,
+  "status": "VMAT1_FINALIZER_PASS",
+  "unexpected_files": []
+}

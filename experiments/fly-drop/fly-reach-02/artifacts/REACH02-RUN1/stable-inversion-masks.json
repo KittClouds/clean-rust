@@ -1,0 +1,135 @@
+{
+  "masks": [
+    {
+      "edge_count": 24355,
+      "mask_sha256": "ffe56e0d332647e7647dcc59bbc3c7832b5d8078506dbcd638fc618b3fb30885",
+      "side": "L",
+      "stable_inversion_fraction": 0.0027509751591049065,
+      "substrate": "fly"
+    },
+    {
+      "edge_count": 24091,
+      "mask_sha256": "93abea401e0a895e6401928c179de5e7e294ebb477fbc005566c947dc9289f11",
+      "side": "R",
+      "stable_inversion_fraction": 0.0004566020505582998,
+      "substrate": "fly"
+    },
+    {
+      "edge_count": 24355,
+      "mask_sha256": "1f4b05399aac1a3f9b154cfedf9b8b266950a32d326fd2630ac6eb6104bb7b21",
+      "side": "L",
+      "stable_inversion_fraction": 0.0,
+      "substrate": "g001"
+    },
+    {
+      "edge_count": 24091,
+      "mask_sha256": "ecda347c532839ffd5dfbd50d0027c6ea2410d6a90f3416f6c944c819af7d53c",
+      "side": "R",
+      "stable_inversion_fraction": 0.0,
+      "substrate": "g001"
+    },
+    {
+      "edge_count": 24355,
+      "mask_sha256": "1f4b05399aac1a3f9b154cfedf9b8b266950a32d326fd2630ac6eb6104bb7b21",
+      "side": "L",
+      "stable_inversion_fraction": 0.0,
+      "substrate": "g002"
+    },
+    {
+      "edge_count": 24091,
+      "mask_sha256": "ecda347c532839ffd5dfbd50d0027c6ea2410d6a90f3416f6c944c819af7d53c",
+      "side": "R",
+      "stable_inversion_fraction": 0.0,
+      "substrate": "g002"
+    },
+    {
+      "edge_count": 24355,
+      "mask_sha256": "1f4b05399aac1a3f9b154cfedf9b8b266950a32d326fd2630ac6eb6104bb7b21",
+      "side": "L",
+      "stable_inversion_fraction": 0.0,
+      "substrate": "g003"
+    },
+    {
+      "edge_count": 24091,
+      "mask_sha256": "ecda347c532839ffd5dfbd50d0027c6ea2410d6a90f3416f6c944c819af7d53c",
+      "side": "R",
+      "stable_inversion_fraction": 0.0,
+      "substrate": "g003"
+    },
+    {
+      "edge_count": 24355,
+      "mask_sha256": "50f7b8db18d07bee8968c39e3cb6059709407bca2380d85b106bb9b5030194ff",
+      "side": "L",
+      "stable_inversion_fraction": 0.0000821186614658181,
+      "substrate": "g004"
+    },
+    {
+      "edge_count": 24091,
+      "mask_sha256": "ecda347c532839ffd5dfbd50d0027c6ea2410d6a90f3416f6c944c819af7d53c",
+      "side": "R",
+      "stable_inversion_fraction": 0.0,
+      "substrate": "g004"
+    },
+    {
+      "edge_count": 24355,
+      "mask_sha256": "1f4b05399aac1a3f9b154cfedf9b8b266950a32d326fd2630ac6eb6104bb7b21",
+      "side": "L",
+      "stable_inversion_fraction": 0.0,
+      "substrate": "g005"
+    },
+    {
+      "edge_count": 24091,
+      "mask_sha256": "ecda347c532839ffd5dfbd50d0027c6ea2410d6a90f3416f6c944c819af7d53c",
+      "side": "R",
+      "stable_inversion_fraction": 0.0,
+      "substrate": "g005"
+    },
+    {
+      "edge_count": 24355,
+      "mask_sha256": "1f4b05399aac1a3f9b154cfedf9b8b266950a32d326fd2630ac6eb6104bb7b21",
+      "side": "L",
+      "stable_inversion_fraction": 0.0,
+      "substrate": "g006"
+    },
+    {
+      "edge_count": 24091,
+      "mask_sha256": "ecda347c532839ffd5dfbd50d0027c6ea2410d6a90f3416f6c944c819af7d53c",
+      "side": "R",
+      "stable_inversion_fraction": 0.0,
+      "substrate": "g006"
+    },
+    {
+      "edge_count": 24355,
+      "mask_sha256": "1f4b05399aac1a3f9b154cfedf9b8b266950a32d326fd2630ac6eb6104bb7b21",
+      "side": "L",
+      "stable_inversion_fraction": 0.0,
+      "substrate": "g007"
+    },
+    {
+      "edge_count": 24091,
+      "mask_sha256": "ecda347c532839ffd5dfbd50d0027c6ea2410d6a90f3416f6c944c819af7d53c",
+      "side": "R",
+      "stable_inversion_fraction": 0.0,
+      "substrate": "g007"
+    },
+    {
+      "edge_count": 24355,
+      "mask_sha256": "1f4b05399aac1a3f9b154cfedf9b8b266950a32d326fd2630ac6eb6104bb7b21",
+      "side": "L",
+      "stable_inversion_fraction": 0.0,
+      "substrate": "g008"
+    },
+    {
+      "edge_count": 24091,
+      "mask_sha256": "8c7aacdb50e4fbd77bdc1b7df7b6244a3f595788e5e88b1e8e84bc2564fa122c",
+      "side": "R",
+      "stable_inversion_fraction": 0.0000830185546469636,
+      "substrate": "g008"
+    }
+  ],
+  "schema": "FLY-REACH-02-derived-mask-v1",
+  "selection_rule": {
+    "max_sign_agreement": 0.2,
+    "min_observations": 128
+  }
+}

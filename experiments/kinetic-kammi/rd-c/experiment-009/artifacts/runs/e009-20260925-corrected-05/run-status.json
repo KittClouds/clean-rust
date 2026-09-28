@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "run_id": "e009-20260925-corrected-05",
+  "phase": "HELDOUT_PAIRED_LANES",
+  "state": "FROZEN_BEFORE_MODEL_CONTACT",
+  "heldout_labels_opened": false,
+  "task_bank": "heldout-bank-v6",
+  "bundle_ids": [
+    "minicpm5-2b-q8-local-v5",
+    "ternary-bonsai-2-27b-ptq1-local-v5"
+  ],
+  "heldout_input_lock_sha256": "48232476b9e3e4bc0df4840c6919ea4ab412357b7ca7fe47460c81ae80c937f6"
+}

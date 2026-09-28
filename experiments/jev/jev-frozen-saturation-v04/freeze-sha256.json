@@ -1,0 +1,20 @@
+{
+  "protocol": "jev-frozen-saturation-true-ood-gate/v0.4",
+  "status": "frozen_before_generation",
+  "frozen_at_utc": "2026-09-20T00:12:10Z",
+  "files": {
+    "docs/jev-frozen-saturation-true-ood-gate-v0.4.md": {
+      "sha256": "87e95a8a9db2b57069cf22cba3f029ed79c0030b9b0f772d530ae52e9344ef6c"
+    },
+    "experiments/jev-frozen-saturation-v04/v04-contract.json": {
+      "sha256": "0c9ab3cb1b4307e2ce0a5b3c7d444e5f5a04bdcdb27d02a8edfe57e0e2a55981"
+    }
+  },
+  "amendments": [
+    "normative saturation is evaluated on the terminal scaling transition",
+    "a single 10k-to-20k rescue transition is permitted only after material 5k-to-10k improvement",
+    "A-F QLoRA gates are evaluated independently per backbone",
+    "Gate C is represented as representation_deficit_supported"
+  ],
+  "phoenix": "out_of_scope"
+}

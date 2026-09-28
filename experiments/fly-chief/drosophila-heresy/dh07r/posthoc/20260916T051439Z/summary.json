@@ -1,0 +1,62 @@
+{
+  "schema": "dh07r-posthoc-trajectory-v1",
+  "status": "DESCRIPTIVE_POST_HOC",
+  "source_run": "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\dh07r\\artifacts\\runs\\20260915T233614Z",
+  "source_seal_sha256": "18508e8fc6b3e86a7f8d56cde0413fd43b436c06de056f7f7a20a155225b060d",
+  "source_completion_sha256": "814ce05f48a9645497696c6410456e039f0dd2a4ecd2854b7d8c190698d70aad",
+  "inputs": [
+    {
+      "path": "R-tau4.jsonl",
+      "sha256": "e7d6bf321375aebdcb1cb6907627485f272de84fd0507ad776127494fe21b08e"
+    },
+    {
+      "path": "R-tau16.jsonl",
+      "sha256": "e76d9c3c67a99023105e155585dc2dce5858c2d06eadc823b4ab7a23e8bd42b3"
+    },
+    {
+      "path": "L-tau4.jsonl",
+      "sha256": "97fa68e3fbc49f218b776c14daa784e42a7c4d0b4463b87e0207e66093624c4e"
+    },
+    {
+      "path": "L-tau16.jsonl",
+      "sha256": "353c5f71ceaa7ec6e44a4c2dd8ceec2522327cc22c8807a784f088b9b646cf50"
+    }
+  ],
+  "fresh_seed_bundles_added": 0,
+  "simulator_rerun": false,
+  "first_checkpoint_with_descriptive_t95_excluding_zero": {
+    "parallel_off": {
+      "margin": 32,
+      "axis": 32
+    },
+    "parallel_on": {
+      "margin": 32,
+      "axis": 16
+    }
+  },
+  "final": {
+    "parallel_off": {
+      "context": "parallel_off",
+      "checkpoint": 256,
+      "margin_mean": 0.0034737621354739823,
+      "margin_t95_low": 0.0027220279138294888,
+      "margin_t95_high": 0.004225496357118476,
+      "axis_mean": 0.0033692030273288435,
+      "axis_t95_low": 0.00016197370733135596,
+      "axis_t95_high": 0.006576432347326331,
+      "seed_correlation_margin_axis": -0.47500028482321394
+    },
+    "parallel_on": {
+      "context": "parallel_on",
+      "checkpoint": 256,
+      "margin_mean": 0.004507480254483662,
+      "margin_t95_low": 0.003608676588212363,
+      "margin_t95_high": 0.0054062839207549606,
+      "axis_mean": 0.08687638747543389,
+      "axis_t95_low": 0.07799065499762023,
+      "axis_t95_high": 0.09576211995324754,
+      "seed_correlation_margin_axis": 0.28968644146042327
+    }
+  },
+  "interpretation_limit": "Event-local matching does not imply matched cumulative geometry after adaptive trajectories diverge."
+}

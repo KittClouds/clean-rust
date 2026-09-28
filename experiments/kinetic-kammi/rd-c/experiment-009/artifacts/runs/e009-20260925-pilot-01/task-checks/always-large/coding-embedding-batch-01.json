@@ -1,0 +1,49 @@
+{
+  "task_id": "coding-embedding-batch-01",
+  "lane": "always-large",
+  "action_id": 51,
+  "tests": [
+    {
+      "filter": "tests::length_bucket_order_is_stable_for_equal_lengths",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "C:\\rd-c\\experiment-009\\tasks\\embedding-batch-order-v2\\candidate-gold\\rust-native\\phoenix\\Cargo.toml",
+        "-p",
+        "phoenix-embed",
+        "--lib",
+        "tests::length_bucket_order_is_stable_for_equal_lengths",
+        "--",
+        "--exact"
+      ],
+      "exit_code": 0,
+      "tests_run": 1,
+      "passed": true,
+      "elapsed_ms": 463.619,
+      "output": "\nrunning 1 test\ntest tests::length_bucket_order_is_stable_for_equal_lengths ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 9 filtered out; finished in 0.00s\n\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.38s\n     Running unittests src\\lib.rs (D:\\cargo-targets\\rdc-e009\\embed-full-gold-v2\\debug\\deps\\phoenix_embed-ca02dae3741287f0.exe)\n"
+    },
+    {
+      "filter": "tests::telemetry_reports_padding_amplification",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "C:\\rd-c\\experiment-009\\tasks\\embedding-batch-order-v2\\candidate-gold\\rust-native\\phoenix\\Cargo.toml",
+        "-p",
+        "phoenix-embed",
+        "--lib",
+        "tests::telemetry_reports_padding_amplification",
+        "--",
+        "--exact"
+      ],
+      "exit_code": 0,
+      "tests_run": 1,
+      "passed": true,
+      "elapsed_ms": 440.863,
+      "output": "\nrunning 1 test\ntest tests::telemetry_reports_padding_amplification ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 9 filtered out; finished in 0.00s\n\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.36s\n     Running unittests src\\lib.rs (D:\\cargo-targets\\rdc-e009\\embed-full-gold-v2\\debug\\deps\\phoenix_embed-ca02dae3741287f0.exe)\n"
+    }
+  ],
+  "completed": true,
+  "status": "passed"
+}

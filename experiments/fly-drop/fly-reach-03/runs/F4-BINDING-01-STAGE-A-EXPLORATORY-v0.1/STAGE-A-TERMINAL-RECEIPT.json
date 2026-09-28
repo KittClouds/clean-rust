@@ -1,0 +1,137 @@
+{
+  "all_six_assignments_evaluable": true,
+  "artifacts": {
+    "PRE-SCORING-INTEGRITY-RECEIPT.json": "b630bd1914a5033014d6fa8b8afe53cac7081d515957b012d1e703a030cbee66",
+    "STAGE-A-ANALYSIS.json": "b70247c4824d3a812e4a5734ec51885bebdd83bdae32d30889b7fa6e1465c330",
+    "STAGE-A-PREDICTION-LOCK.json": "03b403b586aab2626019b451f1af6df6c552046740cd74da2e5502eb4c0f9c62",
+    "STAGE-A-RESULTS.md": "53ab1ae92fe10c5f0a2477841ac1a5f9eccf6376026f9e9c09ef59a5ac800966",
+    "run_stage_a.py": "f6615756cbba29cd4d997b497d358505ddb9094ba210b2008f76fba128d0d55f",
+    "seal_stage_a.py": "448e8211ed307b90aaca202e494155d6330ff8f2e75083c150d889d606f3aa98"
+  },
+  "assignment_order": [
+    "1100",
+    "1010",
+    "0110",
+    "1001",
+    "0101",
+    "0011"
+  ],
+  "assignment_specific_leverage_ess_and_top5_share": {
+    "0011": {
+      "leverage_ess_mean_over_replicates": 22.949496038062478,
+      "top_5pct_leverage_share": 0.9987484993986627
+    },
+    "0101": {
+      "leverage_ess_mean_over_replicates": 18.89619693159522,
+      "top_5pct_leverage_share": 0.9713165346988569
+    },
+    "0110": {
+      "leverage_ess_mean_over_replicates": 123.29878357857774,
+      "top_5pct_leverage_share": 0.9133382374376149
+    },
+    "1001": {
+      "leverage_ess_mean_over_replicates": 55.97937232735401,
+      "top_5pct_leverage_share": 0.9981863132824502
+    },
+    "1010": {
+      "leverage_ess_mean_over_replicates": 47.23902090737877,
+      "top_5pct_leverage_share": 0.8373636699218824
+    },
+    "1100": {
+      "leverage_ess_mean_over_replicates": 39.483038931614885,
+      "top_5pct_leverage_share": 0.9681089996746207
+    }
+  },
+  "cycle_4_delta_balanced_error": [
+    0.622294065875152,
+    0.49865285110253293,
+    0.4135020892928254,
+    0.5026055030912063,
+    0.4995436875736337,
+    0.4994655758291812
+  ],
+  "cycle_4_equal_assignment_mean_delta_error": 0.5060106287940885,
+  "fitting_or_predictions_rerun": false,
+  "frozen_cphi_models_used": 36,
+  "identity": "F4-BINDING-01-STAGE-A-EXPLORATORY-v0.1",
+  "intact_logits_bitwise_reproduced_for_all_models": true,
+  "intervention_output_count": 36,
+  "intervention_outputs_sha256": {
+    "Cphi-H309000-I0": "659aa8091d5d505eec58f1115e9a37fcc0139ed6ed6725df417810f076763da7",
+    "Cphi-H309000-I1": "6b20c0387d6e97ff3b176e18d952e7920e55eef807af3be8b8c90b16b6e94e5a",
+    "Cphi-H309000-I2": "ce4ac6f1f3ef01cc7c5824fd7984238b28cb43252d2346619b271303a5b8e7f5",
+    "Cphi-H309001-I0": "1c4e8c0e73f09393b4ed5ec97effa488080782a6267911f1c2653fb9d8dec30d",
+    "Cphi-H309001-I1": "4bb928e2126ea13dd390c3fd34e05b2596e4d38ad5e5fc9deca7dc2239e519d3",
+    "Cphi-H309001-I2": "f0ac1c1f56172e71129cbd0f297430264b2504b5fc04f7966cf602727b367437",
+    "Cphi-H309002-I0": "bdbc0c373384bab60c918e5e9725b454d48da2417cfd69dcf934261fdb1396c0",
+    "Cphi-H309002-I1": "7c1b93000419f06bfbb6b0b122d18904c9046677d60f50b08f8e133226aadadd",
+    "Cphi-H309002-I2": "989dc19b84da0cabd0a5722a2a9f1b96dda921801d3cb976c951e065b8974ddc",
+    "Cphi-H309003-I0": "0750ef12910893bf7b068b2393e2f2ee6f583f4f07310de049553c411ca05583",
+    "Cphi-H309003-I1": "4413fcf755d4f66b0473ee36ebd52ac48648c4bccd7179ae4ca26e1e012358a9",
+    "Cphi-H309003-I2": "2a8429a27a7213450d0fec36d15e2605c0cd118e51add8aaa2fc80e4f35c934a",
+    "Cphi-H309004-I0": "aea59ef3bba513c247d580d2ec2f055450805ebb6d5c2b229707e0148b54c838",
+    "Cphi-H309004-I1": "ce2c99d961fdc40e2acc71ccc796e05deec140fedffe394e68aa225bfa0502ae",
+    "Cphi-H309004-I2": "4fb5c6f9799fed2ac557066951670d4cc1720bc9d128c703eb5dd02cbdc0bc66",
+    "Cphi-H309005-I0": "5977aa1dccf35f130d37ebcba673d7304f1185ac9458d992ead572551c430037",
+    "Cphi-H309005-I1": "6218a18cab62947ef54596c7c9ab759f1ed2a160d57b8272b9bfa73a6b8d5800",
+    "Cphi-H309005-I2": "c1c575b2c795b38b650779b7ce6561d94ab622c98b3490acf4b0b971dc958114",
+    "Cphi-H309006-I0": "f8d710b2031e31b9f8c2c39382d9abb74da529ebf3f0fd5394c14ac780e0c483",
+    "Cphi-H309006-I1": "8f4699e2a2fd022e65733186719e29c8ed5b285ae39e21ede5f37918a9a12445",
+    "Cphi-H309006-I2": "fd8e03180dac9a63590adfd33325b3de552610b9f33cc457550963b2a35bac9e",
+    "Cphi-H309007-I0": "8aec93bd4e08890066c532b092efd3a42171cf8bb8f13dcdf84b13e32c2e197c",
+    "Cphi-H309007-I1": "db673c576844c305da8509949a9d6bc71d216b804cc562c405e056486244554f",
+    "Cphi-H309007-I2": "a9fa20fb92491700fb95ceae07a6d7122772d937ba0f3d26aae5b713e4bfb34e",
+    "Cphi-H309008-I0": "81abe95eb525f798dccc748ef21eb0ca6bc32a860f6ac7effff7379658227487",
+    "Cphi-H309008-I1": "546e8199b2ddd49219fff89f34e8070d21cbb86fd15656339a0da0b41d4e5396",
+    "Cphi-H309008-I2": "9fe70207a2ef86a73f0dfd69a0693f159cb49462219bf034f78c9ad036794c3b",
+    "Cphi-H309009-I0": "89e195f30be74eec0d3ba74da7afb617639df94cf4b8fc07a3efa9eec11f9203",
+    "Cphi-H309009-I1": "3f9a10752b0322770f11d17c9c0dca359a1c00a91a377480fb962c4e2ab75bb2",
+    "Cphi-H309009-I2": "7834685fed3fb8f6dd539fd7d0e42216b4187847bc4e074c11b025eb3ead7969",
+    "Cphi-H309010-I0": "0a17ab06a5bd3625caeb61140e765460c960117b256c55817cef0efeaa87db72",
+    "Cphi-H309010-I1": "72af9be3fffe17ce96fc505b59405fa4c1ad1e11bb2230c49f6c09e5a1f7ac32",
+    "Cphi-H309010-I2": "9772af5d5265b39ce32941b805346ff0a123b45716c85c355b30372857973279",
+    "Cphi-H309011-I0": "39faea56658f1ea4cd0793a676b765c5c4d594d0f296476f7fcdacc4e4b870f4",
+    "Cphi-H309011-I1": "5814188e83c42094ea933fe2828fefb7fc4ada73909e289213df13cdf1b6108f",
+    "Cphi-H309011-I2": "ef83d4b7062c179ce0863ae88d8a9843b8ece988a78760c71ef1ba83c074d5aa"
+  },
+  "mean_balanced_error_across_assignment_replicate_cells": {
+    "cycle_4": 0.5385013769252853,
+    "intact": 0.032490748131196706,
+    "pair_swap": 0.16543309604718445
+  },
+  "measured_reach03_authorized": false,
+  "model_parameters_unchanged": true,
+  "pair_swap_delta_balanced_error": [
+    0.19008675805631495,
+    0.10907312065535213,
+    0.12690884249806894,
+    0.13999319047239833,
+    0.1401434143246509,
+    0.09144876148914106
+  ],
+  "pair_swap_equal_assignment_mean_delta_error": 0.13294234791598772,
+  "parent_analysis_sha256": "d79f885d3d8b8bef0579312cc72c2b5c8fa08b6edb1fcf52b66bcf5abf1b51c5",
+  "parent_fit_manifest_sha256": "f71d344c5bc58e86a68e7bd9163aed1ab5d945468bfe84f06a8981e6a1c2ce66",
+  "parent_identity": "F4-PRESENTATION-03-ENG1",
+  "parent_integrity_receipt_sha256": "cf52cc787b3bf501b3f80944d452af3247e569f82f110c06c597e499bfca2591",
+  "parent_prediction_lock_sha256": "dd387bcc52510eac947774cb6d9303d8cdd8142cee07a60b0e39cddd4dcb54ce",
+  "parent_terminal_sha256": "298a77fe8aa815a3ff58722dd52a06a8e1e0637fce505955662354150203f2bb",
+  "parent_truth_access_provenance": "Truth was previously opened in the parent lineage; this Stage A is exploratory and post-selection.",
+  "pheno_status": "unchanged",
+  "phi_recomputed": false,
+  "q_weight_diagnostics_pooled": {
+    "count": 29275,
+    "ess": 29274.230288168907,
+    "ess_is_descriptive_only": true,
+    "max": 380.546875,
+    "mean": 379.17262649444916,
+    "min": 376.421875,
+    "sum": 11100278.640625
+  },
+  "schema": "F4-BINDING-01-Stage-A-terminal-receipt-v0.1",
+  "scientific_or_biological_promotion": false,
+  "stage_b_execution_authorized": false,
+  "stage_b_recommendation": "FRESH_PROSPECTIVE_CONFIRMATION_WARRANTED",
+  "status": "EXPLORATORY_ANALYSIS_COMPLETE",
+  "stored_phi_inputs_unchanged": true
+}

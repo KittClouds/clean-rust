@@ -1,0 +1,293 @@
+{
+  "schema": "e012-case-map-vault.v1",
+  "case_map": [
+    {
+      "case_id": "CASE-001",
+      "sample_id": "task-a16e1f5c__ccf8a004a866",
+      "frame_sha256": "ccf8a004a866df3cf374fb62f1c1985f080701dbe4ea4fb953b036dbc379ed98",
+      "task_id": "task-a16e1f5c"
+    },
+    {
+      "case_id": "CASE-002",
+      "sample_id": "task-555bd5d9__347b9728e68f",
+      "frame_sha256": "347b9728e68f04385d9c8f19341cd3d65f92711571d67b42aaceb4fbea179cf6",
+      "task_id": "task-555bd5d9"
+    },
+    {
+      "case_id": "CASE-003",
+      "sample_id": "task-eab60ff9__965613286f64",
+      "frame_sha256": "965613286f645b9c333ef8beb5e42e74cdf4a8641327f21af686722dc3cfbe56",
+      "task_id": "task-eab60ff9"
+    },
+    {
+      "case_id": "CASE-004",
+      "sample_id": "task-eab60ff9__7255df8bb721",
+      "frame_sha256": "7255df8bb721fdf54d77c475baf6061b2404284a5e8eecbff0b08547e57e17db",
+      "task_id": "task-eab60ff9"
+    },
+    {
+      "case_id": "CASE-005",
+      "sample_id": "task-bbc69658__9f2f260cd3f9",
+      "frame_sha256": "9f2f260cd3f98e0bbd59f024f32bc439ee4a0081ca0c288574a7542b55077c20",
+      "task_id": "task-bbc69658"
+    },
+    {
+      "case_id": "CASE-006",
+      "sample_id": "task-6309c722__65c841c7de5a",
+      "frame_sha256": "65c841c7de5adcc24875b6c955c052e9cd02c40a8d749ed8f5bc087ef78c0ce2",
+      "task_id": "task-6309c722"
+    },
+    {
+      "case_id": "CASE-007",
+      "sample_id": "task-e8fdd1f4__395ea35614ed",
+      "frame_sha256": "395ea35614ede2d99913b60984d3715b85a4f036ce03842d29d00a5de49ff52d",
+      "task_id": "task-e8fdd1f4"
+    },
+    {
+      "case_id": "CASE-008",
+      "sample_id": "task-8f66a11b__060910fc4857",
+      "frame_sha256": "060910fc4857b8940b6e10999047f0c4f0952234e08ac07f9001d0d73fb0afa0",
+      "task_id": "task-8f66a11b"
+    },
+    {
+      "case_id": "CASE-009",
+      "sample_id": "task-8c717407__d5e9bc4ac1e9",
+      "frame_sha256": "d5e9bc4ac1e92c6f6f58a2b15b343669cfb0791edd363af9d1963bcb9f80c3b8",
+      "task_id": "task-8c717407"
+    },
+    {
+      "case_id": "CASE-010",
+      "sample_id": "task-b7f8545e__23e4d7ece244",
+      "frame_sha256": "23e4d7ece2443ace47a5fa015632312cc178b6aa84c778f5e1e6914b7d02e5ac",
+      "task_id": "task-b7f8545e"
+    },
+    {
+      "case_id": "CASE-011",
+      "sample_id": "task-965856__5f04e1ff1bfd",
+      "frame_sha256": "5f04e1ff1bfdd9291d4871126afc260c8451b12bfd18bd6289a39e5367c7a335",
+      "task_id": "task-965856"
+    },
+    {
+      "case_id": "CASE-012",
+      "sample_id": "task-a16e1f5c__b90ea9c8621d",
+      "frame_sha256": "b90ea9c8621dc3312fa8c5874369634faa37c898b5f619ebb1cb96c5333fa185",
+      "task_id": "task-a16e1f5c"
+    },
+    {
+      "case_id": "CASE-013",
+      "sample_id": "task-e8fdd1f4__7ab3d64ee684",
+      "frame_sha256": "7ab3d64ee684b028be6e3f929f879b0b5ec42ae80862c35522ceab4b2584110d",
+      "task_id": "task-e8fdd1f4"
+    },
+    {
+      "case_id": "CASE-014",
+      "sample_id": "task-546859__37dc4e78b6f4",
+      "frame_sha256": "37dc4e78b6f429519568eb69ed79d3c8ca1aac07222050554564ee3c6c706450",
+      "task_id": "task-546859"
+    },
+    {
+      "case_id": "CASE-015",
+      "sample_id": "task-b7f8545e__1aa3172d13f8",
+      "frame_sha256": "1aa3172d13f8f62267a8554aecb346cbc9c164b83aed33d49f1cfee52434bee8",
+      "task_id": "task-b7f8545e"
+    },
+    {
+      "case_id": "CASE-016",
+      "sample_id": "task-17dc5b28__1815bf2d0751",
+      "frame_sha256": "1815bf2d0751c041fd72c4a919174c1c6e6a40cca8dc7ec400474ae959dfe815",
+      "task_id": "task-17dc5b28"
+    },
+    {
+      "case_id": "CASE-017",
+      "sample_id": "task-a7e74853__205dea8e45df",
+      "frame_sha256": "205dea8e45df664abc21cf372674ebb76651c7ccdb3fc63c18cf6b92386f021b",
+      "task_id": "task-a7e74853"
+    },
+    {
+      "case_id": "CASE-018",
+      "sample_id": "task-17dc5b28__4e39603942aa",
+      "frame_sha256": "4e39603942aaed13b71e7b76db04a5578a44c1c4908e895eead6a3fcf03d5bf0",
+      "task_id": "task-17dc5b28"
+    },
+    {
+      "case_id": "CASE-019",
+      "sample_id": "task-8f66a11b__44475855fd8d",
+      "frame_sha256": "44475855fd8da2967d2293ac51cf3fbb341428e7fbb7388dc886a0bdd0a8a155",
+      "task_id": "task-8f66a11b"
+    },
+    {
+      "case_id": "CASE-020",
+      "sample_id": "task-5befee37__e656e9f4d2a0",
+      "frame_sha256": "e656e9f4d2a08d652d922ec6c494dadd417f2e728f3f91e9d4ae2fab3f9a1ab8",
+      "task_id": "task-5befee37"
+    },
+    {
+      "case_id": "CASE-021",
+      "sample_id": "task-894855__d2d13839f6d8",
+      "frame_sha256": "d2d13839f6d886ded8cd712f658174271d9e21a71f9a05b5166e287898f11887",
+      "task_id": "task-894855"
+    },
+    {
+      "case_id": "CASE-022",
+      "sample_id": "task-a7e74853__6de65b23eefa",
+      "frame_sha256": "6de65b23eefa579b5d369b860ffa761862928175b7ac9244873ec0233f51da40",
+      "task_id": "task-a7e74853"
+    },
+    {
+      "case_id": "CASE-023",
+      "sample_id": "task-4c1e6cb6__37e1918f8267",
+      "frame_sha256": "37e1918f8267e86fdf86520ca769baed6b5e541f1bdf77b32e5555126fc5b43d",
+      "task_id": "task-4c1e6cb6"
+    },
+    {
+      "case_id": "CASE-024",
+      "sample_id": "task-a1425719__ba349b7ab769",
+      "frame_sha256": "ba349b7ab76938c0351a07a8891be15e8c9a9a7c6afc9297928a9130e478cff7",
+      "task_id": "task-a1425719"
+    },
+    {
+      "case_id": "CASE-025",
+      "sample_id": "task-a7e74853__6c0bea05d1df",
+      "frame_sha256": "6c0bea05d1dffdf812d14f66068046f3a3a4a32db20cab5b89d3796cc1d9f91f",
+      "task_id": "task-a7e74853"
+    },
+    {
+      "case_id": "CASE-026",
+      "sample_id": "task-2c0d08b1__683f17375f96",
+      "frame_sha256": "683f17375f963bef631ebb6f7a23b74cf1aceceeae538ee025592cd56765b46c",
+      "task_id": "task-2c0d08b1"
+    },
+    {
+      "case_id": "CASE-027",
+      "sample_id": "task-555141__d5ba0efc7ebd",
+      "frame_sha256": "d5ba0efc7ebd8f2004172fb4734cf683c6921d401c42000405ff8174ab0d9b95",
+      "task_id": "task-555141"
+    },
+    {
+      "case_id": "CASE-028",
+      "sample_id": "task-6309c722__b5fa9c9c197d",
+      "frame_sha256": "b5fa9c9c197d0b67b5fa7930df082214e9894ec5b428452aa8e5472e37666cc4",
+      "task_id": "task-6309c722"
+    },
+    {
+      "case_id": "CASE-029",
+      "sample_id": "task-242065__45132915a681",
+      "frame_sha256": "45132915a681787a66fbab6f130efd8662292de23639fa72b09e0e1a18dc7234",
+      "task_id": "task-242065"
+    },
+    {
+      "case_id": "CASE-030",
+      "sample_id": "task-555bd5d9__9de2411ef6e5",
+      "frame_sha256": "9de2411ef6e566b2a9854d24bcfbf4fb3da849816690e62bed26f83c32075a92",
+      "task_id": "task-555bd5d9"
+    },
+    {
+      "case_id": "CASE-031",
+      "sample_id": "task-2c0d08b1__5352936600d4",
+      "frame_sha256": "5352936600d4a30e857653f6bc21fc95a51d3bbf26cbab32372c441a9fc25768",
+      "task_id": "task-2c0d08b1"
+    },
+    {
+      "case_id": "CASE-032",
+      "sample_id": "task-e3f5bd9b__b19cb65b944a",
+      "frame_sha256": "b19cb65b944a5df89d785ae921bcca367769f123e1c9179f638415628251ed59",
+      "task_id": "task-e3f5bd9b"
+    },
+    {
+      "case_id": "CASE-033",
+      "sample_id": "task-bbc69658__6b6f3db18a59",
+      "frame_sha256": "6b6f3db18a5975e4e71485ab4e603fd46c115bdcd524bf094ed2037f27ea76d4",
+      "task_id": "task-bbc69658"
+    },
+    {
+      "case_id": "CASE-034",
+      "sample_id": "task-f4b5a75d__d42aad4151b6",
+      "frame_sha256": "d42aad4151b60372b6e5022f1143dfdecea6eb3b55af4cb2cb7e6a73792ff60e",
+      "task_id": "task-f4b5a75d"
+    },
+    {
+      "case_id": "CASE-035",
+      "sample_id": "task-569812__1871bde99f3d",
+      "frame_sha256": "1871bde99f3d83398773f19fd715d391902267965ca7cb88b41c4c4661a0c797",
+      "task_id": "task-569812"
+    },
+    {
+      "case_id": "CASE-036",
+      "sample_id": "task-4c1e6cb6__f2723b8cdedb",
+      "frame_sha256": "f2723b8cdedbd971a0f6bfe9d3476d1c0e2a0b9383e9c0e460ff00f049a7bb29",
+      "task_id": "task-4c1e6cb6"
+    },
+    {
+      "case_id": "CASE-037",
+      "sample_id": "task-eab60ff9__ab3abfeb2a35",
+      "frame_sha256": "ab3abfeb2a3578814d769622656f52afd40eb9f2a6fec85f49acfa721a698273",
+      "task_id": "task-eab60ff9"
+    },
+    {
+      "case_id": "CASE-038",
+      "sample_id": "task-a7e74853__bbfbfa81460c",
+      "frame_sha256": "bbfbfa81460c248305a30f18b8b086935af9c674cc000c10039204bf923ae700",
+      "task_id": "task-a7e74853"
+    },
+    {
+      "case_id": "CASE-039",
+      "sample_id": "task-eab60ff9__ee69aeb31661",
+      "frame_sha256": "ee69aeb31661b7f329e62cecc24fc803e4eeea3764988dd1385534bc56025451",
+      "task_id": "task-eab60ff9"
+    },
+    {
+      "case_id": "CASE-040",
+      "sample_id": "task-e3f5bd9b__063b9f0955fe",
+      "frame_sha256": "063b9f0955fe7b28cb402d6b8fcee89ca1c850ac7f176193d7a1f0e4d23054ef",
+      "task_id": "task-e3f5bd9b"
+    },
+    {
+      "case_id": "CASE-041",
+      "sample_id": "task-a1425719__3ab831f8f853",
+      "frame_sha256": "3ab831f8f8531124c84fb4916fb83be8bed4b4dd1542986da1b42a5d1b2cfc14",
+      "task_id": "task-a1425719"
+    },
+    {
+      "case_id": "CASE-042",
+      "sample_id": "task-620950__5cd20b8edf72",
+      "frame_sha256": "5cd20b8edf72198459fded5c5ee379f5c5c9d07bfb762bc107c8799bc1e836f2",
+      "task_id": "task-620950"
+    },
+    {
+      "case_id": "CASE-043",
+      "sample_id": "task-f4b5a75d__22686fd530e9",
+      "frame_sha256": "22686fd530e9758f4c00f526fd06d55941b1a1a84c6f72519b55df882c8147ae",
+      "task_id": "task-f4b5a75d"
+    },
+    {
+      "case_id": "CASE-044",
+      "sample_id": "task-8c717407__55a28d5cfef8",
+      "frame_sha256": "55a28d5cfef8ba4a97a02a2af58cc24df36a3be9e1ba06fe09e61e67ab543b2a",
+      "task_id": "task-8c717407"
+    },
+    {
+      "case_id": "CASE-045",
+      "sample_id": "task-479184__850e207427e2",
+      "frame_sha256": "850e207427e2ab1afae2d332268c5ed6db3be429e8d451b97adfa6fb0abbdd6a",
+      "task_id": "task-479184"
+    },
+    {
+      "case_id": "CASE-046",
+      "sample_id": "task-16eda64b__a9c01e2db6bc",
+      "frame_sha256": "a9c01e2db6bcc1f5b624cf6057339ff37a1aeb47d6d37f1cf860cd1c309d6052",
+      "task_id": "task-16eda64b"
+    },
+    {
+      "case_id": "CASE-047",
+      "sample_id": "task-5befee37__d7180233e684",
+      "frame_sha256": "d7180233e684f960d58fc19fbdd67f6f8d7c437ab3a9ba838f750d1c579a2f06",
+      "task_id": "task-5befee37"
+    },
+    {
+      "case_id": "CASE-048",
+      "sample_id": "task-16eda64b__0f3c2599ec96",
+      "frame_sha256": "0f3c2599ec96f3cbe915d6f9cd62bb1bc93e72677a79937bf552a17a8380d72c",
+      "task_id": "task-16eda64b"
+    }
+  ]
+}

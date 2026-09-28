@@ -1,0 +1,29 @@
+{
+  "task_id": "coding-gpu-pick-01",
+  "lane": "preflight-gold",
+  "action_id": 23,
+  "tests": [
+    {
+      "filter": "e009_epoch_tests::stale_async_pick_is_rejected_after_either_epoch_changes",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "C:\\rd-c\\experiment-009\\tasks\\gpu-pick-invalidation-focused\\candidate-gold\\phoenix-native\\Cargo.toml",
+        "-p",
+        "graph-render-wgpu",
+        "--lib",
+        "e009_epoch_tests::stale_async_pick_is_rejected_after_either_epoch_changes",
+        "--",
+        "--exact"
+      ],
+      "exit_code": 0,
+      "tests_run": 0,
+      "passed": false,
+      "elapsed_ms": 5549.665,
+      "output": "\nrunning 0 tests\n\ntest result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 39 filtered out; finished in 0.00s\n\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.16s\n     Running unittests src\\lib.rs (D:\\cargo-targets\\rdc-e009\\gpu-focused-real-gold\\debug\\deps\\graph_render_wgpu-14d728d5e0579fc8.exe)\n"
+    }
+  ],
+  "completed": false,
+  "status": "failed-or-mutated"
+}

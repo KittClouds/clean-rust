@@ -1,0 +1,32 @@
+{
+  "authorization_basis": "Continuation of the user-authorized fixed S09 analysis. V06 passed cache verification and exact terminal S01 state/probability/metric replay, then stopped before earlier-layer fitting because arccos roundoff rejected an otherwise exactly matching S08 decision plane. V07 changes only the numerical terminal-plane equality gate to a direct projector comparison; the reported angle analysis, fit recipe, and all scientific inputs remain fixed. No new model contact is introduced.",
+  "expected_terminal_authority": {
+    "ADAPTIVE_MECHANISMS_AUTHORIZED": false,
+    "FAS00_PHASE4_AUTHORIZED": false,
+    "S09_FIXED_ANALYSIS_AUTHORIZED": true,
+    "S09_RESULT_READY": false
+  },
+  "packet_id": "FAS_S09_FIXED_ANALYSIS_AUTHORIZATION_PACKET_V07",
+  "permitted": [
+    "read the sealed S01/S08 inputs and S09-v03 recovery receipts",
+    "read and fully hash-verify the already-qualified v03 feature cache",
+    "audit the v04 terminal probe states against the sealed S01 terminal states and demonstrate the scaler-precision identity mismatch",
+    "rerun the exact 32 fixed S01-3 linear fits with the layer-16 terminal gate first",
+    "run the four fixed native/cross-surface replay cells at every layer",
+    "compute the contracted observer subspaces and convergence to S08 terminal planes",
+    "seal the v05 analysis and result tree"
+  ],
+  "prohibited": [
+    "load or re-extract LFM",
+    "modify any v02, v03, or v04 artifact",
+    "change fit rows, test rows, labels, class order, standardization runtime, optimizer, solver limits, metrics, representation views, or subspace method",
+    "read FAS-00 artifacts",
+    "run additional fitting, layer selection, statistics, adaptation, SAE, nonlinear analysis, or representation search"
+  ],
+  "stop_on": [
+    "v04/v05/v06 provenance or correction audit mismatch",
+    "feature cache integrity mismatch",
+    "terminal probe state, probabilities, condition metrics, pair-normal or projector mismatch",
+    "any fixed analysis invariant failure"
+  ]
+}

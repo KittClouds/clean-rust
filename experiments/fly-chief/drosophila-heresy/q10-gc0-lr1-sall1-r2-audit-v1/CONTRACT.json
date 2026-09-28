@@ -1,0 +1,8 @@
+{
+  "final_gate": "classify_parent_drift_before_follow_on_work",
+  "identity": "q10-gc0-lr1-sall1-r2-audit-v1",
+  "mutation_policy": "read_only",
+  "protocol": "Q10-GC0-LR1-SALL1-R2-PARENT-INTEGRITY-AUDIT",
+  "scope": "read_only_postexecution_lineage_audit",
+  "source_execution": "experiments/drosophila-heresy/q10-gc0-lr1-sall1-r2-v1/execution.json"
+}

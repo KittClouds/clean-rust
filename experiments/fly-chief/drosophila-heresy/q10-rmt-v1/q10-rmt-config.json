@@ -1,0 +1,11 @@
+{
+  "protocol": "Q10-RMT",
+  "candidate_steps": [1, -1, 2, -2, 4, -4, 8, -8, 16, -16],
+  "minimum_final_reserve_ulps": 16,
+  "coordinate_movement_ceiling": 16,
+  "authority_column_cap": 256,
+  "scientific_seed_bundles": 0,
+  "behavioral_inference": false,
+  "repair_applied": false,
+  "dh08b_authorized": false
+}

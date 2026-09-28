@@ -1,0 +1,31 @@
+# Kammi Ledger end-state acceptance
+
+All 28 gates PASS. Infrastructure flight state: OPEN.
+
+```json
+{
+  "schema": "KAMMI_ENDSTATE_TERMINAL_V1",
+  "status": "PASS",
+  "flight_state": "OPEN",
+  "acceptance_identity": "sha256:f98dcd6743c5e8b7ff091cef2d69aa361e53c252711c7b001f3a71d322744602",
+  "acceptance_event": "sha256:75f6e6fb52a9503fb54d270b4811f0b319911e2d42242e3fa6880848ba4eeaea",
+  "source_root": "sha256:662657ce058044ff3793a79833bd08b0d67f53fc4e78f8381d43be96783dcce4",
+  "runtime_identity": "sha256:049b1cc9870e9ab7df3f0f70c17fa083cb9656781f2f10b779daffbd1daa99ac",
+  "acceptance_suite_root": "sha256:c655a2033a4b66a2af70f5b707df7b960fcb6b24f4d9debc91378e55e65d7168",
+  "independent_verification_root": "sha256:a56270c45767a49b6e84eb91b6c97d819c65caca3d8fcf6931689e9ba5e54bc2",
+  "evidence_merkle_root": "sha256:95d6e41652c62047bab2f6dd3034e886aca3f9a0cfd8d386ecbb50e3b9c87fb1",
+  "gates_passed": 28,
+  "tests_passed": 44,
+  "operational_store": "C:\\code land\\clean-rust\\program-infrastructure\\kammi-ledger\\.kammi-dev\\operational\\store",
+  "scientific_observer_contact": false,
+  "scientific_flight_authorized": false
+}
+```
+
+## Qualified boundary
+
+- Trusted local Windows account and loopback clients; direct filesystem access is outside guarded operation.
+- Signed workers are trusted attestations; no hostile-code sandbox or hardware attestation.
+- Process-kill recovery qualified; no physical power-cut/reboot/directory-metadata durability claim.
+- Logical GPU leases and CPU fixture commands; no scientific observer contact or scientific flight authorization.
+- Performance ranges and remaining ancestry/filter costs are reported descriptively; no throughput threshold was invented.

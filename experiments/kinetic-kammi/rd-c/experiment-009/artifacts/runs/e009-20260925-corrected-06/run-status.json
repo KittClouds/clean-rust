@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "run_id": "e009-20260925-corrected-06",
+  "phase": "HELDOUT_SCORE_ATTEMPT_ABORTED",
+  "state": "READER_SCHEMA_MISMATCH_BEFORE_LANE_OUTPUT",
+  "observation_run_id": "e009-20260925-corrected-05",
+  "task_bank": "heldout-bank-v6",
+  "completion_mode": "frozen-bank-receipt",
+  "heldout_labels_opened": true,
+  "error_followup": "Completion log hash comparison failed because Windows text output was stored as CRLF while receipts hash the captured LF string; verifier now canonicalizes LF and the bank builder writer has been fixed for future runs."
+}

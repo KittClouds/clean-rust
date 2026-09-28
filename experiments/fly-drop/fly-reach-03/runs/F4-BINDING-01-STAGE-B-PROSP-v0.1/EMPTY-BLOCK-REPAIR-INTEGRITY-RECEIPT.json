@@ -1,0 +1,11 @@
+{
+  "identity": "F4-BINDING-01-STAGE-B-EMPTY-BLOCK-REPAIR-v0.1",
+  "inference_repair_receipt_sha256": "6809816f4316e95454625c56b52d5733390335b1a40362248d8457e526dd561e",
+  "original_pretruth_integrity_receipt_sha256": "abf24df9b387be6739f1ee26d90261bca0415b18d4b0c02709094d861bd963dc",
+  "original_pretruth_integrity_status": "PASS",
+  "prediction_lock_sha256": "3dc0e1a68b33d02c45b86c2a948e8fa35fcbc08628e0f30468ea270a975a126c",
+  "repair_manifest_sha256": "09afd9bc9ed9793a0bb96283c4f6bffefeac3134f4b5a89b2ebcbe557284eab3",
+  "schema": "F4-BINDING-01-stage-b-empty-block-integrity-repair-receipt-v0.1",
+  "status": "PASS",
+  "truth_values_opened": false
+}

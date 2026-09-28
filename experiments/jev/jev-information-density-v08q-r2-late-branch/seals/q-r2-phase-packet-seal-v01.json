@@ -1,0 +1,66 @@
+{
+  "schema": "jev-v08q-r2-phase-packet-seal-v01",
+  "identity": "JEV-V08Q-R2-PAIRED-LATE-SHAM-WEIGHT-BRANCH-V01",
+  "status": "SEALED_AUTHORIZED_FOR_PHASE_EXECUTION",
+  "contracts": [
+    {
+      "path": "contracts/q-r2-analysis-contract-v01.json",
+      "bytes": 7638,
+      "sha256": "e06cb4d9428f6c1e30603fbfcb442629f991ef96e37555fb09ac7a4fd0b80e64"
+    },
+    {
+      "path": "contracts/q-r2-panel-contract-v01.json",
+      "bytes": 8833,
+      "sha256": "a835b3d2934265b8f64ebd287e4dbf48f80ffe9bbbfcc1d6ed2650da69f63153"
+    },
+    {
+      "path": "contracts/q-r2-run-contract-v01.json",
+      "bytes": 11811,
+      "sha256": "52d093a00076700ed24bfe0e2cc33ada73dfc07d073b39cbdbe52103aef525e6"
+    }
+  ],
+  "contract_bundle_root_sha256": "6b3b826fd3c861e1aa9114371f9db68c704fb9c5ad85e5c8c60a93afba527275",
+  "bundle_root_algorithm": "SHA-256 of UTF-8 canonical JSON for the path-sorted contract-entry array, sorted keys, compact separators, no trailing newline",
+  "authorization": {
+    "source": "Explicit user authorization in the current conversation after the step-80 seed-level moderator correction",
+    "scope": "One complete phase-sized JEV v0.8Q-R2 execution from fresh panel construction through result sealing",
+    "panel_construction": true,
+    "backbone_feature_extraction": true,
+    "head_initialization": true,
+    "common_sham_1x_prefix_steps_1_80": true,
+    "paired_late_branches_steps_81_120": true,
+    "heldout_panel_opening": true,
+    "complete_inference_matrix": true,
+    "analysis_and_independent_replay": true,
+    "automatic_advancement": "Proceed through every contracted stage while invariants pass; do not request intermediate authorization. Stop on a contract-bound failure."
+  },
+  "normative_design": {
+    "arms": ["LATE_SHAM_1X", "LATE_SHAM_HALF"],
+    "common_history": "SHAM multiplier 1.0 through global step 80",
+    "paired_seeds": 24,
+    "late_branch_weights": [1.0, 0.5],
+    "checkpoints": [80, 100, 120],
+    "step_120_primary": true,
+    "step_100_descriptive": true,
+    "step_80_is_shared_prebranch_state": true,
+    "panel_neighborhoods": 2000,
+    "evaluation_cells": 120,
+    "prediction_rows": 960000
+  },
+  "prohibitions": [
+    "extra doses, branch points, checkpoints, or seeds",
+    "seed replacement, rescue branch, or training extension",
+    "checkpoint selection or evaluation feedback during training",
+    "NewTight, legacy evaluation, Phoenix, or controller fitting",
+    "post-result metric, threshold, panel, or analysis changes"
+  ],
+  "execution_state_at_seal": {
+    "fresh_panel_generated": false,
+    "backbone_loaded_for_R2": false,
+    "head_initialized": false,
+    "training_started": false,
+    "panel_opened": false,
+    "inference_started": false,
+    "metrics_computed": false
+  }
+}

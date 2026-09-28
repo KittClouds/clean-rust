@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "run_id": "e009-20260925-corrected-06",
+  "attempt": 1,
+  "occurred_at_utc": "2026-09-25T18:01:59.841238+00:00",
+  "command": "score-heldout-v5 --run-id e009-20260925-corrected-06 --observation-run-id e009-20260925-corrected-05 --heldout-bank heldout-bank-v6 --completion-mode frozen-bank-receipt",
+  "status": "ABORTED_BEFORE_LANE_OUTPUT",
+  "error": "Completion receipt reader expected test_filter inside each variant record; frozen receipt stores it at the family level.",
+  "heldout_labels_opened": true,
+  "lane_results_written": false,
+  "model_outputs_changed": false,
+  "thresholds_changed": false,
+  "corrective_action": "Fixed receipt shape lookup; score again in a new score-only run with the same observer outputs, thresholds, bank, and completion receipts."
+}

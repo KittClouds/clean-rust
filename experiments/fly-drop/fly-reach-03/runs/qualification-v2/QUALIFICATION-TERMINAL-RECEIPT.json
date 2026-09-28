@@ -1,0 +1,125 @@
+{
+  "amendment": {
+    "schema": "FLY-REACH-03-execution-contract-v0.2-f4-encoder-amendment",
+    "sha256": "bd08419eac37a9d46b839ea18cd07c14badcffccc8fb013dd3401b52ded0a9f4",
+    "spec_sha256": "3325e1b6ce91956162fa3022c9e2c3bdf3396b269e975da9c108f45d9129d43b"
+  },
+  "artifacts": {
+    "EXECUTION-CONTRACT-v0.2-F4-ENCODER-AMENDMENT.json": {
+      "bytes": 1043,
+      "path": "EXECUTION-CONTRACT-v0.2-F4-ENCODER-AMENDMENT.json",
+      "sha256": "bd08419eac37a9d46b839ea18cd07c14badcffccc8fb013dd3401b52ded0a9f4"
+    },
+    "F4-ENCODER-CONTRACT-FREEZE-RECEIPT.json": {
+      "bytes": 448,
+      "path": "artifacts/preimplementation/F4-ENCODER-CONTRACT-FREEZE-RECEIPT.json",
+      "sha256": "3cc0fc470d8412037004d5135a998c36535d6eaff124f060ba4ed85bbe78900e"
+    },
+    "F4-ENCODER-QUALIFICATION-RECEIPT.json": {
+      "bytes": 2720,
+      "path": "F4-ENCODER-QUALIFICATION-RECEIPT.json",
+      "sha256": "142bf108c5c707b3ecd5e4c8c2f2dd4be52157916d169c010e1cd9766e7848c3"
+    },
+    "F4-ENCODER-SPEC-v1.json": {
+      "bytes": 3438,
+      "path": "F4-ENCODER-SPEC-v1.json",
+      "sha256": "3325e1b6ce91956162fa3022c9e2c3bdf3396b269e975da9c108f45d9129d43b"
+    },
+    "F4-ENCODER-SPEC-v1.sha256": {
+      "bytes": 91,
+      "path": "F4-ENCODER-SPEC-v1.sha256",
+      "sha256": "7658f2f3f989510fbecb4a3265e922409e871c9c28cfddbf149d450f5fee86a9"
+    },
+    "F4-FEATURE-COLLECTION-RECEIPT.json": {
+      "bytes": 404,
+      "path": "runs/qualification-v2/f4-features-v1/F4-FEATURE-COLLECTION-RECEIPT.json",
+      "sha256": "f011722b24cb2afa7178fa2c44201026f3c1f1c6f3390fadd8e1d637d071a13d"
+    },
+    "F4-RECONSTRUCTION-RECEIPT.json": {
+      "bytes": 417,
+      "path": "runs/qualification-v2/F4-RECONSTRUCTION-RECEIPT.json",
+      "sha256": "ceb58f3e593d2ad44133f1311886cbcddbc3123c277561a94cb2676989351a31"
+    },
+    "QUALIFICATION-COLLECTION-RECEIPT.json": {
+      "bytes": 615,
+      "path": "runs/qualification-v2/QUALIFICATION-COLLECTION-RECEIPT.json",
+      "sha256": "c8b48fa76acf6e3b25a57c02172e9246a1ec409e0d94aa2be1720207e07c4cfc"
+    },
+    "QUALIFICATION-ESTIMATOR-RECEIPT.json": {
+      "bytes": 9116,
+      "path": "runs/qualification-v2/QUALIFICATION-ESTIMATOR-RECEIPT.json",
+      "sha256": "02d352ae6ab59dbf15a3359af9a3c41cb4ed58204e7606d552462ad8ef165a82"
+    },
+    "QUALIFICATION-SUMMARY.json": {
+      "bytes": 117622,
+      "path": "runs/qualification-v2/QUALIFICATION-SUMMARY.json",
+      "sha256": "a03f194fa82f0423b9624c65a785ad701d971294c443f1c4f5a4a553f93dc3fd"
+    }
+  },
+  "biological_promotion": false,
+  "collection": {
+    "cells": 72,
+    "expected_rows": 37748736,
+    "f4_checkpoint_digests": 432,
+    "f4_feature_rows": 13420,
+    "rows": 37748736,
+    "trials": 589824
+  },
+  "disposition": "The exact F4 reconstruction invariant passed, but the frozen learned F4 calibration encoder failed its predeclared estimator-capacity gate. No measured scientific interpretation is opened.",
+  "f4_encoder_calibration": {
+    "exact_f4_reconstruction": "PASS; Omega(F4)=1 invariant audited separately",
+    "feature_width": 80,
+    "final_encoder_weights_created": false,
+    "fold_omega_hat": [
+      0.0,
+      0.0,
+      0.0,
+      0.5249274049387657
+    ],
+    "gate": {
+      "fold_failure_disposition": "ESTIMATOR_CAPACITY_STOP",
+      "per_fold_omega_hat_min": 0.7,
+      "pooled_balanced_error_max": 0.1,
+      "pooled_omega_hat_min": 0.8
+    },
+    "pooled_balanced_error": 0.7334300170576715,
+    "pooled_omega_hat": 0.0,
+    "post_gate_tuning": false,
+    "rows": 13420,
+    "status": "ESTIMATOR_CAPACITY_STOP"
+  },
+  "measured_execution_authorized": false,
+  "measured_namespace_created": false,
+  "next_required_action": "Any further work requires a new explicitly authorized encoder-capacity amendment or a new estimator design; do not tune this frozen identity and do not create the measured namespace.",
+  "nonpromotable_history": "qualification-v1 omitted terminal F4 checkpoint 8192 and remains preserved separately; earlier estimator attempt remains nonpromotable",
+  "phase_gates": {
+    "gate_0_authority": "PASS_HISTORICAL_PRECREATION_AUDIT",
+    "gate_1_contract_roundtrip": "PASS",
+    "gate_2_collector_fixture": "PASS",
+    "gate_3_f4_reconstruction_fixture": "PASS",
+    "gate_4_constant_baseline": {
+      "balanced_error": 0.5,
+      "omega_hat": 0.0
+    },
+    "gate_4_f0_f3b_calibration": "COMPLETE_QUALIFICATION_ONLY",
+    "gate_4_f4_encoder_calibration": "ESTIMATOR_CAPACITY_STOP",
+    "gate_4_f4_encoder_contract": "PASS",
+    "gate_4_f4_replay": "PASS",
+    "gate_4_qualification_collection": "PASS"
+  },
+  "qualification_population": {
+    "ipw_finite_positive": true,
+    "negative_rows": 2308389,
+    "nonzero_target_rows": 4199713,
+    "positive_rows": 1891324,
+    "primary_support_rows": 13760767,
+    "rows": 37748736,
+    "same_rows_all_filtrations": true,
+    "zero_target_rows": 33549023
+  },
+  "run_id": "qualification-v2",
+  "schema": "FLY-REACH-03-qualification-terminal-receipt-v2",
+  "scientific_interpretation_opened": false,
+  "status": "QUALIFICATION_STOP_F4_ENCODER_CAPACITY",
+  "study_id": "FLY-REACH-03"
+}

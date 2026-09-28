@@ -1,0 +1,17 @@
+{
+  "receipt_id": "FAS_E4_0_CONTRACT_DRAFT_V01_AUTHOR_CHECK",
+  "status": "AUTHOR_SIDE_JSON_AND_BOUND_HASH_CHECK_PASS_DRAFT_ONLY",
+  "scope": "JSON parse and content hashes for four bound planning inputs. This is not an independent audit, seal, preflight, or execution receipt.",
+  "contract_path": "experiments/fas-frozen-observer-bundle-engineering-v01/plans/E4-0-CONTRACT-DRAFT-v01.json",
+  "contract_sha256": "04bb8e64412280f5d4c7c7802cf8bf14d8b354b6d02a023739d722ab00b7cd60",
+  "json_parse": "PASS",
+  "bound_planning_input_count": 4,
+  "bound_planning_input_hash_mismatches": 0,
+  "draft_blocker_count": 4,
+  "population_generated": false,
+  "tokenizer_or_model_contact": false,
+  "evaluation_labels_opened": false,
+  "scoring_performed": false,
+  "fitting_performed": false,
+  "E4_A_authorized": false
+}

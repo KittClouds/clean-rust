@@ -1,0 +1,193 @@
+{
+  "seal_id": "FAS00_PHASE1_WORLD_QUALIFICATION_V03",
+  "project_id": "fas-frozen-adaptive-substrate-v00",
+  "parent_pre_model_seal_sha256": "c7227d2a10da05f902ed5d16e94a8e12866d2e0ae6b2b2a357ed2da93431b3e6",
+  "predecessor_phase1_v02_sha256": "af42320abe28885d20a07c2c936ac130da707bf6347dd5bfe24644b06978bf21",
+  "root_sha256": "d3ca9f8ef988a6f0ae93318fc0ea7c504b23b3be801dbf133d66f67746a69274",
+  "files": [
+    {
+      "path": "corpus/audit-v03.json",
+      "sha256": "0255782f4897212e37e074d48f7bc6ce4cee01bce420358eb91461f2f37c135a"
+    },
+    {
+      "path": "corpus/corpus-manifest-v03.json",
+      "sha256": "1a6905972dd397c2035bc8a3349933530a1ce4184f576df57d7f57746fc0628f"
+    },
+    {
+      "path": "corpus/phase1-check-status-v03.json",
+      "sha256": "63e4c3c6b80bc787ac73a26f1afe16c7cf6d2d5d6ca754bdb81bb1430d339110"
+    },
+    {
+      "path": "corpus/phase1-execution-receipt-v03.json",
+      "sha256": "798c95d8f650d2fe20aec51ded5a7bf55680bfc09924a21f07626f02a6eb0fd6"
+    },
+    {
+      "path": "corpus/qualification-events-v03.jsonl",
+      "sha256": "9fdd7ce9e49b86ac9acb3da035429c616865f527123bd0ac7c312b1b912439ca"
+    },
+    {
+      "path": "corpus/world-manifest-v03.jsonl",
+      "sha256": "59caae81aee1a303f7f2320691665cca8a8673fdd084500d5bd53d9272ee213f"
+    },
+    {
+      "path": "source/Cargo.lock",
+      "sha256": "545abc6441e94afc510e7dc0b88ca76d1e516c958aa23855bf9fb246f0a5935f"
+    },
+    {
+      "path": "source/Cargo.toml",
+      "sha256": "c99fcbe4535b3fdcaaa3e65754f78d36cc055b3e9ed7c95cc5d9322c997ec825"
+    },
+    {
+      "path": "source/contracts/reset-contract-v01.json",
+      "sha256": "9f9b10e9a384d6c04123d0253009389e091848da185343032bcd28e77714f260"
+    },
+    {
+      "path": "source/contracts/supersession-v02.json",
+      "sha256": "48878cd7a902b756a20dafef87453c00d33bdead429b3ea3957471daaffd7466"
+    },
+    {
+      "path": "source/contracts/supersession-v03.json",
+      "sha256": "a534be66e123c1d3dbeaa75562542c6ac29bb9906c15ea51e9f6f4c2f472a49b"
+    },
+    {
+      "path": "source/contracts/world-qualification-contract-v03.json",
+      "sha256": "4f6d6ee65f8abfbca8cc2f6e91a17d2fa7673b2703a8c0eb37a3f08bd5598826"
+    },
+    {
+      "path": "source/README.md",
+      "sha256": "78659c5b40aa1ad35dcd6ce67fa2f14fc3a774d83fa12244c342b362eb2de8f8"
+    },
+    {
+      "path": "source/scripts/seal-phase1.ps1",
+      "sha256": "f94cd97650468292f1e117c435b6cc30b34b7e01a52e1789d4d527b8d945d664"
+    },
+    {
+      "path": "source/src/audit.rs",
+      "sha256": "5d903fedf647ecd45a86b91cca126b77b5c7e01a9d42fee09bd8ab36184643b0"
+    },
+    {
+      "path": "source/src/main.rs",
+      "sha256": "360612a054fb9bbef51d1126d6a91f6a6d1c36b5a61997c43d14d47bc80190ca"
+    },
+    {
+      "path": "source/src/materialize.rs",
+      "sha256": "0162f1c0d2ed97f8e83900c46254cf605b75bdd2f3600470d1c40a0f44a3af26"
+    },
+    {
+      "path": "source/src/types.rs",
+      "sha256": "fe4a9ad66f89c64fa477b664fb65beb67570f3165096a30d0a1c2b6c56995e72"
+    }
+  ],
+  "qualification_only": true,
+  "phase5_reuse_authorized": false,
+  "model_contact_authorized": false,
+  "model_contact_performed": false,
+  "phase1_ready": true,
+  "gates": [
+    {
+      "gate": "WORLD_TARGETS_EXACT",
+      "status": "PASS",
+      "detail": "Independent lookup from serialized world state and parsed query key."
+    },
+    {
+      "gate": "TRANSITIONS_EXACT",
+      "status": "PASS",
+      "detail": "Every adjacent serialized world state was checked against the independent transition rule."
+    },
+    {
+      "gate": "RETURN_IDENTITY",
+      "status": "PASS",
+      "detail": "A return restores identical latent state and target for a matched key while query wording differs."
+    },
+    {
+      "gate": "CONTEXT_BINDING",
+      "status": "PASS",
+      "detail": "Changing context and changing entity each change the target in the declared counterfactual pairs."
+    },
+    {
+      "gate": "FEEDBACK_TIMING",
+      "status": "PASS",
+      "detail": "Post-score visible feedback IDs exactly match fixed reveal steps; current delayed target is absent."
+    },
+    {
+      "gate": "SURFACE_SPLIT_INTEGRITY",
+      "status": "PASS",
+      "detail": "Qualification templates and invented-term IDs stay in their split allocation."
+    },
+    {
+      "gate": "OBSERVATION_AUTHORITY",
+      "status": "PASS",
+      "detail": "Noise/drift/poison observations match frozen rules while latent state is checked independently."
+    },
+    {
+      "gate": "TRANSITION_SHAPE_STABLE",
+      "status": "PASS",
+      "detail": "summed transitions across 128 paired worlds=0; expected=0"
+    },
+    {
+      "gate": "TRANSITION_SHAPE_SINGLE_SWITCH",
+      "status": "PASS",
+      "detail": "summed transitions across 128 paired worlds=128; expected=128"
+    },
+    {
+      "gate": "TRANSITION_SHAPE_RETURN",
+      "status": "PASS",
+      "detail": "summed transitions across 128 paired worlds=256; expected=256"
+    },
+    {
+      "gate": "TRANSITION_SHAPE_CYCLIC",
+      "status": "PASS",
+      "detail": "summed transitions across 128 paired worlds=384; expected=384"
+    },
+    {
+      "gate": "TRANSITION_SHAPE_GRADUAL_DRIFT",
+      "status": "PASS",
+      "detail": "summed transitions across 128 paired worlds=128; expected=128"
+    },
+    {
+      "gate": "TRANSITION_SHAPE_TEMPORARY_RULE",
+      "status": "PASS",
+      "detail": "summed transitions across 128 paired worlds=256; expected=256"
+    },
+    {
+      "gate": "TRANSITION_SHAPE_CONTRADICTORY_NOISE",
+      "status": "PASS",
+      "detail": "summed transitions across 128 paired worlds=0; expected=0"
+    },
+    {
+      "gate": "TRANSITION_SHAPE_POISON_BURST",
+      "status": "PASS",
+      "detail": "summed transitions across 128 paired worlds=0; expected=0"
+    },
+    {
+      "gate": "GRADUAL_DRIFT_DISTRIBUTION",
+      "status": "PASS",
+      "detail": "observed B-evidence rates across four time bins=[0.0625, 0.375, 0.34375, 0.8125]; tolerance=0.08"
+    },
+    {
+      "gate": "CHEAP_TARGET_LEAKAGE",
+      "status": "PASS",
+      "detail": "maximum held-out accuracy across cheap surface/metadata groups=0.4500; threshold=0.45"
+    },
+    {
+      "gate": "TRIVIAL_BASELINE_DIAGNOSTIC",
+      "status": "PASS",
+      "detail": "context-bound LAST_GLOBAL_OBSERVATION accuracy=0.4309; failure threshold=0.98"
+    },
+    {
+      "gate": "COUNTERFACTUAL_LABEL_BALANCE",
+      "status": "PASS",
+      "detail": "canonical target counts=[10848, 11064, 10856]; maximum class-count spread=328 (1% of events)"
+    },
+    {
+      "gate": "SEED_DETERMINISM",
+      "status": "PASS",
+      "detail": "two complete 1,024-world builds match byte-derived IDs and latent/rendered hashes; result=true"
+    },
+    {
+      "gate": "QUALIFICATION_HASH_TREE",
+      "status": "PASS",
+      "detail": "SHA-256 root=d3ca9f8ef988a6f0ae93318fc0ea7c504b23b3be801dbf133d66f67746a69274; files=18"
+    }
+  ]
+}

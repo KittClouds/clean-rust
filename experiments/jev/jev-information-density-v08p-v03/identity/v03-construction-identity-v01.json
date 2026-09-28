@@ -1,0 +1,42 @@
+{
+  "protocol": "jev-information-density/v0.8p-v03-setup-identity-v01",
+  "identity": "v0.8P-fresh-trajectory-instrumented-rerun-v03",
+  "status": "SETUP_ONLY_NOT_AUTHORIZED_FOR_PANEL_GENERATION",
+  "parents": {
+    "clean_panel_design_v01": {
+      "path": "experiments/jev-information-density-v08p/phase_a/fresh-panel-contract-v01.json",
+      "sha256": "ce3b7b97caecb27f3ad99439c0e67dca6e40af5da3db9ca2e356ea5e9f06f823"
+    },
+    "run_contract_v01": {
+      "path": "experiments/jev-information-density-v08p/phase_b/phase-b-p-run-contract-v01.json",
+      "sha256": "e345225b4a17fc18eb35fcab24cbe1d72bd0e34bed9de272f927a7be461853e6"
+    },
+    "analysis_contract_v01": {
+      "path": "experiments/jev-information-density-v08p/phase_b/phase-b-p-analysis-contract-v01.json",
+      "sha256": "84111122033fda65c84344317cfe3b50639b23be4c71f480ba665c67a23cc939"
+    },
+    "original_contract_bundle_seal_v01": {
+      "path": "experiments/jev-information-density-v08p/contracts/contract-bundle-seal-v01.json",
+      "sha256": "67cd6b7902111000dc93a0f81f9f20bc05a9c084732705ed8f9ad82fe965fa85"
+    }
+  },
+  "prior_attempts": {
+    "v01": "CONSTRUCTION_BOUNDARY_VIOLATION_E1_JOIN_READ; quarantined; non-promotable",
+    "v02": "SOURCE_SCOPE_BOUNDARY_VIOLATION; quarantined; non-promotable"
+  },
+  "v02_quarantine_receipt": "../provenance/v02-quarantine-receipt.json",
+  "v03_output_namespace": "D:/codex-runs/jev-information-density-v08p-v03/identity",
+  "authorization_state": {
+    "identity_denylist_extraction": "AUTHORIZED_WITH_EXACT_PATH_ALLOWLIST_ONLY",
+    "fresh_panel_contract_materialization": "AUTHORIZED_AFTER_DENYLIST_SEAL",
+    "fresh_panel_generation": false,
+    "lfm_contact": false,
+    "feature_extraction": false,
+    "training": false,
+    "checkpoint_evaluation": false,
+    "trajectory_metrics": false,
+    "newtight": false,
+    "phoenix": false
+  },
+  "source_boundary": "No v02 artifact is read or used. E1 source access is limited to the three exact paths and hashes in source-allowlist-v01.json."
+}

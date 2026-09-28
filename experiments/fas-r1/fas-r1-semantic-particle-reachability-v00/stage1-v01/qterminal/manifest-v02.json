@@ -1,0 +1,219 @@
+{
+  "schema": "R1_QTERMINAL_TRAINING_MIXTURE_V02",
+  "status": "FROZEN_ENGINEERING_AMENDMENT",
+  "version": 2,
+  "created_utc": "2026-09-26",
+  "purpose": "Common terminal validity selector for every R1 search arm.",
+  "model_contact_or_training_performed": false,
+  "family_split": {
+    "unit": "task_isomorphism_family",
+    "algorithm": "sha256-prefix-mod-10000",
+    "salt": "FAS-R1-QTERMINAL-SPLIT-V1",
+    "ranges": {
+      "train": [
+        0,
+        7999
+      ],
+      "validation": [
+        8000,
+        8999
+      ],
+      "test": [
+        9000,
+        9999
+      ]
+    },
+    "split_before_surface_rendering": true,
+    "all_surfaces_of_family_stay_in_one_split": true
+  },
+  "candidate_records": {
+    "schema": "R1_QTERMINAL_CANDIDATE_V01",
+    "required_fields": [
+      "schema",
+      "sample_id",
+      "feature_id",
+      "task_id",
+      "family_id",
+      "source_kind",
+      "assignment",
+      "posthoc_valid",
+      "label_source"
+    ],
+    "source_kinds": [
+      "random_complete",
+      "policy_visited"
+    ],
+    "label_source": "independent_typed_validator_v1",
+    "assignment_encoding": "zero-based role id per entity in rendered task entity order",
+    "policy_fields": {
+      "required_for_policy_visited": [
+        "policy_checkpoint_id",
+        "policy_training_split",
+        "policy_trace_id",
+        "trace_event_index"
+      ],
+      "policy_training_split_must_equal": "train",
+      "candidate_family_split_must_equal": "train"
+    },
+    "random_fields": {
+      "required_for_random_complete": [
+        "random_sampler_id",
+        "random_replicate_index"
+      ],
+      "random_sampler_id": "R1_QTERMINAL_CLASS_CONDITIONED_ASSIGNMENTS_V1"
+    },
+    "labels_are_offline_only": true
+  },
+  "mixture": {
+    "train_cells": [
+      {
+        "source_kind": "random_complete",
+        "label": 0,
+        "weight": 0.25
+      },
+      {
+        "source_kind": "random_complete",
+        "label": 1,
+        "weight": 0.25
+      },
+      {
+        "source_kind": "policy_visited",
+        "label": 0,
+        "weight": 0.25
+      },
+      {
+        "source_kind": "policy_visited",
+        "label": 1,
+        "weight": 0.25
+      }
+    ],
+    "validation_test_cells": [
+      {
+        "source_kind": "random_complete",
+        "label": 0,
+        "weight": 0.5
+      },
+      {
+        "source_kind": "random_complete",
+        "label": 1,
+        "weight": 0.5
+      }
+    ],
+    "sampling": "deterministic-without-replacement-by-sha256-order",
+    "sampling_seed": 20260926,
+    "per_family_per_cell_cap": 4,
+    "matched_cell_size": "minimum_available_cell_count_after_per_family_cap",
+    "maximum_rows_per_cell_per_split": 100000,
+    "deduplicate_key": [
+      "feature_id",
+      "source_kind",
+      "assignment"
+    ],
+    "require_nonempty_all_four_train_cells": true,
+    "require_nonempty_two_heldout_random_cells": true,
+    "policy_trace_labels_only_from_training_families": true,
+    "no_oversampling": true
+  },
+  "policy_trace_source": {
+    "policy_checkpoint_id": "R1_QTERMINAL_BASELINE_VISITATION_V1",
+    "implementation": "Stage 0 RANDOM-WIDTH stub arm",
+    "proposal_mode": "uniform_random_stub",
+    "width": 1,
+    "expansion_budget": 256,
+    "latent_dim": 1,
+    "replicates_per_training_family": 4,
+    "trace_seed": "big-endian-uint64-prefix-of-sha256(FAS-R1-QTERM-TRACE-V1\u0000family_id\u0000replicate_index)",
+    "sampled_states": "initial assignment plus every complete assignment_after event",
+    "posthoc_labels": "independent_typed_validator_v1 after trace closure",
+    "worlds": "training families only",
+    "learned_proposal_required": false,
+    "latent_state_note": "Stage 0 requires a positive latent_dim; the one-coordinate stub state is inert under uniform_random_stub and is not a learned control state."
+  },
+  "random_assignment_source": {
+    "sampler_id": "R1_QTERMINAL_CLASS_CONDITIONED_ASSIGNMENTS_V1",
+    "candidate_count_per_feature_per_label": 4,
+    "valid_assignment_sampling": "uniform without replacement from exact validator solution assignments",
+    "invalid_assignment_sampling": "uniform complete assignments conditioned on validator-invalid, using rejection sampling",
+    "invalid_sampling_attempt_limit": 1000000,
+    "empty_class_support": "emit zero candidates for a task/class when that class is mathematically empty; balance only across supported split-level cells and never synthesize labels",
+    "seed": "big-endian-uint64-prefix-of-sha256(FAS-R1-QTERM-RANDOM-V1\u0000feature_id\u0000replicate_index)",
+    "prng": "SplitMix64 with unbiased rejection-sampled bounded integers",
+    "role_draw_order": "entity order, each role sampled uniformly from [0,k)",
+    "duplicate_assignments": "discard within feature_id and source_kind"
+  },
+  "feature_input": {
+    "schema": "R1_FEATURE_ARRAYS_V1",
+    "source_schema": "R1_STAGE1_SENSOR_EXTRACTION_V01",
+    "source_storage": "constraint_H.float32.npy [R,2048], global_h.float32.npy [T,2048], rows.jsonl, with SHA256 values from receipt.json",
+    "adapter": "verified rows.jsonl mapping into zero-padded per-task arrays in memory; no feature values are dropped or truncated",
+    "prepared_sample_storage": "individual-npy-arrays-without-pickle",
+    "feature_id": "opaque identity for one exact rendered input surface",
+    "h_constraints": "float32[T,M,2048]",
+    "constraint_mask": "bool[T,M]",
+    "h_global": "float32[T,2048]",
+    "entity_incidence": "bool[T,M,20]",
+    "role_incidence": "bool[T,M,6]",
+    "n_by_feature": "uint16[T]",
+    "k_by_feature": "uint8[T]",
+    "padding": "right-pad M/N/K; masks false on padding; never truncate",
+    "max_constraints": 512,
+    "max_entities": 20,
+    "max_roles": 6,
+    "model_input_surface": "H=(constraint embeddings, constraint mask, public entity/role incidence, public active entity/role masks), h_global, a"
+  },
+  "selector": {
+    "schema": "R1_QTERMINAL_MODEL_V01",
+    "task": "predict exact validator validity for an already visited complete assignment",
+    "input_surface": [
+      "H",
+      "h_global",
+      "a"
+    ],
+    "forbidden_inputs": [
+      "latent_state",
+      "remaining_budget",
+      "solver_status",
+      "valid_solution_set",
+      "automorphism_metadata",
+      "trajectory_reward",
+      "family_id",
+      "source_kind",
+      "task_id",
+      "sample_id"
+    ],
+    "shared_across_all_search_arms": true,
+    "output": "one validity logit; sigmoid gives Q_terminal(a,H,h_global)"
+  },
+  "training": {
+    "seed": 20260926,
+    "optimizer": "AdamW",
+    "learning_rate": 0.0003,
+    "weight_decay": 0.0001,
+    "batch_size": 128,
+    "max_clause_feature_elements_per_batch": 8388608,
+    "maximum_epochs": 30,
+    "early_stopping_patience": 5,
+    "checkpoint_metric": "validation binary cross entropy before temperature calibration",
+    "temperature_calibration": "one scalar selected by validation BCE over a fixed logarithmic grid from 0.05 to 20",
+    "test_labels_read_only_after_checkpoint_and_temperature_are_frozen": true
+  },
+  "reported_metrics": [
+    "count",
+    "accuracy_at_0.5",
+    "balanced_accuracy",
+    "brier_score",
+    "binary_cross_entropy",
+    "roc_auc",
+    "expected_calibration_error_10_bins"
+  ],
+  "required_comparisons": [
+    "overall",
+    "random_complete",
+    "policy_visited"
+  ],
+  "runtime_versions_observed_at_construction": {
+    "numpy": "2.5.3",
+    "torch": "2.11.0+cu128"
+  },
+  "supersedes": "manifest-v01.json"
+}

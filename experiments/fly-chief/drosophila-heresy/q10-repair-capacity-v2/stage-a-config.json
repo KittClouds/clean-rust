@@ -1,0 +1,23 @@
+{
+  "stage": "stage-a",
+  "observe": true,
+  "seeds": [9611],
+  "taus": [4.0, 16.0],
+  "sides": ["R", "L"],
+  "conditions": ["true_perpendicular"],
+  "arms": ["E", "Z"],
+  "cues": 16,
+  "delay_steps": 12,
+  "trials": 512,
+  "eta": 0.05,
+  "glut_sign": -1.0,
+  "input_salt": 858980352,
+  "threads": 8,
+  "reserve_ulps": 32,
+  "post_move_reserve_ulps": 31,
+  "rank_multiplier": 1000.0,
+  "svd_epsilon": 1e-14,
+  "svd_max_iterations": 100000,
+  "integrity_tolerance": 2e-10,
+  "coefficient_reporting_floor": 1e-12
+}

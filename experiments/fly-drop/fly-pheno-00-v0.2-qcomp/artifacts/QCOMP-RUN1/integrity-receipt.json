@@ -1,0 +1,9 @@
+{
+  "duplicate_cells": 0,
+  "missing_cells": 0,
+  "nonfinite_rows": 0,
+  "rows": 1080,
+  "schema": "FLY-PHENO-00-v0.2-QCOMP-integrity-v1",
+  "status": "INTEGRITY_PASS",
+  "unique_cells": 1080
+}

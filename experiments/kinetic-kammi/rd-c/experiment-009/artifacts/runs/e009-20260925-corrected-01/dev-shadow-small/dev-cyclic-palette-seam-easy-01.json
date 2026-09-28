@@ -1,0 +1,163 @@
+{
+  "schema_version": 1,
+  "run_id": "e009-20260925-corrected-01",
+  "stage": "dev-shadow-small",
+  "role": "small",
+  "bundle_id": "minicpm5-2b-q8-local-v4-calibration",
+  "bundle_blake3": "e1a853ffb1b1cce1a921550dee31d708a4cf929b08a90d4f88a0e8a042402282",
+  "bundle_lock_sha256": "25dc83d74a72f472cd56c7b6d4ccb0b7bb5825614aa85ece0a624aa512ddb8d3",
+  "frozen_input_lock_sha256": "df5b44b6f8e3d9d36fdf65f8f774500a9c7a5ef5f94c2ecbeedb04aae8d7fec6",
+  "frame_lock_sha256": "f25338bdd754898de614d1aa57445acc8a04a35a97d2785bfba628da7038430b",
+  "frame_blake3": "999a8c8bf139f598cba20e022cb9e4d6010e8168ecd98d3b65fd2a67d11f46ad",
+  "task_id": "dev-cyclic-palette-seam-easy-01",
+  "server_alias": "e009-small-v4",
+  "server_process_id": 41580,
+  "server_runtime_args": [
+    "--model",
+    "D:\\phoenix-models\\candidates\\minicpm5-2b\\2079a22f3beaa4e306449978533478fe0522f4b3\\MiniCPM5-2B-Q8_0.gguf",
+    "--host",
+    "127.0.0.1",
+    "--port",
+    "18089",
+    "--alias",
+    "e009-small-v4",
+    "--ctx-size",
+    "4096",
+    "--n-gpu-layers",
+    "99",
+    "--reasoning",
+    "off"
+  ],
+  "reasoning_mode": "off",
+  "chat_template_sha256": "6e54652d84d698ebb3b7b2172204b6eeafd7f27533e006c8c1ebf8e743a7fd99",
+  "maximum_output_tokens": 1024,
+  "system_prompt_sha256": "976ef1cd914bacb366c64418825010124338a626a0400d459858acc7e48f5a48",
+  "output_schema_sha256": "97170fa0d6a44681f680ad0ac533a3f3913709757e4ee6cbf96d9c9f40d1b2fb",
+  "normalization_contract": "percent-0-100-to-milli-x10-v1+line-endings-lf-v1",
+  "thresholds": {
+    "minimum_applicability_milli": 700,
+    "maximum_abstention_milli": 600
+  },
+  "model": "e009-small-v4",
+  "request_sha256": "3169bffe87a1dbdcd0b056eee4f8df55667613f4b5f4b5e927985abbce41e767",
+  "request": {
+    "model": "e009-small-v4",
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a typed observer in a deterministic coding workflow. The runtime owns workflow state and will execute only one action from the offered action_options after validating your output.\n\nRead the task_prompt and evidence, then compare the offered actions. Choose the action most likely to satisfy the task while preserving the repository's stated constraints. Do not write or propose code outside the offered choices. Do not claim to have executed tests. If no offered action is sufficiently supported, use null for action_choice and express uncertainty with abstention_percent.\n\nReturn exactly one JSON object matching the provided schema. action_choice must be an offered numeric action ID or null. applicability_percent is your estimate from 0 to 100 that this observer can handle the task from the available evidence. abstention_percent is your estimate from 0 to 100 that the runtime should defer this choice. Use integer percentage points only. Do not add prose or fields.\n"
+      },
+      {
+        "role": "user",
+        "content": "{\"schema_id\":\"rdc-real-coding-observation.v1\",\"task_id\":\"dev-cyclic-palette-seam-easy-01\",\"task_family\":\"cyclic-palette-seam\",\"task_prompt\":\"Repair the cyclic gradient stop regression. For three colors, positions must be [0, 1/3, 2/3] and sample(0) must equal sample(1). Choose a patch that makes the frozen test pass.\",\"repository_revision\":\"9a88547372cd35f8dc31f026f0cd8dd8fca8e641\",\"snapshot_sha256\":\"325dc047da94306fba888b2ce1968ef71d6f006a84b37347fbdba17448f86be1\",\"evidence\":[{\"kind\":\"source_excerpt\",\"source_id\":\"phoenix-native/crates/gpui-animated-gradient-text/src/palette.rs\",\"content_blake3\":\"64bb882e394a9e74c130e13ec53673e5dbf7d0e56ef63a8982beea710600e0e4\",\"content\":\"The current task snapshot divides each automatic stop index by color_count - 1, placing the final stop at 1. The frozen test requires three positions 0, 1/3, and 2/3 and a shared sample at 0 and 1.\\nCurrent task-snapshot code: `.map(|(index, color)| GradientStop::new(index as f32 / (count - 1) as f32, color)),`\"},{\"kind\":\"baseline_tool_result\",\"source_id\":\"cargo-test-palette::tests::auto_positions_leave_a_cyclic_seam_interval-frozen-base\",\"content_blake3\":\"270804db70c4f1768cdcad0093c5a04a53ed55956dc0435fd1bb7015985946e6\",\"content\":\"Task snapshot 325dc047da94306fba888b2ce1968ef71d6f006a84b37347fbdba17448f86be1: exact test `palette::tests::auto_positions_leave_a_cyclic_seam_interval` ran on the current snapshot and failed 1/1. No candidate repair has been executed in this episode.\"}],\"action_options\":[{\"action\":{\"id\":11,\"schema_id\":1},\"summary\":\"Apply the focused implementation patch.\",\"diff_excerpt\":\"Patch lines:\\n-                .map(|(index, color)| GradientStop::new(index as f32 / (count - 1) as f32, color)),\\n+                .map(|(index, color)| GradientStop::new(index as f32 / count as f32, color)),\",\"patch_sha256\":\"83a2d211b17691debfa91c094c0ae0636e381f5e3e387ce224174f9649c57a78\"},{\"action\":{\"id\":37,\"schema_id\":1},\"summary\":\"Apply the focused patch with an explanatory source comment.\",\"diff_excerpt\":\"Patch lines:\\n+// E009 candidate: behavior-preserving repair note.\\n-                .map(|(index, color)| GradientStop::new(index as f32 / (count - 1) as f32, color)),\\n+                .map(|(index, color)| GradientStop::new(index as f32 / count as f32, color)),\",\"patch_sha256\":\"cae980a7f664263682214599738768c09ff8ade1fa3f78a15a57be1fa06c8717\"},{\"action\":{\"id\":68,\"schema_id\":1},\"summary\":\"Apply the alternate implementation patch.\",\"diff_excerpt\":\"Patch lines:\\n-                .map(|(index, color)| GradientStop::new(index as f32 / (count - 1) as f32, color)),\\n+                .map(|(index, color)| GradientStop::new(index as f32 / (count + 1) as f32, color)),\",\"patch_sha256\":\"83a5fabd5231e01867cc713cf5e0ce9e288868a51936c1226806c6372a16b918\"},{\"action\":{\"id\":94,\"schema_id\":1},\"summary\":\"Retain the current implementation.\",\"diff_excerpt\":\"No source changes; retain the current expression.\",\"patch_sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"}]}"
+      }
+    ],
+    "temperature": 0,
+    "top_p": 1,
+    "seed": 0,
+    "max_tokens": 1024,
+    "stream": false,
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rdc_coding_observer_output_v1",
+        "strict": true,
+        "schema": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "rdc-coding-observer-output.v2",
+          "title": "RDC Coding Observer Output v2",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "action_choice",
+            "applicability_percent",
+            "abstention_percent"
+          ],
+          "properties": {
+            "action_choice": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 65535
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "applicability_percent": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "abstention_percent": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            }
+          }
+        }
+      }
+    }
+  },
+  "http_status": 200,
+  "response": {
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "{\"action_choice\":11,\"applicability_percent\":100,\"abstention_percent\":0}"
+        }
+      }
+    ],
+    "created": 1790355024,
+    "model": "e009-small-v4",
+    "system_fingerprint": "b10982-fc82583e6",
+    "object": "chat.completion",
+    "usage": {
+      "completion_tokens": 21,
+      "prompt_tokens": 1177,
+      "total_tokens": 1198,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "id": "chatcmpl-VpIXtv3sDf4S5qFYJtrlnPm9l9AeytTU",
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 1177,
+      "prompt_ms": 477.952,
+      "prompt_per_token_ms": 0.40607646559048427,
+      "prompt_per_second": 2462.5903856454206,
+      "predicted_n": 21,
+      "predicted_ms": 339.086,
+      "predicted_per_token_ms": 16.9543,
+      "predicted_per_second": 58.98208714013553
+    }
+  },
+  "content": "{\"action_choice\":11,\"applicability_percent\":100,\"abstention_percent\":0}",
+  "output": {
+    "action_choice": 11,
+    "applicability_percent": 100,
+    "abstention_percent": 0
+  },
+  "normalized_output": {
+    "action_choice": 11,
+    "applicability_milli": 1000,
+    "abstention_milli": 0
+  },
+  "normalization_error": null,
+  "usage": {
+    "completion_tokens": 21,
+    "prompt_tokens": 1177,
+    "total_tokens": 1198,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "finish_reason": "stop",
+  "elapsed_ms": 1012.122
+}

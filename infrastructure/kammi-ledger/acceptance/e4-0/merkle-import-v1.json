@@ -1,0 +1,25 @@
+{
+  "base_root": "sha256:b7444f51049d53d5c5210498ae0c74ccb4f70dbe838ac5cf504ccb7bbc298e47",
+  "disposable_store": "C:\\code land\\clean-rust\\program-infrastructure\\kammi-ledger\\.kammi-dev\\e4-import",
+  "legacy_entry_count": 447,
+  "projection": {
+    "counts": {
+      "artifacts": 433,
+      "events": 451,
+      "runs": 0,
+      "seals": 2
+    },
+    "flight_gate": "CLOSED_PENDING_ACCEPTANCE",
+    "journal_events": 451,
+    "journal_head": "sha256:406eca0d89811ad474f33dcf1a4f15c402c92f181339a084749f84f12e07ea0e",
+    "projection_head": "sha256:406eca0d89811ad474f33dcf1a4f15c402c92f181339a084749f84f12e07ea0e",
+    "projection_seq": 451
+  },
+  "schema": "KAMMI_E4_LEGACY_MERKLE_IMPORT_V1",
+  "status": "PASS",
+  "successor_direct_member_count": 2,
+  "successor_parent_count": 1,
+  "successor_root": "sha256:234e568989f6c0e71fb69fa634b2e0bf085e7fb63336654202d3b221ef33f6fc",
+  "successor_verified_closure_count": 433,
+  "unique_legacy_byte_objects": 432
+}

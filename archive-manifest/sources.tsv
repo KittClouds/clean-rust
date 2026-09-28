@@ -1,0 +1,107 @@
+source_id	thread	location	kind	commit	state	note
+vault-adapter-wip	phoenix-product	D:\phoenix-vault-product-20260927	working-tree	3560021923820b7d8c0fdcfaa259b04c4c75b72f	includes uncommitted/untracked	Golden Path Close Out: uncommitted vault adapter on codex/phoenix-vault-product-20260927
+phoenix-product	phoenix-product	D:\phoenix-product-snapshot-20260923	git	8dfa1af06d6450489a990c33ed664121a9159b25	committed	codex/phoenix-graph-gate3b-20260924 (KittClouds/phoenix-native)
+gliner25-bridge-worker	phoenix-product	C:\code land\clean-rust	git	b50d3c78e145d6e8b6cd1c4e848ea4f3bd3c4d8a	committed	origin/codex/phoenix-product-gliner25-bridge-20260923
+gliner25-bridge-contract	phoenix-product	C:\code land\clean-rust	git	b50d3c78e145d6e8b6cd1c4e848ea4f3bd3c4d8a	committed	
+gliner25-bridge-workspace	phoenix-product	C:\code land\clean-rust	git	b50d3c78e145d6e8b6cd1c4e848ea4f3bd3c4d8a	committed	
+gliner25-bridge-cargo	phoenix-product	C:\code land\clean-rust	git	b50d3c78e145d6e8b6cd1c4e848ea4f3bd3c4d8a	committed	
+gliner25-bridge-scope	phoenix-product	C:\code land\clean-rust	git	b50d3c78e145d6e8b6cd1c4e848ea4f3bd3c4d8a	committed	
+gliner25-worktree-check	phoenix-product	C:\code land\clean-rust\rust-native\phoenix-gliner25	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	shared checkout copy; conflicts only
+gliner25-contract-worktree-check	phoenix-product	C:\code land\clean-rust\rust-native\phoenix-gliner25-contract	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+phoenix-product:gliner25-eval	phoenix-product	C:\code land\clean-rust\experiments\phoenix-gliner25-eval	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+kammi-ledger	chief-kammi	C:\code land\clean-rust\program-infrastructure\kammi-ledger	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+governance	chief-kammi	C:\code land\clean-rust\program-infrastructure\governance	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+fly-chief:drosophila-heresy	fly-chief	C:\code land\clean-rust\experiments\drosophila-heresy	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+fly-chief:stray-root-q10-pred1	fly-chief	C:\code land\clean-rust\q10-gc1-lr1-requal1-csc1-pred1-v1	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+fly-drop:fly-drop-00	fly-drop	C:\code land\clean-rust\experiments\fly-drop-00	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+fly-drop:fly-drop-00-runner	fly-drop	C:\code land\clean-rust\experiments\fly-drop-00-runner	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+fly-drop:fly-pheno-00	fly-drop	C:\code land\clean-rust\experiments\fly-pheno-00	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+fly-drop:fly-pheno-00-v0.2-qcomp	fly-drop	C:\code land\clean-rust\experiments\fly-pheno-00-v0.2-qcomp	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+fly-drop:fly-pheno-00-v0.3-qtask	fly-drop	C:\code land\clean-rust\experiments\fly-pheno-00-v0.3-qtask	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+fly-drop:fly-pheno-00-v0.4-qreal	fly-drop	C:\code land\clean-rust\experiments\fly-pheno-00-v0.4-qreal	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+fly-drop:fly-reach-00	fly-drop	C:\code land\clean-rust\experiments\fly-reach-00	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+fly-drop:fly-reach-01	fly-drop	C:\code land\clean-rust\experiments\fly-reach-01	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+fly-drop:fly-reach-02	fly-drop	C:\code land\clean-rust\experiments\fly-reach-02	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+fly-drop:fly-reach-02-v0.1b	fly-drop	C:\code land\clean-rust\experiments\fly-reach-02-v0.1b	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+fly-drop:fly-reach-03	fly-drop	C:\code land\clean-rust\experiments\fly-reach-03	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+fly-drop:close-branch	fly-drop	C:\code land\clean-rust	git	a3cb9ddb002a159a32bc76c55f8dbf0a83262e56	committed	sealed close commit; differences recorded as conflicts
+fly-drop:close-branch-runner	fly-drop	C:\code land\clean-rust	git	a3cb9ddb002a159a32bc76c55f8dbf0a83262e56	committed	
+jev:jev-corpus-bridge-v01	jev	C:\code land\clean-rust\experiments\jev-corpus-bridge-v01	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+jev:jev-decision-world-v01	jev	C:\code land\clean-rust\experiments\jev-decision-world-v01	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+jev:jev-decision-world-v02	jev	C:\code land\clean-rust\experiments\jev-decision-world-v02	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+jev:jev-frozen-readout-v01	jev	C:\code land\clean-rust\experiments\jev-frozen-readout-v01	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+jev:jev-frozen-saturation-v04	jev	C:\code land\clean-rust\experiments\jev-frozen-saturation-v04	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+jev:jev-frozen-scaling-v05	jev	C:\code land\clean-rust\experiments\jev-frozen-scaling-v05	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+jev:jev-frozen-scaling-v06	jev	C:\code land\clean-rust\experiments\jev-frozen-scaling-v06	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+jev:jev-information-density-v08	jev	C:\code land\clean-rust\experiments\jev-information-density-v08	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+jev:jev-information-density-v08b	jev	C:\code land\clean-rust\experiments\jev-information-density-v08b	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+jev:jev-information-density-v08c	jev	C:\code land\clean-rust\experiments\jev-information-density-v08c	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+jev:jev-information-density-v08d	jev	C:\code land\clean-rust\experiments\jev-information-density-v08d	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+jev:jev-information-density-v08e	jev	C:\code land\clean-rust\experiments\jev-information-density-v08e	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+jev:jev-information-density-v08g	jev	C:\code land\clean-rust\experiments\jev-information-density-v08g	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+jev:jev-information-density-v08h	jev	C:\code land\clean-rust\experiments\jev-information-density-v08h	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+jev:jev-information-density-v08i	jev	C:\code land\clean-rust\experiments\jev-information-density-v08i	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+jev:jev-information-density-v08j	jev	C:\code land\clean-rust\experiments\jev-information-density-v08j	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+jev:jev-information-density-v08k	jev	C:\code land\clean-rust\experiments\jev-information-density-v08k	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+jev:jev-information-density-v08l	jev	C:\code land\clean-rust\experiments\jev-information-density-v08l	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+jev:jev-information-density-v08m	jev	C:\code land\clean-rust\experiments\jev-information-density-v08m	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+jev:jev-information-density-v08n	jev	C:\code land\clean-rust\experiments\jev-information-density-v08n	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+jev:jev-information-density-v08p	jev	C:\code land\clean-rust\experiments\jev-information-density-v08p	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+jev:jev-information-density-v08p-r1	jev	C:\code land\clean-rust\experiments\jev-information-density-v08p-r1	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+jev:jev-information-density-v08p-r2	jev	C:\code land\clean-rust\experiments\jev-information-density-v08p-r2	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+jev:jev-information-density-v08p-v02	jev	C:\code land\clean-rust\experiments\jev-information-density-v08p-v02	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+jev:jev-information-density-v08p-v03	jev	C:\code land\clean-rust\experiments\jev-information-density-v08p-v03	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+jev:jev-information-density-v08p-v04	jev	C:\code land\clean-rust\experiments\jev-information-density-v08p-v04	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+jev:jev-information-density-v08p-v05	jev	C:\code land\clean-rust\experiments\jev-information-density-v08p-v05	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+jev:jev-information-density-v08p-v06	jev	C:\code land\clean-rust\experiments\jev-information-density-v08p-v06	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+jev:jev-information-density-v08p-v07	jev	C:\code land\clean-rust\experiments\jev-information-density-v08p-v07	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+jev:jev-information-density-v08p-v08	jev	C:\code land\clean-rust\experiments\jev-information-density-v08p-v08	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+jev:jev-information-density-v08p-v09	jev	C:\code land\clean-rust\experiments\jev-information-density-v08p-v09	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+jev:jev-information-density-v08q	jev	C:\code land\clean-rust\experiments\jev-information-density-v08q	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+jev:jev-information-density-v08q-r1	jev	C:\code land\clean-rust\experiments\jev-information-density-v08q-r1	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+jev:jev-information-density-v08q-r2-late-branch	jev	C:\code land\clean-rust\experiments\jev-information-density-v08q-r2-late-branch	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+jev:jev-information-density-v08q-r3-selectivity	jev	C:\code land\clean-rust\experiments\jev-information-density-v08q-r3-selectivity	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+jev:jev-lfm-variable-v07	jev	C:\code land\clean-rust\experiments\jev-lfm-variable-v07	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+jev:jev-semantic-stress-v03	jev	C:\code land\clean-rust\experiments\jev-semantic-stress-v03	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+jev:jev-zero-training-recon-v01	jev	C:\code land\clean-rust\experiments\jev-zero-training-recon-v01	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+jev:curated-c100	jev	C:\Users\shuga\.codex\worktrees\3c8a\clean-rust\experiments\jev-curated-c100-v01	working-tree	e5a84994da6011605b11e7b89459fa73f7e47570	includes uncommitted/untracked	
+jev:docs	jev	C:\code land\clean-rust\docs	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+fas-paused:fas-frozen-adaptive-substrate-v00	fas-paused	C:\code land\clean-rust\experiments\fas-frozen-adaptive-substrate-v00	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+fas-paused:fas-s01-frozen-sensor-transfer-cartography	fas-paused	C:\code land\clean-rust\experiments\fas-s01-frozen-sensor-transfer-cartography	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+fas-paused:fas-s02-original-corpus-readout-surface-attribution-v01	fas-paused	C:\code land\clean-rust\experiments\fas-s02-original-corpus-readout-surface-attribution-v01	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+fas-paused:fas-s03-factor-competition-decision-geometry-v01	fas-paused	C:\code land\clean-rust\experiments\fas-s03-factor-competition-decision-geometry-v01	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+fas-paused:fas-s04-controlled-factor-to-decision-transfer-geometry-v01	fas-paused	C:\code land\clean-rust\experiments\fas-s04-controlled-factor-to-decision-transfer-geometry-v01	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+fas-paused:fas-s05-crossed-representation-readout-decomposition-v01	fas-paused	C:\code land\clean-rust\experiments\fas-s05-crossed-representation-readout-decomposition-v01	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+fas-paused:fas-s05-s11-observer-geometry-synthesis-v01	fas-paused	C:\code land\clean-rust\experiments\fas-s05-s11-observer-geometry-synthesis-v01	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+fas-paused:fas-s06-representation-scaler-probe-compatibility-cube-v01	fas-paused	C:\code land\clean-rust\experiments\fas-s06-representation-scaler-probe-compatibility-cube-v01	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+fas-paused:fas-s07-sparse-compatibility-cartography-v01	fas-paused	C:\code land\clean-rust\experiments\fas-s07-sparse-compatibility-cartography-v01	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+fas-paused:fas-s08-exact-decision-surface-attribution-v01	fas-paused	C:\code land\clean-rust\experiments\fas-s08-exact-decision-surface-attribution-v01	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+fas-paused:fas-s08-exact-decision-surface-attribution-v02	fas-paused	C:\code land\clean-rust\experiments\fas-s08-exact-decision-surface-attribution-v02	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+fas-paused:fas-s09-depthwise-decision-subspace-emergence	fas-paused	C:\code land\clean-rust\experiments\fas-s09-depthwise-decision-subspace-emergence	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+fas-paused:fas-s09-depthwise-decision-subspace-emergence-v02	fas-paused	C:\code land\clean-rust\experiments\fas-s09-depthwise-decision-subspace-emergence-v02	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+fas-paused:fas-s09-depthwise-decision-subspace-emergence-v03	fas-paused	C:\code land\clean-rust\experiments\fas-s09-depthwise-decision-subspace-emergence-v03	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+fas-paused:fas-s09-depthwise-decision-subspace-emergence-v04	fas-paused	C:\code land\clean-rust\experiments\fas-s09-depthwise-decision-subspace-emergence-v04	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+fas-paused:fas-s09-depthwise-decision-subspace-emergence-v05	fas-paused	C:\code land\clean-rust\experiments\fas-s09-depthwise-decision-subspace-emergence-v05	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+fas-paused:fas-s09-depthwise-decision-subspace-emergence-v06	fas-paused	C:\code land\clean-rust\experiments\fas-s09-depthwise-decision-subspace-emergence-v06	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+fas-paused:fas-s09-depthwise-decision-subspace-emergence-v07	fas-paused	C:\code land\clean-rust\experiments\fas-s09-depthwise-decision-subspace-emergence-v07	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+fas-paused:fas-s09-depthwise-decision-subspace-emergence-v08	fas-paused	C:\code land\clean-rust\experiments\fas-s09-depthwise-decision-subspace-emergence-v08	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+fas-paused:fas-s09-depthwise-decision-subspace-emergence-v09	fas-paused	C:\code land\clean-rust\experiments\fas-s09-depthwise-decision-subspace-emergence-v09	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+fas-paused:fas-s10-cross-depth-observer-transport	fas-paused	C:\code land\clean-rust\experiments\fas-s10-cross-depth-observer-transport	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+fas-paused:fas-s10-cross-depth-observer-transport-v02	fas-paused	C:\code land\clean-rust\experiments\fas-s10-cross-depth-observer-transport-v02	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+fas-paused:fas-s10-cross-depth-observer-transport-v03	fas-paused	C:\code land\clean-rust\experiments\fas-s10-cross-depth-observer-transport-v03	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+fas-paused:fas-s11-cross-depth-observer-transport-replication-v01	fas-paused	C:\code land\clean-rust\experiments\fas-s11-cross-depth-observer-transport-replication-v01	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+fas-paused:fas-s12-accessibility-necessity-dissociation-v01	fas-paused	C:\code land\clean-rust\experiments\fas-s12-accessibility-necessity-dissociation-v01	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+fas-paused:fas-s12-observer-plane-causal-dependence-v01	fas-paused	C:\code land\clean-rust\experiments\fas-s12-observer-plane-causal-dependence-v01	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+fas-r1:bend-ac-00	fas-r1	C:\code land\clean-rust\experiments\bend-ac-00	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+fas-r1:fas-r1-semantic-particle-reachability-v00	fas-r1	C:\code land\clean-rust\experiments\fas-r1-semantic-particle-reachability-v00	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+fas-r1:stage0-worktree	fas-r1	C:\Users\shuga\.codex\worktrees\fas-r1-stage0-20260925\clean-rust\experiments\fas-r1-semantic-particle-reachability-v00	working-tree	fb984e362a20c7a6ede2eb66b120859f150477d1	includes uncommitted/untracked	codex/fas-r1-stage0-20260925 worktree; adds files missing from shared checkout
+frozen-fabrique:e013-episode-factory	frozen-fabrique	C:\code land\clean-rust\experiments\e013-episode-factory	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+frozen-fabrique:fas-frozen-observer-bundle-engineering-v01	frozen-fabrique	C:\code land\clean-rust\experiments\fas-frozen-observer-bundle-engineering-v01	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+frozen-fabrique:e4-0-worktree	frozen-fabrique	C:\Users\shuga\.codex\worktrees\e4-0-contract-work\clean-rust\experiments\fas-frozen-observer-bundle-engineering-v01	working-tree	e5a84994da6011605b11e7b89459fa73f7e47570	includes uncommitted/untracked	
+frozen-fabrique:e4-0-audits	frozen-fabrique	C:\Users\shuga\.codex\worktrees\e4-0-contract-work\clean-rust\audits	working-tree	e5a84994da6011605b11e7b89459fa73f7e47570	includes uncommitted/untracked	
+frozen-fabrique:e013-worktree	frozen-fabrique	C:\Users\shuga\.codex\worktrees\e013-episode-factory\clean-rust\experiments\e013-episode-factory	working-tree	e5a84994da6011605b11e7b89459fa73f7e47570	includes uncommitted/untracked	
+ar04:adaptive-runtime	ar04	C:\code land\clean-rust	git	4109350e37c91c344bec640c2193d68310306e7c	committed	linear chain adaptive-runtime-cleanroom-20260920 -> ar-03c -> ar-03d -> ar-03d-r1 -> ar-04a..04e; tip carries all
+kinetic-kammi:rd-c	kinetic-kammi	C:\rd-c	working-tree		includes uncommitted/untracked	"C:d-c is not a git repository"
+lab:docs	lab-shared	C:\code land\clean-rust\docs	working-tree	9a88547372cd35f8dc31f026f0cd8dd8fca8e641	includes uncommitted/untracked	
+gliner25-bridge-esaxx	phoenix-product	C:\code land\clean-rust	git	b50d3c78e145d6e8b6cd1c4e848ea4f3bd3c4d8a	committed	vendored patch crate required by the bridge workspace
+gliner25-bridge-scirs2	phoenix-product	C:\code land\clean-rust	git	b50d3c78e145d6e8b6cd1c4e848ea4f3bd3c4d8a	committed	vendored patch crate required by the bridge workspace

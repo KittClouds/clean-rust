@@ -1,0 +1,78 @@
+{
+  "schema": "FAS_E4_0_TRACK_B_SOURCE_TESTS_V01",
+  "receipt_id": "FAS_E4_0_TRACK_B_V03_LEASE_FACTORY_FIX_TESTS_V01",
+  "status": "PASS_SYNTHETIC_SOURCE_AND_CLI_TESTS",
+  "recorded_utc": "2026-09-26T23:32:35Z",
+  "source_unit": "E4-0 runner lease-factory repair v03 targeting contract v07",
+  "target_contract": {
+    "contract_id": "FAS_FROZEN_CAPABILITY_FABRIC_E4_0_V07",
+    "seal_id": "FAS_E4_0_CONTRACT_V07_SEAL"
+  },
+  "repair_summary": "The v03 lease factory accepts the already validated absolute stage output root, eliminating the undefined stage_output_root reference and avoiding helper re-derivation. The v03 mode runner passes its computed stage path; the v03 CLI entrypoint selects the v03 modes.",
+  "commands": [
+    "python -m py_compile source/scripts/e4_runner_common_v03.py source/scripts/e4_runner_artifacts_v03.py source/scripts/e4_gpu_lease_v03.py source/scripts/e4_runner_modes_v03.py source/scripts/e4_online_parity_v03.py source/tests/test_e4_runner_v03.py",
+    "python -m unittest discover -s source\\tests -p test_e4_runner_v03.py -v",
+    "python source/scripts/e4_online_parity_v03.py --help"
+  ],
+  "results": {
+    "py_compile": "PASS",
+    "tests_run": 15,
+    "tests_passed": 15,
+    "tests_failed": 0,
+    "runner_cli_help_smoke": "PASS"
+  },
+  "focused_regression": {
+    "test": "test_make_gpu_lease_uses_validated_stage_output_without_contact",
+    "result": "PASS",
+    "assertions": [
+      "make_gpu_lease constructs successfully without NameError",
+      "receipt path resolves to <validated_stage_output_root>/gpu-lease-release-receipt-v01.json",
+      "lease remains unacquired",
+      "no lease lock or lease receipt is created",
+      "torch and transformers are not imported by the factory path",
+      "relative output roots are rejected before any lock creation"
+    ]
+  },
+  "bound_sources": [
+    {
+      "path": "source/scripts/e4_runner_common_v03.py",
+      "bytes": 20575,
+      "sha256": "34717621552416d132c9aa57adf0714b0ab9dc89d36642631ce7fd4c66506fae"
+    },
+    {
+      "path": "source/scripts/e4_runner_artifacts_v03.py",
+      "bytes": 15794,
+      "sha256": "db1c8ac20071e104f21fdfa6893b0b539121057c9f235bf8959bd8e2ec4f448e"
+    },
+    {
+      "path": "source/scripts/e4_gpu_lease_v03.py",
+      "bytes": 23201,
+      "sha256": "c80e8aeae942e1d4c851822b2eb07f4a5b9eb7c3b819d7fe10a8a23a1d0d79d4"
+    },
+    {
+      "path": "source/scripts/e4_runner_modes_v03.py",
+      "bytes": 32767,
+      "sha256": "7a0f0a0ac54b82753c25f0668a710fc6d952dab9c8288ed22f7016fa24e0d935"
+    },
+    {
+      "path": "source/scripts/e4_online_parity_v03.py",
+      "bytes": 1375,
+      "sha256": "7f987ee72c30357e05a1e60ba50dd9acaa48dcf6846b0d5a3d5da001a2df5a01"
+    },
+    {
+      "path": "source/tests/test_e4_runner_v03.py",
+      "bytes": 19171,
+      "sha256": "778267071266c3fcfc51e24aa5f0b71901b0e596e3f5086750610cd8a8efd302"
+    }
+  ],
+  "boundary": {
+    "real_stage_authorization_issued": false,
+    "e4_population_materialized": false,
+    "labels_opened": false,
+    "tokenizer_contact": false,
+    "model_contact": false,
+    "cuda_initialized": false,
+    "live_gpu_process_scan": false,
+    "synthetic_lease_tests_only": true
+  }
+}

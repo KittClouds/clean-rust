@@ -1,0 +1,9 @@
+{
+  "engineering_only": true,
+  "execution_sha256": "3E6BE728EBE220051637499227A7C8269D91B1BF68776743F19DB38657CAAA50",
+  "identity": "q10-gc1-lr1-requal1-csc1-alg1-v2",
+  "pair_replay_performed": false,
+  "protocol": "Q10-CSC1-ALG1",
+  "scientific_promotion": false,
+  "status": "ALG1_COMPLETE"
+}

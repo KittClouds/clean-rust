@@ -1,0 +1,7 @@
+{
+  "final_gate": "nested_lr1_contract_all_parent_bindings_match",
+  "identity": "q10-gc1-lr1-nl1-audit-v1",
+  "mutation_policy": "read_only",
+  "protocol": "Q10-GC1-LR1-NL1-INTERNAL-PARENT-CONSISTENCY-AUDIT",
+  "scope": "read_only_audit_of_fresh_snapshot_before_replay"
+}

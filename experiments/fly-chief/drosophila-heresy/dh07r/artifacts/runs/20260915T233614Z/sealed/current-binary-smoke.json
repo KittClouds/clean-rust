@@ -1,0 +1,15 @@
+{
+  "status": "PASSED",
+  "seed": 9006,
+  "fresh_measured_seeds_used": 0,
+  "result_cells": 16,
+  "null_events": 512,
+  "observed_maxima": {
+    "axial_error_over_total_norm": 2.0650636578247695e-08,
+    "norm_relative_error": 1.4287899497315804e-08,
+    "residual_norm_relative_error": 1.4292383789422176e-08,
+    "residual_abs_cosine": 1.5243521197756753e-08
+  },
+  "jsonl_sha256": "1d12b99144b62de992caea5803caeabd03c06ace59133abddcf209d8e48fa8c5",
+  "binary_sha256": "8b86f08505339382c62df022903700d1dd81057d2aa6ccafb6ac8f7e4d2f3323"
+}

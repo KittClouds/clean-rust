@@ -1,0 +1,37 @@
+{
+  "record_id": "FAS_S09_V04_METRIC_COMPARATOR_CORRECTION",
+  "superseded_run_id": "fas-s09-depthwise-decision-subspace-emergence-v03",
+  "superseded_protocol_root_sha256": "8e51be468fb78788bd8d3cb66f54d26d401a58d1706163d59290abbfa929de23",
+  "superseded_protocol_seal_file_sha256": "fe3f2ba88fb0f71518ff410409825cb02cfdf20299b19d0f8219ae96ceef7326",
+  "superseded_cache_root_sha256": "82f9eb6ba0b9c37e58c415b03ec1bc4be00032f73cc43e70b3987ac4108f7653",
+  "failure_artifacts": {
+    "analysis_failure_sha256": "fe57b5b06114f3ac3048289bf59f312f0258f0e6e7b918ac47762d59cec79c30",
+    "M_terminal_probe_state_sha256": "1b3db11aa1fe691a98b40b0b9001c3f0125d1acd47f7c069ef53fd487a2d46e4",
+    "recovery_receipt_sha256": "cdba6b96a43be1b16958371cf130b5e1d20e78367930b9e4cfd6f0ad9afd1668",
+    "recovery_cache_seal_file_sha256": "a1165b9d38c75209f7c008b7edc7cc2d2dc359be885fe0aae5762203ce34c306"
+  },
+  "exact_mismatch": {
+    "computed_metric_bundle": "contains ALL_TEST_ROWS plus the eleven contracted condition dictionaries",
+    "sealed_S01_metric_row": "contains only the eleven condition dictionaries, each also carrying interpretation_scope provenance text",
+    "incorrect_v03_operation": "compared the entire computed metric bundle directly to the condition-only reference mapping",
+    "scientific_values": "a read-only replay using the sealed M probabilities found all eleven condition metric values exact after omitting only the ALL_TEST_ROWS aggregate and interpretation_scope provenance field"
+  },
+  "correction": {
+    "compare_condition_names_as_sets": true,
+    "omit_only_computed_ALL_TEST_ROWS_aggregate": true,
+    "omit_only_reference_interpretation_scope_provenance": true,
+    "retain_exact_equality_for_all_other_fields": true,
+    "probe_or_metric_semantics_changed": false
+  },
+  "v03_execution_boundary": {
+    "M_terminal_probe_state_exact": true,
+    "M_test_probabilities_exact": true,
+    "numeric_condition_metrics_exact": true,
+    "F_terminal_fit_started": false,
+    "layers_1_to_15_fit": false,
+    "result_sealed": false,
+    "source_v03_modified": false,
+    "model_contact_during_recovery_v03": true,
+    "model_contact_during_analysis_v03": false
+  }
+}

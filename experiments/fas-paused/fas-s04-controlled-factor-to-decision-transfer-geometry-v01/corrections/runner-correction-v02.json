@@ -1,0 +1,32 @@
+{
+  "correction_id": "FAS_S04_RUNNER_CORRECTION_V02",
+  "status": "ENGINEERING_CORRECTION_ONLY",
+  "experiment_id": "fas-s04-controlled-factor-to-decision-transfer-geometry-v01",
+  "parent_protocol_root_sha256": "3806a541b09351760f168643d2a46747f26e11ff72c852f04f6c8e91ed88880f",
+  "preserved_original_runner": {
+    "path": "scripts/s04_common.py",
+    "sha256": "e9f4253e5db518f2705ea709872e456bd38e9412c0f2e3a81e888371034d5cb6"
+  },
+  "failed_v01_preflight": {
+    "disposition": "S04_FAIL_CLOSED_BEFORE_OUTPUT",
+    "error": "S01-3 result tree lacks probes\\V0_MEAN_FULL\\EXACT_TARGET\\probe-state-v01.npz",
+    "cause": "Windows Path string used backslashes while sealed result-tree entries use forward slashes.",
+    "scientific_outputs_written": false
+  },
+  "correction": {
+    "exact_change": "Normalize constructed S01-3 result-tree lookup paths with Path.as_posix() before comparing to sealed manifest paths.",
+    "scope": "S04 parent verification path lookup only.",
+    "analysis_contract_changed": false,
+    "probe_replay_changed": false,
+    "estimands_changed": false,
+    "parents_changed": false,
+    "feature_cache_changed": false,
+    "model_contact": false,
+    "probe_fitting": false
+  },
+  "execution": {
+    "runner_version": "v02",
+    "original_protocol_seal_preserved": true,
+    "correction_bundle_must_be_verified_before_execution": true
+  }
+}

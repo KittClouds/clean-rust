@@ -1,0 +1,9 @@
+{
+  "engineering_only": true,
+  "error": "fixed/damaged drift at ('seed9731-L-tau16.json', 2) pair 0: expected=(0,0) computed=(164,0) s=22471F33009D988CB82ACE2DE1E3032507B3B11760C5437A5FCC9E500A5B6D3D ab=22471F33009D988CB82ACE2DE1E3032507B3B11760C5437A5FCC9E500A5B6D3D",
+  "error_type": "RuntimeError",
+  "identity": "q10-gc1-lr1-requal1-csc1-vmat1-v4",
+  "protocol": "Q10-CSC1-VMAT1",
+  "scientific_promotion": false,
+  "status": "BLOCKED_CSC1_VMAT1"
+}

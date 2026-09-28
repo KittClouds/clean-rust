@@ -1,0 +1,14 @@
+{
+  "all_input_phi_arrays_unchanged": true,
+  "all_intact_replays_bitwise_match_saved_state_and_epoch200": true,
+  "all_model_tensors_unchanged": true,
+  "biological_promotion": false,
+  "exploratory_existing_bank_only": true,
+  "fit_count": 36,
+  "identity": "F4-BINDING-01-STAGE-A-EXPLORATORY-v0.1",
+  "output_count": 36,
+  "prediction_lock_sha256": "03b403b586aab2626019b451f1af6df6c552046740cd74da2e5502eb4c0f9c62",
+  "schema": "F4-BINDING-01-Stage-A-pretruth-integrity-v0.1",
+  "status": "PASS",
+  "truth_values_read": false
+}

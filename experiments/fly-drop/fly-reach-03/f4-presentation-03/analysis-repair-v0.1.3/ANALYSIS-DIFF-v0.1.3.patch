@@ -1,0 +1,11 @@
+--- analysis-repair-v0.1.2/analyze_results.py
++++ analysis-repair-v0.1.3/analyze_results.py
+@@ -415,7 +415,7 @@
+             "target_polarity_opened_before_fitting_for_support_only": True,
+             "comparative_scoring_fields_opened_before_integrity": [],
+             "remaining_truth_fields_opened_only_after_integrity_pass": ["native_delta", "preweight", "reference_value"],
+-            "support_receipt_sha256": sha(Path(STUDY / "runs" / "F4-PRESENTATION-03-VALIDATION-REPAIR-v0.1.1" / "SUPPORT-ACCOUNTING-RECEIPT-v0.1.1.json").read_bytes()),
++            "support_receipt_sha256": sha_bytes(Path(STUDY / "runs" / "F4-PRESENTATION-03-VALIDATION-REPAIR-v0.1.1" / "SUPPORT-ACCOUNTING-RECEIPT-v0.1.1.json").read_bytes()),
+         },
+         "integrity_receipt_sha256": sha_file(RUN / "INTEGRITY-RECEIPT.json"),
+         "prediction_lock_sha256": sha_file(RUN / "PREDICTION-LOCK.json"),

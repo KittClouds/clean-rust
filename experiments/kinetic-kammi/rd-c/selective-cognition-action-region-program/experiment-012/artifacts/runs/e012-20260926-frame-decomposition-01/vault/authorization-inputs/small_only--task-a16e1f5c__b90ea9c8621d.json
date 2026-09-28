@@ -1,0 +1,62 @@
+{
+  "task_id": "small_only-task-a16e1f5c__b90ea9c8621d",
+  "frame_digest_hex": "b90ea9c8621dc3312fa8c5874369634faa37c898b5f619ebb1cb96c5333fa185",
+  "request_id_hex": "44f757940ca97dc2cf86edff4dbf57ce82e42a1317fae48bb17c798006e3b459",
+  "response_request_id_hex": "44f757940ca97dc2cf86edff4dbf57ce82e42a1317fae48bb17c798006e3b459",
+  "request_receipt_digest_hex": "96527b3dc68d27ea69fd8bfbcbe86fce848f8271041260eb70ec6e169723c410",
+  "response_receipt_digest_hex": "96527b3dc68d27ea69fd8bfbcbe86fce848f8271041260eb70ec6e169723c410",
+  "presentation_receipt_hex": "52444351010004000000b90ea9c8621dc3312fa8c5874369634faa37c898b5f619ebb1cb96c5333fa1859dc3364028a54423a5b751f33f10f88af182c1b3887b4e350973a4fd0e5f6b8aec56bcbd82f2c55fb15aa17a4d5394bad7e25072fc5ee554d80dcf6b016dd82e49eed06960e6328ced42e57e2f47d7814e62c13a99598e5fc6ebe584d0829aa5cce7e2fb378bf9152f572091dc98e7dbb137f4c167186cde3f00908633188ee32df81131c7f335ae0b23d243d19890a25c35e823f9155e5ea8127331af90c6bfc7ba5eaa7dc6c709",
+  "action_ledger_path": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\artifacts\\runs\\e012-20260926-frame-decomposition-01\\action-ledgers\\small_only\\task-a16e1f5c__b90ea9c8621d.bin",
+  "ordered_options": [
+    {
+      "producer_ordinal": 0,
+      "action": {
+        "id": 22252,
+        "schema_id": 1
+      },
+      "summary": "Apply the candidate change shown in the code excerpt.",
+      "diff_excerpt": "@@ -1,14 +1,14 @@\n use clap::{Arg, ArgAction, Command};\n \n pub fn parse_tag_values(argv: &[&str]) -> Vec<String> {\n-    // E012 candidate slot.\n     let command = Command::new(\"demo\")\n-        .arg(Arg::new(\"tag\").long(\"tag\").action(ArgAction::Set));\n+        .arg(Arg::new(\"tag\").long(\"tag\").action(ArgAction::Append));\n     let matches = command\n         .try_get_matches_from(argv.iter().copied())\n         .expect(\"valid task arguments\");\n     matches\n         .get_many::<String>(\"tag\")\n-        .map(|values| values.cloned().collect())\n-        .unwrap_or_default()\n+        .and_then(|mut values| values.next().cloned())\n+        .into_iter()\n+        .collect()\n }",
+      "patch_sha256": "bcbd82f2c55fb15aa17a4d5394bad7e25072fc5ee554d80dcf6b016dd82e49ee"
+    },
+    {
+      "producer_ordinal": 1,
+      "action": {
+        "id": 27088,
+        "schema_id": 1
+      },
+      "summary": "Apply the candidate change shown in the code excerpt.",
+      "diff_excerpt": "@@ -1,9 +1,8 @@\n use clap::{Arg, ArgAction, Command};\n \n pub fn parse_tag_values(argv: &[&str]) -> Vec<String> {\n-    // E012 candidate slot.\n     let command = Command::new(\"demo\")\n-        .arg(Arg::new(\"tag\").long(\"tag\").action(ArgAction::Set));\n+        .arg(Arg::new(\"tag\").long(\"tag\").action(ArgAction::Append));\n     let matches = command\n         .try_get_matches_from(argv.iter().copied())\n         .expect(\"valid task arguments\");",
+      "patch_sha256": "60e6328ced42e57e2f47d7814e62c13a99598e5fc6ebe584d0829aa5cce7e2fb"
+    },
+    {
+      "producer_ordinal": 2,
+      "action": {
+        "id": 35639,
+        "schema_id": 1
+      },
+      "summary": "Apply the candidate change shown in the code excerpt.",
+      "diff_excerpt": "@@ -1,7 +1,6 @@\n use clap::{Arg, ArgAction, Command};\n \n pub fn parse_tag_values(argv: &[&str]) -> Vec<String> {\n-    // E012 candidate slot.\n     let command = Command::new(\"demo\")\n         .arg(Arg::new(\"tag\").long(\"tag\").action(ArgAction::Set));\n     let matches = command",
+      "patch_sha256": "f9152f572091dc98e7dbb137f4c167186cde3f00908633188ee32df81131c7f3"
+    },
+    {
+      "producer_ordinal": 3,
+      "action": {
+        "id": 44597,
+        "schema_id": 1
+      },
+      "summary": "Apply the candidate change shown in the code excerpt.",
+      "diff_excerpt": "@@ -1,8 +1,8 @@\n use clap::{Arg, ArgAction, Command};\n \n pub fn parse_tag_values(argv: &[&str]) -> Vec<String> {\n-    // E012 candidate slot.\n     let command = Command::new(\"demo\")\n+        .args_override_self(true)\n         .arg(Arg::new(\"tag\").long(\"tag\").action(ArgAction::Set));\n     let matches = command\n         .try_get_matches_from(argv.iter().copied())",
+      "patch_sha256": "0b23d243d19890a25c35e823f9155e5ea8127331af90c6bfc7ba5eaa7dc6c709"
+    }
+  ],
+  "observer_output": {
+    "action_choice": 27088,
+    "applicability_milli": 1000,
+    "abstention_milli": 0
+  },
+  "thresholds": {
+    "minimum_applicability_milli": 850,
+    "maximum_abstention_milli": 150
+  },
+  "completion_check_passed": false
+}

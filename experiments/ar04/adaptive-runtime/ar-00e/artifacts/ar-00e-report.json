@@ -1,0 +1,13 @@
+{
+  "schema": "adaptive-runtime-ar-00e/v1",
+  "scope": "engineering-only",
+  "frozen_from": ["adaptive-runtime-ar-00d/v1", "adaptive-runtime-int2/v1"],
+  "epochs": 3000,
+  "primitive_budget_per_epoch": 17,
+  "policies": [
+    {"policy": "E0-global-singleton", "final_loss": 0.18534479, "final_accuracy": 1.00000000, "final_mse": 0.04644836, "selected_primitives": 923, "programs": 3869, "pair_programs": 0, "group_programs": 0, "utility_evaluations": 576845, "predicted_utility": 0.51998663, "realized_utility": 0.51998663, "final_probabilities": [0.30470350, 0.69529659, 0.99275368, 0.00724630], "final_logits": [-0.82499921, 0.82499963, 4.91998959, -4.91999102], "final_margins": [0.82499921, 0.82499963, 4.91998959, 4.91999102]},
+    {"policy": "E1-singleton-or-pair", "final_loss": 0.16492587, "final_accuracy": 1.00000000, "final_mse": 0.03755414, "selected_primitives": 1002, "programs": 554, "pair_programs": 448, "group_programs": 0, "utility_evaluations": 524342, "predicted_utility": 0.54040545, "realized_utility": 0.54040545, "final_probabilities": [0.27388528, 0.72611493, 0.99024326, 0.00975673], "final_logits": [-0.97499877, 0.97499973, 4.61999178, -4.61999369], "final_margins": [0.97499877, 0.97499973, 4.61999178, 4.61999369]},
+    {"policy": "E2-structural-groups", "final_loss": 0.01338625, "final_accuracy": 1.00000000, "final_mse": 0.00056536, "selected_primitives": 2481, "programs": 1183, "pair_programs": 0, "group_programs": 1183, "utility_evaluations": 11342642, "predicted_utility": 0.69194514, "realized_utility": 0.69194514, "final_probabilities": [0.00000614, 0.99752730, 0.99752742, 0.04742600], "final_logits": [-11.99998569, 5.99996948, 6.00001764, -2.99999714], "final_margins": [11.99998569, 5.99996948, 6.00001764, 2.99999714]},
+    {"policy": "E3-randomized-groups", "final_loss": 0.01338628, "final_accuracy": 1.00000000, "final_mse": 0.00056536, "selected_primitives": 2789, "programs": 1225, "pair_programs": 0, "group_programs": 1225, "utility_evaluations": 9862807, "predicted_utility": 0.69194508, "realized_utility": 0.69194508, "final_probabilities": [0.00247265, 0.95257396, 0.99999380, 0.00247265], "final_logits": [-5.99998951, 2.99999619, 11.99113560, -5.99999046], "final_margins": [5.99998951, 2.99999619, 11.99113560, 5.99999046]}
+  ]
+}

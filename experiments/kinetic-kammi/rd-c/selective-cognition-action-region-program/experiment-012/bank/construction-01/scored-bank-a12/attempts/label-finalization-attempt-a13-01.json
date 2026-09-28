@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "attempt": "A13_LABEL_FINALIZATION_ATTEMPT_01",
+  "state": "FINALIZATION_FAILED_EXACT_BALANCE_INFEASIBLE_NO_OUTPUTS_WRITTEN",
+  "model_contact_authorized": false,
+  "design_lock_sha256": "16ef32a216f6c29ea82fded7305570b788f260bca0c9b923091ea0acc49ee572",
+  "candidate_check_lock_sha256": "8d78ba7fd2ac418519c4456a9cada83be4f955462d9b452226e3295505710c57",
+  "precheck_source_sha256": "df64849ea63743bbcb9fff281a7fbdc18fc25fa8425318d56a90fbefda02a25e",
+  "candidate_check_results_sha256": "2d6950bf022373517f9eff2b050d61213dac0476b7b70e89a8cfc7ace587277d",
+  "finalizer_sha256": "911cd1af6eb3b19a31c57aa21c3f9bcdce3d62460af465935e239f17515ce1e8",
+  "error": "ValueError: exact action/position balance is impossible in map-order-feature-contract: valid=5, gold=4",
+  "failed_family": "map-order-feature-contract",
+  "failed_balancing_totals": {
+    "valid_candidate_instances": 5,
+    "tasks": 4,
+    "primary_gold_actions": 4
+  },
+  "outputs_written": false
+}

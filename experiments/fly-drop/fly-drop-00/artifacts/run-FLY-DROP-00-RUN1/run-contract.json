@@ -1,0 +1,500 @@
+{
+  "analysis_order": [
+    "primary contrast and bootstrap",
+    "crossed factor summaries",
+    "secondary controls",
+    "accuracy and trajectories",
+    "operator census exploratory joins"
+  ],
+  "collection_policy": "blind collection; stdout may expose counts and health only; no comparative performance summaries",
+  "created_utc": "2026-09-21T19:43:43.899174+00:00",
+  "epochs_per_fit": 20,
+  "execution_manifest_sha256": "813ca75372255d500b26beb2b3d7a55eaf437a4c73ff34c8c27d8ecb777d7ebf",
+  "fit_count": 656,
+  "heldout_policy": "one terminal pass after update 1280; no earlier reads",
+  "numerical_failure_policy": "retain all updates and attempt; no replacement, normalization, or imputation",
+  "primary_analysis": {
+    "axes": [
+      "adapter_seed",
+      "degree_graph_realization",
+      "teacher_seed",
+      "learner_seed"
+    ],
+    "bootstrap_replicates": 20000,
+    "bootstrap_rng": "SplitMix64 next; unbiased below-4 draws via rejection; axis draw order adapter, degree graph, teacher, learner",
+    "bootstrap_seed": 20260921,
+    "contrast": "MaleCNS minus mean degree-shuffle heldout BCE",
+    "factor_consistency": "for each level, report mean paired contrast and sign; overall sign and zero levels stated; no significance tests",
+    "percentile_interpolation": "linear",
+    "percentile_interval": [
+      0.025,
+      0.975
+    ]
+  },
+  "run_files": [
+    {
+      "bytes": 328,
+      "path": "C:\\code land\\clean-rust\\experiments\\fly-drop-00-runner\\Cargo.toml",
+      "sha256": "e351404eac9b9551df5b80b48d96e9a44ad6d1485a5959481f6c0d306873ed01"
+    },
+    {
+      "bytes": 6005,
+      "path": "C:\\code land\\clean-rust\\experiments\\fly-drop-00-runner\\Cargo.lock",
+      "sha256": "8f03476bee8f42a40dc2f27b83aca361efe539d2d7f9ce52bb8d65923b9d5573"
+    },
+    {
+      "bytes": 4540,
+      "path": "C:\\code land\\clean-rust\\experiments\\fly-drop-00-runner\\src\\main.rs",
+      "sha256": "27a4a39c013374dddf9ce6e769205f714af3a7acf51147650c8205f61c44d469"
+    },
+    {
+      "bytes": 5732,
+      "path": "C:\\code land\\clean-rust\\experiments\\fly-drop-00-runner\\src\\model.rs",
+      "sha256": "4f8b969c1d6f862517ef0db95353cec58c8d117bc27b95060c40d38dce5c9034"
+    },
+    {
+      "bytes": 15651,
+      "path": "C:\\code land\\clean-rust\\experiments\\fly-drop-00-runner\\src\\train.rs",
+      "sha256": "50774b9998ce04d28000385257271a3078040a8e43075f6e043100925dfa0cbf"
+    },
+    {
+      "bytes": 1643,
+      "path": "C:\\code land\\clean-rust\\experiments\\fly-drop-00-runner\\src\\util.rs",
+      "sha256": "cf11b8379f57eeb1472eec3f1290306dd94db5b86336980d6b84b32f27a7e49b"
+    },
+    {
+      "bytes": 16218,
+      "path": "C:\\code land\\clean-rust\\experiments\\fly-drop-00-runner\\scripts\\analyze_run.py",
+      "sha256": "49041ba4ad4219be47176053d612c41d4ad8b580ceb26846d95007db889ad500"
+    },
+    {
+      "bytes": 13493,
+      "path": "C:\\code land\\clean-rust\\experiments\\fly-drop-00-runner\\scripts\\check_integrity.py",
+      "sha256": "f78a94210d4dfdc4860e6df4c04073e679a80e159beacfeaf00b9be09b774ce1"
+    },
+    {
+      "bytes": 15487,
+      "path": "C:\\code land\\clean-rust\\experiments\\fly-drop-00-runner\\scripts\\run_preflight.py",
+      "sha256": "a80c2a0de176f29ce3f85195601626ea3c6fb8bace0af04bfdd726ae1444b48e"
+    },
+    {
+      "bytes": 433152,
+      "path": "C:\\code land\\clean-rust\\experiments\\fly-drop-00-runner\\target\\release\\fly-drop-00-runner.exe",
+      "sha256": "fc8960569502dd65919fe6549e432fdea375e54a9a202c8a93f2d0efa93a414f"
+    }
+  ],
+  "run_id": "FLY-DROP-00-RUN1",
+  "schema": "FLY-DROP-00-run-contract-v1",
+  "seal_sha256": "9dc9235c1b5ebf8c8a426f793100f9081cd1242523c27bab00331c2921e85918",
+  "sealed_files": [
+    {
+      "bytes": 12814336,
+      "path": "C:\\Users\\shuga\\.cargo\\bin\\rustc.EXE",
+      "sha256": "86478e53f769379d7f0ebfa7c9aa97cb76ca92233f79aa2cc0dbee2efaac73c7"
+    },
+    {
+      "bytes": 1051241946,
+      "path": "D:\\drosophila-heresy\\data\\connectome-weights-male-cns-v1.0-minconf-0.5.feather",
+      "sha256": "e35da783d1c686b2b58b3b87cd6a403ae43bfcfba8bff28e08ef752c1a56afc1"
+    },
+    {
+      "bytes": 1193,
+      "path": "D:\\fly-drop-00-stage\\columns\\columns-receipt.json",
+      "sha256": "11d3e89c2e085ad719f9be3c2c4bba4d71d4d1e98f72ad9b89e5bf15152319f3"
+    },
+    {
+      "bytes": 1214853472,
+      "path": "D:\\fly-drop-00-stage\\columns\\post.i64le",
+      "sha256": "85f8b51d9ee8b77852ddc6502afcdc86e5d1366ef44c79f1a2b9466182054c7c"
+    },
+    {
+      "bytes": 1214853472,
+      "path": "D:\\fly-drop-00-stage\\columns\\pre.i64le",
+      "sha256": "15b831c02fd2dcf9675209e808221cc379fa92ef152dac56e9d639d4493a2cd7"
+    },
+    {
+      "bytes": 1214853472,
+      "path": "D:\\fly-drop-00-stage\\columns\\weight.i64le",
+      "sha256": "f309715231cae1cc91c4fc9aa508d46cc3dc689f262ab0a70cba63d892dc1ab1"
+    },
+    {
+      "bytes": 408064,
+      "path": "D:\\fly-drop-00-target\\release\\fly-drop-00.exe",
+      "sha256": "be0204b98a5d02e861aaa722a33d0e06e23d28cae7e77a2d012481f18febe726"
+    },
+    {
+      "bytes": 6388,
+      "path": "experiments\\fly-drop-00\\Cargo.lock",
+      "sha256": "85163c82ca8d6bce66651f28aa7d2af1df3c5390c99f9f6f93e12e72ddf8b30b"
+    },
+    {
+      "bytes": 327,
+      "path": "experiments\\fly-drop-00\\Cargo.toml",
+      "sha256": "f49edb2b99f68cbda19f3877acfef431a706350f670c613fc65673eb63f39c9e"
+    },
+    {
+      "bytes": 5165,
+      "path": "experiments\\fly-drop-00\\DESIGN.md",
+      "sha256": "9930279c43fee52ee253d2b5437f68e28f63093b73df874b8a66cedb2762cf1e"
+    },
+    {
+      "bytes": 13213,
+      "path": "experiments\\fly-drop-00\\PROTOCOL.md",
+      "sha256": "fb9b875ec8b13502e02c49f2805ae61e6a1f354a630b353af7f1f8bcfc316a42"
+    },
+    {
+      "bytes": 131072,
+      "path": "experiments\\fly-drop-00\\artifacts\\operators\\degree-g2101-a1101.f64le",
+      "sha256": "410f6e9912cf8c84d73f628a3511652bb8263dd198f934d2f38f04ad6c9d1073"
+    },
+    {
+      "bytes": 131072,
+      "path": "experiments\\fly-drop-00\\artifacts\\operators\\degree-g2101-a1102.f64le",
+      "sha256": "e38797a8609278c51d4680aa3c0db5bee9c66ce24680335d7f114cf31c206c26"
+    },
+    {
+      "bytes": 131072,
+      "path": "experiments\\fly-drop-00\\artifacts\\operators\\degree-g2101-a1103.f64le",
+      "sha256": "00f293063cd1a6c7b277cc0887d361db2e76cdb294920e629c2c34b2904df363"
+    },
+    {
+      "bytes": 131072,
+      "path": "experiments\\fly-drop-00\\artifacts\\operators\\degree-g2101-a1104.f64le",
+      "sha256": "4724dc5909c7230c1306582df05f0155ac95544abee6df70d842d8e3649e8f7a"
+    },
+    {
+      "bytes": 131072,
+      "path": "experiments\\fly-drop-00\\artifacts\\operators\\degree-g2102-a1101.f64le",
+      "sha256": "9644dccec735811c9761ca3555b29ebdc66e79472833272d0b36d043ab1c56ff"
+    },
+    {
+      "bytes": 131072,
+      "path": "experiments\\fly-drop-00\\artifacts\\operators\\degree-g2102-a1102.f64le",
+      "sha256": "67b714ce0aac19acdab4d61cfe6b7c558409aa97fb13d9d259dd686a284f7287"
+    },
+    {
+      "bytes": 131072,
+      "path": "experiments\\fly-drop-00\\artifacts\\operators\\degree-g2102-a1103.f64le",
+      "sha256": "118ede89633850f43b4e69dad9abf121afa82818dadfc664c04830b8aac12cb4"
+    },
+    {
+      "bytes": 131072,
+      "path": "experiments\\fly-drop-00\\artifacts\\operators\\degree-g2102-a1104.f64le",
+      "sha256": "a3ee3e7e991db0ee19697d797be9d72ee3f81546b8315d14bef0db022b3c2020"
+    },
+    {
+      "bytes": 131072,
+      "path": "experiments\\fly-drop-00\\artifacts\\operators\\degree-g2103-a1101.f64le",
+      "sha256": "216a5a3f06f55bc4a2061dfc78044798f3e544de6763079576af616a094aafd9"
+    },
+    {
+      "bytes": 131072,
+      "path": "experiments\\fly-drop-00\\artifacts\\operators\\degree-g2103-a1102.f64le",
+      "sha256": "0f89fdd227d6d28a41d8acd3348ee6eb04c1632c87754857fbbfb954316e1ae1"
+    },
+    {
+      "bytes": 131072,
+      "path": "experiments\\fly-drop-00\\artifacts\\operators\\degree-g2103-a1103.f64le",
+      "sha256": "973dd3b563db0fac0ecb63e4e72b937cd576943b959f78ae256859047342238b"
+    },
+    {
+      "bytes": 131072,
+      "path": "experiments\\fly-drop-00\\artifacts\\operators\\degree-g2103-a1104.f64le",
+      "sha256": "5b3ae86b59648ab77581f142c6399ddca88ceb1f58beb357ad572a3a4dbe8c99"
+    },
+    {
+      "bytes": 131072,
+      "path": "experiments\\fly-drop-00\\artifacts\\operators\\degree-g2104-a1101.f64le",
+      "sha256": "3153142cb92abad5226758450751d105f601a196efcdd3d4e77314d9ceb0b46f"
+    },
+    {
+      "bytes": 131072,
+      "path": "experiments\\fly-drop-00\\artifacts\\operators\\degree-g2104-a1102.f64le",
+      "sha256": "824d4ace52a60b831cbd86ea99cc8c12ab07e3ddf37a15ef23772140a3ff3afc"
+    },
+    {
+      "bytes": 131072,
+      "path": "experiments\\fly-drop-00\\artifacts\\operators\\degree-g2104-a1103.f64le",
+      "sha256": "687c93af67ecc20f5fdec0e7d47fd2b5186966318ccf36dd2237f92f0cebec12"
+    },
+    {
+      "bytes": 131072,
+      "path": "experiments\\fly-drop-00\\artifacts\\operators\\degree-g2104-a1104.f64le",
+      "sha256": "6e4652f76e63d07a229f2df9f2f00b55b230edeb3789727a260c3ddeab8ab1ee"
+    },
+    {
+      "bytes": 131072,
+      "path": "experiments\\fly-drop-00\\artifacts\\operators\\dense-s5101.f64le",
+      "sha256": "911df87b39b2a6d13c3cdfecb9b7c455a9c345c3ff1b938fa1500b1c0b9fc353"
+    },
+    {
+      "bytes": 131072,
+      "path": "experiments\\fly-drop-00\\artifacts\\operators\\dense-s5102.f64le",
+      "sha256": "40e07bc759e681350effa576c8cf4b6f1f52b9838636754c4200c8e3b97ac09e"
+    },
+    {
+      "bytes": 131072,
+      "path": "experiments\\fly-drop-00\\artifacts\\operators\\dense-s5103.f64le",
+      "sha256": "b1a8675105d872a3cc7d9f7c0d1678ccd36eb0a04821e1df54bc81251bf569bd"
+    },
+    {
+      "bytes": 131072,
+      "path": "experiments\\fly-drop-00\\artifacts\\operators\\dense-s5104.f64le",
+      "sha256": "230183d263a3332bec57cdf139fe97c805dc38a97a60bb7a0e0d0d9f3d292a54"
+    },
+    {
+      "bytes": 131072,
+      "path": "experiments\\fly-drop-00\\artifacts\\operators\\identity.f64le",
+      "sha256": "f6ffc42581de417343fe473df2e6f2b0ed94794425fe2f35d305cff8e66af6eb"
+    },
+    {
+      "bytes": 131072,
+      "path": "experiments\\fly-drop-00\\artifacts\\operators\\malecns-a1101.f64le",
+      "sha256": "09e65410486b100368b8651507fdbd54ee9f517e47c51a1e1f48286faa8a0bdd"
+    },
+    {
+      "bytes": 131072,
+      "path": "experiments\\fly-drop-00\\artifacts\\operators\\malecns-a1102.f64le",
+      "sha256": "2a9f6cdab4c210e749c43db42c74d34a81e43262b41678ba8544c1acb38cf64b"
+    },
+    {
+      "bytes": 131072,
+      "path": "experiments\\fly-drop-00\\artifacts\\operators\\malecns-a1103.f64le",
+      "sha256": "1ad2d9783b961e8b8457c58cbadd6d5f537665060eeebf8bf5e4c63a92694c30"
+    },
+    {
+      "bytes": 131072,
+      "path": "experiments\\fly-drop-00\\artifacts\\operators\\malecns-a1104.f64le",
+      "sha256": "5f93f124c6034711e5d3a477fe7b640ca195a225da3a9415b239eb1bc42129b8"
+    },
+    {
+      "bytes": 131072,
+      "path": "experiments\\fly-drop-00\\artifacts\\operators\\random-g3101-a1101.f64le",
+      "sha256": "d1a355f5a3b17933029631ede74db433920aeabefd2a2a83558b26b6de54f53c"
+    },
+    {
+      "bytes": 131072,
+      "path": "experiments\\fly-drop-00\\artifacts\\operators\\random-g3101-a1102.f64le",
+      "sha256": "45fa9a435b0cf019f08dd1740c2f2dc3951995da6090801c7c261d454bb22579"
+    },
+    {
+      "bytes": 131072,
+      "path": "experiments\\fly-drop-00\\artifacts\\operators\\random-g3101-a1103.f64le",
+      "sha256": "91911480c16c44a765842a3846dd0843eb6c19ae6701aa759be47f11267e71cf"
+    },
+    {
+      "bytes": 131072,
+      "path": "experiments\\fly-drop-00\\artifacts\\operators\\random-g3101-a1104.f64le",
+      "sha256": "36de2b48eff9145f7208201046cb0332cd843eb25e7c82005387f0b048bd9aa9"
+    },
+    {
+      "bytes": 131072,
+      "path": "experiments\\fly-drop-00\\artifacts\\operators\\random-g3102-a1101.f64le",
+      "sha256": "fe8097cc8b9327bc7a187c3a017edebadd16d9370d5516b87df94400d898ad25"
+    },
+    {
+      "bytes": 131072,
+      "path": "experiments\\fly-drop-00\\artifacts\\operators\\random-g3102-a1102.f64le",
+      "sha256": "8765737028b3a4a0c37a4162d614878e7357ab509e5a493a140d70d702f1a220"
+    },
+    {
+      "bytes": 131072,
+      "path": "experiments\\fly-drop-00\\artifacts\\operators\\random-g3102-a1103.f64le",
+      "sha256": "8826fe32097f695ced1ecefc1c57f2cd88b85371d76507333d4b35b0e29a9c89"
+    },
+    {
+      "bytes": 131072,
+      "path": "experiments\\fly-drop-00\\artifacts\\operators\\random-g3102-a1104.f64le",
+      "sha256": "5ee7af112095421303b004b045a388f25f2c132041a386a4ca09e4b96d895c8b"
+    },
+    {
+      "bytes": 131072,
+      "path": "experiments\\fly-drop-00\\artifacts\\operators\\random-g3103-a1101.f64le",
+      "sha256": "82c0ce9bdf7b5135fe826f2954235ad0ec4b85725b244f0564d10b486968ffa1"
+    },
+    {
+      "bytes": 131072,
+      "path": "experiments\\fly-drop-00\\artifacts\\operators\\random-g3103-a1102.f64le",
+      "sha256": "7c98f4ca19ca661b2282bbcad3a9fdaf65a15710833543c9ae2cd85283d754af"
+    },
+    {
+      "bytes": 131072,
+      "path": "experiments\\fly-drop-00\\artifacts\\operators\\random-g3103-a1103.f64le",
+      "sha256": "4c83389a558d4edc7a0bdb519b020be05ba236caa24550178b181d7a76f8395f"
+    },
+    {
+      "bytes": 131072,
+      "path": "experiments\\fly-drop-00\\artifacts\\operators\\random-g3103-a1104.f64le",
+      "sha256": "78b7be0141328ff5ae048c4495cb8bdfdb9fd279d8c8ec655931e62f8504cd05"
+    },
+    {
+      "bytes": 131072,
+      "path": "experiments\\fly-drop-00\\artifacts\\operators\\random-g3104-a1101.f64le",
+      "sha256": "15f4431a4980dcd1f175621fdb0774085947bdafadf90c0a9583d9a022b78b46"
+    },
+    {
+      "bytes": 131072,
+      "path": "experiments\\fly-drop-00\\artifacts\\operators\\random-g3104-a1102.f64le",
+      "sha256": "ce736bd472d5145ce1c3baa651a0007e22b7798b774892808c72d204a0c02fe2"
+    },
+    {
+      "bytes": 131072,
+      "path": "experiments\\fly-drop-00\\artifacts\\operators\\random-g3104-a1103.f64le",
+      "sha256": "dca7a6e5cce59a97e7b246093c5a82da27b60935d3bba814ced30cb056693ed0"
+    },
+    {
+      "bytes": 131072,
+      "path": "experiments\\fly-drop-00\\artifacts\\operators\\random-g3104-a1104.f64le",
+      "sha256": "64112347b377e7b0f28d361cd4d64671f625c2e29a435d769493645417c59408"
+    },
+    {
+      "bytes": 613770,
+      "path": "experiments\\fly-drop-00\\artifacts\\pretraining-manifest.json",
+      "sha256": "e126e6fd29656d3e7d0a1704266c54f36935f028889c1fb5d87e9be1a017135d"
+    },
+    {
+      "bytes": 2097152,
+      "path": "experiments\\fly-drop-00\\artifacts\\teachers\\teacher-6101\\heldout-x.f32le",
+      "sha256": "975bf4fd9bb858ce71da5b19e2ef6f6f4657c2f80b6beb6d74e63b68245cfd53"
+    },
+    {
+      "bytes": 4096,
+      "path": "experiments\\fly-drop-00\\artifacts\\teachers\\teacher-6101\\heldout-y.u8",
+      "sha256": "e19d32018e7a31b61093930e177bef563835a875dbdb47baad0a2e7d0d47870f"
+    },
+    {
+      "bytes": 16512,
+      "path": "experiments\\fly-drop-00\\artifacts\\teachers\\teacher-6101\\teacher-parameters.f32le",
+      "sha256": "0fb2d81d52fb70532e1a03d9835f1d715cb3c0909e965e49e0f470861426b23a"
+    },
+    {
+      "bytes": 4194304,
+      "path": "experiments\\fly-drop-00\\artifacts\\teachers\\teacher-6101\\train-x.f32le",
+      "sha256": "9498bac2b79f5ebe9d022f3d17dd775eb25be2d2c05459a7b8623cb35957ccfa"
+    },
+    {
+      "bytes": 8192,
+      "path": "experiments\\fly-drop-00\\artifacts\\teachers\\teacher-6101\\train-y.u8",
+      "sha256": "a96be61b2515c1478f9b160b3c6734b1cb5f7f44cc5816ec199d5419d353f316"
+    },
+    {
+      "bytes": 2097152,
+      "path": "experiments\\fly-drop-00\\artifacts\\teachers\\teacher-6102\\heldout-x.f32le",
+      "sha256": "8d98ea11b231d764c9e1f76a1fecd43cd3edaab2576bb14cc316f068d92777f0"
+    },
+    {
+      "bytes": 4096,
+      "path": "experiments\\fly-drop-00\\artifacts\\teachers\\teacher-6102\\heldout-y.u8",
+      "sha256": "79f7f98ae57c891fb4674ddbec7ec7ab7cd61ac46cb5cd12661ada122da1fe35"
+    },
+    {
+      "bytes": 16512,
+      "path": "experiments\\fly-drop-00\\artifacts\\teachers\\teacher-6102\\teacher-parameters.f32le",
+      "sha256": "be973d2eba5ad40ebb020d48c62476ef418bed708d9c799e747e78ec38af6aa0"
+    },
+    {
+      "bytes": 4194304,
+      "path": "experiments\\fly-drop-00\\artifacts\\teachers\\teacher-6102\\train-x.f32le",
+      "sha256": "93f3cced1e8e2d9dca3b3ff2de229e441364139504eef577778b20b84875854c"
+    },
+    {
+      "bytes": 8192,
+      "path": "experiments\\fly-drop-00\\artifacts\\teachers\\teacher-6102\\train-y.u8",
+      "sha256": "972df2e93bb18a77eba7ec4f3c5d6e456584927a018af3934ab152a928925deb"
+    },
+    {
+      "bytes": 2097152,
+      "path": "experiments\\fly-drop-00\\artifacts\\teachers\\teacher-6103\\heldout-x.f32le",
+      "sha256": "73d929358d26e23e1ed3c6c79cdb0a25a85fbf78aa1215c8896d17057e2a1f3a"
+    },
+    {
+      "bytes": 4096,
+      "path": "experiments\\fly-drop-00\\artifacts\\teachers\\teacher-6103\\heldout-y.u8",
+      "sha256": "7c349d20e2cdd1d440f15a4fc4298e2c7e7c9c70951f3ed3c2871549cfa3ffd3"
+    },
+    {
+      "bytes": 16512,
+      "path": "experiments\\fly-drop-00\\artifacts\\teachers\\teacher-6103\\teacher-parameters.f32le",
+      "sha256": "7db34710091d5e7e0f7879956327704f7b7129b5a5aca5e0993c03c612319ed0"
+    },
+    {
+      "bytes": 4194304,
+      "path": "experiments\\fly-drop-00\\artifacts\\teachers\\teacher-6103\\train-x.f32le",
+      "sha256": "9eeea8cded23dc5aa878ddc4a2b99214c6e36c32886d56f68dc32184d7931dd7"
+    },
+    {
+      "bytes": 8192,
+      "path": "experiments\\fly-drop-00\\artifacts\\teachers\\teacher-6103\\train-y.u8",
+      "sha256": "e0b6f22b7b18cee42934ff4a26292d496082239bd5443d8fbd3cb98dd39e6b96"
+    },
+    {
+      "bytes": 2097152,
+      "path": "experiments\\fly-drop-00\\artifacts\\teachers\\teacher-6104\\heldout-x.f32le",
+      "sha256": "f9f77402327463233347e0459ee614ad23528f2a11486dd4bc48ef6cbe975ad4"
+    },
+    {
+      "bytes": 4096,
+      "path": "experiments\\fly-drop-00\\artifacts\\teachers\\teacher-6104\\heldout-y.u8",
+      "sha256": "c9d62aad5b0cd02323af54075ca6fb589b8a8903ec40160c45aff0ad80150048"
+    },
+    {
+      "bytes": 16512,
+      "path": "experiments\\fly-drop-00\\artifacts\\teachers\\teacher-6104\\teacher-parameters.f32le",
+      "sha256": "45e8c4a5c497ef335b1e37cf00e3256729e0b9597e421c06008cfe943180b2db"
+    },
+    {
+      "bytes": 4194304,
+      "path": "experiments\\fly-drop-00\\artifacts\\teachers\\teacher-6104\\train-x.f32le",
+      "sha256": "7039d38008cf85a3757102dcfc19a0e30efaf03405431edc20ed3c5b9582265f"
+    },
+    {
+      "bytes": 8192,
+      "path": "experiments\\fly-drop-00\\artifacts\\teachers\\teacher-6104\\train-y.u8",
+      "sha256": "46b9eb6c346801f6edcea0183c22fbaee158ec455967d73e7f38346391518f4c"
+    },
+    {
+      "bytes": 3527,
+      "path": "experiments\\fly-drop-00\\preflight\\source-census.json",
+      "sha256": "89a754dc5caea34f8dfaa532cfbf8e63b449e9ed5fb745b69f09acf2216d776f"
+    },
+    {
+      "bytes": 4015,
+      "path": "experiments\\fly-drop-00\\scripts\\feather_to_columns.py",
+      "sha256": "702c779f8b76c15959401095983b870e96bd0d5f0bd10fb1f937b850526ec3b8"
+    },
+    {
+      "bytes": 10738,
+      "path": "experiments\\fly-drop-00\\scripts\\seal_pretraining.py",
+      "sha256": "9e0b5eda286d792a92f4f0ade6b3bc23a2036c78392fde664aaa0db320736bda"
+    },
+    {
+      "bytes": 8885,
+      "path": "experiments\\fly-drop-00\\scripts\\source_census.py",
+      "sha256": "a63722f2dfe73295f17d70b01b4a49869bb18edb7b898d8449ae30933ac9dff9"
+    },
+    {
+      "bytes": 5783,
+      "path": "experiments\\fly-drop-00\\src\\census.rs",
+      "sha256": "e304a3de2c4efe7c4038dbff1e18701c60f3c52fb8329160b9559bf25eeb79c0"
+    },
+    {
+      "bytes": 20492,
+      "path": "experiments\\fly-drop-00\\src\\graph.rs",
+      "sha256": "dd280476427f62934f8424f76675dba6720d20a5fb3820278b091da3ffb3eee1"
+    },
+    {
+      "bytes": 1735,
+      "path": "experiments\\fly-drop-00\\src\\main.rs",
+      "sha256": "4a163c07e69a747d57c9c42fe0ebd1e30d1503e06b0574a15cc3e88f54b5e220"
+    },
+    {
+      "bytes": 4161,
+      "path": "experiments\\fly-drop-00\\src\\synthetic.rs",
+      "sha256": "f0121521b269acb12477fb0edb175bfd242ebc543da8bebeb5c7a6cc7eac68a9"
+    }
+  ],
+  "status": "SEALED_BEFORE_COLLECTION",
+  "total_optimizer_steps": 839680,
+  "updates_per_epoch": 64,
+  "updates_per_fit": 1280
+}

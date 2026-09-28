@@ -1,0 +1,14 @@
+{
+  "receipt_id": "FAS_E4_0_SYMBOLIC_SUPPORT_PLAN_V07_STOP",
+  "status": "PREMODEL_PLANNING_STOP_PAIRED_HASH_TYPE_DEFECT",
+  "source_path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/e4-support-plan-v07/src/main.rs",
+  "source_sha256": "1b383689ed52880594e2821250c412222f77d581fcf381625151c9606b104343",
+  "failure": "The paired-surface collision planner's render_hashes return type described one digest instead of four row digests, so the candidate-set membership check did not type-check.",
+  "classification": "PLANNING_TOOL_COMPILE_DEFECT",
+  "e1_artifact_modified": false,
+  "e4_population_rows_written": false,
+  "tokenizer_contacted": false,
+  "model_contacted": false,
+  "labels_opened": false,
+  "repair_policy": "Preserve v07 and correct the row-hash array type in a new v08 source identity."
+}

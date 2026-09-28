@@ -1,0 +1,26 @@
+{
+  "correction_id": "FAS_S07_SEMANTIC_TARGET_MAPPING_CORRECTION_V01",
+  "scope": "metadata interpretation and gate validation only; SAE training artifacts and objective unchanged",
+  "superseded_protocol_root_sha256": "da952f0368811bf31688a91c9c69f1a01e2305cf6aabed3c0e380024de08abd4",
+  "training_protocol_root_sha256": "da952f0368811bf31688a91c9c69f1a01e2305cf6aabed3c0e380024de08abd4",
+  "training_tree_root_sha256": "935b104ac2ac59e9e2a05bb1c88fac9534f73ce52cc56f48725a7d7173b567f5",
+  "training_contract_sha256": "b5a971f2052c15c7997daa79d9e639edce244528b0a517d48ea4e3142cd7acbc",
+  "unchanged_training_sources": {
+    "scripts/s07_train.py": "683a22c4a4b6fae5f8a83227f2449c694385b2b753e04f97014f4c5029d9cdae",
+    "contracts/sae-training-contract-v01.json": "b5a971f2052c15c7997daa79d9e639edce244528b0a517d48ea4e3142cd7acbc"
+  },
+  "exact_schema_distinction": "FAS-S01 event metadata exact_target is a candidate-position index; S05 target_state_id is a semantic state ID. Convert the position through candidate_identity_order and state_by_candidate_identity before comparing.",
+  "reproduction_example": {
+    "event_id": "93205896591506e96aae6856b2742235b6c5c2ab70c0c7bf7c66bfa6f3da4276:A",
+    "candidate_identity_order": [1, 0, 2],
+    "metadata_exact_target_candidate_position": 1,
+    "semantic_state_by_candidate_identity": {"0": 0, "1": 1, "2": 2},
+    "reconstructed_semantic_target_state": 0,
+    "sealed_s05_target_state_id": 0
+  },
+  "first_gate_attempt": "FAIL_CLOSED during metadata validation before heldout features, SAE codes, or reconstruction outcomes were opened",
+  "training_repeated": false,
+  "heldout_feature_values_opened_by_failed_attempt": false,
+  "parent_artifacts_modified": false,
+  "scientific_hyperparameters_changed": false
+}

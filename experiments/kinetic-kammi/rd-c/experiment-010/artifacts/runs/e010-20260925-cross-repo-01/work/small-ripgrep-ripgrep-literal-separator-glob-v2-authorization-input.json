@@ -1,0 +1,34 @@
+{
+  "task_id": "ripgrep-ripgrep-literal-separator-glob-v2",
+  "frame_hash_hex": "fa44c8d7b0eee0ce2e43b155c033f237171db8c9f611e12ef16bec0e3bc1acaa",
+  "selected_patch_sha256": "65bd186d034e483ee8e56fde06f3ea4f20665eb6a920922c1c2bf87625467ffe",
+  "action_ledger_path": "C:\\rd-c\\experiment-010\\artifacts\\runs\\e010-20260925-cross-repo-01\\ledgers\\small\\ripgrep-ripgrep-literal-separator-glob-v2.actions.bin",
+  "actions": [
+    {
+      "id": 11,
+      "schema_id": 1
+    },
+    {
+      "id": 37,
+      "schema_id": 1
+    },
+    {
+      "id": 68,
+      "schema_id": 1
+    },
+    {
+      "id": 94,
+      "schema_id": 1
+    }
+  ],
+  "observer_output": {
+    "action_choice": 37,
+    "applicability_milli": 1000,
+    "abstention_milli": 0
+  },
+  "thresholds": {
+    "minimum_applicability_milli": 850,
+    "maximum_abstention_milli": 150
+  },
+  "completion_check_passed": true
+}

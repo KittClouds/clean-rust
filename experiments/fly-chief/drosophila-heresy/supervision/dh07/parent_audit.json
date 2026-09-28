@@ -1,0 +1,81 @@
+{
+  "ancestor_integrity": [
+    {
+      "study": "DH01",
+      "seal_sha256": "ad0d7def1d846ff8d8d8acde61d836002c64c94ba9740eb8560a70d547ada9e9",
+      "frozen_files": 25,
+      "output_files": 19
+    },
+    {
+      "study": "DH02",
+      "seal_sha256": "6439892580573e420dc30a1df401fe874a195788b89272462b09c0a0d0964ad5",
+      "frozen_files": 29,
+      "output_files": 10
+    },
+    {
+      "study": "DH03",
+      "seal_sha256": "9322e7e3dbde9df0596c5480783cbdc3f8c6914ea381f5cf600106cdc623ed03",
+      "frozen_files": 33,
+      "output_files": 10
+    },
+    {
+      "study": "DH04",
+      "seal_sha256": "f7659de540c0fe536d0a7991e1d634c5bc0a42d064e47a5b8a4800e780ff762d",
+      "frozen_files": 34,
+      "output_files": 10
+    },
+    {
+      "study": "DH05",
+      "seal_sha256": "69af690908a9d30d95c485280b666794470aca6270fa9671dcbef10f2ff17f2c",
+      "frozen_files": 35,
+      "output_files": 10
+    },
+    {
+      "study": "DH06",
+      "seal_sha256": "f0c2a67db5a91cb54da04311cb442819a14de97bb3328a4a889af3627566a624",
+      "frozen_files": 41,
+      "output_files": 10
+    }
+  ],
+  "dh06_recorded_controls": {
+    "bundles": 128,
+    "recorded_Z_behavior_parity": true,
+    "acquisition_hash_parity": true,
+    "complementary_margins": true,
+    "hot_allocations_zero": true,
+    "limitation": "DH06 did not persist trial action hashes or delivered geometry"
+  },
+  "clipping_counterexample": {
+    "kind": "mathematical fixture, not an observed DH06 event",
+    "base": [
+      0.0,
+      1.0
+    ],
+    "retained": [
+      0.1,
+      1.4
+    ],
+    "axis": [
+      1.0,
+      1.0
+    ],
+    "intended_perpendicular": [
+      -0.14999999999999994,
+      0.14999999999999997
+    ],
+    "delivered": [
+      0.0,
+      0.1499999999999999
+    ],
+    "intended_axis_dot": 2.7755575615628914e-17,
+    "delivered_axis_dot": 0.1499999999999999
+  },
+  "geometry_feasibility_note": "At a lower-bound corner WB=0 with strictly positive A, every feasible nonnegative N with N dot A=0 is zero. High support dimension alone does not imply a feasible null.",
+  "interpretation_limits": [
+    "E has uniform modulation; no anatomy-specific routing inference.",
+    "Reward is action-dependent; shared RNG does not force shared rewards.",
+    "Acquisition coordinate is a geometric summary, not proof of latent memory.",
+    "DH06 perpendicular trajectory norm is normalized; parallel projection is raw.",
+    "Same-snapshot matched energy is not equal cumulative exposure across arms."
+  ]
+}

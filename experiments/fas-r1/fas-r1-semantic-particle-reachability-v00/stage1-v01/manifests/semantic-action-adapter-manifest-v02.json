@@ -1,0 +1,31 @@
+{
+  "manifest": "R1-SEMANTIC-ACTION-ADAPTER-v02",
+  "status": "FROZEN_ENGINEERING_SHAPE_CORRECTION",
+  "amendment_from": "R1-SEMANTIC-ACTION-ADAPTER-v01",
+  "reason": "The v01 implication note described a two-entity/two-role pairing case that does not occur in the frozen Stage 0 action-probe support. Preserve v01; make the observed one-entity/two-role case explicit and keep nontrivial implications out of scope until the generator includes them.",
+  "purpose": "test whether frozen clause-kind probabilities compose with public incidence and explicit assignment state to predict exact action consequences",
+  "upstream": {
+    "probe_manifest": "FAS-R1-SENSOR-PROBE-FIT-v02",
+    "probe_output": "sensor-probes-v03/identity.pt",
+    "support_manifest": "sensor-support-manifest-v02.json"
+  },
+  "runtime_inputs": [
+    "final-hidden mean H_j per constraint",
+    "public per-clause entity_mentions and role_mentions sets",
+    "complete candidate assignment",
+    "candidate entity-role edit"
+  ],
+  "runtime_operation": "apply the frozen six-way identity head per H_j; for each affected clause simulate before and after satisfaction under each predicted kind; sum probability-weighted deltas and emit the sign",
+  "observed_clause_semantics": {
+    "same_and_different": "two public entity IDs",
+    "fixed_and_forbidden_role": "one public entity ID and one public role ID",
+    "exactly_one_role": "public entity ID set and one public role ID",
+    "implies_not_role": "all 48 support clauses expose one unique entity ID and two distinct role IDs. The same entity appearing on both sides with unequal roles makes every such implication a tautology; satisfaction delta is identically zero. This support does not test nontrivial two-entity implication binding."
+  },
+  "offline_diagnostics": [
+    "private action labels are scoring targets only",
+    "private clause-kind oracle is a separately labeled offline ceiling; private kinds never enter runtime scores"
+  ],
+  "qualification_interpretation": "adaptive engineering diagnostic; this partition was already reported under earlier probes and adapter v01",
+  "source_and_label_boundary": "private typed labels are scoring-only; no private AST fields enter runtime features or predictions"
+}

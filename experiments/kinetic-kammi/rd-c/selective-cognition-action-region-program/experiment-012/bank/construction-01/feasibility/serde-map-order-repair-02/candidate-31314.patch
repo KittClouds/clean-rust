@@ -1,0 +1,11 @@
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -4,6 +4,7 @@
+     let value: Value = serde_json::from_str(input).ok()?;
+     let mut object = value.as_object()?.clone();
+     object.sort_keys();
+-    // E012 candidate slot.
++    let mut object = object.clone();
++    object.sort_keys();
+     Some(object.keys().cloned().collect())
+ }

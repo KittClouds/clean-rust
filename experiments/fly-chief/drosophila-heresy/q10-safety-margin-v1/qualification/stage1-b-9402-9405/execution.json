@@ -1,0 +1,16 @@
+{
+  "audited_states": 4096,
+  "behavioral_inference": false,
+  "box_feasibility": "TESTED_CONTINUOUS_WITH_F32_SAFETY_RESERVE",
+  "complete": true,
+  "cumulative_audited_states": 5120,
+  "freedom_events": 4023,
+  "protocol": "Q10-SM",
+  "reserve_ulps": 32,
+  "schema_version": 1,
+  "scientific_seed_bundles": 0,
+  "sequential_f32_endpoint_equality": "NOT_TESTED",
+  "stage": "stage1-b",
+  "stage2_authorized_by_this_receipt": false,
+  "status": "Q10_SM_STAGE1_VALID__F32_SAFE_FREEDOM_PRESENT"
+}

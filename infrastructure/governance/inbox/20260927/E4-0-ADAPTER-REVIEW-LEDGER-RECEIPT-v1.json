@@ -1,0 +1,49 @@
+{
+  "schema": "CHIEF_E4_0_ADAPTER_REVIEW_LEDGER_RECEIPT_V1",
+  "status": "REJECTED_CANDIDATE_PRESERVED",
+  "artifacts": {
+    "candidate-plan": {
+      "artifact_id": "sha256:278d72a59ef6abedb2366fa2869d4c551bb7d26a98870bf418c5158a48cb32c2",
+      "event_id": "sha256:d42e972e41c525bbb301dad63b2634034d4f1333be277d73dda801e6d4b5bc2d"
+    },
+    "synthetic-qualification": {
+      "artifact_id": "sha256:13643d19ac457a75713e26918f2b548b53e576089abfa23a8667afa6e7dd33a0",
+      "event_id": "sha256:b89e78a0c0339c74996e4c7175d861f1e98a39cd843826d34e5c1a77ff721fe1"
+    },
+    "chief-review": {
+      "artifact_id": "sha256:7086707331620a7c68ffa5d4263670363f77d66babdfc47fbe4c95f4d8bebd21",
+      "event_id": "sha256:549d27587a382bc556ba620f31261593007011d53163bc06e2a1e14b720432ac"
+    },
+    "source-0": {
+      "artifact_id": "sha256:6685158e9fcc902cc678a2891f91a692e83cdf87149cbf9e350d0f91b2c87fb8",
+      "event_id": "sha256:ae67f0dd1b754c324f758e759c39ed39965e75399a2bf35e281c9d6c19a270c8"
+    },
+    "source-1": {
+      "artifact_id": "sha256:a80be515dc4a2afd7f06cff875819aa690916756674ef557f7a985d0d6722d33",
+      "event_id": "sha256:8956a766365f5ca8c6b13bd9ee2a5eef978dd20355e24c4bf6ad2e20fa841821"
+    },
+    "source-2": {
+      "artifact_id": "sha256:7d435b7ec9744a7088c9f56def1aff0570cf8ab797ce03beede64455649a19ac",
+      "event_id": "sha256:1c7bfdbbc87da83f3aa3e31e0ef99a64b87bc09bf96c64d65a57caaaf0e3a7cc"
+    },
+    "source-3": {
+      "artifact_id": "sha256:39c6daaefc1dd2c6f0d4873802ffd696a74fcc559668ae52c68c8abcb93a72a2",
+      "event_id": "sha256:2ee65071dfb51ad789782b642ed71b4c3aa4706a57504b69c51c59477ba1232b"
+    },
+    "source-4": {
+      "artifact_id": "sha256:0b508de5c61737ff2b7d4a1838d8277ac9fe5428874e7b9bec834ee1145ca8a4",
+      "event_id": "sha256:95bf952e0d9f17a2e8fca171096d463c58c85d7646b2460d7ddf8e834a15739d"
+    },
+    "source-5": {
+      "artifact_id": "sha256:25c708eeeecd3c2a71beb03847446ff4301779e44114ada5399c93a437fe6d37",
+      "event_id": "sha256:c2db585a0ade53d1aec31538531cd47eb7a049686980b1b394d3292d0c2a89c8"
+    }
+  },
+  "seal": {
+    "root": "sha256:01e509183523a070dd77b1b11e71453350c22fcf15278f0de9896a0d6e2fa486",
+    "event_id": "sha256:b243a874e90bcb2065dec8d56a3e309e068ab713109a9aaa714f491e473ce207"
+  },
+  "e4_0_authorization_issued": false,
+  "gpu_lease_issued": false,
+  "e4_01_entry_open": false
+}

@@ -1,0 +1,10 @@
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -3,5 +3,6 @@
+ pub fn normalize_json_number(input: &str) -> Option<String> {
+     let value: Value = serde_json::from_str(input).ok()?;
+     // E012 candidate slot.
+-    serde_json::to_string(&value).ok()
++    let number = value.get("n")?.as_i64()?;
++    Some(format!(r#"{{"n":{number},"tag":"x"}}"#))
+ }

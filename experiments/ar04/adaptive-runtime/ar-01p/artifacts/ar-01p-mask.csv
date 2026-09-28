@@ -1,0 +1,3 @@
+magnitude_group,events,mean_abs_j,mean_relu_mask_diff_before,mean_relu_mask_diff_after,mean_newly_different_examples,mean_resolved_examples,none,new,expanding,contracting,turnover,stable_difference
+top_decile,4902,2.617112226763e-4,2.029172,2.021216,0.514280,0.522236,1105,265,725,1017,416,1374
+remaining,44112,1.236707325802e-5,0.481932,0.481638,0.065696,0.065991,33504,875,882,1775,411,6665

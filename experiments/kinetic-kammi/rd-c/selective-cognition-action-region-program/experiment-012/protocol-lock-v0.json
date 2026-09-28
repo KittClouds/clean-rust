@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "program": "Selective Cognition / Action Region Program",
+  "experiment": "E012 Prospective Frame Decomposition",
+  "protocol_version": 0,
+  "state": "FROZEN_FOR_BANK_CONSTRUCTION",
+  "model_contact_authorized": false,
+  "task_construction_started": false,
+  "sealed_at_local": null,
+  "hashes": {
+    "program_readme": "3727ef4210eb350701e86bd713a7a9ad44fd82ad8e2fc7c08e63a6382a8d3566",
+    "protocol": "4ff0e13a1ad48bf030a81aef8e0d0d9b31047048e78bd69a05b3eb7d49922390",
+    "channel_contract": "3dce1202084bc2d780e6d8f767324a6d53e0aa5927ce173d9ba690f0c09dcfba",
+    "observer_frame_projection": "0ea1c2359226f02c92bc61108251b350fd977cb33fba0ba3addb72f3983dd4b7",
+    "bank_construction_plan": "dcfe000e173a439adda16a983ef5f522689c60c9e1b1512fd56ff32f8d576ec2",
+    "freezer_source": "ad37d601a3fe21d03ca5ef6a190a079ba4139ddcfe0314a7c2fae8183479ea20",
+    "e011_frozen_input_lock": "25156b4b2c0d4ed44700bef9fbf442b063a7574ddf424d961befcdc7948fd953",
+    "e011_score_replay_lock": "5a7f380d92a8e08225b21a844aff68818455d42d3d2c2f562f20c47fe45c540c",
+    "e011_qualification_summary": "49ccf0aad48928a3bbbbabcfc40d3b139ca03f94e3767472bf485a74cc4fcb70",
+    "e011_qualification_report": "68fb99eec2d42e7f3f93d37a4af83f57c6c23a0a4b3e7abd5e4be4078960dfed",
+    "e011_runtime_source_tree": "b27d2ae30bbcb0a85837fee9c9278eae3a64969a16fda684c04db1ed6d51cbd9",
+    "e011_engineering_amendment": "5e31992f80282d335d44f5783c8b3295992928bac7b9e0cb893afadc09b68973"
+  },
+  "inherited_switchboard": {
+    "run_id": "e011-producer-order-integration-qual-01",
+    "bank_id": "e011-fresh-integration-bank-v1c",
+    "frozen_input_lock_sha256": "25156b4b2c0d4ed44700bef9fbf442b063a7574ddf424d961befcdc7948fd953",
+    "score_replay_lock_sha256": "5a7f380d92a8e08225b21a844aff68818455d42d3d2c2f562f20c47fe45c540c",
+    "runtime_source_tree_sha256": "b27d2ae30bbcb0a85837fee9c9278eae3a64969a16fda684c04db1ed6d51cbd9",
+    "thresholds": {
+      "minimum_applicability_milli": 850,
+      "maximum_abstention_milli": 150
+    },
+    "normalization_contract": "percent-0-100-to-milli-x10-v1+line-endings-lf-v1",
+    "reasoning_mode": "off",
+    "maximum_output_tokens": 1024,
+    "models": [
+      {
+        "role": "small",
+        "bundle_id": "minicpm5-2b-q8-local-v5",
+        "bundle_blake3": "03203842e1835233af8d9ef337bca1395be9c3828333c79eb96e199e52925842",
+        "bundle_lock_sha256": "a626836853bdb0755fd2e4e1569b6b91b33861306c7d1e4a51e3de54a9ee713d",
+        "bundle_lock_path": "models/bundle-lineage/v5-final/bundle-lock.json",
+        "server_alias": "e009-small-v5",
+        "model_sha256": "c5415f8989bf88a8288f1b55a3cc371af53c07b0faa220a63bd7a990cfaba078",
+        "runtime_sha256": "ffaee576ad271ede87b92a7d8c3863dc8f331bbac666ee00099c250e8809e743",
+        "chat_template_path": "models/chat-templates/minicpm5-2b-q8-local-v3.jinja"
+      },
+      {
+        "role": "large",
+        "bundle_id": "ternary-bonsai-2-27b-ptq1-local-v5",
+        "bundle_blake3": "6d933aba093307e0c333f022426af46f3f5b243a8a10a2e1bb2f4cfc93b17b9d",
+        "bundle_lock_sha256": "a626836853bdb0755fd2e4e1569b6b91b33861306c7d1e4a51e3de54a9ee713d",
+        "bundle_lock_path": "models/bundle-lineage/v5-final/bundle-lock.json",
+        "server_alias": "e009-large-v5",
+        "model_sha256": "53107f530aa52eb00912263ab1ee29bd199261c87cd7b4ad4ca1318c1fe33ee3",
+        "runtime_sha256": "e0ea4fd53e6f0c741cbd28093b427f333ada0eb03b83073e1f99c483793ea976",
+        "chat_template_path": "models/chat-templates/ternary-bonsai-2-27b-ptq1-local-v3.jinja"
+      }
+    ],
+    "routing": "small-then-large-on-abstention at frozen E009 v5 thresholds"
+  },
+  "bank_requirements": {
+    "task_count": 48,
+    "task_families": 12,
+    "repositories": 3,
+    "repositories_new_to_e010_e011": true,
+    "families_per_dependency_stratum_minimum": 2,
+    "strata": [
+      "task_request_dominant",
+      "candidate_action_dominant",
+      "pre_action_test_execution_dominant",
+      "joint_support",
+      "context_sensitive",
+      "abstention_positive"
+    ]
+  },
+  "precontact_gate": "build and audit the complete bank, then create a separate immutable FROZEN_BEFORE_MODEL_CONTACT lock"
+}

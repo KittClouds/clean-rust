@@ -1,0 +1,37 @@
+{
+  "schema": "R1_STAGE1_STRESS_CONFIG_V05",
+  "batch_size": 96,
+  "n": 20,
+  "k": 3,
+  "seed_base": "0x5231535452455354",
+  "seed_stride": "0x9e3779b97f4a7c15",
+  "split_counts": {
+    "train": 64,
+    "validation": 16,
+    "qualification": 16
+  },
+  "solution_cap": 4096,
+  "expected_raw_solutions": 54,
+  "expected_canonical_classes": 9,
+  "expected_role_automorphisms": 6,
+  "max_world_solve_ms": 30000,
+  "underlying_worlds": 24,
+  "initial_state_seed_tag": "0x5249535441525435",
+  "scenarios": [
+    { "id": "base-random", "density_level": "base", "start_kind": "independent_random_assignment" },
+    { "id": "base-swap-trap", "density_level": "base", "start_kind": "witness_module1_swap_trap" },
+    { "id": "dense-random", "density_level": "dense", "start_kind": "independent_random_assignment" },
+    { "id": "dense-swap-trap", "density_level": "dense", "start_kind": "witness_module1_swap_trap" }
+  ],
+  "dense_overlay": {
+    "left_module": 0,
+    "right_module": 2,
+    "expected_extra_edges": 10
+  },
+  "decoy": {
+    "module": 1,
+    "role_permutation": [1, 0, 2],
+    "expected_conflicts": 2,
+    "one_edit_repair_conflicts": 2
+  }
+}

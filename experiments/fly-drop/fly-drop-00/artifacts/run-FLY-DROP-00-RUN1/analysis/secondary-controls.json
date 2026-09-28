@@ -1,0 +1,51 @@
+{
+  "arms": {
+    "degree": {
+      "descriptive_only": true,
+      "difference_from_identity_mean_unpaired_descriptive": -0.025451572047390125,
+      "expected_fit_count": 256,
+      "finite_fit_count": 256,
+      "mean_heldout_bce": 0.25761556969686455,
+      "numerical_or_missing_count": 0,
+      "sd_heldout_bce": 0.01906475264796467
+    },
+    "dense": {
+      "descriptive_only": true,
+      "difference_from_identity_mean_unpaired_descriptive": -0.07336051276660158,
+      "expected_fit_count": 64,
+      "finite_fit_count": 64,
+      "mean_heldout_bce": 0.2097066289776531,
+      "numerical_or_missing_count": 0,
+      "sd_heldout_bce": 0.034718805674766096
+    },
+    "identity": {
+      "descriptive_only": true,
+      "difference_from_identity_mean_unpaired_descriptive": 0.0,
+      "expected_fit_count": 16,
+      "finite_fit_count": 16,
+      "mean_heldout_bce": 0.2830671417442547,
+      "numerical_or_missing_count": 0,
+      "sd_heldout_bce": 0.024072007753325807
+    },
+    "malecns": {
+      "descriptive_only": true,
+      "difference_from_identity_mean_unpaired_descriptive": -0.025452337198954622,
+      "expected_fit_count": 64,
+      "finite_fit_count": 64,
+      "mean_heldout_bce": 0.25761480454530006,
+      "numerical_or_missing_count": 0,
+      "sd_heldout_bce": 0.01918425547540368
+    },
+    "random": {
+      "descriptive_only": true,
+      "difference_from_identity_mean_unpaired_descriptive": -0.03447035793134556,
+      "expected_fit_count": 256,
+      "finite_fit_count": 256,
+      "mean_heldout_bce": 0.24859678381290912,
+      "numerical_or_missing_count": 0,
+      "sd_heldout_bce": 0.01817237814935976
+    }
+  },
+  "status": "DESCRIPTIVE_SECONDARY_CONTROLS",
+  "warning": "These are arm-level descriptive means; no secondary contrast changes the primary endpoint or its inference."
+}

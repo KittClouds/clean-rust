@@ -1,0 +1,157 @@
+{
+  "schema_version": 1,
+  "experiment": "E012 Prospective Frame Decomposition",
+  "amendment": "E012-BANK-A12",
+  "state": "FROZEN_BEFORE_A12_TASK_PREPARATION",
+  "model_contact_authorized": false,
+  "design": "bank-construction-plan-v1.4.md",
+  "preparer": "scripts/prepare_pair_locked_bank_e012_a12.py",
+  "files": [
+    {
+      "path": "amendments/bank-amendment-11.md",
+      "sha256": "ef1fe78653e5e7eea5234b8c9fc43017c2230ab5377f7668f89858f1e7aaddcf",
+      "bytes": 1052
+    },
+    {
+      "path": "amendments/bank-amendment-11.json",
+      "sha256": "c089f7be0740d625b4198d6bf6b007d4a2f5090eb90438ad8d547633cf6d6daf",
+      "bytes": 567
+    },
+    {
+      "path": "amendments/bank-amendment-12.md",
+      "sha256": "ca907395c6a65fcffe4145b3a2af0455c3ea50db42ebc41484b78310b772db1e",
+      "bytes": 2623
+    },
+    {
+      "path": "amendments/bank-amendment-12.json",
+      "sha256": "172a926939e67f2e85510501b0c7e7c269b98e511438c5dd3e1f03a7f6e037dc",
+      "bytes": 915
+    },
+    {
+      "path": "bank-construction-plan-v1.4.md",
+      "sha256": "a4f6fd70e79dba35e22bafaa78ae5f71af34ea8cd5e7ac45d0bd98402bddcbb3",
+      "bytes": 3278
+    },
+    {
+      "path": "task-construction-spec-v1.2.md",
+      "sha256": "7ee9cc4b2ba84b93a8027d7c749c03163d96828fafe1776d1ad84d0cbc3260b8",
+      "bytes": 2305
+    },
+    {
+      "path": "scripts/prepare_pair_locked_bank_e012_a12.py",
+      "sha256": "7805fa886f041aec13abf2f787513c973c9edc7beb764520432b92a33b9d2f28",
+      "bytes": 4030
+    },
+    {
+      "path": "scripts/freeze_pair_locked_bank_e012_a12.py",
+      "sha256": "b999eefa5df9a8e591dd91450efa3b6c51d6812182bac62b99df84cbd5b7ec44",
+      "bytes": 3056
+    },
+    {
+      "path": "scripts/finalize_pair_locked_bank_e012_a12.py",
+      "sha256": "9de9a878cdeceba0a23bc40b26d491833d63c493418456e616714e3e2d315489",
+      "bytes": 27971
+    },
+    {
+      "path": "scripts/test_finalize_pair_locked_bank_a12.py",
+      "sha256": "2451b1791a8c3c75d3feed21690118d69c7a766f9d4d5a49b8cf7fe5150c947a",
+      "bytes": 3065
+    },
+    {
+      "path": "scripts/run_scored_checks_e012_a12_v1.py",
+      "sha256": "7bf6ada9138d8eae271a759584e23179633231e50ad10edddf81ba5228760d53",
+      "bytes": 11793
+    },
+    {
+      "path": "scripts/audit_paired_truth_e012_a12_v1.py",
+      "sha256": "3add9b3540058861a527c0c315054b57f5db5137d5bb8ebe2c55569c5a7ce2a1",
+      "bytes": 11424
+    },
+    {
+      "path": "scripts/audit_nuisance_baselines_e012_a12_v1.py",
+      "sha256": "d3fbe2f3e6e45be485c9145300389b2a34a3eb31c7ef857a9b58e9714a269fc3",
+      "bytes": 14925
+    },
+    {
+      "path": "scripts/audit_paired_truth_e012_v1.py",
+      "sha256": "af52534dd1ddb703eb836f49049494f29755eef49474ad7ee30a4edfb6789ec6",
+      "bytes": 11909
+    },
+    {
+      "path": "scripts/freeze_paired_truth_audit_e012_v1.py",
+      "sha256": "6dd39c7d9fada8fd78d7afaa840faa3c3bdbd9e8f1034083de7f9ecd410c50c7",
+      "bytes": 1804
+    },
+    {
+      "path": "bank/construction-01/paired-truth-audit-lock-v1.json",
+      "sha256": "2bc098d434899271992d79210f2fcedfb0fb8bbd9c1ddec0ed7fde48772b1573",
+      "bytes": 1884
+    },
+    {
+      "path": "bank/construction-01/scored-bank-v1/vault/paired-truth-audit-v1.json",
+      "sha256": "8081e9ba2fcf6be8b1ce6fcd41dd9c06f1c07abdf2e124d6980b82bdef8463ac",
+      "bytes": 21568
+    },
+    {
+      "path": "bank/construction-01/task-construction-lock-v1.1.json",
+      "sha256": "fe90cb29fd0b6b9c233826188d3692124e14660f109065415a58015dbad54c28",
+      "bytes": 1049
+    },
+    {
+      "path": "bank/construction-01/label-finalization-lock-v1.json",
+      "sha256": "9080bd5aa4b7cc5974c7059c23f84519c5bb8b508ed688e44fd5f9765a2e394c",
+      "bytes": 2746
+    },
+    {
+      "path": "bank/construction-01/frame-projection-lock-v1.1.json",
+      "sha256": "938e60fe593971db416e392d2e79ed247af7a08fac112fb518a55d3d0a447ea7",
+      "bytes": 4156
+    },
+    {
+      "path": "bank/construction-01/precontact-audit-lock-v1.3.json",
+      "sha256": "8bac4a3fec333ebf3edb112077a5e27966b92d84f28426819b40e910bedaf5e6",
+      "bytes": 3109
+    },
+    {
+      "path": "bank/construction-01/family-design-lock-v1.3.json",
+      "sha256": "af5b11a88df821cb9174a21abe1f3b1c829c278ff151151f6ed7cd6d7e018ea4",
+      "bytes": 2832
+    },
+    {
+      "path": "bank/construction-01/feasibility-input-manifest-v1.3.json",
+      "sha256": "470f166f5a4c33bb18c0446b9f85b8b13ff297941c380819ba256552a6041bd3",
+      "bytes": 53657
+    },
+    {
+      "path": "bank/construction-01/scored-bank-v1/vault/task-source-fixtures-final-v1.json",
+      "sha256": "4f675c5a66caeef388866971f8a7be9d44916007c94c97266d8465111f40676e",
+      "bytes": 330122
+    },
+    {
+      "path": "bank/construction-01/scored-bank-v1/vault/candidate-check-labels-final-v1.json",
+      "sha256": "0268384c7a859467e5533b54e73a25eb09aedde2cd34205e22a8ea27fb4f04b7",
+      "bytes": 970000
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/clap-color-repair-01/Cargo.toml",
+      "sha256": "05a712bba8137b536d2ae62ddc0573c95e801dfaa9780e83a958c5b3194456b1",
+      "bytes": 174
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/clap-color-repair-01/tests/contract.rs",
+      "sha256": "a41412fb9b1bd2248a5c972035936ee9992016e04a7123d1ca205f315bc3ab56",
+      "bytes": 463
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/serde-map-order-repair-02/Cargo.toml",
+      "sha256": "be24c4768b4e5c1f55ce5f6c3d8a05fc4f4d106cf022050f2ac8da193db2c0df",
+      "bytes": 254
+    },
+    {
+      "path": "bank/construction-01/task-harnesses/serde-map-order-repair-02/tests/contract.rs",
+      "sha256": "4d265a109bcb43c19b19287cc30356e972030053746cb372ec2237eb11fe61b5",
+      "bytes": 702
+    }
+  ],
+  "sha256_self_excluded": true
+}

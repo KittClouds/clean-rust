@@ -1,0 +1,11 @@
+{
+  "completed_contexts": [],
+  "engineering_only": true,
+  "error": "dependency closure drift: ('seed9731-R-tau16.json', 3) 12234837",
+  "error_type": "RuntimeError",
+  "identity": "q10-gc1-lr1-requal1-csc1-pair-alg3-front2-v1",
+  "localized_readout": true,
+  "protocol": "Q10-ALG3-FRONT2",
+  "scientific_promotion": false,
+  "status": "BLOCKED_ALG3_FRONT2"
+}

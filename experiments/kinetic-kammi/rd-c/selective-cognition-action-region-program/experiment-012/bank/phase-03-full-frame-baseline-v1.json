@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "experiment": "R&D-C E012",
+  "phase": "3-frozen-full-frame-baseline",
+  "run_id": "e012-20260926-frame-decomposition-01",
+  "question": "Does the frozen v5 switchboard show a bounded direct-action region on the new audited full-frame bank?",
+  "locked": {
+    "small_bundle": "minicpm5-2b-q8-local-v5",
+    "large_bundle": "ternary-bonsai-2-27b-ptq1-local-v5",
+    "minimum_applicability_milli": 850,
+    "maximum_abstention_milli": 150,
+    "normalization": "percent-0-100-to-milli-x10-v1+line-endings-lf-v1",
+    "reasoning_mode": "off",
+    "maximum_output_tokens": 1024,
+    "candidate_order": "producer order; receipt-bound",
+    "authority": "E011 presentation resolver plus E002 deterministic authority"
+  },
+  "bank": {
+    "full_frame_samples": 48,
+    "pair_groups": 20,
+    "two_task_pair_groups": 16,
+    "four_task_factorial_groups": 4,
+    "repository_count": 3,
+    "family_count": 12,
+    "label_source": "frozen executable candidate checks",
+    "truth_sent_to_observer": false
+  },
+  "lanes": [
+    "small-only",
+    "large-only",
+    "small-then-large-on-abstention"
+  ],
+  "acquisition": {
+    "small_calls": 48,
+    "large_calls": 48,
+    "paired_outputs": true,
+    "serve_order": ["small", "stop-small", "large", "stop-large"]
+  },
+  "admission_gate": {
+    "small_accepted_actions": "at least 1",
+    "small_wrong_accepted_actions": 0,
+    "threshold_fit": false
+  },
+  "prohibited": [
+    "model or prompt changes",
+    "threshold tuning",
+    "channel interventions",
+    "candidate reordering",
+    "label-conditioned selection"
+  ]
+}

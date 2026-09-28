@@ -1,0 +1,114 @@
+{
+  "schema": "FAS_E4_0_TRACK_C_SOURCE_TESTS_V02",
+  "status": "PASS_SYNTHETIC_SOURCE_AND_CLI_TESTS",
+  "supersedes": {
+    "path": "audits/e4-0-track-c/track-c-source-tests-v01.json",
+    "sha256": "54f487ef7e2299cb5550b6fc65ce33440ab0f4be3caa923181b85c6bee098744"
+  },
+  "recorded_utc_date": "2026-09-26",
+  "source_unit": "E4 fresh scorer v01, Track B seal-ID integration repair",
+  "commands": [
+    "python -m py_compile scorer.py runner.py output_artifacts.py test_scorer.py test_runner.py",
+    "python -m unittest -v",
+    "python -c \"import torch; print('torch_cuda_initialized='+str(torch.cuda.is_initialized()))\""
+  ],
+  "results": {
+    "py_compile": "PASS",
+    "unittest": "PASS",
+    "tests_run": 15,
+    "tests_passed": 15,
+    "tests_failed": 0,
+    "test_names": [
+      "test_authorized_reader_opens_synthetic_labels_once_and_verifies_identity",
+      "test_balanced_accuracy_and_support_match_expected_values",
+      "test_bootstrap_is_deterministic_and_uses_linear_tail_quantile",
+      "test_cli_rejects_broader_scope_before_creating_score_or_opening_labels",
+      "test_cli_rejects_tampered_feature_bytes_before_label_open",
+      "test_feature_inference_excludes_escrow_rows",
+      "test_frozen_bootstrap_and_endpoint_constants",
+      "test_invalid_auth_fails_before_synthetic_label_file_is_opened",
+      "test_perfect_synthetic_bundle_passes_all_eight_endpoints",
+      "test_preflight_only_cli_smoke_leaves_labels_unopened_and_score_absent",
+      "test_single_endpoint_failure_cannot_be_hidden_by_bundle_average",
+      "test_support_failure_is_recorded_and_fails_bundle",
+      "test_synthetic_seal_chain_opens_only_primary_once_and_seals_outputs",
+      "test_synthetic_stages_use_exact_track_b_member_ids",
+      "test_synthetic_suite_keeps_cuda_uninitialized"
+    ],
+    "exact_track_b_stage_seal_id_test": "PASS",
+    "preflight_only_cli_smoke": "PASS_SYNTHETIC_SEAL_CHAIN_LABELS_UNOPENED_SCORE_ABSENT",
+    "torch_cuda_is_initialized_after_tests": false
+  },
+  "runtime": {
+    "python": "3.13.15",
+    "numpy": "2.5.3",
+    "torch": "2.11.0+cu128",
+    "ruff_available": false
+  },
+  "integration_ids": {
+    "parity_panel": [
+      "panel_inputs",
+      "panel_row_manifest",
+      "selection_receipt"
+    ],
+    "online_parity": [
+      "gpu_lease_receipt",
+      "parity_receipt",
+      "online_feature_cache"
+    ],
+    "fresh_features": [
+      "gpu_lease_receipt",
+      "feature_extraction_receipt",
+      "feature_cache",
+      "population_row_manifest"
+    ],
+    "population_row_manifest": "E4_POPULATION_ROW_MANIFEST_V01"
+  },
+  "boundary": {
+    "torch_imported": true,
+    "actual_e4_terminal_label_file_read": false,
+    "actual_e4_escrow_label_file_read": false,
+    "actual_frozen_e3_head_files_read": false,
+    "synthetic_e3_head_files_read": true,
+    "synthetic_primary_labels_opened_by_cli_fixture": true,
+    "synthetic_escrow_file_opened_by_runner": false,
+    "tokenizer_contact": false,
+    "backbone_model_contact": false,
+    "cuda_initialization": false,
+    "cuda_status_checked": true,
+    "real_e4_scoring_execution": false
+  },
+  "source_files": {
+    "scorer.py": {
+      "bytes": 33616,
+      "sha256": "58bc957de63d430933570430ee0760a5833bc9c6ef5a82dae6dba78115b8b866"
+    },
+    "runner.py": {
+      "bytes": 41913,
+      "sha256": "311b384bf337450112d4cb782e060c9ca900ca5f28b7aad55155f192577a99d5"
+    },
+    "output_artifacts.py": {
+      "bytes": 5887,
+      "sha256": "73fbdd184d01df6de913676a0caa0be8f38f264bc9667e3985b52485425b33d4"
+    },
+    "test_scorer.py": {
+      "bytes": 11470,
+      "sha256": "49918704b151c9055432f4fb6199e3621a619b21acfb85d2a0427883283132c6"
+    },
+    "test_runner.py": {
+      "bytes": 25339,
+      "sha256": "2dc421dc9e45e9d34b05823a9d85b87721c2c5b5a98d3d8fa7aeaeaa6fac16a0"
+    },
+    "README.md": {
+      "bytes": 8399,
+      "sha256": "a77fb8f7a65ca1b3ab1706746643907aec9b53e061b8bea2eb6d5822b0265d1b"
+    }
+  },
+  "notes": [
+    "Track C now consumes the exact member IDs emitted by e4_runner_modes_v01.py for parity-panel, parity, and fresh-feature stage seals.",
+    "Synthetic CLI fixtures create seals, predecessor audits, feature cache, E3 parameters, and labels in temporary directories.",
+    "Preflight-only synthetic CLI smoke validates the complete identity chain and auth while leaving labels unopened and the score output directory absent.",
+    "The authorized synthetic CLI test opens only its synthetic primary label stream once; the escrow sentinel is not opened by the runner.",
+    "The reduced-replicate metric unit fixture tests logic only; production scoring retains the frozen 10,000-replicate configuration."
+  ]
+}

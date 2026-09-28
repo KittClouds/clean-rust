@@ -1,0 +1,239 @@
+{
+  "schema_version": 1,
+  "state": "PRECONTACT_AUDIT_PASS_NO_MODEL_CONTACT",
+  "model_contact_authorized": false,
+  "task_count": 48,
+  "unique_presentation_task_ids": 26,
+  "family_count": 12,
+  "repository_count": 3,
+  "condition_count": 26,
+  "frame_count": 1248,
+  "presentation_receipt_replays": 1248,
+  "candidate_position_and_id_leakage_diagnostics": {
+    "bounded-prefix-copy": {
+      "valid_action_count_by_producer_position": [
+        2,
+        2,
+        2,
+        2
+      ],
+      "valid_action_count_by_action_id": {
+        "42559": 2,
+        "47505": 2,
+        "51536": 2,
+        "64060": 2
+      },
+      "primary_gold_positions": [
+        3,
+        2,
+        1,
+        0
+      ]
+    },
+    "composite-frame-field": {
+      "valid_action_count_by_producer_position": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "valid_action_count_by_action_id": {
+        "22115": 1,
+        "28666": 1,
+        "51145": 1,
+        "62972": 1
+      },
+      "primary_gold_positions": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    "cursor-advance-observation": {
+      "valid_action_count_by_producer_position": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "valid_action_count_by_action_id": {
+        "31099": 1,
+        "34154": 1,
+        "36737": 1,
+        "64124": 1
+      },
+      "primary_gold_positions": [
+        1,
+        3,
+        2,
+        0
+      ]
+    },
+    "wire-endian-contract": {
+      "valid_action_count_by_producer_position": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "valid_action_count_by_action_id": {
+        "25335": 1,
+        "34126": 1,
+        "43520": 1,
+        "56199": 1
+      },
+      "primary_gold_positions": [
+        0,
+        1,
+        3,
+        2
+      ]
+    },
+    "conflicting-alias-requirement": {
+      "valid_action_count_by_producer_position": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "valid_action_count_by_action_id": {},
+      "primary_gold_positions": []
+    },
+    "help-color-capability": {
+      "valid_action_count_by_producer_position": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "valid_action_count_by_action_id": {
+        "33099": 1,
+        "45190": 1,
+        "48831": 1,
+        "63364": 1
+      },
+      "primary_gold_positions": [
+        1,
+        2,
+        0,
+        3
+      ]
+    },
+    "possible-value-validation": {
+      "valid_action_count_by_producer_position": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "valid_action_count_by_action_id": {
+        "22012": 1,
+        "32916": 1,
+        "52980": 1,
+        "57213": 1
+      },
+      "primary_gold_positions": [
+        2,
+        3,
+        1,
+        0
+      ]
+    },
+    "repeated-option-policy": {
+      "valid_action_count_by_producer_position": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "valid_action_count_by_action_id": {
+        "22252": 1,
+        "27088": 1,
+        "35639": 1,
+        "44597": 1
+      },
+      "primary_gold_positions": [
+        0,
+        2,
+        1,
+        3
+      ]
+    },
+    "map-order-feature-contract": {
+      "valid_action_count_by_producer_position": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "valid_action_count_by_action_id": {
+        "28214": 1,
+        "31314": 1,
+        "38651": 1,
+        "59171": 1
+      },
+      "primary_gold_positions": [
+        3,
+        1,
+        2,
+        0
+      ]
+    },
+    "number-mode-plus-error-site": {
+      "valid_action_count_by_producer_position": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "valid_action_count_by_action_id": {
+        "29284": 1,
+        "31026": 1,
+        "49443": 1,
+        "52928": 1
+      },
+      "primary_gold_positions": [
+        1,
+        0,
+        3,
+        2
+      ]
+    },
+    "raw-number-lossless": {
+      "valid_action_count_by_producer_position": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "valid_action_count_by_action_id": {},
+      "primary_gold_positions": []
+    },
+    "stream-byte-offset": {
+      "valid_action_count_by_producer_position": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "valid_action_count_by_action_id": {
+        "31157": 1,
+        "40696": 1,
+        "54579": 1,
+        "58080": 1
+      },
+      "primary_gold_positions": [
+        2,
+        1,
+        0,
+        3
+      ]
+    }
+  },
+  "observer_frame_schema": "PASS",
+  "sealed_field_scan": "PASS",
+  "task_condition_projection": "PASS",
+  "pair_local_donors": "PASS",
+  "presentation_replay_identity": "PASS"
+}

@@ -1,0 +1,42 @@
+{
+  "identity": "q10-gc0-lr1-pall1-a1-v1",
+  "parent_bindings": [
+    {
+      "label": "SALL1 execution",
+      "path": "experiments/drosophila-heresy/q10-gc0-lr1-sall1-r2-v1/execution.json",
+      "sha256": "57429A4A8B95AE18C88FA48138BACAD757A7949C09F9D0F8472011CF2BA004F9"
+    },
+    {
+      "label": "SALL1 coverage audit",
+      "path": "experiments/drosophila-heresy/q10-gc0-lr1-sall1-a1-v1/execution.json",
+      "sha256": "392EF8F4AA49476F50DAD78359EB137197A241CD7C03FE0598FCB3E75DF30DA3"
+    },
+    {
+      "label": "PALL1 contract",
+      "path": "experiments/drosophila-heresy/q10-gc0-lr1-pall1-v1/CONTRACT.json",
+      "sha256": "E93E030944D4B98C04A1A7893810EDCCA0BCC92FEF62D5F983AAA38A17E27029"
+    },
+    {
+      "label": "PALL1 preexecution",
+      "path": "experiments/drosophila-heresy/q10-gc0-lr1-pall1-v1/PREEXECUTION.json",
+      "sha256": "B3A9D36D03C1F88442A183D39D7FECE642E6AFBEB89BA8B1AD4BBB0F0CA950F5"
+    },
+    {
+      "label": "PALL1 execution",
+      "path": "experiments/drosophila-heresy/q10-gc0-lr1-pall1-v1/qualification/execution.json",
+      "sha256": "1023D5CF563EFC3B0E272D1EDBE83A3B35628AE7A8B6865A600BFDBF30397B47"
+    },
+    {
+      "label": "PALL1 library",
+      "path": "experiments/drosophila-heresy/q10-gc0-lr1-pall1-v1/qualification/valid-worse-pairs.jsonl",
+      "sha256": "DD824FA684B31ED02DB5E3E08E2B057CF774888B302CE77C0CD923CE746721F5"
+    },
+    {
+      "label": "combined coverage report",
+      "path": "experiments/drosophila-heresy/q10-gc0-lr1-pall1-a1-v1/reports/combined-coverage.json",
+      "sha256": "FC6D491A09F4BE7746538E03F40E0906F56924A4F63813E66787BDBB56DE9B12"
+    }
+  ],
+  "protocol": "SINGLETON_PLUS_VALID_WORSE_PAIR_COVERAGE_AUDIT",
+  "sealed": true
+}

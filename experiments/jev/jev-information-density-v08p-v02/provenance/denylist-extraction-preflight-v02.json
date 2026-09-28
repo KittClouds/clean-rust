@@ -1,0 +1,20 @@
+{
+  "protocol": "jev-information-density/v0.8p-v02-identity-denylist-preflight-v02",
+  "attempted_contract": "experiments/jev-information-density-v08p-v02/identity/e1-identity-denylist-extraction-contract-v02.json",
+  "attempted_contract_sha256": "6a27561e053d1505d288d5b14c3bc1132989afa757072f12a6af8f4c389e4caf",
+  "status": "PREFLIGHT_ABORTED_BEFORE_IDENTITY_VALUE_EXTRACTION",
+  "failure": "KeyError: source.seal_status was not included in the frozen v02 source object",
+  "source_access": {
+    "panel_manifest_hash_read": true,
+    "panel_manifest_identity_values_extracted": false,
+    "seal_manifest_read": true,
+    "firewall_lock_read": true,
+    "candidate_join_opened": false,
+    "candidate_features_or_targets_read": false
+  },
+  "output": {
+    "directory": "D:/codex-runs/jev-information-density-v08p-v02/identity-denylist-v02",
+    "files_written": 0
+  },
+  "disposition": "v02 extractor and contract remain byte-preserved; use a preflighted v03 contract with complete schema alignment"
+}

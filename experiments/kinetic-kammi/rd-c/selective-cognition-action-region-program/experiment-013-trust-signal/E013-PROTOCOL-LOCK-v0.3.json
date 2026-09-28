@@ -1,0 +1,91 @@
+{
+  "schema_version": 1,
+  "protocol_id": "E013-TRUST-SIGNAL-DEVELOPMENT-v0.3",
+  "state": "SEALED_PRECONTACT_DESIGN_ONLY",
+  "model_contact_authorized": false,
+  "model_contact_performed": false,
+  "positive_control": {
+    "id": "E012-PC-01-v1.2",
+    "model_contact_authorized": true,
+    "bank_status": "USER_BUILD_PENDING",
+    "run_status": "NOT_RUN"
+  },
+  "banks": {
+    "owner": "USER",
+    "development": {
+      "tasks": 864,
+      "design": "6 repositories x 8 families x 18 tasks",
+      "status": "NOT_BUILT_BY_AGENT"
+    },
+    "confirmation": {
+      "tasks": 1120,
+      "design": "4 fresh repositories x 8 families x 35 tasks",
+      "status": "NOT_BUILT_BY_AGENT"
+    }
+  },
+  "signal_scoring_code": "NOT_BUILT",
+  "feasibility_calculator": "BUILT_AND_SELF_CHECKED",
+  "freeze_boundary": [
+    "No task bank, labels, repository snapshot, or task fixture was built by this work.",
+    "E012 source run files were read-only; no model or API contact occurred.",
+    "E013-D and E013-C model contact remains unauthorized.",
+    "The separately authorized 64-task E012 positive control is pending the user-built sealed task bank.",
+    "E013 signal-scoring code/adapters are not yet built; this lock seals protocol and precontact feasibility only."
+  ],
+  "predecessor": {
+    "protocol_id": "E013-TRUST-SIGNAL-DEVELOPMENT-v0.2",
+    "protocol_sha256": "840be748b8aed6b9b642c3c622f079a61c847c61d0e5c9842b04a2a229aa6bdc",
+    "lock_sha256": "9bd4cfeac86e613ddb7f46ef1b4f8ec92d2aedf702b260323822cb3c53e97ba2"
+  },
+  "artifact_paths": {
+    "protocol": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-013-trust-signal\\E013-TRUST-SIGNAL-DEVELOPMENT-PROTOCOL-v0.3.md",
+    "feasibility_receipt": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-013-trust-signal\\E013-FEASIBILITY-RECEIPT-v0.3.md",
+    "feasibility_json": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-013-trust-signal\\E013-FEASIBILITY-PROJECTIONS-v0.3.json",
+    "feasibility_script": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-013-trust-signal\\project_e013_feasibility.py",
+    "precontact_verifier": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-013-trust-signal\\verify_precontact_v0_3.py",
+    "e012_raw_yield_report": "C:\\rd-c\\selective-cognition-action-region-program\\e012-readonly-anatomy-addendum\\E012-RAW-PROPOSAL-YIELD-v1.0.md",
+    "e012_raw_yield_json": "C:\\rd-c\\selective-cognition-action-region-program\\e012-readonly-anatomy-addendum\\E012-RAW-PROPOSAL-YIELD-v1.0.json",
+    "e012_raw_yield_script": "C:\\rd-c\\selective-cognition-action-region-program\\e012-readonly-anatomy-addendum\\analyze_e012_raw_proposal_yield.py",
+    "e012_raw_yield_seal": "C:\\rd-c\\selective-cognition-action-region-program\\e012-readonly-anatomy-addendum\\E012-RAW-PROPOSAL-YIELD-SEAL-v1.0.json",
+    "positive_control_design": "C:\\rd-c\\selective-cognition-action-region-program\\e012-readonly-anatomy-addendum\\E012-POSITIVE-CONTROL-DESIGN-v1.2.md",
+    "lab_law": "D:\\1-story\\1-Notes Central\\1- Core story\\Newest Data\\1-clean data\\Lore\\part 2\\World\\1-rewrite\\!1-notes\\! V5 rewite\\Frozen Fabrique\\Lab Law.txt",
+    "lab_law_grant": "D:\\1-story\\1-Notes Central\\1- Core story\\Newest Data\\1-clean data\\Lore\\part 2\\World\\1-rewrite\\!1-notes\\! V5 rewite\\Frozen Fabrique\\lab law grant.txt",
+    "readme": "C:\\rd-c\\selective-cognition-action-region-program\\README.md",
+    "predecessor_protocol": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-013-trust-signal\\E013-TRUST-SIGNAL-DEVELOPMENT-PROTOCOL-v0.2.md",
+    "predecessor_lock": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-013-trust-signal\\E013-PROTOCOL-LOCK-v0.2.json",
+    "e012_frozen_input_lock": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\artifacts\\runs\\e012-20260926-frame-decomposition-01\\frozen-input-lock.json",
+    "e012_baseline_report": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\artifacts\\runs\\e012-20260926-frame-decomposition-01\\reports\\full-frame-baseline-report.json",
+    "e012_autopsy": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\artifacts\\runs\\e012-20260926-frame-decomposition-01\\reports\\full-frame-baseline-autopsy-v1.json",
+    "e012_labels": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\artifacts\\runs\\e012-20260926-frame-decomposition-01\\vault\\evaluation-labels.json",
+    "e012_anatomy_report": "C:\\rd-c\\selective-cognition-action-region-program\\e012-readonly-anatomy-addendum\\E012-READONLY-ANATOMY-v1.1.md",
+    "e012_anatomy_json": "C:\\rd-c\\selective-cognition-action-region-program\\e012-readonly-anatomy-addendum\\E012-READONLY-ANATOMY-v1.1.json",
+    "e012_anatomy_seal": "C:\\rd-c\\selective-cognition-action-region-program\\e012-readonly-anatomy-addendum\\E012-READONLY-ANATOMY-SEAL-v1.1.json",
+    "positive_control_v1_1": "C:\\rd-c\\selective-cognition-action-region-program\\e012-readonly-anatomy-addendum\\E012-POSITIVE-CONTROL-DESIGN-v1.1.md"
+  },
+  "upstream_artifacts_sha256": {
+    "protocol": "74910aededa494c49f741a05fa4d632e1f46c8466ae31ac2447f42832f25c70e",
+    "feasibility_receipt": "250045217d113cb48f93e692bded2ec7e232eeedec33e1f944bbfedd062b85ba",
+    "feasibility_json": "83eb335c74139730ea02ffbda2ca055748faf54069f06d036d8d05980e01332c",
+    "feasibility_script": "8cc242375cac6c83daadc74fbcc77ead3d95feac0f53bf9e4a2120d82700d04a",
+    "precontact_verifier": "5254cb902d00189d8b09a4f006d5185deb7c3231131273a3b9c6af22ca43df71",
+    "e012_raw_yield_report": "ad8a9d1d1b93fec50cd838bbcc580b94abdbab38300160e3315626b39f152c49",
+    "e012_raw_yield_json": "5692d4a69bfcc01b16d09f980ee6525de767bd186bff2c8787ebdcf94e8658e5",
+    "e012_raw_yield_script": "70b2df346642f12990e6bdc4772ce1421433e04e1c0db4c3748c545fdac4627e",
+    "e012_raw_yield_seal": "e3cc37d90775797ad040b8564e89fd538716fc3ff8a30b99f277e866edcc9bc3",
+    "positive_control_design": "be69ee36702e2c94cf0f5187aa0fe5f76d512b59d3df645cb407ce4ab2a1c0ad",
+    "lab_law": "a6f85e7a2cc09b9762c17763f03c2eee51b27e099d8faaeeac548452c2c52026",
+    "lab_law_grant": "9380672300b9d8b7c2e21e1fb6a5a4136a159df6c5351f4438aab6c0a09cc600",
+    "readme": "ec0411d58e04494763a89bf180bb70e99522713aa1555acd2f56f1ab500c2465",
+    "predecessor_protocol": "840be748b8aed6b9b642c3c622f079a61c847c61d0e5c9842b04a2a229aa6bdc",
+    "predecessor_lock": "9bd4cfeac86e613ddb7f46ef1b4f8ec92d2aedf702b260323822cb3c53e97ba2",
+    "e012_frozen_input_lock": "4bab6fd945248b6209fa33e3a1df10786298ac620342ce167251411c6a258cd8",
+    "e012_baseline_report": "2155e62daf0650da8e44fb3c44704deb8c4bd2aff615e859ec215aabd6e1a6ed",
+    "e012_autopsy": "17dfc2e69a146e569d895500e3cc43f8852c60d1e274f48f28dc4745a87ea694",
+    "e012_labels": "e9e81f71e46e167b077d4123a84d918b7d2f4afb791a009700f5390f61106caa",
+    "e012_anatomy_report": "68b6c8649882a7934f8fb327bc92766f07b5234888e3ce5770b1153028ecb4ac",
+    "e012_anatomy_json": "b2b93a99193ddad6067ece2fd703ec708230e79143f1f83beea8499ec71ba0a0",
+    "e012_anatomy_seal": "ac6ee4fe67c48022d8e2c385ade4a196145be351bee7bfc0626e5c49214d9034",
+    "positive_control_v1_1": "10bafb793cba27191069fb7aa34bae01a61c3aaa5044d2d84276297e411dad13"
+  },
+  "no_self_hash_note": "This lock binds protocol, feasibility, E012 read-only results, Lab Law source documents, README, and positive-control design. It does not hash itself."
+}

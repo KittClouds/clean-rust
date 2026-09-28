@@ -1,0 +1,81 @@
+{
+  "protocol": "jev-information-density/v0.8p-r1-terminal-disposition-v01",
+  "identity": "v0.8P-R1-fresh-trajectory-instrumented-rerun-v01",
+  "disposition": "TRAINING_PANEL_OVERLAP",
+  "contract_bindings": {
+    "r1_execution_contract_sha256": "d692acbef984c98d7f3ac6c5861112d4fbdcf162c4906a93bf548a84dc5e82fa",
+    "r1_implementation_bundle_sha256": "03d988fc187ab53bb8dc2689a5995ac8ee9c6545be2a9ee0770651d53748d317",
+    "r1_implementation_seal_sha256": "f0c7611f2de17da084b08a1ab299b84fa70f988f5c925763de029e7b88047103",
+    "original_p_terminal_disposition": "CLOSED_UNEXECUTABLE_UNDER_SEALED_OVERLAP_SCHEMA",
+    "original_p_panel_contract_sha256": "ce3b7b97caecb27f3ad99439c0e67dca6e40af5da3db9ca2e356ea5e9f06f823",
+    "v05_e1_denylist_sha256": "50eebeb5790c29b4a75c6f8df849eb4c2865d3c864932bbd7f636b7a0e52a2cd"
+  },
+  "training_identity_replay": {
+    "status": "PASS",
+    "raw_triplets": 12000,
+    "raw_occurrences": 132000,
+    "raw_identity_manifest_sha256": "6aced3e6b7ded5befb348974e55adbcb40566bae85677fc7197c8600c608ef75",
+    "selected_neighborhoods": 5000,
+    "selected_occurrences": 55000,
+    "selected_identity_manifest_sha256": "0f5cd945f965c291b13375b16367085a8c4f3dced4e5996b0e1ffbadf279d191",
+    "parity_receipt_sha256": "5d79c0d2548e3f1caa58f5d277d8477ff9d52407a16074bd05b6cd39751dd7d2",
+    "source_access_receipt_sha256": "023d2ac6124e3e408cd8d64959a6bec7446d65d81d8bd8fc4b002604f323d2ed",
+    "scope_comparison_mismatches": 0
+  },
+  "prior_panel_reconstruction": {
+    "status": "PASS",
+    "neighborhoods": 2000,
+    "occurrences": 22000,
+    "identity_manifest_sha256": "5936d6b4e9d6f651edc0406d844709c99108352459ae90494fa327ed7b110ebf",
+    "v05_hash_set_exact_match": true,
+    "receipt_sha256": "4da975d7145683321846718518514f440295d79335fd1f7dd5c8d62e9c01dc68"
+  },
+  "provisional_panel": {
+    "status": "GENERATED_SEMANTIC_VALIDATION_PASS_NONPROMOTABLE",
+    "neighborhoods": 2000,
+    "episodes": 22000,
+    "family_allocation": {
+      "exposure_control": 500,
+      "respiratory_monitoring": 500,
+      "salinity_control": 500,
+      "vibration_monitoring": 500
+    },
+    "e1_neighborhood_id_collisions": 0,
+    "occurrence_identity_manifest_sha256": "acb5fbb1608ec756e3d81627de6faddc69c92b56b546a03604a774dc21764ccb",
+    "feature_scope_manifest_sha256": "451d0cc4207340cf044fcca93f9cb7b12b9d0287e1a34f8eda7ec9da2f422a5a",
+    "neighborhood_manifest_sha256": "489aece619cadb4b1cef626e2ec0ec5dbc3fcceec618be6c8bf5b112763137b3",
+    "generation_receipt_sha256": "cff2d4bd756f993d7194eddfeb43a6c5516cc777616602b679f87881cee0f310"
+  },
+  "five_field_overlap": {
+    "status": "FAIL",
+    "diagnostic_source_sha256": "efaeae559b97754fe91c250c8c83a0be101afe89cb95647bb1bc00793c4bd710",
+    "diagnostic_output_sha256": "f6cb5fddb2cf78d30f955765d18843dc923f381d568bc2553d895d1af49eeca1",
+    "field_results": {
+      "world_id": {"panel_unique": 2000, "training_selected_intersections": 0, "prior_panel_intersections": 0},
+      "root_id": {"panel_unique": 2000, "training_selected_intersections": 0, "prior_panel_intersections": 0},
+      "episode_id": {"panel_unique": 22000, "training_selected_intersections": 0, "prior_panel_intersections": 0},
+      "full_rendered_input_hash": {"panel_unique": 21967, "training_selected_intersections": 0, "prior_panel_intersections": 121},
+      "selector_input_hash": {"panel_unique": 22000, "training_selected_intersections": 0, "prior_panel_intersections": 0}
+    },
+    "raw_training_132000_occurrence_intersections_diagnostic": {
+      "world_id": 0,
+      "root_id": 0,
+      "episode_id": 0,
+      "full_rendered_input_hash": 0,
+      "selector_input_hash": 0
+    },
+    "replacement_permitted": false,
+    "candidate_modified": false
+  },
+  "model_and_evaluation_boundary": {
+    "lfm_contact": false,
+    "feature_extraction": false,
+    "head_loading": false,
+    "training": false,
+    "checkpoint_inference": false,
+    "heldout_evaluation": false,
+    "phoenix_access": false
+  },
+  "scientific_result": "NONE",
+  "next_direction": "Close R1. Any attempt to continue the late-transition question requires a fresh prospective construction identity with rendered-input-level disjointness guaranteed or screened under a frozen rule before final panel admission."
+}

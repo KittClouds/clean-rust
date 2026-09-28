@@ -1,0 +1,8 @@
+{
+  "engineering_only": true,
+  "execution_sha256": "D80874CE201C03B4705516CC2A63EDE849A6BB3970BB8AD5571F5B8544B7B70A",
+  "identity": "q10-gc1-lr1-requal1-csc1-auth-topo1-v1",
+  "protocol": "Q10-AUTH-TOPO1",
+  "scientific_promotion": false,
+  "status": "AUTH_TOPO1_COMPLETE"
+}

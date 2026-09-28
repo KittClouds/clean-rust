@@ -1,0 +1,62 @@
+{
+  "task_id": "hybrid-task-17dc5b28__4e39603942aa",
+  "frame_digest_hex": "4e39603942aaed13b71e7b76db04a5578a44c1c4908e895eead6a3fcf03d5bf0",
+  "request_id_hex": "e7d34c88231562d39f853634276698d87fdf0f58abbeb1115e3b1335e0f406bd",
+  "response_request_id_hex": "e7d34c88231562d39f853634276698d87fdf0f58abbeb1115e3b1335e0f406bd",
+  "request_receipt_digest_hex": "cb6fe2beb3c790d6fa2c0cd23b686af013a0128767b83bc050de5fe2aca1acdd",
+  "response_receipt_digest_hex": "cb6fe2beb3c790d6fa2c0cd23b686af013a0128767b83bc050de5fe2aca1acdd",
+  "presentation_receipt_hex": "524443510100040000004e39603942aaed13b71e7b76db04a5578a44c1c4908e895eead6a3fcf03d5bf0b9a79da75bf4ed8469f0c2576b8e65dac328b058bd6317f451f2281b71985dc350c994f7811e08ca85382a09aba3f3969fd556c8f0d289ecb41e84cd28487ad389423cfa94dbb9c92a5e0a86e6df0a1924b686e2742efae6312941da06fa39b7eb3df9b03fa6be9583bd2d2773b831a0ce608e4f92164c556947747e7167961b656ff18ab3fc91b9b74671f4136107f20040054ad65e9f2c8edc4a836f161fbd7716a2f2e52e3d06",
+  "action_ledger_path": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\artifacts\\runs\\e012-20260926-frame-decomposition-01\\action-ledgers\\hybrid\\task-17dc5b28__4e39603942aa.bin",
+  "ordered_options": [
+    {
+      "producer_ordinal": 0,
+      "action": {
+        "id": 51536,
+        "schema_id": 1
+      },
+      "summary": "Apply the candidate change shown in the code excerpt.",
+      "diff_excerpt": "API context: take_prefix returns a bounded zero-copy view; the result shares the input Bytes backing storage.\n@@ -1,7 +1,5 @@\n use bytes::{Buf, Bytes};\n \n pub fn take_prefix(input: Bytes, count: usize) -> Bytes {\n-    // E012 candidate slot.\n-    let _ = count;\n-    input\n+    input.slice(..count)\n }",
+      "patch_sha256": "94f7811e08ca85382a09aba3f3969fd556c8f0d289ecb41e84cd28487ad38942"
+    },
+    {
+      "producer_ordinal": 1,
+      "action": {
+        "id": 64060,
+        "schema_id": 1
+      },
+      "summary": "Apply the candidate change shown in the code excerpt.",
+      "diff_excerpt": "API context: take_prefix returns a bounded zero-copy view; the result shares the input Bytes backing storage.\n@@ -1,7 +1,5 @@\n use bytes::{Buf, Bytes};\n \n pub fn take_prefix(input: Bytes, count: usize) -> Bytes {\n-    // E012 candidate slot.\n-    let _ = count;\n-    input\n+    input.slice(count..)\n }",
+      "patch_sha256": "94dbb9c92a5e0a86e6df0a1924b686e2742efae6312941da06fa39b7eb3df9b0"
+    },
+    {
+      "producer_ordinal": 2,
+      "action": {
+        "id": 42559,
+        "schema_id": 1
+      },
+      "summary": "Apply the candidate change shown in the code excerpt.",
+      "diff_excerpt": "API context: take_prefix returns a bounded zero-copy view; the result shares the input Bytes backing storage.\n@@ -1,7 +1,5 @@\n use bytes::{Buf, Bytes};\n \n pub fn take_prefix(input: Bytes, count: usize) -> Bytes {\n-    // E012 candidate slot.\n-    let _ = count;\n     input\n }",
+      "patch_sha256": "be9583bd2d2773b831a0ce608e4f92164c556947747e7167961b656ff18ab3fc"
+    },
+    {
+      "producer_ordinal": 3,
+      "action": {
+        "id": 47505,
+        "schema_id": 1
+      },
+      "summary": "Apply the candidate change shown in the code excerpt.",
+      "diff_excerpt": "API context: take_prefix returns a bounded zero-copy view; the result shares the input Bytes backing storage.\n@@ -1,7 +1,6 @@\n use bytes::{Buf, Bytes};\n \n pub fn take_prefix(input: Bytes, count: usize) -> Bytes {\n-    // E012 candidate slot.\n-    let _ = count;\n-    input\n+    let mut input = input;\n+    input.copy_to_bytes(count)\n }",
+      "patch_sha256": "b74671f4136107f20040054ad65e9f2c8edc4a836f161fbd7716a2f2e52e3d06"
+    }
+  ],
+  "observer_output": {
+    "action_choice": 51536,
+    "applicability_milli": 950,
+    "abstention_milli": 50
+  },
+  "thresholds": {
+    "minimum_applicability_milli": 850,
+    "maximum_abstention_milli": 150
+  },
+  "completion_check_passed": true
+}

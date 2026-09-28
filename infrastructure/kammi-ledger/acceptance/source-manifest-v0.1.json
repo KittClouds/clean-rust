@@ -1,0 +1,93 @@
+{
+  "entries": [
+    {
+      "bytes": 75,
+      "path": "ledgerd/__init__.py",
+      "sha256": "36219aa1cd59fef7d6baa36db459cd14d3877d5de972f7e4851c38bbb25b0458"
+    },
+    {
+      "bytes": 4739,
+      "path": "ledgerd/api.py",
+      "sha256": "46d11cda6fd13cf7030bd5ae072f920f11741ff3c463ba1ac0e5b5eee1e0bcdb"
+    },
+    {
+      "bytes": 2609,
+      "path": "ledgerd/cas.py",
+      "sha256": "9e5e3532894c26bf03b957cf2b87f90b3209d2dc8b14309b5642a3b28b06307e"
+    },
+    {
+      "bytes": 1655,
+      "path": "ledgerd/cli.py",
+      "sha256": "e44cf22f33b69b139a88425eaea1ee95c5746758f85cb56ab1af34268a048c12"
+    },
+    {
+      "bytes": 2555,
+      "path": "ledgerd/client.py",
+      "sha256": "3233f3621cc7e81cd3a144ae06d85e69d3d47b6a1c719ccc661dbc191835e72d"
+    },
+    {
+      "bytes": 8109,
+      "path": "ledgerd/core.py",
+      "sha256": "33e1ac9dcc0cba2ba46e642c5105e75e610f5b253c0c2ade85fe18f00ff22295"
+    },
+    {
+      "bytes": 5039,
+      "path": "ledgerd/graph.py",
+      "sha256": "f0e8c875d20ce8cffd9461e885b91ae3d65bb89f362e40f4378533c1ea907159"
+    },
+    {
+      "bytes": 2807,
+      "path": "ledgerd/identity.py",
+      "sha256": "cb10423c9212cbc8b42a9750ff6198e8222ca1bead9c51a0c08fd17e1c0eed33"
+    },
+    {
+      "bytes": 4360,
+      "path": "ledgerd/journal.py",
+      "sha256": "14022ea64957be491891f7f81fa6fb55d77f980e4ec78662be0657c1091d5d7b"
+    },
+    {
+      "bytes": 2813,
+      "path": "ledgerd/legacy_flat.py",
+      "sha256": "6e575361535b9350993598ca2dba9ea70fc3c5e3a75d21ee486843ef782ad1c2"
+    },
+    {
+      "bytes": 1873,
+      "path": "ledgerd/seals.py",
+      "sha256": "33ea8b99ece028ba64744ca3a44bc411e33301cc91e0ce26e978be76b305f1d8"
+    },
+    {
+      "bytes": 400,
+      "path": "pyproject.toml",
+      "sha256": "f217965162a52c31fc2881e5a96666893bbda8b9d69f6ca184da0c64e837250e"
+    },
+    {
+      "bytes": 3621,
+      "path": "scripts/import_e4_fixture.py",
+      "sha256": "b28aceac48099b4e3b6f6689f025636f7f787aedcd5dd407c6664608e67ab4a4"
+    },
+    {
+      "bytes": 2024,
+      "path": "scripts/rebuild_e4_projection.py",
+      "sha256": "214f6b1924c9fcd251c11d045568629beec421aaa19eed1b1eed69f35c856fa3"
+    },
+    {
+      "bytes": 1327,
+      "path": "scripts/source_manifest.py",
+      "sha256": "98dd04a7807eb6b3d97d4595b1707f90d3ec856ebface5fa46dff51bfb877e2f"
+    },
+    {
+      "bytes": 1623,
+      "path": "scripts/verify_e4_fixture.py",
+      "sha256": "8d4d4847b2592e84699edfe8100dfc42f3956687e50d51b4e378962181a63156"
+    },
+    {
+      "bytes": 4572,
+      "path": "tests/test_custody.py",
+      "sha256": "f27cf57800ab8fcd3261ab00c0bebe8c91693c418f6e89b2ea3984545ccce6ab"
+    }
+  ],
+  "entry_count": 17,
+  "schema": "KAMMI_SOURCE_MANIFEST_V0_1",
+  "source_root_sha256": "2f28022a8aca9c12fd1f6f00181b2043ae6610f559a319e7eab8b3b733116cb1",
+  "status": "DEVELOPMENT_SNAPSHOT"
+}

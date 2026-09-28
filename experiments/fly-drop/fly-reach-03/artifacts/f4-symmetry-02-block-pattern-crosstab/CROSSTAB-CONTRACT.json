@@ -1,0 +1,39 @@
+{
+  "analysis_class": "EXPLORATORY_POST_OUTCOME_QUALIFICATION_ONLY",
+  "analysis_script_sha256": "965d67ba5fe7d40a942043509b585988c48e3b416c6b0ed0284389a26a063d9a",
+  "cell_metrics": [
+    "row_count",
+    "cell_leverage_mass",
+    "global_leverage_share",
+    "disagreement_count",
+    "disagreement_row_fraction",
+    "disagreement_leverage_mass",
+    "disagreement_leverage_share_global",
+    "D_row_accuracy_on_disagreements",
+    "C_row_accuracy_on_disagreements",
+    "D_leverage_accuracy_on_disagreements",
+    "C_leverage_accuracy_on_disagreements",
+    "delta_psi_local",
+    "delta_psi_global_contribution"
+  ],
+  "cue_pattern_encoding": "bit c is stored tuple[c].incidence; string label prints bit3..bit0, so 0011 means incidence in cue slots 0 and 1",
+  "delta_psi_formula": "2*sum_cell(w*(I[D correct]-I[C correct]))/sum_all(w); cell contributions must sum to pooled Psi_D-Psi_C",
+  "grid": "all four frozen blocks crossed with all 16 possible 4-bit absolute cue-incidence patterns; empty cells retained",
+  "leverage_weight": "w=q*abs(native proposed delta)*abs(reference g), using frozen inclusion weight q",
+  "parent_contract_sha256": "cfef638aaeac1dfc0b768d13cc95afe7724861f74e3d3111d91401925bed6379",
+  "parent_identity": "F4-SYMMETRY-01-RUN4",
+  "population": "all 13,420 existing RUN4 U* rows; no refitting, resampling, row exclusion, or new seeds",
+  "schema": "F4-SYMMETRY-02-block-pattern-crosstab-contract-v1",
+  "scope": "No causal, confirmatory, transferable, measured REACH-03, native-controller, biological, or PHENO claim",
+  "sign_rule": "+1 iff locked held-out logit > 0, otherwise -1, matching RUN4 scoring",
+  "source_hashes": {
+    "parent_SYMMETRY02_analysis_sha256": "73683b5d44c9da95f2b2f5bb1fb842e92790205fcc4fa652f7c8c5a5a2c5d905",
+    "parent_SYMMETRY02_receipt_sha256": "06adbfac9117d89b4c6eb4e23ef7b2556e04ee6de466f72bf3951d5a5e6520f6",
+    "parent_integrity_receipt_sha256": "3a830fe8ff05a1cd6fe8e062ae3c5106eab6866ba546634c8123bc918fb2ac94",
+    "parent_prediction_lock_sha256": "1a6828c3956b6f25e057defc808f20698738a9990af4a2f9661dcaebd068aecf",
+    "predictor_sha256": "b201733289faaf8bc33a3147bf1b8d5a4e77e193386e33f89feebb860cf2c13e",
+    "scoring_truth_sha256": "c4af406135aec6ec53b21dc34f1ee6d00f4568f5f205105b8a66837e227c84fd"
+  },
+  "status": "FROZEN_BEFORE_CROSSTAB_CALCULATION",
+  "uncertainty": "none; deterministic decomposition of previously unlocked qualification outputs"
+}

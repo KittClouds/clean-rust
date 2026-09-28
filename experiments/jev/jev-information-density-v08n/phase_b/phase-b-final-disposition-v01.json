@@ -1,0 +1,55 @@
+{
+  "protocol": "jev-information-density/v0.8n-road-b-phase-b-final-disposition-v01",
+  "identity": "v0.8N-phase-b-final-disposition-v01",
+  "status": "EVALUATION_INPUT_CONTRACT_INCOMPLETE",
+  "final_disposition": "SCIENTIFICALLY_INCOMPLETE_NO_BEHAVIORAL_RESULT",
+  "training": {
+    "status": "VALID_AND_SEALED",
+    "runs": 9,
+    "terminal_checkpoints": 9,
+    "epoch_checkpoints": 27,
+    "training_seal_sha256": "43932fc963b150167972e81b1c1bb93f6989e9b93faa65ab1eee3ecf55c7b727",
+    "checkpoint_hash_tree_sha256": "add6dfd013c936b100e7cbdb205018bf91b95e91ed11ca854b26aed998c66923"
+  },
+  "heldout_construction": {
+    "status": "PANEL_SEALED_AND_GEOMETRY_VALID",
+    "panel_identity": "v0.8N-eval-panel-v01/matched-panel-v02",
+    "panel_seal_sha256": "425cef320df94e2b47b448203f8a916ebcbb2019539b2d09e51f5b4ced92f614",
+    "panel_manifest_sha256": "80e09c0f203b8a6505e062a2091a594273dca808258ff2f4539ab8414db9eabe"
+  },
+  "candidate_evaluation_basis": {
+    "status": "INCOMPLETE",
+    "training_candidate_catalog_rows": 48,
+    "training_candidate_feature_dimension": 2048,
+    "training_schema_namespaces": 12,
+    "heldout_schema_namespaces": 4,
+    "heldout_neighborhoods": 2000,
+    "heldout_candidate_feature_rows_available": 0,
+    "whole_schema_join_preflight_receipt_sha256": "1db0042f1a15364e6a304daf426a56c561ca44986c632b6453f960bcf4e6d41f",
+    "schema_feature_crosswalk_reconstructible": false
+  },
+  "evaluation": {
+    "panel_unlock_receipt_sha256": "e8ff5e4548ab5e0b2b96433d844c64836aa03ff878034381c1933db913cb3ec0",
+    "opening_count": 1,
+    "head_inference": false,
+    "predictions": false,
+    "metrics": false,
+    "strict_transition_floor_evaluated": false,
+    "newtight_access": false,
+    "legacy_evaluation_access": false,
+    "phoenix_access": false
+  },
+  "lineage": {
+    "authorization_event_sha256": "0cad8d2e45fe8e7e5eed7f9bcdeab406926f24605ad9f62396d83f9512bb0a09",
+    "run_contract_sha256": "da538aa03355732a2ba362da45d947e169b87aa644d0efd6ba7ef7a546306c1f",
+    "analysis_contract_sha256": "0072c44903ea253cd8ad288cda8c100270f19d909ddced098af32d388ac29e1f",
+    "execution_input_contract_sha256": "efb2bbe59293d7899083927cc187a292b5dfd1dc2948a0b752b3d9cbae2fd18d",
+    "frozen_evaluator_sha256": "fa22bc8febff89d2b635091c6cb40be6f3beba4549c4a135d16e213f6fd3dda4",
+    "failed_attempt_traceback_sha256": "c2f430c43ed02bc77dee84bff0566ad66888e73070d76d3b07847cb4d361a19e"
+  },
+  "phase_b_mutated": false,
+  "new_panel_unlock_authorized": false,
+  "new_candidate_feature_extraction_authorized": false,
+  "head_training_authorized": false,
+  "behavioral_claim_authorized": false
+}

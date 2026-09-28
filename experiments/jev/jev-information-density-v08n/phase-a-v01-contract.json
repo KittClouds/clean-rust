@@ -1,0 +1,99 @@
+{
+  "protocol": "jev-information-density/v0.8n-base-v01",
+  "phase_a_identity": "v0.8N-base-v01",
+  "purpose": "Construct a shared semantic basis for invariant-geometry cartography and prospective matched-control recovery without model-head training or evaluation access.",
+  "parentage": {
+    "scientific_reference_only": [
+      "v0.8K completed attribution result",
+      "v0.8L permanently nonpromotable support-construction failure",
+      "v0.8M geometry gate failure, nonpromotable"
+    ],
+    "forbidden_parent_identity": "phase-a-v01-quarantined",
+    "forbidden_m_or_l_materialization_as_parent": true
+  },
+  "generator": {
+    "generator_identity": "jev-v08n-invariant-geometry-basis",
+    "seed": 20260922,
+    "training_family_count": 12,
+    "heldout_family_count": 4,
+    "training_neighborhoods_per_family": 1000,
+    "heldout_neighborhoods_per_family": 500,
+    "training_neighborhood_capacity": 12000,
+    "heldout_neighborhood_capacity": 2000,
+    "episodes_per_neighborhood": 11,
+    "training_episode_capacity": 132000,
+    "heldout_episode_capacity": 22000,
+    "family_split_unit": "world_family_id",
+    "template_split_required": true,
+    "neutral_candidate_count": 8,
+    "neutral_assignment": "deterministic generator-side eight distinct nuisance axes; no feature selection",
+    "joint_nuisance_audit": "all eight neutral axes jointly toggled in an unmaterialized exact audit episode"
+  },
+  "neighborhood": {
+    "roles": ["anchor", "fact_flip", "sham", "neutral_1", "neutral_2", "neutral_3", "neutral_4", "neutral_5", "neutral_6", "neutral_7", "neutral_8"],
+    "same_latent_world": true,
+    "same_query": true,
+    "same_runtime_schema": true,
+    "same_candidate_order": true,
+    "fact_flip": {
+      "intervention_axis": "cause_observation",
+      "target_preserved": false,
+      "map_winner_must_change": true
+    },
+    "sham": {
+      "intervention_axis": "ambient_marker",
+      "target_preserved": true
+    },
+    "neutral_axes": {
+      "count": 8,
+      "names": ["neutral_marker_1", "neutral_marker_2", "neutral_marker_3", "neutral_marker_4", "neutral_marker_5", "neutral_marker_6", "neutral_marker_7", "neutral_marker_8"],
+      "target_preserved": true,
+      "distinct_from_sham_axis": true,
+      "pairwise_distinct": true
+    },
+    "joint_nuisance_audit": {
+      "materialized_as_training_episode": false,
+      "exact_target_preserved": true,
+      "independence_required": true
+    }
+  },
+  "semantic_gates": {
+    "posterior_component_abs_error_max": 1e-12,
+    "surface_edit": {
+      "changed_field_count": 1,
+      "changed_character_count": 1,
+      "changed_span_count": 1,
+      "sham_neutral_magnitude_equal": true
+    },
+    "neutral_not_cosmetic": true,
+    "neutral_not_selected_by_features": true
+  },
+  "representation_gate": {
+    "model_repo_id": "LiquidAI/LFM2.5-1.2B-Base",
+    "model_revision": "7453bca97ca1e67754c4035a4b4c584e1c9dd725",
+    "pooling": "final-layer mean_full",
+    "input_mode": "exact-length, single-row, no padding",
+    "feature_point": "state feature h",
+    "matching": "Road A post-construction atlas; Road B frozen radius-only selection after shared cache seal",
+    "direction_matching": false,
+    "predeclared_gate": {
+      "mean_relative_radius_difference_max": 0.10,
+      "p95_absolute_radius_difference_max": 0.25,
+      "per_family_mean_relative_difference_max": 0.15,
+    "selection_after_features": true
+    }
+  },
+  "phase_boundaries": {
+    "phase_a0_model_contact": false,
+    "phase_a1_frozen_feature_extraction_only": true,
+    "model_head_training": false,
+    "evaluation_inference": false,
+    "protected_evaluation_bodies_opened": false,
+    "newtight_access": false,
+    "phoenix_access": false,
+    "phase_b_authorized": false,
+    "road_a_training": false,
+    "road_b_head_training": false
+  },
+  "fresh_external_root": "D:/codex-runs/jev-information-density-v08n/v0.8N-base-v01"
+}

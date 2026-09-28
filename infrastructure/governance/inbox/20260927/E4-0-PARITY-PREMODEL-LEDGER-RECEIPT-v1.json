@@ -1,0 +1,13 @@
+{
+  "schema": "CHIEF_E4_0_PARITY_PREMODEL_LEDGER_RECEIPT_V1",
+  "status": "PREMODEL_PREFLIGHT_REGISTERED",
+  "artifact": {
+    "artifact_id": "sha256:e29dd3731366b72a6ae1924473872dbf6f7ddafe66b53e8674c610fc86bc57dc",
+    "event_id": "sha256:5a41cef25e891ece09dd485528e2350c0de943e7d80dff073e5413cc103545a1"
+  },
+  "seal": {
+    "root": "sha256:1b6bb9cedacf534dc3ca903102d77b17557feb8ac8ad19d20c31f6776399a2af",
+    "event_id": "sha256:87f84eea1519a29f4a0d4c5d3f05d2fe80d9e006340a9fc36898ffba623dbab3"
+  },
+  "authorization_conferred": false
+}

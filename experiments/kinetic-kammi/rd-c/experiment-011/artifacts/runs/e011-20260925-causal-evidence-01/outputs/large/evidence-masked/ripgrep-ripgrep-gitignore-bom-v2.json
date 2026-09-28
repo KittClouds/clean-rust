@@ -1,0 +1,148 @@
+{
+  "schema_version": 1,
+  "run_id": "e011-20260925-causal-evidence-01",
+  "condition": "evidence-masked",
+  "role": "large",
+  "bundle_id": "ternary-bonsai-2-27b-ptq1-local-v5",
+  "bundle_blake3": "6d933aba093307e0c333f022426af46f3f5b243a8a10a2e1bb2f4cfc93b17b9d",
+  "frozen_input_lock_sha256": "3a91323be0abca07cd20ace84562cfbfb79a528cbd996811974eeb0eaa857b7a",
+  "frame_lock_sha256": "23a4c606555e8cc1b9e7768d3f4fa2ead71bd9393b413eeee777bb0ca7eaeffd",
+  "frame_sha256": "89e0c7580a6973129a4034f6c5daaf4cb4530f50e656ef15042488ea8518d287",
+  "task_id": "ripgrep-ripgrep-gitignore-bom-v2",
+  "pair_task_id": "ripgrep-ripgrep-gitignore-bom-v2",
+  "server_alias": "e009-large-v5",
+  "server_process_id": 47156,
+  "runtime_sha256": "e0ea4fd53e6f0c741cbd28093b427f333ada0eb03b83073e1f99c483793ea976",
+  "model_sha256": "53107f530aa52eb00912263ab1ee29bd199261c87cd7b4ad4ca1318c1fe33ee3",
+  "reasoning_mode": "off",
+  "chat_template_sha256": "c3cf9e34abf4f9e36c2d72165aa9c132d3e2a725b6c2586aaa3a8af9d7a81041",
+  "maximum_output_tokens": 1024,
+  "system_prompt_sha256": "976ef1cd914bacb366c64418825010124338a626a0400d459858acc7e48f5a48",
+  "output_schema_sha256": "97170fa0d6a44681f680ad0ac533a3f3913709757e4ee6cbf96d9c9f40d1b2fb",
+  "normalization_contract": "percent-0-100-to-milli-x10-v1+line-endings-lf-v1",
+  "thresholds": {
+    "minimum_applicability_milli": 850,
+    "maximum_abstention_milli": 150
+  },
+  "request_sha256": "1fde7c13b63fdaa3c3051ccb7291e22c8f15320e1fc1ed4479be921d73acff6b",
+  "request": {
+    "model": "e009-large-v5",
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a typed observer in a deterministic coding workflow. The runtime owns workflow state and will execute only one action from the offered action_options after validating your output.\n\nRead the task_prompt and evidence, then compare the offered actions. Choose the action most likely to satisfy the task while preserving the repository's stated constraints. Do not write or propose code outside the offered choices. Do not claim to have executed tests. If no offered action is sufficiently supported, use null for action_choice and express uncertainty with abstention_percent.\n\nReturn exactly one JSON object matching the provided schema. action_choice must be an offered numeric action ID or null. applicability_percent is your estimate from 0 to 100 that this observer can handle the task from the available evidence. abstention_percent is your estimate from 0 to 100 that the runtime should defer this choice. Use integer percentage points only. Do not add prose or fields.\n"
+      },
+      {
+        "role": "user",
+        "content": "{\"schema_id\":\"rdc-real-coding-observation.v1\",\"task_id\":\"ripgrep-ripgrep-gitignore-bom-v2\",\"task_family\":\"ripgrep-gitignore-bom\",\"repository_id\":\"ripgrep\",\"task_variant\":2,\"task_prompt\":\"Git-compatible parsing strips the BOM from the first line so that the rule still applies. Select the offered patch that makes the exact ignored-path check pass.\",\"repository_revision\":\"e89fff89ac9af12e8d4ce9d5fd07beb408ca730f\",\"snapshot_sha256\":\"88b1821040580414cdd9a18683765ff5439c9ded6a463083db9c48326987b182\",\"evidence\":[{\"kind\":\"source_excerpt\",\"source_id\":\"redacted-source-1\",\"content_blake3\":\"0ee6042e04b98523b6c1d8e9acd0706c19a2c718a5ecfc08ecb51400f36a44bf\",\"content\":\"[task-specific evidence body removed for E011]\"},{\"kind\":\"baseline_tool_result\",\"source_id\":\"redacted-source-2\",\"content_blake3\":\"0ee6042e04b98523b6c1d8e9acd0706c19a2c718a5ecfc08ecb51400f36a44bf\",\"content\":\"[task-specific evidence body removed for E011]\"}],\"action_options\":[{\"action\":{\"id\":11,\"schema_id\":1},\"summary\":\"Apply the focused source change shown here.\",\"diff_excerpt\":\"@@ -422,7 +422,7 @@\\n-                if i != 0 { line.trim_start_matches(UTF8_BOM) } else { &line };\\n+                if i == 0 { line.trim_start_matches(UTF8_BOM) } else { &line };\",\"patch_sha256\":\"5000d6bc36df5a03c4f167b335cc6d248a22bac17ad2b7041182b31fa05e97af\"},{\"action\":{\"id\":37,\"schema_id\":1},\"summary\":\"Apply this alternative change in the same code path.\",\"diff_excerpt\":\"@@ -422,7 +422,7 @@\\n-                if i != 0 { line.trim_start_matches(UTF8_BOM) } else { &line };\\n+                if i == 1 { line.trim_start_matches(UTF8_BOM) } else { &line };\",\"patch_sha256\":\"ab2085ede44153fec30518b5ed0ab39d5ca6857004a7998783ce2a91a936fecd\"},{\"action\":{\"id\":68,\"schema_id\":1},\"summary\":\"Apply the source change and add a contract comment.\",\"diff_excerpt\":\"@@ -422,7 +422,8 @@\\n-                if i != 0 { line.trim_start_matches(UTF8_BOM) } else { &line };\\n+            // Git ignores a UTF-8 BOM only at the start of the ignore file.\\n+                if i == 0 { line.trim_start_matches(UTF8_BOM) } else { &line };\",\"patch_sha256\":\"48fa64eaccc75e7448cc9bd2806c6344120c775dc45a53944cce0c7f7f443fd2\"},{\"action\":{\"id\":94,\"schema_id\":1},\"summary\":\"Leave the current implementation unchanged.\",\"diff_excerpt\":\"No source line changes are included.\",\"patch_sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"}]}"
+      }
+    ],
+    "temperature": 0,
+    "top_p": 1,
+    "seed": 0,
+    "max_tokens": 1024,
+    "stream": false,
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rdc_coding_observer_output_v1",
+        "strict": true,
+        "schema": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "rdc-coding-observer-output.v2",
+          "title": "RDC Coding Observer Output v2",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "action_choice",
+            "applicability_percent",
+            "abstention_percent"
+          ],
+          "properties": {
+            "action_choice": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 65535
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "applicability_percent": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "abstention_percent": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            }
+          }
+        }
+      }
+    }
+  },
+  "http_status": 200,
+  "response": {
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "{\n  \"action_choice\": 11,\n  \"applicability_percent\": 95,\n  \"abstention_percent\": 5\n}"
+        }
+      }
+    ],
+    "created": 1790367237,
+    "model": "e009-large-v5",
+    "system_fingerprint": "b10685-7dffb158d",
+    "object": "chat.completion",
+    "usage": {
+      "completion_tokens": 35,
+      "prompt_tokens": 1167,
+      "total_tokens": 1202,
+      "prompt_tokens_details": {
+        "cached_tokens": 192
+      }
+    },
+    "id": "chatcmpl-gKYyct7t18YzBV7LjU4pzAKxsoNbJa2H",
+    "timings": {
+      "cache_n": 192,
+      "prompt_n": 975,
+      "prompt_ms": 2146.435,
+      "prompt_per_token_ms": 2.201471794871795,
+      "prompt_per_second": 454.24156799530385,
+      "predicted_n": 35,
+      "predicted_ms": 794.88,
+      "predicted_per_token_ms": 23.378823529411765,
+      "predicted_per_second": 42.77375201288245
+    }
+  },
+  "content": "{\n  \"action_choice\": 11,\n  \"applicability_percent\": 95,\n  \"abstention_percent\": 5\n}",
+  "output": {
+    "action_choice": 11,
+    "applicability_percent": 95,
+    "abstention_percent": 5
+  },
+  "normalized_output": {
+    "action_choice": 11,
+    "applicability_milli": 950,
+    "abstention_milli": 50
+  },
+  "normalization_error": null,
+  "usage": {
+    "completion_tokens": 35,
+    "prompt_tokens": 1167,
+    "total_tokens": 1202,
+    "prompt_tokens_details": {
+      "cached_tokens": 192
+    }
+  },
+  "finish_reason": "stop",
+  "elapsed_ms": 3299.69
+}

@@ -1,0 +1,163 @@
+{
+  "accepted_block_ids": [
+    305012,
+    305013,
+    305014,
+    305015,
+    305016,
+    305017,
+    305018,
+    305019,
+    305020,
+    305021,
+    305022,
+    305023
+  ],
+  "block_count": 12,
+  "blocks": [
+    {
+      "block_id": 305012,
+      "labels_sha256": "9554bae5dc952cf1b6ef07cd670fe536cc0b529cb07d3ebbb65b1f351ba0df00",
+      "negative_labels": 2,
+      "positive_labels": 2,
+      "schedule_seed": 362157567546,
+      "schedule_sha256": "35c2515009a6d2802dc987fa1df6eb70b9c2d91a90fafe0d2c7b5ed23e0c5253",
+      "simulator_seed": 305012,
+      "task_pattern_seed": 305012,
+      "trials": 8192
+    },
+    {
+      "block_id": 305013,
+      "labels_sha256": "c833b7d512c86ed008920633b14e2839886bbd29bd8e841956a842b96583028b",
+      "negative_labels": 2,
+      "positive_labels": 2,
+      "schedule_seed": 362157567547,
+      "schedule_sha256": "3a285ef4452c9e8f17bf57b91665f2ce3be105c981e9f220c887ddef422ca831",
+      "simulator_seed": 305013,
+      "task_pattern_seed": 305013,
+      "trials": 8192
+    },
+    {
+      "block_id": 305014,
+      "labels_sha256": "f509994c41827bfcafac4ee5ea45813d36d6f3e6adcc622c029197ef954294ca",
+      "negative_labels": 2,
+      "positive_labels": 2,
+      "schedule_seed": 362157567544,
+      "schedule_sha256": "a0eddf626febeaebe730642f6397632fd4b955be1db10b428f1e59b7346cbaf5",
+      "simulator_seed": 305014,
+      "task_pattern_seed": 305014,
+      "trials": 8192
+    },
+    {
+      "block_id": 305015,
+      "labels_sha256": "c833b7d512c86ed008920633b14e2839886bbd29bd8e841956a842b96583028b",
+      "negative_labels": 2,
+      "positive_labels": 2,
+      "schedule_seed": 362157567545,
+      "schedule_sha256": "826342d72d31b387895b7e375decd66d6d5bf97648951297204baa89908d2f22",
+      "simulator_seed": 305015,
+      "task_pattern_seed": 305015,
+      "trials": 8192
+    },
+    {
+      "block_id": 305016,
+      "labels_sha256": "c833b7d512c86ed008920633b14e2839886bbd29bd8e841956a842b96583028b",
+      "negative_labels": 2,
+      "positive_labels": 2,
+      "schedule_seed": 362157567542,
+      "schedule_sha256": "91a22507fd77b60f8b28f6f32679982df4dc5f83c70191accc73993c6df44a4a",
+      "simulator_seed": 305016,
+      "task_pattern_seed": 305016,
+      "trials": 8192
+    },
+    {
+      "block_id": 305017,
+      "labels_sha256": "9554bae5dc952cf1b6ef07cd670fe536cc0b529cb07d3ebbb65b1f351ba0df00",
+      "negative_labels": 2,
+      "positive_labels": 2,
+      "schedule_seed": 362157567543,
+      "schedule_sha256": "81440603381a70b1692e8e2e10a2743f571fc92e93323dafbe750bb8d3109181",
+      "simulator_seed": 305017,
+      "task_pattern_seed": 305017,
+      "trials": 8192
+    },
+    {
+      "block_id": 305018,
+      "labels_sha256": "c833b7d512c86ed008920633b14e2839886bbd29bd8e841956a842b96583028b",
+      "negative_labels": 2,
+      "positive_labels": 2,
+      "schedule_seed": 362157567540,
+      "schedule_sha256": "84b30ef1c0930c543d7f2445a635e7cf88f275f5321031394a27d07995f11728",
+      "simulator_seed": 305018,
+      "task_pattern_seed": 305018,
+      "trials": 8192
+    },
+    {
+      "block_id": 305019,
+      "labels_sha256": "547ee2503741a868b7cfd3439fd5359858299be856a1475d06db916d64b63d2d",
+      "negative_labels": 2,
+      "positive_labels": 2,
+      "schedule_seed": 362157567541,
+      "schedule_sha256": "1053454b41663b6da08d8ae284eb4c5ebfd86d9ff899afb10dad4e5f575a8bd0",
+      "simulator_seed": 305019,
+      "task_pattern_seed": 305019,
+      "trials": 8192
+    },
+    {
+      "block_id": 305020,
+      "labels_sha256": "9554bae5dc952cf1b6ef07cd670fe536cc0b529cb07d3ebbb65b1f351ba0df00",
+      "negative_labels": 2,
+      "positive_labels": 2,
+      "schedule_seed": 362157567538,
+      "schedule_sha256": "fab590e95be8e86aad30c04c3aafaec08ff8df11e6183d4e98c3250ca74e4c93",
+      "simulator_seed": 305020,
+      "task_pattern_seed": 305020,
+      "trials": 8192
+    },
+    {
+      "block_id": 305021,
+      "labels_sha256": "66c37616ddf5503b96b17822460183fb983b9c47e3e59b8f3fbcd2d4c1a3f0ac",
+      "negative_labels": 2,
+      "positive_labels": 2,
+      "schedule_seed": 362157567539,
+      "schedule_sha256": "bdfad16406d6929da87f37bddf5e7baaf658c82f99639cd9687dd00de2bf3798",
+      "simulator_seed": 305021,
+      "task_pattern_seed": 305021,
+      "trials": 8192
+    },
+    {
+      "block_id": 305022,
+      "labels_sha256": "547ee2503741a868b7cfd3439fd5359858299be856a1475d06db916d64b63d2d",
+      "negative_labels": 2,
+      "positive_labels": 2,
+      "schedule_seed": 362157567536,
+      "schedule_sha256": "adb0e9c79f5413b74c29d52d1233c9c508f45db7db73d8beeb109fb9b9e92008",
+      "simulator_seed": 305022,
+      "task_pattern_seed": 305022,
+      "trials": 8192
+    },
+    {
+      "block_id": 305023,
+      "labels_sha256": "9554bae5dc952cf1b6ef07cd670fe536cc0b529cb07d3ebbb65b1f351ba0df00",
+      "negative_labels": 2,
+      "positive_labels": 2,
+      "schedule_seed": 362157567537,
+      "schedule_sha256": "ad4bcc4bfbb665e062d1f13338c08c5fd5a6ff2e80db92aaaf9c8a206fa05ecb",
+      "simulator_seed": 305023,
+      "task_pattern_seed": 305023,
+      "trials": 8192
+    }
+  ],
+  "contract_sha256": "192b0c3c01b2b7978aedfe55e5490012226e62e0b7660c4410797a08b44a01b8",
+  "measured_namespace_created": false,
+  "qualification_only": true,
+  "schedule_parity": "PASS against block 303000 labels and all 8,192 schedule rows",
+  "schema": "F4-CALIBRATION-02-v0.2-task-bank-manifest-v1",
+  "source_schedule_generator_sha256": "d1de1bb9f1d0a82e0bd9ca3a9520a6d38e696fa686d0dbcda46bced17561923a",
+  "status": "FROZEN_ORDINARY_QUALIFICATION_TASK_BANK",
+  "structural_pattern_selection": false,
+  "target_or_prediction_data_read": false,
+  "task_generator_sha256": "57b2393c029a3daab841e91b3e8a366cc86fa0854950cc026b14d5ca2fdc7282",
+  "training_file": "training.json",
+  "training_sha256": "9ec1f7c240143e7fb5537ae72eb6d5bb3fb4fb8fc0445bcbafa54ae913a826b5"
+}

@@ -1,0 +1,18 @@
+[package]
+name = "rdc-candidate-canonicalizer"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[dependencies]
+hashbrown = "0.15"
+memchr = "2"
+memmap2 = "0.9"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+panic = "abort"

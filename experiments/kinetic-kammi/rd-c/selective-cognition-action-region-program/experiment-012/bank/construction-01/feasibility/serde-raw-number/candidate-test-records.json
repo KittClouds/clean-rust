@@ -1,0 +1,182 @@
+[
+  {
+    "candidate_id": 38796,
+    "candidate_role_hidden": "value_reserialize",
+    "case_id": "case-01",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (35332) panicked at tests\\contract.rs:13:5:\nassertion `left == right` failed: lossless-number contract failed\n  left: Some(\"{\\\"n\\\":1.23,\\\"tag\\\":\\\"x\\\"}\")\n right: Some(\"{\\\"n\\\":1.2300,\\\"tag\\\":\\\"x\\\"}\")\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "     Locking 11 packages to latest compatible versions\n   Compiling e012-serde-raw-number-harness v0.1.0 (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\task-harnesses\\serde-raw-number)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.90s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\serde-json-harness\\debug\\deps\\contract-1ca954ea319816ae.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 38796,
+    "candidate_role_hidden": "value_reserialize",
+    "case_id": "case-02",
+    "exit_code": 0,
+    "passed": true,
+    "stdout": "\nrunning 1 test\ntest check_contract ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.05s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\serde-json-harness\\debug\\deps\\contract-1ca954ea319816ae.exe)\n"
+  },
+  {
+    "candidate_id": 38796,
+    "candidate_role_hidden": "value_reserialize",
+    "case_id": "case-03",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (4124) panicked at tests\\contract.rs:13:5:\nassertion `left == right` failed: lossless-number contract failed\n  left: Some(\"{\\\"n\\\":100.0,\\\"tag\\\":\\\"x\\\"}\")\n right: Some(\"{\\\"n\\\":1e+02,\\\"tag\\\":\\\"x\\\"}\")\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.04s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\serde-json-harness\\debug\\deps\\contract-1ca954ea319816ae.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 38796,
+    "candidate_role_hidden": "value_reserialize",
+    "case_id": "case-04",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (21132) panicked at tests\\contract.rs:13:5:\nassertion `left == right` failed: lossless-number contract failed\n  left: Some(\"{\\\"n\\\":1.8446744073709552e+19,\\\"tag\\\":\\\"x\\\"}\")\n right: Some(\"{\\\"n\\\":18446744073709551617,\\\"tag\\\":\\\"x\\\"}\")\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.05s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\serde-json-harness\\debug\\deps\\contract-1ca954ea319816ae.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 58574,
+    "candidate_role_hidden": "f64_rewrite",
+    "case_id": "case-01",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (22952) panicked at tests\\contract.rs:13:5:\nassertion `left == right` failed: lossless-number contract failed\n  left: Some(\"{\\\"n\\\":1.23,\\\"tag\\\":\\\"x\\\"}\")\n right: Some(\"{\\\"n\\\":1.2300,\\\"tag\\\":\\\"x\\\"}\")\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "   Compiling e012-serde-raw-number-harness v0.1.0 (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\task-harnesses\\serde-raw-number)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.92s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\serde-json-harness\\debug\\deps\\contract-1ca954ea319816ae.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 58574,
+    "candidate_role_hidden": "f64_rewrite",
+    "case_id": "case-02",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (41760) panicked at tests\\contract.rs:13:5:\nassertion `left == right` failed: lossless-number contract failed\n  left: Some(\"{\\\"n\\\":9007199254740992,\\\"tag\\\":\\\"x\\\"}\")\n right: Some(\"{\\\"n\\\":9007199254740993,\\\"tag\\\":\\\"x\\\"}\")\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.04s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\serde-json-harness\\debug\\deps\\contract-1ca954ea319816ae.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 58574,
+    "candidate_role_hidden": "f64_rewrite",
+    "case_id": "case-03",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (18968) panicked at tests\\contract.rs:13:5:\nassertion `left == right` failed: lossless-number contract failed\n  left: Some(\"{\\\"n\\\":100,\\\"tag\\\":\\\"x\\\"}\")\n right: Some(\"{\\\"n\\\":1e+02,\\\"tag\\\":\\\"x\\\"}\")\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.06s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\serde-json-harness\\debug\\deps\\contract-1ca954ea319816ae.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 58574,
+    "candidate_role_hidden": "f64_rewrite",
+    "case_id": "case-04",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (18500) panicked at tests\\contract.rs:13:5:\nassertion `left == right` failed: lossless-number contract failed\n  left: Some(\"{\\\"n\\\":18446744073709552000,\\\"tag\\\":\\\"x\\\"}\")\n right: Some(\"{\\\"n\\\":18446744073709551617,\\\"tag\\\":\\\"x\\\"}\")\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.04s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\serde-json-harness\\debug\\deps\\contract-1ca954ea319816ae.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 64610,
+    "candidate_role_hidden": "unsigned_integer_rewrite",
+    "case_id": "case-01",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (18956) panicked at tests\\contract.rs:13:5:\nassertion `left == right` failed: lossless-number contract failed\n  left: None\n right: Some(\"{\\\"n\\\":1.2300,\\\"tag\\\":\\\"x\\\"}\")\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "   Compiling e012-serde-raw-number-harness v0.1.0 (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\task-harnesses\\serde-raw-number)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.86s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\serde-json-harness\\debug\\deps\\contract-1ca954ea319816ae.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 64610,
+    "candidate_role_hidden": "unsigned_integer_rewrite",
+    "case_id": "case-02",
+    "exit_code": 0,
+    "passed": true,
+    "stdout": "\nrunning 1 test\ntest check_contract ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.05s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\serde-json-harness\\debug\\deps\\contract-1ca954ea319816ae.exe)\n"
+  },
+  {
+    "candidate_id": 64610,
+    "candidate_role_hidden": "unsigned_integer_rewrite",
+    "case_id": "case-03",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (30956) panicked at tests\\contract.rs:13:5:\nassertion `left == right` failed: lossless-number contract failed\n  left: None\n right: Some(\"{\\\"n\\\":1e+02,\\\"tag\\\":\\\"x\\\"}\")\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.06s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\serde-json-harness\\debug\\deps\\contract-1ca954ea319816ae.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 64610,
+    "candidate_role_hidden": "unsigned_integer_rewrite",
+    "case_id": "case-04",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (5836) panicked at tests\\contract.rs:13:5:\nassertion `left == right` failed: lossless-number contract failed\n  left: None\n right: Some(\"{\\\"n\\\":18446744073709551617,\\\"tag\\\":\\\"x\\\"}\")\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.05s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\serde-json-harness\\debug\\deps\\contract-1ca954ea319816ae.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 53677,
+    "candidate_role_hidden": "signed_integer_rewrite",
+    "case_id": "case-01",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (29452) panicked at tests\\contract.rs:13:5:\nassertion `left == right` failed: lossless-number contract failed\n  left: None\n right: Some(\"{\\\"n\\\":1.2300,\\\"tag\\\":\\\"x\\\"}\")\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "   Compiling e012-serde-raw-number-harness v0.1.0 (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\task-harnesses\\serde-raw-number)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.88s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\serde-json-harness\\debug\\deps\\contract-1ca954ea319816ae.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 53677,
+    "candidate_role_hidden": "signed_integer_rewrite",
+    "case_id": "case-02",
+    "exit_code": 0,
+    "passed": true,
+    "stdout": "\nrunning 1 test\ntest check_contract ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.05s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\serde-json-harness\\debug\\deps\\contract-1ca954ea319816ae.exe)\n"
+  },
+  {
+    "candidate_id": 53677,
+    "candidate_role_hidden": "signed_integer_rewrite",
+    "case_id": "case-03",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (16468) panicked at tests\\contract.rs:13:5:\nassertion `left == right` failed: lossless-number contract failed\n  left: None\n right: Some(\"{\\\"n\\\":1e+02,\\\"tag\\\":\\\"x\\\"}\")\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.04s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\serde-json-harness\\debug\\deps\\contract-1ca954ea319816ae.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 53677,
+    "candidate_role_hidden": "signed_integer_rewrite",
+    "case_id": "case-04",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (34316) panicked at tests\\contract.rs:13:5:\nassertion `left == right` failed: lossless-number contract failed\n  left: None\n right: Some(\"{\\\"n\\\":18446744073709551617,\\\"tag\\\":\\\"x\\\"}\")\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.07s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\serde-json-harness\\debug\\deps\\contract-1ca954ea319816ae.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": null,
+    "candidate_role_hidden": "base_snapshot",
+    "case_id": "case-01",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (27936) panicked at tests\\contract.rs:13:5:\nassertion `left == right` failed: lossless-number contract failed\n  left: Some(\"{\\\"n\\\":1.23,\\\"tag\\\":\\\"x\\\"}\")\n right: Some(\"{\\\"n\\\":1.2300,\\\"tag\\\":\\\"x\\\"}\")\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "   Compiling e012-serde-raw-number-harness v0.1.0 (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\task-harnesses\\serde-raw-number)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.02s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\serde-json-harness\\debug\\deps\\contract-1ca954ea319816ae.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": null,
+    "candidate_role_hidden": "base_snapshot",
+    "case_id": "case-02",
+    "exit_code": 0,
+    "passed": true,
+    "stdout": "\nrunning 1 test\ntest check_contract ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.04s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\serde-json-harness\\debug\\deps\\contract-1ca954ea319816ae.exe)\n"
+  },
+  {
+    "candidate_id": null,
+    "candidate_role_hidden": "base_snapshot",
+    "case_id": "case-03",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (2620) panicked at tests\\contract.rs:13:5:\nassertion `left == right` failed: lossless-number contract failed\n  left: Some(\"{\\\"n\\\":100.0,\\\"tag\\\":\\\"x\\\"}\")\n right: Some(\"{\\\"n\\\":1e+02,\\\"tag\\\":\\\"x\\\"}\")\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.07s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\serde-json-harness\\debug\\deps\\contract-1ca954ea319816ae.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": null,
+    "candidate_role_hidden": "base_snapshot",
+    "case_id": "case-04",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (15136) panicked at tests\\contract.rs:13:5:\nassertion `left == right` failed: lossless-number contract failed\n  left: Some(\"{\\\"n\\\":1.8446744073709552e+19,\\\"tag\\\":\\\"x\\\"}\")\n right: Some(\"{\\\"n\\\":18446744073709551617,\\\"tag\\\":\\\"x\\\"}\")\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.04s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\serde-json-harness\\debug\\deps\\contract-1ca954ea319816ae.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  }
+]

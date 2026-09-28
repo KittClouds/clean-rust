@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "state": "REPOSITORY_SOURCE_AUDIT_PASS",
+  "model_contact_authorized": false,
+  "repository_count": 3,
+  "all_checkouts_clean": true,
+  "all_targets_on_D_drive": true,
+  "all_repositories_absent_from_E009_E010_E011": true,
+  "repositories": [
+    {
+      "repository_id": "bytes",
+      "commit": "417dccdeff249e0c011327de7d92e0d6fbe7cc43",
+      "release": "v1.11.1",
+      "checkout_clean": true,
+      "source_archive_sha256": "e3503c834ebece95674c8586af32b8bd9c506e67bdc79449a7c355e7d2b6ed55",
+      "root_cargo_toml_sha256": "cc5543c243c68ff5cc169cced62e64bae3ad1fb4aa7a141d02a1ddc2f2e559c8",
+      "target_resolved_path": "D:\\rdc-e012-target\\bytes",
+      "target_on_D_drive": true,
+      "new_evaluation_repository": true
+    },
+    {
+      "repository_id": "clap",
+      "commit": "ac5fda6a799e4c640d671edd1111d4a5e723dc1a",
+      "release": "v4.6.1",
+      "checkout_clean": true,
+      "source_archive_sha256": "fa30cb380c1ba8def3554592cba41d5f73d5905e81669ecc69fdc5f87479c92b",
+      "root_cargo_toml_sha256": "4859b4d8617eb49e07b2da240a8186c9af03e3d74b2d65012e3739c2add6358d",
+      "target_resolved_path": "D:\\rdc-e012-target\\clap",
+      "target_on_D_drive": true,
+      "new_evaluation_repository": true
+    },
+    {
+      "repository_id": "serde-json",
+      "commit": "4f6dbfac79647d032b0997b5ab73022340c6dab7",
+      "release": "v1.0.149",
+      "checkout_clean": true,
+      "source_archive_sha256": "80835a13241fa9ebe48ed59179444f2f4f176973ff8307a650ef605dccf3a170",
+      "root_cargo_toml_sha256": "804ff71fff564cb236aa600678d35c243e881651b10139c4d64b27a5483b0546",
+      "target_resolved_path": "D:\\rdc-e012-target\\serde-json-harness",
+      "target_on_D_drive": true,
+      "new_evaluation_repository": true
+    }
+  ]
+}

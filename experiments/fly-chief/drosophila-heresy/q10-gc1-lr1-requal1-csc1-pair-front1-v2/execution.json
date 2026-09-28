@@ -1,0 +1,149 @@
+{
+  "contexts": [
+    {
+      "better_than_V": 5456,
+      "complete_context": true,
+      "context": [
+        "seed9731-L-tau16.json",
+        2
+      ],
+      "evaluated_records": 7553,
+      "exact_alternative": 0,
+      "exact_record": null,
+      "frontier_records": 7553,
+      "max_frontier_geometry_abs_error": 4.440892098500626e-16,
+      "shard": "seed9731-L-tau16__set2.jsonl",
+      "shard_sha256": "6AAD72FB8828775EA0B27F7387BDB77B0F619299EB01181B5286B9B01A84602D",
+      "valid_evaluated": 7553
+    },
+    {
+      "better_than_V": 7,
+      "complete_context": true,
+      "context": [
+        "seed9731-L-tau4.json",
+        3
+      ],
+      "evaluated_records": 7,
+      "exact_alternative": 0,
+      "exact_record": null,
+      "frontier_records": 7,
+      "max_frontier_geometry_abs_error": 2.220446049250313e-16,
+      "shard": "seed9731-L-tau4__set3.jsonl",
+      "shard_sha256": "80C6D89BD9FD363776BEDF15BD3362B46BFDE6BA5D5E043C6B01E32287321BE9",
+      "valid_evaluated": 7
+    },
+    {
+      "better_than_V": 68,
+      "complete_context": true,
+      "context": [
+        "seed9731-R-tau16.json",
+        1
+      ],
+      "evaluated_records": 68,
+      "exact_alternative": 0,
+      "exact_record": null,
+      "frontier_records": 68,
+      "max_frontier_geometry_abs_error": 2.220446049250313e-16,
+      "shard": "seed9731-R-tau16__set1.jsonl",
+      "shard_sha256": "24B6D100376D55A492E39292407C677ADF70F4DD3A7E1FD7E717F4EBE81144DC",
+      "valid_evaluated": 68
+    },
+    {
+      "better_than_V": 0,
+      "complete_context": true,
+      "context": [
+        "seed9731-R-tau16.json",
+        3
+      ],
+      "evaluated_records": 0,
+      "exact_alternative": 0,
+      "exact_record": null,
+      "frontier_records": 0,
+      "max_frontier_geometry_abs_error": 0.0,
+      "shard": "seed9731-R-tau16__set3.jsonl",
+      "shard_sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "valid_evaluated": 0
+    },
+    {
+      "better_than_V": 0,
+      "complete_context": true,
+      "context": [
+        "seed9731-R-tau4.json",
+        0
+      ],
+      "evaluated_records": 0,
+      "exact_alternative": 0,
+      "exact_record": null,
+      "frontier_records": 0,
+      "max_frontier_geometry_abs_error": 0.0,
+      "shard": "seed9731-R-tau4__set0.jsonl",
+      "shard_sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "valid_evaluated": 0
+    },
+    {
+      "better_than_V": 223,
+      "complete_context": true,
+      "context": [
+        "seed9731-R-tau4.json",
+        1
+      ],
+      "evaluated_records": 223,
+      "exact_alternative": 0,
+      "exact_record": null,
+      "frontier_records": 223,
+      "max_frontier_geometry_abs_error": 0.0,
+      "shard": "seed9731-R-tau4__set1.jsonl",
+      "shard_sha256": "15E3601AE8A69616BF07C66E2426AF8A31921D03FA70BD1A0749F485967CFBF0",
+      "valid_evaluated": 223
+    },
+    {
+      "better_than_V": 241,
+      "complete_context": true,
+      "context": [
+        "seed9731-R-tau4.json",
+        2
+      ],
+      "evaluated_records": 241,
+      "exact_alternative": 0,
+      "exact_record": null,
+      "frontier_records": 241,
+      "max_frontier_geometry_abs_error": 2.220446049250313e-16,
+      "shard": "seed9731-R-tau4__set2.jsonl",
+      "shard_sha256": "B02433529F2BC35257F36B0FD907989EF2C2DA258BA1453789D16D141B047BFD",
+      "valid_evaluated": 241
+    },
+    {
+      "better_than_V": 631,
+      "complete_context": true,
+      "context": [
+        "seed9731-R-tau4.json",
+        3
+      ],
+      "evaluated_records": 1438,
+      "exact_alternative": 0,
+      "exact_record": null,
+      "frontier_records": 1438,
+      "max_frontier_geometry_abs_error": 2.220446049250313e-16,
+      "shard": "seed9731-R-tau4__set3.jsonl",
+      "shard_sha256": "C56E924387CE319038150A481D485EF188B8380E87CB9A7BB3EEA0DC8A594695",
+      "valid_evaluated": 1438
+    }
+  ],
+  "contract_sha256": "6210400E715AC8F48CD7C84B1FCC059A3C36B78032FF26029D2E3CF705CC5DD1",
+  "counts": {
+    "better_than_V": 6626,
+    "evaluated_pairs": 9530,
+    "exact_alternative": 0,
+    "frontier_pairs": 9530,
+    "valid_evaluated": 9530
+  },
+  "engineering_only": true,
+  "identity": "q10-gc1-lr1-requal1-csc1-pair-front1-v2",
+  "order2_frontier_exhausted": true,
+  "pair_replay_performed": true,
+  "protocol": "Q10-PAIR-FRONT1",
+  "readout_executed": true,
+  "scientific_promotion": false,
+  "status": "PAIR_FRONT1_COMPLETE_NO_EXACT",
+  "stopped_on_first_exact": false
+}

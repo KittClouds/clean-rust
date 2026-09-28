@@ -1,0 +1,28 @@
+{
+  "schema": "F4-INVARIANT-01-fit-manifest-stop-receipt-v1",
+  "run_id": "F4-INVARIANT-01-COLLECT2",
+  "status": "STOP_FIT_AND_ANALYSIS_SOURCES_NOT_FROZEN",
+  "training_support_gate": "PASS",
+  "training_support_receipt": "TRAINING-SUPPORT-RECEIPT.json",
+  "initializer_regeneration": "PASS",
+  "initializer_regeneration_receipt": "INITIAL-TENSOR-REGENERATION-RECEIPT.json",
+  "reason": "The frozen implementation source set contains the D/S model and input modules but no F4-INVARIANT-01 fit executor or matching analysis script. The required executable_sha256 and analysis_sha256 fields cannot be assigned truthful frozen values.",
+  "incompatible_existing_fit_sources": [
+    {
+      "path": "experiments/fly-reach-03/scripts/f4_symmetry_01_fit.py",
+      "sha256": "40ed12bd4ddc377d361f1369af2f33c5a379dcc4dce60d24d79382de83d56e62",
+      "reason": "F4-SYMMETRY-01 fit implementation; expects its distinct 16-fit manifest and D-only architecture."
+    },
+    {
+      "path": "experiments/fly-reach-03/scripts/f4_symmetry_01_integrity.py",
+      "sha256": "dc70be0276297f32a6dd01508f7146243390ae3a6adf83ecb39879ba4fc6887d",
+      "reason": "F4-SYMMETRY-01 integrity and analysis implementation; expects its distinct 16-fit output schema."
+    }
+  ],
+  "heldout_class_complete_blocks": 7,
+  "heldout_support_used_as_stop_reason": false,
+  "fit_manifest_created": false,
+  "model_training_or_prediction_performed": false,
+  "qualification_only": true,
+  "measured_reach03_authorized": false
+}

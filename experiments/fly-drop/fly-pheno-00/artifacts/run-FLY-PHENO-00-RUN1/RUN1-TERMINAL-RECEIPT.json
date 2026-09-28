@@ -1,0 +1,51 @@
+{
+  "analysis_receipt_sha256": "f8adebad780cdc6570c7d4f15bf32bf5f7b88f741c7d03d445604abfd54e0ee3",
+  "created_utc": "2026-09-22T03:16:48.108876Z",
+  "criterion_failure_blocks": 216,
+  "disposition": "All measured execution and integrity requirements passed, but no learner block satisfied the pre-lesion competence criterion; no inferential evidence for or against a fly-derived adaptive damage-response phenotype.",
+  "global_complete_blocks": 0,
+  "integrity_receipt_sha256": "dcac6e929074704f91021fe9b3cf45ad665c8ef482593a9bbbaadfb3c9fa69bf",
+  "minimum_global_complete_blocks": 8,
+  "no_rescue_execution": true,
+  "no_seed_replacement": true,
+  "no_threshold_relaxation": true,
+  "outcome_artifacts": [
+    {
+      "bytes": 19932795,
+      "path": "final-outcomes.csv",
+      "sha256": "eb9b765f37f406ee715fd8aa07de7aa15f30a021e10777cd50e986c2ec85ef35"
+    },
+    {
+      "bytes": 42621726,
+      "path": "final-outcomes.jsonl",
+      "sha256": "a4fb264a795e2aa3438d8a78c6de6480925d11ec59cd2566d525077d048e24a7"
+    },
+    {
+      "bytes": 23023506,
+      "path": "fit-receipts.jsonl",
+      "sha256": "3e73d97418bd2e01ba85da81ef9babcf826e4fb15df8c0fec1beaad15bbe4061"
+    },
+    {
+      "bytes": 615,
+      "path": "collection-receipt.json",
+      "sha256": "e679c5a650fcc670c152ec1980d4de90842efa620e3648dfee319667b29ad199"
+    },
+    {
+      "bytes": 1322,
+      "path": "integrity-receipt.json",
+      "sha256": "dcac6e929074704f91021fe9b3cf45ad665c8ef482593a9bbbaadfb3c9fa69bf"
+    },
+    {
+      "bytes": 4068,
+      "path": "analysis-receipt.json",
+      "sha256": "f8adebad780cdc6570c7d4f15bf32bf5f7b88f741c7d03d445604abfd54e0ee3"
+    }
+  ],
+  "preexecution_seal_sha256": "8bfacdbe6548956c26939f7f2ed4f92309cafa3442e4c91a290b498a1bb571d1",
+  "primary_contrast_sha256": "bf0dd60e7f28e5349b3b6d624df11d3a0c53a91f0cf659fbfb5632323eaf5329",
+  "primary_not_evaluable": true,
+  "raw_descriptive_delta_not_inferential": -0.002521514892578125,
+  "run_id": "FLY-PHENO-00-RUN1",
+  "schema": "FLY-PHENO-00-terminal-receipt-v1",
+  "status": "CLOSED_PRIMARY_NOT_EVALUABLE"
+}

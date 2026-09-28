@@ -1,0 +1,7 @@
+{
+  "candidate_snapshot": "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-lr1-nl1-v1\\parent-snapshot",
+  "captured_at_utc": "2026-09-18T15:37:46.599150+00:00",
+  "identity": "q10-gc1-lr1-nl1-audit-v1",
+  "protocol": "Q10-GC1-LR1-NL1-INTERNAL-PARENT-CONSISTENCY-AUDIT",
+  "sealed": true
+}

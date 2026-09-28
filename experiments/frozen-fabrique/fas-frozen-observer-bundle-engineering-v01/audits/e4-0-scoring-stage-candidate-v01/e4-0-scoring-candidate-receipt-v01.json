@@ -1,0 +1,149 @@
+{
+  "schema": "FAS_E4_0_SCORING_CANDIDATE_RECEIPT_V01",
+  "status": "CANDIDATE_ONLY_NOT_SEALED_NOT_AUTHORIZED",
+  "created_utc": "2026-09-28T01:58:21.818077+00:00",
+  "spec_candidate": {
+    "path": "experiments\\fas-frozen-observer-bundle-engineering-v01\\audits\\e4-0-scoring-stage-candidate-v01\\e4-0-scoring-execution-spec-candidate-v01.json",
+    "bytes": 32926,
+    "sha256": "141490794863f1cba56195cb6b76a0bf9ea8b83cad32a5f50c3e37b369a613b3"
+  },
+  "implementation": {
+    "path": "experiments\\fas-frozen-observer-bundle-engineering-v01\\source\\scripts\\e4_fresh_scorer_ledger_v01\\ledger_adapter.py",
+    "bytes": 17724,
+    "sha256": "36b6ff6ae2692d054162fe8e2e2e7730e89cd212d63d570c9630f098f2a5c4e7"
+  },
+  "qualification": {
+    "kind": "synthetic_only",
+    "command": "python -m unittest -v test_adapter",
+    "result": "PASS",
+    "tests_passed": 6,
+    "tests_failed": 0,
+    "duration_seconds": 14.971,
+    "coverage": [
+      "frozen math hash and gates/runtime",
+      "E3 asset hash acceptance and synthetic tamper rejection",
+      "unauthorized invocation rejected before inference",
+      "one-shot primary panel reader on synthetic panel",
+      "source path/escrow/scope rejection",
+      "synthetic 6400-row eight-endpoint qualification"
+    ],
+    "actual_e4_label_or_feature_cache_or_e3_head_accessed": false,
+    "tokenizer_model_cuda_ledger_contact": false
+  },
+  "source_identities": [
+    {
+      "path": "experiments\\fas-frozen-observer-bundle-engineering-v01\\source\\scripts\\e4_fresh_scorer_ledger_v01\\ledger_adapter.py",
+      "bytes": 17724,
+      "sha256": "36b6ff6ae2692d054162fe8e2e2e7730e89cd212d63d570c9630f098f2a5c4e7"
+    },
+    {
+      "path": "experiments\\fas-frozen-observer-bundle-engineering-v01\\source\\scripts\\e4_fresh_scorer_ledger_v01\\README.md",
+      "bytes": 3752,
+      "sha256": "bf00a4102d753fb7bd34834e485bd4d45725b2b9d97a881016607af5d0999435"
+    },
+    {
+      "path": "experiments\\fas-frozen-observer-bundle-engineering-v01\\source\\scripts\\e4_fresh_scorer_ledger_v01\\test_adapter.py",
+      "bytes": 9595,
+      "sha256": "517f694aab646731b7d45a62a26501cbe226bc093a082103e78a65e072069eb2"
+    },
+    {
+      "path": "experiments\\fas-frozen-observer-bundle-engineering-v01\\source\\scripts\\e4_fresh_scorer_v04\\scorer.py",
+      "bytes": 33616,
+      "sha256": "58bc957de63d430933570430ee0760a5833bc9c6ef5a82dae6dba78115b8b866"
+    },
+    {
+      "path": "experiments\\fas-frozen-observer-bundle-engineering-v01\\source\\scripts\\e4_fresh_scorer_v04\\output_artifacts.py",
+      "bytes": 5887,
+      "sha256": "73fbdd184d01df6de913676a0caa0be8f38f264bc9667e3985b52485425b33d4"
+    },
+    {
+      "path": "experiments\\fas-frozen-observer-bundle-engineering-v01\\contracts\\e4-0-contract-v16-v09-final.json",
+      "bytes": 146087,
+      "sha256": "21fc77d5a288b9adef995d88f089890235f8dcb2fbc3c9e452725bb67892a22f"
+    },
+    {
+      "path": "experiments\\fas-frozen-observer-bundle-engineering-v01\\seals\\e4-0-contract-v16-v09-seal.json",
+      "bytes": 171220,
+      "sha256": "0635de4a384b4d5121d8b2295e88a73f649c53e402ffcda311fcaf9c8d93099c"
+    },
+    {
+      "path": "experiments\\fas-frozen-observer-bundle-engineering-v01\\contracts\\e3-score-v02.json",
+      "bytes": 11485,
+      "sha256": "6d1c7f35a7f3405313b9b67cbebebbb1b740c7e1c670b93d5579f280a7889704"
+    },
+    {
+      "path": "experiments\\fas-frozen-observer-bundle-engineering-v01\\seals\\e3-score-v02-seal.json",
+      "bytes": 4149,
+      "sha256": "7874bd0c8e9b47973b7cae5cac44da394a6ad1113a98c80ce89d886bae729169"
+    },
+    {
+      "path": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e3-v02\\e3-v02-seal.json",
+      "bytes": 19475,
+      "sha256": "b8dce8dc7ff2d1a1739619f1ed00444d970ccc46872bb1acca2f1e07bf31a485"
+    }
+  ],
+  "library_intake": {
+    "acceptance_id": "sha256:2578de42c94f7f8cbed72521cb582a47bea465039f7a485ecce30ec1fcd7a898",
+    "source_root": "sha256:8019d2281747a5b9d4572e58770fa7ec671c744d9274be43dea3a17ac001a10c",
+    "status_at_chief_notice": "OPEN"
+  },
+  "ledger_state_at_chief_notice": {
+    "panel_exposure_count": 0,
+    "source": "Chief Kammi status message",
+    "observed_utc": "2026-09-27"
+  },
+  "panel_mapping": {
+    "artifact_id": "E4_PRIMARY_TERMINAL_LABELS_V01",
+    "panel_id": null,
+    "resolution": "PENDING_CHIEF_KAMMI"
+  },
+  "outputs": [
+    {
+      "artifact_id": "E4_SCORING_PREDICTIONS_V01",
+      "path": "score/predictions-v01.jsonl",
+      "class": "row_level",
+      "max_bytes": 382300160,
+      "truth_included": false
+    },
+    {
+      "artifact_id": "E4_SCORING_SCORED_ROWS_V01",
+      "path": "score/scored-rows-v01.jsonl",
+      "class": "row_level",
+      "max_bytes": 382300160,
+      "truth_included": true
+    },
+    {
+      "artifact_id": "E4_SCORING_METRICS_V01",
+      "path": "score/metrics-v01.json",
+      "class": "other_persistent_aggregate"
+    },
+    {
+      "artifact_id": "E4_SCORING_BOOTSTRAP_V01",
+      "path": "score/bootstrap-v01.npz",
+      "class": "other_persistent_aggregate"
+    },
+    {
+      "artifact_id": "E4_SCORING_LABEL_OPEN_RECEIPT_V01",
+      "path": "score/label-open-receipt-v01.json",
+      "class": "other_persistent_aggregate"
+    },
+    {
+      "artifact_id": "E4_SCORING_TERMINAL_RECEIPT_V01",
+      "path": "score/terminal-receipt-v01.json",
+      "class": "other_persistent_aggregate"
+    }
+  ],
+  "resource_caps": {
+    "row_level_per_file_bytes": 382300160,
+    "other_persistent_aggregate_bytes": 536870912,
+    "temporary_aggregate_bytes": 536870912,
+    "host_ram_bytes": 25769803776,
+    "conservative_stage_bytes_including_panel": 1877705408
+  },
+  "execution_grant_issued": false,
+  "panel_opened": false,
+  "real_labels_opened": false,
+  "real_scoring_performed": false,
+  "real_predictions_generated": false,
+  "candidate_packet_sealed": false
+}

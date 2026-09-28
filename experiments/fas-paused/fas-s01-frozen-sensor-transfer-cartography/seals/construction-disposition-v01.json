@@ -1,0 +1,11 @@
+{
+  "disposition_id": "FASS01_CONSTRUCTION_DISPOSITION_V01",
+  "project_id": "fas-s01-frozen-sensor-transfer-cartography",
+  "project_root_sha256": "894b4a0c6db98a5d84fe75589168715a00660d48917e47b0c21bb794a2fc3777",
+  "S01_PROTOCOL_READY": true,
+  "S01_READONLY_ANALYSIS_AUTHORIZED": false,
+  "S01_MODEL_CONTACT_AUTHORIZED": false,
+  "S01_PROBE_TRAINING_AUTHORIZED": false,
+  "S01_PHASE1_RESULT_CREATED": false,
+  "FAS00_PHASE4_AUTHORIZED": false
+}

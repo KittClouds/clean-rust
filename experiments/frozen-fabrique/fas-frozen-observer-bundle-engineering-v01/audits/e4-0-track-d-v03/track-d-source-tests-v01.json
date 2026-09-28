@@ -1,0 +1,132 @@
+{
+  "schema": "FAS_E4_0_TRACK_D_V03_SOURCE_TESTS_V01",
+  "status": "PASS_SYNTHETIC_SOURCE_AND_CLI_TESTS",
+  "source_unit": "E4 independent auditor v03; validates v06 inherited stages and v07 runtime stages",
+  "supersedes": {
+    "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-d/track-d-receipt-v06.json",
+    "bytes": 5510,
+    "sha256": "d53cf6bf67700746875fb1ead3572006bc36a12163156689b9c8287dfa3bfc0a"
+  },
+  "recorded_utc": "2026-09-26T23:50:11+00:00",
+  "commands": [
+    "python -m compileall -q source/scripts/e4_independent_audit_v03",
+    "python -m unittest discover -s source/scripts/e4_independent_audit_v03/tests -v",
+    "PowerShell: set PYTHONPATH to source/scripts; python -m e4_independent_audit_v03 --help; clear PYTHONPATH",
+    "PowerShell here-string piped to Python: import sys, numpy, torch; print Python/NumPy/Torch versions and torch.cuda.is_initialized() (False)"
+  ],
+  "results": {
+    "compileall": "PASS",
+    "unittest": "PASS",
+    "tests_run": 16,
+    "tests_passed": 16,
+    "tests_failed": 0,
+    "test_names": [
+      "test_all_non_scoring_runtime_stage_shapes",
+      "test_auditor_source_has_no_scorer_imports",
+      "test_cache_and_receipt_tamper_are_rejected",
+      "test_cli_workspace_root_walks_above_project_folder",
+      "test_contract_seal_binds_v07_and_exact_v06_contract_seal_lineage",
+      "test_escrow_sentinel_is_never_opened_by_pre_score_seal_audit",
+      "test_inherited_v06_contract_seal_checks_exact_synthetic_bytes",
+      "test_markdown_source_map_accepts_exact_workspace_project_prefix",
+      "test_runtime_authorization_requires_artifact_map_and_exact_roots",
+      "test_scorer_auditor_disagreement_is_rejected",
+      "test_scoring_authorization_forbids_runtime_artifact_map",
+      "test_single_endpoint_failure_is_not_hidden_by_bundle",
+      "test_source_map_hash_and_path_are_checked",
+      "test_support_failure_skips_endpoint_bootstrap",
+      "test_synthetic_qualification_passes_and_bootstrap_reproduces",
+      "test_v06_population_and_panel_are_inherited_while_later_stages_require_v07"
+    ],
+    "cli_help_smoke": "PASS_CONTRACT_POPULATION_PARITY_FEATURES_SCORE_COMMANDS_LISTED",
+    "torch_cuda_is_initialized_after_tests": false
+  },
+  "runtime": {
+    "python": "3.13.15",
+    "numpy": "2.5.3",
+    "torch": "2.11.0+cu128",
+    "torch_cuda_initialized_after_probe": false
+  },
+  "identity": {
+    "contract_id": "FAS_FROZEN_CAPABILITY_FABRIC_E4_0_V07",
+    "contract_seal_id": "FAS_E4_0_CONTRACT_V07_SEAL",
+    "inherited_contract_id": "FAS_FROZEN_CAPABILITY_FABRIC_E4_0_V06",
+    "inherited_contract_seal_id": "FAS_E4_0_CONTRACT_V06_SEAL",
+    "v06_inherited_stages": [
+      "POPULATION_GENERATION",
+      "PARITY_PANEL_MATERIALIZATION"
+    ],
+    "v07_new_stages": [
+      "ONLINE_CACHE_PARITY",
+      "FRESH_FEATURE_EXTRACTION",
+      "FRESH_SCORING"
+    ],
+    "scientific_predecessor_map": [
+      "e0_v10_root_sha256",
+      "e1_v04_root_sha256",
+      "e2_v07_root_sha256",
+      "e3_v02_bundle_root_sha256"
+    ]
+  },
+  "boundary": {
+    "actual_e4_population_or_feature_data_read": false,
+    "actual_e4_primary_terminal_labels_read": false,
+    "actual_e4_escrow_labels_read": false,
+    "actual_e3_head_files_read": false,
+    "synthetic_e3_head_arrays_used_for_replay_logic": true,
+    "escrow_sentinel_opened": false,
+    "actual_v06_contract_or_seal_read": false,
+    "tokenizer_contact": false,
+    "backbone_model_contact": false,
+    "torch_imported_for_synthetic_cpu_replay": true,
+    "cuda_initialization": false,
+    "real_e4_audit_or_replay": false
+  },
+  "source_files": {
+    "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v03/__init__.py": {
+      "bytes": 71,
+      "sha256": "c5c6939552ed8fc92be9b0dd26f6732123dcccc44ef316eb3ab685f8bf291f12"
+    },
+    "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v03/__main__.py": {
+      "bytes": 48,
+      "sha256": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d"
+    },
+    "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v03/cli.py": {
+      "bytes": 28874,
+      "sha256": "673bcf94e9201fdb8918af6cd6ba30a7d954a050b4f46b9e52f1815f37ed1f3b"
+    },
+    "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v03/constants.py": {
+      "bytes": 4383,
+      "sha256": "ff44013e9aab2fba7aecf93ae872f14dcfc4fe103d4bf13ab5e10e399c56c14e"
+    },
+    "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v03/features.py": {
+      "bytes": 13065,
+      "sha256": "241f84f6874cf272b173acb52a1541c472445c109c270c230858210b8ab529b5"
+    },
+    "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v03/integrity.py": {
+      "bytes": 26840,
+      "sha256": "f63881593394f4f1a122e53b0cf921dda8aae60fa39c949fcd1cd0fcf4853e55"
+    },
+    "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v03/population.py": {
+      "bytes": 16583,
+      "sha256": "721f7d965777e9c2cb1baee6d4459ef7dbffea8b84c58cb123dedc72e5bf3309"
+    },
+    "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v03/README.md": {
+      "bytes": 1770,
+      "sha256": "0ba9f3851b6b1e7e23d4cd9cf945fc932357ea35dae5bacadfc248a2a8e48b11"
+    },
+    "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v03/replay.py": {
+      "bytes": 24743,
+      "sha256": "fc2d49b6efe7b300b425d8a69858f4256da7218a400872d2560798456a44b421"
+    },
+    "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v03/tests/test_audit.py": {
+      "bytes": 39334,
+      "sha256": "5e8b67e613feed5626e6b2d12afbae47a3fe64ed540055f2e082f6e7e96e9e46"
+    }
+  },
+  "notes": [
+    "All runtime/seal and replay fixtures are synthetic temporary artifacts. The inherited-v06 checks validate synthetic bytes against frozen identity constants and do not read or alter the sealed v06 runtime artifacts.",
+    "The auditor contains no scorer imports and reconstructs synthetic support, predictions, balanced accuracy, bootstrap bounds, and conjunction independently.",
+    "The suite imports torch lazily for CPU-only synthetic replay; torch.cuda.is_initialized() remains False."
+  ]
+}

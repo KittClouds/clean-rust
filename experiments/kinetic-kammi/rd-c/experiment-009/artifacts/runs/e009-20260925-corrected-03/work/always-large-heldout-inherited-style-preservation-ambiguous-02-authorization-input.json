@@ -1,0 +1,34 @@
+{
+  "task_id": "heldout-inherited-style-preservation-ambiguous-02",
+  "frame_hash_hex": "3db673e2c2f32d7d6e7a2c949ad8d9863eac08358d0f7a79be8590fb7dc8bc33",
+  "selected_patch_sha256": "b86fe5bffa52431fd54e37e5079a56998aa6f4cf581681931196f3051b96d22b",
+  "action_ledger_path": "C:\\rd-c\\experiment-009\\artifacts\\runs\\e009-20260925-corrected-03\\ledgers\\always-large\\heldout-inherited-style-preservation-ambiguous-02.actions.bin",
+  "actions": [
+    {
+      "id": 11,
+      "schema_id": 1
+    },
+    {
+      "id": 37,
+      "schema_id": 1
+    },
+    {
+      "id": 68,
+      "schema_id": 1
+    },
+    {
+      "id": 94,
+      "schema_id": 1
+    }
+  ],
+  "observer_output": {
+    "action_choice": 37,
+    "applicability_milli": 950,
+    "abstention_milli": 50
+  },
+  "thresholds": {
+    "minimum_applicability_milli": 850,
+    "maximum_abstention_milli": 150
+  },
+  "completion_check_passed": true
+}

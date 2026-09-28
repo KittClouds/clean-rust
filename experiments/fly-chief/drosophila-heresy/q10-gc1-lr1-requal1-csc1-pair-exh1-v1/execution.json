@@ -1,0 +1,148 @@
+{
+  "contexts": [
+    {
+      "context": [
+        "seed9731-L-tau16.json",
+        2
+      ],
+      "degree_sha256": "77AC37672F093FCE258181F0610AC4E1CFEC72A0A0678B7AC3C123DCCC7F67FF",
+      "frontier_sha256": "C30208D1A51EE5F25AFA25C3BD7469F39A1CD121D248D59BA788828AC70232DF",
+      "max_geometry_abs_error": 4.440892098500626e-16,
+      "max_valid_degree": 123,
+      "min_valid_degree": 1,
+      "nonzero_degree_actions": 430,
+      "parent_pairs": 95040,
+      "valid_pairs": 7553,
+      "validation_mismatches": 0,
+      "validation_pairs": 2121
+    },
+    {
+      "context": [
+        "seed9731-L-tau4.json",
+        3
+      ],
+      "degree_sha256": "BAE34FEF9A3C5539E24C4EBB58E6F087B645ACA282F199DE45E5831C2429F27D",
+      "frontier_sha256": "3E2C6BA7799AB29E0F0E48FA5FE64F953355788979776C9350E5DE3946F3F5D2",
+      "max_geometry_abs_error": 2.220446049250313e-16,
+      "max_valid_degree": 6,
+      "min_valid_degree": 1,
+      "nonzero_degree_actions": 9,
+      "parent_pairs": 121024,
+      "valid_pairs": 7,
+      "validation_mismatches": 0,
+      "validation_pairs": 2389
+    },
+    {
+      "context": [
+        "seed9731-R-tau16.json",
+        1
+      ],
+      "degree_sha256": "25873FAC47FACA5C9278FEFA1436DC259416D4C7FFBD45ABA87FF161A2992771",
+      "frontier_sha256": "6E23D78F9529897C53D8A1D144F01153E85E53E69B3CC6372221B73EA74F8FDA",
+      "max_geometry_abs_error": 2.220446049250313e-16,
+      "max_valid_degree": 14,
+      "min_valid_degree": 1,
+      "nonzero_degree_actions": 47,
+      "parent_pairs": 109504,
+      "valid_pairs": 68,
+      "validation_mismatches": 0,
+      "validation_pairs": 2266
+    },
+    {
+      "context": [
+        "seed9731-R-tau16.json",
+        3
+      ],
+      "degree_sha256": "CA3D163BAB055381827226140568F3BEF7EAAC187CEBD76878E0B63E9E442356",
+      "frontier_sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "max_geometry_abs_error": 2.220446049250313e-16,
+      "max_valid_degree": 0,
+      "min_valid_degree": 0,
+      "nonzero_degree_actions": 0,
+      "parent_pairs": 91584,
+      "valid_pairs": 0,
+      "validation_mismatches": 0,
+      "validation_pairs": 2062
+    },
+    {
+      "context": [
+        "seed9731-R-tau4.json",
+        0
+      ],
+      "degree_sha256": "CA3D163BAB055381827226140568F3BEF7EAAC187CEBD76878E0B63E9E442356",
+      "frontier_sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "max_geometry_abs_error": 2.220446049250313e-16,
+      "max_valid_degree": 0,
+      "min_valid_degree": 0,
+      "nonzero_degree_actions": 0,
+      "parent_pairs": 109504,
+      "valid_pairs": 0,
+      "validation_mismatches": 0,
+      "validation_pairs": 2267
+    },
+    {
+      "context": [
+        "seed9731-R-tau4.json",
+        1
+      ],
+      "degree_sha256": "F44885758AE9DE9751E4D9913EB1ACDCCF4F8AFCADF8CA8ED90FE528FCC4987B",
+      "frontier_sha256": "230F49D1473295DB09C55C936E236CEDD4448D559EF3A872FA75EE1E42BABB59",
+      "max_geometry_abs_error": 0.0,
+      "max_valid_degree": 140,
+      "min_valid_degree": 1,
+      "nonzero_degree_actions": 187,
+      "parent_pairs": 95040,
+      "valid_pairs": 223,
+      "validation_mismatches": 0,
+      "validation_pairs": 2099
+    },
+    {
+      "context": [
+        "seed9731-R-tau4.json",
+        2
+      ],
+      "degree_sha256": "46F49764CEAEF6B2D8A5D1F486F560746E4BCA5DF53B5D47E432ACECEF75D7F3",
+      "frontier_sha256": "163D858A6752738C18BAEA302F895340AF09883A69245792654E4026128E17B3",
+      "max_geometry_abs_error": 2.220446049250313e-16,
+      "max_valid_degree": 221,
+      "min_valid_degree": 1,
+      "nonzero_degree_actions": 246,
+      "parent_pairs": 109504,
+      "valid_pairs": 241,
+      "validation_mismatches": 0,
+      "validation_pairs": 2253
+    },
+    {
+      "context": [
+        "seed9731-R-tau4.json",
+        3
+      ],
+      "degree_sha256": "F6C55E09EA6D3CE9C487F3C743B6C4F8DC2884C36E133AD9F9D9798200BC5EA7",
+      "frontier_sha256": "95AA4E5B9E95C57A58D9F5438ED0E6CDC865CE1B33A4BFB0087FAA2B9FBCCD74",
+      "max_geometry_abs_error": 2.220446049250313e-16,
+      "max_valid_degree": 245,
+      "min_valid_degree": 1,
+      "nonzero_degree_actions": 384,
+      "parent_pairs": 109504,
+      "valid_pairs": 1438,
+      "validation_mismatches": 0,
+      "validation_pairs": 2255
+    }
+  ],
+  "contract_sha256": "8CD748435C8BD876CC2094D01FB290CC834284EA0EE6EE3230174E9D0A31DBAD",
+  "counts": {
+    "contexts": 8,
+    "parent_pairs": 840704,
+    "valid_pairs": 9530,
+    "validation_mismatches": 0,
+    "validation_pairs": 17712
+  },
+  "engineering_only": true,
+  "frontier_ready_for_front1": true,
+  "identity": "q10-gc1-lr1-requal1-csc1-pair-exh1-v1",
+  "pair_replay_performed": false,
+  "protocol": "Q10-PAIR-EXH1",
+  "readout_executed": false,
+  "scientific_promotion": false,
+  "status": "PAIR_EXH1_COMPLETE"
+}

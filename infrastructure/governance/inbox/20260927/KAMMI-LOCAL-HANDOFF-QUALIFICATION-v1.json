@@ -1,0 +1,58 @@
+{
+  "schema": "KAMMI_LOCAL_HANDOFF_QUALIFICATION_V1",
+  "status": "PASS",
+  "run_id": "library.local.handoff.qual.v1",
+  "stage_id": "LIB_LOCAL_HANDOFF_QUAL_V1",
+  "actor_id": "library-local-qual-v1",
+  "resource_id": "cpu.library.local.qual.v1",
+  "policy_hash": "sha256:9573f887039733ef93e445604aa9b46780be84ae3af00eb4987fb58765a858d9",
+  "grants": {
+    "bind_spec": "sha256:2ab8470c389e35df92fcf99d2086f8ea0c22ea0064a9231bf2dbd2fd0aecc952",
+    "authorize_stage": "sha256:cee06840f5a1c54e8de11b687d65e75fa5eb3adc78346504932e2670b6d705b4",
+    "acquire_lease": "sha256:d8107ebb25d615ad2a7fa47343d9a6aa645f06d70119d20c5924c3ad09973c61",
+    "execute_local": "sha256:abd30c9751608b0192014dafabca459ced3dfb147948efea633987ff97d1c498"
+  },
+  "scientific_spec": "sha256:5944b8b57a90bc5630fb7bae9ff8f803bf00d869060c93d081767e386fc84d0b",
+  "execution_spec": "sha256:428f65ed8bf8e929d6982f7219c13b2295761f317834fd40a02ab09f049786e6",
+  "seal_root": "sha256:e5faf11bb3ec2d64d9dd380e77ebc0ca279b43f9c747367515547c08b14e7f32",
+  "authorization_id": "sha256:b0ecf614573416dd4b07103cf75f5e054b4a78c4ecc8d85e3740ff38d4746131",
+  "lease_id": "lease-95b75b53f3133cbd0486a5b9f634baaca686df649c499fbf052dca2f7167c55f",
+  "fencing_token": 1,
+  "execution_exit": 0,
+  "execution_stdout": "{\"schema\": \"KAMMI_LOCAL_EXECUTION_RESULT_V1\", \"status\": \"OUTPUTS_REGISTERED\", \"attempt_id\": \"library.local.qual.attempt.v1\", \"run_id\": \"library.local.handoff.qual.v1\", \"stage_id\": \"LIB_LOCAL_HANDOFF_QUAL_V1\", \"authorization_id\": \"sha256:b0ecf614573416dd4b07103cf75f5e054b4a78c4ecc8d85e3740ff38d4746131\", \"lease_id\": \"lease-95b75b53f3133cbd0486a5b9f634baaca686df649c499fbf052dca2f7167c55f\", \"fencing_token\": 1, \"library_acceptance\": \"sha256:f98dcd6743c5e8b7ff091cef2d69aa361e53c252711c7b001f3a71d322744602\", \"output_root\": \"C:\\\\code land\\\\clean-rust\\\\program-infrastructure\\\\kammi-ledger\\\\.kammi-dev\\\\operational\\\\local-qualification-v1\\\\output\", \"outputs\": {\"large-output.bin\": {\"artifact_id\": \"sha256:1854b646fe95f45524c80d8b9291633300bb7482663dd1fa28b7b508fc5038d5\", \"event_id\": \"sha256:e6c6311da14c1038fc920fe111006f41118e8a9ad94424f8cd9c546bf251d490\", \"bytes\": 19005440}}, \"pid_diagnostic_only\": 26644, \"model_launch_contact_event\": \"sha256:6edaded3517372c738fddc09d042048452ba4426ec08fc0a5fd5980d41defc8e\", \"exit_code\": 0, \"stdout\": {\"path\": \"C:\\\\code land\\\\clean-rust\\\\program-infrastructure\\\\kammi-ledger\\\\.kammi-dev\\\\operational\\\\local-qualification-v1\\\\receipts\\\\stdout.log\", \"sha256\": \"sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"}, \"stderr\": {\"path\": \"C:\\\\code land\\\\clean-rust\\\\program-infrastructure\\\\kammi-ledger\\\\.kammi-dev\\\\operational\\\\local-qualification-v1\\\\receipts\\\\stderr.log\", \"sha256\": \"sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"}}\n",
+  "execution_stderr": "",
+  "result_path": "C:\\code land\\clean-rust\\program-infrastructure\\kammi-ledger\\.kammi-dev\\operational\\local-qualification-v1\\receipts\\RESULT.json",
+  "result": {
+    "schema": "KAMMI_LOCAL_EXECUTION_RESULT_V1",
+    "status": "OUTPUTS_REGISTERED",
+    "attempt_id": "library.local.qual.attempt.v1",
+    "run_id": "library.local.handoff.qual.v1",
+    "stage_id": "LIB_LOCAL_HANDOFF_QUAL_V1",
+    "authorization_id": "sha256:b0ecf614573416dd4b07103cf75f5e054b4a78c4ecc8d85e3740ff38d4746131",
+    "lease_id": "lease-95b75b53f3133cbd0486a5b9f634baaca686df649c499fbf052dca2f7167c55f",
+    "fencing_token": 1,
+    "library_acceptance": "sha256:f98dcd6743c5e8b7ff091cef2d69aa361e53c252711c7b001f3a71d322744602",
+    "output_root": "C:\\code land\\clean-rust\\program-infrastructure\\kammi-ledger\\.kammi-dev\\operational\\local-qualification-v1\\output",
+    "outputs": {
+      "large-output.bin": {
+        "artifact_id": "sha256:1854b646fe95f45524c80d8b9291633300bb7482663dd1fa28b7b508fc5038d5",
+        "event_id": "sha256:e6c6311da14c1038fc920fe111006f41118e8a9ad94424f8cd9c546bf251d490",
+        "bytes": 19005440
+      }
+    },
+    "pid_diagnostic_only": 26644,
+    "model_launch_contact_event": "sha256:6edaded3517372c738fddc09d042048452ba4426ec08fc0a5fd5980d41defc8e",
+    "exit_code": 0,
+    "stdout": {
+      "path": "C:\\code land\\clean-rust\\program-infrastructure\\kammi-ledger\\.kammi-dev\\operational\\local-qualification-v1\\receipts\\stdout.log",
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stderr": {
+      "path": "C:\\code land\\clean-rust\\program-infrastructure\\kammi-ledger\\.kammi-dev\\operational\\local-qualification-v1\\receipts\\stderr.log",
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "journal_head_before": "sha256:a949bfc74e65b21a0eedf021109523af334edf77ba54695435ea519768047b22",
+  "journal_head_after": "sha256:4ef0539e948ee1aa2cff2b767252d2187d5f6d0a56ab9ce01e731be6512f0278",
+  "scope": "CPU-only Library fixture; does not qualify Fabrique adaptation or confer E4 authority"
+}

@@ -1,0 +1,100 @@
+{
+  "receipt_id": "FAS_FROZEN_OBSERVER_BUNDLE_E2_V07_PREAUTHORIZATION_PREFLIGHT_PASS_V01",
+  "recorded_utc": "2026-09-26T10:48:06.884420+00:00",
+  "status": "PREFLIGHT_PASS_MODEL_CONTACT_NOT_AUTHORIZED",
+  "e0_v10_root_sha256": "899a131c09298fdafdcc6771ad01e8982857a1cd47900259800f97dd7bea7ccd",
+  "e0_v10_independent_audit_sha256": "e5462e6374a0e547965bec802183e42fb8b16d3518d65ed06eac2e343a5b178b",
+  "cli_result": {
+    "checks": {
+      "actual_e0_seal_root_and_members_recomputed": true,
+      "comparator_hash_and_length_verified_read_only": true,
+      "concurrent_wait_receipt_and_live_absence_verified": true,
+      "cuda_allocator_not_initialized": true,
+      "e0_v09_direct_predecessor_verified": true,
+      "e0_v09_predecessor_root_and_members_recomputed": true,
+      "e1_v04_root_and_panel_row_order_verified": true,
+      "e2_v07_protocol_hash_and_authority_verified": true,
+      "feature_output_root_is_new": true,
+      "freeze_contract_derived_from_manifest_membership": true,
+      "labels_not_opened": true,
+      "manifest_metadata_spelling_not_used_as_identity_gate": true,
+      "model_and_tokenizer_asset_hashes_verified": true,
+      "representation_abi_and_extractor_hashes_verified": true,
+      "runtime_distribution_versions_verified_without_importing_model_libraries": true,
+      "storage_host_and_device_resource_preflight_passed": true
+    },
+    "execution_identity": {
+      "comparator_sha256": "8eb80df5f73e761fe6c025fc1c66abef2027d639b6c14f56d4177d6e6a7a45a4",
+      "e1_root_sha256": "6ba77a899363651e3ba119b005f59a22e86f011f83c86b873857cd3f9ab64b03",
+      "extractor_sha256": "2b210d4f65c37d823b7060278c8a29db3a5c5f7fb535e6bb28d5147bc56b7b24",
+      "freeze_contract_sha256": "a47c66391d9f691ed182ab327c6fd6d68a6ed18c5c08ac6250a46c5dde2556f3",
+      "representation_abi_sha256": "3b36b066111872290b9f37a877b9043650867fa81658476c783a5c7e7485d319",
+      "seal_root_sha256": "899a131c09298fdafdcc6771ad01e8982857a1cd47900259800f97dd7bea7ccd",
+      "verifier_sha256": "ef077ddd6edaff7594088dddec1911527281dfdbbf04e53f7a71cb6d3f2abf82"
+    },
+    "observations": {
+      "assets": {
+        "model_asset_manifest_sha256": "a76c55c90e6beaaf6acf145abcfbfa6bd5cbb7a1ff4788cbb80856f62adaa56e",
+        "model_config_sha256": "15d6157fb6df3f8272e2fe90e18f57727ccf02a125c94469198b0f3281510185",
+        "model_weights_sha256": "7678ab9546a0c51c1fca161876b1efc4f0906277f170b5822045f40fdaf9eeff",
+        "tokenizer_loaded_file_count": 4,
+        "tokenizer_manifest_sha256": "c5e9a5b08ec5658ef2a8760d8230bbe9367bea124451488e164baf0eeca95afc"
+      },
+      "comparator_bytes": 872415232,
+      "comparator_sha256": "8eb80df5f73e761fe6c025fc1c66abef2027d639b6c14f56d4177d6e6a7a45a4",
+      "cuda_allocator_initialized": false,
+      "live_wait_target_matches": [],
+      "manifest_metadata": {
+        "contract_freeze_id": "FAS_FROZEN_OBSERVER_BUNDLE_E0_FREEZE_V10",
+        "freeze_contract_path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/e0-freeze-v10-sealed-v01.json",
+        "manifest_freeze_id": null,
+        "manifest_seal_id": "FAS_FROZEN_OBSERVER_BUNDLE_E0_SEAL_V10",
+        "manifest_status": "E0_FROZEN_NOT_AUTHORIZED_FOR_MODEL_CONTACT"
+      },
+      "model_contact_authorized": false,
+      "panel_row_identity": {
+        "labels_opened": false,
+        "ordered_identity_match": true,
+        "row_count": 106496
+      },
+      "resources": {
+        "device_wide_gpu_diagnostic": "NVIDIA GeForce RTX 3080, 12288, 2233, 9859, 20",
+        "host_memory": {
+          "available_bytes": 12591898624,
+          "total_bytes": 34239672320
+        },
+        "projected_peak_bytes": 3429093176,
+        "required_free_bytes": 3772002493,
+        "target_drive_free_bytes": 745533296640,
+        "total_gpu_memory_claimed": false
+      },
+      "runtime_versions": {
+        "cuda_runtime": "12.8",
+        "expected_device_0": "NVIDIA GeForce RTX 3080",
+        "huggingface_hub": "1.32.0",
+        "numpy": "2.5.3",
+        "python": "3.13.15",
+        "safetensors": "0.8.0",
+        "tokenizers": "0.23.2",
+        "torch": "2.11.0+cu128",
+        "transformers": "5.17.0"
+      },
+      "tokenizer_contact_authorized": false,
+      "wait_receipt_status": "WAIT_COMPLETE_STABLE_ABSENCE"
+    },
+    "paths": {
+      "e0_seal_manifest": "C:\\code land\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\seals\\e0-seal-v10.json",
+      "e1_run_root": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e1-panel-v04",
+      "e2_protocol": "C:\\code land\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\contracts\\e2-run-v07.json",
+      "extractor": "C:\\code land\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\source\\scripts\\extract_features_v07.py",
+      "feature_output_root": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e2-v07",
+      "representation_abi": "C:\\code land\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\contracts\\representation-abi-v07.json"
+    },
+    "status": "PREFLIGHT_PASS_MODEL_CONTACT_NOT_AUTHORIZED"
+  },
+  "stdout_payload_sha256": "303d558424392c291260caced355667273c5c260f6eb4270e04b3f0223049283",
+  "model_contact_authorized": false,
+  "tokenizer_contact_authorized": false,
+  "cuda_allocator_initialized": false,
+  "e3_authorized": false
+}

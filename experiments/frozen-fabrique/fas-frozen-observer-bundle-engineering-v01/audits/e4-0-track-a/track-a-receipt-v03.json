@@ -1,0 +1,121 @@
+{
+  "schema": "FAS_E4_0_TRACK_A_RECEIPT_V03",
+  "receipt_version": "v03",
+  "supersedes": {
+    "path": "audits/e4-0-track-a/track-a-receipt-v02.json",
+    "bytes": 6821,
+    "sha256": "54e143b1657d5f99a8f730604e4095bc0ece2521492124e6bb5effc52da92dcb"
+  },
+  "supersession_reason": "Versioned population CLI identities for E4-0 v06 while preserving population generation semantics and prior artifacts.",
+  "track": "E4_0_POPULATION_GENERATOR",
+  "status": "TRACK_A_COMPLETE_PREAUTHORIZATION",
+  "created_utc": "2026-09-26T22:15:45.711351+00:00",
+  "bound_contract_identity": {
+    "contract_id": "FAS_FROZEN_CAPABILITY_FABRIC_E4_0_V06",
+    "contract_path": "contracts/e4-0-contract-v06-final.json",
+    "contract_artifact_id": "E4_0_CONTRACT_V06_FINAL",
+    "seal_id": "FAS_E4_0_CONTRACT_V06_SEAL",
+    "seal_path": "seals/e4-0-contract-v06-seal.json"
+  },
+  "source_files": [
+    {
+      "path": "source/e4-population-v02/benches/population_hot_path.rs",
+      "bytes": 2522,
+      "sha256": "c87bb976feea504935d8f3042f577d74f5809314294507f2881a8c192835deda",
+      "lines": 54
+    },
+    {
+      "path": "source/e4-population-v02/Cargo.lock",
+      "bytes": 19005,
+      "sha256": "ebe38c4657bf638886f81916734b31506ea535dd4840d36dba9d1974b208a9ca",
+      "lines": 737
+    },
+    {
+      "path": "source/e4-population-v02/Cargo.toml",
+      "bytes": 500,
+      "sha256": "faa0515d9a4308bd3e128c49131fdc3a95eb795e385518b2c47ae26f647e436c",
+      "lines": 26
+    },
+    {
+      "path": "source/e4-population-v02/src/bin/e4-population-v02.rs",
+      "bytes": 16107,
+      "sha256": "ffa41e08ca9f5d06fe7eb9d414d470e208d864e679bce688b4b84c4d4c319ea7",
+      "lines": 433
+    },
+    {
+      "path": "source/e4-population-v02/src/identity.rs",
+      "bytes": 14033,
+      "sha256": "58e5c95ad5d00daeafc810b70d28aefa605f0320b2d7144651e85b5a598f3b5d",
+      "lines": 398
+    },
+    {
+      "path": "source/e4-population-v02/src/lib.rs",
+      "bytes": 3760,
+      "sha256": "8de3e3ddf932011d83ca3131310fb97607e0bb00535e395b36c6712407ce014c",
+      "lines": 107
+    },
+    {
+      "path": "source/e4-population-v02/src/population.rs",
+      "bytes": 30119,
+      "sha256": "674a610a29d5903ec34562d537fd45b573237d96b7a5450978545fc46d4363cf",
+      "lines": 810
+    },
+    {
+      "path": "source/e4-population-v02/src/render.rs",
+      "bytes": 9345,
+      "sha256": "4bfe046c905b19733f809bc59434db781245f5c7412d77723d5bc13358f6f984",
+      "lines": 271
+    },
+    {
+      "path": "source/e4-population-v02/src/schema.rs",
+      "bytes": 4529,
+      "sha256": "bc31c30b5f0bf512edcce7c306fd03fb1511cfe0c570cab03208b0707fdabef9",
+      "lines": 153
+    },
+    {
+      "path": "source/e4-population-v02/src/support.rs",
+      "bytes": 5793,
+      "sha256": "8cbb8b4c2b61238481dfbe0815eb35930c67d1bce1cb8b000358079a33992a88",
+      "lines": 159
+    },
+    {
+      "path": "source/e4-population-v02/src/writer.rs",
+      "bytes": 12143,
+      "sha256": "b9d70061432319991138f19585c2115555deabfbb372963edc56cd9c22a52997",
+      "lines": 339
+    }
+  ],
+  "validation": {
+    "cargo_fmt_check": "PASS: cargo fmt --manifest-path Cargo.toml -- --check",
+    "cargo_clippy": "PASS: cargo clippy --manifest-path Cargo.toml --all-targets --all-features -- -D warnings",
+    "cargo_test": "PASS: cargo test --manifest-path Cargo.toml --release --all-targets; 12 library tests, 4 binary tests, Criterion synthetic smoke succeeded",
+    "cargo_target_dir": "G:\\codex-targets\\e4-population-v02",
+    "g_build_binary": {
+      "path": "G:\\codex-targets\\e4-population-v02\\release\\e4-population-v02.exe",
+      "bytes": 607232,
+      "sha256": "4f6a17056073a71ffe67662e131ce553c5e4c33abb97c5e104d0204147065d82"
+    },
+    "c_test_copy": {
+      "path": "C:\\Users\\shuga\\.codex\\build-links\\e4-population-v02\\e4-population-v02.exe",
+      "bytes": 607232,
+      "sha256": "4f6a17056073a71ffe67662e131ce553c5e4c33abb97c5e104d0204147065d82",
+      "matches_g_build": true,
+      "smoke": "PASS: C-path binary rejects missing authorization with expected usage error and exit 2 before workspace/data/model access"
+    },
+    "performance_claim": "No new runtime benchmark claim; v01 construction microbenchmark remains the historical performance measurement because v02 changes contract identity bindings only.",
+    "preserved_initial_build_attempt": {
+      "path": "audits/e4-0-track-a/track-a-v02-build-failure-v01.json",
+      "bytes": 1245,
+      "sha256": "b48e38c8c3f1589a1d5d942493681e5738e362fe92d3b6ee7fb8e8df0e6d23de"
+    }
+  },
+  "materialization": {
+    "actual_e4_rows_written": false,
+    "output_root_created": false,
+    "tokenizer_contacted": false,
+    "model_contacted": false,
+    "cuda_initialized": false,
+    "terminal_labels_opened": false,
+    "population_authorization_issued": false
+  }
+}

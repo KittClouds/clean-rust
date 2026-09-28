@@ -1,0 +1,13 @@
+{
+  "engineering_only": true,
+  "front2_audit_execution_sha256": "0875D639BF9C9850FA835ED39F148B80951CF08BA419BDCD3BD3D2AD7BB11404",
+  "front2_execution_sha256": "67FE6C23420110E0C97A6153F05EB9EDBBCBA22ACA538AA03397987F75522DA2",
+  "identity": "q10-gc1-lr1-requal1-csc1-o3-locqual1-v1",
+  "independent_full_replay_samples": 14,
+  "localized_audit_records": 1621,
+  "localized_readout_qualified": true,
+  "protocol": "Q10-O3-LOCQUAL1",
+  "replay_executed": false,
+  "scientific_promotion": false,
+  "status": "O3_LOCQUAL1_COMPLETE"
+}

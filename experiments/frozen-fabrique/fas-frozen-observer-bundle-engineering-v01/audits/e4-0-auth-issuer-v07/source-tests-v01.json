@@ -1,0 +1,46 @@
+{
+  "schema": "FAS_E4_0_AUTH_ISSUER_SOURCE_TESTS_RECEIPT_V01",
+  "receipt_id": "FAS_E4_0_AUTH_ISSUER_V07_SOURCE_TESTS_V01",
+  "status": "PASS_SYNTHETIC_TESTS",
+  "recorded_utc": "2026-09-26T23:42:58Z",
+  "issuer_identity": "stage authorization issuer v07 bound to E4 contract v07 with v01 wire authorization schema",
+  "contract_identity": "FAS_FROZEN_CAPABILITY_FABRIC_E4_0_V07",
+  "source_files": [
+    {
+      "path": "source/scripts/issue_e4_stage_authorization_v07.py",
+      "bytes": 30721,
+      "sha256": "cd0a739fa8d2dec2e93d86c5637318f16ce36c500258cdd65a0f9c7b6660b6d4"
+    },
+    {
+      "path": "source/tests/test_e4_stage_authorization_v07.py",
+      "bytes": 22829,
+      "sha256": "ba2d3767c9073a8d444964a18bddc3400e4ae37f9c5993da8ef49ecb86bb5a14"
+    }
+  ],
+  "py_compile": "PASS",
+  "synthetic_test_count": 7,
+  "synthetic_tests": [
+    "all_runtime_stages_match_track_d_exact_fields_roots_and_scope",
+    "artifact_role_extra_and_truth_paths_are_rejected",
+    "contract_audit_and_stage_seal_identity_fail_closed",
+    "fresh_scoring_preserves_scorer_exact_fourteen_fields",
+    "interval_must_be_finite_integer_and_create_is_once",
+    "online_parity_rejects_same_root_panel_copy_and_non_v06_lineage",
+    "online_parity_reuses_exact_v06_population_and_panel_files"
+  ],
+  "integration_checks": {
+    "track_b_v03_stage_auth_validator_panel_parity_feature": "PASS",
+    "track_c_v02_fresh_scoring_auth_validator": "PASS"
+  },
+  "scope": {
+    "real_authorization_issued": false,
+    "e4_population_materialized": false,
+    "tokenizer_contact": false,
+    "model_contact": false,
+    "cuda_contact": false,
+    "labels_opened": false,
+    "v07_contract_sealed": false,
+    "v07_seal_and_audit_pending": true
+  },
+  "synthetic_only": true
+}

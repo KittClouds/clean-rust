@@ -1,0 +1,29 @@
+{
+  "analysis_repair_manifest_sha256": "296ac0e3a3bd5944fe85bf7f18fae3862eee0f5ef26bb601d01ed0363266b0cb",
+  "analysis_stop_receipt_sha256": "0dcafcacd124be3c006be551676e43c84d338c8d852f4a343354f10b67936269",
+  "biological_promotion": false,
+  "comparative_result_previously_emitted": false,
+  "identity": "F4-BINDING-01-STAGE-B-ANALYSIS-METADATA-REPAIR-v0.2",
+  "locked_prediction_surface_unchanged": true,
+  "measured_reach03_authorized": false,
+  "metrics_and_disposition_source_unchanged": true,
+  "models_refit": false,
+  "original_analysis_source_sha256": "a9523255e6641b053986737006380db06a19888e20ef8f0ec146622d7b61fa2b",
+  "output_hashes": {
+    "ANALYSIS.json": "bdfd01c45f8fc8e95116ab6534b62b3bfe4bb5463c186475b4ef81ff0cd4fed8",
+    "ASSIGNMENT-METRICS.csv": "547683b4d74951ce6653055bdafa22dec8e250a18a9fee43d4e495d27c1e9b3d",
+    "BLOCK-METRICS.csv": "273915bdd08478c3ac5e355b5e1d06a6327bc7d0c8bab6b27671eb43dce2c6ce",
+    "MODEL-ASSIGNMENT-METRICS.csv": "1eed1284b3944da6cc72e4671448853d9e9078bc89a2e44d84384c10f64bb2bb",
+    "MODEL-CELL-METRICS.csv": "189554e232c33ce42f112f4680c6563680075f2dc2a4dea965c3d05586bd03cc",
+    "RESULTS.md": "5a108f59fc46de8d2f24f7a5eb5e287a486c4ca4ee4e1d3b3cb5ea0596dfecec",
+    "STAGE-B-SUPPORT-TABLE.csv": "3154309960f126e7fcf2ed0d487d8f13667b78ab675530935b0ad4c10a4486e3",
+    "STAGE-B-TERMINAL-RECEIPT.json": "a84a379b1b1acdd15ac30d999a6a5f143fc9005739d3a878c930996ad19d7152"
+  },
+  "pheno_status": "unchanged",
+  "predictions_regenerated": false,
+  "repaired_wrapper_sha256": "b44fa6030ec9d51c816785e65e69390838e859376fb7e8d98747d89b878ab904",
+  "schema": "F4-BINDING-01-stage-b-analysis-metadata-repair-receipt-v0.2",
+  "scientific_disposition": "INCONCLUSIVE_BOOTSTRAP_SUPPORT",
+  "status": "ANALYSIS_COMPLETE_WITH_PREVIOUS_TRUTH_ACCESS",
+  "truth_values_previously_opened": true
+}

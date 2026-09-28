@@ -1,0 +1,143 @@
+{
+  "schema_version": 1,
+  "run_id": "e011-r2-20260925-presentation-factorial-01",
+  "condition": "ids-only",
+  "role": "small",
+  "bundle_id": "minicpm5-2b-q8-local-v5",
+  "server_alias": "e009-small-v5",
+  "server_process_id": 45648,
+  "model_sha256": "c5415f8989bf88a8288f1b55a3cc371af53c07b0faa220a63bd7a990cfaba078",
+  "runtime_sha256": "ffaee576ad271ede87b92a7d8c3863dc8f331bbac666ee00099c250e8809e743",
+  "reasoning_mode": "off",
+  "input_lock_sha256": "145ed40927e766f5da6db06c9beff573564a23bc54211872b24b79b8dddf12ca",
+  "pre_model_seal_sha256": "b230fd385ad5907eb7b3a7c287f33af3abed884d3e71608d29e4aef2f9e94122",
+  "frame_lock_sha256": "af319c25cc3f6cf11ecac2d506ad4e8cdd8606501d42de4a4d7564c252a8c319",
+  "frame_sha256": "9379e96ad265de6dfcc8c890c74d5c0b823e69d4ec2a2c6006a824a5b87aee99",
+  "task_id": "ripgrep-ripgrep-recursive-glob-v1",
+  "request_sha256": "3394ca6512a816f67d69edfd131e0839acacffce725febb973e44a19d2641da5",
+  "request": {
+    "model": "e009-small-v5",
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a typed observer in a deterministic coding workflow. The runtime owns workflow state and will execute only one action from the offered action_options after validating your output.\n\nRead the task_prompt and evidence, then compare the offered actions. Choose the action most likely to satisfy the task while preserving the repository's stated constraints. Do not write or propose code outside the offered choices. Do not claim to have executed tests. If no offered action is sufficiently supported, use null for action_choice and express uncertainty with abstention_percent.\n\nReturn exactly one JSON object matching the provided schema. action_choice must be an offered numeric action ID or null. applicability_percent is your estimate from 0 to 100 that this observer can handle the task from the available evidence. abstention_percent is your estimate from 0 to 100 that the runtime should defer this choice. Use integer percentage points only. Do not add prose or fields.\n"
+      },
+      {
+        "role": "user",
+        "content": "{\"schema_id\":\"rdc-real-coding-observation.v1\",\"task_id\":\"ripgrep-ripgrep-recursive-glob-v1\",\"task_family\":\"ripgrep-recursive-glob\",\"repository_id\":\"ripgrep\",\"task_variant\":1,\"task_prompt\":\"Repair the token selected for a middle `**/` component. The frozen regex contract test fails; choose the patch that preserves zero-or-more whole-directory semantics.\",\"repository_revision\":\"e89fff89ac9af12e8d4ce9d5fd07beb408ca730f\",\"snapshot_sha256\":\"156f9e56b6be3d41805d37b80c96df8013fa845489bdfd8a200c89be4c0d30d5\",\"evidence\":[{\"kind\":\"source_excerpt\",\"source_id\":\"crates/globset/src/glob.rs\",\"content_blake3\":\"001d52e94c81c2bb1e5b72987b4093b6927b2cab4c540e32393337b5db697eb2\",\"content\":\"use std::fmt::Write;\\nuse std::path::{Path, is_separator};\\n\\nuse regex_automata::meta::Regex;\\n\\nuse crate::{Candidate, Error, ErrorKind, new_regex};\\n\\n/// Describes a matching strategy for a particular pattern.\"},{\"kind\":\"baseline_tool_result\",\"source_id\":\"cargo-test::glob::tests::re22\",\"content_blake3\":\"e8511af8c436df9f92d0924ad611519641808dea3eba5962cb55103dc2d46298\",\"content\":\"Exact test `glob::tests::re22` failed on the frozen snapshot. Candidate patches have not been run in this task.\\n\\nrunning 1 test\\ntest glob::tests::re22 ... FAILED\\n\\nfailures:\\n\\n---- glob::tests::re22 stdout ----\\n\\nthread 'glob::tests::re22' (26156) panicked at crates\\\\globset\\\\src\\\\glob.rs:1378:5:\\nassertion `left == right` failed\\n  left: \\\"(?-u)^a(?:/|/.*/)b$\\\"\\n right: \\\"(?-u)^a/.*b$\\\"\\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\\n\\n\\nfailures:\\n    glob::tests::re22\\n\\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 289 filtered out; finished in 0.00s\\n\\n   Compiling globset v0.4.19 (<frozen-repository-snapshot>\\\\crates\\\\globset)\\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.27s\\n     Running unittests src\\\\lib.rs (<cargo-target>\\\\debug\\\\deps\\\\globset-250b4c7d9a08c2e6.exe)\\nerror: test failed, to rerun pass `-p globset --lib`\\n\"}],\"action_options\":[{\"action\":{\"id\":26504,\"schema_id\":1},\"summary\":\"Apply the source change and add a contract comment.\",\"diff_excerpt\":\"@@ -948,11 +948,12 @@\\n+            // A middle `**/` spans zero or more whole directories.\\n-                    self.push_token(Token::RecursiveSuffix)?;\\n+                    self.push_token(Token::RecursiveZeroOrMore)?;\",\"patch_sha256\":\"8203baf35e2cb5d2e1edf344f977b04891aa2508439c978d2e4203b69620060f\"},{\"action\":{\"id\":38439,\"schema_id\":1},\"summary\":\"Apply this alternative change in the same code path.\",\"diff_excerpt\":\"@@ -952,7 +952,7 @@\\n-                    self.push_token(Token::RecursiveSuffix)?;\\n+                    self.push_token(Token::RecursivePrefix)?;\",\"patch_sha256\":\"1c12b124f8575708682a41748896ab7424fc398835f5b33879fb378939813db9\"},{\"action\":{\"id\":62799,\"schema_id\":1},\"summary\":\"Leave the current implementation unchanged.\",\"diff_excerpt\":\"No source line changes are included.\",\"patch_sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"},{\"action\":{\"id\":25428,\"schema_id\":1},\"summary\":\"Apply the focused source change shown here.\",\"diff_excerpt\":\"@@ -952,7 +952,7 @@\\n-                    self.push_token(Token::RecursiveSuffix)?;\\n+                    self.push_token(Token::RecursiveZeroOrMore)?;\",\"patch_sha256\":\"141751f0596f2515235db26a90bd3ffe4cdf8edf586f4f01e29631341392b1ca\"}]}"
+      }
+    ],
+    "temperature": 0,
+    "top_p": 1,
+    "seed": 0,
+    "max_tokens": 1024,
+    "stream": false,
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rdc_coding_observer_output_v1",
+        "strict": true,
+        "schema": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "rdc-coding-observer-output.v2",
+          "title": "RDC Coding Observer Output v2",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "action_choice",
+            "applicability_percent",
+            "abstention_percent"
+          ],
+          "properties": {
+            "action_choice": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 65535
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "applicability_percent": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "abstention_percent": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            }
+          }
+        }
+      }
+    }
+  },
+  "normalization_contract": "percent-0-100-to-milli-x10-v1+line-endings-lf-v1",
+  "thresholds": {
+    "minimum_applicability_milli": 850,
+    "maximum_abstention_milli": 150
+  },
+  "http_status": 200,
+  "response": {
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "{\"action_choice\":26504,\"applicability_percent\":100,\"abstention_percent\":0}"
+        }
+      }
+    ],
+    "created": 1790369206,
+    "model": "e009-small-v5",
+    "system_fingerprint": "b10982-fc82583e6",
+    "object": "chat.completion",
+    "usage": {
+      "completion_tokens": 22,
+      "prompt_tokens": 1303,
+      "total_tokens": 1325,
+      "prompt_tokens_details": {
+        "cached_tokens": 216
+      }
+    },
+    "id": "chatcmpl-UBiiCsdkRrab6CgD8scZWO1wWBGD05NS",
+    "timings": {
+      "cache_n": 216,
+      "prompt_n": 1087,
+      "prompt_ms": 111.513,
+      "prompt_per_token_ms": 0.10258785648574058,
+      "prompt_per_second": 9747.742415682476,
+      "predicted_n": 22,
+      "predicted_ms": 139.917,
+      "predicted_per_token_ms": 6.662714285714285,
+      "predicted_per_second": 150.08898132464245
+    }
+  },
+  "content": "{\"action_choice\":26504,\"applicability_percent\":100,\"abstention_percent\":0}",
+  "output": {
+    "action_choice": 26504,
+    "applicability_percent": 100,
+    "abstention_percent": 0
+  },
+  "normalized_output": {
+    "action_choice": 26504,
+    "applicability_milli": 1000,
+    "abstention_milli": 0
+  },
+  "normalization_error": null,
+  "usage": {
+    "completion_tokens": 22,
+    "prompt_tokens": 1303,
+    "total_tokens": 1325,
+    "prompt_tokens_details": {
+      "cached_tokens": 216
+    }
+  },
+  "finish_reason": "stop",
+  "elapsed_ms": 299.408
+}

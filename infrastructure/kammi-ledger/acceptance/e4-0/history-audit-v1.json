@@ -1,0 +1,29 @@
+{
+  "contact_global_conclusion": "UNKNOWN_OUTSIDE_EXPLICIT_RECEIPT_SCOPES",
+  "fact_kinds": {
+    "ATTEMPT": 40,
+    "CONTACT": 36,
+    "EVIDENCE_ACCESS": 64,
+    "HEAD": 1,
+    "SUPERSESSION": 17
+  },
+  "flight_authorization_conferred": false,
+  "fresh_projection": "C:\\Users\\shuga\\AppData\\Local\\Temp\\kammi-e4-history-audit-2359w6am\\custody.lbdb",
+  "head_fact": {
+    "evidence_artifact": "sha256:21fc77d5a288b9adef995d88f089890235f8dcb2fbc3c9e452725bb67892a22f",
+    "fact_id": "sha256:db23aafab7e3d4eb0310aaab1369ecac52620a0b0723b57bcbf75088a5195474",
+    "kind": "HEAD",
+    "object": "sha256:21fc77d5a288b9adef995d88f089890235f8dcb2fbc3c9e452725bb67892a22f",
+    "scope": "VERIFIED_LEGACY_FIXTURE_HEAD_ONLY",
+    "subject": "contract",
+    "value": "SEALED"
+  },
+  "positive_contact_assertions": 0,
+  "rebuilt_fact_count": 158,
+  "rebuilt_head": "sha256:264eea2afd4cf8a7fd08a904138a63ce59531613f329d78b6a3b896979ab0f57",
+  "schema": "KAMMI_E4_HISTORY_AUDIT_V1",
+  "source": "CAS plus journal",
+  "source_fact_count": 158,
+  "source_head": "sha256:264eea2afd4cf8a7fd08a904138a63ce59531613f329d78b6a3b896979ab0f57",
+  "status": "PASS"
+}

@@ -1,0 +1,9 @@
+{
+  "analysis_started": false,
+  "correction": "Preserve the failed manifest under history/ and recompute the v02 manifest root after sorting entries by relative UTF-8 path string, as required by tree_root.",
+  "failed_attempt": "The initial manifest used Windows Path enumeration order, which differed from canonical lexical ordering of relative path strings.",
+  "identity": "FAS_S10_PROTOCOL_SEAL_ORDER_CORRECTION_V02",
+  "parent_data_accessed": false,
+  "scientific_or_source_artifact_changed": false,
+  "verification": "All recorded file byte counts and SHA-256 values matched. Only the derived tree root was wrong."
+}

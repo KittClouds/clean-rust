@@ -1,0 +1,39 @@
+{
+  "contact_global_conclusion": "UNKNOWN_OUTSIDE_EXPLICIT_RECEIPT_SCOPES",
+  "fact_kinds": {
+    "ATTEMPT": 40,
+    "CONTACT": 36,
+    "EVIDENCE_ACCESS": 64,
+    "HEAD": 1,
+    "SUPERSESSION": 17
+  },
+  "flight_authorization_conferred": false,
+  "fresh_projection": "C:\\Users\\shuga\\AppData\\Local\\Temp\\kammi-e4-history-audit-nbcaelm_\\custody.lbdb",
+  "head_fact": {
+    "evidence_artifact": "sha256:21fc77d5a288b9adef995d88f089890235f8dcb2fbc3c9e452725bb67892a22f",
+    "fact_id": "sha256:db23aafab7e3d4eb0310aaab1369ecac52620a0b0723b57bcbf75088a5195474",
+    "kind": "HEAD",
+    "object": "sha256:21fc77d5a288b9adef995d88f089890235f8dcb2fbc3c9e452725bb67892a22f",
+    "scope": "VERIFIED_LEGACY_FIXTURE_HEAD_ONLY",
+    "subject": "contract",
+    "value": "SEALED"
+  },
+  "head_predecessor_chain": [
+    "sha256:21fc77d5a288b9adef995d88f089890235f8dcb2fbc3c9e452725bb67892a22f",
+    "sha256:9cefc7cf9ca8f367bceff3c1c9b7e84ab3e15f684326edf94354e33e3d1fb2fd",
+    "sha256:c00e140c4cb503717cbf0aa2515f613fde86ac2b81d24a9819d785e9ff959369",
+    "sha256:ec17befa2a65e0da589ee51792cde3c028e900aa919179b2c9c3365cc20c3e9b",
+    "sha256:33b56e95cbf083036f436b5496c2db3c0c052bacfdce593869a6f4aa3125a2d7",
+    "sha256:ea4f11cec5d65a3be7716c77febf5d448d8ebf1a5a4049aee5d25d51c0c50958",
+    "sha256:ad709bd1496536e6fb1464bd89a06ec0eed552b89ef4159bfc1aa0f406fcc71a"
+  ],
+  "positive_contact_assertions": 0,
+  "rebuilt_fact_count": 158,
+  "rebuilt_head": "sha256:264eea2afd4cf8a7fd08a904138a63ce59531613f329d78b6a3b896979ab0f57",
+  "schema": "KAMMI_E4_HISTORY_AUDIT_V2",
+  "source": "CAS plus journal",
+  "source_fact_count": 158,
+  "source_head": "sha256:264eea2afd4cf8a7fd08a904138a63ce59531613f329d78b6a3b896979ab0f57",
+  "status": "PASS",
+  "stopped_attempt_count": 24
+}

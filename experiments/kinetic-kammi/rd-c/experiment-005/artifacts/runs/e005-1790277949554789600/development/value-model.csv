@@ -1,0 +1,9 @@
+inspection_domain,development_examples,wrong_to_right,right_to_wrong,expected_net_benefit_milli
+0,32,0,0,0
+1,32,24,0,750
+2,32,16,0,500
+3,32,32,0,1000
+4,32,0,0,0
+5,32,0,32,-1000
+6,32,0,0,0
+7,32,0,0,0

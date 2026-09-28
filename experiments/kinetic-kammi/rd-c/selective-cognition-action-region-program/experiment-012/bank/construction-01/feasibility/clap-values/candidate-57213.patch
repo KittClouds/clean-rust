@@ -1,0 +1,11 @@
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -5,7 +5,7 @@
+         Arg::new("speed")
+             .long("speed")
+             // E012 candidate slot.
+-            .value_parser(["broken"]),
++            .value_parser(["fast", "safe", "auto"]),
+     );
+     command
+         .try_get_matches_from(["demo", "--speed", value])

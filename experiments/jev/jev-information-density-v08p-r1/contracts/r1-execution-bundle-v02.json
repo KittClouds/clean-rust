@@ -1,0 +1,54 @@
+{
+  "protocol": "jev-information-density/v0.8p-r1-execution-bundle-v02",
+  "identity": "v0.8P-R1-fresh-trajectory-instrumented-rerun-v01",
+  "status": "RUNNER_CORRECTION_AFTER_PRESERVED_ATTEMPT_02_FAILURE_BEFORE_MODEL_CONTACT",
+  "supersedes_implementation_only": "r1-execution-bundle-v01.json",
+  "scientific_contracts_unchanged": true,
+  "contracts": {
+    "identity_schema_r1_v01_sha256": "a5d9bf108a1b14d05652b78021a55b74500ed55d6bdc759ff02c09560ea6f7ed",
+    "r1_execution_contract_v01_sha256": "d692acbef984c98d7f3ac6c5861112d4fbdcf162c4906a93bf548a84dc5e82fa",
+    "original_p_run_sha256": "e345225b4a17fc18eb35fcab24cbe1d72bd0e34bed9de272f927a7be461853e6",
+    "original_p_analysis_sha256": "84111122033fda65c84344317cfe3b50639b23be4c71f480ba665c67a23cc939",
+    "original_p_panel_sha256": "ce3b7b97caecb27f3ad99439c0e67dca6e40af5da3db9ca2e356ea5e9f06f823",
+    "v05_e1_denylist_root_sha256": "272a14e57c2dcf610568381c0c1c4673c7b40e368ac81b07d3e7160e4e5953a2",
+    "v05_e1_denylist_sha256": "50eebeb5790c29b4a75c6f8df849eb4c2865d3c864932bbd7f636b7a0e52a2cd"
+  },
+  "implementation": {
+    "generator_source_path": "experiments/jev-information-density-v08p-r1/generator-r1/src/main.rs",
+    "generator_source_sha256": "f66b9ea267cddeff56b28f13d2345ff8c48ce39465f45656237174aaf54d11f1",
+    "cargo_manifest_sha256": "66dc2975d37c55d2c7acdb918b27de23aabab03a1cabc249123085a8fd13994d",
+    "cargo_lock_sha256": "2aabb4c76436ae9f01655bf070fce1cf13c1ca9dba7fe2c016d820b7a66c9945",
+    "release_binary_path": "D:/cargo-targets/jev-v08p-r1/release/jev-information-density-v08p-r1-generator.exe",
+    "release_binary_sha256": "b6e3227555c289adff9e5c3ef2f90f2e31e30eeaf352ffb60e44109b87a8e1fb",
+    "release_binary_bytes": 811520,
+    "tests": {
+      "command": "cargo test --locked",
+      "passed": 5,
+      "failed": 0
+    }
+  },
+  "correction": {
+    "parity_verifier_order": "canonical, exact, certificates",
+    "stream_mapping": {
+      "canonical": "replay_bytes[1]",
+      "exact": "replay_bytes[0]",
+      "certificates": "replay_bytes[2]"
+    },
+    "duplicate_exact_world_validation": "removed from replay loop; build_triplet validates each exact episode before returning; complete historical raw-byte identity parity remains mandatory",
+    "scientific_data_or_metric_change": false
+  },
+  "attempt_02": {
+    "path": "D:/codex-runs/jev-information-density-v08p-r1/v0.8P-R1/replay-attempt-02",
+    "status": "PRESERVED_NONPROMOTABLE_IMPLEMENTATION_PARITY_ARGUMENT_ORDER_FAILURE",
+    "modified": false
+  },
+  "boundaries": {
+    "model_contact": false,
+    "feature_extraction": false,
+    "training": false,
+    "head_loading": false,
+    "inference": false,
+    "evaluation": false,
+    "phoenix_access": false
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "candidate_root": "C:\\Users\\shuga\\.codex\\worktrees\\5c65\\clean-rust",
+  "captured_at_utc": "2026-09-18T15:27:23.298592+00:00",
+  "identity": "q10-gc1-lr1-rec1-v1",
+  "protocol": "LR1-REC1-PARENT-SNAPSHOT-RECOVERY",
+  "sealed": true,
+  "source_artifact": "experiments/drosophila-heresy/q10-gc0-lr1-sall1-r2-v1/PREEXECUTION.json"
+}

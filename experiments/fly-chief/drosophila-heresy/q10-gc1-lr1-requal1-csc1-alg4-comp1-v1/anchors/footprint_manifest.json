@@ -1,0 +1,26 @@
+{
+  "action_count": 472,
+  "anchor_group": 45,
+  "anchor_rows": [
+    161,
+    357,
+    749
+  ],
+  "context": [
+    "seed9731-R-tau4.json",
+    3
+  ],
+  "excluded_action_ordinals_comp1a": [
+    361,
+    363,
+    364,
+    365,
+    366,
+    367
+  ],
+  "excluded_count": 6,
+  "footprint_sha256": "A9D742CF3161ABB3B3AFF53574045E5FFAA606FA7D21B861700F16F56C0B3B83",
+  "group_count": 59,
+  "source_runner": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-pair-alg3-exh1-v1/scripts/run_exh1.py",
+  "source_runner_sha256": "F99AE1DA7DD46785C40F7CCA6FB5C7196C26C7F6DB3C5FAFE57D0159918B6C1A"
+}

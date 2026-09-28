@@ -1,0 +1,116 @@
+{
+  "assembly": {
+    "new_replay": false,
+    "new_search": false,
+    "saved_states_only": true
+  },
+  "firewall": {
+    "behavioral_probe": false,
+    "engineering_only": true,
+    "parent_writes": false,
+    "scientific_promotion": false,
+    "write_root": "experiments/drosophila-heresy/q10-gc1-d1-v1"
+  },
+  "identity": "q10-gc1-d1-v1",
+  "parent_bindings": [
+    {
+      "label": "par8_plan",
+      "path": "experiments/drosophila-heresy/q10-gc1-par8-v1/PLAN.md",
+      "sha256": "1DD4AF7D82B4262EDADF285811D26AF23F6E0418B1D34D0F85542BA84F47E0CD"
+    },
+    {
+      "label": "par8_contract",
+      "path": "experiments/drosophila-heresy/q10-gc1-par8-v1/CONTRACT.json",
+      "sha256": "D3323FE08D35371F2F3FFD8B575BC338A37416F37B216C74E3C69936CBE567C4"
+    },
+    {
+      "label": "par8_preexecution",
+      "path": "experiments/drosophila-heresy/q10-gc1-par8-v1/PREEXECUTION.json",
+      "sha256": "A7DEBADA37E1992B07547EB7F9A6DB3797161957A8600254BAEE729393B7D153"
+    },
+    {
+      "label": "par8_runner",
+      "path": "experiments/drosophila-heresy/q10-gc1-par8-v1/scripts/run_gc1.py",
+      "sha256": "93CD7A01881F45FE552C930C56A88D7707147863317F66E72EB2F0688304A342"
+    },
+    {
+      "label": "par8_execution",
+      "path": "experiments/drosophila-heresy/q10-gc1-par8-v1/qualification/execution.json",
+      "sha256": "A4304E70F7D32436109CD6F3367C298CD1227FBD5C4AA2578C28D14272721D6B"
+    },
+    {
+      "label": "par2_contract",
+      "path": "experiments/drosophila-heresy/q10-gc0-gp1-par2-v1/CONTRACT.json",
+      "sha256": "13EF3F6D7EF2C1C548F5E36B6FF98E48D3BBFBCEA1917E318078A8068E6C57D7"
+    },
+    {
+      "label": "par2_status",
+      "path": "experiments/drosophila-heresy/q10-gc0-gp1-par2-v1/qualification/derived/STATUS.json",
+      "sha256": "97C277DBCF3238561E783A545D46D8142C564400FBF04DC3CC20022C87B41019"
+    },
+    {
+      "label": "par2_palettes",
+      "path": "experiments/drosophila-heresy/q10-gc0-gp1-par2-v1/qualification/palettes.jsonl",
+      "sha256": "56A8BCFD950C2C796279556B03C4905622B1207023C1142076AE7147203477FA"
+    },
+    {
+      "label": "par2_execution",
+      "path": "experiments/drosophila-heresy/q10-gc0-gp1-par2-v1/qualification/execution.json",
+      "sha256": "C74E310443C15C58E9EC897DCAEFFB1C0E86ED23B350E830D4308953751F34D2"
+    },
+    {
+      "label": "pf0_plan",
+      "path": "experiments/drosophila-heresy/q10-gc1-pf0-v1/PLAN.md",
+      "sha256": "06BB42E896317BB93431913A037AC2572027D6B9DBC307C3067FFF4A823F4469"
+    },
+    {
+      "label": "pf0_contract",
+      "path": "experiments/drosophila-heresy/q10-gc1-pf0-v1/CONTRACT.json",
+      "sha256": "462121090C3413746617ACCAC4A85A3517C6AE998C03D48F30F3D3134BB84B10"
+    },
+    {
+      "label": "pf0_execution",
+      "path": "experiments/drosophila-heresy/q10-gc1-pf0-v1/qualification/execution.json",
+      "sha256": "47DB038381C9ACB0C98E7D933AA40864F779584CC635178BDF775FDAB5598762"
+    },
+    {
+      "label": "pf5_contract",
+      "path": "experiments/drosophila-heresy/q10-pf5-v1/CONTRACT.json",
+      "sha256": "20995E1826A9C62E0E8689017A2F3E624CC9E63B76B210FBD4AB11D7E9E7D34F"
+    },
+    {
+      "label": "review_audit",
+      "path": "experiments/drosophila-heresy/supervision/gc1-review-20260918/AUDIT.md",
+      "sha256": "61211656AD7DA218823EE1303F506A2D36333F8A2565E1B37383A1B78639FC22"
+    },
+    {
+      "label": "review_summary",
+      "path": "experiments/drosophila-heresy/supervision/gc1-review-20260918/REVIEWER_SUMMARY.md",
+      "sha256": "335ECA91F26070095295C7FF537DA714946673E978EB5F3C3164DD848DF593FD"
+    },
+    {
+      "label": "review_verifier",
+      "path": "experiments/drosophila-heresy/supervision/gc1-review-20260918/verify_review.py",
+      "sha256": "1D40C7ADCA8E2EAE11920FAD872B211AF2252B1FBC974FF702A7E0F9F3DA1049"
+    },
+    {
+      "label": "review_evidence",
+      "path": "experiments/drosophila-heresy/supervision/gc1-review-20260918/evidence.json",
+      "sha256": "54A7E58619958E01C90E78F52673A567D866EC39E94A89DA5A9E42CED0E92CB1"
+    },
+    {
+      "label": "next_review",
+      "path": "experiments/drosophila-heresy/supervision/gc1-next-program-20260918/REVIEW.md",
+      "sha256": "5079581B191BE1063DD952516FD29BA4AB299BFB694F9902AC4930670C742877"
+    },
+    {
+      "label": "next_steps",
+      "path": "experiments/drosophila-heresy/supervision/gc1-next-program-20260918/NEXT_STEPS.md",
+      "sha256": "D5D35B2F7F2838367E31073F70F740DABB2E2DCB0A6A7DAA7A123FDF190414DE"
+    }
+  ],
+  "plan_sha256": "729939FB99E79D7732A8011036C510ECF9F4179AA8094C75B28D288D716CFF2E",
+  "protocol": "Q10-GC1-D1",
+  "sealed_runner_sha256": "D4D02706D77766C6FA35289B4664179AD1B1C4395B7C922AF9AFBDFAADB73A86",
+  "status": "PREEXECUTION_SEALED_NO_EXECUTION"
+}

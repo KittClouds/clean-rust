@@ -1,0 +1,34 @@
+{
+  "task_id": "heldout-draft-cardinality-transitions-easy-01",
+  "frame_hash_hex": "65804f96379dec811808922303e47af365d736d737371a4e92e9e857871fde9f",
+  "selected_patch_sha256": "89ff38e3bf856a69a57ecf71e52d8af33186cfbd0ae9ac94a70a101a563ceb51",
+  "action_ledger_path": "C:\\rd-c\\experiment-009\\artifacts\\runs\\e009-20260925-expanded-01\\ledgers\\always-large\\heldout-draft-cardinality-transitions-easy-01.actions.bin",
+  "actions": [
+    {
+      "id": 11,
+      "schema_id": 1
+    },
+    {
+      "id": 37,
+      "schema_id": 1
+    },
+    {
+      "id": 68,
+      "schema_id": 1
+    },
+    {
+      "id": 94,
+      "schema_id": 1
+    }
+  ],
+  "observer_output": {
+    "action_choice": 94,
+    "applicability_milli": 950,
+    "abstention_milli": 50
+  },
+  "thresholds": {
+    "minimum_applicability_milli": 50,
+    "maximum_abstention_milli": 180
+  },
+  "completion_check_passed": true
+}

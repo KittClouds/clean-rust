@@ -1,0 +1,17 @@
+{
+  "observation_run_id": "e010-20260925-cross-repo-01",
+  "heldout_frame_lock_sha256": "de330f467dfe8d14d66dba428211b8a27c3eb8a62dd175ba01cf5847728eb587",
+  "heldout_labels_sha256": "4bd1a3984a9c54ecd36c2caf1e09d9b28bc0656a73f0714e9d8b388873dbc0d2",
+  "heldout_candidate_lock_sha256": "9c6f156b0561ebb4a016abb5c2fc44e0500e2f4a534f1cdb83471b2aacaf5ab1",
+  "heldout_build_receipt_sha256": "3c567a4336f1acf4439be7c1c962e0ce442c9ea170bf8e5b0502b83e7794a692",
+  "heldout_freeze_sha256": "149816a7839766d66e1a8fad51d246e36d961e60354c70ab0528caa22dfbc504",
+  "heldout_bank_tree_sha256": "98e764de951ad952d2115ebf2d8a44f8ad9d3593b1541cfcdc9605d4c54af0df",
+  "small_observer_outputs_sha256": "439c3224b9520abfc5d6ffabad38482f27c790b04f8323dfbc18406ce200ff84",
+  "large_observer_outputs_sha256": "f04ff3629b84421e6afb28e7396155b52f1c8de108ad46310e9d5d02aab40e20",
+  "thresholds_sha256": "846b0668db2a7796ac1ee90c190d45532a3065617ff1abca03df495496ddb173",
+  "bundle_lock_sha256": "a626836853bdb0755fd2e4e1569b6b91b33861306c7d1e4a51e3de54a9ee713d",
+  "frozen_input_lock_sha256": "323f14b07c698d289af6f11a2e894014538bd6be0644de8786b30b1e954f8165",
+  "evaluator_sha256": "fe1392366fb29b6ca5bd2a9b5dd0d46dd035895b1014c9060aee1b797f990270",
+  "completion_mode": "live",
+  "labels_opened_after_observer_capture": true
+}

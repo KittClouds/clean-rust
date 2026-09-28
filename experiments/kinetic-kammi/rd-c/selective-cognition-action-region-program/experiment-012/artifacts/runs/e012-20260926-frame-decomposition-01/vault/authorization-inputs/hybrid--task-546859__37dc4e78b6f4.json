@@ -1,0 +1,62 @@
+{
+  "task_id": "hybrid-task-546859__37dc4e78b6f4",
+  "frame_digest_hex": "37dc4e78b6f429519568eb69ed79d3c8ca1aac07222050554564ee3c6c706450",
+  "request_id_hex": "8e803d939126397fd64d83fc86750017f75cad5e9f8c59e293a6239c14f080dd",
+  "response_request_id_hex": "8e803d939126397fd64d83fc86750017f75cad5e9f8c59e293a6239c14f080dd",
+  "request_receipt_digest_hex": "1c91002b21ca1fd2f59aea66f74395992bf622f524bf9d58a855fbf78e7dcf8d",
+  "response_receipt_digest_hex": "1c91002b21ca1fd2f59aea66f74395992bf622f524bf9d58a855fbf78e7dcf8d",
+  "presentation_receipt_hex": "5244435101000400000037dc4e78b6f429519568eb69ed79d3c8ca1aac07222050554564ee3c6c706450bfad1549ab3adca942b2ccd6688330978d314cc8a08fd76fcab9e14d1b6b9b5afc558b05d58595f1cc9354bf0c82ea82fb173d96b4d2f415bf0079feccaca58e40ed94802ab88607f65106a128e8bcc7e7ef5869f8ea0c16112f653ec8120661675356cbf4ce2f0b77319d88b3d5b0b27dc7e2aec0a1a1cf49ae37c3367f5e4d86440889aa8a7ddfe3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "action_ledger_path": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\artifacts\\runs\\e012-20260926-frame-decomposition-01\\action-ledgers\\hybrid\\task-546859__37dc4e78b6f4.bin",
+  "ordered_options": [
+    {
+      "producer_ordinal": 0,
+      "action": {
+        "id": 22012,
+        "schema_id": 1
+      },
+      "summary": "Apply the candidate change shown in the code excerpt.",
+      "diff_excerpt": "@@ -1,7 +1,7 @@\n use clap::{Arg, ArgAction, Command};\n \n // E012 candidate slot: implementations differ in which spellings they support.\n-const FORMS: &[(&str, bool)] = &[(\"color\", true)];\n+const FORMS: &[(&str, bool)] = &[(\"color\", true), (\"colour\", true)];\n \n pub fn parse_color(argv: &[&str]) -> Option<bool> {\n     let mut command = Command::new(\"demo\");",
+      "patch_sha256": "8b05d58595f1cc9354bf0c82ea82fb173d96b4d2f415bf0079feccaca58e40ed"
+    },
+    {
+      "producer_ordinal": 1,
+      "action": {
+        "id": 32916,
+        "schema_id": 1
+      },
+      "summary": "Apply the candidate change shown in the code excerpt.",
+      "diff_excerpt": "@@ -1,7 +1,7 @@\n use clap::{Arg, ArgAction, Command};\n \n // E012 candidate slot: implementations differ in which spellings they support.\n-const FORMS: &[(&str, bool)] = &[(\"color\", true)];\n+const FORMS: &[(&str, bool)] = &[(\"color\", true), (\"no-color\", false)];\n \n pub fn parse_color(argv: &[&str]) -> Option<bool> {\n     let mut command = Command::new(\"demo\");",
+      "patch_sha256": "2ab88607f65106a128e8bcc7e7ef5869f8ea0c16112f653ec8120661675356cb"
+    },
+    {
+      "producer_ordinal": 2,
+      "action": {
+        "id": 52980,
+        "schema_id": 1
+      },
+      "summary": "Apply the candidate change shown in the code excerpt.",
+      "diff_excerpt": "@@ -1,7 +1,7 @@\n use clap::{Arg, ArgAction, Command};\n \n // E012 candidate slot: implementations differ in which spellings they support.\n-const FORMS: &[(&str, bool)] = &[(\"color\", true)];\n+const FORMS: &[(&str, bool)] = &[(\"colour\", true), (\"no-color\", false)];\n \n pub fn parse_color(argv: &[&str]) -> Option<bool> {\n     let mut command = Command::new(\"demo\");",
+      "patch_sha256": "2f0b77319d88b3d5b0b27dc7e2aec0a1a1cf49ae37c3367f5e4d86440889aa8a"
+    },
+    {
+      "producer_ordinal": 3,
+      "action": {
+        "id": 57213,
+        "schema_id": 1
+      },
+      "summary": "Apply the candidate change shown in the code excerpt.",
+      "diff_excerpt": "",
+      "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "observer_output": {
+    "action_choice": null,
+    "applicability_milli": 350,
+    "abstention_milli": 650
+  },
+  "thresholds": {
+    "minimum_applicability_milli": 850,
+    "maximum_abstention_milli": 150
+  },
+  "completion_check_passed": false
+}

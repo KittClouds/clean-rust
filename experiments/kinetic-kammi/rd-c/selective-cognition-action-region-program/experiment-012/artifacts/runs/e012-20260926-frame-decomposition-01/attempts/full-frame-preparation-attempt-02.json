@@ -1,0 +1,9 @@
+{
+  "attempt_id": "full-frame-preparation-02",
+  "state": "FAILED_PRECONTACT_ENGINEERING_CHECK",
+  "model_contact": false,
+  "failure": "Presentation receipts reuse public task IDs across conditions; the condition/task key selected a different frame digest.",
+  "repair": "Key the receipt join by public task ID, condition, and exact frame SHA256.",
+  "source_script": "scripts/prepare_full_frame_lock_e012.py",
+  "preserved": true
+}

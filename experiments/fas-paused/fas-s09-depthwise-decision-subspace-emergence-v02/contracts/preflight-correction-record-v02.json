@@ -1,0 +1,12 @@
+{
+  "record_id": "FAS_S09_PREFLIGHT_CORRECTION_V02",
+  "supersedes_attempt": "D:\\codex-runs\\fas-s09-depthwise-decision-subspace-emergence-v01",
+  "failed_operation": "copying the frozen S01-3 linear accessibility contract into S09 preflight inputs",
+  "failure": "the script referenced s01-3-linear-accessibility-v01/contracts/linear-accessibility-contract-v01.json; the actual authorized source is the sealed result snapshot at s01-3-linear-accessibility-v01/inputs/contracts/linear-accessibility-contract-v01.json",
+  "correction": "copy from the sealed inputs/contracts location, then verify against the S01-3 result-tree seal before preflight sealing",
+  "v01_model_loaded": false,
+  "v01_feature_extraction_started": false,
+  "v01_probe_fitting_started": false,
+  "v01_partial_artifacts": "preserved in place, unsealed, not imported into v02",
+  "scientific_parent_roots_changed": false
+}

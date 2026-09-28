@@ -1,0 +1,80 @@
+{
+  "protocol": "jev-information-density/v0.8i-phase-a",
+  "run_identity": "phase-a-v02-clean",
+  "parent_identity": "phase-a-v01",
+  "parent_disposition": "permanently_quarantined_nonpromotable",
+  "purpose": "reconstruct the identical Phase-A training banks under a training-only representation-source boundary",
+  "semantic_protocol_change": false,
+  "implementation_only_change": "build independent representation tables from sealed R100-star training rows; never open mixed v0.8G representation tables; assembler does not parse generated heldout bodies",
+  "generator": {
+    "seed": 20260921,
+    "training_family_count": 12,
+    "heldout_family_count": 4,
+    "training_pairs_per_family": 1000,
+    "heldout_pairs_per_family": 500,
+    "training_pair_capacity": 12000,
+    "heldout_pair_capacity": 2000,
+    "training_episode_capacity": 36000,
+    "heldout_episode_capacity": 6000,
+    "family_split_unit": "world_family_id",
+    "template_split_required": true
+  },
+  "source_scope": {
+    "source_bank": "R100-star",
+    "source_bank_sha256": "850cb2805aa5e677d8d89792a3ea716e1aa3a007bcb1f0a87dedbbeb77e9429c",
+    "source_row_count": 100000,
+    "source_scope": "training_only",
+    "prohibited_source": "v0.8G shared mixed-scope representation tables",
+    "protected_metadata_inputs": [
+      "NewTight-Eval ID/family manifest",
+      "legacy protected ID manifests",
+      "metadata-only group record overlap keys",
+      "sealed training-signature index"
+    ]
+  },
+  "bank_construction": {
+    "selected_anchor_dose": 5000,
+    "bank_groups_per_arm": 100000,
+    "common_skeleton_groups": 90000,
+    "replacement_groups_per_arm": 10000,
+    "pair_selection_seed": "jev-v08i-phase-a-pair-select-v1",
+    "baseline_removal_seed": "jev-v08i-phase-a-remove-v1",
+    "s100_semantics": "anchor plus sham sibling for each selected contrast pair",
+    "f100_semantics": "anchor plus certified relevant-fact-flip sibling for each selected contrast pair",
+    "training_signature_definition": "frozen group_training_signature in assemble_phase_a.py",
+    "expected_D_train": 0.05,
+    "profile_matching": "same exact Phase-A profile/count constraints as phase-a-v01"
+  },
+  "acceptance": {
+    "exact_world_train_episodes_validate": true,
+    "train_eval_family_and_template_ids_disjoint": true,
+    "train_eval_episode_ids_disjoint": true,
+    "R100_star_group_id_digest_reconciles": true,
+    "representation_tables_source_scope_training_only": true,
+    "protected_group_episode_root_family_text_schema_and_model_input_overlaps_zero": true,
+    "S100_F100_profile_matching_pass": true,
+    "S100_F100_training_signature_distance_equals_expected": true,
+    "generated_eval_bodies_opened_during_assembly": false,
+    "model_contact": false,
+    "feature_extraction": false,
+    "training": false,
+    "evaluation_inference": false,
+    "phoenix_access": false,
+    "phase_b_authorized": false
+  },
+  "source_code_sha256": {
+    "experiments/jev-information-density-v08i/Cargo.toml": "38e1b7b5b1b131e7ac520634605e3c42c2f140f80287893e3914737977e34253",
+    "experiments/jev-information-density-v08i/Cargo.lock": "08305217750a83ea112ab5645a4c99a02f2cf44d9a3a773864c89cff253881d6",
+    "experiments/jev-information-density-v08i/src/main.rs": "f61e43255b0daa658ba4695e6f530ffdd1945d2ef1b0767209e2eec5ea7fd745",
+    "experiments/jev-information-density-v08i/src/families.rs": "e56885005487b36b573c1bf4d47741413ca72df0992ff62bcf48891eecacb429",
+    "experiments/jev-information-density-v08i/src/generator.rs": "e08107a024bb53fbb41a9b586698872356741751306ab7f4c4a78331707102db",
+    "experiments/jev-information-density-v08i/scope_training_inputs.py": "cc69ff58252f32804bce30f8da37a0bafc9bcba0b84b95288230fbb9471f0249",
+    "experiments/jev-information-density-v08i/assemble_phase_a.py": "77c170fc8da8748883a19014faeb2d2aa29bedeee33d3d5e7387476904313bfd",
+    "experiments/jev-information-density-v08i/tests/test_training_scope.py": "ce35cf27a249282419905f26037c54c0420388c682861ea946cfeb0567dbd132"
+  },
+  "execution_boundary": {
+    "fresh_external_root": "D:/codex-runs/jev-information-density-v08i/phase-a-v02-clean",
+    "v01_artifacts_mutable": false,
+    "phase_b_model_contact_authorized": false
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "summary_sha256": "456bd16ec7b659037bae3951f81cd24815247907564631a8a6cee883f389dcba",
+  "statistics_recomputed": false,
+  "renderer": "dependency-free Python SVG writer",
+  "output_hashes": {
+    "dh06-results.svg": "aebb5e6fae1fa5e0d867b9853e975488739cce20e1c8a1f477bc33236067953c"
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "protocol": "jev-information-density/v0.8p-r1-identity-schema-v01",
+  "identity": "IDENTITY-SCHEMA-R1",
+  "status": "FROZEN_BEFORE_R1_DATA_REPLAY",
+  "encoding": {
+    "text": "UTF-8",
+    "unicode": "all identity strings must already be NFC; reject rather than normalize",
+    "whitespace": "identity strings must be nonempty and have no leading or trailing whitespace; reject rather than trim",
+    "canonical_json": "serde_json::to_vec of the explicitly declared Rust structs below; struct field order is the serialization order; no maps, floats, omitted defaults, or trailing newline",
+    "hash": "lowercase hexadecimal SHA-256"
+  },
+  "fields": {
+    "world_id": {
+      "meaning": "content identity of the exact generator-sampled latent world, shared by its intervention siblings",
+      "source_object": "the actual jev_decision_world_v01::Episode fields template.template_id, sampled_world, provenance.world_sample_seed",
+      "canonical_payload_fields_in_order": ["template_id", "sampled_world_u8", "world_sample_seed"],
+      "domain_separator": "jev-information-density-v08p-r1/world/v1\\0",
+      "value": "world:sha256:<hex(SHA256(domain_separator || canonical_json(payload)))>"
+    },
+    "root_id": {
+      "meaning": "content identity of the pre-variant neighborhood root, shared by its A/F/S/N siblings and distinct from world_id",
+      "source_object": "the actual generator Triplet root context before episode variants: partition namespace, family slug, sequence, seed, anchor_id, template id, and context code",
+      "canonical_payload_fields_in_order": ["partition_namespace", "family_slug", "sequence", "seed", "anchor_id", "template_id", "context_code", "world_id_sha256"],
+      "domain_separator": "jev-information-density-v08p-r1/root/v1\\0",
+      "value": "root:sha256:<hex(SHA256(domain_separator || canonical_json(payload)))>"
+    },
+    "episode_id": {
+      "meaning": "generator-owned episode identity emitted by the actual episode object",
+      "source_object": "Episode.episode_id",
+      "canonicalization": "exact validated string, no aliasing or reconstruction"
+    },
+    "full_rendered_input_hash": {
+      "meaning": "identity of the exact model-visible rendered text bytes",
+      "source_object": "Episode.renderings[0].text, required byte-equal to the canonical episode content consumed by the frozen encoder",
+      "canonicalization": "SHA-256 of exact UTF-8 bytes; no trimming, normalization, prefix, or wrapper"
+    },
+    "selector_input_hash": {
+      "meaning": "identity of the exact generator occurrence-selection request used to resolve one role from the built neighborhood",
+      "source_object": "typed OccurrenceSelectorInput passed to the R1 select_occurrence routine that selects the actual episode object before writing its occurrence",
+      "canonical_payload_fields_in_order": ["schema", "partition_namespace", "family_slug", "triplet_anchor_id", "role", "candidate_order_sha256"],
+      "canonicalization": "SHA-256 of canonical_json(payload); this is the pre-feature occurrence selector, not the later radius matcher"
+    }
+  },
+  "occurrence_selector": {
+    "schema": "jev-information-density/v0.8p-r1-occurrence-selector-v01",
+    "operation": "select exactly one generator-produced episode by its declared role from the current Triplet; fail if role is absent or duplicated",
+    "input_is_consumed_by_selection": true,
+    "candidate_order_sha256": "SHA-256(canonical_json(ordered candidate_semantic_id strings read from the actual anchor episode runtime schema))",
+    "validated_fields": ["partition_namespace must equal Triplet.partition", "triplet_anchor_id must equal Triplet.anchor_id", "family_slug must prefix every candidate_semantic_id", "role must occur exactly once in the Triplet", "candidate_order_sha256 must match the selected episode runtime schema"],
+    "no_targets_or_features": true
+  },
+  "sidecar": {
+    "one_row_per_generator_occurrence": true,
+    "emission_point": "after the exact episode object and render are constructed and validated, and in the same write transaction as its corresponding corpus/panel occurrence",
+    "fields_only": ["partition_namespace", "family_slug", "role", "world_id", "root_id", "episode_id", "full_rendered_input_hash", "selector_input_hash"],
+    "targets_features_predictions_metrics": "never serialized to the identity sidecar"
+  }
+}

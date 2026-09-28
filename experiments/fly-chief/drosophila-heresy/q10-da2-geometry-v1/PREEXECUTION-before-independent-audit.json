@@ -1,0 +1,46 @@
+{
+  "protocol": "Q10-DA2",
+  "status": "FROZEN_PRE_EXECUTION",
+  "source_manifest": [
+    {
+      "path": "PLAN.md",
+      "sha256": "7531068F764CC10BCD0AB34924B150B94B492DFDBAEB1B28166F2B33BB9072D0"
+    },
+    {
+      "path": "CONTRACT.json",
+      "sha256": "649DCD03D21F64313F988FF0A49024808DC3507A7DF78DD9342957DA81D53B48"
+    },
+    {
+      "path": "q10-da2-config.json",
+      "sha256": "9FD5D8EC3AAD3F0FC625556761B7BD6BB73A205AD59B974B28211C1E656F52B4"
+    },
+    {
+      "path": "scripts/run_q10_da2.py",
+      "sha256": "8C6A0E0E9EA99B1CADCC1E70BC611DC56579A63BE08796FD8EEDC03650530F78"
+    },
+    {
+      "path": "scripts/audit_q10_da2.py",
+      "sha256": "36F1CB3E957A8220FA7092F83358AF722D0977C91E440B94FB0516287BB1B258"
+    },
+    {
+      "path": "scripts/seal_q10_da2.py",
+      "sha256": "570BA120681D189CC8779EDDD930154D790D4E81A474DE1DA92C7C86087715EB"
+    }
+  ],
+  "input_root": "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-distributed-additive-v1\\qualification\\sample-9731-9732",
+  "input_sha256": {
+    "seed9731-L-tau16.json": "3114A3B31C59A79D540F32C30FE1C217971418655CD8B13E17A91D8157AA1707",
+    "seed9731-L-tau4.json": "2974BF3A4CB5C80569EE73B2E46C8800D12D142DDA9B67EA572880F4EE9C3B5E",
+    "seed9731-R-tau16.json": "185769A85B1EA2FE8E596804C1FC3CB4F27A3D8318010FB8D739E56CBF554F73",
+    "seed9731-R-tau4.json": "8BA8EF71BF255B53769A6E50EB65408E19BD59743F932F3DF741AF3EB97DCE99",
+    "seed9732-L-tau16.json": "461269AF2C4B89F9DD9B589E6CA322A29CA9357FAA29627911E7FB5B85E8E1A3",
+    "seed9732-L-tau4.json": "36F042052DF02EEA4371C3C76F8AFA727FECF5450158CBFAEA731E7E43A60D28",
+    "seed9732-R-tau16.json": "2E6AF0C80578CD61214099D166D692007B431FF557D678AFBBAF2FFD8DC8BFC9",
+    "seed9732-R-tau4.json": "A53A3567E84CB753805409A92B1C350C5F2AC6173557D221C000C975BF19A135"
+  },
+  "parent_protocol": "Q10-DA1",
+  "scientific_seed_bundles": 0,
+  "behavioral_inference": false,
+  "dh08b_authorized": false,
+  "selector": "DA1 local mismatch-first choices plus deterministic one/two-coordinate axis correction"
+}

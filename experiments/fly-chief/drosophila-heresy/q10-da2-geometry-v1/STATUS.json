@@ -1,0 +1,14 @@
+{
+  "protocol": "Q10-DA2",
+  "status": "ENGINEERING_COMPLETE_GEOMETRY_MOSTLY_FEASIBLE_READOUT_UNREPAIRED",
+  "declared_events": 8,
+  "sets": 32,
+  "geometry_passes": 28,
+  "geometry_failures": 4,
+  "independent_endpoint_audit": "PASS",
+  "sequential_bitwise_equal_endpoints": 0,
+  "scientific_seed_bundles_used": 0,
+  "behavioral_inference": false,
+  "future_dh08b_authorized": false,
+  "next_decision": "Keep DH08B closed; qualify a wider deterministic correction policy with explicit readout parity before any science."
+}

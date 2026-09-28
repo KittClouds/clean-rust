@@ -1,0 +1,36 @@
+{
+  "biological_promotion": false,
+  "comparative_outcomes_accessed": false,
+  "contract_sha256": "2c3f46214cbe9ec1271a2b9a72a2fac130d648f05f23f1e43685c1436c153a90",
+  "disposition": "Preserve this sealed identity and its collection as non-promotable. Any continuation requires a new execution identity and seal after the launcher/schema defect is corrected.",
+  "failure_stage": "FIT_LAUNCH_PRECONDITION",
+  "findings": [
+    "The frozen fit_d.py runner cannot resolve f4_symmetry_01_model.py from its default module path; the exact frozen model path and SHA were independently verified during a read-only launcher check.",
+    "The runner requires PRE-FIT-GATES.heldout_truth_opened=false, while the frozen preparation receipt records the equivalent field as truth_values_opened=false; the runner stopped before reading the collection or starting a fit."
+  ],
+  "fit_count_started": 0,
+  "fit_preparation_status": "PASS",
+  "fit_receipts_written": 0,
+  "heldout_truth_values_opened": false,
+  "integrity_analysis_performed": false,
+  "measured_reach03_authorized": false,
+  "native_collection_status": "PASS",
+  "native_row_count": 20952,
+  "native_stream_count": 216,
+  "prediction_lock_written": false,
+  "prediction_streams_written": 0,
+  "preexecution_seal_sha256": "1cda48d2eafca0a70a249172c702eb1f4afb297082158bbcdf2ee0524b113210",
+  "prefit_status": "PASS",
+  "preservation": {
+    "fit_script_sha256": "2add98238ce4dea5b5fcc74642c435a07a0604f42e6793d66d65c552017f3dc0",
+    "integrity_script_sha256": "986f007ac9941de34653d10d8ac674d20f6debf848fc1490b7fa63215549ca25",
+    "native_collection_receipt_sha256": "34ed18fbf75a9a6ea2729ebe9dca5a2a202755aa24f02088278c77b8a767edd2",
+    "predictor_sha256": "154ee7ea7f261de03a098da45e77c050fe63498a2ae5ba9917596c635b7a2b78",
+    "scoring_truth_sha256": "cf575d9072c6ee6f765602fe53f8c7660f0141b6f16bf2cf66173d359839ac69",
+    "task_manifest_sha256": "381bca3f219078147935e57a3938d7beec927e476543a1daabad96370243aa79",
+    "task_training_sha256": "df0031f7d2b52e32a23a6572c43e32894cab62989dfa39faf6da92f36f32a31c"
+  },
+  "run_id": "F4-CALIBRATION-02-QPROMO1",
+  "schema": "F4-CALIBRATION-02-engineering-stop-v1",
+  "status": "NONPROMOTABLE_ENGINEERING_STOP_BEFORE_FITS"
+}

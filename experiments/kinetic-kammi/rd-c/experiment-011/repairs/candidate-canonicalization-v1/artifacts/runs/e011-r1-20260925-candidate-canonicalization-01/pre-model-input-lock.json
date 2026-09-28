@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "state": "FROZEN_BEFORE_MODEL_CONTACT",
+  "run_id": "e011-r1-20260925-candidate-canonicalization-01",
+  "created_utc": "2026-09-25T20:34:33.098062+00:00",
+  "purpose": "post-E011 deterministic adapter repair test; same-bank diagnostic only",
+  "task_bank": "E010 heldout bank reused; E010 labels previously opened",
+  "observer_weights": "E009 v5 small and large unchanged",
+  "observer_bundle_ids": {
+    "small": "minicpm5-2b-q8-local-v5+candidate-canonicalization-v1",
+    "large": "ternary-bonsai-2-27b-ptq1-local-v5+candidate-canonicalization-v1"
+  },
+  "prompt_schema_normalization": "E009 v5 unchanged",
+  "thresholds": {
+    "minimum_applicability_milli": 850,
+    "maximum_abstention_milli": 150
+  },
+  "routing": "small first, large on small abstention or rejection",
+  "authority": "map proposal to original action ID, then deterministic E002 authority; shadow-only, no action effect",
+  "parent_e011_hashes": {
+    "e011_pre_model_seal_sha256": "8cf6424be08142364117ec43e1d70a2b3529815369ec2b9705cead308cb2d7ce",
+    "e011_postrun_output_seal_sha256": "a4d5321d6622f8cbe6027437e076bc712c1bec4b5f5e20219d628245279436f8",
+    "e011_score_sha256": "61ae20328b50aa0808613eadb4858b20b9c64559c38989e887f83975c958ca4e",
+    "e011_episode_autopsy_sha256": "7457b14a9777129c795f592002c4f39a362cecdba70bcda7a689ab4831f6e77e",
+    "parent_candidate_frame_lock_sha256": "70f6c76971dbfff9a01aa1ab2a271b8055d5a0857fde6964985a642569eb7529"
+  },
+  "sha256": {
+    "input_files": {
+      "inputs/chat-template-large.jinja": "c3cf9e34abf4f9e36c2d72165aa9c132d3e2a725b6c2586aaa3a8af9d7a81041",
+      "inputs/chat-template-small.jinja": "6e54652d84d698ebb3b7b2172204b6eeafd7f27533e006c8c1ebf8e743a7fd99",
+      "inputs/e009-v5-bundle-lock.json": "a626836853bdb0755fd2e4e1569b6b91b33861306c7d1e4a51e3de54a9ee713d",
+      "inputs/e009-v5-thresholds.json": "846b0668db2a7796ac1ee90c190d45532a3065617ff1abca03df495496ddb173",
+      "inputs/e010-frozen-input-lock.json": "323f14b07c698d289af6f11a2e894014538bd6be0644de8786b30b1e954f8165",
+      "inputs/e010-heldout-frame-lock.json": "de330f467dfe8d14d66dba428211b8a27c3eb8a62dd175ba01cf5847728eb587",
+      "inputs/e010-heldout-sealed-labels.json": "4bd1a3984a9c54ecd36c2caf1e09d9b28bc0656a73f0714e9d8b388873dbc0d2",
+      "inputs/observer-output.v2.json": "97170fa0d6a44681f680ad0ac533a3f3913709757e4ee6cbf96d9c9f40d1b2fb",
+      "inputs/system-observer-v2.txt": "976ef1cd914bacb366c64418825010124338a626a0400d459858acc7e48f5a48",
+      "observer-adapter-identities.json": "80b03a6cc7f6faac25c7f676bbebdb445c421094dcb00bf7d0ea04350f631def",
+      "spec.md": "01861037c999a0bc83b8f7a8c9326e22dcd5d21d2c41c83f3f9098cfa0a0698a",
+      "adapter/Cargo.toml": "83b321613d6f69c242ba4c166aa4b9a5517f01d3b43171406cd29797f030d67b",
+      "adapter/Cargo.lock": "2091b6e64039d921a659b78030aea4812bcf68f412e8f3c29d237b3fd330498c",
+      "adapter/src/lib.rs": "5c24ad00ab53fbe4df9db15f0df4dda75378ba5ac332741b570d2b93886c3147",
+      "adapter/src/main.rs": "9b03bfec882e5a20b7f111497d71df936e17279d2a48b98dbfb6dd0854995fab",
+      "rdc-candidate-canonicalizer.exe": "493364e572511cc0198b295d1703aee94af6155a6d8668a191645f334ebc69d7"
+    },
+    "canonical_frame_lock": "0f2c5d570b7c1f7a4c9eaf38ba14142246803490d1c7b6a3c6c7eef1afcdc2e8",
+    "canonical_action_count": 16,
+    "full_and_permuted_frames_canonicalized_identically": true
+  }
+}

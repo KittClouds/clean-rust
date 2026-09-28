@@ -1,0 +1,17 @@
+{
+  "experiment":"AR-03C",
+  "source_revision":"8d03df54b2749dbb1ad87256b0b33114557b0940",
+  "diagnostic_only":true,
+  "runtime_proxy_used":false,
+  "training_policy_changed":false,
+  "replayed_states":234,
+  "r2_checkpoints_verified":54,
+  "ar03b_snapshots_matched":162,
+  "quality_rows":3672,
+  "panel_rows":235008,
+  "r2_model_states_sha256":"895b3b4b16748bd429fd5f86007411b1658698fb523efa07d0088e1a3cab525d",
+  "r2_dataset_sha256":["82249938c79f82d2d484780602244f424f3a5b4a831fca666a04229e32491b8c","005388d66f614e49a60f15c7ac19a00dd8b35fb0febbefdef93326fa766cd67f","c5ee81741b5cfc7f20db776e42ef612885c28a0c0454bae5bb72c2b6dd2d33f8"],
+  "capture_steps":[600, 601, 610, 625, 650, 700, 2400, 2401, 2410, 2425, 2450, 2500, 4200],
+  "candidate_features":"output_layer_gradient_27",
+  "limitations":["same nine R2 crossed cells and 18 streams","new capture ages are observational replays only","timings are local CPU component measurements","no end-to-end optimizer comparison"]
+}

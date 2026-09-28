@@ -1,0 +1,13 @@
+--- validation-repair-v0.1.1/verify_integrity.py
++++ integrity-repair-v0.1.2/verify_integrity.py
+@@ -226,8 +226,8 @@
+             if record_key != key:
+                 raise RuntimeError(f"truth/predictor key mismatch at row {index}")
+             stream.seek(TRUTH_WIDTH - 18, os.SEEK_CUR)
+-    if stream.tell() != path.stat().st_size:
+-        raise RuntimeError("truth key scan ended at wrong offset")
++        if stream.tell() != path.stat().st_size:
++            raise RuntimeError("truth key scan ended at wrong offset")
+     return sha_file(path)
+ 
+ 

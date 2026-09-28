@@ -1,0 +1,236 @@
+{
+  "contract": "phoenix-gliner25-rust-five-surface-v1",
+  "features": [
+    {
+      "elapsed_ms": 3383.8077000000003,
+      "feature": "long_context",
+      "status": "observed",
+      "value": [
+        {
+          "char_end": 8896,
+          "char_start": 8890,
+          "field": "organization",
+          "logit": 0.7785823345184326,
+          "query_id": 1,
+          "score": 0.6853744983673096,
+          "text": "OpenAI",
+          "word_end": 901,
+          "word_start": 900
+        },
+        {
+          "char_end": 8917,
+          "char_start": 8907,
+          "field": "person",
+          "logit": 4.169069290161133,
+          "query_id": 0,
+          "score": 0.9847688674926758,
+          "text": "Sam Altman",
+          "word_end": 904,
+          "word_start": 902
+        },
+        {
+          "char_end": 8934,
+          "char_start": 8921,
+          "field": "location",
+          "logit": 6.67086124420166,
+          "query_id": 2,
+          "score": 0.9987342953681946,
+          "text": "San Francisco",
+          "word_end": 907,
+          "word_start": 905
+        },
+        {
+          "char_end": 8945,
+          "char_start": 8938,
+          "field": "date",
+          "logit": 4.290060043334961,
+          "query_id": 3,
+          "score": 0.9864811897277832,
+          "text": "Tuesday",
+          "word_end": 909,
+          "word_start": 908
+        }
+      ]
+    },
+    {
+      "elapsed_ms": 453.8512,
+      "feature": "unlimited_span_candidate",
+      "status": "observed",
+      "value": [
+        {
+          "mentions": [
+            {
+              "char_end": 127,
+              "char_start": 24,
+              "field": "operation_name",
+              "logit": 3.1235904693603516,
+              "query_id": 0,
+              "score": 0.9578553438186646,
+              "text": "Recover Every Surviving Archive From The Abandoned Underground Observatory Beneath New Rome Before Dawn",
+              "word_end": 18,
+              "word_start": 4
+            }
+          ],
+          "text": "The operation was named Recover Every Surviving Archive From The Abandoned Underground Observatory Beneath New Rome Before Dawn."
+        },
+        {
+          "mentions": [
+            {
+              "char_end": 131,
+              "char_start": 18,
+              "field": "treaty_title",
+              "logit": 2.4091482162475586,
+              "query_id": 0,
+              "score": 0.9175222516059875,
+              "text": "Agreement for the Coordinated Recovery and Preservation of All Cultural Archives Lost During the Fall of New Rome",
+              "word_end": 21,
+              "word_start": 3
+            }
+          ],
+          "text": "The treaty titled Agreement for the Coordinated Recovery and Preservation of All Cultural Archives Lost During the Fall of New Rome was signed today."
+        },
+        {
+          "mentions": [
+            {
+              "char_end": 61,
+              "char_start": 53,
+              "field": "event_name",
+              "logit": -0.542241096496582,
+              "query_id": 0,
+              "score": 0.3676663935184479,
+              "text": "New Rome",
+              "word_end": 10,
+              "word_start": 8
+            }
+          ],
+          "text": "Witnesses remembered The Night When Every Star Above New Rome Turned Crimson And The Sea Rose Against The City."
+        }
+      ]
+    },
+    {
+      "elapsed_ms": 331.10240000000005,
+      "feature": "span_attributes",
+      "status": "observed",
+      "value": [
+        {
+          "char_end": 21,
+          "char_start": 8,
+          "field": "product",
+          "logit": 3.4371654987335205,
+          "query_id": 0,
+          "score": 0.9688460230827332,
+          "sentiment": {
+            "confidence": 0.46897488832473755,
+            "label": "positive"
+          },
+          "text": "iPhone camera",
+          "word_end": 4,
+          "word_start": 2
+        }
+      ]
+    },
+    {
+      "elapsed_ms": 63.3392,
+      "feature": "constrained_classification",
+      "status": "observed",
+      "value": {
+        "meta": {
+          "decoder": "exact",
+          "exact": true,
+          "feasible": true,
+          "objective": 15.036396980285645,
+          "violations": []
+        },
+        "tasks": {
+          "effects": {
+            "confidence": 0.9989712238311768,
+            "probabilities": {
+              "create": 0.0019097996409982443,
+              "delete": 0.9995415210723877,
+              "modify": 0.0015558048617094755,
+              "read_only": 0.0001898940681712702
+            },
+            "value": [
+              "delete"
+            ]
+          },
+          "intent": {
+            "confidence": 0.9999984502792358,
+            "probabilities": {
+              "delete": 0.9999984502792358,
+              "read": 6.537105150528078e-7,
+              "write": 8.369014494746807e-7
+            },
+            "value": "delete"
+          }
+        }
+      }
+    },
+    {
+      "elapsed_ms": 301.1123,
+      "feature": "joint_information_extraction",
+      "status": "observed",
+      "value": {
+        "entities": [
+          {
+            "confidence": 0.9983804225921631,
+            "end": 5,
+            "id": "e1",
+            "start": 0,
+            "text": "Alice",
+            "type": "person"
+          },
+          {
+            "confidence": 0.99986732006073,
+            "end": 20,
+            "id": "e2",
+            "start": 16,
+            "text": "Acme",
+            "type": "organization"
+          },
+          {
+            "confidence": 0.9995410442352295,
+            "end": 29,
+            "id": "e3",
+            "start": 24,
+            "text": "Paris",
+            "type": "location"
+          },
+          {
+            "confidence": 0.9986923336982727,
+            "end": 34,
+            "id": "e4",
+            "start": 31,
+            "text": "Bob",
+            "type": "person"
+          },
+          {
+            "confidence": 0.9997949004173279,
+            "end": 46,
+            "id": "e5",
+            "start": 42,
+            "text": "Acme",
+            "type": "organization"
+          }
+        ],
+        "feasible": true,
+        "relations": [
+          {
+            "confidence": 0.9856975078582764,
+            "head": "e1",
+            "tail": "e2",
+            "type": "works_for"
+          },
+          {
+            "confidence": 0.8743638396263123,
+            "head": "e4",
+            "tail": "e5",
+            "type": "works_for"
+          }
+        ]
+      }
+    }
+  ],
+  "graph_publications": 0,
+  "model": "D:\\phoenix-models\\gliner2.5-base-v1-onnx-a639bad"
+}

@@ -1,0 +1,14 @@
+{
+  "supersession_id": "FAS00_PHASE3_EXECUTOR_SUPERSESSION_V02",
+  "project_id": "fas-frozen-adaptive-substrate-v00",
+  "superseded_source_root_sha256": "96f7110df97acc88436d55d475b0db1b015b219e5657ffda97f82baa6ff37e26",
+  "superseded_implementation_sha256": "f7a4a05d5e3b3411fb85e339707f43f0d7de6d3d61ee6ba1f4a46f004bd71eb4",
+  "reason": "The v01 Python source verifier sorted file names by case-sensitive codepoint order while the sealed PowerShell source tree used case-insensitive name order.",
+  "failure_stage": "source seal verification",
+  "qualification_corpus_opened": false,
+  "probe_fitting_started": false,
+  "phase3_result_created": false,
+  "scientific_contract_changed": false,
+  "probe_math_changed": false,
+  "corrected_behavior": "Match the sealed source file-name ordering before any corpus read or fit."
+}

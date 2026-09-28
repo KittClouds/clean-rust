@@ -1,0 +1,90 @@
+{
+  "entries": [
+    {
+      "bytes": 5378,
+      "path": "S09-PROTOCOL.md",
+      "sha256": "55c5340a7e82355cf58efa9d8b583cc1a07028f6b82c61896f8f4cfa0dd7070d"
+    },
+    {
+      "bytes": 2249,
+      "path": "contracts/authorization-packet-v02.json",
+      "sha256": "29a5742054bcbd9a4c4a11a22c95eef854ba3fd21ca106d4c9b54941e39f5e70"
+    },
+    {
+      "bytes": 1954,
+      "path": "contracts/parent-binding-v02.json",
+      "sha256": "d8d9b7e3673ce70b14ee16d50824dd8a06a946939c607e666041fa6f618ef246"
+    },
+    {
+      "bytes": 896,
+      "path": "contracts/preflight-correction-record-v02.json",
+      "sha256": "12e0ef1fde313d8760cd910001479298ff34f0b4395c7998f39ab10f910862b8"
+    },
+    {
+      "bytes": 5074,
+      "path": "contracts/s09-contract-v02.json",
+      "sha256": "8658c6c2fc7e7adcf94354480957de98f72aa62dc87fdaf1dc114a17121ba733"
+    },
+    {
+      "bytes": 12636,
+      "path": "source/extract_layers.py",
+      "sha256": "2c4c586bab5d5f027d07683df1699da9cc666b2edebb5708f5d72ec047b2989a"
+    },
+    {
+      "bytes": 11187,
+      "path": "source/freeze_inputs.py",
+      "sha256": "49e42753125946ef6d88cb92436f66ec88d6a06729099c6aca3964540ab7ab62"
+    },
+    {
+      "bytes": 10030,
+      "path": "source/linear_core.py",
+      "sha256": "771bf4a235639cbd8ed5a0f0078339da65ad6fb10e46406646473bfc8df5ffbe"
+    },
+    {
+      "bytes": 4416,
+      "path": "source/prepare_model.py",
+      "sha256": "7b9b2419801c5a99791b5150ec4a1444ed638e9c5e8a395415a8f0109f4e572b"
+    },
+    {
+      "bytes": 21007,
+      "path": "source/run_analysis.py",
+      "sha256": "147b6bc32da89e760a2fc655fcb609d174dacc2f34bfe15351e02cb336736e28"
+    },
+    {
+      "bytes": 14256,
+      "path": "source/s01_common_reference.py",
+      "sha256": "edf7263b2538c8cfc898fb974ac66edfbef58d925fc4617f65ce9c3306093609"
+    },
+    {
+      "bytes": 4821,
+      "path": "source/s09_common.py",
+      "sha256": "a62783c667686920c603b53ccbd1484cb7ee192509ae9851a24a17f537b688fc"
+    },
+    {
+      "bytes": 6030,
+      "path": "source/s09_math.py",
+      "sha256": "17fc73bec83213f8c6b28e84e9099aae4a8b92230f505d1dfd21ef02a54909aa"
+    },
+    {
+      "bytes": 1364,
+      "path": "source/seal_protocol.py",
+      "sha256": "5a35796836054c5e660bebe919174e51a5a97b5ba91766987cb1a9890a0d1976"
+    },
+    {
+      "bytes": 7880,
+      "path": "source/seal_result.py",
+      "sha256": "612733881e55639ed0061812cb9778a367dff4783f6004f179de53bb3b546689"
+    },
+    {
+      "bytes": 1830,
+      "path": "tests/test_s09_math.py",
+      "sha256": "47a4efad8e2c0eefe0ed9c32f1a9fc0ba0dd76bd5ce52f83395cc1304ee5e2e5"
+    }
+  ],
+  "features_extracted": false,
+  "model_loaded": false,
+  "probes_fitted": false,
+  "project_id": "fas-s09-depthwise-decision-subspace-emergence",
+  "root_sha256": "274b8291e208017555f922544f43694e9d30cab6141f47d4d8a68772c3a76c19",
+  "seal_id": "FAS_S09_PROTOCOL_SEAL_V02"
+}

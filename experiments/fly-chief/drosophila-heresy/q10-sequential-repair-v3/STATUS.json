@@ -1,0 +1,40 @@
+{
+  "protocol": "Q10-SR3",
+  "status": "Q10_SR3_STAGE2A_INVALID",
+  "stage": "STAGE_1B_ABORTED__CAPACITY_FACTORIZATION_PERFORMANCE",
+  "stage_1a": {
+    "status": "VERIFIED",
+    "seed": 9521,
+    "audited_states": 1024,
+    "eligible_states": 1002,
+    "capacity_exact": 0,
+    "capacity_gated": 1002,
+    "search_entered": 0,
+    "repairs": 0
+  },
+  "stage_1b": {
+    "configured_seeds": [9522, 9523, 9524, 9525],
+    "completed_seeds": [],
+    "completed_side_tau_blocks": 2,
+    "completed_event_receipts": 512,
+    "started_uncommitted_block": {
+      "seed": 9522,
+      "side": "L",
+      "tau": 4.0,
+      "events_committed": 0
+    }
+  },
+  "scientific_seed_bundles": 0,
+  "behavioral_inference": false,
+  "failure": {
+    "kind": "FROZEN_CAPACITY_FACTORIZATION_PERFORMANCE_BUDGET_EXCEEDED",
+    "observation_window_minutes": 10.18,
+    "worker_threads_waiting": 8,
+    "worker_threads_running": 1,
+    "memory_bytes_stable_near": 267000000,
+    "interpretation": "A deterministic capacity factorization worker did not commit the third block within the bounded engineering window; no repair or scientific result is inferred.",
+    "same_identity_resume_authorized": false
+  },
+  "stage_1b_authorized": false,
+  "dh08b_authorized": false
+}

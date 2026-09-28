@@ -1,0 +1,79 @@
+{
+  "artifact_paths": {
+    "amendment": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-013-trust-signal\\E013-PROTOCOL-AMENDMENT-v0.3.1.md",
+    "construction_handoff_status": "C:\\Users\\shuga\\.codex\\worktrees\\e013-episode-factory\\clean-rust\\experiments\\e013-episode-factory\\precontact-v031\\HANDOFF-STATUS-v0.3.1.md",
+    "e012_raw_yield": "C:\\rd-c\\selective-cognition-action-region-program\\e012-readonly-anatomy-addendum\\E012-RAW-PROPOSAL-YIELD-v1.0.json",
+    "feasibility_projections": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-013-trust-signal\\E013-FEASIBILITY-PROJECTIONS-v0.3.1.json",
+    "feasibility_receipt": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-013-trust-signal\\E013-FEASIBILITY-RECEIPT-v0.3.1.md",
+    "generator_script": "C:\\Users\\shuga\\.codex\\worktrees\\e013-episode-factory\\clean-rust\\experiments\\e013-episode-factory\\precontact-v031\\build_precontact_v031.py",
+    "lab_law": "D:\\1-story\\1-Notes Central\\1- Core story\\Newest Data\\1-clean data\\Lore\\part 2\\World\\1-rewrite\\!1-notes\\! V5 rewite\\Frozen Fabrique\\Lab Law.txt",
+    "lab_law_grant": "D:\\1-story\\1-Notes Central\\1- Core story\\Newest Data\\1-clean data\\Lore\\part 2\\World\\1-rewrite\\!1-notes\\! V5 rewite\\Frozen Fabrique\\lab law grant.txt",
+    "parent_lock": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-013-trust-signal\\E013-PROTOCOL-LOCK-v0.3.json",
+    "parent_projections": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-013-trust-signal\\E013-FEASIBILITY-PROJECTIONS-v0.3.json",
+    "parent_protocol": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-013-trust-signal\\E013-TRUST-SIGNAL-DEVELOPMENT-PROTOCOL-v0.3.md",
+    "parent_receipt": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-013-trust-signal\\E013-FEASIBILITY-RECEIPT-v0.3.md",
+    "positive_control_v1_2": "C:\\rd-c\\selective-cognition-action-region-program\\e012-readonly-anatomy-addendum\\E012-POSITIVE-CONTROL-DESIGN-v1.2.md"
+  },
+  "bank_generation_performed_by_agent": false,
+  "bank_owner": "USER",
+  "banks": {
+    "C": {
+      "status": "USER_BUILD_PENDING",
+      "tasks": 1120
+    },
+    "D": {
+      "status": "USER_BUILD_PENDING",
+      "tasks": 864
+    }
+  },
+  "freeze_boundary": [
+    "No E013 bank, task, fixture, label, seed, T1 screen, model call, or scoring was produced by this work.",
+    "The user owns and builds both E013 banks.",
+    "E013-D/C model contact remains unauthorized.",
+    "The separate positive control is authorized but awaits the user-built sealed bank.",
+    "Parent v0.3 files and lock remain byte-identical."
+  ],
+  "locked_decisions": {
+    "development_fixed_recall_targets": [
+      0.5,
+      0.7,
+      0.9
+    ],
+    "epsilon": 0.05,
+    "n_min": 60,
+    "no_proposal_fallback_conditionals": true,
+    "primary_resource_axis": "PAIRED_MEAN_END_TO_END_WALL_MS_PER_TASK_VS_LARGE_ONLY",
+    "t1_screen_cost": "INCREMENTAL_UNLESS_LARGE_ONLY_RUNS_IDENTICAL_SCREENS"
+  },
+  "model_contact_authorized": false,
+  "model_contact_performed": false,
+  "parent_lock_sha256": "422efcda45938c5aa1258c49afd101ef30fa4f4405ed3b7a70945a4716aec788",
+  "parent_protocol_id": "E013-TRUST-SIGNAL-DEVELOPMENT-v0.3",
+  "parent_protocol_sha256": "74910aededa494c49f741a05fa4d632e1f46c8466ae31ac2447f42832f25c70e",
+  "positive_control": {
+    "bank_status": "USER_BUILD_PENDING",
+    "c_use": "LINEAGE_ONLY; no E013 projection or bank-design update",
+    "id": "E012-PC-01-v1.2",
+    "model_contact_authorized": true,
+    "run_status": "NOT_RUN"
+  },
+  "protocol_id": "E013-TRUST-SIGNAL-DEVELOPMENT-v0.3.1",
+  "schema_version": 1,
+  "self_hash_note": "This lock does not hash itself or the post-lock verification receipt.",
+  "sha256": {
+    "amendment": "ed586a80686784c5234965e858e7299a2bac198af9d3453362d5218b1bbc88f8",
+    "construction_handoff_status": "33e21c6a597009e559f17fcc4196b5bdf8e21cb0adbd04981ef717968158c02a",
+    "e012_raw_yield": "5692d4a69bfcc01b16d09f980ee6525de767bd186bff2c8787ebdcf94e8658e5",
+    "feasibility_projections": "fffd68e8d1c687cc648f81857cc3f593e8fa5c498884a5413a08d151e9b65f69",
+    "feasibility_receipt": "c699207d35326e44d581c90a4e61caabb85412c0de6ad6e9d448bd9e4df6ea39",
+    "generator_script": "a22d6593b6dcc4f907863654239b639dd71db8ebaa4af327baf0e34e87c77fa0",
+    "lab_law": "a6f85e7a2cc09b9762c17763f03c2eee51b27e099d8faaeeac548452c2c52026",
+    "lab_law_grant": "9380672300b9d8b7c2e21e1fb6a5a4136a159df6c5351f4438aab6c0a09cc600",
+    "parent_lock": "422efcda45938c5aa1258c49afd101ef30fa4f4405ed3b7a70945a4716aec788",
+    "parent_projections": "83eb335c74139730ea02ffbda2ca055748faf54069f06d036d8d05980e01332c",
+    "parent_protocol": "74910aededa494c49f741a05fa4d632e1f46c8466ae31ac2447f42832f25c70e",
+    "parent_receipt": "250045217d113cb48f93e692bded2ec7e232eeedec33e1f944bbfedd062b85ba",
+    "positive_control_v1_2": "be69ee36702e2c94cf0f5187aa0fe5f76d512b59d3df645cb407ce4ab2a1c0ad"
+  },
+  "state": "SEALED_PRECONTACT_DESIGN_ONLY"
+}

@@ -1,0 +1,37 @@
+{
+  "artifact_id": "E013-PRECONTACT-VERIFICATION-v0.3.4",
+  "banks_generated_by_agent": false,
+  "checked_sha256": {
+    "amendment": "79a2475857f7d7ec72a61bdf65500b2744865a9951958870ab6ca05be78710e1",
+    "generator": "db4b2755d6a706813569b9860911735242232e50920ce1d5a7c5129714451683",
+    "parent_lock_v032": "fbac0d86ffd6a593793d2a35d00d2250ae63b52a0abec99864d36456d1af1adb",
+    "parent_verification_v032": "4081425f5cf6cb61be6674560c70afbc1a4803bcf721696aff086c72e880ca66",
+    "projections_v032": "7f71d0dc6d619dfbeea03cd25a1c9dc3d7e80737f47558cb8fa47cad1e944c88",
+    "supplement_lock_v033": "a3445cac2493e8b448f4ffeefd189fa7bd40e8b33a4ff99e2af995fdd255146b",
+    "supplement_verification_v033": "f3d31c61c37e3bb95dff3904185cdd436cc49a1e5bf12cfb4019aeafbcad223c"
+  },
+  "checks": {
+    "Tmax_matches_locked_inputs": true,
+    "cluster_reporting_present": true,
+    "contact_and_ownership_boundary": true,
+    "exists:amendment": true,
+    "exists:generator": true,
+    "exists:parent_lock_v032": true,
+    "exists:parent_verification_v032": true,
+    "exists:projections_v032": true,
+    "exists:supplement_lock_v033": true,
+    "exists:supplement_verification_v033": true,
+    "selection_rule_present": true,
+    "sha256:amendment": true,
+    "sha256:generator": true,
+    "sha256:parent_lock_v032": true,
+    "sha256:parent_verification_v032": true,
+    "sha256:projections_v032": true,
+    "sha256:supplement_lock_v033": true,
+    "sha256:supplement_verification_v033": true,
+    "wall_time_bound_present": true
+  },
+  "lock_sha256": "85c0b4e4c13fae800ecb42f5742d1a53e89f7388ce3c2fd42789c8759e613f38",
+  "model_contact_performed": false,
+  "state": "PASS"
+}

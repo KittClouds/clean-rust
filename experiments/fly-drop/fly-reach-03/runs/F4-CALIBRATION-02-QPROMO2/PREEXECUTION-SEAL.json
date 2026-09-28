@@ -1,0 +1,30 @@
+{
+  "biological_promotion": false,
+  "block_ids": [
+    305012,
+    305013,
+    305014,
+    305015,
+    305016,
+    305017,
+    305018,
+    305019,
+    305020,
+    305021,
+    305022,
+    305023
+  ],
+  "contract_sha256": "192b0c3c01b2b7978aedfe55e5490012226e62e0b7660c4410797a08b44a01b8",
+  "execution_manifest_canonical_sha256": "f25e7d4573e08b584e92518b43d7b837a75d225a10850207556fd0faf0a9a30b",
+  "execution_manifest_file_sha256": "c02bc813d9780fbfc31b497bae1fc281ca0a18539bbeb4f94d21a9b8bf6304df",
+  "expected_fit_count": 12,
+  "expected_native_stream_count": 216,
+  "heldout_truth_opened": false,
+  "measured_reach03_authorized": false,
+  "qualification_only": true,
+  "run_id": "F4-CALIBRATION-02-QPROMO2",
+  "schema": "F4-CALIBRATION-02-v0.2-preexecution-seal-v1",
+  "source_manifest_canonical_sha256": "c6c3feacdbd63325fd0c484abae28b486f6cdc284e5deebc02851b5552bda110",
+  "source_manifest_file_sha256": "bb9de9d1c7e02ff922c0d29f2fba6e6bdc09e10490942f00ca957ff8958055a3",
+  "status": "PASS"
+}

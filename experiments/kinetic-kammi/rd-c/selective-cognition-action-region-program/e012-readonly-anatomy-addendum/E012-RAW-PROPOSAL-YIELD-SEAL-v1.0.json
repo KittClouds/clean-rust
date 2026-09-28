@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "artifact_id": "E012-RAW-PROPOSAL-YIELD-v1.0",
+  "state": "SEALED_READ_ONLY_RECOUNT",
+  "source_run_id": "e012-20260926-frame-decomposition-01",
+  "source_run_modified": false,
+  "model_contact": false,
+  "fitting_or_threshold_search": false,
+  "artifacts_sha256": {
+    "report": "ad8a9d1d1b93fec50cd838bbcc580b94abdbab38300160e3315626b39f152c49",
+    "result": "5692d4a69bfcc01b16d09f980ee6525de767bd186bff2c8787ebdcf94e8658e5",
+    "analyzer": "70b2df346642f12990e6bdc4772ce1421433e04e1c0db4c3748c545fdac4627e",
+    "source_lock": "4bab6fd945248b6209fa33e3a1df10786298ac620342ce167251411c6a258cd8",
+    "source_report": "2155e62daf0650da8e44fb3c44704deb8c4bd2aff615e859ec215aabd6e1a6ed",
+    "source_labels": "e9e81f71e46e167b077d4123a84d918b7d2f4afb791a009700f5390f61106caa"
+  },
+  "counts": {
+    "tasks": 48,
+    "raw_correct": 7,
+    "raw_wrong": 11,
+    "raw_null": 30,
+    "accepted": 16,
+    "accepted_correct": 6,
+    "accepted_wrong": 10
+  },
+  "note": "Seal binds report, deterministic analyzer, generated JSON, and source lock/report/labels. It does not hash itself."
+}

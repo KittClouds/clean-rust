@@ -1,0 +1,48 @@
+[package]
+name = "gpui-animated-gradient-text"
+version = "0.2.0"
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+description = "Fast, Unicode-aware animated gradient text for GPUI"
+documentation = "https://docs.rs/gpui-animated-gradient-text"
+repository = "https://github.com/KittClouds/clean-rust"
+readme = "README.md"
+keywords = ["gpui", "gradient", "animation", "text", "ui"]
+categories = ["gui", "rendering"]
+include = [
+    "src/**",
+    "examples/**",
+    "benches/**",
+    "Cargo.toml",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE-APACHE",
+    "LICENSE-MIT",
+]
+
+[features]
+default = []
+picker-ui = ["dep:gpui-component"]
+serde = ["dep:serde", "dep:serde_json"]
+
+[dependencies]
+gpui = "=0.2.2"
+gpui-component = { version = "=0.5.1", optional = true }
+serde = { version = "1.0", features = ["derive"], optional = true }
+serde_json = { version = "1.0", optional = true }
+unicode-segmentation = "1.13"
+
+[dev-dependencies]
+criterion = { version = "0.5", default-features = false, features = ["cargo_bench_support"] }
+
+[[bench]]
+name = "gradient_runs"
+harness = false
+
+[[example]]
+name = "authoring_showcase"
+required-features = ["picker-ui", "serde"]
+
+[package.metadata.docs.rs]
+all-features = true

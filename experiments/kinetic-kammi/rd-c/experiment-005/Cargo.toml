@@ -1,0 +1,21 @@
+[package]
+name = "rdc-experiment-005"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[dependencies]
+blake3 = "=1.8.5"
+hashbrown = "=0.17.1"
+memchr = "=2.8.3"
+memmap2 = "=0.9.11"
+rdc-experiment-001 = { path = "../experiment-002/baseline/rdc-experiment-001" }
+rdc-experiment-002 = { path = "../experiment-002" }
+rdc-experiment-004 = { path = "../experiment-004" }
+serde = { version = "=1.0.229", features = ["derive"] }
+serde_json = "=1.0.151"
+zerocopy = { version = "=0.8.55", features = ["derive"] }
+
+[[bin]]
+name = "rdc005-bench"
+path = "src/bin/bench.rs"

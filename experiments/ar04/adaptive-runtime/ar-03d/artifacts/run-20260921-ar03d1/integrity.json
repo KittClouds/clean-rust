@@ -1,0 +1,23 @@
+{
+  "protocol": "AR-03D-2026-09-21",
+  "parent_commit": "f850f537e15e28024cca163b43ad6e4052b2b535",
+  "frozen_source_commit": "848295638fdfe302c9341882c073bfc594456782",
+  "binary_sha256": "7b6bd52de21a362e41524e38ecb24c5d46aad2124fd18ec24dc59dea380fcdc3",
+  "training_dataset_count": 3,
+  "evaluation_dataset_count": 3,
+  "dataset_initialization_cells": 9,
+  "evaluation_streams": 18,
+  "paired_trajectories": 36,
+  "decision_slots": 151200,
+  "panel_records": 37800,
+  "partition_build_records": 774,
+  "steps_per_trajectory": 4200,
+  "verifier_examples": 48,
+  "samples_per_stratum": 4,
+  "strata": 12,
+  "examples_per_stratum": 8,
+  "projected_refresh_slots": [0,100,200,300,400,500,600,700,800,900,1000,1100,1200,1300,1400,1500,1600,1700,1800,1900,2000,2100,2200,2300,2400,2500,2600,2700,2800,2900,3000,3100,3200,3300,3400,3500,3600,3700,3800,3900,4000,4100],
+  "full_reference_scope": "chosen program only on all 96 training examples; no best-action search",
+  "evaluation_scope": "independent 96-example synthetic set per training dataset; readout only",
+  "integrity_valid": true
+}

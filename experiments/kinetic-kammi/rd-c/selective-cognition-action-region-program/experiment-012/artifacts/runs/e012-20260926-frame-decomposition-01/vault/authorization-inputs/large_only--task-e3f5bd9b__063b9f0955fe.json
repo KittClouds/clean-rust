@@ -1,0 +1,62 @@
+{
+  "task_id": "large_only-task-e3f5bd9b__063b9f0955fe",
+  "frame_digest_hex": "063b9f0955fe7b28cb402d6b8fcee89ca1c850ac7f176193d7a1f0e4d23054ef",
+  "request_id_hex": "61cb046a74f786326a05702d55f5e077eb0c22cebd9b62df48c0826d1a43ad92",
+  "response_request_id_hex": "61cb046a74f786326a05702d55f5e077eb0c22cebd9b62df48c0826d1a43ad92",
+  "request_receipt_digest_hex": "19f1cd680c60bf4cb686821d6ce3c3cd9c30556df51a77dd592fd862d0735f3a",
+  "response_receipt_digest_hex": "19f1cd680c60bf4cb686821d6ce3c3cd9c30556df51a77dd592fd862d0735f3a",
+  "presentation_receipt_hex": "52444351010004000000063b9f0955fe7b28cb402d6b8fcee89ca1c850ac7f176193d7a1f0e4d23054ef135f00fc4ab887da045ff86fa33b122424bc13058916e12cd76bc1a90da7d78f4b81e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b85586b0d98d3ed848f3242fa295977b741f2229116c10d9a455526abba8799fed6bd526bfbef46c8c76900293f511d73b486aaa0a75e4a40ad6e8433a0bdb5db6459c3eafe284f7b3a0f673d012daf64cf2b9d8c19eefd817f41ecf1b743181f9ded20ff7b8541f",
+  "action_ledger_path": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\artifacts\\runs\\e012-20260926-frame-decomposition-01\\action-ledgers\\large_only\\task-e3f5bd9b__063b9f0955fe.bin",
+  "ordered_options": [
+    {
+      "producer_ordinal": 0,
+      "action": {
+        "id": 33099,
+        "schema_id": 1
+      },
+      "summary": "Apply the candidate change shown in the code excerpt.",
+      "diff_excerpt": "",
+      "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "producer_ordinal": 1,
+      "action": {
+        "id": 45190,
+        "schema_id": 1
+      },
+      "summary": "Apply the candidate change shown in the code excerpt.",
+      "diff_excerpt": "@@ -5,6 +5,6 @@\n         .about(\"A compact command-line example\")\n         .arg(Arg::new(\"speed\").long(\"speed\").help(\"Execution speed\"))\n         // E012 candidate slot.\n-        .color(ColorChoice::Auto)\n+        .color(ColorChoice::Always)\n         .get_color()\n }",
+      "patch_sha256": "d98d3ed848f3242fa295977b741f2229116c10d9a455526abba8799fed6bd526"
+    },
+    {
+      "producer_ordinal": 2,
+      "action": {
+        "id": 48831,
+        "schema_id": 1
+      },
+      "summary": "Apply the candidate change shown in the code excerpt.",
+      "diff_excerpt": "@@ -5,6 +5,6 @@\n         .about(\"A compact command-line example\")\n         .arg(Arg::new(\"speed\").long(\"speed\").help(\"Execution speed\"))\n         // E012 candidate slot.\n-        .color(ColorChoice::Auto)\n+        .color(ColorChoice::Never)\n         .get_color()\n }",
+      "patch_sha256": "f46c8c76900293f511d73b486aaa0a75e4a40ad6e8433a0bdb5db6459c3eafe2"
+    },
+    {
+      "producer_ordinal": 3,
+      "action": {
+        "id": 63364,
+        "schema_id": 1
+      },
+      "summary": "Apply the candidate change shown in the code excerpt.",
+      "diff_excerpt": "@@ -5,6 +5,7 @@\n         .about(\"A compact command-line example\")\n         .arg(Arg::new(\"speed\").long(\"speed\").help(\"Execution speed\"))\n         // E012 candidate slot.\n-        .color(ColorChoice::Auto)\n+        .color(ColorChoice::Auto)\n+        .term_width(72)\n         .get_color()\n }",
+      "patch_sha256": "b3a0f673d012daf64cf2b9d8c19eefd817f41ecf1b743181f9ded20ff7b8541f"
+    }
+  ],
+  "observer_output": {
+    "action_choice": 45190,
+    "applicability_milli": 820,
+    "abstention_milli": 180
+  },
+  "thresholds": {
+    "minimum_applicability_milli": 850,
+    "maximum_abstention_milli": 150
+  },
+  "completion_check_passed": false
+}

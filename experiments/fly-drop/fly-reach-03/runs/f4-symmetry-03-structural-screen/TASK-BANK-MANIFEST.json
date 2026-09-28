@@ -1,0 +1,117 @@
+{
+  "accepted_block_ids": [
+    304000,
+    304001,
+    304002,
+    304003,
+    304004,
+    304005,
+    304006,
+    304007
+  ],
+  "block_count": 8,
+  "blocks": [
+    {
+      "block_id": 304000,
+      "labels_sha256": "547ee2503741a868b7cfd3439fd5359858299be856a1475d06db916d64b63d2d",
+      "negative_labels": 2,
+      "positive_labels": 2,
+      "schedule_seed": 362157566670,
+      "schedule_sha256": "053665ec8e62028dba837ff0d6283f1fd7f5278ee6058a9ba3700741b390cc31",
+      "simulator_seed": 304000,
+      "task_pattern_seed": 304000,
+      "trials": 8192
+    },
+    {
+      "block_id": 304001,
+      "labels_sha256": "9554bae5dc952cf1b6ef07cd670fe536cc0b529cb07d3ebbb65b1f351ba0df00",
+      "negative_labels": 2,
+      "positive_labels": 2,
+      "schedule_seed": 362157566671,
+      "schedule_sha256": "431a9038243c25906b2c97be43d725087cbc4ad8fbf90b3205eb198242b64b70",
+      "simulator_seed": 304001,
+      "task_pattern_seed": 304001,
+      "trials": 8192
+    },
+    {
+      "block_id": 304002,
+      "labels_sha256": "66c37616ddf5503b96b17822460183fb983b9c47e3e59b8f3fbcd2d4c1a3f0ac",
+      "negative_labels": 2,
+      "positive_labels": 2,
+      "schedule_seed": 362157566668,
+      "schedule_sha256": "1826bda4264d162c502aa6854485105a54a9e5016211b8e455276c37f22db4df",
+      "simulator_seed": 304002,
+      "task_pattern_seed": 304002,
+      "trials": 8192
+    },
+    {
+      "block_id": 304003,
+      "labels_sha256": "c833b7d512c86ed008920633b14e2839886bbd29bd8e841956a842b96583028b",
+      "negative_labels": 2,
+      "positive_labels": 2,
+      "schedule_seed": 362157566669,
+      "schedule_sha256": "ce3ee15e435bb9e4d3eb9ecde48d621bb8ef82f0cb2d63cf5b9250f3b27cc758",
+      "simulator_seed": 304003,
+      "task_pattern_seed": 304003,
+      "trials": 8192
+    },
+    {
+      "block_id": 304004,
+      "labels_sha256": "66c37616ddf5503b96b17822460183fb983b9c47e3e59b8f3fbcd2d4c1a3f0ac",
+      "negative_labels": 2,
+      "positive_labels": 2,
+      "schedule_seed": 362157566666,
+      "schedule_sha256": "130a1602f3b0fed8ed3b1586671d24a09e55c7ae1b645933ebc613a8802021de",
+      "simulator_seed": 304004,
+      "task_pattern_seed": 304004,
+      "trials": 8192
+    },
+    {
+      "block_id": 304005,
+      "labels_sha256": "f509994c41827bfcafac4ee5ea45813d36d6f3e6adcc622c029197ef954294ca",
+      "negative_labels": 2,
+      "positive_labels": 2,
+      "schedule_seed": 362157566667,
+      "schedule_sha256": "5a023d569d79ae94c6039b004c2b39d62c7ed6079c1b367cb095a8bb79e82056",
+      "simulator_seed": 304005,
+      "task_pattern_seed": 304005,
+      "trials": 8192
+    },
+    {
+      "block_id": 304006,
+      "labels_sha256": "9554bae5dc952cf1b6ef07cd670fe536cc0b529cb07d3ebbb65b1f351ba0df00",
+      "negative_labels": 2,
+      "positive_labels": 2,
+      "schedule_seed": 362157566664,
+      "schedule_sha256": "b534f96fa17f6fce35b6da129316a9747ef1ea9653861e57663bcd2caa38f456",
+      "simulator_seed": 304006,
+      "task_pattern_seed": 304006,
+      "trials": 8192
+    },
+    {
+      "block_id": 304007,
+      "labels_sha256": "9554bae5dc952cf1b6ef07cd670fe536cc0b529cb07d3ebbb65b1f351ba0df00",
+      "negative_labels": 2,
+      "positive_labels": 2,
+      "schedule_seed": 362157566665,
+      "schedule_sha256": "ccf1657cbdef8188c3647f40353116c43506db49eec188bf1041263d21bddff4",
+      "simulator_seed": 304007,
+      "task_pattern_seed": 304007,
+      "trials": 8192
+    }
+  ],
+  "contract_sha256": "7c49b8419896dca4418de3497ecd8566b2167d1c6bf24d7860d904d70f87afe0",
+  "coordinate_manifest_sha256": "9ea9048d424698212b5a14eecdadef56987a93c54ed28e3ef40a9508431014e5",
+  "machine_contract_sha256": "afc606b66243e400123906367c01b02cc1d4391f473dbdfb6e6abfdd19490338",
+  "measured_namespace_created": false,
+  "qualification_only": true,
+  "schedule_generator_parity": "PASS against existing block 303000 labels and all 8,192 schedule rows",
+  "schema": "F4-SYMMETRY-03-task-bank-manifest-v1",
+  "screen_uses_outcome_data": false,
+  "screened_batch_count": 1,
+  "source_schedule_generator_sha256": "d1de1bb9f1d0a82e0bd9ca3a9520a6d38e696fa686d0dbcda46bced17561923a",
+  "status": "FROZEN_QUALIFICATION_TASK_BANK",
+  "structure_screen_sha256": "55fed118e2b6442839a3bed9334b405590026b31882f1c3c39673baa46d46f4b",
+  "training_file": "runs/f4-symmetry-03-structural-screen/training.json",
+  "training_sha256": "f91dac177eb5547fd2fb518a55b6156701f1ec3d5c876f3527cfa882f918a04e"
+}

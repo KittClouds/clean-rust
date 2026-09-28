@@ -1,0 +1,34 @@
+{
+  "task_id": "heldout-fill-clear-intervals-ambiguous-02",
+  "frame_hash_hex": "6ff1c1a18e4ccbeeb3867d333511377e55fd62aac8f36a0fc4c443dddacae5fa",
+  "selected_patch_sha256": "bebc6d7e52683412107259b240d2fd73c74066dd77d5cbfb37357f0d37d8667c",
+  "action_ledger_path": "C:\\rd-c\\experiment-009\\artifacts\\runs\\e009-20260925-corrected-02\\ledgers\\small-then-large-on-abstention\\heldout-fill-clear-intervals-ambiguous-02.actions.bin",
+  "actions": [
+    {
+      "id": 11,
+      "schema_id": 1
+    },
+    {
+      "id": 37,
+      "schema_id": 1
+    },
+    {
+      "id": 68,
+      "schema_id": 1
+    },
+    {
+      "id": 94,
+      "schema_id": 1
+    }
+  ],
+  "observer_output": {
+    "action_choice": 68,
+    "applicability_milli": 950,
+    "abstention_milli": 50
+  },
+  "thresholds": {
+    "minimum_applicability_milli": 850,
+    "maximum_abstention_milli": 150
+  },
+  "completion_check_passed": true
+}

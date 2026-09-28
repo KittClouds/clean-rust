@@ -1,0 +1,28 @@
+{
+  "protocol": "Q10-PF6-RH1-F2",
+  "identity": "q10-rh1-f2-v1",
+  "source_execution": "qualification/execution/execution.json",
+  "source_execution_sha256": "D900B374F076AEC352381D878D31AEA8D7129D8BB5A3E53DB5B7D5B05E3FAFF9",
+  "source_derived_summary": "qualification/derived/SUMMARY.json",
+  "source_derived_summary_sha256": "C56E6B3DCB351867BA2BE9EB2394810B94284F2534AC3F7252502B2956BD8B62",
+  "scope": {
+    "engineering_only": true,
+    "scientific_promotion": false,
+    "behavioral_probe": false,
+    "dh08b_authorized": false
+  },
+  "primary_observations": [
+    "Authority-aware ordering improved the declared-row search objective at horizon 16 and horizon 32.",
+    "Extending the search horizon from 16 to 32 improved the declared-row search objective under both residual and authority ordering.",
+    "Authority plus horizon 32 was the strongest tested primary arm by exact declared-row count and mean declared-row score.",
+    "Authority-selected nonzero coordinates were commonly deeper in the residual ordering; the authority h16 audit had mean residual-rank minus authority-rank migration of 10.28, with 94 used coordinates originally beyond residual rank 16.",
+    "All 220 reported candidates passed the inherited final geometry checks and independent audit agreement."
+  ],
+  "primary_nonclaims": [
+    "This does not establish that 32 coordinates are required.",
+    "This does not establish that authority ordering is globally optimal.",
+    "This does not establish whole-endpoint isofunctionality; whole-endpoint scores remain diagnostic for group-local construction.",
+    "This does not establish a biological mechanism or a behavioral learning effect."
+  ],
+  "next_gate": "Construct and audit whole-endpoint alternatives before any behavioral experiment."
+}

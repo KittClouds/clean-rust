@@ -1,0 +1,21 @@
+{
+  "construction_root_sha256": "86e7f2e94b8e376b4a78f228db9ba97615478b74079e057b3ecb67fc68891015",
+  "corrected_runner_path": "scripts/analyze_s03_v02.py",
+  "corrected_runner_sha256": "d042d9effd862e363d65717495358788a8919d7a3bc821eb41b1cf5eacadaf0f",
+  "correction_id": "FAS_S03_RUNNER_CORRECTION_V01",
+  "exact_correction": "The run-stage overwrite guard now allows only the already-sealed construction copy, the passed preflight and selected-event manifest, and the bound failure/correction provenance receipts. It still fails closed if any scientific result output already exists.",
+  "experiment_id": "fas-s03-factor-competition-decision-geometry-v01",
+  "failed_attempt_computed_logits": false,
+  "failure_receipt_path": "D:/codex-runs/fas-s03-factor-competition-decision-geometry-v01/runner-failure-v01.json",
+  "failure_receipt_sha256": "c084eb68650126ad6d35fa614172995807849622509bb1bac463792379e510f5",
+  "feature_extraction_performed": false,
+  "metric_definitions_changed": false,
+  "model_contact_performed": false,
+  "original_runner_path": "scripts/analyze_s03.py",
+  "original_runner_sha256": "3c7ff8ee55903c25adcbc34feeec93ce281fb8e0d6dca02829eefede32205bb5",
+  "parent_inputs_changed": false,
+  "preflight_reused_unchanged": true,
+  "probe_fitting_performed": false,
+  "scientific_contract_changed": false,
+  "status": "S03_RUNNER_CORRECTION_SEALED"
+}

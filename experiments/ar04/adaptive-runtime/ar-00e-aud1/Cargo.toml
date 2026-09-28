@@ -1,0 +1,20 @@
+[package]
+name = "adaptive-runtime-ar-00e-aud1"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.96"
+publish = false
+
+[dependencies]
+adaptive-runtime-ar-00 = { package = "adaptive-runtime-ar-00", path = "../ar-00" }
+adaptive-runtime-ar-00c-int1 = { package = "adaptive-runtime-ar-00c-int1", path = "../ar-00c-int1" }
+
+[[bench]]
+name = "aud1"
+harness = false
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+panic = "abort"

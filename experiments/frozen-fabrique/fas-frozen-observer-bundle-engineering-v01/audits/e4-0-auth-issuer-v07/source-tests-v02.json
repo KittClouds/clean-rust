@@ -1,0 +1,57 @@
+{
+  "schema": "FAS_E4_0_AUTH_ISSUER_SOURCE_TESTS_RECEIPT_V01",
+  "receipt_id": "FAS_E4_0_AUTH_ISSUER_V07_SOURCE_TESTS_V02",
+  "status": "PASS_SYNTHETIC_TESTS",
+  "recorded_utc": "2026-09-27T00:10:26Z",
+  "issuer_identity": "stage authorization issuer v07 requires exact v07 contract seal/member/path and excludes v06 parity-panel materialization as an issuable v07 stage; wire authorization schema remains v01",
+  "contract_identity": "FAS_FROZEN_CAPABILITY_FABRIC_E4_0_V07",
+  "supersedes": {
+    "receipt_id": "FAS_E4_0_AUTH_ISSUER_V07_SOURCE_TESTS_V01",
+    "path": "audits/e4-0-auth-issuer-v07/source-tests-v01.json",
+    "bytes": 1805,
+    "sha256": "c67c5a5e0db326466d77b41f5f20547283f873c0241443f50c6714048dd91f34"
+  },
+  "source_files": [
+    {
+      "path": "source/scripts/issue_e4_stage_authorization_v07.py",
+      "bytes": 33672,
+      "sha256": "284097928a0a0bf0ab64ee75b516e7d3e3e9d176beb84ae918ef1b377c02b9c8"
+    },
+    {
+      "path": "source/tests/test_e4_stage_authorization_v07.py",
+      "bytes": 26207,
+      "sha256": "c709bcb4df0891c0dd6fdc7f7ecb80255cffd199014bcfb0fd78909a1d233df4"
+    }
+  ],
+  "py_compile": "PASS",
+  "synthetic_test_count": 10,
+  "synthetic_tests": [
+    "all_runtime_stages_match_track_d_exact_fields_roots_and_scope",
+    "artifact_role_extra_and_truth_paths_are_rejected",
+    "contract_audit_and_stage_seal_identity_fail_closed",
+    "contract_seal_rejects_duplicate_or_ambiguous_membership",
+    "contract_seal_requires_exact_v07_seal_member_and_path",
+    "fresh_scoring_preserves_scorer_exact_fourteen_fields",
+    "interval_must_be_finite_integer_and_create_is_once",
+    "online_parity_rejects_same_root_panel_copy_and_non_v06_lineage",
+    "online_parity_reuses_exact_v06_population_and_panel_files",
+    "sealed_v06_panel_cannot_be_materialized_as_v07_stage"
+  ],
+  "integration_checks": {
+    "track_b_v03_stage_auth_validator_parity_and_feature": "PASS",
+    "track_c_v02_fresh_scoring_auth_validator": "PASS",
+    "parity_panel_materialization_rejected_as_v07_stage": "PASS"
+  },
+  "scope": {
+    "real_authorization_issued": false,
+    "e4_population_materialized": false,
+    "v06_panel_materialized_or_resealed": false,
+    "tokenizer_contact": false,
+    "model_contact": false,
+    "cuda_contact": false,
+    "labels_opened": false,
+    "v07_contract_sealed": false,
+    "v07_seal_and_audit_pending": true
+  },
+  "synthetic_only": true
+}

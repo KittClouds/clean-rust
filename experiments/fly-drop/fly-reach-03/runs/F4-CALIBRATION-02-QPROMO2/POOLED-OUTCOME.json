@@ -1,0 +1,24 @@
+{
+  "balanced_error": 0.34988114501534634,
+  "class_counts": {
+    "negative": 14793,
+    "positive": 8693
+  },
+  "eta_del": 0.08966518704238485,
+  "evaluable": true,
+  "leverage_concentration": {
+    "effective_sample_size": 215.4633944315409,
+    "leverage_total": 3.65662849482735,
+    "top_1pct_share": 0.7296069629905374,
+    "top_20pct_share": 0.9992685117198871,
+    "top_5pct_share": 0.9625585375900636
+  },
+  "omega_hat_clipped": 0.3002377099693073,
+  "omega_hat_unclipped": 0.3002377099693073,
+  "psi_native_sign": 0.08355574945204514,
+  "psi_prop": 0.4795323310646862,
+  "psi_reference_sign": 1.0,
+  "rows": 23486,
+  "signed_margin": 4.413504406420947,
+  "signed_margin_scope": "class_balanced_ipw"
+}

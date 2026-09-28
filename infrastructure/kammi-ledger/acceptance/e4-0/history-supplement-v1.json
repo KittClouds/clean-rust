@@ -1,0 +1,330 @@
+{
+  "entries": [
+    {
+      "artifact": "sha256:c67c5a5e0db326466d77b41f5f20547283f873c0241443f50c6714048dd91f34",
+      "bytes": 1805,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-auth-issuer-v07/source-tests-v01.json"
+    },
+    {
+      "artifact": "sha256:a45ed04a59960705ac1cd80410b4a07aaeed3842595921f53f533c4237b36cf8",
+      "bytes": 1740,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-auth-issuer-v13/source-tests-v01.json"
+    },
+    {
+      "artifact": "sha256:3f1730d904e96f105dd64a987754b388a9bccffac824a9ef70c674bf712c4815",
+      "bytes": 2057,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-execution/population-stage-seal-operation-v01.json"
+    },
+    {
+      "artifact": "sha256:8b94cce4387fcc71b3b339ce9d802078b07c1e7acdd4914661d38b0af6d28677",
+      "bytes": 9157,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-execution/wddm-gpu-lease-preflight-v01.json"
+    },
+    {
+      "artifact": "sha256:5e4648bf91167dad4e0f0e22b791aec62b4d323382c52f60c4574ff6ae8211c4",
+      "bytes": 2695,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-source-integration-tests-v01.json"
+    },
+    {
+      "artifact": "sha256:b48e38c8c3f1589a1d5d942493681e5738e362fe92d3b6ee7fb8e8df0e6d23de",
+      "bytes": 1245,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-a/track-a-v02-build-failure-v01.json"
+    },
+    {
+      "artifact": "sha256:4d0d53e22944916f52ab6fe5c18cfdb27533a0ba39d19fbccad556f921ffac41",
+      "bytes": 3190,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-b-v03/track-b-source-tests-v01.json"
+    },
+    {
+      "artifact": "sha256:ac0e2dcc7ba1532946f4cd8527d8132b46fded873f320510c1ae5f53ba96a925",
+      "bytes": 3329,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-b-v03/track-b-source-tests-v02.json"
+    },
+    {
+      "artifact": "sha256:c757dbc183cbdf2a0ec2d7af684cad45d1c9652a3f6c0ffb59d1bc7aa33ebd17",
+      "bytes": 5825,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-c-v03/track-c-source-tests-v01.json"
+    },
+    {
+      "artifact": "sha256:753ba8688e4ca9d6b3ff4774c41c1a75927c0b1661cf93e468771cc67f66da02",
+      "bytes": 7650,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-c-v03/track-c-source-tests-v02.json"
+    },
+    {
+      "artifact": "sha256:54f487ef7e2299cb5550b6fc65ce33440ab0f4be3caa923181b85c6bee098744",
+      "bytes": 3935,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-c/track-c-source-tests-v01.json"
+    },
+    {
+      "artifact": "sha256:3ea5e269c7da021daa13f8c991372395d28dde4e63ee2d6dc2e477e435334153",
+      "bytes": 6409,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-d-v03/track-d-source-tests-v01.json"
+    },
+    {
+      "artifact": "sha256:a502b94a7b5f6e827b2dfb9621b6fecea23e4acf5bf2acdde638fbe157921198",
+      "bytes": 988,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-d/history/track-d-contract-audit-attempt-v01.json"
+    },
+    {
+      "artifact": "sha256:75ff211823767a27e2fbadfa4c6d08643ad46ba5aa7cc4ed51af5b4935ac7c16",
+      "bytes": 1874,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-d/history/track-d-v05-source-restoration-v01.json"
+    },
+    {
+      "artifact": "sha256:90d06338feaf9840582eb5e61218401dd127babb595e0cdb85cf10227552b2e9",
+      "bytes": 685,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-d/history/track-d-v05-source-snapshot-attempt-v01.json"
+    },
+    {
+      "artifact": "sha256:c91e948f3ecccdb4f06a06431e32d690e5c788042e315d3c49922fcc6f2d268b",
+      "bytes": 618,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-d/history/track-d-v05-source-snapshot-attempt-v02.json"
+    },
+    {
+      "artifact": "sha256:403a03cdf59a84a493bff629051e9d551424e6d04eba567c5f6c532a22aa794b",
+      "bytes": 3957,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-d/track-d-receipt-v01.json"
+    },
+    {
+      "artifact": "sha256:b272eff6c3eece5a505d993a72f4bff101faff82585457e2e2957ed8d895a507",
+      "bytes": 4456,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-d/track-d-receipt-v02.json"
+    },
+    {
+      "artifact": "sha256:e62460957e0473660c5791ce04aaaeb0989b2dd8db333a8b65768899311beaa7",
+      "bytes": 4605,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-d/track-d-receipt-v03.json"
+    },
+    {
+      "artifact": "sha256:41d35cc3003faa62ddd9fca33675800a33725ffe1410e565647efea54fb20720",
+      "bytes": 4828,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-d/track-d-receipt-v04.json"
+    },
+    {
+      "artifact": "sha256:7d698386d44e128a15e7262f20cc50a6463793a80816df1bf5bfbed800a356d2",
+      "bytes": 2849,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/contract-tooling-source-tests-v01.json"
+    },
+    {
+      "artifact": "sha256:b0bd5559a74a0ccd2570ba698e11cc8aba977ea1ae46767e2161bf9816393256",
+      "bytes": 2932,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/contract-tooling-source-tests-v02.json"
+    },
+    {
+      "artifact": "sha256:2a7e59c5a130189a03a4b704b87b7acaea1996ba3244d41c57dcfaeb969a9e07",
+      "bytes": 3067,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/contract-tooling-source-tests-v03.json"
+    },
+    {
+      "artifact": "sha256:141698f1574d43b030521a9ba98dc78cb465347aaaefa4092422c6f753cc5a73",
+      "bytes": 1404,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/contract-tooling-source-tests-v05.json"
+    },
+    {
+      "artifact": "sha256:c2f09281429ce4355e72ba7cc5cc273f2f117ac5099e4ff096a7660e570f9888",
+      "bytes": 1654,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/contract-tooling-source-tests-v06.json"
+    },
+    {
+      "artifact": "sha256:5e0bf92ef43c37065bd51c0d4d0f2df3d0475df940be21e2a23385205acff018",
+      "bytes": 2458,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/contract-tooling-source-tests-v12.json"
+    },
+    {
+      "artifact": "sha256:f8095dad21d88d38c317240ad6836133925835ca9e731262666fbc299d23f508",
+      "bytes": 2325,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/contract-tooling-source-tests-v16-v04.json"
+    },
+    {
+      "artifact": "sha256:dbd6553dca2856d8559ceae9dbfffe3713638ac7272b53a5ef21174fbe07f89e",
+      "bytes": 1768,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/e4-0-contract-audit-bridge-v01.json"
+    },
+    {
+      "artifact": "sha256:4dfe8e118e4f4f398b43eefc64223502769417e1f1d25e4a995ffc146120014f",
+      "bytes": 39944,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/history/e4-0-contract-v05-final-superseded-attempt-v01.json"
+    },
+    {
+      "artifact": "sha256:eb80791030fe056e615911fb97287d30faf5901c3886a0ee104bd185940a5194",
+      "bytes": 1188,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/history/source-map-v05-builder-pin-mismatch-attempt-v01.json"
+    },
+    {
+      "artifact": "sha256:7997ddfdf8c676b4da77074f3a3f0cc97da5ba465f9bc44b68884c9e3a56c8ec",
+      "bytes": 48881,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/history/v07-preseal-attempt-v01/contract-v07-final.json"
+    },
+    {
+      "artifact": "sha256:f4d8647212cb3bcf6283afd9bc99ac28b91007121c2b164e3c45a0c4fd0ebba3",
+      "bytes": 48025,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/history/v07-preseal-attempt-v01/preseal-stop-v01.json"
+    },
+    {
+      "artifact": "sha256:9e4f1a18c518b4514e2fa4e606ca3a5ee42eda8f8012c2082462b2965aaf3fb8",
+      "bytes": 16729,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-postseal-receipt-v01.json"
+    },
+    {
+      "artifact": "sha256:d4bcffcd9fcec0b11ded889fc91c41299dbf385b1971ac71c35b31a75a9c5bce",
+      "bytes": 18469,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-postseal-receipt-v02.json"
+    },
+    {
+      "artifact": "sha256:2ef6d7c91a9ca987a786f15add4c1ae073fcd816902e464cf0140b8b4e82c885",
+      "bytes": 142680,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-postseal-receipt-v16-v05.json"
+    },
+    {
+      "artifact": "sha256:8b05f33e615c1484690890ffd8933b31a1fe6e21f61831266ff3b278cec32b64",
+      "bytes": 165290,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-postseal-receipt-v16-v11.json"
+    },
+    {
+      "artifact": "sha256:f6b32ed2e8c5f128b04f656ed5123e53d4464e365e4003fa0398873bf13d08cd",
+      "bytes": 15647,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-preseal-receipt-v01.json"
+    },
+    {
+      "artifact": "sha256:06fc997c3ca23c33af7cdfa7804cdb85476e546bc88f2b2e997d83f15713bc9e",
+      "bytes": 15647,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-preseal-receipt-v02.json"
+    },
+    {
+      "artifact": "sha256:d7136985a7d9f49370b0db96f09cc6aa4078e42cb9c0c5c4e35518c495cc10ff",
+      "bytes": 17387,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-preseal-receipt-v03.json"
+    },
+    {
+      "artifact": "sha256:9858d1ebc915af6e0ea769da3c47ac51984f7cc0e0c6c4ba05366ba7465ea391",
+      "bytes": 47985,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-preseal-receipt-v07.json"
+    },
+    {
+      "artifact": "sha256:cc10520529e0c2a858ea64589fef2b3901af1ffa0251fbbb20df1e992846927d",
+      "bytes": 67487,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-preseal-receipt-v08.json"
+    },
+    {
+      "artifact": "sha256:97cb29f6d3add513de5a95ab5f078b394f1396e29bc8a5e289c33ddf5351dc4c",
+      "bytes": 141937,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-preseal-receipt-v16-v05.json"
+    },
+    {
+      "artifact": "sha256:85bd2981e86005a0036976eeca904698fd4e6f82045b7a0c8a5e67dd3e9f11f5",
+      "bytes": 147259,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-preseal-receipt-v16-v06.json"
+    },
+    {
+      "artifact": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-source-tests-v01.json"
+    },
+    {
+      "artifact": "sha256:98f8809bf876aa1003d18f4070c2b4183c7f0dd1eee8e463c14e2a9c7bb9bd8a",
+      "bytes": 1508,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-source-tests-v02.json"
+    },
+    {
+      "artifact": "sha256:f2b6254f7353c67d7e924bb7a6f93ec730da46c08f640ebf3b504fae59fab2e1",
+      "bytes": 1798,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-source-tests-v03.json"
+    },
+    {
+      "artifact": "sha256:bf97ac58141c0da9cfbc6af19f7327f78fbfcbea38d2c2d69c2a966941c5f964",
+      "bytes": 1944,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-source-tests-v04.json"
+    },
+    {
+      "artifact": "sha256:8bc115ff1a7abd034edec158a53cc0ed0cd24cff3a2ba7aef6c0e4b516b9a45f",
+      "bytes": 2376,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-source-tests-v05.json"
+    },
+    {
+      "artifact": "sha256:05d7d621b0d7115dbe86ad9852e269adead5d59b1a0a2f874afb466d1fe883d9",
+      "bytes": 2671,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-source-tests-v06.json"
+    },
+    {
+      "artifact": "sha256:a7538adf2e86ddc59a491f3668b0598d062864d3ffc279a17854b925eb289645",
+      "bytes": 2001,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-source-tests-v07.json"
+    },
+    {
+      "artifact": "sha256:06f991cc621702c5c81a4b7b160cba4270d1df82729ecb8893e504d33c585ff4",
+      "bytes": 1564,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-source-tests-v09.json"
+    },
+    {
+      "artifact": "sha256:f8e2f26695a1b2ab442c8e52ed15709fbab5a8e7ef799b19c571390d6e2dcee0",
+      "bytes": 2046,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-source-tests-v10.json"
+    },
+    {
+      "artifact": "sha256:a4ee5c8d7de5c8aa77c83c77618a05a25a83df68d76c4374a481cd0085e62280",
+      "bytes": 2684,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-source-tests-v11.json"
+    },
+    {
+      "artifact": "sha256:f2613ccd7f78c1b4876870abb73e24025b3da9b623cd157a890fd6d20ee99513",
+      "bytes": 2247,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-source-tests-v12.json"
+    },
+    {
+      "artifact": "sha256:f769b0b142ca43d20be926cb8004fd6fa939f0abedba28ccbe016e19c944a28e",
+      "bytes": 2011,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-source-tests-v13.json"
+    },
+    {
+      "artifact": "sha256:976f9d91e1c242098cdcb2d6d61054bb07d8d2eb4c192679407ed035a6bdd3e3",
+      "bytes": 1160,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-source-tests-v15.json"
+    },
+    {
+      "artifact": "sha256:2cef041b269ee7367de874ea318094aec3ae573b2f124761677fb06026ceef4b",
+      "bytes": 1755,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-source-tests-v21.json"
+    },
+    {
+      "artifact": "sha256:2e615006526e783fae8f2cf152ae0f17ff4b009123c684c5ae6151bdaba2df96",
+      "bytes": 1884,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-source-tests-v24.json"
+    },
+    {
+      "artifact": "sha256:e1a0cc545f4eeb3eb9100db00475d5a2fe399e0a55dd839e939a3b8f1de7ff50",
+      "bytes": 1660,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-source-tests-v31.json"
+    },
+    {
+      "artifact": "sha256:ad709bd1496536e6fb1464bd89a06ec0eed552b89ef4159bfc1aa0f406fcc71a",
+      "bytes": 39944,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/e4-0-contract-v05-final.json"
+    },
+    {
+      "artifact": "sha256:434e4472275adbd6514e5b6a0e8d905c7a283ea6ea294edc0068c050336cd9eb",
+      "bytes": 29668,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/seals/e4-0-contract-v05-seal.json"
+    }
+  ],
+  "parent_merkle_root": "sha256:234e568989f6c0e71fb69fa634b2e0bf085e7fb63336654202d3b221ef33f6fc",
+  "projection": {
+    "counts": {
+      "artifacts": 493,
+      "custodyfacts": 158,
+      "events": 672,
+      "runs": 1,
+      "seals": 3
+    },
+    "flight_gate": "CLOSED_PENDING_ACCEPTANCE",
+    "journal_events": 672,
+    "journal_head": "sha256:5dae8973ac436cadb4e59dd94bdc2266fbd0a161b251c858ddcae339450bed34",
+    "projection_head": "sha256:5dae8973ac436cadb4e59dd94bdc2266fbd0a161b251c858ddcae339450bed34",
+    "projection_seq": 672
+  },
+  "schema": "KAMMI_E4_HISTORY_SUPPLEMENT_V1",
+  "source_path_count": 61,
+  "status": "CAPTURED_NOT_LEGACY_SCIENTIFIC_SEAL",
+  "supplement_root": "sha256:5da7b54cbb1b1a3e246efb61d11969334f3be9554103e7dafe38deee7a75d236",
+  "unique_direct_objects": 61,
+  "verified_total_closure": 493
+}

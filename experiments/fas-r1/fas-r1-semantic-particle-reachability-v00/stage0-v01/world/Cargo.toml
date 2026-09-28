@@ -1,0 +1,17 @@
+[package]
+name = "r1-world"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lib]
+name = "r1_world"
+path = "src/lib.rs"
+
+[dependencies]
+hashbrown = "0.14"
+sha2 = "0.10"
+serde = { version = "1", features = ["derive"] }
+
+[dev-dependencies]
+serde_json = "1"

@@ -1,0 +1,144 @@
+{
+  "schema_version": 1,
+  "run_id": "e011-r3-20260925-order-robust-prompt-01",
+  "condition": "order-only",
+  "role": "small",
+  "bundle_id": "minicpm5-2b-q8-local-v5+candidate-order-instruction-v1",
+  "parent_weights_bundle_id": "minicpm5-2b-q8-local-v5",
+  "server_alias": "e009-small-v5",
+  "server_process_id": 28856,
+  "model_sha256": "c5415f8989bf88a8288f1b55a3cc371af53c07b0faa220a63bd7a990cfaba078",
+  "runtime_sha256": "ffaee576ad271ede87b92a7d8c3863dc8f331bbac666ee00099c250e8809e743",
+  "prompt_sha256": "3a673a9843cd1fb965ebd411d550bdb5a9b0019989cae727a0f67e7a62d073a6",
+  "input_lock_sha256": "519c96fb51adab9e736b8a978504373e3d8517679dbdaa86839523079df09a97",
+  "pre_model_seal_sha256": "d6623d1778d1d0d9b28f67d3ae0fc39a1b957f54cf3a06f1297dd42f729ca858",
+  "frame_lock_sha256": "8bcb8e379a5929be964969bc9fe9397aa66731f5c339695653b6d6c2fcc21ce6",
+  "frame_sha256": "a798ad7f0b21bc33ed54f299341ff08cfc4adb4c705d5c878e4a1745ee6a9bb0",
+  "task_id": "turbovec-turbovec-rotation-wire-format-v1",
+  "request_sha256": "68c80d47a359c290b2e5232f887747b6fb46039a1e616de83ac091330c0d9688",
+  "request": {
+    "model": "e009-small-v5",
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a typed observer in a deterministic coding workflow. The runtime owns workflow state and will execute only one action from the offered action_options after validating your output.\n\nRead the task_prompt and evidence, then compare the offered actions. Choose the action most likely to satisfy the task while preserving the repository's stated constraints. Do not write or propose code outside the offered choices. Do not claim to have executed tests. If no offered action is sufficiently supported, use null for action_choice and express uncertainty with abstention_percent.\n\nThe action_options array is an unordered set. Its displayed order is arbitrary and may change between equivalent requests. Numeric action IDs are opaque labels: never use their values or positions as evidence, a ranking, or a tie-break. Compare candidates using their summaries and diff content against the task and evidence. After choosing by content, return that candidate's current numeric action ID. If the content does not support one choice over the alternatives, abstain with action_choice null.\n\nReturn exactly one JSON object matching the provided schema. action_choice must be an offered numeric action ID or null. applicability_percent is your estimate from 0 to 100 that this observer can handle the task from the available evidence. abstention_percent is your estimate from 0 to 100 that the runtime should defer this choice. Use integer percentage points only. Do not add prose or fields.\n"
+      },
+      {
+        "role": "user",
+        "content": "{\"schema_id\":\"rdc-real-coding-observation.v1\",\"task_id\":\"turbovec-turbovec-rotation-wire-format-v1\",\"task_family\":\"turbovec-rotation-wire-format\",\"repository_id\":\"turbovec\",\"task_variant\":1,\"task_prompt\":\"Restore the v5 deterministic rotation contract. The frozen golden-byte test fails; choose the patch that preserves existing encoded data.\",\"repository_revision\":\"8202f194a0cbbd52213a004290401e180e5c123d\",\"snapshot_sha256\":\"13fa3258b3e7d4d2e315e3f6ff68e1e6ea775c111fbc0eb9cd9b7c8f223f5f6a\",\"evidence\":[{\"kind\":\"source_excerpt\",\"source_id\":\"turbovec/src/rotation.rs\",\"content_blake3\":\"00c986a414035569e5792c1328176ef1111199db5d02cab5498ca015d5f54905\",\"content\":\"/// `tests/rotation_determinism.rs` pin the resulting stream.\\nconst ROTATION_SEED: [u8; 32] = [\\n    165, 143, 161, 123, 88, 50, 61, 10, 234, 184, 161, 204, 105, 1, 20, 184, 43, 140, 200,\\n    117, 24, 180, 247, 84, 141, 68, 110, 161, 228, 223, 32, 242,\\n];\"},{\"kind\":\"baseline_tool_result\",\"source_id\":\"cargo-test::golden_rotation_bits_pin_the_chacha_stream\",\"content_blake3\":\"12673101a26ec71242fd712838167452a9dac89fbca8e10704783c48a7bcbfeb\",\"content\":\"Exact test `golden_rotation_bits_pin_the_chacha_stream` failed on the frozen snapshot. Candidate patches have not been run in this task.\\n\\nrunning 1 test\\ntest golden_rotation_bits_pin_the_chacha_stream ... FAILED\\n\\nfailures:\\n\\n---- golden_rotation_bits_pin_the_chacha_stream stdout ----\\n\\nthread 'golden_rotation_bits_pin_the_chacha_stream' (42776) panicked at turbovec\\\\tests\\\\rotation_determinism.rs:41:5:\\nassertion `left == right` failed: dim=8 rotation output changed — a rand_chacha stream change or a transform edit would break every v5-encoded index. If this change is intentional, it is a NEW format version, not an edit to v5.\\n  left: [1083179007, 1073741822, 1065353214, 3223322624, 3217031167, 3212836863, 1065353214, 3223322624]\\n right: [1071644673, 3224371200, 1048575995, 1061158910, 1074790400, 1083703296, 3214934014, 1067450369]\\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\\n\\n\\nfailures:\\n    golden_rotation_bits_pin_the_chacha_stream\\n\\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.00s\\n\\n   Compiling turbovec v0.9.0 (<frozen-repository-snapshot>\\\\turbovec)\\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 7.70s\\n     Running tests\\\\rotation_determinism.rs (<cargo-target>\\\\debug\\\\deps\\\\rotation_determinism-762b4124a14c9a64.exe)\\nerror: test failed, to rerun pass `-p turbovec --test rotation_determinism`\\n\"}],\"action_options\":[{\"action\":{\"id\":68,\"schema_id\":1},\"summary\":\"Apply the focused source change shown here.\",\"diff_excerpt\":\"@@ -80,7 +80,7 @@\\n-    165, 143, 161, 123, 88, 50, 61, 10, 234, 184, 161, 204, 105, 1, 20, 184, 43, 140, 200,\\n+    164, 143, 161, 123, 88, 50, 61, 10, 234, 184, 161, 204, 105, 1, 20, 184, 43, 140, 200,\",\"patch_sha256\":\"007e449ffd08981da2a14e8ad064b052c3b914a91563dddfcaf8b08d8d89f579\"},{\"action\":{\"id\":11,\"schema_id\":1},\"summary\":\"Apply this alternative change in the same code path.\",\"diff_excerpt\":\"@@ -80,7 +80,7 @@\\n-    165, 143, 161, 123, 88, 50, 61, 10, 234, 184, 161, 204, 105, 1, 20, 184, 43, 140, 200,\\n+    163, 143, 161, 123, 88, 50, 61, 10, 234, 184, 161, 204, 105, 1, 20, 184, 43, 140, 200,\",\"patch_sha256\":\"0f250400d060f791524f689a9a43a98af396f0da5dc2daf3b3f492ac9d3353d4\"},{\"action\":{\"id\":37,\"schema_id\":1},\"summary\":\"Apply the source change and add a contract comment.\",\"diff_excerpt\":\"@@ -79,8 +79,9 @@\\n+// This seed is part of the persisted v5 encoding contract.\\n-    165, 143, 161, 123, 88, 50, 61, 10, 234, 184, 161, 204, 105, 1, 20, 184, 43, 140, 200,\\n+    164, 143, 161, 123, 88, 50, 61, 10, 234, 184, 161, 204, 105, 1, 20, 184, 43, 140, 200,\",\"patch_sha256\":\"620ba171f88123de86b3582f0b41b48c45f3820f4aa76105319ba60f286a8f76\"},{\"action\":{\"id\":94,\"schema_id\":1},\"summary\":\"Leave the current implementation unchanged.\",\"diff_excerpt\":\"No source line changes are included.\",\"patch_sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"}]}"
+      }
+    ],
+    "temperature": 0,
+    "top_p": 1,
+    "seed": 0,
+    "max_tokens": 1024,
+    "stream": false,
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rdc_coding_observer_output_v1",
+        "strict": true,
+        "schema": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "rdc-coding-observer-output.v2",
+          "title": "RDC Coding Observer Output v2",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "action_choice",
+            "applicability_percent",
+            "abstention_percent"
+          ],
+          "properties": {
+            "action_choice": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 65535
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "applicability_percent": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "abstention_percent": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            }
+          }
+        }
+      }
+    }
+  },
+  "normalization_contract": "percent-0-100-to-milli-x10-v1+line-endings-lf-v1",
+  "thresholds": {
+    "minimum_applicability_milli": 850,
+    "maximum_abstention_milli": 150
+  },
+  "http_status": 200,
+  "response": {
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "{\"action_choice\":null,\"applicability_percent\":0,\"abstention_percent\":100}"
+        }
+      }
+    ],
+    "created": 1790371217,
+    "model": "e009-small-v5",
+    "system_fingerprint": "b10982-fc82583e6",
+    "object": "chat.completion",
+    "usage": {
+      "completion_tokens": 21,
+      "prompt_tokens": 1875,
+      "total_tokens": 1896,
+      "prompt_tokens_details": {
+        "cached_tokens": 1184
+      }
+    },
+    "id": "chatcmpl-AGScc4AcLKuLYeE9x1CJZcD0Hdvjg8xN",
+    "timings": {
+      "cache_n": 1184,
+      "prompt_n": 691,
+      "prompt_ms": 77.19,
+      "prompt_per_token_ms": 0.11170767004341534,
+      "prompt_per_second": 8951.936779375566,
+      "predicted_n": 21,
+      "predicted_ms": 122.055,
+      "predicted_per_token_ms": 6.10275,
+      "predicted_per_second": 163.86055466797754
+    }
+  },
+  "content": "{\"action_choice\":null,\"applicability_percent\":0,\"abstention_percent\":100}",
+  "output": {
+    "action_choice": null,
+    "applicability_percent": 0,
+    "abstention_percent": 100
+  },
+  "normalized_output": {
+    "action_choice": null,
+    "applicability_milli": 0,
+    "abstention_milli": 1000
+  },
+  "normalization_error": null,
+  "usage": {
+    "completion_tokens": 21,
+    "prompt_tokens": 1875,
+    "total_tokens": 1896,
+    "prompt_tokens_details": {
+      "cached_tokens": 1184
+    }
+  },
+  "finish_reason": "stop",
+  "elapsed_ms": 260.673
+}

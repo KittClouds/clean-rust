@@ -1,0 +1,13 @@
+{
+  "schema": "CHIEF_E4_0_PARITY_PREPARED_LEDGER_RECEIPT_V1",
+  "status": "STAGE_PREP_REGISTERED_AUTH_WITHHELD",
+  "artifact": {
+    "artifact_id": "sha256:1d81a09d73ce7a2f8d5e10680dc2fb2f002f5bf9918e64e92319c62b41bb333d",
+    "event_id": "sha256:0baa93eed51ac0738cc087766ed362617c8e46ad4ead6ec7e12bcf79ed8e8340"
+  },
+  "seal": {
+    "root": "sha256:e4963ba9119919446e07fb7fea50762f9d00e672eed6b5f91e10679f37eb084a",
+    "event_id": "sha256:d8d1feb5b527e44ae9c41705e4a5b5a7ee256e46acd765b2fc552e9e3af19753"
+  },
+  "authorization_conferred": false
+}

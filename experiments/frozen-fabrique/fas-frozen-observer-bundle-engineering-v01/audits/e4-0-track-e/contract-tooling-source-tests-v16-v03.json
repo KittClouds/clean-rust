@@ -1,0 +1,44 @@
+{
+  "schema": "FAS_E4_0_CONTRACT_TOOLING_SOURCE_TESTS_V16_V03",
+  "receipt_id": "E4_0_CONTRACT_TOOLING_V16_SOURCE_TESTS_V03",
+  "status": "PASS_SYNTHETIC_CONTRACT_AND_SOURCE_MAP_TESTS_V03",
+  "commands": [
+    "python -m py_compile experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/build_e4_0_source_map_v16_v03.py experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/finalize_e4_0_contract_v16_v03.py experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/seal_e4_0_contract_v16_v02.py experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/test_e4_0_contract_v16_v03.py",
+    "python experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/test_e4_0_contract_v16_v03.py (32 synthetic tests)"
+  ],
+  "unit_test_count": 32,
+  "py_compile": "PASS",
+  "source_bindings": [
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/build_e4_0_source_map_v16_v03.py",
+      "bytes": 69908,
+      "sha256": "daa0ab8295a4f3131218cb1c1bbef38db6ae8f43d99452996e7f01de9a34fa7c"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/finalize_e4_0_contract_v16_v03.py",
+      "bytes": 68187,
+      "sha256": "02dc2899e304c8d6de64cf9d499167cd303fc07b871b6c617061c77421adf1e3"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/seal_e4_0_contract_v16_v02.py",
+      "bytes": 17713,
+      "sha256": "2d4a695c62250b4a16534619834333eef372d3adab90b3720776da54c16c32d4"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/test_e4_0_contract_v16_v03.py",
+      "bytes": 34518,
+      "sha256": "84dda6c34aa9cc25eb6b84025e2caa1b21cc7a533f7f677061da9553e05823bc"
+    }
+  ],
+  "runtime_access": {
+    "model_contact": false,
+    "tokenizer_contact": false,
+    "cuda_initialized": false,
+    "gpu_lease_acquired": false,
+    "cache_created": false,
+    "labels_opened": false
+  },
+  "scope": "Synthetic-only contract, source-map, finalizer, and sealer validation. No final contract candidate, seal, authorization, E4 population, labels, tokenizer, model, or CUDA contact.",
+  "execution_authorization_conferred": false,
+  "recorded_utc": "2026-09-27T05:53:08Z"
+}

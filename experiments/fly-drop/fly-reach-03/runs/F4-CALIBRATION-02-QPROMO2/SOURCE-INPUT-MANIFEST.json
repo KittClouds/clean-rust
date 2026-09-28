@@ -1,0 +1,285 @@
+{
+  "entries": [
+    {
+      "byte_length": 5717837,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/anatomy/edges-L.tsv",
+      "sha256": "ed6044a5de43b2c6acd58aa034967ac80a595ab55456a04f505ecb764d36b0de"
+    },
+    {
+      "byte_length": 5725623,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/anatomy/edges-R.tsv",
+      "sha256": "42b602cd95cf169e86cee7fdc3b28f59e068677aa63e382b845af30c2bffa573"
+    },
+    {
+      "byte_length": 58761,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/anatomy/nodes-L.tsv",
+      "sha256": "3fc14bc6bf33e6a1fc2af7f377b7a23f6700ff916030b840bab4259d76e5232f"
+    },
+    {
+      "byte_length": 58949,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/anatomy/nodes-R.tsv",
+      "sha256": "871cf14a0daf569139b2a880f1927a0f3be7b4d11f5feb47bd435178b74d347f"
+    },
+    {
+      "byte_length": 5255578,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g001/edges-L.tsv",
+      "sha256": "eb92e858b4b07534abc8763e3b8f92bd139b02d95d4bb3cc6b2c9ae2807c28c9"
+    },
+    {
+      "byte_length": 5262051,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g001/edges-R.tsv",
+      "sha256": "7de3749f1a0fc8a03a5ed760650db2526ebaf391aa29a30c5b8ddeb461e3b223"
+    },
+    {
+      "byte_length": 5255578,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g002/edges-L.tsv",
+      "sha256": "655a2e71a0f1da4b82ee8560c2b1e20570a04a9e34eb018ebb4c5aebf0568c54"
+    },
+    {
+      "byte_length": 5262051,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g002/edges-R.tsv",
+      "sha256": "108ffd074903a08d801371027b6662503fc0e2a7814ec95e6fac7718e7ae601e"
+    },
+    {
+      "byte_length": 5255578,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g003/edges-L.tsv",
+      "sha256": "5d4b14cab55df828c61c0f13abc73a5d4ed9171ea5b743cb9623b34c084cfa19"
+    },
+    {
+      "byte_length": 5262051,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g003/edges-R.tsv",
+      "sha256": "1d5578e048b7ba567a909337988234c8dd3721e23905419826c664ee8e14f332"
+    },
+    {
+      "byte_length": 5255578,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g004/edges-L.tsv",
+      "sha256": "c2c0cfef2e4b5006e7d0bebc5a222ea0bb2d925ee79c4088566f1adf23bcc17e"
+    },
+    {
+      "byte_length": 5262051,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g004/edges-R.tsv",
+      "sha256": "c26d834b276648dfc9b529bd8ce6d1f2d3db61c22cdd3563a75b4801da4590ac"
+    },
+    {
+      "byte_length": 5255578,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g005/edges-L.tsv",
+      "sha256": "94cf106a1dd66c161a18bcba31d5e62c89dce378d4bf4fd8c70e604000fd3e74"
+    },
+    {
+      "byte_length": 5262051,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g005/edges-R.tsv",
+      "sha256": "ad73539b78bd22232dc73f9e6d94e4ebcea547a9d4109861e07c6da4f0d5c3d2"
+    },
+    {
+      "byte_length": 5255578,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g006/edges-L.tsv",
+      "sha256": "165ef118059d023b9a4db2346aa6ed044a0f80e601a5850dd42ea6e5634e5662"
+    },
+    {
+      "byte_length": 5262051,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g006/edges-R.tsv",
+      "sha256": "41f9bef7b72386177e02dd9979f2801970fd99176d48335a9a7f4c8eb86dc0c0"
+    },
+    {
+      "byte_length": 5255578,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g007/edges-L.tsv",
+      "sha256": "6c966396aef86b7280cbda592604c4e111a3c7a80792b861c6f486ddc3df93b1"
+    },
+    {
+      "byte_length": 5262051,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g007/edges-R.tsv",
+      "sha256": "2a4fcd636b3bb6a62ae56395e499631586e439b4808780275d48412abef0582e"
+    },
+    {
+      "byte_length": 5255578,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g008/edges-L.tsv",
+      "sha256": "bd0444ddc71c8fb02f59777190c9c2610ed79fa4b9572ddaeb367dda75213927"
+    },
+    {
+      "byte_length": 5262051,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g008/edges-R.tsv",
+      "sha256": "da63f56a22074bb72a1b6b7aaf75602470f4b92c98a6007ef86e7a8b3242a59d"
+    },
+    {
+      "byte_length": 9016,
+      "path": "experiments/fly-reach-03/executor/Cargo.lock",
+      "sha256": "bf229c7ff0d6ad207757dc941ddaa561e404015c89a9a7a3e85594483ce29c91"
+    },
+    {
+      "byte_length": 465,
+      "path": "experiments/fly-reach-03/executor/Cargo.toml",
+      "sha256": "51566e4930763e18d432c95ad7d053db72e4b43ef14ab5cfa8bc3997a9045952"
+    },
+    {
+      "byte_length": 17997,
+      "path": "experiments/fly-reach-03/executor/src/collector.rs",
+      "sha256": "f551c86875b6ec7f5d9fe7327adbfcfc4a66810640cf70c72aaa234822a4a258"
+    },
+    {
+      "byte_length": 5250,
+      "path": "experiments/fly-reach-03/executor/src/graph.rs",
+      "sha256": "8977281a6f5a3cceaf1783f8099b7d49db81fd51f9a83bec144327e02f56ebad"
+    },
+    {
+      "byte_length": 11933,
+      "path": "experiments/fly-reach-03/executor/src/reach_sim.rs",
+      "sha256": "b487e23da9ab85164b79bad40f2802a89f1d660a68c97d7728ea8af52d1f0790"
+    },
+    {
+      "byte_length": 976,
+      "path": "experiments/fly-reach-03/executor/src/rng.rs",
+      "sha256": "e18ae9832519a211983d401d111f6685c76988375e29d150f2a8355e504a07f4"
+    },
+    {
+      "byte_length": 2403,
+      "path": "experiments/fly-reach-03/executor/src/task.rs",
+      "sha256": "c19e955138cded658382216e947c1d381d11fab2e258b32f29176934a2e2c4be"
+    },
+    {
+      "byte_length": 5021,
+      "path": "experiments/fly-reach-03/f4-calibration-02-v0.2/F4-CALIBRATION-02-CONTRACT-v0.2.json",
+      "sha256": "f1c3516fbc46aa8b315fc0d679a9b910ecdd3de2a2637a9c3c364ecde7e8ce96"
+    },
+    {
+      "byte_length": 7481,
+      "path": "experiments/fly-reach-03/f4-calibration-02-v0.2/F4-CALIBRATION-02-CONTRACT-v0.2.md",
+      "sha256": "192b0c3c01b2b7978aedfe55e5490012226e62e0b7660c4410797a08b44a01b8"
+    },
+    {
+      "byte_length": 3218,
+      "path": "experiments/fly-reach-03/f4-calibration-02-v0.2/F4-CALIBRATION-02-v0.2-PRETASK-FREEZE-RECEIPT.json",
+      "sha256": "f84586b621d99526bbfac41c4153fa76f68f73e4da746c427c165c92bab973fe"
+    },
+    {
+      "byte_length": 117,
+      "path": "experiments/fly-reach-03/f4-calibration-02-v0.2/F4-CALIBRATION-02-v0.2-PRETASK-FREEZE-RECEIPT.sha256",
+      "sha256": "c9a3a08d28fe631470e87c6908a41d364a4915e59819e18f20779f907143004a"
+    },
+    {
+      "byte_length": 6011,
+      "path": "experiments/fly-reach-03/f4-calibration-02-v0.2/executor/Cargo.lock",
+      "sha256": "d23ba3259fce0c8b27c80b97f0be9a954984cab0f519a8bb9b07e9ca14064e7c"
+    },
+    {
+      "byte_length": 382,
+      "path": "experiments/fly-reach-03/f4-calibration-02-v0.2/executor/Cargo.toml",
+      "sha256": "5860b8b8665fc5de52be37372933106f2d150588566e578b3d52098f7e67c45e"
+    },
+    {
+      "byte_length": 1036,
+      "path": "experiments/fly-reach-03/f4-calibration-02-v0.2/executor/src/main.rs",
+      "sha256": "66f3b992f7bc59bb1c3cd76d682406160e477102758b001215f2dd850473e85a"
+    },
+    {
+      "byte_length": 16881,
+      "path": "experiments/fly-reach-03/f4-calibration-02-v0.2/executor/src/native_collect.rs",
+      "sha256": "8051ce03a296aec85e001b3d7df6fdec82a50f389d3fc9846fb4a858ecc1095c"
+    },
+    {
+      "byte_length": 16190,
+      "path": "experiments/fly-reach-03/f4-calibration-02-v0.2/scripts/analysis.py",
+      "sha256": "54a54276b4cd71fd6f0f794a9aa2aed31e5f69fb78953092572b458507a2a0a4"
+    },
+    {
+      "byte_length": 8283,
+      "path": "experiments/fly-reach-03/f4-calibration-02-v0.2/scripts/fit_d.py",
+      "sha256": "763256b0dfc3bb8718d84f20185a12d791e89cdb19225a3f1a74fafa0a62033a"
+    },
+    {
+      "byte_length": 14726,
+      "path": "experiments/fly-reach-03/f4-calibration-02-v0.2/scripts/integrity.py",
+      "sha256": "cbc7c608bb2d2ef924e5569313f2614fe9dc59700b5139d0740dadcb5cf1f2ff"
+    },
+    {
+      "byte_length": 10289,
+      "path": "experiments/fly-reach-03/f4-calibration-02-v0.2/scripts/preflight.py",
+      "sha256": "9aca7d6b91f7274acb26327a2f17d6dd004fac632b85f27325f762f317e6ec9b"
+    },
+    {
+      "byte_length": 6838,
+      "path": "experiments/fly-reach-03/f4-calibration-02-v0.2/scripts/prepare_d.py",
+      "sha256": "3cb2cc15ad6be783a0293253b3381760415376e6fac005a7935a4e71719e1a5b"
+    },
+    {
+      "byte_length": 6550,
+      "path": "experiments/fly-reach-03/f4-calibration-02-v0.2/scripts/prepare_tasks.py",
+      "sha256": "57b2393c029a3daab841e91b3e8a366cc86fa0854950cc026b14d5ca2fdc7282"
+    },
+    {
+      "byte_length": 4867,
+      "path": "experiments/fly-reach-03/f4-calibration-02-v0.2/scripts/terminal.py",
+      "sha256": "6df73692a06ae5113f93b25266dd79b05c7fb8be9f80707222b2fe78311d574c"
+    },
+    {
+      "byte_length": 8029,
+      "path": "experiments/fly-reach-03/f4-symmetry-03/F4-SYMMETRY-03-CONTRACT-v0.1.md",
+      "sha256": "7c49b8419896dca4418de3497ecd8566b2167d1c6bf24d7860d904d70f87afe0"
+    },
+    {
+      "byte_length": 9266,
+      "path": "experiments/fly-reach-03/f4-symmetry-03/scripts/common.py",
+      "sha256": "27024a001f2c89f520b5230bf3796ee8691e499f29ce73c71597ad7c303debf5"
+    },
+    {
+      "byte_length": 7602,
+      "path": "experiments/fly-reach-03/f4-symmetry-03/scripts/fit.py",
+      "sha256": "0c8a84f2418c8b2d7fa222675860771e7e4e64b871ad333ec0fb5e3e65af5026"
+    },
+    {
+      "byte_length": 8910,
+      "path": "experiments/fly-reach-03/f4-symmetry-03/scripts/prepare_fit.py",
+      "sha256": "9da88d9a2e147cad551e8e4e2c8b11ba460b435f5743f57527fbf46d7eb09497"
+    },
+    {
+      "byte_length": 32126,
+      "path": "experiments/fly-reach-03/manifests/QUALIFICATION-MANIFEST.json",
+      "sha256": "9ea9048d424698212b5a14eecdadef56987a93c54ed28e3ef40a9508431014e5"
+    },
+    {
+      "byte_length": 1151,
+      "path": "experiments/fly-reach-03/runs/F4-CALIBRATION-02-QPROMO1/ENGINEERING-STOP-ADDENDUM.json",
+      "sha256": "4bb1fb284fa1d666e5e71bb00c7247ec1ccd3b19cb06e7bb3e91c5739f6f4f8c"
+    },
+    {
+      "byte_length": 2224,
+      "path": "experiments/fly-reach-03/runs/F4-CALIBRATION-02-QPROMO1/ENGINEERING-STOP-RECEIPT.json",
+      "sha256": "24c95d84e866e195493825ddc0a8cee458e089941f85afe3eae60b26570ff881"
+    },
+    {
+      "byte_length": 433664,
+      "path": "experiments/fly-reach-03/runs/F4-CALIBRATION-02-QPROMO2/bin/f4-calibration-02-executor.exe",
+      "sha256": "920ad4f8925cb46204bf15206c44edc2f66492d3503ad7a565fb43547658c3b5"
+    },
+    {
+      "byte_length": 5832,
+      "path": "experiments/fly-reach-03/runs/F4-CALIBRATION-02-QPROMO2/task-bank/TASK-BANK-MANIFEST.json",
+      "sha256": "c1a63224682550e473b626780d3c1ba68d1636e00b4ef09f501f13dcbbc5967c"
+    },
+    {
+      "byte_length": 672,
+      "path": "experiments/fly-reach-03/runs/F4-CALIBRATION-02-QPROMO2/task-bank/TASK-BANK-RECEIPT.json",
+      "sha256": "4c9a39bf2d05aec2afb31ab8cd1eb55cf3dd862649b6c9532d7a9f14b99343e1"
+    },
+    {
+      "byte_length": 19541514,
+      "path": "experiments/fly-reach-03/runs/F4-CALIBRATION-02-QPROMO2/task-bank/training.json",
+      "sha256": "9ec1f7c240143e7fb5537ae72eb6d5bb3fb4fb8fc0445bcbafa54ae913a826b5"
+    },
+    {
+      "byte_length": 13462,
+      "path": "experiments/fly-reach-03/runs/F4-SYMMETRY-03-QREP1-IMPLFIX1/TERMINAL-RECEIPT.json",
+      "sha256": "a5a40dce9710cb9f2e47850d6bdf9b99a44758a910a0fc7e8e8848eaef3d0d01"
+    },
+    {
+      "byte_length": 5214,
+      "path": "experiments/fly-reach-03/runs/qualification-v2/QUALIFICATION-TERMINAL-RECEIPT.json",
+      "sha256": "29f073c42de3160a7cb60385747daa247c43892fa19da6d56a1883d6ee7fea18"
+    },
+    {
+      "byte_length": 3811,
+      "path": "experiments/fly-reach-03/scripts/f4_symmetry_01_model.py",
+      "sha256": "92e260bd0057115867bf69b343d8193bab141035f3338af4586c5e0af61c47f8"
+    }
+  ],
+  "schema": "F4-CALIBRATION-02-v0.2-source-input-manifest-v1"
+}

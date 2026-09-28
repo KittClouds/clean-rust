@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "run_id": "e009-20260925-corrected-06",
+  "attempt": 2,
+  "occurred_at_utc": "2026-09-25T18:03:49.143000+00:00",
+  "status": "RECEIPT_READER_DIAGNOSTIC_FAILED_BEFORE_LANE_OUTPUT",
+  "error": "Raw completion log bytes used Windows CRLF while the bank receipt hashes the captured LF text.",
+  "heldout_labels_opened": true,
+  "lane_results_written": false,
+  "model_outputs_changed": false,
+  "thresholds_changed": false,
+  "corrective_action": "Canonicalize CRLF and CR to LF before hash verification; write future completion logs with LF line endings."
+}

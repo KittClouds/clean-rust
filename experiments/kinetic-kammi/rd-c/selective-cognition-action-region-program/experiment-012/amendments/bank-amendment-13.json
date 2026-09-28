@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "amendment_id": "E012-BANK-A13-RETRY",
+  "state": "PATCH_ENCODING_REPAIR_NO_MODEL_CONTACT",
+  "diagnostic_parent": "E012-BANK-A12",
+  "failed_attempt": "bank/construction-01/scored-bank-a12/attempts/scored-check-attempt-01.json",
+  "repair": "encode map-order canonical_sort replacement as a unified-diff removal/addition and update hunk counts",
+  "semantic_candidate_behavior_changed": false,
+  "model_contact_authorized": false
+}

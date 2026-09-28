@@ -1,0 +1,9 @@
+{
+  "contract_sha256": "3CF2CAE05B9BFA18AFA7F73AFA55F2ED46FE33F4D5EA61CF1CF09979FB9AB946",
+  "frontier_pairs": 9530,
+  "identity": "q10-gc1-lr1-requal1-csc1-pair-front1-v1",
+  "pair_replay_performed": false,
+  "protocol": "Q10-PAIR-FRONT1",
+  "readout_executed": false,
+  "status": "PREEXECUTION_SEALED"
+}

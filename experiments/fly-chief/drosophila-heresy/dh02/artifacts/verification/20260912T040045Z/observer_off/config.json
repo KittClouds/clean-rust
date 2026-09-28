@@ -1,0 +1,33 @@
+{
+  "observe": false,
+  "seeds": [
+    2000
+  ],
+  "taus": [
+    4.0
+  ],
+  "sides": [
+    "R"
+  ],
+  "conditions": [
+    "immediate",
+    "quiet",
+    "distractor"
+  ],
+  "arms": [
+    "E",
+    "Z"
+  ],
+  "cues": 16,
+  "delay_steps": 12,
+  "trials": 512,
+  "eta": 0.05,
+  "glut_sign": -1.0,
+  "input_salt": 858980352,
+  "threads": 1,
+  "primary_metric": "probe_reversal",
+  "primary_contrast": "quiet_minus_distractor",
+  "primary_side": "R",
+  "bootstrap_seed": 2026091202,
+  "bootstrap_resamples": 20000
+}

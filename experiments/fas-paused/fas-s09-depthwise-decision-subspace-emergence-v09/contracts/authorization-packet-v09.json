@@ -1,0 +1,32 @@
+{
+  "authorization_basis": "Continuation of the user-authorized fixed S09 offline analysis. V08 completed full cache verification, all 32 prescribed probe fits, and the terminal gates, then stopped at the first replay cell because apply_pipeline read a nonexistent layer key from the fit state. V09 supplies the already contracted loop layer explicitly and reruns the sealed analysis so fit diagnostics, replay cells, metrics, and seals are emitted together. No model contact or scientific design change is introduced.",
+  "expected_terminal_authority": {
+    "ADAPTIVE_MECHANISMS_AUTHORIZED": false,
+    "FAS00_PHASE4_AUTHORIZED": false,
+    "S09_FIXED_ANALYSIS_AUTHORIZED": true,
+    "S09_RESULT_READY": false
+  },
+  "packet_id": "FAS_S09_FIXED_ANALYSIS_AUTHORIZATION_PACKET_V09",
+  "permitted": [
+    "read the sealed S01/S08 inputs and S09-v03 recovery receipts",
+    "read and fully hash-verify the already-qualified v03 feature cache",
+    "audit the v04 terminal probe states against the sealed S01 terminal states and demonstrate the scaler-precision identity mismatch",
+    "rerun the exact 32 fixed S01-3 linear fits with the layer-16 terminal gate first",
+    "run the four fixed native/cross-surface replay cells at every layer",
+    "compute the contracted observer subspaces and convergence to S08 terminal planes",
+    "seal the v05 analysis and result tree"
+  ],
+  "prohibited": [
+    "load or re-extract LFM",
+    "modify any v02, v03, or v04 artifact",
+    "change fit rows, test rows, labels, class order, standardization runtime, optimizer, solver limits, metrics, representation views, or subspace method",
+    "read FAS-00 artifacts",
+    "run additional fitting, layer selection, statistics, adaptation, SAE, nonlinear analysis, or representation search"
+  ],
+  "stop_on": [
+    "any v04-v08 provenance mismatch",
+    "feature cache integrity mismatch",
+    "terminal probe, probability, metric, pair-normal or projector mismatch",
+    "any fixed analysis invariant failure"
+  ]
+}

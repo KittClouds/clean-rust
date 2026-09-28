@@ -1,0 +1,13 @@
+{
+  "campaign_started": false,
+  "contract_sha256": "0592C33F18BD59F8BC7B21027370E3DC53D993BFCB070C5A45C4AB9FE1263FA5",
+  "created_at_utc": "2026-09-18T00:00:00Z",
+  "identity": "q10-gc1-cancel1-lr1-v1",
+  "parent_bindings_sealed": true,
+  "plan_sha256": "C4E856FFF0443B91165DEFAA12C375B623D6741F4F059F8E7FEFDC1C2B2590CB",
+  "protocol": "Q10-GC1-CANCEL1-LR1",
+  "qualification_sealed": true,
+  "result_exposure": false,
+  "runner_shas_sealed": true,
+  "status": "QUALIFIED_NO_CAMPAIGN"
+}

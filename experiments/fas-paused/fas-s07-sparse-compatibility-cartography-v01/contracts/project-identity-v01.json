@@ -1,0 +1,13 @@
+{
+  "experiment_id": "fas-s07-sparse-compatibility-cartography-v01",
+  "phase_id": "s07-sparse-compatibility-cartography-v01",
+  "status": "FROZEN_PRE_FIT",
+  "purpose": "Shared sparse-dictionary attribution of native mean_full/final_position compatibility over sealed feature caches.",
+  "model_contact": false,
+  "feature_extraction": false,
+  "probe_fitting": false,
+  "sae_fitting": true,
+  "online_adaptation": false,
+  "layerwise_analysis": false,
+  "fas00_modified": false
+}

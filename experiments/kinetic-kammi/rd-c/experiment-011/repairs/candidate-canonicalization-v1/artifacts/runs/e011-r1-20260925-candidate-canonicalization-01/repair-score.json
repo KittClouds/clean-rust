@@ -1,0 +1,190 @@
+{
+  "schema_version": 1,
+  "run_id": "e011-r1-20260925-candidate-canonicalization-01",
+  "scored_utc": "2026-09-25T20:37:59.801116+00:00",
+  "classification": "same-bank repair validation; shadow-only; no independent generalization claim",
+  "adapter_id": "candidate-canonicalization-v1",
+  "thresholds": {
+    "minimum_applicability_milli": 850,
+    "maximum_abstention_milli": 150
+  },
+  "canonical_input_invariance": {
+    "tasks": 16,
+    "full_vs_permuted_canonical_frames_identical": true,
+    "accepted_outputs_mapped_to_original_authority_ids": true,
+    "mapping_failures": 0
+  },
+  "repositories": [
+    {
+      "repository": "ripgrep",
+      "tasks": 8,
+      "small": {
+        "coverage": {
+          "accepted": 8,
+          "tasks": 8
+        },
+        "direct_precision": {
+          "correct": 8,
+          "accepted": 8
+        },
+        "wrong_accepted": 0,
+        "mapping_failures": 0,
+        "mapped_proposals": 8,
+        "proposal_reasons": {
+          "accepted": 8
+        },
+        "tokens": 11393,
+        "observer_ms": 2915.653
+      },
+      "large": {
+        "coverage": {
+          "accepted": 8,
+          "tasks": 8
+        },
+        "direct_precision": {
+          "correct": 8,
+          "accepted": 8
+        },
+        "wrong_accepted": 0,
+        "mapping_failures": 0,
+        "mapped_proposals": 8,
+        "proposal_reasons": {
+          "accepted": 8
+        },
+        "tokens": 12617,
+        "observer_ms": 22605.702
+      },
+      "hybrid": {
+        "completions": 8,
+        "tasks": 8,
+        "large_calls": 0,
+        "large_calls_avoided": 8,
+        "wrong_commits": 0,
+        "routed_tokens": 11393,
+        "routed_observer_ms": 2915.653
+      },
+      "always_large_completions": 8
+    },
+    {
+      "repository": "turbovec",
+      "tasks": 8,
+      "small": {
+        "coverage": {
+          "accepted": 8,
+          "tasks": 8
+        },
+        "direct_precision": {
+          "correct": 2,
+          "accepted": 8
+        },
+        "wrong_accepted": 6,
+        "mapping_failures": 0,
+        "mapped_proposals": 8,
+        "proposal_reasons": {
+          "accepted": 8
+        },
+        "tokens": 11779,
+        "observer_ms": 1781.567
+      },
+      "large": {
+        "coverage": {
+          "accepted": 8,
+          "tasks": 8
+        },
+        "direct_precision": {
+          "correct": 7,
+          "accepted": 8
+        },
+        "wrong_accepted": 1,
+        "mapping_failures": 0,
+        "mapped_proposals": 8,
+        "proposal_reasons": {
+          "accepted": 8
+        },
+        "tokens": 13710,
+        "observer_ms": 23875.524
+      },
+      "hybrid": {
+        "completions": 2,
+        "tasks": 8,
+        "large_calls": 0,
+        "large_calls_avoided": 8,
+        "wrong_commits": 6,
+        "routed_tokens": 11779,
+        "routed_observer_ms": 1781.567
+      },
+      "always_large_completions": 7
+    }
+  ],
+  "pooled_descriptive": {
+    "repository": "POOLED_DESCRIPTIVE",
+    "tasks": 16,
+    "small_coverage": 16,
+    "small_correct": 10,
+    "small_wrong_accepted": 6,
+    "large_completions": 15,
+    "hybrid_completions": 10,
+    "large_calls_avoided": 16,
+    "mapping_failures": 0,
+    "routed_tokens": 23172,
+    "routed_observer_ms": 4697.22
+  },
+  "parent_e011_comparison": {
+    "full-frame": [
+      {
+        "repository": "ripgrep",
+        "hybrid_completions": 8,
+        "always_large_completions": 8,
+        "small_coverage": 8,
+        "small_direct_precision": {
+          "numerator": 8,
+          "denominator": 8,
+          "percent": 100.0
+        },
+        "large_calls_avoided": 8,
+        "wrong_small_actions": 0
+      },
+      {
+        "repository": "turbovec",
+        "hybrid_completions": 8,
+        "always_large_completions": 5,
+        "small_coverage": 5,
+        "small_direct_precision": {
+          "numerator": 5,
+          "denominator": 5,
+          "percent": 100.0
+        },
+        "large_calls_avoided": 5,
+        "wrong_small_actions": 0
+      }
+    ],
+    "candidate-permuted": [
+      {
+        "repository": "ripgrep",
+        "hybrid_completions": 7,
+        "always_large_completions": 8,
+        "small_coverage": 7,
+        "small_direct_precision": {
+          "numerator": 6,
+          "denominator": 7,
+          "percent": 85.71
+        },
+        "large_calls_avoided": 7,
+        "wrong_small_actions": 1
+      },
+      {
+        "repository": "turbovec",
+        "hybrid_completions": 6,
+        "always_large_completions": 5,
+        "small_coverage": 6,
+        "small_direct_precision": {
+          "numerator": 5,
+          "denominator": 6,
+          "percent": 83.33
+        },
+        "large_calls_avoided": 6,
+        "wrong_small_actions": 1
+      }
+    ]
+  }
+}

@@ -1,0 +1,866 @@
+{
+  "CASE-001": {
+    "scores": {
+      "operative_constraints": 0,
+      "wording_ambiguity": 0,
+      "candidate_similarity": 2,
+      "evidence_conflict": 0,
+      "reasoning_depth": 1,
+      "distractor_plausibility": 2
+    },
+    "rationales": {
+      "operative_constraints": "One clear requirement governs repeated --tag values: retain every occurrence.",
+      "wording_ambiguity": "The request explicitly says to append every occurrence.",
+      "candidate_similarity": "Candidates change parser action and retrieval behavior, with some alternatives differing only in how collected values are returned.",
+      "evidence_conflict": "No baseline observation or repository cue conflicts with the stated behavior.",
+      "reasoning_depth": "The choice links a local argument action to the output collection through a short consequence chain.",
+      "distractor_plausibility": "Changing the action while extracting only one value is a plausible partial adjustment; leaving Set behavior is an obvious miss."
+    }
+  },
+  "CASE-002": {
+    "scores": {
+      "operative_constraints": 0,
+      "wording_ambiguity": 0,
+      "candidate_similarity": 3,
+      "evidence_conflict": 0,
+      "reasoning_depth": 0,
+      "distractor_plausibility": 2
+    },
+    "rationales": {
+      "operative_constraints": "The request specifies one clear property: a two-byte word in the named byte order.",
+      "wording_ambiguity": "The requested byte order and output width are explicit.",
+      "candidate_similarity": "Several edits share the same encoding call and differ by endianness, value source, or an extra byte.",
+      "evidence_conflict": "No exposed baseline observation conflicts with the requested encoding.",
+      "reasoning_depth": "The task is one local encoding edit with no dependent behavior shown.",
+      "distractor_plausibility": "Wrong endianness, a constant value, and an added byte are plausible nearby implementation choices."
+    }
+  },
+  "CASE-003": {
+    "scores": {
+      "operative_constraints": 1,
+      "wording_ambiguity": 0,
+      "candidate_similarity": 3,
+      "evidence_conflict": 0,
+      "reasoning_depth": 1,
+      "distractor_plausibility": 2
+    },
+    "rationales": {
+      "operative_constraints": "The requested numeric mode and the observed failing path both constrain the pointer selection.",
+      "wording_ambiguity": "The mode name and instruction to use the observed path give a clear selection task.",
+      "candidate_similarity": "All alternatives use the same pointer call and differ by one path segment or mode segment.",
+      "evidence_conflict": "The baseline path observation supplies a cue to combine with the requested mode; no separate cue contradicts it.",
+      "reasoning_depth": "The choice combines a short path observation with the requested field before returning one value.",
+      "distractor_plausibility": "Nearby paths and the other numeric mode are credible wrong-place alternatives."
+    }
+  },
+  "CASE-004": {
+    "scores": {
+      "operative_constraints": 1,
+      "wording_ambiguity": 0,
+      "candidate_similarity": 3,
+      "evidence_conflict": 0,
+      "reasoning_depth": 1,
+      "distractor_plausibility": 2
+    },
+    "rationales": {
+      "operative_constraints": "The requested numeric mode and the observed failing path both constrain the pointer selection.",
+      "wording_ambiguity": "The mode name and instruction to use the observed path give a clear selection task.",
+      "candidate_similarity": "All alternatives use the same pointer call and differ by one path segment or mode segment.",
+      "evidence_conflict": "The baseline path observation supplies a cue to combine with the requested mode; no separate cue contradicts it.",
+      "reasoning_depth": "The choice combines a short path observation with the requested field before returning one value.",
+      "distractor_plausibility": "Nearby paths and the other numeric mode are credible wrong-place alternatives."
+    }
+  },
+  "CASE-005": {
+    "scores": {
+      "operative_constraints": 1,
+      "wording_ambiguity": 0,
+      "candidate_similarity": 2,
+      "evidence_conflict": 0,
+      "reasoning_depth": 2,
+      "distractor_plausibility": 2
+    },
+    "rationales": {
+      "operative_constraints": "The ordering contract and active preserve_order feature state jointly constrain behavior.",
+      "wording_ambiguity": "The requested map order and feature state are explicit in the task materials.",
+      "candidate_similarity": "Several candidates use feature-gated branches, while others alter the same key iteration with sorting or reversal.",
+      "evidence_conflict": "The repository context directly exposes the active feature and requested ordering contract.",
+      "reasoning_depth": "Selecting behavior requires connecting a build feature to the map representation and iteration path.",
+      "distractor_plausibility": "A reversed order or the opposite feature branch can look like an ordering fix while violating the stated contract."
+    }
+  },
+  "CASE-006": {
+    "scores": {
+      "operative_constraints": 0,
+      "wording_ambiguity": 0,
+      "candidate_similarity": 2,
+      "evidence_conflict": 0,
+      "reasoning_depth": 1,
+      "distractor_plausibility": 2
+    },
+    "rationales": {
+      "operative_constraints": "One clear requirement governs repeated --tag values: retain every occurrence.",
+      "wording_ambiguity": "The request explicitly says to append every occurrence.",
+      "candidate_similarity": "Candidates change parser action and retrieval behavior, with some alternatives differing only in how collected values are returned.",
+      "evidence_conflict": "No baseline observation or repository cue conflicts with the stated behavior.",
+      "reasoning_depth": "The choice links a local argument action to the output collection through a short consequence chain.",
+      "distractor_plausibility": "Changing the action while extracting only one value is a plausible partial adjustment; leaving Set behavior is an obvious miss."
+    }
+  },
+  "CASE-007": {
+    "scores": {
+      "operative_constraints": 0,
+      "wording_ambiguity": 0,
+      "candidate_similarity": 3,
+      "evidence_conflict": 0,
+      "reasoning_depth": 1,
+      "distractor_plausibility": 2
+    },
+    "rationales": {
+      "operative_constraints": "The observed first-item offset and reference offset define one adjustment target.",
+      "wording_ambiguity": "The task explicitly directs use of the parser offset observation.",
+      "candidate_similarity": "All candidates modify the same expression with nearby arithmetic or a constant return.",
+      "evidence_conflict": "The observed and reference offsets supply a direct basis for comparing the local expressions.",
+      "reasoning_depth": "A short offset calculation connects the observation to the local return expression.",
+      "distractor_plausibility": "Nearby arithmetic alternatives can look reasonable without applying the observed/reference difference."
+    }
+  },
+  "CASE-008": {
+    "scores": {
+      "operative_constraints": 0,
+      "wording_ambiguity": 0,
+      "candidate_similarity": 3,
+      "evidence_conflict": 0,
+      "reasoning_depth": 1,
+      "distractor_plausibility": 2
+    },
+    "rationales": {
+      "operative_constraints": "The observed first-item offset and reference offset define one adjustment target.",
+      "wording_ambiguity": "The task explicitly directs use of the parser offset observation.",
+      "candidate_similarity": "All candidates modify the same expression with nearby arithmetic or a constant return.",
+      "evidence_conflict": "The observed and reference offsets supply a direct basis for comparing the local expressions.",
+      "reasoning_depth": "A short offset calculation connects the observation to the local return expression.",
+      "distractor_plausibility": "Nearby arithmetic alternatives can look reasonable without applying the observed/reference difference."
+    }
+  },
+  "CASE-009": {
+    "scores": {
+      "operative_constraints": 2,
+      "wording_ambiguity": 0,
+      "candidate_similarity": 3,
+      "evidence_conflict": 0,
+      "reasoning_depth": 2,
+      "distractor_plausibility": 2
+    },
+    "rationales": {
+      "operative_constraints": "The result must be bounded, zero-copy, and share the input backing storage.",
+      "wording_ambiguity": "The API context states the required view and storage behavior.",
+      "candidate_similarity": "Candidates differ by closely related slice ranges or by using the buffer API, while some leave the input unchanged.",
+      "evidence_conflict": "The code-local API contract aligns with the requested selection criterion.",
+      "reasoning_depth": "The choice depends on understanding both the range returned and how Bytes views retain storage.",
+      "distractor_plausibility": "A suffix view or consuming copy can appear close while changing the requested range or storage behavior."
+    }
+  },
+  "CASE-010": {
+    "scores": {
+      "operative_constraints": 1,
+      "wording_ambiguity": 0,
+      "candidate_similarity": 3,
+      "evidence_conflict": 0,
+      "reasoning_depth": 1,
+      "distractor_plausibility": 2
+    },
+    "rationales": {
+      "operative_constraints": "The accepted set has two specified values, and other strings must be rejected.",
+      "wording_ambiguity": "The code-local parser contract names the complete accepted set.",
+      "candidate_similarity": "The alternatives are one-line parser substitutions with small changes to the allowed-value list.",
+      "evidence_conflict": "The exposed API contract and requested selection align.",
+      "reasoning_depth": "The choice is local, with a short consequence for which inputs are accepted.",
+      "distractor_plausibility": "A broader nonempty parser, an extra value, or a near-miss spelling can seem reasonable while changing the finite contract."
+    }
+  },
+  "CASE-011": {
+    "scores": {
+      "operative_constraints": 1,
+      "wording_ambiguity": 0,
+      "candidate_similarity": 3,
+      "evidence_conflict": 0,
+      "reasoning_depth": 2,
+      "distractor_plausibility": 2
+    },
+    "rationales": {
+      "operative_constraints": "The JSON document must be rewritten while preserving the exact source number token.",
+      "wording_ambiguity": "The request explicitly forbids normalization of the stated token.",
+      "candidate_similarity": "The conversion alternatives differ mainly by numeric accessor, and several share the same formatting structure.",
+      "evidence_conflict": "No separate baseline observation conflicts with the lexical-preservation requirement.",
+      "reasoning_depth": "The task connects parsing, numeric representation, and document serialization across multiple steps.",
+      "distractor_plausibility": "Typed numeric conversions can appear to preserve the number while changing its original textual spelling."
+    }
+  },
+  "CASE-012": {
+    "scores": {
+      "operative_constraints": 0,
+      "wording_ambiguity": 0,
+      "candidate_similarity": 2,
+      "evidence_conflict": 0,
+      "reasoning_depth": 1,
+      "distractor_plausibility": 2
+    },
+    "rationales": {
+      "operative_constraints": "One clear requirement governs repeated --tag values: retain only the last occurrence.",
+      "wording_ambiguity": "The last-occurrence behavior is stated directly.",
+      "candidate_similarity": "The alternatives vary parser action and selected-value handling, including nearby but behaviorally distinct choices.",
+      "evidence_conflict": "No baseline observation or repository cue conflicts with the stated behavior.",
+      "reasoning_depth": "The local choice links repeated-argument handling to the returned value through a short consequence chain.",
+      "distractor_plausibility": "Append plus first-value extraction is a plausible but mismatched strategy; unchanged behavior is an obvious miss."
+    }
+  },
+  "CASE-013": {
+    "scores": {
+      "operative_constraints": 0,
+      "wording_ambiguity": 0,
+      "candidate_similarity": 3,
+      "evidence_conflict": 0,
+      "reasoning_depth": 1,
+      "distractor_plausibility": 2
+    },
+    "rationales": {
+      "operative_constraints": "The observed first-item offset and reference offset define one adjustment target.",
+      "wording_ambiguity": "The task explicitly directs use of the parser offset observation.",
+      "candidate_similarity": "All candidates modify the same expression with nearby arithmetic or a constant return.",
+      "evidence_conflict": "The observed and reference offsets supply a direct basis for comparing the local expressions.",
+      "reasoning_depth": "A short offset calculation connects the observation to the local return expression.",
+      "distractor_plausibility": "Nearby arithmetic alternatives can look reasonable without applying the observed/reference difference."
+    }
+  },
+  "CASE-014": {
+    "scores": {
+      "operative_constraints": 3,
+      "wording_ambiguity": 1,
+      "candidate_similarity": 3,
+      "evidence_conflict": 0,
+      "reasoning_depth": 3,
+      "distractor_plausibility": 2
+    },
+    "rationales": {
+      "operative_constraints": "The task combines two equivalent positive spellings, a negative spelling, a precedence rule, and preservation of the existing alias contract.",
+      "wording_ambiguity": "The requested ordering rule is stated, though preserving the current public alias contract relies on the code-local context.",
+      "candidate_similarity": "The form-list edits are nearly identical and differ by which spellings and boolean values they retain.",
+      "evidence_conflict": "No baseline observation or repository setting contradicts the spelling and precedence request.",
+      "reasoning_depth": "The choices affect accepted spellings, option values, and precedence among multiple supplied arguments.",
+      "distractor_plausibility": "Partial form lists can satisfy visible subsets while missing an alias or changing precedence."
+    }
+  },
+  "CASE-015": {
+    "scores": {
+      "operative_constraints": 1,
+      "wording_ambiguity": 0,
+      "candidate_similarity": 3,
+      "evidence_conflict": 0,
+      "reasoning_depth": 1,
+      "distractor_plausibility": 2
+    },
+    "rationales": {
+      "operative_constraints": "The accepted set has two specified values, and other strings must be rejected.",
+      "wording_ambiguity": "The code-local parser contract names the complete accepted set.",
+      "candidate_similarity": "The alternatives are one-line parser substitutions with small changes to the allowed-value list.",
+      "evidence_conflict": "The exposed API contract and requested selection align.",
+      "reasoning_depth": "The choice is local, with a short consequence for which inputs are accepted.",
+      "distractor_plausibility": "A broader nonempty parser, an extra value, or a near-miss spelling can seem reasonable while changing the finite contract."
+    }
+  },
+  "CASE-016": {
+    "scores": {
+      "operative_constraints": 2,
+      "wording_ambiguity": 0,
+      "candidate_similarity": 3,
+      "evidence_conflict": 0,
+      "reasoning_depth": 2,
+      "distractor_plausibility": 2
+    },
+    "rationales": {
+      "operative_constraints": "The result must be bounded, zero-copy, and share the input backing storage.",
+      "wording_ambiguity": "The API context states the required view and storage behavior.",
+      "candidate_similarity": "Candidates differ by closely related slice ranges or by using the buffer API, while some leave the input unchanged.",
+      "evidence_conflict": "The code-local API contract aligns with the requested selection criterion.",
+      "reasoning_depth": "The choice depends on understanding both the range returned and how Bytes views retain storage.",
+      "distractor_plausibility": "A suffix view or consuming copy can appear close while changing the requested range or storage behavior."
+    }
+  },
+  "CASE-017": {
+    "scores": {
+      "operative_constraints": 1,
+      "wording_ambiguity": 0,
+      "candidate_similarity": 3,
+      "evidence_conflict": 0,
+      "reasoning_depth": 1,
+      "distractor_plausibility": 2
+    },
+    "rationales": {
+      "operative_constraints": "The requested field and the observed byte order jointly constrain the decoder.",
+      "wording_ambiguity": "The target field and pre-action byte-order observation are explicit.",
+      "candidate_similarity": "The four edits share the same two-byte read and vary only by field offset or endian method.",
+      "evidence_conflict": "The pre-action endian observation directly supplements the requested target field.",
+      "reasoning_depth": "The task combines a local field location with a local endian choice.",
+      "distractor_plausibility": "Reading the other field or using the opposite endian method is a plausible partial selection."
+    }
+  },
+  "CASE-018": {
+    "scores": {
+      "operative_constraints": 2,
+      "wording_ambiguity": 0,
+      "candidate_similarity": 3,
+      "evidence_conflict": 0,
+      "reasoning_depth": 2,
+      "distractor_plausibility": 2
+    },
+    "rationales": {
+      "operative_constraints": "The result must be bounded, zero-copy, and share the input backing storage.",
+      "wording_ambiguity": "The API context states the required view and storage behavior.",
+      "candidate_similarity": "Candidates differ by closely related slice ranges or by using the buffer API, while some leave the input unchanged.",
+      "evidence_conflict": "The code-local API contract aligns with the requested selection criterion.",
+      "reasoning_depth": "The choice depends on understanding both the range returned and how Bytes views retain storage.",
+      "distractor_plausibility": "A suffix view or consuming copy can appear close while changing the requested range or storage behavior."
+    }
+  },
+  "CASE-019": {
+    "scores": {
+      "operative_constraints": 0,
+      "wording_ambiguity": 0,
+      "candidate_similarity": 3,
+      "evidence_conflict": 0,
+      "reasoning_depth": 1,
+      "distractor_plausibility": 2
+    },
+    "rationales": {
+      "operative_constraints": "The observed first-item offset and reference offset define one adjustment target.",
+      "wording_ambiguity": "The task explicitly directs use of the parser offset observation.",
+      "candidate_similarity": "All candidates modify the same expression with nearby arithmetic or a constant return.",
+      "evidence_conflict": "The observed and reference offsets supply a direct basis for comparing the local expressions.",
+      "reasoning_depth": "A short offset calculation connects the observation to the local return expression.",
+      "distractor_plausibility": "Nearby arithmetic alternatives can look reasonable without applying the observed/reference difference."
+    }
+  },
+  "CASE-020": {
+    "scores": {
+      "operative_constraints": 1,
+      "wording_ambiguity": 0,
+      "candidate_similarity": 2,
+      "evidence_conflict": 0,
+      "reasoning_depth": 2,
+      "distractor_plausibility": 2
+    },
+    "rationales": {
+      "operative_constraints": "The ordering contract and active preserve_order feature state jointly constrain behavior.",
+      "wording_ambiguity": "The requested map order and feature state are explicit in the task materials.",
+      "candidate_similarity": "Several candidates use feature-gated branches, while others alter the same key iteration with sorting or reversal.",
+      "evidence_conflict": "The repository context directly exposes the active feature and requested ordering contract.",
+      "reasoning_depth": "Selecting behavior requires connecting a build feature to the map representation and iteration path.",
+      "distractor_plausibility": "A reversed order or the opposite feature branch can look like an ordering fix while violating the stated contract."
+    }
+  },
+  "CASE-021": {
+    "scores": {
+      "operative_constraints": 3,
+      "wording_ambiguity": 1,
+      "candidate_similarity": 3,
+      "evidence_conflict": 0,
+      "reasoning_depth": 3,
+      "distractor_plausibility": 2
+    },
+    "rationales": {
+      "operative_constraints": "The task combines two equivalent positive spellings, a negative spelling, a precedence rule, and preservation of the existing alias contract.",
+      "wording_ambiguity": "The requested ordering rule is stated, though preserving the current public alias contract relies on the code-local context.",
+      "candidate_similarity": "The form-list edits are nearly identical and differ by which spellings and boolean values they retain.",
+      "evidence_conflict": "No baseline observation or repository setting contradicts the spelling and precedence request.",
+      "reasoning_depth": "The choices affect accepted spellings, option values, and precedence among multiple supplied arguments.",
+      "distractor_plausibility": "Partial form lists can satisfy visible subsets while missing an alias or changing precedence."
+    }
+  },
+  "CASE-022": {
+    "scores": {
+      "operative_constraints": 1,
+      "wording_ambiguity": 0,
+      "candidate_similarity": 3,
+      "evidence_conflict": 0,
+      "reasoning_depth": 1,
+      "distractor_plausibility": 2
+    },
+    "rationales": {
+      "operative_constraints": "The requested field and the observed byte order jointly constrain the decoder.",
+      "wording_ambiguity": "The target field and pre-action byte-order observation are explicit.",
+      "candidate_similarity": "The four edits share the same two-byte read and vary only by field offset or endian method.",
+      "evidence_conflict": "The pre-action endian observation directly supplements the requested target field.",
+      "reasoning_depth": "The task combines a local field location with a local endian choice.",
+      "distractor_plausibility": "Reading the other field or using the opposite endian method is a plausible partial selection."
+    }
+  },
+  "CASE-023": {
+    "scores": {
+      "operative_constraints": 0,
+      "wording_ambiguity": 0,
+      "candidate_similarity": 3,
+      "evidence_conflict": 0,
+      "reasoning_depth": 0,
+      "distractor_plausibility": 2
+    },
+    "rationales": {
+      "operative_constraints": "The request specifies one clear property: a two-byte word in the named byte order.",
+      "wording_ambiguity": "The requested byte order and output width are explicit.",
+      "candidate_similarity": "Several edits share the same encoding call and differ by endianness, value source, or an extra byte.",
+      "evidence_conflict": "No exposed baseline observation conflicts with the requested encoding.",
+      "reasoning_depth": "The task is one local encoding edit with no dependent behavior shown.",
+      "distractor_plausibility": "Wrong endianness, a constant value, and an added byte are plausible nearby implementation choices."
+    }
+  },
+  "CASE-024": {
+    "scores": {
+      "operative_constraints": 1,
+      "wording_ambiguity": 0,
+      "candidate_similarity": 3,
+      "evidence_conflict": 0,
+      "reasoning_depth": 1,
+      "distractor_plausibility": 2
+    },
+    "rationales": {
+      "operative_constraints": "The output policy and terminal ANSI capability both constrain the color choice.",
+      "wording_ambiguity": "The compatibility context states whether color should be emitted and whether the terminal supports it.",
+      "candidate_similarity": "Candidates alter the same color setting by a single enum value or leave it unchanged.",
+      "evidence_conflict": "The policy and terminal capability provide matching context for selecting a setting.",
+      "reasoning_depth": "The task maps local terminal context to one local configuration value.",
+      "distractor_plausibility": "Automatic, forced, or suppressed color are credible settings under different terminal contexts."
+    }
+  },
+  "CASE-025": {
+    "scores": {
+      "operative_constraints": 1,
+      "wording_ambiguity": 0,
+      "candidate_similarity": 3,
+      "evidence_conflict": 0,
+      "reasoning_depth": 1,
+      "distractor_plausibility": 2
+    },
+    "rationales": {
+      "operative_constraints": "The requested field and the observed byte order jointly constrain the decoder.",
+      "wording_ambiguity": "The target field and pre-action byte-order observation are explicit.",
+      "candidate_similarity": "The four edits share the same two-byte read and vary only by field offset or endian method.",
+      "evidence_conflict": "The pre-action endian observation directly supplements the requested target field.",
+      "reasoning_depth": "The task combines a local field location with a local endian choice.",
+      "distractor_plausibility": "Reading the other field or using the opposite endian method is a plausible partial selection."
+    }
+  },
+  "CASE-026": {
+    "scores": {
+      "operative_constraints": 0,
+      "wording_ambiguity": 0,
+      "candidate_similarity": 3,
+      "evidence_conflict": 0,
+      "reasoning_depth": 1,
+      "distractor_plausibility": 2
+    },
+    "rationales": {
+      "operative_constraints": "One observed offset and one reference offset define the requested adjustment.",
+      "wording_ambiguity": "The task explicitly asks to use the pre-action offset observation.",
+      "candidate_similarity": "The alternatives are small edits to the same offset expression, including adjacent arithmetic choices.",
+      "evidence_conflict": "The observed and reference offsets provide a directly comparable cue for the local expression.",
+      "reasoning_depth": "The task needs a short calculation connecting the observed offset to the edited return expression.",
+      "distractor_plausibility": "Adjacent additions, subtraction, and returning the base offset are plausible nearby choices."
+    }
+  },
+  "CASE-027": {
+    "scores": {
+      "operative_constraints": 1,
+      "wording_ambiguity": 0,
+      "candidate_similarity": 3,
+      "evidence_conflict": 0,
+      "reasoning_depth": 2,
+      "distractor_plausibility": 2
+    },
+    "rationales": {
+      "operative_constraints": "The JSON document must be rewritten while preserving the exact source number token.",
+      "wording_ambiguity": "The request explicitly forbids normalization of the stated token.",
+      "candidate_similarity": "The conversion alternatives differ mainly by numeric accessor, and several share the same formatting structure.",
+      "evidence_conflict": "No separate baseline observation conflicts with the lexical-preservation requirement.",
+      "reasoning_depth": "The task connects parsing, numeric representation, and document serialization across multiple steps.",
+      "distractor_plausibility": "Typed numeric conversions can appear to preserve the number while changing its original textual spelling."
+    }
+  },
+  "CASE-028": {
+    "scores": {
+      "operative_constraints": 0,
+      "wording_ambiguity": 0,
+      "candidate_similarity": 2,
+      "evidence_conflict": 0,
+      "reasoning_depth": 1,
+      "distractor_plausibility": 2
+    },
+    "rationales": {
+      "operative_constraints": "One clear requirement governs repeated --tag values: retain only the last occurrence.",
+      "wording_ambiguity": "The last-occurrence behavior is stated directly.",
+      "candidate_similarity": "The alternatives vary parser action and selected-value handling, including nearby but behaviorally distinct choices.",
+      "evidence_conflict": "No baseline observation or repository cue conflicts with the stated behavior.",
+      "reasoning_depth": "The local choice links repeated-argument handling to the returned value through a short consequence chain.",
+      "distractor_plausibility": "Append plus first-value extraction is a plausible but mismatched strategy; unchanged behavior is an obvious miss."
+    }
+  },
+  "CASE-029": {
+    "scores": {
+      "operative_constraints": 1,
+      "wording_ambiguity": 0,
+      "candidate_similarity": 3,
+      "evidence_conflict": 0,
+      "reasoning_depth": 2,
+      "distractor_plausibility": 2
+    },
+    "rationales": {
+      "operative_constraints": "The JSON document must be rewritten while preserving the exact source number token.",
+      "wording_ambiguity": "The request explicitly forbids normalization of the stated token.",
+      "candidate_similarity": "The conversion alternatives differ mainly by numeric accessor, and several share the same formatting structure.",
+      "evidence_conflict": "No separate baseline observation conflicts with the lexical-preservation requirement.",
+      "reasoning_depth": "The task connects parsing, numeric representation, and document serialization across multiple steps.",
+      "distractor_plausibility": "Typed numeric conversions can appear to preserve the number while changing its original textual spelling."
+    }
+  },
+  "CASE-030": {
+    "scores": {
+      "operative_constraints": 0,
+      "wording_ambiguity": 0,
+      "candidate_similarity": 3,
+      "evidence_conflict": 0,
+      "reasoning_depth": 0,
+      "distractor_plausibility": 2
+    },
+    "rationales": {
+      "operative_constraints": "The request specifies one clear property: a two-byte word in the named byte order.",
+      "wording_ambiguity": "The requested byte order and output width are explicit.",
+      "candidate_similarity": "Several edits share the same encoding call and differ by endianness, value source, or an extra byte.",
+      "evidence_conflict": "No exposed baseline observation conflicts with the requested encoding.",
+      "reasoning_depth": "The task is one local encoding edit with no dependent behavior shown.",
+      "distractor_plausibility": "Wrong endianness, a constant value, and an added byte are plausible nearby implementation choices."
+    }
+  },
+  "CASE-031": {
+    "scores": {
+      "operative_constraints": 0,
+      "wording_ambiguity": 0,
+      "candidate_similarity": 3,
+      "evidence_conflict": 0,
+      "reasoning_depth": 1,
+      "distractor_plausibility": 2
+    },
+    "rationales": {
+      "operative_constraints": "One observed offset and one reference offset define the requested adjustment.",
+      "wording_ambiguity": "The task explicitly asks to use the pre-action offset observation.",
+      "candidate_similarity": "The alternatives are small edits to the same offset expression, including adjacent arithmetic choices.",
+      "evidence_conflict": "The observed and reference offsets provide a directly comparable cue for the local expression.",
+      "reasoning_depth": "The task needs a short calculation connecting the observed offset to the edited return expression.",
+      "distractor_plausibility": "Adjacent additions, subtraction, and returning the base offset are plausible nearby choices."
+    }
+  },
+  "CASE-032": {
+    "scores": {
+      "operative_constraints": 1,
+      "wording_ambiguity": 0,
+      "candidate_similarity": 3,
+      "evidence_conflict": 0,
+      "reasoning_depth": 1,
+      "distractor_plausibility": 2
+    },
+    "rationales": {
+      "operative_constraints": "The output policy and terminal ANSI capability both constrain the color choice.",
+      "wording_ambiguity": "The compatibility context states whether color should be emitted and whether the terminal supports it.",
+      "candidate_similarity": "Candidates alter the same color setting by a single enum value or leave it unchanged.",
+      "evidence_conflict": "The policy and terminal capability provide matching context for selecting a setting.",
+      "reasoning_depth": "The task maps local terminal context to one local configuration value.",
+      "distractor_plausibility": "Automatic, forced, or suppressed color are credible settings under different terminal contexts."
+    }
+  },
+  "CASE-033": {
+    "scores": {
+      "operative_constraints": 1,
+      "wording_ambiguity": 0,
+      "candidate_similarity": 2,
+      "evidence_conflict": 0,
+      "reasoning_depth": 2,
+      "distractor_plausibility": 2
+    },
+    "rationales": {
+      "operative_constraints": "The ordering contract and active preserve_order feature state jointly constrain behavior.",
+      "wording_ambiguity": "The requested map order and feature state are explicit in the task materials.",
+      "candidate_similarity": "Several candidates use feature-gated branches, while others alter the same key iteration with sorting or reversal.",
+      "evidence_conflict": "The repository context directly exposes the active feature and requested ordering contract.",
+      "reasoning_depth": "Selecting behavior requires connecting a build feature to the map representation and iteration path.",
+      "distractor_plausibility": "A reversed order or the opposite feature branch can look like an ordering fix while violating the stated contract."
+    }
+  },
+  "CASE-034": {
+    "scores": {
+      "operative_constraints": 1,
+      "wording_ambiguity": 0,
+      "candidate_similarity": 3,
+      "evidence_conflict": 0,
+      "reasoning_depth": 1,
+      "distractor_plausibility": 2
+    },
+    "rationales": {
+      "operative_constraints": "The accepted set has two specified values, and other strings must be rejected.",
+      "wording_ambiguity": "The code-local parser contract names the complete accepted set.",
+      "candidate_similarity": "The alternatives are one-line parser substitutions with small changes to the allowed-value list.",
+      "evidence_conflict": "The exposed API contract and requested selection align.",
+      "reasoning_depth": "The choice is local, with a short consequence for which inputs are accepted.",
+      "distractor_plausibility": "A broader nonempty parser, an extra value, or a near-miss spelling can seem reasonable while changing the finite contract."
+    }
+  },
+  "CASE-035": {
+    "scores": {
+      "operative_constraints": 3,
+      "wording_ambiguity": 1,
+      "candidate_similarity": 3,
+      "evidence_conflict": 0,
+      "reasoning_depth": 3,
+      "distractor_plausibility": 2
+    },
+    "rationales": {
+      "operative_constraints": "The task combines two equivalent positive spellings, a negative spelling, a precedence rule, and preservation of the existing alias contract.",
+      "wording_ambiguity": "The requested ordering rule is stated, though preserving the current public alias contract relies on the code-local context.",
+      "candidate_similarity": "The form-list edits are nearly identical and differ by which spellings and boolean values they retain.",
+      "evidence_conflict": "No baseline observation or repository setting contradicts the spelling and precedence request.",
+      "reasoning_depth": "The choices affect accepted spellings, option values, and precedence among multiple supplied arguments.",
+      "distractor_plausibility": "Partial form lists can satisfy visible subsets while missing an alias or changing precedence."
+    }
+  },
+  "CASE-036": {
+    "scores": {
+      "operative_constraints": 0,
+      "wording_ambiguity": 0,
+      "candidate_similarity": 3,
+      "evidence_conflict": 0,
+      "reasoning_depth": 0,
+      "distractor_plausibility": 2
+    },
+    "rationales": {
+      "operative_constraints": "The request specifies one clear property: a two-byte word in the named byte order.",
+      "wording_ambiguity": "The requested byte order and output width are explicit.",
+      "candidate_similarity": "Several edits share the same encoding call and differ by endianness, value source, or an extra byte.",
+      "evidence_conflict": "No exposed baseline observation conflicts with the requested encoding.",
+      "reasoning_depth": "The task is one local encoding edit with no dependent behavior shown.",
+      "distractor_plausibility": "Wrong endianness, a constant value, and an added byte are plausible nearby implementation choices."
+    }
+  },
+  "CASE-037": {
+    "scores": {
+      "operative_constraints": 1,
+      "wording_ambiguity": 0,
+      "candidate_similarity": 3,
+      "evidence_conflict": 0,
+      "reasoning_depth": 1,
+      "distractor_plausibility": 2
+    },
+    "rationales": {
+      "operative_constraints": "The requested numeric mode and the observed failing path both constrain the pointer selection.",
+      "wording_ambiguity": "The mode name and instruction to use the observed path give a clear selection task.",
+      "candidate_similarity": "All alternatives use the same pointer call and differ by one path segment or mode segment.",
+      "evidence_conflict": "The baseline path observation supplies a cue to combine with the requested mode; no separate cue contradicts it.",
+      "reasoning_depth": "The choice combines a short path observation with the requested field before returning one value.",
+      "distractor_plausibility": "Nearby paths and the other numeric mode are credible wrong-place alternatives."
+    }
+  },
+  "CASE-038": {
+    "scores": {
+      "operative_constraints": 1,
+      "wording_ambiguity": 0,
+      "candidate_similarity": 3,
+      "evidence_conflict": 0,
+      "reasoning_depth": 1,
+      "distractor_plausibility": 2
+    },
+    "rationales": {
+      "operative_constraints": "The requested field and the observed byte order jointly constrain the decoder.",
+      "wording_ambiguity": "The target field and pre-action byte-order observation are explicit.",
+      "candidate_similarity": "The four edits share the same two-byte read and vary only by field offset or endian method.",
+      "evidence_conflict": "The pre-action endian observation directly supplements the requested target field.",
+      "reasoning_depth": "The task combines a local field location with a local endian choice.",
+      "distractor_plausibility": "Reading the other field or using the opposite endian method is a plausible partial selection."
+    }
+  },
+  "CASE-039": {
+    "scores": {
+      "operative_constraints": 1,
+      "wording_ambiguity": 0,
+      "candidate_similarity": 3,
+      "evidence_conflict": 0,
+      "reasoning_depth": 1,
+      "distractor_plausibility": 2
+    },
+    "rationales": {
+      "operative_constraints": "The requested numeric mode and the observed failing path both constrain the pointer selection.",
+      "wording_ambiguity": "The mode name and instruction to use the observed path give a clear selection task.",
+      "candidate_similarity": "All alternatives use the same pointer call and differ by one path segment or mode segment.",
+      "evidence_conflict": "The baseline path observation supplies a cue to combine with the requested mode; no separate cue contradicts it.",
+      "reasoning_depth": "The choice combines a short path observation with the requested field before returning one value.",
+      "distractor_plausibility": "Nearby paths and the other numeric mode are credible wrong-place alternatives."
+    }
+  },
+  "CASE-040": {
+    "scores": {
+      "operative_constraints": 1,
+      "wording_ambiguity": 0,
+      "candidate_similarity": 3,
+      "evidence_conflict": 0,
+      "reasoning_depth": 1,
+      "distractor_plausibility": 2
+    },
+    "rationales": {
+      "operative_constraints": "The output policy and terminal ANSI capability both constrain the color choice.",
+      "wording_ambiguity": "The compatibility context states whether color should be emitted and whether the terminal supports it.",
+      "candidate_similarity": "Candidates alter the same color setting by a single enum value or leave it unchanged.",
+      "evidence_conflict": "The policy and terminal capability provide matching context for selecting a setting.",
+      "reasoning_depth": "The task maps local terminal context to one local configuration value.",
+      "distractor_plausibility": "Automatic, forced, or suppressed color are credible settings under different terminal contexts."
+    }
+  },
+  "CASE-041": {
+    "scores": {
+      "operative_constraints": 1,
+      "wording_ambiguity": 0,
+      "candidate_similarity": 3,
+      "evidence_conflict": 0,
+      "reasoning_depth": 1,
+      "distractor_plausibility": 2
+    },
+    "rationales": {
+      "operative_constraints": "The output policy and terminal ANSI capability both constrain the color choice.",
+      "wording_ambiguity": "The compatibility context states whether color should be emitted and whether the terminal supports it.",
+      "candidate_similarity": "Candidates alter the same color setting by a single enum value or leave it unchanged.",
+      "evidence_conflict": "The policy and terminal capability provide matching context for selecting a setting.",
+      "reasoning_depth": "The task maps local terminal context to one local configuration value.",
+      "distractor_plausibility": "Automatic, forced, or suppressed color are credible settings under different terminal contexts."
+    }
+  },
+  "CASE-042": {
+    "scores": {
+      "operative_constraints": 3,
+      "wording_ambiguity": 1,
+      "candidate_similarity": 3,
+      "evidence_conflict": 0,
+      "reasoning_depth": 3,
+      "distractor_plausibility": 2
+    },
+    "rationales": {
+      "operative_constraints": "The task combines two equivalent positive spellings, a negative spelling, a precedence rule, and preservation of the existing alias contract.",
+      "wording_ambiguity": "The requested ordering rule is stated, though preserving the current public alias contract relies on the code-local context.",
+      "candidate_similarity": "The form-list edits are nearly identical and differ by which spellings and boolean values they retain.",
+      "evidence_conflict": "No baseline observation or repository setting contradicts the spelling and precedence request.",
+      "reasoning_depth": "The choices affect accepted spellings, option values, and precedence among multiple supplied arguments.",
+      "distractor_plausibility": "Partial form lists can satisfy visible subsets while missing an alias or changing precedence."
+    }
+  },
+  "CASE-043": {
+    "scores": {
+      "operative_constraints": 1,
+      "wording_ambiguity": 0,
+      "candidate_similarity": 3,
+      "evidence_conflict": 0,
+      "reasoning_depth": 1,
+      "distractor_plausibility": 2
+    },
+    "rationales": {
+      "operative_constraints": "The accepted set has two specified values, and other strings must be rejected.",
+      "wording_ambiguity": "The code-local parser contract names the complete accepted set.",
+      "candidate_similarity": "The alternatives are one-line parser substitutions with small changes to the allowed-value list.",
+      "evidence_conflict": "The exposed API contract and requested selection align.",
+      "reasoning_depth": "The choice is local, with a short consequence for which inputs are accepted.",
+      "distractor_plausibility": "A broader nonempty parser, an extra value, or a near-miss spelling can seem reasonable while changing the finite contract."
+    }
+  },
+  "CASE-044": {
+    "scores": {
+      "operative_constraints": 2,
+      "wording_ambiguity": 0,
+      "candidate_similarity": 3,
+      "evidence_conflict": 0,
+      "reasoning_depth": 2,
+      "distractor_plausibility": 2
+    },
+    "rationales": {
+      "operative_constraints": "The result must be bounded, zero-copy, and share the input backing storage.",
+      "wording_ambiguity": "The API context states the required view and storage behavior.",
+      "candidate_similarity": "Candidates differ by closely related slice ranges or by using the buffer API, while some leave the input unchanged.",
+      "evidence_conflict": "The code-local API contract aligns with the requested selection criterion.",
+      "reasoning_depth": "The choice depends on understanding both the range returned and how Bytes views retain storage.",
+      "distractor_plausibility": "A suffix view or consuming copy can appear close while changing the requested range or storage behavior."
+    }
+  },
+  "CASE-045": {
+    "scores": {
+      "operative_constraints": 1,
+      "wording_ambiguity": 0,
+      "candidate_similarity": 3,
+      "evidence_conflict": 0,
+      "reasoning_depth": 2,
+      "distractor_plausibility": 2
+    },
+    "rationales": {
+      "operative_constraints": "The JSON document must be rewritten while preserving the exact source number token.",
+      "wording_ambiguity": "The request explicitly forbids normalization of the stated token.",
+      "candidate_similarity": "The conversion alternatives differ mainly by numeric accessor, and several share the same formatting structure.",
+      "evidence_conflict": "No separate baseline observation conflicts with the lexical-preservation requirement.",
+      "reasoning_depth": "The task connects parsing, numeric representation, and document serialization across multiple steps.",
+      "distractor_plausibility": "Typed numeric conversions can appear to preserve the number while changing its original textual spelling."
+    }
+  },
+  "CASE-046": {
+    "scores": {
+      "operative_constraints": 0,
+      "wording_ambiguity": 0,
+      "candidate_similarity": 3,
+      "evidence_conflict": 0,
+      "reasoning_depth": 1,
+      "distractor_plausibility": 2
+    },
+    "rationales": {
+      "operative_constraints": "One observed offset and one reference offset define the requested adjustment.",
+      "wording_ambiguity": "The task explicitly asks to use the pre-action offset observation.",
+      "candidate_similarity": "The alternatives are small edits to the same offset expression, including adjacent arithmetic choices.",
+      "evidence_conflict": "The observed and reference offsets provide a directly comparable cue for the local expression.",
+      "reasoning_depth": "The task needs a short calculation connecting the observed offset to the edited return expression.",
+      "distractor_plausibility": "Adjacent additions, subtraction, and returning the base offset are plausible nearby choices."
+    }
+  },
+  "CASE-047": {
+    "scores": {
+      "operative_constraints": 1,
+      "wording_ambiguity": 0,
+      "candidate_similarity": 2,
+      "evidence_conflict": 0,
+      "reasoning_depth": 2,
+      "distractor_plausibility": 2
+    },
+    "rationales": {
+      "operative_constraints": "The ordering contract and active preserve_order feature state jointly constrain behavior.",
+      "wording_ambiguity": "The requested map order and feature state are explicit in the task materials.",
+      "candidate_similarity": "Several candidates use feature-gated branches, while others alter the same key iteration with sorting or reversal.",
+      "evidence_conflict": "The repository context directly exposes the active feature and requested ordering contract.",
+      "reasoning_depth": "Selecting behavior requires connecting a build feature to the map representation and iteration path.",
+      "distractor_plausibility": "A reversed order or the opposite feature branch can look like an ordering fix while violating the stated contract."
+    }
+  },
+  "CASE-048": {
+    "scores": {
+      "operative_constraints": 0,
+      "wording_ambiguity": 0,
+      "candidate_similarity": 3,
+      "evidence_conflict": 0,
+      "reasoning_depth": 1,
+      "distractor_plausibility": 2
+    },
+    "rationales": {
+      "operative_constraints": "One observed offset and one reference offset define the requested adjustment.",
+      "wording_ambiguity": "The task explicitly asks to use the pre-action offset observation.",
+      "candidate_similarity": "The alternatives are small edits to the same offset expression, including adjacent arithmetic choices.",
+      "evidence_conflict": "The observed and reference offsets provide a directly comparable cue for the local expression.",
+      "reasoning_depth": "The task needs a short calculation connecting the observed offset to the edited return expression.",
+      "distractor_plausibility": "Adjacent additions, subtraction, and returning the base offset are plausible nearby choices."
+    }
+  }
+}

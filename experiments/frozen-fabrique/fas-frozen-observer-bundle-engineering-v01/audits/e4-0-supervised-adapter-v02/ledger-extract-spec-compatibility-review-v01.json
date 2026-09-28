@@ -1,0 +1,79 @@
+{
+  "schema": "FAS_E4_0_LEDGER_EXTRACT_SPEC_COMPATIBILITY_REVIEW_V01",
+  "status": "PASS_STATIC_EXTRACT_SPEC_COMPATIBILITY_NO_EXECUTION",
+  "date": "2026-09-27",
+  "review_scope": "Read-only review of the prepared E4-0 fresh feature extraction request",
+  "spec": {
+    "artifact_id": "sha256:216c7ac33722e0a9d241bc630f21df1385f461d150b48d72c7db54936f18fbe2",
+    "sha256": "216c7ac33722e0a9d241bc630f21df1385f461d150b48d72c7db54936f18fbe2",
+    "binding_sha256": "9187f72c460ef0ad095f4fca4f602107b9d9e881ff2169a4bff301fe3ed498fc",
+    "prepared_receipt_sha256": "4db990e309b1f9a1b84006c0f4b879e63db99aff03dadb6108872e7ca8d2d5b5",
+    "spec_seal_root": "sha256:9aa63f24d2cba189852fb026ed088b42e134553503b7260eec9a8da6baddb791"
+  },
+  "identity": {
+    "run_id": "frozen-fabrique.e4-0.supervised.v1",
+    "stage_id": "E4_0_FRESH_FEATURE_EXTRACTION_V1",
+    "actor_id": "fabrique-e4-supervisor-v1",
+    "mode": "extract-e4",
+    "runner": "e4_online_supervised_v02.py",
+    "command_matches_mode_and_binding": true,
+    "runner_accepts_mode": true
+  },
+  "source_identity_check": {
+    "bound_source_count": 28,
+    "all_bound_byte_lengths_match": true,
+    "all_bound_sha256_values_match": true,
+    "mismatches": []
+  },
+  "input_and_predecessor_check": {
+    "contract_root_sha256": "278ae16eeb6852d3efad44221556a87be6df54964471f0870931fe2e99b305d1",
+    "population_root_sha256": "27731b483b8242aaef15ca22b97796b7b305a79db9bbb235765e13dcd9d08967",
+    "population_audit_root_sha256": "7dd3eea3133dbed779071fd14e22df06ff5a0ddce994e4446cf4c6ef7b9cbe5a",
+    "parity_predecessor_root_sha256": "21b5cdd1f1dfbaaa132ffc8cea38f31bb26612bc438fb7e10ac3bffcb673ae73",
+    "parity_predecessor_matches_completed_seal": true,
+    "population_inputs_sha256": "ed8ca6ac10f2008c49b9460890e0595ad2e573e0b0af488763f52e0f9cfc4d9f",
+    "population_rows_sha256": "234a616bbbe1e392704e21c3d1b6402067d836b9f47a59d5432d01cd92c261b6",
+    "binding_contains_terminal_label_input": false
+  },
+  "output_check": {
+    "output_root": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e4-0-ledger-run-v02\\features",
+    "output_root_absent_at_review": true,
+    "expected_outputs": [
+      "V1_FINAL_POSITION.f32le",
+      "feature-extraction-receipt-v01.json",
+      "population-row-manifest-v01.jsonl",
+      "stage-seal-v01.json"
+    ],
+    "cache_rows": 149336,
+    "feature_dimension": 2048,
+    "dtype": "little-endian float32",
+    "expected_cache_bytes": 1223360512,
+    "worker_max_output_bytes": 2147483648,
+    "feature_cache_fits_output_cap": true,
+    "population_manifest_copy_bytes": 39686934,
+    "cache_plus_manifest_bytes": 1263047446,
+    "cache_plus_manifest_fits_output_cap": true
+  },
+  "truth_firewall_review": {
+    "extractor_reads_sealed_input_text_and_row_manifest": true,
+    "extractor_uses_label_free_strict_row_schema": true,
+    "extraction_branch_emits_features_and_receipts_only": true,
+    "predictions_or_class_support_emitted": false,
+    "labels_or_heldout_truth_opened": false,
+    "scoring_or_observer_fitting_performed": false
+  },
+  "authorization_boundary": {
+    "prepared_receipt_reports_authorization_grant_issued": false,
+    "prepared_receipt_reports_gpu_lease_issued": false,
+    "prepared_receipt_reports_stage_authorization_issued": false,
+    "prepared_receipt_reports_extraction_started": false,
+    "runner_invoked": false,
+    "tokenizer_or_model_contact": false,
+    "cuda_contact": false
+  },
+  "disposition": {
+    "compatibility_defects_found": [],
+    "review_result": "PASS",
+    "next_action": "Await Chief Kammi's separate stage grant, fenced GPU lease, authorization, and immutable worker request. Do not launch from this review."
+  }
+}

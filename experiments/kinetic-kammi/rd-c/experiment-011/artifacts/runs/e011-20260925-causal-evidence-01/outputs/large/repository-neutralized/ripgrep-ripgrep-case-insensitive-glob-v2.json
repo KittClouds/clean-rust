@@ -1,0 +1,148 @@
+{
+  "schema_version": 1,
+  "run_id": "e011-20260925-causal-evidence-01",
+  "condition": "repository-neutralized",
+  "role": "large",
+  "bundle_id": "ternary-bonsai-2-27b-ptq1-local-v5",
+  "bundle_blake3": "6d933aba093307e0c333f022426af46f3f5b243a8a10a2e1bb2f4cfc93b17b9d",
+  "frozen_input_lock_sha256": "3a91323be0abca07cd20ace84562cfbfb79a528cbd996811974eeb0eaa857b7a",
+  "frame_lock_sha256": "2cf5b53efea5ae668f35d5d767369b32438d61dc6cc77408fe0e02f59419a227",
+  "frame_sha256": "191f8a55410dddaa07d7762a364d164b00bf3df389f1df89a2e373a4f297d41d",
+  "task_id": "neutral-task-10",
+  "pair_task_id": "ripgrep-ripgrep-case-insensitive-glob-v2",
+  "server_alias": "e009-large-v5",
+  "server_process_id": 47156,
+  "runtime_sha256": "e0ea4fd53e6f0c741cbd28093b427f333ada0eb03b83073e1f99c483793ea976",
+  "model_sha256": "53107f530aa52eb00912263ab1ee29bd199261c87cd7b4ad4ca1318c1fe33ee3",
+  "reasoning_mode": "off",
+  "chat_template_sha256": "c3cf9e34abf4f9e36c2d72165aa9c132d3e2a725b6c2586aaa3a8af9d7a81041",
+  "maximum_output_tokens": 1024,
+  "system_prompt_sha256": "976ef1cd914bacb366c64418825010124338a626a0400d459858acc7e48f5a48",
+  "output_schema_sha256": "97170fa0d6a44681f680ad0ac533a3f3913709757e4ee6cbf96d9c9f40d1b2fb",
+  "normalization_contract": "percent-0-100-to-milli-x10-v1+line-endings-lf-v1",
+  "thresholds": {
+    "minimum_applicability_milli": 850,
+    "maximum_abstention_milli": 150
+  },
+  "request_sha256": "ba1a2c3736f6e20a092e826dae1d6c4c70b19a7c5bd1519d0a776a50e0840df2",
+  "request": {
+    "model": "e009-large-v5",
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a typed observer in a deterministic coding workflow. The runtime owns workflow state and will execute only one action from the offered action_options after validating your output.\n\nRead the task_prompt and evidence, then compare the offered actions. Choose the action most likely to satisfy the task while preserving the repository's stated constraints. Do not write or propose code outside the offered choices. Do not claim to have executed tests. If no offered action is sufficiently supported, use null for action_choice and express uncertainty with abstention_percent.\n\nReturn exactly one JSON object matching the provided schema. action_choice must be an offered numeric action ID or null. applicability_percent is your estimate from 0 to 100 that this observer can handle the task from the available evidence. abstention_percent is your estimate from 0 to 100 that the runtime should defer this choice. Use integer percentage points only. Do not add prose or fields.\n"
+      },
+      {
+        "role": "user",
+        "content": "{\"schema_id\":\"rdc-real-coding-observation.v1\",\"task_id\":\"neutral-task-10\",\"task_family\":\"family-01\",\"repository_id\":\"repository-neutral\",\"task_variant\":2,\"task_prompt\":\"A caller enables case-insensitive matching for a mixed-case pattern. Select the patch that makes the lowercase candidate match in the exact regression test.\",\"repository_revision\":\"revision-neutralized\",\"snapshot_sha256\":\"0000000000000000000000000000000000000000000000000000000000000000\",\"evidence\":[{\"kind\":\"source_excerpt\",\"source_id\":\"crates/globset/src/glob.rs\",\"content_blake3\":\"89500240e7784a870e6b18f27f681038c546255659612a7dc36cbeaab44ee5ab\",\"content\":\"    /// This is disabled by default.\\n    pub fn case_insensitive(&mut self, yes: bool) -> &mut GlobBuilder<'a> {\\n        self.opts.case_insensitive = !yes;\\n        self\\n    }\"},{\"kind\":\"baseline_tool_result\",\"source_id\":\"cargo-test::glob::tests::matchcasei2\",\"content_blake3\":\"2960f397f49ea81a55a4d3f4f808c6cc2fe0729da5fc1069356f5018cca89842\",\"content\":\"Exact test `glob::tests::matchcasei2` failed on the frozen snapshot. Candidate patches have not been run in this task.\\n\\nrunning 1 test\\ntest glob::tests::matchcasei2 ... FAILED\\n\\nfailures:\\n\\n---- glob::tests::matchcasei2 stdout ----\\n\\nthread 'glob::tests::matchcasei2' (39748) panicked at crates\\\\globset\\\\src\\\\glob.rs:1461:5:\\nassertion failed: matcher.is_match(\\\"abcdefg\\\")\\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\\n\\n\\nfailures:\\n    glob::tests::matchcasei2\\n\\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 289 filtered out; finished in 0.00s\\n\\n   Compiling globset v0.4.19 (<frozen-repository-snapshot>\\\\crates\\\\globset)\\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.62s\\n     Running unittests src\\\\lib.rs (<cargo-target>\\\\debug\\\\deps\\\\globset-250b4c7d9a08c2e6.exe)\\nerror: test failed, to rerun pass `-p globset --lib`\\n\"}],\"action_options\":[{\"action\":{\"id\":11,\"schema_id\":1},\"summary\":\"Apply the source change and add a contract comment.\",\"diff_excerpt\":\"@@ -613,7 +613,8 @@\\n-        self.opts.case_insensitive = !yes;\\n+        // Preserve the caller's requested matching mode.\\n+        self.opts.case_insensitive = yes;\",\"patch_sha256\":\"ba2df6b3963a2e63bf04e89df67f324cd81986cda5b521dff1061b12d9bf2648\"},{\"action\":{\"id\":37,\"schema_id\":1},\"summary\":\"Apply the focused source change shown here.\",\"diff_excerpt\":\"@@ -613,7 +613,7 @@\\n-        self.opts.case_insensitive = !yes;\\n+        self.opts.case_insensitive = yes;\",\"patch_sha256\":\"41fb794fb6ac8f8b265fa9bfe17155da8d26a63cbaee3c9fb70ed63c05a76cd5\"},{\"action\":{\"id\":68,\"schema_id\":1},\"summary\":\"Apply this alternative change in the same code path.\",\"diff_excerpt\":\"@@ -613,7 +613,7 @@\\n-        self.opts.case_insensitive = !yes;\\n+        self.opts.case_insensitive = false;\",\"patch_sha256\":\"645c24ac169e883eb1d6e47aa9032257ed6c19a9dc10e6fcacea938ffee66814\"},{\"action\":{\"id\":94,\"schema_id\":1},\"summary\":\"Leave the current implementation unchanged.\",\"diff_excerpt\":\"No source line changes are included.\",\"patch_sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"}]}"
+      }
+    ],
+    "temperature": 0,
+    "top_p": 1,
+    "seed": 0,
+    "max_tokens": 1024,
+    "stream": false,
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rdc_coding_observer_output_v1",
+        "strict": true,
+        "schema": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "rdc-coding-observer-output.v2",
+          "title": "RDC Coding Observer Output v2",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "action_choice",
+            "applicability_percent",
+            "abstention_percent"
+          ],
+          "properties": {
+            "action_choice": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 65535
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "applicability_percent": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "abstention_percent": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            }
+          }
+        }
+      }
+    }
+  },
+  "http_status": 200,
+  "response": {
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "{\n  \"action_choice\": 37,\n  \"applicability_percent\": 95,\n  \"abstention_percent\": 5\n}"
+        }
+      }
+    ],
+    "created": 1790367339,
+    "model": "e009-large-v5",
+    "system_fingerprint": "b10685-7dffb158d",
+    "object": "chat.completion",
+    "usage": {
+      "completion_tokens": 35,
+      "prompt_tokens": 1370,
+      "total_tokens": 1405,
+      "prompt_tokens_details": {
+        "cached_tokens": 192
+      }
+    },
+    "id": "chatcmpl-h9e0XlDVutmveWdED3ATajd7fzZuOTdH",
+    "timings": {
+      "cache_n": 192,
+      "prompt_n": 1178,
+      "prompt_ms": 2399.972,
+      "prompt_per_token_ms": 2.037327674023769,
+      "prompt_per_second": 490.8390597890308,
+      "predicted_n": 35,
+      "predicted_ms": 818.902,
+      "predicted_per_token_ms": 24.08535294117647,
+      "predicted_per_second": 41.5190096006604
+    }
+  },
+  "content": "{\n  \"action_choice\": 37,\n  \"applicability_percent\": 95,\n  \"abstention_percent\": 5\n}",
+  "output": {
+    "action_choice": 37,
+    "applicability_percent": 95,
+    "abstention_percent": 5
+  },
+  "normalized_output": {
+    "action_choice": 37,
+    "applicability_milli": 950,
+    "abstention_milli": 50
+  },
+  "normalization_error": null,
+  "usage": {
+    "completion_tokens": 35,
+    "prompt_tokens": 1370,
+    "total_tokens": 1405,
+    "prompt_tokens_details": {
+      "cached_tokens": 192
+    }
+  },
+  "finish_reason": "stop",
+  "elapsed_ms": 3461.336
+}

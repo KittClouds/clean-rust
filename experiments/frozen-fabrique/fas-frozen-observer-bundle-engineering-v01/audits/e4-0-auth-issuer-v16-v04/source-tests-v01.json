@@ -1,0 +1,34 @@
+{
+  "commands": [
+    "python -m py_compile source/scripts/issue_e4_stage_authorization_v16_v04.py source/tests/test_e4_stage_authorization_v16_v04.py",
+    "python -m unittest discover -s experiments/fas-frozen-observer-bundle-engineering-v01/source/tests -p test_e4_stage_authorization_v16_v04.py -v"
+  ],
+  "execution_authorization_conferred": false,
+  "py_compile": "PASS",
+  "receipt_id": "E4_0_AUTHORIZATION_ISSUER_V16_V04_SOURCE_TESTS",
+  "recorded_utc": "2026-09-27T07:21:21+00:00",
+  "runtime_access": {
+    "cache_created": false,
+    "cuda_initialized": false,
+    "gpu_lease_acquired": false,
+    "labels_opened": false,
+    "model_contact": false,
+    "tokenizer_contact": false
+  },
+  "schema": "FAS_E4_0_AUTHORIZATION_ISSUER_SOURCE_TESTS_V16_V04",
+  "scope": "Synthetic E4 stage-authorization issuer verification only. Validates v16-v04 seal/member identity and exact preserved failed v16-v04 sealer lineage. Fixtures are temporary and no authorization output is emitted. No model, tokenizer, CUDA, GPU lease, cache, or terminal-label access.",
+  "source_files": [
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/issue_e4_stage_authorization_v16_v04.py",
+      "bytes": 61049,
+      "sha256": "774317d0b7e5cd1c07dfee7d0d99c42db9579ccf9d008dd07bc9e7e0352fdff6"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/tests/test_e4_stage_authorization_v16_v04.py",
+      "bytes": 49158,
+      "sha256": "a210423284efba2a22129020ac54d0a52c7174b1cbce6a85f77746c17fe7beef"
+    }
+  ],
+  "status": "PASS_SYNTHETIC_TESTS_V16_V04",
+  "synthetic_test_count": 17
+}

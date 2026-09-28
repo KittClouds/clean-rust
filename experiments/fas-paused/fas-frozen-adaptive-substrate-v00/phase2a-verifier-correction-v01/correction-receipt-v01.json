@@ -1,0 +1,26 @@
+{
+  "correction_id": "FAS00_PHASE2A_VERIFIER_SCHEMA_CORRECTION_V01",
+  "project_id": "fas-frozen-adaptive-substrate-v00",
+  "verification_result": "PASS",
+  "correction_scope": "metadata-only cache seal verification",
+  "original_verifier_path": "experiments/fas-frozen-adaptive-substrate-v00/phase2a-execution-v02/scripts/seal-cache.ps1",
+  "original_verifier_sha256": "258557344d92b8ff87475a3e23dbcc744f9999d3f3b11446d92c65b58881d0cf",
+  "corrected_verifier_path": "experiments/fas-frozen-adaptive-substrate-v00/phase2a-verifier-correction-v01/verify-phase2a-cache-v01.ps1",
+  "corrected_verifier_sha256": "8d227ef06011eac255be1cfb25e6be34533abe152d5124b18cd189dc5c90ca0c",
+  "exact_field_name_mismatch": {
+    "historical_verifier_expected": "root_sha256",
+    "sealed_disposition_contains": "phase2a_cache_root_sha256"
+  },
+  "cache_root_sha256": "9af2c6c73a2f21608e8a2dc912d8838968eaebffb32b4b1ea0a18364e488d217",
+  "cache_root_unchanged": true,
+  "disposition_path": "D:/codex-runs/fas-frozen-adaptive-substrate-v00/phase2a-v01/phase2a-v01-cache-disposition.json",
+  "disposition_sha256": "635c2277ba1afdda27d1c8f8897f7eeb026cda131d787169af5f8d55c1790f2c",
+  "disposition_sha256_unchanged_from_pre_correction": true,
+  "feature_extraction_repeated": false,
+  "model_or_tokenizer_loaded": false,
+  "probe_training_performed": false,
+  "FAS00_FEATURE_CACHE_READY": true,
+  "FAS00_SENSOR_PROBE_AUTHORIZED": false,
+  "FAS00_ONLINE_MECHANISMS_AUTHORIZED": false,
+  "verified_utc": "2026-09-23T10:41:32Z"
+}

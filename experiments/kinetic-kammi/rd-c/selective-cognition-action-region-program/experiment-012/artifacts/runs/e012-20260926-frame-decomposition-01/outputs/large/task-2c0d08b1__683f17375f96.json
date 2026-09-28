@@ -1,0 +1,149 @@
+{
+  "schema_version": 1,
+  "run_id": "e012-20260926-frame-decomposition-01",
+  "role": "large",
+  "sample_id": "task-2c0d08b1__683f17375f96",
+  "task_id": "task-2c0d08b1",
+  "bundle_id": "ternary-bonsai-2-27b-ptq1-local-v5",
+  "bundle_blake3": "6d933aba093307e0c333f022426af46f3f5b243a8a10a2e1bb2f4cfc93b17b9d",
+  "frozen_input_lock_sha256": "4bab6fd945248b6209fa33e3a1df10786298ac620342ce167251411c6a258cd8",
+  "model_contact_gate_sha256": "c41c0145221be561310f74ba8fe3c2342ce0d942290f1b03229a2ae67e848483",
+  "frame_lock_sha256": "e4d9c2e0c668bfa60445ac476ad1f1b695fe8f1bfc9fd07b5746c7b31dbbeb0b",
+  "frame_sha256": "683f17375f963bef631ebb6f7a23b74cf1aceceeae538ee025592cd56765b46c",
+  "server_alias": "e009-large-v5",
+  "server_process_id": 18052,
+  "runtime_sha256": "e0ea4fd53e6f0c741cbd28093b427f333ada0eb03b83073e1f99c483793ea976",
+  "model_sha256": "53107f530aa52eb00912263ab1ee29bd199261c87cd7b4ad4ca1318c1fe33ee3",
+  "reasoning_mode": "off",
+  "maximum_output_tokens": 1024,
+  "chat_template_sha256": "c3cf9e34abf4f9e36c2d72165aa9c132d3e2a725b6c2586aaa3a8af9d7a81041",
+  "system_prompt_sha256": "976ef1cd914bacb366c64418825010124338a626a0400d459858acc7e48f5a48",
+  "output_schema_sha256": "97170fa0d6a44681f680ad0ac533a3f3913709757e4ee6cbf96d9c9f40d1b2fb",
+  "normalization_contract": "percent-0-100-to-milli-x10-v1+line-endings-lf-v1",
+  "thresholds": {
+    "minimum_applicability_milli": 850,
+    "maximum_abstention_milli": 150
+  },
+  "request_sha256": "0ca26749608ad4b7691eb7405f9b9ec5e6f8de1ae15a9f3f820a5adfc6e6e464",
+  "request_bytes": 4353,
+  "request": {
+    "model": "e009-large-v5",
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a typed observer in a deterministic coding workflow. The runtime owns workflow state and will execute only one action from the offered action_options after validating your output.\n\nRead the task_prompt and evidence, then compare the offered actions. Choose the action most likely to satisfy the task while preserving the repository's stated constraints. Do not write or propose code outside the offered choices. Do not claim to have executed tests. If no offered action is sufficiently supported, use null for action_choice and express uncertainty with abstention_percent.\n\nReturn exactly one JSON object matching the provided schema. action_choice must be an offered numeric action ID or null. applicability_percent is your estimate from 0 to 100 that this observer can handle the task from the available evidence. abstention_percent is your estimate from 0 to 100 that the runtime should defer this choice. Use integer percentage points only. Do not add prose or fields.\n"
+      },
+      {
+        "role": "user",
+        "content": "{\"schema_id\":\"rdc-real-coding-observation.v1\",\"task_id\":\"task-2c0d08b1\",\"task_family\":\"fam-9358\",\"repository_id\":\"repo-01\",\"task_variant\":1769558560,\"task_prompt\":\"The adapter contract test fails on the frozen base snapshot. Use its pre-action cursor observation to choose a patch.\",\"repository_revision\":\"417dccdeff249e0c011327de7d92e0d6fbe7cc43\",\"snapshot_sha256\":\"e3503c834ebece95674c8586af32b8bd9c506e67bdc79449a7c355e7d2b6ed55\",\"evidence\":[{\"kind\":\"baseline_tool_result\",\"source_id\":\"pre-action-test\",\"content_blake3\":\"76fd865058d6ccbd4aedd5499149b0e23009df5e2a74396dde6c60e26ef754c5\",\"content\":\"Untouched base-snapshot assertion: observed cursor 160; reference value 34.\"},{\"kind\":\"repository_context\",\"source_id\":\"repository-context\",\"content_blake3\":\"383d360f6917115830568cb7f3e1a7e7f73a4e15075229e73fd7f9346d70b7b6\",\"content\":\"{\\\"build_features\\\": \\\"baseline\\\", \\\"dependency_release\\\": \\\"v1.11.1\\\", \\\"language\\\": \\\"Rust\\\", \\\"repository_code\\\": \\\"repo-01\\\", \\\"target\\\": \\\"host\\\", \\\"toolchain\\\": \\\"stable\\\"}\"}],\"action_options\":[{\"action\":{\"id\":31099,\"schema_id\":1},\"summary\":\"Apply the candidate change shown in the code excerpt.\",\"diff_excerpt\":\"\",\"patch_sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"},{\"action\":{\"id\":34154,\"schema_id\":1},\"summary\":\"Apply the candidate change shown in the code excerpt.\",\"diff_excerpt\":\"@@ -2,6 +2,6 @@\\n \\n pub fn byte_at_task_cursor(input: &[u8]) -> u8 {\\n     let mut cursor = input;\\n-    cursor.advance(0);\\n+    cursor.advance(1);\\n     cursor.get_u8()\\n }\",\"patch_sha256\":\"d3c5b1ecda36f3762a0912105d963d808f530d491febbf8f89b70ec52bca8a1c\"},{\"action\":{\"id\":36737,\"schema_id\":1},\"summary\":\"Apply the candidate change shown in the code excerpt.\",\"diff_excerpt\":\"@@ -2,6 +2,6 @@\\n \\n pub fn byte_at_task_cursor(input: &[u8]) -> u8 {\\n     let mut cursor = input;\\n-    cursor.advance(0);\\n+    cursor.advance(3);\\n     cursor.get_u8()\\n }\",\"patch_sha256\":\"1e5ab6bec6680143154e285e9b5c8a2a175c0d8716d0190bd93e7d07b6e65234\"},{\"action\":{\"id\":64124,\"schema_id\":1},\"summary\":\"Apply the candidate change shown in the code excerpt.\",\"diff_excerpt\":\"@@ -2,6 +2,6 @@\\n \\n pub fn byte_at_task_cursor(input: &[u8]) -> u8 {\\n     let mut cursor = input;\\n-    cursor.advance(0);\\n+    cursor.advance(2);\\n     cursor.get_u8()\\n }\",\"patch_sha256\":\"dbc163300c0b7246a40655f8497adf3911cff3733c5827550ca851c7c202eba5\"}]}"
+      }
+    ],
+    "temperature": 0,
+    "top_p": 1,
+    "seed": 0,
+    "max_tokens": 1024,
+    "stream": false,
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rdc_coding_observer_output_v1",
+        "strict": true,
+        "schema": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "rdc-coding-observer-output.v2",
+          "title": "RDC Coding Observer Output v2",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "action_choice",
+            "applicability_percent",
+            "abstention_percent"
+          ],
+          "properties": {
+            "action_choice": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 65535
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "applicability_percent": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "abstention_percent": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            }
+          }
+        }
+      }
+    }
+  },
+  "http_status": 200,
+  "response": {
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "{\n  \"action_choice\": 34154,\n  \"applicability_percent\": 85,\n  \"abstention_percent\": 15\n}"
+        }
+      }
+    ],
+    "created": 1790400380,
+    "model": "e009-large-v5",
+    "system_fingerprint": "b10685-7dffb158d",
+    "object": "chat.completion",
+    "usage": {
+      "completion_tokens": 39,
+      "prompt_tokens": 1198,
+      "total_tokens": 1237,
+      "prompt_tokens_details": {
+        "cached_tokens": 192
+      }
+    },
+    "id": "chatcmpl-drQ9OeHi57jKIxygz8Onil2Tbovkcdun",
+    "timings": {
+      "cache_n": 192,
+      "prompt_n": 1006,
+      "prompt_ms": 1762.838,
+      "prompt_per_token_ms": 1.752324055666004,
+      "prompt_per_second": 570.670702582994,
+      "predicted_n": 39,
+      "predicted_ms": 714.414,
+      "predicted_per_token_ms": 18.80036842105263,
+      "predicted_per_second": 53.19044699571957
+    }
+  },
+  "content": "{\n  \"action_choice\": 34154,\n  \"applicability_percent\": 85,\n  \"abstention_percent\": 15\n}",
+  "output": {
+    "action_choice": 34154,
+    "applicability_percent": 85,
+    "abstention_percent": 15
+  },
+  "normalized_output": {
+    "action_choice": 34154,
+    "applicability_milli": 850,
+    "abstention_milli": 150
+  },
+  "normalization_error": null,
+  "usage": {
+    "completion_tokens": 39,
+    "prompt_tokens": 1198,
+    "total_tokens": 1237,
+    "prompt_tokens_details": {
+      "cached_tokens": 192
+    }
+  },
+  "finish_reason": "stop",
+  "elapsed_ms": 2830.863
+}

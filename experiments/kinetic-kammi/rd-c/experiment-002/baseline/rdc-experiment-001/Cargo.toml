@@ -1,0 +1,20 @@
+[package]
+name = "rdc-experiment-001"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[dependencies]
+blake3 = "=1.8.5"
+hashbrown = "=0.17.1"
+memchr = "=2.8.3"
+memmap2 = "=0.9.11"
+zerocopy = { version = "=0.8.55", features = ["derive"] }
+
+[[bin]]
+name = "rdc-demo"
+path = "src/bin/demo.rs"
+
+[[bin]]
+name = "rdc-bench"
+path = "src/bin/bench.rs"

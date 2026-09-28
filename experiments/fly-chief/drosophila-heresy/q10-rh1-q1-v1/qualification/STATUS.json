@@ -1,0 +1,11 @@
+{
+  "protocol": "Q10-PF6-RH1-Q1",
+  "status": "Q1_REAL_LEARNER_CANONICAL_EQUIVALENCE_COMPLETE",
+  "summary_sha256": "848BE1D1A72A7B5C50863539AA7E4838299FC12C21E5BBCEF46EDB879B1096B7",
+  "groups_tested": 8,
+  "all_checks_passed": true,
+  "measured_factorial_started": false,
+  "scientific_seed_bundles": 0,
+  "behavioral_probe": false,
+  "dh08b_authorized": false
+}

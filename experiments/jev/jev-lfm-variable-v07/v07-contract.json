@@ -1,0 +1,88 @@
+{
+  "protocol": "jev-lfm-architecture-variable",
+  "version": "0.7",
+  "status": "prospective_frozen_backbone_architecture_control",
+  "scope": {
+    "backbone_updates": false,
+    "real_data_mixtures": false,
+    "phoenix": false,
+    "modify_prior_protocols": false,
+    "native_lm_head_contest": false,
+    "lfm_specific_tuning": false
+  },
+  "model": {
+    "repo_id": "LiquidAI/LFM2.5-1.2B-Base",
+    "revision": "7453bca97ca1e67754c4035a4b4c584e1c9dd725",
+    "architecture_variable": true,
+    "base_not_instruct": true,
+    "trust_remote_code": false,
+    "expected_hidden_size": 2048,
+    "expected_layer_count": 16,
+    "config_max_position_embeddings": 128000,
+    "experiment_max_length": 1024
+  },
+  "comparison_reference": [
+    "minicpm5-1b-base",
+    "qwen3-0.6b-base",
+    "k2-horizon-0.9b"
+  ],
+  "data": {
+    "training_source": "synthetic_control",
+    "bank_lineage": "jev-frozen-decision-surface-scaling-v0.5",
+    "scales": [50000, 100000],
+    "conditional_scale": 250000,
+    "candidate_profile": "name_definition",
+    "protected_splits": ["dev", "test", "external"]
+  },
+  "representation": {
+    "location": "mean_full",
+    "layer": "final",
+    "dtype": "bfloat16_backbone_float32_cache",
+    "state_candidate_shared_semantics": true,
+    "extraction_batch_size": 1,
+    "padding_policy": "no_padding_exact_length_inputs",
+    "batch_shape_sensitivity": "measured_and_mitigated_by_single_row_extraction"
+  },
+  "head": {
+    "kind": "dynamic_mlp_compatibility",
+    "projection_dim": 128,
+    "functional_form": "state,candidate,state_times_candidate,absolute_difference",
+    "candidate_inventory_fixed": false,
+    "parameter_count_backbone_excluded": true
+  },
+  "loss": {
+    "name": "v0.4_L3_source_typed",
+    "semantic": true,
+    "brier": true,
+    "certified_invariance": true,
+    "weights_inherited": true
+  },
+  "promotion_rule": {
+    "from": "50k",
+    "to": "100k",
+    "run_250k_if_exact_accuracy_gain_at_least": 0.03,
+    "or_major_semantic_ood_rank_metrics_with_material_gain": 2,
+    "no_new_qlora_gate": true
+  },
+  "diagnostics": [
+    "feature_validation",
+    "scaling_curve",
+    "hard_sibling",
+    "ontology_ood",
+    "world_ood",
+    "intervention",
+    "contradictory_binding",
+    "binding_decomposition",
+    "open_world",
+    "failure_overlap",
+    "representation_complementarity",
+    "compute_economics"
+  ],
+  "integrity": {
+    "v04_gate_mutation": false,
+    "v05_reports_mutation": false,
+    "v06_reports_mutation": false,
+    "model_weights_trainable": false,
+    "outputs_external": true
+  }
+}

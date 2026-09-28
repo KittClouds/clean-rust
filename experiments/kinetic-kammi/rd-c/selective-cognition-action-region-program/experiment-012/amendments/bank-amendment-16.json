@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "amendment_id": "E012-AUDIT-A16",
+  "state": "AUDIT_LOCK_VERIFIER_TYPE_REPAIR_NO_MODEL_CONTACT",
+  "diagnostic_parent": "E012-AUDIT-A15",
+  "preserved_attempt": "bank/construction-01/scored-bank-a14/attempts/paired-truth-audit-attempt-a15-01.json",
+  "source_or_label_changes": false,
+  "model_contact_authorized": false
+}

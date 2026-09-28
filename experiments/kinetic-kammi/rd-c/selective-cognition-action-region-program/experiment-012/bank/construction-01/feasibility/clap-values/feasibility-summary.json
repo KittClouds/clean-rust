@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "state": "OFFLINE_FEASIBILITY_ONLY",
+  "model_contact_authorized": false,
+  "family": "possible-value-validation",
+  "candidate_ids_hidden_role_map": {
+    "allow_fast_and_safe": 22012,
+    "allow_auto_extra": 57213,
+    "allow_quick_instead": 52980,
+    "allow_any_nonempty": 32916
+  },
+  "baseline_pass_by_case": {
+    "case-01": false,
+    "case-02": false,
+    "case-03": true,
+    "case-04": true
+  },
+  "candidate_pass_matrix_hidden_roles": {
+    "allow_fast_and_safe": {
+      "case-01": true,
+      "case-02": true,
+      "case-03": true,
+      "case-04": true
+    },
+    "allow_auto_extra": {
+      "case-01": true,
+      "case-02": true,
+      "case-03": false,
+      "case-04": true
+    },
+    "allow_quick_instead": {
+      "case-01": false,
+      "case-02": true,
+      "case-03": true,
+      "case-04": false
+    },
+    "allow_any_nonempty": {
+      "case-01": true,
+      "case-02": true,
+      "case-03": false,
+      "case-04": false
+    }
+  },
+  "code_sha256": {
+    "base": "383754cba3d4d4705b22ae301ff8a0b8a9833f3ff7d90b62c4bb9be5ac134667",
+    "allow_fast_and_safe": "f3c3d801b758d9a3d171f38a51ccf2c356f891bcc6284df9fc04bc604651055d",
+    "allow_auto_extra": "56e14b2b539fcf74d341125c00035cb9233da3b2861a16789d2c2cd60beb7d75",
+    "allow_quick_instead": "c0d27ed3a1a80d53590be61bd7b7ec12d3e4bc99df6ac32fb769c9c42edb26ee",
+    "allow_any_nonempty": "72915650c7383c27850bcb056550afdec0fdfc8dc80b95fe47da075dc470399b"
+  },
+  "intended_contract": "The candidate evidence contains the finite allowed-value declaration; choose the implementation matching that declaration exactly."
+}

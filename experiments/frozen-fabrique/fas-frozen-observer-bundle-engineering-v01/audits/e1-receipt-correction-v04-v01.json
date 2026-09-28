@@ -1,0 +1,56 @@
+{
+  "receipt_id": "FAS_FROZEN_OBSERVER_BUNDLE_E1_V04_SPLIT_COUNT_ERRATUM_V01",
+  "status": "PASS_METADATA_CORRECTION_ONLY",
+  "created_utc": "2026-09-26T01:18:42.309249+00:00",
+  "e1_root_sha256": "6ba77a899363651e3ba119b005f59a22e86f011f83c86b873857cd3f9ab64b03",
+  "sealed_e1_files_modified": false,
+  "model_loaded": false,
+  "tokenizer_loaded": false,
+  "feature_extraction_performed": false,
+  "observer_fitting_performed": false,
+  "cause": "The builder counted all quartets per exact_target stratum, then labeled that vector as test-only counts; it also derived fit_quartets from the all-quartet total and emitted zero.",
+  "sealed_receipt_values_preserved": {
+    "support_receipt_test_quartets_by_exact_target_class": [
+      8876,
+      8874,
+      8874
+    ],
+    "panel_build_core_fit_quartets": 0,
+    "panel_build_core_test_quartets_by_exact_target_class": [
+      8876,
+      8874,
+      8874
+    ],
+    "panel_build_receipt_fit_quartets": 0,
+    "panel_build_receipt_test_quartets_by_exact_target_class": [
+      8876,
+      8874,
+      8874
+    ]
+  },
+  "corrected_values_from_sealed_split_manifest_and_label_files": {
+    "all_quartets_by_exact_target_class": [
+      8876,
+      8874,
+      8874
+    ],
+    "test_quartets_by_exact_target_class": [
+      1775,
+      1774,
+      1774
+    ],
+    "fit_quartets_by_exact_target_class": [
+      7101,
+      7100,
+      7100
+    ],
+    "test_quartets_total": 5323,
+    "fit_quartets_total": 21301,
+    "test_label_rows": 21292,
+    "fit_label_rows": 85204
+  },
+  "panel_data_split_support_and_e1_root_unchanged": true,
+  "use_corrected_values_for_quartet_split_counts": true,
+  "correction_script_sha256": "9011ad7d504945bda2c3d97ad13361b69aba1f3d5396a5c021bd359b98d7016c",
+  "this_receipt_is_outside_the_e1_sealed_tree": true
+}

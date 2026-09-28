@@ -1,0 +1,105 @@
+{
+  "analysis_fixture_validation": {
+    "computes": [
+      "B_p",
+      "B_0",
+      "C_p",
+      "D",
+      "A(t)",
+      "R(t)"
+    ],
+    "rejects": [
+      "missing",
+      "duplicate",
+      "extra",
+      "wrong-pair cells"
+    ],
+    "status": "PASS"
+  },
+  "bank_validation": {
+    "competence_n": 256,
+    "disjoint_response_draws": true,
+    "measurement_n": 256,
+    "status": "PASS",
+    "training_blocks": 12,
+    "training_never_reads_evaluation_banks": true
+  },
+  "compiler": {
+    "cargo_path": "C:\\Users\\shuga\\.cargo\\bin\\cargo.exe",
+    "cargo_sha256": "86478e53f769379d7f0ebfa7c9aa97cb76ca92233f79aa2cc0dbee2efaac73c7",
+    "cargo_version": "cargo 1.96.0 (30a34c682 2026-05-25)",
+    "python_path": "C:\\Users\\shuga\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+    "python_sha256": "85b71d8c6ec1905935f74be0c9869aae198d00e98f39df699ec66f9c5a84cecd",
+    "python_version": "Python 3.13.15",
+    "rustc_path": "C:\\Users\\shuga\\.cargo\\bin\\rustc.exe",
+    "rustc_sha256": "86478e53f769379d7f0ebfa7c9aa97cb76ca92233f79aa2cc0dbee2efaac73c7",
+    "rustc_verbose": [
+      "rustc 1.96.0 (ac68faa20 2026-05-25)",
+      "binary: rustc",
+      "commit-hash: ac68faa20c58cbccd01ee7208bf3b6e93a7d7f96",
+      "commit-date: 2026-05-25",
+      "host: x86_64-pc-windows-msvc",
+      "release: 1.96.0",
+      "LLVM version: 22.1.2"
+    ],
+    "rustc_version": "rustc 1.96.0 (ac68faa20 2026-05-25)"
+  },
+  "fit_manifest_validation": {
+    "complete_matrix": true,
+    "primary_rows": 1728,
+    "rows": 11232,
+    "status": "PASS",
+    "unique_cells": true
+  },
+  "lesion_validation": {
+    "exact_counts": true,
+    "mask_hashes_recorded": true,
+    "nested_prefixes": true,
+    "random_permutations": 4,
+    "side_count": 2,
+    "status": "PASS",
+    "substrate_count": 9
+  },
+  "measured_execution_authorized": false,
+  "null_graph_validation": {
+    "accepted_swaps_per_edge": 4,
+    "duplicate_pairs_rejected": true,
+    "outcome_dependent_convergence": false,
+    "side_realizations": 16,
+    "status": "PASS"
+  },
+  "outcome_comparisons_recorded": false,
+  "outcomes_opened": false,
+  "preflight_runner": {
+    "contract_sha256": "c2c52cd4dcbb76cfb0a758bca3ea1deffd52296497269ee395da2c1e1e963ecb",
+    "fit_manifest_sha256": "b1718c980f9bbeedb34f5fa6c540dc7a63483a924cebd753f022853bc9e51261",
+    "fit_rows": 11232,
+    "lesion_outcome_comparisons_recorded": false,
+    "measured_execution_authorized": false,
+    "outcomes_opened": false,
+    "primary_rows": 1728,
+    "qualification_seed_namespace": "910000..910005",
+    "status": "QUALIFICATION_ONLY_PASS",
+    "summary_sha256": "cea0e1da1ac31a83a603fd808ba0e1eb1a83679ce6ff7d24c87bd113cb42b6c1"
+  },
+  "protected_dh08a_tree_unchanged": true,
+  "protected_tree_receipt_sha256": "5a8f4beb9a9a4d50c35bbb73455d14551a23ff79f58e4ebcb00e07faedce0466",
+  "qualification_runner_build": {
+    "command": "cargo build --offline --release and cargo test --offline --release",
+    "executable_path": "provenance/fly-pheno-00-preflight.exe",
+    "executable_sha256": "78b8a52014f92035b70378726c4fb005a28bf764ff37b5a4ac101e642a161231",
+    "status": "PASS",
+    "target": "D:\\fly-pheno-00-target"
+  },
+  "schema": "FLY-PHENO-00-qualification-receipt-v1",
+  "source_and_result_boundary": "DH-08A source and result tree hashed before and after; only authorized source inputs copied; no DH-08A result artifact opened for inspection or copied",
+  "source_build": {
+    "command": "cargo build --release --manifest-path source/dh08a/Cargo.toml",
+    "status": "PASS",
+    "target": "D:\\fly-pheno-00-source-target",
+    "tests_not_run_to_avoid_protected_DH08A_artifact_paths": true
+  },
+  "source_snapshot_sha256": "3ffd0ee6590c0168517b3c66baa8dc48307754435d8eb6ae053a38b3631c29e0",
+  "status": "PASS",
+  "study_id": "FLY-PHENO-00"
+}

@@ -1,0 +1,16 @@
+{
+  "completed_blocks": 432,
+  "contract_sha256": "aba89e416e73d2f992fc0ff39e6b0abbf0f445edf4dda59d690e192bfc5e6244",
+  "expected_rows": 432,
+  "no_lesions": true,
+  "no_recovery_comparison": true,
+  "oracle_steps": 128,
+  "primary_task": "four_cue",
+  "qualification_only": true,
+  "sanity_task": "two_cue_sanity",
+  "schema": "FLY-PHENO-00-v0.4-QREAL-collection-receipt-v1",
+  "status": "QUALIFICATION_COMPLETE",
+  "study_id": "FLY-PHENO-00-v0.4-QREAL",
+  "threshold": 0.25,
+  "wall_seconds": 142.5076714
+}

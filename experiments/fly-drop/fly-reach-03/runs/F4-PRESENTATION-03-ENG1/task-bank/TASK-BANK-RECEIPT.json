@@ -1,0 +1,17 @@
+{
+  "assignment_counts": {
+    "0": 2,
+    "1": 2,
+    "2": 2,
+    "3": 2,
+    "4": 2,
+    "5": 2
+  },
+  "block_count": 12,
+  "native_collection_started": false,
+  "schema": "F4-PRESENTATION-03-task-bank-receipt-v1",
+  "status": "PASS",
+  "task_bank_manifest_sha256": "ad339f4a710c9cb803e68a7076da923a68486f81b7552aa767c710f885deb0a1",
+  "task_bank_sha256": "d61a0390fb9ba413b8970ba3ae82b8b5ec9fb717d3fc2247a79d9f8e30431d61",
+  "task_payload_created": true
+}

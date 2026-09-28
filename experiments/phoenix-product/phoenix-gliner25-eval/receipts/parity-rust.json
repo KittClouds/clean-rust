@@ -1,0 +1,363 @@
+[
+  {
+    "entities": [
+      {
+        "end": 11,
+        "label": "person",
+        "score": 0.9980000257492065,
+        "start": 0,
+        "text": "Mario Rossi"
+      },
+      {
+        "end": 26,
+        "label": "organization",
+        "score": 0.9980999827384949,
+        "start": 21,
+        "text": "Apple"
+      },
+      {
+        "end": 39,
+        "label": "location",
+        "score": 0.9969000220298767,
+        "start": 30,
+        "text": "Cupertino"
+      }
+    ],
+    "name": "en_basic"
+  },
+  {
+    "entities": [
+      {
+        "end": 28,
+        "label": "person",
+        "score": 0.9975000023841858,
+        "start": 15,
+        "text": "Laura Bianchi"
+      },
+      {
+        "end": 57,
+        "label": "email",
+        "score": 0.9973999857902527,
+        "start": 32,
+        "text": "laura.bianchi@example.com"
+      },
+      {
+        "end": 76,
+        "label": "phone_number",
+        "score": 0.9951000213623047,
+        "start": 61,
+        "text": "+39 340 1234567"
+      }
+    ],
+    "name": "en_contact"
+  },
+  {
+    "entities": [
+      {
+        "end": 34,
+        "label": "organization",
+        "score": 0.9957000017166138,
+        "start": 12,
+        "text": "Alfa Consulting S.r.l."
+      },
+      {
+        "end": 53,
+        "label": "location",
+        "score": 0.9979000091552734,
+        "start": 47,
+        "text": "Milano"
+      },
+      {
+        "end": 88,
+        "label": "person",
+        "score": 0.9972000122070312,
+        "start": 75,
+        "text": "Marco Bianchi"
+      }
+    ],
+    "name": "it_business"
+  },
+  {
+    "entities": [
+      {
+        "end": 21,
+        "label": "person",
+        "score": 0.9679999947547913,
+        "start": 7,
+        "text": "Camille Dubois"
+      },
+      {
+        "end": 44,
+        "label": "organization",
+        "score": 0.9962999820709229,
+        "start": 37,
+        "text": "Renault"
+      },
+      {
+        "end": 52,
+        "label": "location",
+        "score": 0.9940000176429749,
+        "start": 47,
+        "text": "Paris"
+      },
+      {
+        "end": 64,
+        "label": "date",
+        "score": 0.9905999898910522,
+        "start": 60,
+        "text": "2019"
+      }
+    ],
+    "name": "fr_person"
+  },
+  {
+    "entities": [
+      {
+        "end": 19,
+        "label": "person",
+        "score": 0.9861000180244446,
+        "start": 5,
+        "text": "Andreas Muller"
+      },
+      {
+        "end": 43,
+        "label": "organization",
+        "score": 0.9832000136375427,
+        "start": 33,
+        "text": "Siemens AG"
+      },
+      {
+        "end": 54,
+        "label": "location",
+        "score": 0.9976999759674072,
+        "start": 47,
+        "text": "Munchen"
+      }
+    ],
+    "name": "de_person"
+  },
+  {
+    "entities": [
+      {
+        "end": 15,
+        "label": "person",
+        "score": 0.9919999837875366,
+        "start": 0,
+        "text": "Ana Maria Lopez"
+      },
+      {
+        "end": 37,
+        "label": "organization",
+        "score": 0.9739999771118164,
+        "start": 27,
+        "text": "Telefonica"
+      },
+      {
+        "end": 47,
+        "label": "location",
+        "score": 0.9976000189781189,
+        "start": 41,
+        "text": "Madrid"
+      }
+    ],
+    "name": "es_person"
+  },
+  {
+    "entities": [
+      {
+        "end": 41,
+        "label": "organization",
+        "score": 0.9047999978065491,
+        "start": 34,
+        "text": "meeting"
+      }
+    ],
+    "name": "no_entities"
+  },
+  {
+    "entities": [
+      {
+        "end": 11,
+        "label": "person",
+        "score": 0.9991999864578247,
+        "start": 0,
+        "text": "Mario Rossi"
+      },
+      {
+        "end": 30,
+        "label": "person",
+        "score": 0.9991000294685364,
+        "start": 19,
+        "text": "Mario Rossi"
+      },
+      {
+        "end": 57,
+        "label": "person",
+        "score": 0.9984999895095825,
+        "start": 46,
+        "text": "Mario Rossi"
+      }
+    ],
+    "name": "repeated_entity"
+  },
+  {
+    "entities": [
+      {
+        "end": 13,
+        "label": "person",
+        "score": 0.9420999884605408,
+        "start": 0,
+        "text": "Alice Johnson"
+      },
+      {
+        "end": 23,
+        "label": "person",
+        "score": 0.7911999821662903,
+        "start": 14,
+        "text": "Bob Smith"
+      },
+      {
+        "end": 35,
+        "label": "person",
+        "score": 0.9261000156402588,
+        "start": 24,
+        "text": "Carol White"
+      },
+      {
+        "end": 64,
+        "label": "location",
+        "score": 0.9975000023841858,
+        "start": 60,
+        "text": "Rome"
+      },
+      {
+        "end": 77,
+        "label": "person",
+        "score": 0.9789999723434448,
+        "start": 65,
+        "text": "Milan Naples"
+      }
+    ],
+    "name": "adjacent_entities"
+  },
+  {
+    "entities": [
+      {
+        "end": 24,
+        "label": "person",
+        "score": 0.9962999820709229,
+        "start": 0,
+        "text": "Nicolo D'Ambrosio-Sforza"
+      },
+      {
+        "end": 48,
+        "label": "person",
+        "score": 0.9919999837875366,
+        "start": 27,
+        "text": "Zoe Muller-Lowenstein"
+      },
+      {
+        "end": 76,
+        "label": "location",
+        "score": 0.9970999956130981,
+        "start": 70,
+        "text": "Zurigo"
+      }
+    ],
+    "name": "accents_unicode"
+  },
+  {
+    "entities": [
+      {
+        "end": 40,
+        "label": "date",
+        "score": 0.9987999796867371,
+        "start": 27,
+        "text": "15 March 2024"
+      },
+      {
+        "end": 69,
+        "label": "date",
+        "score": 0.9962999820709229,
+        "start": 56,
+        "text": "14 March 2027"
+      }
+    ],
+    "name": "dates"
+  },
+  {
+    "entities": [
+      {
+        "end": 77,
+        "label": "date",
+        "score": 0.9896000027656555,
+        "start": 62,
+        "text": "3 February 2024"
+      },
+      {
+        "end": 109,
+        "label": "person",
+        "score": 0.9976999759674072,
+        "start": 97,
+        "text": "Thomas Weber"
+      },
+      {
+        "end": 186,
+        "label": "location",
+        "score": 0.9976999759674072,
+        "start": 177,
+        "text": "Frankfurt"
+      },
+      {
+        "end": 235,
+        "label": "person",
+        "score": 0.9965999722480774,
+        "start": 220,
+        "text": "Julia Schneider"
+      },
+      {
+        "end": 253,
+        "label": "person",
+        "score": 0.9952999949455261,
+        "start": 240,
+        "text": "Marco Ferrari"
+      },
+      {
+        "end": 317,
+        "label": "email",
+        "score": 0.9919000267982483,
+        "start": 291,
+        "text": "julia.schneider@example.de"
+      },
+      {
+        "end": 346,
+        "label": "email",
+        "score": 0.9944999814033508,
+        "start": 322,
+        "text": "marco.ferrari@example.it"
+      },
+      {
+        "end": 390,
+        "label": "person",
+        "score": 0.9973000288009644,
+        "start": 377,
+        "text": "Anna Kowalski"
+      },
+      {
+        "end": 434,
+        "label": "date",
+        "score": 0.9807000160217285,
+        "start": 419,
+        "text": "5 February 2024"
+      },
+      {
+        "end": 497,
+        "label": "location",
+        "score": 0.9983000159263611,
+        "start": 491,
+        "text": "Berlin"
+      }
+    ],
+    "name": "long_text"
+  }
+]

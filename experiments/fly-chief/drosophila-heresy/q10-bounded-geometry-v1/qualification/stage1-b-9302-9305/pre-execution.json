@@ -1,0 +1,183 @@
+{
+  "angle_bisections": 32,
+  "behavioral_inference": false,
+  "box_feasibility": "TESTED_CONTINUOUS_ONLY",
+  "candidate_directions": 8,
+  "config_sha256": "61a141073e35e9ed0413aed5176e2f9123c7f9a8324d091a0c70125b27d05603",
+  "executable": "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-bounded-geometry-v1\\target\\release\\q10-bounded-geometry.exe",
+  "executable_sha256": "94583b97792843581feef952f69f6faf190a151d325a37df763538711c064313",
+  "numeric_tolerance": 2e-10,
+  "protocol": "Q10-BG",
+  "schema_version": 1,
+  "scientific_seed_bundles": 0,
+  "seeds": [
+    9302,
+    9303,
+    9304,
+    9305
+  ],
+  "sequential_f32_endpoint_equality": "NOT_TESTED",
+  "source": [
+    {
+      "path": "CONTRACT.json",
+      "sha256": "fdd0dfb924d82a798f5c11b661e0b5683fcf9fff67d48d9e6f302e61474674ca"
+    },
+    {
+      "path": "Cargo.lock",
+      "sha256": "0bea73cc957079973a60f46037e8d1f2f3c482d8df7a8d035900024c3d03205d"
+    },
+    {
+      "path": "Cargo.toml",
+      "sha256": "900fafd8dfcd63cda47af36351e8371c93de253e489d31862b8ce341579153fc"
+    },
+    {
+      "path": "PLAN.md",
+      "sha256": "630f11591247ab2446b617039efefdb007aa8794a291b9863eb87d1cdc8ba777"
+    },
+    {
+      "path": "src\\allocation.rs",
+      "sha256": "4fff2a7f1bc7078795abde6916bf14c96d2334579d04e48d4194999a076f826e"
+    },
+    {
+      "path": "src\\baseline.rs",
+      "sha256": "0ac5d54b053a26f97841bf8e4ac8acadeed6296056d466289f116420255212fa"
+    },
+    {
+      "path": "src\\capture.rs",
+      "sha256": "e0ed3fdc33cc1c0cd7236ddd6aba67e29d685fc10e0a6b6a416ec5da81b8c66f"
+    },
+    {
+      "path": "src\\dh03.rs",
+      "sha256": "ddaebb5caa82a16fff7745d878babf0f09d204a5ca8dd6360d6e60fa6f4b34e4"
+    },
+    {
+      "path": "src\\dh04.rs",
+      "sha256": "1ea9f7df8e36b97f96298dc44fbbb2cb0c4e5eabda103db13c7c076bf71312e2"
+    },
+    {
+      "path": "src\\dh06.rs",
+      "sha256": "06cc84d7e4ddcc7bfb34c395fef074835b98fef7b02dd9c95ce5023bb66696c0"
+    },
+    {
+      "path": "src\\dh06_tests.rs",
+      "sha256": "1e5750e75b404928b152bd2a63b53847d47cb03857d463215be2213fdf4b55b1"
+    },
+    {
+      "path": "src\\dh07.rs",
+      "sha256": "4a3d8df5f3e389d211e19fae96093f12ab6ebe3450be34169fab82010e05909a"
+    },
+    {
+      "path": "src\\dh07_null.rs",
+      "sha256": "9a576bfbc0335ac9d2f169ce3fe98a393b6a884879a43257e2c5e218495f17ee"
+    },
+    {
+      "path": "src\\dh07_tests.rs",
+      "sha256": "f1e34ec8be6c1721260dc780fcacfe5639321f410c4146fb98a8bc790ba0a588"
+    },
+    {
+      "path": "src\\dh08a_tests.rs",
+      "sha256": "2372aae14491498fd621b53317e129ac3aac8ae384d04184a10d02d813880b35"
+    },
+    {
+      "path": "src\\experiment.rs",
+      "sha256": "4ef74dfe60ad9cc9ae4b440a995419c648dceb1a903204b0c53fc770c94ba477"
+    },
+    {
+      "path": "src\\experiment_main.rs",
+      "sha256": "eb277782c24c6a7486a06f5e2c4185f2cd0dee7ef0bc1705cad5bf647f887c8c"
+    },
+    {
+      "path": "src\\graph.rs",
+      "sha256": "a697285a9fe4560fce32afb5330358ede1c84e96365c23ac96c24d97fe667464"
+    },
+    {
+      "path": "src\\linear.rs",
+      "sha256": "1523d127f8a36f27266ffc777614d8a5a1ef77729080923106a916364d59d404"
+    },
+    {
+      "path": "src\\linear_tests.rs",
+      "sha256": "7541cc0c7e243727d3ef9822885732c107b6e2c776ef88e221f1887657dc9396"
+    },
+    {
+      "path": "src\\main.rs",
+      "sha256": "b3839ed43279bc209a7d4d70ef3b23864613ab3deca40e9218293c2f40008a13"
+    },
+    {
+      "path": "src\\observer.rs",
+      "sha256": "08fc18ef45d376a9e58d7531231b110dad8a81cc86dc3c0d84e7333f445688ef"
+    },
+    {
+      "path": "src\\plasticity.rs",
+      "sha256": "d08e4057234dfbd6c4c11da660031263aeaa0327a86b68f7cae04cdc4bf9438c"
+    },
+    {
+      "path": "src\\policy.rs",
+      "sha256": "b01b4072d60bc2efc3ccaa121bbaf0763168f3154ef5ea32829c1c85193b08ed"
+    },
+    {
+      "path": "src\\q09_tests.rs",
+      "sha256": "5030f26d4db5d18b8d622017d3654fe90e4dfacadf8b7a6b1e5d7bc6253b0024"
+    },
+    {
+      "path": "src\\q10.rs",
+      "sha256": "efa0a01e008dabd8b744ae65a197eb93383d5df1228b7bab92e1beb67dc92b6e"
+    },
+    {
+      "path": "src\\rng.rs",
+      "sha256": "794d04a94d011ece9f5758ad05a680b3acccbc82e94e33f4d9a9179c882dd950"
+    },
+    {
+      "path": "src\\rotation.rs",
+      "sha256": "d50637747333bcc3463fffb4f986c721e8b397cb2f6b6da0bf63b55c6ed599ac"
+    },
+    {
+      "path": "src\\simulation\\dh03.rs",
+      "sha256": "ddaebb5caa82a16fff7745d878babf0f09d204a5ca8dd6360d6e60fa6f4b34e4"
+    },
+    {
+      "path": "src\\simulation\\dh04.rs",
+      "sha256": "1ea9f7df8e36b97f96298dc44fbbb2cb0c4e5eabda103db13c7c076bf71312e2"
+    },
+    {
+      "path": "src\\simulation\\dh06.rs",
+      "sha256": "06cc84d7e4ddcc7bfb34c395fef074835b98fef7b02dd9c95ce5023bb66696c0"
+    },
+    {
+      "path": "src\\simulation\\dh06_tests.rs",
+      "sha256": "1e5750e75b404928b152bd2a63b53847d47cb03857d463215be2213fdf4b55b1"
+    },
+    {
+      "path": "src\\simulation\\dh07.rs",
+      "sha256": "4a3d8df5f3e389d211e19fae96093f12ab6ebe3450be34169fab82010e05909a"
+    },
+    {
+      "path": "src\\simulation\\dh07_null.rs",
+      "sha256": "9a576bfbc0335ac9d2f169ce3fe98a393b6a884879a43257e2c5e218495f17ee"
+    },
+    {
+      "path": "src\\simulation\\dh07_tests.rs",
+      "sha256": "f1e34ec8be6c1721260dc780fcacfe5639321f410c4146fb98a8bc790ba0a588"
+    },
+    {
+      "path": "src\\simulation\\dh08a_tests.rs",
+      "sha256": "2372aae14491498fd621b53317e129ac3aac8ae384d04184a10d02d813880b35"
+    },
+    {
+      "path": "src\\simulation\\experiment.rs",
+      "sha256": "4ef74dfe60ad9cc9ae4b440a995419c648dceb1a903204b0c53fc770c94ba477"
+    },
+    {
+      "path": "src\\simulation\\q09_tests.rs",
+      "sha256": "5030f26d4db5d18b8d622017d3654fe90e4dfacadf8b7a6b1e5d7bc6253b0024"
+    },
+    {
+      "path": "src\\simulation.rs",
+      "sha256": "c02a7baf74760eb94b54b16d283e54a1da998f4b91f82302fb29851463b79ae4"
+    },
+    {
+      "path": "src\\task.rs",
+      "sha256": "06b4ea25e3c8c4a0106337866c714c6d74e6d1c0377ac0a934c33e859a02dc61"
+    }
+  ],
+  "stage": "stage1-b"
+}

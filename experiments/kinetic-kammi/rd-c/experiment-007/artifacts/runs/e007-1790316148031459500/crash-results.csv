@@ -1,0 +1,4 @@
+crash_boundary,endpoint_attempts,retries,paid_charges,result_receipts,duplicate_effects,replay_ok
+after-durable-intent-before-call,1,0,1,1,0,true
+after-paid-response-before-outcome-receipt,2,1,1,1,0,true
+after-durable-outcome-receipt,1,0,1,1,0,true

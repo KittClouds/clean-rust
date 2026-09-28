@@ -1,0 +1,19 @@
+{
+  "status": "OUTCOME_BLIND_EVALUATOR_PREFLIGHT_BINDING_CORRECTION",
+  "identity": "v0.8P-R2-evaluator-recovery-correction-v01",
+  "reason": "The evaluator binding was first updated to the sealed v03 recovery preflight; a second metadata-only check then found that the expected metric digest was assigned to the inference module while that digest actually belongs to the separate analysis module.",
+  "pretraining_preflight_v03_sha256": "691d6ea34d0b042e2968d829b7458e0a2ea43deec6f5a1f15170cb0754bb2140",
+  "original_evaluator_sha256": "dc139cf1ff29740eb9a8117eb92f35fa90cac5178a364f38b71b43b710cbb68a",
+  "corrected_evaluator_sha256": "0dda5980c224b7bfdfa2f640180cd0ec42933fdb106175d346f1792ebf40e10a",
+  "evaluation_metric_source_sha256": "fa22bc8febff89d2b635091c6cb40be6f3beba4549c4a135d16e213f6fd3dda4",
+  "analysis_metric_source_sha256": "dbde07fe1ec009f2bca7f1f22ad913a2a79f4f8dfb8120a1f31ebf37d5f59b70",
+  "permitted_change": "Bind the outcome-blind evaluator preflight to the sealed v03 zero-step recovery receipt and distinguish the already-frozen inference-module digest from the separately frozen analysis-module digest. No metric source or metric behavior changed.",
+  "scientific_contract_changed": false,
+  "panel_records_or_targets_read_when_authored": false,
+  "predictions_or_metrics_existed_when_authored": false,
+  "checkpoint_inventory_changed": false,
+  "candidate_order_or_mapping_changed": false,
+  "analysis_metrics_or_thresholds_changed": false,
+  "second_panel_opening_authorized_by_this_receipt": false,
+  "phoenix_access": false
+}

@@ -1,0 +1,4 @@
+crash_boundary,query_intents,endpoint_attempts,retries,paid_charges,result_receipts,task_action_effects,duplicate_actions,replay_ok
+after-intent-before-query,1,1,0,1,1,1,0,true
+after-paid-response-before-outcome-receipt,1,2,1,1,1,1,0,true
+after-durable-outcome-receipt,1,1,0,1,1,1,0,true

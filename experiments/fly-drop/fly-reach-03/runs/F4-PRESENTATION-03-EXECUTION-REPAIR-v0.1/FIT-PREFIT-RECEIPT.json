@@ -1,0 +1,23 @@
+{
+  "arms": {
+    "Cphi": 36,
+    "Cphi_shuffled": 36,
+    "Cphi_unshared": 36,
+    "D": 36
+  },
+  "collection_receipt_sha256": "74b4a574519a665dfea0bf2a1196362f1d2ba7e4ff18aae422fb653b4ca00a40",
+  "fit_count": 144,
+  "fit_manifest_sha256": "f71d344c5bc58e86a68e7bd9163aed1ab5d945468bfe84f06a8981e6a1c2ce66",
+  "fits_executed": false,
+  "heldout_support_used_to_change_execution": false,
+  "implementation_freeze_sha256": "563f58216e6a276bcdffebd8d14df730fae6d82779311b23914783ccf6282430",
+  "initializer_manifest_sha256": "4fe74735648fb49eba9c31bb79ef20e4d8b4e7a82c1f65feb31c065789b23b98",
+  "normalization_manifest_sha256": "c171245ce82a22fd3562357d29fcc4b0b253197adb4084622fb7aee10760a6ef",
+  "run_id": "F4-PRESENTATION-03-ENG1",
+  "schema": "F4-PRESENTATION-03-fit-prefit-receipt-v1",
+  "shared_input_hashes_identical_across_arms": true,
+  "status": "PASS",
+  "task_bank_manifest_sha256": "ad339f4a710c9cb803e68a7076da923a68486f81b7552aa767c710f885deb0a1",
+  "training_support_receipt_sha256": "90a1adea638c01ef0baada8af8baf15b03f6c34936d823fe7e46860f534fbf30",
+  "training_truth_scope": "only non-heldout Y values were read; no heldout score fields were read"
+}

@@ -1,0 +1,9 @@
+{
+  "engineering_only": true,
+  "execution_sha256": "EA8E07387F2E0A82DF65AC0F548644290CC200E14D289CBFBD4E19269B82B108",
+  "identity": "q10-gc1-lr1-requal1-sreplace-singles-v1",
+  "pair_replay_executed": false,
+  "protocol": "REQUAL1-SREPLACE-SINGLES",
+  "scientific_promotion": false,
+  "status": "SREPLACE_SINGLETONS_COMPLETE"
+}

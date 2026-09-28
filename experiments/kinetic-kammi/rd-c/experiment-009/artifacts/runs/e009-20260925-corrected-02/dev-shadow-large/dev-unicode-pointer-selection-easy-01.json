@@ -1,0 +1,163 @@
+{
+  "schema_version": 1,
+  "run_id": "e009-20260925-corrected-02",
+  "stage": "dev-shadow-large",
+  "role": "large",
+  "bundle_id": "ternary-bonsai-2-27b-ptq1-local-v5-calibration",
+  "bundle_blake3": "d8a2abe6384173d033becaf094e0f5b69bdb836b2a834c77a3c503e05a4f6ef9",
+  "bundle_lock_sha256": "485c1b613e1f5d2b03d4c8696363986645946e7983ed21919354d2ff5e1b0ec8",
+  "frozen_input_lock_sha256": "49f89c62d6a505562f1152c4692540edbb0f57bd9e0e5b03f3b8d808f7758c51",
+  "frame_lock_sha256": "f25338bdd754898de614d1aa57445acc8a04a35a97d2785bfba628da7038430b",
+  "frame_blake3": "fc937c6623792f42c234f430bba2aac4fa1b11611e23db90973e9119d0e3b276",
+  "task_id": "dev-unicode-pointer-selection-easy-01",
+  "server_alias": "e009-large-v5",
+  "server_process_id": 14192,
+  "server_runtime_args": [
+    "--model",
+    "D:\\phoenix-models\\candidates\\ternary-bonsai-2-27b\\6ed5e12bf84b7a63069882c91dd9e9218647d17b\\Ternary-Bonsai-2-27B-PTQ1_0.gguf",
+    "--host",
+    "127.0.0.1",
+    "--port",
+    "18090",
+    "--alias",
+    "e009-large-v5",
+    "--ctx-size",
+    "4096",
+    "--n-gpu-layers",
+    "99",
+    "--reasoning",
+    "off"
+  ],
+  "reasoning_mode": "off",
+  "chat_template_sha256": "c3cf9e34abf4f9e36c2d72165aa9c132d3e2a725b6c2586aaa3a8af9d7a81041",
+  "maximum_output_tokens": 1024,
+  "system_prompt_sha256": "976ef1cd914bacb366c64418825010124338a626a0400d459858acc7e48f5a48",
+  "output_schema_sha256": "97170fa0d6a44681f680ad0ac533a3f3913709757e4ee6cbf96d9c9f40d1b2fb",
+  "normalization_contract": "percent-0-100-to-milli-x10-v1+line-endings-lf-v1",
+  "thresholds": {
+    "minimum_applicability_milli": 700,
+    "maximum_abstention_milli": 600
+  },
+  "model": "e009-large-v5",
+  "request_sha256": "5a1d7db429d0481bfb6a25e20c80bdf16d32c6eaac30815b811a2f0685849547",
+  "request": {
+    "model": "e009-large-v5",
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a typed observer in a deterministic coding workflow. The runtime owns workflow state and will execute only one action from the offered action_options after validating your output.\n\nRead the task_prompt and evidence, then compare the offered actions. Choose the action most likely to satisfy the task while preserving the repository's stated constraints. Do not write or propose code outside the offered choices. Do not claim to have executed tests. If no offered action is sufficiently supported, use null for action_choice and express uncertainty with abstention_percent.\n\nReturn exactly one JSON object matching the provided schema. action_choice must be an offered numeric action ID or null. applicability_percent is your estimate from 0 to 100 that this observer can handle the task from the available evidence. abstention_percent is your estimate from 0 to 100 that the runtime should defer this choice. Use integer percentage points only. Do not add prose or fields.\n"
+      },
+      {
+        "role": "user",
+        "content": "{\"schema_id\":\"rdc-real-coding-observation.v1\",\"task_id\":\"dev-unicode-pointer-selection-easy-01\",\"task_family\":\"unicode-pointer-selection\",\"task_prompt\":\"Repair pointer-to-text selection. When both pointer positions land inside a joined astronaut emoji, the selected byte range must cover the whole emoji grapheme. Choose a patch that passes the test.\",\"repository_revision\":\"9a88547372cd35f8dc31f026f0cd8dd8fca8e641\",\"snapshot_sha256\":\"7c1c2fd46a5eec8ad9c12cc4872786e6a6a40bbaa56f812d9ccfdd79722d38f4\",\"evidence\":[{\"kind\":\"source_excerpt\",\"source_id\":\"phoenix-native/crates/gpui-animated-gradient-text/src/text.rs\",\"content_blake3\":\"328f86264b5f71248c69e6929e61f00c611b48378eedf7ac2e1adc8411902d6c\",\"content\":\"The current task snapshot maps an interior byte position to the next grapheme start. The frozen test starts and ends inside a joined astronaut emoji and requires selection of the entire emoji.\\nCurrent task-snapshot code: `.saturating_sub(0)`\"},{\"kind\":\"baseline_tool_result\",\"source_id\":\"cargo-test-text::tests::pointer_indexes_snap_to_whole_graphemes-frozen-base\",\"content_blake3\":\"e2402fbc35e411baaed8cb8f854e1a70591eda30b14a64d27bc47f10baa5f9be\",\"content\":\"Task snapshot 7c1c2fd46a5eec8ad9c12cc4872786e6a6a40bbaa56f812d9ccfdd79722d38f4: exact test `text::tests::pointer_indexes_snap_to_whole_graphemes` ran on the current snapshot and failed 1/1. No candidate repair has been executed in this episode.\"}],\"action_options\":[{\"action\":{\"id\":11,\"schema_id\":1},\"summary\":\"Retain the current implementation.\",\"diff_excerpt\":\"No source changes; retain the current expression.\",\"patch_sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"},{\"action\":{\"id\":37,\"schema_id\":1},\"summary\":\"Apply the focused implementation patch.\",\"diff_excerpt\":\"Patch lines:\\n-            .saturating_sub(0)\\n+            .saturating_sub(1)\",\"patch_sha256\":\"98cb7d7f9f607eeec6779414a5c11a08a74f316a77396023eb0aefd779a7b763\"},{\"action\":{\"id\":68,\"schema_id\":1},\"summary\":\"Apply the alternate implementation patch.\",\"diff_excerpt\":\"Patch lines:\\n-            .saturating_sub(0)\\n+            .saturating_sub(2)\",\"patch_sha256\":\"3e95ca4bdb9d6b7905a294b1d4ab704e7e351ea397bbf61735f750c0293d6dcc\"},{\"action\":{\"id\":94,\"schema_id\":1},\"summary\":\"Apply the focused patch with an explanatory source comment.\",\"diff_excerpt\":\"Patch lines:\\n+// E009 candidate: behavior-preserving repair note.\\n-            .saturating_sub(0)\\n+            .saturating_sub(1)\",\"patch_sha256\":\"24d87922fe95dfad554e4cc31a7251528f93324c2b0dcd506bc1cae3889a6330\"}]}"
+      }
+    ],
+    "temperature": 0,
+    "top_p": 1,
+    "seed": 0,
+    "max_tokens": 1024,
+    "stream": false,
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rdc_coding_observer_output_v1",
+        "strict": true,
+        "schema": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "rdc-coding-observer-output.v2",
+          "title": "RDC Coding Observer Output v2",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "action_choice",
+            "applicability_percent",
+            "abstention_percent"
+          ],
+          "properties": {
+            "action_choice": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 65535
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "applicability_percent": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "abstention_percent": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            }
+          }
+        }
+      }
+    }
+  },
+  "http_status": 200,
+  "response": {
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "{\n  \"action_choice\": 37,\n  \"applicability_percent\": 85,\n  \"abstention_percent\": 15\n}"
+        }
+      }
+    ],
+    "created": 1790355636,
+    "model": "e009-large-v5",
+    "system_fingerprint": "b10685-7dffb158d",
+    "object": "chat.completion",
+    "usage": {
+      "completion_tokens": 36,
+      "prompt_tokens": 1170,
+      "total_tokens": 1206,
+      "prompt_tokens_details": {
+        "cached_tokens": 192
+      }
+    },
+    "id": "chatcmpl-n09tA9dOxp9RvedQBntVnfQoBZbYqMUr",
+    "timings": {
+      "cache_n": 192,
+      "prompt_n": 978,
+      "prompt_ms": 1793.325,
+      "prompt_per_token_ms": 1.8336656441717791,
+      "prompt_per_second": 545.3556940320354,
+      "predicted_n": 36,
+      "predicted_ms": 685.528,
+      "predicted_per_token_ms": 19.586514285714287,
+      "predicted_per_second": 51.05553675415155
+    }
+  },
+  "content": "{\n  \"action_choice\": 37,\n  \"applicability_percent\": 85,\n  \"abstention_percent\": 15\n}",
+  "output": {
+    "action_choice": 37,
+    "applicability_percent": 85,
+    "abstention_percent": 15
+  },
+  "normalized_output": {
+    "action_choice": 37,
+    "applicability_milli": 850,
+    "abstention_milli": 150
+  },
+  "normalization_error": null,
+  "usage": {
+    "completion_tokens": 36,
+    "prompt_tokens": 1170,
+    "total_tokens": 1206,
+    "prompt_tokens_details": {
+      "cached_tokens": 192
+    }
+  },
+  "finish_reason": "stop",
+  "elapsed_ms": 2780.706
+}

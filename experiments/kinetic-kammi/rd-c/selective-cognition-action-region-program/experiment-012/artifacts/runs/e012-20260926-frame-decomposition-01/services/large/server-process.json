@@ -1,0 +1,32 @@
+{
+  "gpu_layers": 99,
+  "role": "large",
+  "context_tokens": 4096,
+  "reasoning_mode": "off",
+  "runtime_args": [
+    "--model",
+    "D:\\phoenix-models\\candidates\\ternary-bonsai-2-27b\\6ed5e12bf84b7a63069882c91dd9e9218647d17b\\Ternary-Bonsai-2-27B-PTQ1_0.gguf",
+    "--host",
+    "127.0.0.1",
+    "--port",
+    "18390",
+    "--alias",
+    "e009-large-v5",
+    "--ctx-size",
+    "4096",
+    "--n-gpu-layers",
+    "99",
+    "--reasoning",
+    "off"
+  ],
+  "base_url": "http://127.0.0.1:18390",
+  "frozen_input_lock_sha256": "4bab6fd945248b6209fa33e3a1df10786298ac620342ce167251411c6a258cd8",
+  "runtime_sha256": "e0ea4fd53e6f0c741cbd28093b427f333ada0eb03b83073e1f99c483793ea976",
+  "started_at": "2026-09-26T05:25:29.6944977Z",
+  "model_sha256": "53107f530aa52eb00912263ab1ee29bd199261c87cd7b4ad4ca1318c1fe33ee3",
+  "run_id": "e012-20260926-frame-decomposition-01",
+  "runtime_path": "D:\\phoenix-runtimes\\prism-llama.cpp\\prism-b10685-7dffb15\\win-cuda-12.4\\runtime\\llama-server.exe",
+  "process_id": 18052,
+  "model_path": "D:\\phoenix-models\\candidates\\ternary-bonsai-2-27b\\6ed5e12bf84b7a63069882c91dd9e9218647d17b\\Ternary-Bonsai-2-27B-PTQ1_0.gguf",
+  "alias": "e009-large-v5"
+}

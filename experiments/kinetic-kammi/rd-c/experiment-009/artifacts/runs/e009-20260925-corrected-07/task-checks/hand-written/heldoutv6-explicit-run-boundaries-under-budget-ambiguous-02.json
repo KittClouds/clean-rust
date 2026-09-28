@@ -1,0 +1,14 @@
+{
+  "task_id": "heldoutv6-explicit-run-boundaries-under-budget-ambiguous-02",
+  "lane": "hand-written",
+  "action_id": 11,
+  "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "candidate_variant": "keep",
+  "test_filter": "text::tests::explicit_boundaries_survive_a_tiny_run_budget",
+  "status": "failed-test",
+  "passed": false,
+  "elapsed_ms": 0.0,
+  "completion_source": "precontact-bank-build-receipt",
+  "completion_log_sha256": "65b8b1702d03315d3f5014c519ffd1410a84849e079d94f8daece1a2766dd7f6",
+  "bank_build_receipt_sha256": "1e8f063758e9d469041e2fa602389bf28478b415aa4c0fedcaa123af0241bc30"
+}

@@ -1,0 +1,91 @@
+{
+  "contract_id": "FASS01_COUNTERFACTUAL_WORLD_V01",
+  "generator_seed": 2026092301,
+  "serialization": "UTF-8 JSON Lines; one quartet per line; canonical key order and compact JSON before line termination",
+  "term_inventory": {
+    "algorithm": "ordered Cartesian product with prefix as the outer loop and suffix as the inner loop; product index i is selected at (17*i) mod 64; positions 0..31 become context terms and 32..63 become entity terms",
+    "prefixes": ["banu", "deki", "fimo", "galu", "kove", "mipa", "nozu", "veti"],
+    "suffixes": ["rek", "tal", "vum", "qof", "zin", "pax", "luj", "sem"],
+    "permutation_multiplier": 17,
+    "permutation_offset": 0,
+    "term_id_range_per_role": [0, 31],
+    "train_side_style_ids": [0, 15],
+    "novel_heldout_ids": [16, 31],
+    "partner_rule": "For role-local index i in 0..15, partner=(i+7) mod 16 within the same term split.",
+    "semantic_alias_rule": "Each pair of surface term IDs maps to one unchanged canonical context/entity identity within a quartet."
+  },
+  "world_families": ["STABLE", "SINGLE_SWITCH", "RETURN", "CYCLIC", "GRADUAL_DRIFT", "TEMPORARY_RULE", "CONTRADICTORY_NOISE", "POISON_BURST"],
+  "world_family_role": "Balanced latent counterbalancing stratum only; the one-step exact fact is independently assigned and no temporal adaptation claim is made.",
+  "relations": [
+    {"relation_id": 0, "surface": "relvane"},
+    {"relation_id": 1, "surface": "soprix"}
+  ],
+  "states_and_targets": [
+    {"state_id": 0, "state_surface": "zavik", "candidate_identity": 0},
+    {"state_id": 1, "state_surface": "nurex", "candidate_identity": 1},
+    {"state_id": 2, "state_surface": "pavom", "candidate_identity": 2}
+  ],
+  "candidate_order": "One of all six permutations; the factorial track derives order from family, relation, query template, and pair index, while binding tracks derive it from pair indices and split IDs. State is excluded in every track. Candidate identity order is invariant within each quartet.",
+  "template_partner": "observation paraphrase template (i+4) mod 8; query template does not change in P",
+  "templates": {
+    "observation": [
+      "In {context}, the {entity} has {relation} {state}.",
+      "For {context}: {relation} of {entity} = {state}.",
+      "Within {context}, {entity} is recorded as {state} for {relation}.",
+      "The {relation} entry for {entity} at {context} reads {state}.",
+      "Record: {context} / {entity} / {relation} -> {state}.",
+      "{entity} at {context} carries {state} under {relation}.",
+      "Index {relation}: {entity} in {context} maps to {state}.",
+      "Fact [{context}; {entity}; {relation}] = {state}."
+    ],
+    "query": [
+      "What is {relation} for {entity} in {context}?",
+      "Find the {relation} of {entity} at {context}.",
+      "Select {relation}({context}, {entity}).",
+      "Report {entity}'s {relation} within {context}.",
+      "Return current {relation}: {context} / {entity}.",
+      "Which value is stored for {relation} and {entity} under {context}?",
+      "Give the {relation} linked to {entity} in {context}.",
+      "Look up {context} -> {entity} -> {relation}."
+    ]
+  },
+  "input_layout": "observation_text + LF + query_text + LF + 'Options: ' + candidate surface strings in candidate identity order separated by ', '",
+  "quartet_invariants": [
+    "latent fact and canonical context/entity identities",
+    "relation identity and relation surface",
+    "state identity and target candidate identity",
+    "candidate identities and ordering",
+    "world family, time step, feedback marker, generator seed",
+    "query template, except that observation template alone changes in P"
+  ],
+  "variant_changes": {
+    "A": "base context alias, base entity alias, base observation template",
+    "C": "context alias only; replace all context alias occurrences in observation and query",
+    "E": "entity alias only; replace all entity alias occurrences in observation and query",
+    "P": "observation template only; query bytes unchanged"
+  },
+  "span_character_offsets": "Half-open offsets into exact rendered ASCII UTF-8 input bytes. Record all context/entity/relation occurrences across observation and query, state occurrence in observation, and each candidate span.",
+  "tracks": {
+    "FACTORIAL_BALANCED": {
+      "split_combinations": 4,
+      "world_families": 8,
+      "relations": 2,
+      "states": 3,
+      "query_templates": 8,
+      "pair_indices_per_represented_cell": 16,
+      "observation_template_rule": "(query_template_id + family_index + relation_id + 3*state_id) mod 8",
+      "entity_pair_offset_rule": "(3*family_index + 5*relation_id + 7*state_id + 11*context_split_index + 13*entity_split_index) mod 16; independent of template IDs"
+    },
+    "BINDING_CONTEXT": {
+      "conditions": {"world_family": "STABLE", "relation_id": 0, "state_id": 0, "observation_template_id": 0, "query_template_id": 0},
+      "construction": "For each of four context/entity split combinations, cross every one of 16 context substitution pairs with every one of 16 individual entity aliases. Candidate order index is (context_pair_index + entity_pair_index + 3*context_split_index + entity_split_index) mod 6."
+    },
+    "BINDING_ENTITY": {
+      "conditions": {"world_family": "STABLE", "relation_id": 0, "state_id": 0, "observation_template_id": 0, "query_template_id": 0},
+      "construction": "For each of four context/entity split combinations, cross every one of 16 entity substitution pairs with every one of 16 individual context aliases. Candidate order index is (entity_pair_index + context_pair_index + context_split_index + 3*entity_split_index) mod 6."
+    }
+  },
+  "expected_quartets": {"FACTORIAL_BALANCED": 24576, "BINDING_CONTEXT": 1024, "BINDING_ENTITY": 1024},
+  "future_probe_template_roles": {"training_eligible_ids": [0, 5], "heldout_ids": [6, 7]},
+  "no_model_contact": true
+}

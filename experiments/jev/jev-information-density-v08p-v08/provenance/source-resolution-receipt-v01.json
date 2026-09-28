@@ -1,0 +1,115 @@
+{
+  "protocol": "jev-information-density/v0.8p-v08-source-resolution-receipt-v01",
+  "identity": "v0.8P-v08-source-resolution-receipt-v01",
+  "disposition": "SOURCE_BYTES_UNAVAILABLE",
+  "contract": {
+    "path": "experiments/jev-information-density-v08p-v08/protocol/v08-source-resolution-and-panel-construction-v01.json",
+    "sha256": "0b91c228b35aa9fb87adcc4203849f8efdd76bec2faf7c805772e3a32ba94da6"
+  },
+  "input_root": {
+    "path": "experiments/jev-information-density-v08p-v08/provenance/v08-input-binding-root-v01.json",
+    "sha256": "1abe2a9240a2773119d14160fcefbb0c6c8fec3c5933edb305c2b368a21f1463"
+  },
+  "verified_bound_inputs": {
+    "v07_contract_sha256": "cf2fc2705ea40d86cc81ddc7e9bd77108c303071e12efe32486653db27c14e0d",
+    "v07_input_root_sha256": "b892aedf985694f541ab8b7fb428593f2a9fee633a603528cbecd345cf8ba2a5",
+    "original_p_run_contract_sha256": "e345225b4a17fc18eb35fcab24cbe1d72bd0e34bed9de272f927a7be461853e6",
+    "original_p_panel_contract_sha256": "ce3b7b97caecb27f3ad99439c0e67dca6e40af5da3db9ca2e356ea5e9f06f823",
+    "v06_panel_contract_sha256": "28b7878c9d68026254b8db734959387857b7eafb7b083d658d30d4cca6636a00",
+    "v05_denylist_root_sha256": "272a14e57c2dcf610568381c0c1c4673c7b40e368ac81b07d3e7160e4e5953a2",
+    "v05_opaque_denylist_sha256": "50eebeb5790c29b4a75c6f8df849eb4c2865d3c864932bbd7f636b7a0e52a2cd",
+    "p_execution_inputs_receipt_sha256": "c022befafd49a1e317f692ff3b6f7efcccd11aee98285ca5f0071f6edbaf817c",
+    "p_parent_training_seal_sha256": "43932fc963b150167972e81b1c1bb93f6989e9b93faa65ab1eee3ecf55c7b727",
+    "p_parent_synthesis_receipt_sha256": "e86f3cd925841c4e68f8558696e68cb729b9b9ba49a644b9bc35e7e2bcde68a6"
+  },
+  "frozen_search": {
+    "roots": [
+      {
+        "absolute_path": "D:\\codex-runs\\jev-information-density-v08n\\v0.8N-base-v01\\phase-b-v03-inputs",
+        "files_in_metadata_inventory": 8,
+        "bytes_in_metadata_inventory": 53257856
+      },
+      {
+        "absolute_path": "D:\\codex-runs\\jev-information-density-v08n\\v0.8N-base-v01\\phase-b-run-v01",
+        "files_in_metadata_inventory": 81,
+        "bytes_in_metadata_inventory": 201544588
+      },
+      {
+        "absolute_path": "D:\\codex-runs\\jev-information-density-v08n\\v0.8N-base-v01\\synthesis",
+        "files_in_metadata_inventory": 10,
+        "bytes_in_metadata_inventory": 57661
+      }
+    ],
+    "total_metadata_rows": 99,
+    "metadata_inventory_sha256": "4bb5de654f06b6f3be762023df8a134ac25052c9f57757f4b74a307db9322d14",
+    "hash_candidates": 56,
+    "candidate_hash_ledger_sha256": "700614048819fd805d5b5a3246955f950fa07bdc471fe050c48a7548d89ad90a",
+    "nonmatching_candidate_files_parsed": 0,
+    "directory_ancestry_expansion": false,
+    "search_outside_frozen_roots": false,
+    "format_or_root_widening_after_scan": false,
+    "os_level_file_open_telemetry": false
+  },
+  "scan_reconciliation": {
+    "initial_expected_scope_receipt_digest_entry": "d98ae657e28b9765e5cef1b1bab7a34f07c0773c24fa0518d1f8b6027fd654f92",
+    "initial_entry_disposition": "TRANSCRIPTION_ERROR_SUPERSEDED_BEFORE_SEAL",
+    "correct_expected_scope_receipt_sha256": "d98ae657e28b976f187d4d67e58119ce80496e76c061c90362ac2e50ff7f720e",
+    "corrected_scan_metadata_inventory_sha256": "4bb5de654f06b6f3be762023df8a134ac25052c9f57757f4b74a307db9322d14",
+    "corrected_scan_candidate_hash_ledger_sha256": "700614048819fd805d5b5a3246955f950fa07bdc471fe050c48a7548d89ad90a",
+    "same_frozen_candidates_rehashed": true,
+    "corrected_scan_found_scope_receipt_or_manifest": false,
+    "source_contents_parsed_during_either_scan": false,
+    "note": "The authoritative disposition uses the corrected digest comparison. The initial scan hashed the same bounded candidate set but used a mistyped comparison digest; it did not parse any candidate or read identity rows."
+  },
+  "source_resolution": {
+    "common_primary_occurrence_manifest": {
+      "expected_sha256": "773119294a51aa46487de26f9f253355187a7bfd1e75cb2f258c307c86f10b06",
+      "expected_rows_from_bound_receipt": 10000,
+      "matching_paths": [
+        {
+          "absolute_path": "D:\\codex-runs\\jev-information-density-v08n\\v0.8N-base-v01\\phase-b-v03-inputs\\common-primary-occurrence-manifest.jsonl",
+          "bytes": 6776884,
+          "sha256": "773119294a51aa46487de26f9f253355187a7bfd1e75cb2f258c307c86f10b06"
+        }
+      ],
+      "canonical_path": "D:\\codex-runs\\jev-information-density-v08n\\v0.8N-base-v01\\phase-b-v03-inputs\\common-primary-occurrence-manifest.jsonl",
+      "content_parsed": false,
+      "rows_independently_verified": false
+    },
+    "training_only_state_scope": {
+      "expected_scope_receipt_sha256": "d98ae657e28b976f187d4d67e58119ce80496e76c061c90362ac2e50ff7f720e",
+      "expected_scope_manifest_sha256": "aa8cba58f4a8ec46ed6ec8eaf0bfbe992b03b9fa58f815b4259d9fdfe2b009f3",
+      "expected_scope_content_sha256": "40648e3bbf50e25f31e84d7656221171425cb6e71e07d4c07d4dc72650bb228e",
+      "expected_rows_from_bound_contract": 55000,
+      "scope_receipt_matching_paths": [],
+      "scope_manifest_matching_paths": [],
+      "scope_content_digest_matching_file_paths": [],
+      "status": "NO_EXACT_HASH_MATCH_WITHIN_FROZEN_ROOTS_AND_CANDIDATE_FORMATS"
+    }
+  },
+  "failure": {
+    "code": "SOURCE_BYTES_UNAVAILABLE",
+    "detail": "The primary occurrence manifest resolved by exact SHA-256, but neither the training-only scope receipt nor the training-only scope manifest matched its contract-bound digest within the frozen search roots. The protocol forbids widening roots or formats, so identity acquisition stops here.",
+    "v07_not_evaluable_reinterpreted": false,
+    "source_path_substituted": false
+  },
+  "terminal_state": {
+    "training_identity_manifest": "ABSENT",
+    "training_identity_rows_acquired": false,
+    "candidate_staging_manifest": "ABSENT",
+    "candidate_generation": false,
+    "v05_denylist_decoded": false,
+    "e1_id_collision_check": "NOT_RUN",
+    "training_scope_overlap": "NONE",
+    "fresh_panel": "NOT_GENERATED",
+    "fresh_panel_validated": false,
+    "lfm_contact": false,
+    "feature_extraction": false,
+    "training": false,
+    "head_loading": false,
+    "inference": false,
+    "evaluation": false,
+    "phoenix": false
+  },
+  "hash_rule": "SHA-256 of exact artifact bytes; this receipt does not include a self-hash."
+}

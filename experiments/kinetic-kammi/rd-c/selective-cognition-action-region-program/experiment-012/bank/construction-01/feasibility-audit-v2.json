@@ -1,0 +1,173 @@
+{
+  "schema_version": 1,
+  "experiment": "E012 Prospective Frame Decomposition",
+  "state": "OFFLINE_FEASIBILITY_AUDIT_PASS",
+  "model_contact_authorized": false,
+  "scored_task_frames_created": false,
+  "selected_family_count": 12,
+  "candidate_case_rows": 192,
+  "baseline_case_rows": 48,
+  "candidate_compile_errors": 0,
+  "all_failed_selected_cases_reached_contract_assertion": true,
+  "abstention_positive_families_checked": [
+    "clap/conflicting-alias-requirement",
+    "serde-json/raw-number-lossless"
+  ],
+  "families": [
+    {
+      "family": "bytes/wire-endian-contract",
+      "selected_trial": "bytes-endian",
+      "baseline_pass_count": 0,
+      "candidate_case_rows": 16,
+      "baseline_case_rows": 4,
+      "assertion_failure_rows": 16,
+      "fully_passing_candidate_roles_hidden": [],
+      "summary_sha256": "b2e251caa101978417b26bbede2d5a284c1017ca3b687264cbb6b03c6c48f91e",
+      "records_sha256": "90189cda36186c4d06bbbb644c1fdf75c7c87950ee404ac90ed5313b63ef0e0c"
+    },
+    {
+      "family": "bytes/bounded-prefix-copy",
+      "selected_trial": "bytes-prefix",
+      "baseline_pass_count": 0,
+      "candidate_case_rows": 16,
+      "baseline_case_rows": 4,
+      "assertion_failure_rows": 12,
+      "fully_passing_candidate_roles_hidden": [
+        "copy_prefix",
+        "slice_prefix"
+      ],
+      "summary_sha256": "e095a1eb4a778fa7c13a34c87223eb566b042e5b88c2e8726293d08ec90c1e09",
+      "records_sha256": "849df840f00d2052be90001056dca17768a8829635c91860c3eb41cb72999e27"
+    },
+    {
+      "family": "bytes/cursor-advance-observation",
+      "selected_trial": "bytes-cursor-repair-01",
+      "baseline_pass_count": 0,
+      "candidate_case_rows": 16,
+      "baseline_case_rows": 4,
+      "assertion_failure_rows": 16,
+      "fully_passing_candidate_roles_hidden": [],
+      "summary_sha256": "060fabf98c06abaf18efe5d06d2d64c70243d507a65961bb7ad22c39e27e7c18",
+      "records_sha256": "db7616c8c88231ef8fb8e33625a9483bc87ce8356855cd468112c5b79a3f5754"
+    },
+    {
+      "family": "bytes/composite-frame-field",
+      "selected_trial": "bytes-composite-repair-01",
+      "baseline_pass_count": 0,
+      "candidate_case_rows": 16,
+      "baseline_case_rows": 4,
+      "assertion_failure_rows": 16,
+      "fully_passing_candidate_roles_hidden": [],
+      "summary_sha256": "866031d3b1869ecb81ab069065f940c0500368af8b42462897b4cc25ce0f91bd",
+      "records_sha256": "094258b85f2f188141edc19c77491ff25d6c185873ba32594ac5c63ee1bc81da"
+    },
+    {
+      "family": "clap/repeated-option-policy",
+      "selected_trial": "clap-repeat-repair-01",
+      "baseline_pass_count": 0,
+      "candidate_case_rows": 16,
+      "baseline_case_rows": 4,
+      "assertion_failure_rows": 16,
+      "fully_passing_candidate_roles_hidden": [],
+      "summary_sha256": "898c511bf07b0fc85b840a04c7a65c60a76a3c0d6bc15ff02b71bc21db6d454c",
+      "records_sha256": "f536ebee7a285be2bdc7c72ab8bd7d39c13dc7f4928ebca175ddb53a4b264192"
+    },
+    {
+      "family": "clap/possible-value-validation",
+      "selected_trial": "clap-values",
+      "baseline_pass_count": 2,
+      "candidate_case_rows": 16,
+      "baseline_case_rows": 4,
+      "assertion_failure_rows": 7,
+      "fully_passing_candidate_roles_hidden": [
+        "allow_fast_and_safe"
+      ],
+      "summary_sha256": "be6c2e5b07f66cad35df9acd16e75bf2a9877b053a98ac734353c84b250c5dce",
+      "records_sha256": "affb253201c19dfdf250d8d8950b40dabbd7776c8b8c39e279f964c0cd2c1b56"
+    },
+    {
+      "family": "clap/help-color-capability",
+      "selected_trial": "clap-color-repair-01",
+      "baseline_pass_count": 0,
+      "candidate_case_rows": 16,
+      "baseline_case_rows": 4,
+      "assertion_failure_rows": 14,
+      "fully_passing_candidate_roles_hidden": [],
+      "summary_sha256": "b2632c032773b1bbabd2056b3e26779af7c875fb7ddc0b8a739ad3f4764e3e26",
+      "records_sha256": "a56e6df0c20f525c58019a40f502d0c761bb3c9fe1e5e6ddbcfd939fbfb40da8"
+    },
+    {
+      "family": "clap/conflicting-alias-requirement",
+      "selected_trial": "clap-alias",
+      "baseline_pass_count": 1,
+      "candidate_case_rows": 16,
+      "baseline_case_rows": 4,
+      "assertion_failure_rows": 11,
+      "fully_passing_candidate_roles_hidden": [],
+      "summary_sha256": "7395183126fc7b5729bf32d7a33bc482fa63b5d63ed62d28a0589af4937f55dc",
+      "records_sha256": "077effc1c24072ec1fb012b34c86ee78c82f83aabc99197a8ca984f5acfd7c03"
+    },
+    {
+      "family": "serde-json/stream-byte-offset",
+      "selected_trial": "serde-offset-repair-02",
+      "baseline_pass_count": 0,
+      "candidate_case_rows": 16,
+      "baseline_case_rows": 4,
+      "assertion_failure_rows": 16,
+      "fully_passing_candidate_roles_hidden": [],
+      "summary_sha256": "2e981471b1c7cb47109a22def41b81331346c959c6fb6c093fa0c54a20cda81b",
+      "records_sha256": "9ea3764cf7be9a7fbe7f00e9e44865f24c318cee5f082ed5a724f9acfcf5a088"
+    },
+    {
+      "family": "serde-json/number-mode-plus-error-site",
+      "selected_trial": "serde-numeric-joint-repair-01",
+      "baseline_pass_count": 0,
+      "candidate_case_rows": 16,
+      "baseline_case_rows": 4,
+      "assertion_failure_rows": 16,
+      "fully_passing_candidate_roles_hidden": [],
+      "summary_sha256": "8e0feb8a9cf1658b04d34eaf3538a0942337ee471ba026be95064e96e3069602",
+      "records_sha256": "be8e25f54ee2ee12cd959f0c0398ec5d8d9998a440897c3011f588c6c2e05a9d"
+    },
+    {
+      "family": "serde-json/map-order-feature-contract",
+      "selected_trial": "serde-map-order-repair-02",
+      "baseline_pass_count": 2,
+      "candidate_case_rows": 16,
+      "baseline_case_rows": 4,
+      "assertion_failure_rows": 11,
+      "fully_passing_candidate_roles_hidden": [],
+      "summary_sha256": "5df638e299234bd606d5f353a09356a3815c67db39285abb97ccb22622d64d37",
+      "records_sha256": "aa9f3ee17e4cdeadf8f739d5167bdb953992a13eb723dd8dba2f9aee4c0cd006"
+    },
+    {
+      "family": "serde-json/raw-number-lossless",
+      "selected_trial": "serde-raw-number",
+      "baseline_pass_count": 1,
+      "candidate_case_rows": 16,
+      "baseline_case_rows": 4,
+      "assertion_failure_rows": 16,
+      "fully_passing_candidate_roles_hidden": [],
+      "summary_sha256": "4233f0a4df90023bcca76cb14dc8b58cfd7f27b15067f6fe632e2c1dd64c822d",
+      "records_sha256": "86e2340870ab0aed2c7fd30546d6957ce9799dd3042987cd89ededbd36a255a1"
+    }
+  ],
+  "preserved_failed_trials": [
+    "clap-color",
+    "serde-offset",
+    "clap-repeat",
+    "serde-map-order",
+    "serde-map-order-repair-01",
+    "bytes-cursor",
+    "bytes-composite",
+    "serde-offset-repair-01",
+    "serde-numeric-joint"
+  ],
+  "execution_evidence_families_checked": [
+    "bytes/composite-frame-field",
+    "bytes/cursor-advance-observation",
+    "serde-json/number-mode-plus-error-site",
+    "serde-json/stream-byte-offset"
+  ],
+  "decision": "All 12 locked families have executable feasibility fixtures and the declared E_x families expose observed-versus-expected traces; proceed to scored-task fixture construction only."
+}

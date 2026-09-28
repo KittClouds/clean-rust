@@ -1,0 +1,44 @@
+{
+  "analysis": "RDC-C-E007-AUTOPSY-v1",
+  "analysis_script_sha256": "617b045a43f925ff515a413d4a2680b327af73b95e781a13ac00186da2b7f9fd",
+  "implementation_sources_sha256": {
+    "C:\\rd-c\\experiment-007\\src\\domain.rs": "30b83ca6b9344938cad8f5ddee33e2f4431bdffa15cf9d2be3b5edb515ccda3b",
+    "C:\\rd-c\\experiment-007\\src\\evaluation.rs": "b4dc82d24d6c9eb6840b959f7160368737299f549364f62d394cdd69ee939b6d",
+    "C:\\rd-c\\experiment-007\\src\\model.rs": "c699d3de3e7c49fcdd2046987817d31a4eac4a96dc55b8845d7ce410535dbc8a",
+    "C:\\rd-c\\experiment-007\\src\\routing.rs": "c5cb0777e742a9164064c071c833d8bca82ec9fb7c94ccd88b481765ebfa5851",
+    "C:\\rd-c\\experiment-007\\src\\runtime.rs": "82baef1dbda5fd244d40d49308144726e8301b17bfbe4526d4dbea8759e7b566",
+    "C:\\rd-c\\rdc-runtime-contracts-v1\\src\\inspection.rs": "d430b687f48a046f3e543d979d55e0ff6c816ebcf1c2d83e02c3f8f6e4667ebc"
+  },
+  "inputs_sha256": {
+    "inputs/development/frozen-models.csv": "bd8a4dda2979c38947fe79ecb66d46aebab45bcb8e7c73779ea1156e84aab8eb",
+    "inputs/development/labels.csv": "d0458503df16ebe2315bc6deb201ddf697a973c5a4f3a67f0e4aff56fded3c1f",
+    "inputs/development/public.csv": "d2a4b4e67b6c6c8a1b4dbaceef31f06185cf03221bb247bd524792de861c9e97",
+    "inputs/development/source-state.csv": "a9a4f412d6f319e64d7a702f7d976523c55d0abf0fd93941deebad77ca9aba13",
+    "inputs/heldout/labels.csv": "218212489dcb595a507dec7afe25c2479060a7ae009bee456e890345c1f7b3b2",
+    "inputs/heldout/public.csv": "0184f878019f6301985477e00185bb587171c9a3583ef250973cb812bac72ec6",
+    "inputs/heldout/source-state.csv": "1579410b3348098b6355be9938e27dc4944b50c2991765599f5a8a911de84a74",
+    "manifest.json": "55b98f7fb49ccb9f65976527394ddd934864acdecbe952535d132fe23fd509ec",
+    "planning/evaluation-oracle-plans.csv": "afbf6657d3700ab604c24113b4746ab94d1b2e12ecf5d9926c78c206af2af790",
+    "planning/frozen-router-plans.csv": "8e4133d16c5f75b13724bc820b273735fe4314e6e8f83f189908b0611717c2dc",
+    "run-trace.csv": "4538c18ff1c5f29a025141b45544dd15809fbfb9bf54b8e1805f215bd62de874"
+  },
+  "outputs_sha256": {
+    "autopsy-report.md": "aaf22f96e84070c530c14c9e84c888a947921223af6bf43383dd4c0e54dcae72",
+    "autopsy.py": "617b045a43f925ff515a413d4a2680b327af73b95e781a13ac00186da2b7f9fd",
+    "crossworld-feature-predictions.csv": "7d988d78fe4bdbbd7cf14751f8fef3a230748699eceac834238a3111a771e1b8",
+    "episode-value-diagnostics.csv": "67f94aa0f665e05555985e5d2cd869c5a73b9ae33b842ea6f1a24482db0c26db",
+    "feature-only-ceiling.csv": "f66a4c7c58cd46a427f04c3939234eb730cd5f5ea91d0059769be7b5635990dd",
+    "feature-only-ceiling.png": "0970a10a73e2c2ca9abbe23531ae218e5da10c04f3b0854089e27cac7f5979fc",
+    "feature-ranker-folds.csv": "352aca8c6ffda415c74cc067bfdf71ff47838dc294ac32a1029ca8d92d24c8e3",
+    "positive-value-stop-diagnostic.csv": "6da807a84fb5b8894dfe94159b4f2c062faf1f152e50345bc0ba778337d45b8e",
+    "score-calibration.csv": "ea6a259a970908338e0e9ec54773e1e985843e74acdd5aa3de98018e742560c0",
+    "stratum-reconciliation.csv": "c9ba1098d13095deba30d3e2d998dd38f93872eb76de64823f36432057693b8d",
+    "unresolved-breakdown.png": "a8faeea3066212f3ecef3735701f77929a9fc084090caa60a6406ad04adad6f0",
+    "value-calibration-price.png": "f92b90f99433de36ba95ae8b994988e586b9804c64be170f50a35fc7f7344dea",
+    "world-policy-results.csv": "2409083830277612aab315babe68619a1ad7d61df77dae77254bd7889348e2d0",
+    "world-reconciliation.csv": "8dc9b81ab234e3d87adec9373cde6c1b4332f9da63ba5d1bbb5646b19da2704f"
+  },
+  "source_run_id": "e007-1790316330677261600",
+  "source_run_read_only": true,
+  "status": "exploratory_outcome_conditioned_not_runtime_evidence"
+}

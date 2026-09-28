@@ -1,0 +1,34 @@
+{
+  "artifact_id": "E012-PC-BANK-CONSTRUCTION-VERIFICATION-v1.3",
+  "bank_generated_by_agent": false,
+  "checked_sha256": {
+    "construction_spec": "7d4be952441f9619c876a2080d19d0d1d7ce57bf52d59f7f12a84a4ac7a3b254",
+    "generator": "381c98bc19509cb4293f09a27322a10fae217aaf3b7d108518efe08a85b329f9",
+    "parent_e013_v034_amendment": "79a2475857f7d7ec72a61bdf65500b2744865a9951958870ab6ca05be78710e1",
+    "parent_e013_v034_lock": "85c0b4e4c13fae800ecb42f5742d1a53e89f7388ce3c2fd42789c8759e613f38",
+    "parent_e013_v034_verification": "7f9ca73a8a67317f125d0499aa37ec97a2a754fc543844ded4b5a2e852c130f5",
+    "parent_positive_control_v12": "be69ee36702e2c94cf0f5187aa0fe5f76d512b59d3df645cb407ce4ab2a1c0ad"
+  },
+  "checks": {
+    "bank_owner": true,
+    "contact_boundary": true,
+    "e013_parent": true,
+    "empty_set_decision": true,
+    "exists:construction_spec": true,
+    "exists:generator": true,
+    "exists:parent_e013_v034_amendment": true,
+    "exists:parent_e013_v034_lock": true,
+    "exists:parent_e013_v034_verification": true,
+    "exists:parent_positive_control_v12": true,
+    "positive_control_parent": true,
+    "sha256:construction_spec": true,
+    "sha256:generator": true,
+    "sha256:parent_e013_v034_amendment": true,
+    "sha256:parent_e013_v034_lock": true,
+    "sha256:parent_e013_v034_verification": true,
+    "sha256:parent_positive_control_v12": true
+  },
+  "lock_sha256": "0659c005ca2ea03d76164d423f14fd785fb1066cc34d9d1a7b0fcb629a2f958b",
+  "model_contact_performed": false,
+  "state": "PASS"
+}

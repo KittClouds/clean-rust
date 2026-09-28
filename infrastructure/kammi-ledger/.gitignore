@@ -1,0 +1,6 @@
+.venv/
+.kammi-dev/
+vendor/
+__pycache__/
+*.pyc
+

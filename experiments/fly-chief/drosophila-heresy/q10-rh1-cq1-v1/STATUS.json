@@ -1,0 +1,14 @@
+{
+  "protocol": "Q10-PF6-RH1-CQ1",
+  "status": "CQ1_SCAFFOLD_QUALIFIED_UNIT_SMOKE_ONLY",
+  "report_sha256": "720193AF2F167CF8077B4F7A69279E4B41C537D69E4B64817BA6794954A58D09",
+  "smoke_report_sha256": "77EED8A0E4B50B3D60D1E32CD4B1B39851043CCE5099E6636CD4DBA9984A37F0",
+  "primary_cohort": 32,
+  "secondary_cohort": 23,
+  "authority_endpoint_coordinate_coverage": 1.0,
+  "measured_factorial_started": false,
+  "rh1_f1_authorized": false,
+  "scientific_seed_bundles": 0,
+  "behavioral_probe": false,
+  "dh08b_authorized": false
+}

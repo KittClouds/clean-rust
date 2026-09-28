@@ -1,0 +1,221 @@
+{
+  "schema": "FLY-REACH-03-math-objects-v1",
+  "status": "FROZEN_PRE_CODE",
+  "version": "0.1",
+  "engineering_only": true,
+  "no_biological_promotion": true,
+  "grounding_runs": [
+    "FLY-REACH-01/REACH01-RUN1",
+    "FLY-REACH-02/REACH02-RUN1",
+    "FLY-REACH-02-v0.1b/REACH02-RUN2"
+  ],
+  "target": {
+    "symbol": "Y_{i,t}",
+    "source": "reference_delta_into g_{i,t} at weight state w_t, pre native delivery",
+    "tau_primary": 1e-12,
+    "zero_channel": true,
+    "values": [
+      -1,
+      0,
+      1
+    ],
+    "binary_channel_conditioned_on": "Y != 0",
+    "report_pi0": true,
+    "report_pi_plus": true,
+    "on_policy": "native_trajectory_only"
+  },
+  "filtrations": {
+    "F0": [
+      "coordinate_index",
+      "pre_post_cell_types",
+      "compartment",
+      "anatomical_mb_sign",
+      "degree_buckets",
+      "side",
+      "substrate"
+    ],
+    "F1": [
+      "F0",
+      "w_i",
+      "eligibility_E_i",
+      "local_baseline_gain",
+      "pre_trace",
+      "post_trace",
+      "local_signed_contribution",
+      "sign_w_i"
+    ],
+    "F2": [
+      "F1",
+      "ring_buffer_K",
+      "lagged_flip_counters",
+      "running_mean_var_eligibility"
+    ],
+    "F3": [
+      "F2",
+      "trial_reward_r_t",
+      "dan_feedback_summary",
+      "global_scale_lr_traces",
+      "aggregate_eligibility_summary",
+      "binned_trial_index"
+    ],
+    "F4": [
+      "F3",
+      "full_weight_vector_w_t",
+      "full_task_definition_patterns_labels_schedule"
+    ],
+    "F4_excludes": [
+      "g_i_t",
+      "any_function_of_g",
+      "reference_arm_outputs"
+    ],
+    "ring_buffer_K": 32,
+    "lag_set": [
+      1,
+      2,
+      4,
+      8,
+      16,
+      32
+    ]
+  },
+  "observability": {
+    "omega": "1 - 2*epsilon_star_balanced = TV(P_F|+, P_F|-)",
+    "range": [
+      0,
+      1
+    ],
+    "delta_Omega_k": "Omega(F_k) - Omega(F_{k-1})",
+    "primary_level": "F3",
+    "clip_negative_plugin_to_zero": true,
+    "raw_2a_minus_1_not_Omega_unless_pi_plus_verified_half": true
+  },
+  "volatility": {
+    "V": "consecutive non-zero-target flip fraction",
+    "rho_Y_tau": "Corr(Y_t, Y_{t+tau}) over eligible pairs",
+    "lag_set": [
+      1,
+      2,
+      4,
+      8,
+      16,
+      32
+    ],
+    "reach02_unstable_is_not_V": true
+  },
+  "polarity_efficiency": {
+    "eta_P_native": "cos(u_N, g)",
+    "eta_P_observable": "cos(diag(|u_N|) * sign(s_hat(F3)), g)",
+    "eta_P_oracle": "cos(diag(|u_N|) * sign(g), g)",
+    "decomposition": "oracle - native = (oracle - observable) + (observable - native)",
+    "information_deficit": "eta_P_oracle - eta_P_observable",
+    "mapping_deficit": "eta_P_observable - eta_P_native"
+  },
+  "reach02_anchors": {
+    "disposition": "SIGN_COUNTERFACTUAL_SUPPORTED_STABLE_MASK_NOT_EXPLANATORY",
+    "RUN1": {
+      "native_loss_large": 0.3077709056712963,
+      "sign_ref_native_mag_loss_large": 0.0,
+      "stable_inversion_flip_loss_large": 0.3085968582718461,
+      "reference_direction_loss_large": 0.24779369212962962,
+      "weight_oracle_loss_large": 0.23276491518373843,
+      "sign_agreement": 0.47783478186628187,
+      "stable_correct": 0.0641473397444227,
+      "stable_inverted": 0.06379408012233341,
+      "unstable": 0.8720585801332439,
+      "local_cancellation": 0.012498285361025631,
+      "stable_mask_fraction_mean": 0.00018737302365422155
+    },
+    "RUN2": {
+      "native_loss_large": 0.3133683381257234,
+      "sign_ref_native_mag_loss_large": 0.0014261316370081018,
+      "stable_inversion_flip_loss_large": 0.3167252717194734,
+      "reference_direction_loss_large": 0.24959931550202547,
+      "weight_oracle_loss_large": 0.23602605749059608,
+      "sign_agreement": 0.48884683827123565,
+      "stable_correct": 0.06501910024066028,
+      "stable_inverted": 0.06308169487622692,
+      "unstable": 0.8718992048831128,
+      "local_cancellation": 0.012381798312834678,
+      "stable_mask_fraction_mean": 0.000169749358037613
+    }
+  },
+  "decision_tree_order": [
+    "Omega0 >> 0 => static mask rule was too crude (soft prior revisit)",
+    "Omega1 >> 0 & Omega0 ~ 0 => local mapping failure",
+    "Omega2 >> 0 & Omega1 ~ 0 => temporal integration failure",
+    "Omega3 >> 0 & Omega2 ~ 0 => feedback gating failure",
+    "Omega3 ~ 0 & Omega4 >> 0 => information-boundary failure",
+    "Omega4 weak => contract red flag (estimator/feature/Y audit)",
+    "all Omega ~ 0 & eta_P_oracle high & pi0 not ~1 => target instability branch"
+  ],
+  "estimation": {
+    "qualification_blocks": [
+      72000,
+      72001,
+      72002,
+      72003
+    ],
+    "measured_blocks": [
+      82000,
+      82001,
+      82002,
+      82003,
+      82004,
+      82005,
+      82006,
+      82007,
+      82008,
+      82009,
+      82010,
+      82011
+    ],
+    "checkpoints": [
+      0,
+      512,
+      1024,
+      2048,
+      4096,
+      8192
+    ],
+    "cv": [
+      "time_block_within_trajectory",
+      "leave_block_out_headline"
+    ],
+    "ci": "cluster_bootstrap_substrate_side_block_95pct",
+    "same_model_family_all_levels": true,
+    "predictors_may_never_see": [
+      "g_i_t",
+      "Y_i_t",
+      "reference_outputs",
+      "other_arms",
+      "eval_loss",
+      "write_paths"
+    ],
+    "mi_secondary": true
+  },
+  "logging": {
+    "approach": "streaming_sufficient_statistics_plus_stratified_subsample",
+    "strata": [
+      "pre_post_cell_type_pair",
+      "side",
+      "abs_w_bin",
+      "native_support_flag"
+    ],
+    "online_accumulators": [
+      "flip_counts",
+      "lag_products_Y_t_Y_t_plus_tau",
+      "pi0_pi_plus"
+    ],
+    "receipt_schema": "FLY-REACH-03-collection-receipt-v1",
+    "arms_for_observability_run": [
+      "native"
+    ]
+  },
+  "out_of_scope": [
+    "chi_AB_order_swap",
+    "continuous_mixture_probes",
+    "biological_promotion",
+    "PHENO_reseal"
+  ],
+  "amendment_rule": "any change to filtrations/estimands/decision_tree requires versioned MATH-CONTRACT.md amendment before corresponding code"
+}

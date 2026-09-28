@@ -1,0 +1,674 @@
+[
+  {
+    "world_id": 0,
+    "seed": 246321208756517,
+    "stratum": "Development",
+    "params": {
+      "base_error": 0.2515575,
+      "shadow_error": 0.24004835,
+      "shared_error": 0.41240084,
+      "helpful_accuracy": 0.18133731,
+      "harmful_contradiction": 0.10867743,
+      "unknown_rate": 0.013782857,
+      "failed_rate": 0.051533613,
+      "staleness_rate": 0.3952986,
+      "stale_penalty": 0.08089833,
+      "warning_rate": 0.8134427,
+      "base_query_cost": 2
+    },
+    "families": [
+      {
+        "domain_id": 0,
+        "family_key": 0,
+        "observer_error_shift": -0.017211713,
+        "helpful_shift": 0.029074758,
+        "harmful_shift": 0.12172138,
+        "stale_shift": 0.14514112
+      },
+      {
+        "domain_id": 1,
+        "family_key": 1,
+        "observer_error_shift": 0.035203926,
+        "helpful_shift": 0.012468696,
+        "harmful_shift": -0.06748489,
+        "stale_shift": -0.03539134
+      },
+      {
+        "domain_id": 2,
+        "family_key": 2,
+        "observer_error_shift": -0.108254924,
+        "helpful_shift": 0.01770106,
+        "harmful_shift": 0.03081476,
+        "stale_shift": -0.10126159
+      },
+      {
+        "domain_id": 3,
+        "family_key": 3,
+        "observer_error_shift": 0.087770514,
+        "helpful_shift": 0.033125147,
+        "harmful_shift": -0.006577596,
+        "stale_shift": 0.15618914
+      },
+      {
+        "domain_id": 4,
+        "family_key": 104,
+        "observer_error_shift": 0.081099816,
+        "helpful_shift": -0.16695401,
+        "harmful_shift": -0.06974973,
+        "stale_shift": 0.10535118
+      },
+      {
+        "domain_id": 5,
+        "family_key": 105,
+        "observer_error_shift": 0.045885496,
+        "helpful_shift": -0.14505991,
+        "harmful_shift": 0.00048672408,
+        "stale_shift": 0.0062857866
+      },
+      {
+        "domain_id": 6,
+        "family_key": 106,
+        "observer_error_shift": -0.10093045,
+        "helpful_shift": -0.1557395,
+        "harmful_shift": -0.000058345497,
+        "stale_shift": 0.056430995
+      },
+      {
+        "domain_id": 7,
+        "family_key": 107,
+        "observer_error_shift": 0.0030243322,
+        "helpful_shift": -0.11645749,
+        "harmful_shift": 0.0020277202,
+        "stale_shift": 0.07484776
+      }
+    ]
+  },
+  {
+    "world_id": 1,
+    "seed": 11400750024635479344,
+    "stratum": "Development",
+    "params": {
+      "base_error": 0.39582023,
+      "shadow_error": 0.46498233,
+      "shared_error": 0.53234494,
+      "helpful_accuracy": 0.23655811,
+      "harmful_contradiction": 0.067284726,
+      "unknown_rate": 0.025591869,
+      "failed_rate": 0.18307786,
+      "staleness_rate": 0.21243367,
+      "stale_penalty": 0.104939766,
+      "warning_rate": 0.51445436,
+      "base_query_cost": 2
+    },
+    "families": [
+      {
+        "domain_id": 0,
+        "family_key": 0,
+        "observer_error_shift": -0.07644663,
+        "helpful_shift": 0.0030399263,
+        "harmful_shift": -0.042193048,
+        "stale_shift": 0.011128753
+      },
+      {
+        "domain_id": 1,
+        "family_key": 1,
+        "observer_error_shift": 0.06398005,
+        "helpful_shift": 0.11356515,
+        "harmful_shift": -0.029212296,
+        "stale_shift": 0.1811609
+      },
+      {
+        "domain_id": 2,
+        "family_key": 2,
+        "observer_error_shift": -0.03295435,
+        "helpful_shift": 0.09641254,
+        "harmful_shift": 0.003475286,
+        "stale_shift": -0.023972228
+      },
+      {
+        "domain_id": 3,
+        "family_key": 3,
+        "observer_error_shift": 0.07084093,
+        "helpful_shift": 0.043165475,
+        "harmful_shift": 0.007311277,
+        "stale_shift": 0.11247742
+      },
+      {
+        "domain_id": 4,
+        "family_key": 104,
+        "observer_error_shift": 0.096922226,
+        "helpful_shift": 0.05311103,
+        "harmful_shift": 0.05899284,
+        "stale_shift": -0.13265832
+      },
+      {
+        "domain_id": 5,
+        "family_key": 105,
+        "observer_error_shift": -0.100441016,
+        "helpful_shift": -0.17413743,
+        "harmful_shift": 0.08506829,
+        "stale_shift": 0.041205406
+      },
+      {
+        "domain_id": 6,
+        "family_key": 106,
+        "observer_error_shift": -0.07895155,
+        "helpful_shift": 0.0488822,
+        "harmful_shift": 0.0052492023,
+        "stale_shift": -0.023603082
+      },
+      {
+        "domain_id": 7,
+        "family_key": 107,
+        "observer_error_shift": 0.035291977,
+        "helpful_shift": 0.12147838,
+        "harmful_shift": 0.13632187,
+        "stale_shift": 0.1163297
+      }
+    ]
+  },
+  {
+    "world_id": 2,
+    "seed": 4354439286682218767,
+    "stratum": "Development",
+    "params": {
+      "base_error": 0.3436499,
+      "shadow_error": 0.34783238,
+      "shared_error": 0.21175441,
+      "helpful_accuracy": 0.16923437,
+      "harmful_contradiction": 0.045865513,
+      "unknown_rate": 0.025289804,
+      "failed_rate": 0.21206923,
+      "staleness_rate": 0.33960652,
+      "stale_penalty": 0.0762846,
+      "warning_rate": 0.41085997,
+      "base_query_cost": 2
+    },
+    "families": [
+      {
+        "domain_id": 0,
+        "family_key": 0,
+        "observer_error_shift": -0.029646866,
+        "helpful_shift": -0.076207705,
+        "harmful_shift": -0.0003979504,
+        "stale_shift": 0.04114878
+      },
+      {
+        "domain_id": 1,
+        "family_key": 1,
+        "observer_error_shift": 0.074978374,
+        "helpful_shift": -0.11933665,
+        "harmful_shift": -0.08506874,
+        "stale_shift": 0.068688035
+      },
+      {
+        "domain_id": 2,
+        "family_key": 2,
+        "observer_error_shift": -0.11560155,
+        "helpful_shift": 0.05692576,
+        "harmful_shift": 0.020982198,
+        "stale_shift": -0.050628103
+      },
+      {
+        "domain_id": 3,
+        "family_key": 3,
+        "observer_error_shift": 0.09771765,
+        "helpful_shift": -0.044099033,
+        "harmful_shift": 0.080275424,
+        "stale_shift": -0.12774104
+      },
+      {
+        "domain_id": 4,
+        "family_key": 104,
+        "observer_error_shift": -0.006363541,
+        "helpful_shift": 0.062786564,
+        "harmful_shift": 0.12184114,
+        "stale_shift": -0.11974883
+      },
+      {
+        "domain_id": 5,
+        "family_key": 105,
+        "observer_error_shift": 0.038954638,
+        "helpful_shift": -0.07960456,
+        "harmful_shift": 0.037268184,
+        "stale_shift": 0.028274953
+      },
+      {
+        "domain_id": 6,
+        "family_key": 106,
+        "observer_error_shift": 0.03192372,
+        "helpful_shift": 0.1342485,
+        "harmful_shift": 0.11700194,
+        "stale_shift": -0.038304932
+      },
+      {
+        "domain_id": 7,
+        "family_key": 107,
+        "observer_error_shift": -0.021343842,
+        "helpful_shift": -0.09590861,
+        "harmful_shift": -0.01953923,
+        "stale_shift": -0.14738874
+      }
+    ]
+  },
+  {
+    "world_id": 3,
+    "seed": 15755435563802000666,
+    "stratum": "Development",
+    "params": {
+      "base_error": 0.25666296,
+      "shadow_error": 0.36385196,
+      "shared_error": 0.39675635,
+      "helpful_accuracy": 0.26226872,
+      "harmful_contradiction": 0.06260022,
+      "unknown_rate": 0.062378064,
+      "failed_rate": 0.32776532,
+      "staleness_rate": 0.14930674,
+      "stale_penalty": 0.25805297,
+      "warning_rate": 0.71618116,
+      "base_query_cost": 1
+    },
+    "families": [
+      {
+        "domain_id": 0,
+        "family_key": 0,
+        "observer_error_shift": 0.021783106,
+        "helpful_shift": -0.0191565,
+        "harmful_shift": 0.035972305,
+        "stale_shift": 0.031480983
+      },
+      {
+        "domain_id": 1,
+        "family_key": 1,
+        "observer_error_shift": -0.07590602,
+        "helpful_shift": -0.042252496,
+        "harmful_shift": 0.055376403,
+        "stale_shift": 0.06159979
+      },
+      {
+        "domain_id": 2,
+        "family_key": 2,
+        "observer_error_shift": 0.08965086,
+        "helpful_shift": -0.05066201,
+        "harmful_shift": 0.031482674,
+        "stale_shift": 0.15909702
+      },
+      {
+        "domain_id": 3,
+        "family_key": 3,
+        "observer_error_shift": -0.03978806,
+        "helpful_shift": -0.1016249,
+        "harmful_shift": 0.08510526,
+        "stale_shift": -0.056574196
+      },
+      {
+        "domain_id": 4,
+        "family_key": 104,
+        "observer_error_shift": 0.07607687,
+        "helpful_shift": 0.1269072,
+        "harmful_shift": -0.055905085,
+        "stale_shift": -0.14534238
+      },
+      {
+        "domain_id": 5,
+        "family_key": 105,
+        "observer_error_shift": -0.04274653,
+        "helpful_shift": 0.11366522,
+        "harmful_shift": 0.013029173,
+        "stale_shift": -0.03913352
+      },
+      {
+        "domain_id": 6,
+        "family_key": 106,
+        "observer_error_shift": -0.081257895,
+        "helpful_shift": 0.10177907,
+        "harmful_shift": -0.018894702,
+        "stale_shift": 0.075695425
+      },
+      {
+        "domain_id": 7,
+        "family_key": 107,
+        "observer_error_shift": -0.011954397,
+        "helpful_shift": 0.04836443,
+        "harmful_shift": 0.025944345,
+        "stale_shift": 0.0719278
+      }
+    ]
+  },
+  {
+    "world_id": 4,
+    "seed": 8709124825845594481,
+    "stratum": "Development",
+    "params": {
+      "base_error": 0.15461585,
+      "shadow_error": 0.50526583,
+      "shared_error": 0.49642605,
+      "helpful_accuracy": 0.27912557,
+      "harmful_contradiction": 0.1033559,
+      "unknown_rate": 0.036898226,
+      "failed_rate": 0.19571643,
+      "staleness_rate": 0.1973198,
+      "stale_penalty": 0.22536814,
+      "warning_rate": 0.39219326,
+      "base_query_cost": 1
+    },
+    "families": [
+      {
+        "domain_id": 0,
+        "family_key": 0,
+        "observer_error_shift": -0.11079958,
+        "helpful_shift": -0.02173622,
+        "harmful_shift": -0.07972522,
+        "stale_shift": -0.114972666
+      },
+      {
+        "domain_id": 1,
+        "family_key": 1,
+        "observer_error_shift": 0.11904553,
+        "helpful_shift": 0.1199891,
+        "harmful_shift": 0.10328589,
+        "stale_shift": -0.006748572
+      },
+      {
+        "domain_id": 2,
+        "family_key": 2,
+        "observer_error_shift": -0.09417552,
+        "helpful_shift": -0.08005765,
+        "harmful_shift": 0.07996119,
+        "stale_shift": -0.08844654
+      },
+      {
+        "domain_id": 3,
+        "family_key": 3,
+        "observer_error_shift": 0.072974436,
+        "helpful_shift": -0.13682696,
+        "harmful_shift": 0.026849441,
+        "stale_shift": 0.002752617
+      },
+      {
+        "domain_id": 4,
+        "family_key": 104,
+        "observer_error_shift": 0.0040381327,
+        "helpful_shift": -0.042782724,
+        "harmful_shift": 0.087687366,
+        "stale_shift": -0.11693201
+      },
+      {
+        "domain_id": 5,
+        "family_key": 105,
+        "observer_error_shift": -0.063735306,
+        "helpful_shift": 0.09508556,
+        "harmful_shift": 0.053314157,
+        "stale_shift": 0.111503184
+      },
+      {
+        "domain_id": 6,
+        "family_key": 106,
+        "observer_error_shift": -0.04186532,
+        "helpful_shift": -0.015176371,
+        "harmful_shift": 0.14626,
+        "stale_shift": 0.1710436
+      },
+      {
+        "domain_id": 7,
+        "family_key": 107,
+        "observer_error_shift": 0.11390937,
+        "helpful_shift": -0.0434552,
+        "harmful_shift": -0.08838878,
+        "stale_shift": -0.048007034
+      }
+    ]
+  },
+  {
+    "world_id": 5,
+    "seed": 1663377029255554380,
+    "stratum": "Development",
+    "params": {
+      "base_error": 0.16833992,
+      "shadow_error": 0.6738795,
+      "shared_error": 0.3841975,
+      "helpful_accuracy": 0.08577366,
+      "harmful_contradiction": 0.10331388,
+      "unknown_rate": 0.10649982,
+      "failed_rate": 0.22763957,
+      "staleness_rate": 0.26529217,
+      "stale_penalty": 0.21316963,
+      "warning_rate": 0.39756602,
+      "base_query_cost": 1
+    },
+    "families": [
+      {
+        "domain_id": 0,
+        "family_key": 0,
+        "observer_error_shift": -0.09666856,
+        "helpful_shift": -0.026157767,
+        "harmful_shift": -0.013684757,
+        "stale_shift": 0.18573454
+      },
+      {
+        "domain_id": 1,
+        "family_key": 1,
+        "observer_error_shift": -0.016807921,
+        "helpful_shift": 0.093630224,
+        "harmful_shift": -0.07849879,
+        "stale_shift": 0.010403961
+      },
+      {
+        "domain_id": 2,
+        "family_key": 2,
+        "observer_error_shift": 0.03178575,
+        "helpful_shift": -0.105574995,
+        "harmful_shift": 0.14020106,
+        "stale_shift": 0.1932182
+      },
+      {
+        "domain_id": 3,
+        "family_key": 3,
+        "observer_error_shift": 0.017491303,
+        "helpful_shift": 0.014821976,
+        "harmful_shift": -0.017213985,
+        "stale_shift": 0.121444404
+      },
+      {
+        "domain_id": 4,
+        "family_key": 104,
+        "observer_error_shift": 0.02842047,
+        "helpful_shift": -0.06377019,
+        "harmful_shift": 0.12851456,
+        "stale_shift": -0.060071036
+      },
+      {
+        "domain_id": 5,
+        "family_key": 105,
+        "observer_error_shift": -0.027594693,
+        "helpful_shift": -0.03766556,
+        "harmful_shift": -0.039545923,
+        "stale_shift": 0.16615742
+      },
+      {
+        "domain_id": 6,
+        "family_key": 106,
+        "observer_error_shift": -0.06404458,
+        "helpful_shift": -0.0040252656,
+        "harmful_shift": 0.1240012,
+        "stale_shift": 0.041775778
+      },
+      {
+        "domain_id": 7,
+        "family_key": 107,
+        "observer_error_shift": 0.11331666,
+        "helpful_shift": -0.056025475,
+        "harmful_shift": 0.121885456,
+        "stale_shift": -0.044226736
+      }
+    ]
+  },
+  {
+    "world_id": 6,
+    "seed": 13063880802475499867,
+    "stratum": "Development",
+    "params": {
+      "base_error": 0.22829877,
+      "shadow_error": 0.37707978,
+      "shared_error": 0.24667728,
+      "helpful_accuracy": 0.14693753,
+      "harmful_contradiction": 0.044033088,
+      "unknown_rate": 0.06238818,
+      "failed_rate": 0.3287813,
+      "staleness_rate": 0.38322794,
+      "stale_penalty": 0.07592952,
+      "warning_rate": 0.43629584,
+      "base_query_cost": 2
+    },
+    "families": [
+      {
+        "domain_id": 0,
+        "family_key": 0,
+        "observer_error_shift": 0.02512183,
+        "helpful_shift": -0.17808236,
+        "harmful_shift": -0.014519036,
+        "stale_shift": 0.10791078
+      },
+      {
+        "domain_id": 1,
+        "family_key": 1,
+        "observer_error_shift": -0.041859515,
+        "helpful_shift": -0.12957664,
+        "harmful_shift": 0.12986842,
+        "stale_shift": 0.15309826
+      },
+      {
+        "domain_id": 2,
+        "family_key": 2,
+        "observer_error_shift": -0.096294776,
+        "helpful_shift": 0.0049569607,
+        "harmful_shift": 0.1495102,
+        "stale_shift": -0.084024005
+      },
+      {
+        "domain_id": 3,
+        "family_key": 3,
+        "observer_error_shift": 0.11718183,
+        "helpful_shift": -0.15611947,
+        "harmful_shift": 0.11785748,
+        "stale_shift": 0.16845107
+      },
+      {
+        "domain_id": 4,
+        "family_key": 104,
+        "observer_error_shift": -0.04093238,
+        "helpful_shift": 0.12616244,
+        "harmful_shift": 0.07285821,
+        "stale_shift": 0.10404071
+      },
+      {
+        "domain_id": 5,
+        "family_key": 105,
+        "observer_error_shift": -0.0045313463,
+        "helpful_shift": 0.009476632,
+        "harmful_shift": 0.08774089,
+        "stale_shift": -0.08285498
+      },
+      {
+        "domain_id": 6,
+        "family_key": 106,
+        "observer_error_shift": 0.061120324,
+        "helpful_shift": -0.036603734,
+        "harmful_shift": 0.085028194,
+        "stale_shift": 0.1659312
+      },
+      {
+        "domain_id": 7,
+        "family_key": 107,
+        "observer_error_shift": -0.08424046,
+        "helpful_shift": -0.11361308,
+        "harmful_shift": 0.036097832,
+        "stale_shift": 0.012695283
+      }
+    ]
+  },
+  {
+    "world_id": 7,
+    "seed": 6018133005890973110,
+    "stratum": "Development",
+    "params": {
+      "base_error": 0.2021188,
+      "shadow_error": 0.36170393,
+      "shared_error": 0.22073135,
+      "helpful_accuracy": 0.033238232,
+      "harmful_contradiction": 0.054204553,
+      "unknown_rate": 0.043124355,
+      "failed_rate": 0.16433217,
+      "staleness_rate": 0.22119802,
+      "stale_penalty": 0.16823247,
+      "warning_rate": 0.5793262,
+      "base_query_cost": 1
+    },
+    "families": [
+      {
+        "domain_id": 0,
+        "family_key": 0,
+        "observer_error_shift": -0.009712271,
+        "helpful_shift": -0.008638337,
+        "harmful_shift": -0.022681087,
+        "stale_shift": 0.096228525
+      },
+      {
+        "domain_id": 1,
+        "family_key": 1,
+        "observer_error_shift": -0.058568686,
+        "helpful_shift": -0.17717347,
+        "harmful_shift": 0.10456567,
+        "stale_shift": -0.12830923
+      },
+      {
+        "domain_id": 2,
+        "family_key": 2,
+        "observer_error_shift": 0.11640898,
+        "helpful_shift": -0.08071818,
+        "harmful_shift": 0.14034757,
+        "stale_shift": -0.018090501
+      },
+      {
+        "domain_id": 3,
+        "family_key": 3,
+        "observer_error_shift": 0.024415232,
+        "helpful_shift": -0.007426232,
+        "harmful_shift": 0.10523171,
+        "stale_shift": -0.020203441
+      },
+      {
+        "domain_id": 4,
+        "family_key": 104,
+        "observer_error_shift": 0.09130969,
+        "helpful_shift": 0.107675135,
+        "harmful_shift": 0.120708264,
+        "stale_shift": 0.07030691
+      },
+      {
+        "domain_id": 5,
+        "family_key": 105,
+        "observer_error_shift": -0.022757761,
+        "helpful_shift": -0.052857623,
+        "harmful_shift": -0.013253488,
+        "stale_shift": 0.08766973
+      },
+      {
+        "domain_id": 6,
+        "family_key": 106,
+        "observer_error_shift": 0.0273946,
+        "helpful_shift": 0.13884261,
+        "harmful_shift": -0.051085733,
+        "stale_shift": 0.12588674
+      },
+      {
+        "domain_id": 7,
+        "family_key": 107,
+        "observer_error_shift": 0.07009823,
+        "helpful_shift": 0.047102228,
+        "harmful_shift": 0.017829493,
+        "stale_shift": 0.0028055906
+      }
+    ]
+  }
+]

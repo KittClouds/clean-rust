@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "state": "OFFLINE_FEASIBILITY_ONLY",
+  "model_contact_authorized": false,
+  "family": "bounded-prefix-copy",
+  "candidate_ids_hidden_role_map": {
+    "slice_prefix": 42559,
+    "copy_prefix": 64060,
+    "return_suffix": 51536,
+    "return_full_input": 47505
+  },
+  "baseline_pass_by_case": {
+    "case-01": false,
+    "case-02": false,
+    "case-03": false,
+    "case-04": false
+  },
+  "candidate_pass_matrix_hidden_roles": {
+    "slice_prefix": {
+      "case-01": true,
+      "case-02": true,
+      "case-03": true,
+      "case-04": true
+    },
+    "copy_prefix": {
+      "case-01": true,
+      "case-02": true,
+      "case-03": true,
+      "case-04": true
+    },
+    "return_suffix": {
+      "case-01": false,
+      "case-02": false,
+      "case-03": false,
+      "case-04": false
+    },
+    "return_full_input": {
+      "case-01": false,
+      "case-02": false,
+      "case-03": false,
+      "case-04": false
+    }
+  },
+  "code_sha256": {
+    "base": "9294c6af20de0c37b9337ffc18d08222407f2b0b35e46286a780c6644b15cba0",
+    "slice_prefix": "3e62c6e7284a44d875114f2babc4d24dc54e2ec443578a6ec352e78e9bdba3be",
+    "copy_prefix": "b3b9a8cc5a563a05fd8982576983ebe8408642920f2b87fd283336c4007ee219",
+    "return_suffix": "15f9224877f83df1e45185d34e7a976e7308167ca70ac36c5fb195239111ff8b",
+    "return_full_input": "9323828fc3a2e77088c4becf7e674a1848caf97c9eaa013ea26e354370c10c2a"
+  },
+  "intended_positive_sets": {
+    "case-01": [
+      "slice_prefix",
+      "copy_prefix"
+    ],
+    "case-02": [
+      "slice_prefix",
+      "copy_prefix"
+    ],
+    "case-03": [
+      "slice_prefix",
+      "copy_prefix"
+    ],
+    "case-04": [
+      "slice_prefix",
+      "copy_prefix"
+    ]
+  },
+  "note": "For paired bank worlds, only E_c.content changes; candidate action IDs remain fixed while the content-to-ID mapping changes."
+}

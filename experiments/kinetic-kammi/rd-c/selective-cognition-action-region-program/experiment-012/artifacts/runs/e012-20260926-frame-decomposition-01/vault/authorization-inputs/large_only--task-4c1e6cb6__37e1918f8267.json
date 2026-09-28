@@ -1,0 +1,62 @@
+{
+  "task_id": "large_only-task-4c1e6cb6__37e1918f8267",
+  "frame_digest_hex": "37e1918f8267e86fdf86520ca769baed6b5e541f1bdf77b32e5555126fc5b43d",
+  "request_id_hex": "0b96f564aacb19f9f3d97cd558b731e7390929b292dee6c57a96e263341476f3",
+  "response_request_id_hex": "0b96f564aacb19f9f3d97cd558b731e7390929b292dee6c57a96e263341476f3",
+  "request_receipt_digest_hex": "9e742b73bcab7ef6d79576f256e355f94e3b7da565b8e654448b17a05360f823",
+  "response_receipt_digest_hex": "9e742b73bcab7ef6d79576f256e355f94e3b7da565b8e654448b17a05360f823",
+  "presentation_receipt_hex": "5244435101000400000037e1918f8267e86fdf86520ca769baed6b5e541f1bdf77b32e5555126fc5b43da8d8ac80fe7cda315c0fcb89b6f57faffd6437473b85320bcdf8fea94d282028f762b359d59a5392e2cd8b5314408ac0d3b2316804b6a534583953e152cc1a4d2ac74e8585f16e168ac2515d1deecf21dd3db5321bbd4454580918254b082db20fa5c47400aa2f62c9c05f1a041390bfa6652ec91da034e7d16e8a01de9b60781f000b028cb487dbd9001cb88c8fc6e83bf897ecbedcb0eeb04cc1fb61dd916b5ae21146c638f996",
+  "action_ledger_path": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\artifacts\\runs\\e012-20260926-frame-decomposition-01\\action-ledgers\\large_only\\task-4c1e6cb6__37e1918f8267.bin",
+  "ordered_options": [
+    {
+      "producer_ordinal": 0,
+      "action": {
+        "id": 25335,
+        "schema_id": 1
+      },
+      "summary": "Apply the candidate change shown in the code excerpt.",
+      "diff_excerpt": "@@ -2,7 +2,6 @@\n \n pub fn encode_wire_word(value: u16) -> Bytes {\n     let mut out = BytesMut::with_capacity(2);\n-    // The frozen task snapshot drops the requested word.\n-    let _ = value;\n+    out.put_u16(value);\n     out.freeze()\n }",
+      "patch_sha256": "b359d59a5392e2cd8b5314408ac0d3b2316804b6a534583953e152cc1a4d2ac7"
+    },
+    {
+      "producer_ordinal": 1,
+      "action": {
+        "id": 34126,
+        "schema_id": 1
+      },
+      "summary": "Apply the candidate change shown in the code excerpt.",
+      "diff_excerpt": "@@ -2,7 +2,6 @@\n \n pub fn encode_wire_word(value: u16) -> Bytes {\n     let mut out = BytesMut::with_capacity(2);\n-    // The frozen task snapshot drops the requested word.\n-    let _ = value;\n+    out.put_u16_le(value);\n     out.freeze()\n }",
+      "patch_sha256": "85f16e168ac2515d1deecf21dd3db5321bbd4454580918254b082db20fa5c474"
+    },
+    {
+      "producer_ordinal": 2,
+      "action": {
+        "id": 43520,
+        "schema_id": 1
+      },
+      "summary": "Apply the candidate change shown in the code excerpt.",
+      "diff_excerpt": "@@ -2,7 +2,7 @@\n \n pub fn encode_wire_word(value: u16) -> Bytes {\n     let mut out = BytesMut::with_capacity(2);\n-    // The frozen task snapshot drops the requested word.\n-    let _ = value;\n+    out.put_u16(value);\n+    out.put_u8(0);\n     out.freeze()\n }",
+      "patch_sha256": "2f62c9c05f1a041390bfa6652ec91da034e7d16e8a01de9b60781f000b028cb4"
+    },
+    {
+      "producer_ordinal": 3,
+      "action": {
+        "id": 56199,
+        "schema_id": 1
+      },
+      "summary": "Apply the candidate change shown in the code excerpt.",
+      "diff_excerpt": "@@ -2,7 +2,6 @@\n \n pub fn encode_wire_word(value: u16) -> Bytes {\n     let mut out = BytesMut::with_capacity(2);\n-    // The frozen task snapshot drops the requested word.\n-    let _ = value;\n+    out.put_u16(0);\n     out.freeze()\n }",
+      "patch_sha256": "d9001cb88c8fc6e83bf897ecbedcb0eeb04cc1fb61dd916b5ae21146c638f996"
+    }
+  ],
+  "observer_output": {
+    "action_choice": 34126,
+    "applicability_milli": 950,
+    "abstention_milli": 50
+  },
+  "thresholds": {
+    "minimum_applicability_milli": 850,
+    "maximum_abstention_milli": 150
+  },
+  "completion_check_passed": false
+}

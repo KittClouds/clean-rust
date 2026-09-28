@@ -1,0 +1,12 @@
+{
+  "contract_sha256": "21fc77d5a288b9adef995d88f089890235f8dcb2fbc3c9e452725bb67892a22f",
+  "declared_entries": 447,
+  "fixture_workspace": "C:\\Users\\shuga\\.codex\\worktrees\\e4-0-contract-work\\clean-rust",
+  "legacy_root_sha256": "278ae16eeb6852d3efad44221556a87be6df54964471f0870931fe2e99b305d1",
+  "mismatched_artifact_ids": [],
+  "missing_artifact_ids": [],
+  "schema": "KAMMI_LEGACY_FLAT_VERIFICATION_V1",
+  "seal_file_sha256": "0635de4a384b4d5121d8b2295e88a73f649c53e402ffcda311fcaf9c8d93099c",
+  "status": "PASS",
+  "verified_entries": 447
+}

@@ -1,0 +1,41 @@
+{
+  "disposition_id": "FAS00_PHASE2A_PAPERWORK_READY_V01",
+  "project_id": "fas-frozen-adaptive-substrate-v00",
+  "paperwork_bundle_id": "FAS00_SENSOR_CONTACT_PAPERWORK_V01",
+  "phase2a_packet_sealed": true,
+  "phase3_contract_sealed": true,
+  "ready_for_explicit_model_contact_authorization": true,
+  "model_contact_authorized": false,
+  "model_contact_performed": false,
+  "feature_extraction_authorized": false,
+  "feature_cache_ready": false,
+  "sensor_probe_authorized": false,
+  "online_mechanisms_authorized": false,
+  "phase5_corpus_generation_authorized": false,
+  "phase5_corpus_generated": false,
+  "root_sha256": "e1ce39935e566f7dad53fae69c18a091dfc05526c3c5a3cdc8fae52b27357189",
+  "gates": [
+    {
+      "gate": "PHASE0_PARENT_SEAL",
+      "status": "PASS",
+      "sha256": "c7227d2a10da05f902ed5d16e94a8e12866d2e0ae6b2b2a357ed2da93431b3e6"
+    },
+    {
+      "gate": "PHASE1_V03_PARENT_SEAL",
+      "status": "PASS",
+      "sha256": "d3ca9f8ef988a6f0ae93318fc0ea7c504b23b3be801dbf133d66f67746a69274"
+    },
+    {
+      "gate": "FEATURE_EXTRACTION_PACKET",
+      "status": "SEALED_AWAITING_EXPLICIT_AUTHORIZATION"
+    },
+    {
+      "gate": "SENSOR_QUALIFICATION_CONTRACT",
+      "status": "SEALED_PROBE_TRAINING_NOT_AUTHORIZED"
+    },
+    {
+      "gate": "MODEL_CONTACT",
+      "status": "NOT_AUTHORIZED_NOT_PERFORMED"
+    }
+  ]
+}

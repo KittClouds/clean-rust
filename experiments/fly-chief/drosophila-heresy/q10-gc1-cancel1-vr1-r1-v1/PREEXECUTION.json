@@ -1,0 +1,12 @@
+{
+  "identity": "q10-gc1-cancel1-vr1-r1-v1",
+  "protocol": "Q10-LR1-VR1-R1",
+  "status": "QUALIFIED_NO_CAMPAIGN",
+  "campaign_started": false,
+  "result_exposure": false,
+  "parent_bindings_sealed": true,
+  "plan_sha256": "EDD31F910E2FF722485AE13C549C04DC4C7746B909CF31FB0C7A8CEA08E25DC8",
+  "runner_sha256": "30A4093FB4232092B50DD3E518DAC24B7618E9B8F45B2A140A4FD116FDD47D4C",
+  "contract_sha256": "B95AB2BD39A3B7099F772314CD90AA4D1F6D20E433793B21E677A98D29E5A580",
+  "created_at_utc": "2026-09-18T00:00:00Z"
+}

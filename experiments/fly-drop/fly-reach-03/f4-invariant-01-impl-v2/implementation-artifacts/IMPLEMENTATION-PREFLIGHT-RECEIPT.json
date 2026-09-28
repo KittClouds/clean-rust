@@ -1,0 +1,57 @@
+{
+  "design_contract_sha256": "52280190e160fafdbb973b4cda273bf9e24eca6ba96998a0393e90601fc88f40",
+  "fit_manifest_created": false,
+  "fits_executed": 0,
+  "implementation_spec_sha256": "1e82459a516daddc375a3304860bbe45c5fda3880c7404abeaa3df214e7ce086",
+  "initializer_seed_manifest_file_sha256": "efb32a7c2ca2709407b65c32627dbd206b8b1bde304ce9b0b98b165aeea1da8e",
+  "initializer_seed_manifest_sha256": "8e713f540bedd67fad573b41d747fb4fefc2fcec41618b6c9ebcdd73ef94c08d",
+  "measured_namespace_created": false,
+  "parent_authority": {
+    "parent_source_hashes": {
+      "experiments/fly-reach-03/F4-INVARIANT-01-DESIGN-CONTRACT-v0.1.md": "52280190e160fafdbb973b4cda273bf9e24eca6ba96998a0393e90601fc88f40",
+      "experiments/fly-reach-03/F4-INVARIANT-01-IMPLEMENTATION-SPEC-v0.1.md": "1e82459a516daddc375a3304860bbe45c5fda3880c7404abeaa3df214e7ce086",
+      "experiments/fly-reach-03/F4-SYMMETRY-01-CONTRACT-v0.1.md": "cfef638aaeac1dfc0b768d13cc95afe7724861f74e3d3111d91401925bed6379",
+      "experiments/fly-reach-03/F4-SYMMETRY-01-IMPLEMENTATION-AMENDMENT-v0.2.md": "cf4b1a83922a08ec45b7e812cd1c39e8681940ff18c479bc0856bc18a9fa35f3",
+      "experiments/fly-reach-03/F4-SYMMETRY-01-IMPLEMENTATION-SPEC-v0.1.md": "9ef769a80e4e5e91cd9af8b26bf22f8d1b49a940fe89c1f24f571333541ce0a4",
+      "experiments/fly-reach-03/scripts/f4_symmetry_01_common.py": "47ddbeca65ee2b0a94f1712915c8df17fc5855fddfb160c1ac59b9bc48afbeca",
+      "experiments/fly-reach-03/scripts/f4_symmetry_01_fit.py": "40ed12bd4ddc377d361f1369af2f33c5a379dcc4dce60d24d79382de83d56e62",
+      "experiments/fly-reach-03/scripts/f4_symmetry_01_integrity.py": "dc70be0276297f32a6dd01508f7146243390ae3a6adf83ecb39879ba4fc6887d",
+      "experiments/fly-reach-03/scripts/f4_symmetry_01_model.py": "92e260bd0057115867bf69b343d8193bab141035f3338af4586c5e0af61c47f8",
+      "experiments/fly-reach-03/scripts/f4_symmetry_01_prepare.py": "702d3f9a401bc598dfe062bad1fb1a7c8a1a25095abda3e0baa1690d47fba13f"
+    },
+    "parent_source_manifest_file_sha256": "e9bcfecdf211d7d12e1e5ad31f345455663226e1ab0cd2d35c466a24b1451a6a",
+    "parent_source_manifest_sha256": "aa9f1e92d630cbfbe20b82ee6edf10c75568b482010ed98e613a77a39ded1525",
+    "parent_terminal_receipt_sha256": "2e0886313d5a87ef2551b7df6d27440b6973303a42a827a2f1143911bf85fe6a"
+  },
+  "qualification_only": true,
+  "runtime": {
+    "loaded_threadpools": "threadpoolctl-unavailable",
+    "numpy_config": "Build Dependencies:\n  blas:\n    detection method: pkgconfig\n    found: true\n    include directory: C:/Users/runneradmin/AppData/Local/Temp/cibw-run-hg727bee/cp313-win_amd64/build/venv/Lib/site-packages/scipy_openblas64/include\n    lib directory: C:/Users/runneradmin/AppData/Local/Temp/cibw-run-hg727bee/cp313-win_amd64/build/venv/Lib/site-packages/scipy_openblas64/lib\n    name: scipy-openblas\n    openblas configuration: OpenBLAS 0.3.34.106.0  USE64BITINT DYNAMIC_ARCH NO_AFFINITY\n      Haswell MAX_THREADS=24\n    pc file directory: D:/a/numpy-release/numpy-release/.openblas\n    version: 0.3.34.106.0\n  lapack:\n    detection method: pkgconfig\n    found: true\n    include directory: C:/Users/runneradmin/AppData/Local/Temp/cibw-run-hg727bee/cp313-win_amd64/build/venv/Lib/site-packages/scipy_openblas64/include\n    lib directory: C:/Users/runneradmin/AppData/Local/Temp/cibw-run-hg727bee/cp313-win_amd64/build/venv/Lib/site-packages/scipy_openblas64/lib\n    name: scipy-openblas\n    openblas configuration: OpenBLAS 0.3.34.106.0  USE64BITINT DYNAMIC_ARCH NO_AFFINITY\n      Haswell MAX_THREADS=24\n    pc file directory: D:/a/numpy-release/numpy-release/.openblas\n    version: 0.3.34.106.0\nCompilers:\n  c:\n    commands: cl\n    linker: link\n    name: msvc\n    version: 19.44.35228\n  c++:\n    commands: cl\n    linker: link\n    name: msvc\n    version: 19.44.35228\n  cython:\n    commands: cython\n    linker: cython\n    name: cython\n    version: 3.3.0\nMachine Information:\n  build:\n    cpu: x86_64\n    endian: little\n    family: x86_64\n    system: windows\n  host:\n    cpu: x86_64\n    endian: little\n    family: x86_64\n    system: windows\nPython Information:\n  path: C:\\Users\\runneradmin\\AppData\\Local\\Temp\\build-env-xf1j587o\\Scripts\\python.exe\n  version: '3.13'\nSIMD Extensions:\n  baseline:\n  - X86_V2\n  found:\n  - X86_V3\n\n",
+    "numpy_version": "2.5.3",
+    "python_executable": "C:\\Users\\shuga\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+    "python_executable_sha256": "85b71d8c6ec1905935f74be0c9869aae198d00e98f39df699ec66f9c5a84cecd",
+    "python_version": "3.13.15 (tags/v3.13.15:4061bc4, Aug  5 2026, 13:05:39) [MSC v.1944 64 bit (AMD64)]",
+    "thread_environment": {
+      "BLIS_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "NUMEXPR_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1"
+    },
+    "threadpool_introspection": "UNAVAILABLE"
+  },
+  "schema": "F4-INVARIANT-01-implementation-preflight-v1",
+  "shared_input_fixture_file_sha256": "e091548e5865232ddca6b1afee6c934607cbfe9bc3b15eda5c25d5b80180317a",
+  "source_manifest_canonical_sha256": "4ea09b4b2106b6125a7d567ce723506787181841c4d75e4d9922ab8672ac8af4",
+  "source_manifest_file_sha256": "41f31a90a8244c05e07570a54560ee6682e64ab6b891e938f3e5be767d938ee9",
+  "status": "PASS",
+  "targeted_tests": {
+    "command": "python -m unittest -v test_f4_invariant_01_model.py test_f4_invariant_01_inputs.py",
+    "output_sha256": "13f8a74f6bf171107603b35a8cd851eba1ad5a360ff0d6024b5b6eb5d2a31cb7",
+    "return_code": 0,
+    "status": "PASS"
+  },
+  "task_bank_created": false,
+  "task_ids_or_task_seeds_created": false
+}

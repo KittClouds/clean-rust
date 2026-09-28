@@ -1,0 +1,29 @@
+{
+  "task_id": "turbovec-turbovec-id-swap-repair-v2",
+  "lane": "hand-written",
+  "action_id": 11,
+  "patch_sha256": "f92aef127b434ce4962d0cf28b159dfe3049b0572d67553880f97da5ced86edd",
+  "candidate_variant": "gold_comment",
+  "test_filter": "remaining_ids_still_self_query_after_mixed_removes",
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--manifest-path",
+    "C:\\rd-c\\experiment-010\\tasks\\heldout-bank-v1\\families\\turbovec-id-swap-repair\\candidates\\gold_comment\\Cargo.toml",
+    "--package",
+    "turbovec",
+    "--test",
+    "id_map",
+    "remaining_ids_still_self_query_after_mixed_removes",
+    "--",
+    "--exact"
+  ],
+  "exit_code": 0,
+  "status": "passed",
+  "passed": true,
+  "elapsed_ms": 11095.622,
+  "completion_source": "live-cargo-test",
+  "output_sha256": "fa6d482dec75196a8586666e38969bb66d44dd88dace6cf217e34d48b2069346",
+  "output": "\nrunning 1 test\ntest remaining_ids_still_self_query_after_mixed_removes ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 22 filtered out; finished in 1.31s\n\n   Compiling turbovec v0.9.0 (C:\\rd-c\\experiment-010\\tasks\\heldout-bank-v1\\families\\turbovec-id-swap-repair\\candidates\\gold_comment\\turbovec)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 9.53s\n     Running tests\\id_map.rs (D:\\cargo-targets\\rdc-e010\\scoring\\debug\\deps\\id_map-6028bbdd1bdac666.exe)\n"
+}

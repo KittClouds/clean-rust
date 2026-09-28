@@ -1,0 +1,232 @@
+{
+  "protocol": "jev-information-density/v0.8p-fresh-heldout-panel-v01",
+  "identity": "v0.8P-fresh-eval-panel-v01",
+  "status": "CONTRACT_SEALED_PANEL_NOT_CONSTRUCTED",
+  "purpose": "Prospectively construct a fresh held-out panel for the new v0.8P optimizer trajectories; preserve v0.8N/E1 estimands while using new generated world instances and a new panel identity.",
+  "authorization_state": {
+    "contract_sealed": true,
+    "panel_materialized": false,
+    "panel_construction_authorized": false,
+    "head_load": false,
+    "head_training": false,
+    "evaluation_inference": false,
+    "firewall_open": false
+  },
+  "construction_custody": {
+    "custodian_identity": "v0.8P-panel-builder-v01",
+    "custodian_role": "isolated panel-construction process only",
+    "allowed_inputs_after_separate_authorization": [
+      "frozen generator and family specification",
+      "P-specific generator seed and partition namespace",
+      "exact-world episodes and targets for semantic validation",
+      "fresh P state and candidate text inputs",
+      "pinned frozen LFM snapshot for feature extraction and radius-only matching"
+    ],
+    "forbidden_inputs": [
+      "any head checkpoint or head output",
+      "E1 or v0.8N panel bodies, targets, joins, predictions, or metrics",
+      "NewTight or legacy evaluation data",
+      "Phoenix"
+    ],
+    "output_policy": "Write only under the new P panel root, seal all data and receipts, and grant no read access to the P trainer. The evaluator receives access only after all P training/checkpoint artifacts are sealed and separate evaluation authorization is recorded.",
+    "construction_authorization_now": false
+  },
+  "parents_and_source_bindings": {
+    "v08n_base_contract": {
+      "path": "experiments/jev-information-density-v08n/phase-a-v01-contract.json",
+      "sha256": "f72947a53c7df85d12c7d9f91620c0c32925c047b0c556d9298038c80c51f103"
+    },
+    "v08n_eval_panel_contract": {
+      "path": "experiments/jev-information-density-v08n/eval-panel-v01-contract.json",
+      "sha256": "3fa547c0a2490c4cfb5d578a32dffeb8414c35daa5e59ef339ab1e148e2e9cd6"
+    },
+    "family_spec": {
+      "path": "experiments/jev-information-density-v08n/generator/src/families.rs",
+      "sha256": "e56885005487b36b573c1bf4d47741413ca72df0992ff62bcf48891eecacb429"
+    },
+    "identity_constructor": {
+      "path": "experiments/jev-information-density-v08n/generator/src/generator.rs",
+      "sha256": "f04a9b1d4f6682522e5957be3c0075db4bd7aa4e4e25968650f2ff24a42c7f5b"
+    },
+    "existing_semantic_builder_reference": {
+      "path": "experiments/jev-information-density-v08n/phase_a/build_eval_panel_semantic.py",
+      "sha256": "55104d496d825e7aa58c55fa27f59f67b4b74efb34d2b7882d82ffeada8e7083"
+    },
+    "existing_frozen_extractor": {
+      "path": "experiments/jev-lfm-variable-v07/extract_lfm.py",
+      "sha256": "b8cd79a9a3265eca0fde5f509ba7c058bc2065d7747efe17ff7c7c1f6335b2d0"
+    },
+    "existing_panel_matcher_reference": {
+      "path": "experiments/jev-information-density-v08n/phase_a/match_eval_panel_radius.py",
+      "sha256": "1036f3242c24bbc5d2d1f8112b2129b6454960591d3ea8f003d71ccec7cc9640"
+    },
+    "existing_panel_feature_extractor_reference": {
+      "path": "experiments/jev-information-density-v08n/phase_a/extract_eval_panel_features.py",
+      "sha256": "460b02b3d262372f554c6fa4a3c3accb34379e8cd56ed3fda275775668dc1269"
+    },
+    "existing_panel_sealer_reference": {
+      "path": "experiments/jev-information-density-v08n/phase_a/seal_eval_panel.py",
+      "sha256": "71c301c02c173c02c585c0c8490b2d0058c11d4f96a6b487877112a886aa4628"
+    },
+    "note": "These are immutable semantic/algorithm references. Any P-specific wrapper or adapter must have its own source hash and tests sealed before a separate panel-construction authorization."
+  },
+  "freshness_and_scope": {
+    "partition_namespace": "eval_v08p",
+    "generator_seed_derivation": {
+      "label": "jev-information-density-v08p-panel-v01/generator-seed",
+      "algorithm": "SHA-256(UTF-8(label)); interpret the first four digest bytes as unsigned little-endian u32",
+      "sha256": "988f195d0e723dae91f4e8ee55d5f91f131ca6150759ed08f48e14f967808e65",
+      "seed": 1561956248
+    },
+    "fresh_instance_rule": "Generate new anchor/world/root/episode IDs under partition eval_v08p using sequences 000000-000499 independently within each of the four held-out semantic families. Do not copy or regenerate any E1 or v0.8N panel row by ID.",
+    "family_basis": [
+      {"slug": "exposure_control", "neighborhoods": 500},
+      {"slug": "respiratory_monitoring", "neighborhoods": 500},
+      {"slug": "salinity_control", "neighborhoods": 500},
+      {"slug": "vibration_monitoring", "neighborhoods": 500}
+    ],
+    "family_total": 2000,
+    "family_interpretation": "same four held-out semantic family slugs and candidate schemas as E1; new world instances and IDs",
+    "template_scope_limit": "The frozen generator constructs the same p0-p3 held-out template surfaces. P is fresh at the neighborhood/world-instance level, not a novel-template generalization test. Report this limitation explicitly.",
+    "training_overlap": "require zero overlap in world/root IDs, episode IDs, full rendered input hashes, and selector-input hashes against the sealed training scope",
+    "prior_panel_overlap": "require zero overlap in world/root IDs, episode IDs, full rendered input hashes, and selector-input hashes against digest-only identity inventories for v0.8N/E1; do not read their targets, panel bodies, joins, predictions, or metrics to construct P",
+    "no_replacement_after_audit": true
+  },
+  "neighborhood_contract": {
+    "neighborhoods": 2000,
+    "episodes_per_neighborhood": 11,
+    "episode_roles": [
+      "anchor",
+      "fact_flip",
+      "sham",
+      "neutral_1",
+      "neutral_2",
+      "neutral_3",
+      "neutral_4",
+      "neutral_5",
+      "neutral_6",
+      "neutral_7",
+      "neutral_8"
+    ],
+    "selected_evaluation_views": ["anchor", "fact_flip", "sham", "matched_neutral"],
+    "same_latent_world": true,
+    "same_query_schema_candidate_set_and_order": true,
+    "exact_world_validation": {
+      "sham_target_max_component_abs_error": 1e-12,
+      "each_neutral_target_max_component_abs_error": 1e-12,
+      "fact_flip_exact_map_winner_changes": true,
+      "independent_solver_receipt_per_episode": true,
+      "single_intended_intervention_per_sibling": true
+    },
+    "surface_edit": {
+      "changed_field_count": 1,
+      "changed_character_count": 1,
+      "changed_span_count": 1,
+      "sham_neutral_magnitude_equal": true,
+      "semantic_neutral_not_cosmetic": true
+    }
+  },
+  "representation_and_matching": {
+    "backbone": "LiquidAI/LFM2.5-1.2B-Base",
+    "revision": "7453bca97ca1e67754c4035a4b4c584e1c9dd725",
+    "snapshot_sha256": {
+      "config.json": "15d6157fb6df3f8272e2fe90e18f57727ccf02a125c94469198b0f3281510185",
+      "model.safetensors": "7678ab9546a0c51c1fca161876b1efc4f0906277f170b5822045f40fdaf9eeff",
+      "tokenizer.json": "d7a0ab0fc22e41ec8c6d7450a9ff9ce40e196ec5e5a2fa6a2105e064e0514ed7",
+      "tokenizer_config.json": "8cba5b0c7acab23a0d4cc9ac587346c9220a1b6d288fc5346fe118202fd6f43e",
+      "special_tokens_map.json": "742aefe2b7dec496e8caffdba03a75d0c1a9925d53bd3f3e0d388c96b591b6f4"
+    },
+    "backbone_frozen": true,
+    "extractor": "experiments/jev-lfm-variable-v07/extract_lfm.py::encode_lfm_texts",
+    "pooling": "final-layer mean_full@16 over valid positions",
+    "input_mode": "exact-length, single-row, no padding",
+    "production_batch_size": 1,
+    "maximum_length": 1024,
+    "backbone_dtype": "bfloat16",
+    "output_dtype": "float32",
+    "feature_dimension": 2048,
+    "feature_scope_count": 22016,
+    "feature_scope_composition": "22,000 state episodes (2,000 neighborhoods times 11 roles) plus a fresh 16-row candidate text basis derived from the sealed FamilySpecs",
+    "candidate_basis": {
+      "rows": 16,
+      "candidates_per_schema": 4,
+      "feature_shape": [16, 2048],
+      "join_key": "schema_family_id plus exact candidate_semantic_id",
+      "order_source": "authoritative FamilySpec candidate order",
+      "fresh_for_p": true,
+      "reuse_e1_candidate_vectors": false,
+      "slot_or_position_crosswalk": false
+    },
+    "matching_rule": "For each anchor, choose argmin_j abs(||h_Nj-h_A||_2 - ||h_S-h_A||_2); deterministic tie-break is SHA-256(anchor_id + '|' + neutral_role), ascending lexical digest.",
+    "matching_implementation_reference_sha256": "1036f3242c24bbc5d2d1f8112b2129b6454960591d3ea8f003d71ccec7cc9640",
+    "direction_or_cosine_used_for_selection": false,
+    "evaluation_outcomes_used_for_selection": false,
+    "radius_gates": {
+      "mean_relative_error_max": 0.10,
+      "p95_absolute_error_max": 0.25,
+      "per_family_mean_relative_error_max": 0.15,
+      "all_gates_required": true,
+      "failure_action": "fail the panel identity; no candidate replacement, seed change, or threshold relaxation"
+    },
+    "report_required": [
+      "full per-neighborhood sham/matched radius-error distribution",
+      "overall and per-family mean relative error",
+      "p95 absolute error",
+      "all three gate decisions",
+      "selected neutral-axis histogram",
+      "feature and candidate text hashes",
+      "identity-overlap audit"
+    ]
+  },
+  "panel_size_and_join": {
+    "selected_neighborhoods": 2000,
+    "neighborhoods_per_family": 500,
+    "scored_views_per_neighborhood": 4,
+    "candidate_count_per_view": 4,
+    "evaluated_view_rows": 8000,
+    "candidate_join": "exact schema_family_id + candidate_semantic_id; candidate order resolved from fresh P manifest, never from row number or E1",
+    "whole_panel_join_preflight": "all 2,000 neighborhoods must resolve to exactly four unique candidate vectors in authoritative order; zero missing, duplicate, or extra candidates"
+  },
+  "required_seal_artifacts": [
+    "p-fresh-panel-contract.json",
+    "generator-and-seed-receipt.json",
+    "semantic-validation-receipt.json",
+    "training-and-prior-panel-identity-overlap-receipt.json",
+    "fresh-candidate-text-manifest.jsonl",
+    "fresh-candidate-feature-cache-receipt.json",
+    "fresh-state-feature-cache-receipt.json",
+    "matched-neutral-selection.jsonl",
+    "radius-gate-report.json",
+    "semantic-axis-composition.json",
+    "whole-panel-candidate-join.jsonl",
+    "whole-panel-join-preflight.json",
+    "panel-hash-tree.json",
+    "evaluation-firewall-lock.json",
+    "panel-seal-manifest.json"
+  ],
+  "panel_firewall": {
+    "panel_readable_to_training_process": false,
+    "panel_opening_count_before_future_evaluation": 0,
+    "body_access_granted_before_future_evaluation_authorization": false,
+    "evaluation_authorized_now": false,
+    "no_newtight_legacy_or_phoenix": true
+  },
+  "output": {
+    "root": "D:/codex-runs/jev-information-density-v08p/v0.8P-fresh-eval-panel-v01",
+    "create_during_contract_drafting": false,
+    "create_only_after_separate_panel_construction_authorization": true,
+    "fail_if_identity_root_exists": true
+  },
+  "boundaries": {
+    "E1_panel_rows_or_targets_as_primary_data": false,
+    "E1_predictions_or_metrics_as_panel_construction_inputs": false,
+    "training_head_contact": false,
+    "training": false,
+    "evaluation_inference": false,
+    "replacement_shopping": false,
+    "direction_or_cosine_matching": false,
+    "newtight": false,
+    "legacy_evaluation": false,
+    "phoenix": false
+  }
+}

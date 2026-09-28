@@ -1,0 +1,156 @@
+{
+  "schema_version": 1,
+  "run_id": "e009-20260925-expanded-01",
+  "stage": "heldout-shadow-large",
+  "role": "large",
+  "bundle_id": "ternary-bonsai-2-27b-ptq1-local-v3",
+  "bundle_blake3": "10718ac888360735f332dfa545e5db53b235a02159d924d90fc3370124550281",
+  "bundle_lock_sha256": "e6027516ebf46a536533a5a35afc1b5280153e3146c1f503e75d4ec13969f2d6",
+  "frozen_input_lock_sha256": "def427389b4fac2b0b307e222b8c62d788eea02ea39e4e7d65643537b2c5968b",
+  "frame_lock_sha256": "fea435d14ccf9cba99502a50efc1d7f95191c53bb271b7ed210bcb11dbfb0d67",
+  "frame_blake3": "8344bcbdecb40551f2b82ab0819c49dc3d2fcc32f731c10a5fc180e525847f23",
+  "task_id": "heldout-draft-cardinality-transitions-ambiguous-02",
+  "server_alias": "e009-large-v3",
+  "server_process_id": 440,
+  "server_runtime_args": [
+    "--model",
+    "D:\\phoenix-models\\candidates\\ternary-bonsai-2-27b\\6ed5e12bf84b7a63069882c91dd9e9218647d17b\\Ternary-Bonsai-2-27B-PTQ1_0.gguf",
+    "--host",
+    "127.0.0.1",
+    "--port",
+    "18090",
+    "--alias",
+    "e009-large-v3",
+    "--ctx-size",
+    "4096",
+    "--n-gpu-layers",
+    "99",
+    "--reasoning",
+    "off"
+  ],
+  "reasoning_mode": "off",
+  "chat_template_sha256": "c3cf9e34abf4f9e36c2d72165aa9c132d3e2a725b6c2586aaa3a8af9d7a81041",
+  "maximum_output_tokens": 1024,
+  "system_prompt_sha256": "2b97ece95d1afb065fed7287d5125e8e032196c209610c9bc9931841aa1db7e6",
+  "output_schema_sha256": "d3e44b9964d52bb68384b83e17d9cb5699be96bae7dc98d576acaaabcf3eb8ef",
+  "thresholds": {
+    "minimum_applicability_milli": 50,
+    "maximum_abstention_milli": 180
+  },
+  "model": "e009-large-v3",
+  "request_sha256": "44fe540f441208813cd15347ba6af02851221bd9f140bd916756e7d8bb336e10",
+  "request": {
+    "model": "e009-large-v3",
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a typed observer in a deterministic coding workflow. The runtime owns workflow state and will execute only one action from the offered action_options after validating your output.\n\nRead the task_prompt and evidence, then compare the offered actions. Choose the action most likely to satisfy the task while preserving the repository's stated constraints. Do not write or propose code outside the offered choices. Do not claim to have executed tests. If no offered action is sufficiently supported, use null for action_choice and express uncertainty with abstention_milli.\n\nReturn exactly one JSON object matching the provided schema. action_choice must be an offered numeric action ID or null. applicability_milli is your 0-to-1000 estimate that this observer can handle the task from the available evidence. abstention_milli is your 0-to-1000 estimate that the runtime should defer this choice. Use integer values only. Do not add prose or fields.\n"
+      },
+      {
+        "role": "user",
+        "content": "{\"schema_id\":\"rdc-real-coding-observation.v1\",\"task_id\":\"heldout-draft-cardinality-transitions-ambiguous-02\",\"task_family\":\"draft-cardinality-transitions\",\"task_prompt\":\"Repair the transition from draft state to palette. Read the frozen test's three checkpoints—zero, one, and two colors—and choose the minimum stop count that satisfies all of them.\",\"repository_revision\":\"9a88547372cd35f8dc31f026f0cd8dd8fca8e641\",\"snapshot_sha256\":\"eeddd149081288b578a73d4f1e9eddc420e9e64ed87905be50103d8d0bacf4bd\",\"evidence\":[{\"kind\":\"source_excerpt\",\"source_id\":\"phoenix-native/crates/gpui-animated-gradient-text/src/palette.rs\",\"content_blake3\":\"567a4369142edff5bf8ee4d4670e90fbe65b12276c9d0e91db410896d61912c1\",\"content\":\"The current task snapshot permits a one-stop GradientPalette. The frozen test requires an empty and one-color draft to remain non-gradient and a two-color draft to produce a two-stop palette.\\nCurrent task-snapshot code: `if stops.len() < 1 {`\"},{\"kind\":\"baseline_tool_result\",\"source_id\":\"cargo-test-palette::tests::draft_supports_empty_solid_and_gradient_states-frozen-base\",\"content_blake3\":\"017a2c5743e8978a96efba590907448b73bacd16f31bb57213d915923498f499\",\"content\":\"Task snapshot eeddd149081288b578a73d4f1e9eddc420e9e64ed87905be50103d8d0bacf4bd: exact test `palette::tests::draft_supports_empty_solid_and_gradient_states` ran on the current snapshot and failed 1/1. No candidate repair has been executed in this episode.\"}],\"action_options\":[{\"action\":{\"id\":11,\"schema_id\":1},\"summary\":\"Apply the focused patch with an explanatory source comment.\",\"diff_excerpt\":\"Patch lines:\\n+// E009 candidate: behavior-preserving repair note.\\n-        if stops.len() < 1 {\\n+        if stops.len() < 2 {\",\"patch_sha256\":\"242203341c0b1e134781f4f9a3e03dd8ff5f4b3d4dc0f957ad12211b011fe001\"},{\"action\":{\"id\":37,\"schema_id\":1},\"summary\":\"Apply the alternate implementation patch.\",\"diff_excerpt\":\"Patch lines:\\n-        if stops.len() < 1 {\\n+        if stops.len() < 3 {\",\"patch_sha256\":\"090db41494971118b1e7d941bb599524ab15af6a311472986f52d3bda882b7bf\"},{\"action\":{\"id\":68,\"schema_id\":1},\"summary\":\"Apply the focused implementation patch.\",\"diff_excerpt\":\"Patch lines:\\n-        if stops.len() < 1 {\\n+        if stops.len() < 2 {\",\"patch_sha256\":\"89ff38e3bf856a69a57ecf71e52d8af33186cfbd0ae9ac94a70a101a563ceb51\"},{\"action\":{\"id\":94,\"schema_id\":1},\"summary\":\"Retain the current implementation.\",\"diff_excerpt\":\"No source changes; retain the current expression.\",\"patch_sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"}]}"
+      }
+    ],
+    "temperature": 0,
+    "top_p": 1,
+    "seed": 0,
+    "max_tokens": 1024,
+    "stream": false,
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rdc_coding_observer_output_v1",
+        "strict": true,
+        "schema": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "rdc-coding-observer-output.v1",
+          "title": "RDC Coding Observer Output v1",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "action_choice",
+            "applicability_milli",
+            "abstention_milli"
+          ],
+          "properties": {
+            "action_choice": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 65535
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "applicability_milli": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1000
+            },
+            "abstention_milli": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1000
+            }
+          }
+        }
+      }
+    }
+  },
+  "http_status": 200,
+  "response": {
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "{\n  \"action_choice\": 68,\n  \"applicability_milli\": 950,\n  \"abstention_milli\": 50\n}"
+        }
+      }
+    ],
+    "created": 1790353748,
+    "model": "e009-large-v3",
+    "system_fingerprint": "b10685-7dffb158d",
+    "object": "chat.completion",
+    "usage": {
+      "completion_tokens": 39,
+      "prompt_tokens": 1187,
+      "total_tokens": 1226,
+      "prompt_tokens_details": {
+        "cached_tokens": 194
+      }
+    },
+    "id": "chatcmpl-k5ihM0RbWJcNmy0dpY9GnggH4ChdFgMY",
+    "timings": {
+      "cache_n": 194,
+      "prompt_n": 993,
+      "prompt_ms": 1928.43,
+      "prompt_per_token_ms": 1.94202416918429,
+      "prompt_per_second": 514.9266501765685,
+      "predicted_n": 39,
+      "predicted_ms": 760.335,
+      "predicted_per_token_ms": 20.008815789473687,
+      "predicted_per_second": 49.97797023680351
+    }
+  },
+  "content": "{\n  \"action_choice\": 68,\n  \"applicability_milli\": 950,\n  \"abstention_milli\": 50\n}",
+  "output": {
+    "action_choice": 68,
+    "applicability_milli": 950,
+    "abstention_milli": 50
+  },
+  "usage": {
+    "completion_tokens": 39,
+    "prompt_tokens": 1187,
+    "total_tokens": 1226,
+    "prompt_tokens_details": {
+      "cached_tokens": 194
+    }
+  },
+  "finish_reason": "stop",
+  "elapsed_ms": 2989.791
+}

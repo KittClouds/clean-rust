@@ -1,0 +1,62 @@
+{
+  "task_id": "small_only-task-569812__1871bde99f3d",
+  "frame_digest_hex": "1871bde99f3d83398773f19fd715d391902267965ca7cb88b41c4c4661a0c797",
+  "request_id_hex": "b528d281de6f04994fb3a004791160edd36f781dcd93f0b137139ccc8ad64829",
+  "response_request_id_hex": "b528d281de6f04994fb3a004791160edd36f781dcd93f0b137139ccc8ad64829",
+  "request_receipt_digest_hex": "e2a128e174d7ae21e851ab479ec6945941af2f3b8e9680a8ee3c3eeb4e9bdbbc",
+  "response_receipt_digest_hex": "e2a128e174d7ae21e851ab479ec6945941af2f3b8e9680a8ee3c3eeb4e9bdbbc",
+  "presentation_receipt_hex": "524443510100040000001871bde99f3d83398773f19fd715d391902267965ca7cb88b41c4c4661a0c797c07dfbb5de7b94b2d630c2f147a0e7a9f75f5f988b7e1d1d96761f9d5f4333ec7ddfe3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855fc558b05d58595f1cc9354bf0c82ea82fb173d96b4d2f415bf0079feccaca58e40ed94802ab88607f65106a128e8bcc7e7ef5869f8ea0c16112f653ec8120661675356cbf4ce2f0b77319d88b3d5b0b27dc7e2aec0a1a1cf49ae37c3367f5e4d86440889aa8a",
+  "action_ledger_path": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\artifacts\\runs\\e012-20260926-frame-decomposition-01\\action-ledgers\\small_only\\task-569812__1871bde99f3d.bin",
+  "ordered_options": [
+    {
+      "producer_ordinal": 0,
+      "action": {
+        "id": 57213,
+        "schema_id": 1
+      },
+      "summary": "Apply the candidate change shown in the code excerpt.",
+      "diff_excerpt": "",
+      "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "producer_ordinal": 1,
+      "action": {
+        "id": 22012,
+        "schema_id": 1
+      },
+      "summary": "Apply the candidate change shown in the code excerpt.",
+      "diff_excerpt": "@@ -1,7 +1,7 @@\n use clap::{Arg, ArgAction, Command};\n \n // E012 candidate slot: implementations differ in which spellings they support.\n-const FORMS: &[(&str, bool)] = &[(\"color\", true)];\n+const FORMS: &[(&str, bool)] = &[(\"color\", true), (\"colour\", true)];\n \n pub fn parse_color(argv: &[&str]) -> Option<bool> {\n     let mut command = Command::new(\"demo\");",
+      "patch_sha256": "8b05d58595f1cc9354bf0c82ea82fb173d96b4d2f415bf0079feccaca58e40ed"
+    },
+    {
+      "producer_ordinal": 2,
+      "action": {
+        "id": 32916,
+        "schema_id": 1
+      },
+      "summary": "Apply the candidate change shown in the code excerpt.",
+      "diff_excerpt": "@@ -1,7 +1,7 @@\n use clap::{Arg, ArgAction, Command};\n \n // E012 candidate slot: implementations differ in which spellings they support.\n-const FORMS: &[(&str, bool)] = &[(\"color\", true)];\n+const FORMS: &[(&str, bool)] = &[(\"color\", true), (\"no-color\", false)];\n \n pub fn parse_color(argv: &[&str]) -> Option<bool> {\n     let mut command = Command::new(\"demo\");",
+      "patch_sha256": "2ab88607f65106a128e8bcc7e7ef5869f8ea0c16112f653ec8120661675356cb"
+    },
+    {
+      "producer_ordinal": 3,
+      "action": {
+        "id": 52980,
+        "schema_id": 1
+      },
+      "summary": "Apply the candidate change shown in the code excerpt.",
+      "diff_excerpt": "@@ -1,7 +1,7 @@\n use clap::{Arg, ArgAction, Command};\n \n // E012 candidate slot: implementations differ in which spellings they support.\n-const FORMS: &[(&str, bool)] = &[(\"color\", true)];\n+const FORMS: &[(&str, bool)] = &[(\"colour\", true), (\"no-color\", false)];\n \n pub fn parse_color(argv: &[&str]) -> Option<bool> {\n     let mut command = Command::new(\"demo\");",
+      "patch_sha256": "2f0b77319d88b3d5b0b27dc7e2aec0a1a1cf49ae37c3367f5e4d86440889aa8a"
+    }
+  ],
+  "observer_output": {
+    "action_choice": 22012,
+    "applicability_milli": 1000,
+    "abstention_milli": 0
+  },
+  "thresholds": {
+    "minimum_applicability_milli": 850,
+    "maximum_abstention_milli": 150
+  },
+  "completion_check_passed": false
+}

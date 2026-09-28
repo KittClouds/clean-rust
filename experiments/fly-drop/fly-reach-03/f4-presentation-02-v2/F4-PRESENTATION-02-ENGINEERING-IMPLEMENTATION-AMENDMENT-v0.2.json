@@ -1,0 +1,34 @@
+{
+  "schema": "F4-PRESENTATION-02-implementation-amendment-v0.2",
+  "status": "IMPLEMENTATION_ONLY_VERSIONED_RUNTIME_REPAIR",
+  "supersedes_execution_identity": "F4-PRESENTATION-02-CPHI-ENG1",
+  "execution_identity": "F4-PRESENTATION-02-CPHI-ENG1-V2",
+  "prior_attempt": {
+    "stop_receipt_path": "experiments/fly-reach-03/runs/F4-PRESENTATION-02-CPHI-ENG1/EXECUTION-STOP-RECEIPT-v0.1.json",
+    "stop_receipt_sha256": "15547bf1d79b1a6e3118b8158fa03a25bb725e7497f8b7cab7a53d7ab9ba6021",
+    "completed_fit_count": 0,
+    "prediction_or_state_outputs": 0,
+    "heldout_truth_opened": false,
+    "comparative_outcomes_emitted": false
+  },
+  "exact_implementation_change": [
+    "Replace repeated per-row Python tuple sorting with NumPy lexsort over the same six-field D key, normalizing signed zero exactly as D does.",
+    "Precompute the D-canonical tuple order once per fit and reuse those byte-identical ordered tuples for every minibatch and epoch."
+  ],
+  "required_exact_parity": [
+    "Vectorized tuple sorting must byte-match the frozen D input routine on deterministic fixtures, including signed zero and duplicate tuples.",
+    "The sorted normalized tuple values, shared phi operations, readout, loss, gradients, Adam update order, training row order, batches, epoch count, and initialization semantics remain unchanged."
+  ],
+  "explicitly_unchanged": [
+    "task bank, raw predictor and scoring truth streams, U* rows, fold normalization, shared input hashes",
+    "D and S anchors and all their fit/prediction/analysis artifacts",
+    "Cphi dimensions, shared phi, canonical tuple ordering, initial phi tensors, readout initializer domain, parameter count",
+    "optimizer, learning rate, batch size, epochs, three replicate identities, scoring and diagnostics",
+    "parent NOT_EVALUABLE_SUPPORT status, truth-access provenance, and downstream authorization state"
+  ],
+  "new_fit_count": 36,
+  "qualification_only": true,
+  "scientific_promotion": false,
+  "measured_reach03_authorized": false,
+  "pheno_status": "unchanged"
+}

@@ -1,0 +1,796 @@
+{
+  "biological_promotion": false,
+  "bootstrap_seed_domain_hex": "46342d42494e44494e472d30312d53544147452d422f424f4f5453545241502d76302e3100",
+  "bootstrap_seed_u64": 9814054199547548830,
+  "identity": "F4-BINDING-01-STAGE-B-PROSP-v0.1",
+  "measured_reach03_authorized": false,
+  "model_registry_path": "experiments/fly-reach-03/frozen-fabrique/F4-BINDING-01-STAGE-B-v0.1/MODEL-REGISTRY.json",
+  "model_registry_sha256": "8d936560fdf442e69e724f5bdf2898fad3a3b624f116ac385aca8a5b7d637713",
+  "parent_artifacts": [
+    {
+      "byte_length": 5717837,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/anatomy/edges-L.tsv",
+      "sha256": "ed6044a5de43b2c6acd58aa034967ac80a595ab55456a04f505ecb764d36b0de"
+    },
+    {
+      "byte_length": 5725623,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/anatomy/edges-R.tsv",
+      "sha256": "42b602cd95cf169e86cee7fdc3b28f59e068677aa63e382b845af30c2bffa573"
+    },
+    {
+      "byte_length": 58761,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/anatomy/nodes-L.tsv",
+      "sha256": "3fc14bc6bf33e6a1fc2af7f377b7a23f6700ff916030b840bab4259d76e5232f"
+    },
+    {
+      "byte_length": 58949,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/anatomy/nodes-R.tsv",
+      "sha256": "871cf14a0daf569139b2a880f1927a0f3be7b4d11f5feb47bd435178b74d347f"
+    },
+    {
+      "byte_length": 5255578,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g001/edges-L.tsv",
+      "sha256": "eb92e858b4b07534abc8763e3b8f92bd139b02d95d4bb3cc6b2c9ae2807c28c9"
+    },
+    {
+      "byte_length": 5262051,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g001/edges-R.tsv",
+      "sha256": "7de3749f1a0fc8a03a5ed760650db2526ebaf391aa29a30c5b8ddeb461e3b223"
+    },
+    {
+      "byte_length": 5255578,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g002/edges-L.tsv",
+      "sha256": "655a2e71a0f1da4b82ee8560c2b1e20570a04a9e34eb018ebb4c5aebf0568c54"
+    },
+    {
+      "byte_length": 5262051,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g002/edges-R.tsv",
+      "sha256": "108ffd074903a08d801371027b6662503fc0e2a7814ec95e6fac7718e7ae601e"
+    },
+    {
+      "byte_length": 5255578,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g003/edges-L.tsv",
+      "sha256": "5d4b14cab55df828c61c0f13abc73a5d4ed9171ea5b743cb9623b34c084cfa19"
+    },
+    {
+      "byte_length": 5262051,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g003/edges-R.tsv",
+      "sha256": "1d5578e048b7ba567a909337988234c8dd3721e23905419826c664ee8e14f332"
+    },
+    {
+      "byte_length": 5255578,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g004/edges-L.tsv",
+      "sha256": "c2c0cfef2e4b5006e7d0bebc5a222ea0bb2d925ee79c4088566f1adf23bcc17e"
+    },
+    {
+      "byte_length": 5262051,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g004/edges-R.tsv",
+      "sha256": "c26d834b276648dfc9b529bd8ce6d1f2d3db61c22cdd3563a75b4801da4590ac"
+    },
+    {
+      "byte_length": 5255578,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g005/edges-L.tsv",
+      "sha256": "94cf106a1dd66c161a18bcba31d5e62c89dce378d4bf4fd8c70e604000fd3e74"
+    },
+    {
+      "byte_length": 5262051,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g005/edges-R.tsv",
+      "sha256": "ad73539b78bd22232dc73f9e6d94e4ebcea547a9d4109861e07c6da4f0d5c3d2"
+    },
+    {
+      "byte_length": 5255578,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g006/edges-L.tsv",
+      "sha256": "165ef118059d023b9a4db2346aa6ed044a0f80e601a5850dd42ea6e5634e5662"
+    },
+    {
+      "byte_length": 5262051,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g006/edges-R.tsv",
+      "sha256": "41f9bef7b72386177e02dd9979f2801970fd99176d48335a9a7f4c8eb86dc0c0"
+    },
+    {
+      "byte_length": 5255578,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g007/edges-L.tsv",
+      "sha256": "6c966396aef86b7280cbda592604c4e111a3c7a80792b861c6f486ddc3df93b1"
+    },
+    {
+      "byte_length": 5262051,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g007/edges-R.tsv",
+      "sha256": "2a4fcd636b3bb6a62ae56395e499631586e439b4808780275d48412abef0582e"
+    },
+    {
+      "byte_length": 5255578,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g008/edges-L.tsv",
+      "sha256": "bd0444ddc71c8fb02f59777190c9c2610ed79fa4b9572ddaeb367dda75213927"
+    },
+    {
+      "byte_length": 5262051,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g008/edges-R.tsv",
+      "sha256": "da63f56a22074bb72a1b6b7aaf75602470f4b92c98a6007ef86e7a8b3242a59d"
+    },
+    {
+      "byte_length": 13602,
+      "path": "experiments/fly-reach-03/f4-presentation-02-v2/cphi_model.py",
+      "sha256": "d50521285235db36b062f9eda9a90eb4182a836e2ccb8ab292c04e9e74158099"
+    },
+    {
+      "byte_length": 24159,
+      "path": "experiments/fly-reach-03/frozen-fabrique/F4-BINDING-01-STAGE-B-v0.1/PARENT-REPLAY-RECEIPT-v0.2.json",
+      "sha256": "856494ce20d365c29ed59aab3f4ebf67fafaf3e37fe2f71638520e0644c50fec"
+    },
+    {
+      "byte_length": 7206,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-A-EXPLORATORY-v0.1/STAGE-A-TERMINAL-RECEIPT.json",
+      "sha256": "77fd5aafb321da1fb4a6dd204a099031596b3e61d7de39d7663f33b8f023b0ea"
+    },
+    {
+      "byte_length": 10012082,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-ENG1/native-collection/RAW-PREDICTORS.bin",
+      "sha256": "495c68070624e4b8eaeeba217aeb03bdac6636d75e6691292a59872c11a9455f"
+    },
+    {
+      "byte_length": 8954,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-ENG1/task-bank/TASK-BANK-MANIFEST.json",
+      "sha256": "ad339f4a710c9cb803e68a7076da923a68486f81b7552aa767c710f885deb0a1"
+    },
+    {
+      "byte_length": 96679,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/ANALYSIS.json",
+      "sha256": "d79f885d3d8b8bef0579312cc72c2b5c8fa08b6edb1fcf52b66bcf5abf1b51c5"
+    },
+    {
+      "byte_length": 1337,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/COLLECTION-RECEIPT.json",
+      "sha256": "74b4a574519a665dfea0bf2a1196362f1d2ba7e4ff18aae422fb653b4ca00a40"
+    },
+    {
+      "byte_length": 1339,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/F4-PRESENTATION-03-TERMINAL-RECEIPT.json",
+      "sha256": "298a77fe8aa815a3ff58722dd52a06a8e1e0637fce505955662354150203f2bb"
+    },
+    {
+      "byte_length": 184941,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/FIT-MANIFEST.csv",
+      "sha256": "f71d344c5bc58e86a68e7bd9163aed1ab5d945468bfe84f06a8981e6a1c2ce66"
+    },
+    {
+      "byte_length": 55985,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/INTEGRITY-RECEIPT.json",
+      "sha256": "cf52cc787b3bf501b3f80944d452af3247e569f82f110c06c597e499bfca2591"
+    },
+    {
+      "byte_length": 111387,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/PREDICTION-LOCK.json",
+      "sha256": "dd387bcc52510eac947774cb6d9303d8cdd8142cee07a60b0e39cddd4dcb54ce"
+    },
+    {
+      "byte_length": 66103,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/SOURCE-INPUT-MANIFEST.json",
+      "sha256": "7310de650f0efd5bb7ccb5342bf30e9cc8ae11a16da968e656512bda0e1b7305"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309000-I0.bin",
+      "sha256": "62b9a6c75d3e784df9611fae2a1b3ca27ad8f9e038da8799368b7315530b668a"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309000-I1.bin",
+      "sha256": "dc04b2fa5b32e411ebcc8e5aed4741f4d6d42f5af4fbe656c8e27d21453ac09d"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309000-I2.bin",
+      "sha256": "cf54ebcb7cf60ba42bbe149a855234a824a0cb1a2264fcd89dac03ef63b3a469"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309001-I0.bin",
+      "sha256": "4fb321cf04f426353256f94828f545e520ae75e4d466c2f522f6c4520b29e084"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309001-I1.bin",
+      "sha256": "89a1de7f394a9d986b2e659d0f65af9e6797f7f84d55b8e1bd53d3501cfdca5d"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309001-I2.bin",
+      "sha256": "66210c98cc7461b35af89c1139c554342a8fc33d65c37bcef17af9a63f86fa75"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309002-I0.bin",
+      "sha256": "e6a424920a07f7558647263cee39b9b9889ccad7f68e2dbd2ccffc6ab7b9222b"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309002-I1.bin",
+      "sha256": "58705c73de8e04ffaf8687d6012a0e4a9a5fd6b75793fbe201029dc1b94cfb24"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309002-I2.bin",
+      "sha256": "b4e50848b2f454452cb135ff6cffcf3020be18a904cb12db72c747f32f0c4719"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309003-I0.bin",
+      "sha256": "577b4fa6f96fec5f52acb99d022037f56fcedae29c9c6d474f148deedfde760b"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309003-I1.bin",
+      "sha256": "b431dfd901db4164bcc3dd1d63017db9fc5062f1f4f95610592464f9534611eb"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309003-I2.bin",
+      "sha256": "ac50c6028ade164ec73672391b087e9afc1ea42f04f8b62ccd4cf9d207b0e724"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309004-I0.bin",
+      "sha256": "f5a7eb009735197b67c2d2bc69fae14fbaeb52c4a494500a7a01125a29f64412"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309004-I1.bin",
+      "sha256": "bbe38e70be4734daf741a0c34e3ac88d3ba4abf8dd85af457e0cb475730bce1d"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309004-I2.bin",
+      "sha256": "c6ee4dd880b386d88e3416a80c5c6affecf670fa2e06556320f86f7163ed250b"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309005-I0.bin",
+      "sha256": "1dba7dde471b4933b40a8384f569ad8ea534deea0a3ec8767981d482bd4cff6e"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309005-I1.bin",
+      "sha256": "fb883dc579fc6568e6f4c21fce0224427cd092614a87b38e8b86b1c8d53b2574"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309005-I2.bin",
+      "sha256": "06acb0646174fc6431fb1c08f324895ccbb00d54187e7c27a2bc80dd8fb5ae60"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309006-I0.bin",
+      "sha256": "d20ba8d8c660ec11a9e99dd71825ebb81d792d711d50995d766fdd24d16c63d9"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309006-I1.bin",
+      "sha256": "fc729f029acd01ff034757fba023eaf2e7f78f5e3d88b8abcb8587b5fd408821"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309006-I2.bin",
+      "sha256": "01feb53e945b098f0fd1fd6a853a03e33f768bf6ee96fd61fb26ee3f5c034af9"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309007-I0.bin",
+      "sha256": "25268b385e9bc9431c05898c4e38bc52fd3495acf330530a2200490938a3592b"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309007-I1.bin",
+      "sha256": "41b5024cf1bbb1d49c36b9bf42aef431ca213b09cc8011f515cbdcb023f9eae8"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309007-I2.bin",
+      "sha256": "da4bc1c82ab7c5eb80c240e5ceaeda7e4fe950f4dda061fdd70bd20fb259fda6"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309008-I0.bin",
+      "sha256": "4f16d95cb4053f4d233a53146a081c4d6cc01cbd4dfd5985ec9adc9edf899cf0"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309008-I1.bin",
+      "sha256": "a08ed6dff0e07f4105e46807d6548a9ccac652abac50d8710064acfd1fafe0a5"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309008-I2.bin",
+      "sha256": "a3e4f1675a6ee9ab59883d39a1d774618ea7b8261b2aedf5d8357aaabe22b86e"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309009-I0.bin",
+      "sha256": "e5f2ac8e1027344fca54fa7f05dbb30d02c9df11c509b4bd6353cb0a6008f5c3"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309009-I1.bin",
+      "sha256": "19cebc18cba6e480f6fc9a1a110e867beef20570658a73cb39023eb9a7d525d6"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309009-I2.bin",
+      "sha256": "9a03341bb66209b2f53a3199db859271682a3edf2b763bba20eb74781b84cec9"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309010-I0.bin",
+      "sha256": "4ec42791c30c696af6d12bae7c65908a26525f004d9d55113fb82cab71fc4b5d"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309010-I1.bin",
+      "sha256": "e2707033f2bb0397c4d431f1c8bd87ecd15f948a84dad8339ce0e7ee37dd5da7"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309010-I2.bin",
+      "sha256": "8d8e7e45989262714817b5f7c3786d37abdbf1718b4de5358e8a28519a7b085a"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309011-I0.bin",
+      "sha256": "73015e889018ea74fdfb4e0a3f88aadb6fe3303320cc6ec27d83c9addf2e1cb5"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309011-I1.bin",
+      "sha256": "6aa86c0a6b09e1593a70b0b968729f72682aad86539b4de3d61efa0b383e4df3"
+    },
+    {
+      "byte_length": 79895,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/final-tensors/Cphi-H309011-I2.bin",
+      "sha256": "d2fc472361b086c92cfee31d6c440de58a62a7bcc9b25c53565afdc16f0e0908"
+    },
+    {
+      "byte_length": 3156090,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309000-I0.npz",
+      "sha256": "7f15303a128507507a87ab969b165e0950d9569c50e4304612af37b65684df42"
+    },
+    {
+      "byte_length": 3156090,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309000-I1.npz",
+      "sha256": "deed32f0b5ef9f94272d426d7fa0cca3fa31ffb2054670844bd907d06e4ee332"
+    },
+    {
+      "byte_length": 3156090,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309000-I2.npz",
+      "sha256": "db6e46376febfb13bd3c77fdfc7df42ad05262a52cdc15c5bd3100ce31595c08"
+    },
+    {
+      "byte_length": 5811660,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309001-I0.npz",
+      "sha256": "58ff26ab5f3f48153b779df47d1a36a1f7b96022cd1ae9123faf0621043934f1"
+    },
+    {
+      "byte_length": 5811660,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309001-I1.npz",
+      "sha256": "7734f74bf979ca3b0ee1caaaa3bf701784ab27e26493a36b2755107a36c7c73a"
+    },
+    {
+      "byte_length": 5811660,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309001-I2.npz",
+      "sha256": "1737ec6367249b25ec799e00c84cd22ff08e34cb72a6ea54654262d4eb54a549"
+    },
+    {
+      "byte_length": 2180700,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309002-I0.npz",
+      "sha256": "6f845a0a215d495320051c5bdb2d3526b5c378f36b2267c990e7e353c7c551ae"
+    },
+    {
+      "byte_length": 2180700,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309002-I1.npz",
+      "sha256": "0264e28d9365c039fc363d33f2f6107715545962e3a0916090dad4d55353eeab"
+    },
+    {
+      "byte_length": 2180700,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309002-I2.npz",
+      "sha256": "d001e2116e417f5df5c96637490df1f1df3e235367f480e95a42e9b092de38a9"
+    },
+    {
+      "byte_length": 3885480,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309003-I0.npz",
+      "sha256": "ba2187423d16a851c52fdbb363538509e18ba36189289ad4b007c9ef916331de"
+    },
+    {
+      "byte_length": 3885480,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309003-I1.npz",
+      "sha256": "b26349298c88aea94d278b50e1265a933a892764fa226dd08a0f1bc1ec1bb5d4"
+    },
+    {
+      "byte_length": 3885480,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309003-I2.npz",
+      "sha256": "78112c1e836a4f84a067e51b36ce5515a0da58f276d16441f5b87e03cd2fc330"
+    },
+    {
+      "byte_length": 5411910,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309004-I0.npz",
+      "sha256": "9e795cdb2dd531bab68c65bb4ed0132f7002338877f6be13a31bab37e91462fd"
+    },
+    {
+      "byte_length": 5411910,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309004-I1.npz",
+      "sha256": "247ff34341792af5ccdf1e05acd3a2c95d969ad558f0878e64d16c5ebbf41840"
+    },
+    {
+      "byte_length": 5411910,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309004-I2.npz",
+      "sha256": "0980e9a42a133bf5789a575b1be24b5f8c86c863e63242d9d9ce98b450afd312"
+    },
+    {
+      "byte_length": 5105640,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309005-I0.npz",
+      "sha256": "15715ddf2dd7814adf5b8aa2d850bdf41816478adeeb930526b8b051001df5a5"
+    },
+    {
+      "byte_length": 5105640,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309005-I1.npz",
+      "sha256": "a08b231f57d6d6c945e8eb4243122d6a8f9090960bee8bd72cd4fdbea5029b9e"
+    },
+    {
+      "byte_length": 5105640,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309005-I2.npz",
+      "sha256": "7844aefd3d638c1f57ef1373dd825b0667074a9d663ae517958db32e5dc72e92"
+    },
+    {
+      "byte_length": 2881800,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309006-I0.npz",
+      "sha256": "e30fc739a494131fc66d5abea3033a657d2eb2bdb5f470dc92c03d669be30468"
+    },
+    {
+      "byte_length": 2881800,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309006-I1.npz",
+      "sha256": "46104364aa3f11c29d9054dfaea0499c91af9b8c6f61cb74b09a88fa61b046a2"
+    },
+    {
+      "byte_length": 2881800,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309006-I2.npz",
+      "sha256": "43c11f59f1989105789974aac0d11b43ba37d6c1b188dea1abc3e164cb90707f"
+    },
+    {
+      "byte_length": 2163480,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309007-I0.npz",
+      "sha256": "c53edce3a6bf5bc1ef37d66dbc910df64b50cae3bd7e1018a9ad5f701dde0802"
+    },
+    {
+      "byte_length": 2163480,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309007-I1.npz",
+      "sha256": "8b799f58bfe04a62a570b677f6ae36ffeaa8d535ee704b30ccb77f2770604c69"
+    },
+    {
+      "byte_length": 2163480,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309007-I2.npz",
+      "sha256": "d54cb2172c98b0ab5f4f1da0e73ed62c71f8e39639b650c989f169857e43bc6b"
+    },
+    {
+      "byte_length": 2634570,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309008-I0.npz",
+      "sha256": "92101b14b2d61b4350433d311d3b626a9e82dbd805146c3ef133b2bd94208b55"
+    },
+    {
+      "byte_length": 2634570,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309008-I1.npz",
+      "sha256": "c573974c8bc1e7fb09bf4babcaf6be52ec94c9b9b7f8bdb930270405e2fef8e8"
+    },
+    {
+      "byte_length": 2634570,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309008-I2.npz",
+      "sha256": "819597d7fec01fa311b743d1e9d6f36c0b790dfc568098158f775c897e0f8a28"
+    },
+    {
+      "byte_length": 498060,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309009-I0.npz",
+      "sha256": "9328cb7e18daf187ebe97fb5b55a796fe397f4f235a15a702a8e34a9a1f64a5e"
+    },
+    {
+      "byte_length": 498060,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309009-I1.npz",
+      "sha256": "5fa029fbe615939f0a149207995bed46babd089e86adecbce9c1a4fb92ac6d6d"
+    },
+    {
+      "byte_length": 498060,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309009-I2.npz",
+      "sha256": "cf276dad6afe3299ee394bc6d3e1ab0068ac409e8dd1537cc2b9f85b4ec8ce71"
+    },
+    {
+      "byte_length": 2206530,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309010-I0.npz",
+      "sha256": "113152b7b4687d5759a2789b125db523617f6f734ff869cd728d252bdf918268"
+    },
+    {
+      "byte_length": 2206530,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309010-I1.npz",
+      "sha256": "12fcb21450111b117e02c814b78a1714c4933aa73465377248bff9fdf1f08926"
+    },
+    {
+      "byte_length": 2206530,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309010-I2.npz",
+      "sha256": "53ac9fa95c6516801c98a2b2eb64192ae7e6c598589bdc8c11aba000d8319d14"
+    },
+    {
+      "byte_length": 100770,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309011-I0.npz",
+      "sha256": "e8b99afff3eca8f70ad0987ff75ae08b59e637706eeb245b0d87d89d51d01bb0"
+    },
+    {
+      "byte_length": 100770,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309011-I1.npz",
+      "sha256": "d1d22f1c35996aad02ac1c36aaf0f807272bd524c885b9d158a38417326150eb"
+    },
+    {
+      "byte_length": 100770,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/heldout-state/Cphi-H309011-I2.npz",
+      "sha256": "7a5ae226afc9bb9c007f490f517856af86c6147fdf14cc668f4fe3489958616e"
+    },
+    {
+      "byte_length": 576,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-00.bin",
+      "sha256": "710cf55b18c1051f6ac325ff7a9fab9cf8fe696ca4bd51798a969a10afbd5a0d"
+    },
+    {
+      "byte_length": 576,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-01.bin",
+      "sha256": "5f69dd52aca323fac49593a883835b8122424193067cd0bce6cdfe26554b7bf9"
+    },
+    {
+      "byte_length": 576,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-02.bin",
+      "sha256": "b974207ffdebb7f37d2f997b74e58c892c59e839ca68f1fab580c6d37e9c3590"
+    },
+    {
+      "byte_length": 576,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-03.bin",
+      "sha256": "339bf2b1be4ab7a13296a88b1a34e98087bb90643cb03e98ace91b558124b021"
+    },
+    {
+      "byte_length": 576,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-04.bin",
+      "sha256": "ce8e97f0686999b21a34331529ef3c12116a2bb396e9de5d2afd709bdf3b3e57"
+    },
+    {
+      "byte_length": 576,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-05.bin",
+      "sha256": "0bbb4db87e95c4b112b4529c488d91f6d490786fb92058b2e8d67298577f9904"
+    },
+    {
+      "byte_length": 576,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-06.bin",
+      "sha256": "38bd89f28fa4d21bae6edbf798e8bcb7ac2e56677a79a13056590074b47fccc9"
+    },
+    {
+      "byte_length": 576,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-07.bin",
+      "sha256": "3b95e9df81b1645ec25293e083af2fd7c79dedc4819912d95eafe630b05679c7"
+    },
+    {
+      "byte_length": 576,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-08.bin",
+      "sha256": "5a9ea8ae51aad377c6db8ed073c560dd6239d49f4f96ac84ed5df5024d3a60cc"
+    },
+    {
+      "byte_length": 576,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-09.bin",
+      "sha256": "896f1e8038b86d2f94bc7c86c52314a5e33f4398a01fbc72ca88332e368f41ba"
+    },
+    {
+      "byte_length": 576,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-10.bin",
+      "sha256": "cd597b5dfe7cf0176e76456dc4de1cc326bd8de11d1432106c7374d63945b468"
+    },
+    {
+      "byte_length": 576,
+      "path": "experiments/fly-reach-03/runs/F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1/normalizations/fold-11.bin",
+      "sha256": "f3099cda6890113631e75701a0fa4d9b889975f66916edd17907fdd282ae6787"
+    }
+  ],
+  "pheno_status": "unchanged",
+  "planned_block_ids": [
+    310000,
+    310001,
+    310002,
+    310003,
+    310004,
+    310005,
+    310006,
+    310007,
+    310008,
+    310009,
+    310010,
+    310011,
+    310012,
+    310013,
+    310014,
+    310015,
+    310016,
+    310017,
+    310018,
+    310019,
+    310020,
+    310021,
+    310022,
+    310023
+  ],
+  "planned_blocks_per_assignment": 4,
+  "planned_model_panel": 36,
+  "planned_native_cells": 432,
+  "runtime_identity": {
+    "machine": "AMD64",
+    "numpy_runtime_sha256": "b97e79b342204a44621682bd48b7b1c489f1b0472236a85c07505bc07d8ce61d",
+    "numpy_version": "2.5.3",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python_executable": "C:\\Users\\shuga\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+    "python_executable_sha256": "85b71d8c6ec1905935f74be0c9869aae198d00e98f39df699ec66f9c5a84cecd",
+    "python_implementation": "CPython",
+    "python_version": "3.13.15 (tags/v3.13.15:4061bc4, Aug  5 2026, 13:05:39) [MSC v.1944 64 bit (AMD64)]",
+    "thread_environment": {
+      "BLIS_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "NUMEXPR_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1"
+    }
+  },
+  "schema": "F4-BINDING-01-stage-b-implementation-freeze-v0.1",
+  "source_files": [
+    {
+      "byte_length": 6979,
+      "path": "experiments/fly-reach-03/frozen-fabrique/F4-BINDING-01-STAGE-B-v0.1/STAGE-B-EXECUTION-CONTRACT-v0.1.md",
+      "sha256": "8c2d2a514b81dfb51d0074941c3a62c8138835af89d63ed9fde493d7fd9ae4c9"
+    },
+    {
+      "byte_length": 12987,
+      "path": "experiments/fly-reach-03/frozen-fabrique/F4-BINDING-01-STAGE-B-v0.1/prepare_stage_b_tasks.py",
+      "sha256": "be5ad7f5bc7e7917c0c7552c141700c513dbb43eb02594848c6b55e3d5712aab"
+    },
+    {
+      "byte_length": 8408,
+      "path": "experiments/fly-reach-03/frozen-fabrique/F4-BINDING-01-STAGE-B-v0.1/binding_stage_b_data.py",
+      "sha256": "66a2e4d962506d39781b559c858091248bed5ebcb2159b1060adab268b5d73d2"
+    },
+    {
+      "byte_length": 5001,
+      "path": "experiments/fly-reach-03/frozen-fabrique/F4-BINDING-01-STAGE-B-v0.1/binding_stage_b_model.py",
+      "sha256": "2a7ce22876c12a17aba713fa27620129b2dbbcd3c3f4ec59f568b3edfec998c4"
+    },
+    {
+      "byte_length": 10177,
+      "path": "experiments/fly-reach-03/frozen-fabrique/F4-BINDING-01-STAGE-B-v0.1/binding_stage_b_scoring.py",
+      "sha256": "241896cae2504f3438ed96c6f0bba6c4443405dcc5ce3f6756bc6d59c9a9a0de"
+    },
+    {
+      "byte_length": 15993,
+      "path": "experiments/fly-reach-03/frozen-fabrique/F4-BINDING-01-STAGE-B-v0.1/freeze_stage_b.py",
+      "sha256": "22d99efeef0e4df868b8317c2ba67de7894918bbf76f7ade133fb4668d5fe72b"
+    },
+    {
+      "byte_length": 12645,
+      "path": "experiments/fly-reach-03/frozen-fabrique/F4-BINDING-01-STAGE-B-v0.1/validate_stage_b_collection.py",
+      "sha256": "e2dc29f164983e4d3f239ecae12a6f7169617f43474a809ff93cfefcd8dbfdee"
+    },
+    {
+      "byte_length": 11462,
+      "path": "experiments/fly-reach-03/frozen-fabrique/F4-BINDING-01-STAGE-B-v0.1/run_stage_b_inference.py",
+      "sha256": "c8e4440840b53e0417d95839e48b3e17db4773a187edad066bd6df2f8aabcd42"
+    },
+    {
+      "byte_length": 10556,
+      "path": "experiments/fly-reach-03/frozen-fabrique/F4-BINDING-01-STAGE-B-v0.1/verify_stage_b_predictions.py",
+      "sha256": "673b77db3b29067ad84aeb8a7fdc50edd4fe5719ca609a5eec6505df213a14d3"
+    },
+    {
+      "byte_length": 31579,
+      "path": "experiments/fly-reach-03/frozen-fabrique/F4-BINDING-01-STAGE-B-v0.1/analyze_stage_b.py",
+      "sha256": "a9523255e6641b053986737006380db06a19888e20ef8f0ec146622d7b61fa2b"
+    },
+    {
+      "byte_length": 5739,
+      "path": "experiments/fly-reach-03/frozen-fabrique/F4-BINDING-01-STAGE-B-v0.1/verify_parent_replay.py",
+      "sha256": "6b4c315f7f63c38321beb37f9fd418d7e15e7d7613e96c998a7933ce13827f87"
+    },
+    {
+      "byte_length": 1694,
+      "path": "experiments/fly-reach-03/frozen-fabrique/F4-BINDING-01-STAGE-B-v0.1/stage_b_runtime.py",
+      "sha256": "89a6c25306b7ef3429d425e5ff9ec69473edd4bc13b4ac903feafc3e27816c33"
+    },
+    {
+      "byte_length": 5180,
+      "path": "experiments/fly-reach-03/frozen-fabrique/F4-BINDING-01-STAGE-B-v0.1/test_stage_b_components.py",
+      "sha256": "788a5006aa97db2cb1e12691aecfbf4be80b47202f586407d42064773c17208e"
+    },
+    {
+      "byte_length": 394,
+      "path": "experiments/fly-reach-03/frozen-fabrique/F4-BINDING-01-STAGE-B-v0.1/native-collector/Cargo.toml",
+      "sha256": "7fd26137cc821596742ee5672ab5dd544e7a2b455b19fbef7dac27ed83f2f5a1"
+    },
+    {
+      "byte_length": 6023,
+      "path": "experiments/fly-reach-03/frozen-fabrique/F4-BINDING-01-STAGE-B-v0.1/native-collector/Cargo.lock",
+      "sha256": "53eaae20fa70952d307f11d0e0621777ffaa423c8846f924c76eaf20bf195e1b"
+    },
+    {
+      "byte_length": 1051,
+      "path": "experiments/fly-reach-03/frozen-fabrique/F4-BINDING-01-STAGE-B-v0.1/native-collector/src/main.rs",
+      "sha256": "808ca5fd1942bb449544862444633ac2687fe03d6ad3425e828b0b2cc3782d36"
+    },
+    {
+      "byte_length": 17922,
+      "path": "experiments/fly-reach-03/frozen-fabrique/F4-BINDING-01-STAGE-B-v0.1/native-collector/src/native_collect.rs",
+      "sha256": "5110f1616dc5129e1ff0ea16ecb086d7566f8ee78c2b8a9f387cd698ddf3b22b"
+    },
+    {
+      "byte_length": 436224,
+      "path": "experiments/fly-reach-03/frozen-fabrique/F4-BINDING-01-STAGE-B-v0.1/native-collector/target/release/f4-binding-01-stage-b-native-collector.exe",
+      "sha256": "513bd9ad6f56c1a0370813bfeade6975a15306e464b37626dccbb9577c105339"
+    },
+    {
+      "byte_length": 13602,
+      "path": "experiments/fly-reach-03/f4-presentation-02-v2/cphi_model.py",
+      "sha256": "d50521285235db36b062f9eda9a90eb4182a836e2ccb8ab292c04e9e74158099"
+    },
+    {
+      "byte_length": 5137,
+      "path": "experiments/fly-reach-03/f4-invariant-01-impl-v2/f4_invariant_01_inputs.py",
+      "sha256": "32f5301842e9e5ec0463276dc507a69522e6bd08989d08cf625678296136d2a9"
+    },
+    {
+      "byte_length": 15762,
+      "path": "experiments/fly-reach-03/f4-invariant-01-impl-v2/f4_invariant_01_model.py",
+      "sha256": "2882482311355f5729fb3922d0b51fdef960f24a49d793a77ce855d903939f02"
+    },
+    {
+      "byte_length": 12239,
+      "path": "experiments/fly-reach-03/scripts/f4_symmetry_01_common.py",
+      "sha256": "47ddbeca65ee2b0a94f1712915c8df17fc5855fddfb160c1ac59b9bc48afbeca"
+    },
+    {
+      "byte_length": 3811,
+      "path": "experiments/fly-reach-03/scripts/f4_symmetry_01_model.py",
+      "sha256": "92e260bd0057115867bf69b343d8193bab141035f3338af4586c5e0af61c47f8"
+    },
+    {
+      "byte_length": 10956,
+      "path": "experiments/fly-reach-03/scripts/prepare_qualification.py",
+      "sha256": "d1de1bb9f1d0a82e0bd9ca3a9520a6d38e696fa686d0dbcda46bced17561923a"
+    },
+    {
+      "byte_length": 32126,
+      "path": "experiments/fly-reach-03/manifests/QUALIFICATION-MANIFEST.json",
+      "sha256": "9ea9048d424698212b5a14eecdadef56987a93c54ed28e3ef40a9508431014e5"
+    },
+    {
+      "byte_length": 17997,
+      "path": "experiments/fly-reach-03/executor/src/collector.rs",
+      "sha256": "f551c86875b6ec7f5d9fe7327adbfcfc4a66810640cf70c72aaa234822a4a258"
+    },
+    {
+      "byte_length": 5250,
+      "path": "experiments/fly-reach-03/executor/src/graph.rs",
+      "sha256": "8977281a6f5a3cceaf1783f8099b7d49db81fd51f9a83bec144327e02f56ebad"
+    },
+    {
+      "byte_length": 11933,
+      "path": "experiments/fly-reach-03/executor/src/reach_sim.rs",
+      "sha256": "b487e23da9ab85164b79bad40f2802a89f1d660a68c97d7728ea8af52d1f0790"
+    },
+    {
+      "byte_length": 976,
+      "path": "experiments/fly-reach-03/executor/src/rng.rs",
+      "sha256": "e18ae9832519a211983d401d111f6685c76988375e29d150f2a8355e504a07f4"
+    },
+    {
+      "byte_length": 2403,
+      "path": "experiments/fly-reach-03/executor/src/task.rs",
+      "sha256": "c19e955138cded658382216e947c1d381d11fab2e258b32f29176934a2e2c4be"
+    }
+  ],
+  "source_manifest_canonical_sha256": "2765e85ba382bac5e8d5f7ceb9b66fd980049732031983054533c091912758a6",
+  "source_manifest_file_sha256": "461a959b099ad7cb555d6cfa5dfdc66c191f3ffcdadc79f874801abe36079752",
+  "status": "PASS",
+  "task_bank_created": false
+}

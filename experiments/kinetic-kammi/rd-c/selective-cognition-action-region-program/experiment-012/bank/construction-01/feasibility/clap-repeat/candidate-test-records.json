@@ -1,0 +1,182 @@
+[
+  {
+    "candidate_id": 35639,
+    "candidate_role_hidden": "append_all",
+    "case_id": "case-01",
+    "exit_code": 0,
+    "passed": true,
+    "stdout": "\nrunning 1 test\ntest check_contract ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "     Locking 15 packages to latest compatible versions\n   Compiling windows-link v0.2.1\n   Compiling anstyle v1.0.14\n   Compiling once_cell_polyfill v1.70.2\n   Compiling utf8parse v0.2.2\n   Compiling colorchoice v1.0.5\n   Compiling is_terminal_polyfill v1.70.2\n   Compiling strsim v0.11.1\n   Compiling clap_lex v1.1.0 (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\repositories\\clap\\clap_lex)\n   Compiling windows-sys v0.61.2\n   Compiling anstyle-parse v1.0.0\n   Compiling anstyle-wincon v3.0.11\n   Compiling anstyle-query v1.1.5\n   Compiling anstream v1.0.0\n   Compiling clap_builder v4.6.0 (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\repositories\\clap\\clap_builder)\n   Compiling clap v4.6.1 (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\repositories\\clap)\n   Compiling e012-clap-repeat-harness v0.1.0 (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\task-harnesses\\clap-repeat)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 10.68s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\clap-harness\\debug\\deps\\contract-90f7b68a8528048b.exe)\n"
+  },
+  {
+    "candidate_id": 35639,
+    "candidate_role_hidden": "append_all",
+    "case_id": "case-02",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (36896) panicked at tests\\contract.rs:14:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.07s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\clap-harness\\debug\\deps\\contract-90f7b68a8528048b.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 35639,
+    "candidate_role_hidden": "append_all",
+    "case_id": "case-03",
+    "exit_code": 0,
+    "passed": true,
+    "stdout": "\nrunning 1 test\ntest check_contract ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.06s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\clap-harness\\debug\\deps\\contract-90f7b68a8528048b.exe)\n"
+  },
+  {
+    "candidate_id": 35639,
+    "candidate_role_hidden": "append_all",
+    "case_id": "case-04",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (30972) panicked at tests\\contract.rs:14:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.07s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\clap-harness\\debug\\deps\\contract-90f7b68a8528048b.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 27088,
+    "candidate_role_hidden": "last_value_wins",
+    "case_id": "case-01",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (47252) panicked at tests\\contract.rs:14:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "   Compiling e012-clap-repeat-harness v0.1.0 (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\task-harnesses\\clap-repeat)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.32s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\clap-harness\\debug\\deps\\contract-90f7b68a8528048b.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 27088,
+    "candidate_role_hidden": "last_value_wins",
+    "case_id": "case-02",
+    "exit_code": 0,
+    "passed": true,
+    "stdout": "\nrunning 1 test\ntest check_contract ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.08s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\clap-harness\\debug\\deps\\contract-90f7b68a8528048b.exe)\n"
+  },
+  {
+    "candidate_id": 27088,
+    "candidate_role_hidden": "last_value_wins",
+    "case_id": "case-03",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (31112) panicked at tests\\contract.rs:14:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.07s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\clap-harness\\debug\\deps\\contract-90f7b68a8528048b.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 27088,
+    "candidate_role_hidden": "last_value_wins",
+    "case_id": "case-04",
+    "exit_code": 0,
+    "passed": true,
+    "stdout": "\nrunning 1 test\ntest check_contract ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.07s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\clap-harness\\debug\\deps\\contract-90f7b68a8528048b.exe)\n"
+  },
+  {
+    "candidate_id": 22252,
+    "candidate_role_hidden": "first_value_only",
+    "case_id": "case-01",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "",
+    "stderr": "   Compiling e012-clap-repeat-harness v0.1.0 (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\task-harnesses\\clap-repeat)\nerror[E0596]: cannot borrow `values` as mutable, as it is not declared as mutable\n  --> src\\lib.rs:11:28\n   |\n11 |         .and_then(|values| values.next().cloned())\n   |                            ^^^^^^ cannot borrow as mutable\n   |\nhelp: consider changing this to be mutable\n   |\n11 |         .and_then(|mut values| values.next().cloned())\n   |                    +++\n\nFor more information about this error, try `rustc --explain E0596`.\nerror: could not compile `e012-clap-repeat-harness` (lib) due to 1 previous error\n"
+  },
+  {
+    "candidate_id": 22252,
+    "candidate_role_hidden": "first_value_only",
+    "case_id": "case-02",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "",
+    "stderr": "   Compiling e012-clap-repeat-harness v0.1.0 (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\task-harnesses\\clap-repeat)\nerror[E0596]: cannot borrow `values` as mutable, as it is not declared as mutable\n  --> src\\lib.rs:11:28\n   |\n11 |         .and_then(|values| values.next().cloned())\n   |                            ^^^^^^ cannot borrow as mutable\n   |\nhelp: consider changing this to be mutable\n   |\n11 |         .and_then(|mut values| values.next().cloned())\n   |                    +++\n\nFor more information about this error, try `rustc --explain E0596`.\nerror: could not compile `e012-clap-repeat-harness` (lib) due to 1 previous error\n"
+  },
+  {
+    "candidate_id": 22252,
+    "candidate_role_hidden": "first_value_only",
+    "case_id": "case-03",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "",
+    "stderr": "   Compiling e012-clap-repeat-harness v0.1.0 (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\task-harnesses\\clap-repeat)\nerror[E0596]: cannot borrow `values` as mutable, as it is not declared as mutable\n  --> src\\lib.rs:11:28\n   |\n11 |         .and_then(|values| values.next().cloned())\n   |                            ^^^^^^ cannot borrow as mutable\n   |\nhelp: consider changing this to be mutable\n   |\n11 |         .and_then(|mut values| values.next().cloned())\n   |                    +++\n\nFor more information about this error, try `rustc --explain E0596`.\nerror: could not compile `e012-clap-repeat-harness` (lib) due to 1 previous error\n"
+  },
+  {
+    "candidate_id": 22252,
+    "candidate_role_hidden": "first_value_only",
+    "case_id": "case-04",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "",
+    "stderr": "   Compiling e012-clap-repeat-harness v0.1.0 (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\task-harnesses\\clap-repeat)\nerror[E0596]: cannot borrow `values` as mutable, as it is not declared as mutable\n  --> src\\lib.rs:11:28\n   |\n11 |         .and_then(|values| values.next().cloned())\n   |                            ^^^^^^ cannot borrow as mutable\n   |\nhelp: consider changing this to be mutable\n   |\n11 |         .and_then(|mut values| values.next().cloned())\n   |                    +++\n\nFor more information about this error, try `rustc --explain E0596`.\nerror: could not compile `e012-clap-repeat-harness` (lib) due to 1 previous error\n"
+  },
+  {
+    "candidate_id": 44597,
+    "candidate_role_hidden": "single_occurrence_only",
+    "case_id": "case-01",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (29432) panicked at src\\lib.rs:8:10:\nvalid task arguments: ErrorInner { kind: ArgumentConflict, context: FlatMap { keys: [InvalidArg, PriorArg, Usage], values: [String(\"--tag <tag>\"), String(\"--tag <tag>\"), StyledStr(StyledStr(\"\\u{1b}[1m\\u{1b}[4mUsage:\\u{1b}[0m \\u{1b}[1mdemo\\u{1b}[0m [OPTIONS]\"))] }, message: None, source: None, help_flag: Some(\"--help\"), styles: Styles { header: Style { fg: None, bg: None, underline: None, effects: Effects(BOLD | UNDERLINE) }, error: Style { fg: Some(Ansi(Red)), bg: None, underline: None, effects: Effects(BOLD) }, usage: Style { fg: None, bg: None, underline: None, effects: Effects(BOLD | UNDERLINE) }, literal: Style { fg: None, bg: None, underline: None, effects: Effects(BOLD) }, placeholder: Style { fg: None, bg: None, underline: None, effects: Effects() }, valid: Style { fg: Some(Ansi(Green)), bg: None, underline: None, effects: Effects() }, invalid: Style { fg: Some(Ansi(Yellow)), bg: None, underline: None, effects: Effects() }, context: Style { fg: None, bg: None, underline: None, effects: Effects() }, context_value: None }, color_when: Auto, color_help_when: Auto, backtrace: None }\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "   Compiling e012-clap-repeat-harness v0.1.0 (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\task-harnesses\\clap-repeat)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.43s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\clap-harness\\debug\\deps\\contract-90f7b68a8528048b.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 44597,
+    "candidate_role_hidden": "single_occurrence_only",
+    "case_id": "case-02",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (2860) panicked at src\\lib.rs:8:10:\nvalid task arguments: ErrorInner { kind: ArgumentConflict, context: FlatMap { keys: [InvalidArg, PriorArg, Usage], values: [String(\"--tag <tag>\"), String(\"--tag <tag>\"), StyledStr(StyledStr(\"\\u{1b}[1m\\u{1b}[4mUsage:\\u{1b}[0m \\u{1b}[1mdemo\\u{1b}[0m [OPTIONS]\"))] }, message: None, source: None, help_flag: Some(\"--help\"), styles: Styles { header: Style { fg: None, bg: None, underline: None, effects: Effects(BOLD | UNDERLINE) }, error: Style { fg: Some(Ansi(Red)), bg: None, underline: None, effects: Effects(BOLD) }, usage: Style { fg: None, bg: None, underline: None, effects: Effects(BOLD | UNDERLINE) }, literal: Style { fg: None, bg: None, underline: None, effects: Effects(BOLD) }, placeholder: Style { fg: None, bg: None, underline: None, effects: Effects() }, valid: Style { fg: Some(Ansi(Green)), bg: None, underline: None, effects: Effects() }, invalid: Style { fg: Some(Ansi(Yellow)), bg: None, underline: None, effects: Effects() }, context: Style { fg: None, bg: None, underline: None, effects: Effects() }, context_value: None }, color_when: Auto, color_help_when: Auto, backtrace: None }\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.07s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\clap-harness\\debug\\deps\\contract-90f7b68a8528048b.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 44597,
+    "candidate_role_hidden": "single_occurrence_only",
+    "case_id": "case-03",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (17496) panicked at src\\lib.rs:8:10:\nvalid task arguments: ErrorInner { kind: ArgumentConflict, context: FlatMap { keys: [InvalidArg, PriorArg, Usage], values: [String(\"--tag <tag>\"), String(\"--tag <tag>\"), StyledStr(StyledStr(\"\\u{1b}[1m\\u{1b}[4mUsage:\\u{1b}[0m \\u{1b}[1mdemo\\u{1b}[0m [OPTIONS]\"))] }, message: None, source: None, help_flag: Some(\"--help\"), styles: Styles { header: Style { fg: None, bg: None, underline: None, effects: Effects(BOLD | UNDERLINE) }, error: Style { fg: Some(Ansi(Red)), bg: None, underline: None, effects: Effects(BOLD) }, usage: Style { fg: None, bg: None, underline: None, effects: Effects(BOLD | UNDERLINE) }, literal: Style { fg: None, bg: None, underline: None, effects: Effects(BOLD) }, placeholder: Style { fg: None, bg: None, underline: None, effects: Effects() }, valid: Style { fg: Some(Ansi(Green)), bg: None, underline: None, effects: Effects() }, invalid: Style { fg: Some(Ansi(Yellow)), bg: None, underline: None, effects: Effects() }, context: Style { fg: None, bg: None, underline: None, effects: Effects() }, context_value: None }, color_when: Auto, color_help_when: Auto, backtrace: None }\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.07s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\clap-harness\\debug\\deps\\contract-90f7b68a8528048b.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 44597,
+    "candidate_role_hidden": "single_occurrence_only",
+    "case_id": "case-04",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (12952) panicked at src\\lib.rs:8:10:\nvalid task arguments: ErrorInner { kind: ArgumentConflict, context: FlatMap { keys: [InvalidArg, PriorArg, Usage], values: [String(\"--tag <tag>\"), String(\"--tag <tag>\"), StyledStr(StyledStr(\"\\u{1b}[1m\\u{1b}[4mUsage:\\u{1b}[0m \\u{1b}[1mdemo\\u{1b}[0m [OPTIONS]\"))] }, message: None, source: None, help_flag: Some(\"--help\"), styles: Styles { header: Style { fg: None, bg: None, underline: None, effects: Effects(BOLD | UNDERLINE) }, error: Style { fg: Some(Ansi(Red)), bg: None, underline: None, effects: Effects(BOLD) }, usage: Style { fg: None, bg: None, underline: None, effects: Effects(BOLD | UNDERLINE) }, literal: Style { fg: None, bg: None, underline: None, effects: Effects(BOLD) }, placeholder: Style { fg: None, bg: None, underline: None, effects: Effects() }, valid: Style { fg: Some(Ansi(Green)), bg: None, underline: None, effects: Effects() }, invalid: Style { fg: Some(Ansi(Yellow)), bg: None, underline: None, effects: Effects() }, context: Style { fg: None, bg: None, underline: None, effects: Effects() }, context_value: None }, color_when: Auto, color_help_when: Auto, backtrace: None }\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.06s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\clap-harness\\debug\\deps\\contract-90f7b68a8528048b.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": null,
+    "candidate_role_hidden": "base_snapshot",
+    "case_id": "case-01",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (7776) panicked at src\\lib.rs:9:10:\nvalid task arguments: ErrorInner { kind: ArgumentConflict, context: FlatMap { keys: [InvalidArg, PriorArg, Usage], values: [String(\"--tag <tag>\"), String(\"--tag <tag>\"), StyledStr(StyledStr(\"\\u{1b}[1m\\u{1b}[4mUsage:\\u{1b}[0m \\u{1b}[1mdemo\\u{1b}[0m [OPTIONS]\"))] }, message: None, source: None, help_flag: Some(\"--help\"), styles: Styles { header: Style { fg: None, bg: None, underline: None, effects: Effects(BOLD | UNDERLINE) }, error: Style { fg: Some(Ansi(Red)), bg: None, underline: None, effects: Effects(BOLD) }, usage: Style { fg: None, bg: None, underline: None, effects: Effects(BOLD | UNDERLINE) }, literal: Style { fg: None, bg: None, underline: None, effects: Effects(BOLD) }, placeholder: Style { fg: None, bg: None, underline: None, effects: Effects() }, valid: Style { fg: Some(Ansi(Green)), bg: None, underline: None, effects: Effects() }, invalid: Style { fg: Some(Ansi(Yellow)), bg: None, underline: None, effects: Effects() }, context: Style { fg: None, bg: None, underline: None, effects: Effects() }, context_value: None }, color_when: Auto, color_help_when: Auto, backtrace: None }\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "   Compiling e012-clap-repeat-harness v0.1.0 (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\task-harnesses\\clap-repeat)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.28s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\clap-harness\\debug\\deps\\contract-90f7b68a8528048b.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": null,
+    "candidate_role_hidden": "base_snapshot",
+    "case_id": "case-02",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (10460) panicked at src\\lib.rs:9:10:\nvalid task arguments: ErrorInner { kind: ArgumentConflict, context: FlatMap { keys: [InvalidArg, PriorArg, Usage], values: [String(\"--tag <tag>\"), String(\"--tag <tag>\"), StyledStr(StyledStr(\"\\u{1b}[1m\\u{1b}[4mUsage:\\u{1b}[0m \\u{1b}[1mdemo\\u{1b}[0m [OPTIONS]\"))] }, message: None, source: None, help_flag: Some(\"--help\"), styles: Styles { header: Style { fg: None, bg: None, underline: None, effects: Effects(BOLD | UNDERLINE) }, error: Style { fg: Some(Ansi(Red)), bg: None, underline: None, effects: Effects(BOLD) }, usage: Style { fg: None, bg: None, underline: None, effects: Effects(BOLD | UNDERLINE) }, literal: Style { fg: None, bg: None, underline: None, effects: Effects(BOLD) }, placeholder: Style { fg: None, bg: None, underline: None, effects: Effects() }, valid: Style { fg: Some(Ansi(Green)), bg: None, underline: None, effects: Effects() }, invalid: Style { fg: Some(Ansi(Yellow)), bg: None, underline: None, effects: Effects() }, context: Style { fg: None, bg: None, underline: None, effects: Effects() }, context_value: None }, color_when: Auto, color_help_when: Auto, backtrace: None }\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.06s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\clap-harness\\debug\\deps\\contract-90f7b68a8528048b.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": null,
+    "candidate_role_hidden": "base_snapshot",
+    "case_id": "case-03",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (33616) panicked at src\\lib.rs:9:10:\nvalid task arguments: ErrorInner { kind: ArgumentConflict, context: FlatMap { keys: [InvalidArg, PriorArg, Usage], values: [String(\"--tag <tag>\"), String(\"--tag <tag>\"), StyledStr(StyledStr(\"\\u{1b}[1m\\u{1b}[4mUsage:\\u{1b}[0m \\u{1b}[1mdemo\\u{1b}[0m [OPTIONS]\"))] }, message: None, source: None, help_flag: Some(\"--help\"), styles: Styles { header: Style { fg: None, bg: None, underline: None, effects: Effects(BOLD | UNDERLINE) }, error: Style { fg: Some(Ansi(Red)), bg: None, underline: None, effects: Effects(BOLD) }, usage: Style { fg: None, bg: None, underline: None, effects: Effects(BOLD | UNDERLINE) }, literal: Style { fg: None, bg: None, underline: None, effects: Effects(BOLD) }, placeholder: Style { fg: None, bg: None, underline: None, effects: Effects() }, valid: Style { fg: Some(Ansi(Green)), bg: None, underline: None, effects: Effects() }, invalid: Style { fg: Some(Ansi(Yellow)), bg: None, underline: None, effects: Effects() }, context: Style { fg: None, bg: None, underline: None, effects: Effects() }, context_value: None }, color_when: Auto, color_help_when: Auto, backtrace: None }\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.07s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\clap-harness\\debug\\deps\\contract-90f7b68a8528048b.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": null,
+    "candidate_role_hidden": "base_snapshot",
+    "case_id": "case-04",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (6416) panicked at src\\lib.rs:9:10:\nvalid task arguments: ErrorInner { kind: ArgumentConflict, context: FlatMap { keys: [InvalidArg, PriorArg, Usage], values: [String(\"--tag <tag>\"), String(\"--tag <tag>\"), StyledStr(StyledStr(\"\\u{1b}[1m\\u{1b}[4mUsage:\\u{1b}[0m \\u{1b}[1mdemo\\u{1b}[0m [OPTIONS]\"))] }, message: None, source: None, help_flag: Some(\"--help\"), styles: Styles { header: Style { fg: None, bg: None, underline: None, effects: Effects(BOLD | UNDERLINE) }, error: Style { fg: Some(Ansi(Red)), bg: None, underline: None, effects: Effects(BOLD) }, usage: Style { fg: None, bg: None, underline: None, effects: Effects(BOLD | UNDERLINE) }, literal: Style { fg: None, bg: None, underline: None, effects: Effects(BOLD) }, placeholder: Style { fg: None, bg: None, underline: None, effects: Effects() }, valid: Style { fg: Some(Ansi(Green)), bg: None, underline: None, effects: Effects() }, invalid: Style { fg: Some(Ansi(Yellow)), bg: None, underline: None, effects: Effects() }, context: Style { fg: None, bg: None, underline: None, effects: Effects() }, context_value: None }, color_when: Auto, color_help_when: Auto, backtrace: None }\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.07s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\clap-harness\\debug\\deps\\contract-90f7b68a8528048b.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  }
+]

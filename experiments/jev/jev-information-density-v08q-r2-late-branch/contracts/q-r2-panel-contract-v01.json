@@ -1,0 +1,138 @@
+{
+  "identity": "JEV-V08Q-R2-FRESH-PANEL-CONTRACT-V01",
+  "status": "SEALED_WITH_PHASE_PACKET_V01",
+  "parent_binding": {
+    "q_r1_panel_contract_sha256": "f81ea3fcb3445434dd2f9bfc92bf3c7aa6118efc605c157475b77d75b8e813b1",
+    "q_r1_completion_seal_sha256": "4e63e379671d7641cb174f1ed3db6ac8395b6c49e4c644392d55996eab1df68c"
+  },
+  "purpose": "Fresh held-out panel for paired late-branch evaluation; retain the Q-R1 task measurement interface while generating new world/neighborhood instances.",
+  "namespace": "eval_v08q_r2_late_branch_v01",
+  "population_boundary": "new worlds under the same four semantic families and fixed templates/generator semantics; not novel-family or novel-template generalization",
+  "generator_seed": {
+    "label": "jev-information-density-v08q-r2-late-branch-v01/panel/generator-seed",
+    "sha256": "4dfedc0875cd43955a2b3dbe69caf46c9b80ee4a2abf15a44ac3f2dd242d016e",
+    "value": 148700749,
+    "operation": "first four SHA-256 digest bytes, unsigned little-endian"
+  },
+  "population": {
+    "neighborhoods_total": 2000,
+    "families": ["exposure_control", "respiratory_monitoring", "salinity_control", "vibration_monitoring"],
+    "neighborhoods_per_family": 500,
+    "measurement_surfaces": ["p0", "p1", "p2", "p3"],
+    "construction_roles": ["anchor", "fact_flip", "sham", "neutral_1", "neutral_2", "neutral_3", "neutral_4", "neutral_5", "neutral_6", "neutral_7", "neutral_8"],
+    "prediction_views": ["anchor", "fact_flip", "sham", "matched_neutral"],
+    "neutral_candidate_roles": ["neutral_1", "neutral_2", "neutral_3", "neutral_4", "neutral_5", "neutral_6", "neutral_7", "neutral_8"]
+  },
+  "admission": {
+    "candidate_ordinals_per_family": {"inclusive_range": [0, 699]},
+    "maximum_candidates_per_family": 700,
+    "candidate_order": "family-major in the listed family order, then ascending ordinal within family",
+    "rejection": "reject the entire neighborhood atomically on any five-field or E1-ID collision; continue only to the next ordinal in the already-frozen stream",
+    "budget_exhaustion": "PANEL_ADMISSION_BUDGET_EXHAUSTED; preserve and stop",
+    "reseed_or_budget_extension": false,
+    "online_admission_and_final_audit_must_agree": true,
+    "rejection_log": ["candidate_ordinal", "family", "accepted", "collision_field_names", "collision_value_hashes_only"],
+    "raw_excluded_identity_values_in_log": false
+  },
+  "freshness": {
+    "identity_dimensions": ["world_id", "root_id", "episode_id", "full_rendered_input_hash", "selector_input_hash"],
+    "required_exclusion_ancestry": ["training", "E1", "P-R2", "Q", "Q-R1", "already-admitted-candidates-in-this-Q-R2-panel"],
+    "ancestry_identity_sources": [
+      {
+        "role": "selected-training-five-field-identities",
+        "path": "D:/codex-runs/jev-information-density-v08p-r1/v0.8P-R1/replay-attempt-03/training-scope-identities.jsonl",
+        "sha256": "0f5cd945f965c291b13375b16367085a8c4f3dced4e5996b0e1ffbadf279d191",
+        "rows": 55000,
+        "authority_path": "experiments/jev-information-density-v08q-r1/contracts/q-r1-panel-contract-v01.json",
+        "authority_sha256": "f81ea3fcb3445434dd2f9bfc92bf3c7aa6118efc605c157475b77d75b8e813b1"
+      },
+      {
+        "role": "sealed-E1-five-field-identities",
+        "path": "D:/codex-runs/jev-information-density-v08p-r1/v0.8P-R1/prior-reconstruction/prior-panel-identities.jsonl",
+        "sha256": "5936d6b4e9d6f651edc0406d844709c99108352459ae90494fa327ed7b110ebf",
+        "rows": 22000,
+        "authority_path": "experiments/jev-information-density-v08p-r1/provenance/r1-terminal-disposition-v01.json",
+        "authority_sha256": "151e28a629cc6877084b5c4d5395309c3a73e346f5b589d1b0cc588027a6596b"
+      },
+      {
+        "role": "sealed-P-R2-five-field-identities",
+        "path": "D:/codex-runs/jev-information-density-v08p-r2/v0.8P-R2/panel/panel-occurrence-identities.jsonl",
+        "sha256": "08ba6f9676ad6ec816a946f9bb1be37086c7401d7e1c4413f8c09ffe1e6b7573",
+        "rows": 22000,
+        "authority_path": "experiments/jev-information-density-v08p-r2/provenance/r2-panel-materialization-manifest-v01.json",
+        "authority_sha256": "565d5e2650db375230fed15eb94471c92a25810c1644d629e7bb9d1490bf4822"
+      },
+      {
+        "role": "sealed-v0.8Q-heldout-five-field-identities",
+        "path": "D:/codex-runs/jev-information-density-v08q-panel-v02/panel/panel-occurrence-identities.jsonl",
+        "sha256": "97a4e45c1f868499e11faf612218d3d9ec44902e17263ca5238933ec0393fa31",
+        "rows": 22000,
+        "authority_path": "D:/codex-runs/jev-information-density-v08q-panel-v02/provenance/q-panel-manifest-v01.json",
+        "authority_sha256": "1eeb4b1ac192fe51dcfa9e78dee82398b43d3565c9a6a863e813fa2ce52031c5"
+      },
+      {
+        "role": "sealed-Q-R1-five-field-identities",
+        "path": "D:/codex-runs/jev-information-density-v08q-r1/panel-v01/panel/panel-occurrence-identities.jsonl",
+        "sha256": "bf46d5aba583215713afdbf320a97fc8969ae5beb1aa9a19212f297f6a626fcd",
+        "bytes": 14527215,
+        "rows": 22000,
+        "authority_path": "D:/codex-runs/jev-information-density-v08q-r1/panel-v01/seals/q-r1-panel-input-terminal-seal-v01.json",
+        "authority_sha256": "064c1bef2dfe160396641be74e3a4419f16f0ead28cb0ab4b6978151d587dfe8",
+        "authority_root_sha256": "f90fc1de0ce1e728e4b6c72cbc58756e2278c5932adb77dcf33f2b9dff2b6f53"
+      }
+    ],
+    "identity_fields_permitted_from_ancestry": ["world_id", "root_id", "episode_id", "full_rendered_input_hash", "selector_input_hash"],
+    "ancestry_artifact_read_policy": "read only the listed identity artifacts and their listed authority receipts; parse only the five permitted fields; no labels, targets, predictions, metrics, features, or geometry",
+    "e1_neighborhood_id_denylist_binding": {
+      "path": "D:/codex-runs/jev-information-density-v08p-v05/identity/run-1/canonical-e1-neighborhood-hash-denylist.json",
+      "sha256": "50eebeb5790c29b4a75c6f8df849eb4c2865d3c864932bbd7f636b7a0e52a2cd",
+      "count": 2000,
+      "use": "opaque exact neighborhood-ID exclusion only"
+    },
+    "collision_rule": "for every required identity dimension, each proposed occurrence identity must be absent from every bound ancestry set and from every already-admitted candidate in this Q-R2 panel",
+    "missing_identity_source": "fail before candidate admission; no neighborhood-ID-only substitute",
+    "E1_neighborhood_id_denylist": "apply the already-sealed v05 opaque hash denylist as an additional exact identity exclusion only",
+    "no_rendered_text_similarity_gate": true,
+    "no_semantic_similarity_gate": true,
+    "no_outcome_or_geometry_admission_selection": true,
+    "source_binding": "the exact ancestry identities and their authority hashes are listed above; verify every listed byte identity and authority binding before generation; do not use predictions, targets, metrics, or Q-R1 row-level outcomes"
+  },
+  "matching": {
+    "rule": "select one exact-world invariant neutral candidate per neighborhood by argmin absolute L2-radius mismatch to the sham, after candidate identities and semantic roles are frozen",
+    "radius": "||h_neutral-h_anchor||_2 versus ||h_sham-h_anchor||_2",
+    "tie_break": "ascending SHA256(anchor_id + '|' + neutral_role)",
+    "prohibited_selection_inputs": ["direction/cosine", "head outputs", "Q-R1 results", "evaluation labels", "family performance"],
+    "gates": {
+      "mean_relative_error_max": 0.10,
+      "p95_absolute_error_max": 0.25,
+      "per_family_mean_relative_error_max": 0.15
+    },
+    "failure": "fail closed; no replacement shopping or threshold relaxation"
+  },
+  "exact_world_contract": {
+    "same_query_schema_candidate_set_and_order": true,
+    "sham_and_matched_neutral_target_preservation_per_component": 1e-12,
+    "fact_flip_changes_exact_MAP": true,
+    "all_views_independently_solved": true,
+    "single_declared_intervention_per_view": true
+  },
+  "feature_contract": {
+    "encoder": "LiquidAI/LFM2.5-1.2B-Base",
+    "revision": "7453bca97ca1e67754c4035a4b4c584e1c9dd725",
+    "representation": "final-layer mean_full@16, 2048-d FP32",
+    "sequence": "exact-length, single-row, no padding",
+    "backbone": "frozen BF16; verify identical parameter hash before/after extraction",
+    "repeat_tolerance_max_abs": 0.00001,
+    "feature_scope": "fresh-panel state occurrences and required candidate semantic basis only; no trained heads or Q-R1 predictions"
+  },
+  "output": {
+    "panel_occurrences": 22000,
+    "expected_feature_rows": 22016,
+    "prediction_rows_per_evaluation_cell": 8000,
+    "evaluation_cell_count": 120,
+    "expected_prediction_rows": 960000,
+    "candidate_order_join": "exact schema identity plus candidate semantic ID; never storage row or positional crosswalk",
+    "seal_before_training": true,
+    "panel_open_count": 1
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "experiment": "E012 Prospective Frame Decomposition",
+  "state": "FROZEN_BEFORE_A14_FRAME_PROJECTION",
+  "model_contact_authorized": false,
+  "task_count": 48,
+  "conditions_per_task": 26,
+  "expected_frame_count": 1248,
+  "projector": "scripts/project_frames_e012_a14_v1.py",
+  "projector_sha256": "dee48af049fbd94c5ef99c77899dd155e26a117b259e7086129e7f1058c5d440",
+  "presentation_binary_sha256": "c16f11a37d93f844156f1a5f2cdbe82912843b0b4615b93cd2a746f814e541c2",
+  "hash_binary_sha256": "27cb573a7d74eacef3f56d40391b08b24285668a313caf961c56ec79fe624f30",
+  "files": [
+    {
+      "path": "bank/construction-01/a14-design-lock-v1.json",
+      "sha256": "9601c8742240bec28b6c7372539d3b57756155f4a9ee8475d73cedbc2ab17726",
+      "bytes": 24943
+    },
+    {
+      "path": "bank/construction-01/scored-bank-a14/vault/task-source-fixtures-final-v3.json",
+      "sha256": "5c74f424906f618e817a1cd1f2ba020f5ab02c0c9e39737631b4983e70847bea",
+      "bytes": 336595
+    },
+    {
+      "path": "bank/construction-01/scored-bank-a14/vault/candidate-check-labels-final-v3.json",
+      "sha256": "45b357bb7b443c84b75d11ce9d56b4f6e1051bfbd3e6a9ec94fd572fc3d187f3",
+      "bytes": 943366
+    },
+    {
+      "path": "bank/construction-01/scored-bank-a14/vault/label-finalization-report-v3.json",
+      "sha256": "b6b877eafc1b4d4ff1b5b2ceb03974fa464af3dc08740706e0c74f1acf99f39c",
+      "bytes": 8680
+    },
+    {
+      "path": "scripts/project_frames_e012_a14_v1.py",
+      "sha256": "dee48af049fbd94c5ef99c77899dd155e26a117b259e7086129e7f1058c5d440",
+      "bytes": 23068
+    },
+    {
+      "path": "scripts/freeze_frame_projection_e012_a14_v1.py",
+      "sha256": "b119df500b25506eb8092857e4ca0f841174bba19871b13b3727193bedf68b74",
+      "bytes": 2284
+    },
+    {
+      "path": "scripts/audit_paired_truth_e012_a14_v1.py",
+      "sha256": "0330416ddc3e8138ea9d5fd1dada2f9ab0c1060434d8381543e2f7fcd63ffbab",
+      "bytes": 11549
+    },
+    {
+      "path": "scripts/audit_nuisance_baselines_e012_a14_v1.py",
+      "sha256": "3d8746fe688e84214add0c2e31445fe8e9a9a94370276fb6d605eb5cc7fc70d3",
+      "bytes": 14925
+    },
+    {
+      "path": "external::D:/rdc-e012-target/runtime-integration/release/e011-presentation.exe",
+      "sha256": "c16f11a37d93f844156f1a5f2cdbe82912843b0b4615b93cd2a746f814e541c2",
+      "bytes": 341504
+    },
+    {
+      "path": "external::D:/rdc-e012-target/runtime-integration/release/e011-hash.exe",
+      "sha256": "27cb573a7d74eacef3f56d40391b08b24285668a313caf961c56ec79fe624f30",
+      "bytes": 210944
+    }
+  ],
+  "sha256_self_excluded": true
+}

@@ -1,0 +1,50 @@
+{
+  "global_complete_blocks": [],
+  "per_substrate": {
+    "fly": {
+      "complete_blocks": 0,
+      "of": 12,
+      "rate": 0.0
+    },
+    "g001": {
+      "complete_blocks": 0,
+      "of": 12,
+      "rate": 0.0
+    },
+    "g002": {
+      "complete_blocks": 0,
+      "of": 12,
+      "rate": 0.0
+    },
+    "g003": {
+      "complete_blocks": 0,
+      "of": 12,
+      "rate": 0.0
+    },
+    "g004": {
+      "complete_blocks": 0,
+      "of": 12,
+      "rate": 0.0
+    },
+    "g005": {
+      "complete_blocks": 0,
+      "of": 12,
+      "rate": 0.0
+    },
+    "g006": {
+      "complete_blocks": 0,
+      "of": 12,
+      "rate": 0.0
+    },
+    "g007": {
+      "complete_blocks": 0,
+      "of": 12,
+      "rate": 0.0
+    },
+    "g008": {
+      "complete_blocks": 0,
+      "of": 12,
+      "rate": 0.0
+    }
+  }
+}

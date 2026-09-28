@@ -1,0 +1,60 @@
+{
+  "protocol": "jev-information-density/v0.8p-r2-analysis-implementation-addendum-v01",
+  "identity": "v0.8P-R2-outcome-blind-bootstrap-implementation-addendum-v01",
+  "status": "SEALED_BEFORE_HEAD_INITIALIZATION",
+  "purpose": "Resolve only deterministic bootstrap implementation details omitted from the sealed P analysis contract; preserve all scientific estimands and onset definitions.",
+  "parents": {
+    "p_run_contract_sha256": "e345225b4a17fc18eb35fcab24cbe1d72bd0e34bed9de272f927a7be461853e6",
+    "p_analysis_contract_sha256": "84111122033fda65c84344317cfe3b50639b23be4c71f480ba665c67a23cc939",
+    "r2_execution_contract_sha256": "51cd8dee09688f1aae24ff575fa0a181d50b2a6ffc94dc6b7e7ed5b61c58ef14",
+    "r2_panel_ready_manifest_sha256": "c0d48381356113451bc72f9578204ade4ef7449a75264cd5018a34d002b313ac",
+    "r2_schedule_sha256": "455d2f8fd709cb0c617f652f7b4ed447fcaaaa30e3e8d2ff1c5cadf358480933"
+  },
+  "bootstrap_implementation": {
+    "quantile": {
+      "function": "numpy.quantile",
+      "q": 0.95,
+      "method": "linear"
+    },
+    "family_order": [
+      "exposure_control",
+      "respiratory_monitoring",
+      "salinity_control",
+      "vibration_monitoring"
+    ],
+    "draw_order": "family-major; for each family in family_order, draw a (10000, 500) integer matrix before advancing to the next family",
+    "rng": "numpy.random.Generator(numpy.random.PCG64(2773025982))",
+    "rng_call": "rng.integers(0, 500, size=(10000, 500), dtype=numpy.int32), once per family in family_order",
+    "resampling_unit": "whole neighborhood trajectory; one sampled neighborhood index carries all views and every measured checkpoint step together",
+    "resample_plan_scope": "materialize one 10000 x 2000 index plan and reuse it unchanged for every seed x arm x continuous-coordinate simultaneous band; same sampled neighborhoods in each replicate across all series",
+    "neighborhood_order_within_family": "lexical neighborhood_id order",
+    "family_column_layout": "concatenate each family's 500 lexical neighborhood indices in family_order"
+  },
+  "parser_compatibility": {
+    "sealed_contract_wording": "A continuous-coordinate onset requires the relevant one-sided simultaneous band to remain beyond zero for three consecutive optimizer-step checkpoints.",
+    "adapter_input_assertion": "The adapter must require the exact sealed wording above before transformation.",
+    "in_memory_normalization": "Map only the phrase 'three consecutive optimizer-step checkpoints' to the helper's accepted literal '3-consecutive-step checkpoints'.",
+    "semantic_value": 3,
+    "sealed_source_files_modified": false
+  },
+  "unchanged_contract_elements": {
+    "bootstrap_replicates": 10000,
+    "bootstrap_seed": 2773025982,
+    "simultaneous_confidence": 0.95,
+    "simultaneous_scope": "40 epoch-3 optimizer steps separately for each seed-arm-coordinate series",
+    "band_formula": "Preserve the exact formula in the bound P analysis contract.",
+    "event_persistence": 3,
+    "baseline_step": 80,
+    "trajectory_steps": "81..120 inclusive",
+    "metrics_estimands_thresholds_checkpoint_set_panel_training_schedule": "unchanged",
+    "trajectory_dependent_selection_or_reordering": false,
+    "alternate_quantile_or_post_hoc_bootstrap_variant": false
+  },
+  "preoutcome_status": {
+    "head_initialized": false,
+    "training_started": false,
+    "heldout_inference_started": false,
+    "trajectory_outcomes_observed": false,
+    "panel_or_metrics_used_to_choose_values": false
+  }
+}

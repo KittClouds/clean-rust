@@ -1,0 +1,53 @@
+{
+  "schema": "jev-r3-run-contract-v03",
+  "identity": "JEV-V08Q-R3-SELECTIVITY-V03",
+  "status": "SEALED",
+  "scientific_question": "Under balanced high-to-low and low-to-high training, characterize the late paired effect of changing only the SHAM auxiliary multiplier from 1.0 to 0.5 after a common step-80 history, and test whether signed discrimination response D depends on pre-branch semantic-role state S80.",
+  "claim_scope": "Conditional on the sealed training corpus, task families, frozen model, runtime, and realized histories. No controller, population-law, mechanism, or novel-family claim.",
+  "cohort": {
+    "balanced_histories": 192,
+    "calibration_histories_excluded": 48,
+    "seed_label": "jev-information-density-v08q-r3-selectivity-v03/balanced-history/{index}",
+    "seed_derivation": "little-endian uint32 from first four bytes SHA256(label)",
+    "seed_indices": "0..191",
+    "bridge_count": 24,
+    "bridge_selection": "Sort indices 0..191 by SHA256('jev-information-density-v08q-r3-selectivity-v03/bridge-rank/' + zero-padded index); select first 24. Frozen indices: [88,80,135,136,159,38,41,72,145,44,144,74,52,84,160,115,111,42,86,15,177,183,59,143]. Freeze before any training or S80 measurement.",
+    "bridge_paired_initialization": "Same seed-derived initial head for balanced and high-to-low-only histories; bridge differs only in training polarity assignment before the fork."
+  },
+  "design_basis": {
+    "balanced_S80_pre_treatment_calibration_sha256": "dcf3e524fc57cd359029bda2fc1a9e52b66d77843552394c778723aa34744396",
+    "balanced_S120_1x_only_calibration_sha256": "cd50ec49d5d2196cc92df0bb18276f2d10643d2cc5dc12b928dc6459bea16fab",
+    "continuation_replay_root_sha256": "f588bad0b6f8ebaadda5438b4f1e72ea9104b4483ddc77cd79d7fd633f4e08f3",
+    "design_operating_characteristics_sha256": "e098f44cbe0cf7c95395f3559451221d71b9946fa7208961f8460849690c89f5",
+    "calibration_scope": "48 balanced histories; no HALF continuation, confirmatory outcome, or confirmatory-panel access; excluded from the 192-history cohort",
+    "ratio_feasibility": "48/48 calibration 1x endpoint separations were >=0.01; pilot informs feasibility only and is not a guarantee of R3 ratio coverage"
+  },
+  "training": {
+    "families": ["exposure_control", "respiratory_monitoring", "salinity_control", "vibration_monitoring"],
+    "training_polarity": "Balanced high_to_low and low_to_high within family under the sealed R3 generator allocation.",
+    "bridge_polarity": "high_to_low only; evaluation still includes both polarities, and low_to_high bridge cells are explicitly out of training-polarity distribution.",
+    "common_history": "SHAM auxiliary multiplier 1.0 through global step 80.",
+    "fork_state": ["head parameters", "AdamW state", "RNG state", "event cursor", "schedule identity"],
+    "late_branches": [1.0, 0.5],
+    "branch_difference": "Only the per-event weight on auxiliary SHAM rows; primary row weights remain 1.0 and the loss denominator remains batch row count.",
+    "auxiliary_coverage": "Each of 5,000 anchor primary occurrences has exactly one paired SHAM event per epoch; 2,500 low-to-high events use the separately extracted reverse-SHAM state features. Per-minibatch auxiliary row count may vary with randomized anchor/fact composition.",
+    "optimizer": {"name": "AdamW", "lr": 0.002, "weight_decay": 0.01, "betas": [0.9, 0.999], "epsilon": 1e-8, "amsgrad": false},
+    "head": {"class": "CompatibilityHead", "input_dimension": 2048, "architecture": "mlp", "hidden_dimension": 128, "parameter_count": 590081},
+    "objective": {"brier_weight": 0.25, "denominator": "number of active batch rows; unchanged between branches"},
+    "steps": 120,
+    "checkpoints": [80, 100, 120],
+    "evaluation_feedback": false,
+    "checkpoint_selection": false,
+    "extra_training_or_rescue": false
+  },
+  "continuation": {
+    "replay_receipt_sha256": "55c2297843876bbf502485af28e3810742ed509bbe6ef2d307323552d7e90abe",
+    "policy": "Exact same-fork replay under the bound runtime was bit-identical; no redundant A/A continuation. Both branches restore the complete step-80 state and same schedule/event stream."
+  },
+  "failure_policy": {
+    "retry": "Technical crash or I/O failure may rerun only with the identical seed, initial state, schedule, and deterministic replay contract; never substitute a seed.",
+    "permanent_failure": "Retain the registered history in the denominator; mark R ineligible and D/M/P/C missing for that history, report its identity, and mark any affected fixed-sequence test NOT_EVALUABLE rather than silently using a reduced cohort.",
+    "no_adaptive_repair": true
+  },
+  "prohibited": ["dose sweep", "controller fitting", "extra checkpoint", "checkpoint selection", "new family treatment", "NewTight", "Phoenix", "post-result threshold change", "confirmatory use of calibration histories or panel"]
+}

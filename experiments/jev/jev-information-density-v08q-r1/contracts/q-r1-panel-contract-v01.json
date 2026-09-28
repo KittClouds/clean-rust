@@ -1,0 +1,140 @@
+{
+  "identity": "JEV-V08Q-R1-FRESH-WORLD-PANEL-CONTRACT-V01",
+  "status": "SEALED_AUTHORIZED_FOR_PHASE_EXECUTION",
+  "parent_bindings": {
+    "q_source_lock_sha256": "d6d70768242ac12801069e2bdb27cb976679c907206e81ae8c0921867bea2363",
+    "q_source_lock_root_sha256": "5e973916fb62747cde2de51f7deb2e29616ea1ead13ce384dcdb254901d936d3",
+    "q_panel_contract_sha256": "a48bcce6389cab974aeed56d0358c3cff0d6e71324bbc1dd70954ba9be201811",
+    "q_run_contract_sha256": "5f6cd42b6de058a4fcdcbeb70b1939dbe944a6c973ee704a93148f9bea71d1ae",
+    "q_panel_manifest": {
+      "path": "D:/codex-runs/jev-information-density-v08q-panel-v02/provenance/q-panel-manifest-v01.json",
+      "sha256": "1eeb4b1ac192fe51dcfa9e78dee82398b43d3565c9a6a863e813fa2ce52031c5"
+    },
+    "q_panel_terminal_seal": {
+      "path": "D:/codex-runs/jev-information-density-v08q-panel-v02/seals/q-panel-phase-terminal-seal-v01.json",
+      "sha256": "161511e6617ee012b3051590b4a9ce747f79a85228c02649e61ca8a10d080ad6"
+    }
+  },
+  "purpose": "Construct one fresh-world held-out panel for the Q-R1 replication. Preserve Q measurement semantics while generating new neighborhood/world instances.",
+  "namespace": "eval_v08q_r1",
+  "generator_seed": 133739824,
+  "generator_seed_derivation": {
+    "label": "jev-information-density-v08q-r1-panel/generator-seed-v01",
+    "sha256": "30b5f8072cc883f4f61829690df447a0b7d9e207b1643cdef7e0f5fce2c36857",
+    "operation": "first four digest bytes unsigned little-endian"
+  },
+  "population_boundary": "same four families and fixed template/generator semantics as Q; fresh world/neighborhood draws only",
+  "families": ["exposure_control", "respiratory_monitoring", "salinity_control", "vibration_monitoring"],
+  "admission": {
+    "neighborhoods_total": 2000,
+    "neighborhoods_per_family": 500,
+    "candidate_ordinals_per_family": {"inclusive_range": [0, 699]},
+    "max_candidates_per_family": 700,
+    "candidate_order": "ascending ordinal independently within each family",
+    "failure": "PANEL_ADMISSION_BUDGET_EXHAUSTED; preserve and stop",
+    "replacement_reseed_or_budget_extension": false,
+    "roles_per_neighborhood": ["anchor", "fact_flip", "sham", "neutral_1", "neutral_2", "neutral_3", "neutral_4", "neutral_5", "neutral_6", "neutral_7", "neutral_8"],
+    "measurement_surfaces": ["p0", "p1", "p2", "p3"]
+  },
+  "freshness_and_exclusion": {
+    "five_identity_fields": ["world_id", "root_id", "episode_id", "full_rendered_input_hash", "selector_input_hash"],
+    "exact_exclusion_sources": [
+      {
+        "role": "selected-training-five-field-identities",
+        "path": "D:/codex-runs/jev-information-density-v08p-r1/v0.8P-R1/replay-attempt-03/training-scope-identities.jsonl",
+        "sha256": "0f5cd945f965c291b13375b16367085a8c4f3dced4e5996b0e1ffbadf279d191",
+        "rows": 55000,
+        "fields_permitted": ["world_id", "root_id", "episode_id", "full_rendered_input_hash", "selector_input_hash"],
+        "authority": {"path": "experiments/jev-information-density-v08q/contracts/q-source-lock-v02.json", "sha256": "d6d70768242ac12801069e2bdb27cb976679c907206e81ae8c0921867bea2363"}
+      },
+      {
+        "role": "sealed-E1-five-field-identities",
+        "path": "D:/codex-runs/jev-information-density-v08p-r1/v0.8P-R1/prior-reconstruction/prior-panel-identities.jsonl",
+        "sha256": "5936d6b4e9d6f651edc0406d844709c99108352459ae90494fa327ed7b110ebf",
+        "rows": 22000,
+        "fields_permitted": ["world_id", "root_id", "episode_id", "full_rendered_input_hash", "selector_input_hash"],
+        "authority": {"path": "experiments/jev-information-density-v08p-r1/provenance/r1-terminal-disposition-v01.json", "sha256": "151e28a629cc6877084b5c4d5395309c3a73e346f5b589d1b0cc588027a6596b", "binding": "prior_panel_reconstruction.identity_manifest_sha256; v05_hash_set_exact_match=true; 2,000 neighborhoods / 22,000 occurrences"}
+      },
+      {
+        "role": "sealed-P-R2-five-field-identities",
+        "path": "D:/codex-runs/jev-information-density-v08p-r2/v0.8P-R2/panel/panel-occurrence-identities.jsonl",
+        "sha256": "08ba6f9676ad6ec816a946f9bb1be37086c7401d7e1c4413f8c09ffe1e6b7573",
+        "rows": 22000,
+        "fields_permitted": ["world_id", "root_id", "episode_id", "full_rendered_input_hash", "selector_input_hash"],
+        "authority": {"path": "experiments/jev-information-density-v08p-r2/provenance/r2-panel-materialization-manifest-v01.json", "sha256": "565d5e2650db375230fed15eb94471c92a25810c1644d629e7bb9d1490bf4822", "binding": "construction_outputs.panel-occurrence-identities.jsonl; source-lock binding and output digest independently verified"}
+      },
+      {
+        "role": "sealed-v0.8Q-heldout-five-field-identities",
+        "path": "D:/codex-runs/jev-information-density-v08q-panel-v02/panel/panel-occurrence-identities.jsonl",
+        "sha256": "97a4e45c1f868499e11faf612218d3d9ec44902e17263ca5238933ec0393fa31",
+        "rows": 22000,
+        "fields_permitted": ["world_id", "root_id", "episode_id", "full_rendered_input_hash", "selector_input_hash"],
+        "authority": {"path": "D:/codex-runs/jev-information-density-v08q-panel-v02/provenance/q-panel-manifest-v01.json", "sha256": "1eeb4b1ac192fe51dcfa9e78dee82398b43d3565c9a6a863e813fa2ce52031c5"}
+      },
+      {
+        "role": "sealed-v0.5-E1-neighborhood-ID-hash-denylist",
+        "path": "D:/codex-runs/jev-information-density-v08p-v05/identity/run-1/canonical-e1-neighborhood-hash-denylist.json",
+        "sha256": "50eebeb5790c29b4a75c6f8df849eb4c2865d3c864932bbd7f636b7a0e52a2cd",
+        "count": 2000,
+        "use": "opaque neighborhood-ID exclusion only",
+        "authority": {"path": "experiments/jev-information-density-v08q/contracts/q-source-lock-v02.json", "sha256": "d6d70768242ac12801069e2bdb27cb976679c907206e81ae8c0921867bea2363"}
+      }
+    ],
+    "already_admitted_r1_occurrences": "five identity sets accumulated online during this fixed candidate stream",
+    "collision_predicate": "for each of the five fields, candidate value must be absent from the union of selected-training, sealed-E1, sealed-P-R2, sealed-Q, and already-admitted-R1 sets",
+    "missing_required_ancestry_identity_source": "fail closed before candidate generation; do not substitute neighborhood-ID-only or metadata-only evidence for the five-field set",
+    "e1_denylist_rule": "reject if SHA256(canonical(neighborhood_id)) is in the bound denylist",
+    "canonicalization": "exact original Q identity canonicalization; no aliasing or inferred field substitution",
+    "whole_neighborhood_atomic_admission": true,
+    "rejected_candidate_log_fields": ["candidate_ordinal", "family", "accepted=false", "collision_field_names", "collision_value_hashes_only"],
+    "raw_excluded_identity_values_in_log": false,
+    "online_admission_and_independent_final_audit_must_agree": true,
+    "no_rendered_text_similarity_or_semantic_similarity_gate": true,
+    "no_outcome_or_q_x1_values_used_for_admission": true
+  },
+  "matching": {
+    "rule": "argmin absolute Euclidean L2 radius error between certified sham and neutral_1..neutral_8 from the anchor",
+    "tie_break": "ascending SHA256(anchor_id + '|' + neutral_role)",
+    "outcome_or_direction_inputs": false,
+    "radius_gates": {
+      "mean_relative_error_max": 0.10,
+      "p95_absolute_error_max": 0.25,
+      "per_family_mean_relative_error_max": 0.15
+    },
+    "failed_gate_replacement": false
+  },
+  "exact_world_validation": {
+    "preserve_query_schema_candidate_set_and_candidate_order": true,
+    "anchor_fact_sham_and_selected_neutral_have_exact_world_receipts": true,
+    "target_tolerance_per_component": 1e-12,
+    "fact_flip_requires_new_map": true,
+    "sham_and_selected_neutral_require_anchor_target": true
+  },
+  "feature_extraction": {
+    "candidate_texts": 16,
+    "state_occurrences": 22000,
+    "feature": "LiquidAI/LFM2.5-1.2B-Base revision 7453bca97ca1e67754c4035a4b4c584e1c9dd725; final-layer mean_full@16; 2048 FP32",
+    "sequence": "exact-length, one model-visible input per forward call, no padding, maximum 1024 tokens",
+    "backbone": "BF16 frozen; before/after parameter identity required",
+    "repeat_max_abs_error": 0.00001,
+    "feature_cache_sealed_before_training": true
+  },
+  "required_pretraining_artifacts": [
+    "source-bound five-field exclusion manifests",
+    "candidate stream and online admission log",
+    "E1 neighborhood-ID collision audit",
+    "training/E1/P-R2/Q/R1 internal five-field overlap audits",
+    "exact-world receipts",
+    "new feature tensors and row manifests",
+    "radius matching result and family report",
+    "exact target joins",
+    "panel and feature seals"
+  ],
+  "authority": {
+    "panel_construction": true,
+    "model_contact": true,
+    "feature_extraction": true,
+    "training": true,
+    "evaluation": true
+  }
+}

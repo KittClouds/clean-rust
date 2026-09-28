@@ -1,0 +1,16 @@
+{
+  "receipt_id": "FAS_FROZEN_OBSERVER_BUNDLE_E2_V07_AUTHORIZATION_VALIDATION_STOP_V01",
+  "status": "E2_V07_AUTHORIZATION_VALIDATION_STOP_PRESERVED_PRECONTACT",
+  "recorded_utc": "2026-09-26T10:51:15.634477+00:00",
+  "e0_v10_root_sha256": "899a131c09298fdafdcc6771ad01e8982857a1cd47900259800f97dd7bea7ccd",
+  "rejected_authorization_path": "C:\\code land\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\audits\\e2-v07-model-contact-authorization-v01.json",
+  "rejected_authorization_sha256": "0827f54d9845c8af3076f7bf77a0a54857d4b93688d7812ed3bca61fc6a7f27e",
+  "failure": "required normalized execution_identity object was omitted from the generated authorization receipt",
+  "model_contact_performed": false,
+  "tokenizer_loaded": false,
+  "model_loaded": false,
+  "model_runtime_imported": false,
+  "cuda_allocator_initialized": false,
+  "feature_cache_written": false,
+  "classification": "authorization artifact construction defect; sealed E0/E2 identities did not mismatch"
+}

@@ -1,0 +1,8 @@
+{
+  "engineering_only": true,
+  "execution_sha256": "78BBFD003B86088175F12EE4036A6762A7A92BD01C880ADD817660338911FC81",
+  "identity": "q10-gc1-lr1-requal1-csc1-resid-invalid1-reconcile1-v1",
+  "protocol": "Q10-RESID-INVALID1-RECONCILE1",
+  "scientific_promotion": false,
+  "status": "RESID_INVALID1_RECONCILE1_COMPLETE"
+}

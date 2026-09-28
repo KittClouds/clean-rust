@@ -1,0 +1,20 @@
+{
+  "schema": "KAMMI_LEDGER_ARCHITECTURE_LOCK_V1",
+  "status": "LOCKED_FOR_IMPLEMENTATION",
+  "locked_utc": "2026-09-27T14:35:09Z",
+  "architecture_path": "program-infrastructure/kammi-ledger/ARCHITECTURE-v1.md",
+  "architecture_sha256": "c9e9d5bb54ee863ce99760ee26c0f0e912b952ff3e8a3b502cc23f2d78eb3524",
+  "implementation_status": "NOT_STARTED_BY_THIS_LOCK",
+  "acceptance_status": "NOT_RUN",
+  "new_flight_gate": "CLOSED_PENDING_ACCEPTANCE",
+  "legacy_fixture": {
+    "name": "E4-0-v16-v09",
+    "contract_sha256": "21fc77d5a288b9adef995d88f089890235f8dcb2fbc3c9e452725bb67892a22f",
+    "seal_file_sha256": "0635de4a384b4d5121d8b2295e88a73f649c53e402ffcda311fcaf9c8d93099c",
+    "legacy_root_sha256": "278ae16eeb6852d3efad44221556a87be6df54964471f0870931fe2e99b305d1",
+    "declared_entry_count": 447,
+    "observed_entry_count": 447,
+    "kammi_independent_closure_verification": "PENDING"
+  },
+  "change_rule": "Numbered architecture amendment and new lock receipt; never mutate this lock in place."
+}

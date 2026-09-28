@@ -1,0 +1,218 @@
+{
+  "closure_twin": "twin-a",
+  "counts": {
+    "contexts": 8,
+    "exact_replays": 8
+  },
+  "domain_execution_sha256": "6E526DFFE06A0C5051F3F4FB699EC62A802FC54613FCDFA652EBC9F4A69249AF",
+  "domain_identity": "q10-gc1-lr1-requal1-domain-r2-v1",
+  "engineering_only": true,
+  "identity": "q10-gc1-lr1-requal1-smoke-v1",
+  "pair_replay_executed": false,
+  "protocol": "REQUAL1-SMOKE",
+  "receipts": [
+    {
+      "candidate_identity": "4B718E234AE140599D357A36C7B4CF46B3B582835C94C007F0B2CF8E7EB62E04",
+      "final_geometry_pass": false,
+      "geometry": {
+        "axis_absolute_error": 1.6961896697202834e-08,
+        "axis_normalized_error": 2.2874456830359838e-05,
+        "cue_linear_absolute_error": 3.551477629561481e-06,
+        "cue_linear_normalized_error": 6.214907938622885e-07,
+        "final_axis": 0.0007415043263679652,
+        "final_norm": 2.125817970223839,
+        "norm_absolute_error": 1.1299379210072402e-09,
+        "norm_normalized_error": 5.315308912774248e-10,
+        "target_axis": 0.0007415212882646624,
+        "target_norm": 2.125817971353777
+      },
+      "group_index": 0,
+      "key": [
+        "seed9731-L-tau16.json",
+        2
+      ],
+      "mismatch_count": 253,
+      "readout_sha256": "F17145FD8786517B7D53CB9BD8DF1CF0EEA1478874833C0893D600CC88EB2F3E",
+      "total_ulp_distance": 326,
+      "weight_state_sha256": "F50AE79911C7AA1546C8026D055C82569D5FD646B94882A02CA6C6329959C6D6"
+    },
+    {
+      "candidate_identity": "225DADE38C870D4902BA2AFAEA7BE6B9FC43FD821CB0777FE85BAC5262723A9C",
+      "final_geometry_pass": false,
+      "geometry": {
+        "axis_absolute_error": 5.437842385581926e-08,
+        "axis_normalized_error": 1.5406421201226307e-05,
+        "cue_linear_absolute_error": 4.326792098340036e-06,
+        "cue_linear_normalized_error": 1.0485702187069671e-06,
+        "final_axis": -0.0035296491587801723,
+        "final_norm": 1.3133192263848383,
+        "norm_absolute_error": 1.1620231665787628e-08,
+        "norm_normalized_error": 8.847987092185403e-09,
+        "target_axis": -0.0035295947803563165,
+        "target_norm": 1.31331923800507
+      },
+      "group_index": 0,
+      "key": [
+        "seed9731-L-tau4.json",
+        3
+      ],
+      "mismatch_count": 245,
+      "readout_sha256": "68391B7E846B7B49DFA09E8FB0198E1B19F56701043689AA023AF4710E0BF641",
+      "total_ulp_distance": 326,
+      "weight_state_sha256": "C56F3A53EF811D29E6CA692FE7891C992AB3C0BB759A04D1797607F054653387"
+    },
+    {
+      "candidate_identity": "33019244E64747AF5A43B344BAF969602448BD01CDC1789F1356313A9AA5DA23",
+      "final_geometry_pass": true,
+      "geometry": {
+        "axis_absolute_error": 8.509656122118736e-10,
+        "axis_normalized_error": 1.285575877277329e-07,
+        "cue_linear_absolute_error": 3.5568430754639107e-06,
+        "cue_linear_normalized_error": 7.15210965999275e-07,
+        "final_axis": 0.006619334857248466,
+        "final_norm": 1.9494161433467376,
+        "norm_absolute_error": 2.1910280256776105e-08,
+        "norm_normalized_error": 1.123940626289378e-08,
+        "target_axis": 0.006619334006282854,
+        "target_norm": 1.9494161652570179
+      },
+      "group_index": 0,
+      "key": [
+        "seed9731-R-tau16.json",
+        1
+      ],
+      "mismatch_count": 246,
+      "readout_sha256": "A4659E71F5E96A297B1D412616917A8744D770385E43C876315F0D33BF92F3B5",
+      "total_ulp_distance": 331,
+      "weight_state_sha256": "7C5D07CF3D6F3A152DD9FC8BEB58CBCCFE9D0F5086ECCB646D874528FD2D4A1A"
+    },
+    {
+      "candidate_identity": "F1AF793C980DF26B06DA8CDF8FA388022C815DF8B338AAA8D9EBB0813628F180",
+      "final_geometry_pass": true,
+      "geometry": {
+        "axis_absolute_error": 1.2860040896761626e-09,
+        "axis_normalized_error": 1.942799817104757e-07,
+        "cue_linear_absolute_error": 3.569684686270238e-06,
+        "cue_linear_normalized_error": 7.17793160567581e-07,
+        "final_axis": 0.006619335292286943,
+        "final_norm": 1.9494161997664397,
+        "norm_absolute_error": 3.4509421764639114e-08,
+        "norm_normalized_error": 1.770243951993148e-08,
+        "target_axis": 0.006619334006282854,
+        "target_norm": 1.9494161652570179
+      },
+      "group_index": 0,
+      "key": [
+        "seed9731-R-tau16.json",
+        3
+      ],
+      "mismatch_count": 233,
+      "readout_sha256": "77EFD14E01E4B0B850FBEAC0C5EFCF7AABB44522CFE893DB52F994205D7941D3",
+      "total_ulp_distance": 317,
+      "weight_state_sha256": "184013378A152BE718ED21901965DC7EF2E2EADC716D561BFB09AC391D47BD55"
+    },
+    {
+      "candidate_identity": "BCD580913905963D432F691BD8054F7338F3E4D922B52C0850E26A5AAB12068E",
+      "final_geometry_pass": true,
+      "geometry": {
+        "axis_absolute_error": 6.206943795744602e-09,
+        "axis_normalized_error": 6.145692988760513e-07,
+        "cue_linear_absolute_error": 5.276106797080819e-06,
+        "cue_linear_normalized_error": 1.7806465817776608e-06,
+        "final_axis": -0.010099670812865547,
+        "final_norm": 1.2014554566313862,
+        "norm_absolute_error": 5.317184137432207e-08,
+        "norm_normalized_error": 4.425619229911971e-08,
+        "target_axis": -0.010099664605921752,
+        "target_norm": 1.2014554034595448
+      },
+      "group_index": 0,
+      "key": [
+        "seed9731-R-tau4.json",
+        0
+      ],
+      "mismatch_count": 222,
+      "readout_sha256": "D04D8805FD58BAFD4E4F3830D4C44E59B0C201156BB41F6C6A459B0ABA6824AC",
+      "total_ulp_distance": 283,
+      "weight_state_sha256": "C51F12EDEB16A54EF01A7E9B51B2B01D9FB1829707C68D47A78C74CD4BF774C8"
+    },
+    {
+      "candidate_identity": "BCD580913905963D432F691BD8054F7338F3E4D922B52C0850E26A5AAB12068E",
+      "final_geometry_pass": true,
+      "geometry": {
+        "axis_absolute_error": 6.227530800068104e-09,
+        "axis_normalized_error": 6.166076838251348e-07,
+        "cue_linear_absolute_error": 3.902290778564395e-06,
+        "cue_linear_normalized_error": 1.316993950880168e-06,
+        "final_axis": -0.010099670833452552,
+        "final_norm": 1.2014554066488166,
+        "norm_absolute_error": 3.1892717355930245e-09,
+        "norm_normalized_error": 2.6545069641450185e-09,
+        "target_axis": -0.010099664605921752,
+        "target_norm": 1.2014554034595448
+      },
+      "group_index": 0,
+      "key": [
+        "seed9731-R-tau4.json",
+        1
+      ],
+      "mismatch_count": 241,
+      "readout_sha256": "B0603AD912F0E3F7ED73871C4B36B0923EFEB935801079F0582F23D8429B6CC3",
+      "total_ulp_distance": 309,
+      "weight_state_sha256": "D6E858C74AF3EEE3883101DFE26D3765A9F63551F646E0A9283ECAAA60215DBB"
+    },
+    {
+      "candidate_identity": "BCD580913905963D432F691BD8054F7338F3E4D922B52C0850E26A5AAB12068E",
+      "final_geometry_pass": true,
+      "geometry": {
+        "axis_absolute_error": 6.443355089064129e-09,
+        "axis_normalized_error": 6.379771349324003e-07,
+        "cue_linear_absolute_error": 4.7464171624526216e-06,
+        "cue_linear_normalized_error": 1.6018802918637399e-06,
+        "final_axis": -0.01009967104927684,
+        "final_norm": 1.2014554255384056,
+        "norm_absolute_error": 2.2078860739682682e-08,
+        "norm_normalized_error": 1.837676261316687e-08,
+        "target_axis": -0.010099664605921752,
+        "target_norm": 1.2014554034595448
+      },
+      "group_index": 0,
+      "key": [
+        "seed9731-R-tau4.json",
+        2
+      ],
+      "mismatch_count": 238,
+      "readout_sha256": "38F196AF53C3679C54CF1BF16244D9F55B031CE1DBB6D89D882B6F5A787D8AC3",
+      "total_ulp_distance": 311,
+      "weight_state_sha256": "41DA1EED6CC8FBA5F3A9AB3D6105E76E8CA3557343320DA91C76C8872C27A442"
+    },
+    {
+      "candidate_identity": "BCD580913905963D432F691BD8054F7338F3E4D922B52C0850E26A5AAB12068E",
+      "final_geometry_pass": true,
+      "geometry": {
+        "axis_absolute_error": 6.2046025296746965e-09,
+        "axis_normalized_error": 6.143374826562798e-07,
+        "cue_linear_absolute_error": 3.5866053604361056e-06,
+        "cue_linear_normalized_error": 1.2104524834068022e-06,
+        "final_axis": -0.010099670810524281,
+        "final_norm": 1.2014553721350973,
+        "norm_absolute_error": 3.132444748032981e-08,
+        "norm_normalized_error": 2.6072085064607694e-08,
+        "target_axis": -0.010099664605921752,
+        "target_norm": 1.2014554034595448
+      },
+      "group_index": 0,
+      "key": [
+        "seed9731-R-tau4.json",
+        3
+      ],
+      "mismatch_count": 215,
+      "readout_sha256": "F64177B8BD4F847E2C822AEEDAD593CF4BC2CBCBC903B69F8FFA53EEBECDFD64",
+      "total_ulp_distance": 279,
+      "weight_state_sha256": "863E598EA6B8A1F406D5CE92906FC0DBF137B711436C8BC78716940D3A24F92D"
+    }
+  ],
+  "scientific_promotion": false,
+  "singleton_campaign_opened": false,
+  "status": "SMOKE_PASS"
+}

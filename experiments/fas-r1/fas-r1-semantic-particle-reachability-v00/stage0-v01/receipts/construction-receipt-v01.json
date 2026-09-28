@@ -1,0 +1,51 @@
+{
+  "schema": "R1_STAGE0_SOURCE_RECEIPT_V01",
+  "status": "R1_CONSTRUCTION_READY",
+  "date": "2026-09-25",
+  "scope": "model-free symbolic construction only",
+  "design_packet_status": "SEALED_FOR_STAGE0_CONSTRUCTION",
+  "design_packet_seal_sha256": "27dbe228f0af4fe4b14d877861d3c51227b27fbc8a2714aea72243481374a21b",
+  "run_root": "D:\\codex-runs\\fas-r1-semantic-particle-reachability-v00\\stage0-v01\\construction-attempt-v02",
+  "run_artifact_root_sha256": "2078a366082a358275fa2b10d9f657967ef71a7c259a709822e631f01ce929d7",
+  "run_artifact_manifest_sha256": "39b8aff68c7006b335b02ff5bbbfce86c95ea5299c26c3fd77a62ef6b4196c61",
+  "run_artifact_seal_verified": true,
+  "accepted_worlds": 96,
+  "stub_arm_runs": 576,
+  "charged_expansions": 36864,
+  "saved_trace_count": 576,
+  "all_disk_readback_replays_passed": true,
+  "all_exact_solver_and_independent_validator_checks_passed": true,
+  "all_symmetry_checks_passed": true,
+  "canonical_class_strata_observed": ["1", "2-4", "5-16", "17+"],
+  "role_modes_observed": ["role_anonymous", "role_specific"],
+  "tests": {
+    "command": "cargo test --workspace --release",
+    "passed": 16,
+    "failed": 0
+  },
+  "strict_clippy": {
+    "command": "cargo clippy --workspace --release --all-targets -- -D warnings",
+    "passed": true
+  },
+  "build_target": "D:\\cargo-targets\\fas-r1-stage0-20260925\\workspace",
+  "c_link": "C:\\Users\\shuga\\.codex\\worktrees\\fas-r1-stage0-20260925\\clean-rust\\experiments\\fas-r1-semantic-particle-reachability-v00\\stage0-v01\\target",
+  "host": "DESKTOP-N8K3I16",
+  "operating_system": "windows",
+  "architecture": "x86_64",
+  "rustc": "rustc 1.96.0 (ac68faa20 2026-05-25)",
+  "cargo": "cargo 1.96.0 (30a34c682 2026-05-25)",
+  "preserved_prior_attempts": [
+    "diagnostic-attempt-v01: failed; particle pool became empty",
+    "diagnostic-attempt-v02: passed 8-world smoke before later runtime changes",
+    "diagnostic-attempt-v03: passed 8-world disk replay",
+    "construction-attempt-v01: passed 96-world smoke before later accounting and cutoff corrections"
+  ],
+  "trace_timing_granularity": "per-expansion completion with aggregate charged operation counts and measured CPU active and wall time",
+  "known_limitations": [
+    "generator currently uses compact symbolic profiles and does not yet cover all planned graph-density or deceptive-basin strata",
+    "Stage 0 uses stub policies only; no learned proposal, frozen LFM sensor, or scientific reachability evaluation was performed"
+  ],
+  "model_contact_performed": false,
+  "training_performed": false,
+  "evaluation_performed": false
+}

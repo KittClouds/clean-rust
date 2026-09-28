@@ -1,0 +1,18 @@
+{
+  "diagonal_reproduction_gate_retained": true,
+  "feature_extraction_or_model_contact": false,
+  "identity": "FAS_S10_IO_CORRECTION_V03",
+  "implementation_change": "Read each target-layer and surface test-row slice once into contiguous FP32 memory and reuse it for all 16 source observers.",
+  "numerical_operation_order_changed": false,
+  "ordered_rows_changed": false,
+  "parent_v02_protocol_root_sha256": "49ff87b358cc5d86013d20f773be2054d33077a14a1e3f277bcec7c9d8252c34",
+  "parent_verification_reused_without_rereading": "The v02 preflight receipt binds byte-verified S09 parent roots; v03 validates the receipt hash and root fields before use.",
+  "s09_artifacts_modified": false,
+  "scalers_or_probes_changed": false,
+  "scientific_estimand_changed": false,
+  "supersedes_execution_attempt": "FAS-S10-CROSS-DEPTH-OBSERVER-TRANSPORT-V02",
+  "v02_artifacts_modified": false,
+  "v02_attempt_disposition": "parent verification completed; no transport results, predictions, or result seal were persisted; execution was interrupted after sustained no-output I/O.",
+  "v02_attempt_status_sha256": "a03941b5ebb2d6355dd557c2150ea4dea800f1925630f47f526c59b9be5dac69",
+  "v02_parent_preflight_receipt_sha256": "8336821723a47df380bdb6ace4b0f2cacc47b5cebd94c6d8d54bc4137e24bc78"
+}

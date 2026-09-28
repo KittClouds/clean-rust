@@ -1,0 +1,194 @@
+{
+  "protocol": "jev-information-density/v0.8p-v08-source-resolution-and-panel-construction-v01",
+  "identity": "v0.8P-v08-source-resolution-and-panel-construction-v01",
+  "status": "AUTHORIZED_PHASE_PACKET",
+  "purpose": "Resolve the already-bound P training identity sources, acquire only the frozen overlap fields, stage the already-contracted candidate identity stream, apply the unchanged overlap predicate, and continue through the frozen non-model-contact panel construction gates. Stop before LFM/model contact.",
+  "immutable_bindings": {
+    "v07_contract": {
+      "path": "experiments/jev-information-density-v08p-v07/protocol/v07-overlap-ordering-repair-contract-v01.json",
+      "sha256": "cf2fc2705ea40d86cc81ddc7e9bd77108c303071e12efe32486653db27c14e0d"
+    },
+    "v07_input_root": {
+      "path": "experiments/jev-information-density-v08p-v07/provenance/v07-input-binding-root-v01.json",
+      "sha256": "b892aedf985694f541ab8b7fb428593f2a9fee633a603528cbecd345cf8ba2a5"
+    },
+    "original_p_run_contract": {
+      "path": "experiments/jev-information-density-v08p/phase_b/phase-b-p-run-contract-v01.json",
+      "sha256": "e345225b4a17fc18eb35fcab24cbe1d72bd0e34bed9de272f927a7be461853e6"
+    },
+    "original_p_panel_contract": {
+      "path": "experiments/jev-information-density-v08p/phase_a/fresh-panel-contract-v01.json",
+      "sha256": "ce3b7b97caecb27f3ad99439c0e67dca6e40af5da3db9ca2e356ea5e9f06f823"
+    },
+    "p_parent_execution_inputs_receipt": {
+      "path": "D:/codex-runs/jev-information-density-v08n/v0.8N-base-v01/phase-b-v03-inputs/execution-inputs-receipt.json",
+      "sha256": "c022befafd49a1e317f692ff3b6f7efcccd11aee98285ca5f0071f6edbaf817c"
+    },
+    "p_parent_training_seal": {
+      "path": "D:/codex-runs/jev-information-density-v08n/v0.8N-base-v01/phase-b-run-v01/training-seal-manifest.json",
+      "sha256": "43932fc963b150167972e81b1c1bb93f6989e9b93faa65ab1eee3ecf55c7b727"
+    },
+    "p_parent_v08n_synthesis_receipt": {
+      "path": "D:/codex-runs/jev-information-density-v08n/v0.8N-base-v01/synthesis/v08n-synthesis-receipt-final-v09.json",
+      "sha256": "e86f3cd925841c4e68f8558696e68cb729b9b9ba49a644b9bc35e7e2bcde68a6"
+    },
+    "v06_panel_contract": {
+      "path": "experiments/jev-information-density-v08p-v06/phase_a/fresh-panel-contract-v01.json",
+      "sha256": "28b7878c9d68026254b8db734959387857b7eafb7b083d658d30d4cca6636a00"
+    },
+    "v06_v05_denylist_root": {
+      "path": "experiments/jev-information-density-v08p-v05/provenance/v05-denylist-root-seal-v01.json",
+      "sha256": "272a14e57c2dcf610568381c0c1c4673c7b40e368ac81b07d3e7160e4e5953a2"
+    },
+    "v05_opaque_identity_denylist": {
+      "path": "D:/codex-runs/jev-information-density-v08p-v05/identity/run-1/canonical-e1-neighborhood-hash-denylist.json",
+      "sha256": "50eebeb5790c29b4a75c6f8df849eb4c2865d3c864932bbd7f636b7a0e52a2cd",
+      "count": 2000,
+      "use": "opaque identity membership only"
+    }
+  },
+  "expected_training_sources": {
+    "common_primary_occurrence_manifest": {
+      "sha256": "773119294a51aa46487de26f9f253355187a7bfd1e75cb2f258c307c86f10b06",
+      "rows": 10000,
+      "anchors": 5000,
+      "fact_flips": 5000,
+      "expected_bound_path_from_hash_verified_parent_receipt": "D:/codex-runs/jev-information-density-v08n/v0.8N-base-v01/phase-b-v03-inputs/common-primary-occurrence-manifest.jsonl"
+    },
+    "training_only_state_scope": {
+      "scope_receipt_sha256": "d98ae657e28b976f187d4d67e58119ce80496e76c061c90362ac2e50ff7f720e",
+      "scope_manifest_sha256": "aa8cba58f4a8ec46ed6ec8eaf0bfbe992b03b9fa58f815b4259d9fdfe2b009f3",
+      "scope_content_sha256": "40648e3bbf50e25f31e84d7656221171425cb6e71e07d4c07d4dc72650bb228e",
+      "rows": 55000,
+      "exact_path_not_yet_resolved": true
+    }
+  },
+  "bounded_source_resolution": {
+    "root_derivation": "Only parent-artifact directories named by the hash-bound original P run contract and its hash-verified execution-input receipt are searched. No ancestor expansion is allowed.",
+    "roots": [
+      {
+        "absolute_path": "D:\\codex-runs\\jev-information-density-v08n\\v0.8N-base-v01\\phase-b-v03-inputs",
+        "derived_from_bound_parent": "execution-inputs-receipt.json",
+        "role": "P training-input artifact directory"
+      },
+      {
+        "absolute_path": "D:\\codex-runs\\jev-information-density-v08n\\v0.8N-base-v01\\phase-b-run-v01",
+        "derived_from_bound_parent": "training-seal-manifest.json",
+        "role": "P training-run parent artifact directory"
+      },
+      {
+        "absolute_path": "D:\\codex-runs\\jev-information-density-v08n\\v0.8N-base-v01\\synthesis",
+        "derived_from_bound_parent": "v08n-synthesis-receipt-final-v09.json",
+        "role": "P source-lineage parent artifact directory"
+      }
+    ],
+    "enumeration": "Within these roots only, enumerate regular-file absolute path and byte size. No directory ancestry expansion and no access outside the three roots.",
+    "hash_candidate_formats": [
+      ".json",
+      ".jsonl",
+      ".ndjson",
+      ".csv",
+      ".tsv",
+      ".parquet",
+      ".arrow",
+      ".jsonl.gz",
+      ".ndjson.gz"
+    ],
+    "nonmatch_handling": "Hash candidates only; do not parse, preview, tokenize, or semantically inspect nonmatching files.",
+    "match_handling": "Only after an exact expected SHA-256 match may the uniquely matched bytes be parsed, and then only for the identity fields below. If identical bytes occur at multiple paths, record every matching path and use the lexicographically smallest absolute path as canonical.",
+    "no_match": "SOURCE_BYTES_UNAVAILABLE; stop without widening roots or formats.",
+    "no_substitution": true
+  },
+  "identity_acquisition": {
+    "fields_only": [
+      "world_id",
+      "root_id",
+      "episode_id",
+      "full_rendered_input_hash",
+      "selector_input_hash"
+    ],
+    "occurrence_identity": "episode_id is the occurrence identity used by the unchanged v07 five-field rule; no sixth overlap dimension is introduced.",
+    "serialization": "Use the exact canonicalization and value equality frozen by the original P panel contract and v07. If source encoding or a required field is ambiguous or absent, stop TRAINING_SCOPE_IDENTITY_NOT_EVALUABLE.",
+    "expected_source_rows": {
+      "common_primary_occurrence_manifest": 10000,
+      "training_only_state_scope": 55000
+    },
+    "source_row_identity": "For overlap, episode_id is the occurrence identity. The five v07 overlap fields remain the complete comparison key; no sixth field is added.",
+    "validation": "Verify source byte SHA-256 before parsing, exact expected row counts, required-field presence, and per-source row/unique counts. Seal field-separated opaque exact-value sets, source resolution receipt, canonical source-path allowlist, and access receipt. Do not emit targets, labels, features, predictions, metrics, or unrelated metadata."
+  },
+  "candidate_staging": {
+    "authorization_within_packet": true,
+    "condition": "Proceed only after the training identity manifest is sealed.",
+    "generator_identity": "Reuse exactly the v06 partition namespace eval_v08p_v06, seed label/digest/u32, generator-family and identity-constructor source hashes, candidate sequence 000000..001999, and frozen family/template semantics.",
+    "frozen_generator_sources": {
+      "family_spec_sha256": "e56885005487b36b573c1bf4d47741413ca72df0992ff62bcf48891eecacb429",
+      "identity_constructor_sha256": "f04a9b1d4f6682522e5957be3c0075db4bd7aa4e4e25968650f2ff24a42c7f5b",
+      "semantic_builder_sha256": "55104d496d825e7aa58c55fa27f59f67b4b74efb34d2b7882d82ffeada8e7083"
+    },
+    "family_counts": {
+      "exposure_control": 500,
+      "respiratory_monitoring": 500,
+      "salinity_control": 500,
+      "vibration_monitoring": 500
+    },
+    "expected_panel_totals": {
+      "neighborhoods": 2000,
+      "episodes": 22000,
+      "selected_evaluation_view_rows": 8000
+    },
+    "surfaces": ["p0", "p1", "p2", "p3"],
+    "e1_exclusion": "Apply only the bound v05 SHA-256 neighborhood-ID denylist and its fixed collision-rejection stream. Never decode or disclose denylist entries or E1 metadata.",
+    "training_exclusion_separation": "Candidate generation must not read or mount the training identity manifest. No candidate replacement or resampling based on the training overlap result.",
+    "staging_root": "D:/codex-runs/jev-information-density-v08p-v08/staging/candidate-identities",
+    "promotable_before_overlap_pass": false,
+    "lfm_or_head_contact": false
+  },
+  "overlap_audit": {
+    "authorization_within_packet": true,
+    "condition": "Proceed immediately after training identity manifest and provisional candidate identity manifest are sealed.",
+    "fields": [
+      "world_id",
+      "root_id",
+      "episode_id",
+      "full_rendered_input_hash",
+      "selector_input_hash"
+    ],
+    "predicate": "Each exact same-field training/candidate set intersection must be empty; all five must be empty for OVERLAP_PASS.",
+    "failure_semantics": "On any overlap, seal OVERLAP_FAIL and mark staged identities permanently non-promotable. Do not regenerate, reseed, replace, or shop candidates.",
+    "missing_or_ambiguous": "NOT_EVALUABLE; stop."
+  },
+  "panel_construction_and_stop_boundary": {
+    "after_overlap_pass": "Continue with the exact staged identities and frozen v06/P generator, family, p0-p3, exact-world, surface, count, identity, and join checks. Do not regenerate a different panel.",
+    "full_validation_includes_frozen_radius_matching": true,
+    "model_contact_boundary": "The original P panel contract requires frozen LFM representations for candidate/state feature extraction and radius matching. This packet explicitly forbids LFM contact; therefore do not claim full panel validation or seal a promotable final panel unless those frozen checks are already computable without new LFM contact. If they are not, seal the completed pre-model staging/semantic artifacts and stop at MODEL_CONTACT_BOUNDARY_PENDING_AUTHORIZATION.",
+    "stop_before": [
+      "LFM load or feature extraction",
+      "historical head loading",
+      "training",
+      "inference",
+      "P metrics",
+      "E1 predictions or metrics",
+      "NewTight",
+      "Phoenix"
+    ]
+  },
+  "output_namespace": {
+    "local": "experiments/jev-information-density-v08p-v08/",
+    "external": "D:/codex-runs/jev-information-density-v08p-v08/",
+    "no_modification_of_v01_through_v07": true
+  },
+  "authorization_state": {
+    "source_resolution": true,
+    "training_identity_acquisition": true,
+    "candidate_identity_staging": true,
+    "training_overlap_audit": true,
+    "pre_model_panel_construction": true,
+    "lfm_contact": false,
+    "feature_extraction": false,
+    "training": false,
+    "head_loading": false,
+    "inference": false,
+    "evaluation": false,
+    "phoenix": false
+  }
+}

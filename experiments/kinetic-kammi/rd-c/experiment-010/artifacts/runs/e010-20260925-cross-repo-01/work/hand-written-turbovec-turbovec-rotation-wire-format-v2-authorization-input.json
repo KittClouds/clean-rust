@@ -1,0 +1,34 @@
+{
+  "task_id": "turbovec-turbovec-rotation-wire-format-v2",
+  "frame_hash_hex": "31c16201a5ae8c59c1c5a1e9b7e9bd217dbae9536c4cdd20a42ce7e9c4958c99",
+  "selected_patch_sha256": "620ba171f88123de86b3582f0b41b48c45f3820f4aa76105319ba60f286a8f76",
+  "action_ledger_path": "C:\\rd-c\\experiment-010\\artifacts\\runs\\e010-20260925-cross-repo-01\\ledgers\\hand-written\\turbovec-turbovec-rotation-wire-format-v2.actions.bin",
+  "actions": [
+    {
+      "id": 11,
+      "schema_id": 1
+    },
+    {
+      "id": 37,
+      "schema_id": 1
+    },
+    {
+      "id": 68,
+      "schema_id": 1
+    },
+    {
+      "id": 94,
+      "schema_id": 1
+    }
+  ],
+  "observer_output": {
+    "action_choice": 11,
+    "applicability_milli": 900,
+    "abstention_milli": 0
+  },
+  "thresholds": {
+    "minimum_applicability_milli": 850,
+    "maximum_abstention_milli": 150
+  },
+  "completion_check_passed": true
+}

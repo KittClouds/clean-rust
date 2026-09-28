@@ -1,0 +1,30 @@
+{
+  "task_id": "coding-embedding-batch-01",
+  "frame_hash_hex": "0b2cb36975a5440848a351f905363805d4b36dc06d48118e5fdfa84343afe0e3",
+  "selected_patch_sha256": null,
+  "action_ledger_path": "C:\\rd-c\\experiment-009\\artifacts\\runs\\e009-20260925-pilot-01\\ledgers\\hand-written\\coding-embedding-batch-01.actions.bin",
+  "actions": [
+    {
+      "id": 17,
+      "schema_id": 1
+    },
+    {
+      "id": 51,
+      "schema_id": 1
+    },
+    {
+      "id": 42,
+      "schema_id": 1
+    }
+  ],
+  "observer_output": {
+    "action_choice": null,
+    "applicability_milli": 800,
+    "abstention_milli": 900
+  },
+  "thresholds": {
+    "minimum_applicability_milli": 700,
+    "maximum_abstention_milli": 600
+  },
+  "completion_check_passed": false
+}

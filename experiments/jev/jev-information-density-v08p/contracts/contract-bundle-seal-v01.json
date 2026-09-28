@@ -1,0 +1,59 @@
+{
+  "protocol": "jev-information-density/v0.8p-contract-bundle-seal-v01",
+  "identity": "v0.8P-contract-bundle-v01",
+  "status": "CONTRACTS_SEALED_FOR_REVIEW_NOT_AUTHORIZED",
+  "contracts": {
+    "run": {
+      "path": "phase_b/phase-b-p-run-contract-v01.json",
+      "sha256": "e345225b4a17fc18eb35fcab24cbe1d72bd0e34bed9de272f927a7be461853e6"
+    },
+    "analysis": {
+      "path": "phase_b/phase-b-p-analysis-contract-v01.json",
+      "sha256": "84111122033fda65c84344317cfe3b50639b23be4c71f480ba665c67a23cc939"
+    },
+    "fresh_panel": {
+      "path": "phase_a/fresh-panel-contract-v01.json",
+      "sha256": "ce3b7b97caecb27f3ad99439c0e67dca6e40af5da3db9ca2e356ea5e9f06f823"
+    },
+    "shareable_writeup": {
+      "path": "README.md",
+      "sha256": "050b917f95237a407b5b0983a381c1bb8467416c074e8a7acd8bf5ce3dbb0a90"
+    }
+  },
+  "audit": {
+    "local_fallback": {
+      "status": "PASS",
+      "checks": [
+        "all three contracts parse as JSON",
+        "18 of 18 referenced source-file SHA-256 bindings recomputed and match",
+        "cross-contract run, analysis, panel, seed, and identity bindings agree",
+        "run, checkpoint, evaluation-cell, prediction-row, panel, and feature-scope counts reconcile",
+        "E1 is excluded as a P primary input",
+        "training, panel construction, panel opening, and evaluation authorization flags are false",
+        "P run and panel output roots do not exist",
+        "cited v0.8O report and result-seal SHA-256 values recomputed and match"
+      ],
+      "source_binding_correction": "Before sealing, corrected one mistyped SHA-256 for the referenced existing panel feature-extractor source; no source code or scientific rule changed."
+    },
+    "delegated_luna_review": {
+      "status": "LUNA_NO_ARTIFACT",
+      "note": "A bounded read-only review was requested; no review artifact was returned. No Luna PASS is claimed."
+    }
+  },
+  "state": {
+    "run_contract_sealed": true,
+    "analysis_contract_sealed": true,
+    "fresh_panel_contract_sealed": true,
+    "fresh_panel_materialized": false,
+    "fresh_panel_construction_authorized": false,
+    "training_authorized": false,
+    "evaluation_authorized": false,
+    "execution_ready": false,
+    "authorization_receipt_exists": false,
+    "model_contact_in_this_work": false,
+    "heldout_inference_in_this_work": false,
+    "newtight_or_legacy_access": false,
+    "phoenix_access": false
+  },
+  "scope_note": "This seal binds contract drafts and a shareable evidence write-up only. It is not authorization to construct the panel, contact the model, train, open evaluation data, infer, select checkpoints, or run follow-on work. The original v0.8N Phase-B disposition remains EVALUATION_INPUT_CONTRACT_INCOMPLETE."
+}

@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "amendment_id": "E012-BANK-A11",
+  "state": "PRECONTACT_DIAGNOSTIC_FAILURE_NO_MODEL_CONTACT",
+  "paired_truth_audit_lock": "bank/construction-01/paired-truth-audit-lock-v1.json",
+  "paired_truth_audit_output": "bank/construction-01/scored-bank-v1/vault/paired-truth-audit-v1.json",
+  "pair_groups": 20,
+  "action_support_groups_failed": 18,
+  "abstention_groups_not_applicable": 2,
+  "model_contact_authorized": false,
+  "required_repair": "paired producer coordinates, candidate bindings, and discriminating candidate-only alternatives"
+}

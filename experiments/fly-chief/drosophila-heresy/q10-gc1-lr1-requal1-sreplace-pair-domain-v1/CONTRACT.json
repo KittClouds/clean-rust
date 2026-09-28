@@ -1,0 +1,47 @@
+{
+  "protocol": "REQUAL1-SREPLACE-PAIR-DOMAIN",
+  "identity": "q10-gc1-lr1-requal1-sreplace-pair-domain-v1",
+  "status": "FROZEN_PRE_EXECUTION__NOT_EXECUTED",
+  "plan_sha256": "1A93E99FBE74A9206B1E463A6E76CAD182EA52E89F05763EDBA7D7794C1EF3BD",
+  "runner_sha256": "D485E1C8A36779685F622419493F0AC0EBC2563D8DA4ED6573CF1E743C57ABCC",
+  "parent_bindings": [
+    {"label": "candidate_execution", "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-sreplace-candidates-v1/execution.json", "sha256": "F2792DE092933E560CFF09757E71E8763D427663A836DE174A17FF133F6D1B8B"},
+    {"label": "candidate_plan", "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-sreplace-candidates-v1/PLAN.md", "sha256": "DFE46E2A297FF848BF5CEA289BE448DD31513BFB9A4454EE80EB2A59A1D155CA"},
+    {"label": "candidate_contract", "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-sreplace-candidates-v1/CONTRACT.json", "sha256": "7C6DE423D123A7B12D1B60D67053DFED7D521A955E6C9E666DC56D2BCD5168C7"},
+    {"label": "candidate_runner", "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-sreplace-candidates-v1/scripts/derive_candidates.py", "sha256": "3C7C5CDAE9F8C3A5A76AA0428E9014137298C182D009000616D8C81B677F6C07"},
+    {"label": "fresh_reference_execution", "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-par8-ref1-v1/execution.json", "sha256": "9C47DBA6BF576FC6696E70153F0CE80FB0163B538794BE82158710C1064A04E5"},
+    {"label": "closure_manifest", "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-domain-r2-v1/closures/twin-a/MANIFEST.json", "sha256": "F84BB9D1D1E32FE603F29374AFA166B79468CCA7C9F1877B0A46CA1AF1A06606"},
+    {"label": "closure_derived", "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-domain-r2-v1/closures/twin-a/DERIVED.json", "sha256": "5BF46E18DFE942C259E46055B893301D86204E2FB8493AE44D41D0BBC3611BFE"},
+    {"label": "current_palette", "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-domain-r2-v1/closures/twin-a/repo/experiments/drosophila-heresy/q10-gc0-gp1-par2-v1/qualification/palettes.jsonl", "sha256": "54A2688080A65F5CFE31B11A12F5DA85B92D86BBDE2E42072FB0C0F32F3D3B1A"},
+    {"label": "current_pf5_contract", "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-domain-r2-v1/closures/twin-a/repo/experiments/drosophila-heresy/q10-pf5-v1/CONTRACT.json", "sha256": "730D6B03CEE7CE58A9002320372E9F77EC2AB593EC25A71583F59D90D690BC26"}
+  ],
+  "scope": {
+    "contexts": 8,
+    "input_candidates": 3029,
+    "sequential_readout_replay": false,
+    "pair_replay": false,
+    "scientific_promotion": false,
+    "behavioral_probe": false
+  },
+  "compatibility": {
+    "same_context_required": true,
+    "distinct_group_ids_required": true,
+    "coordinate_overlap": "reject",
+    "application_base": "same fresh S for both replacements",
+    "pair_order": "canonical candidate order by input row order; no sequential state mutation"
+  },
+  "geometry_screen": {
+    "source": "committed f32 bytes",
+    "quantities": ["axis", "norm", "cue_linear"],
+    "margin": 1e-12,
+    "retained_pairs_full_geometry_verified": true,
+    "screen_is_not_sequential_readout": true
+  },
+  "firewall": {
+    "historical_result_import": false,
+    "new_sequential_replay": false,
+    "pair_replay": false,
+    "scientific_promotion": false,
+    "behavioral_probe": false
+  }
+}

@@ -1,0 +1,1735 @@
+{
+  "schema": "e012-blind-rubric-inputs.v1",
+  "source_sha256": "e4d9c2e0c668bfa60445ac476ad1f1b695fe8f1bfc9fd07b5746c7b31dbbeb0b",
+  "case_count": 48,
+  "cases": [
+    {
+      "case_id": "CASE-001",
+      "task_request": "For repeated --tag arguments, the caller requires that we append every occurrence. Choose one patch.",
+      "repository_context_and_evidence": [
+        {
+          "kind": "baseline_tool_result",
+          "content": "The untouched base snapshot produced no task-relevant pre-action execution observation."
+        },
+        {
+          "kind": "repository_context",
+          "content": "{\"build_features\": \"baseline\", \"dependency_release\": \"v4.6.1\", \"language\": \"Rust\", \"target\": \"host\", \"toolchain\": \"stable\"}"
+        }
+      ],
+      "candidates_in_recorded_producer_order": [
+        {
+          "producer_ordinal": 0,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -1,14 +1,14 @@\n use clap::{Arg, ArgAction, Command};\n \n pub fn parse_tag_values(argv: &[&str]) -> Vec<String> {\n-    // E012 candidate slot.\n     let command = Command::new(\"demo\")\n-        .arg(Arg::new(\"tag\").long(\"tag\").action(ArgAction::Set));\n+        .arg(Arg::new(\"tag\").long(\"tag\").action(ArgAction::Append));\n     let matches = command\n         .try_get_matches_from(argv.iter().copied())\n         .expect(\"valid task arguments\");\n     matches\n         .get_many::<String>(\"tag\")\n-        .map(|values| values.cloned().collect())\n-        .unwrap_or_default()\n+        .and_then(|mut values| values.next().cloned())\n+        .into_iter()\n+        .collect()\n }"
+        },
+        {
+          "producer_ordinal": 1,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -1,9 +1,8 @@\n use clap::{Arg, ArgAction, Command};\n \n pub fn parse_tag_values(argv: &[&str]) -> Vec<String> {\n-    // E012 candidate slot.\n     let command = Command::new(\"demo\")\n-        .arg(Arg::new(\"tag\").long(\"tag\").action(ArgAction::Set));\n+        .arg(Arg::new(\"tag\").long(\"tag\").action(ArgAction::Append));\n     let matches = command\n         .try_get_matches_from(argv.iter().copied())\n         .expect(\"valid task arguments\");"
+        },
+        {
+          "producer_ordinal": 2,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -1,7 +1,6 @@\n use clap::{Arg, ArgAction, Command};\n \n pub fn parse_tag_values(argv: &[&str]) -> Vec<String> {\n-    // E012 candidate slot.\n     let command = Command::new(\"demo\")\n         .arg(Arg::new(\"tag\").long(\"tag\").action(ArgAction::Set));\n     let matches = command"
+        },
+        {
+          "producer_ordinal": 3,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -1,8 +1,8 @@\n use clap::{Arg, ArgAction, Command};\n \n pub fn parse_tag_values(argv: &[&str]) -> Vec<String> {\n-    // E012 candidate slot.\n     let command = Command::new(\"demo\")\n+        .args_override_self(true)\n         .arg(Arg::new(\"tag\").long(\"tag\").action(ArgAction::Set));\n     let matches = command\n         .try_get_matches_from(argv.iter().copied())"
+        }
+      ]
+    },
+    {
+      "case_id": "CASE-002",
+      "task_request": "Implement the requested two-byte word order: big-endian. Choose one offered patch.",
+      "repository_context_and_evidence": [
+        {
+          "kind": "baseline_tool_result",
+          "content": "The untouched base snapshot produced no task-relevant pre-action execution observation."
+        },
+        {
+          "kind": "repository_context",
+          "content": "{\"build_features\": \"baseline\", \"dependency_release\": \"v1.11.1\", \"language\": \"Rust\", \"target\": \"host\", \"toolchain\": \"stable\"}"
+        }
+      ],
+      "candidates_in_recorded_producer_order": [
+        {
+          "producer_ordinal": 0,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -2,7 +2,7 @@\n \n pub fn encode_wire_word(value: u16) -> Bytes {\n     let mut out = BytesMut::with_capacity(2);\n-    // The frozen task snapshot drops the requested word.\n-    let _ = value;\n+    out.put_u16(value);\n+    out.put_u8(0);\n     out.freeze()\n }"
+        },
+        {
+          "producer_ordinal": 1,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -2,7 +2,6 @@\n \n pub fn encode_wire_word(value: u16) -> Bytes {\n     let mut out = BytesMut::with_capacity(2);\n-    // The frozen task snapshot drops the requested word.\n-    let _ = value;\n+    out.put_u16(0);\n     out.freeze()\n }"
+        },
+        {
+          "producer_ordinal": 2,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -2,7 +2,6 @@\n \n pub fn encode_wire_word(value: u16) -> Bytes {\n     let mut out = BytesMut::with_capacity(2);\n-    // The frozen task snapshot drops the requested word.\n-    let _ = value;\n+    out.put_u16(value);\n     out.freeze()\n }"
+        },
+        {
+          "producer_ordinal": 3,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -2,7 +2,6 @@\n \n pub fn encode_wire_word(value: u16) -> Bytes {\n     let mut out = BytesMut::with_capacity(2);\n-    // The frozen task snapshot drops the requested word.\n-    let _ = value;\n+    out.put_u16_le(value);\n     out.freeze()\n }"
+        }
+      ]
+    },
+    {
+      "case_id": "CASE-003",
+      "task_request": "The requested JSON numeric mode is whole. Use the failing-path observation to select a patch.",
+      "repository_context_and_evidence": [
+        {
+          "kind": "baseline_tool_result",
+          "content": "Pre-action parser observation: the first failure is at /header."
+        },
+        {
+          "kind": "repository_context",
+          "content": "{\"build_features\": \"baseline\", \"dependency_release\": \"v1.0.149\", \"language\": \"Rust\", \"target\": \"host\", \"toolchain\": \"stable\"}"
+        }
+      ],
+      "candidates_in_recorded_producer_order": [
+        {
+          "producer_ordinal": 0,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -2,7 +2,5 @@\n \n pub fn selected_numeric(input: &str) -> Option<Value> {\n     let value: Value = serde_json::from_str(input).ok()?;\n-    // E012 candidate slot.\n-    let _ = value;\n-    None\n+    value.pointer(\"/header/ratio\").cloned()\n }"
+        },
+        {
+          "producer_ordinal": 1,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -2,7 +2,5 @@\n \n pub fn selected_numeric(input: &str) -> Option<Value> {\n     let value: Value = serde_json::from_str(input).ok()?;\n-    // E012 candidate slot.\n-    let _ = value;\n-    None\n+    value.pointer(\"/header/whole\").cloned()\n }"
+        },
+        {
+          "producer_ordinal": 2,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -2,7 +2,5 @@\n \n pub fn selected_numeric(input: &str) -> Option<Value> {\n     let value: Value = serde_json::from_str(input).ok()?;\n-    // E012 candidate slot.\n-    let _ = value;\n-    None\n+    value.pointer(\"/payload/ratio\").cloned()\n }"
+        },
+        {
+          "producer_ordinal": 3,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -2,7 +2,5 @@\n \n pub fn selected_numeric(input: &str) -> Option<Value> {\n     let value: Value = serde_json::from_str(input).ok()?;\n-    // E012 candidate slot.\n-    let _ = value;\n-    None\n+    value.pointer(\"/payload/whole\").cloned()\n }"
+        }
+      ]
+    },
+    {
+      "case_id": "CASE-004",
+      "task_request": "The requested JSON numeric mode is ratio. Use the failing-path observation to select a patch.",
+      "repository_context_and_evidence": [
+        {
+          "kind": "baseline_tool_result",
+          "content": "Pre-action parser observation: the first failure is at /header."
+        },
+        {
+          "kind": "repository_context",
+          "content": "{\"build_features\": \"baseline\", \"dependency_release\": \"v1.0.149\", \"language\": \"Rust\", \"target\": \"host\", \"toolchain\": \"stable\"}"
+        }
+      ],
+      "candidates_in_recorded_producer_order": [
+        {
+          "producer_ordinal": 0,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -2,7 +2,5 @@\n \n pub fn selected_numeric(input: &str) -> Option<Value> {\n     let value: Value = serde_json::from_str(input).ok()?;\n-    // E012 candidate slot.\n-    let _ = value;\n-    None\n+    value.pointer(\"/header/ratio\").cloned()\n }"
+        },
+        {
+          "producer_ordinal": 1,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -2,7 +2,5 @@\n \n pub fn selected_numeric(input: &str) -> Option<Value> {\n     let value: Value = serde_json::from_str(input).ok()?;\n-    // E012 candidate slot.\n-    let _ = value;\n-    None\n+    value.pointer(\"/header/whole\").cloned()\n }"
+        },
+        {
+          "producer_ordinal": 2,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -2,7 +2,5 @@\n \n pub fn selected_numeric(input: &str) -> Option<Value> {\n     let value: Value = serde_json::from_str(input).ok()?;\n-    // E012 candidate slot.\n-    let _ = value;\n-    None\n+    value.pointer(\"/payload/ratio\").cloned()\n }"
+        },
+        {
+          "producer_ordinal": 3,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -2,7 +2,5 @@\n \n pub fn selected_numeric(input: &str) -> Option<Value> {\n     let value: Value = serde_json::from_str(input).ok()?;\n-    // E012 candidate slot.\n-    let _ = value;\n-    None\n+    value.pointer(\"/payload/whole\").cloned()\n }"
+        }
+      ]
+    },
+    {
+      "case_id": "CASE-005",
+      "task_request": "Choose the map-order patch that satisfies the active build-feature contract.",
+      "repository_context_and_evidence": [
+        {
+          "kind": "baseline_tool_result",
+          "content": "The untouched base snapshot produced no task-relevant pre-action execution observation."
+        },
+        {
+          "kind": "repository_context",
+          "content": "{\"build_features\": \"baseline\", \"dependency_release\": \"v1.0.149\", \"language\": \"Rust\", \"map_iteration_contract\": \"preserve-insertion-order\", \"serde_json_preserve_order_feature\": true, \"target\": \"host\", \"toolchain\": \"stable\"}"
+        }
+      ],
+      "candidates_in_recorded_producer_order": [
+        {
+          "producer_ordinal": 0,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -4,6 +4,11 @@\n     let value: Value = serde_json::from_str(input).ok()?;\n     let mut object = value.as_object()?.clone();\n     object.sort_keys();\n-    // E012 candidate slot.\n-    Some(object.keys().cloned().collect())\n+    #[cfg(feature = \"preserve_order\")]\n+    {\n+        let original: Value = serde_json::from_str(input).ok()?;\n+        Some(original.as_object()?.keys().cloned().collect())\n+    }\n+    #[cfg(not(feature = \"preserve_order\"))]\n+    { None }\n }"
+        },
+        {
+          "producer_ordinal": 1,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -4,7 +4,8 @@\n     let value: Value = serde_json::from_str(input).ok()?;\n     let mut object = value.as_object()?.clone();\n     object.sort_keys();\n-    // E012 candidate slot.\n+    let mut object = object.clone();\n+    object.sort_keys();\n-    Some(object.keys().cloned().collect())\n+    Some(object.keys().skip(1).cloned().collect())\n }"
+        },
+        {
+          "producer_ordinal": 2,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -4,6 +4,8 @@\n     let value: Value = serde_json::from_str(input).ok()?;\n     let mut object = value.as_object()?.clone();\n     object.sort_keys();\n-    // E012 candidate slot.\n-    Some(object.keys().cloned().collect())\n+    #[cfg(not(feature = \"preserve_order\"))]\n+    { Some(object.keys().cloned().collect()) }\n+    #[cfg(feature = \"preserve_order\")]\n+    { None }\n }"
+        },
+        {
+          "producer_ordinal": 3,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -4,6 +4,5 @@\n     let value: Value = serde_json::from_str(input).ok()?;\n     let mut object = value.as_object()?.clone();\n     object.sort_keys();\n-    // E012 candidate slot.\n-    Some(object.keys().cloned().collect())\n+    Some(object.keys().rev().cloned().collect())\n }"
+        }
+      ]
+    },
+    {
+      "case_id": "CASE-006",
+      "task_request": "For repeated --tag arguments, the caller requires that we append every occurrence. Choose one patch.",
+      "repository_context_and_evidence": [
+        {
+          "kind": "baseline_tool_result",
+          "content": "The untouched base snapshot produced no task-relevant pre-action execution observation."
+        },
+        {
+          "kind": "repository_context",
+          "content": "{\"build_features\": \"baseline\", \"dependency_release\": \"v4.6.1\", \"language\": \"Rust\", \"target\": \"host\", \"toolchain\": \"stable\"}"
+        }
+      ],
+      "candidates_in_recorded_producer_order": [
+        {
+          "producer_ordinal": 0,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -1,9 +1,8 @@\n use clap::{Arg, ArgAction, Command};\n \n pub fn parse_tag_values(argv: &[&str]) -> Vec<String> {\n-    // E012 candidate slot.\n     let command = Command::new(\"demo\")\n-        .arg(Arg::new(\"tag\").long(\"tag\").action(ArgAction::Set));\n+        .arg(Arg::new(\"tag\").long(\"tag\").action(ArgAction::Append));\n     let matches = command\n         .try_get_matches_from(argv.iter().copied())\n         .expect(\"valid task arguments\");"
+        },
+        {
+          "producer_ordinal": 1,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -1,14 +1,14 @@\n use clap::{Arg, ArgAction, Command};\n \n pub fn parse_tag_values(argv: &[&str]) -> Vec<String> {\n-    // E012 candidate slot.\n     let command = Command::new(\"demo\")\n-        .arg(Arg::new(\"tag\").long(\"tag\").action(ArgAction::Set));\n+        .arg(Arg::new(\"tag\").long(\"tag\").action(ArgAction::Append));\n     let matches = command\n         .try_get_matches_from(argv.iter().copied())\n         .expect(\"valid task arguments\");\n     matches\n         .get_many::<String>(\"tag\")\n-        .map(|values| values.cloned().collect())\n-        .unwrap_or_default()\n+        .and_then(|mut values| values.next().cloned())\n+        .into_iter()\n+        .collect()\n }"
+        },
+        {
+          "producer_ordinal": 2,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -1,8 +1,8 @@\n use clap::{Arg, ArgAction, Command};\n \n pub fn parse_tag_values(argv: &[&str]) -> Vec<String> {\n-    // E012 candidate slot.\n     let command = Command::new(\"demo\")\n+        .args_override_self(true)\n         .arg(Arg::new(\"tag\").long(\"tag\").action(ArgAction::Set));\n     let matches = command\n         .try_get_matches_from(argv.iter().copied())"
+        },
+        {
+          "producer_ordinal": 3,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -1,7 +1,6 @@\n use clap::{Arg, ArgAction, Command};\n \n pub fn parse_tag_values(argv: &[&str]) -> Vec<String> {\n-    // E012 candidate slot.\n     let command = Command::new(\"demo\")\n         .arg(Arg::new(\"tag\").long(\"tag\").action(ArgAction::Set));\n     let matches = command"
+        }
+      ]
+    },
+    {
+      "case_id": "CASE-007",
+      "task_request": "The streaming adapter test fails on the frozen base snapshot. Use the pre-action parser observation to choose a patch.",
+      "repository_context_and_evidence": [
+        {
+          "kind": "baseline_tool_result",
+          "content": "Untouched base-snapshot assertion: observed first-item byte offset 10; reference value 9."
+        },
+        {
+          "kind": "repository_context",
+          "content": "{\"build_features\": \"baseline\", \"dependency_release\": \"v1.0.149\", \"language\": \"Rust\", \"target\": \"host\", \"toolchain\": \"stable\"}"
+        }
+      ],
+      "candidates_in_recorded_producer_order": [
+        {
+          "producer_ordinal": 0,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -5,6 +5,5 @@\n     let mut stream = de.into_iter::<Value>();\n     let _ = stream.next();\n     let base = stream.byte_offset();\n-    // E012 candidate slot.\n-    base.saturating_add(2)\n+    base.saturating_sub(1)\n }"
+        },
+        {
+          "producer_ordinal": 1,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -5,6 +5,5 @@\n     let mut stream = de.into_iter::<Value>();\n     let _ = stream.next();\n     let base = stream.byte_offset();\n-    // E012 candidate slot.\n-    base.saturating_add(2)\n+    base.saturating_add(1)\n }"
+        },
+        {
+          "producer_ordinal": 2,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -5,6 +5,5 @@\n     let mut stream = de.into_iter::<Value>();\n     let _ = stream.next();\n     let base = stream.byte_offset();\n-    // E012 candidate slot.\n-    base.saturating_add(2)\n+    base\n }"
+        },
+        {
+          "producer_ordinal": 3,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -5,6 +5,5 @@\n     let mut stream = de.into_iter::<Value>();\n     let _ = stream.next();\n     let base = stream.byte_offset();\n-    // E012 candidate slot.\n-    base.saturating_add(2)\n+    0\n }"
+        }
+      ]
+    },
+    {
+      "case_id": "CASE-008",
+      "task_request": "The streaming adapter test fails on the frozen base snapshot. Use the pre-action parser observation to choose a patch.",
+      "repository_context_and_evidence": [
+        {
+          "kind": "baseline_tool_result",
+          "content": "Untouched base-snapshot assertion: observed first-item byte offset 10; reference value 7."
+        },
+        {
+          "kind": "repository_context",
+          "content": "{\"build_features\": \"baseline\", \"dependency_release\": \"v1.0.149\", \"language\": \"Rust\", \"target\": \"host\", \"toolchain\": \"stable\"}"
+        }
+      ],
+      "candidates_in_recorded_producer_order": [
+        {
+          "producer_ordinal": 0,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -5,6 +5,5 @@\n     let mut stream = de.into_iter::<Value>();\n     let _ = stream.next();\n     let base = stream.byte_offset();\n-    // E012 candidate slot.\n-    base.saturating_add(2)\n+    base.saturating_sub(1)\n }"
+        },
+        {
+          "producer_ordinal": 1,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -5,6 +5,5 @@\n     let mut stream = de.into_iter::<Value>();\n     let _ = stream.next();\n     let base = stream.byte_offset();\n-    // E012 candidate slot.\n-    base.saturating_add(2)\n+    base.saturating_add(1)\n }"
+        },
+        {
+          "producer_ordinal": 2,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -5,6 +5,5 @@\n     let mut stream = de.into_iter::<Value>();\n     let _ = stream.next();\n     let base = stream.byte_offset();\n-    // E012 candidate slot.\n-    base.saturating_add(2)\n+    base\n }"
+        },
+        {
+          "producer_ordinal": 3,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -5,6 +5,5 @@\n     let mut stream = de.into_iter::<Value>();\n     let _ = stream.next();\n     let base = stream.byte_offset();\n-    // E012 candidate slot.\n-    base.saturating_add(2)\n+    0\n }"
+        }
+      ]
+    },
+    {
+      "case_id": "CASE-009",
+      "task_request": "Review the code-local API contract included with the offered changes. Select the conforming patch.",
+      "repository_context_and_evidence": [
+        {
+          "kind": "baseline_tool_result",
+          "content": "The untouched base snapshot produced no task-relevant pre-action execution observation."
+        },
+        {
+          "kind": "repository_context",
+          "content": "{\"build_features\": \"baseline\", \"dependency_release\": \"v1.11.1\", \"language\": \"Rust\", \"target\": \"host\", \"toolchain\": \"stable\"}"
+        }
+      ],
+      "candidates_in_recorded_producer_order": [
+        {
+          "producer_ordinal": 0,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "API context: take_prefix returns a bounded zero-copy view; the result shares the input Bytes backing storage.\n@@ -1,7 +1,5 @@\n use bytes::{Buf, Bytes};\n \n pub fn take_prefix(input: Bytes, count: usize) -> Bytes {\n-    // E012 candidate slot.\n-    let _ = count;\n     input\n }"
+        },
+        {
+          "producer_ordinal": 1,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "API context: take_prefix returns a bounded zero-copy view; the result shares the input Bytes backing storage.\n@@ -1,7 +1,6 @@\n use bytes::{Buf, Bytes};\n \n pub fn take_prefix(input: Bytes, count: usize) -> Bytes {\n-    // E012 candidate slot.\n-    let _ = count;\n-    input\n+    let mut input = input;\n+    input.copy_to_bytes(count)\n }"
+        },
+        {
+          "producer_ordinal": 2,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "API context: take_prefix returns a bounded zero-copy view; the result shares the input Bytes backing storage.\n@@ -1,7 +1,5 @@\n use bytes::{Buf, Bytes};\n \n pub fn take_prefix(input: Bytes, count: usize) -> Bytes {\n-    // E012 candidate slot.\n-    let _ = count;\n-    input\n+    input.slice(..count)\n }"
+        },
+        {
+          "producer_ordinal": 3,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "API context: take_prefix returns a bounded zero-copy view; the result shares the input Bytes backing storage.\n@@ -1,7 +1,5 @@\n use bytes::{Buf, Bytes};\n \n pub fn take_prefix(input: Bytes, count: usize) -> Bytes {\n-    // E012 candidate slot.\n-    let _ = count;\n-    input\n+    input.slice(count..)\n }"
+        }
+      ]
+    },
+    {
+      "case_id": "CASE-010",
+      "task_request": "Review the code-local parser contract included with the offered changes. Select the conforming patch.",
+      "repository_context_and_evidence": [
+        {
+          "kind": "baseline_tool_result",
+          "content": "The untouched base snapshot produced no task-relevant pre-action execution observation."
+        },
+        {
+          "kind": "repository_context",
+          "content": "{\"build_features\": \"baseline\", \"dependency_release\": \"v4.6.1\", \"language\": \"Rust\", \"target\": \"host\", \"toolchain\": \"stable\"}"
+        }
+      ],
+      "candidates_in_recorded_producer_order": [
+        {
+          "producer_ordinal": 0,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "API context: the parser accepts exactly the finite values \"fast\" and \"safe\"; other strings are rejected.\n@@ -5,7 +5,7 @@\n         Arg::new(\"speed\")\n             .long(\"speed\")\n             // E012 candidate slot.\n-            .value_parser([\"broken\"]),\n+            .value_parser(clap::builder::NonEmptyStringValueParser::new()),\n     );\n     command\n         .try_get_matches_from([\"demo\", \"--speed\", value])"
+        },
+        {
+          "producer_ordinal": 1,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "API context: the parser accepts exactly the finite values \"fast\" and \"safe\"; other strings are rejected.\n@@ -5,7 +5,7 @@\n         Arg::new(\"speed\")\n             .long(\"speed\")\n             // E012 candidate slot.\n-            .value_parser([\"broken\"]),\n+            .value_parser([\"fast\", \"safe\"]),\n     );\n     command\n         .try_get_matches_from([\"demo\", \"--speed\", value])"
+        },
+        {
+          "producer_ordinal": 2,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "API context: the parser accepts exactly the finite values \"fast\" and \"safe\"; other strings are rejected.\n@@ -5,7 +5,7 @@\n         Arg::new(\"speed\")\n             .long(\"speed\")\n             // E012 candidate slot.\n-            .value_parser([\"broken\"]),\n+            .value_parser([\"fast\", \"safe\", \"auto\"]),\n     );\n     command\n         .try_get_matches_from([\"demo\", \"--speed\", value])"
+        },
+        {
+          "producer_ordinal": 3,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "API context: the parser accepts exactly the finite values \"fast\" and \"safe\"; other strings are rejected.\n@@ -5,7 +5,7 @@\n         Arg::new(\"speed\")\n             .long(\"speed\")\n             // E012 candidate slot.\n-            .value_parser([\"broken\"]),\n+            .value_parser([\"quick\", \"safe\"]),\n     );\n     command\n         .try_get_matches_from([\"demo\", \"--speed\", value])"
+        }
+      ]
+    },
+    {
+      "case_id": "CASE-011",
+      "task_request": "Rewrite the JSON document while preserving the exact source number token 6.022000e23; do not normalize it.",
+      "repository_context_and_evidence": [
+        {
+          "kind": "baseline_tool_result",
+          "content": "The untouched base snapshot produced no task-relevant pre-action execution observation."
+        },
+        {
+          "kind": "repository_context",
+          "content": "{\"build_features\": \"baseline\", \"dependency_release\": \"v1.0.149\", \"language\": \"Rust\", \"target\": \"host\", \"toolchain\": \"stable\"}"
+        }
+      ],
+      "candidates_in_recorded_producer_order": [
+        {
+          "producer_ordinal": 0,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -3,5 +3,6 @@\n pub fn normalize_json_number(input: &str) -> Option<String> {\n     let value: Value = serde_json::from_str(input).ok()?;\n     // E012 candidate slot.\n-    serde_json::to_string(&value).ok()\n+    let number = value.get(\"n\")?.as_i64()?;\n+    Some(format!(r#\"{{\"n\":{number},\"tag\":\"x\"}}\"#))\n }"
+        },
+        {
+          "producer_ordinal": 1,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": ""
+        },
+        {
+          "producer_ordinal": 2,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -3,5 +3,6 @@\n pub fn normalize_json_number(input: &str) -> Option<String> {\n     let value: Value = serde_json::from_str(input).ok()?;\n     // E012 candidate slot.\n-    serde_json::to_string(&value).ok()\n+    let number = value.get(\"n\")?.as_f64()?;\n+    Some(format!(r#\"{{\"n\":{number},\"tag\":\"x\"}}\"#))\n }"
+        },
+        {
+          "producer_ordinal": 3,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -3,5 +3,6 @@\n pub fn normalize_json_number(input: &str) -> Option<String> {\n     let value: Value = serde_json::from_str(input).ok()?;\n     // E012 candidate slot.\n-    serde_json::to_string(&value).ok()\n+    let number = value.get(\"n\")?.as_u64()?;\n+    Some(format!(r#\"{{\"n\":{number},\"tag\":\"x\"}}\"#))\n }"
+        }
+      ]
+    },
+    {
+      "case_id": "CASE-012",
+      "task_request": "For repeated --tag arguments, the caller requires that we use only the last occurrence. Choose one patch.",
+      "repository_context_and_evidence": [
+        {
+          "kind": "baseline_tool_result",
+          "content": "The untouched base snapshot produced no task-relevant pre-action execution observation."
+        },
+        {
+          "kind": "repository_context",
+          "content": "{\"build_features\": \"baseline\", \"dependency_release\": \"v4.6.1\", \"language\": \"Rust\", \"target\": \"host\", \"toolchain\": \"stable\"}"
+        }
+      ],
+      "candidates_in_recorded_producer_order": [
+        {
+          "producer_ordinal": 0,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -1,14 +1,14 @@\n use clap::{Arg, ArgAction, Command};\n \n pub fn parse_tag_values(argv: &[&str]) -> Vec<String> {\n-    // E012 candidate slot.\n     let command = Command::new(\"demo\")\n-        .arg(Arg::new(\"tag\").long(\"tag\").action(ArgAction::Set));\n+        .arg(Arg::new(\"tag\").long(\"tag\").action(ArgAction::Append));\n     let matches = command\n         .try_get_matches_from(argv.iter().copied())\n         .expect(\"valid task arguments\");\n     matches\n         .get_many::<String>(\"tag\")\n-        .map(|values| values.cloned().collect())\n-        .unwrap_or_default()\n+        .and_then(|mut values| values.next().cloned())\n+        .into_iter()\n+        .collect()\n }"
+        },
+        {
+          "producer_ordinal": 1,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -1,9 +1,8 @@\n use clap::{Arg, ArgAction, Command};\n \n pub fn parse_tag_values(argv: &[&str]) -> Vec<String> {\n-    // E012 candidate slot.\n     let command = Command::new(\"demo\")\n-        .arg(Arg::new(\"tag\").long(\"tag\").action(ArgAction::Set));\n+        .arg(Arg::new(\"tag\").long(\"tag\").action(ArgAction::Append));\n     let matches = command\n         .try_get_matches_from(argv.iter().copied())\n         .expect(\"valid task arguments\");"
+        },
+        {
+          "producer_ordinal": 2,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -1,7 +1,6 @@\n use clap::{Arg, ArgAction, Command};\n \n pub fn parse_tag_values(argv: &[&str]) -> Vec<String> {\n-    // E012 candidate slot.\n     let command = Command::new(\"demo\")\n         .arg(Arg::new(\"tag\").long(\"tag\").action(ArgAction::Set));\n     let matches = command"
+        },
+        {
+          "producer_ordinal": 3,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -1,8 +1,8 @@\n use clap::{Arg, ArgAction, Command};\n \n pub fn parse_tag_values(argv: &[&str]) -> Vec<String> {\n-    // E012 candidate slot.\n     let command = Command::new(\"demo\")\n+        .args_override_self(true)\n         .arg(Arg::new(\"tag\").long(\"tag\").action(ArgAction::Set));\n     let matches = command\n         .try_get_matches_from(argv.iter().copied())"
+        }
+      ]
+    },
+    {
+      "case_id": "CASE-013",
+      "task_request": "The streaming adapter test fails on the frozen base snapshot. Use the pre-action parser observation to choose a patch.",
+      "repository_context_and_evidence": [
+        {
+          "kind": "baseline_tool_result",
+          "content": "Untouched base-snapshot assertion: observed first-item byte offset 10; reference value 8."
+        },
+        {
+          "kind": "repository_context",
+          "content": "{\"build_features\": \"baseline\", \"dependency_release\": \"v1.0.149\", \"language\": \"Rust\", \"target\": \"host\", \"toolchain\": \"stable\"}"
+        }
+      ],
+      "candidates_in_recorded_producer_order": [
+        {
+          "producer_ordinal": 0,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -5,6 +5,5 @@\n     let mut stream = de.into_iter::<Value>();\n     let _ = stream.next();\n     let base = stream.byte_offset();\n-    // E012 candidate slot.\n-    base.saturating_add(2)\n+    base.saturating_sub(1)\n }"
+        },
+        {
+          "producer_ordinal": 1,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -5,6 +5,5 @@\n     let mut stream = de.into_iter::<Value>();\n     let _ = stream.next();\n     let base = stream.byte_offset();\n-    // E012 candidate slot.\n-    base.saturating_add(2)\n+    base.saturating_add(1)\n }"
+        },
+        {
+          "producer_ordinal": 2,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -5,6 +5,5 @@\n     let mut stream = de.into_iter::<Value>();\n     let _ = stream.next();\n     let base = stream.byte_offset();\n-    // E012 candidate slot.\n-    base.saturating_add(2)\n+    base\n }"
+        },
+        {
+          "producer_ordinal": 3,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -5,6 +5,5 @@\n     let mut stream = de.into_iter::<Value>();\n     let _ = stream.next();\n     let base = stream.byte_offset();\n-    // E012 candidate slot.\n-    base.saturating_add(2)\n+    0\n }"
+        }
+      ]
+    },
+    {
+      "case_id": "CASE-014",
+      "task_request": "Support both --color and --colour as equivalent spellings, plus --no-color with the required precedence (primary spelling first); preserve the current public alias contract.",
+      "repository_context_and_evidence": [
+        {
+          "kind": "baseline_tool_result",
+          "content": "The untouched base snapshot produced no task-relevant pre-action execution observation."
+        },
+        {
+          "kind": "repository_context",
+          "content": "{\"build_features\": \"baseline\", \"dependency_release\": \"v4.6.1\", \"language\": \"Rust\", \"target\": \"host\", \"toolchain\": \"stable\"}"
+        }
+      ],
+      "candidates_in_recorded_producer_order": [
+        {
+          "producer_ordinal": 0,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -1,7 +1,7 @@\n use clap::{Arg, ArgAction, Command};\n \n // E012 candidate slot: implementations differ in which spellings they support.\n-const FORMS: &[(&str, bool)] = &[(\"color\", true)];\n+const FORMS: &[(&str, bool)] = &[(\"color\", true), (\"colour\", true)];\n \n pub fn parse_color(argv: &[&str]) -> Option<bool> {\n     let mut command = Command::new(\"demo\");"
+        },
+        {
+          "producer_ordinal": 1,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -1,7 +1,7 @@\n use clap::{Arg, ArgAction, Command};\n \n // E012 candidate slot: implementations differ in which spellings they support.\n-const FORMS: &[(&str, bool)] = &[(\"color\", true)];\n+const FORMS: &[(&str, bool)] = &[(\"color\", true), (\"no-color\", false)];\n \n pub fn parse_color(argv: &[&str]) -> Option<bool> {\n     let mut command = Command::new(\"demo\");"
+        },
+        {
+          "producer_ordinal": 2,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -1,7 +1,7 @@\n use clap::{Arg, ArgAction, Command};\n \n // E012 candidate slot: implementations differ in which spellings they support.\n-const FORMS: &[(&str, bool)] = &[(\"color\", true)];\n+const FORMS: &[(&str, bool)] = &[(\"colour\", true), (\"no-color\", false)];\n \n pub fn parse_color(argv: &[&str]) -> Option<bool> {\n     let mut command = Command::new(\"demo\");"
+        },
+        {
+          "producer_ordinal": 3,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": ""
+        }
+      ]
+    },
+    {
+      "case_id": "CASE-015",
+      "task_request": "Review the code-local parser contract included with the offered changes. Select the conforming patch.",
+      "repository_context_and_evidence": [
+        {
+          "kind": "baseline_tool_result",
+          "content": "The untouched base snapshot produced no task-relevant pre-action execution observation."
+        },
+        {
+          "kind": "repository_context",
+          "content": "{\"build_features\": \"baseline\", \"dependency_release\": \"v4.6.1\", \"language\": \"Rust\", \"target\": \"host\", \"toolchain\": \"stable\"}"
+        }
+      ],
+      "candidates_in_recorded_producer_order": [
+        {
+          "producer_ordinal": 0,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "API context: the parser accepts exactly the finite values \"fast\" and \"safe\"; other strings are rejected.\n@@ -5,7 +5,7 @@\n         Arg::new(\"speed\")\n             .long(\"speed\")\n             // E012 candidate slot.\n-            .value_parser([\"broken\"]),\n+            .value_parser([\"fast\", \"safe\"]),\n     );\n     command\n         .try_get_matches_from([\"demo\", \"--speed\", value])"
+        },
+        {
+          "producer_ordinal": 1,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "API context: the parser accepts exactly the finite values \"fast\" and \"safe\"; other strings are rejected.\n@@ -5,7 +5,7 @@\n         Arg::new(\"speed\")\n             .long(\"speed\")\n             // E012 candidate slot.\n-            .value_parser([\"broken\"]),\n+            .value_parser(clap::builder::NonEmptyStringValueParser::new()),\n     );\n     command\n         .try_get_matches_from([\"demo\", \"--speed\", value])"
+        },
+        {
+          "producer_ordinal": 2,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "API context: the parser accepts exactly the finite values \"fast\" and \"safe\"; other strings are rejected.\n@@ -5,7 +5,7 @@\n         Arg::new(\"speed\")\n             .long(\"speed\")\n             // E012 candidate slot.\n-            .value_parser([\"broken\"]),\n+            .value_parser([\"fast\", \"safe\", \"auto\"]),\n     );\n     command\n         .try_get_matches_from([\"demo\", \"--speed\", value])"
+        },
+        {
+          "producer_ordinal": 3,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "API context: the parser accepts exactly the finite values \"fast\" and \"safe\"; other strings are rejected.\n@@ -5,7 +5,7 @@\n         Arg::new(\"speed\")\n             .long(\"speed\")\n             // E012 candidate slot.\n-            .value_parser([\"broken\"]),\n+            .value_parser([\"quick\", \"safe\"]),\n     );\n     command\n         .try_get_matches_from([\"demo\", \"--speed\", value])"
+        }
+      ]
+    },
+    {
+      "case_id": "CASE-016",
+      "task_request": "Review the code-local API contract included with the offered changes. Select the conforming patch.",
+      "repository_context_and_evidence": [
+        {
+          "kind": "baseline_tool_result",
+          "content": "The untouched base snapshot produced no task-relevant pre-action execution observation."
+        },
+        {
+          "kind": "repository_context",
+          "content": "{\"build_features\": \"baseline\", \"dependency_release\": \"v1.11.1\", \"language\": \"Rust\", \"target\": \"host\", \"toolchain\": \"stable\"}"
+        }
+      ],
+      "candidates_in_recorded_producer_order": [
+        {
+          "producer_ordinal": 0,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "API context: take_prefix returns a bounded zero-copy view; the result shares the input Bytes backing storage.\n@@ -1,7 +1,5 @@\n use bytes::{Buf, Bytes};\n \n pub fn take_prefix(input: Bytes, count: usize) -> Bytes {\n-    // E012 candidate slot.\n-    let _ = count;\n-    input\n+    input.slice(count..)\n }"
+        },
+        {
+          "producer_ordinal": 1,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "API context: take_prefix returns a bounded zero-copy view; the result shares the input Bytes backing storage.\n@@ -1,7 +1,5 @@\n use bytes::{Buf, Bytes};\n \n pub fn take_prefix(input: Bytes, count: usize) -> Bytes {\n-    // E012 candidate slot.\n-    let _ = count;\n-    input\n+    input.slice(..count)\n }"
+        },
+        {
+          "producer_ordinal": 2,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "API context: take_prefix returns a bounded zero-copy view; the result shares the input Bytes backing storage.\n@@ -1,7 +1,6 @@\n use bytes::{Buf, Bytes};\n \n pub fn take_prefix(input: Bytes, count: usize) -> Bytes {\n-    // E012 candidate slot.\n-    let _ = count;\n-    input\n+    let mut input = input;\n+    input.copy_to_bytes(count)\n }"
+        },
+        {
+          "producer_ordinal": 3,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "API context: take_prefix returns a bounded zero-copy view; the result shares the input Bytes backing storage.\n@@ -1,7 +1,5 @@\n use bytes::{Buf, Bytes};\n \n pub fn take_prefix(input: Bytes, count: usize) -> Bytes {\n-    // E012 candidate slot.\n-    let _ = count;\n     input\n }"
+        }
+      ]
+    },
+    {
+      "case_id": "CASE-017",
+      "task_request": "Implement the two-byte frame decoder for the requested target field: header.",
+      "repository_context_and_evidence": [
+        {
+          "kind": "baseline_tool_result",
+          "content": "Pre-action decoder observation: the frame bytes are in big-endian order."
+        },
+        {
+          "kind": "repository_context",
+          "content": "{\"build_features\": \"baseline\", \"dependency_release\": \"v1.11.1\", \"language\": \"Rust\", \"target\": \"host\", \"toolchain\": \"stable\"}"
+        }
+      ],
+      "candidates_in_recorded_producer_order": [
+        {
+          "producer_ordinal": 0,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -1,7 +1,6 @@\n use bytes::Buf;\n \n pub fn read_selected_field(input: &[u8]) -> u16 {\n-    // E012 candidate slot.\n-    let _ = input;\n-    0\n+    let mut field = input;\n+    field.get_u16()\n }"
+        },
+        {
+          "producer_ordinal": 1,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -1,7 +1,6 @@\n use bytes::Buf;\n \n pub fn read_selected_field(input: &[u8]) -> u16 {\n-    // E012 candidate slot.\n-    let _ = input;\n-    0\n+    let mut field = input;\n+    field.get_u16_le()\n }"
+        },
+        {
+          "producer_ordinal": 2,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -1,7 +1,6 @@\n use bytes::Buf;\n \n pub fn read_selected_field(input: &[u8]) -> u16 {\n-    // E012 candidate slot.\n-    let _ = input;\n-    0\n+    let mut field = &input[2..];\n+    field.get_u16()\n }"
+        },
+        {
+          "producer_ordinal": 3,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -1,7 +1,6 @@\n use bytes::Buf;\n \n pub fn read_selected_field(input: &[u8]) -> u16 {\n-    // E012 candidate slot.\n-    let _ = input;\n-    0\n+    let mut field = &input[2..];\n+    field.get_u16_le()\n }"
+        }
+      ]
+    },
+    {
+      "case_id": "CASE-018",
+      "task_request": "Review the code-local API contract included with the offered changes. Select the conforming patch.",
+      "repository_context_and_evidence": [
+        {
+          "kind": "baseline_tool_result",
+          "content": "The untouched base snapshot produced no task-relevant pre-action execution observation."
+        },
+        {
+          "kind": "repository_context",
+          "content": "{\"build_features\": \"baseline\", \"dependency_release\": \"v1.11.1\", \"language\": \"Rust\", \"target\": \"host\", \"toolchain\": \"stable\"}"
+        }
+      ],
+      "candidates_in_recorded_producer_order": [
+        {
+          "producer_ordinal": 0,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "API context: take_prefix returns a bounded zero-copy view; the result shares the input Bytes backing storage.\n@@ -1,7 +1,5 @@\n use bytes::{Buf, Bytes};\n \n pub fn take_prefix(input: Bytes, count: usize) -> Bytes {\n-    // E012 candidate slot.\n-    let _ = count;\n-    input\n+    input.slice(..count)\n }"
+        },
+        {
+          "producer_ordinal": 1,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "API context: take_prefix returns a bounded zero-copy view; the result shares the input Bytes backing storage.\n@@ -1,7 +1,5 @@\n use bytes::{Buf, Bytes};\n \n pub fn take_prefix(input: Bytes, count: usize) -> Bytes {\n-    // E012 candidate slot.\n-    let _ = count;\n-    input\n+    input.slice(count..)\n }"
+        },
+        {
+          "producer_ordinal": 2,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "API context: take_prefix returns a bounded zero-copy view; the result shares the input Bytes backing storage.\n@@ -1,7 +1,5 @@\n use bytes::{Buf, Bytes};\n \n pub fn take_prefix(input: Bytes, count: usize) -> Bytes {\n-    // E012 candidate slot.\n-    let _ = count;\n     input\n }"
+        },
+        {
+          "producer_ordinal": 3,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "API context: take_prefix returns a bounded zero-copy view; the result shares the input Bytes backing storage.\n@@ -1,7 +1,6 @@\n use bytes::{Buf, Bytes};\n \n pub fn take_prefix(input: Bytes, count: usize) -> Bytes {\n-    // E012 candidate slot.\n-    let _ = count;\n-    input\n+    let mut input = input;\n+    input.copy_to_bytes(count)\n }"
+        }
+      ]
+    },
+    {
+      "case_id": "CASE-019",
+      "task_request": "The streaming adapter test fails on the frozen base snapshot. Use the pre-action parser observation to choose a patch.",
+      "repository_context_and_evidence": [
+        {
+          "kind": "baseline_tool_result",
+          "content": "Untouched base-snapshot assertion: observed first-item byte offset 10; reference value 0."
+        },
+        {
+          "kind": "repository_context",
+          "content": "{\"build_features\": \"baseline\", \"dependency_release\": \"v1.0.149\", \"language\": \"Rust\", \"target\": \"host\", \"toolchain\": \"stable\"}"
+        }
+      ],
+      "candidates_in_recorded_producer_order": [
+        {
+          "producer_ordinal": 0,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -5,6 +5,5 @@\n     let mut stream = de.into_iter::<Value>();\n     let _ = stream.next();\n     let base = stream.byte_offset();\n-    // E012 candidate slot.\n-    base.saturating_add(2)\n+    base.saturating_sub(1)\n }"
+        },
+        {
+          "producer_ordinal": 1,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -5,6 +5,5 @@\n     let mut stream = de.into_iter::<Value>();\n     let _ = stream.next();\n     let base = stream.byte_offset();\n-    // E012 candidate slot.\n-    base.saturating_add(2)\n+    base.saturating_add(1)\n }"
+        },
+        {
+          "producer_ordinal": 2,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -5,6 +5,5 @@\n     let mut stream = de.into_iter::<Value>();\n     let _ = stream.next();\n     let base = stream.byte_offset();\n-    // E012 candidate slot.\n-    base.saturating_add(2)\n+    base\n }"
+        },
+        {
+          "producer_ordinal": 3,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -5,6 +5,5 @@\n     let mut stream = de.into_iter::<Value>();\n     let _ = stream.next();\n     let base = stream.byte_offset();\n-    // E012 candidate slot.\n-    base.saturating_add(2)\n+    0\n }"
+        }
+      ]
+    },
+    {
+      "case_id": "CASE-020",
+      "task_request": "Choose the map-order patch that satisfies the active build-feature contract.",
+      "repository_context_and_evidence": [
+        {
+          "kind": "baseline_tool_result",
+          "content": "The untouched base snapshot produced no task-relevant pre-action execution observation."
+        },
+        {
+          "kind": "repository_context",
+          "content": "{\"build_features\": \"baseline\", \"dependency_release\": \"v1.0.149\", \"language\": \"Rust\", \"map_iteration_contract\": \"lexical-order\", \"serde_json_preserve_order_feature\": false, \"target\": \"host\", \"toolchain\": \"stable\"}"
+        }
+      ],
+      "candidates_in_recorded_producer_order": [
+        {
+          "producer_ordinal": 0,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -4,7 +4,8 @@\n     let value: Value = serde_json::from_str(input).ok()?;\n     let mut object = value.as_object()?.clone();\n     object.sort_keys();\n-    // E012 candidate slot.\n+    let mut object = object.clone();\n+    object.sort_keys();\n-    Some(object.keys().cloned().collect())\n+    Some(object.keys().skip(1).cloned().collect())\n }"
+        },
+        {
+          "producer_ordinal": 1,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -4,6 +4,11 @@\n     let value: Value = serde_json::from_str(input).ok()?;\n     let mut object = value.as_object()?.clone();\n     object.sort_keys();\n-    // E012 candidate slot.\n-    Some(object.keys().cloned().collect())\n+    #[cfg(feature = \"preserve_order\")]\n+    {\n+        let original: Value = serde_json::from_str(input).ok()?;\n+        Some(original.as_object()?.keys().cloned().collect())\n+    }\n+    #[cfg(not(feature = \"preserve_order\"))]\n+    { None }\n }"
+        },
+        {
+          "producer_ordinal": 2,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -4,6 +4,5 @@\n     let value: Value = serde_json::from_str(input).ok()?;\n     let mut object = value.as_object()?.clone();\n     object.sort_keys();\n-    // E012 candidate slot.\n-    Some(object.keys().cloned().collect())\n+    Some(object.keys().rev().cloned().collect())\n }"
+        },
+        {
+          "producer_ordinal": 3,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -4,6 +4,8 @@\n     let value: Value = serde_json::from_str(input).ok()?;\n     let mut object = value.as_object()?.clone();\n     object.sort_keys();\n-    // E012 candidate slot.\n-    Some(object.keys().cloned().collect())\n+    #[cfg(not(feature = \"preserve_order\"))]\n+    { Some(object.keys().cloned().collect()) }\n+    #[cfg(feature = \"preserve_order\")]\n+    { None }\n }"
+        }
+      ]
+    },
+    {
+      "case_id": "CASE-021",
+      "task_request": "Support both --color and --colour as equivalent spellings, plus --no-color with the required precedence (alias first); preserve the current public alias contract.",
+      "repository_context_and_evidence": [
+        {
+          "kind": "baseline_tool_result",
+          "content": "The untouched base snapshot produced no task-relevant pre-action execution observation."
+        },
+        {
+          "kind": "repository_context",
+          "content": "{\"build_features\": \"baseline\", \"dependency_release\": \"v4.6.1\", \"language\": \"Rust\", \"target\": \"host\", \"toolchain\": \"stable\"}"
+        }
+      ],
+      "candidates_in_recorded_producer_order": [
+        {
+          "producer_ordinal": 0,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -1,7 +1,7 @@\n use clap::{Arg, ArgAction, Command};\n \n // E012 candidate slot: implementations differ in which spellings they support.\n-const FORMS: &[(&str, bool)] = &[(\"color\", true)];\n+const FORMS: &[(&str, bool)] = &[(\"color\", true), (\"no-color\", false)];\n \n pub fn parse_color(argv: &[&str]) -> Option<bool> {\n     let mut command = Command::new(\"demo\");"
+        },
+        {
+          "producer_ordinal": 1,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -1,7 +1,7 @@\n use clap::{Arg, ArgAction, Command};\n \n // E012 candidate slot: implementations differ in which spellings they support.\n-const FORMS: &[(&str, bool)] = &[(\"color\", true)];\n+const FORMS: &[(&str, bool)] = &[(\"colour\", true), (\"no-color\", false)];\n \n pub fn parse_color(argv: &[&str]) -> Option<bool> {\n     let mut command = Command::new(\"demo\");"
+        },
+        {
+          "producer_ordinal": 2,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": ""
+        },
+        {
+          "producer_ordinal": 3,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -1,7 +1,7 @@\n use clap::{Arg, ArgAction, Command};\n \n // E012 candidate slot: implementations differ in which spellings they support.\n-const FORMS: &[(&str, bool)] = &[(\"color\", true)];\n+const FORMS: &[(&str, bool)] = &[(\"color\", true), (\"colour\", true)];\n \n pub fn parse_color(argv: &[&str]) -> Option<bool> {\n     let mut command = Command::new(\"demo\");"
+        }
+      ]
+    },
+    {
+      "case_id": "CASE-022",
+      "task_request": "Implement the two-byte frame decoder for the requested target field: header.",
+      "repository_context_and_evidence": [
+        {
+          "kind": "baseline_tool_result",
+          "content": "Pre-action decoder observation: the frame bytes are in little-endian order."
+        },
+        {
+          "kind": "repository_context",
+          "content": "{\"build_features\": \"baseline\", \"dependency_release\": \"v1.11.1\", \"language\": \"Rust\", \"target\": \"host\", \"toolchain\": \"stable\"}"
+        }
+      ],
+      "candidates_in_recorded_producer_order": [
+        {
+          "producer_ordinal": 0,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -1,7 +1,6 @@\n use bytes::Buf;\n \n pub fn read_selected_field(input: &[u8]) -> u16 {\n-    // E012 candidate slot.\n-    let _ = input;\n-    0\n+    let mut field = input;\n+    field.get_u16()\n }"
+        },
+        {
+          "producer_ordinal": 1,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -1,7 +1,6 @@\n use bytes::Buf;\n \n pub fn read_selected_field(input: &[u8]) -> u16 {\n-    // E012 candidate slot.\n-    let _ = input;\n-    0\n+    let mut field = input;\n+    field.get_u16_le()\n }"
+        },
+        {
+          "producer_ordinal": 2,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -1,7 +1,6 @@\n use bytes::Buf;\n \n pub fn read_selected_field(input: &[u8]) -> u16 {\n-    // E012 candidate slot.\n-    let _ = input;\n-    0\n+    let mut field = &input[2..];\n+    field.get_u16()\n }"
+        },
+        {
+          "producer_ordinal": 3,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -1,7 +1,6 @@\n use bytes::Buf;\n \n pub fn read_selected_field(input: &[u8]) -> u16 {\n-    // E012 candidate slot.\n-    let _ = input;\n-    0\n+    let mut field = &input[2..];\n+    field.get_u16_le()\n }"
+        }
+      ]
+    },
+    {
+      "case_id": "CASE-023",
+      "task_request": "Implement the requested two-byte word order: big-endian. Choose one offered patch.",
+      "repository_context_and_evidence": [
+        {
+          "kind": "baseline_tool_result",
+          "content": "The untouched base snapshot produced no task-relevant pre-action execution observation."
+        },
+        {
+          "kind": "repository_context",
+          "content": "{\"build_features\": \"baseline\", \"dependency_release\": \"v1.11.1\", \"language\": \"Rust\", \"target\": \"host\", \"toolchain\": \"stable\"}"
+        }
+      ],
+      "candidates_in_recorded_producer_order": [
+        {
+          "producer_ordinal": 0,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -2,7 +2,6 @@\n \n pub fn encode_wire_word(value: u16) -> Bytes {\n     let mut out = BytesMut::with_capacity(2);\n-    // The frozen task snapshot drops the requested word.\n-    let _ = value;\n+    out.put_u16(value);\n     out.freeze()\n }"
+        },
+        {
+          "producer_ordinal": 1,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -2,7 +2,6 @@\n \n pub fn encode_wire_word(value: u16) -> Bytes {\n     let mut out = BytesMut::with_capacity(2);\n-    // The frozen task snapshot drops the requested word.\n-    let _ = value;\n+    out.put_u16_le(value);\n     out.freeze()\n }"
+        },
+        {
+          "producer_ordinal": 2,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -2,7 +2,7 @@\n \n pub fn encode_wire_word(value: u16) -> Bytes {\n     let mut out = BytesMut::with_capacity(2);\n-    // The frozen task snapshot drops the requested word.\n-    let _ = value;\n+    out.put_u16(value);\n+    out.put_u8(0);\n     out.freeze()\n }"
+        },
+        {
+          "producer_ordinal": 3,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -2,7 +2,6 @@\n \n pub fn encode_wire_word(value: u16) -> Bytes {\n     let mut out = BytesMut::with_capacity(2);\n-    // The frozen task snapshot drops the requested word.\n-    let _ = value;\n+    out.put_u16(0);\n     out.freeze()\n }"
+        }
+      ]
+    },
+    {
+      "case_id": "CASE-024",
+      "task_request": "Choose the help-color patch that satisfies the current terminal/build compatibility context.",
+      "repository_context_and_evidence": [
+        {
+          "kind": "baseline_tool_result",
+          "content": "The untouched base snapshot produced no task-relevant pre-action execution observation."
+        },
+        {
+          "kind": "repository_context",
+          "content": "{\"build_features\": \"baseline\", \"dependency_release\": \"v4.6.1\", \"help_color_policy\": \"emit-color\", \"language\": \"Rust\", \"target\": \"host\", \"terminal_ansi_capability\": \"supported\", \"toolchain\": \"stable\"}"
+        }
+      ],
+      "candidates_in_recorded_producer_order": [
+        {
+          "producer_ordinal": 0,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -5,6 +5,6 @@\n         .about(\"A compact command-line example\")\n         .arg(Arg::new(\"speed\").long(\"speed\").help(\"Execution speed\"))\n         // E012 candidate slot.\n-        .color(ColorChoice::Auto)\n+        .color(ColorChoice::Always)\n         .get_color()\n }"
+        },
+        {
+          "producer_ordinal": 1,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": ""
+        },
+        {
+          "producer_ordinal": 2,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -5,6 +5,7 @@\n         .about(\"A compact command-line example\")\n         .arg(Arg::new(\"speed\").long(\"speed\").help(\"Execution speed\"))\n         // E012 candidate slot.\n-        .color(ColorChoice::Auto)\n+        .color(ColorChoice::Auto)\n+        .term_width(72)\n         .get_color()\n }"
+        },
+        {
+          "producer_ordinal": 3,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -5,6 +5,6 @@\n         .about(\"A compact command-line example\")\n         .arg(Arg::new(\"speed\").long(\"speed\").help(\"Execution speed\"))\n         // E012 candidate slot.\n-        .color(ColorChoice::Auto)\n+        .color(ColorChoice::Never)\n         .get_color()\n }"
+        }
+      ]
+    },
+    {
+      "case_id": "CASE-025",
+      "task_request": "Implement the two-byte frame decoder for the requested target field: payload.",
+      "repository_context_and_evidence": [
+        {
+          "kind": "baseline_tool_result",
+          "content": "Pre-action decoder observation: the frame bytes are in little-endian order."
+        },
+        {
+          "kind": "repository_context",
+          "content": "{\"build_features\": \"baseline\", \"dependency_release\": \"v1.11.1\", \"language\": \"Rust\", \"target\": \"host\", \"toolchain\": \"stable\"}"
+        }
+      ],
+      "candidates_in_recorded_producer_order": [
+        {
+          "producer_ordinal": 0,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -1,7 +1,6 @@\n use bytes::Buf;\n \n pub fn read_selected_field(input: &[u8]) -> u16 {\n-    // E012 candidate slot.\n-    let _ = input;\n-    0\n+    let mut field = input;\n+    field.get_u16()\n }"
+        },
+        {
+          "producer_ordinal": 1,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -1,7 +1,6 @@\n use bytes::Buf;\n \n pub fn read_selected_field(input: &[u8]) -> u16 {\n-    // E012 candidate slot.\n-    let _ = input;\n-    0\n+    let mut field = input;\n+    field.get_u16_le()\n }"
+        },
+        {
+          "producer_ordinal": 2,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -1,7 +1,6 @@\n use bytes::Buf;\n \n pub fn read_selected_field(input: &[u8]) -> u16 {\n-    // E012 candidate slot.\n-    let _ = input;\n-    0\n+    let mut field = &input[2..];\n+    field.get_u16()\n }"
+        },
+        {
+          "producer_ordinal": 3,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -1,7 +1,6 @@\n use bytes::Buf;\n \n pub fn read_selected_field(input: &[u8]) -> u16 {\n-    // E012 candidate slot.\n-    let _ = input;\n-    0\n+    let mut field = &input[2..];\n+    field.get_u16_le()\n }"
+        }
+      ]
+    },
+    {
+      "case_id": "CASE-026",
+      "task_request": "The adapter contract test fails on the frozen base snapshot. Use its pre-action cursor observation to choose a patch.",
+      "repository_context_and_evidence": [
+        {
+          "kind": "baseline_tool_result",
+          "content": "Untouched base-snapshot assertion: observed cursor 160; reference value 34."
+        },
+        {
+          "kind": "repository_context",
+          "content": "{\"build_features\": \"baseline\", \"dependency_release\": \"v1.11.1\", \"language\": \"Rust\", \"target\": \"host\", \"toolchain\": \"stable\"}"
+        }
+      ],
+      "candidates_in_recorded_producer_order": [
+        {
+          "producer_ordinal": 0,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": ""
+        },
+        {
+          "producer_ordinal": 1,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -2,6 +2,6 @@\n \n pub fn byte_at_task_cursor(input: &[u8]) -> u8 {\n     let mut cursor = input;\n-    cursor.advance(0);\n+    cursor.advance(1);\n     cursor.get_u8()\n }"
+        },
+        {
+          "producer_ordinal": 2,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -2,6 +2,6 @@\n \n pub fn byte_at_task_cursor(input: &[u8]) -> u8 {\n     let mut cursor = input;\n-    cursor.advance(0);\n+    cursor.advance(3);\n     cursor.get_u8()\n }"
+        },
+        {
+          "producer_ordinal": 3,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -2,6 +2,6 @@\n \n pub fn byte_at_task_cursor(input: &[u8]) -> u8 {\n     let mut cursor = input;\n-    cursor.advance(0);\n+    cursor.advance(2);\n     cursor.get_u8()\n }"
+        }
+      ]
+    },
+    {
+      "case_id": "CASE-027",
+      "task_request": "Rewrite the JSON document while preserving the exact source number token -0.000; do not normalize it.",
+      "repository_context_and_evidence": [
+        {
+          "kind": "baseline_tool_result",
+          "content": "The untouched base snapshot produced no task-relevant pre-action execution observation."
+        },
+        {
+          "kind": "repository_context",
+          "content": "{\"build_features\": \"baseline\", \"dependency_release\": \"v1.0.149\", \"language\": \"Rust\", \"target\": \"host\", \"toolchain\": \"stable\"}"
+        }
+      ],
+      "candidates_in_recorded_producer_order": [
+        {
+          "producer_ordinal": 0,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -3,5 +3,6 @@\n pub fn normalize_json_number(input: &str) -> Option<String> {\n     let value: Value = serde_json::from_str(input).ok()?;\n     // E012 candidate slot.\n-    serde_json::to_string(&value).ok()\n+    let number = value.get(\"n\")?.as_u64()?;\n+    Some(format!(r#\"{{\"n\":{number},\"tag\":\"x\"}}\"#))\n }"
+        },
+        {
+          "producer_ordinal": 1,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -3,5 +3,6 @@\n pub fn normalize_json_number(input: &str) -> Option<String> {\n     let value: Value = serde_json::from_str(input).ok()?;\n     // E012 candidate slot.\n-    serde_json::to_string(&value).ok()\n+    let number = value.get(\"n\")?.as_i64()?;\n+    Some(format!(r#\"{{\"n\":{number},\"tag\":\"x\"}}\"#))\n }"
+        },
+        {
+          "producer_ordinal": 2,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": ""
+        },
+        {
+          "producer_ordinal": 3,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -3,5 +3,6 @@\n pub fn normalize_json_number(input: &str) -> Option<String> {\n     let value: Value = serde_json::from_str(input).ok()?;\n     // E012 candidate slot.\n-    serde_json::to_string(&value).ok()\n+    let number = value.get(\"n\")?.as_f64()?;\n+    Some(format!(r#\"{{\"n\":{number},\"tag\":\"x\"}}\"#))\n }"
+        }
+      ]
+    },
+    {
+      "case_id": "CASE-028",
+      "task_request": "For repeated --tag arguments, the caller requires that we use only the last occurrence. Choose one patch.",
+      "repository_context_and_evidence": [
+        {
+          "kind": "baseline_tool_result",
+          "content": "The untouched base snapshot produced no task-relevant pre-action execution observation."
+        },
+        {
+          "kind": "repository_context",
+          "content": "{\"build_features\": \"baseline\", \"dependency_release\": \"v4.6.1\", \"language\": \"Rust\", \"target\": \"host\", \"toolchain\": \"stable\"}"
+        }
+      ],
+      "candidates_in_recorded_producer_order": [
+        {
+          "producer_ordinal": 0,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -1,9 +1,8 @@\n use clap::{Arg, ArgAction, Command};\n \n pub fn parse_tag_values(argv: &[&str]) -> Vec<String> {\n-    // E012 candidate slot.\n     let command = Command::new(\"demo\")\n-        .arg(Arg::new(\"tag\").long(\"tag\").action(ArgAction::Set));\n+        .arg(Arg::new(\"tag\").long(\"tag\").action(ArgAction::Append));\n     let matches = command\n         .try_get_matches_from(argv.iter().copied())\n         .expect(\"valid task arguments\");"
+        },
+        {
+          "producer_ordinal": 1,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -1,14 +1,14 @@\n use clap::{Arg, ArgAction, Command};\n \n pub fn parse_tag_values(argv: &[&str]) -> Vec<String> {\n-    // E012 candidate slot.\n     let command = Command::new(\"demo\")\n-        .arg(Arg::new(\"tag\").long(\"tag\").action(ArgAction::Set));\n+        .arg(Arg::new(\"tag\").long(\"tag\").action(ArgAction::Append));\n     let matches = command\n         .try_get_matches_from(argv.iter().copied())\n         .expect(\"valid task arguments\");\n     matches\n         .get_many::<String>(\"tag\")\n-        .map(|values| values.cloned().collect())\n-        .unwrap_or_default()\n+        .and_then(|mut values| values.next().cloned())\n+        .into_iter()\n+        .collect()\n }"
+        },
+        {
+          "producer_ordinal": 2,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -1,8 +1,8 @@\n use clap::{Arg, ArgAction, Command};\n \n pub fn parse_tag_values(argv: &[&str]) -> Vec<String> {\n-    // E012 candidate slot.\n     let command = Command::new(\"demo\")\n+        .args_override_self(true)\n         .arg(Arg::new(\"tag\").long(\"tag\").action(ArgAction::Set));\n     let matches = command\n         .try_get_matches_from(argv.iter().copied())"
+        },
+        {
+          "producer_ordinal": 3,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -1,7 +1,6 @@\n use clap::{Arg, ArgAction, Command};\n \n pub fn parse_tag_values(argv: &[&str]) -> Vec<String> {\n-    // E012 candidate slot.\n     let command = Command::new(\"demo\")\n         .arg(Arg::new(\"tag\").long(\"tag\").action(ArgAction::Set));\n     let matches = command"
+        }
+      ]
+    },
+    {
+      "case_id": "CASE-029",
+      "task_request": "Rewrite the JSON document while preserving the exact source number token 9007199254740993; do not normalize it.",
+      "repository_context_and_evidence": [
+        {
+          "kind": "baseline_tool_result",
+          "content": "The untouched base snapshot produced no task-relevant pre-action execution observation."
+        },
+        {
+          "kind": "repository_context",
+          "content": "{\"build_features\": \"baseline\", \"dependency_release\": \"v1.0.149\", \"language\": \"Rust\", \"target\": \"host\", \"toolchain\": \"stable\"}"
+        }
+      ],
+      "candidates_in_recorded_producer_order": [
+        {
+          "producer_ordinal": 0,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -3,5 +3,6 @@\n pub fn normalize_json_number(input: &str) -> Option<String> {\n     let value: Value = serde_json::from_str(input).ok()?;\n     // E012 candidate slot.\n-    serde_json::to_string(&value).ok()\n+    let number = value.get(\"n\")?.as_f64()?;\n+    Some(format!(r#\"{{\"n\":{number},\"tag\":\"x\"}}\"#))\n }"
+        },
+        {
+          "producer_ordinal": 1,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -3,5 +3,6 @@\n pub fn normalize_json_number(input: &str) -> Option<String> {\n     let value: Value = serde_json::from_str(input).ok()?;\n     // E012 candidate slot.\n-    serde_json::to_string(&value).ok()\n+    let number = value.get(\"n\")?.as_u64()?;\n+    Some(format!(r#\"{{\"n\":{number},\"tag\":\"x\"}}\"#))\n }"
+        },
+        {
+          "producer_ordinal": 2,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -3,5 +3,6 @@\n pub fn normalize_json_number(input: &str) -> Option<String> {\n     let value: Value = serde_json::from_str(input).ok()?;\n     // E012 candidate slot.\n-    serde_json::to_string(&value).ok()\n+    let number = value.get(\"n\")?.as_i64()?;\n+    Some(format!(r#\"{{\"n\":{number},\"tag\":\"x\"}}\"#))\n }"
+        },
+        {
+          "producer_ordinal": 3,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": ""
+        }
+      ]
+    },
+    {
+      "case_id": "CASE-030",
+      "task_request": "Implement the requested two-byte word order: little-endian. Choose one offered patch.",
+      "repository_context_and_evidence": [
+        {
+          "kind": "baseline_tool_result",
+          "content": "The untouched base snapshot produced no task-relevant pre-action execution observation."
+        },
+        {
+          "kind": "repository_context",
+          "content": "{\"build_features\": \"baseline\", \"dependency_release\": \"v1.11.1\", \"language\": \"Rust\", \"target\": \"host\", \"toolchain\": \"stable\"}"
+        }
+      ],
+      "candidates_in_recorded_producer_order": [
+        {
+          "producer_ordinal": 0,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -2,7 +2,7 @@\n \n pub fn encode_wire_word(value: u16) -> Bytes {\n     let mut out = BytesMut::with_capacity(2);\n-    // The frozen task snapshot drops the requested word.\n-    let _ = value;\n+    out.put_u16(value);\n+    out.put_u8(0);\n     out.freeze()\n }"
+        },
+        {
+          "producer_ordinal": 1,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -2,7 +2,6 @@\n \n pub fn encode_wire_word(value: u16) -> Bytes {\n     let mut out = BytesMut::with_capacity(2);\n-    // The frozen task snapshot drops the requested word.\n-    let _ = value;\n+    out.put_u16(0);\n     out.freeze()\n }"
+        },
+        {
+          "producer_ordinal": 2,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -2,7 +2,6 @@\n \n pub fn encode_wire_word(value: u16) -> Bytes {\n     let mut out = BytesMut::with_capacity(2);\n-    // The frozen task snapshot drops the requested word.\n-    let _ = value;\n+    out.put_u16(value);\n     out.freeze()\n }"
+        },
+        {
+          "producer_ordinal": 3,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -2,7 +2,6 @@\n \n pub fn encode_wire_word(value: u16) -> Bytes {\n     let mut out = BytesMut::with_capacity(2);\n-    // The frozen task snapshot drops the requested word.\n-    let _ = value;\n+    out.put_u16_le(value);\n     out.freeze()\n }"
+        }
+      ]
+    },
+    {
+      "case_id": "CASE-031",
+      "task_request": "The adapter contract test fails on the frozen base snapshot. Use its pre-action cursor observation to choose a patch.",
+      "repository_context_and_evidence": [
+        {
+          "kind": "baseline_tool_result",
+          "content": "Untouched base-snapshot assertion: observed cursor 160; reference value 17."
+        },
+        {
+          "kind": "repository_context",
+          "content": "{\"build_features\": \"baseline\", \"dependency_release\": \"v1.11.1\", \"language\": \"Rust\", \"target\": \"host\", \"toolchain\": \"stable\"}"
+        }
+      ],
+      "candidates_in_recorded_producer_order": [
+        {
+          "producer_ordinal": 0,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": ""
+        },
+        {
+          "producer_ordinal": 1,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -2,6 +2,6 @@\n \n pub fn byte_at_task_cursor(input: &[u8]) -> u8 {\n     let mut cursor = input;\n-    cursor.advance(0);\n+    cursor.advance(1);\n     cursor.get_u8()\n }"
+        },
+        {
+          "producer_ordinal": 2,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -2,6 +2,6 @@\n \n pub fn byte_at_task_cursor(input: &[u8]) -> u8 {\n     let mut cursor = input;\n-    cursor.advance(0);\n+    cursor.advance(3);\n     cursor.get_u8()\n }"
+        },
+        {
+          "producer_ordinal": 3,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -2,6 +2,6 @@\n \n pub fn byte_at_task_cursor(input: &[u8]) -> u8 {\n     let mut cursor = input;\n-    cursor.advance(0);\n+    cursor.advance(2);\n     cursor.get_u8()\n }"
+        }
+      ]
+    },
+    {
+      "case_id": "CASE-032",
+      "task_request": "Choose the help-color patch that satisfies the current terminal/build compatibility context.",
+      "repository_context_and_evidence": [
+        {
+          "kind": "baseline_tool_result",
+          "content": "The untouched base snapshot produced no task-relevant pre-action execution observation."
+        },
+        {
+          "kind": "repository_context",
+          "content": "{\"build_features\": \"baseline\", \"dependency_release\": \"v4.6.1\", \"help_color_policy\": \"emit-color\", \"language\": \"Rust\", \"target\": \"host\", \"terminal_ansi_capability\": \"supported\", \"toolchain\": \"stable\"}"
+        }
+      ],
+      "candidates_in_recorded_producer_order": [
+        {
+          "producer_ordinal": 0,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": ""
+        },
+        {
+          "producer_ordinal": 1,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -5,6 +5,6 @@\n         .about(\"A compact command-line example\")\n         .arg(Arg::new(\"speed\").long(\"speed\").help(\"Execution speed\"))\n         // E012 candidate slot.\n-        .color(ColorChoice::Auto)\n+        .color(ColorChoice::Always)\n         .get_color()\n }"
+        },
+        {
+          "producer_ordinal": 2,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -5,6 +5,6 @@\n         .about(\"A compact command-line example\")\n         .arg(Arg::new(\"speed\").long(\"speed\").help(\"Execution speed\"))\n         // E012 candidate slot.\n-        .color(ColorChoice::Auto)\n+        .color(ColorChoice::Never)\n         .get_color()\n }"
+        },
+        {
+          "producer_ordinal": 3,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -5,6 +5,7 @@\n         .about(\"A compact command-line example\")\n         .arg(Arg::new(\"speed\").long(\"speed\").help(\"Execution speed\"))\n         // E012 candidate slot.\n-        .color(ColorChoice::Auto)\n+        .color(ColorChoice::Auto)\n+        .term_width(72)\n         .get_color()\n }"
+        }
+      ]
+    },
+    {
+      "case_id": "CASE-033",
+      "task_request": "Choose the map-order patch that satisfies the active build-feature contract.",
+      "repository_context_and_evidence": [
+        {
+          "kind": "baseline_tool_result",
+          "content": "The untouched base snapshot produced no task-relevant pre-action execution observation."
+        },
+        {
+          "kind": "repository_context",
+          "content": "{\"build_features\": \"baseline\", \"dependency_release\": \"v1.0.149\", \"language\": \"Rust\", \"map_iteration_contract\": \"lexical-order\", \"serde_json_preserve_order_feature\": false, \"target\": \"host\", \"toolchain\": \"stable\"}"
+        }
+      ],
+      "candidates_in_recorded_producer_order": [
+        {
+          "producer_ordinal": 0,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -4,6 +4,11 @@\n     let value: Value = serde_json::from_str(input).ok()?;\n     let mut object = value.as_object()?.clone();\n     object.sort_keys();\n-    // E012 candidate slot.\n-    Some(object.keys().cloned().collect())\n+    #[cfg(feature = \"preserve_order\")]\n+    {\n+        let original: Value = serde_json::from_str(input).ok()?;\n+        Some(original.as_object()?.keys().cloned().collect())\n+    }\n+    #[cfg(not(feature = \"preserve_order\"))]\n+    { None }\n }"
+        },
+        {
+          "producer_ordinal": 1,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -4,7 +4,8 @@\n     let value: Value = serde_json::from_str(input).ok()?;\n     let mut object = value.as_object()?.clone();\n     object.sort_keys();\n-    // E012 candidate slot.\n+    let mut object = object.clone();\n+    object.sort_keys();\n-    Some(object.keys().cloned().collect())\n+    Some(object.keys().skip(1).cloned().collect())\n }"
+        },
+        {
+          "producer_ordinal": 2,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -4,6 +4,8 @@\n     let value: Value = serde_json::from_str(input).ok()?;\n     let mut object = value.as_object()?.clone();\n     object.sort_keys();\n-    // E012 candidate slot.\n-    Some(object.keys().cloned().collect())\n+    #[cfg(not(feature = \"preserve_order\"))]\n+    { Some(object.keys().cloned().collect()) }\n+    #[cfg(feature = \"preserve_order\")]\n+    { None }\n }"
+        },
+        {
+          "producer_ordinal": 3,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -4,6 +4,5 @@\n     let value: Value = serde_json::from_str(input).ok()?;\n     let mut object = value.as_object()?.clone();\n     object.sort_keys();\n-    // E012 candidate slot.\n-    Some(object.keys().cloned().collect())\n+    Some(object.keys().rev().cloned().collect())\n }"
+        }
+      ]
+    },
+    {
+      "case_id": "CASE-034",
+      "task_request": "Review the code-local parser contract included with the offered changes. Select the conforming patch.",
+      "repository_context_and_evidence": [
+        {
+          "kind": "baseline_tool_result",
+          "content": "The untouched base snapshot produced no task-relevant pre-action execution observation."
+        },
+        {
+          "kind": "repository_context",
+          "content": "{\"build_features\": \"baseline\", \"dependency_release\": \"v4.6.1\", \"language\": \"Rust\", \"target\": \"host\", \"toolchain\": \"stable\"}"
+        }
+      ],
+      "candidates_in_recorded_producer_order": [
+        {
+          "producer_ordinal": 0,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "API context: the parser accepts exactly the finite values \"fast\" and \"safe\"; other strings are rejected.\n@@ -5,7 +5,7 @@\n         Arg::new(\"speed\")\n             .long(\"speed\")\n             // E012 candidate slot.\n-            .value_parser([\"broken\"]),\n+            .value_parser(clap::builder::NonEmptyStringValueParser::new()),\n     );\n     command\n         .try_get_matches_from([\"demo\", \"--speed\", value])"
+        },
+        {
+          "producer_ordinal": 1,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "API context: the parser accepts exactly the finite values \"fast\" and \"safe\"; other strings are rejected.\n@@ -5,7 +5,7 @@\n         Arg::new(\"speed\")\n             .long(\"speed\")\n             // E012 candidate slot.\n-            .value_parser([\"broken\"]),\n+            .value_parser([\"fast\", \"safe\", \"auto\"]),\n     );\n     command\n         .try_get_matches_from([\"demo\", \"--speed\", value])"
+        },
+        {
+          "producer_ordinal": 2,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "API context: the parser accepts exactly the finite values \"fast\" and \"safe\"; other strings are rejected.\n@@ -5,7 +5,7 @@\n         Arg::new(\"speed\")\n             .long(\"speed\")\n             // E012 candidate slot.\n-            .value_parser([\"broken\"]),\n+            .value_parser([\"fast\", \"safe\"]),\n     );\n     command\n         .try_get_matches_from([\"demo\", \"--speed\", value])"
+        },
+        {
+          "producer_ordinal": 3,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "API context: the parser accepts exactly the finite values \"fast\" and \"safe\"; other strings are rejected.\n@@ -5,7 +5,7 @@\n         Arg::new(\"speed\")\n             .long(\"speed\")\n             // E012 candidate slot.\n-            .value_parser([\"broken\"]),\n+            .value_parser([\"quick\", \"safe\"]),\n     );\n     command\n         .try_get_matches_from([\"demo\", \"--speed\", value])"
+        }
+      ]
+    },
+    {
+      "case_id": "CASE-035",
+      "task_request": "Support both --color and --colour as equivalent spellings, plus --no-color with the required precedence (override before aliases); preserve the current public alias contract.",
+      "repository_context_and_evidence": [
+        {
+          "kind": "baseline_tool_result",
+          "content": "The untouched base snapshot produced no task-relevant pre-action execution observation."
+        },
+        {
+          "kind": "repository_context",
+          "content": "{\"build_features\": \"baseline\", \"dependency_release\": \"v4.6.1\", \"language\": \"Rust\", \"target\": \"host\", \"toolchain\": \"stable\"}"
+        }
+      ],
+      "candidates_in_recorded_producer_order": [
+        {
+          "producer_ordinal": 0,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": ""
+        },
+        {
+          "producer_ordinal": 1,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -1,7 +1,7 @@\n use clap::{Arg, ArgAction, Command};\n \n // E012 candidate slot: implementations differ in which spellings they support.\n-const FORMS: &[(&str, bool)] = &[(\"color\", true)];\n+const FORMS: &[(&str, bool)] = &[(\"color\", true), (\"colour\", true)];\n \n pub fn parse_color(argv: &[&str]) -> Option<bool> {\n     let mut command = Command::new(\"demo\");"
+        },
+        {
+          "producer_ordinal": 2,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -1,7 +1,7 @@\n use clap::{Arg, ArgAction, Command};\n \n // E012 candidate slot: implementations differ in which spellings they support.\n-const FORMS: &[(&str, bool)] = &[(\"color\", true)];\n+const FORMS: &[(&str, bool)] = &[(\"color\", true), (\"no-color\", false)];\n \n pub fn parse_color(argv: &[&str]) -> Option<bool> {\n     let mut command = Command::new(\"demo\");"
+        },
+        {
+          "producer_ordinal": 3,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -1,7 +1,7 @@\n use clap::{Arg, ArgAction, Command};\n \n // E012 candidate slot: implementations differ in which spellings they support.\n-const FORMS: &[(&str, bool)] = &[(\"color\", true)];\n+const FORMS: &[(&str, bool)] = &[(\"colour\", true), (\"no-color\", false)];\n \n pub fn parse_color(argv: &[&str]) -> Option<bool> {\n     let mut command = Command::new(\"demo\");"
+        }
+      ]
+    },
+    {
+      "case_id": "CASE-036",
+      "task_request": "Implement the requested two-byte word order: little-endian. Choose one offered patch.",
+      "repository_context_and_evidence": [
+        {
+          "kind": "baseline_tool_result",
+          "content": "The untouched base snapshot produced no task-relevant pre-action execution observation."
+        },
+        {
+          "kind": "repository_context",
+          "content": "{\"build_features\": \"baseline\", \"dependency_release\": \"v1.11.1\", \"language\": \"Rust\", \"target\": \"host\", \"toolchain\": \"stable\"}"
+        }
+      ],
+      "candidates_in_recorded_producer_order": [
+        {
+          "producer_ordinal": 0,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -2,7 +2,6 @@\n \n pub fn encode_wire_word(value: u16) -> Bytes {\n     let mut out = BytesMut::with_capacity(2);\n-    // The frozen task snapshot drops the requested word.\n-    let _ = value;\n+    out.put_u16(value);\n     out.freeze()\n }"
+        },
+        {
+          "producer_ordinal": 1,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -2,7 +2,6 @@\n \n pub fn encode_wire_word(value: u16) -> Bytes {\n     let mut out = BytesMut::with_capacity(2);\n-    // The frozen task snapshot drops the requested word.\n-    let _ = value;\n+    out.put_u16_le(value);\n     out.freeze()\n }"
+        },
+        {
+          "producer_ordinal": 2,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -2,7 +2,7 @@\n \n pub fn encode_wire_word(value: u16) -> Bytes {\n     let mut out = BytesMut::with_capacity(2);\n-    // The frozen task snapshot drops the requested word.\n-    let _ = value;\n+    out.put_u16(value);\n+    out.put_u8(0);\n     out.freeze()\n }"
+        },
+        {
+          "producer_ordinal": 3,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -2,7 +2,6 @@\n \n pub fn encode_wire_word(value: u16) -> Bytes {\n     let mut out = BytesMut::with_capacity(2);\n-    // The frozen task snapshot drops the requested word.\n-    let _ = value;\n+    out.put_u16(0);\n     out.freeze()\n }"
+        }
+      ]
+    },
+    {
+      "case_id": "CASE-037",
+      "task_request": "The requested JSON numeric mode is whole. Use the failing-path observation to select a patch.",
+      "repository_context_and_evidence": [
+        {
+          "kind": "baseline_tool_result",
+          "content": "Pre-action parser observation: the first failure is at /payload."
+        },
+        {
+          "kind": "repository_context",
+          "content": "{\"build_features\": \"baseline\", \"dependency_release\": \"v1.0.149\", \"language\": \"Rust\", \"target\": \"host\", \"toolchain\": \"stable\"}"
+        }
+      ],
+      "candidates_in_recorded_producer_order": [
+        {
+          "producer_ordinal": 0,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -2,7 +2,5 @@\n \n pub fn selected_numeric(input: &str) -> Option<Value> {\n     let value: Value = serde_json::from_str(input).ok()?;\n-    // E012 candidate slot.\n-    let _ = value;\n-    None\n+    value.pointer(\"/header/ratio\").cloned()\n }"
+        },
+        {
+          "producer_ordinal": 1,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -2,7 +2,5 @@\n \n pub fn selected_numeric(input: &str) -> Option<Value> {\n     let value: Value = serde_json::from_str(input).ok()?;\n-    // E012 candidate slot.\n-    let _ = value;\n-    None\n+    value.pointer(\"/header/whole\").cloned()\n }"
+        },
+        {
+          "producer_ordinal": 2,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -2,7 +2,5 @@\n \n pub fn selected_numeric(input: &str) -> Option<Value> {\n     let value: Value = serde_json::from_str(input).ok()?;\n-    // E012 candidate slot.\n-    let _ = value;\n-    None\n+    value.pointer(\"/payload/ratio\").cloned()\n }"
+        },
+        {
+          "producer_ordinal": 3,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -2,7 +2,5 @@\n \n pub fn selected_numeric(input: &str) -> Option<Value> {\n     let value: Value = serde_json::from_str(input).ok()?;\n-    // E012 candidate slot.\n-    let _ = value;\n-    None\n+    value.pointer(\"/payload/whole\").cloned()\n }"
+        }
+      ]
+    },
+    {
+      "case_id": "CASE-038",
+      "task_request": "Implement the two-byte frame decoder for the requested target field: payload.",
+      "repository_context_and_evidence": [
+        {
+          "kind": "baseline_tool_result",
+          "content": "Pre-action decoder observation: the frame bytes are in big-endian order."
+        },
+        {
+          "kind": "repository_context",
+          "content": "{\"build_features\": \"baseline\", \"dependency_release\": \"v1.11.1\", \"language\": \"Rust\", \"target\": \"host\", \"toolchain\": \"stable\"}"
+        }
+      ],
+      "candidates_in_recorded_producer_order": [
+        {
+          "producer_ordinal": 0,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -1,7 +1,6 @@\n use bytes::Buf;\n \n pub fn read_selected_field(input: &[u8]) -> u16 {\n-    // E012 candidate slot.\n-    let _ = input;\n-    0\n+    let mut field = input;\n+    field.get_u16()\n }"
+        },
+        {
+          "producer_ordinal": 1,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -1,7 +1,6 @@\n use bytes::Buf;\n \n pub fn read_selected_field(input: &[u8]) -> u16 {\n-    // E012 candidate slot.\n-    let _ = input;\n-    0\n+    let mut field = input;\n+    field.get_u16_le()\n }"
+        },
+        {
+          "producer_ordinal": 2,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -1,7 +1,6 @@\n use bytes::Buf;\n \n pub fn read_selected_field(input: &[u8]) -> u16 {\n-    // E012 candidate slot.\n-    let _ = input;\n-    0\n+    let mut field = &input[2..];\n+    field.get_u16()\n }"
+        },
+        {
+          "producer_ordinal": 3,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -1,7 +1,6 @@\n use bytes::Buf;\n \n pub fn read_selected_field(input: &[u8]) -> u16 {\n-    // E012 candidate slot.\n-    let _ = input;\n-    0\n+    let mut field = &input[2..];\n+    field.get_u16_le()\n }"
+        }
+      ]
+    },
+    {
+      "case_id": "CASE-039",
+      "task_request": "The requested JSON numeric mode is ratio. Use the failing-path observation to select a patch.",
+      "repository_context_and_evidence": [
+        {
+          "kind": "baseline_tool_result",
+          "content": "Pre-action parser observation: the first failure is at /payload."
+        },
+        {
+          "kind": "repository_context",
+          "content": "{\"build_features\": \"baseline\", \"dependency_release\": \"v1.0.149\", \"language\": \"Rust\", \"target\": \"host\", \"toolchain\": \"stable\"}"
+        }
+      ],
+      "candidates_in_recorded_producer_order": [
+        {
+          "producer_ordinal": 0,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -2,7 +2,5 @@\n \n pub fn selected_numeric(input: &str) -> Option<Value> {\n     let value: Value = serde_json::from_str(input).ok()?;\n-    // E012 candidate slot.\n-    let _ = value;\n-    None\n+    value.pointer(\"/header/ratio\").cloned()\n }"
+        },
+        {
+          "producer_ordinal": 1,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -2,7 +2,5 @@\n \n pub fn selected_numeric(input: &str) -> Option<Value> {\n     let value: Value = serde_json::from_str(input).ok()?;\n-    // E012 candidate slot.\n-    let _ = value;\n-    None\n+    value.pointer(\"/header/whole\").cloned()\n }"
+        },
+        {
+          "producer_ordinal": 2,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -2,7 +2,5 @@\n \n pub fn selected_numeric(input: &str) -> Option<Value> {\n     let value: Value = serde_json::from_str(input).ok()?;\n-    // E012 candidate slot.\n-    let _ = value;\n-    None\n+    value.pointer(\"/payload/ratio\").cloned()\n }"
+        },
+        {
+          "producer_ordinal": 3,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -2,7 +2,5 @@\n \n pub fn selected_numeric(input: &str) -> Option<Value> {\n     let value: Value = serde_json::from_str(input).ok()?;\n-    // E012 candidate slot.\n-    let _ = value;\n-    None\n+    value.pointer(\"/payload/whole\").cloned()\n }"
+        }
+      ]
+    },
+    {
+      "case_id": "CASE-040",
+      "task_request": "Choose the help-color patch that satisfies the current terminal/build compatibility context.",
+      "repository_context_and_evidence": [
+        {
+          "kind": "baseline_tool_result",
+          "content": "The untouched base snapshot produced no task-relevant pre-action execution observation."
+        },
+        {
+          "kind": "repository_context",
+          "content": "{\"build_features\": \"baseline\", \"dependency_release\": \"v4.6.1\", \"help_color_policy\": \"plain-text\", \"language\": \"Rust\", \"target\": \"host\", \"terminal_ansi_capability\": \"suppressed\", \"toolchain\": \"stable\"}"
+        }
+      ],
+      "candidates_in_recorded_producer_order": [
+        {
+          "producer_ordinal": 0,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": ""
+        },
+        {
+          "producer_ordinal": 1,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -5,6 +5,6 @@\n         .about(\"A compact command-line example\")\n         .arg(Arg::new(\"speed\").long(\"speed\").help(\"Execution speed\"))\n         // E012 candidate slot.\n-        .color(ColorChoice::Auto)\n+        .color(ColorChoice::Always)\n         .get_color()\n }"
+        },
+        {
+          "producer_ordinal": 2,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -5,6 +5,6 @@\n         .about(\"A compact command-line example\")\n         .arg(Arg::new(\"speed\").long(\"speed\").help(\"Execution speed\"))\n         // E012 candidate slot.\n-        .color(ColorChoice::Auto)\n+        .color(ColorChoice::Never)\n         .get_color()\n }"
+        },
+        {
+          "producer_ordinal": 3,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -5,6 +5,7 @@\n         .about(\"A compact command-line example\")\n         .arg(Arg::new(\"speed\").long(\"speed\").help(\"Execution speed\"))\n         // E012 candidate slot.\n-        .color(ColorChoice::Auto)\n+        .color(ColorChoice::Auto)\n+        .term_width(72)\n         .get_color()\n }"
+        }
+      ]
+    },
+    {
+      "case_id": "CASE-041",
+      "task_request": "Choose the help-color patch that satisfies the current terminal/build compatibility context.",
+      "repository_context_and_evidence": [
+        {
+          "kind": "baseline_tool_result",
+          "content": "The untouched base snapshot produced no task-relevant pre-action execution observation."
+        },
+        {
+          "kind": "repository_context",
+          "content": "{\"build_features\": \"baseline\", \"dependency_release\": \"v4.6.1\", \"help_color_policy\": \"plain-text\", \"language\": \"Rust\", \"target\": \"host\", \"terminal_ansi_capability\": \"suppressed\", \"toolchain\": \"stable\"}"
+        }
+      ],
+      "candidates_in_recorded_producer_order": [
+        {
+          "producer_ordinal": 0,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -5,6 +5,6 @@\n         .about(\"A compact command-line example\")\n         .arg(Arg::new(\"speed\").long(\"speed\").help(\"Execution speed\"))\n         // E012 candidate slot.\n-        .color(ColorChoice::Auto)\n+        .color(ColorChoice::Always)\n         .get_color()\n }"
+        },
+        {
+          "producer_ordinal": 1,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": ""
+        },
+        {
+          "producer_ordinal": 2,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -5,6 +5,7 @@\n         .about(\"A compact command-line example\")\n         .arg(Arg::new(\"speed\").long(\"speed\").help(\"Execution speed\"))\n         // E012 candidate slot.\n-        .color(ColorChoice::Auto)\n+        .color(ColorChoice::Auto)\n+        .term_width(72)\n         .get_color()\n }"
+        },
+        {
+          "producer_ordinal": 3,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -5,6 +5,6 @@\n         .about(\"A compact command-line example\")\n         .arg(Arg::new(\"speed\").long(\"speed\").help(\"Execution speed\"))\n         // E012 candidate slot.\n-        .color(ColorChoice::Auto)\n+        .color(ColorChoice::Never)\n         .get_color()\n }"
+        }
+      ]
+    },
+    {
+      "case_id": "CASE-042",
+      "task_request": "Support both --color and --colour as equivalent spellings, plus --no-color with the required precedence (override last); preserve the current public alias contract.",
+      "repository_context_and_evidence": [
+        {
+          "kind": "baseline_tool_result",
+          "content": "The untouched base snapshot produced no task-relevant pre-action execution observation."
+        },
+        {
+          "kind": "repository_context",
+          "content": "{\"build_features\": \"baseline\", \"dependency_release\": \"v4.6.1\", \"language\": \"Rust\", \"target\": \"host\", \"toolchain\": \"stable\"}"
+        }
+      ],
+      "candidates_in_recorded_producer_order": [
+        {
+          "producer_ordinal": 0,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -1,7 +1,7 @@\n use clap::{Arg, ArgAction, Command};\n \n // E012 candidate slot: implementations differ in which spellings they support.\n-const FORMS: &[(&str, bool)] = &[(\"color\", true)];\n+const FORMS: &[(&str, bool)] = &[(\"colour\", true), (\"no-color\", false)];\n \n pub fn parse_color(argv: &[&str]) -> Option<bool> {\n     let mut command = Command::new(\"demo\");"
+        },
+        {
+          "producer_ordinal": 1,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": ""
+        },
+        {
+          "producer_ordinal": 2,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -1,7 +1,7 @@\n use clap::{Arg, ArgAction, Command};\n \n // E012 candidate slot: implementations differ in which spellings they support.\n-const FORMS: &[(&str, bool)] = &[(\"color\", true)];\n+const FORMS: &[(&str, bool)] = &[(\"color\", true), (\"colour\", true)];\n \n pub fn parse_color(argv: &[&str]) -> Option<bool> {\n     let mut command = Command::new(\"demo\");"
+        },
+        {
+          "producer_ordinal": 3,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -1,7 +1,7 @@\n use clap::{Arg, ArgAction, Command};\n \n // E012 candidate slot: implementations differ in which spellings they support.\n-const FORMS: &[(&str, bool)] = &[(\"color\", true)];\n+const FORMS: &[(&str, bool)] = &[(\"color\", true), (\"no-color\", false)];\n \n pub fn parse_color(argv: &[&str]) -> Option<bool> {\n     let mut command = Command::new(\"demo\");"
+        }
+      ]
+    },
+    {
+      "case_id": "CASE-043",
+      "task_request": "Review the code-local parser contract included with the offered changes. Select the conforming patch.",
+      "repository_context_and_evidence": [
+        {
+          "kind": "baseline_tool_result",
+          "content": "The untouched base snapshot produced no task-relevant pre-action execution observation."
+        },
+        {
+          "kind": "repository_context",
+          "content": "{\"build_features\": \"baseline\", \"dependency_release\": \"v4.6.1\", \"language\": \"Rust\", \"target\": \"host\", \"toolchain\": \"stable\"}"
+        }
+      ],
+      "candidates_in_recorded_producer_order": [
+        {
+          "producer_ordinal": 0,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "API context: the parser accepts exactly the finite values \"fast\" and \"safe\"; other strings are rejected.\n@@ -5,7 +5,7 @@\n         Arg::new(\"speed\")\n             .long(\"speed\")\n             // E012 candidate slot.\n-            .value_parser([\"broken\"]),\n+            .value_parser(clap::builder::NonEmptyStringValueParser::new()),\n     );\n     command\n         .try_get_matches_from([\"demo\", \"--speed\", value])"
+        },
+        {
+          "producer_ordinal": 1,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "API context: the parser accepts exactly the finite values \"fast\" and \"safe\"; other strings are rejected.\n@@ -5,7 +5,7 @@\n         Arg::new(\"speed\")\n             .long(\"speed\")\n             // E012 candidate slot.\n-            .value_parser([\"broken\"]),\n+            .value_parser([\"fast\", \"safe\", \"auto\"]),\n     );\n     command\n         .try_get_matches_from([\"demo\", \"--speed\", value])"
+        },
+        {
+          "producer_ordinal": 2,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "API context: the parser accepts exactly the finite values \"fast\" and \"safe\"; other strings are rejected.\n@@ -5,7 +5,7 @@\n         Arg::new(\"speed\")\n             .long(\"speed\")\n             // E012 candidate slot.\n-            .value_parser([\"broken\"]),\n+            .value_parser([\"quick\", \"safe\"]),\n     );\n     command\n         .try_get_matches_from([\"demo\", \"--speed\", value])"
+        },
+        {
+          "producer_ordinal": 3,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "API context: the parser accepts exactly the finite values \"fast\" and \"safe\"; other strings are rejected.\n@@ -5,7 +5,7 @@\n         Arg::new(\"speed\")\n             .long(\"speed\")\n             // E012 candidate slot.\n-            .value_parser([\"broken\"]),\n+            .value_parser([\"fast\", \"safe\"]),\n     );\n     command\n         .try_get_matches_from([\"demo\", \"--speed\", value])"
+        }
+      ]
+    },
+    {
+      "case_id": "CASE-044",
+      "task_request": "Review the code-local API contract included with the offered changes. Select the conforming patch.",
+      "repository_context_and_evidence": [
+        {
+          "kind": "baseline_tool_result",
+          "content": "The untouched base snapshot produced no task-relevant pre-action execution observation."
+        },
+        {
+          "kind": "repository_context",
+          "content": "{\"build_features\": \"baseline\", \"dependency_release\": \"v1.11.1\", \"language\": \"Rust\", \"target\": \"host\", \"toolchain\": \"stable\"}"
+        }
+      ],
+      "candidates_in_recorded_producer_order": [
+        {
+          "producer_ordinal": 0,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "API context: take_prefix returns a bounded zero-copy view; the result shares the input Bytes backing storage.\n@@ -1,7 +1,6 @@\n use bytes::{Buf, Bytes};\n \n pub fn take_prefix(input: Bytes, count: usize) -> Bytes {\n-    // E012 candidate slot.\n-    let _ = count;\n-    input\n+    let mut input = input;\n+    input.copy_to_bytes(count)\n }"
+        },
+        {
+          "producer_ordinal": 1,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "API context: take_prefix returns a bounded zero-copy view; the result shares the input Bytes backing storage.\n@@ -1,7 +1,5 @@\n use bytes::{Buf, Bytes};\n \n pub fn take_prefix(input: Bytes, count: usize) -> Bytes {\n-    // E012 candidate slot.\n-    let _ = count;\n     input\n }"
+        },
+        {
+          "producer_ordinal": 2,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "API context: take_prefix returns a bounded zero-copy view; the result shares the input Bytes backing storage.\n@@ -1,7 +1,5 @@\n use bytes::{Buf, Bytes};\n \n pub fn take_prefix(input: Bytes, count: usize) -> Bytes {\n-    // E012 candidate slot.\n-    let _ = count;\n-    input\n+    input.slice(count..)\n }"
+        },
+        {
+          "producer_ordinal": 3,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "API context: take_prefix returns a bounded zero-copy view; the result shares the input Bytes backing storage.\n@@ -1,7 +1,5 @@\n use bytes::{Buf, Bytes};\n \n pub fn take_prefix(input: Bytes, count: usize) -> Bytes {\n-    // E012 candidate slot.\n-    let _ = count;\n-    input\n+    input.slice(..count)\n }"
+        }
+      ]
+    },
+    {
+      "case_id": "CASE-045",
+      "task_request": "Rewrite the JSON document while preserving the exact source number token 1.2300e+02; do not normalize it.",
+      "repository_context_and_evidence": [
+        {
+          "kind": "baseline_tool_result",
+          "content": "The untouched base snapshot produced no task-relevant pre-action execution observation."
+        },
+        {
+          "kind": "repository_context",
+          "content": "{\"build_features\": \"baseline\", \"dependency_release\": \"v1.0.149\", \"language\": \"Rust\", \"target\": \"host\", \"toolchain\": \"stable\"}"
+        }
+      ],
+      "candidates_in_recorded_producer_order": [
+        {
+          "producer_ordinal": 0,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": ""
+        },
+        {
+          "producer_ordinal": 1,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -3,5 +3,6 @@\n pub fn normalize_json_number(input: &str) -> Option<String> {\n     let value: Value = serde_json::from_str(input).ok()?;\n     // E012 candidate slot.\n-    serde_json::to_string(&value).ok()\n+    let number = value.get(\"n\")?.as_f64()?;\n+    Some(format!(r#\"{{\"n\":{number},\"tag\":\"x\"}}\"#))\n }"
+        },
+        {
+          "producer_ordinal": 2,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -3,5 +3,6 @@\n pub fn normalize_json_number(input: &str) -> Option<String> {\n     let value: Value = serde_json::from_str(input).ok()?;\n     // E012 candidate slot.\n-    serde_json::to_string(&value).ok()\n+    let number = value.get(\"n\")?.as_u64()?;\n+    Some(format!(r#\"{{\"n\":{number},\"tag\":\"x\"}}\"#))\n }"
+        },
+        {
+          "producer_ordinal": 3,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -3,5 +3,6 @@\n pub fn normalize_json_number(input: &str) -> Option<String> {\n     let value: Value = serde_json::from_str(input).ok()?;\n     // E012 candidate slot.\n-    serde_json::to_string(&value).ok()\n+    let number = value.get(\"n\")?.as_i64()?;\n+    Some(format!(r#\"{{\"n\":{number},\"tag\":\"x\"}}\"#))\n }"
+        }
+      ]
+    },
+    {
+      "case_id": "CASE-046",
+      "task_request": "The adapter contract test fails on the frozen base snapshot. Use its pre-action cursor observation to choose a patch.",
+      "repository_context_and_evidence": [
+        {
+          "kind": "baseline_tool_result",
+          "content": "Untouched base-snapshot assertion: observed cursor 192; reference value 68."
+        },
+        {
+          "kind": "repository_context",
+          "content": "{\"build_features\": \"baseline\", \"dependency_release\": \"v1.11.1\", \"language\": \"Rust\", \"target\": \"host\", \"toolchain\": \"stable\"}"
+        }
+      ],
+      "candidates_in_recorded_producer_order": [
+        {
+          "producer_ordinal": 0,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -2,6 +2,6 @@\n \n pub fn byte_at_task_cursor(input: &[u8]) -> u8 {\n     let mut cursor = input;\n-    cursor.advance(0);\n+    cursor.advance(3);\n     cursor.get_u8()\n }"
+        },
+        {
+          "producer_ordinal": 1,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": ""
+        },
+        {
+          "producer_ordinal": 2,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -2,6 +2,6 @@\n \n pub fn byte_at_task_cursor(input: &[u8]) -> u8 {\n     let mut cursor = input;\n-    cursor.advance(0);\n+    cursor.advance(2);\n     cursor.get_u8()\n }"
+        },
+        {
+          "producer_ordinal": 3,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -2,6 +2,6 @@\n \n pub fn byte_at_task_cursor(input: &[u8]) -> u8 {\n     let mut cursor = input;\n-    cursor.advance(0);\n+    cursor.advance(1);\n     cursor.get_u8()\n }"
+        }
+      ]
+    },
+    {
+      "case_id": "CASE-047",
+      "task_request": "Choose the map-order patch that satisfies the active build-feature contract.",
+      "repository_context_and_evidence": [
+        {
+          "kind": "baseline_tool_result",
+          "content": "The untouched base snapshot produced no task-relevant pre-action execution observation."
+        },
+        {
+          "kind": "repository_context",
+          "content": "{\"build_features\": \"baseline\", \"dependency_release\": \"v1.0.149\", \"language\": \"Rust\", \"map_iteration_contract\": \"preserve-insertion-order\", \"serde_json_preserve_order_feature\": true, \"target\": \"host\", \"toolchain\": \"stable\"}"
+        }
+      ],
+      "candidates_in_recorded_producer_order": [
+        {
+          "producer_ordinal": 0,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -4,7 +4,8 @@\n     let value: Value = serde_json::from_str(input).ok()?;\n     let mut object = value.as_object()?.clone();\n     object.sort_keys();\n-    // E012 candidate slot.\n+    let mut object = object.clone();\n+    object.sort_keys();\n-    Some(object.keys().cloned().collect())\n+    Some(object.keys().skip(1).cloned().collect())\n }"
+        },
+        {
+          "producer_ordinal": 1,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -4,6 +4,11 @@\n     let value: Value = serde_json::from_str(input).ok()?;\n     let mut object = value.as_object()?.clone();\n     object.sort_keys();\n-    // E012 candidate slot.\n-    Some(object.keys().cloned().collect())\n+    #[cfg(feature = \"preserve_order\")]\n+    {\n+        let original: Value = serde_json::from_str(input).ok()?;\n+        Some(original.as_object()?.keys().cloned().collect())\n+    }\n+    #[cfg(not(feature = \"preserve_order\"))]\n+    { None }\n }"
+        },
+        {
+          "producer_ordinal": 2,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -4,6 +4,5 @@\n     let value: Value = serde_json::from_str(input).ok()?;\n     let mut object = value.as_object()?.clone();\n     object.sort_keys();\n-    // E012 candidate slot.\n-    Some(object.keys().cloned().collect())\n+    Some(object.keys().rev().cloned().collect())\n }"
+        },
+        {
+          "producer_ordinal": 3,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -4,6 +4,8 @@\n     let value: Value = serde_json::from_str(input).ok()?;\n     let mut object = value.as_object()?.clone();\n     object.sort_keys();\n-    // E012 candidate slot.\n-    Some(object.keys().cloned().collect())\n+    #[cfg(not(feature = \"preserve_order\"))]\n+    { Some(object.keys().cloned().collect()) }\n+    #[cfg(feature = \"preserve_order\")]\n+    { None }\n }"
+        }
+      ]
+    },
+    {
+      "case_id": "CASE-048",
+      "task_request": "The adapter contract test fails on the frozen base snapshot. Use its pre-action cursor observation to choose a patch.",
+      "repository_context_and_evidence": [
+        {
+          "kind": "baseline_tool_result",
+          "content": "Untouched base-snapshot assertion: observed cursor 192; reference value 85."
+        },
+        {
+          "kind": "repository_context",
+          "content": "{\"build_features\": \"baseline\", \"dependency_release\": \"v1.11.1\", \"language\": \"Rust\", \"target\": \"host\", \"toolchain\": \"stable\"}"
+        }
+      ],
+      "candidates_in_recorded_producer_order": [
+        {
+          "producer_ordinal": 0,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -2,6 +2,6 @@\n \n pub fn byte_at_task_cursor(input: &[u8]) -> u8 {\n     let mut cursor = input;\n-    cursor.advance(0);\n+    cursor.advance(3);\n     cursor.get_u8()\n }"
+        },
+        {
+          "producer_ordinal": 1,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": ""
+        },
+        {
+          "producer_ordinal": 2,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -2,6 +2,6 @@\n \n pub fn byte_at_task_cursor(input: &[u8]) -> u8 {\n     let mut cursor = input;\n-    cursor.advance(0);\n+    cursor.advance(2);\n     cursor.get_u8()\n }"
+        },
+        {
+          "producer_ordinal": 3,
+          "summary": "Apply the candidate change shown in the code excerpt.",
+          "patch_excerpt": "@@ -2,6 +2,6 @@\n \n pub fn byte_at_task_cursor(input: &[u8]) -> u8 {\n     let mut cursor = input;\n-    cursor.advance(0);\n+    cursor.advance(1);\n     cursor.get_u8()\n }"
+        }
+      ]
+    }
+  ]
+}

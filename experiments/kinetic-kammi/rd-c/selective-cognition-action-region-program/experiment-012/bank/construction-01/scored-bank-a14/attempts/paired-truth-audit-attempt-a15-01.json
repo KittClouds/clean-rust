@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "attempt": "A15_PAIRED_AUDIT_LAUNCH_01",
+  "state": "AUDIT_DID_NOT_START_LOCK_VERIFIER_TYPE_ERROR",
+  "model_contact_authorized": false,
+  "paired_audit_lock_sha256": "2dfcdd43db27c596107475860f99de6e03101f833cf1fecbba8022c20fe471b2",
+  "audit_script_sha256": "b1cd6f06f043669a73d37d37d23d0a26caecd63c8501bac453b4aa74d85b7d8a",
+  "error": "AttributeError: sha256 helper expected Path but received bytes during script-hash verification",
+  "audit_output_written": false
+}

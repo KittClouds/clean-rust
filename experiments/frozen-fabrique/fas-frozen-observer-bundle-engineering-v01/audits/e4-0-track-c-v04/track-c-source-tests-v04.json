@@ -1,0 +1,49 @@
+{
+  "recorded_utc": "2026-09-27T01:17:06.807737+00:00",
+  "schema": "FAS_E4_0_TRACK_C_SOURCE_TEST_RECEIPT_V04",
+  "receipt_id": "E4_0_TRACK_C_V04_SOURCE_TESTS",
+  "status": "PASS_SYNTHETIC_SOURCE_AND_CLI_TESTS",
+  "command": "python -m unittest discover -s source/scripts/e4_fresh_scorer_v04 -p test_*.py -v; python -m compileall -q; independent auditor --help",
+  "synthetic_test_count": 18,
+  "compile_and_cli": "PASS",
+  "source_files": [
+    {
+      "path": "source/scripts/e4_fresh_scorer_v04/runner.py",
+      "bytes": 53258,
+      "sha256": "d3507898b848d4911361751d44acb80dac6fbcd4fc99736c40fa53bee8a9b26c"
+    },
+    {
+      "path": "source/scripts/e4_fresh_scorer_v04/scorer.py",
+      "bytes": 33616,
+      "sha256": "58bc957de63d430933570430ee0760a5833bc9c6ef5a82dae6dba78115b8b866"
+    },
+    {
+      "path": "source/scripts/e4_fresh_scorer_v04/output_artifacts.py",
+      "bytes": 5887,
+      "sha256": "73fbdd184d01df6de913676a0caa0be8f38f264bc9667e3985b52485425b33d4"
+    },
+    {
+      "path": "source/scripts/e4_fresh_scorer_v04/test_runner.py",
+      "bytes": 33583,
+      "sha256": "3df29d5540c96e20bdfe5d3edbc2cbd5e62b40848c82484fc438d55096cb515d"
+    },
+    {
+      "path": "source/scripts/e4_fresh_scorer_v04/test_scorer.py",
+      "bytes": 11856,
+      "sha256": "f7d8225e60b6c15e9bfd1fa81ae71182c8507eb591967e0d34890f85c7b97a15"
+    },
+    {
+      "path": "source/scripts/e4_fresh_scorer_v04/README.md",
+      "bytes": 9749,
+      "sha256": "12c340e03ac754ebad68d3b46119a1da66ba9463450574527295efb92cd576a0"
+    }
+  ],
+  "runtime_access": {
+    "model_contact": false,
+    "tokenizer_contact": false,
+    "cuda_initialized": false,
+    "E4_rows_materialized": false,
+    "truth_opened": false
+  },
+  "scope": "Synthetic and source-level checks only. No E4 population, labels, tokenizer, model, CUDA, feature cache, or execution authorization was touched."
+}

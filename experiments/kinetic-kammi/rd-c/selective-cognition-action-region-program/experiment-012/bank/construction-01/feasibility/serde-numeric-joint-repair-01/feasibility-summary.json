@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "state": "OFFLINE_FEASIBILITY_ONLY",
+  "model_contact_authorized": false,
+  "family": "number-mode-plus-error-site",
+  "candidate_ids_hidden_role_map": {
+    "header_whole": 29284,
+    "header_ratio": 52928,
+    "payload_whole": 31026,
+    "payload_ratio": 49443
+  },
+  "baseline_pass_by_case": {
+    "case-01": false,
+    "case-02": false,
+    "case-03": false,
+    "case-04": false
+  },
+  "candidate_pass_matrix_hidden_roles": {
+    "header_whole": {
+      "case-01": true,
+      "case-02": false,
+      "case-03": false,
+      "case-04": false
+    },
+    "header_ratio": {
+      "case-01": false,
+      "case-02": true,
+      "case-03": false,
+      "case-04": false
+    },
+    "payload_whole": {
+      "case-01": false,
+      "case-02": false,
+      "case-03": true,
+      "case-04": false
+    },
+    "payload_ratio": {
+      "case-01": false,
+      "case-02": false,
+      "case-03": false,
+      "case-04": true
+    }
+  },
+  "code_sha256": {
+    "base": "8ace0bc7ddd9ed630b8e61cf21deb61c01df6a333218769c2e536f6c8ff6250c",
+    "header_whole": "ca622016239b5c4e987a35c36b69941d4315db8fb26558c36bf672c3d8b999be",
+    "header_ratio": "c6cc5b905dbdd7308f8bdee0eca5f13b37894aad6c8c22e4e480cc5ac9a2404a",
+    "payload_whole": "5c88003f21481ca621b392d2dcd6b4d0cae0b1490ba45dbe299a9fa2ec13c62e",
+    "payload_ratio": "b0e59cc638189be5bd7072530978196aae03fed58fe49eb3c88698517f5d73f3"
+  },
+  "intended_positive_sets": {
+    "case-01": [
+      "header_whole"
+    ],
+    "case-02": [
+      "header_ratio"
+    ],
+    "case-03": [
+      "payload_whole"
+    ],
+    "case-04": [
+      "payload_ratio"
+    ]
+  },
+  "joint_factorial": {
+    "case-01": {
+      "request_parent": "header",
+      "execution_leaf": "whole"
+    },
+    "case-02": {
+      "request_parent": "header",
+      "execution_leaf": "ratio"
+    },
+    "case-03": {
+      "request_parent": "payload",
+      "execution_leaf": "whole"
+    },
+    "case-04": {
+      "request_parent": "payload",
+      "execution_leaf": "ratio"
+    }
+  }
+}

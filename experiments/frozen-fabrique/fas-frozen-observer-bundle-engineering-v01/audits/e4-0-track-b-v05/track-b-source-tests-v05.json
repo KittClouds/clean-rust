@@ -1,0 +1,51 @@
+{
+  "recorded_utc": "2026-09-27T01:57:39.786772+00:00",
+  "schema": "FAS_E4_0_TRACK_B_SOURCE_TEST_RECEIPT_V05",
+  "receipt_id": "E4_0_TRACK_B_V05_SOURCE_TESTS",
+  "status": "PASS_SYNTHETIC_SOURCE_AND_CLI_TESTS",
+  "command": "python -m py_compile Track B v05 source and test files; python source/tests/test_e4_runner_v05.py",
+  "synthetic_test_count": 23,
+  "py_compile": "PASS",
+  "bound_sources": [
+    {
+      "path": "source/scripts/e4_runner_common_v05.py",
+      "bytes": 23451,
+      "sha256": "0b508de5c61737ff2b7d4a1838d8277ac9fe5428874e7b9bec834ee1145ca8a4"
+    },
+    {
+      "path": "source/scripts/e4_runner_artifacts_v05.py",
+      "bytes": 16642,
+      "sha256": "25c708eeeecd3c2a71beb03847446ff4301779e44114ada5399c93a437fe6d37"
+    },
+    {
+      "path": "source/scripts/e4_gpu_lease_v04.py",
+      "bytes": 25284,
+      "sha256": "45a14179765501fbda6e56fe93969cb28bd5ef3705b37a7ef6727833c4f84a3f"
+    },
+    {
+      "path": "source/scripts/e4_runner_modes_v05.py",
+      "bytes": 32820,
+      "sha256": "a173a1366799f8a63b5793ed99275fa3f1371c4c0ba7275e357d39dd1eef34f1"
+    },
+    {
+      "path": "source/scripts/e4_online_parity_v05.py",
+      "bytes": 1213,
+      "sha256": "23c04759d07cf91d85cb36d86c8bdf2cc2dda1e3383ea93bc3e27d6c3a722604"
+    },
+    {
+      "path": "source/tests/test_e4_runner_v05.py",
+      "bytes": 26636,
+      "sha256": "3f6ae0fcad7d5c913f6bad503ed054d66608e9b7c85fb43f3d839227728f11e8"
+    }
+  ],
+  "runtime_access": {
+    "model_contact": false,
+    "tokenizer_contact": false,
+    "cuda_initialized": false,
+    "E4_rows_materialized": false,
+    "truth_opened": false,
+    "gpu_lease_acquired": false
+  },
+  "scope": "Synthetic/source/CLI checks only; verifies WDDM pmon Type-C blocking, C+G/G diagnostic filtering, unverifiable Type-C fail-closed, and race/quiet-window behavior. No E4 population, labels, tokenizer, model, CUDA, cache, GPU lease, or execution authorization was touched.",
+  "execution_authorization_conferred": false
+}

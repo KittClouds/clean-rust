@@ -1,0 +1,209 @@
+{
+  "contract_id": "FAS_S12_OBSERVER_PLANE_CAUSAL_DEPENDENCE_V02",
+  "status": "SEALED_FOR_EXECUTION",
+  "supersedes": "S12 v01 implementation check only; scientific estimand, model, observers, population, random planes, strengths, repeat set, and bootstrap remain unchanged",
+  "user_authorization": {
+    "authorized": true,
+    "scope": "complete S12 packet through parity, intervention, raw-output seal, frozen bootstrap, independent replay, final result seal, and stop",
+    "endpoint": "fixed observer augmented task system only"
+  },
+  "claim_scope": {
+    "positive_result": "selective causal dependence of the frozen LFM plus observer system under the specified activation intervention",
+    "does_not_establish": [
+      "mathematical necessity",
+      "native LFM language generation behavior",
+      "transformer circuit causality",
+      "semantic feature identity",
+      "generalization beyond the fixed model, observer bank, panel, and intervention"
+    ],
+    "population_status": "paired mechanistic follow-up on the already revealed S11 panel; not independent confirmation"
+  },
+  "parents": {
+    "s09_result_root_sha256": "664af5b22f071b28d52a67d748e9f6f93ae3e67d587edec80b921dd529945880",
+    "s11_result_root_sha256": "23758806537df1895772025e97824393dd4cd79ede7956360cd93f341c30740a",
+    "s11_panel_root_sha256": "9011d425faaac7c6c1bee0f619a696a4469816ebeae1c0df2c6d4f8516fde824",
+    "s11_feature_cache_root_sha256": "b93f724f674219484002aeece36eb0512322e59ae37df204b76885c22624cff3",
+    "s11_tokenization_root_sha256": "1c759a420594db8ce682259058ac9da3cc52c202c1bbacf8ed4fe0235ba6cf39",
+    "parent_binding_path": "inputs/parent-binding-v01.json",
+    "parent_binding_sha256": "485119566d96c80c4376ed5f142b1341648d79d7d2e1783eaa347f31e59452c5",
+    "preparation_receipt_path": "preparation-receipt-v01.json",
+    "preparation_receipt_sha256": "0bf46a925e9d81e161b18577910edcf0b5853984c85968fffc12e956e1d871ed",
+    "plane_bank": {
+      "path": "inputs/plane-bank-v01.f64le",
+      "sha256": "c8ce0b7e0a3be77c612c114104084557498bb56229421298c72f747a676474b1",
+      "shape": [6, 9, 2, 2048],
+      "dtype": "<f8"
+    },
+    "source_centers": {
+      "path": "inputs/source-centers-v01.f64le",
+      "sha256": "951bc893950b09ce6e393fa6c6f30dae0d20239818ca612dc7f5fccd57db7e2c",
+      "shape": [6, 2048],
+      "dtype": "<f8"
+    },
+    "bootstrap_plan": {
+      "path": "inputs/bootstrap-plan-v01.u32le",
+      "sha256": "032ece187d81fc05e42a2a4faf811a4c06da181a466b138e259dc9a3b50c1c0b",
+      "shape": [10000, 5318],
+      "dtype": "<u4",
+      "seed_label": "FAS-S12-V01-BOOTSTRAP-SEED",
+      "seed_sha256": "2729cc00389a20b639cb369e0c1b4d8c2584323481fa68f603a12aec5bac4a88",
+      "seed_u64": 13123658879479851303,
+      "stratum_order": [0, 1, 2],
+      "stratum_sizes": [1733, 1815, 1770]
+    },
+    "repeat_quartets": {
+      "path": "inputs/repeat-quartets-v01.json",
+      "sha256": "0756cd0d5117749668c385939e9b0524cc951ac8bc01bd064130701c2c15821a",
+      "seed_label": "FAS-S12-V01-REPEAT-QUARTET-SEED",
+      "seed_sha256": "63f46c561819a1b56185f72b136366118c4a73a9130b975cb0f43f5757ee3553",
+      "seed_u64": 13087769584435262563,
+      "quartets_per_target": 10,
+      "total_quartets": 30,
+      "total_rows": 120
+    }
+  },
+  "model": {
+    "model_id": "LiquidAI/LFM2.5-1.2B-Base",
+    "revision": "7453bca97ca1e67754c4035a4b4c584e1c9dd725",
+    "asset_root_sha256": "661a7e73c0804e98bfb4ca9d1786ca9126a0a21595fbd2d3aea517c342fba1b3",
+    "expected_parameter_state_sha256": "14b8ccb6c347eb5a91ccb718de39d70865f15410f5b6e62ca747aaf77f6bb9e5",
+    "expected_parameter_count": 1170340608,
+    "expected_state_tensor_count": 148,
+    "expected_serialized_state_bytes": 4681362432,
+    "inference_dtype": "float32",
+    "immutable": true,
+    "parameter_delta": 0
+  },
+  "runtime": {
+    "python": "3.13.15",
+    "numpy": "2.5.3",
+    "torch": "2.11.0+cu128",
+    "transformers": "5.17.0",
+    "device": "NVIDIA GeForce RTX 3080",
+    "cuda_devices": 1,
+    "cpu_threads": 1,
+    "cuda_matmul_tf32": false,
+    "cudnn_tf32": false,
+    "float32_matmul_precision": "highest",
+    "deterministic_algorithms": true,
+    "cublas_workspace_config": ":4096:8"
+  },
+  "population": {
+    "source": "S11 selected-events-v02 and token-rows-v01",
+    "rows": 21272,
+    "quartets": 5318,
+    "variants_per_quartet": ["A", "C", "E", "P"],
+    "class_quartet_counts": {"0": 1733, "1": 1815, "2": 1770},
+    "input_reuse": "sealed S11 token IDs only; no retokenization or corpus edits"
+  },
+  "observers": {
+    "source_layers": [4, 8, 12],
+    "source_surfaces": ["M", "F"],
+    "terminal_layer": 16,
+    "terminal_surfaces": ["M", "F"],
+    "classes": [0, 1, 2],
+    "feature_dimension": 2048,
+    "fit_or_update": false,
+    "terminal_s11_context": {
+      "M_balanced_accuracy": 0.604337864053308,
+      "M_accuracy": 0.6029522376833396,
+      "M_class_recall": [0.7023946912867859, 0.5212121212121212, 0.589406779661017],
+      "F_balanced_accuracy": 0.9784932619144247,
+      "F_accuracy": 0.978469349379466,
+      "F_class_recall": [0.9685516445470282, 0.9674931129476584, 0.9994350282485875],
+      "interpretation": "baseline dynamic range context only; not a new pass threshold"
+    }
+  },
+  "intervention": {
+    "source_tap": "post-block hidden state H_l matching S09 hidden_states[l]",
+    "summary": {
+      "M": "float32 mean over all model-visible positions",
+      "F": "float32 final model-visible position"
+    },
+    "center": "sealed source observer scaler_mean, stored as FP64",
+    "plane": "rank-2 row span of frozen effective pair normals (W_a-W_b)/scaler_scale",
+    "projection": "Pq = U.T @ (U @ q), q = summary - center",
+    "strengths": [0.0, 0.25, 0.5, 1.0],
+    "primary_strength": 1.0,
+    "M_operator": "subtract the same delta from every visible position; tensor Frobenius norm = sqrt(T)*norm(delta); minimum-Frobenius edit for the contracted mean shift",
+    "F_operator": "subtract delta from the final visible position only; tensor Frobenius norm = norm(delta)",
+    "random_controls_per_site": 8,
+    "random_plane_generation": "independent NumPy PCG64 Gaussian 2048x2 QR planes from fixed hash-derived seeds; no target-plane orthogonalization",
+    "random_delta": "zero if target delta norm is zero; otherwise norm(target_delta)*random_projection/norm(random_projection)",
+    "random_projection_fail_threshold": "norm(random_projection) <= 1e-12 * max(norm(q),1) when target delta is nonzero is fail-closed",
+    "norm_match_tolerance": {"relative": 1e-5, "absolute": 1e-7},
+    "projected_residual_tolerance": "norm(Pq'-(1-lambda)Pq) <= 5e-4*max(1,norm(Pq))",
+    "site_order": ["L04-M", "L04-F", "L08-M", "L08-F", "L12-M", "L12-F"],
+    "branch_order": "strength-major (.25,.50,1.00), target arm, controls 1..8",
+    "counterfactual_microbatch": 8,
+    "input_batching": "one source event per base forward; intervention branches batch only variants derived from that single event and all retain the identical exact sequence length; no padding and no mixed lengths",
+    "tensor_energy_rule": "target versus random control contrasts are valid within a layer/surface site; raw M-versus-F intervention magnitudes are not ranked because M broadcasts across T positions and F edits one position",
+    "repeat_check": "repeat all nonzero branches for 30 prospectively selected quartets (10 per exact-target class; 120 rows); branch logits and manipulation records must match byte-for-byte"
+  },
+  "execution_order": [
+    "verify S09/S11 parent entries and S12 bundle hashes",
+    "verify source pair normals span the six sealed target planes and reconstruct all 48 random planes from their frozen seed labels",
+    "independently verify and reuse the sealed v01 all-row base/suffix parity and baseline replay receipts; no model feature re-extraction",
+    "load pinned frozen LFM and verify pre-run parameter identity",
+    "confirm v02 runtime/model identity matches the v01 gate parents",
+    "run all six sites, three nonzero strengths, target and eight random arms; emit both terminal observer logits",
+    "repeat all nonzero branches on the frozen 30-quartet subset",
+    "verify post-run model state is unchanged",
+    "seal raw logits, plane-specific manipulation checks, execution receipts, and output tree",
+    "analyze labels and compute frozen metrics and shared whole-quartet bootstrap",
+    "independently replay the analysis and verify all hashes",
+    "seal final result and stop"
+  ],
+  "analysis": {
+    "primary_endpoint": "frozen-observer probe logit margin: true-target class logit minus best rival class logit",
+    "primary_contrast": "mean across 8 random-control target margins minus target-plane target margin at lambda=1; positive means selective target-plane damage",
+    "primary_sites": 6,
+    "resampling_unit": "whole A/C/E/P quartet",
+    "stratification": "independent within exact-target classes 0,1,2 at sealed observed counts",
+    "bootstrap_replicates": 10000,
+    "bootstrap_plan_shared": true,
+    "simultaneous_interval": "95% max-absolute standardized deviation across the six primary contrasts, NumPy linear quantile",
+    "bootstrap_standard_error": "sample standard deviation of the 10000 bootstrap estimates with ddof=1",
+    "standardized_deviation": "(bootstrap estimate - point estimate) / site bootstrap standard error",
+    "simultaneous_statistic": "for each replicate, maximum absolute standardized deviation across all six sites",
+    "critical_quantile": "NumPy quantile at 0.95 with method=linear",
+    "interval_formula": "point estimate +/- critical quantile * site bootstrap standard error",
+    "site_interpretation_rule": "selective causal dependence supported for a site only when its simultaneous lower interval bound is greater than zero; report every site; no all-sites gate",
+    "secondary": [
+      "accuracy, balanced accuracy, class recall, confusion matrix",
+      "probe softmax probabilities, predictions, target margins, all pair margins",
+      "sham-relative changes and prediction transitions",
+      "cross-terminal-observer results",
+      "lambda .25 and .50 descriptions",
+      "quartet variant and target class summaries"
+    ],
+    "labels_opened_by_inference_runner": false
+  },
+  "invariants": {
+    "source_basis_rank": 2,
+    "basis_gram_max_abs_error": 1e-10,
+    "source_pair_normal_relative_residual": 1e-10,
+    "projector_symmetry_frobenius_error": 1e-10,
+    "projector_idempotence_frobenius_error": 1e-9,
+    "target_plane_manipulation": "norm(P_target q'-(1-lambda)P_target q) <= 5e-4*max(1,norm(P_target q))",
+    "random_plane_manipulation": "max(norm(delta-P_random delta),norm((q'-q)+delta)) <= 5e-4*max(1,norm(delta))",
+    "v01_correction_reason": "The v01 checker incorrectly applied the target-plane residual identity to random-control arms. At row 0, L04-M, lambda=1, random control 1, that identity failed because the control direction is intentionally a different plane. No row was committed and no label or outcome analysis was opened.",
+    "v01_failed_attempt": "preserved unchanged at run-v01; its all-row base/suffix parity and S11 class-prediction replay passed, while the first intervention stopped before row commit",
+    "v02_reused_inputs": "S11 panel, tokenizer rows, model, observer states, target and random planes, strengths, repeat set, and bootstrap plan are identical to the sealed v01 inputs",
+    "base_terminal_feature_parity": "byte-identical to sealed S11 layer-16 M/F cache for every row",
+    "parent_probability_reference": "S11 did not store probabilities; S12 computes them from the sealed S11 feature rows and probe states",
+    "baseline_metrics": "exact support, prediction counts, accuracy, balanced accuracy, and class recall reproduction after analysis opens labels",
+    "backbone_parameter_delta": 0,
+    "missing_or_nonfinite_outputs": "fail closed",
+    "deterministic_repeat": "byte identity on all planned repeat rows and branches"
+  },
+  "forbidden": [
+    "native LFM answer generation or native candidate scoring",
+    "probe fitting, refitting, or updating",
+    "new feature view, representation, model revision, layer, or observer",
+    "changing random planes, strengths, layers, or bootstrap after execution begins",
+    "selecting controls or examples based on outcomes",
+    "FAS-00 inputs, labels, or evaluation data",
+    "SAE, neurons, heads, attention patching, or adaptive mechanisms"
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "task_id": "ripgrep-ripgrep-gitignore-bom-v2",
+  "lane": "small-then-large-on-abstention",
+  "action_id": 11,
+  "patch_sha256": "5000d6bc36df5a03c4f167b335cc6d248a22bac17ad2b7041182b31fa05e97af",
+  "candidate_variant": "gold",
+  "test_filter": "gitignore_skip_bom",
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--manifest-path",
+    "C:\\rd-c\\experiment-010\\tasks\\heldout-bank-v1\\families\\ripgrep-gitignore-bom\\candidates\\gold\\Cargo.toml",
+    "--package",
+    "ignore",
+    "--test",
+    "gitignore_skip_bom",
+    "gitignore_skip_bom",
+    "--",
+    "--exact"
+  ],
+  "exit_code": 0,
+  "status": "passed",
+  "passed": true,
+  "elapsed_ms": 6352.685,
+  "completion_source": "live-cargo-test",
+  "output_sha256": "5ef8225b69b6e04bfec1f12bdcda27d006b8408e403f5692cd836f49ca0bf91e",
+  "output": "\nrunning 1 test\ntest gitignore_skip_bom ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n   Compiling ignore v0.4.29 (C:\\rd-c\\experiment-010\\tasks\\heldout-bank-v1\\families\\ripgrep-gitignore-bom\\candidates\\gold\\crates\\ignore)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 6.06s\n     Running tests\\gitignore_skip_bom.rs (D:\\cargo-targets\\rdc-e010\\scoring\\debug\\deps\\gitignore_skip_bom-7042e8b063b131d9.exe)\n"
+}

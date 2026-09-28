@@ -1,0 +1,29 @@
+{
+  "task_id": "turbovec-turbovec-id-remove-readd-v1",
+  "lane": "always-large",
+  "action_id": 68,
+  "patch_sha256": "206a716d47a60ca5e1b0de9ccd26c71c9a1a710134b4a703b06af6fc81a87c5b",
+  "candidate_variant": "mutant",
+  "test_filter": "remove_then_re_add_same_id_is_allowed",
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--manifest-path",
+    "C:\\rd-c\\experiment-010\\tasks\\heldout-bank-v1\\families\\turbovec-id-remove-readd\\candidates\\mutant\\Cargo.toml",
+    "--package",
+    "turbovec",
+    "--test",
+    "id_map",
+    "remove_then_re_add_same_id_is_allowed",
+    "--",
+    "--exact"
+  ],
+  "exit_code": 101,
+  "status": "failed-test",
+  "passed": false,
+  "elapsed_ms": 10407.799,
+  "completion_source": "live-cargo-test",
+  "output_sha256": "a0a5dd515d44721c370add1e59d60dffa39ece1c214b1ddb6e397ec79fea72e6",
+  "output": "\nrunning 1 test\ntest remove_then_re_add_same_id_is_allowed ... FAILED\n\nfailures:\n\n---- remove_then_re_add_same_id_is_allowed stdout ----\n\nthread 'remove_then_re_add_same_id_is_allowed' (24032) panicked at turbovec\\tests\\id_map.rs:153:5:\nassertion failed: !idx.contains(3)\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    remove_then_re_add_same_id_is_allowed\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 22 filtered out; finished in 1.11s\n\n   Compiling turbovec v0.9.0 (C:\\rd-c\\experiment-010\\tasks\\heldout-bank-v1\\families\\turbovec-id-remove-readd\\candidates\\mutant\\turbovec)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 8.98s\n     Running tests\\id_map.rs (D:\\cargo-targets\\rdc-e010\\scoring\\debug\\deps\\id_map-6028bbdd1bdac666.exe)\nerror: test failed, to rerun pass `-p turbovec --test id_map`\n"
+}

@@ -1,0 +1,23 @@
+{
+  "schema": "jev-v08q-independent-verifier-correction-v01",
+  "identity": "JEV-V08Q-INDEPENDENT-VERIFIER-CORRECTION-V01",
+  "status": "FROZEN_VERIFIER_BOOKKEEPING_FIX_AFTER_SEALED_ANALYSIS",
+  "failed_attempt": {
+    "verifier": "verify_q_full_execution_v07.py",
+    "failure_receipt": "D:/codex-runs/jev-information-density-v08q-run-v01/independent-verification-failure-v03.json",
+    "failure_receipt_sha256": "b4f0fd15ed0b22bd319c77f484f7bfd44ff72c1f58f82e5a1c11801f5745e8ba",
+    "bug": "The per-neighborhood view index was initialized as a set, then used with setdefault as a dictionary.",
+    "rows_parsed_before_failure": 1
+  },
+  "repair": {
+    "change": "Initialize the per-neighborhood view index as a dictionary in verifier v08.",
+    "prediction_logic_changed": false,
+    "metric_logic_changed": false,
+    "analysis_outputs_changed": false,
+    "training_or_checkpoints_changed": false,
+    "raw_prediction_sha256": "d4bc4fce5fd1c51815ac214b794e3b5d5c51f549d80ad7e1362ec5c04abc976e",
+    "analysis_root_sha256": "a760ed7fab0deeb81a64e9679965b8a5e172e213cde550ae804cd0370ec89ab1",
+    "output_receipt": "independent-verification-v04.json"
+  },
+  "historical_verifier_v07_preserved": true
+}

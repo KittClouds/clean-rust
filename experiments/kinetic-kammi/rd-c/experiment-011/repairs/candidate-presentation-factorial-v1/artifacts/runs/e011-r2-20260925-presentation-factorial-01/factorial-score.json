@@ -1,0 +1,169 @@
+{
+  "schema_version": 1,
+  "run_id": "e011-r2-20260925-presentation-factorial-01",
+  "scored_utc": "2026-09-25T20:50:25.456156+00:00",
+  "classification": "same-bank factorial diagnosis; shadow-only",
+  "thresholds": {
+    "minimum_applicability_milli": 850,
+    "maximum_abstention_milli": 150
+  },
+  "conditions": {
+    "ids-only": [
+      {
+        "repository": "ripgrep",
+        "tasks": 8,
+        "small": {
+          "coverage": 7,
+          "direct_correct": 7,
+          "wrong_accepted": 0,
+          "proposal_reasons": {
+            "accepted": 7,
+            "abstention-threshold": 1
+          },
+          "tokens": 11408,
+          "observer_ms": 2463.081
+        },
+        "large": {
+          "coverage": 8,
+          "direct_correct": 8,
+          "wrong_accepted": 0,
+          "tokens": 12747,
+          "observer_ms": 32701.804
+        },
+        "hybrid": {
+          "completions": 8,
+          "wrong_accepted": 0,
+          "large_calls": 1,
+          "large_calls_avoided": 7,
+          "tokens": 12863,
+          "observer_ms": 6155.461
+        },
+        "always_large_completions": 8
+      },
+      {
+        "repository": "turbovec",
+        "tasks": 8,
+        "small": {
+          "coverage": 5,
+          "direct_correct": 5,
+          "wrong_accepted": 0,
+          "proposal_reasons": {
+            "explicit-abstention": 3,
+            "accepted": 5
+          },
+          "tokens": 11790,
+          "observer_ms": 2758.985
+        },
+        "large": {
+          "coverage": 6,
+          "direct_correct": 5,
+          "wrong_accepted": 1,
+          "tokens": 13829,
+          "observer_ms": 34639.728
+        },
+        "hybrid": {
+          "completions": 8,
+          "wrong_accepted": 0,
+          "large_calls": 3,
+          "large_calls_avoided": 5,
+          "tokens": 16488,
+          "observer_ms": 14999.487
+        },
+        "always_large_completions": 5
+      }
+    ],
+    "order-only": [
+      {
+        "repository": "ripgrep",
+        "tasks": 8,
+        "small": {
+          "coverage": 8,
+          "direct_correct": 7,
+          "wrong_accepted": 1,
+          "proposal_reasons": {
+            "accepted": 8
+          },
+          "tokens": 11363,
+          "observer_ms": 1861.089
+        },
+        "large": {
+          "coverage": 8,
+          "direct_correct": 8,
+          "wrong_accepted": 0,
+          "tokens": 12629,
+          "observer_ms": 30494.868
+        },
+        "hybrid": {
+          "completions": 7,
+          "wrong_accepted": 1,
+          "large_calls": 0,
+          "large_calls_avoided": 8,
+          "tokens": 11363,
+          "observer_ms": 1861.089
+        },
+        "always_large_completions": 8
+      },
+      {
+        "repository": "turbovec",
+        "tasks": 8,
+        "small": {
+          "coverage": 7,
+          "direct_correct": 5,
+          "wrong_accepted": 2,
+          "proposal_reasons": {
+            "accepted": 7,
+            "abstention-threshold": 1
+          },
+          "tokens": 11749,
+          "observer_ms": 2190.654
+        },
+        "large": {
+          "coverage": 6,
+          "direct_correct": 5,
+          "wrong_accepted": 1,
+          "tokens": 13715,
+          "observer_ms": 33988.381
+        },
+        "hybrid": {
+          "completions": 5,
+          "wrong_accepted": 2,
+          "large_calls": 1,
+          "large_calls_avoided": 7,
+          "tokens": 14052,
+          "observer_ms": 7602.711
+        },
+        "always_large_completions": 5
+      }
+    ]
+  },
+  "prior_comparison": {
+    "ripgrep": {
+      "full_frame": {
+        "hybrid": 8,
+        "small_wrong": 0
+      },
+      "combined_permutation": {
+        "hybrid": 7,
+        "small_wrong": 1
+      },
+      "canonicalization_r1": {
+        "hybrid": 8,
+        "small_wrong": 0
+      }
+    },
+    "turbovec": {
+      "full_frame": {
+        "hybrid": 8,
+        "small_wrong": 0
+      },
+      "combined_permutation": {
+        "hybrid": 6,
+        "small_wrong": 1
+      },
+      "canonicalization_r1": {
+        "hybrid": 2,
+        "small_wrong": 6
+      }
+    }
+  }
+}

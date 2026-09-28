@@ -1,0 +1,5 @@
+{
+  "status": "CQ1_SCAFFOLD_QUALIFIED_UNIT_SMOKE_ONLY",
+  "unit_smoke": "PASS",
+  "factorial_started": false
+}

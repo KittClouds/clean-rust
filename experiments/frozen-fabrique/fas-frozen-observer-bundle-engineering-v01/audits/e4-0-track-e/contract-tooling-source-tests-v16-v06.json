@@ -1,0 +1,44 @@
+{
+  "commands": [
+    "python -m py_compile source/scripts/build_e4_0_source_map_v16_v06.py source/scripts/finalize_e4_0_contract_v16_v06.py source/scripts/seal_e4_0_contract_v16_v05.py source/scripts/test_e4_0_contract_v16_v06.py",
+    "python -m unittest discover -s experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts -p test_e4_0_contract_v16_v06.py -v"
+  ],
+  "execution_authorization_conferred": false,
+  "py_compile": "PASS",
+  "receipt_id": "E4_0_CONTRACT_TOOLING_V16_V06_SOURCE_TESTS",
+  "recorded_utc": "2026-09-27T07:21:21+00:00",
+  "runtime_access": {
+    "cache_created": false,
+    "cuda_initialized": false,
+    "gpu_lease_acquired": false,
+    "labels_opened": false,
+    "model_contact": false,
+    "tokenizer_contact": false
+  },
+  "schema": "FAS_E4_0_CONTRACT_TOOLING_SOURCE_TESTS_V16_V06",
+  "scope": "Synthetic-only v16-v05 contract tooling tests: exact failed seal-attempt lineage, source/input path deduplication after identity verification, receipt registry and source closure, scientific-field invariance, source-role projection, and path safety. No candidate contract, seal, stage authorization, E4 truth, tokenizer, model, CUDA, GPU lease, or cache was accessed.",
+  "source_bindings": [
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/build_e4_0_source_map_v16_v06.py",
+      "bytes": 84160,
+      "sha256": "25a52c131d78ddf5c85c3e1f9d9a14d5f42acc0cf6bcebc6b51615c7eb5da5f0"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/finalize_e4_0_contract_v16_v06.py",
+      "bytes": 85620,
+      "sha256": "a5dc8334f74450526bef282191cf86a352084061446dad9fad913efc0d995aa1"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/seal_e4_0_contract_v16_v05.py",
+      "bytes": 18744,
+      "sha256": "1620485705a47fdb7f719a5c7a64d1851e16302c48f3b0690abb464010e02459"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/test_e4_0_contract_v16_v06.py",
+      "bytes": 39785,
+      "sha256": "3eda226c2982a85ed8fa816d987afe41ac94dfa87e7f2eaa624bf63dd7a90973"
+    }
+  ],
+  "status": "PASS_SYNTHETIC_CONTRACT_AND_SOURCE_MAP_TESTS_V06",
+  "unit_test_count": 35
+}

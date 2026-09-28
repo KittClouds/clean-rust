@@ -1,0 +1,26 @@
+{
+  "task_id": "heldout-hard-stop-ordering-easy-01",
+  "lane": "always-large",
+  "action_id": 11,
+  "patch_sha256": "559f2cc203927e4b012a214d9badb5707d22db260b2ec3972a378ea210643899",
+  "candidate_variant": "gold",
+  "test_filter": "palette::tests::explicit_hard_stop_uses_the_last_duplicate",
+  "command": [
+    "cargo",
+    "test",
+    "--manifest-path",
+    "C:\\rd-c\\experiment-009\\tasks\\expanded\\heldout-bank-v5\\families\\hard-stop-ordering\\candidates\\gold\\Cargo.toml",
+    "-p",
+    "gpui-animated-gradient-text",
+    "--lib",
+    "palette::tests::explicit_hard_stop_uses_the_last_duplicate",
+    "--",
+    "--exact"
+  ],
+  "exit_code": 0,
+  "status": "passed",
+  "passed": true,
+  "elapsed_ms": 7863.491,
+  "output_sha256": "c3f533bd1ae8a73e6110a7c51033675b864c90b3b3d4595a6160d50920a646e8",
+  "output": "\nrunning 1 test\ntest palette::tests::explicit_hard_stop_uses_the_last_duplicate ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 10 filtered out; finished in 0.00s\n\n   Compiling gpui-animated-gradient-text v0.2.0 (C:\\rd-c\\experiment-009\\tasks\\expanded\\heldout-bank-v5\\families\\hard-stop-ordering\\candidates\\gold\\crates\\gpui-animated-gradient-text)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 7.62s\n     Running unittests src\\lib.rs (D:\\cargo-targets\\rdc-e009-expanded\\scoring\\debug\\deps\\gpui_animated_gradient_text-97c243e5a105215d.exe)\n"
+}

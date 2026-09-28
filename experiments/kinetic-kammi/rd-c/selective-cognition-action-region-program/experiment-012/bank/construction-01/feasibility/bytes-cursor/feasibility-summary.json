@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "state": "OFFLINE_FEASIBILITY_ONLY",
+  "model_contact_authorized": false,
+  "family": "cursor-advance-observation",
+  "candidate_ids_hidden_role_map": {
+    "skip_one": 34154,
+    "skip_two": 36737,
+    "skip_three": 64124,
+    "skip_none": 31099
+  },
+  "baseline_pass_by_case": {
+    "case-01": false,
+    "case-02": false,
+    "case-03": false,
+    "case-04": false
+  },
+  "candidate_pass_matrix_hidden_roles": {
+    "skip_one": {
+      "case-01": true,
+      "case-02": false,
+      "case-03": false,
+      "case-04": false
+    },
+    "skip_two": {
+      "case-01": false,
+      "case-02": true,
+      "case-03": true,
+      "case-04": false
+    },
+    "skip_three": {
+      "case-01": false,
+      "case-02": false,
+      "case-03": false,
+      "case-04": true
+    },
+    "skip_none": {
+      "case-01": false,
+      "case-02": false,
+      "case-03": false,
+      "case-04": false
+    }
+  },
+  "code_sha256": {
+    "base": "480de3ae8476bd94178bb819350e7896353a6dea6cfa787705a294d5b3a2799c",
+    "skip_one": "456097acedbb836a9a7ebf0fe34df81e0637eab7221f1ae5ef024dd531364d83",
+    "skip_two": "c822e565c23c09cf71b709fd9e73ed82b9a4c1375ae4e77fb45a3ee1e53fd64c",
+    "skip_three": "f1d8a28703e93da64f565e985c3559cdac1cc8da4e88745876b8868a638de952",
+    "skip_none": "480de3ae8476bd94178bb819350e7896353a6dea6cfa787705a294d5b3a2799c"
+  },
+  "intended_positive_sets": {
+    "case-01": [
+      "skip_one"
+    ],
+    "case-02": [
+      "skip_two"
+    ],
+    "case-03": [
+      "skip_two"
+    ],
+    "case-04": [
+      "skip_three"
+    ]
+  }
+}

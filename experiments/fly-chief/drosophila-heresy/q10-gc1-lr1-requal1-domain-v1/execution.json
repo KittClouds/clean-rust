@@ -1,0 +1,22 @@
+{
+  "closures": {
+    "twin-a": {
+      "manifest_sha256": "C0D5078007493A12BE1F136FC2E18B43403A1204BEA383878E117012F9B8C549",
+      "repo": "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-lr1-requal1-domain-v1\\closures\\twin-a\\repo"
+    }
+  },
+  "engineering_only": true,
+  "error": "selected source fixture is outside the bound input set",
+  "error_type": "QualificationError",
+  "firewall": {
+    "pair_replay_allowed": false,
+    "scientific_seed_bundles": 0,
+    "singleton_replay_allowed": false
+  },
+  "identity": "q10-gc1-lr1-requal1-domain-v1",
+  "pair_replay_executed": false,
+  "protocol": "REQUAL1-DOMAIN",
+  "scientific_promotion": false,
+  "singleton_replay_executed": false,
+  "status": "BLOCKED_CURRENT_DOMAIN_REDERIVATION"
+}

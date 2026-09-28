@@ -1,0 +1,33 @@
+{
+  "artifact_id": "E013-PRECONTACT-SUPPLEMENT-VERIFICATION-v0.3.3",
+  "banks_generated_by_agent": false,
+  "checked_sha256": {
+    "generator": "1039ff34d84fc9e8e39d543ff7820c4161f283664712367a78eb0531b8886f2e",
+    "parent_correction_v032": "dfd00ad2c48aed6dbeee8451bd7b13defcb9cf268d34cd33bda4f9503bcf5259",
+    "parent_lock_v032": "fbac0d86ffd6a593793d2a35d00d2250ae63b52a0abec99864d36456d1af1adb",
+    "parent_projections_v032": "7f71d0dc6d619dfbeea03cd25a1c9dc3d7e80737f47558cb8fa47cad1e944c88",
+    "parent_receipt_v032": "f985535550542b454c150a3815dbdaaa30687ca3b1694df7b814f7fbe4a4bf21",
+    "supplement": "9fa441e9567b776fa6f3e80779c0c7a31bfd8d8729ba1b02bcf5913065a4b5ef"
+  },
+  "checks": {
+    "exists:generator": true,
+    "exists:parent_correction_v032": true,
+    "exists:parent_lock_v032": true,
+    "exists:parent_projections_v032": true,
+    "exists:parent_receipt_v032": true,
+    "exists:supplement": true,
+    "one_error_support_rendered": true,
+    "ownership_contact_boundary": true,
+    "projection_source_bound": true,
+    "sha256:generator": true,
+    "sha256:parent_correction_v032": true,
+    "sha256:parent_lock_v032": true,
+    "sha256:parent_projections_v032": true,
+    "sha256:parent_receipt_v032": true,
+    "sha256:supplement": true,
+    "t5_probability_rendered": true
+  },
+  "lock_sha256": "a3445cac2493e8b448f4ffeefd189fa7bd40e8b33a4ff99e2af995fdd255146b",
+  "model_contact_performed": false,
+  "state": "PASS"
+}

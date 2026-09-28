@@ -1,0 +1,6 @@
+{
+  "execution_receipt_not_authoritative": true,
+  "identity": "q10-gc0-lr1-sall1-a2-v1",
+  "reason": "MAT1 pair changed-row field was absent at top level; preliminary report treated an absent field as empty",
+  "status": "INVALID_DERIVATION"
+}

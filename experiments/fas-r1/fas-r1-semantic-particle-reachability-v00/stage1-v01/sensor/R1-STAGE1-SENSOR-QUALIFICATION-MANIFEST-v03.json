@@ -1,0 +1,162 @@
+{
+  "schema": "R1_STAGE1_SENSOR_QUALIFICATION_MANIFEST_V03",
+  "status": "FROZEN_PREMODEL_REPAIRED",
+  "identity": "R1-STAGE1-SENSOR-QUALIFICATION-v03",
+  "supersedes_for_execution": "R1-STAGE1-SENSOR-QUALIFICATION-v02",
+  "prior_manifest_sha256": "7224d48d77f226b665a8629169663f513875a338553dc3de829c21b643d06994",
+  "repair_amendment_path": "R1-STAGE1-SENSOR-INPUT-REPAIR-v01.json",
+  "repair_amendment_sha256": "fc90e55a30caf81ae1affb6a7cde71c463cbdf0d3a5566e370783853a182d35c",
+  "snapshot_path_repair_path": "R1-STAGE1-SENSOR-SNAPSHOT-PATH-REPAIR-v01.json",
+  "snapshot_path_repair_sha256": "c2c0adf4357c936fed0835b65408338c6d0d3d6a391215ea359272f825df97cf",
+  "model_contact_authorized": true,
+  "model_contact_performed_at_seal": false,
+  "probe_fitting_performed_at_seal": false,
+  "parent": {
+    "stage0_status": "R1_CONSTRUCTION_READY",
+    "artifact_root_sha256": "2078a366082a358275fa2b10d9f657967ef71a7c259a709822e631f01ce929d7",
+    "artifact_manifest_path": "D:\\codex-runs\\fas-r1-semantic-particle-reachability-v00\\stage0-v01\\construction-attempt-v02\\artifact-manifest-v01.json",
+    "artifact_manifest_bytes": 200749,
+    "artifact_manifest_sha256": "39b8aff68c7006b335b02ff5bbbfce86c95ea5299c26c3fd77a62ef6b4196c61",
+    "public_tasks_sha256": "eed1f65aa9a1a51f7887808dae88655c1266cfeac674bf25611c0cd6cd8f6c58",
+    "private_tasks_sha256": "31029713a34cc5080fb247a013158fc83f5ad971fa602be66bed95a494ce38d4",
+    "task_evidence_sha256": "2298229ac96f27597b1d64efdd49be7e1cf5bb08a24895bcb214985a6c475b60",
+    "construction_receipt_sha256": "ae4bdee6ff167adbec78df0a79de87adecc58d7a24a246ebd117b4f754d57ec2"
+  },
+  "prepared_inputs": {
+    "root": "D:\\codex-runs\\fas-r1-semantic-particle-reachability-v00\\stage1-v01\\sensor-qualification-v01\\qualification-data-v02",
+    "support_status": "SUPPORT_PASS_PREMODEL",
+    "support_audit_sha256": "70bea2804531446e2c309526f318ffd5630f7132bd9304818652639967fe0110",
+    "public_probe_tasks": {
+      "path": "public-probe-tasks.jsonl",
+      "bytes": 301728,
+      "sha256": "8fa9a27eef4cb01505cef252b97982a5d6418b6ad3a4c0063fc24dfb48b644bc"
+    },
+    "private_probe_targets": {
+      "path": "private-probe-targets.jsonl",
+      "bytes": 505342,
+      "sha256": "1c159f78a9147cb56668857f4674f43cfa5192eb59b1875eb34f8c1ff8a15fdb"
+    },
+    "name_queries": {
+      "path": "name-queries.jsonl",
+      "bytes": 2046,
+      "sha256": "4c99835235c9b2efb15712123b0adeffe863a1d3a817b25dfdf94b4898ee03d2"
+    },
+    "private_action_examples": {
+      "path": "private-action-examples.jsonl",
+      "bytes": 20592464,
+      "sha256": "21a0bb7c90a2c01107b70e286873022997fa6b1b929c7ac06da7a65c5315e19d"
+    },
+    "family_split": {
+      "path": "family-split.jsonl",
+      "bytes": 32452,
+      "sha256": "83d94095bb5aa0c16f6f8673c160c5b3fe87f3609682ce24483219b9450d3f2e"
+    },
+    "counts": {
+      "independent_families": 96,
+      "train_families": 48,
+      "validation_families": 16,
+      "evaluation_families": 32,
+      "rendered_task_records": 320,
+      "candidate_name_queries": 32,
+      "action_examples": 55008,
+      "sampled_states_per_family": 32,
+      "raw_solution_count_reconciliations": 96
+    }
+  },
+  "heldout_render_conditions": [
+    {"id": "id_seen", "templates": ["T0", "T1"], "vocabulary": "V0", "families": 32},
+    {"id": "template_ood", "templates": ["T2"], "vocabulary": "V0", "families": 32},
+    {"id": "vocabulary_ood", "templates": ["T0", "T1"], "vocabulary": "V1", "families": 32},
+    {"id": "joint_ood", "templates": ["T2"], "vocabulary": "V1", "families": 32}
+  ],
+  "model": {
+    "repo_id": "LiquidAI/LFM2.5-1.2B-Base",
+    "revision": "7453bca97ca1e67754c4035a4b4c584e1c9dd725",
+    "snapshot_path": "D:\\r1-models\\lfm2.5-1.2b-base-7453bca97ca1e67754c4035a4b4c584e1c9dd725",
+    "inventory_path": "D:\\codex-runs\\fas-r1-semantic-particle-reachability-v00\\stage1-v01\\sensor-qualification-v01\\MODEL-SNAPSHOT-INVENTORY.json",
+    "inventory_sha256": "84142f95653f8f0f1c60934d6c5c711747b89e48e8ff3181c67dc437becef103",
+    "file_count": 10,
+    "total_bytes": 2345546543,
+    "model_safetensors_sha256": "7678ab9546a0c51c1fca161876b1efc4f0906277f170b5822045f40fdaf9eeff",
+    "hidden_size": 2048,
+    "layers": 16,
+    "device": "cuda",
+    "device_name": "NVIDIA GeForce RTX 3080",
+    "compute_dtype": "bfloat16",
+    "output_dtype": "little-endian float32",
+    "backbone_updates": 0,
+    "network_access": false,
+    "trust_remote_code": false
+  },
+  "extraction": {
+    "implementation": "run_sensor_v03.py",
+    "implementation_sha256": "88dd7b7e6fcb25cd23db386e7ddfbdb2ccec1681c261e7b9f20590c1d1b24a73",
+    "preparation_implementation": "prepare_sensor_qualification.py",
+    "preparation_implementation_sha256": "b026ca0d1ad7d210c1dbcadd7c9470df38c12772149eeb9e9424297c0585751f",
+    "protocol_path": "R1-STAGE1-SENSOR-QUALIFICATION-PROTOCOL-v02.md",
+    "protocol_sha256": "a22e889e02d59fa272e304bbd732d6036f03130587c95bc1a6dde313fb312365",
+    "thread_environment": {
+      "OPENBLAS_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "NUMEXPR_NUM_THREADS": "1",
+      "torch_intraop_threads": 1,
+      "torch_interop_threads": 1
+    },
+    "repeat_verification": "exact output float32 bytes on identical global text",
+    "row_order": "name queries, then task input order with global and each clause",
+    "fit_source_hashing_boundary": "before first probe fit; must be frozen after extraction and before label fitting",
+    "zero_clause_task_policy": "retain task; encode empty task mean clause vector as zeros for action input; no dummy clause"
+  },
+  "probes": {
+    "shared_hidden": 128,
+    "activation": "GELU",
+    "dropout": 0.1,
+    "optimizer": "AdamW",
+    "learning_rate": 0.0003,
+    "weight_decay": 0.0001,
+    "batch_size": 256,
+    "maximum_epochs": 40,
+    "early_stop_patience": 6,
+    "gradient_norm_cap": 1.0,
+    "initialization_seeds": [20260926, 20260927, 20260928],
+    "loss_weighting": "inverse class frequency on train; equal total weight per task family",
+    "semantic": {"input": 2048, "output": 6, "gate_balanced_accuracy_each_condition": 0.9, "min_margin_over_shuffled": 0.2},
+    "binding": {"input": 4102, "output": 1, "gate_binary_micro_f1_each_condition": 0.9, "min_margin_over_shuffled": 0.2, "min_margin_over_surface_metadata": 0.05, "threshold_grid": [0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9]},
+    "action": {"input": 4180, "output": 3, "gate_mean_condition_balanced_accuracy": 0.6, "gate_each_condition_balanced_accuracy": 0.55, "min_margin_over_each_control": 0.1, "family_cluster_bootstrap_replicates": 2000, "confidence_level": 0.95}
+  },
+  "controls": {
+    "surface_metadata": "names/IDs, mention incidence, template/vocabulary IDs, N/K and length/count summaries only; no clause words or typed labels",
+    "shuffled_lfm": "SHA256-seeded permutation of clause vectors or whole task representation within split; action within held-out condition; labels unchanged",
+    "template_only": "template/vocabulary IDs, N/K, and length/count summaries; diagnostic only"
+  },
+  "support_minimums": {
+    "clause_kind_instances": {"train": 20, "validation": 5, "evaluation_condition": 8},
+    "argument_slot_positive_instances": {"train": 20, "validation": 5, "evaluation_condition": 8},
+    "action_class_instances": {"train": 1000, "validation": 500, "evaluation": 1000},
+    "evaluation_families_per_condition": 32
+  },
+  "pre_model_tests": {
+    "test_source": "test_sensor_qualification.py",
+    "test_source_sha256": "1c046ff18fc8b09085908114a4c909b1690bfd5fd61c19affe243ce3e817f540",
+    "result": "PASS 11/11 across original pre-model tests and two versioned repair test suites",
+    "repair_regression_test": "test_sensor_extractor_v02.py",
+    "repair_regression_test_sha256": "05b76894842045637360e7815a2cf8df6ed0109bafa2e7024bb0d37fa123fc58",
+    "snapshot_path_repair_test": "test_sensor_extractor_v03.py",
+    "snapshot_path_repair_test_sha256": "9ffd682f9f2acb9e9df5dd5cb393d009949d7bda602f54ddee1a2c87bffbeb50",
+    "model_contact": false,
+    "probe_fitting": false
+  },
+  "stop_labels": [
+    "R1_SENSOR_FAIL_SEMANTIC",
+    "R1_SENSOR_FAIL_BINDING",
+    "R1_SENSOR_FAIL_ACTION_RELEVANCE",
+    "R1_SENSOR_FAIL_EXTRACTION_INTEGRITY"
+  ],
+  "downstream_authority": {
+    "proposal_training_authorized": false,
+    "particle_search_authorized": false,
+    "protected_evaluation_authorized": false,
+    "pheno_status": "unchanged"
+  }
+}

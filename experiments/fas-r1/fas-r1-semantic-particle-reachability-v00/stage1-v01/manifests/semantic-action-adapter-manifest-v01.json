@@ -1,0 +1,29 @@
+{
+  "manifest": "R1-SEMANTIC-ACTION-ADAPTER-v01",
+  "status": "FROZEN_ENGINEERING_ADAPTER_DIAGNOSTIC",
+  "purpose": "test whether frozen clause-kind probabilities become action relevant when composed with public mention incidence and explicit assignment state",
+  "upstream": {
+    "probe_manifest": "FAS-R1-SENSOR-PROBE-FIT-v02",
+    "probe_output": "sensor-probes-v03/identity.pt",
+    "support_manifest": "sensor-support-manifest-v02.json"
+  },
+  "runtime_inputs": [
+    "final-hidden mean H_j per constraint",
+    "public entity_mentions and role_mentions sets per clause",
+    "complete candidate assignment",
+    "candidate entity-role edit"
+  ],
+  "runtime_operation": "apply frozen six-way identity head per H_j; for each affected clause compute before/after satisfaction delta under each candidate clause kind; sum probability-weighted deltas and emit the sign",
+  "clause_semantics": {
+    "same_and_different": "two public entity IDs",
+    "fixed_and_forbidden_role": "one public entity ID and one public role ID",
+    "exactly_one_role": "public entity ID set and one public role ID",
+    "implies_not_role": "two entity IDs and two role IDs; average both possible pairings because the current public incidence stores sets without argument pairing"
+  },
+  "offline_diagnostics": [
+    "score against private exact action labels",
+    "private-kind oracle plus public-incidence comparison; private kinds never enter runtime score"
+  ],
+  "qualification_interpretation": "adaptive engineering diagnostic on a partition already reported by earlier v01 sensor probes; not independent confirmation",
+  "source_and_label_boundary": "private typed labels are scoring-only; no private AST fields enter runtime features or adapter predictions"
+}

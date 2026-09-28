@@ -1,0 +1,16 @@
+{
+  "entry_count": 55,
+  "fit_manifest_created": false,
+  "fits_executed": false,
+  "measured_reach03_authorized": false,
+  "native_collection_started": false,
+  "native_collector_sha256": "596938cd129db02e66cedb940e2cbdd6568509a57a8fc7849511b31048ff70fb",
+  "qualification_only": true,
+  "run_id": "F4-INVARIANT-01-RUN2",
+  "schema": "F4-INVARIANT-01-RUN2-implementation-freeze-v1",
+  "source_manifest_canonical_sha256": "2345918fafae91c2a56b2cdf596a343369f0faf51ace18ed7ffde2bbe6060a27",
+  "source_manifest_file_sha256": "6dfc960f3e7654b7c569995dd99ef91964f8646cc9aaa50a8a6e291c7268187e",
+  "status": "TASK_INDEPENDENT_EXECUTION_FROZEN",
+  "task_bank_created": false,
+  "task_ids_or_task_seeds_created": false
+}

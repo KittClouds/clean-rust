@@ -1,0 +1,163 @@
+{
+  "schema_version": 1,
+  "run_id": "e009-20260925-corrected-05",
+  "stage": "heldout-shadow-large",
+  "role": "large",
+  "bundle_id": "ternary-bonsai-2-27b-ptq1-local-v5",
+  "bundle_blake3": "6d933aba093307e0c333f022426af46f3f5b243a8a10a2e1bb2f4cfc93b17b9d",
+  "bundle_lock_sha256": "a626836853bdb0755fd2e4e1569b6b91b33861306c7d1e4a51e3de54a9ee713d",
+  "frozen_input_lock_sha256": "48232476b9e3e4bc0df4840c6919ea4ab412357b7ca7fe47460c81ae80c937f6",
+  "frame_lock_sha256": "bfe38e14ce91b95ac471ffc4920d69b7dd09e0fb1fe8c3b19c0ca431c1200693",
+  "frame_blake3": "65a3678327908fc3d88da1ed999be22c0e546a2f6e70a0ade74f7b5ec9bd3fc3",
+  "task_id": "heldoutv6-builtin-preset-duration-validation-ambiguous-02",
+  "server_alias": "e009-large-v5",
+  "server_process_id": 20156,
+  "server_runtime_args": [
+    "--model",
+    "D:\\phoenix-models\\candidates\\ternary-bonsai-2-27b\\6ed5e12bf84b7a63069882c91dd9e9218647d17b\\Ternary-Bonsai-2-27B-PTQ1_0.gguf",
+    "--host",
+    "127.0.0.1",
+    "--port",
+    "18090",
+    "--alias",
+    "e009-large-v5",
+    "--ctx-size",
+    "4096",
+    "--n-gpu-layers",
+    "99",
+    "--reasoning",
+    "off"
+  ],
+  "reasoning_mode": "off",
+  "chat_template_sha256": "c3cf9e34abf4f9e36c2d72165aa9c132d3e2a725b6c2586aaa3a8af9d7a81041",
+  "maximum_output_tokens": 1024,
+  "system_prompt_sha256": "976ef1cd914bacb366c64418825010124338a626a0400d459858acc7e48f5a48",
+  "output_schema_sha256": "97170fa0d6a44681f680ad0ac533a3f3913709757e4ee6cbf96d9c9f40d1b2fb",
+  "normalization_contract": "percent-0-100-to-milli-x10-v1+line-endings-lf-v1",
+  "thresholds": {
+    "minimum_applicability_milli": 850,
+    "maximum_abstention_milli": 150
+  },
+  "model": "e009-large-v5",
+  "request_sha256": "f0a7b5d37a9d445614095451bdd6d997c34e3bc8deeb4f96976de3a740b64f96",
+  "request": {
+    "model": "e009-large-v5",
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a typed observer in a deterministic coding workflow. The runtime owns workflow state and will execute only one action from the offered action_options after validating your output.\n\nRead the task_prompt and evidence, then compare the offered actions. Choose the action most likely to satisfy the task while preserving the repository's stated constraints. Do not write or propose code outside the offered choices. Do not claim to have executed tests. If no offered action is sufficiently supported, use null for action_choice and express uncertainty with abstention_percent.\n\nReturn exactly one JSON object matching the provided schema. action_choice must be an offered numeric action ID or null. applicability_percent is your estimate from 0 to 100 that this observer can handle the task from the available evidence. abstention_percent is your estimate from 0 to 100 that the runtime should defer this choice. Use integer percentage points only. Do not add prose or fields.\n"
+      },
+      {
+        "role": "user",
+        "content": "{\"schema_id\":\"rdc-real-coding-observation.v1\",\"task_id\":\"heldoutv6-builtin-preset-duration-validation-ambiguous-02\",\"task_family\":\"builtin-preset-duration-validation\",\"task_prompt\":\"Repair built-in preset metadata using the frozen validation test. Preserve positive animation duration and cycle count for every preset.\",\"repository_revision\":\"9a88547372cd35f8dc31f026f0cd8dd8fca8e641\",\"snapshot_sha256\":\"0ec2ea6c4009d96494415c547f8e38d363e25c3fbf9e42d71b9fd3da7ffd9bce\",\"evidence\":[{\"kind\":\"source_excerpt\",\"source_id\":\"phoenix-native/crates/gpui-animated-gradient-text/src/preset.rs\",\"content_blake3\":\"25dc57a4863eccfdd111468961cebf9c324c621f58e5528be1363e4e53fb2797\",\"content\":\"The built-in preset test validates every preset through `to_palette` and exports each builder. Preset validation rejects a zero duration or non-positive cycle count.\"},{\"kind\":\"baseline_tool_result\",\"source_id\":\"cargo-test-preset::tests::builtins_are_valid_and_exportable-frozen-base\",\"content_blake3\":\"94708d1ed7e711a7ab91ad7226bcb88a0c2edc6c6090ad08bef17e68b13f8703\",\"content\":\"Task snapshot 0ec2ea6c4009d96494415c547f8e38d363e25c3fbf9e42d71b9fd3da7ffd9bce: exact test `preset::tests::builtins_are_valid_and_exportable` ran on the current snapshot and failed 1/1. No candidate repair has been executed in this episode.\"}],\"action_options\":[{\"action\":{\"id\":11,\"schema_id\":1},\"summary\":\"Keep the current invalid Aurora metadata.\",\"diff_excerpt\":\"The current task snapshot gives the Aurora built-in an invalid animation value.\",\"patch_sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"},{\"action\":{\"id\":37,\"schema_id\":1},\"summary\":\"Set the Aurora cycle count to zero.\",\"diff_excerpt\":\"Change Aurora's cycle count from `1.0` to `0.0`.\",\"patch_sha256\":\"a5c67951805da64d422c95bd6ae0553803a6fd20edfacdeabd8fc78be97d1a09\"},{\"action\":{\"id\":68,\"schema_id\":1},\"summary\":\"Keep all built-in presets valid and exportable.\",\"diff_excerpt\":\"Give Aurora a positive duration and cycle count so validation and export succeed.\",\"patch_sha256\":\"dc1fedf88775a3b713716752563fcab086ddfe1dbb35914b55473609cd9a23a5\"},{\"action\":{\"id\":94,\"schema_id\":1},\"summary\":\"Restore valid Aurora metadata and document the built-in preset invariant.\",\"diff_excerpt\":\"Restores the positive duration and notes that built-ins must pass preset validation.\",\"patch_sha256\":\"76d5f66c2025364d83b126c8b5d128e3e58ae1f430c5be0ecffce57cd3da43b3\"}]}"
+      }
+    ],
+    "temperature": 0,
+    "top_p": 1,
+    "seed": 0,
+    "max_tokens": 1024,
+    "stream": false,
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rdc_coding_observer_output_v1",
+        "strict": true,
+        "schema": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "rdc-coding-observer-output.v2",
+          "title": "RDC Coding Observer Output v2",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "action_choice",
+            "applicability_percent",
+            "abstention_percent"
+          ],
+          "properties": {
+            "action_choice": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 65535
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "applicability_percent": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "abstention_percent": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            }
+          }
+        }
+      }
+    }
+  },
+  "http_status": 200,
+  "response": {
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "{\n  \"action_choice\": 94,\n  \"applicability_percent\": 95,\n  \"abstention_percent\": 5\n}"
+        }
+      }
+    ],
+    "created": 1790358218,
+    "model": "e009-large-v5",
+    "system_fingerprint": "b10685-7dffb158d",
+    "object": "chat.completion",
+    "usage": {
+      "completion_tokens": 35,
+      "prompt_tokens": 1107,
+      "total_tokens": 1142,
+      "prompt_tokens_details": {
+        "cached_tokens": 192
+      }
+    },
+    "id": "chatcmpl-7Rgdw5lKP9rbYTPS6JhLwJE19VdPNcpj",
+    "timings": {
+      "cache_n": 192,
+      "prompt_n": 915,
+      "prompt_ms": 1836.21,
+      "prompt_per_token_ms": 2.006786885245902,
+      "prompt_per_second": 498.30901694250656,
+      "predicted_n": 35,
+      "predicted_ms": 670.276,
+      "predicted_per_token_ms": 19.714,
+      "predicted_per_second": 50.72537283149032
+    }
+  },
+  "content": "{\n  \"action_choice\": 94,\n  \"applicability_percent\": 95,\n  \"abstention_percent\": 5\n}",
+  "output": {
+    "action_choice": 94,
+    "applicability_percent": 95,
+    "abstention_percent": 5
+  },
+  "normalized_output": {
+    "action_choice": 94,
+    "applicability_milli": 950,
+    "abstention_milli": 50
+  },
+  "normalization_error": null,
+  "usage": {
+    "completion_tokens": 35,
+    "prompt_tokens": 1107,
+    "total_tokens": 1142,
+    "prompt_tokens_details": {
+      "cached_tokens": 192
+    }
+  },
+  "finish_reason": "stop",
+  "elapsed_ms": 2805.217
+}

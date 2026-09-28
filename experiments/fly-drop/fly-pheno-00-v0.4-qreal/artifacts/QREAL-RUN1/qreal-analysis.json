@@ -1,0 +1,597 @@
+{
+  "disposition": "NATIVE_ADAPTIVE_REACHABILITY_PROBLEM",
+  "interpretation": "Representation and weight-space oracles passed, but the native adaptive rule did not reach competence under the fixed contract.",
+  "measured_pheno_reseal_authorized": false,
+  "native_pass": false,
+  "native_reachability_earned": true,
+  "primary_task": "four_cue",
+  "representation_pass": true,
+  "sanity_task": "two_cue_sanity",
+  "schema": "FLY-PHENO-00-v0.4-QREAL-analysis-v1",
+  "status": "INTEGRITY_PASS",
+  "summary": {
+    "four_cue": {
+      "fly": {
+        "native_error_256": {
+          "mean": 0.3048095703125,
+          "median": 0.2900390625,
+          "support_rate": 0.16666666666666666
+        },
+        "native_error_large": {
+          "mean": 0.3001708984375,
+          "median": 0.2901611328125,
+          "support_rate": 0.16666666666666666
+        },
+        "representation_error": {
+          "mean": 0.0,
+          "median": 0.0,
+          "support_rate": 1.0
+        },
+        "weight_oracle_error_256": {
+          "mean": 0.21565755208333334,
+          "median": 0.220703125,
+          "support_rate": 0.9583333333333334
+        },
+        "weight_oracle_error_large": {
+          "mean": 0.2186304728190104,
+          "median": 0.226715087890625,
+          "support_rate": 0.9583333333333334
+        },
+        "weight_oracle_expected_error": {
+          "mean": 0.0,
+          "median": 0.0,
+          "support_rate": 1.0
+        }
+      },
+      "g001": {
+        "native_error_256": {
+          "mean": 0.3039957682291667,
+          "median": 0.30126953125,
+          "support_rate": 0.20833333333333334
+        },
+        "native_error_large": {
+          "mean": 0.29993438720703125,
+          "median": 0.295166015625,
+          "support_rate": 0.25
+        },
+        "representation_error": {
+          "mean": 0.0,
+          "median": 0.0,
+          "support_rate": 1.0
+        },
+        "weight_oracle_error_256": {
+          "mean": 0.23111979166666666,
+          "median": 0.2353515625,
+          "support_rate": 0.75
+        },
+        "weight_oracle_error_large": {
+          "mean": 0.23573811848958334,
+          "median": 0.23590087890625,
+          "support_rate": 0.75
+        },
+        "weight_oracle_expected_error": {
+          "mean": 0.0,
+          "median": 0.0,
+          "support_rate": 1.0
+        }
+      },
+      "g002": {
+        "native_error_256": {
+          "mean": 0.3226318359375,
+          "median": 0.30078125,
+          "support_rate": 0.16666666666666666
+        },
+        "native_error_large": {
+          "mean": 0.32055409749348956,
+          "median": 0.307098388671875,
+          "support_rate": 0.16666666666666666
+        },
+        "representation_error": {
+          "mean": 0.0,
+          "median": 0.0,
+          "support_rate": 1.0
+        },
+        "weight_oracle_error_256": {
+          "mean": 0.22928873697916666,
+          "median": 0.23193359375,
+          "support_rate": 0.7083333333333334
+        },
+        "weight_oracle_error_large": {
+          "mean": 0.2362848917643229,
+          "median": 0.235870361328125,
+          "support_rate": 0.7083333333333334
+        },
+        "weight_oracle_expected_error": {
+          "mean": 0.0,
+          "median": 0.0,
+          "support_rate": 1.0
+        }
+      },
+      "g003": {
+        "native_error_256": {
+          "mean": 0.3413492838541667,
+          "median": 0.326171875,
+          "support_rate": 0.041666666666666664
+        },
+        "native_error_large": {
+          "mean": 0.3383534749348958,
+          "median": 0.326202392578125,
+          "support_rate": 0.041666666666666664
+        },
+        "representation_error": {
+          "mean": 0.0,
+          "median": 0.0,
+          "support_rate": 1.0
+        },
+        "weight_oracle_error_256": {
+          "mean": 0.2264404296875,
+          "median": 0.22509765625,
+          "support_rate": 0.75
+        },
+        "weight_oracle_error_large": {
+          "mean": 0.2294921875,
+          "median": 0.23223876953125,
+          "support_rate": 0.75
+        },
+        "weight_oracle_expected_error": {
+          "mean": 0.0,
+          "median": 0.0,
+          "support_rate": 1.0
+        }
+      },
+      "g004": {
+        "native_error_256": {
+          "mean": 0.2997639973958333,
+          "median": 0.28466796875,
+          "support_rate": 0.125
+        },
+        "native_error_large": {
+          "mean": 0.2958424886067708,
+          "median": 0.279571533203125,
+          "support_rate": 0.16666666666666666
+        },
+        "representation_error": {
+          "mean": 0.0,
+          "median": 0.0,
+          "support_rate": 1.0
+        },
+        "weight_oracle_error_256": {
+          "mean": 0.23763020833333334,
+          "median": 0.24169921875,
+          "support_rate": 0.6666666666666666
+        },
+        "weight_oracle_error_large": {
+          "mean": 0.24275970458984375,
+          "median": 0.24530029296875,
+          "support_rate": 0.5416666666666666
+        },
+        "weight_oracle_expected_error": {
+          "mean": 0.0,
+          "median": 0.0,
+          "support_rate": 1.0
+        }
+      },
+      "g005": {
+        "native_error_256": {
+          "mean": 0.3135579427083333,
+          "median": 0.28662109375,
+          "support_rate": 0.16666666666666666
+        },
+        "native_error_large": {
+          "mean": 0.3093516031901042,
+          "median": 0.28521728515625,
+          "support_rate": 0.20833333333333334
+        },
+        "representation_error": {
+          "mean": 0.0,
+          "median": 0.0,
+          "support_rate": 1.0
+        },
+        "weight_oracle_error_256": {
+          "mean": 0.2276611328125,
+          "median": 0.2236328125,
+          "support_rate": 0.75
+        },
+        "weight_oracle_error_large": {
+          "mean": 0.2312164306640625,
+          "median": 0.22796630859375,
+          "support_rate": 0.7083333333333334
+        },
+        "weight_oracle_expected_error": {
+          "mean": 0.0,
+          "median": 0.0,
+          "support_rate": 1.0
+        }
+      },
+      "g006": {
+        "native_error_256": {
+          "mean": 0.3123372395833333,
+          "median": 0.27392578125,
+          "support_rate": 0.20833333333333334
+        },
+        "native_error_large": {
+          "mean": 0.3102366129557292,
+          "median": 0.2806396484375,
+          "support_rate": 0.2916666666666667
+        },
+        "representation_error": {
+          "mean": 0.0,
+          "median": 0.0,
+          "support_rate": 1.0
+        },
+        "weight_oracle_error_256": {
+          "mean": 0.2236328125,
+          "median": 0.2216796875,
+          "support_rate": 0.75
+        },
+        "weight_oracle_error_large": {
+          "mean": 0.22623697916666666,
+          "median": 0.222808837890625,
+          "support_rate": 0.75
+        },
+        "weight_oracle_expected_error": {
+          "mean": 0.0,
+          "median": 0.0,
+          "support_rate": 1.0
+        }
+      },
+      "g007": {
+        "native_error_256": {
+          "mean": 0.2923583984375,
+          "median": 0.26416015625,
+          "support_rate": 0.375
+        },
+        "native_error_large": {
+          "mean": 0.29414621988932294,
+          "median": 0.277801513671875,
+          "support_rate": 0.3333333333333333
+        },
+        "representation_error": {
+          "mean": 0.0,
+          "median": 0.0,
+          "support_rate": 1.0
+        },
+        "weight_oracle_error_256": {
+          "mean": 0.23372395833333334,
+          "median": 0.2412109375,
+          "support_rate": 0.7083333333333334
+        },
+        "weight_oracle_error_large": {
+          "mean": 0.23620096842447916,
+          "median": 0.245086669921875,
+          "support_rate": 0.5833333333333334
+        },
+        "weight_oracle_expected_error": {
+          "mean": 0.0,
+          "median": 0.0,
+          "support_rate": 1.0
+        }
+      },
+      "g008": {
+        "native_error_256": {
+          "mean": 0.3072102864583333,
+          "median": 0.29541015625,
+          "support_rate": 0.2916666666666667
+        },
+        "native_error_large": {
+          "mean": 0.30631256103515625,
+          "median": 0.2947998046875,
+          "support_rate": 0.25
+        },
+        "representation_error": {
+          "mean": 0.0,
+          "median": 0.0,
+          "support_rate": 1.0
+        },
+        "weight_oracle_error_256": {
+          "mean": 0.2408447265625,
+          "median": 0.24560546875,
+          "support_rate": 0.5833333333333334
+        },
+        "weight_oracle_error_large": {
+          "mean": 0.24257405598958334,
+          "median": 0.244476318359375,
+          "support_rate": 0.5833333333333334
+        },
+        "weight_oracle_expected_error": {
+          "mean": 0.0,
+          "median": 0.0,
+          "support_rate": 1.0
+        }
+      }
+    },
+    "two_cue_sanity": {
+      "fly": {
+        "native_error_256": {
+          "mean": 0.2520345052083333,
+          "median": 0.2060546875,
+          "support_rate": 0.5416666666666666
+        },
+        "native_error_large": {
+          "mean": 0.2530619303385417,
+          "median": 0.20611572265625,
+          "support_rate": 0.5416666666666666
+        },
+        "representation_error": {
+          "mean": 0.0,
+          "median": 0.0,
+          "support_rate": 1.0
+        },
+        "weight_oracle_error_256": {
+          "mean": 0.143798828125,
+          "median": 0.142578125,
+          "support_rate": 0.9166666666666666
+        },
+        "weight_oracle_error_large": {
+          "mean": 0.13641357421875,
+          "median": 0.13848876953125,
+          "support_rate": 0.9166666666666666
+        },
+        "weight_oracle_expected_error": {
+          "mean": 0.0,
+          "median": 0.0,
+          "support_rate": 1.0
+        }
+      },
+      "g001": {
+        "native_error_256": {
+          "mean": 0.239501953125,
+          "median": 0.228515625,
+          "support_rate": 0.5416666666666666
+        },
+        "native_error_large": {
+          "mean": 0.23943074544270834,
+          "median": 0.234619140625,
+          "support_rate": 0.5
+        },
+        "representation_error": {
+          "mean": 0.0,
+          "median": 0.0,
+          "support_rate": 1.0
+        },
+        "weight_oracle_error_256": {
+          "mean": 0.12345377604166667,
+          "median": 0.123046875,
+          "support_rate": 0.9166666666666666
+        },
+        "weight_oracle_error_large": {
+          "mean": 0.12551371256510416,
+          "median": 0.13067626953125,
+          "support_rate": 0.9166666666666666
+        },
+        "weight_oracle_expected_error": {
+          "mean": 0.0,
+          "median": 0.0,
+          "support_rate": 1.0
+        }
+      },
+      "g002": {
+        "native_error_256": {
+          "mean": 0.19156901041666666,
+          "median": 0.1513671875,
+          "support_rate": 0.7083333333333334
+        },
+        "native_error_large": {
+          "mean": 0.19008382161458334,
+          "median": 0.1392822265625,
+          "support_rate": 0.7083333333333334
+        },
+        "representation_error": {
+          "mean": 0.0,
+          "median": 0.0,
+          "support_rate": 1.0
+        },
+        "weight_oracle_error_256": {
+          "mean": 0.1240234375,
+          "median": 0.130859375,
+          "support_rate": 0.9583333333333334
+        },
+        "weight_oracle_error_large": {
+          "mean": 0.12166849772135417,
+          "median": 0.1273193359375,
+          "support_rate": 0.9583333333333334
+        },
+        "weight_oracle_expected_error": {
+          "mean": 0.0,
+          "median": 0.0,
+          "support_rate": 1.0
+        }
+      },
+      "g003": {
+        "native_error_256": {
+          "mean": 0.22623697916666666,
+          "median": 0.201171875,
+          "support_rate": 0.5416666666666666
+        },
+        "native_error_large": {
+          "mean": 0.22449239095052084,
+          "median": 0.2000732421875,
+          "support_rate": 0.5416666666666666
+        },
+        "representation_error": {
+          "mean": 0.0,
+          "median": 0.0,
+          "support_rate": 1.0
+        },
+        "weight_oracle_error_256": {
+          "mean": 0.14070638020833334,
+          "median": 0.1533203125,
+          "support_rate": 0.9583333333333334
+        },
+        "weight_oracle_error_large": {
+          "mean": 0.13753255208333334,
+          "median": 0.14190673828125,
+          "support_rate": 0.9583333333333334
+        },
+        "weight_oracle_expected_error": {
+          "mean": 0.0,
+          "median": 0.0,
+          "support_rate": 1.0
+        }
+      },
+      "g004": {
+        "native_error_256": {
+          "mean": 0.21085611979166666,
+          "median": 0.166015625,
+          "support_rate": 0.5833333333333334
+        },
+        "native_error_large": {
+          "mean": 0.20915730794270834,
+          "median": 0.16998291015625,
+          "support_rate": 0.5833333333333334
+        },
+        "representation_error": {
+          "mean": 0.0,
+          "median": 0.0,
+          "support_rate": 1.0
+        },
+        "weight_oracle_error_256": {
+          "mean": 0.12540690104166666,
+          "median": 0.146484375,
+          "support_rate": 0.9583333333333334
+        },
+        "weight_oracle_error_large": {
+          "mean": 0.12306722005208333,
+          "median": 0.1392822265625,
+          "support_rate": 0.9583333333333334
+        },
+        "weight_oracle_expected_error": {
+          "mean": 0.0,
+          "median": 0.0,
+          "support_rate": 1.0
+        }
+      },
+      "g005": {
+        "native_error_256": {
+          "mean": 0.2353515625,
+          "median": 0.1884765625,
+          "support_rate": 0.5833333333333334
+        },
+        "native_error_large": {
+          "mean": 0.23555501302083334,
+          "median": 0.1854248046875,
+          "support_rate": 0.5833333333333334
+        },
+        "representation_error": {
+          "mean": 0.0,
+          "median": 0.0,
+          "support_rate": 1.0
+        },
+        "weight_oracle_error_256": {
+          "mean": 0.1259765625,
+          "median": 0.1240234375,
+          "support_rate": 0.9166666666666666
+        },
+        "weight_oracle_error_large": {
+          "mean": 0.12621561686197916,
+          "median": 0.1378173828125,
+          "support_rate": 0.9166666666666666
+        },
+        "weight_oracle_expected_error": {
+          "mean": 0.0,
+          "median": 0.0,
+          "support_rate": 1.0
+        }
+      },
+      "g006": {
+        "native_error_256": {
+          "mean": 0.21793619791666666,
+          "median": 0.1767578125,
+          "support_rate": 0.5416666666666666
+        },
+        "native_error_large": {
+          "mean": 0.21355692545572916,
+          "median": 0.16351318359375,
+          "support_rate": 0.625
+        },
+        "representation_error": {
+          "mean": 0.0,
+          "median": 0.0,
+          "support_rate": 1.0
+        },
+        "weight_oracle_error_256": {
+          "mean": 0.12589518229166666,
+          "median": 0.1279296875,
+          "support_rate": 0.9583333333333334
+        },
+        "weight_oracle_error_large": {
+          "mean": 0.12397257486979167,
+          "median": 0.12335205078125,
+          "support_rate": 0.9583333333333334
+        },
+        "weight_oracle_expected_error": {
+          "mean": 0.0,
+          "median": 0.0,
+          "support_rate": 1.0
+        }
+      },
+      "g007": {
+        "native_error_256": {
+          "mean": 0.18619791666666666,
+          "median": 0.1435546875,
+          "support_rate": 0.625
+        },
+        "native_error_large": {
+          "mean": 0.18741861979166666,
+          "median": 0.12640380859375,
+          "support_rate": 0.625
+        },
+        "representation_error": {
+          "mean": 0.0,
+          "median": 0.0,
+          "support_rate": 1.0
+        },
+        "weight_oracle_error_256": {
+          "mean": 0.14982096354166666,
+          "median": 0.150390625,
+          "support_rate": 0.9583333333333334
+        },
+        "weight_oracle_error_large": {
+          "mean": 0.1492767333984375,
+          "median": 0.14776611328125,
+          "support_rate": 0.8333333333333334
+        },
+        "weight_oracle_expected_error": {
+          "mean": 0.0,
+          "median": 0.0,
+          "support_rate": 1.0
+        }
+      },
+      "g008": {
+        "native_error_256": {
+          "mean": 0.210205078125,
+          "median": 0.1533203125,
+          "support_rate": 0.7083333333333334
+        },
+        "native_error_large": {
+          "mean": 0.20680745442708334,
+          "median": 0.1527099609375,
+          "support_rate": 0.7083333333333334
+        },
+        "representation_error": {
+          "mean": 0.0,
+          "median": 0.0,
+          "support_rate": 1.0
+        },
+        "weight_oracle_error_256": {
+          "mean": 0.13069661458333334,
+          "median": 0.1259765625,
+          "support_rate": 0.9583333333333334
+        },
+        "weight_oracle_error_large": {
+          "mean": 0.13264973958333334,
+          "median": 0.1395263671875,
+          "support_rate": 0.9583333333333334
+        },
+        "weight_oracle_expected_error": {
+          "mean": 0.0,
+          "median": 0.0,
+          "support_rate": 1.0
+        }
+      }
+    }
+  },
+  "support_requirement": 0.8,
+  "threshold": 0.25,
+  "weight_space_pass": true
+}

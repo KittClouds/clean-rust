@@ -1,0 +1,64 @@
+{
+  "protocol": "jev-information-density/v0.8p-v05-denylist-root-seal-v01",
+  "identity": "v0.8P-v05-direct-panel-identity-extraction-v01",
+  "disposition": "DENYLIST_EXTRACTION_SEALED",
+  "root_contents": {
+    "contract_sha256": "b2a1446635451e2f4a442f658458f3606767d2566bb31e8395c386acab5e38cb",
+    "identity_sha256": "f1caedd9308bbd7565490d57ae31e118d68dfa162e6796939f877c14ddaaadf8",
+    "source_allowlist_sha256": "3470df15dd74b5e406816e3af5b4fad5760b37dbf0c455456452c4f0dc8e20cb",
+    "source_allowlist_seal_sha256": "4deb9d6ef80b47f053b12e13a20a6656aa09025dd3e6d8b211603bdf79162880",
+    "extractor_sha256": "436c980977ca5a3bc1878e5c165d13e6733b835e87a31ff70ba2e0d2eb131e89",
+    "synthetic_test_source_sha256": "d3f8e94c3382695ce182dafacc544891ac911c4b1458661d93fa80a112d4b18a",
+    "v04_authority_trace_sha256": "050a24e85f45eaf8b70d382871b4aaa50f973b25c8494ad116531f0b152ed02e",
+    "v04_authority_seal_sha256": "e8c9154b9af87d098272fdde4ef6fb2e634010ef797cbfa3f6502848208d06ab",
+    "run_1_denylist_sha256": "50eebeb5790c29b4a75c6f8df849eb4c2865d3c864932bbd7f636b7a0e52a2cd",
+    "run_1_source_access_receipt_sha256": "70584c84a78b0b26c71743e0c19e517ed1bf475f6a55e8da70f8559ad470243d",
+    "run_2_denylist_sha256": "50eebeb5790c29b4a75c6f8df849eb4c2865d3c864932bbd7f636b7a0e52a2cd",
+    "run_2_source_access_receipt_sha256": "f0e236b2b3f23ebeb6d42dadc29ed1356daf306cd27ac61ba330df07ffe39791",
+    "repeat_parity_receipt_sha256": "17e22484dd6e7c486f6bab9e982812ebd13678822673162d40d8945c1d85e12f"
+  },
+  "denylist": {
+    "schema": "canonical-neighborhood-id-sha256-set-v01",
+    "count": 2000,
+    "unique": true,
+    "sorted": true,
+    "raw_ids_emitted": false,
+    "clean_process_repeat_bytes_identical": true
+  },
+  "authorized_e1_sources": [
+    {
+      "path_hash": "53f6ff76ae0016c7f826c414b22889413f3d3d7b4f8b2c2799df644bf946f894",
+      "expected_sha256": "79d25ac82fba1bc6332e16d8bc5f877fadd11cccaed5ef3f07eacfe5e1877da2",
+      "purpose": "read only top-level panel_manifest_sha256 from the E1 firewall lock"
+    },
+    {
+      "path_hash": "9f134282815a7074dbc43960a8af03e632fe27be4ba8dd5f104ff696a521f972",
+      "expected_sha256": "80e09c0f203b8a6505e062a2091a594273dca808258ff2f4539ab8414db9eabe",
+      "purpose": "after whole-object hash verification, read only top-level neighborhood_id values"
+    }
+  ],
+  "access_boundary": {
+    "observed_successful_source_set_equals_authorized_set": true,
+    "successful_opens_per_source_per_run": 1,
+    "blocked_access_events": 0,
+    "v03_seal_manifest_accessed": false,
+    "candidate_join_or_features_accessed": false,
+    "targets_predictions_metrics_or_geometry_accessed": false
+  },
+  "execution_provenance": {
+    "clean_process_runs": 2,
+    "initial_cli_parse_failure_before_extractor_or_source_open": true,
+    "corrected_invocations_used_unchanged_frozen_extractor": true
+  },
+  "stop_state": {
+    "panel_contract_created": false,
+    "panel_generation": false,
+    "lfm_contact": false,
+    "training": false,
+    "head_loading": false,
+    "evaluation": false,
+    "phoenix_access": false,
+    "further_work_authorized": false
+  },
+  "root_hash_rule": "SHA-256 of the exact bytes of this manifest; no self-referential hash field"
+}

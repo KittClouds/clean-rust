@@ -1,0 +1,116 @@
+{
+  "conclusion": "Affected-row exact replay reproduced every authoritative UPAIR1 pair readout bit for bit.",
+  "contexts": [
+    {
+      "context": [
+        "seed9731-L-tau16.json",
+        2
+      ],
+      "max_affected_rows": 32,
+      "mean_affected_fraction": 0.03320281804966211,
+      "pairs": 2121,
+      "readout_mismatches": 0,
+      "total_affected_rows": 54085,
+      "total_rows": 1628928
+    },
+    {
+      "context": [
+        "seed9731-L-tau4.json",
+        3
+      ],
+      "max_affected_rows": 32,
+      "mean_affected_fraction": 0.02998879412585461,
+      "pairs": 2389,
+      "readout_mismatches": 0,
+      "total_affected_rows": 55022,
+      "total_rows": 1834752
+    },
+    {
+      "context": [
+        "seed9731-R-tau16.json",
+        1
+      ],
+      "max_affected_rows": 32,
+      "mean_affected_fraction": 0.028070793630779762,
+      "pairs": 2266,
+      "readout_mismatches": 0,
+      "total_affected_rows": 49869,
+      "total_rows": 1776544
+    },
+    {
+      "context": [
+        "seed9731-R-tau16.json",
+        3
+      ],
+      "max_affected_rows": 32,
+      "mean_affected_fraction": 0.030013460282270036,
+      "pairs": 2062,
+      "readout_mismatches": 0,
+      "total_affected_rows": 48520,
+      "total_rows": 1616608
+    },
+    {
+      "context": [
+        "seed9731-R-tau4.json",
+        0
+      ],
+      "max_affected_rows": 32,
+      "mean_affected_fraction": 0.027177876002628665,
+      "pairs": 2267,
+      "readout_mismatches": 0,
+      "total_affected_rows": 48304,
+      "total_rows": 1777328
+    },
+    {
+      "context": [
+        "seed9731-R-tau4.json",
+        1
+      ],
+      "max_affected_rows": 32,
+      "mean_affected_fraction": 0.029143493986446414,
+      "pairs": 2099,
+      "readout_mismatches": 0,
+      "total_affected_rows": 47959,
+      "total_rows": 1645616
+    },
+    {
+      "context": [
+        "seed9731-R-tau4.json",
+        2
+      ],
+      "max_affected_rows": 32,
+      "mean_affected_fraction": 0.027507540965787114,
+      "pairs": 2253,
+      "readout_mismatches": 0,
+      "total_affected_rows": 48588,
+      "total_rows": 1766352
+    },
+    {
+      "context": [
+        "seed9731-R-tau4.json",
+        3
+      ],
+      "max_affected_rows": 32,
+      "mean_affected_fraction": 0.027452034028689083,
+      "pairs": 2255,
+      "readout_mismatches": 0,
+      "total_affected_rows": 48533,
+      "total_rows": 1767920
+    }
+  ],
+  "contract_sha256": "43022ADC0A967A06EF1C8A26A5B0C9D545F64178FF02A0861C2D27104039240E",
+  "counts": {
+    "contexts": 8,
+    "pairs": 17712,
+    "readout_mismatches": 0,
+    "total_affected_rows": 400880,
+    "total_rows": 13814048
+  },
+  "engineering_only": true,
+  "full_pair_replay_performed": false,
+  "identity": "q10-gc1-lr1-requal1-csc1-read-inc1-v1",
+  "incremental_readout_executed": true,
+  "protocol": "Q10-READ-INC1",
+  "scientific_promotion": false,
+  "status": "READ_INC1_COMPLETE"
+}

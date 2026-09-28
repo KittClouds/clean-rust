@@ -1,0 +1,195 @@
+{
+  "contract_id": "FAS_FROZEN_CAPABILITY_FABRIC_E4_0_V01",
+  "status": "DRAFT_NOT_SEALED_NOT_AUTHORIZED",
+  "draft_date_utc": "2026-09-26",
+  "purpose": "Fresh population qualification and exact online/cache parity for the frozen E3 capability fabric.",
+  "authorization": {
+    "population_generation_authorized": false,
+    "tokenizer_contact_authorized": false,
+    "model_contact_authorized": false,
+    "feature_extraction_authorized": false,
+    "evaluation_label_opening_authorized": false,
+    "scoring_authorized": false,
+    "fitting_authorized": false,
+    "E4_A_authorized": false
+  },
+  "design_inputs": {
+    "e4_0_design_v03_path": "experiments/fas-frozen-observer-bundle-engineering-v01/plans/E4-0-PRECONDITIONS-DESIGN-v03.md",
+    "e4_0_design_v03_sha256": "ce7ba083f359eb252a04e3c3971edf8251995dfe41d43f21a499c50727f5b42b",
+    "template_manifest_path": "experiments/fas-frozen-observer-bundle-engineering-v01/plans/E4-0-HELDOUT-TEMPLATES-v02.json",
+    "template_manifest_sha256": "e3b8a70b90b06fc4185d2e379cbfc7cf3724238d9505590add1cf8bba2e9b068",
+    "template_text_audit_path": "experiments/fas-frozen-observer-bundle-engineering-v01/plans/E4-0-HELDOUT-TEMPLATES-v02-audit.json",
+    "template_text_audit_sha256": "c5a6eb4412652122a5cfd126e50fc5c907d9fd9f94bd101d4549be2796535f87",
+    "template_structural_audit_path": "experiments/fas-frozen-observer-bundle-engineering-v01/plans/E4-0-TEMPLATE-STRUCTURAL-AUDIT-v01.md",
+    "template_structural_audit_sha256": "aeca3020f0cbcb779ddb7dac7aea1b9b9f6f4db0fa1abb8221740e2ff188b9ff"
+  },
+  "predecessors": {
+    "e0_v10_root_sha256": "899a131c09298fdafdcc6771ad01e8982857a1cd47900259800f97dd7bea7ccd",
+    "e1_v04_root_sha256": "6ba77a899363651e3ba119b005f59a22e86f011f83c86b873857cd3f9ab64b03",
+    "e1_term_inventory_sha256": "43b793068ad759a7ec77bd0027e7113a0145a35b1daacb8ea1cefa551803c672",
+    "e1_row_manifest_sha256": "ebfdf0064430ecae7a9ae2edd139f47c0c61291aa6c30c8ccb97daa195f835bc",
+    "e1_split_manifest_sha256": "fb20dd79b5d02a46e7ac65f8a69b621c19f47b193db4e9c5f898778032464e70",
+    "e1_fit_labels_sha256": "1c4223544ff8e164a393f6313db46dd814c50e3ea484a14ebdbed5070ebdfc15",
+    "e1_model_inputs_sha256": "9f0076daa147bac37aa80d4f9a55f9225289910ceb8acc41998354c5a166917a",
+    "e1_generator_source_sha256": "fa2bd0617135a0dce4e12f0e0967f82e461133b394a7d969daba5afb11e2cce1",
+    "e2_v07_root_sha256": "a2e2aa76f77904665b9abfa2a22f609c05219d8bc64c537bed41f5c634d1da8a",
+    "e2_v07_feature_cache_sha256": "8eb80df5f73e761fe6c025fc1c66abef2027d639b6c14f56d4177d6e6a7a45a4",
+    "e2_v07_feature_cache_bytes": 872415232,
+    "e3_v02_bundle_root_sha256": "899ff6a61272b86fdf1cd51d8c14100e77185157c242f27fbffe452803a435e1",
+    "e3_v02_bundle_manifest_sha256": "8fa86f8c9891949196844ca62522822a246e47b4185cc4ed45c45136ada6576f",
+    "e3_v02_score_replay_root_sha256": "a104bffedbc3e31268c0f1c0103ad4326add5a9da93816007904b70cdf3c7d1f"
+  },
+  "representation_abi": {
+    "abi_path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/representation-abi-v07.json",
+    "abi_sha256": "3b36b066111872290b9f37a877b9043650867fa81658476c783a5c7e7485d319",
+    "extractor_source_path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/extract_features_v07.py",
+    "extractor_source_sha256": "2b210d4f65c37d823b7060278c8a29db3a5c5f7fb535e6bb28d5147bc56b7b24",
+    "model_id": "LiquidAI/LFM2.5-1.2B-Base",
+    "model_revision": "7453bca97ca1e67754c4035a4b4c584e1c9dd725",
+    "model_config_sha256": "15d6157fb6df3f8272e2fe90e18f57727ccf02a125c94469198b0f3281510185",
+    "model_weights_sha256": "7678ab9546a0c51c1fca161876b1efc4f0906277f170b5822045f40fdaf9eeff",
+    "tokenizer_assets_manifest_sha256": "c5e9a5b08ec5658ef2a8760d8230bbe9367bea124451488e164baf0eeca95afc",
+    "surface_id": "V1_FINAL_POSITION",
+    "tensor_identity": "output.last_hidden_state[0, sequence_length - 1, :]",
+    "feature_dimension": 2048,
+    "serialization_dtype": "little-endian float32",
+    "runtime_and_loader": "Inherited exactly from the E2 v07 ABI; all local assets rehashed before eventual model loading."
+  },
+  "population": {
+    "population_id": "FAS_E4_0_FRESH_POPULATION_V01",
+    "namespace_in_quartet_identity": true,
+    "world_render_seed": 2026092605,
+    "seed_status": "PROPOSED_PROSPECTIVE_FIXED_VALUE",
+    "term_inventory": "Import E1 v04 context/entity ID-to-term tables byte-for-byte; do not reassign any of the 32 class IDs in either role.",
+    "schedule": "Reuse the frozen E1 factorial design and four-row A/C/E/P quartet semantics with a new deterministic namespaced world/render stream.",
+    "collisions": {
+      "keys": ["quartet_id", "row_id", "rendered_input_sha256"],
+      "compare_against": ["all E1 rows", "all accepted E4 rows"],
+      "action": "Reject the entire candidate quartet, increment the candidate counter, regenerate, and receipt every skipped counter and collision class."
+    },
+    "strata": {
+      "primary_seen_rendering": "New semantic items rendered with the eight E1 observation/query templates.",
+      "primary_lexical": ["in_domain", "context_novel", "entity_novel", "both_novel"],
+      "heldout_template": "New observation/query template bytes from the bound template manifest; no E1 or fit overlap.",
+      "joint_template_lexical": "Held-out template combined with lexical novelty; intended population member if resource preflight passes."
+    },
+    "support": {
+      "construction_target_rows_per_required_class": 250,
+      "scoring_minimum_rows_per_class": 200,
+      "population_size_rule": "Smallest whole-quartet prefix of the deterministic schedule meeting the construction target for every class of all eight primary endpoints after E3 eligibility filters.",
+      "support_receipt_before_model_contact": true
+    },
+    "template_identity": {
+      "normalization": "Unicode NFKC, Unicode case-fold, trim, collapse internal Unicode whitespace runs to one ASCII space.",
+      "transfer_claim": "Unseen-template transfer with limited structural variation; do not claim broad structural invariance.",
+      "structural_audit_role": "Descriptive only; no new scoring endpoints or post-score strata.",
+      "freeze_before_population_generation": true,
+      "heldout_template_and_joint_truth_open_before_FF_BUNDLE_TEMPLATE_01_contract": false,
+      "precontract_feature_extraction": "Allowed only if the E4-0 contract and resource preflight bind it; predictions and class-support tables remain unopened."
+    }
+  },
+  "parity": {
+    "panel": {
+      "source_partition": "E1 FIT",
+      "whole_quartets": 256,
+      "stratification": "8 query-template IDs by 4 quartiles of quartet maximum token count; select 8 per cell by domain-separated SHA-256 order.",
+      "quartile_assignment": "Sort E1 FIT quartets by (maximum token count, UTF-8 quartet ID). For N quartets and zero-based rank r, quartile k is the unique k in 0..3 satisfying floor(k*N/4) <= r < floor((k+1)*N/4).",
+      "ranking_digest_input": "UTF-8(FAS-E4-0-PARITY-v01) || 0x00 || ASCII decimal query-template ID (no leading zero) || 0x00 || ASCII decimal quartile ID (no leading zero) || 0x00 || UTF-8 quartet ID",
+      "ranking_order": "Raw SHA-256 digest bytes ascending; ties by UTF-8 quartet ID bytes; select 8 per cell.",
+      "coverage_stop": "If any cell contains fewer than 8 E1 FIT quartets, stop before model weights load and version the design.",
+      "tokenizer_call": "encode(input_text, add_special_tokens=true, truncation=false); no padding.",
+      "selection_receipt_before_online_extraction": true
+    },
+    "serving_configuration": {
+      "device": "cuda:0",
+      "dtype": "float32",
+      "batch_size": 1,
+      "padding": false,
+      "truncation": false,
+      "tensor": "last_hidden_state[0, sequence_length - 1, :]"
+    },
+    "gates": {
+      "feature_cache_byte_equality": true,
+      "maximum_absolute_feature_deviation": 0.0,
+      "prediction_agreement_each_of_five_heads": 1.0,
+      "alternate_batch_or_device_paths_in_scope": false
+    }
+  },
+  "fresh_qualification": {
+    "scorers": "Five E3 v02 observers read-only; no refit, scaler change, threshold change, or task selection.",
+    "metric": "balanced_accuracy",
+    "bootstrap": {
+      "replicates": 10000,
+      "seed": 2026092604,
+      "rng": "NumPy PCG64; one generator consumed in frozen endpoint order.",
+      "resampling_unit": "Whole quartet, stratified by the E3 task-specific A-variant label; sample the original eligible quartet count with replacement.",
+      "chunk_replicates": 64,
+      "quantile_method": "NumPy linear",
+      "lower_tail_alpha_per_endpoint": 0.00625
+    },
+    "gate": {
+      "simultaneous_familywise_confidence": 0.95,
+      "endpoint_count": 8,
+      "balanced_accuracy_lower_bound_minimum": 0.90,
+      "all_endpoints_must_pass": true,
+      "endpoint_order": [
+        "context_identity",
+        "entity_identity",
+        "relation",
+        "observed_state",
+        "exact_target_in_domain",
+        "exact_target_context_novel",
+        "exact_target_entity_novel",
+        "exact_target_both_novel"
+      ]
+    },
+    "scored_truth_partitions": ["primary_seen_rendering", "primary_lexical"],
+    "heldout_template_truth_scored": false,
+    "joint_template_lexical_truth_scored": false
+  },
+  "truth_access": {
+    "E1_FIT": "Available for later companion fitting under separate contracts.",
+    "E4_primary_labels": "Open once for E4-0 scoring only after the fresh feature cache, row identity, and parity receipts are sealed.",
+    "E4_template_and_joint_labels": "Escrowed until FF-BUNDLE-TEMPLATE-01 has a frozen analysis contract.",
+    "fresh_E4_labels_for_fitting": false
+  },
+  "resources": {
+    "target_volume": "D:",
+    "host_ram_peak_max_bytes": 25769803776,
+    "extractor_process_pytorch_cuda_reserved_peak_max_bytes": 10737418240,
+    "gpu_metric_scope": "torch.cuda.max_memory_reserved(cuda:0) in the extractor process; not total GPU memory.",
+    "total_gpu_memory_claimed": false,
+    "minimum_free_space_after_projected_peak_fraction": 0.1,
+    "feature_cache_bytes_formula": "8192 * all extracted E4 rows",
+    "feature_cache_atomic_staging_bytes_formula": "8192 * all extracted E4 rows",
+    "joint_stratum_resource_rule": "Include by default; if prospective resource preflight fails, stop and amend before generation rather than silently omitting it.",
+    "gpu_lease_required_before_model_contact": true
+  },
+  "phase_gates": [
+    "Contract reviewed and sealed; no execution authority is conferred by this draft.",
+    "Model-free population generation, support/resource receipt, seal, and independent audit.",
+    "Only after population audit and separate authorization: pinned tokenizer/model preflight and label-free parity panel.",
+    "Parity pass and sealed fresh E4 features precede the single primary-label opening and simultaneous scoring.",
+    "Independent replay and terminal disposition."
+  ],
+  "stop_rule": "On identity, collision, support, resource, ABI, repeatability, parity, row-order, shape, dtype, finiteness, byte-integrity, truth-boundary, or scoring-integrity failure, preserve the attempt and stop. No in-place repair, dropped endpoint, or same-identity rerun.",
+  "E4_A_dependency": "Normal E4-A design eligibility requires parity pass and all eight simultaneous endpoints pass. If qualification fails, no normal E4-A; a systems-only benchmark requires a distinct decision and identity.",
+  "implementation_sources_not_yet_bound": {
+    "e4_population_generator": null,
+    "e4_online_feature_and_parity_runner": null,
+    "e4_fresh_scorer": null,
+    "e4_independent_auditor": null
+  },
+  "draft_blockers_before_freeze": [
+    "Implement and bind versioned E4 population generator, online parity/feature runner, fresh scorer, and independent auditor source hashes.",
+    "Freeze exact generator seed derivation, quartet and row ID byte serialization, and complete seed schedule in executable-source parity with this draft.",
+    "Calculate the exact minimum population support schedule and projected disk footprint before generation.",
+    "Confirm the bound template and structural audit files by hash at contract freeze."
+  ],
+  "execution_identity": {
+    "model_contact_authorized": false,
+    "label_opening_authorized": false,
+    "scoring_authorized": false,
+    "E4_A_authorized": false
+  }
+}

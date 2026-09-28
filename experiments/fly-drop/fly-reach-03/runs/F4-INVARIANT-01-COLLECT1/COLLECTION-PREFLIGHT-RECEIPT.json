@@ -1,0 +1,16 @@
+{
+  "fit_manifest_created": false,
+  "fits_executed": false,
+  "measured_reach03_authorized": false,
+  "native_collection_started": false,
+  "native_collector_sha256": "596938cd129db02e66cedb940e2cbdd6568509a57a8fc7849511b31048ff70fb",
+  "qualification_only": true,
+  "run_id": "F4-INVARIANT-01-COLLECT1",
+  "schema": "F4-INVARIANT-01-COLLECT1-preflight-v1",
+  "source_manifest_canonical_sha256": "bc3e76911ff0351174101f379312f85dcadd9c3c4331a7a624674421c3c42750",
+  "source_manifest_file_sha256": "ea5abc4a1337dfd4844828bff0954af32c733b4d7d4a4287b82ed66a7c4f175f",
+  "status": "PASS",
+  "task_bank_reused_without_regeneration": true,
+  "task_bank_run_id": "F4-INVARIANT-01-RUN2",
+  "task_bank_sha256": "8e49f61018255fa32d4328056d46a0b5a14b70306ccfa98733849dcac245c02c"
+}

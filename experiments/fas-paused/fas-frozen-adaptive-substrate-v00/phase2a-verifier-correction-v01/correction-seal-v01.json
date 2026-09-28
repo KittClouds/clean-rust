@@ -1,0 +1,17 @@
+{
+  "seal_id": "FAS00_PHASE2A_VERIFIER_CORRECTION_V01",
+  "project_id": "fas-frozen-adaptive-substrate-v00",
+  "cache_root_sha256": "9af2c6c73a2f21608e8a2dc912d8838968eaebffb32b4b1ea0a18364e488d217",
+  "disposition_sha256": "635c2277ba1afdda27d1c8f8897f7eeb026cda131d787169af5f8d55c1790f2c",
+  "root_sha256": "d2c84b22e141845392e6ad51ba9ca9584778cc283953bd137518b577e857360b",
+  "files": [
+    {
+      "path": "correction-receipt-v01.json",
+      "sha256": "e1091944ce2c125b1092536a71b6c4160531fe1920c80fa4e1ac8300ced374e7"
+    },
+    {
+      "path": "verify-phase2a-cache-v01.ps1",
+      "sha256": "8d227ef06011eac255be1cfb25e6be34533abe152d5124b18cd189dc5c90ca0c"
+    }
+  ]
+}

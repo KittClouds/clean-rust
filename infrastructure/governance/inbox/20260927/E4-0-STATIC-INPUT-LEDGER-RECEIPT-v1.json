@@ -1,0 +1,13 @@
+{
+  "schema": "CHIEF_E4_0_STATIC_INVENTORY_LEDGER_RECEIPT_V1",
+  "status": "PARITY_VISIBLE_INPUTS_REGISTERED",
+  "artifact": {
+    "artifact_id": "sha256:755618754dc51acd9d43e514e8d6a7c78e1eea090910ddeca29a1e8124a06204",
+    "event_id": "sha256:d9ca0d02a894c9ea039d0df3a2c83b8f71bcac3ea4720fd13ffb31a62b3dd8f8"
+  },
+  "seal": {
+    "root": "sha256:7f62cdbf7b401d84c30d2d225e90c8e8ff16e5998fb0f97a7a98ff6455a54ca7",
+    "event_id": "sha256:e44ea964dffe7c4e8f9b6cfab10ad974e9df2e5488b2ea67282ca7414ce4b9aa"
+  },
+  "authorization_conferred": false
+}

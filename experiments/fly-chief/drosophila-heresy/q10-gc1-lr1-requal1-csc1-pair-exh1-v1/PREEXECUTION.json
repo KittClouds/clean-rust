@@ -1,0 +1,8 @@
+{
+  "contract_sha256": "8CD748435C8BD876CC2094D01FB290CC834284EA0EE6EE3230174E9D0A31DBAD",
+  "identity": "q10-gc1-lr1-requal1-csc1-pair-exh1-v1",
+  "pair_replay_performed": false,
+  "protocol": "Q10-PAIR-EXH1",
+  "readout_executed": false,
+  "status": "PREEXECUTION_SEALED"
+}

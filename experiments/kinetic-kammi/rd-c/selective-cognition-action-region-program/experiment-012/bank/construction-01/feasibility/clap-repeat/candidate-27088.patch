@@ -1,0 +1,12 @@
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -1,8 +1,8 @@
+ use clap::{Arg, ArgAction, Command};
+ 
+ pub fn parse_tag_values(argv: &[&str]) -> Vec<String> {
+-    // E012 candidate slot.
+     let command = Command::new("demo")
++        .args_override_self(true)
+         .arg(Arg::new("tag").long("tag").action(ArgAction::Set));
+     let matches = command
+         .try_get_matches_from(argv.iter().copied())

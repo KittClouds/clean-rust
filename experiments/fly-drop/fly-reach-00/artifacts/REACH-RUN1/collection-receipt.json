@@ -1,0 +1,27 @@
+{
+  "arms": [
+    "native",
+    "native_direction_reference_magnitude",
+    "reference_direction_native_support",
+    "reference_direction_full_support",
+    "weight_oracle"
+  ],
+  "checkpoints": [
+    0,
+    512,
+    1024,
+    2048,
+    4096,
+    8192
+  ],
+  "completed_blocks": 216,
+  "contract_sha256": "4629ca75748439b5fce20684393c2f9a9e6643367ded9af1f836a9694c447548",
+  "diagnostic_rows": 1080,
+  "engineering_only": true,
+  "outcome_rows": 5616,
+  "schema": "FLY-REACH-00-collection-receipt-v1",
+  "status": "QUALIFICATION_COMPLETE",
+  "study_id": "FLY-REACH-00",
+  "threshold": 0.25,
+  "wall_seconds": 417.0504556
+}

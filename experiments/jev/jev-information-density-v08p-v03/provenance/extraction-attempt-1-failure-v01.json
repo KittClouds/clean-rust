@@ -1,0 +1,56 @@
+{
+  "protocol": "jev-information-density/v0.8p-v03-extraction-failure-v01",
+  "identity": "v0.8P-v03-identity-extraction-attempt-1",
+  "status": "FAIL_CLOSED_AUTHORIZED_SOURCE_HASH_MISMATCH",
+  "authorization_scope": "v03 identity-denylist setup only; exact-path allowlist v01",
+  "allowlist_sha256": "43bdf7408ef2b0e6fbcdd75b4848fd7631870d4312624e39b917ef554d62f854",
+  "extractor_sha256": "e93cc70387c1acd526ad4245b35bec2dfc6ac1f5a68fb104e18010a1c33a6450",
+  "failure": {
+    "source_path_hash": "2851fb7e5116af416c7c5b02465bafbea01d2ef2a592f2af9f1881480ce1ac69",
+    "source_role": "E1 seal manifest; opaque exact-byte provenance input",
+    "expected_sha256": "425cef320df94e2b47b448203f8a916ebbcbb2019539b2d09e51f5b4ced92f614",
+    "observed_sha256": "NOT_PERSISTED_BY_FAILING_PROCESS",
+    "runtime_error": "authorized source hash mismatch",
+    "action": "stopped immediately; no retry, source re-open, expected-hash update, or source discovery"
+  },
+  "access_accounting": {
+    "manifest_source": {
+      "path_hash": "9f134282815a7074dbc43960a8af03e632fe27be4ba8dd5f104ff696a521f972",
+      "expected_sha256": "80e09c0f203b8a6505e062a2091a594273dca808258ff2f4539ab8414db9eabe",
+      "result": "opened once; byte hash matched; only top-level neighborhood_id values were semantically extracted in-process",
+      "raw_identity_values_written": false
+    },
+    "seal_manifest_source": {
+      "path_hash": "2851fb7e5116af416c7c5b02465bafbea01d2ef2a592f2af9f1881480ce1ac69",
+      "expected_sha256": "425cef320df94e2b47b448203f8a916ebbcbb2019539b2d09e51f5b4ced92f614",
+      "result": "opened once; observed byte hash differed; actual hash was not persisted before failure"
+    },
+    "firewall_lock_source": {
+      "path_hash": "53f6ff76ae0016c7f826c414b22889413f3d3d7b4f8b2c2799df644bf946f894",
+      "result": "not opened; sequential processing stopped at seal-manifest mismatch"
+    },
+    "machine_access_receipt": "NOT_WRITTEN; the process failed before receipt materialization",
+    "observed_successful_set_equals_allowlist": false,
+    "run_2_started": false
+  },
+  "outputs": {
+    "denylist_written": false,
+    "denylist_seal_written": false,
+    "run_1_result_directory_created": false,
+    "run_2_result_directory_created": false,
+    "v03_fresh_panel_contract_created": false,
+    "fresh_panel_generated": false
+  },
+  "boundaries": {
+    "candidate_join_opened": false,
+    "candidate_features_opened": false,
+    "targets_semantically_accessed": false,
+    "predictions_or_metrics_accessed": false,
+    "model_contact": false,
+    "training": false,
+    "evaluation": false,
+    "newtight": false,
+    "phoenix": false
+  },
+  "disposition": "STOP. A new explicit authorization is required before any re-derivation or retry of the E1 source identity binding."
+}

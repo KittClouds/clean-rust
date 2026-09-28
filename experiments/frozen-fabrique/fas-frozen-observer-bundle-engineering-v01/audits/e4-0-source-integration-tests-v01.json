@@ -1,0 +1,68 @@
+{
+  "schema": "FAS_E4_0_SOURCE_INTEGRATION_TESTS_V01",
+  "status": "PASS_PRESEAL_SYNTHETIC_SOURCE_VALIDATION",
+  "recorded_utc": "2026-09-26T20:47:15Z",
+  "workspace": "managed worktree e4-0-contract-work",
+  "execution_boundary": {
+    "e4_population_rows_materialized": false,
+    "tokenizer_contact": false,
+    "model_contact": false,
+    "cuda_initialized": false,
+    "actual_terminal_labels_opened": false,
+    "actual_template_joint_labels_opened": false,
+    "e4_predictions_emitted": false,
+    "e4_scoring_executed": false
+  },
+  "tracks": {
+    "A": {
+      "receipt": {
+        "path": "audits/e4-0-track-a/track-a-receipt-v01.json",
+        "bytes": 5369,
+        "sha256": "6ff04e3eefae26d419560d30158fb863545f5d348478fdd59cc3013daba867d7"
+      },
+      "status": "TRACK_A_COMPLETE_PREAUTHORIZATION",
+      "unit_and_binary_tests": 14,
+      "doc_tests": "PASS",
+      "fmt": "PASS",
+      "strict_clippy": "PASS",
+      "model_free_E1_replay": "PASS",
+      "selected_prefix": 18667,
+      "prior_min_support": 248,
+      "selected_min_support": 252,
+      "benchmark": "512 synthetic quartets, 9.3739 ms estimate; 95% interval [8.6376,10.287] ms; not E4 throughput"
+    },
+    "B": {
+      "receipt": {
+        "path": "audits/e4-0-track-b/track-b-source-tests-v01.json",
+        "bytes": 7170,
+        "sha256": "acba272c3eb177e8e15b178343a7fcc87ecc43e0bfb6bc665dda9ddf25e400a3"
+      },
+      "status": "PASS_SYNTHETIC_SOURCE_AND_CLI_TESTS",
+      "tests_run": 13,
+      "tests_passed": 13,
+      "py_compile": "PASS",
+      "cli_help": "PASS"
+    },
+    "C": {
+      "receipt": {
+        "path": "audits/e4-0-track-c/track-c-source-tests-v01.json",
+        "bytes": 3935,
+        "sha256": "54f487ef7e2299cb5550b6fc65ce33440ab0f4be3caa923181b85c6bee098744"
+      },
+      "status": "PASS_SYNTHETIC_SOURCE_AND_CLI_TESTS",
+      "tests_run": 14,
+      "tests_passed": 14,
+      "py_compile": "PASS",
+      "preflight_only_synthetic_cli": "PASS",
+      "labels_unopened_in_preflight": true,
+      "cuda_initialized": false
+    }
+  },
+  "expected_predecessor_roots": {
+    "e0_v10_root_sha256": "899a131c09298fdafdcc6771ad01e8982857a1cd47900259800f97dd7bea7ccd",
+    "e1_v04_root_sha256": "6ba77a899363651e3ba119b005f59a22e86f011f83c86b873857cd3f9ab64b03",
+    "e2_v07_root_sha256": "a2e2aa76f77904665b9abfa2a22f609c05219d8bc64c537bed41f5c634d1da8a",
+    "e3_v02_bundle_root_sha256": "899ff6a61272b86fdf1cd51d8c14100e77185157c242f27fbffe452803a435e1"
+  },
+  "note": "These are source-level and synthetic tests. Track D independent replay/audit is pending; final seal and E4 runtime phases have not started."
+}

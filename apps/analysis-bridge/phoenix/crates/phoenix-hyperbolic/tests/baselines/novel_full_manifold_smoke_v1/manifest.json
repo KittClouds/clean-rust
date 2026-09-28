@@ -1,0 +1,1 @@
+{"test":"novel_full_manifold_smoke_v1","geometry":"hopf_ico_r5_v1","projection_space":"hopf_manifold","hybrid_projection":false,"seed":1337,"input_kind":"fixture_mmap","input_path":"tests/fixtures/novel_full_manifold_smoke_v1.fixture","input_bytes":440279,"input_chars":437976,"input_hash":1376547431926177487}

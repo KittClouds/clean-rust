@@ -1,0 +1,11 @@
+{
+  "record_id": "FAS00_PHASE1_V02_SUPERSESSION_V03",
+  "supersedes": "phase1-v02 partial diagnostic materialization",
+  "superseded_combined_root_sha256": "af42320abe28885d20a07c2c936ac130da707bf6347dd5bfe24644b06978bf21",
+  "superseded_corpus_path": "D:/codex-runs/fas-frozen-adaptive-substrate-v00/phase1-v02/corpus/",
+  "reason": "The v02 builder wrote the versioned qualification-event file, then its serialized readback validator looked for the old v01 filename and stopped before audit/status emission. V03 validates the v03 serialized filename and recomputes all per-world hashes after disk round-trip.",
+  "phase1_v02_mutated": false,
+  "parent_pre_model_seal_sha256": "c7227d2a10da05f902ed5d16e94a8e12866d2e0ae6b2b2a357ed2da93431b3e6",
+  "model_contact_authorized": false,
+  "phase5_reuse_authorized": false
+}

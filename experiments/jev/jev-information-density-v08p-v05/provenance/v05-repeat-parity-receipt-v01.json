@@ -1,0 +1,58 @@
+{
+  "protocol": "jev-information-density/v0.8p-v05-repeat-parity-receipt-v01",
+  "identity": "v0.8P-v05-direct-panel-identity-extraction-v01",
+  "status": "PASS",
+  "contract_sha256": "b2a1446635451e2f4a442f658458f3606767d2566bb31e8395c386acab5e38cb",
+  "source_allowlist_sha256": "3470df15dd74b5e406816e3af5b4fad5760b37dbf0c455456452c4f0dc8e20cb",
+  "extractor_sha256": "436c980977ca5a3bc1878e5c165d13e6733b835e87a31ff70ba2e0d2eb131e89",
+  "authority": {
+    "v04_stage_a_trace_sha256": "050a24e85f45eaf8b70d382871b4aaa50f973b25c8494ad116531f0b152ed02e",
+    "v04_stage_a_seal_sha256": "e8c9154b9af87d098272fdde4ef6fb2e634010ef797cbfa3f6502848208d06ab",
+    "firewall_lock_path_hash": "53f6ff76ae0016c7f826c414b22889413f3d3d7b4f8b2c2799df644bf946f894",
+    "firewall_lock_sha256": "79d25ac82fba1bc6332e16d8bc5f877fadd11cccaed5ef3f07eacfe5e1877da2",
+    "panel_manifest_path_hash": "9f134282815a7074dbc43960a8af03e632fe27be4ba8dd5f104ff696a521f972",
+    "panel_manifest_sha256": "80e09c0f203b8a6505e062a2091a594273dca808258ff2f4539ab8414db9eabe"
+  },
+  "runs": [
+    {
+      "run_label": "clean-process-1",
+      "denylist_sha256": "50eebeb5790c29b4a75c6f8df849eb4c2865d3c864932bbd7f636b7a0e52a2cd",
+      "source_access_receipt_sha256": "70584c84a78b0b26c71743e0c19e517ed1bf475f6a55e8da70f8559ad470243d",
+      "status": "PASS"
+    },
+    {
+      "run_label": "clean-process-2",
+      "denylist_sha256": "50eebeb5790c29b4a75c6f8df849eb4c2865d3c864932bbd7f636b7a0e52a2cd",
+      "source_access_receipt_sha256": "f0e236b2b3f23ebeb6d42dadc29ed1356daf306cd27ac61ba330df07ffe39791",
+      "status": "PASS"
+    }
+  ],
+  "denylist": {
+    "schema": "canonical-neighborhood-id-sha256-set-v01",
+    "identity_count": 2000,
+    "unique_count": 2000,
+    "sorted": true,
+    "raw_neighborhood_ids_written": false,
+    "byte_identical_across_clean_processes": true,
+    "sha256": "50eebeb5790c29b4a75c6f8df849eb4c2865d3c864932bbd7f636b7a0e52a2cd"
+  },
+  "source_access_audit": {
+    "authorized_source_count": 2,
+    "observed_successful_source_count_per_run": 2,
+    "observed_open_set_equals_authorized_set": true,
+    "blocked_access_events_per_run": 0,
+    "firewall_fields_read": ["/panel_manifest_sha256"],
+    "panel_manifest_fields_read": ["/neighborhood_id"],
+    "source_hashes_verified_before_semantic_extraction": true
+  },
+  "execution_note": "An initial CLI invocation stopped in argument parsing before extractor execution and before any E1 source open. The unchanged extractor was then invoked using its frozen CLI arguments in two separate isolated clean processes.",
+  "scope_boundary": {
+    "panel_contract_created": false,
+    "panel_generation": false,
+    "lfm_contact": false,
+    "training": false,
+    "evaluation": false,
+    "head_loading": false,
+    "phoenix_access": false
+  }
+}

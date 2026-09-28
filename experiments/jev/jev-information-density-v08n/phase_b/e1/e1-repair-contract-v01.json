@@ -1,0 +1,182 @@
+{
+  "protocol": "jev-information-density/v0.8n-e1-heldout-candidate-semantic-basis-recovery-v01",
+  "identity": "v0.8N-E1-heldout-candidate-semantic-basis-recovery-v01",
+  "registration_status": "POST_REGISTERED_REPAIR_RECIPE_SEALED_PENDING_SEPARATE_AUTHORIZATION",
+  "scientific_status": "ORIGINAL_PHASE_B_EVALUATION_INCOMPLETE_NO_BEHAVIORAL_RESULT",
+  "purpose": "Determine whether the already sealed Phase-B heads can be evaluated on the already sealed held-out schemas using candidate semantic vectors independently encoded by the exact frozen candidate-text representation path, without a training-candidate crosswalk.",
+  "original_phase_b_disposition": {
+    "identity": "v0.8N-phase-b-final-disposition-v01",
+    "status": "EVALUATION_INPUT_CONTRACT_INCOMPLETE",
+    "disposition_sha256": "bae6d7ac88f5ca0c5684c219e0e0b82f03962bf6f0292c205cba58765c75a656",
+    "training_remains_valid_and_sealed": true,
+    "head_inference_performed": false,
+    "predictions_or_metrics_exist": false,
+    "original_panel_opening_count": 1,
+    "original_unlock_receipt_sha256": "e8ff5e4548ab5e0b2b96433d844c64836aa03ff878034381c1933db913cb3ec0"
+  },
+  "parents": {
+    "run_contract": {
+      "path": "experiments/jev-information-density-v08n/phase_b/phase-b-run-contract-v01.json",
+      "sha256": "da538aa03355732a2ba362da45d947e169b87aa644d0efd6ba7ef7a546306c1f"
+    },
+    "analysis_contract": {
+      "path": "experiments/jev-information-density-v08n/phase_b/phase-b-analysis-contract-v01.json",
+      "sha256": "0072c44903ea253cd8ad288cda8c100270f19d909ddced098af32d388ac29e1f"
+    },
+    "execution_input_contract": {
+      "path": "experiments/jev-information-density-v08n/phase_b/phase_b-contract-v02.json",
+      "sha256": "efb2bbe59293d7899083927cc187a292b5dfd1dc2948a0b752b3d9cbae2fd18d"
+    },
+    "candidate_basis_metadata_audit": {
+      "path": "experiments/jev-information-density-v08n/phase_b/e1/e1-candidate-basis-metadata-audit-v01.json",
+      "sha256": "f91b27f60905280d86cbf302520945c59619a501ae749b6ecfeee75d5c5ed752"
+    },
+    "candidate_text_manifest": {
+      "path": "experiments/jev-information-density-v08n/phase_b/e1/e1-candidate-text-manifest-v01.jsonl",
+      "sha256": "7987ae385454b32ddec548e48ef6543253b7b061ee1f077c064363c06304a285"
+    },
+    "original_schema_join_failure_receipt": {
+      "path": "experiments/jev-information-density-v08n/phase_b/phase-b-evaluator-schema-join-correction-v01.json",
+      "sha256": "1db0042f1a15364e6a304daf426a56c561ca44986c632b6453f960bcf4e6d41f"
+    },
+    "failed_attempt_traceback": {
+      "path": "experiments/jev-information-density-v08n/phase_b/evaluator-failed-attempt-v01.json",
+      "sha256": "c2f430c43ed02bc77dee84bff0566ad66888e73070d76d3b07847cb4d361a19e"
+    }
+  },
+  "evaluation_panel": {
+    "identity": "v0.8N-eval-panel-v01/matched-panel-v02",
+    "panel_seal_sha256": "425cef320df94e2b47b448203f8a916ebcbb2019539b2d09e51f5b4ced92f614",
+    "panel_manifest_sha256": "80e09c0f203b8a6505e062a2091a594273dca808258ff2f4539ab8414db9eabe",
+    "panel_hash_tree_sha256": "fc0adf7f8d1b9a10914dd9aa85282a42b0cd4bbe185f8b09710498b556d0f08f",
+    "neighborhoods": 2000,
+    "schema_counts": {
+      "jev-v08n-schema:exposure_control": 500,
+      "jev-v08n-schema:respiratory_monitoring": 500,
+      "jev-v08n-schema:salinity_control": 500,
+      "jev-v08n-schema:vibration_monitoring": 500
+    },
+    "existing_opening_count": 1,
+    "second_opening": "NOT_AUTHORIZED; requires a distinct explicit authorization after the E1 feature basis and target-free join preflight are sealed"
+  },
+  "candidate_basis": {
+    "source_of_semantic_identity_and_order": {
+      "family_spec_path": "experiments/jev-information-density-v08n/generator/src/families.rs",
+      "family_spec_sha256": "e56885005487b36b573c1bf4d47741413ca72df0992ff62bcf48891eecacb429",
+      "identity_constructor_path": "experiments/jev-information-density-v08n/generator/src/generator.rs",
+      "identity_constructor_sha256": "f04a9b1d4f6682522e5957be3c0075db4bd7aa4e4e25968650f2ff24a42c7f5b",
+      "surface_serializer_path": "experiments/jev-frozen-readout-v01/probe.py",
+      "surface_serializer_sha256": "a3049d52e1183c806c84522a617a05646eb86fbcb69af72b5bb26f4808852cb1",
+      "surface_rule": "name + U+2014 EM DASH + one space + description; preserve exact UTF-8 bytes; no normalization"
+    },
+    "feature_identity_key": "candidate_semantic_id",
+    "schema_join_key": "schema_family_id plus exact candidate_semantic_id; never candidate slot or training-schema positional correspondence",
+    "canonical_serialization_order": "candidate_vector_index in the sealed 16-row text manifest, ordered by the four authoritative held-out FamilySpecs and each FamilySpec candidate order; this index is storage order only and is not a semantic crosswalk",
+    "candidates": [
+      {"schema_family_id": "jev-v08n-schema:exposure_control", "candidate_semantic_ids": ["exposure_control::overexposure", "exposure_control::underexposure", "exposure_control::contrast_drift", "exposure_control::sensor_bias"]},
+      {"schema_family_id": "jev-v08n-schema:respiratory_monitoring", "candidate_semantic_ids": ["respiratory_monitoring::rapid_breathing", "respiratory_monitoring::slow_breathing", "respiratory_monitoring::irregular_breathing", "respiratory_monitoring::sensor_bias"]},
+      {"schema_family_id": "jev-v08n-schema:salinity_control", "candidate_semantic_ids": ["salinity_control::high_salinity", "salinity_control::low_salinity", "salinity_control::mineral_imbalance", "salinity_control::sensor_bias"]},
+      {"schema_family_id": "jev-v08n-schema:vibration_monitoring", "candidate_semantic_ids": ["vibration_monitoring::excess_vibration", "vibration_monitoring::low_vibration", "vibration_monitoring::resonance", "vibration_monitoring::sensor_bias"]}
+    ],
+    "candidate_count": 16,
+    "expected_tensor_shape": [16, 2048],
+    "expected_tensor_dtype": "float32",
+    "metadata_preflight": {
+      "status": "PASS_METADATA_ONLY_CANDIDATE_BASIS_CONSTRUCTIBLE",
+      "token_counts": [14, 15, 13, 14, 13, 14, 12, 14, 12, 13, 15, 14, 13, 13, 14, 14],
+      "maximum_tokens": 15,
+      "frozen_maximum_length": 1024,
+      "training_candidate_identity_overlap": 0,
+      "feature_vectors_created": false,
+      "heldout_targets_used": false,
+      "head_checkpoints_loaded": false
+    }
+  },
+  "frozen_extraction_recipe": {
+    "backbone": {
+      "repo_id": "LiquidAI/LFM2.5-1.2B-Base",
+      "revision": "7453bca97ca1e67754c4035a4b4c584e1c9dd725",
+      "backbone_frozen": true,
+      "snapshot_directory": "D:/codex-runs/jev-lfm-variable-v07/models/lfm2.5-1.2b-base",
+      "snapshot_file_sha256": {
+        "config.json": "15d6157fb6df3f8272e2fe90e18f57727ccf02a125c94469198b0f3281510185",
+        "model.safetensors": "7678ab9546a0c51c1fca161876b1efc4f0906277f170b5822045f40fdaf9eeff",
+        "tokenizer.json": "d7a0ab0fc22e41ec8c6d7450a9ff9ce40e196ec5e5a2fa6a2105e064e0514ed7",
+        "tokenizer_config.json": "8cba5b0c7acab23a0d4cc9ac587346c9220a1b6d288fc5346fe118202fd6f43e",
+        "special_tokens_map.json": "742aefe2b7dec496e8caffdba03a75d0c1a9925d53bd3f3e0d388c96b591b6f4"
+      },
+      "network_access": false,
+      "trust_remote_code": false
+    },
+    "encoder": {
+      "path": "experiments/jev-lfm-variable-v07/extract_lfm.py::encode_lfm_texts",
+      "sha256": "b8cd79a9a3265eca0fde5f509ba7c058bc2065d7747efe17ff7c7c1f6335b2d0",
+      "settings": "feature_key=mean_full@16; final-layer mean_full pooling; exact-length input; single-row batch_size=1; no padding; add_special_tokens=true; truncation=true with max_length=1024, but abort unless independently tokenized input is untruncated; frozen backbone internal dtype=bfloat16; exported feature dtype=float32"
+    },
+    "candidate_order": "exact order in the sealed 16-row text manifest; retain every unique semantic ID; no deduplication",
+    "required_feature_validation": [
+      "revalidate every bound source hash and text hash before extraction",
+      "verify local pinned snapshot hashes; disable network and remote code",
+      "encode only the 16 manifest texts; do not read targets, training heads, predictions, metrics, or evaluation outcomes",
+      "verify output shape 16x2048, float32, contiguous, and all finite",
+      "perform a second clean-process extraction with the same exact recipe; require max absolute tensor difference <= 1e-5 and record both tensor/file hashes",
+      "seal the canonical first-pass tensor and receipt; any mismatch fails closed without alternative input text, candidate replacement, or extraction settings"
+    ],
+    "future_output_root": "D:/codex-runs/jev-information-density-v08n-e1/v0.8N-E1-heldout-candidate-basis-v01",
+    "future_output_paths": [
+      "feature-cache/heldout-candidate-features.pt",
+      "feature-cache/heldout-candidate-feature-receipt.json",
+      "feature-cache/heldout-candidate-token-lengths.json",
+      "feature-cache/repeat-parity-receipt.json"
+    ],
+    "future_output_root_must_not_be_created_before_extraction_authorization": true
+  },
+  "future_target_free_join_preflight": {
+    "required_after_feature_basis_is_sealed": true,
+    "requires_separate_panel_unlock": false,
+    "source_scope": "sealed panel schema/candidate identity metadata only; no target or body text",
+    "checks": [
+      "reconcile all 2000 neighborhoods against exactly four candidate_semantic_id rows from their schema namespace",
+      "prove every candidate identity resolves to exactly one feature row and each neighborhood has four unique candidate identities",
+      "verify all four schemas and 500 neighborhoods per schema",
+      "report no missing, duplicate, or extra identity joins",
+      "do not load head checkpoints or execute inference"
+    ],
+    "failure_disposition": "E1_BASIS_OR_JOIN_INCOMPLETE; do not request a second panel opening"
+  },
+  "future_evaluation": {
+    "requires_distinct_explicit_authorization": true,
+    "panel_opening_count_after_original": 1,
+    "second_opening_authorized_by_this_contract": false,
+    "use_exactly_nine_sealed_terminal_checkpoints": true,
+    "no_retraining_or_checkpoint_substitution": true,
+    "no_newtight_or_legacy_evaluation": true,
+    "no_phoenix": true,
+    "prediction_sealing_before_analysis": true,
+    "analysis_contract_unchanged_sha256": "0072c44903ea253cd8ad288cda8c100270f19d909ddced098af32d388ac29e1f",
+    "labeling": "Post-registered E1 repaired held-out evaluation of the already sealed Phase-B checkpoints; not the preregistered original Phase-B result",
+    "interpretation_limit": "Encoding the held-out candidate texts proves that the frozen semantic candidate interface is independently computable at the required dimension. It does not validate a training-to-held-out semantic crosswalk, prove out-of-schema performance, or establish any behavioral outcome until a separately authorized evaluation is completed."
+  },
+  "forbidden_information_and_actions_before_separate_authorization": {
+    "candidate_feature_extraction": false,
+    "head_checkpoint_load": false,
+    "head_inference": false,
+    "heldout_target_read_for_mapping_or_extraction": false,
+    "predictions_or_metric_read_or_created": false,
+    "second_panel_unlock": false,
+    "new_panel_or_replacement_panel": false,
+    "newtight_or_legacy_access": false,
+    "training_or_checkpoint_changes": false,
+    "candidate_slot_crosswalk": false,
+    "nearest_candidate_or_cosine_search": false,
+    "learned_transformation_or_candidate_order_optimization": false,
+    "phoenix_access": false
+  },
+  "authorization_state": {
+    "candidate_extraction_authorized": false,
+    "second_panel_opening_authorized": false,
+    "head_inference_authorized": false,
+    "newtight_authorized": false,
+    "phase_b_original_contract_modified": false
+  }
+}

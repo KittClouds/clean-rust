@@ -1,0 +1,60 @@
+{
+  "schema": "FAS_E4_0_TRACK_B_V03_ATTEMPT_NOTE_V01",
+  "receipt_id": "FAS_E4_0_TRACK_B_V03_ATTEMPT_NOTE_V01",
+  "status": "PREMODEL_NAMEERROR_REPAIRED_IN_VERSIONED_SUCCESSOR",
+  "recorded_utc": "2026-09-26T23:32:35Z",
+  "stopped_attempt": {
+    "stage": "ONLINE_CACHE_PARITY",
+    "failure": "NameError in e4_gpu_lease_v01.make_gpu_lease: stage_output_root was referenced but not imported or defined in that module.",
+    "classification": "PREMODEL_RUNNER_IMPLEMENTATION_FAILURE",
+    "parity_output_directory_created": false,
+    "gpu_lease_created": false,
+    "model_contact": false,
+    "cuda_contact": false,
+    "labels_opened": false
+  },
+  "source_identity_review": {
+    "v06_contract_id": "FAS_FROZEN_CAPABILITY_FABRIC_E4_0_V06",
+    "v06_seal_id": "FAS_E4_0_CONTRACT_V06_SEAL",
+    "v06_seal_root_sha256": "7344badf07476d19d9c6228f80d026a112c339e93daa75593e61031f68456e64",
+    "v06_contract_sha256": "ea4f11cec5d65a3be7716c77febf5d448d8ebf1a5a4049aee5d25d51c0c50958",
+    "v06_seal_manifest_sha256": "799d1535a16ea6fbf2269206443addf96736ef8a70ca5ab3373cdd5e6a44605c",
+    "bound_affected_sources": [
+      "source/scripts/e4_gpu_lease_v01.py",
+      "source/scripts/e4_runner_modes_v02.py",
+      "source/scripts/e4_online_parity_v02.py"
+    ],
+    "v06_files_modified": false,
+    "root_cause": "stage_output_root is defined in e4_runner_artifacts_v02.py; e4_gpu_lease_v01.py imports common_v01 only, where stage_output_root is absent."
+  },
+  "repair": {
+    "target_contract_id": "FAS_FROZEN_CAPABILITY_FABRIC_E4_0_V07",
+    "target_seal_id": "FAS_E4_0_CONTRACT_V07_SEAL",
+    "source_change": "Create v07 successor common/artifact/mode/entrypoint modules and e4_gpu_lease_v03. The lease factory accepts the already validated absolute stage output root from the mode runner and writes its release receipt beneath it. The mode successor imports the lease API from v03.",
+    "science_or_resource_gate_change": false,
+    "representation_abi_change": false,
+    "model_or_tokenizer_identity_change": false,
+    "output_or_truth_boundary_change": false
+  },
+  "preservation_note": {
+    "path": "source/scripts/e4_gpu_lease_v02.py",
+    "bytes": 23188,
+    "sha256": "4fc65b5433bde1509797d6c84a5cc36912b5135980f5dd45a09ca56f0996d9e2",
+    "v07_source_closure_member": false,
+    "pre_edit_origin": "UNKNOWN; no verified pre-change hash or backup was available. Current bytes were preserved as directed and not included in the v07 closure."
+  },
+  "validation": {
+    "synthetic_track_b_tests": "15/15 PASS",
+    "py_compile": "PASS",
+    "cli_help": "PASS",
+    "focused_factory_regression": "PASS_WITHOUT_LEASE_ACQUISITION"
+  },
+  "scope": {
+    "real_authorization_issued": false,
+    "tokenizer_contact": false,
+    "model_contact": false,
+    "cuda_contact": false,
+    "e4_population_materialized": false,
+    "labels_opened": false
+  }
+}

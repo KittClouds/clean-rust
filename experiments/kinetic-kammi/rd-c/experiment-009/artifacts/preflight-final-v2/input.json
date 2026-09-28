@@ -1,0 +1,30 @@
+{
+  "task_id": "preflight-authority-replay",
+  "frame_hash_hex": "a0e87b5e175688f611d808b9d0f5e76981535bce86cde2ddfd450d08a887bbcd",
+  "selected_patch_sha256": "29e8722b801f66a2ccad73226f0c1f66579b3363b6e4993b945c06a9074edb77",
+  "action_ledger_path": "C:\\rd-c\\experiment-009\\artifacts\\preflight-final-v2\\actions.bin",
+  "actions": [
+    {
+      "id": 23,
+      "schema_id": 1
+    },
+    {
+      "id": 71,
+      "schema_id": 1
+    },
+    {
+      "id": 14,
+      "schema_id": 1
+    }
+  ],
+  "observer_output": {
+    "action_choice": 23,
+    "applicability_milli": 800,
+    "abstention_milli": 200
+  },
+  "thresholds": {
+    "minimum_applicability_milli": 700,
+    "maximum_abstention_milli": 600
+  },
+  "completion_check_passed": true
+}

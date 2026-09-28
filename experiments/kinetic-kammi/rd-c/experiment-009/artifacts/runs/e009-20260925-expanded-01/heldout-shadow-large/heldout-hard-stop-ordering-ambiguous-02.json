@@ -1,0 +1,156 @@
+{
+  "schema_version": 1,
+  "run_id": "e009-20260925-expanded-01",
+  "stage": "heldout-shadow-large",
+  "role": "large",
+  "bundle_id": "ternary-bonsai-2-27b-ptq1-local-v3",
+  "bundle_blake3": "10718ac888360735f332dfa545e5db53b235a02159d924d90fc3370124550281",
+  "bundle_lock_sha256": "e6027516ebf46a536533a5a35afc1b5280153e3146c1f503e75d4ec13969f2d6",
+  "frozen_input_lock_sha256": "def427389b4fac2b0b307e222b8c62d788eea02ea39e4e7d65643537b2c5968b",
+  "frame_lock_sha256": "fea435d14ccf9cba99502a50efc1d7f95191c53bb271b7ed210bcb11dbfb0d67",
+  "frame_blake3": "5978024d093f6c98513f7e7408ad38bd348830b6798307a5dcb238c84c9e8dbd",
+  "task_id": "heldout-hard-stop-ordering-ambiguous-02",
+  "server_alias": "e009-large-v3",
+  "server_process_id": 440,
+  "server_runtime_args": [
+    "--model",
+    "D:\\phoenix-models\\candidates\\ternary-bonsai-2-27b\\6ed5e12bf84b7a63069882c91dd9e9218647d17b\\Ternary-Bonsai-2-27B-PTQ1_0.gguf",
+    "--host",
+    "127.0.0.1",
+    "--port",
+    "18090",
+    "--alias",
+    "e009-large-v3",
+    "--ctx-size",
+    "4096",
+    "--n-gpu-layers",
+    "99",
+    "--reasoning",
+    "off"
+  ],
+  "reasoning_mode": "off",
+  "chat_template_sha256": "c3cf9e34abf4f9e36c2d72165aa9c132d3e2a725b6c2586aaa3a8af9d7a81041",
+  "maximum_output_tokens": 1024,
+  "system_prompt_sha256": "2b97ece95d1afb065fed7287d5125e8e032196c209610c9bc9931841aa1db7e6",
+  "output_schema_sha256": "d3e44b9964d52bb68384b83e17d9cb5699be96bae7dc98d576acaaabcf3eb8ef",
+  "thresholds": {
+    "minimum_applicability_milli": 50,
+    "maximum_abstention_milli": 180
+  },
+  "model": "e009-large-v3",
+  "request_sha256": "443dd8f24a9c84dd057f8dc564e82282341b9287f0fb46f0869024a109c8fe4a",
+  "request": {
+    "model": "e009-large-v3",
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a typed observer in a deterministic coding workflow. The runtime owns workflow state and will execute only one action from the offered action_options after validating your output.\n\nRead the task_prompt and evidence, then compare the offered actions. Choose the action most likely to satisfy the task while preserving the repository's stated constraints. Do not write or propose code outside the offered choices. Do not claim to have executed tests. If no offered action is sufficiently supported, use null for action_choice and express uncertainty with abstention_milli.\n\nReturn exactly one JSON object matching the provided schema. action_choice must be an offered numeric action ID or null. applicability_milli is your 0-to-1000 estimate that this observer can handle the task from the available evidence. abstention_milli is your 0-to-1000 estimate that the runtime should defer this choice. Use integer values only. Do not add prose or fields.\n"
+      },
+      {
+        "role": "user",
+        "content": "{\"schema_id\":\"rdc-real-coding-observation.v1\",\"task_id\":\"heldout-hard-stop-ordering-ambiguous-02\",\"task_family\":\"hard-stop-ordering\",\"task_prompt\":\"Repair a palette lookup at a duplicated stop position. Use the frozen test to determine how the search boundary should treat equal positions and which duplicate supplies the sampled color.\",\"repository_revision\":\"9a88547372cd35f8dc31f026f0cd8dd8fca8e641\",\"snapshot_sha256\":\"3d5a84a26be2ec7ced98e4661db8c5acc317a4c3dada0cafca988c36a70b9d9c\",\"evidence\":[{\"kind\":\"source_excerpt\",\"source_id\":\"phoenix-native/crates/gpui-animated-gradient-text/src/palette.rs\",\"content_blake3\":\"2b678cd40118b24b9092eeeb460a9a77863c4cb13782016c9760b355f1afc132\",\"content\":\"The current task snapshot uses a strict less-than lookup, so a stop exactly at 0.5 is excluded. The frozen test creates duplicate stops at 0.5 and requires the last duplicate's blue color.\\nCurrent task-snapshot code: `.partition_point(|stop| stop.stop.position < position);`\"},{\"kind\":\"baseline_tool_result\",\"source_id\":\"cargo-test-palette::tests::explicit_hard_stop_uses_the_last_duplicate-frozen-base\",\"content_blake3\":\"b38af5fd51d7d66cf002367d1c98e8279a10d06bf1c19a91a5618c9d9638ae6b\",\"content\":\"Task snapshot 3d5a84a26be2ec7ced98e4661db8c5acc317a4c3dada0cafca988c36a70b9d9c: exact test `palette::tests::explicit_hard_stop_uses_the_last_duplicate` ran on the current snapshot and failed 1/1. No candidate repair has been executed in this episode.\"}],\"action_options\":[{\"action\":{\"id\":11,\"schema_id\":1},\"summary\":\"Retain the current implementation.\",\"diff_excerpt\":\"No source changes; retain the current expression.\",\"patch_sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"},{\"action\":{\"id\":37,\"schema_id\":1},\"summary\":\"Apply the alternate implementation patch.\",\"diff_excerpt\":\"Patch lines:\\n-            .partition_point(|stop| stop.stop.position < position);\\n+            .partition_point(|stop| stop.stop.position <= position).saturating_sub(2);\",\"patch_sha256\":\"54bac4baa15313b7cbce3be56f1f40b86e618c3b2f30c1600562acb900eace4f\"},{\"action\":{\"id\":68,\"schema_id\":1},\"summary\":\"Apply the focused implementation patch.\",\"diff_excerpt\":\"Patch lines:\\n-            .partition_point(|stop| stop.stop.position < position);\\n+            .partition_point(|stop| stop.stop.position <= position);\",\"patch_sha256\":\"559f2cc203927e4b012a214d9badb5707d22db260b2ec3972a378ea210643899\"},{\"action\":{\"id\":94,\"schema_id\":1},\"summary\":\"Apply the focused patch with an explanatory source comment.\",\"diff_excerpt\":\"Patch lines:\\n+// E009 candidate: behavior-preserving repair note.\\n-            .partition_point(|stop| stop.stop.position < position);\\n+            .partition_point(|stop| stop.stop.position <= position);\",\"patch_sha256\":\"0632928157e6c4f114b66981a35995a0c6e3c69d86b019f0bbc0a71f2e45bc5c\"}]}"
+      }
+    ],
+    "temperature": 0,
+    "top_p": 1,
+    "seed": 0,
+    "max_tokens": 1024,
+    "stream": false,
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rdc_coding_observer_output_v1",
+        "strict": true,
+        "schema": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "rdc-coding-observer-output.v1",
+          "title": "RDC Coding Observer Output v1",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "action_choice",
+            "applicability_milli",
+            "abstention_milli"
+          ],
+          "properties": {
+            "action_choice": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 65535
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "applicability_milli": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1000
+            },
+            "abstention_milli": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1000
+            }
+          }
+        }
+      }
+    }
+  },
+  "http_status": 200,
+  "response": {
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "{\n  \"action_choice\": 68,\n  \"applicability_milli\": 920,\n  \"abstention_milli\": 80\n}"
+        }
+      }
+    ],
+    "created": 1790353729,
+    "model": "e009-large-v3",
+    "system_fingerprint": "b10685-7dffb158d",
+    "object": "chat.completion",
+    "usage": {
+      "completion_tokens": 39,
+      "prompt_tokens": 1217,
+      "total_tokens": 1256,
+      "prompt_tokens_details": {
+        "cached_tokens": 194
+      }
+    },
+    "id": "chatcmpl-8xmhJilWZyuAfmHQxtdhjLDK24GIXEqO",
+    "timings": {
+      "cache_n": 194,
+      "prompt_n": 1023,
+      "prompt_ms": 1900.531,
+      "prompt_per_token_ms": 1.8578015640273704,
+      "prompt_per_second": 538.2706201582611,
+      "predicted_n": 39,
+      "predicted_ms": 755.295,
+      "predicted_per_token_ms": 19.876184210526315,
+      "predicted_per_second": 50.311467704671685
+    }
+  },
+  "content": "{\n  \"action_choice\": 68,\n  \"applicability_milli\": 920,\n  \"abstention_milli\": 80\n}",
+  "output": {
+    "action_choice": 68,
+    "applicability_milli": 920,
+    "abstention_milli": 80
+  },
+  "usage": {
+    "completion_tokens": 39,
+    "prompt_tokens": 1217,
+    "total_tokens": 1256,
+    "prompt_tokens_details": {
+      "cached_tokens": 194
+    }
+  },
+  "finish_reason": "stop",
+  "elapsed_ms": 2827.986
+}

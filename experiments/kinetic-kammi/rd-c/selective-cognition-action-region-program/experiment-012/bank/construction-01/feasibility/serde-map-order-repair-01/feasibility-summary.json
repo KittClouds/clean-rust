@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "state": "OFFLINE_FEASIBILITY_ONLY",
+  "model_contact_authorized": false,
+  "family": "map-order-feature-contract",
+  "candidate_ids_hidden_role_map": {
+    "preserve_order_only": 28214,
+    "sorted_profile_only": 59171,
+    "canonical_sort": 31314,
+    "reverse_native": 38651
+  },
+  "baseline_pass_by_case": {
+    "case-01": true,
+    "case-02": false,
+    "case-03": true,
+    "case-04": false
+  },
+  "candidate_pass_matrix_hidden_roles": {
+    "preserve_order_only": {
+      "case-01": false,
+      "case-02": false,
+      "case-03": false,
+      "case-04": false
+    },
+    "sorted_profile_only": {
+      "case-01": true,
+      "case-02": false,
+      "case-03": true,
+      "case-04": false
+    },
+    "canonical_sort": {
+      "case-01": true,
+      "case-02": false,
+      "case-03": true,
+      "case-04": false
+    },
+    "reverse_native": {
+      "case-01": false,
+      "case-02": true,
+      "case-03": false,
+      "case-04": false
+    }
+  },
+  "code_sha256": {
+    "base": "dfaace8b58ec06169f29dd2614894acdd4114255b8fced69baa5ea6b0b3a6950",
+    "preserve_order_only": "aca30f2211b8aaa08a43db8cc0b505c54bee77327e6f0590383d868b6a4a3ee6",
+    "sorted_profile_only": "1870a17dd8cbf1840b4c660b93236c1afb3c1bb7e68fcc3e10aa47e81eed89bc",
+    "canonical_sort": "a0eb7055630f7881a1fde7b114af90d7c884c9313fc222f2cf8035dd59e285f8",
+    "reverse_native": "230444bf3250f72930ca178fd220b048974279ef518880cb1de6ca7a3c3f7aac"
+  },
+  "intended_contract": "Preserve input order with preserve_order enabled and emit lexical order without it; the typed Cargo feature state is the context channel."
+}

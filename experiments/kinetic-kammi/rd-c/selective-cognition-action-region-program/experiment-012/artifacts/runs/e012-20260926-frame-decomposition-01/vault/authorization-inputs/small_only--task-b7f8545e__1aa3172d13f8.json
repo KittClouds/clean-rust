@@ -1,0 +1,62 @@
+{
+  "task_id": "small_only-task-b7f8545e__1aa3172d13f8",
+  "frame_digest_hex": "1aa3172d13f8f62267a8554aecb346cbc9c164b83aed33d49f1cfee52434bee8",
+  "request_id_hex": "c320d582591ffe7fc7a12e60b44da8c31275b0f3459fe976b07fb88012c95520",
+  "response_request_id_hex": "c320d582591ffe7fc7a12e60b44da8c31275b0f3459fe976b07fb88012c95520",
+  "request_receipt_digest_hex": "e0948148f0ac1f58c295672d8427b8d77d5c281cad3c487abbd1b87d4f0bf592",
+  "response_receipt_digest_hex": "e0948148f0ac1f58c295672d8427b8d77d5c281cad3c487abbd1b87d4f0bf592",
+  "presentation_receipt_hex": "524443510100040000001aa3172d13f8f62267a8554aecb346cbc9c164b83aed33d49f1cfee52434bee8f4b44b09f478a0da31251901670c8a524d38272d4bf1aff4da7f0818ca168506fc551bf1161b5e7665a124206c541db0bbbfac7ebec5dc218f3fa8d2cad77eebc566948032f04a35e766db2d826146eeb206e34ec8a99c5dcccc41e7be2618bd188cb689f4cec5f029b1f62eab215d28324ddfc371590c95fb734be62842c561de7e13b2663f7ddf532101a0e648fc7227514311d95b57e78a2478ed90592ca58222350b2dd35218",
+  "action_ledger_path": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\artifacts\\runs\\e012-20260926-frame-decomposition-01\\action-ledgers\\small_only\\task-b7f8545e__1aa3172d13f8.bin",
+  "ordered_options": [
+    {
+      "producer_ordinal": 0,
+      "action": {
+        "id": 22012,
+        "schema_id": 1
+      },
+      "summary": "Apply the candidate change shown in the code excerpt.",
+      "diff_excerpt": "API context: the parser accepts exactly the finite values \"fast\" and \"safe\"; other strings are rejected.\n@@ -5,7 +5,7 @@\n         Arg::new(\"speed\")\n             .long(\"speed\")\n             // E012 candidate slot.\n-            .value_parser([\"broken\"]),\n+            .value_parser([\"fast\", \"safe\"]),\n     );\n     command\n         .try_get_matches_from([\"demo\", \"--speed\", value])",
+      "patch_sha256": "1bf1161b5e7665a124206c541db0bbbfac7ebec5dc218f3fa8d2cad77eebc566"
+    },
+    {
+      "producer_ordinal": 1,
+      "action": {
+        "id": 32916,
+        "schema_id": 1
+      },
+      "summary": "Apply the candidate change shown in the code excerpt.",
+      "diff_excerpt": "API context: the parser accepts exactly the finite values \"fast\" and \"safe\"; other strings are rejected.\n@@ -5,7 +5,7 @@\n         Arg::new(\"speed\")\n             .long(\"speed\")\n             // E012 candidate slot.\n-            .value_parser([\"broken\"]),\n+            .value_parser(clap::builder::NonEmptyStringValueParser::new()),\n     );\n     command\n         .try_get_matches_from([\"demo\", \"--speed\", value])",
+      "patch_sha256": "32f04a35e766db2d826146eeb206e34ec8a99c5dcccc41e7be2618bd188cb689"
+    },
+    {
+      "producer_ordinal": 2,
+      "action": {
+        "id": 52980,
+        "schema_id": 1
+      },
+      "summary": "Apply the candidate change shown in the code excerpt.",
+      "diff_excerpt": "API context: the parser accepts exactly the finite values \"fast\" and \"safe\"; other strings are rejected.\n@@ -5,7 +5,7 @@\n         Arg::new(\"speed\")\n             .long(\"speed\")\n             // E012 candidate slot.\n-            .value_parser([\"broken\"]),\n+            .value_parser([\"fast\", \"safe\", \"auto\"]),\n     );\n     command\n         .try_get_matches_from([\"demo\", \"--speed\", value])",
+      "patch_sha256": "c5f029b1f62eab215d28324ddfc371590c95fb734be62842c561de7e13b2663f"
+    },
+    {
+      "producer_ordinal": 3,
+      "action": {
+        "id": 57213,
+        "schema_id": 1
+      },
+      "summary": "Apply the candidate change shown in the code excerpt.",
+      "diff_excerpt": "API context: the parser accepts exactly the finite values \"fast\" and \"safe\"; other strings are rejected.\n@@ -5,7 +5,7 @@\n         Arg::new(\"speed\")\n             .long(\"speed\")\n             // E012 candidate slot.\n-            .value_parser([\"broken\"]),\n+            .value_parser([\"quick\", \"safe\"]),\n     );\n     command\n         .try_get_matches_from([\"demo\", \"--speed\", value])",
+      "patch_sha256": "532101a0e648fc7227514311d95b57e78a2478ed90592ca58222350b2dd35218"
+    }
+  ],
+  "observer_output": {
+    "action_choice": null,
+    "applicability_milli": 0,
+    "abstention_milli": 1000
+  },
+  "thresholds": {
+    "minimum_applicability_milli": 850,
+    "maximum_abstention_milli": 150
+  },
+  "completion_check_passed": false
+}

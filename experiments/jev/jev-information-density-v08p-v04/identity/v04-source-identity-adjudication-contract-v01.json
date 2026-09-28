@@ -1,0 +1,69 @@
+{
+  "protocol": "jev-information-density/v0.8p-v04-source-identity-adjudication-v01",
+  "identity": "v0.8P-v04-source-identity-adjudication-v01",
+  "status": "STAGE_A_AUTHORIZED_STAGE_B_CONDITIONAL",
+  "purpose": "Determine, without reading the mismatching E1 seal-manifest object, which already-sealed authority binds the expected SHA-256 recorded in the terminal v03 allowlist.",
+  "v03_disposition": "FINISHED_FAIL_CLOSED; DO_NOT_RETRY_OR_EDIT",
+  "stage_a": {
+    "authorized": true,
+    "candidate_expected_source_from_v03": {
+      "path": "D:\\codex-runs\\jev-information-density-v08n\\v0.8N-eval-panel-v01\\seal\\seal-manifest.json",
+      "sha256": "425cef320df94e2b47b448203f8a916ebbcbb2019539b2d09e51f5b4ced92f614",
+      "v03_allowlist_json_pointer": "/authorized_sources/1/expected_sha256"
+    },
+    "e1_source_bytes_allowed": [
+      {
+        "path": "D:\\codex-runs\\jev-information-density-v08n\\v0.8N-eval-panel-v01\\seal\\evaluation-firewall-lock.json",
+        "expected_sha256": "79d25ac82fba1bc6332e16d8bc5f877fadd11cccaed5ef3f07eacfe5e1877da2",
+        "permitted_use": "read only the already-sealed binding that names the exact panel seal-manifest path and SHA-256; no neighboring files"
+      }
+    ],
+    "local_authority_records": [
+      {
+        "path": "experiments/jev-information-density-v08n/eval-panel-v01-contract.json",
+        "sha256": "3fa547c0a2490c4cfb5d578a32dffeb8414c35daa5e59ef339ab1e148e2e9cd6",
+        "role": "sealed panel protocol identity"
+      },
+      {
+        "path": "experiments/jev-information-density-v08p-v03/identity/source-allowlist-v01.json",
+        "sha256": "43bdf7408ef2b0e6fbcdd75b4848fd7631870d4312624e39b917ef554d62f854",
+        "role": "records the expected v03 path/hash assertion"
+      },
+      {
+        "path": "experiments/jev-information-density-v08p-v03/provenance/extraction-attempt-1-failure-v01.json",
+        "sha256": "06932c8100f36218f9ee392f44c17cfa75bfab4756e1c399a3e0bed22a9ab5ce",
+        "role": "records the fail-closed mismatch without an observed digest"
+      }
+    ],
+    "forbidden": [
+      "E1 seal-manifest bytes",
+      "E1 matched-panel manifest bytes",
+      "E1 candidate joins or feature files",
+      "E1 targets, predictions, metrics, geometry, or head outputs",
+      "v01 or v02 quarantined content",
+      "directory enumeration, globbing, repository search, or neighboring artifact discovery"
+    ],
+    "required_output": [
+      "expected source path",
+      "expected source SHA-256",
+      "authority artifact path and SHA-256",
+      "JSON pointer carrying the binding",
+      "derivation of the v03 expected hash",
+      "Stage A disposition"
+    ]
+  },
+  "stage_b": {
+    "authorized": "CONDITIONAL_ON_STAGE_A_UNAMBIGUOUS_EXACT_BINDING",
+    "permitted_operation": "one hash-only read of the one exact source path and expected digest Stage A establishes",
+    "must_persist_before_stop": ["authorized_path_hash", "expected_sha256", "observed_sha256", "bytes_read", "purpose", "match"],
+    "semantic_parsing": false,
+    "retry": false
+  },
+  "explicit_non_authorizations": {
+    "new_denylist_extraction": false,
+    "panel_construction": false,
+    "lfm_contact": false,
+    "training": false,
+    "evaluation": false
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "experiment": "E012 Prospective Frame Decomposition",
+  "state": "FROZEN_BEFORE_SCORED_TASK_FIXTURES",
+  "model_contact_authorized": false,
+  "supersedes_spec": "task-construction-spec-v1.json",
+  "amendments": ["E012-BANK-A04", "E012-BANK-A05"],
+  "task_count": 48,
+  "family_count": 12,
+  "repository_count": 3,
+  "conditions_per_task": 26,
+  "frame_count": 1248,
+  "candidate_task_check_rows": 192,
+  "candidate_case_invocations": 384,
+  "base_task_check_rows": 48,
+  "base_case_invocations": 96,
+  "candidate_coordinate_contract": {
+    "source_fixture_order": "seeded four-row Latin schedule built by deterministic backtracking",
+    "action_position_balance": "each action ID appears once per position within each four-task family",
+    "gold_position_balance": "each gold action appears once per position within each four-task action family",
+    "passing_option_position_balance": "minimize per-position passing-option count spread; positions remain mixed when exact equality is infeasible",
+    "balanced_coordinate_control": "reverse each row's producer sequence",
+    "isomorphic_donor_coordinate": "same-pair role-to-position transfer mapped to recipient IDs",
+    "receipt": "every projected condition has an E011 presentation receipt"
+  },
+  "donor_contract": "all donors are nonself and within pair_id; swaps prefer a differing target channel while minimizing other-channel differences",
+  "observer_contract": "E009 v5 prompt/schema/model bundle, thresholds, normalization, producer-order runtime, and deterministic authority stay frozen",
+  "observer_contact_gate": "separate FROZEN_BEFORE_MODEL_CONTACT lock after construction and passing audits"
+}

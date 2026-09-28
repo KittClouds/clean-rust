@@ -1,0 +1,57 @@
+{
+  "classification_counts": {
+    "MOVABLE_NOT_TARGETABLE": 29,
+    "NO_EFFECT_AUTHORITY": 61,
+    "TARGETABLE_AND_COMPATIBLE": 14,
+    "TARGETABLE_WITH_COLLATERAL_LOCK": 19
+  },
+  "co_attainment_max": 73804,
+  "co_attainment_nonzero_pairs": 359,
+  "co_attainment_sha256": "3DD629C3F9DF1A6864EA81D22036F23706D460110FE4F92E8C9AAF5A166938E0",
+  "context": [
+    "seed9731-R-tau4.json",
+    3
+  ],
+  "engineering_only": true,
+  "first_target_order_counts": {
+    "1": 2,
+    "2": 23,
+    "3": 8,
+    "never": 90
+  },
+  "identity": "q10-gc1-lr1-requal1-csc1-resid1-r1-v1",
+  "orders": {
+    "1": {
+      "records": 5,
+      "states_with_target_residual": 4,
+      "valid": 5
+    },
+    "2": {
+      "records": 1438,
+      "states_with_target_residual": 1211,
+      "valid": 1438
+    },
+    "3": {
+      "records": 225429,
+      "states_with_target_residual": 198911,
+      "valid": 225429
+    }
+  },
+  "parent_sha256": {
+    "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-lr1-requal1-csc1-o1-readmat1-v1\\execution.json": "03E92DAB87ABD55146AA68B77C20735C35A55D1F5B739976007D9A3F960F79AB",
+    "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-lr1-requal1-csc1-o1-readmat1-v1\\records.jsonl": "9E76858278B49D6208F3848E2E7D8068A4CA17C2D53B0DFEE70FDB7AE2F5D6FE",
+    "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-lr1-requal1-csc1-o3-maskmat1-v1\\execution.json": "D8E93BC27D08C73D7A63CB0520C02012095FA89FBF5771A606B944F64FD56099",
+    "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-lr1-requal1-csc1-o3-maskmat1-v1\\schema.json": "54A926C86F1D5DCBA59A4122316611263FB084EBE23BA44DF7A92F1BB40DBF2E",
+    "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-lr1-requal1-csc1-o3-maskmat1-v1\\semantic.bin": "0747C9928B96295A688381E4FF5A70C1E1FD75B4C30AA883B16B976CC40849B6",
+    "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-lr1-requal1-csc1-o3-maskmat1-v1\\semantic.jsonl": "6435788E00ED56E124B9844733CD5CED586C678516486079F63B980ED82B0B2E",
+    "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-lr1-requal1-csc1-pair-front1-v2\\execution.json": "5EB2CC6BC10A21CE2497FEA927A0003A85B7BEDDB280D886EF11C9A4A9C8A3A9",
+    "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-lr1-requal1-csc1-pair-front1-v2\\shards\\seed9731-R-tau4__set3.jsonl": "C56E924387CE319038150A481D485EF188B8380E87CB9A7BB3EEA0DC8A594695",
+    "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-lr1-requal1-sreplace-singles-v1\\scripts\\run_sreplace_singles.py": "839D885F193D5ED967EDE0EFA1457D245E23DDD86EC30FC00EDF1953732E6C0C"
+  },
+  "protocol": "Q10-RESID1-R1",
+  "reference_mismatch_count": 123,
+  "replay_executed": false,
+  "row_stats_sha256": "7024FFD1AE969AD20D04ADFDB32CD271963CD49864C91E70AEF29B3F16C1A3AA",
+  "scientific_promotion": false,
+  "status": "RESID1_R1_COMPLETE"
+}

@@ -1,0 +1,121 @@
+{
+  "protocol": "Q10-SR2",
+  "version": 1,
+  "status": "FROZEN_PRE_EXECUTION__NOT_EXECUTED",
+  "plan_sha256": "83C3C3147390A279807F85E450215B648C918AECBDEC3A366674B2D61FC42D64",
+  "parent": {
+    "protocol": "Q10-SM",
+    "plan_sha256": "8A70CFADA7A833AA1110FDE5DBF0CFAFDDD4AFD4297A06AD846B1959439B8B9D",
+    "contract_sha256": "5A7CD7E15724F6260C2D42296BED5FF3667CA32FA1D8D48E5408EFFA2A0F35BF",
+    "result_sha256": "68200D7F49B8A4B943150A1C3A5AB4B46DF4ED8EB1EBBE7A3DF45F8BEEBBD337",
+    "status_sha256": "D19D051DA550BCDED9C436F9A7164AF0C4322D8BB16C418D7C4CA9E04217A9C4",
+    "required_status": "Q10_SM_STAGE1_VALID__F32_SAFE_FREEDOM_PRESENT",
+    "audited_states": 5120,
+    "accepted_nonidentity_events": 5026,
+    "scientific_seed_bundles": 0
+  },
+  "predecessor_abort": {
+    "protocol": "Q10-SR",
+    "status": "Q10_SR_STAGE2A_INVALID",
+    "seed_opened": 9501,
+    "completed_event_receipts": 0,
+    "reason": "FROZEN_SEARCH_PERFORMANCE_BUDGET_EXCEEDED",
+    "resume_forbidden": true
+  },
+  "authorization": {
+    "engineering_only": true,
+    "scientific_seeds": 0,
+    "behavior": false,
+    "rewards": false,
+    "measured_cli": false,
+    "dh08b": false,
+    "stage_1b_requires_independent_stage_1a_review": true
+  },
+  "seeds": {
+    "stage_1a": [9511],
+    "stage_1b": [9512, 9513, 9514, 9515],
+    "events_per_seed": 1024,
+    "cumulative_events": 5120,
+    "sides": ["R", "L"],
+    "taus": [4.0, 16.0],
+    "replacement_or_topup": false
+  },
+  "capacity_gate": {
+    "factorization": "deterministic f64 nalgebra SVD",
+    "rank_multiplier": 1000.0,
+    "projection_tolerance": 2e-10,
+    "coefficient_resolution": 1e-12,
+    "search_entry": "initially mismatched and CAPACITY_EXACT_WITHIN_TOLERANCE",
+    "partial_or_empty_action": "record diagnostics and skip discrete search",
+    "numeric_ambiguity_action": "fail closed and do not search",
+    "nonlinear_repairability_claim_forbidden": true
+  },
+  "sparse_search": {
+    "state_weights": "sorted sparse coordinate entries with exact committed f32 bits",
+    "state_readout": "full authoritative f32 readout vector",
+    "state_objective": "frozen lexicographic objective",
+    "materialize_full_weights": "only for returned exact-readout endpoint",
+    "dead_coordinate_pruning": "coordinates absent from every authoritative row only",
+    "candidate_objective_max": "top-64 ULP cache with exact wide-incidence fallback",
+    "authoritative_replay": "full learner-order f32 row replay for every candidate",
+    "semantic_change": "capacity gate changes search denominator; sparse state preserves entered-search semantics"
+  },
+  "search_envelope": {
+    "beam_width": 64,
+    "branch_width": 64,
+    "maximum_moves": 64,
+    "maximum_moves_per_coordinate": 16,
+    "minimum_final_reserve_ulps": 16,
+    "reserve_ulps_at_start": 32,
+    "immediate_inverse_move": false,
+    "clipping": false,
+    "simulation_rng_consumption": false
+  },
+  "final_gates": {
+    "sequential_readout_bitwise_equal": true,
+    "outside_support_unchanged": true,
+    "separate_boundary_memberships_preserved": true,
+    "no_new_boundary_memberships": true,
+    "finite_and_in_bounds": true,
+    "final_reserve_ulps_each_direction": 16,
+    "maximum_coordinate_displacement_ulps": 16,
+    "maximum_total_moves": 64,
+    "normalized_cue_error": 2e-6,
+    "normalized_axis_error": 2e-6,
+    "normalized_norm_error": 2e-7,
+    "absolute_errors_required": true
+  },
+  "repair_statuses": [
+    "READOUT_ALREADY_EQUAL__FINAL_GATES_PASS",
+    "REPAIR_VALID",
+    "EXACT_READOUT_FOUND__FINAL_GATE_FAILURE",
+    "CAPACITY_GATE_SKIPPED__PARTIAL_OR_EMPTY",
+    "SEARCH_EXHAUSTED__CAPACITY_PRESENT",
+    "SEARCH_NUMERICALLY_AMBIGUOUS",
+    "PARENT_CONSTRUCTOR_INELIGIBLE",
+    "INTEGRITY_INVALID"
+  ],
+  "protocol_statuses": [
+    "DRAFT_PRE_FREEZE__NOT_EXECUTED",
+    "Q10_SR2_STAGE2A_VALID__REPAIR_FOUND",
+    "Q10_SR2_STAGE2A_VALID__NO_REPAIR_WITHIN_FROZEN_SEARCH",
+    "Q10_SR2_STAGE2A_VALID__READOUTS_ALREADY_EQUAL",
+    "Q10_SR2_STAGE2A_VALID__CAPACITY_GATED_MIXTURE",
+    "Q10_SR2_STAGE2A_NUMERICALLY_AMBIGUOUS",
+    "Q10_SR2_STAGE2A_INVALID"
+  ],
+  "forbidden_claims": [
+    "Q10-SR v1 performance abort is a repair result",
+    "capacity partial proves discrete impossibility",
+    "meaningful directional separation",
+    "scientific exchangeability",
+    "behavior effect",
+    "future-learning effect",
+    "hidden learning state",
+    "metaplasticity",
+    "DH-08B authorization"
+  ],
+  "stage_1a_review_required": true,
+  "stage_1b_requires_new_source_identity": false,
+  "post_stage_1a_change_requires_new_protocol_identity": true
+}

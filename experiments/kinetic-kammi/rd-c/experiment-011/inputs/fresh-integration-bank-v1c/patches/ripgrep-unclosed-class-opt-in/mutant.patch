@@ -1,0 +1,11 @@
+--- a/crates/globset/src/glob.rs
++++ b/crates/globset/src/glob.rs
+@@ -661,7 +661,7 @@
+     /// might want to enable this when compatibility (e.g., with POSIX glob
+     /// implementations) is more important than good error messages.
+     pub fn allow_unclosed_class(&mut self, yes: bool) -> &mut GlobBuilder<'a> {
+-        self.opts.allow_unclosed_class = !yes;
++        self.opts.allow_unclosed_class = false;
+         self
+     }
+ }

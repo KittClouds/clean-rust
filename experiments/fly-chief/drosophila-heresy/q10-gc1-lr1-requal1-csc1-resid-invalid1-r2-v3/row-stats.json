@@ -1,0 +1,1211 @@
+{
+  "context": [
+    "seed9731-R-tau4.json",
+    3
+  ],
+  "rows": [
+    {
+      "changed_from_reference": 106257,
+      "classification": "MOVABLE_NOT_TARGETABLE_THROUGH_ORDER3",
+      "confirmed_invalid_target_witnesses": 0,
+      "confirmed_valid_target_witnesses": 0,
+      "evaluated_candidates": 425028,
+      "first_target_order": null,
+      "minimum_ulp": 1,
+      "minimum_ulp_record": {
+        "actions": [
+          329
+        ],
+        "geometry_valid": false,
+        "order": 1,
+        "value_bits": 1094633065
+      },
+      "numeric_direction_counts": {
+        "away_or_same_side": 425028
+      },
+      "row": 34
+    },
+    {
+      "changed_from_reference": 106257,
+      "classification": "MOVABLE_NOT_TARGETABLE_THROUGH_ORDER3",
+      "confirmed_invalid_target_witnesses": 0,
+      "confirmed_valid_target_witnesses": 0,
+      "evaluated_candidates": 637542,
+      "first_target_order": null,
+      "minimum_ulp": 1,
+      "minimum_ulp_record": {
+        "actions": [
+          408
+        ],
+        "geometry_valid": false,
+        "order": 1,
+        "value_bits": 1092185578
+      },
+      "numeric_direction_counts": {
+        "away_or_same_side": 637542
+      },
+      "row": 36
+    },
+    {
+      "changed_from_reference": 0,
+      "classification": "NO_EFFECT_THROUGH_ORDER3",
+      "confirmed_invalid_target_witnesses": 0,
+      "confirmed_valid_target_witnesses": 0,
+      "evaluated_candidates": 425028,
+      "first_target_order": null,
+      "minimum_ulp": 1,
+      "minimum_ulp_record": {
+        "actions": [
+          416
+        ],
+        "geometry_valid": false,
+        "order": 1,
+        "value_bits": 1103096579
+      },
+      "numeric_direction_counts": {
+        "away_or_same_side": 425028
+      },
+      "row": 49
+    },
+    {
+      "changed_from_reference": 0,
+      "classification": "NO_EFFECT_THROUGH_ORDER3",
+      "confirmed_invalid_target_witnesses": 0,
+      "confirmed_valid_target_witnesses": 0,
+      "evaluated_candidates": 743799,
+      "first_target_order": null,
+      "minimum_ulp": 3,
+      "minimum_ulp_record": {
+        "actions": [
+          385
+        ],
+        "geometry_valid": false,
+        "order": 1,
+        "value_bits": 1096108808
+      },
+      "numeric_direction_counts": {
+        "away_or_same_side": 743799
+      },
+      "row": 51
+    },
+    {
+      "changed_from_reference": 0,
+      "classification": "NO_EFFECT_THROUGH_ORDER3",
+      "confirmed_invalid_target_witnesses": 0,
+      "confirmed_valid_target_witnesses": 0,
+      "evaluated_candidates": 633429,
+      "first_target_order": null,
+      "minimum_ulp": 1,
+      "minimum_ulp_record": {
+        "actions": [
+          176
+        ],
+        "geometry_valid": false,
+        "order": 1,
+        "value_bits": 1092326980
+      },
+      "numeric_direction_counts": {
+        "away_or_same_side": 633429
+      },
+      "row": 53
+    },
+    {
+      "changed_from_reference": 212514,
+      "classification": "MOVABLE_NOT_TARGETABLE_THROUGH_ORDER3",
+      "confirmed_invalid_target_witnesses": 0,
+      "confirmed_valid_target_witnesses": 0,
+      "evaluated_candidates": 318771,
+      "first_target_order": null,
+      "minimum_ulp": 1,
+      "minimum_ulp_record": {
+        "actions": [
+          340
+        ],
+        "geometry_valid": false,
+        "order": 1,
+        "value_bits": 1084871233
+      },
+      "numeric_direction_counts": {
+        "away_or_same_side": 318771
+      },
+      "row": 54
+    },
+    {
+      "changed_from_reference": 0,
+      "classification": "NO_EFFECT_THROUGH_ORDER3",
+      "confirmed_invalid_target_witnesses": 0,
+      "confirmed_valid_target_witnesses": 0,
+      "evaluated_candidates": 425028,
+      "first_target_order": null,
+      "minimum_ulp": 2,
+      "minimum_ulp_record": {
+        "actions": [
+          441
+        ],
+        "geometry_valid": false,
+        "order": 1,
+        "value_bits": 1081608351
+      },
+      "numeric_direction_counts": {
+        "away_or_same_side": 425028
+      },
+      "row": 60
+    },
+    {
+      "changed_from_reference": 0,
+      "classification": "NO_EFFECT_THROUGH_ORDER3",
+      "confirmed_invalid_target_witnesses": 0,
+      "confirmed_valid_target_witnesses": 0,
+      "evaluated_candidates": 212514,
+      "first_target_order": null,
+      "minimum_ulp": 1,
+      "minimum_ulp_record": {
+        "actions": [
+          436
+        ],
+        "geometry_valid": false,
+        "order": 1,
+        "value_bits": 1086298240
+      },
+      "numeric_direction_counts": {
+        "away_or_same_side": 212514
+      },
+      "row": 82
+    },
+    {
+      "changed_from_reference": 0,
+      "classification": "NO_EFFECT_THROUGH_ORDER3",
+      "confirmed_invalid_target_witnesses": 0,
+      "confirmed_valid_target_witnesses": 0,
+      "evaluated_candidates": 425028,
+      "first_target_order": null,
+      "minimum_ulp": 1,
+      "minimum_ulp_record": {
+        "actions": [
+          416
+        ],
+        "geometry_valid": false,
+        "order": 1,
+        "value_bits": 1094123396
+      },
+      "numeric_direction_counts": {
+        "away_or_same_side": 425028
+      },
+      "row": 98
+    },
+    {
+      "changed_from_reference": 0,
+      "classification": "NO_EFFECT_THROUGH_ORDER3",
+      "confirmed_invalid_target_witnesses": 0,
+      "confirmed_valid_target_witnesses": 0,
+      "evaluated_candidates": 637542,
+      "first_target_order": null,
+      "minimum_ulp": 2,
+      "minimum_ulp_record": {
+        "actions": [
+          440
+        ],
+        "geometry_valid": false,
+        "order": 1,
+        "value_bits": 1096175954
+      },
+      "numeric_direction_counts": {
+        "away_or_same_side": 637542
+      },
+      "row": 109
+    },
+    {
+      "changed_from_reference": 212514,
+      "classification": "MOVABLE_NOT_TARGETABLE_THROUGH_ORDER3",
+      "confirmed_invalid_target_witnesses": 0,
+      "confirmed_valid_target_witnesses": 0,
+      "evaluated_candidates": 743799,
+      "first_target_order": null,
+      "minimum_ulp": 1,
+      "minimum_ulp_record": {
+        "actions": [
+          376
+        ],
+        "geometry_valid": false,
+        "order": 1,
+        "value_bits": 1089003828
+      },
+      "numeric_direction_counts": {
+        "away_or_same_side": 743799
+      },
+      "row": 133
+    },
+    {
+      "changed_from_reference": 0,
+      "classification": "NO_EFFECT_THROUGH_ORDER3",
+      "confirmed_invalid_target_witnesses": 0,
+      "confirmed_valid_target_witnesses": 0,
+      "evaluated_candidates": 743799,
+      "first_target_order": null,
+      "minimum_ulp": 2,
+      "minimum_ulp_record": {
+        "actions": [
+          408
+        ],
+        "geometry_valid": false,
+        "order": 1,
+        "value_bits": 1098378659
+      },
+      "numeric_direction_counts": {
+        "away_or_same_side": 743799
+      },
+      "row": 134
+    },
+    {
+      "changed_from_reference": 0,
+      "classification": "NO_EFFECT_THROUGH_ORDER3",
+      "confirmed_invalid_target_witnesses": 0,
+      "confirmed_valid_target_witnesses": 0,
+      "evaluated_candidates": 743799,
+      "first_target_order": null,
+      "minimum_ulp": 3,
+      "minimum_ulp_record": {
+        "actions": [
+          456
+        ],
+        "geometry_valid": false,
+        "order": 1,
+        "value_bits": 1097166648
+      },
+      "numeric_direction_counts": {
+        "away_or_same_side": 743799
+      },
+      "row": 153
+    },
+    {
+      "changed_from_reference": 743799,
+      "classification": "MOVABLE_NOT_TARGETABLE_THROUGH_ORDER3",
+      "confirmed_invalid_target_witnesses": 0,
+      "confirmed_valid_target_witnesses": 0,
+      "evaluated_candidates": 743799,
+      "first_target_order": null,
+      "minimum_ulp": 3,
+      "minimum_ulp_record": {
+        "actions": [
+          448
+        ],
+        "geometry_valid": false,
+        "order": 1,
+        "value_bits": 1102179167
+      },
+      "numeric_direction_counts": {
+        "away_or_same_side": 743799
+      },
+      "row": 157
+    },
+    {
+      "changed_from_reference": 531285,
+      "classification": "TARGETABLE_ONLY_OUTSIDE_VALID_FRONTIER",
+      "confirmed_invalid_target_witnesses": 1,
+      "confirmed_valid_target_witnesses": 0,
+      "evaluated_candidates": 637542,
+      "first_target_order": 1,
+      "minimum_ulp": 0,
+      "minimum_ulp_record": {
+        "actions": [
+          360
+        ],
+        "geometry_valid": false,
+        "order": 1,
+        "value_bits": 1100141956
+      },
+      "numeric_direction_counts": {
+        "away_or_same_side": 106257,
+        "equal": 531285
+      },
+      "row": 161
+    },
+    {
+      "changed_from_reference": 106257,
+      "classification": "MOVABLE_NOT_TARGETABLE_THROUGH_ORDER3",
+      "confirmed_invalid_target_witnesses": 0,
+      "confirmed_valid_target_witnesses": 0,
+      "evaluated_candidates": 743799,
+      "first_target_order": null,
+      "minimum_ulp": 1,
+      "minimum_ulp_record": {
+        "actions": [
+          8
+        ],
+        "geometry_valid": false,
+        "order": 1,
+        "value_bits": 1079707630
+      },
+      "numeric_direction_counts": {
+        "away_or_same_side": 637542,
+        "toward_numeric": 106257
+      },
+      "row": 188
+    },
+    {
+      "changed_from_reference": 531285,
+      "classification": "MOVABLE_NOT_TARGETABLE_THROUGH_ORDER3",
+      "confirmed_invalid_target_witnesses": 0,
+      "confirmed_valid_target_witnesses": 0,
+      "evaluated_candidates": 531285,
+      "first_target_order": null,
+      "minimum_ulp": 2,
+      "minimum_ulp_record": {
+        "actions": [
+          425
+        ],
+        "geometry_valid": false,
+        "order": 1,
+        "value_bits": 1082853851
+      },
+      "numeric_direction_counts": {
+        "away_or_same_side": 531285
+      },
+      "row": 205
+    },
+    {
+      "changed_from_reference": 0,
+      "classification": "NO_EFFECT_THROUGH_ORDER3",
+      "confirmed_invalid_target_witnesses": 0,
+      "confirmed_valid_target_witnesses": 0,
+      "evaluated_candidates": 318771,
+      "first_target_order": null,
+      "minimum_ulp": 1,
+      "minimum_ulp_record": {
+        "actions": [
+          441
+        ],
+        "geometry_valid": false,
+        "order": 1,
+        "value_bits": 1092911686
+      },
+      "numeric_direction_counts": {
+        "away_or_same_side": 318771
+      },
+      "row": 207
+    },
+    {
+      "changed_from_reference": 106257,
+      "classification": "MOVABLE_NOT_TARGETABLE_THROUGH_ORDER3",
+      "confirmed_invalid_target_witnesses": 0,
+      "confirmed_valid_target_witnesses": 0,
+      "evaluated_candidates": 425028,
+      "first_target_order": null,
+      "minimum_ulp": 1,
+      "minimum_ulp_record": {
+        "actions": [
+          211
+        ],
+        "geometry_valid": false,
+        "order": 1,
+        "value_bits": 1087324886
+      },
+      "numeric_direction_counts": {
+        "away_or_same_side": 425028
+      },
+      "row": 238
+    },
+    {
+      "changed_from_reference": 425028,
+      "classification": "MOVABLE_NOT_TARGETABLE_THROUGH_ORDER3",
+      "confirmed_invalid_target_witnesses": 0,
+      "confirmed_valid_target_witnesses": 0,
+      "evaluated_candidates": 425028,
+      "first_target_order": null,
+      "minimum_ulp": 2,
+      "minimum_ulp_record": {
+        "actions": [
+          416
+        ],
+        "geometry_valid": false,
+        "order": 1,
+        "value_bits": 1104493855
+      },
+      "numeric_direction_counts": {
+        "away_or_same_side": 425028
+      },
+      "row": 294
+    },
+    {
+      "changed_from_reference": 212514,
+      "classification": "MOVABLE_NOT_TARGETABLE_THROUGH_ORDER3",
+      "confirmed_invalid_target_witnesses": 0,
+      "confirmed_valid_target_witnesses": 0,
+      "evaluated_candidates": 318771,
+      "first_target_order": null,
+      "minimum_ulp": 1,
+      "minimum_ulp_record": {
+        "actions": [
+          248
+        ],
+        "geometry_valid": false,
+        "order": 1,
+        "value_bits": 1086630371
+      },
+      "numeric_direction_counts": {
+        "away_or_same_side": 106257,
+        "toward_numeric": 212514
+      },
+      "row": 322
+    },
+    {
+      "changed_from_reference": 106257,
+      "classification": "MOVABLE_NOT_TARGETABLE_THROUGH_ORDER3",
+      "confirmed_invalid_target_witnesses": 0,
+      "confirmed_valid_target_witnesses": 0,
+      "evaluated_candidates": 637542,
+      "first_target_order": null,
+      "minimum_ulp": 1,
+      "minimum_ulp_record": {
+        "actions": [
+          408
+        ],
+        "geometry_valid": false,
+        "order": 1,
+        "value_bits": 1098754637
+      },
+      "numeric_direction_counts": {
+        "away_or_same_side": 531285,
+        "toward_numeric": 106257
+      },
+      "row": 330
+    },
+    {
+      "changed_from_reference": 425028,
+      "classification": "MOVABLE_NOT_TARGETABLE_THROUGH_ORDER3",
+      "confirmed_invalid_target_witnesses": 0,
+      "confirmed_valid_target_witnesses": 0,
+      "evaluated_candidates": 743799,
+      "first_target_order": null,
+      "minimum_ulp": 1,
+      "minimum_ulp_record": {
+        "actions": [
+          389
+        ],
+        "geometry_valid": false,
+        "order": 1,
+        "value_bits": 1096624831
+      },
+      "numeric_direction_counts": {
+        "away_or_same_side": 743799
+      },
+      "row": 345
+    },
+    {
+      "changed_from_reference": 637542,
+      "classification": "TARGETABLE_ONLY_OUTSIDE_VALID_FRONTIER",
+      "confirmed_invalid_target_witnesses": 1,
+      "confirmed_valid_target_witnesses": 0,
+      "evaluated_candidates": 850056,
+      "first_target_order": 1,
+      "minimum_ulp": 0,
+      "minimum_ulp_record": {
+        "actions": [
+          362
+        ],
+        "geometry_valid": false,
+        "order": 1,
+        "value_bits": 1096948161
+      },
+      "numeric_direction_counts": {
+        "away_or_same_side": 425028,
+        "equal": 425028
+      },
+      "row": 357
+    },
+    {
+      "changed_from_reference": 425028,
+      "classification": "MOVABLE_NOT_TARGETABLE_THROUGH_ORDER3",
+      "confirmed_invalid_target_witnesses": 0,
+      "confirmed_valid_target_witnesses": 0,
+      "evaluated_candidates": 743799,
+      "first_target_order": null,
+      "minimum_ulp": 1,
+      "minimum_ulp_record": {
+        "actions": [
+          467
+        ],
+        "geometry_valid": false,
+        "order": 1,
+        "value_bits": 1094542230
+      },
+      "numeric_direction_counts": {
+        "away_or_same_side": 743799
+      },
+      "row": 381
+    },
+    {
+      "changed_from_reference": 318771,
+      "classification": "MOVABLE_NOT_TARGETABLE_THROUGH_ORDER3",
+      "confirmed_invalid_target_witnesses": 0,
+      "confirmed_valid_target_witnesses": 0,
+      "evaluated_candidates": 743799,
+      "first_target_order": null,
+      "minimum_ulp": 1,
+      "minimum_ulp_record": {
+        "actions": [
+          385
+        ],
+        "geometry_valid": false,
+        "order": 1,
+        "value_bits": 1097350366
+      },
+      "numeric_direction_counts": {
+        "away_or_same_side": 743799
+      },
+      "row": 394
+    },
+    {
+      "changed_from_reference": 0,
+      "classification": "NO_EFFECT_THROUGH_ORDER3",
+      "confirmed_invalid_target_witnesses": 0,
+      "confirmed_valid_target_witnesses": 0,
+      "evaluated_candidates": 318771,
+      "first_target_order": null,
+      "minimum_ulp": 1,
+      "minimum_ulp_record": {
+        "actions": [
+          458
+        ],
+        "geometry_valid": false,
+        "order": 1,
+        "value_bits": 1102530211
+      },
+      "numeric_direction_counts": {
+        "away_or_same_side": 318771
+      },
+      "row": 398
+    },
+    {
+      "changed_from_reference": 637542,
+      "classification": "MOVABLE_NOT_TARGETABLE_THROUGH_ORDER3",
+      "confirmed_invalid_target_witnesses": 0,
+      "confirmed_valid_target_witnesses": 0,
+      "evaluated_candidates": 850056,
+      "first_target_order": null,
+      "minimum_ulp": 1,
+      "minimum_ulp_record": {
+        "actions": [
+          361
+        ],
+        "geometry_valid": false,
+        "order": 1,
+        "value_bits": 1094472634
+      },
+      "numeric_direction_counts": {
+        "away_or_same_side": 850056
+      },
+      "row": 406
+    },
+    {
+      "changed_from_reference": 0,
+      "classification": "NO_EFFECT_THROUGH_ORDER3",
+      "confirmed_invalid_target_witnesses": 0,
+      "confirmed_valid_target_witnesses": 0,
+      "evaluated_candidates": 212514,
+      "first_target_order": null,
+      "minimum_ulp": 1,
+      "minimum_ulp_record": {
+        "actions": [
+          280
+        ],
+        "geometry_valid": false,
+        "order": 1,
+        "value_bits": 1078121757
+      },
+      "numeric_direction_counts": {
+        "away_or_same_side": 212514
+      },
+      "row": 423
+    },
+    {
+      "changed_from_reference": 0,
+      "classification": "NO_EFFECT_THROUGH_ORDER3",
+      "confirmed_invalid_target_witnesses": 0,
+      "confirmed_valid_target_witnesses": 0,
+      "evaluated_candidates": 637542,
+      "first_target_order": null,
+      "minimum_ulp": 1,
+      "minimum_ulp_record": {
+        "actions": [
+          376
+        ],
+        "geometry_valid": false,
+        "order": 1,
+        "value_bits": 1084435019
+      },
+      "numeric_direction_counts": {
+        "away_or_same_side": 637542
+      },
+      "row": 427
+    },
+    {
+      "changed_from_reference": 212514,
+      "classification": "MOVABLE_NOT_TARGETABLE_THROUGH_ORDER3",
+      "confirmed_invalid_target_witnesses": 0,
+      "confirmed_valid_target_witnesses": 0,
+      "evaluated_candidates": 531285,
+      "first_target_order": null,
+      "minimum_ulp": 1,
+      "minimum_ulp_record": {
+        "actions": [
+          464
+        ],
+        "geometry_valid": false,
+        "order": 1,
+        "value_bits": 1100833817
+      },
+      "numeric_direction_counts": {
+        "away_or_same_side": 531285
+      },
+      "row": 430
+    },
+    {
+      "changed_from_reference": 0,
+      "classification": "NO_EFFECT_THROUGH_ORDER3",
+      "confirmed_invalid_target_witnesses": 0,
+      "confirmed_valid_target_witnesses": 0,
+      "evaluated_candidates": 743799,
+      "first_target_order": null,
+      "minimum_ulp": 1,
+      "minimum_ulp_record": {
+        "actions": [
+          152
+        ],
+        "geometry_valid": false,
+        "order": 1,
+        "value_bits": 1078249324
+      },
+      "numeric_direction_counts": {
+        "away_or_same_side": 743799
+      },
+      "row": 434
+    },
+    {
+      "changed_from_reference": 0,
+      "classification": "NO_EFFECT_THROUGH_ORDER3",
+      "confirmed_invalid_target_witnesses": 0,
+      "confirmed_valid_target_witnesses": 0,
+      "evaluated_candidates": 318771,
+      "first_target_order": null,
+      "minimum_ulp": 1,
+      "minimum_ulp_record": {
+        "actions": [
+          458
+        ],
+        "geometry_valid": false,
+        "order": 1,
+        "value_bits": 1103823224
+      },
+      "numeric_direction_counts": {
+        "away_or_same_side": 318771
+      },
+      "row": 447
+    },
+    {
+      "changed_from_reference": 743799,
+      "classification": "MOVABLE_NOT_TARGETABLE_THROUGH_ORDER3",
+      "confirmed_invalid_target_witnesses": 0,
+      "confirmed_valid_target_witnesses": 0,
+      "evaluated_candidates": 743799,
+      "first_target_order": null,
+      "minimum_ulp": 1,
+      "minimum_ulp_record": {
+        "actions": [
+          412
+        ],
+        "geometry_valid": false,
+        "order": 1,
+        "value_bits": 1100787988
+      },
+      "numeric_direction_counts": {
+        "away_or_same_side": 743799
+      },
+      "row": 477
+    },
+    {
+      "changed_from_reference": 212514,
+      "classification": "MOVABLE_NOT_TARGETABLE_THROUGH_ORDER3",
+      "confirmed_invalid_target_witnesses": 0,
+      "confirmed_valid_target_witnesses": 0,
+      "evaluated_candidates": 743799,
+      "first_target_order": null,
+      "minimum_ulp": 1,
+      "minimum_ulp_record": {
+        "actions": [
+          458
+        ],
+        "geometry_valid": false,
+        "order": 1,
+        "value_bits": 1107369405
+      },
+      "numeric_direction_counts": {
+        "away_or_same_side": 743799
+      },
+      "row": 496
+    },
+    {
+      "changed_from_reference": 318771,
+      "classification": "MOVABLE_NOT_TARGETABLE_THROUGH_ORDER3",
+      "confirmed_invalid_target_witnesses": 0,
+      "confirmed_valid_target_witnesses": 0,
+      "evaluated_candidates": 743799,
+      "first_target_order": null,
+      "minimum_ulp": 1,
+      "minimum_ulp_record": {
+        "actions": [
+          440
+        ],
+        "geometry_valid": false,
+        "order": 1,
+        "value_bits": 1084022881
+      },
+      "numeric_direction_counts": {
+        "away_or_same_side": 743799
+      },
+      "row": 501
+    },
+    {
+      "changed_from_reference": 212514,
+      "classification": "MOVABLE_NOT_TARGETABLE_THROUGH_ORDER3",
+      "confirmed_invalid_target_witnesses": 0,
+      "confirmed_valid_target_witnesses": 0,
+      "evaluated_candidates": 743799,
+      "first_target_order": null,
+      "minimum_ulp": 2,
+      "minimum_ulp_record": {
+        "actions": [
+          16
+        ],
+        "geometry_valid": false,
+        "order": 1,
+        "value_bits": 1087531328
+      },
+      "numeric_direction_counts": {
+        "away_or_same_side": 743799
+      },
+      "row": 507
+    },
+    {
+      "changed_from_reference": 531285,
+      "classification": "MOVABLE_NOT_TARGETABLE_THROUGH_ORDER3",
+      "confirmed_invalid_target_witnesses": 0,
+      "confirmed_valid_target_witnesses": 0,
+      "evaluated_candidates": 531285,
+      "first_target_order": null,
+      "minimum_ulp": 1,
+      "minimum_ulp_record": {
+        "actions": [
+          356
+        ],
+        "geometry_valid": false,
+        "order": 1,
+        "value_bits": 1087287386
+      },
+      "numeric_direction_counts": {
+        "away_or_same_side": 531285
+      },
+      "row": 537
+    },
+    {
+      "changed_from_reference": 318771,
+      "classification": "MOVABLE_NOT_TARGETABLE_THROUGH_ORDER3",
+      "confirmed_invalid_target_witnesses": 0,
+      "confirmed_valid_target_witnesses": 0,
+      "evaluated_candidates": 743799,
+      "first_target_order": null,
+      "minimum_ulp": 2,
+      "minimum_ulp_record": {
+        "actions": [
+          378
+        ],
+        "geometry_valid": false,
+        "order": 1,
+        "value_bits": 1098714941
+      },
+      "numeric_direction_counts": {
+        "away_or_same_side": 743799
+      },
+      "row": 574
+    },
+    {
+      "changed_from_reference": 425028,
+      "classification": "MOVABLE_NOT_TARGETABLE_THROUGH_ORDER3",
+      "confirmed_invalid_target_witnesses": 0,
+      "confirmed_valid_target_witnesses": 0,
+      "evaluated_candidates": 743799,
+      "first_target_order": null,
+      "minimum_ulp": 1,
+      "minimum_ulp_record": {
+        "actions": [
+          297
+        ],
+        "geometry_valid": false,
+        "order": 1,
+        "value_bits": 1090077390
+      },
+      "numeric_direction_counts": {
+        "away_or_same_side": 743799
+      },
+      "row": 585
+    },
+    {
+      "changed_from_reference": 212514,
+      "classification": "MOVABLE_NOT_TARGETABLE_THROUGH_ORDER3",
+      "confirmed_invalid_target_witnesses": 0,
+      "confirmed_valid_target_witnesses": 0,
+      "evaluated_candidates": 637542,
+      "first_target_order": null,
+      "minimum_ulp": 2,
+      "minimum_ulp_record": {
+        "actions": [
+          354
+        ],
+        "geometry_valid": false,
+        "order": 1,
+        "value_bits": 1096192771
+      },
+      "numeric_direction_counts": {
+        "away_or_same_side": 637542
+      },
+      "row": 586
+    },
+    {
+      "changed_from_reference": 0,
+      "classification": "NO_EFFECT_THROUGH_ORDER3",
+      "confirmed_invalid_target_witnesses": 0,
+      "confirmed_valid_target_witnesses": 0,
+      "evaluated_candidates": 318771,
+      "first_target_order": null,
+      "minimum_ulp": 1,
+      "minimum_ulp_record": {
+        "actions": [
+          458
+        ],
+        "geometry_valid": false,
+        "order": 1,
+        "value_bits": 1105259027
+      },
+      "numeric_direction_counts": {
+        "away_or_same_side": 318771
+      },
+      "row": 594
+    },
+    {
+      "changed_from_reference": 0,
+      "classification": "NO_EFFECT_THROUGH_ORDER3",
+      "confirmed_invalid_target_witnesses": 0,
+      "confirmed_valid_target_witnesses": 0,
+      "evaluated_candidates": 743799,
+      "first_target_order": null,
+      "minimum_ulp": 3,
+      "minimum_ulp_record": {
+        "actions": [
+          424
+        ],
+        "geometry_valid": false,
+        "order": 1,
+        "value_bits": 1088975149
+      },
+      "numeric_direction_counts": {
+        "away_or_same_side": 743799
+      },
+      "row": 597
+    },
+    {
+      "changed_from_reference": 0,
+      "classification": "NO_EFFECT_THROUGH_ORDER3",
+      "confirmed_invalid_target_witnesses": 0,
+      "confirmed_valid_target_witnesses": 0,
+      "evaluated_candidates": 212514,
+      "first_target_order": null,
+      "minimum_ulp": 1,
+      "minimum_ulp_record": {
+        "actions": [
+          451
+        ],
+        "geometry_valid": false,
+        "order": 1,
+        "value_bits": 1102389971
+      },
+      "numeric_direction_counts": {
+        "away_or_same_side": 212514
+      },
+      "row": 598
+    },
+    {
+      "changed_from_reference": 106257,
+      "classification": "MOVABLE_NOT_TARGETABLE_THROUGH_ORDER3",
+      "confirmed_invalid_target_witnesses": 0,
+      "confirmed_valid_target_witnesses": 0,
+      "evaluated_candidates": 318771,
+      "first_target_order": null,
+      "minimum_ulp": 1,
+      "minimum_ulp_record": {
+        "actions": [
+          469
+        ],
+        "geometry_valid": false,
+        "order": 1,
+        "value_bits": 1099699704
+      },
+      "numeric_direction_counts": {
+        "away_or_same_side": 318771
+      },
+      "row": 626
+    },
+    {
+      "changed_from_reference": 0,
+      "classification": "NO_EFFECT_THROUGH_ORDER3",
+      "confirmed_invalid_target_witnesses": 0,
+      "confirmed_valid_target_witnesses": 0,
+      "evaluated_candidates": 531285,
+      "first_target_order": null,
+      "minimum_ulp": 1,
+      "minimum_ulp_record": {
+        "actions": [
+          425
+        ],
+        "geometry_valid": false,
+        "order": 1,
+        "value_bits": 1099342544
+      },
+      "numeric_direction_counts": {
+        "away_or_same_side": 531285
+      },
+      "row": 646
+    },
+    {
+      "changed_from_reference": 425028,
+      "classification": "MOVABLE_NOT_TARGETABLE_THROUGH_ORDER3",
+      "confirmed_invalid_target_witnesses": 0,
+      "confirmed_valid_target_witnesses": 0,
+      "evaluated_candidates": 743799,
+      "first_target_order": null,
+      "minimum_ulp": 1,
+      "minimum_ulp_record": {
+        "actions": [
+          467
+        ],
+        "geometry_valid": false,
+        "order": 1,
+        "value_bits": 1095774870
+      },
+      "numeric_direction_counts": {
+        "away_or_same_side": 743799
+      },
+      "row": 675
+    },
+    {
+      "changed_from_reference": 531285,
+      "classification": "MOVABLE_NOT_TARGETABLE_THROUGH_ORDER3",
+      "confirmed_invalid_target_witnesses": 0,
+      "confirmed_valid_target_witnesses": 0,
+      "evaluated_candidates": 743799,
+      "first_target_order": null,
+      "minimum_ulp": 1,
+      "minimum_ulp_record": {
+        "actions": [
+          424
+        ],
+        "geometry_valid": false,
+        "order": 1,
+        "value_bits": 1103757537
+      },
+      "numeric_direction_counts": {
+        "away_or_same_side": 743799
+      },
+      "row": 695
+    },
+    {
+      "changed_from_reference": 0,
+      "classification": "NO_EFFECT_THROUGH_ORDER3",
+      "confirmed_invalid_target_witnesses": 0,
+      "confirmed_valid_target_witnesses": 0,
+      "evaluated_candidates": 637542,
+      "first_target_order": null,
+      "minimum_ulp": 1,
+      "minimum_ulp_record": {
+        "actions": [
+          448
+        ],
+        "geometry_valid": false,
+        "order": 1,
+        "value_bits": 1108587216
+      },
+      "numeric_direction_counts": {
+        "away_or_same_side": 637542
+      },
+      "row": 696
+    },
+    {
+      "changed_from_reference": 212514,
+      "classification": "MOVABLE_NOT_TARGETABLE_THROUGH_ORDER3",
+      "confirmed_invalid_target_witnesses": 0,
+      "confirmed_valid_target_witnesses": 0,
+      "evaluated_candidates": 531285,
+      "first_target_order": null,
+      "minimum_ulp": 1,
+      "minimum_ulp_record": {
+        "actions": [
+          441
+        ],
+        "geometry_valid": false,
+        "order": 1,
+        "value_bits": 1105173708
+      },
+      "numeric_direction_counts": {
+        "away_or_same_side": 531285
+      },
+      "row": 697
+    },
+    {
+      "changed_from_reference": 531285,
+      "classification": "MOVABLE_NOT_TARGETABLE_THROUGH_ORDER3",
+      "confirmed_invalid_target_witnesses": 0,
+      "confirmed_valid_target_witnesses": 0,
+      "evaluated_candidates": 850056,
+      "first_target_order": null,
+      "minimum_ulp": 2,
+      "minimum_ulp_record": {
+        "actions": [
+          361
+        ],
+        "geometry_valid": false,
+        "order": 1,
+        "value_bits": 1093645843
+      },
+      "numeric_direction_counts": {
+        "away_or_same_side": 850056
+      },
+      "row": 700
+    },
+    {
+      "changed_from_reference": 318771,
+      "classification": "MOVABLE_NOT_TARGETABLE_THROUGH_ORDER3",
+      "confirmed_invalid_target_witnesses": 0,
+      "confirmed_valid_target_witnesses": 0,
+      "evaluated_candidates": 531285,
+      "first_target_order": null,
+      "minimum_ulp": 1,
+      "minimum_ulp_record": {
+        "actions": [
+          466
+        ],
+        "geometry_valid": false,
+        "order": 1,
+        "value_bits": 1106850480
+      },
+      "numeric_direction_counts": {
+        "away_or_same_side": 531285
+      },
+      "row": 724
+    },
+    {
+      "changed_from_reference": 106257,
+      "classification": "MOVABLE_NOT_TARGETABLE_THROUGH_ORDER3",
+      "confirmed_invalid_target_witnesses": 0,
+      "confirmed_valid_target_witnesses": 0,
+      "evaluated_candidates": 743799,
+      "first_target_order": null,
+      "minimum_ulp": 1,
+      "minimum_ulp_record": {
+        "actions": [
+          385
+        ],
+        "geometry_valid": false,
+        "order": 1,
+        "value_bits": 1103091532
+      },
+      "numeric_direction_counts": {
+        "away_or_same_side": 743799
+      },
+      "row": 737
+    },
+    {
+      "changed_from_reference": 212514,
+      "classification": "MOVABLE_NOT_TARGETABLE_THROUGH_ORDER3",
+      "confirmed_invalid_target_witnesses": 0,
+      "confirmed_valid_target_witnesses": 0,
+      "evaluated_candidates": 425028,
+      "first_target_order": null,
+      "minimum_ulp": 1,
+      "minimum_ulp_record": {
+        "actions": [
+          441
+        ],
+        "geometry_valid": false,
+        "order": 1,
+        "value_bits": 1105686606
+      },
+      "numeric_direction_counts": {
+        "away_or_same_side": 425028
+      },
+      "row": 746
+    },
+    {
+      "changed_from_reference": 106257,
+      "classification": "MOVABLE_NOT_TARGETABLE_THROUGH_ORDER3",
+      "confirmed_invalid_target_witnesses": 0,
+      "confirmed_valid_target_witnesses": 0,
+      "evaluated_candidates": 318771,
+      "first_target_order": null,
+      "minimum_ulp": 1,
+      "minimum_ulp_record": {
+        "actions": [
+          374
+        ],
+        "geometry_valid": false,
+        "order": 1,
+        "value_bits": 1101518285
+      },
+      "numeric_direction_counts": {
+        "away_or_same_side": 318771
+      },
+      "row": 747
+    },
+    {
+      "changed_from_reference": 637542,
+      "classification": "TARGETABLE_ONLY_OUTSIDE_VALID_FRONTIER",
+      "confirmed_invalid_target_witnesses": 1,
+      "confirmed_valid_target_witnesses": 0,
+      "evaluated_candidates": 850056,
+      "first_target_order": 1,
+      "minimum_ulp": 0,
+      "minimum_ulp_record": {
+        "actions": [
+          360
+        ],
+        "geometry_valid": false,
+        "order": 1,
+        "value_bits": 1091312866
+      },
+      "numeric_direction_counts": {
+        "away_or_same_side": 318771,
+        "equal": 531285
+      },
+      "row": 749
+    },
+    {
+      "changed_from_reference": 106257,
+      "classification": "MOVABLE_NOT_TARGETABLE_THROUGH_ORDER3",
+      "confirmed_invalid_target_witnesses": 0,
+      "confirmed_valid_target_witnesses": 0,
+      "evaluated_candidates": 425028,
+      "first_target_order": null,
+      "minimum_ulp": 1,
+      "minimum_ulp_record": {
+        "actions": [
+          432
+        ],
+        "geometry_valid": false,
+        "order": 1,
+        "value_bits": 1078050486
+      },
+      "numeric_direction_counts": {
+        "away_or_same_side": 425028
+      },
+      "row": 768
+    }
+  ]
+}

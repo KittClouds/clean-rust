@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "rdc-coding-observer-output.v2",
+  "title": "RDC Coding Observer Output v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["action_choice", "applicability_percent", "abstention_percent"],
+  "properties": {
+    "action_choice": {
+      "anyOf": [
+        { "type": "integer", "minimum": 0, "maximum": 65535 },
+        { "type": "null" }
+      ]
+    },
+    "applicability_percent": { "type": "integer", "minimum": 0, "maximum": 100 },
+    "abstention_percent": { "type": "integer", "minimum": 0, "maximum": 100 }
+  }
+}

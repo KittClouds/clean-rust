@@ -1,0 +1,22 @@
+{
+  "receipt_id": "FAS_FROZEN_OBSERVER_BUNDLE_E3_V01_RESOURCE_GATE_DISPOSITION_V01",
+  "status": "E3_V01_FITS_PRESERVED_RESOURCE_GATE_UNVERIFIED_NOT_QUALIFIED",
+  "recorded_utc": "2026-09-26T12:08:14.288498+00:00",
+  "e3_v01_contract_sha256": "e825a41fcdb5099e59ebe2a7bfd878bfcd03dc5a23ae18ba1bd3083136ed64df",
+  "e3_v01_fit_source_sha256": "6a88c4bbf9acb51f21aca75225381afdfd4bc0c21915d70964fcabd2e959498a",
+  "e3_v01_fit_receipt_sha256": "75a065bdb17dccb0ccddea90744db8454a2e2ee760197ed6545e5d85f787ddf8",
+  "e3_v01_fit_receipt_bytes": 11751,
+  "fit_artifacts_modified": false,
+  "declared_minimum_free_disk_bytes": 1073741824,
+  "disk_space_measured_before_fit": false,
+  "historical_disk_gate_disposition": "UNVERIFIED; current free-space readings cannot qualify the earlier execution retroactively",
+  "independent_findings": [
+    "The E3 v01 contract declared a minimum free-disk resource gate.",
+    "The E3 v01 fitter did not measure or record free disk before creating its output root.",
+    "This is an engineering qualification gap, not a model-performance result."
+  ],
+  "evaluation_labels_opened": false,
+  "heldout_rows_read": false,
+  "performance_scored": false,
+  "superseded_by": "E3 v02 uses the same fit inputs, tasks, model, optimizer, and no-scoring boundary with the disk preflight implemented and receipted."
+}

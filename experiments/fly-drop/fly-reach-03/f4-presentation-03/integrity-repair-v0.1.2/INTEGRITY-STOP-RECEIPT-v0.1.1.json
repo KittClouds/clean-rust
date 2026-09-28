@@ -1,0 +1,38 @@
+{
+  "comparative_analysis_performed": false,
+  "failed_verifier_sha256": "7c7a756b9bb5e577fe1683d2e4829f1d4e8b2fc9d0347157238b1fc77babcd57",
+  "failure": "_truth_keys_only called stream.tell() after the with-block closed the file; Python raised ValueError: I/O operation on closed file.",
+  "failure_location": "verify_integrity.py::_truth_keys_only",
+  "failure_stage": "full integrity audit, during row-key-only truth/predictor reconciliation",
+  "identity": "F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1",
+  "integrity_receipt_created": false,
+  "locked_output_tree_manifest_sha256": "cffcb86b1263577cc627df1f62b8af92647b32e7bfe267b509359b4737328d3d",
+  "locked_outputs": {
+    "fit_count": 144,
+    "fit_manifest_sha256": "f71d344c5bc58e86a68e7bd9163aed1ab5d945468bfe84f06a8981e6a1c2ce66",
+    "lock_sha256": "dd387bcc52510eac947774cb6d9303d8cdd8142cee07a60b0e39cddd4dcb54ce",
+    "output_file_counts": {
+      "checkpoint-tensors": 1296,
+      "final-tensors": 144,
+      "fit-receipts": 144,
+      "heldout-state": 144,
+      "predictions": 144,
+      "training-traces": 144
+    }
+  },
+  "old_62_fit_snapshot": {
+    "interruption_receipt_sha256": "1b32eb8d247cbc4bdf17fe00c83a286047e8aa206a9de4b0498f3be713f3b9bc",
+    "original_snapshot_files_reconciled": 1035,
+    "original_snapshot_tree_sha256": "8a0f79bac05372f3f62141ad162d370ef2a5d5c2e1c732416106006405397430"
+  },
+  "raw_predictor_sha256": "495c68070624e4b8eaeeba217aeb03bdac6636d75e6691292a59872c11a9455f",
+  "raw_truth_file_sha256": "ff9d000145fc503e83710ca99d65b0304d52c1f94533d92c78e28b9730214d50",
+  "schema": "F4-PRESENTATION-03-integrity-stop-receipt-v1",
+  "status": "STOP_VERIFIER_EXCEPTION_NO_INTEGRITY_PASS",
+  "target_or_comparative_truth_values_read_by_failed_invocation": false,
+  "task_bank_manifest_sha256": "ad339f4a710c9cb803e68a7076da923a68486f81b7552aa767c710f885deb0a1",
+  "truth_fields_previously_opened_for_support_only": [
+    "inclusion_probability_p",
+    "target_polarity_Y"
+  ]
+}

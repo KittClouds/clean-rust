@@ -1,0 +1,23 @@
+{
+  "protocol": "Q10-PF3",
+  "status": "Q10_PF3_INVALID__PREDECLARED_BUNDLE_CAPACITY_FAILURE",
+  "stage": "EXECUTION_COMPLETE__INDEPENDENT_REVIEW_REJECTED",
+  "failure": {
+    "reason": "seed9672-L-tau4 produced 3 shared triples instead of the predeclared 4",
+    "reviewer_status": "REJECTED",
+    "scientific_seed_bundles": 0,
+    "behavioral_inference": false,
+    "dh08b_authorized": false
+  },
+  "diagnostic_only": {
+    "disjoint_triples_observed": 32,
+    "disjoint_max_third_order_ratio": 0.0,
+    "available_shared_triples_observed": 31,
+    "available_shared_max_third_order_ratio": 0.0404341549726168
+  },
+  "promotion": {
+    "interaction_aware_solver": false,
+    "exact_prefix_search": false,
+    "scientific": false
+  }
+}

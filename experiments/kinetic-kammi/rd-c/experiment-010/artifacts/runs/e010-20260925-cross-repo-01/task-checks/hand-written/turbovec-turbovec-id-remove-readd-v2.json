@@ -1,0 +1,29 @@
+{
+  "task_id": "turbovec-turbovec-id-remove-readd-v2",
+  "lane": "hand-written",
+  "action_id": 37,
+  "patch_sha256": "5071ceeede54082f166a1d50243cbc910e06dbc783b9911323ebe22c8d67ee7c",
+  "candidate_variant": "gold_comment",
+  "test_filter": "remove_then_re_add_same_id_is_allowed",
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--manifest-path",
+    "C:\\rd-c\\experiment-010\\tasks\\heldout-bank-v1\\families\\turbovec-id-remove-readd\\candidates\\gold_comment\\Cargo.toml",
+    "--package",
+    "turbovec",
+    "--test",
+    "id_map",
+    "remove_then_re_add_same_id_is_allowed",
+    "--",
+    "--exact"
+  ],
+  "exit_code": 0,
+  "status": "passed",
+  "passed": true,
+  "elapsed_ms": 11118.923,
+  "completion_source": "live-cargo-test",
+  "output_sha256": "7e3d32094d476f663454be1a52f3a34b60514eefad4f3b1fda347d088a5fc6b5",
+  "output": "\nrunning 1 test\ntest remove_then_re_add_same_id_is_allowed ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 22 filtered out; finished in 1.14s\n\n   Compiling turbovec v0.9.0 (C:\\rd-c\\experiment-010\\tasks\\heldout-bank-v1\\families\\turbovec-id-remove-readd\\candidates\\gold_comment\\turbovec)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 9.68s\n     Running tests\\id_map.rs (D:\\cargo-targets\\rdc-e010\\scoring\\debug\\deps\\id_map-6028bbdd1bdac666.exe)\n"
+}

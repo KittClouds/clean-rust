@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "access": "label-side only; exclude from all observer and routing inputs",
+  "tasks": {
+    "coding-gpu-pick-01": {
+      "completion_check": "one task-specific e009_epoch_tests test must run and pass",
+      "actions": {
+        "23": {
+          "expected_task_completion": true,
+          "check": "AND implementation passes stale-generation regression"
+        },
+        "14": {
+          "expected_task_completion": false,
+          "check": "OR mutant fails stale-generation regression"
+        },
+        "71": {
+          "expected_task_completion": false,
+          "check": "base has no task-specific regression"
+        }
+      }
+    },
+    "coding-embedding-batch-01": {
+      "completion_check": "stable-order and telemetry regression tests must both run and pass",
+      "actions": {
+        "51": {
+          "expected_task_completion": true,
+          "check": "both regression tests pass"
+        },
+        "17": {
+          "expected_task_completion": false,
+          "check": "stable-order regression fails; telemetry regression passes"
+        },
+        "42": {
+          "expected_task_completion": false,
+          "check": "base has neither task-specific regression"
+        }
+      }
+    }
+  }
+}

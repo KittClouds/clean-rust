@@ -1,0 +1,8 @@
+{
+  "protocol": "Q10-GC1-PAR4",
+  "identity": "q10-gc1-par4-v1",
+  "status": "INTERRUPTED_BEFORE_RECEIPT",
+  "authoritative": false,
+  "reason": "Runner was stopped before receipt emission after runtime audit found full geometry recomputation dominating the exact candidate hot loop. No execution or derived result receipt was emitted.",
+  "replacement_identity": "q10-gc1-par5-v1"
+}

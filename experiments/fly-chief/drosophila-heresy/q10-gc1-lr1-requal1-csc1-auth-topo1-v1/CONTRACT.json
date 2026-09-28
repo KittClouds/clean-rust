@@ -1,0 +1,243 @@
+{
+  "identity": "q10-gc1-lr1-requal1-csc1-auth-topo1-v1",
+  "parent_bindings": [
+    {
+      "bytes": 502,
+      "label": "topo1_plan",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-auth-topo1-v1/PLAN.md",
+      "sha256": "ABB3B19613AAB6E1968F66DD71F3F0AA60BC260A9EBCE0E0A7BB42BEDCF5A3CC"
+    },
+    {
+      "bytes": 7730,
+      "label": "topo1_runner",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-auth-topo1-v1/scripts/run_topo1.py",
+      "sha256": "71C030EDD0C44823B521453D5EC5E6EC36AABE8CD05904D2376D69AACA0782BF"
+    },
+    {
+      "bytes": 4829,
+      "label": "exh1_execution",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-pair-exh1-v1/execution.json",
+      "sha256": "13303BA195672CEB8D7971D44753CF5DF9F30FF822BE538901CF8AA40ED4C707"
+    },
+    {
+      "bytes": 9523,
+      "label": "exh1_contract",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-pair-exh1-v1/CONTRACT.json",
+      "sha256": "8CD748435C8BD876CC2094D01FB290CC834284EA0EE6EE3230174E9D0A31DBAD"
+    },
+    {
+      "bytes": 3263,
+      "label": "alg3_execution",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-pair-alg3-v1/execution.json",
+      "sha256": "35697FCE8F5CD05D9706423F30EB44CEA0A5520237E8DC266E83CEC2CE9BDA3F"
+    },
+    {
+      "bytes": 2681,
+      "label": "alg3_domain_execution",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-pair-alg3-domain-v1/execution.json",
+      "sha256": "B7E7659945FFAA10DC788328A5D73735D71FFB95CAFBB074455F799FE5158FE6"
+    },
+    {
+      "bytes": 230911133,
+      "label": "alg1_descriptor:seed9731-L-tau16__set2",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-alg1-v2/descriptors/seed9731-L-tau16__set2.json",
+      "sha256": "65AC0D26B6A478C10AC8136220F54D2F3D3F3F1FB15CF38612EF926F66081771"
+    },
+    {
+      "bytes": 5487959,
+      "label": "exh1_frontier:seed9731-L-tau16__set2",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-pair-exh1-v1/valid-frontier/seed9731-L-tau16__set2.jsonl",
+      "sha256": "C30208D1A51EE5F25AFA25C3BD7469F39A1CD121D248D59BA788828AC70232DF"
+    },
+    {
+      "bytes": 83659,
+      "label": "alg3_domain:seed9731-L-tau16__set2",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-pair-alg3-domain-v1/shards/seed9731-L-tau16__set2.jsonl",
+      "sha256": "E6A56343959E403E4C6015098A7BF6ED470E96B21F4442A2C08540B17A50F923"
+    },
+    {
+      "bytes": 315898,
+      "label": "alg3_result:seed9731-L-tau16__set2",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-pair-alg3-v1/results/seed9731-L-tau16__set2.jsonl",
+      "sha256": "8AF96D4B2AF32AD33472F87E8184C783CA0CAAB51394E0F95651950242DA0903"
+    },
+    {
+      "bytes": 260022496,
+      "label": "alg1_descriptor:seed9731-L-tau4__set3",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-alg1-v2/descriptors/seed9731-L-tau4__set3.json",
+      "sha256": "D6A5207DAE3E3B11709D2F805295EEE98FA03F660B026DA46AFBE4DF71512E35"
+    },
+    {
+      "bytes": 5069,
+      "label": "exh1_frontier:seed9731-L-tau4__set3",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-pair-exh1-v1/valid-frontier/seed9731-L-tau4__set3.jsonl",
+      "sha256": "3E2C6BA7799AB29E0F0E48FA5FE64F953355788979776C9350E5DE3946F3F5D2"
+    },
+    {
+      "bytes": 83394,
+      "label": "alg3_domain:seed9731-L-tau4__set3",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-pair-alg3-domain-v1/shards/seed9731-L-tau4__set3.jsonl",
+      "sha256": "C322DF48391BC75C9D2BC259A5B41FA41B9BE5A9944204E57D785C9CBF7375DD"
+    },
+    {
+      "bytes": 316176,
+      "label": "alg3_result:seed9731-L-tau4__set3",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-pair-alg3-v1/results/seed9731-L-tau4__set3.jsonl",
+      "sha256": "1FAE7F6BFDDA31A472549266DE06304A90BECAE8C89368D706B58919CDFD8808"
+    },
+    {
+      "bytes": 244426341,
+      "label": "alg1_descriptor:seed9731-R-tau16__set1",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-alg1-v2/descriptors/seed9731-R-tau16__set1.json",
+      "sha256": "7868CC11E61535E560794A93E059CA8CC043DA8E23F11FF2062476C8402988A5"
+    },
+    {
+      "bytes": 49287,
+      "label": "exh1_frontier:seed9731-R-tau16__set1",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-pair-exh1-v1/valid-frontier/seed9731-R-tau16__set1.jsonl",
+      "sha256": "6E23D78F9529897C53D8A1D144F01153E85E53E69B3CC6372221B73EA74F8FDA"
+    },
+    {
+      "bytes": 83668,
+      "label": "alg3_domain:seed9731-R-tau16__set1",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-pair-alg3-domain-v1/shards/seed9731-R-tau16__set1.jsonl",
+      "sha256": "4F66AB186AE0A57FB89160F67D66AF89D73810B7D865C73DA74E8B1A92C0FC43"
+    },
+    {
+      "bytes": 315278,
+      "label": "alg3_result:seed9731-R-tau16__set1",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-pair-alg3-v1/results/seed9731-R-tau16__set1.jsonl",
+      "sha256": "817593268844F25BAB65C59542A31C25E73D8E701528A832A730FC83623ABBEE"
+    },
+    {
+      "bytes": 223726396,
+      "label": "alg1_descriptor:seed9731-R-tau16__set3",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-alg1-v2/descriptors/seed9731-R-tau16__set3.json",
+      "sha256": "D566E81E161AE54C733E2AFD1CD308FAF1352F83DB371F0AFA6B54328864DD11"
+    },
+    {
+      "bytes": 0,
+      "label": "exh1_frontier:seed9731-R-tau16__set3",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-pair-exh1-v1/valid-frontier/seed9731-R-tau16__set3.jsonl",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "bytes": 83668,
+      "label": "alg3_domain:seed9731-R-tau16__set3",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-pair-alg3-domain-v1/shards/seed9731-R-tau16__set3.jsonl",
+      "sha256": "497B221A4B46BB5A4C4FE5CFFCD0FEFEF0FD4F0D5A2A49314DB78487782DE0F6"
+    },
+    {
+      "bytes": 315789,
+      "label": "alg3_result:seed9731-R-tau16__set3",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-pair-alg3-v1/results/seed9731-R-tau16__set3.jsonl",
+      "sha256": "FF5EEAD05D183BA4252F2C2B0EAB1F5DF94EADCC0B9E5D07C5DFCC0FBCD8A341"
+    },
+    {
+      "bytes": 245375539,
+      "label": "alg1_descriptor:seed9731-R-tau4__set0",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-alg1-v2/descriptors/seed9731-R-tau4__set0.json",
+      "sha256": "A873C80B7FABCC3C2417C762FDFEF94F73D623EDAE080880E93516C194E8B3AE"
+    },
+    {
+      "bytes": 0,
+      "label": "exh1_frontier:seed9731-R-tau4__set0",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-pair-exh1-v1/valid-frontier/seed9731-R-tau4__set0.jsonl",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "bytes": 83407,
+      "label": "alg3_domain:seed9731-R-tau4__set0",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-pair-alg3-domain-v1/shards/seed9731-R-tau4__set0.jsonl",
+      "sha256": "B97DCE908026C417F868BA9A8D53D72781879F1955E7D460F0CA6FEEB14EC24E"
+    },
+    {
+      "bytes": 316938,
+      "label": "alg3_result:seed9731-R-tau4__set0",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-pair-alg3-v1/results/seed9731-R-tau4__set0.jsonl",
+      "sha256": "5B7B51F51B5058ADBEA153ACFBFBCFBA4CFE7AD680BAED0C93205F1C93B3500C"
+    },
+    {
+      "bytes": 228844457,
+      "label": "alg1_descriptor:seed9731-R-tau4__set1",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-alg1-v2/descriptors/seed9731-R-tau4__set1.json",
+      "sha256": "4821E2D7B5AA953787E0822121E463872F694660D9E223CB642D9ACB59F17866"
+    },
+    {
+      "bytes": 162076,
+      "label": "exh1_frontier:seed9731-R-tau4__set1",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-pair-exh1-v1/valid-frontier/seed9731-R-tau4__set1.jsonl",
+      "sha256": "230F49D1473295DB09C55C936E236CEDD4448D559EF3A872FA75EE1E42BABB59"
+    },
+    {
+      "bytes": 83430,
+      "label": "alg3_domain:seed9731-R-tau4__set1",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-pair-alg3-domain-v1/shards/seed9731-R-tau4__set1.jsonl",
+      "sha256": "89A2D105816E54B57A0712F9F1DC8564D725AA25501B65A4831DC9FBADAC82E9"
+    },
+    {
+      "bytes": 316386,
+      "label": "alg3_result:seed9731-R-tau4__set1",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-pair-alg3-v1/results/seed9731-R-tau4__set1.jsonl",
+      "sha256": "FC6A439FA8714A3B69E610D58714B8DD7E8C766D40F260DAB857438A23D8365D"
+    },
+    {
+      "bytes": 245331409,
+      "label": "alg1_descriptor:seed9731-R-tau4__set2",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-alg1-v2/descriptors/seed9731-R-tau4__set2.json",
+      "sha256": "8243C560F920200BE1E6A3D8F6E2536B894252D6A4D81290ED88A2715EEEA801"
+    },
+    {
+      "bytes": 174898,
+      "label": "exh1_frontier:seed9731-R-tau4__set2",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-pair-exh1-v1/valid-frontier/seed9731-R-tau4__set2.jsonl",
+      "sha256": "163D858A6752738C18BAEA302F895340AF09883A69245792654E4026128E17B3"
+    },
+    {
+      "bytes": 83400,
+      "label": "alg3_domain:seed9731-R-tau4__set2",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-pair-alg3-domain-v1/shards/seed9731-R-tau4__set2.jsonl",
+      "sha256": "7984A0CA737A2C96C1B6056DD309CDF78643E9739E8D5A670CABE4A9785EF9BC"
+    },
+    {
+      "bytes": 316099,
+      "label": "alg3_result:seed9731-R-tau4__set2",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-pair-alg3-v1/results/seed9731-R-tau4__set2.jsonl",
+      "sha256": "6F3420DA88D4F7C5C3E6D02F35C19D74CA8904D6A0AD8E42D4BF3CAC2A281BA7"
+    },
+    {
+      "bytes": 245398591,
+      "label": "alg1_descriptor:seed9731-R-tau4__set3",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-alg1-v2/descriptors/seed9731-R-tau4__set3.json",
+      "sha256": "9ACA7A84D85B1098AC6A23C8DFC31F137B79C1770899FCE05F973FC6C3AC2112"
+    },
+    {
+      "bytes": 1044308,
+      "label": "exh1_frontier:seed9731-R-tau4__set3",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-pair-exh1-v1/valid-frontier/seed9731-R-tau4__set3.jsonl",
+      "sha256": "95AA4E5B9E95C57A58D9F5438ED0E6CDC865CE1B33A4BFB0087FAA2B9FBCCD74"
+    },
+    {
+      "bytes": 83395,
+      "label": "alg3_domain:seed9731-R-tau4__set3",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-pair-alg3-domain-v1/shards/seed9731-R-tau4__set3.jsonl",
+      "sha256": "99476B6B951D5CAA0DE8A9161769EA8C13D2F51FE2F490B929194F4A6E9007F7"
+    },
+    {
+      "bytes": 315799,
+      "label": "alg3_result:seed9731-R-tau4__set3",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-pair-alg3-v1/results/seed9731-R-tau4__set3.jsonl",
+      "sha256": "EC894189C7027E64E4ABE7DAF2999FBB4176041AA6D32BAF012B8842378BC515"
+    }
+  ],
+  "protocol": "Q10-AUTH-TOPO1",
+  "readout_executed": false,
+  "scientific_promotion": false,
+  "status": "SEALED_PREMEASUREMENT",
+  "write_allowlist": [
+    "CONTRACT.json",
+    "PREEXECUTION.json",
+    "execution.json",
+    "STATUS.json"
+  ]
+}

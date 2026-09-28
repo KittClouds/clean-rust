@@ -1,0 +1,17 @@
+{
+  "fit_grid_declared": 16,
+  "measured_namespace_created": false,
+  "pre_fit_gates": {
+    "B_DETERMINISM": "PASS",
+    "CD_VALUE_IDENTITY": "PASS",
+    "FORWARD_PROBABILITY": "PASS",
+    "JOINT_INVERSION_REPRESENTATION": "PASS",
+    "REPRESENTATION_INVARIANTS": "PASS",
+    "ROW_RECONCILIATION": "PASS"
+  },
+  "qualification_rows": 13420,
+  "schema": "F4-SYMMETRY-01-collection-receipt-v1",
+  "source_manifest_sha256": "1cc359c3f5e1ec92ba005c40f6dac3ce4f3df618288e7c9ca246e45193e8a144",
+  "status": "PASS",
+  "truth_opened": false
+}

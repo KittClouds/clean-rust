@@ -1,0 +1,11 @@
+{
+  "measured_namespace_created": false,
+  "predictor_bytes": 4589672,
+  "predictor_sha256": "b201733289faaf8bc33a3147bf1b8d5a4e77e193386e33f89feebb860cf2c13e",
+  "reference_blind_predictors": true,
+  "rows": 13420,
+  "schema": "F4-SYMMETRY-01-native-collection-v1",
+  "status": "PASS",
+  "truth_bytes": 523412,
+  "truth_sha256": "c4af406135aec6ec53b21dc34f1ee6d00f4568f5f205105b8a66837e227c84fd"
+}

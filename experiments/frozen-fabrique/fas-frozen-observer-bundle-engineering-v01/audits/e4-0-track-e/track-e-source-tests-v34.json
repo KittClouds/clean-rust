@@ -1,0 +1,33 @@
+{
+  "commands": [
+    "python -m py_compile experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/audit_e4_0_track_e_v16_v07.py experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/test_audit_e4_0_track_e_v16_v07.py",
+    "python -m unittest discover -s experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e -p test_audit_e4_0_track_e_v16_v07.py -v"
+  ],
+  "execution_authorization_conferred": false,
+  "model_tokenizer_cuda_contact": false,
+  "python_compile": "PASS",
+  "receipt_id": "E4_0_TRACK_E_V16_V06_SOURCE_TESTS_V07",
+  "recorded_utc": "2026-09-27T07:54:51+00:00",
+  "schema": "FAS_E4_0_TRACK_E_SOURCE_TESTS_V16_V06_V07",
+  "scope": "Synthetic-only independent Track E v16-v06 contract, source-map, seal, preserved v16-v04 authorizer-stop lineage, and no-contact audit tests. No preseal or postseal execution, E4 population, truth payload, tokenizer, model, CUDA, GPU, cache, or authorization access.",
+  "sources": [
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/audit_e4_0_track_e_v16_v07.py",
+      "bytes": 151420,
+      "sha256": "698d3444bb2b409723f5b78a1cadd71129658cf5d41b5fd461dbf92eb43b1d43"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/test_audit_e4_0_track_e_v16_v07.py",
+      "bytes": 13449,
+      "sha256": "a51bccf499c02839ad0b2dbbf1360f17792a9be5f0b751e0313ff6c9a3394e1a"
+    }
+  ],
+  "status": "TRACK_E_SOURCE_TESTS_PASS_V16_PREMAP_SYNTHETIC_AUDITOR_V07",
+  "tests": {
+    "discovered": 13,
+    "failed": 0,
+    "passed": 13,
+    "skipped": 0
+  },
+  "truth_payloads_opened": false
+}

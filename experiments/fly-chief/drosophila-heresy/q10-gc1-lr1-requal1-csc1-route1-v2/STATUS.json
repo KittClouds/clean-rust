@@ -1,0 +1,9 @@
+{
+  "engineering_only": true,
+  "execution_sha256": "2CD6F8D144D47A726C1DAEDCFFECE712C4D294C4108C5FC0C53E2F5760A9C771",
+  "identity": "q10-gc1-lr1-requal1-csc1-route1-v2",
+  "protocol": "Q10-CSC1-ROUTE1",
+  "replay_performed": false,
+  "scientific_promotion": false,
+  "status": "ROUTE1_COMPLETE"
+}

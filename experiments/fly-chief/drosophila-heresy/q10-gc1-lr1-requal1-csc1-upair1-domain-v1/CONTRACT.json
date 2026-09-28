@@ -1,0 +1,97 @@
+{
+  "identity": "q10-gc1-lr1-requal1-csc1-upair1-domain-v1",
+  "pair_outcomes_consulted": false,
+  "pair_replay_performed": false,
+  "parent_bindings": [
+    {
+      "bytes": 1239,
+      "label": "upair1_plan",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-upair1-domain-v1/PLAN.md",
+      "sha256": "E32EA52B161864A5A3BD380CC35210917932D99E70A9CB5F10BCF1EB15237DFD"
+    },
+    {
+      "bytes": 8902,
+      "label": "upair1_runner",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-upair1-domain-v1/scripts/seal_upair1_domain.py",
+      "sha256": "168ED65E844FE4A9D3DB527F4529B867697BAC35DC9CED873AE3506CE727FC66"
+    },
+    {
+      "bytes": 4429,
+      "label": "uvd0_contract",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-uvd0-v1/CONTRACT.json",
+      "sha256": "475495837462F728743736810A1063EC09AABF9EA7C596F76B81AE1C2231E0A8"
+    },
+    {
+      "bytes": 4692,
+      "label": "uvd0_execution",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-uvd0-v1/execution.json",
+      "sha256": "768320AA2B19C4F86A91BF369DE039E0C18DAE1806827112DE54DE81F3771223"
+    },
+    {
+      "bytes": 21908570,
+      "label": "uvd0_shard:seed9731-L-tau16__set2",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-uvd0-v1/shards/seed9731-L-tau16__set2.jsonl",
+      "sha256": "86B0133B81617CE2778F8EC535BEE88E10A2E4B264F9AC772085E139625ABBC4"
+    },
+    {
+      "bytes": 27806394,
+      "label": "uvd0_shard:seed9731-L-tau4__set3",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-uvd0-v1/shards/seed9731-L-tau4__set3.jsonl",
+      "sha256": "ED08794AA61E19ABB23CB4504C4F17A84EC2DFEE78B572E86F83900F812BFB3F"
+    },
+    {
+      "bytes": 25256698,
+      "label": "uvd0_shard:seed9731-R-tau16__set1",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-uvd0-v1/shards/seed9731-R-tau16__set1.jsonl",
+      "sha256": "440D602D0D8FB1CF48978D8A110B123614E41769AB054BB79D636CB9D6BB6000"
+    },
+    {
+      "bytes": 21110874,
+      "label": "uvd0_shard:seed9731-R-tau16__set3",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-uvd0-v1/shards/seed9731-R-tau16__set3.jsonl",
+      "sha256": "428426C78B8E0E8B0618EC870E19DF6363C6C68FD187C46A9E178B2AE8DA4C8A"
+    },
+    {
+      "bytes": 25147194,
+      "label": "uvd0_shard:seed9731-R-tau4__set0",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-uvd0-v1/shards/seed9731-R-tau4__set0.jsonl",
+      "sha256": "D8D2478BB94AE9E61A12A97C458494B5E9466C9F3FF0A18576DCF936CBC5BE85"
+    },
+    {
+      "bytes": 21813530,
+      "label": "uvd0_shard:seed9731-R-tau4__set1",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-uvd0-v1/shards/seed9731-R-tau4__set1.jsonl",
+      "sha256": "0EE22EDC9F630887734CD8B86AC4576FE7B8925CB46D82659960ABD3E24C6ABC"
+    },
+    {
+      "bytes": 25147194,
+      "label": "uvd0_shard:seed9731-R-tau4__set2",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-uvd0-v1/shards/seed9731-R-tau4__set2.jsonl",
+      "sha256": "E2C46F83E91F95F3FE11D2AFD6D26FD29BADF591A72A003DBB35E2D200D432D8"
+    },
+    {
+      "bytes": 25147194,
+      "label": "uvd0_shard:seed9731-R-tau4__set3",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-uvd0-v1/shards/seed9731-R-tau4__set3.jsonl",
+      "sha256": "CE3BFE3AA8C7F09FEF0813EB95C5AD93715C95180E9304B5C8D8DE130804B19D"
+    }
+  ],
+  "parent_census_pairs": 840704,
+  "parent_protocol": "Q10-CSC1-UVD0",
+  "partner_selection": {
+    "hash": "SHA256(UTF8(context|a_group:a_to|b_group:b_to))",
+    "partners_per_action": 8,
+    "retention_order": "original UVD0 shard order",
+    "selection": "lowest hash-ranked eligible partners per action, union across actions"
+  },
+  "protocol": "Q10-CSC1-UPAIR1-DOMAIN",
+  "scientific_promotion": false,
+  "status": "SEALED_PREMEASUREMENT",
+  "write_allowlist": [
+    "CONTRACT.json",
+    "PREEXECUTION.json",
+    "execution.json",
+    "STATUS.json",
+    "shards/*.jsonl"
+  ]
+}

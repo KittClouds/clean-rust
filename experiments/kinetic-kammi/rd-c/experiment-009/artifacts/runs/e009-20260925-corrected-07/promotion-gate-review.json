@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "run_id": "e009-20260925-corrected-07",
+  "scope": "fresh four-family task holdout within the frozen gpui-animated-gradient-text repository commit; two prompts per family; not cross-repository evidence",
+  "promotion_gate": {
+    "hybrid_completion_at_least_always_large": true,
+    "fewer_large_calls": true,
+    "reduced_measured_time": true,
+    "reduced_token_use": false,
+    "zero_illegal_commits": true,
+    "zero_rejected_transitions": true,
+    "zero_duplicate_effects": true,
+    "replay_identity": true,
+    "decision": "PASS_FOR_MEASURED_TIME_AND_LARGE_CALL_REDUCTION; TOKEN COST INCREASES"
+  },
+  "hybrid_vs_always_large": {
+    "completions": [
+      8,
+      8
+    ],
+    "large_calls": [
+      5,
+      8
+    ],
+    "total_tokens": [
+      13859,
+      9302,
+      "delta",
+      4557,
+      "percent_increase",
+      48.99
+    ],
+    "observer_model_wall_ms": [
+      37730.449,
+      48623.277,
+      "time_saved_ms",
+      10892.828,
+      "percent_reduction",
+      22.4
+    ],
+    "summed_task_time_ms": [
+      38278.224,
+      49036.955,
+      "time_saved_ms",
+      10758.731,
+      "percent_reduction",
+      21.94
+    ],
+    "task_p50_ms": [
+      3450.096,
+      3866.985
+    ],
+    "task_p95_ms": [
+      14310.618,
+      14046.435
+    ]
+  },
+  "small_only": {
+    "completions": 3,
+    "tasks": 8,
+    "abstentions": 5,
+    "wrong_legal_actions": 0,
+    "confident_wrong_actions": 0
+  },
+  "hand_written": {
+    "completions": 4,
+    "tasks": 8,
+    "wrong_legal_actions": 1
+  },
+  "latency_definition": "Sum of per-task observer-call elapsed times and deterministic authority time in the serial local harness; completion-test time is excluded because exact hash-verified pre-contact bank-build receipts were reused. p95 is descriptive with eight tasks, nearest-rank.",
+  "cost_definition": "Local calls have zero billed API spend. Tokens and time are separate; energy and hardware-dollar cost were not measured.",
+  "heldout_label_access": "An aborted score-only attempt opened labels before stopping on a receipt-reader schema mismatch. It wrote no lane results and changed no model outputs, bank, thresholds, or prompt. Corrected replay used the same frozen artifacts; no fitting or tuning followed label access.",
+  "source_artifact_sha256": {
+    "benchmark_summary": "d2d44a984330adfd27abcb7917bcac8f916f9793fc4cda60642567cb388427c0",
+    "benchmark_report": "e59eff2c26771bff95dc716de0a5ce7597486ee8109b968f2585ddfc9994fb15",
+    "score_replay_input_lock": "bd0d43af0e8e7951051acbe3968735fd60853309d6c33817b4d6e07c522cc701",
+    "observer_input_lock": "48232476b9e3e4bc0df4840c6919ea4ab412357b7ca7fe47460c81ae80c937f6"
+  }
+}

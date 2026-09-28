@@ -1,0 +1,23 @@
+{
+  "protocol": "AR-02A-R1 corrected-strata and verifier oracle; engineering-only",
+  "task": {"train": 96, "validation": 48, "classes": 3, "latent_cells": 12, "margin_strata": 12, "margin_bins": 4},
+  "runtime": {"model": "2-8-8-3 ReLU", "commits": 4800, "commits_per_evidence": 4, "K2_shortlist": 2, "full_reference_audit_interval": 50},
+  "weighted_estimators": {"class": "equal mean of per-class means", "cell": "equal mean of per-cell means", "decision_margin": "equal mean of class-conditional quartile-stratum means", "random_and_full": "ordinary sample mean"},
+  "seeds": ["2b7e151628aed2a6", "77a19d3c4e280b51", "1111222233334444"],
+  "runs": 33,
+  "methods": [
+    {"name":"p16_v16_random","proposal_size":16,"verifier_size":16,"verifier":"random","n":3,"mean_train_loss":0.419194281,"mean_validation_loss":0.462739418,"mean_validation_accuracy":0.895833,"mean_sampled_reference_regret":0.001274770333,"mean_wall_seconds":7.315285},
+    {"name":"p16_v16_class_weighted","proposal_size":16,"verifier_size":16,"verifier":"class_weighted","n":3,"mean_train_loss":0.406478425,"mean_validation_loss":0.485879044,"mean_validation_accuracy":0.833333,"mean_sampled_reference_regret":0.001637378087,"mean_wall_seconds":7.279888},
+    {"name":"p16_v16_cell_weighted","proposal_size":16,"verifier_size":16,"verifier":"cell_population_weighted","n":3,"mean_train_loss":0.338302682,"mean_validation_loss":0.446349382,"mean_validation_accuracy":0.847222,"mean_sampled_reference_regret":0.001465077408,"mean_wall_seconds":7.195022},
+    {"name":"p16_v16_margin_weighted","proposal_size":16,"verifier_size":16,"verifier":"class_bayes_margin_weighted","n":3,"mean_train_loss":0.404008389,"mean_validation_loss":0.473970821,"mean_validation_accuracy":0.833333,"mean_sampled_reference_regret":0.001407676894,"mean_wall_seconds":7.294852},
+    {"name":"p16_v48_random","proposal_size":16,"verifier_size":48,"verifier":"random","n":3,"mean_train_loss":0.386862397,"mean_validation_loss":0.450892299,"mean_validation_accuracy":0.854167,"mean_sampled_reference_regret":0.001213467059,"mean_wall_seconds":9.863174},
+    {"name":"p16_v48_class_weighted","proposal_size":16,"verifier_size":48,"verifier":"class_weighted","n":3,"mean_train_loss":0.387085358,"mean_validation_loss":0.404107799,"mean_validation_accuracy":0.840278,"mean_sampled_reference_regret":0.001515467237,"mean_wall_seconds":9.574110},
+    {"name":"p16_v48_cell_weighted","proposal_size":16,"verifier_size":48,"verifier":"cell_population_weighted","n":3,"mean_train_loss":0.298169310,"mean_validation_loss":0.360282073,"mean_validation_accuracy":0.861111,"mean_sampled_reference_regret":0.001224405132,"mean_wall_seconds":9.440306},
+    {"name":"p16_v48_margin_weighted","proposal_size":16,"verifier_size":48,"verifier":"class_bayes_margin_weighted","n":3,"mean_train_loss":0.318660706,"mean_validation_loss":0.417586555,"mean_validation_accuracy":0.881944,"mean_sampled_reference_regret":0.001233394154,"mean_wall_seconds":9.579933},
+    {"name":"p16_v96_full","proposal_size":16,"verifier_size":96,"verifier":"full_training","n":3,"mean_train_loss":0.069016479,"mean_validation_loss":0.246371975,"mean_validation_accuracy":0.909722,"mean_sampled_reference_regret":0.000073921000,"mean_wall_seconds":12.163633},
+    {"name":"p96_v16_random","proposal_size":96,"verifier_size":16,"verifier":"random","n":3,"mean_train_loss":0.138968925,"mean_validation_loss":0.283027286,"mean_validation_accuracy":0.930556,"mean_sampled_reference_regret":0.000363550149,"mean_wall_seconds":27.739296},
+    {"name":"p96_v96_full","proposal_size":96,"verifier_size":96,"verifier":"full_training","n":3,"mean_train_loss":0.062250849,"mean_validation_loss":0.344531924,"mean_validation_accuracy":0.916667,"mean_sampled_reference_regret":0.000003842947,"mean_wall_seconds":31.069421}
+  ],
+  "integrity": {"validation_used_for_selection":false,"proposal_and_verifier_roles_are_independently_configurable":true,"random_p16_proposal_and_verifier_use_distinct_rng_streams":true,"strata_weights_sum_to_one":true,"extra_16_sample_strata_rotate_by_evidence_round":true},
+  "artifacts": ["gaussian-cells.bin","ar-02a-r1-runs.csv","ar-02a-r1-curve.csv","decision-strata.csv"]
+}

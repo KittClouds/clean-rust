@@ -1,0 +1,13 @@
+{
+  "block_count": 12,
+  "blocks_per_assignment": 2,
+  "native_collection_started": false,
+  "schedule_seed_count": 12,
+  "schema": "F4-PRESENTATION-03-task-seed-receipt-v1",
+  "simulator_seed_count": 12,
+  "status": "PASS",
+  "task_pattern_seed_count": 12,
+  "task_payload_created": false,
+  "task_seed_manifest_sha256": "22680d8cffd0a272ff841aa0478e2eb6bb36dce79c2c9c805f2aa93f8fb467a1",
+  "unique_seed_count": 36
+}

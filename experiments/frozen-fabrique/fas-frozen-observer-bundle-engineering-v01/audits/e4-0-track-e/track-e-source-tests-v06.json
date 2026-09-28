@@ -1,0 +1,57 @@
+{
+  "schema": "FAS_E4_0_TRACK_E_SOURCE_TESTS_V01",
+  "status": "TRACK_E_SOURCE_TESTS_PASS_PREMAP_UNIT_TESTS",
+  "created_utc": "2026-09-26T21:57:52.363364+00:00",
+  "command": "python -B -m unittest discover -s audits/e4-0-track-e -p 'test_*.py' -v",
+  "scope": "Track E independent source, parser, seal-root, final sealer symlink/junction ordering, duplicate-member rejection, and Input Path table normalization tests before final v04 map regeneration. The actual-map integration test was skipped because the canonical map was moved to a preserved superseded-attempt path. No E4 rows, labels, tokenizer/model, or CUDA were accessed.",
+  "sources": [
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/audit_e4_0_track_e.py",
+      "bytes": 42870,
+      "sha256": "e5068bd61211fe4a823baa85d3d3ec1609fa3887d45b2924672606d51cc2ccc7"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/audit_e4_0_track_e_seal.py",
+      "bytes": 10558,
+      "sha256": "c7ffac775b97ed7ccfda21fcd74757379d8785d4699d9b9064766017cf7fd326"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/test_audit_e4_0_track_e.py",
+      "bytes": 5292,
+      "sha256": "99f2301ae679df113d264fd5cd8ffeef53a55f96a6ac8006c8eb0b66bacc8a48"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/seal_e4_0_contract_v05.py",
+      "bytes": 8620,
+      "sha256": "e6eb28a5c1a5a116650ed2e01c615c46f9d94fc9b3f868d3746bb9a157ab7c25"
+    }
+  ],
+  "tests": {
+    "discovered": 6,
+    "passed": 5,
+    "skipped": 1,
+    "failed": 0
+  },
+  "supersedes": [
+    {
+      "path": "audits/e4-0-track-e/track-e-source-tests-v01.json",
+      "reason": "Preserved empty file from failed create-once serialization; excluded from receipt table."
+    },
+    {
+      "path": "audits/e4-0-track-e/track-e-source-tests-v02.json",
+      "reason": "Superseded after exact map-row/source binding changes."
+    },
+    {
+      "path": "audits/e4-0-track-e/track-e-source-tests-v03.json",
+      "reason": "Superseded after independent seal-root helper consolidation."
+    },
+    {
+      "path": "audits/e4-0-track-e/track-e-source-tests-v04.json",
+      "reason": "Superseded after adding pre-resolve symlink and duplicate seal-member tests."
+    },
+    {
+      "path": "audits/e4-0-track-e/track-e-source-tests-v05.json",
+      "reason": "Superseded after adding Input Path header normalization coverage, pinning Track D v04 and the final sealer, and versioning the preseal receipt path; actual map was absent during this pre-map run."
+    }
+  ]
+}

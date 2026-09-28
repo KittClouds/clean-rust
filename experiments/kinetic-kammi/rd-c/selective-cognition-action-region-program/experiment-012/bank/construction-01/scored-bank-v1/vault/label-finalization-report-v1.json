@@ -1,0 +1,579 @@
+{
+  "schema_version": 1,
+  "state": "LABEL_FINALIZATION_COMPLETE_NO_MODEL_CONTACT",
+  "model_contact_authorized": false,
+  "raw_source_fixture_sha256": "462937e9b9ae5787a016bbda7ab0939bf0a92dafdf9a7a5d72664583244e0b3c",
+  "raw_candidate_check_result_sha256": "22c8c6db459a124a91d8cc4971b33be0e5baf97d3450c23b34fac51fcb235d43",
+  "derived_source_fixture_sha256": "4f675c5a66caeef388866971f8a7be9d44916007c94c97266d8465111f40676e",
+  "derived_candidate_check_labels_sha256": "0268384c7a859467e5533b54e73a25eb09aedde2cd34205e22a8ea27fb4f04b7",
+  "consistent_input_case_groups": 224,
+  "same_input_case_conflicts": 0,
+  "expected_set_divergences": {
+    "task-348504": {
+      "prior_expected_ids": [
+        42559
+      ],
+      "executable_valid_roles": [
+        "copy_prefix",
+        "slice_prefix"
+      ],
+      "executable_valid_ids_under_prior_mapping": [
+        42559,
+        47505
+      ]
+    },
+    "task-742866": {
+      "prior_expected_ids": [
+        64060
+      ],
+      "executable_valid_roles": [
+        "copy_prefix",
+        "slice_prefix"
+      ],
+      "executable_valid_ids_under_prior_mapping": [
+        42559,
+        64060
+      ]
+    },
+    "task-724742": {
+      "prior_expected_ids": [
+        47505
+      ],
+      "executable_valid_roles": [
+        "copy_prefix",
+        "slice_prefix"
+      ],
+      "executable_valid_ids_under_prior_mapping": [
+        42559,
+        47505
+      ]
+    },
+    "task-809202": {
+      "prior_expected_ids": [
+        51536
+      ],
+      "executable_valid_roles": [
+        "copy_prefix",
+        "slice_prefix"
+      ],
+      "executable_valid_ids_under_prior_mapping": [
+        42559,
+        51536
+      ]
+    }
+  },
+  "families": {
+    "bounded-prefix-copy": {
+      "passing_roles_by_task": {
+        "task-348504": [
+          "copy_prefix",
+          "slice_prefix"
+        ],
+        "task-742866": [
+          "copy_prefix",
+          "slice_prefix"
+        ],
+        "task-724742": [
+          "copy_prefix",
+          "slice_prefix"
+        ],
+        "task-809202": [
+          "copy_prefix",
+          "slice_prefix"
+        ]
+      },
+      "valid_action_count_by_id_before": {
+        "42559": 4,
+        "47505": 2,
+        "51536": 1,
+        "64060": 1
+      },
+      "valid_action_count_by_id_after": {
+        "42559": 2,
+        "47505": 2,
+        "51536": 2,
+        "64060": 2
+      },
+      "id_mapping_changed": true,
+      "perfect_id_indicator_before": true,
+      "perfect_id_indicator_after": false,
+      "valid_action_count_by_producer_position_final": [
+        2,
+        2,
+        2,
+        2
+      ]
+    },
+    "composite-frame-field": {
+      "passing_roles_by_task": {
+        "task-943194": [
+          "header_big_endian"
+        ],
+        "task-104800": [
+          "header_little_endian"
+        ],
+        "task-215890": [
+          "payload_big_endian"
+        ],
+        "task-299379": [
+          "payload_little_endian"
+        ]
+      },
+      "valid_action_count_by_id_before": {
+        "22115": 1,
+        "28666": 1,
+        "51145": 1,
+        "62972": 1
+      },
+      "valid_action_count_by_id_after": {
+        "22115": 1,
+        "28666": 1,
+        "51145": 1,
+        "62972": 1
+      },
+      "id_mapping_changed": true,
+      "perfect_id_indicator_before": false,
+      "perfect_id_indicator_after": false,
+      "valid_action_count_by_producer_position_final": [
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    "conflicting-alias-requirement": {
+      "passing_roles_by_task": {
+        "task-546859": [],
+        "task-894855": [],
+        "task-620950": [],
+        "task-569812": []
+      },
+      "valid_action_count_by_id_before": {
+        "22012": 0,
+        "32916": 0,
+        "52980": 0,
+        "57213": 0
+      },
+      "valid_action_count_by_id_after": {
+        "22012": 0,
+        "32916": 0,
+        "52980": 0,
+        "57213": 0
+      },
+      "id_mapping_changed": false,
+      "perfect_id_indicator_before": false,
+      "perfect_id_indicator_after": false,
+      "valid_action_count_by_producer_position_final": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "cursor-advance-observation": {
+      "passing_roles_by_task": {
+        "task-827381": [
+          "skip_one"
+        ],
+        "task-334405": [
+          "skip_two"
+        ],
+        "task-580656": [
+          "skip_two"
+        ],
+        "task-711391": [
+          "skip_three"
+        ]
+      },
+      "valid_action_count_by_id_before": {
+        "31099": 1,
+        "34154": 1,
+        "36737": 1,
+        "64124": 1
+      },
+      "valid_action_count_by_id_after": {
+        "31099": 1,
+        "34154": 1,
+        "36737": 1,
+        "64124": 1
+      },
+      "id_mapping_changed": true,
+      "perfect_id_indicator_before": false,
+      "perfect_id_indicator_after": false,
+      "valid_action_count_by_producer_position_final": [
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    "help-color-capability": {
+      "passing_roles_by_task": {
+        "task-962261": [
+          "force_color"
+        ],
+        "task-343379": [
+          "suppress_color",
+          "suppress_color_narrow_help"
+        ],
+        "task-825317": [
+          "force_color"
+        ],
+        "task-976226": [
+          "suppress_color",
+          "suppress_color_narrow_help"
+        ]
+      },
+      "valid_action_count_by_id_before": {
+        "33099": 2,
+        "45190": 2,
+        "48831": 1,
+        "63364": 1
+      },
+      "valid_action_count_by_id_after": {
+        "33099": 2,
+        "45190": 2,
+        "48831": 1,
+        "63364": 1
+      },
+      "id_mapping_changed": true,
+      "perfect_id_indicator_before": false,
+      "perfect_id_indicator_after": false,
+      "valid_action_count_by_producer_position_final": [
+        1,
+        2,
+        1,
+        2
+      ]
+    },
+    "map-order-feature-contract": {
+      "passing_roles_by_task": {
+        "task-294600": [
+          "canonical_sort",
+          "sorted_profile_only"
+        ],
+        "task-798417": [
+          "preserve_order_only",
+          "reverse_native"
+        ],
+        "task-582475": [
+          "canonical_sort",
+          "sorted_profile_only"
+        ],
+        "task-544502": [
+          "preserve_order_only"
+        ]
+      },
+      "valid_action_count_by_id_before": {
+        "28214": 2,
+        "31314": 2,
+        "38651": 2,
+        "59171": 1
+      },
+      "valid_action_count_by_id_after": {
+        "28214": 2,
+        "31314": 2,
+        "38651": 1,
+        "59171": 2
+      },
+      "id_mapping_changed": true,
+      "perfect_id_indicator_before": false,
+      "perfect_id_indicator_after": false,
+      "valid_action_count_by_producer_position_final": [
+        1,
+        2,
+        2,
+        2
+      ]
+    },
+    "number-mode-plus-error-site": {
+      "passing_roles_by_task": {
+        "task-401405": [
+          "header_whole"
+        ],
+        "task-582537": [
+          "header_ratio"
+        ],
+        "task-261550": [
+          "payload_whole"
+        ],
+        "task-395319": [
+          "payload_ratio"
+        ]
+      },
+      "valid_action_count_by_id_before": {
+        "29284": 1,
+        "31026": 1,
+        "49443": 1,
+        "52928": 1
+      },
+      "valid_action_count_by_id_after": {
+        "29284": 1,
+        "31026": 1,
+        "49443": 1,
+        "52928": 1
+      },
+      "id_mapping_changed": true,
+      "perfect_id_indicator_before": false,
+      "perfect_id_indicator_after": false,
+      "valid_action_count_by_producer_position_final": [
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    "possible-value-validation": {
+      "passing_roles_by_task": {
+        "task-538216": [
+          "allow_fast_and_safe"
+        ],
+        "task-440067": [
+          "allow_fast_and_safe"
+        ],
+        "task-312377": [
+          "allow_fast_and_safe"
+        ],
+        "task-342767": [
+          "allow_fast_and_safe"
+        ]
+      },
+      "valid_action_count_by_id_before": {
+        "22012": 1,
+        "32916": 1,
+        "52980": 1,
+        "57213": 1
+      },
+      "valid_action_count_by_id_after": {
+        "22012": 1,
+        "32916": 1,
+        "52980": 1,
+        "57213": 1
+      },
+      "id_mapping_changed": true,
+      "perfect_id_indicator_before": false,
+      "perfect_id_indicator_after": false,
+      "valid_action_count_by_producer_position_final": [
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    "raw-number-lossless": {
+      "passing_roles_by_task": {
+        "task-479184": [],
+        "task-242065": [],
+        "task-555141": [],
+        "task-965856": []
+      },
+      "valid_action_count_by_id_before": {
+        "38796": 0,
+        "53677": 0,
+        "58574": 0,
+        "64610": 0
+      },
+      "valid_action_count_by_id_after": {
+        "38796": 0,
+        "53677": 0,
+        "58574": 0,
+        "64610": 0
+      },
+      "id_mapping_changed": false,
+      "perfect_id_indicator_before": false,
+      "perfect_id_indicator_after": false,
+      "valid_action_count_by_producer_position_final": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "repeated-option-policy": {
+      "passing_roles_by_task": {
+        "task-626801": [
+          "append_all"
+        ],
+        "task-366887": [
+          "last_value_wins"
+        ],
+        "task-893694": [
+          "append_all"
+        ],
+        "task-702830": [
+          "last_value_wins"
+        ]
+      },
+      "valid_action_count_by_id_before": {
+        "22252": 1,
+        "27088": 1,
+        "35639": 1,
+        "44597": 1
+      },
+      "valid_action_count_by_id_after": {
+        "22252": 1,
+        "27088": 1,
+        "35639": 1,
+        "44597": 1
+      },
+      "id_mapping_changed": true,
+      "perfect_id_indicator_before": false,
+      "perfect_id_indicator_after": false,
+      "valid_action_count_by_producer_position_final": [
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    "stream-byte-offset": {
+      "passing_roles_by_task": {
+        "task-131190": [
+          "report_consumed_json_bytes"
+        ],
+        "task-180180": [
+          "include_following_separator"
+        ],
+        "task-192782": [
+          "exclude_last_consumed_byte"
+        ],
+        "task-922800": [
+          "reset_offset"
+        ]
+      },
+      "valid_action_count_by_id_before": {
+        "31157": 1,
+        "40696": 1,
+        "54579": 1,
+        "58080": 1
+      },
+      "valid_action_count_by_id_after": {
+        "31157": 1,
+        "40696": 1,
+        "54579": 1,
+        "58080": 1
+      },
+      "id_mapping_changed": true,
+      "perfect_id_indicator_before": false,
+      "perfect_id_indicator_after": false,
+      "valid_action_count_by_producer_position_final": [
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    "wire-endian-contract": {
+      "passing_roles_by_task": {
+        "task-409437": [
+          "emit_big_endian_word"
+        ],
+        "task-979490": [
+          "emit_little_endian_word"
+        ],
+        "task-109830": [
+          "emit_little_endian_word"
+        ],
+        "task-459976": [
+          "emit_big_endian_word"
+        ]
+      },
+      "valid_action_count_by_id_before": {
+        "25335": 1,
+        "34126": 1,
+        "43520": 1,
+        "56199": 1
+      },
+      "valid_action_count_by_id_after": {
+        "25335": 1,
+        "34126": 1,
+        "43520": 1,
+        "56199": 1
+      },
+      "id_mapping_changed": true,
+      "perfect_id_indicator_before": false,
+      "perfect_id_indicator_after": false,
+      "valid_action_count_by_producer_position_final": [
+        1,
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  "position_validity_counts": {
+    "bounded-prefix-copy": [
+      2,
+      2,
+      2,
+      2
+    ],
+    "composite-frame-field": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "conflicting-alias-requirement": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "cursor-advance-observation": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "help-color-capability": [
+      1,
+      2,
+      1,
+      2
+    ],
+    "map-order-feature-contract": [
+      1,
+      2,
+      2,
+      2
+    ],
+    "number-mode-plus-error-site": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "possible-value-validation": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "raw-number-lossless": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "repeated-option-policy": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "stream-byte-offset": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "wire-endian-contract": [
+      1,
+      1,
+      1,
+      1
+    ]
+  },
+  "model_contact": false
+}

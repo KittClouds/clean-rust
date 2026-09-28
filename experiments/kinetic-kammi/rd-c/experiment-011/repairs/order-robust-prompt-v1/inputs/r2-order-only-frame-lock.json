@@ -1,0 +1,1078 @@
+{
+  "schema_version": 1,
+  "condition": "order-only",
+  "frames": [
+    {
+      "task_id": "turbovec-turbovec-mask-allowlist-v1",
+      "pair_task_id": "turbovec-turbovec-mask-allowlist-v1",
+      "frame_sha256": "5d62c720efc858da48439c7afeedc071a1ada683326fcd9625a7344ec326c765",
+      "frame": {
+        "schema_id": "rdc-real-coding-observation.v1",
+        "task_id": "turbovec-turbovec-mask-allowlist-v1",
+        "task_family": "turbovec-mask-allowlist",
+        "repository_id": "turbovec",
+        "task_variant": 1,
+        "task_prompt": "Repair masked vector search so the frozen allowlist parity test passes. Choose one offered patch.",
+        "repository_revision": "8202f194a0cbbd52213a004290401e180e5c123d",
+        "snapshot_sha256": "209a6c9c47be7b48d3cf76c355407c60e85d366c8b4c7f292074cb8d74206a34",
+        "evidence": [
+          {
+            "kind": "source_excerpt",
+            "source_id": "turbovec/src/search.rs",
+            "content_blake3": "38465efa53f0a24c7327297e0e59ca3b3d0dcbc140fc34051f8775de5fa4af48",
+            "content": "    // Safety: caller validates mask length against n_vectors before reaching\n    // any kernel; we never query past it in scoring loops.\n    (mask[slot >> 6] >> (slot & 31)) & 1 != 0\n}\n"
+          },
+          {
+            "kind": "baseline_tool_result",
+            "source_id": "cargo-test::block_skip_at_one_percent_selectivity_matches_post_filter",
+            "content_blake3": "dd9a061ae2ebdc824953b190603ed97521951f1b35d1b23139a5d4bbad881f1d",
+            "content": "Exact test `block_skip_at_one_percent_selectivity_matches_post_filter` failed on the frozen snapshot. Candidate patches have not been run in this task.\n\nrunning 1 test\ntest block_skip_at_one_percent_selectivity_matches_post_filter ... FAILED\n\nfailures:\n\n---- block_skip_at_one_percent_selectivity_matches_post_filter stdout ----\n\nthread 'block_skip_at_one_percent_selectivity_matches_post_filter' (3056) panicked at turbovec\\tests\\filtering.rs:352:9:\nassertion `left == right` failed: rank 1: id mismatch (got 1940, want 2619)\n  left: 1940\n right: 2619\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    block_skip_at_one_percent_selectivity_matches_post_filter\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 21 filtered out; finished in 1.27s\n\n   Compiling turbovec v0.9.0 (<frozen-repository-snapshot>\\turbovec)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 11.36s\n     Running tests\\filtering.rs (<cargo-target>\\debug\\deps\\filtering-e398ca839dedcfa2.exe)\nerror: test failed, to rerun pass `-p turbovec --test filtering`\n"
+          }
+        ],
+        "action_options": [
+          {
+            "action": {
+              "id": 37,
+              "schema_id": 1
+            },
+            "summary": "Apply the source change and add a contract comment.",
+            "diff_excerpt": "@@ -3000,7 +3000,8 @@\n-    (mask[slot >> 6] >> (slot & 31)) & 1 != 0\n+    // Slot indices select one bit from each complete u64 word.\n+    (mask[slot >> 6] >> (slot & 63)) & 1 != 0",
+            "patch_sha256": "f977765cc076a1eb302b0c9310a0770c7c74035912ad92214d0a70ffb5325974"
+          },
+          {
+            "action": {
+              "id": 11,
+              "schema_id": 1
+            },
+            "summary": "Apply the focused source change shown here.",
+            "diff_excerpt": "@@ -3000,7 +3000,7 @@\n-    (mask[slot >> 6] >> (slot & 31)) & 1 != 0\n+    (mask[slot >> 6] >> (slot & 63)) & 1 != 0",
+            "patch_sha256": "0351d46c399b62825821094c90c92701d18d5e56718bc7af4825e6dc9b13ac74"
+          },
+          {
+            "action": {
+              "id": 94,
+              "schema_id": 1
+            },
+            "summary": "Apply this alternative change in the same code path.",
+            "diff_excerpt": "@@ -3000,7 +3000,7 @@\n-    (mask[slot >> 6] >> (slot & 31)) & 1 != 0\n+    (mask[slot >> 5] >> (slot & 63)) & 1 != 0",
+            "patch_sha256": "027c3f06e442faa979b6e9381ceb566b4a2d4028837c4747ddad6f91984801ab"
+          },
+          {
+            "action": {
+              "id": 68,
+              "schema_id": 1
+            },
+            "summary": "Leave the current implementation unchanged.",
+            "diff_excerpt": "No source line changes are included.",
+            "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        ]
+      }
+    },
+    {
+      "task_id": "turbovec-turbovec-mask-allowlist-v2",
+      "pair_task_id": "turbovec-turbovec-mask-allowlist-v2",
+      "frame_sha256": "4662bdc31b9e736927e39f75b385c00f499a09c9790cc5e3a67b20cd0695ae24",
+      "frame": {
+        "schema_id": "rdc-real-coding-observation.v1",
+        "task_id": "turbovec-turbovec-mask-allowlist-v2",
+        "task_family": "turbovec-mask-allowlist",
+        "repository_id": "turbovec",
+        "task_variant": 2,
+        "task_prompt": "The top-k result must contain only permitted vector slots and match post-hoc filtering. The exact regression test currently fails; choose the patch that restores the packed-mask contract.",
+        "repository_revision": "8202f194a0cbbd52213a004290401e180e5c123d",
+        "snapshot_sha256": "209a6c9c47be7b48d3cf76c355407c60e85d366c8b4c7f292074cb8d74206a34",
+        "evidence": [
+          {
+            "kind": "source_excerpt",
+            "source_id": "turbovec/src/search.rs",
+            "content_blake3": "38465efa53f0a24c7327297e0e59ca3b3d0dcbc140fc34051f8775de5fa4af48",
+            "content": "    // Safety: caller validates mask length against n_vectors before reaching\n    // any kernel; we never query past it in scoring loops.\n    (mask[slot >> 6] >> (slot & 31)) & 1 != 0\n}\n"
+          },
+          {
+            "kind": "baseline_tool_result",
+            "source_id": "cargo-test::block_skip_at_one_percent_selectivity_matches_post_filter",
+            "content_blake3": "dd9a061ae2ebdc824953b190603ed97521951f1b35d1b23139a5d4bbad881f1d",
+            "content": "Exact test `block_skip_at_one_percent_selectivity_matches_post_filter` failed on the frozen snapshot. Candidate patches have not been run in this task.\n\nrunning 1 test\ntest block_skip_at_one_percent_selectivity_matches_post_filter ... FAILED\n\nfailures:\n\n---- block_skip_at_one_percent_selectivity_matches_post_filter stdout ----\n\nthread 'block_skip_at_one_percent_selectivity_matches_post_filter' (3056) panicked at turbovec\\tests\\filtering.rs:352:9:\nassertion `left == right` failed: rank 1: id mismatch (got 1940, want 2619)\n  left: 1940\n right: 2619\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    block_skip_at_one_percent_selectivity_matches_post_filter\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 21 filtered out; finished in 1.27s\n\n   Compiling turbovec v0.9.0 (<frozen-repository-snapshot>\\turbovec)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 11.36s\n     Running tests\\filtering.rs (<cargo-target>\\debug\\deps\\filtering-e398ca839dedcfa2.exe)\nerror: test failed, to rerun pass `-p turbovec --test filtering`\n"
+          }
+        ],
+        "action_options": [
+          {
+            "action": {
+              "id": 37,
+              "schema_id": 1
+            },
+            "summary": "Leave the current implementation unchanged.",
+            "diff_excerpt": "No source line changes are included.",
+            "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "action": {
+              "id": 94,
+              "schema_id": 1
+            },
+            "summary": "Apply the source change and add a contract comment.",
+            "diff_excerpt": "@@ -3000,7 +3000,8 @@\n-    (mask[slot >> 6] >> (slot & 31)) & 1 != 0\n+    // Slot indices select one bit from each complete u64 word.\n+    (mask[slot >> 6] >> (slot & 63)) & 1 != 0",
+            "patch_sha256": "f977765cc076a1eb302b0c9310a0770c7c74035912ad92214d0a70ffb5325974"
+          },
+          {
+            "action": {
+              "id": 68,
+              "schema_id": 1
+            },
+            "summary": "Apply this alternative change in the same code path.",
+            "diff_excerpt": "@@ -3000,7 +3000,7 @@\n-    (mask[slot >> 6] >> (slot & 31)) & 1 != 0\n+    (mask[slot >> 5] >> (slot & 63)) & 1 != 0",
+            "patch_sha256": "027c3f06e442faa979b6e9381ceb566b4a2d4028837c4747ddad6f91984801ab"
+          },
+          {
+            "action": {
+              "id": 11,
+              "schema_id": 1
+            },
+            "summary": "Apply the focused source change shown here.",
+            "diff_excerpt": "@@ -3000,7 +3000,7 @@\n-    (mask[slot >> 6] >> (slot & 31)) & 1 != 0\n+    (mask[slot >> 6] >> (slot & 63)) & 1 != 0",
+            "patch_sha256": "0351d46c399b62825821094c90c92701d18d5e56718bc7af4825e6dc9b13ac74"
+          }
+        ]
+      }
+    },
+    {
+      "task_id": "turbovec-turbovec-id-remove-readd-v1",
+      "pair_task_id": "turbovec-turbovec-id-remove-readd-v1",
+      "frame_sha256": "e3fbcc604b1470dd3e72d7991eb2aaee5864252d59dc2d531b57695852e94763",
+      "frame": {
+        "schema_id": "rdc-real-coding-observation.v1",
+        "task_id": "turbovec-turbovec-id-remove-readd-v1",
+        "task_family": "turbovec-id-remove-readd",
+        "repository_id": "turbovec",
+        "task_variant": 1,
+        "task_prompt": "Repair the stable-ID removal path. The frozen remove-and-readd test fails on this snapshot; choose the patch that makes the ID reusable.",
+        "repository_revision": "8202f194a0cbbd52213a004290401e180e5c123d",
+        "snapshot_sha256": "6f8992837d0fe84619bfd496ddef1555aa3b20c7612487362df8608ddbdd213c",
+        "evidence": [
+          {
+            "kind": "source_excerpt",
+            "source_id": "turbovec/src/id_map.rs",
+            "content_blake3": "5232ec7083a5da17f4c02716e9c438ca57bee0bf486a3dcd2be59c3fd332c822",
+            "content": "//! Stable external IDs on top of [`TurboQuantIndex`].\n//!\n//! [`TurboQuantIndex`] stores vectors positionally: calling `swap_remove`\n//! invalidates external references because the previously-last vector\n//! moves into the deleted slot. `IdMapIndex` wraps the positional index\n//! with a bidirectional `id ↔ slot` mapping so callers can identify\n//! vectors by a stable `u64` ID that doesn't change when other vectors\n//! are inserted or removed."
+          },
+          {
+            "kind": "baseline_tool_result",
+            "source_id": "cargo-test::remove_then_re_add_same_id_is_allowed",
+            "content_blake3": "b4b1bef1e5e99c4e7fb255b588adb2771430dd9eff2ec7ba86ff3f83b79406b3",
+            "content": "Exact test `remove_then_re_add_same_id_is_allowed` failed on the frozen snapshot. Candidate patches have not been run in this task.\n\nrunning 1 test\ntest remove_then_re_add_same_id_is_allowed ... FAILED\n\nfailures:\n\n---- remove_then_re_add_same_id_is_allowed stdout ----\n\nthread 'remove_then_re_add_same_id_is_allowed' (27340) panicked at turbovec\\tests\\id_map.rs:153:5:\nassertion failed: !idx.contains(3)\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    remove_then_re_add_same_id_is_allowed\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 22 filtered out; finished in 1.10s\n\n   Compiling turbovec v0.9.0 (<frozen-repository-snapshot>\\turbovec)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 8.89s\n     Running tests\\id_map.rs (<cargo-target>\\debug\\deps\\id_map-6028bbdd1bdac666.exe)\nerror: test failed, to rerun pass `-p turbovec --test id_map`\n"
+          }
+        ],
+        "action_options": [
+          {
+            "action": {
+              "id": 37,
+              "schema_id": 1
+            },
+            "summary": "Apply the focused source change shown here.",
+            "diff_excerpt": "@@ -553,7 +553,6 @@\n-        self.ids_mut().insert(id, last);",
+            "patch_sha256": "c38e076a8bc156f51817b22c9d46c450421eb8586893ca918d5cf68a3aab2c91"
+          },
+          {
+            "action": {
+              "id": 68,
+              "schema_id": 1
+            },
+            "summary": "Apply this alternative change in the same code path.",
+            "diff_excerpt": "@@ -553,7 +553,7 @@\n-        self.ids_mut().insert(id, last);\n+        self.ids_mut().insert(id, slot);",
+            "patch_sha256": "206a716d47a60ca5e1b0de9ccd26c71c9a1a710134b4a703b06af6fc81a87c5b"
+          },
+          {
+            "action": {
+              "id": 11,
+              "schema_id": 1
+            },
+            "summary": "Leave the current implementation unchanged.",
+            "diff_excerpt": "No source line changes are included.",
+            "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "action": {
+              "id": 94,
+              "schema_id": 1
+            },
+            "summary": "Apply the source change and add a contract comment.",
+            "diff_excerpt": "@@ -552,8 +552,8 @@\n+        // Remove the external ID before it can be reinserted.\n-        self.ids_mut().insert(id, last);",
+            "patch_sha256": "5071ceeede54082f166a1d50243cbc910e06dbc783b9911323ebe22c8d67ee7c"
+          }
+        ]
+      }
+    },
+    {
+      "task_id": "turbovec-turbovec-id-remove-readd-v2",
+      "pair_task_id": "turbovec-turbovec-id-remove-readd-v2",
+      "frame_sha256": "cb146647e4b73e818b6633180e9671e16ac1c21cc7899d1fcf3143ddfb971d74",
+      "frame": {
+        "schema_id": "rdc-real-coding-observation.v1",
+        "task_id": "turbovec-turbovec-id-remove-readd-v2",
+        "task_family": "turbovec-id-remove-readd",
+        "repository_id": "turbovec",
+        "task_variant": 2,
+        "task_prompt": "A deleted external ID should no longer be reported as present, and a new vector must be allowed to reuse it. Select the offered implementation that satisfies the exact test.",
+        "repository_revision": "8202f194a0cbbd52213a004290401e180e5c123d",
+        "snapshot_sha256": "6f8992837d0fe84619bfd496ddef1555aa3b20c7612487362df8608ddbdd213c",
+        "evidence": [
+          {
+            "kind": "source_excerpt",
+            "source_id": "turbovec/src/id_map.rs",
+            "content_blake3": "5232ec7083a5da17f4c02716e9c438ca57bee0bf486a3dcd2be59c3fd332c822",
+            "content": "//! Stable external IDs on top of [`TurboQuantIndex`].\n//!\n//! [`TurboQuantIndex`] stores vectors positionally: calling `swap_remove`\n//! invalidates external references because the previously-last vector\n//! moves into the deleted slot. `IdMapIndex` wraps the positional index\n//! with a bidirectional `id ↔ slot` mapping so callers can identify\n//! vectors by a stable `u64` ID that doesn't change when other vectors\n//! are inserted or removed."
+          },
+          {
+            "kind": "baseline_tool_result",
+            "source_id": "cargo-test::remove_then_re_add_same_id_is_allowed",
+            "content_blake3": "b4b1bef1e5e99c4e7fb255b588adb2771430dd9eff2ec7ba86ff3f83b79406b3",
+            "content": "Exact test `remove_then_re_add_same_id_is_allowed` failed on the frozen snapshot. Candidate patches have not been run in this task.\n\nrunning 1 test\ntest remove_then_re_add_same_id_is_allowed ... FAILED\n\nfailures:\n\n---- remove_then_re_add_same_id_is_allowed stdout ----\n\nthread 'remove_then_re_add_same_id_is_allowed' (27340) panicked at turbovec\\tests\\id_map.rs:153:5:\nassertion failed: !idx.contains(3)\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    remove_then_re_add_same_id_is_allowed\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 22 filtered out; finished in 1.10s\n\n   Compiling turbovec v0.9.0 (<frozen-repository-snapshot>\\turbovec)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 8.89s\n     Running tests\\id_map.rs (<cargo-target>\\debug\\deps\\id_map-6028bbdd1bdac666.exe)\nerror: test failed, to rerun pass `-p turbovec --test id_map`\n"
+          }
+        ],
+        "action_options": [
+          {
+            "action": {
+              "id": 68,
+              "schema_id": 1
+            },
+            "summary": "Apply the focused source change shown here.",
+            "diff_excerpt": "@@ -553,7 +553,6 @@\n-        self.ids_mut().insert(id, last);",
+            "patch_sha256": "c38e076a8bc156f51817b22c9d46c450421eb8586893ca918d5cf68a3aab2c91"
+          },
+          {
+            "action": {
+              "id": 11,
+              "schema_id": 1
+            },
+            "summary": "Apply this alternative change in the same code path.",
+            "diff_excerpt": "@@ -553,7 +553,7 @@\n-        self.ids_mut().insert(id, last);\n+        self.ids_mut().insert(id, slot);",
+            "patch_sha256": "206a716d47a60ca5e1b0de9ccd26c71c9a1a710134b4a703b06af6fc81a87c5b"
+          },
+          {
+            "action": {
+              "id": 37,
+              "schema_id": 1
+            },
+            "summary": "Apply the source change and add a contract comment.",
+            "diff_excerpt": "@@ -552,8 +552,8 @@\n+        // Remove the external ID before it can be reinserted.\n-        self.ids_mut().insert(id, last);",
+            "patch_sha256": "5071ceeede54082f166a1d50243cbc910e06dbc783b9911323ebe22c8d67ee7c"
+          },
+          {
+            "action": {
+              "id": 94,
+              "schema_id": 1
+            },
+            "summary": "Leave the current implementation unchanged.",
+            "diff_excerpt": "No source line changes are included.",
+            "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        ]
+      }
+    },
+    {
+      "task_id": "turbovec-turbovec-id-swap-repair-v1",
+      "pair_task_id": "turbovec-turbovec-id-swap-repair-v1",
+      "frame_sha256": "a9645337ca9a72e79b2d68101f5b4cbdc78e2b824a6a5b730cced4803847d0d5",
+      "frame": {
+        "schema_id": "rdc-real-coding-observation.v1",
+        "task_id": "turbovec-turbovec-id-swap-repair-v1",
+        "task_family": "turbovec-id-swap-repair",
+        "repository_id": "turbovec",
+        "task_variant": 1,
+        "task_prompt": "Repair the ID-to-slot update after removing vectors from mixed positions. Choose the patch that keeps the frozen survivor search test passing.",
+        "repository_revision": "8202f194a0cbbd52213a004290401e180e5c123d",
+        "snapshot_sha256": "608d68fd4875ae1cae9221e43a947fc7a8610b8b2a791773028f6b52185a0219",
+        "evidence": [
+          {
+            "kind": "source_excerpt",
+            "source_id": "turbovec/src/id_map.rs",
+            "content_blake3": "4d9b51057e438341ff6f1f1fe88da6098b68f809fdc1c76f9744f404101206c7",
+            "content": "            self.slot_to_id[slot] = moved_id;\n            // The previously-last id now lives at `slot`.\n            self.ids_mut().insert(moved_id, last);\n        }\n        self.slot_to_id.pop();"
+          },
+          {
+            "kind": "baseline_tool_result",
+            "source_id": "cargo-test::remaining_ids_still_self_query_after_mixed_removes",
+            "content_blake3": "199f34031fed00e478e30f0d2a6b0f59cb58d99540b7861f6d60217cedeb1d79",
+            "content": "Exact test `remaining_ids_still_self_query_after_mixed_removes` failed on the frozen snapshot. Candidate patches have not been run in this task.\n\nrunning 1 test\ntest remaining_ids_still_self_query_after_mixed_removes ... FAILED\n\nfailures:\n\n---- remaining_ids_still_self_query_after_mixed_removes stdout ----\n\nthread 'remaining_ids_still_self_query_after_mixed_removes' (28152) panicked at turbovec\\src\\lib.rs:2943:9:\nindex 19 out of bounds (n_vectors = 19)\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    remaining_ids_still_self_query_after_mixed_removes\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 22 filtered out; finished in 1.33s\n\n   Compiling turbovec v0.9.0 (<frozen-repository-snapshot>\\turbovec)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 8.66s\n     Running tests\\id_map.rs (<cargo-target>\\debug\\deps\\id_map-6028bbdd1bdac666.exe)\nerror: test failed, to rerun pass `-p turbovec --test id_map`\n"
+          }
+        ],
+        "action_options": [
+          {
+            "action": {
+              "id": 11,
+              "schema_id": 1
+            },
+            "summary": "Apply this alternative change in the same code path.",
+            "diff_excerpt": "@@ -559,7 +559,7 @@\n-            self.ids_mut().insert(moved_id, last);\n+            self.ids_mut().insert(moved_id, 0);",
+            "patch_sha256": "4e9f6d2ebebddf364cc4cd528d7822e691de77588fe01a1afc0152cd5f5003e4"
+          },
+          {
+            "action": {
+              "id": 37,
+              "schema_id": 1
+            },
+            "summary": "Apply the source change and add a contract comment.",
+            "diff_excerpt": "@@ -559,7 +559,8 @@\n-            self.ids_mut().insert(moved_id, last);\n+            // The moved vector now occupies the vacated slot.\n+            self.ids_mut().insert(moved_id, slot);",
+            "patch_sha256": "f92aef127b434ce4962d0cf28b159dfe3049b0572d67553880f97da5ced86edd"
+          },
+          {
+            "action": {
+              "id": 94,
+              "schema_id": 1
+            },
+            "summary": "Apply the focused source change shown here.",
+            "diff_excerpt": "@@ -559,7 +559,7 @@\n-            self.ids_mut().insert(moved_id, last);\n+            self.ids_mut().insert(moved_id, slot);",
+            "patch_sha256": "3f16db25c03d7158b34d061e6a263bff6dcbd7977dee404cc7028c9b7a185f9b"
+          },
+          {
+            "action": {
+              "id": 68,
+              "schema_id": 1
+            },
+            "summary": "Leave the current implementation unchanged.",
+            "diff_excerpt": "No source line changes are included.",
+            "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        ]
+      }
+    },
+    {
+      "task_id": "turbovec-turbovec-id-swap-repair-v2",
+      "pair_task_id": "turbovec-turbovec-id-swap-repair-v2",
+      "frame_sha256": "66295d8076e42d706154114b0b7bb21cea7437a0507108bb07a6e9f229cc77af",
+      "frame": {
+        "schema_id": "rdc-real-coding-observation.v1",
+        "task_id": "turbovec-turbovec-id-swap-repair-v2",
+        "task_family": "turbovec-id-swap-repair",
+        "repository_id": "turbovec",
+        "task_variant": 2,
+        "task_prompt": "A swap removal moves the last vector into the deleted vector's slot. Later removals and self-queries must still agree about each external ID; select the patch that restores that invariant.",
+        "repository_revision": "8202f194a0cbbd52213a004290401e180e5c123d",
+        "snapshot_sha256": "608d68fd4875ae1cae9221e43a947fc7a8610b8b2a791773028f6b52185a0219",
+        "evidence": [
+          {
+            "kind": "source_excerpt",
+            "source_id": "turbovec/src/id_map.rs",
+            "content_blake3": "4d9b51057e438341ff6f1f1fe88da6098b68f809fdc1c76f9744f404101206c7",
+            "content": "            self.slot_to_id[slot] = moved_id;\n            // The previously-last id now lives at `slot`.\n            self.ids_mut().insert(moved_id, last);\n        }\n        self.slot_to_id.pop();"
+          },
+          {
+            "kind": "baseline_tool_result",
+            "source_id": "cargo-test::remaining_ids_still_self_query_after_mixed_removes",
+            "content_blake3": "199f34031fed00e478e30f0d2a6b0f59cb58d99540b7861f6d60217cedeb1d79",
+            "content": "Exact test `remaining_ids_still_self_query_after_mixed_removes` failed on the frozen snapshot. Candidate patches have not been run in this task.\n\nrunning 1 test\ntest remaining_ids_still_self_query_after_mixed_removes ... FAILED\n\nfailures:\n\n---- remaining_ids_still_self_query_after_mixed_removes stdout ----\n\nthread 'remaining_ids_still_self_query_after_mixed_removes' (28152) panicked at turbovec\\src\\lib.rs:2943:9:\nindex 19 out of bounds (n_vectors = 19)\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    remaining_ids_still_self_query_after_mixed_removes\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 22 filtered out; finished in 1.33s\n\n   Compiling turbovec v0.9.0 (<frozen-repository-snapshot>\\turbovec)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 8.66s\n     Running tests\\id_map.rs (<cargo-target>\\debug\\deps\\id_map-6028bbdd1bdac666.exe)\nerror: test failed, to rerun pass `-p turbovec --test id_map`\n"
+          }
+        ],
+        "action_options": [
+          {
+            "action": {
+              "id": 94,
+              "schema_id": 1
+            },
+            "summary": "Apply this alternative change in the same code path.",
+            "diff_excerpt": "@@ -559,7 +559,7 @@\n-            self.ids_mut().insert(moved_id, last);\n+            self.ids_mut().insert(moved_id, 0);",
+            "patch_sha256": "4e9f6d2ebebddf364cc4cd528d7822e691de77588fe01a1afc0152cd5f5003e4"
+          },
+          {
+            "action": {
+              "id": 37,
+              "schema_id": 1
+            },
+            "summary": "Leave the current implementation unchanged.",
+            "diff_excerpt": "No source line changes are included.",
+            "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "action": {
+              "id": 68,
+              "schema_id": 1
+            },
+            "summary": "Apply the focused source change shown here.",
+            "diff_excerpt": "@@ -559,7 +559,7 @@\n-            self.ids_mut().insert(moved_id, last);\n+            self.ids_mut().insert(moved_id, slot);",
+            "patch_sha256": "3f16db25c03d7158b34d061e6a263bff6dcbd7977dee404cc7028c9b7a185f9b"
+          },
+          {
+            "action": {
+              "id": 11,
+              "schema_id": 1
+            },
+            "summary": "Apply the source change and add a contract comment.",
+            "diff_excerpt": "@@ -559,7 +559,8 @@\n-            self.ids_mut().insert(moved_id, last);\n+            // The moved vector now occupies the vacated slot.\n+            self.ids_mut().insert(moved_id, slot);",
+            "patch_sha256": "f92aef127b434ce4962d0cf28b159dfe3049b0572d67553880f97da5ced86edd"
+          }
+        ]
+      }
+    },
+    {
+      "task_id": "turbovec-turbovec-rotation-wire-format-v1",
+      "pair_task_id": "turbovec-turbovec-rotation-wire-format-v1",
+      "frame_sha256": "a798ad7f0b21bc33ed54f299341ff08cfc4adb4c705d5c878e4a1745ee6a9bb0",
+      "frame": {
+        "schema_id": "rdc-real-coding-observation.v1",
+        "task_id": "turbovec-turbovec-rotation-wire-format-v1",
+        "task_family": "turbovec-rotation-wire-format",
+        "repository_id": "turbovec",
+        "task_variant": 1,
+        "task_prompt": "Restore the v5 deterministic rotation contract. The frozen golden-byte test fails; choose the patch that preserves existing encoded data.",
+        "repository_revision": "8202f194a0cbbd52213a004290401e180e5c123d",
+        "snapshot_sha256": "13fa3258b3e7d4d2e315e3f6ff68e1e6ea775c111fbc0eb9cd9b7c8f223f5f6a",
+        "evidence": [
+          {
+            "kind": "source_excerpt",
+            "source_id": "turbovec/src/rotation.rs",
+            "content_blake3": "00c986a414035569e5792c1328176ef1111199db5d02cab5498ca015d5f54905",
+            "content": "/// `tests/rotation_determinism.rs` pin the resulting stream.\nconst ROTATION_SEED: [u8; 32] = [\n    165, 143, 161, 123, 88, 50, 61, 10, 234, 184, 161, 204, 105, 1, 20, 184, 43, 140, 200,\n    117, 24, 180, 247, 84, 141, 68, 110, 161, 228, 223, 32, 242,\n];"
+          },
+          {
+            "kind": "baseline_tool_result",
+            "source_id": "cargo-test::golden_rotation_bits_pin_the_chacha_stream",
+            "content_blake3": "12673101a26ec71242fd712838167452a9dac89fbca8e10704783c48a7bcbfeb",
+            "content": "Exact test `golden_rotation_bits_pin_the_chacha_stream` failed on the frozen snapshot. Candidate patches have not been run in this task.\n\nrunning 1 test\ntest golden_rotation_bits_pin_the_chacha_stream ... FAILED\n\nfailures:\n\n---- golden_rotation_bits_pin_the_chacha_stream stdout ----\n\nthread 'golden_rotation_bits_pin_the_chacha_stream' (42776) panicked at turbovec\\tests\\rotation_determinism.rs:41:5:\nassertion `left == right` failed: dim=8 rotation output changed — a rand_chacha stream change or a transform edit would break every v5-encoded index. If this change is intentional, it is a NEW format version, not an edit to v5.\n  left: [1083179007, 1073741822, 1065353214, 3223322624, 3217031167, 3212836863, 1065353214, 3223322624]\n right: [1071644673, 3224371200, 1048575995, 1061158910, 1074790400, 1083703296, 3214934014, 1067450369]\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    golden_rotation_bits_pin_the_chacha_stream\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.00s\n\n   Compiling turbovec v0.9.0 (<frozen-repository-snapshot>\\turbovec)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 7.70s\n     Running tests\\rotation_determinism.rs (<cargo-target>\\debug\\deps\\rotation_determinism-762b4124a14c9a64.exe)\nerror: test failed, to rerun pass `-p turbovec --test rotation_determinism`\n"
+          }
+        ],
+        "action_options": [
+          {
+            "action": {
+              "id": 68,
+              "schema_id": 1
+            },
+            "summary": "Apply the focused source change shown here.",
+            "diff_excerpt": "@@ -80,7 +80,7 @@\n-    165, 143, 161, 123, 88, 50, 61, 10, 234, 184, 161, 204, 105, 1, 20, 184, 43, 140, 200,\n+    164, 143, 161, 123, 88, 50, 61, 10, 234, 184, 161, 204, 105, 1, 20, 184, 43, 140, 200,",
+            "patch_sha256": "007e449ffd08981da2a14e8ad064b052c3b914a91563dddfcaf8b08d8d89f579"
+          },
+          {
+            "action": {
+              "id": 11,
+              "schema_id": 1
+            },
+            "summary": "Apply this alternative change in the same code path.",
+            "diff_excerpt": "@@ -80,7 +80,7 @@\n-    165, 143, 161, 123, 88, 50, 61, 10, 234, 184, 161, 204, 105, 1, 20, 184, 43, 140, 200,\n+    163, 143, 161, 123, 88, 50, 61, 10, 234, 184, 161, 204, 105, 1, 20, 184, 43, 140, 200,",
+            "patch_sha256": "0f250400d060f791524f689a9a43a98af396f0da5dc2daf3b3f492ac9d3353d4"
+          },
+          {
+            "action": {
+              "id": 37,
+              "schema_id": 1
+            },
+            "summary": "Apply the source change and add a contract comment.",
+            "diff_excerpt": "@@ -79,8 +79,9 @@\n+// This seed is part of the persisted v5 encoding contract.\n-    165, 143, 161, 123, 88, 50, 61, 10, 234, 184, 161, 204, 105, 1, 20, 184, 43, 140, 200,\n+    164, 143, 161, 123, 88, 50, 61, 10, 234, 184, 161, 204, 105, 1, 20, 184, 43, 140, 200,",
+            "patch_sha256": "620ba171f88123de86b3582f0b41b48c45f3820f4aa76105319ba60f286a8f76"
+          },
+          {
+            "action": {
+              "id": 94,
+              "schema_id": 1
+            },
+            "summary": "Leave the current implementation unchanged.",
+            "diff_excerpt": "No source line changes are included.",
+            "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        ]
+      }
+    },
+    {
+      "task_id": "turbovec-turbovec-rotation-wire-format-v2",
+      "pair_task_id": "turbovec-turbovec-rotation-wire-format-v2",
+      "frame_sha256": "586c679678ee56906f88f36d46d48c7f627097481caa4ae7209644d553db9172",
+      "frame": {
+        "schema_id": "rdc-real-coding-observation.v1",
+        "task_id": "turbovec-turbovec-rotation-wire-format-v2",
+        "task_family": "turbovec-rotation-wire-format",
+        "repository_id": "turbovec",
+        "task_variant": 2,
+        "task_prompt": "Changing the rotation stream changes persisted vector bytes. Use the exact test output and offered changes to select the patch that restores the recorded v5 format.",
+        "repository_revision": "8202f194a0cbbd52213a004290401e180e5c123d",
+        "snapshot_sha256": "13fa3258b3e7d4d2e315e3f6ff68e1e6ea775c111fbc0eb9cd9b7c8f223f5f6a",
+        "evidence": [
+          {
+            "kind": "source_excerpt",
+            "source_id": "turbovec/src/rotation.rs",
+            "content_blake3": "00c986a414035569e5792c1328176ef1111199db5d02cab5498ca015d5f54905",
+            "content": "/// `tests/rotation_determinism.rs` pin the resulting stream.\nconst ROTATION_SEED: [u8; 32] = [\n    165, 143, 161, 123, 88, 50, 61, 10, 234, 184, 161, 204, 105, 1, 20, 184, 43, 140, 200,\n    117, 24, 180, 247, 84, 141, 68, 110, 161, 228, 223, 32, 242,\n];"
+          },
+          {
+            "kind": "baseline_tool_result",
+            "source_id": "cargo-test::golden_rotation_bits_pin_the_chacha_stream",
+            "content_blake3": "12673101a26ec71242fd712838167452a9dac89fbca8e10704783c48a7bcbfeb",
+            "content": "Exact test `golden_rotation_bits_pin_the_chacha_stream` failed on the frozen snapshot. Candidate patches have not been run in this task.\n\nrunning 1 test\ntest golden_rotation_bits_pin_the_chacha_stream ... FAILED\n\nfailures:\n\n---- golden_rotation_bits_pin_the_chacha_stream stdout ----\n\nthread 'golden_rotation_bits_pin_the_chacha_stream' (42776) panicked at turbovec\\tests\\rotation_determinism.rs:41:5:\nassertion `left == right` failed: dim=8 rotation output changed — a rand_chacha stream change or a transform edit would break every v5-encoded index. If this change is intentional, it is a NEW format version, not an edit to v5.\n  left: [1083179007, 1073741822, 1065353214, 3223322624, 3217031167, 3212836863, 1065353214, 3223322624]\n right: [1071644673, 3224371200, 1048575995, 1061158910, 1074790400, 1083703296, 3214934014, 1067450369]\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    golden_rotation_bits_pin_the_chacha_stream\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.00s\n\n   Compiling turbovec v0.9.0 (<frozen-repository-snapshot>\\turbovec)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 7.70s\n     Running tests\\rotation_determinism.rs (<cargo-target>\\debug\\deps\\rotation_determinism-762b4124a14c9a64.exe)\nerror: test failed, to rerun pass `-p turbovec --test rotation_determinism`\n"
+          }
+        ],
+        "action_options": [
+          {
+            "action": {
+              "id": 37,
+              "schema_id": 1
+            },
+            "summary": "Apply this alternative change in the same code path.",
+            "diff_excerpt": "@@ -80,7 +80,7 @@\n-    165, 143, 161, 123, 88, 50, 61, 10, 234, 184, 161, 204, 105, 1, 20, 184, 43, 140, 200,\n+    163, 143, 161, 123, 88, 50, 61, 10, 234, 184, 161, 204, 105, 1, 20, 184, 43, 140, 200,",
+            "patch_sha256": "0f250400d060f791524f689a9a43a98af396f0da5dc2daf3b3f492ac9d3353d4"
+          },
+          {
+            "action": {
+              "id": 68,
+              "schema_id": 1
+            },
+            "summary": "Leave the current implementation unchanged.",
+            "diff_excerpt": "No source line changes are included.",
+            "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "action": {
+              "id": 94,
+              "schema_id": 1
+            },
+            "summary": "Apply the focused source change shown here.",
+            "diff_excerpt": "@@ -80,7 +80,7 @@\n-    165, 143, 161, 123, 88, 50, 61, 10, 234, 184, 161, 204, 105, 1, 20, 184, 43, 140, 200,\n+    164, 143, 161, 123, 88, 50, 61, 10, 234, 184, 161, 204, 105, 1, 20, 184, 43, 140, 200,",
+            "patch_sha256": "007e449ffd08981da2a14e8ad064b052c3b914a91563dddfcaf8b08d8d89f579"
+          },
+          {
+            "action": {
+              "id": 11,
+              "schema_id": 1
+            },
+            "summary": "Apply the source change and add a contract comment.",
+            "diff_excerpt": "@@ -79,8 +79,9 @@\n+// This seed is part of the persisted v5 encoding contract.\n-    165, 143, 161, 123, 88, 50, 61, 10, 234, 184, 161, 204, 105, 1, 20, 184, 43, 140, 200,\n+    164, 143, 161, 123, 88, 50, 61, 10, 234, 184, 161, 204, 105, 1, 20, 184, 43, 140, 200,",
+            "patch_sha256": "620ba171f88123de86b3582f0b41b48c45f3820f4aa76105319ba60f286a8f76"
+          }
+        ]
+      }
+    },
+    {
+      "task_id": "ripgrep-ripgrep-case-insensitive-glob-v1",
+      "pair_task_id": "ripgrep-ripgrep-case-insensitive-glob-v1",
+      "frame_sha256": "a5131b62d0de318221479dd794c945d840da9f761da63739e48f96483e87dbc5",
+      "frame": {
+        "schema_id": "rdc-real-coding-observation.v1",
+        "task_id": "ripgrep-ripgrep-case-insensitive-glob-v1",
+        "task_family": "ripgrep-case-insensitive-glob",
+        "repository_id": "ripgrep",
+        "task_variant": 1,
+        "task_prompt": "Repair the case-insensitive glob option. The frozen mixed-case matching test fails; choose the patch that honors the requested mode.",
+        "repository_revision": "e89fff89ac9af12e8d4ce9d5fd07beb408ca730f",
+        "snapshot_sha256": "903dac98a558a3233b1671db0b60dc0293c7e56fbcd88bf9d13927763960b1a2",
+        "evidence": [
+          {
+            "kind": "source_excerpt",
+            "source_id": "crates/globset/src/glob.rs",
+            "content_blake3": "89500240e7784a870e6b18f27f681038c546255659612a7dc36cbeaab44ee5ab",
+            "content": "    /// This is disabled by default.\n    pub fn case_insensitive(&mut self, yes: bool) -> &mut GlobBuilder<'a> {\n        self.opts.case_insensitive = !yes;\n        self\n    }"
+          },
+          {
+            "kind": "baseline_tool_result",
+            "source_id": "cargo-test::glob::tests::matchcasei2",
+            "content_blake3": "2960f397f49ea81a55a4d3f4f808c6cc2fe0729da5fc1069356f5018cca89842",
+            "content": "Exact test `glob::tests::matchcasei2` failed on the frozen snapshot. Candidate patches have not been run in this task.\n\nrunning 1 test\ntest glob::tests::matchcasei2 ... FAILED\n\nfailures:\n\n---- glob::tests::matchcasei2 stdout ----\n\nthread 'glob::tests::matchcasei2' (39748) panicked at crates\\globset\\src\\glob.rs:1461:5:\nassertion failed: matcher.is_match(\"abcdefg\")\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    glob::tests::matchcasei2\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 289 filtered out; finished in 0.00s\n\n   Compiling globset v0.4.19 (<frozen-repository-snapshot>\\crates\\globset)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.62s\n     Running unittests src\\lib.rs (<cargo-target>\\debug\\deps\\globset-250b4c7d9a08c2e6.exe)\nerror: test failed, to rerun pass `-p globset --lib`\n"
+          }
+        ],
+        "action_options": [
+          {
+            "action": {
+              "id": 68,
+              "schema_id": 1
+            },
+            "summary": "Apply this alternative change in the same code path.",
+            "diff_excerpt": "@@ -613,7 +613,7 @@\n-        self.opts.case_insensitive = !yes;\n+        self.opts.case_insensitive = false;",
+            "patch_sha256": "645c24ac169e883eb1d6e47aa9032257ed6c19a9dc10e6fcacea938ffee66814"
+          },
+          {
+            "action": {
+              "id": 11,
+              "schema_id": 1
+            },
+            "summary": "Leave the current implementation unchanged.",
+            "diff_excerpt": "No source line changes are included.",
+            "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "action": {
+              "id": 94,
+              "schema_id": 1
+            },
+            "summary": "Apply the focused source change shown here.",
+            "diff_excerpt": "@@ -613,7 +613,7 @@\n-        self.opts.case_insensitive = !yes;\n+        self.opts.case_insensitive = yes;",
+            "patch_sha256": "41fb794fb6ac8f8b265fa9bfe17155da8d26a63cbaee3c9fb70ed63c05a76cd5"
+          },
+          {
+            "action": {
+              "id": 37,
+              "schema_id": 1
+            },
+            "summary": "Apply the source change and add a contract comment.",
+            "diff_excerpt": "@@ -613,7 +613,8 @@\n-        self.opts.case_insensitive = !yes;\n+        // Preserve the caller's requested matching mode.\n+        self.opts.case_insensitive = yes;",
+            "patch_sha256": "ba2df6b3963a2e63bf04e89df67f324cd81986cda5b521dff1061b12d9bf2648"
+          }
+        ]
+      }
+    },
+    {
+      "task_id": "ripgrep-ripgrep-case-insensitive-glob-v2",
+      "pair_task_id": "ripgrep-ripgrep-case-insensitive-glob-v2",
+      "frame_sha256": "5f3f3b13bec1cdfc59b7e5d47770943ed7d138a2d24e9973d8bea99570427c1f",
+      "frame": {
+        "schema_id": "rdc-real-coding-observation.v1",
+        "task_id": "ripgrep-ripgrep-case-insensitive-glob-v2",
+        "task_family": "ripgrep-case-insensitive-glob",
+        "repository_id": "ripgrep",
+        "task_variant": 2,
+        "task_prompt": "A caller enables case-insensitive matching for a mixed-case pattern. Select the patch that makes the lowercase candidate match in the exact regression test.",
+        "repository_revision": "e89fff89ac9af12e8d4ce9d5fd07beb408ca730f",
+        "snapshot_sha256": "903dac98a558a3233b1671db0b60dc0293c7e56fbcd88bf9d13927763960b1a2",
+        "evidence": [
+          {
+            "kind": "source_excerpt",
+            "source_id": "crates/globset/src/glob.rs",
+            "content_blake3": "89500240e7784a870e6b18f27f681038c546255659612a7dc36cbeaab44ee5ab",
+            "content": "    /// This is disabled by default.\n    pub fn case_insensitive(&mut self, yes: bool) -> &mut GlobBuilder<'a> {\n        self.opts.case_insensitive = !yes;\n        self\n    }"
+          },
+          {
+            "kind": "baseline_tool_result",
+            "source_id": "cargo-test::glob::tests::matchcasei2",
+            "content_blake3": "2960f397f49ea81a55a4d3f4f808c6cc2fe0729da5fc1069356f5018cca89842",
+            "content": "Exact test `glob::tests::matchcasei2` failed on the frozen snapshot. Candidate patches have not been run in this task.\n\nrunning 1 test\ntest glob::tests::matchcasei2 ... FAILED\n\nfailures:\n\n---- glob::tests::matchcasei2 stdout ----\n\nthread 'glob::tests::matchcasei2' (39748) panicked at crates\\globset\\src\\glob.rs:1461:5:\nassertion failed: matcher.is_match(\"abcdefg\")\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    glob::tests::matchcasei2\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 289 filtered out; finished in 0.00s\n\n   Compiling globset v0.4.19 (<frozen-repository-snapshot>\\crates\\globset)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.62s\n     Running unittests src\\lib.rs (<cargo-target>\\debug\\deps\\globset-250b4c7d9a08c2e6.exe)\nerror: test failed, to rerun pass `-p globset --lib`\n"
+          }
+        ],
+        "action_options": [
+          {
+            "action": {
+              "id": 94,
+              "schema_id": 1
+            },
+            "summary": "Leave the current implementation unchanged.",
+            "diff_excerpt": "No source line changes are included.",
+            "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "action": {
+              "id": 68,
+              "schema_id": 1
+            },
+            "summary": "Apply this alternative change in the same code path.",
+            "diff_excerpt": "@@ -613,7 +613,7 @@\n-        self.opts.case_insensitive = !yes;\n+        self.opts.case_insensitive = false;",
+            "patch_sha256": "645c24ac169e883eb1d6e47aa9032257ed6c19a9dc10e6fcacea938ffee66814"
+          },
+          {
+            "action": {
+              "id": 37,
+              "schema_id": 1
+            },
+            "summary": "Apply the focused source change shown here.",
+            "diff_excerpt": "@@ -613,7 +613,7 @@\n-        self.opts.case_insensitive = !yes;\n+        self.opts.case_insensitive = yes;",
+            "patch_sha256": "41fb794fb6ac8f8b265fa9bfe17155da8d26a63cbaee3c9fb70ed63c05a76cd5"
+          },
+          {
+            "action": {
+              "id": 11,
+              "schema_id": 1
+            },
+            "summary": "Apply the source change and add a contract comment.",
+            "diff_excerpt": "@@ -613,7 +613,8 @@\n-        self.opts.case_insensitive = !yes;\n+        // Preserve the caller's requested matching mode.\n+        self.opts.case_insensitive = yes;",
+            "patch_sha256": "ba2df6b3963a2e63bf04e89df67f324cd81986cda5b521dff1061b12d9bf2648"
+          }
+        ]
+      }
+    },
+    {
+      "task_id": "ripgrep-ripgrep-literal-separator-glob-v1",
+      "pair_task_id": "ripgrep-ripgrep-literal-separator-glob-v1",
+      "frame_sha256": "439f907ea829a88dbf0d4379536b69587000ac1309c30460cdfcfab2e82eb6e3",
+      "frame": {
+        "schema_id": "rdc-real-coding-observation.v1",
+        "task_id": "ripgrep-ripgrep-literal-separator-glob-v1",
+        "task_family": "ripgrep-literal-separator-glob",
+        "repository_id": "ripgrep",
+        "task_variant": 1,
+        "task_prompt": "Repair literal-separator matching for glob patterns. The exact separator test fails; choose the patch that preserves the requested path boundary.",
+        "repository_revision": "e89fff89ac9af12e8d4ce9d5fd07beb408ca730f",
+        "snapshot_sha256": "1678dbbeed2ef50c42989b13607335ca1e16ff863e0158235e25e407842ba483",
+        "evidence": [
+          {
+            "kind": "source_excerpt",
+            "source_id": "crates/globset/src/glob.rs",
+            "content_blake3": "244e1812d671015fd7538f67b97c7e8ab88508b4347f504830230cdd2b1df22e",
+            "content": "    /// By default this is false: `*` and `?` will match `/`.\n    pub fn literal_separator(&mut self, yes: bool) -> &mut GlobBuilder<'a> {\n        self.opts.literal_separator = false;\n        self\n    }"
+          },
+          {
+            "kind": "baseline_tool_result",
+            "source_id": "cargo-test::glob::tests::matchslash2",
+            "content_blake3": "4db59b6bce385fae7cc42b027b87e57afe8b4f164c72e1c9553b1cbf548bc91a",
+            "content": "Exact test `glob::tests::matchslash2` failed on the frozen snapshot. Candidate patches have not been run in this task.\n\nrunning 1 test\ntest glob::tests::matchslash2 ... FAILED\n\nfailures:\n\n---- glob::tests::matchslash2 stdout ----\n\nthread 'glob::tests::matchslash2' (21220) panicked at crates\\globset\\src\\glob.rs:1489:5:\nassertion failed: !matcher.is_match(\"abc\\\\def\")\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    glob::tests::matchslash2\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 289 filtered out; finished in 0.00s\n\n   Compiling globset v0.4.19 (<frozen-repository-snapshot>\\crates\\globset)\nwarning: unused variable: `yes`\n   --> crates\\globset\\src\\glob.rs:623:41\n    |\n623 |     pub fn literal_separator(&mut self, yes: bool) -> &mut GlobBuilder<'a> {\n    |                                         ^^^ help: if this is intentional, prefix it with an underscore: `_yes`\n    |\n    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default\n\nwarning: `globset` (lib test) generated 1 warning (run `cargo fix --lib -p globset --tests` to apply 1 suggestion)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.25s\n     Running unittests src\\lib.rs (<cargo-target>\\debug\\deps\\globset-250b4c7d9a08c2e6.exe)\nerror: test failed, to rerun pass `-p globset --lib`\n"
+          }
+        ],
+        "action_options": [
+          {
+            "action": {
+              "id": 94,
+              "schema_id": 1
+            },
+            "summary": "Leave the current implementation unchanged.",
+            "diff_excerpt": "No source line changes are included.",
+            "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "action": {
+              "id": 37,
+              "schema_id": 1
+            },
+            "summary": "Apply the source change and add a contract comment.",
+            "diff_excerpt": "@@ -621,7 +621,8 @@\n-        self.opts.literal_separator = false;\n+        // Keep path separators literal when the option is enabled.\n+        self.opts.literal_separator = yes;",
+            "patch_sha256": "65bd186d034e483ee8e56fde06f3ea4f20665eb6a920922c1c2bf87625467ffe"
+          },
+          {
+            "action": {
+              "id": 11,
+              "schema_id": 1
+            },
+            "summary": "Apply the focused source change shown here.",
+            "diff_excerpt": "@@ -621,7 +621,7 @@\n-        self.opts.literal_separator = false;\n+        self.opts.literal_separator = yes;",
+            "patch_sha256": "75c4ee5bf57f0293b5a6ec8c79a83a50a9d36b0533db14b10a0566ab402f448a"
+          },
+          {
+            "action": {
+              "id": 68,
+              "schema_id": 1
+            },
+            "summary": "Apply this alternative change in the same code path.",
+            "diff_excerpt": "@@ -621,7 +621,7 @@\n-        self.opts.literal_separator = false;\n+        self.opts.literal_separator = !yes;",
+            "patch_sha256": "943ccba73ac87d1fabb3c88f78a4812aff99bb9246779665de9b69f3711a0342"
+          }
+        ]
+      }
+    },
+    {
+      "task_id": "ripgrep-ripgrep-literal-separator-glob-v2",
+      "pair_task_id": "ripgrep-ripgrep-literal-separator-glob-v2",
+      "frame_sha256": "6c6d69a37f3bd46dff11eb65f4079b275310cb0e352374e74835c5293c147445",
+      "frame": {
+        "schema_id": "rdc-real-coding-observation.v1",
+        "task_id": "ripgrep-ripgrep-literal-separator-glob-v2",
+        "task_family": "ripgrep-literal-separator-glob",
+        "repository_id": "ripgrep",
+        "task_variant": 2,
+        "task_prompt": "When this option is enabled, `?` must not cross a path separator. Select the offered patch that makes the frozen negative-match test pass.",
+        "repository_revision": "e89fff89ac9af12e8d4ce9d5fd07beb408ca730f",
+        "snapshot_sha256": "1678dbbeed2ef50c42989b13607335ca1e16ff863e0158235e25e407842ba483",
+        "evidence": [
+          {
+            "kind": "source_excerpt",
+            "source_id": "crates/globset/src/glob.rs",
+            "content_blake3": "244e1812d671015fd7538f67b97c7e8ab88508b4347f504830230cdd2b1df22e",
+            "content": "    /// By default this is false: `*` and `?` will match `/`.\n    pub fn literal_separator(&mut self, yes: bool) -> &mut GlobBuilder<'a> {\n        self.opts.literal_separator = false;\n        self\n    }"
+          },
+          {
+            "kind": "baseline_tool_result",
+            "source_id": "cargo-test::glob::tests::matchslash2",
+            "content_blake3": "4db59b6bce385fae7cc42b027b87e57afe8b4f164c72e1c9553b1cbf548bc91a",
+            "content": "Exact test `glob::tests::matchslash2` failed on the frozen snapshot. Candidate patches have not been run in this task.\n\nrunning 1 test\ntest glob::tests::matchslash2 ... FAILED\n\nfailures:\n\n---- glob::tests::matchslash2 stdout ----\n\nthread 'glob::tests::matchslash2' (21220) panicked at crates\\globset\\src\\glob.rs:1489:5:\nassertion failed: !matcher.is_match(\"abc\\\\def\")\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    glob::tests::matchslash2\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 289 filtered out; finished in 0.00s\n\n   Compiling globset v0.4.19 (<frozen-repository-snapshot>\\crates\\globset)\nwarning: unused variable: `yes`\n   --> crates\\globset\\src\\glob.rs:623:41\n    |\n623 |     pub fn literal_separator(&mut self, yes: bool) -> &mut GlobBuilder<'a> {\n    |                                         ^^^ help: if this is intentional, prefix it with an underscore: `_yes`\n    |\n    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default\n\nwarning: `globset` (lib test) generated 1 warning (run `cargo fix --lib -p globset --tests` to apply 1 suggestion)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.25s\n     Running unittests src\\lib.rs (<cargo-target>\\debug\\deps\\globset-250b4c7d9a08c2e6.exe)\nerror: test failed, to rerun pass `-p globset --lib`\n"
+          }
+        ],
+        "action_options": [
+          {
+            "action": {
+              "id": 11,
+              "schema_id": 1
+            },
+            "summary": "Apply this alternative change in the same code path.",
+            "diff_excerpt": "@@ -621,7 +621,7 @@\n-        self.opts.literal_separator = false;\n+        self.opts.literal_separator = !yes;",
+            "patch_sha256": "943ccba73ac87d1fabb3c88f78a4812aff99bb9246779665de9b69f3711a0342"
+          },
+          {
+            "action": {
+              "id": 68,
+              "schema_id": 1
+            },
+            "summary": "Leave the current implementation unchanged.",
+            "diff_excerpt": "No source line changes are included.",
+            "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "action": {
+              "id": 94,
+              "schema_id": 1
+            },
+            "summary": "Apply the focused source change shown here.",
+            "diff_excerpt": "@@ -621,7 +621,7 @@\n-        self.opts.literal_separator = false;\n+        self.opts.literal_separator = yes;",
+            "patch_sha256": "75c4ee5bf57f0293b5a6ec8c79a83a50a9d36b0533db14b10a0566ab402f448a"
+          },
+          {
+            "action": {
+              "id": 37,
+              "schema_id": 1
+            },
+            "summary": "Apply the source change and add a contract comment.",
+            "diff_excerpt": "@@ -621,7 +621,8 @@\n-        self.opts.literal_separator = false;\n+        // Keep path separators literal when the option is enabled.\n+        self.opts.literal_separator = yes;",
+            "patch_sha256": "65bd186d034e483ee8e56fde06f3ea4f20665eb6a920922c1c2bf87625467ffe"
+          }
+        ]
+      }
+    },
+    {
+      "task_id": "ripgrep-ripgrep-recursive-glob-v1",
+      "pair_task_id": "ripgrep-ripgrep-recursive-glob-v1",
+      "frame_sha256": "ebe61eb2d885d62c1da427e21b1372363bb039a74935ec4828814ff7b34a3b92",
+      "frame": {
+        "schema_id": "rdc-real-coding-observation.v1",
+        "task_id": "ripgrep-ripgrep-recursive-glob-v1",
+        "task_family": "ripgrep-recursive-glob",
+        "repository_id": "ripgrep",
+        "task_variant": 1,
+        "task_prompt": "Repair the token selected for a middle `**/` component. The frozen regex contract test fails; choose the patch that preserves zero-or-more whole-directory semantics.",
+        "repository_revision": "e89fff89ac9af12e8d4ce9d5fd07beb408ca730f",
+        "snapshot_sha256": "156f9e56b6be3d41805d37b80c96df8013fa845489bdfd8a200c89be4c0d30d5",
+        "evidence": [
+          {
+            "kind": "source_excerpt",
+            "source_id": "crates/globset/src/glob.rs",
+            "content_blake3": "001d52e94c81c2bb1e5b72987b4093b6927b2cab4c540e32393337b5db697eb2",
+            "content": "use std::fmt::Write;\nuse std::path::{Path, is_separator};\n\nuse regex_automata::meta::Regex;\n\nuse crate::{Candidate, Error, ErrorKind, new_regex};\n\n/// Describes a matching strategy for a particular pattern."
+          },
+          {
+            "kind": "baseline_tool_result",
+            "source_id": "cargo-test::glob::tests::re22",
+            "content_blake3": "e8511af8c436df9f92d0924ad611519641808dea3eba5962cb55103dc2d46298",
+            "content": "Exact test `glob::tests::re22` failed on the frozen snapshot. Candidate patches have not been run in this task.\n\nrunning 1 test\ntest glob::tests::re22 ... FAILED\n\nfailures:\n\n---- glob::tests::re22 stdout ----\n\nthread 'glob::tests::re22' (26156) panicked at crates\\globset\\src\\glob.rs:1378:5:\nassertion `left == right` failed\n  left: \"(?-u)^a(?:/|/.*/)b$\"\n right: \"(?-u)^a/.*b$\"\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    glob::tests::re22\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 289 filtered out; finished in 0.00s\n\n   Compiling globset v0.4.19 (<frozen-repository-snapshot>\\crates\\globset)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.27s\n     Running unittests src\\lib.rs (<cargo-target>\\debug\\deps\\globset-250b4c7d9a08c2e6.exe)\nerror: test failed, to rerun pass `-p globset --lib`\n"
+          }
+        ],
+        "action_options": [
+          {
+            "action": {
+              "id": 68,
+              "schema_id": 1
+            },
+            "summary": "Leave the current implementation unchanged.",
+            "diff_excerpt": "No source line changes are included.",
+            "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "action": {
+              "id": 37,
+              "schema_id": 1
+            },
+            "summary": "Apply this alternative change in the same code path.",
+            "diff_excerpt": "@@ -952,7 +952,7 @@\n-                    self.push_token(Token::RecursiveSuffix)?;\n+                    self.push_token(Token::RecursivePrefix)?;",
+            "patch_sha256": "1c12b124f8575708682a41748896ab7424fc398835f5b33879fb378939813db9"
+          },
+          {
+            "action": {
+              "id": 11,
+              "schema_id": 1
+            },
+            "summary": "Apply the source change and add a contract comment.",
+            "diff_excerpt": "@@ -948,11 +948,12 @@\n+            // A middle `**/` spans zero or more whole directories.\n-                    self.push_token(Token::RecursiveSuffix)?;\n+                    self.push_token(Token::RecursiveZeroOrMore)?;",
+            "patch_sha256": "8203baf35e2cb5d2e1edf344f977b04891aa2508439c978d2e4203b69620060f"
+          },
+          {
+            "action": {
+              "id": 94,
+              "schema_id": 1
+            },
+            "summary": "Apply the focused source change shown here.",
+            "diff_excerpt": "@@ -952,7 +952,7 @@\n-                    self.push_token(Token::RecursiveSuffix)?;\n+                    self.push_token(Token::RecursiveZeroOrMore)?;",
+            "patch_sha256": "141751f0596f2515235db26a90bd3ffe4cdf8edf586f4f01e29631341392b1ca"
+          }
+        ]
+      }
+    },
+    {
+      "task_id": "ripgrep-ripgrep-recursive-glob-v2",
+      "pair_task_id": "ripgrep-ripgrep-recursive-glob-v2",
+      "frame_sha256": "b68b490d726314b79d61327a7ce9a85b1b9689e5efdaae50dd0d10dc34187a37",
+      "frame": {
+        "schema_id": "rdc-real-coding-observation.v1",
+        "task_id": "ripgrep-ripgrep-recursive-glob-v2",
+        "task_family": "ripgrep-recursive-glob",
+        "repository_id": "ripgrep",
+        "task_variant": 2,
+        "task_prompt": "The middle recursive wildcard must allow zero directories or any number of whole directories. Select the patch that restores the exact compiled-regex contract.",
+        "repository_revision": "e89fff89ac9af12e8d4ce9d5fd07beb408ca730f",
+        "snapshot_sha256": "156f9e56b6be3d41805d37b80c96df8013fa845489bdfd8a200c89be4c0d30d5",
+        "evidence": [
+          {
+            "kind": "source_excerpt",
+            "source_id": "crates/globset/src/glob.rs",
+            "content_blake3": "001d52e94c81c2bb1e5b72987b4093b6927b2cab4c540e32393337b5db697eb2",
+            "content": "use std::fmt::Write;\nuse std::path::{Path, is_separator};\n\nuse regex_automata::meta::Regex;\n\nuse crate::{Candidate, Error, ErrorKind, new_regex};\n\n/// Describes a matching strategy for a particular pattern."
+          },
+          {
+            "kind": "baseline_tool_result",
+            "source_id": "cargo-test::glob::tests::re22",
+            "content_blake3": "e8511af8c436df9f92d0924ad611519641808dea3eba5962cb55103dc2d46298",
+            "content": "Exact test `glob::tests::re22` failed on the frozen snapshot. Candidate patches have not been run in this task.\n\nrunning 1 test\ntest glob::tests::re22 ... FAILED\n\nfailures:\n\n---- glob::tests::re22 stdout ----\n\nthread 'glob::tests::re22' (26156) panicked at crates\\globset\\src\\glob.rs:1378:5:\nassertion `left == right` failed\n  left: \"(?-u)^a(?:/|/.*/)b$\"\n right: \"(?-u)^a/.*b$\"\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    glob::tests::re22\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 289 filtered out; finished in 0.00s\n\n   Compiling globset v0.4.19 (<frozen-repository-snapshot>\\crates\\globset)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.27s\n     Running unittests src\\lib.rs (<cargo-target>\\debug\\deps\\globset-250b4c7d9a08c2e6.exe)\nerror: test failed, to rerun pass `-p globset --lib`\n"
+          }
+        ],
+        "action_options": [
+          {
+            "action": {
+              "id": 68,
+              "schema_id": 1
+            },
+            "summary": "Leave the current implementation unchanged.",
+            "diff_excerpt": "No source line changes are included.",
+            "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "action": {
+              "id": 11,
+              "schema_id": 1
+            },
+            "summary": "Apply the source change and add a contract comment.",
+            "diff_excerpt": "@@ -948,11 +948,12 @@\n+            // A middle `**/` spans zero or more whole directories.\n-                    self.push_token(Token::RecursiveSuffix)?;\n+                    self.push_token(Token::RecursiveZeroOrMore)?;",
+            "patch_sha256": "8203baf35e2cb5d2e1edf344f977b04891aa2508439c978d2e4203b69620060f"
+          },
+          {
+            "action": {
+              "id": 94,
+              "schema_id": 1
+            },
+            "summary": "Apply this alternative change in the same code path.",
+            "diff_excerpt": "@@ -952,7 +952,7 @@\n-                    self.push_token(Token::RecursiveSuffix)?;\n+                    self.push_token(Token::RecursivePrefix)?;",
+            "patch_sha256": "1c12b124f8575708682a41748896ab7424fc398835f5b33879fb378939813db9"
+          },
+          {
+            "action": {
+              "id": 37,
+              "schema_id": 1
+            },
+            "summary": "Apply the focused source change shown here.",
+            "diff_excerpt": "@@ -952,7 +952,7 @@\n-                    self.push_token(Token::RecursiveSuffix)?;\n+                    self.push_token(Token::RecursiveZeroOrMore)?;",
+            "patch_sha256": "141751f0596f2515235db26a90bd3ffe4cdf8edf586f4f01e29631341392b1ca"
+          }
+        ]
+      }
+    },
+    {
+      "task_id": "ripgrep-ripgrep-gitignore-bom-v1",
+      "pair_task_id": "ripgrep-ripgrep-gitignore-bom-v1",
+      "frame_sha256": "a9426b3ef9077c2a3e64b1c668d0393c1b6887337ddfc5849673fed79f49c01b",
+      "frame": {
+        "schema_id": "rdc-real-coding-observation.v1",
+        "task_id": "ripgrep-ripgrep-gitignore-bom-v1",
+        "task_family": "ripgrep-gitignore-bom",
+        "repository_id": "ripgrep",
+        "task_variant": 1,
+        "task_prompt": "Repair parsing of a .gitignore file that begins with a UTF-8 BOM. The frozen test cannot match its first rule; choose the patch that handles the file prefix.",
+        "repository_revision": "e89fff89ac9af12e8d4ce9d5fd07beb408ca730f",
+        "snapshot_sha256": "88b1821040580414cdd9a18683765ff5439c9ded6a463083db9c48326987b182",
+        "evidence": [
+          {
+            "kind": "source_excerpt",
+            "source_id": "crates/ignore/src/gitignore.rs",
+            "content_blake3": "11d9c7a952dc62cd27be6245179ebaeea7abb11d1981316264858eaeda20c552",
+            "content": "            const UTF8_BOM: &str = \"\\u{feff}\";\n            let line =\n                if i != 0 { line.trim_start_matches(UTF8_BOM) } else { &line };\n\n            if let Err(err) = self.add_line(Some(path.to_path_buf()), &line) {"
+          },
+          {
+            "kind": "baseline_tool_result",
+            "source_id": "cargo-test::gitignore_skip_bom",
+            "content_blake3": "723a11d954ed25b4991052febfa345faa712d70ee19365d44929ca5c66dba893",
+            "content": "Exact test `gitignore_skip_bom` failed on the frozen snapshot. Candidate patches have not been run in this task.\n\nrunning 1 test\ntest gitignore_skip_bom ... FAILED\n\nfailures:\n\n---- gitignore_skip_bom stdout ----\n\nthread 'gitignore_skip_bom' (12408) panicked at crates\\ignore\\tests\\gitignore_skip_bom.rs:16:5:\nassertion failed: g.matched(\"ignore/this/path\", false).is_ignore()\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    gitignore_skip_bom\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n Downloading crates ...\n  Downloaded crossbeam-channel v0.5.16\n   Compiling crossbeam-utils v0.8.22\n   Compiling memchr v2.8.3\n   Compiling windows-link v0.2.1\n   Compiling crossbeam-epoch v0.9.20\n   Compiling crossbeam-deque v0.8.7\n   Compiling windows-sys v0.61.2\n   Compiling aho-corasick v1.1.4\n   Compiling bstr v1.13.0\n   Compiling winapi-util v0.1.11\n   Compiling same-file v1.0.6\n   Compiling crossbeam-channel v0.5.16\n   Compiling walkdir v2.5.0\n   Compiling regex-automata v0.4.15\n   Compiling globset v0.4.19 (<frozen-repository-snapshot>\\crates\\globset)\n   Compiling ignore v0.4.29 (<frozen-repository-snapshot>\\crates\\ignore)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 10.26s\n     Running tests\\gitignore_skip_bom.rs (<cargo-target>\\debug\\deps\\gitignore_skip_bom-7042e8b063b131d9.exe)\nerror: test failed, to rerun pass `-p ignore --test gitignore_skip_bom`\n"
+          }
+        ],
+        "action_options": [
+          {
+            "action": {
+              "id": 94,
+              "schema_id": 1
+            },
+            "summary": "Apply this alternative change in the same code path.",
+            "diff_excerpt": "@@ -422,7 +422,7 @@\n-                if i != 0 { line.trim_start_matches(UTF8_BOM) } else { &line };\n+                if i == 1 { line.trim_start_matches(UTF8_BOM) } else { &line };",
+            "patch_sha256": "ab2085ede44153fec30518b5ed0ab39d5ca6857004a7998783ce2a91a936fecd"
+          },
+          {
+            "action": {
+              "id": 11,
+              "schema_id": 1
+            },
+            "summary": "Apply the focused source change shown here.",
+            "diff_excerpt": "@@ -422,7 +422,7 @@\n-                if i != 0 { line.trim_start_matches(UTF8_BOM) } else { &line };\n+                if i == 0 { line.trim_start_matches(UTF8_BOM) } else { &line };",
+            "patch_sha256": "5000d6bc36df5a03c4f167b335cc6d248a22bac17ad2b7041182b31fa05e97af"
+          },
+          {
+            "action": {
+              "id": 68,
+              "schema_id": 1
+            },
+            "summary": "Leave the current implementation unchanged.",
+            "diff_excerpt": "No source line changes are included.",
+            "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "action": {
+              "id": 37,
+              "schema_id": 1
+            },
+            "summary": "Apply the source change and add a contract comment.",
+            "diff_excerpt": "@@ -422,7 +422,8 @@\n-                if i != 0 { line.trim_start_matches(UTF8_BOM) } else { &line };\n+            // Git ignores a UTF-8 BOM only at the start of the ignore file.\n+                if i == 0 { line.trim_start_matches(UTF8_BOM) } else { &line };",
+            "patch_sha256": "48fa64eaccc75e7448cc9bd2806c6344120c775dc45a53944cce0c7f7f443fd2"
+          }
+        ]
+      }
+    },
+    {
+      "task_id": "ripgrep-ripgrep-gitignore-bom-v2",
+      "pair_task_id": "ripgrep-ripgrep-gitignore-bom-v2",
+      "frame_sha256": "fd993d830e5fe36566f33e38ad8b0b7bb9361e6fbb62c0f6bbbb4563f84fd102",
+      "frame": {
+        "schema_id": "rdc-real-coding-observation.v1",
+        "task_id": "ripgrep-ripgrep-gitignore-bom-v2",
+        "task_family": "ripgrep-gitignore-bom",
+        "repository_id": "ripgrep",
+        "task_variant": 2,
+        "task_prompt": "Git-compatible parsing strips the BOM from the first line so that the rule still applies. Select the offered patch that makes the exact ignored-path check pass.",
+        "repository_revision": "e89fff89ac9af12e8d4ce9d5fd07beb408ca730f",
+        "snapshot_sha256": "88b1821040580414cdd9a18683765ff5439c9ded6a463083db9c48326987b182",
+        "evidence": [
+          {
+            "kind": "source_excerpt",
+            "source_id": "crates/ignore/src/gitignore.rs",
+            "content_blake3": "11d9c7a952dc62cd27be6245179ebaeea7abb11d1981316264858eaeda20c552",
+            "content": "            const UTF8_BOM: &str = \"\\u{feff}\";\n            let line =\n                if i != 0 { line.trim_start_matches(UTF8_BOM) } else { &line };\n\n            if let Err(err) = self.add_line(Some(path.to_path_buf()), &line) {"
+          },
+          {
+            "kind": "baseline_tool_result",
+            "source_id": "cargo-test::gitignore_skip_bom",
+            "content_blake3": "723a11d954ed25b4991052febfa345faa712d70ee19365d44929ca5c66dba893",
+            "content": "Exact test `gitignore_skip_bom` failed on the frozen snapshot. Candidate patches have not been run in this task.\n\nrunning 1 test\ntest gitignore_skip_bom ... FAILED\n\nfailures:\n\n---- gitignore_skip_bom stdout ----\n\nthread 'gitignore_skip_bom' (12408) panicked at crates\\ignore\\tests\\gitignore_skip_bom.rs:16:5:\nassertion failed: g.matched(\"ignore/this/path\", false).is_ignore()\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    gitignore_skip_bom\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n Downloading crates ...\n  Downloaded crossbeam-channel v0.5.16\n   Compiling crossbeam-utils v0.8.22\n   Compiling memchr v2.8.3\n   Compiling windows-link v0.2.1\n   Compiling crossbeam-epoch v0.9.20\n   Compiling crossbeam-deque v0.8.7\n   Compiling windows-sys v0.61.2\n   Compiling aho-corasick v1.1.4\n   Compiling bstr v1.13.0\n   Compiling winapi-util v0.1.11\n   Compiling same-file v1.0.6\n   Compiling crossbeam-channel v0.5.16\n   Compiling walkdir v2.5.0\n   Compiling regex-automata v0.4.15\n   Compiling globset v0.4.19 (<frozen-repository-snapshot>\\crates\\globset)\n   Compiling ignore v0.4.29 (<frozen-repository-snapshot>\\crates\\ignore)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 10.26s\n     Running tests\\gitignore_skip_bom.rs (<cargo-target>\\debug\\deps\\gitignore_skip_bom-7042e8b063b131d9.exe)\nerror: test failed, to rerun pass `-p ignore --test gitignore_skip_bom`\n"
+          }
+        ],
+        "action_options": [
+          {
+            "action": {
+              "id": 11,
+              "schema_id": 1
+            },
+            "summary": "Apply the focused source change shown here.",
+            "diff_excerpt": "@@ -422,7 +422,7 @@\n-                if i != 0 { line.trim_start_matches(UTF8_BOM) } else { &line };\n+                if i == 0 { line.trim_start_matches(UTF8_BOM) } else { &line };",
+            "patch_sha256": "5000d6bc36df5a03c4f167b335cc6d248a22bac17ad2b7041182b31fa05e97af"
+          },
+          {
+            "action": {
+              "id": 37,
+              "schema_id": 1
+            },
+            "summary": "Apply this alternative change in the same code path.",
+            "diff_excerpt": "@@ -422,7 +422,7 @@\n-                if i != 0 { line.trim_start_matches(UTF8_BOM) } else { &line };\n+                if i == 1 { line.trim_start_matches(UTF8_BOM) } else { &line };",
+            "patch_sha256": "ab2085ede44153fec30518b5ed0ab39d5ca6857004a7998783ce2a91a936fecd"
+          },
+          {
+            "action": {
+              "id": 68,
+              "schema_id": 1
+            },
+            "summary": "Apply the source change and add a contract comment.",
+            "diff_excerpt": "@@ -422,7 +422,8 @@\n-                if i != 0 { line.trim_start_matches(UTF8_BOM) } else { &line };\n+            // Git ignores a UTF-8 BOM only at the start of the ignore file.\n+                if i == 0 { line.trim_start_matches(UTF8_BOM) } else { &line };",
+            "patch_sha256": "48fa64eaccc75e7448cc9bd2806c6344120c775dc45a53944cce0c7f7f443fd2"
+          },
+          {
+            "action": {
+              "id": 94,
+              "schema_id": 1
+            },
+            "summary": "Leave the current implementation unchanged.",
+            "diff_excerpt": "No source line changes are included.",
+            "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        ]
+      }
+    }
+  ]
+}

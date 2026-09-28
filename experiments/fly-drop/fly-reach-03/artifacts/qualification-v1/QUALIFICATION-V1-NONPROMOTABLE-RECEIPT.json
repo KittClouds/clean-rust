@@ -1,0 +1,13 @@
+{
+  "schema": "FLY-REACH-03-qualification-v1-nonpromotable-receipt-v1",
+  "study_id": "FLY-REACH-03",
+  "run_id": "qualification-v1",
+  "status": "NONPROMOTABLE_CONTRACT_DEFECT",
+  "non_promotable": true,
+  "reason": "F4 replay descriptors covered pre-trial states 0..8191 but omitted the frozen terminal checkpoint 8192.",
+  "scientific_execution_started": false,
+  "estimator_fit": false,
+  "measured_namespace_created": false,
+  "replacement": "qualification-v2",
+  "preserved_artifacts": true
+}

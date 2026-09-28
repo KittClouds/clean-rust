@@ -1,0 +1,13 @@
+{
+  "schema": "FLY-REACH-03-F4-PRECISION-01-analysis-attempt-v1",
+  "identity": "F4-PRECISION-01-ANALYSIS-01",
+  "contract_version": "0.1.5",
+  "status": "ANALYSIS_PIPELINE_FAILURE_PRE_FIT",
+  "failure": "The copied analysis attempted to call the frozen Encoder constructor with a feature-width argument; it accepts only the initialization seed.",
+  "frozen_streams_changed": false,
+  "optimizer_updates": 0,
+  "model_metrics_computed": false,
+  "analysis_output_created": false,
+  "measured_namespace_created": false,
+  "disposition": "Preserved as a pre-fit implementation failure. v0.1.6 corrects the constructor call and uses synthetic API smoke checks before analysis."
+}

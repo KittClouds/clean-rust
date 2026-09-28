@@ -1,0 +1,183 @@
+{
+  "artifact_id": "E013-FEASIBILITY-PROJECTIONS-v0.3",
+  "assumptions": {
+    "E012_pessimistic_source": "small raw proposals: 7 correct, 11 wrong, 30 null among 48 tasks",
+    "four_candidate_signal_workload": "T1 has four screening jobs; T2 has three perturbations; T3 scores four candidate IDs; T4 has six pairs in both orientations (12 observer evaluations). Each applies only to non-null baseline proposals, except base inference/T5 capture which occur once per task.",
+    "iid_limitation": "Binomial/multinomial probabilities ignore repository/family clustering and are planning illustrations, not guarantees or inferential claims.",
+    "nominal_planning_assumption": "25% correct proposals, 25% wrong proposals, 50% no proposal; scenario only, not an empirical estimate or bank requirement",
+    "runtime_timing_proxy": "E012 full-call averages (small 242.11 ms, large 3076.58 ms) scale extra small-observer evaluations only; T1 execution time and teacher-forced scoring speed are unmeasured."
+  },
+  "banks": [
+    {
+      "bank": "development",
+      "expected_correct_proposals": 126.00000000000001,
+      "expected_nonnull_proposals": 324.0,
+      "expected_wrong_proposals": 198.0,
+      "p_correct_raw_proposal": 0.14583333333333334,
+      "p_no_proposal": 0.625,
+      "p_wrong_raw_proposal": 0.22916666666666666,
+      "prob_T5_at_least_100_correct_and_100_wrong": 0.9956620479042707,
+      "scenario": "E012_pessimistic",
+      "t1_screen_jobs_4_per_nonnull": 1296.0,
+      "t2_estimated_small_pass_seconds": 235.33114274999997,
+      "t2_small_evaluations_3_per_nonnull": 972.0,
+      "t3_candidate_score_evaluations_4_per_nonnull": 1296.0,
+      "t3_estimated_small_pass_seconds": 313.77485699999994,
+      "t4_estimated_small_pass_seconds": 941.3245709999999,
+      "t4_pairwise_evaluations_12_per_nonnull": 3888.0,
+      "t6_estimated_small_pass_seconds": 209.183238,
+      "t6_separate_none_schema_evaluations_per_task": 864,
+      "tasks": 864
+    },
+    {
+      "bank": "confirmation",
+      "expected_correct_proposals": 163.33333333333334,
+      "expected_nonnull_proposals": 420.0,
+      "expected_wrong_proposals": 256.66666666666663,
+      "p_correct_raw_proposal": 0.14583333333333334,
+      "p_no_proposal": 0.625,
+      "p_wrong_raw_proposal": 0.22916666666666666,
+      "prob_T5_at_least_100_correct_and_100_wrong": 0.9999999955651868,
+      "scenario": "E012_pessimistic",
+      "t1_screen_jobs_4_per_nonnull": 1680.0,
+      "t2_estimated_small_pass_seconds": 305.05888875,
+      "t2_small_evaluations_3_per_nonnull": 1260.0,
+      "t3_candidate_score_evaluations_4_per_nonnull": 1680.0,
+      "t3_estimated_small_pass_seconds": 406.74518499999994,
+      "t4_estimated_small_pass_seconds": 1220.235555,
+      "t4_pairwise_evaluations_12_per_nonnull": 5040.0,
+      "t6_estimated_small_pass_seconds": 271.16345666666666,
+      "t6_separate_none_schema_evaluations_per_task": 1120,
+      "tasks": 1120
+    },
+    {
+      "bank": "development",
+      "expected_correct_proposals": 216.0,
+      "expected_nonnull_proposals": 432.0,
+      "expected_wrong_proposals": 216.0,
+      "p_correct_raw_proposal": 0.25,
+      "p_no_proposal": 0.5,
+      "p_wrong_raw_proposal": 0.25,
+      "prob_T5_at_least_100_correct_and_100_wrong": 0.9999999999999876,
+      "scenario": "nominal_planning_assumption",
+      "t1_screen_jobs_4_per_nonnull": 1728.0,
+      "t2_estimated_small_pass_seconds": 313.77485699999994,
+      "t2_small_evaluations_3_per_nonnull": 1296.0,
+      "t3_candidate_score_evaluations_4_per_nonnull": 1728.0,
+      "t3_estimated_small_pass_seconds": 418.366476,
+      "t4_estimated_small_pass_seconds": 1255.0994279999998,
+      "t4_pairwise_evaluations_12_per_nonnull": 5184.0,
+      "t6_estimated_small_pass_seconds": 209.183238,
+      "t6_separate_none_schema_evaluations_per_task": 864,
+      "tasks": 864
+    },
+    {
+      "bank": "confirmation",
+      "expected_correct_proposals": 280.0,
+      "expected_nonnull_proposals": 560.0,
+      "expected_wrong_proposals": 280.0,
+      "p_correct_raw_proposal": 0.25,
+      "p_no_proposal": 0.5,
+      "p_wrong_raw_proposal": 0.25,
+      "prob_T5_at_least_100_correct_and_100_wrong": 0.9999999999999852,
+      "scenario": "nominal_planning_assumption",
+      "t1_screen_jobs_4_per_nonnull": 2240.0,
+      "t2_estimated_small_pass_seconds": 406.74518499999994,
+      "t2_small_evaluations_3_per_nonnull": 1680.0,
+      "t3_candidate_score_evaluations_4_per_nonnull": 2240.0,
+      "t3_estimated_small_pass_seconds": 542.3269133333333,
+      "t4_estimated_small_pass_seconds": 1626.9807399999997,
+      "t4_pairwise_evaluations_12_per_nonnull": 6720.0,
+      "t6_estimated_small_pass_seconds": 271.16345666666666,
+      "t6_separate_none_schema_evaluations_per_task": 1120,
+      "tasks": 1120
+    }
+  ],
+  "banks_built": false,
+  "baseline_ms_per_call": {
+    "large": 3076.582291666667,
+    "small": 242.11022916666664
+  },
+  "confirmation_gate_support": [
+    {
+      "oracle_expected_correct_proposals": 74.66666666666667,
+      "oracle_probability_at_least_59": 0.9810511748635143,
+      "oracle_probability_at_least_93": 0.01461578095129349,
+      "rho_50_expected_accepted_correct": 37.333333333333336,
+      "rho_50_probability_at_least_93": 4.797123507204799e-16,
+      "rho_70_expected_accepted_correct": 52.266666666666666,
+      "rho_70_probability_at_least_93": 3.711744724141154e-08,
+      "rho_required_for_59": 0.7901785714285714,
+      "rho_required_for_93": 1.2455357142857142,
+      "scenario": "E012_pessimistic",
+      "tasks": 512
+    },
+    {
+      "oracle_expected_correct_proposals": 163.33333333333334,
+      "oracle_probability_at_least_59": 0.9999999999999654,
+      "oracle_probability_at_least_93": 0.9999999999395851,
+      "rho_50_expected_accepted_correct": 81.66666666666667,
+      "rho_50_probability_at_least_93": 0.10804600890676762,
+      "rho_70_expected_accepted_correct": 114.33333333333333,
+      "rho_70_probability_at_least_93": 0.9863631677847021,
+      "rho_required_for_59": 0.36122448979591837,
+      "rho_required_for_93": 0.5693877551020408,
+      "scenario": "E012_pessimistic",
+      "tasks": 1120
+    },
+    {
+      "oracle_expected_correct_proposals": 128.0,
+      "oracle_probability_at_least_59": 0.9999999999999833,
+      "oracle_probability_at_least_93": 0.9999096668992731,
+      "rho_50_expected_accepted_correct": 64.0,
+      "rho_50_probability_at_least_93": 0.0001473776895811039,
+      "rho_70_expected_accepted_correct": 89.6,
+      "rho_70_probability_at_least_93": 0.36376992443684036,
+      "rho_required_for_59": 0.4609375,
+      "rho_required_for_93": 0.7265625,
+      "scenario": "nominal_planning_assumption",
+      "tasks": 512
+    },
+    {
+      "oracle_expected_correct_proposals": 280.0,
+      "oracle_probability_at_least_59": 0.9999999999999852,
+      "oracle_probability_at_least_93": 0.9999999999999852,
+      "rho_50_expected_accepted_correct": 140.0,
+      "rho_50_probability_at_least_93": 0.9999969933719054,
+      "rho_70_expected_accepted_correct": 196.0,
+      "rho_70_probability_at_least_93": 0.9999999999999459,
+      "rho_required_for_59": 0.21071428571428572,
+      "rho_required_for_93": 0.33214285714285713,
+      "scenario": "nominal_planning_assumption",
+      "tasks": 1120
+    }
+  ],
+  "exact_gate_minimum_support": [
+    {
+      "epsilon": 0.05,
+      "errors": 0,
+      "minimum_n": 59,
+      "upper_error_bound": 0.049507609888226944
+    },
+    {
+      "epsilon": 0.05,
+      "errors": 1,
+      "minimum_n": 93,
+      "upper_error_bound": 0.0499939783879883
+    },
+    {
+      "epsilon": 0.05,
+      "errors": 2,
+      "minimum_n": 124,
+      "upper_error_bound": 0.049900171228312085
+    },
+    {
+      "epsilon": 0.05,
+      "errors": 3,
+      "minimum_n": 153,
+      "upper_error_bound": 0.04989503037896342
+    }
+  ],
+  "model_contact": false,
+  "schema_version": 1
+}

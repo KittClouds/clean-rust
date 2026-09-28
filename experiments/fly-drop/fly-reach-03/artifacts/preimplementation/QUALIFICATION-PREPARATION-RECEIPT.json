@@ -1,0 +1,15 @@
+{
+  "blocks": 4,
+  "cells": 18,
+  "estimators_fit": false,
+  "expected_sampled_rows": 37748736,
+  "manifest": "experiments/fly-reach-03/manifests/QUALIFICATION-MANIFEST.json",
+  "manifest_sha256": "9ea9048d424698212b5a14eecdadef56987a93c54ed28e3ef40a9508431014e5",
+  "measured_namespace_created": false,
+  "qualification_contract": "experiments/fly-reach-03/manifests/QUALIFICATION-CONTRACT-v0.1.json",
+  "qualification_contract_sha256": "0e1b60f486ddc4b05ba43eb0ba28edeada4fd4c7d1b5b49c657ba4d23c3ed9e3",
+  "schema": "FLY-REACH-03-qualification-preparation-receipt-v1",
+  "scientific_execution_started": false,
+  "status": "PASS",
+  "training_sha256": "57328ec2749e599d0130da5e39ec8c917f41ee5c388cbfdef85a33c0af02eb5a"
+}

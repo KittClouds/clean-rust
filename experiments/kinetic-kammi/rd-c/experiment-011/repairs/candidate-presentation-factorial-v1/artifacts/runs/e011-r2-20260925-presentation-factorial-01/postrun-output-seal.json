@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "state": "OUTPUTS_SEALED_BEFORE_SCORING",
+  "run_id": "e011-r2-20260925-presentation-factorial-01",
+  "created_utc": "2026-09-25T20:50:25.224948+00:00",
+  "pre_model_seal_sha256": "b230fd385ad5907eb7b3a7c287f33af3abed884d3e71608d29e4aef2f9e94122",
+  "trees": {
+    "small": {
+      "ids-only": {
+        "record_count": 16,
+        "http_success_count": 16,
+        "normalized_output_count": 16,
+        "tree_sha256": "4721059357bb33ea3b87bf2faa17bff08a7f14ae0baab1b90273182815a606c0"
+      },
+      "order-only": {
+        "record_count": 16,
+        "http_success_count": 16,
+        "normalized_output_count": 16,
+        "tree_sha256": "df34152da2a611f27bd7d17eb8ce625e4cdf57218e1d5739913a17156e63cbf8"
+      }
+    },
+    "large": {
+      "ids-only": {
+        "record_count": 16,
+        "http_success_count": 16,
+        "normalized_output_count": 16,
+        "tree_sha256": "cc060815157590185ebd65a0cfd1ad1abc0ccfeb412d89402ee7a2a4fe7850c5"
+      },
+      "order-only": {
+        "record_count": 16,
+        "http_success_count": 16,
+        "normalized_output_count": 16,
+        "tree_sha256": "aecaca8df8477a2ace7571a7e5b1c7c0b316a9a982b4bb6af99445ed1fe111b4"
+      }
+    }
+  }
+}

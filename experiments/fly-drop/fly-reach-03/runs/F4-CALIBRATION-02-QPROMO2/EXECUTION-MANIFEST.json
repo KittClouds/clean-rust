@@ -1,0 +1,79 @@
+{
+  "block_ids": [
+    305012,
+    305013,
+    305014,
+    305015,
+    305016,
+    305017,
+    305018,
+    305019,
+    305020,
+    305021,
+    305022,
+    305023
+  ],
+  "contract_sha256": "192b0c3c01b2b7978aedfe55e5490012226e62e0b7660c4410797a08b44a01b8",
+  "executor_path": "bin/f4-calibration-02-executor.exe",
+  "executor_sha256": "920ad4f8925cb46204bf15206c44edc2f66492d3503ad7a565fb43547658c3b5",
+  "expected_fit_count": 12,
+  "expected_native_stream_count": 216,
+  "fit_ids": [
+    "D-H305012",
+    "D-H305013",
+    "D-H305014",
+    "D-H305015",
+    "D-H305016",
+    "D-H305017",
+    "D-H305018",
+    "D-H305019",
+    "D-H305020",
+    "D-H305021",
+    "D-H305022",
+    "D-H305023"
+  ],
+  "machine_contract_sha256": "f1c3516fbc46aa8b315fc0d679a9b910ecdd3de2a2637a9c3c364ecde7e8ce96",
+  "measured_reach03_authorized": false,
+  "per_block_gate": {
+    "minimum_evaluable": 10,
+    "omega_hat_min": 0.7,
+    "total": 12
+  },
+  "pooled_gate": {
+    "epsilon_balanced_max": 0.1,
+    "omega_hat_min": 0.8
+  },
+  "qualification_only": true,
+  "run_id": "F4-CALIBRATION-02-QPROMO2",
+  "runtime": {
+    "numpy_config": "Build Dependencies:\n  blas:\n    detection method: pkgconfig\n    found: true\n    include directory: C:/Users/runneradmin/AppData/Local/Temp/cibw-run-hg727bee/cp313-win_amd64/build/venv/Lib/site-packages/scipy_openblas64/include\n    lib directory: C:/Users/runneradmin/AppData/Local/Temp/cibw-run-hg727bee/cp313-win_amd64/build/venv/Lib/site-packages/scipy_openblas64/lib\n    name: scipy-openblas\n    openblas configuration: OpenBLAS 0.3.34.106.0  USE64BITINT DYNAMIC_ARCH NO_AFFINITY\n      Haswell MAX_THREADS=24\n    pc file directory: D:/a/numpy-release/numpy-release/.openblas\n    version: 0.3.34.106.0\n  lapack:\n    detection method: pkgconfig\n    found: true\n    include directory: C:/Users/runneradmin/AppData/Local/Temp/cibw-run-hg727bee/cp313-win_amd64/build/venv/Lib/site-packages/scipy_openblas64/include\n    lib directory: C:/Users/runneradmin/AppData/Local/Temp/cibw-run-hg727bee/cp313-win_amd64/build/venv/Lib/site-packages/scipy_openblas64/lib\n    name: scipy-openblas\n    openblas configuration: OpenBLAS 0.3.34.106.0  USE64BITINT DYNAMIC_ARCH NO_AFFINITY\n      Haswell MAX_THREADS=24\n    pc file directory: D:/a/numpy-release/numpy-release/.openblas\n    version: 0.3.34.106.0\nCompilers:\n  c:\n    commands: cl\n    linker: link\n    name: msvc\n    version: 19.44.35228\n  c++:\n    commands: cl\n    linker: link\n    name: msvc\n    version: 19.44.35228\n  cython:\n    commands: cython\n    linker: cython\n    name: cython\n    version: 3.3.0\nMachine Information:\n  build:\n    cpu: x86_64\n    endian: little\n    family: x86_64\n    system: windows\n  host:\n    cpu: x86_64\n    endian: little\n    family: x86_64\n    system: windows\nPython Information:\n  path: C:\\Users\\runneradmin\\AppData\\Local\\Temp\\build-env-xf1j587o\\Scripts\\python.exe\n  version: '3.13'\nSIMD Extensions:\n  baseline:\n  - X86_V2\n  found:\n  - X86_V3\n\n",
+    "numpy_version": "2.5.3",
+    "python_executable": "C:\\Users\\shuga\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+    "python_sha256": "85b71d8c6ec1905935f74be0c9869aae198d00e98f39df699ec66f9c5a84cecd",
+    "python_version": "3.13.15 (tags/v3.13.15:4061bc4, Aug  5 2026, 13:05:39) [MSC v.1944 64 bit (AMD64)]",
+    "thread_environment": {
+      "BLIS_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "NUMEXPR_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1"
+    },
+    "threadpools": "unavailable"
+  },
+  "schema": "F4-CALIBRATION-02-v0.2-execution-manifest-v1",
+  "script_hashes": {
+    "analysis.py": "54a54276b4cd71fd6f0f794a9aa2aed31e5f69fb78953092572b458507a2a0a4",
+    "fit_d.py": "763256b0dfc3bb8718d84f20185a12d791e89cdb19225a3f1a74fafa0a62033a",
+    "integrity.py": "cbc7c608bb2d2ef924e5569313f2614fe9dc59700b5139d0740dadcb5cf1f2ff",
+    "preflight.py": "9aca7d6b91f7274acb26327a2f17d6dd004fac632b85f27325f762f317e6ec9b",
+    "prepare_d.py": "3cb2cc15ad6be783a0293253b3381760415376e6fac005a7935a4e71719e1a5b",
+    "prepare_tasks.py": "57b2393c029a3daab841e91b3e8a366cc86fa0854950cc026b14d5ca2fdc7282",
+    "terminal.py": "6df73692a06ae5113f93b25266dd79b05c7fb8be9f80707222b2fe78311d574c"
+  },
+  "source_manifest_canonical_sha256": "c6c3feacdbd63325fd0c484abae28b486f6cdc284e5deebc02851b5552bda110",
+  "source_manifest_file_sha256": "bb9de9d1c7e02ff922c0d29f2fba6e6bdc09e10490942f00ca957ff8958055a3",
+  "task_manifest_sha256": "c1a63224682550e473b626780d3c1ba68d1636e00b4ef09f501f13dcbbc5967c",
+  "task_training_sha256": "9ec1f7c240143e7fb5537ae72eb6d5bb3fb4fb8fc0445bcbafa54ae913a826b5",
+  "truth_firewall": "lock all heldout predictions, pass integrity, then open heldout truth"
+}

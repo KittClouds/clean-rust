@@ -1,0 +1,33 @@
+{
+  "schema": "FLY-REACH-03-F4-CAPACITY-01-action-sign-contract-v1",
+  "identity": "F4-CAPACITY-01-ACTION-SIGN",
+  "status": "QUALIFICATION_ONLY_FROZEN",
+  "parent_identity": "F4-CAPACITY-01",
+  "parent_encoder_spec_sha256": "3325e1b6ce91956162fa3022c9e2c3bdf3396b269e975da9c108f45d9129d43b",
+  "representation": {
+    "base": "f4-features-v1, width 80",
+    "augmentation": "sim.action_sign[coordinate.post]",
+    "width": 81,
+    "reference_blind": true,
+    "source": "deterministic replay state; no reference delta or target input",
+    "row_universe": "same qualification-v2 U* rows as F4-CAPACITY-01"
+  },
+  "estimator": {
+    "hidden_layers": [128, 64],
+    "activation": "GELU",
+    "optimizer": "Adam",
+    "learning_rate": 0.001,
+    "batch_size": 2048,
+    "epochs": 200,
+    "initialization_seed_base": 307000,
+    "training_order": "concatenated lexicographic feature-stream row order; no shuffle",
+    "hyperparameter_search": "none"
+  },
+  "evaluation": {
+    "folds": "four leave-one-Q-block-out folds",
+    "blocks": [303000, 303001, 303002, 303003],
+    "scoring": "IPW-balanced error and Omega_hat",
+    "measured_namespace_created": false,
+    "scientific_interpretation_opened": false
+  }
+}

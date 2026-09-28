@@ -1,0 +1,78 @@
+{
+  "allowed_scope": [
+    "build the frozen 144-fit manifest from the existing sealed collection",
+    "execute the four already frozen arms using the frozen 200-epoch schedule",
+    "verify locked fits and predictions before comparative analysis",
+    "report q=1/p diagnostics without changing score weights or estimands",
+    "record prior target-polarity-only support access explicitly"
+  ],
+  "collection_validation_receipt_sha256": "9df970a7c9065d9f7058eb3d5af3c189f5dec64c6097b2d78e8c0c26bb75cb3b",
+  "identity": "F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1",
+  "implementation_freeze_sha256": "563f58216e6a276bcdffebd8d14df730fae6d82779311b23914783ccf6282430",
+  "native_collection_receipt_sha256": "534a8d817ed3d610d9f257c51392426f05cabc1f4fd157ddfa39d9a5243f34cf",
+  "parent_identity": "F4-PRESENTATION-03-ENG1",
+  "parent_source_manifest_sha256": "7310de650f0efd5bb7ccb5342bf30e9cc8ae11a16da968e656512bda0e1b7305",
+  "predictor_sha256": "495c68070624e4b8eaeeba217aeb03bdac6636d75e6691292a59872c11a9455f",
+  "prohibited": [
+    "task generation or replacement",
+    "native recollection",
+    "raw input edits",
+    "feature/model/optimizer/epoch changes",
+    "q trimming/capping/normalizing/winsorizing",
+    "assignment substitution or survivor reweighting",
+    "analysis before integrity PASS",
+    "scientific promotion or measured REACH-03 authorization"
+  ],
+  "raw_collection_tree_seal_sha256": "5d98535f780d5b630b5136c07367791c4698f750013561ad8c243211c6d01b88",
+  "raw_collection_unchanged": true,
+  "schema": "F4-PRESENTATION-03-execution-repair-amendment-v0.1",
+  "status": "PREFIT_CONTINUATION_FROZEN",
+  "support_accounting_receipt_sha256": "966e69845091e6aa6c2c52ccc760723a49d15eb573749066c867699e3b38303a",
+  "task_bank_manifest_sha256": "ad339f4a710c9cb803e68a7076da923a68486f81b7552aa767c710f885deb0a1",
+  "task_bank_payload_sha256": "d61a0390fb9ba413b8970ba3ae82b8b5ec9fb717d3fc2247a79d9f8e30431d61",
+  "tool_sources": {
+    "EXECUTION-REPAIR-AMENDMENT-v0.1.json": {
+      "bytes": 1457,
+      "sha256": "2095f502f0f2c63978df951d2e07206dc7d92c3804b353c41603f487435d710c"
+    },
+    "RUNNER-REPAIR-RECEIPT-v0.1.json": {
+      "bytes": 818,
+      "sha256": "0ef36b60b0f4444bf0238e4b9a545d8ebdc2a9633a7732aef4458b75b719e1c0"
+    },
+    "analyze_results.py": {
+      "bytes": 27987,
+      "sha256": "777c2bc7d6f2f817dd40d2654932b9f4bc503335bf5c0ffb15d6e6667409181f"
+    },
+    "prepare_execution_repair.py": {
+      "bytes": 9638,
+      "sha256": "044f278c778f274035e851d42b9d856163969fb856a93e2a056c6625cdd7080d"
+    },
+    "q_weight_diagnostics_repair.py": {
+      "bytes": 10275,
+      "sha256": "487e7875d1b44becd7a14da20391dfaa015b23e8e77cae44169951583262517c"
+    },
+    "run_fits_repair.py": {
+      "bytes": 23756,
+      "sha256": "aa6a1c4b757c2209efae6aa859ba5d6b85ce59f0f918300dee02dac6000f3c52"
+    },
+    "seal_execution_repair_prefit.py": {
+      "bytes": 5316,
+      "sha256": "a706557190f08f2a62e0729712c7170535fc811bcc70bb5c8757a79b1b9e4d60"
+    },
+    "seal_fit_surface_repair.py": {
+      "bytes": 4339,
+      "sha256": "b6621852a0b3f0cb6607a2a064db74f997442794a6dff7e04b4967786f569fd6"
+    },
+    "test_runner_repair.py": {
+      "bytes": 1654,
+      "sha256": "160b021bb5b953167e575476b444696b2cb7d2e2a509558c0e3c55f6462e5db6"
+    },
+    "verify_integrity.py": {
+      "bytes": 34747,
+      "sha256": "7c7a756b9bb5e577fe1683d2e4829f1d4e8b2fc9d0347157238b1fc77babcd57"
+    }
+  },
+  "truth_access_context_receipt_sha256": "4d4cf2cd421e067a0124d703c97c8e3ce9716a62b8dbee80efe7417984f73159",
+  "truth_sha256": "ff9d000145fc503e83710ca99d65b0304d52c1f94533d92c78e28b9730214d50",
+  "validation_identity": "F4-PRESENTATION-03-VALIDATION-REPAIR-v0.1.1"
+}

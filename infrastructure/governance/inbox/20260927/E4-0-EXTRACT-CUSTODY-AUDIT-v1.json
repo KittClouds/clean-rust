@@ -1,0 +1,25 @@
+{
+  "schema": "CHIEF_E4_0_EXTRACT_CUSTODY_AUDIT_V1",
+  "status": "PASS_SUPERVISED_FEATURE_CUSTODY",
+  "scope": "worker completion, output hashes and sizes, lab seal root, released fence; no primary truth opened",
+  "run_id": "frozen-fabrique.e4-0.supervised.v1",
+  "stage_id": "E4_0_FRESH_FEATURE_EXTRACTION_V1",
+  "authorization_id": "sha256:64e6c203995bfcb0df21389b7780538ccc6eedb2649b3eab5da2b8a4f42b39c1",
+  "model_launch_contact_event": "sha256:adfd9cf7ad7cfdbe1394e7738c876bc581088ee8d537efc0d22eb34da9a4de70",
+  "finish_event": "sha256:233bc67d736b9b51ef8866ffd5e79e2f2179a640543488f7aafdbebc6e05426b",
+  "release_event": "sha256:daed8458d4fab8ebeecaa211a5b7d594178aa7a98c480f6719757fd70984827a",
+  "output_artifact_ids": {
+    "V1_FINAL_POSITION.f32le": "sha256:49236412bf7409bd5f8d2c15f43436afa17940d51cc4bfdcdaf9d773029deac4",
+    "feature-extraction-receipt-v01.json": "sha256:c9940764af2e18ff2eb05bc2f35a72e29b107112a5ad21ce1f5552af47379ede",
+    "population-row-manifest-v01.jsonl": "sha256:234a616bbbe1e392704e21c3d1b6402067d836b9f47a59d5432d01cd92c261b6",
+    "stage-seal-v01.json": "sha256:98e5804e087d057386e6c399ba262ade930482088e52a2371595384d75d7e99f"
+  },
+  "feature_stage_seal_root": "b0395dd693fb115c74540647722c2e8f36c624fb5621097e9eb197b39acff17a",
+  "lab_execution_receipt_sha256": "sha256:a8e3d844ecade6020d2c3b9bc7d61d6b870704ad9b1542a65daa61f1edde3a85",
+  "fence_valid_after_release": false,
+  "library_acceptance_id": "sha256:f98dcd6743c5e8b7ff091cef2d69aa361e53c252711c7b001f3a71d322744602",
+  "journal_projection_match": true,
+  "protected_label_bytes_opened_by_chief": false,
+  "primary_scoring_authorized": false,
+  "e4_01_entry_open": false
+}

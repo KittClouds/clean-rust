@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "label_file_sha256": "173c9af67dc4ae7494910c118a3e73e3c0464633824ed357f4e139b3baf71e64",
+  "public_frame_label_marker_scan": "pass",
+  "passing_action_position_varies": true,
+  "tasks": [
+    {
+      "task_id": "coding-gpu-pick-01",
+      "public_frame_blake3": "a0e87b5e175688f611d808b9d0f5e76981535bce86cde2ddfd450d08a887bbcd",
+      "passing_action_position": 0
+    },
+    {
+      "task_id": "coding-embedding-batch-01",
+      "public_frame_blake3": "0b2cb36975a5440848a351f905363805d4b36dc06d48118e5fdfa84343afe0e3",
+      "passing_action_position": 1
+    }
+  ]
+}

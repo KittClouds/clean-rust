@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "state": "FROZEN_LABEL_FINALIZATION_BEFORE_DERIVATION",
+  "model_contact_authorized": false,
+  "task_source_sha256": "462937e9b9ae5787a016bbda7ab0939bf0a92dafdf9a7a5d72664583244e0b3c",
+  "raw_candidate_check_results_sha256": "22c8c6db459a124a91d8cc4971b33be0e5baf97d3450c23b34fac51fcb235d43",
+  "same_input_case_groups": 224,
+  "same_input_case_conflicts": 0,
+  "finalizer": "scripts/finalize_task_labels_e012_v1.py",
+  "finalizer_sha256": "e1c4cd37185a6ad60b8b6be1713ceed435fa69f22da61a8199940bff86d50c99",
+  "files": [
+    {
+      "path": "amendments/bank-amendment-08.md",
+      "sha256": "4da24d7c0b47be5cf5ddc3b811e0d167343cbffe582c6922cd7a65a2a6e33f0a",
+      "bytes": 1923
+    },
+    {
+      "path": "amendments/bank-amendment-08.json",
+      "sha256": "61c10bb099b3655dffff9f715e9fda6340deb730c9166ce806d1ad259f097eeb",
+      "bytes": 1174
+    },
+    {
+      "path": "scripts/finalize_task_labels_e012_v1.py",
+      "sha256": "e1c4cd37185a6ad60b8b6be1713ceed435fa69f22da61a8199940bff86d50c99",
+      "bytes": 16829
+    },
+    {
+      "path": "scripts/freeze_label_finalization_e012_v1.py",
+      "sha256": "e24907df41df07e5aafc51c970e27b9d39197f109bb2144f36345914a562f781",
+      "bytes": 3994
+    },
+    {
+      "path": "scripts/build_task_sources_e012_v1.py",
+      "sha256": "99cb994d80040f6cd388e250ee5ab8b89e59d0e5a978c91894f15d5620c804a9",
+      "bytes": 23605
+    },
+    {
+      "path": "bank/construction-01/task-construction-lock-v1.1.json",
+      "sha256": "fe90cb29fd0b6b9c233826188d3692124e14660f109065415a58015dbad54c28",
+      "bytes": 1049
+    },
+    {
+      "path": "bank/construction-01/scored-check-run-lock-v1.2.json",
+      "sha256": "52e1900015e64454220ca37f0db1fef9dd9f0e5bfa7428687929a4b7a47bfb81",
+      "bytes": 2828
+    },
+    {
+      "path": "bank/construction-01/scored-bank-v1/vault/task-source-fixtures.json",
+      "sha256": "462937e9b9ae5787a016bbda7ab0939bf0a92dafdf9a7a5d72664583244e0b3c",
+      "bytes": 336199
+    },
+    {
+      "path": "bank/construction-01/scored-bank-v1/vault/candidate-check-results.json",
+      "sha256": "22c8c6db459a124a91d8cc4971b33be0e5baf97d3450c23b34fac51fcb235d43",
+      "bytes": 961716
+    },
+    {
+      "path": "bank/construction-01/scored-bank-v1/attempts/scored-check-attempt-02-audit.json",
+      "sha256": "673611b450b4e3028cd7d732e822f1c995dcc8389cf21d93aa32ceed008b3b85",
+      "bytes": 17702
+    },
+    {
+      "path": "bank/construction-01/scored-bank-v1/attempts/scored-check-results-attempt-02-quarantined.json",
+      "sha256": "36793253689a43139c5e653b2e413348c5e4bc9ebbdeefd795ffa632ff451adc",
+      "bytes": 793478
+    }
+  ],
+  "sha256_self_excluded": true
+}

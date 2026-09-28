@@ -1,0 +1,21 @@
+[package]
+name = "jev-information-density-v08n-generator"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.88"
+publish = false
+
+[workspace]
+
+[dependencies]
+anyhow = "1.0"
+blake3 = "1.8"
+jev-decision-world-v01 = { path = "../../jev-decision-world-v01" }
+serde_json = "1.0"
+serde = "1.0"
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+panic = "abort"

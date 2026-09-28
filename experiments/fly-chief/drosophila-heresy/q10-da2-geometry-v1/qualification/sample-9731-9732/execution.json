@@ -1,0 +1,23 @@
+{
+  "protocol": "Q10-DA2",
+  "status": "ENGINEERING_COMPLETE",
+  "source_sha256": {
+    "seed9731-L-tau16.json": "3114A3B31C59A79D540F32C30FE1C217971418655CD8B13E17A91D8157AA1707",
+    "seed9731-L-tau4.json": "2974BF3A4CB5C80569EE73B2E46C8800D12D142DDA9B67EA572880F4EE9C3B5E",
+    "seed9731-R-tau16.json": "185769A85B1EA2FE8E596804C1FC3CB4F27A3D8318010FB8D739E56CBF554F73",
+    "seed9731-R-tau4.json": "8BA8EF71BF255B53769A6E50EB65408E19BD59743F932F3DF741AF3EB97DCE99",
+    "seed9732-L-tau16.json": "461269AF2C4B89F9DD9B589E6CA322A29CA9357FAA29627911E7FB5B85E8E1A3",
+    "seed9732-L-tau4.json": "36F042052DF02EEA4371C3C76F8AFA727FECF5450158CBFAEA731E7E43A60D28",
+    "seed9732-R-tau16.json": "2E6AF0C80578CD61214099D166D692007B431FF557D678AFBBAF2FFD8DC8BFC9",
+    "seed9732-R-tau4.json": "A53A3567E84CB753805409A92B1C350C5F2AC6173557D221C000C975BF19A135"
+  },
+  "declared_events": 8,
+  "sets": 32,
+  "geometry_passes": 28,
+  "geometry_failures": 4,
+  "scientific_seed_bundles_used": 0,
+  "behavioral_inference": false,
+  "future_dh08b_authorized": false,
+  "readout_authority": "reported_from_committed_f32_replay",
+  "next_decision": "Do not open DH08B; require a wider deterministic selector only if DA2 geometry qualification warrants it."
+}

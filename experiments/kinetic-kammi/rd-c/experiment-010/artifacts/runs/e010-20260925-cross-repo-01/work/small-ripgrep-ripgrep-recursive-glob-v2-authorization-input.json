@@ -1,0 +1,34 @@
+{
+  "task_id": "ripgrep-ripgrep-recursive-glob-v2",
+  "frame_hash_hex": "9ac0cab2ea5576d80d68edf90ba8b24b92ab1699068f897c36c4d20e9339e889",
+  "selected_patch_sha256": "141751f0596f2515235db26a90bd3ffe4cdf8edf586f4f01e29631341392b1ca",
+  "action_ledger_path": "C:\\rd-c\\experiment-010\\artifacts\\runs\\e010-20260925-cross-repo-01\\ledgers\\small\\ripgrep-ripgrep-recursive-glob-v2.actions.bin",
+  "actions": [
+    {
+      "id": 11,
+      "schema_id": 1
+    },
+    {
+      "id": 37,
+      "schema_id": 1
+    },
+    {
+      "id": 68,
+      "schema_id": 1
+    },
+    {
+      "id": 94,
+      "schema_id": 1
+    }
+  ],
+  "observer_output": {
+    "action_choice": 37,
+    "applicability_milli": 1000,
+    "abstention_milli": 0
+  },
+  "thresholds": {
+    "minimum_applicability_milli": 850,
+    "maximum_abstention_milli": 150
+  },
+  "completion_check_passed": true
+}

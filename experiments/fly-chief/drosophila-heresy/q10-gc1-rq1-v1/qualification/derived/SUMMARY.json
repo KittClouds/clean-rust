@@ -1,0 +1,20 @@
+{
+  "counts": {
+    "completed_replays": 3,
+    "fixtures": 8,
+    "unique_states": 3
+  },
+  "engineering_only": true,
+  "gate": {
+    "atomic_receipt": true,
+    "behavioral_probe": false,
+    "no_unconditional_fallback": true,
+    "oracle_parity": true,
+    "parents_unchanged": true
+  },
+  "identity": "q10-gc1-rq1-v1",
+  "interpretation": "Fresh bounded replay runtime qualified for baseline-relative replacement; counterfactual campaigns remain unfrozen.",
+  "protocol": "Q10-GC1-RQ1",
+  "scientific_promotion": false,
+  "status": "RQ1_RUNTIME_QUALIFIED"
+}

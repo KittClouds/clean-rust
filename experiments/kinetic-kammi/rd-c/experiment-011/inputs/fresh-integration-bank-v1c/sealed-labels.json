@@ -1,0 +1,114 @@
+{
+  "schema_version": 1,
+  "state": "SEALED_PRECONTACT",
+  "tasks": {
+    "fresh-ripgrep-unclosed-class-single-v1": {
+      "repository_id": "ripgrep",
+      "task_family": "ripgrep-unclosed-class-opt-in",
+      "test_filter": "glob::tests::allow_unclosed_class_single",
+      "actions_by_patch_sha256": {
+        "e47d23b20f7029ce2f0f92c9d01bd6263c1bc470134441b1b10bc7e84186ce46": {
+          "expected_task_completion": true,
+          "candidate_variant": "gold",
+          "test_filter": "glob::tests::allow_unclosed_class_single"
+        },
+        "fc4d68e44e43320591232d87667f6796e22b8b39aac4e81640905721ee053b90": {
+          "expected_task_completion": true,
+          "candidate_variant": "gold_comment",
+          "test_filter": "glob::tests::allow_unclosed_class_single"
+        },
+        "0fe59c27bee439e611d2a8b681f71fb1100a25fc7d13a193aac5c454512f1917": {
+          "expected_task_completion": false,
+          "candidate_variant": "mutant",
+          "test_filter": "glob::tests::allow_unclosed_class_single"
+        },
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855": {
+          "expected_task_completion": false,
+          "candidate_variant": "keep",
+          "test_filter": "glob::tests::allow_unclosed_class_single"
+        }
+      }
+    },
+    "fresh-ripgrep-unclosed-class-many-v2": {
+      "repository_id": "ripgrep",
+      "task_family": "ripgrep-unclosed-class-opt-in",
+      "test_filter": "glob::tests::allow_unclosed_class_many",
+      "actions_by_patch_sha256": {
+        "e47d23b20f7029ce2f0f92c9d01bd6263c1bc470134441b1b10bc7e84186ce46": {
+          "expected_task_completion": true,
+          "candidate_variant": "gold",
+          "test_filter": "glob::tests::allow_unclosed_class_many"
+        },
+        "fc4d68e44e43320591232d87667f6796e22b8b39aac4e81640905721ee053b90": {
+          "expected_task_completion": true,
+          "candidate_variant": "gold_comment",
+          "test_filter": "glob::tests::allow_unclosed_class_many"
+        },
+        "0fe59c27bee439e611d2a8b681f71fb1100a25fc7d13a193aac5c454512f1917": {
+          "expected_task_completion": false,
+          "candidate_variant": "mutant",
+          "test_filter": "glob::tests::allow_unclosed_class_many"
+        },
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855": {
+          "expected_task_completion": false,
+          "candidate_variant": "keep",
+          "test_filter": "glob::tests::allow_unclosed_class_many"
+        }
+      }
+    },
+    "fresh-turbovec-search-results-clone-contract-v1": {
+      "repository_id": "turbovec",
+      "task_family": "turbovec-search-results-clone-contract",
+      "test_filter": "search_results_clone_is_independent_of_its_source",
+      "actions_by_patch_sha256": {
+        "d7c1e233f97f4ca98a72dc565d3133d301c4b3118dee9ead829d3ba18e06c1a3": {
+          "expected_task_completion": true,
+          "candidate_variant": "gold",
+          "test_filter": "search_results_clone_is_independent_of_its_source"
+        },
+        "f1ca29b631625189ac005bac09f87b8ad604ae23f7aa132f716107ebcc6090d8": {
+          "expected_task_completion": true,
+          "candidate_variant": "gold_comment",
+          "test_filter": "search_results_clone_is_independent_of_its_source"
+        },
+        "17bba2661ae4036b0ce69de7fe9345b59183020ce8ba2bfeec7e03edd7141a06": {
+          "expected_task_completion": false,
+          "candidate_variant": "mutant",
+          "test_filter": "search_results_clone_is_independent_of_its_source"
+        },
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855": {
+          "expected_task_completion": false,
+          "candidate_variant": "keep",
+          "test_filter": "search_results_clone_is_independent_of_its_source"
+        }
+      }
+    },
+    "fresh-turbovec-search-results-trait-set-v2": {
+      "repository_id": "turbovec",
+      "task_family": "turbovec-search-results-clone-contract",
+      "test_filter": "search_results_implements_the_downstream_derive_set",
+      "actions_by_patch_sha256": {
+        "d7c1e233f97f4ca98a72dc565d3133d301c4b3118dee9ead829d3ba18e06c1a3": {
+          "expected_task_completion": true,
+          "candidate_variant": "gold",
+          "test_filter": "search_results_implements_the_downstream_derive_set"
+        },
+        "f1ca29b631625189ac005bac09f87b8ad604ae23f7aa132f716107ebcc6090d8": {
+          "expected_task_completion": true,
+          "candidate_variant": "gold_comment",
+          "test_filter": "search_results_implements_the_downstream_derive_set"
+        },
+        "17bba2661ae4036b0ce69de7fe9345b59183020ce8ba2bfeec7e03edd7141a06": {
+          "expected_task_completion": false,
+          "candidate_variant": "mutant",
+          "test_filter": "search_results_implements_the_downstream_derive_set"
+        },
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855": {
+          "expected_task_completion": false,
+          "candidate_variant": "keep",
+          "test_filter": "search_results_implements_the_downstream_derive_set"
+        }
+      }
+    }
+  }
+}

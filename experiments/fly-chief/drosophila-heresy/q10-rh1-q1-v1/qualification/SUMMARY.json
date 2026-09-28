@@ -1,0 +1,396 @@
+{
+  "protocol": "Q10-PF6-RH1-Q1",
+  "status": "Q1_REAL_LEARNER_CANONICAL_EQUIVALENCE_COMPLETE",
+  "parent_bindings_verified": {
+    "rh1_cq1_contract": "E28592C95AFCA90FC83817A98CB2558E5C6157F6CE0050D260F3420F324F24E4",
+    "s1_execution": "E561D7392D471CC0B47E98E66EC5AD9FC772476F2F61103FBF5994A051BC0E17",
+    "s1_sample": "0DE70DA72627D834C7D877F667469DA848F04312F072036245DFE312AD863BB9",
+    "pf5_runner": "A00078787DB732906416B3C7158DC777CD41C2E71C3AAE660D1AE525446FB82A"
+  },
+  "groups_tested": 8,
+  "all_checks_passed": true,
+  "records": [
+    {
+      "identity": [
+        "seed9731-L-tau16.json",
+        0,
+        45
+      ],
+      "coordinates": [
+        2749,
+        3026,
+        3264
+      ],
+      "mapping": [
+        [
+          2749,
+          -1
+        ],
+        [
+          3026,
+          1
+        ],
+        [
+          3264,
+          -2
+        ]
+      ],
+      "order_a": [
+        2749,
+        3026,
+        3264
+      ],
+      "order_b": [
+        3264,
+        3026,
+        2749
+      ],
+      "checks": {
+        "canonical_state_equal": true,
+        "canonical_bytes_equal": true,
+        "state_identity_equal": true,
+        "tie_hash_equal": true,
+        "committed_weight_bytes_equal": true,
+        "sequential_f32_readout_equal": true,
+        "geometry_metrics_equal": true
+      },
+      "state_identity": "083B3CC686B2BBD9601859AF25EE3F86A6593DD081F59A017584638BBF4A61BB",
+      "tie_hash": "DB552B3DA729660452053CD41ED180FF2C80C8DD0354C82C2B537F03FE51F4EE"
+    },
+    {
+      "identity": [
+        "seed9731-L-tau16.json",
+        1,
+        43
+      ],
+      "coordinates": [
+        15255,
+        15187,
+        15289
+      ],
+      "mapping": [
+        [
+          15187,
+          1
+        ],
+        [
+          15255,
+          -1
+        ],
+        [
+          15289,
+          -2
+        ]
+      ],
+      "order_a": [
+        15255,
+        15187,
+        15289
+      ],
+      "order_b": [
+        15289,
+        15187,
+        15255
+      ],
+      "checks": {
+        "canonical_state_equal": true,
+        "canonical_bytes_equal": true,
+        "state_identity_equal": true,
+        "tie_hash_equal": true,
+        "committed_weight_bytes_equal": true,
+        "sequential_f32_readout_equal": true,
+        "geometry_metrics_equal": true
+      },
+      "state_identity": "CC8FEAA0FCC633CDBB2FE3D9640AA07EC5376C72120D388CB7E86C3DC204FF47",
+      "tie_hash": "43FD67CF280662EAF4178C7C6C7078930C0E8F8535BFCC7FB5E066720E48FEBE"
+    },
+    {
+      "identity": [
+        "seed9731-L-tau16.json",
+        2,
+        40
+      ],
+      "coordinates": [
+        18080,
+        18001,
+        18376
+      ],
+      "mapping": [
+        [
+          18001,
+          1
+        ],
+        [
+          18080,
+          -1
+        ],
+        [
+          18376,
+          -2
+        ]
+      ],
+      "order_a": [
+        18080,
+        18001,
+        18376
+      ],
+      "order_b": [
+        18376,
+        18001,
+        18080
+      ],
+      "checks": {
+        "canonical_state_equal": true,
+        "canonical_bytes_equal": true,
+        "state_identity_equal": true,
+        "tie_hash_equal": true,
+        "committed_weight_bytes_equal": true,
+        "sequential_f32_readout_equal": true,
+        "geometry_metrics_equal": true
+      },
+      "state_identity": "443C3A7C86C6D853C60905C496287CDEEF3286491211A85403C0BAFC79317C3D",
+      "tie_hash": "F6D884B7688BA4CA3DABC1FF5ED588135055BF8373E7CBB7187D514C0846AA09"
+    },
+    {
+      "identity": [
+        "seed9731-L-tau16.json",
+        3,
+        44
+      ],
+      "coordinates": [
+        23910,
+        24140,
+        23881
+      ],
+      "mapping": [
+        [
+          23881,
+          -2
+        ],
+        [
+          23910,
+          -1
+        ],
+        [
+          24140,
+          1
+        ]
+      ],
+      "order_a": [
+        23910,
+        24140,
+        23881
+      ],
+      "order_b": [
+        23881,
+        24140,
+        23910
+      ],
+      "checks": {
+        "canonical_state_equal": true,
+        "canonical_bytes_equal": true,
+        "state_identity_equal": true,
+        "tie_hash_equal": true,
+        "committed_weight_bytes_equal": true,
+        "sequential_f32_readout_equal": true,
+        "geometry_metrics_equal": true
+      },
+      "state_identity": "02FB67FFF6E11294A3C322B4154CA16F026EAD9C5EFD3837FB8E49A26C126F7D",
+      "tie_hash": "73EDF6CA06194EC334ADC9558BA07BE3AAD66D1F23B959925D25B82320F4DF5E"
+    },
+    {
+      "identity": [
+        "seed9731-L-tau4.json",
+        0,
+        41
+      ],
+      "coordinates": [
+        6089,
+        5880,
+        6196
+      ],
+      "mapping": [
+        [
+          5880,
+          1
+        ],
+        [
+          6089,
+          -1
+        ],
+        [
+          6196,
+          -2
+        ]
+      ],
+      "order_a": [
+        6089,
+        5880,
+        6196
+      ],
+      "order_b": [
+        6196,
+        5880,
+        6089
+      ],
+      "checks": {
+        "canonical_state_equal": true,
+        "canonical_bytes_equal": true,
+        "state_identity_equal": true,
+        "tie_hash_equal": true,
+        "committed_weight_bytes_equal": true,
+        "sequential_f32_readout_equal": true,
+        "geometry_metrics_equal": true
+      },
+      "state_identity": "0C92BE8B4701930696E35E58ED36239D41018978934F2DB2FBD3F59176C491E2",
+      "tie_hash": "46878FB13A35DE56E918E6DC38A81722DFC760906B461165E9A6B07BBE8EDC44"
+    },
+    {
+      "identity": [
+        "seed9731-L-tau4.json",
+        1,
+        43
+      ],
+      "coordinates": [
+        9121,
+        9311,
+        9268
+      ],
+      "mapping": [
+        [
+          9121,
+          -1
+        ],
+        [
+          9268,
+          -2
+        ],
+        [
+          9311,
+          1
+        ]
+      ],
+      "order_a": [
+        9121,
+        9311,
+        9268
+      ],
+      "order_b": [
+        9268,
+        9311,
+        9121
+      ],
+      "checks": {
+        "canonical_state_equal": true,
+        "canonical_bytes_equal": true,
+        "state_identity_equal": true,
+        "tie_hash_equal": true,
+        "committed_weight_bytes_equal": true,
+        "sequential_f32_readout_equal": true,
+        "geometry_metrics_equal": true
+      },
+      "state_identity": "3D3A57A54B25EC30795B42E80579D729E0AB75A8DBAA38E07CB3A6F6B7110250",
+      "tie_hash": "6A84C7313AE4EBF9D91BDBE1E0B3D41773245CC53D74B92C14B9DE4FFDA671FC"
+    },
+    {
+      "identity": [
+        "seed9731-L-tau4.json",
+        2,
+        41
+      ],
+      "coordinates": [
+        14335,
+        15141,
+        14962
+      ],
+      "mapping": [
+        [
+          14335,
+          -1
+        ],
+        [
+          14962,
+          -2
+        ],
+        [
+          15141,
+          1
+        ]
+      ],
+      "order_a": [
+        14335,
+        15141,
+        14962
+      ],
+      "order_b": [
+        14962,
+        15141,
+        14335
+      ],
+      "checks": {
+        "canonical_state_equal": true,
+        "canonical_bytes_equal": true,
+        "state_identity_equal": true,
+        "tie_hash_equal": true,
+        "committed_weight_bytes_equal": true,
+        "sequential_f32_readout_equal": true,
+        "geometry_metrics_equal": true
+      },
+      "state_identity": "067E85ABD3E2199CA6D593A62796D7DC7D9A0990A13094C850E0644692F6F2DA",
+      "tie_hash": "FFB19E45C4F4403F4732C351C4E29F57D936C636232278119266B95CF14278A0"
+    },
+    {
+      "identity": [
+        "seed9731-L-tau4.json",
+        3,
+        48
+      ],
+      "coordinates": [
+        18496,
+        17973,
+        18444
+      ],
+      "mapping": [
+        [
+          17973,
+          1
+        ],
+        [
+          18444,
+          -2
+        ],
+        [
+          18496,
+          -1
+        ]
+      ],
+      "order_a": [
+        18496,
+        17973,
+        18444
+      ],
+      "order_b": [
+        18444,
+        17973,
+        18496
+      ],
+      "checks": {
+        "canonical_state_equal": true,
+        "canonical_bytes_equal": true,
+        "state_identity_equal": true,
+        "tie_hash_equal": true,
+        "committed_weight_bytes_equal": true,
+        "sequential_f32_readout_equal": true,
+        "geometry_metrics_equal": true
+      },
+      "state_identity": "46A6F3030ECED59EBB22EB9FA9CDD167341B3735D2345D6EF38337CB73C7AAD9",
+      "tie_hash": "E157C0B9BCA9E96C7328ACCE05C8CA0720C69BF791E51E55A4E31E4F32C45E96"
+    }
+  ],
+  "scope": {
+    "measured_factorial_started": false,
+    "scientific_seed_bundles": 0,
+    "behavioral_probe": false,
+    "dh08b_authorized": false
+  }
+}

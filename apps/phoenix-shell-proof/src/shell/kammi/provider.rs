@@ -1,0 +1,734 @@
+use super::session::KammiRole;
+use super::settings::{
+    load_openrouter_key, validate_model_id, LlamaCppSettings, ProviderBackend, ReasoningLevel,
+};
+use anyhow::{anyhow, Context, Result};
+use futures_util::StreamExt;
+use openrouter_rs::{
+    api::chat::{ChatCompletionRequest, Message},
+    types::{Effort, Role},
+    OpenRouterClient,
+};
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::Arc;
+use std::time::Duration;
+use tokio::time::Instant;
+
+mod llama_cpp;
+use llama_cpp::LlamaServerManager;
+
+pub fn validate_llama_cpp_settings(settings: &LlamaCppSettings) -> Result<()> {
+    llama_cpp::validate_settings(settings).map(|_| ())
+}
+
+const COMMAND_CAPACITY: usize = 16;
+const EVENT_CAPACITY: usize = 32;
+const MAX_REQUEST_MESSAGES: usize = 256;
+const MAX_REQUEST_BYTES: usize = 1024 * 1024;
+const MAX_OUTPUT_TOKENS: u32 = 4_096;
+// A provider can emit token fragments much faster than GPUI can usefully paint
+// them. Coalescing at 10 Hz keeps the root Phoenix view responsive while still
+// presenting visibly streamed output.
+const STREAM_FLUSH_INTERVAL: Duration = Duration::from_millis(100);
+const STREAM_BATCH_CAPACITY: usize = 4 * 1024;
+const STREAM_BATCH_MAX_BYTES: usize = 32 * 1024;
+
+struct DeltaBatch {
+    text: String,
+    flush_at: Option<Instant>,
+}
+
+impl DeltaBatch {
+    fn new() -> Self {
+        Self {
+            text: String::with_capacity(STREAM_BATCH_CAPACITY),
+            flush_at: None,
+        }
+    }
+
+    fn push(&mut self, fragment: &str, now: Instant) {
+        if self.text.is_empty() {
+            self.flush_at = Some(now + STREAM_FLUSH_INTERVAL);
+        }
+        self.text.push_str(fragment);
+    }
+
+    fn flush_at(&self) -> Option<Instant> {
+        self.flush_at
+    }
+
+    fn reached_size_limit(&self) -> bool {
+        self.text.len() >= STREAM_BATCH_MAX_BYTES
+    }
+
+    fn take_event(&mut self, request_id: u64) -> Option<ProviderEvent> {
+        if self.text.is_empty() {
+            return None;
+        }
+        self.flush_at = None;
+        let text = std::mem::replace(&mut self.text, String::with_capacity(STREAM_BATCH_CAPACITY));
+        Some(ProviderEvent::Delta { request_id, text })
+    }
+}
+
+#[derive(Clone, Debug)]
+pub enum ProviderCommand {
+    Generate(ProviderRequest),
+    Cancel { request_id: u64 },
+    WarmLocal(LlamaCppSettings),
+    ReleaseLocal,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum LocalServerState {
+    Stopped,
+    Starting,
+    Ready,
+    Releasing,
+    Failed,
+}
+
+#[derive(Clone, Debug)]
+pub struct ProviderRequest {
+    pub request_id: u64,
+    pub backend: ProviderBackend,
+    pub model: String,
+    pub llama_cpp: LlamaCppSettings,
+    pub messages: Vec<ProviderMessage>,
+    pub reasoning: ReasoningLevel,
+}
+
+#[derive(Clone, Debug)]
+pub struct ProviderMessage {
+    pub role: KammiRole,
+    pub content: String,
+}
+
+#[derive(Clone, Debug)]
+pub enum ProviderEvent {
+    Started { request_id: u64 },
+    Delta { request_id: u64, text: String },
+    Finished { request_id: u64 },
+    Cancelled { request_id: u64 },
+    Failed { request_id: u64, error: String },
+    LocalServerState(LocalServerState),
+    LocalServerControlFailed { error: String, state: LocalServerState },
+    Fatal { error: String },
+}
+
+pub struct KammiProviderRuntime {
+    commands: async_channel::Sender<ProviderCommand>,
+    events: async_channel::Receiver<ProviderEvent>,
+    thread: Option<std::thread::JoinHandle<()>>,
+}
+
+impl KammiProviderRuntime {
+    pub fn try_generate(&self, request: ProviderRequest) -> Result<()> {
+        self.try_command(ProviderCommand::Generate(request), "generation")
+    }
+
+    pub fn events(&self) -> &async_channel::Receiver<ProviderEvent> {
+        &self.events
+    }
+
+    pub fn try_cancel(&self, request_id: u64) -> Result<()> {
+        self.try_command(ProviderCommand::Cancel { request_id }, "cancellation")
+    }
+
+    pub fn try_warm_local(&self, settings: LlamaCppSettings) -> Result<()> {
+        self.try_command(ProviderCommand::WarmLocal(settings), "local model load")
+    }
+
+    pub fn try_release_local(&self) -> Result<()> {
+        self.try_command(ProviderCommand::ReleaseLocal, "local model release")
+    }
+
+    fn try_command(&self, command: ProviderCommand, label: &'static str) -> Result<()> {
+        self.commands
+            .try_send(command)
+            .map_err(|error| match error {
+                async_channel::TrySendError::Full(_) => {
+                    anyhow!("Kammi provider {label} queue is busy")
+                }
+                async_channel::TrySendError::Closed(_) => {
+                    anyhow!("Kammi provider runtime is unavailable")
+                }
+            })
+    }
+}
+
+impl Drop for KammiProviderRuntime {
+    fn drop(&mut self) {
+        // Closing wakes `recv` and any producer blocked on the bounded event
+        // channel. Never block the GPUI thread trying to enqueue shutdown.
+        self.commands.close();
+        if let Some(thread) = self.thread.take() {
+            let _ = thread.join();
+        }
+    }
+}
+
+pub fn spawn_provider_runtime() -> Result<KammiProviderRuntime> {
+    let (commands_tx, commands_rx) = async_channel::bounded(COMMAND_CAPACITY);
+    let (events_tx, events_rx) = async_channel::bounded(EVENT_CAPACITY);
+    let thread_events = events_tx.clone();
+
+    let thread = std::thread::Builder::new()
+        .name("phoenix-kammi-provider".into())
+        .spawn(move || {
+            let runtime = match tokio::runtime::Builder::new_current_thread()
+                .enable_all()
+                .build()
+            {
+                Ok(runtime) => runtime,
+                Err(error) => {
+                    let _ = thread_events.try_send(ProviderEvent::Fatal {
+                        error: format!("failed to create Kammi runtime: {error}"),
+                    });
+                    return;
+                }
+            };
+            runtime.block_on(provider_loop(commands_rx, thread_events));
+        })
+        .context("spawn Kammi provider thread")?;
+
+    Ok(KammiProviderRuntime {
+        commands: commands_tx,
+        events: events_rx,
+        thread: Some(thread),
+    })
+}
+
+async fn provider_loop(
+    commands: async_channel::Receiver<ProviderCommand>,
+    events: async_channel::Sender<ProviderEvent>,
+) {
+    let mut active_task: Option<(u64, tokio::task::JoinHandle<()>, Arc<AtomicBool>)> = None;
+    let mut warm_task: Option<tokio::task::JoinHandle<()>> = None;
+    let llama_server = Arc::new(tokio::sync::Mutex::new(LlamaServerManager::new()));
+
+    while let Ok(cmd) = commands.recv().await {
+        match cmd {
+            ProviderCommand::Generate(request) => {
+                if let Some(handle) = warm_task.take() {
+                    if !handle.is_finished() {
+                        handle.abort();
+                        llama_server.lock().await.stop_if_loading();
+                    }
+                }
+                let req_id = request.request_id;
+                if let Some((old_id, handle, cancel_flag)) = active_task.take() {
+                    cancel_flag.store(true, Ordering::SeqCst);
+                    handle.abort();
+                    llama_server.lock().await.stop_if_loading();
+                    let _ = events.try_send(ProviderEvent::Cancelled { request_id: old_id });
+                }
+
+                let cancel_flag = Arc::new(AtomicBool::new(false));
+                let cancel_flag_task = cancel_flag.clone();
+                let events_task = events.clone();
+                let llama_server_task = llama_server.clone();
+
+                let handle = tokio::spawn(async move {
+                    if let Err(err) = run_generation(
+                        request,
+                        events_task.clone(),
+                        cancel_flag_task,
+                        llama_server_task,
+                    )
+                    .await
+                    {
+                        let err_msg = format!("{err:#}");
+                        let _ = events_task
+                            .send(ProviderEvent::Failed {
+                                request_id: req_id,
+                                error: err_msg,
+                            })
+                            .await;
+                    }
+                });
+
+                active_task = Some((req_id, handle, cancel_flag));
+            }
+            ProviderCommand::Cancel { request_id } => {
+                if let Some((active_id, handle, cancel_flag)) = active_task.take() {
+                    if active_id == request_id {
+                        cancel_flag.store(true, Ordering::SeqCst);
+                        handle.abort();
+                        llama_server.lock().await.stop_if_loading();
+                        let _ = events.try_send(ProviderEvent::Cancelled { request_id });
+                    } else {
+                        active_task = Some((active_id, handle, cancel_flag));
+                    }
+                }
+            }
+            ProviderCommand::WarmLocal(settings) => {
+                if active_task.as_ref().is_some_and(|(_, handle, _)| !handle.is_finished()) {
+                    let state = if llama_server.lock().await.is_ready() { LocalServerState::Ready } else { LocalServerState::Stopped };
+                    let _ = events.try_send(ProviderEvent::LocalServerControlFailed {
+                        error: "Kammi is generating. Stop or finish that request before loading a model.".into(),
+                        state,
+                    });
+                    continue;
+                }
+                if warm_task.as_ref().is_some_and(|handle| !handle.is_finished()) {
+                    continue;
+                }
+                let _ = events.try_send(ProviderEvent::LocalServerState(LocalServerState::Starting));
+                let manager = llama_server.clone();
+                let warm_events = events.clone();
+                warm_task = Some(tokio::spawn(async move {
+                    let cancelled = AtomicBool::new(false);
+                    let result = manager.lock().await.ensure_ready(&settings, &cancelled).await;
+                    match result {
+                        Ok(()) => {
+                            let _ = warm_events.send(ProviderEvent::LocalServerState(LocalServerState::Ready)).await;
+                        }
+                        Err(error) => {
+                            let state = if manager.lock().await.is_ready() {
+                                LocalServerState::Ready
+                            } else {
+                                LocalServerState::Failed
+                            };
+                            let _ = warm_events.send(ProviderEvent::LocalServerState(state)).await;
+                            let _ = warm_events.send(ProviderEvent::LocalServerControlFailed {
+                                error: format!("Could not load the local model: {error:#}"),
+                                state,
+                            }).await;
+                        }
+                    }
+                }));
+            }
+            ProviderCommand::ReleaseLocal => {
+                if active_task.as_ref().is_some_and(|(_, handle, _)| !handle.is_finished()) {
+                    let state = if llama_server.lock().await.is_ready() { LocalServerState::Ready } else { LocalServerState::Stopped };
+                    let _ = events.try_send(ProviderEvent::LocalServerControlFailed {
+                        error: "Kammi is generating. Stop or finish that request before releasing GPU memory.".into(),
+                        state,
+                    });
+                    continue;
+                }
+                let _ = events.try_send(ProviderEvent::LocalServerState(LocalServerState::Releasing));
+                if let Some(handle) = warm_task.take() {
+                    handle.abort();
+                }
+                llama_server.lock().await.stop();
+                let _ = events.try_send(ProviderEvent::LocalServerState(LocalServerState::Stopped));
+            }
+        }
+    }
+
+    if let Some((_id, handle, cancel_flag)) = active_task.take() {
+        cancel_flag.store(true, Ordering::SeqCst);
+        handle.abort();
+        llama_server.lock().await.stop_if_loading();
+    }
+    if let Some(handle) = warm_task.take() {
+        handle.abort();
+        llama_server.lock().await.stop();
+    }
+}
+
+async fn run_generation(
+    request: ProviderRequest,
+    events: async_channel::Sender<ProviderEvent>,
+    cancel_flag: Arc<AtomicBool>,
+    llama_server: Arc<tokio::sync::Mutex<LlamaServerManager>>,
+) -> Result<()> {
+    let completion = build_completion_request(&request)?;
+    let (client, model, provider_label) = match request.backend {
+        ProviderBackend::OpenRouter => {
+            let model = validate_model_id(&request.model)?;
+            let api_key = load_openrouter_key()?.context("OpenRouter API key is not configured")?;
+            let client = OpenRouterClient::builder()
+                .api_key(api_key)
+                .x_title("Phoenix Native")
+                .app_categories(["writing"])
+                .build()
+                .context("build OpenRouter client")?;
+            (client, model, "OpenRouter")
+        }
+        ProviderBackend::LlamaCpp => {
+            let _ = events.try_send(ProviderEvent::LocalServerState(LocalServerState::Starting));
+            let ready = llama_server
+                .lock()
+                .await
+                .ensure_ready(&request.llama_cpp, &cancel_flag)
+                .await;
+            if ready.is_err() {
+                let _ = events.try_send(ProviderEvent::LocalServerState(LocalServerState::Failed));
+            }
+            ready?;
+            let _ = events.try_send(ProviderEvent::LocalServerState(LocalServerState::Ready));
+            let model = request.llama_cpp.model_label();
+            let client = OpenRouterClient::builder()
+                .base_url(request.llama_cpp.endpoint.trim_end_matches('/'))
+                .api_key("phoenix-local")
+                .x_title("Phoenix Native")
+                .build()
+                .context("build llama.cpp client")?;
+            (client, model, "llama.cpp")
+        }
+    };
+
+    events
+        .send(ProviderEvent::Started {
+            request_id: request.request_id,
+        })
+        .await?;
+
+    let mut stream = client
+        .chat()
+        .stream(&completion)
+        .await
+        .with_context(|| format!("start {provider_label} stream"))?;
+
+    let mut pending = DeltaBatch::new();
+    loop {
+        let next = if let Some(flush_at) = pending.flush_at() {
+            tokio::select! {
+                biased;
+                _ = tokio::time::sleep_until(flush_at) => {
+                    flush_delta_batch(request.request_id, &events, &mut pending).await?;
+                    continue;
+                }
+                next = stream.next() => next,
+            }
+        } else {
+            stream.next().await
+        };
+        let Some(chunk) = next else {
+            break;
+        };
+
+        if cancel_flag.load(Ordering::SeqCst) {
+            events
+                .send(ProviderEvent::Cancelled {
+                    request_id: request.request_id,
+                })
+                .await?;
+            return Ok(());
+        }
+
+        let chunk = match chunk {
+            Ok(c) => c,
+            Err(e) => {
+                let msg = e.to_string();
+                let friendly_err = if request.backend == ProviderBackend::OpenRouter
+                    && (msg.contains("401") || msg.contains("Unauthorized"))
+                {
+                    "OpenRouter rejected the API key (401 Unauthorized).".to_string()
+                } else if msg.contains("404") || msg.contains("Not Found") {
+                    format!("Model '{model}' was not found or is unavailable.")
+                } else if msg.contains("429") || msg.contains("Too Many Requests") {
+                    "OpenRouter rate limit reached (429 Too Many Requests).".to_string()
+                } else {
+                    format!("{provider_label} stream failed: {msg}")
+                };
+                anyhow::bail!("{friendly_err}");
+            }
+        };
+
+        for choice in &chunk.choices {
+            let Some(content) = choice.content() else {
+                continue;
+            };
+            if content.is_empty() {
+                continue;
+            }
+            pending.push(content, Instant::now());
+            if pending.reached_size_limit() {
+                flush_delta_batch(request.request_id, &events, &mut pending).await?;
+            }
+        }
+    }
+
+    flush_delta_batch(request.request_id, &events, &mut pending).await?;
+    events
+        .send(ProviderEvent::Finished {
+            request_id: request.request_id,
+        })
+        .await?;
+
+    Ok(())
+}
+
+async fn flush_delta_batch(
+    request_id: u64,
+    events: &async_channel::Sender<ProviderEvent>,
+    pending: &mut DeltaBatch,
+) -> Result<()> {
+    if let Some(event) = pending.take_event(request_id) {
+        events.send(event).await?;
+    }
+    Ok(())
+}
+
+fn build_completion_request(request: &ProviderRequest) -> Result<ChatCompletionRequest> {
+    let model = match request.backend {
+        ProviderBackend::OpenRouter => validate_model_id(&request.model)?,
+        ProviderBackend::LlamaCpp => request.llama_cpp.model_label(),
+    };
+    anyhow::ensure!(
+        request.messages.len() <= MAX_REQUEST_MESSAGES,
+        "provider request exceeds {MAX_REQUEST_MESSAGES} messages"
+    );
+    let request_bytes = request.messages.iter().try_fold(0usize, |total, message| {
+        total.checked_add(message.content.len())
+    });
+    anyhow::ensure!(
+        request_bytes.is_some_and(|bytes| bytes <= MAX_REQUEST_BYTES),
+        "provider request exceeds {MAX_REQUEST_BYTES} UTF-8 bytes"
+    );
+
+    let messages = request.messages.iter().map(to_openrouter_message).collect();
+    let mut builder = ChatCompletionRequest::builder();
+    builder
+        .model(model)
+        .messages(messages)
+        .max_tokens(MAX_OUTPUT_TOKENS);
+    if request.backend == ProviderBackend::OpenRouter {
+        if let Some(effort) = openrouter_effort(request.reasoning) {
+            builder.reasoning_effort(effort);
+        }
+    }
+    builder.build().context("build OpenRouter chat request")
+}
+
+fn openrouter_effort(level: ReasoningLevel) -> Option<Effort> {
+    match level {
+        ReasoningLevel::Auto => None,
+        ReasoningLevel::None => Some(Effort::None),
+        ReasoningLevel::Minimal => Some(Effort::Minimal),
+        ReasoningLevel::Low => Some(Effort::Low),
+        ReasoningLevel::Medium => Some(Effort::Medium),
+        ReasoningLevel::High => Some(Effort::High),
+        ReasoningLevel::Max => Some(Effort::Max),
+        ReasoningLevel::Xhigh => Some(Effort::Xhigh),
+    }
+}
+
+fn to_openrouter_message(message: &ProviderMessage) -> Message {
+    let role = match message.role {
+        KammiRole::System => Role::System,
+        KammiRole::User => Role::User,
+        KammiRole::Assistant => Role::Assistant,
+    };
+    Message::new(role, message.content.clone())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn request(messages: Vec<ProviderMessage>) -> ProviderRequest {
+        ProviderRequest {
+            request_id: 1,
+            backend: ProviderBackend::OpenRouter,
+            model: "openai/gpt-4o".to_string(),
+            llama_cpp: LlamaCppSettings::default(),
+            messages,
+            reasoning: ReasoningLevel::Auto,
+        }
+    }
+
+    fn detached_runtime(
+        command_capacity: usize,
+    ) -> (
+        KammiProviderRuntime,
+        async_channel::Receiver<ProviderCommand>,
+    ) {
+        let (commands, command_receiver) = async_channel::bounded(command_capacity);
+        let (_events, receiver) = async_channel::bounded(1);
+        (
+            KammiProviderRuntime {
+                commands,
+                events: receiver,
+                thread: None,
+            },
+            command_receiver,
+        )
+    }
+
+    #[test]
+    fn ui_dispatch_fails_fast_when_command_queue_is_full() {
+        let (runtime, _receiver) = detached_runtime(1);
+        runtime
+            .commands
+            .try_send(ProviderCommand::Cancel { request_id: 9 })
+            .expect("fill command queue");
+
+        let error = runtime
+            .try_generate(request(Vec::new()))
+            .expect_err("full queue must reject without blocking");
+
+        assert!(error.to_string().contains("queue is busy"));
+    }
+
+    #[test]
+    fn dropping_a_runtime_with_a_full_command_queue_does_not_block() {
+        let (runtime, _receiver) = detached_runtime(1);
+        runtime
+            .commands
+            .try_send(ProviderCommand::Cancel { request_id: 9 })
+            .expect("fill command queue");
+        drop(runtime);
+    }
+
+    #[test]
+    fn release_local_does_not_touch_an_unmanaged_listener() {
+        let listener = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+        let address = listener.local_addr().unwrap();
+        let runtime = tokio::runtime::Builder::new_current_thread()
+            .enable_all()
+            .build()
+            .unwrap();
+        runtime.block_on(async {
+            let (commands_tx, commands_rx) = async_channel::bounded(4);
+            let (events_tx, events_rx) = async_channel::bounded(4);
+            let loop_task = tokio::spawn(provider_loop(commands_rx, events_tx));
+            commands_tx.send(ProviderCommand::ReleaseLocal).await.unwrap();
+            assert!(matches!(events_rx.recv().await.unwrap(), ProviderEvent::LocalServerState(LocalServerState::Releasing)));
+            assert!(matches!(events_rx.recv().await.unwrap(), ProviderEvent::LocalServerState(LocalServerState::Stopped)));
+            assert!(std::net::TcpStream::connect(address).is_ok());
+            commands_tx.close();
+            loop_task.await.unwrap();
+        });
+    }
+
+    #[test]
+    fn invalid_local_model_load_reports_failure_without_starting_a_server() {
+        let runtime = tokio::runtime::Builder::new_current_thread()
+            .enable_all()
+            .build()
+            .unwrap();
+        runtime.block_on(async {
+            let (commands_tx, commands_rx) = async_channel::bounded(4);
+            let (events_tx, events_rx) = async_channel::bounded(4);
+            let loop_task = tokio::spawn(provider_loop(commands_rx, events_tx));
+            commands_tx.send(ProviderCommand::WarmLocal(LlamaCppSettings::default())).await.unwrap();
+            assert!(matches!(events_rx.recv().await.unwrap(), ProviderEvent::LocalServerState(LocalServerState::Starting)));
+            assert!(matches!(events_rx.recv().await.unwrap(), ProviderEvent::LocalServerState(LocalServerState::Failed)));
+            assert!(matches!(events_rx.recv().await.unwrap(), ProviderEvent::LocalServerControlFailed { .. }));
+            commands_tx.close();
+            loop_task.await.unwrap();
+        });
+    }
+
+    #[test]
+    fn oversized_request_is_rejected_before_credential_or_network_access() {
+        let messages = (0..=MAX_REQUEST_MESSAGES)
+            .map(|_| ProviderMessage {
+                role: KammiRole::User,
+                content: String::new(),
+            })
+            .collect();
+        let (events, _receiver) = async_channel::bounded(1);
+        let runtime = tokio::runtime::Builder::new_current_thread()
+            .build()
+            .expect("test runtime");
+
+        let error = runtime
+            .block_on(run_generation(
+                request(messages),
+                events,
+                Arc::new(AtomicBool::new(false)),
+                Arc::new(tokio::sync::Mutex::new(LlamaServerManager::new())),
+            ))
+            .expect_err("oversized request must fail");
+
+        assert!(error.to_string().contains("exceeds 256 messages"));
+    }
+
+    #[test]
+    fn request_shape_preserves_system_prompt_and_reasoning_effort() {
+        let request = ProviderRequest {
+            request_id: 7,
+            backend: ProviderBackend::OpenRouter,
+            model: "google/gemini-2.5-flash".to_string(),
+            llama_cpp: LlamaCppSettings::default(),
+            messages: vec![
+                ProviderMessage {
+                    role: KammiRole::System,
+                    content: "Be concise and cite uncertainty.".to_string(),
+                },
+                ProviderMessage {
+                    role: KammiRole::User,
+                    content: "Hello".to_string(),
+                },
+            ],
+            reasoning: ReasoningLevel::High,
+        };
+
+        let completion = build_completion_request(&request).unwrap();
+        let json = serde_json::to_value(completion).unwrap();
+
+        assert_eq!(json["model"], "google/gemini-2.5-flash");
+        assert_eq!(json["messages"][0]["role"], "system");
+        assert_eq!(
+            json["messages"][0]["content"],
+            "Be concise and cite uncertainty."
+        );
+        assert_eq!(json["reasoning"]["effort"], "high");
+    }
+
+    #[test]
+    fn automatic_reasoning_omits_provider_override() {
+        let completion = build_completion_request(&request(Vec::new())).unwrap();
+        let json = serde_json::to_value(completion).unwrap();
+
+        assert!(json.get("reasoning").is_none());
+    }
+
+    #[test]
+    fn llama_cpp_request_uses_local_model_alias_and_omits_openrouter_reasoning() {
+        let mut request = request(vec![ProviderMessage {
+            role: KammiRole::User,
+            content: "Hello locally".to_string(),
+        }]);
+        request.backend = ProviderBackend::LlamaCpp;
+        request.reasoning = ReasoningLevel::High;
+        request.llama_cpp.model_path = r"D:\models\Qwen3-8B-Q4_K_M.gguf".into();
+
+        let completion = build_completion_request(&request).unwrap();
+        let json = serde_json::to_value(completion).unwrap();
+
+        assert_eq!(json["model"], "Qwen3-8B-Q4_K_M");
+        assert!(json.get("reasoning").is_none());
+        assert_eq!(json["messages"][0]["content"], "Hello locally");
+    }
+
+    #[test]
+    fn token_fragments_are_coalesced_losslessly_before_ui_delivery() {
+        let now = Instant::now();
+        let mut batch = DeltaBatch::new();
+        for _ in 0..10_000 {
+            batch.push("x", now);
+        }
+
+        let event = batch.take_event(17).expect("coalesced delta");
+        match event {
+            ProviderEvent::Delta { request_id, text } => {
+                assert_eq!(request_id, 17);
+                assert_eq!(text.len(), 10_000);
+                assert!(text.bytes().all(|byte| byte == b'x'));
+            }
+            _ => panic!("expected delta"),
+        }
+        assert!(batch.take_event(17).is_none());
+    }
+
+    #[test]
+    fn stream_batch_has_bounded_time_and_size_flushes() {
+        let now = Instant::now();
+        let mut batch = DeltaBatch::new();
+        batch.push("a", now);
+
+        assert_eq!(batch.flush_at(), Some(now + STREAM_FLUSH_INTERVAL));
+        assert!(!batch.reached_size_limit());
+
+        batch.push(&"b".repeat(STREAM_BATCH_MAX_BYTES), now);
+        assert!(batch.reached_size_limit());
+        assert!(EVENT_CAPACITY <= 32);
+    }
+}

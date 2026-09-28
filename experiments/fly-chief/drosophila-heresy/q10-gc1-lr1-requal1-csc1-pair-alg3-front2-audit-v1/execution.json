@@ -1,0 +1,1137 @@
+{
+  "audited_identity": "q10-gc1-lr1-requal1-csc1-pair-alg3-front2-v3",
+  "contexts": [
+    {
+      "context": [
+        "seed9731-L-tau16.json",
+        2
+      ],
+      "evaluated": 772155,
+      "exact": 0,
+      "improved_vs_V": 405901,
+      "ranges": [
+        {
+          "end": 1000000,
+          "records": 71968,
+          "sha256": "B6B657D7CA9C4850024FD5EA71DEE7D9802C5CA0878B058FC00E9D7CDECC4549",
+          "start": 0
+        },
+        {
+          "end": 2000000,
+          "records": 56494,
+          "sha256": "142EA9FD01673B3BA105A1AAC9B210CA0B2706C2620BAC0FF1874A6D3BCB158A",
+          "start": 1000000
+        },
+        {
+          "end": 3000000,
+          "records": 61227,
+          "sha256": "08A34359D4B0E5FA440FDD0FCB0A117D6A4F0D258965BE1F98E81C488F8036EB",
+          "start": 2000000
+        },
+        {
+          "end": 4000000,
+          "records": 68594,
+          "sha256": "AF494014FA75359991B70EB99950E107A8907AEFC770F6EE2C3008290CD8776E",
+          "start": 3000000
+        },
+        {
+          "end": 5000000,
+          "records": 75142,
+          "sha256": "E5B610DAA25CF5BD32D710A8D66C538B6FD941ACB414124167D6227A783D6384",
+          "start": 4000000
+        },
+        {
+          "end": 6000000,
+          "records": 55793,
+          "sha256": "E62A261A722B44A3354A191D0E0A03BB89C3D39A7E25EFD800582971A8FFBC1D",
+          "start": 5000000
+        },
+        {
+          "end": 7000000,
+          "records": 60706,
+          "sha256": "72EC6B632DEE3F4B4ABD11D37E5430398A4CF4545C4E3CD338C3D514171034A8",
+          "start": 6000000
+        },
+        {
+          "end": 8000000,
+          "records": 58208,
+          "sha256": "F27A79871F87B6050E577D2869A22918D74B5847FB11C4E9023B889CC4A1C2DE",
+          "start": 7000000
+        },
+        {
+          "end": 9000000,
+          "records": 52402,
+          "sha256": "087625FD08A5FA10530A46032262059029C592FD1282435D7BCB163FC9DBFC58",
+          "start": 8000000
+        },
+        {
+          "end": 10000000,
+          "records": 47385,
+          "sha256": "EA004C75A80823AC20431917A6CDE9889E319CCC279135876CF974DD043002D7",
+          "start": 9000000
+        },
+        {
+          "end": 11000000,
+          "records": 48681,
+          "sha256": "EDFDC8B8E5FF3380EB11261DB2AA94607EF1D3E21C4213489BF99B4274D4B8C6",
+          "start": 10000000
+        },
+        {
+          "end": 12000000,
+          "records": 46056,
+          "sha256": "06610546E697B9457FE090785234890485D33D1BA92BD14A9E9BEE4D32D47F92",
+          "start": 11000000
+        },
+        {
+          "end": 13000000,
+          "records": 48310,
+          "sha256": "D0B7A4E199B839BB1C86F82E0D9683FBFEC34F27C47A3438CD05A0617BE1435E",
+          "start": 12000000
+        },
+        {
+          "end": 13432320,
+          "records": 21189,
+          "sha256": "9832367E00C534DD8F484227819565D07ACD6E6F5A840778185A9D4949EEC451",
+          "start": 13000000
+        }
+      ]
+    },
+    {
+      "context": [
+        "seed9731-L-tau4.json",
+        3
+      ],
+      "evaluated": 4326,
+      "exact": 0,
+      "improved_vs_V": 4326,
+      "ranges": [
+        {
+          "end": 1000000,
+          "records": 24,
+          "sha256": "4599434F73409EE67F5AB21C45BFA4C59CB57F8B4D3167F8611371923CA313AF",
+          "start": 0
+        },
+        {
+          "end": 2000000,
+          "records": 316,
+          "sha256": "57384F0BC3E9FE9AAAD96068D2570DCBA4A0A8597F4A2D085BBF0B4F1E46C88C",
+          "start": 1000000
+        },
+        {
+          "end": 3000000,
+          "records": 102,
+          "sha256": "584CD526832452696406F9A3D861B2B439AF9C1D6E3D6670943DB3FDF50D41FA",
+          "start": 2000000
+        },
+        {
+          "end": 4000000,
+          "records": 333,
+          "sha256": "50E9424CC6C3B897A4BEFD5BC081AFA07FB8D9883ACC8EC84E8387B8FA65D444",
+          "start": 3000000
+        },
+        {
+          "end": 5000000,
+          "records": 72,
+          "sha256": "9A7E62A04A5B0F2EB53C453D5C3877FDC841021FC60AA3F430C4FA2060E6E4EF",
+          "start": 4000000
+        },
+        {
+          "end": 6000000,
+          "records": 87,
+          "sha256": "1CBB8943B3D5D51B9C2664139381D0A7379FA4B5D9AFA3BFD057B2201AA3F042",
+          "start": 5000000
+        },
+        {
+          "end": 7000000,
+          "records": 43,
+          "sha256": "EC88289AB2FDB64620A9F8F12BF96D9FCD75F411F52E3E9740BAD9950450959A",
+          "start": 6000000
+        },
+        {
+          "end": 8000000,
+          "records": 147,
+          "sha256": "9B097C599E9C74973DDF24885E9AA15C4272DD322F75F1A32FE5C0CC4B62C4EF",
+          "start": 7000000
+        },
+        {
+          "end": 9000000,
+          "records": 74,
+          "sha256": "1AC0C602911FF98609B252C839804DF28B2621BEC6E36C9666DA1789B838D406",
+          "start": 8000000
+        },
+        {
+          "end": 10000000,
+          "records": 92,
+          "sha256": "B1249853470F62785DA67AF353F1E3A8D6DCFF23BEAA38A240018E394FC36236",
+          "start": 9000000
+        },
+        {
+          "end": 11000000,
+          "records": 75,
+          "sha256": "37479BD658DF18D8E94994404D0B562C477F7B326CFB4895159EAE2C4256CAF3",
+          "start": 10000000
+        },
+        {
+          "end": 12000000,
+          "records": 106,
+          "sha256": "CC766C8FD1E5FAF962C2C8CC997BE57D604C0EDE3C80F60DCB5F1DD14950E9A2",
+          "start": 11000000
+        },
+        {
+          "end": 13000000,
+          "records": 309,
+          "sha256": "4333325192A2E7C1F28E9A0129585B1FDD5F57A5BEE15185BB64BAEC93C283BD",
+          "start": 12000000
+        },
+        {
+          "end": 14000000,
+          "records": 118,
+          "sha256": "6AFD2F7B35E9FC96B222B331F7F3E7F7B287373D8F8D6E431467C67CCDC7C72C",
+          "start": 13000000
+        },
+        {
+          "end": 15000000,
+          "records": 115,
+          "sha256": "C80C62AA288EE901948E840A946C980596E1AAE679E0119ADDA273A2F7F3C569",
+          "start": 14000000
+        },
+        {
+          "end": 16000000,
+          "records": 362,
+          "sha256": "D2498F4E7D2CDABA6042ECA8C139B6E7EF777DB9340177882100BDE273A6B5C6",
+          "start": 15000000
+        },
+        {
+          "end": 17000000,
+          "records": 348,
+          "sha256": "21BB8048303E9C34C4C398BCBA8AD83D3CD82913347D8F0336F974458C6B7D36",
+          "start": 16000000
+        },
+        {
+          "end": 18000000,
+          "records": 503,
+          "sha256": "0E372574211AEA1D44C4BB4147FCCB9F3FC19D3CE8195C12EB1E7077A97C4FEB",
+          "start": 17000000
+        },
+        {
+          "end": 19000000,
+          "records": 977,
+          "sha256": "4B6D0070ED7151D1BA664D469ED9E3130E0EEF9AC221F447A06A023150F5ABA9",
+          "start": 18000000
+        },
+        {
+          "end": 19363840,
+          "records": 123,
+          "sha256": "12E780DC93754BC56906E1B16396316CF971A296F79573F8C84DB0651FA1114E",
+          "start": 19000000
+        }
+      ]
+    },
+    {
+      "context": [
+        "seed9731-R-tau16.json",
+        1
+      ],
+      "evaluated": 23820,
+      "exact": 0,
+      "improved_vs_V": 23820,
+      "ranges": [
+        {
+          "end": 1000000,
+          "records": 555,
+          "sha256": "923203069AAC6CDC2A24D7A2270D7D78B4B0F50D620F73A0576A8B1CB323F10D",
+          "start": 0
+        },
+        {
+          "end": 2000000,
+          "records": 453,
+          "sha256": "16088A443956AF9B8A51833A9513670E9292F33D88AC77F76AEA7594F37F362F",
+          "start": 1000000
+        },
+        {
+          "end": 3000000,
+          "records": 708,
+          "sha256": "ADD827595C890474C094BA176C6CDB1378FF808F3D0C6E141FFDB3B2EDBFE5A5",
+          "start": 2000000
+        },
+        {
+          "end": 4000000,
+          "records": 911,
+          "sha256": "B6E210DE614B8F0CF1C03B23B6854EBBCBA6C5CEC85183FAAA7A3986777DC7AA",
+          "start": 3000000
+        },
+        {
+          "end": 5000000,
+          "records": 613,
+          "sha256": "4FB31B74627601DC39BDDDB1C6109A9A4E0CAAFCE6B136EF0000865293E2758C",
+          "start": 4000000
+        },
+        {
+          "end": 6000000,
+          "records": 780,
+          "sha256": "9D181E5D4B5EEB7FE560D74E6EF76BFBF1921A1BB63F84633AF06D42D75B52E3",
+          "start": 5000000
+        },
+        {
+          "end": 7000000,
+          "records": 671,
+          "sha256": "9E80306D776098A5734964724FFFC952284060CC74844429F8DC2DC76B3DD014",
+          "start": 6000000
+        },
+        {
+          "end": 8000000,
+          "records": 1100,
+          "sha256": "F9E657D59E20504A74B54D3950C86C5815C31E435FE95A59C874F2A346014A3C",
+          "start": 7000000
+        },
+        {
+          "end": 9000000,
+          "records": 1603,
+          "sha256": "44890C3BC2186F0CBB9520405AE378D2115183940DD06692F41171AE6C8E67A1",
+          "start": 8000000
+        },
+        {
+          "end": 10000000,
+          "records": 1694,
+          "sha256": "620C8E30EC0A1AC0F531DE532D7426A2FDE37CAE7E0C001914AF343AFBBC0949",
+          "start": 9000000
+        },
+        {
+          "end": 11000000,
+          "records": 1221,
+          "sha256": "534C139C847ACF1DC49D8DBEB139A7893DEFAA34B827D99F8559A604E31C0EFE",
+          "start": 10000000
+        },
+        {
+          "end": 12000000,
+          "records": 1104,
+          "sha256": "1EB3D7AF77BB7DBD932E214B16D209EE89C2F23E45F8E5A8DE07E155392EA213",
+          "start": 11000000
+        },
+        {
+          "end": 13000000,
+          "records": 1779,
+          "sha256": "100A90ED8F79F0067850E7B71EDFDCC173798656FCC9532DFCFF0E8EC98AF7B4",
+          "start": 12000000
+        },
+        {
+          "end": 14000000,
+          "records": 2214,
+          "sha256": "3FF162F9410463B40A426CC09DFCE559CA6D3217B931C2181C3F9B2B6F6A71D0",
+          "start": 13000000
+        },
+        {
+          "end": 15000000,
+          "records": 4120,
+          "sha256": "E0C078FC40DCB804D2AA154C0D57210293A8357B9F8DD316296C1A9C46123102",
+          "start": 14000000
+        },
+        {
+          "end": 16000000,
+          "records": 2513,
+          "sha256": "DF3D2CE0D9A5324020480C20EEE99E0E22F1E0255A9406F0420B833B803C62B7",
+          "start": 15000000
+        },
+        {
+          "end": 16644608,
+          "records": 1781,
+          "sha256": "91B8368054076891430C4DCB11AC3DCDFD200338AA2B8A58A9209AD05D52EA78",
+          "start": 16000000
+        }
+      ]
+    },
+    {
+      "context": [
+        "seed9731-R-tau16.json",
+        3
+      ],
+      "evaluated": 3,
+      "exact": 0,
+      "improved_vs_V": 3,
+      "ranges": [
+        {
+          "end": 1000000,
+          "records": 0,
+          "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "start": 0
+        },
+        {
+          "end": 2000000,
+          "records": 0,
+          "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "start": 1000000
+        },
+        {
+          "end": 3000000,
+          "records": 0,
+          "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "start": 2000000
+        },
+        {
+          "end": 4000000,
+          "records": 0,
+          "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "start": 3000000
+        },
+        {
+          "end": 5000000,
+          "records": 0,
+          "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "start": 4000000
+        },
+        {
+          "end": 6000000,
+          "records": 0,
+          "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "start": 5000000
+        },
+        {
+          "end": 7000000,
+          "records": 0,
+          "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "start": 6000000
+        },
+        {
+          "end": 8000000,
+          "records": 0,
+          "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "start": 7000000
+        },
+        {
+          "end": 9000000,
+          "records": 0,
+          "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "start": 8000000
+        },
+        {
+          "end": 10000000,
+          "records": 0,
+          "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "start": 9000000
+        },
+        {
+          "end": 11000000,
+          "records": 0,
+          "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "start": 10000000
+        },
+        {
+          "end": 12000000,
+          "records": 0,
+          "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "start": 11000000
+        },
+        {
+          "end": 12699648,
+          "records": 3,
+          "sha256": "5BEF78AAB1E723EB13FD103781FC898CD5C34BCB6707C087C9B6FBA8F231DBF7",
+          "start": 12000000
+        }
+      ]
+    },
+    {
+      "context": [
+        "seed9731-R-tau4.json",
+        0
+      ],
+      "evaluated": 0,
+      "exact": 0,
+      "improved_vs_V": 0,
+      "ranges": [
+        {
+          "end": 1000000,
+          "records": 0,
+          "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "start": 0
+        },
+        {
+          "end": 2000000,
+          "records": 0,
+          "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "start": 1000000
+        },
+        {
+          "end": 3000000,
+          "records": 0,
+          "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "start": 2000000
+        },
+        {
+          "end": 4000000,
+          "records": 0,
+          "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "start": 3000000
+        },
+        {
+          "end": 5000000,
+          "records": 0,
+          "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "start": 4000000
+        },
+        {
+          "end": 6000000,
+          "records": 0,
+          "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "start": 5000000
+        },
+        {
+          "end": 7000000,
+          "records": 0,
+          "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "start": 6000000
+        },
+        {
+          "end": 8000000,
+          "records": 0,
+          "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "start": 7000000
+        },
+        {
+          "end": 9000000,
+          "records": 0,
+          "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "start": 8000000
+        },
+        {
+          "end": 10000000,
+          "records": 0,
+          "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "start": 9000000
+        },
+        {
+          "end": 11000000,
+          "records": 0,
+          "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "start": 10000000
+        },
+        {
+          "end": 12000000,
+          "records": 0,
+          "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "start": 11000000
+        },
+        {
+          "end": 13000000,
+          "records": 0,
+          "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "start": 12000000
+        },
+        {
+          "end": 14000000,
+          "records": 0,
+          "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "start": 13000000
+        },
+        {
+          "end": 15000000,
+          "records": 0,
+          "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "start": 14000000
+        },
+        {
+          "end": 16000000,
+          "records": 0,
+          "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "start": 15000000
+        },
+        {
+          "end": 16644608,
+          "records": 0,
+          "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "start": 16000000
+        }
+      ]
+    },
+    {
+      "context": [
+        "seed9731-R-tau4.json",
+        1
+      ],
+      "evaluated": 33961,
+      "exact": 0,
+      "improved_vs_V": 33961,
+      "ranges": [
+        {
+          "end": 1000000,
+          "records": 1311,
+          "sha256": "B62115BE10632BF0C66D71839C3332488615296684B5C3FBEF6EA16D1672B975",
+          "start": 0
+        },
+        {
+          "end": 2000000,
+          "records": 1228,
+          "sha256": "A83E102AD6FC15731265DC0274AC6E11BDAF6D425BF415C0A5804D9902AC6A1B",
+          "start": 1000000
+        },
+        {
+          "end": 3000000,
+          "records": 2167,
+          "sha256": "5C65234C57C20C480A2A82BD476B3CF015B717D105EA1FBD72D4D081900FC903",
+          "start": 2000000
+        },
+        {
+          "end": 4000000,
+          "records": 1953,
+          "sha256": "1F7AABAC484F87E502C921244507FBFD44C3C61FEB88B006AD5EAA604E590972",
+          "start": 3000000
+        },
+        {
+          "end": 5000000,
+          "records": 1680,
+          "sha256": "C64FEB3FA523F69460D01C68E2DF885C137C6893B29047795123A770524B9547",
+          "start": 4000000
+        },
+        {
+          "end": 6000000,
+          "records": 1752,
+          "sha256": "9200A004017DF4B67B9374756DC9D637462324918A3BDF0680DBC2FB5B717017",
+          "start": 5000000
+        },
+        {
+          "end": 7000000,
+          "records": 1800,
+          "sha256": "40BA133DB746359ED6A09E9B6CDCBA84F042B0F56144AA3E926C74EF1297E437",
+          "start": 6000000
+        },
+        {
+          "end": 8000000,
+          "records": 1982,
+          "sha256": "207B19B74FE402DE3CBE205161CA0484F16EC19B8183A5CFE11596347CFE72EB",
+          "start": 7000000
+        },
+        {
+          "end": 9000000,
+          "records": 1729,
+          "sha256": "2920D94B6E58DD7D00DECF2B380E8A4E7CC9D2BA6A35CB8FFDFC2E584AAB3E97",
+          "start": 8000000
+        },
+        {
+          "end": 10000000,
+          "records": 2480,
+          "sha256": "973BD454891BA94D51F21B5993F661D7E9F24F7351F7A1BA9A65F01A7FDCEFF4",
+          "start": 9000000
+        },
+        {
+          "end": 11000000,
+          "records": 2932,
+          "sha256": "8607F4FBD45F1C8418D3C500B2FD352A09A4894AE123AB2500EA5AA12CA8BBB6",
+          "start": 10000000
+        },
+        {
+          "end": 12000000,
+          "records": 3586,
+          "sha256": "D3615B2BAB55874322196A8048AED91AEB7D3816B5434B56FA7C4BFADB2879EC",
+          "start": 11000000
+        },
+        {
+          "end": 13000000,
+          "records": 5135,
+          "sha256": "F11B4090025CDAF80377FE0608B64A38FA1FCA5E1D66AC568411F31172AD9B22",
+          "start": 12000000
+        },
+        {
+          "end": 13432320,
+          "records": 4226,
+          "sha256": "961EFAA3A2B115D8DE2032E1207C11C1457B85F32EFCD8019113C1125083DDB7",
+          "start": 13000000
+        }
+      ]
+    },
+    {
+      "context": [
+        "seed9731-R-tau4.json",
+        2
+      ],
+      "evaluated": 30886,
+      "exact": 0,
+      "improved_vs_V": 30886,
+      "ranges": [
+        {
+          "end": 1000000,
+          "records": 1609,
+          "sha256": "A92D6724C42FFB812D36DAA1F257A5D340977C04A8353B3520D7F9586E32B803",
+          "start": 0
+        },
+        {
+          "end": 2000000,
+          "records": 1057,
+          "sha256": "85F6A1205E05A448E16A8952039E63757405D2C131F3FD0D86B400F999D69FAC",
+          "start": 1000000
+        },
+        {
+          "end": 3000000,
+          "records": 1961,
+          "sha256": "E99058B8A45CB5F6BE6103112EA320C10D2D044BFE69ECD5CF0E0202962A3E77",
+          "start": 2000000
+        },
+        {
+          "end": 4000000,
+          "records": 1348,
+          "sha256": "1D3F099552D5BC7B4F30EF3264D94281ABC7496A02BB3F6D4131C14C10506F8B",
+          "start": 3000000
+        },
+        {
+          "end": 5000000,
+          "records": 1687,
+          "sha256": "25445087B18EC5B440999CAAE2D275E8A0DD1BC2294F890979187B076148482B",
+          "start": 4000000
+        },
+        {
+          "end": 6000000,
+          "records": 2097,
+          "sha256": "7260C7755AC2B1637DB52A750C2285DE2E9CEDF8A043A0356C1771938EC73893",
+          "start": 5000000
+        },
+        {
+          "end": 7000000,
+          "records": 786,
+          "sha256": "65462ACC7C68F07B2268774332E82DA0C1DCE8D57D0A8D7D0227A477588DB210",
+          "start": 6000000
+        },
+        {
+          "end": 8000000,
+          "records": 1959,
+          "sha256": "6399E4B7859F7986AFC3F9D95E4A3347C1EED0A2C72FB56BDC981195DD7868F4",
+          "start": 7000000
+        },
+        {
+          "end": 9000000,
+          "records": 2245,
+          "sha256": "86CEFB138EEF73472A30EDF223ED532CDFE36F5DFD41052FF07CADEE6004E577",
+          "start": 8000000
+        },
+        {
+          "end": 10000000,
+          "records": 1939,
+          "sha256": "979DA790A0E866D8FD5666FCDF79BEF67BDFC08406B4B4306E5423EB9EC5D514",
+          "start": 9000000
+        },
+        {
+          "end": 11000000,
+          "records": 1546,
+          "sha256": "38278F4602942E425CA220DDA0971C8E555627C7E98F96E6DABAFBDF990FCA1F",
+          "start": 10000000
+        },
+        {
+          "end": 12000000,
+          "records": 2395,
+          "sha256": "51AE9506DCE24DDA28097C4E9616B2CAB6A8E05DAFB0FFD3D1EB7664F89E766C",
+          "start": 11000000
+        },
+        {
+          "end": 13000000,
+          "records": 2014,
+          "sha256": "D2CDE2434FF8599FADCBC7182F8CE5600360FF16BCA81EAAAFE432FB0E9A952A",
+          "start": 12000000
+        },
+        {
+          "end": 14000000,
+          "records": 1225,
+          "sha256": "44209A4E607B5C54A41DF4C70E8DB84DD5FE29091DEF6C24B7FC44404F0C8548",
+          "start": 13000000
+        },
+        {
+          "end": 15000000,
+          "records": 2139,
+          "sha256": "08758CD0ABE99D9CEF066237906B5C0915FA5AB3EEC9AABF0A62ACBB7014A1CD",
+          "start": 14000000
+        },
+        {
+          "end": 16000000,
+          "records": 2189,
+          "sha256": "93271F4AC95AF38F25D2882737C3FB800939034C1A4FD024272E0E862C6643A1",
+          "start": 15000000
+        },
+        {
+          "end": 16644608,
+          "records": 2690,
+          "sha256": "F5268CC18B78A6D8D535B9833F11F8F9F0B59435F27A4648491740AF9649E49E",
+          "start": 16000000
+        }
+      ]
+    },
+    {
+      "context": [
+        "seed9731-R-tau4.json",
+        3
+      ],
+      "evaluated": 225429,
+      "exact": 0,
+      "improved_vs_V": 64752,
+      "ranges": [
+        {
+          "end": 1000000,
+          "records": 10030,
+          "sha256": "80AE8D65D5B729ADA64CBAA54AF89BB439A20239CF6ECDD191458047F30944C6",
+          "start": 0
+        },
+        {
+          "end": 2000000,
+          "records": 7284,
+          "sha256": "9A3ED36C6913C8D1EEBE986E2AC7D3492BDE28BB525EA1F64FEFE0B9AB2CE943",
+          "start": 1000000
+        },
+        {
+          "end": 3000000,
+          "records": 10898,
+          "sha256": "BF7EC57E6FC5ADDE146306747633EACD233D9D3EC4543A8D098E40367830A7BE",
+          "start": 2000000
+        },
+        {
+          "end": 4000000,
+          "records": 13960,
+          "sha256": "162BDBBB4CB06CA2F109BB94747BE3CA156D0F6D0CF7267A8D77EBC42EECE7AD",
+          "start": 3000000
+        },
+        {
+          "end": 5000000,
+          "records": 11675,
+          "sha256": "B7C32FE5EF05E168D2800AED7837E7458FBDC54D09ADC08C1817A476B47B820B",
+          "start": 4000000
+        },
+        {
+          "end": 6000000,
+          "records": 12641,
+          "sha256": "3D4D3C1B211A2EEB484D858B01861F0C58883F6ECFFC344CBE09C17BE63AB508",
+          "start": 5000000
+        },
+        {
+          "end": 7000000,
+          "records": 9741,
+          "sha256": "8FF76706175EDD07C3EDAB969017F370C0FD17A6F8E95F186A19756BE8E815A1",
+          "start": 6000000
+        },
+        {
+          "end": 8000000,
+          "records": 11708,
+          "sha256": "DC42E3335C606A0062845CBAD0C509C857F23CF76585B404DB1FBA1B8F548E3F",
+          "start": 7000000
+        },
+        {
+          "end": 9000000,
+          "records": 10388,
+          "sha256": "EE755A97B2305BE842D87CA1AF69E09B91D016789CF7B011C026A5D5B132B27B",
+          "start": 8000000
+        },
+        {
+          "end": 10000000,
+          "records": 10756,
+          "sha256": "24367A1856898A615752DFFA733C40D2898687139EF569ABA8E831613B5197EB",
+          "start": 9000000
+        },
+        {
+          "end": 11000000,
+          "records": 14001,
+          "sha256": "D423F2E5A1D4A6AA892D48FB74040CC490A09BC14F86CC1CEE63D250C59BCE3D",
+          "start": 10000000
+        },
+        {
+          "end": 12000000,
+          "records": 15131,
+          "sha256": "DB50424508F99B2B72696A3996A375D29CA38414E3E4E5AE4800F7EB1D977372",
+          "start": 11000000
+        },
+        {
+          "end": 13000000,
+          "records": 13518,
+          "sha256": "C60188FDE3E225B243166742524F9EC57EBBE6945F6BA78C52A16211EF8700D2",
+          "start": 12000000
+        },
+        {
+          "end": 14000000,
+          "records": 17873,
+          "sha256": "ECB2F29B30182026BE59975B7C72C2C03822B07F99B2506397C4D9B4964A468F",
+          "start": 13000000
+        },
+        {
+          "end": 15000000,
+          "records": 19075,
+          "sha256": "435BEA08DC8DB6C1454FF17CD3A643716D150883C83DED3722BFEF95905516C3",
+          "start": 14000000
+        },
+        {
+          "end": 16000000,
+          "records": 22918,
+          "sha256": "80403153E2A00A79735A211B72153842A20A549BCE70C7C27046582FCB091D9D",
+          "start": 15000000
+        },
+        {
+          "end": 16644608,
+          "records": 13832,
+          "sha256": "82864360A5D6BFFB22E7F168AD49977DDBE93217FC6392B69A7FAF2F1A2CCF6F",
+          "start": 16000000
+        }
+      ]
+    }
+  ],
+  "engineering_only": true,
+  "identity": "q10-gc1-lr1-requal1-csc1-pair-alg3-front2-audit-v1",
+  "independent_full_replay_samples_verified": 14,
+  "parent_bindings_verified": true,
+  "protocol": "Q10-ALG3-FRONT2-AUDIT",
+  "range_hashes_and_counts_verified": true,
+  "samples": [
+    {
+      "context": [
+        "seed9731-L-tau16.json",
+        2
+      ],
+      "global_rank": 1,
+      "local_rank": 1,
+      "matches_receipt": true,
+      "readout_sha256": "CFC849BEF57661EF507663B96E7B5B374109E9B91A2251FD29CA6C5BEEE2CB9F",
+      "reason": "first",
+      "score": {
+        "maximum_absolute_residual": 3.814697265625e-06,
+        "mismatch_count": 167,
+        "residual_l2": 1.4448687178898816e-05,
+        "total_ulp_distance": 215
+      },
+      "weight_sha256": "633F5859C8F18380235CFA95829DB8699ECDFBEE9BEBBA1E540B5FDC66D9A73A"
+    },
+    {
+      "context": [
+        "seed9731-L-tau16.json",
+        2
+      ],
+      "global_rank": 24,
+      "local_rank": 24,
+      "matches_receipt": true,
+      "readout_sha256": "94BF46AE43DD7C96C2B79EA4B10A9A3B8CBF9C19E4CAE428DB9CDD3A96A37365",
+      "reason": "first_n2_zero",
+      "score": {
+        "maximum_absolute_residual": 3.814697265625e-06,
+        "mismatch_count": 171,
+        "residual_l2": 1.4462327351156932e-05,
+        "total_ulp_distance": 232
+      },
+      "weight_sha256": "D87FFE13FBCDEA282377E5CFB09BFD82E567FF606B090920A8B76B24B89028CE"
+    },
+    {
+      "context": [
+        "seed9731-L-tau4.json",
+        3
+      ],
+      "global_rank": 13450580,
+      "local_rank": 18260,
+      "matches_receipt": true,
+      "readout_sha256": "C7245A9118A8A18EFC0B85D1A583D7F0C4F34C89E052A510E12C49E4807C79A1",
+      "reason": "first",
+      "score": {
+        "maximum_absolute_residual": 5.7220458984375e-06,
+        "mismatch_count": 164,
+        "residual_l2": 1.6228342869677184e-05,
+        "total_ulp_distance": 208
+      },
+      "weight_sha256": "0344596B249048ABE5806E721B8A94864E5CFAF8FCBDBE211AF8AD285C9BC5B7"
+    },
+    {
+      "context": [
+        "seed9731-L-tau4.json",
+        3
+      ],
+      "global_rank": 14221282,
+      "local_rank": 788962,
+      "matches_receipt": true,
+      "readout_sha256": "FC784C3710F8494C3E403E82CE2D3A23A5A10E7E6476685FA7C89348D49B6312",
+      "reason": "first_n2_zero",
+      "score": {
+        "maximum_absolute_residual": 5.7220458984375e-06,
+        "mismatch_count": 163,
+        "residual_l2": 1.6202051135979364e-05,
+        "total_ulp_distance": 204
+      },
+      "weight_sha256": "7618222A820F21A2C32C9BC0B5DDF4D1C883E7AD6FDCD2B706E6179E4B13F4A5"
+    },
+    {
+      "context": [
+        "seed9731-R-tau16.json",
+        1
+      ],
+      "global_rank": 32876056,
+      "local_rank": 79896,
+      "matches_receipt": true,
+      "readout_sha256": "6879DEDE3085CCA5FBA9C8DEF0469ACAE1042E59A38BB19DEAEC968B43C8D294",
+      "reason": "first",
+      "score": {
+        "maximum_absolute_residual": 7.62939453125e-06,
+        "mismatch_count": 149,
+        "residual_l2": 2.0120121500662993e-05,
+        "total_ulp_distance": 205
+      },
+      "weight_sha256": "8905CFC150FD4E916E742FB813F194CABBA8B3999854C434B2A685AB85D8863C"
+    },
+    {
+      "context": [
+        "seed9731-R-tau16.json",
+        1
+      ],
+      "global_rank": 32879518,
+      "local_rank": 83358,
+      "matches_receipt": true,
+      "readout_sha256": "2D1C91E3B375A7283B03746D3F068470F59AF4AE18CCA651D52975D7AE9C89B6",
+      "reason": "first_n2_zero",
+      "score": {
+        "maximum_absolute_residual": 7.62939453125e-06,
+        "mismatch_count": 151,
+        "residual_l2": 2.0892129463195256e-05,
+        "total_ulp_distance": 207
+      },
+      "weight_sha256": "953637F28EE2AE8FAF25E72D64D85F1272CE8A9CE5A928C2BBD1BCBD3BDA314C"
+    },
+    {
+      "context": [
+        "seed9731-R-tau16.json",
+        3
+      ],
+      "global_rank": 61675605,
+      "local_rank": 12234837,
+      "matches_receipt": true,
+      "readout_sha256": "E2251A649027C081ED26638329F2D3C9B75D6C68F3CBAE1028E2F5D65A355384",
+      "reason": "first",
+      "score": {
+        "maximum_absolute_residual": 1.1444091796875e-05,
+        "mismatch_count": 145,
+        "residual_l2": 2.227188786927331e-05,
+        "total_ulp_distance": 212
+      },
+      "weight_sha256": "5E3B7C0A420F59C05A104BE8CFBBF465E76F44D5B5BC80EF106A320808167193"
+    },
+    {
+      "context": [
+        "seed9731-R-tau16.json",
+        3
+      ],
+      "global_rank": 61675605,
+      "local_rank": 12234837,
+      "matches_receipt": true,
+      "readout_sha256": "E2251A649027C081ED26638329F2D3C9B75D6C68F3CBAE1028E2F5D65A355384",
+      "reason": "first_n2_zero",
+      "score": {
+        "maximum_absolute_residual": 1.1444091796875e-05,
+        "mismatch_count": 145,
+        "residual_l2": 2.227188786927331e-05,
+        "total_ulp_distance": 212
+      },
+      "weight_sha256": "5E3B7C0A420F59C05A104BE8CFBBF465E76F44D5B5BC80EF106A320808167193"
+    },
+    {
+      "context": [
+        "seed9731-R-tau4.json",
+        1
+      ],
+      "global_rank": 78806018,
+      "local_rank": 20994,
+      "matches_receipt": true,
+      "readout_sha256": "128EED51EE361576EBED5748B8393F6357E6B908070C9A5E4996BD485A7B4B65",
+      "reason": "first",
+      "score": {
+        "maximum_absolute_residual": 5.7220458984375e-06,
+        "mismatch_count": 146,
+        "residual_l2": 1.8122752791736445e-05,
+        "total_ulp_distance": 194
+      },
+      "weight_sha256": "8ECAF09412C19BB241E2C4E82D43918E902CEA2053133C4C628A8E591662652B"
+    },
+    {
+      "context": [
+        "seed9731-R-tau4.json",
+        1
+      ],
+      "global_rank": 79277652,
+      "local_rank": 492628,
+      "matches_receipt": true,
+      "readout_sha256": "35F2D9DB07349090C12C6B3C3C27DB772BD2B0D37CCEDAD464EF34C25B9A4A56",
+      "reason": "first_n2_zero",
+      "score": {
+        "maximum_absolute_residual": 5.7220458984375e-06,
+        "mismatch_count": 152,
+        "residual_l2": 1.8719180079634155e-05,
+        "total_ulp_distance": 209
+      },
+      "weight_sha256": "82454F236FA71646A8BD1DB88E246EFE24BE5A143FBC63670B4D25E4D549410A"
+    },
+    {
+      "context": [
+        "seed9731-R-tau4.json",
+        2
+      ],
+      "global_rank": 92240420,
+      "local_rank": 23076,
+      "matches_receipt": true,
+      "readout_sha256": "CC2DA5A594C7BAD80805E9A2A08CCF939D3517C5E543506F90E026C41DA0C25A",
+      "reason": "first",
+      "score": {
+        "maximum_absolute_residual": 5.7220458984375e-06,
+        "mismatch_count": 144,
+        "residual_l2": 1.9514878381987436e-05,
+        "total_ulp_distance": 191
+      },
+      "weight_sha256": "D253915BE72E559BEB560456A3A096389281D1F421C23E228B5F53867FD437E9"
+    },
+    {
+      "context": [
+        "seed9731-R-tau4.json",
+        2
+      ],
+      "global_rank": 92803916,
+      "local_rank": 586572,
+      "matches_receipt": true,
+      "readout_sha256": "DEB646F46A51DE7565E32747A52F7BB3D9BF4C8BDEF5C1BC19741F7CD00A051A",
+      "reason": "first_n2_zero",
+      "score": {
+        "maximum_absolute_residual": 5.7220458984375e-06,
+        "mismatch_count": 147,
+        "residual_l2": 1.9549164977580715e-05,
+        "total_ulp_distance": 216
+      },
+      "weight_sha256": "943C9152BCCB43130C4FAF90E0411ACEBB2F89D9038C2B62E4D2DD461BE7BE25"
+    },
+    {
+      "context": [
+        "seed9731-R-tau4.json",
+        3
+      ],
+      "global_rank": 108881946,
+      "local_rank": 19994,
+      "matches_receipt": true,
+      "readout_sha256": "C19623EC8F595DEEBBAD6BF9F35146F376CA6138F03CA1E27EE7D573BC42837B",
+      "reason": "first",
+      "score": {
+        "maximum_absolute_residual": 7.62939453125e-06,
+        "mismatch_count": 123,
+        "residual_l2": 1.866006202952065e-05,
+        "total_ulp_distance": 162
+      },
+      "weight_sha256": "88F7375386836F677CA2EAF1CA175F7B8653E7A7CA19FF7D5995DFAB9D38095D"
+    },
+    {
+      "context": [
+        "seed9731-R-tau4.json",
+        3
+      ],
+      "global_rank": 108912359,
+      "local_rank": 50407,
+      "matches_receipt": true,
+      "readout_sha256": "0052F9F69D0CF663B3B978F4C46C0A9CCFA95BEA654991456F2D13C73EBC744F",
+      "reason": "first_n2_zero",
+      "score": {
+        "maximum_absolute_residual": 7.62939453125e-06,
+        "mismatch_count": 129,
+        "residual_l2": 1.8658634040046346e-05,
+        "total_ulp_distance": 169
+      },
+      "weight_sha256": "6FB5A8140AAAB0B2D0DB495F2A7412F5BDE62AAE8D8E7E7A79DBD9A2CC3CD022"
+    }
+  ],
+  "scientific_promotion": false,
+  "status": "FRONT2_AUDIT_COMPLETE",
+  "totals": {
+    "contexts": 8,
+    "evaluated": 1090580,
+    "exact_target_distinct": 0,
+    "improved_vs_V": 563649,
+    "range_files": 129
+  },
+  "write_surface_verified": true
+}

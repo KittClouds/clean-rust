@@ -1,0 +1,8 @@
+{
+  "d_s_hash_mismatches": 0,
+  "fold_count": 12,
+  "normalization_payloads_sha256": "81af5466f6432a7d2a798b73f210a953f1ea7fe8977babe7ce2a0bfe837c5e6c",
+  "reconciliation_file_sha256": "c5130d17cddcf1abf32aee5f16b07f9a21c429859dbac841dad3d51fc98c1c0b",
+  "schema": "F4-INVARIANT-01-COLLECT2-shared-input-reconciliation-seal-v1",
+  "status": "PASS"
+}

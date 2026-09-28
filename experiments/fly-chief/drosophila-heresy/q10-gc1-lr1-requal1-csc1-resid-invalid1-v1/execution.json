@@ -1,0 +1,11 @@
+{
+  "engineering_only": true,
+  "error": "a bytes-like object is required, not 'str'",
+  "error_type": "TypeError",
+  "evaluated_total": 57,
+  "identity": "q10-gc1-lr1-requal1-csc1-resid-invalid1-v1",
+  "protocol": "Q10-RESID-INVALID1",
+  "replay_executed": true,
+  "scientific_promotion": false,
+  "status": "BLOCKED_RESID_INVALID1"
+}

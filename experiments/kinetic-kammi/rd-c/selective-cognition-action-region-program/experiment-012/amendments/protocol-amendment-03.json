@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "amendment_id": "E012-PROTOCOL-A03",
+  "base_protocol_version": "0.2",
+  "state": "PRECONSTRUCTION_ALIGNMENT_REPAIR",
+  "task_construction_started": false,
+  "model_contact_authorized": false,
+  "candidate_channel": {
+    "required_identity_envelope": "E_c.identity remains present in every condition",
+    "manipulated_truth_bearing_content": "E_c.content contains candidate summaries and patch evidence",
+    "absent_or_control_behavior": "replace E_c.content only; preserve opaque IDs, schema, option count, and condition-specific producer positions",
+    "ids_encode_semantics": false
+  },
+  "effective_support_sets": {
+    "task_request_dominant": ["E_c.content", "E_t"],
+    "candidate_action_dominant": ["E_c.content"],
+    "pre_action_test_execution_dominant": ["E_c.content", "E_x"],
+    "joint_support": ["E_c.content", "E_t", "E_x"],
+    "context_sensitive": ["E_c.content", "E_r"],
+    "abstention_positive": []
+  },
+  "diagnostic_only_cells": [
+    ["E_t"], ["E_x"], ["E_r"], ["E_t", "E_x"]
+  ],
+  "valid_sufficiency_cells": [
+    ["E_c.content"],
+    ["E_c.content", "E_t"],
+    ["E_c.content", "E_x"],
+    ["E_c.content", "E_r"],
+    ["E_c.content", "E_t", "E_x"],
+    ["E_c.content", "E_t", "E_r"]
+  ],
+  "necessary_channel_test": "hold all other truth-bearing channels and candidate identities fixed; channel change changes correct-action set",
+  "coordinate_contract": "condition-specific producer schedule is prospective and receipt-bound; restore exact condition order before serialization; no post-receipt movement"
+}

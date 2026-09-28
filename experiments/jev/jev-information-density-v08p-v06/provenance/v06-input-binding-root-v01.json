@@ -1,0 +1,90 @@
+{
+  "protocol": "jev-information-density/v0.8p-v06-input-binding-root-v01",
+  "identity": "v0.8P-v06-fresh-panel-contract-v01",
+  "disposition": "CONTRACT_SEALED_NOT_AUTHORIZED_FOR_PANEL_GENERATION",
+  "contract": {
+    "path": "experiments/jev-information-density-v08p-v06/phase_a/fresh-panel-contract-v01.json",
+    "sha256": "28b7878c9d68026254b8db734959387857b7eafb7b083d658d30d4cca6636a00"
+  },
+  "authorized_content_inputs": [
+    {
+      "path": "experiments/jev-information-density-v08p/contracts/contract-bundle-seal-v01.json",
+      "sha256": "67cd6b7902111000dc93a0f81f9f20bc05a9c084732705ed8f9ad82fe965fa85",
+      "role": "verify original P contract bundle bindings"
+    },
+    {
+      "path": "experiments/jev-information-density-v08p/phase_b/phase-b-p-run-contract-v01.json",
+      "sha256": "e345225b4a17fc18eb35fcab24cbe1d72bd0e34bed9de272f927a7be461853e6",
+      "role": "unchanged training/run recipe and lineage binding"
+    },
+    {
+      "path": "experiments/jev-information-density-v08p/phase_b/phase-b-p-analysis-contract-v01.json",
+      "sha256": "84111122033fda65c84344317cfe3b50639b23be4c71f480ba665c67a23cc939",
+      "role": "unchanged measurement and analysis binding"
+    },
+    {
+      "path": "experiments/jev-information-density-v08p/phase_a/fresh-panel-contract-v01.json",
+      "sha256": "ce3b7b97caecb27f3ad99439c0e67dca6e40af5da3db9ca2e356ea5e9f06f823",
+      "role": "scientific panel design and frozen source references"
+    },
+    {
+      "path": "experiments/jev-information-density-v08p-v05/provenance/v05-denylist-root-seal-v01.json",
+      "sha256": "272a14e57c2dcf610568381c0c1c4673c7b40e368ac81b07d3e7160e4e5953a2",
+      "role": "authorize and bind the opaque E1 neighborhood-identity set"
+    },
+    {
+      "path": "D:/codex-runs/jev-information-density-v08p-v05/identity/run-1/canonical-e1-neighborhood-hash-denylist.json",
+      "sha256": "50eebeb5790c29b4a75c6f8df849eb4c2865d3c864932bbd7f636b7a0e52a2cd",
+      "role": "single canonical opaque membership-set copy; hash verified, entries not parsed during v06 contract construction"
+    }
+  ],
+  "binding_checks": {
+    "original_bundle_run_hash_matches": true,
+    "original_bundle_analysis_hash_matches": true,
+    "original_bundle_panel_hash_matches": true,
+    "v05_root_disposition_is_denylist_extraction_sealed": true,
+    "v05_root_binds_selected_denylist_hash": true,
+    "v05_root_count_is_2000": true,
+    "denylist_content_hash_matches_root": true,
+    "denylist_bytes_read_only_for_sha256_verification": true,
+    "denylist_entries_semantically_parsed_or_decoded_for_contract_construction": false
+  },
+  "contract_changes_from_original_panel_design": {
+    "scientific_treatments_metrics_family_quotas_templates_exact_world_rules_and_radius_gates_changed": false,
+    "new_v06_identity_namespace_and_seed": true,
+    "E1_exclusion_mechanism": "Replace any need to inspect E1 material with membership checks against the v05 SHA-256 set of canonical neighborhood_id values only.",
+    "collision_stream": "For each family, scan the fixed v06 sequence range 000000-001999 and accept the first 500 non-colliding candidates. Abort if fewer than 500 survive; no threshold expansion or adaptive shopping.",
+    "scope_limit": "This denylist proves only neighborhood_id exclusion. It does not prove disjointness of rendered-text hashes or other E1 body-derived fields, and no such broader E1 claim is made."
+  },
+  "construction_access_audit": {
+    "content_inputs_declared": 6,
+    "prohibited_v01_v02_v03_artifact_contents_opened": false,
+    "v04_e1_authority_material_beyond_the_v05_binding_opened": false,
+    "e1_candidate_join_features_targets_predictions_metrics_or_geometry_opened": false,
+    "e1_denylist_bytes_used_only_for_sha256_verification": true,
+    "e1_denylist_entries_semantically_parsed": false,
+    "generator_or_lfm_source_opened_or_executed": false,
+    "head_loaded_or_contacted": false,
+    "path_resolution_note": "A path-only workspace filename listing was used to locate the exact pre-incident P contract paths. It did not supply contract content or scientific inputs; no quarantined/failed artifact content was opened or bound."
+  },
+  "new_identity_and_seed": {
+    "partition_namespace": "eval_v08p_v06",
+    "seed_label": "jev-information-density-v08p-v06/fresh-panel-generator-seed",
+    "seed_label_sha256": "bd505cf5434f87c58fb55d4cf8467cad25ca9e0c4c190ee682292cc1bad7e4c2",
+    "seed_u32_little_endian": 4116467901
+  },
+  "stop_state": {
+    "contract_sealed": true,
+    "panel_root_created": false,
+    "panel_generated": false,
+    "lfm_contact": false,
+    "feature_extraction": false,
+    "training": false,
+    "head_loading": false,
+    "inference": false,
+    "evaluation": false,
+    "phoenix_access": false,
+    "next_step_requires_separate_explicit_authorization": true
+  },
+  "root_hash_rule": "SHA-256 of the exact bytes of this receipt; no self-referential hash field"
+}

@@ -1,0 +1,9 @@
+{
+  "attempt_id": "full-frame-preparation-03",
+  "state": "FAILED_PRECONTACT_ENGINEERING_CHECK",
+  "model_contact": false,
+  "failure": "Paired full-frame variants intentionally share a public task ID but have distinct frame digests and hidden labels; public-ID uniqueness rejected a valid pair.",
+  "repair": "Retain both variants and assign a run-local sample ID from public task ID plus frame digest.",
+  "source_script": "scripts/prepare_full_frame_lock_e012.py",
+  "preserved": true
+}

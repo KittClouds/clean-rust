@@ -1,0 +1,17 @@
+heldout_world,stratum,selected_model,inner_mean_gain_sum_across_budgets
+100,familiar_ids,ridge_0.001,-6.54761905
+101,familiar_ids,knn_256,-6.34523810
+102,familiar_ids,knn_256,-4.96428571
+103,familiar_ids,knn_256,-9.96428571
+104,new_ids,knn_256,-11.25000000
+105,new_ids,knn_256,-12.02380952
+106,new_ids,knn_256,-10.63095238
+107,new_ids,knn_256,-7.60714286
+108,reliability_shift,knn_128,-5.53571429
+109,reliability_shift,ridge_0.01,-5.98809524
+110,reliability_shift,ridge_0.001,-8.25000000
+111,reliability_shift,ridge_0.01,-9.60714286
+112,stale_sources,knn_256,-7.33333333
+113,stale_sources,knn_256,-7.25000000
+114,stale_sources,knn_256,-8.59523810
+115,stale_sources,knn_256,-5.54761905

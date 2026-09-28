@@ -1,0 +1,438 @@
+{
+  "tools": [
+    {
+      "name": "custody_get_run",
+      "description": "Kammi custody_get_run; server custody and policy semantics apply.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "run_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "run_id"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "custody_get_attempt",
+      "description": "Kammi custody_get_attempt; server custody and policy semantics apply.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "attempt_id": {
+            "type": "string"
+          },
+          "actor_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "attempt_id",
+          "actor_id"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "custody_get_lineage",
+      "description": "Kammi custody_get_lineage; server custody and policy semantics apply.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "root": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "root"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "custody_verify",
+      "description": "Kammi custody_verify; server custody and policy semantics apply.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "root": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "root"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "custody_contact_status",
+      "description": "Kammi custody_contact_status; server custody and policy semantics apply.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "run_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "run_id"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "custody_create_run",
+      "description": "Kammi custody_create_run; server custody and policy semantics apply.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "type": "object",
+            "description": "Versioned HTTP request object; server validates scope."
+          }
+        },
+        "required": [
+          "body"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "custody_register_artifact",
+      "description": "Kammi custody_register_artifact; server custody and policy semantics apply.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "type": "object",
+            "description": "Versioned HTTP request object; server validates scope."
+          }
+        },
+        "required": [
+          "body"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "policy_check",
+      "description": "Kammi policy_check; server custody and policy semantics apply.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "type": "object",
+            "description": "Versioned HTTP request object; server validates scope."
+          }
+        },
+        "required": [
+          "body"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "authorization_request",
+      "description": "Kammi authorization_request; server custody and policy semantics apply.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "type": "object",
+            "description": "Versioned HTTP request object; server validates scope."
+          }
+        },
+        "required": [
+          "body"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "exposure_request",
+      "description": "Kammi exposure_request; server custody and policy semantics apply.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "panel_id": {
+            "type": "string"
+          },
+          "body": {
+            "type": "object",
+            "description": "Versioned HTTP request object; server validates scope."
+          }
+        },
+        "required": [
+          "panel_id",
+          "body"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "exposure_report",
+      "description": "Kammi exposure_report; server custody and policy semantics apply.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "panel_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "panel_id"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "lease_acquire",
+      "description": "Kammi lease_acquire; server custody and policy semantics apply.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "type": "object",
+            "description": "Versioned HTTP request object; server validates scope."
+          }
+        },
+        "required": [
+          "body"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "lease_renew",
+      "description": "Kammi lease_renew; server custody and policy semantics apply.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "lease_id": {
+            "type": "string"
+          },
+          "body": {
+            "type": "object",
+            "description": "Versioned HTTP request object; server validates scope."
+          }
+        },
+        "required": [
+          "lease_id",
+          "body"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "lease_release",
+      "description": "Kammi lease_release; server custody and policy semantics apply.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "lease_id": {
+            "type": "string"
+          },
+          "body": {
+            "type": "object",
+            "description": "Versioned HTTP request object; server validates scope."
+          }
+        },
+        "required": [
+          "lease_id",
+          "body"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "lease_status",
+      "description": "Kammi lease_status; server custody and policy semantics apply.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "resource_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "resource_id"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "adapter_resolve",
+      "description": "Kammi adapter_resolve; server custody and policy semantics apply.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "adapter_id": {
+            "type": "string"
+          },
+          "body": {
+            "type": "object",
+            "description": "Versioned HTTP request object; server validates scope."
+          }
+        },
+        "required": [
+          "adapter_id",
+          "body"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "remote_create_bundle",
+      "description": "Kammi remote_create_bundle; server custody and policy semantics apply.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "type": "object",
+            "description": "Versioned HTTP request object; server validates scope."
+          }
+        },
+        "required": [
+          "body"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "remote_accept_return",
+      "description": "Kammi remote_accept_return; server custody and policy semantics apply.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "bundle_id": {
+            "type": "string"
+          },
+          "body": {
+            "type": "object",
+            "description": "Versioned HTTP request object; server validates scope."
+          }
+        },
+        "required": [
+          "bundle_id",
+          "body"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "memory_search",
+      "description": "Kammi memory_search; server custody and policy semantics apply.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "type": "object",
+            "description": "Versioned HTTP request object; server validates scope."
+          }
+        },
+        "required": [
+          "body"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "memory_record",
+      "description": "Kammi memory_record; server custody and policy semantics apply.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "type": "object",
+            "description": "Versioned HTTP request object; server validates scope."
+          }
+        },
+        "required": [
+          "body"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "memory_supersede",
+      "description": "Kammi memory_supersede; server custody and policy semantics apply.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "type": "object",
+            "description": "Versioned HTTP request object; server validates scope."
+          }
+        },
+        "required": [
+          "body"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "memory_get",
+      "description": "Kammi memory_get; server custody and policy semantics apply.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "memory_id": {
+            "type": "string"
+          },
+          "actor_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "memory_id",
+          "actor_id"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "memory_trace",
+      "description": "Kammi memory_trace; server custody and policy semantics apply.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "memory_id": {
+            "type": "string"
+          },
+          "actor_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "memory_id",
+          "actor_id"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "memory_neighbors",
+      "description": "Kammi memory_neighbors; server custody and policy semantics apply.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "memory_id": {
+            "type": "string"
+          },
+          "actor_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "memory_id",
+          "actor_id"
+        ],
+        "additionalProperties": false
+      }
+    }
+  ]
+}

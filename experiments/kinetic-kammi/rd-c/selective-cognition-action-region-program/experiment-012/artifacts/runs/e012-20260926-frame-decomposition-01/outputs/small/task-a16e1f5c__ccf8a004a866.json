@@ -1,0 +1,149 @@
+{
+  "schema_version": 1,
+  "run_id": "e012-20260926-frame-decomposition-01",
+  "role": "small",
+  "sample_id": "task-a16e1f5c__ccf8a004a866",
+  "task_id": "task-a16e1f5c",
+  "bundle_id": "minicpm5-2b-q8-local-v5",
+  "bundle_blake3": "03203842e1835233af8d9ef337bca1395be9c3828333c79eb96e199e52925842",
+  "frozen_input_lock_sha256": "4bab6fd945248b6209fa33e3a1df10786298ac620342ce167251411c6a258cd8",
+  "model_contact_gate_sha256": "c41c0145221be561310f74ba8fe3c2342ce0d942290f1b03229a2ae67e848483",
+  "frame_lock_sha256": "e4d9c2e0c668bfa60445ac476ad1f1b695fe8f1bfc9fd07b5746c7b31dbbeb0b",
+  "frame_sha256": "ccf8a004a866df3cf374fb62f1c1985f080701dbe4ea4fb953b036dbc379ed98",
+  "server_alias": "e009-small-v5",
+  "server_process_id": 32972,
+  "runtime_sha256": "ffaee576ad271ede87b92a7d8c3863dc8f331bbac666ee00099c250e8809e743",
+  "model_sha256": "c5415f8989bf88a8288f1b55a3cc371af53c07b0faa220a63bd7a990cfaba078",
+  "reasoning_mode": "off",
+  "maximum_output_tokens": 1024,
+  "chat_template_sha256": "6e54652d84d698ebb3b7b2172204b6eeafd7f27533e006c8c1ebf8e743a7fd99",
+  "system_prompt_sha256": "976ef1cd914bacb366c64418825010124338a626a0400d459858acc7e48f5a48",
+  "output_schema_sha256": "97170fa0d6a44681f680ad0ac533a3f3913709757e4ee6cbf96d9c9f40d1b2fb",
+  "normalization_contract": "percent-0-100-to-milli-x10-v1+line-endings-lf-v1",
+  "thresholds": {
+    "minimum_applicability_milli": 850,
+    "maximum_abstention_milli": 150
+  },
+  "request_sha256": "a072307efa5f4b06e88de4a6b7edc3ff16d6a547a6322ba49e9400309e831665",
+  "request_bytes": 5753,
+  "request": {
+    "model": "e009-small-v5",
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a typed observer in a deterministic coding workflow. The runtime owns workflow state and will execute only one action from the offered action_options after validating your output.\n\nRead the task_prompt and evidence, then compare the offered actions. Choose the action most likely to satisfy the task while preserving the repository's stated constraints. Do not write or propose code outside the offered choices. Do not claim to have executed tests. If no offered action is sufficiently supported, use null for action_choice and express uncertainty with abstention_percent.\n\nReturn exactly one JSON object matching the provided schema. action_choice must be an offered numeric action ID or null. applicability_percent is your estimate from 0 to 100 that this observer can handle the task from the available evidence. abstention_percent is your estimate from 0 to 100 that the runtime should defer this choice. Use integer percentage points only. Do not add prose or fields.\n"
+      },
+      {
+        "role": "user",
+        "content": "{\"schema_id\":\"rdc-real-coding-observation.v1\",\"task_id\":\"task-a16e1f5c\",\"task_family\":\"fam-8072\",\"repository_id\":\"repo-02\",\"task_variant\":2055062015,\"task_prompt\":\"For repeated --tag arguments, the caller requires that we append every occurrence. Choose one patch.\",\"repository_revision\":\"ac5fda6a799e4c640d671edd1111d4a5e723dc1a\",\"snapshot_sha256\":\"fa30cb380c1ba8def3554592cba41d5f73d5905e81669ecc69fdc5f87479c92b\",\"evidence\":[{\"kind\":\"baseline_tool_result\",\"source_id\":\"pre-action-test\",\"content_blake3\":\"0e6c7d6e52cc4ce77f5e4df0ed179af2a27b0292ce8ebd8e3a48fc6f43831423\",\"content\":\"The untouched base snapshot produced no task-relevant pre-action execution observation.\"},{\"kind\":\"repository_context\",\"source_id\":\"repository-context\",\"content_blake3\":\"6983e85d04b902cb657d69947400c5a7b6abcc3d3f347b716baa15af137bed5f\",\"content\":\"{\\\"build_features\\\": \\\"baseline\\\", \\\"dependency_release\\\": \\\"v4.6.1\\\", \\\"language\\\": \\\"Rust\\\", \\\"repository_code\\\": \\\"repo-02\\\", \\\"target\\\": \\\"host\\\", \\\"toolchain\\\": \\\"stable\\\"}\"}],\"action_options\":[{\"action\":{\"id\":22252,\"schema_id\":1},\"summary\":\"Apply the candidate change shown in the code excerpt.\",\"diff_excerpt\":\"@@ -1,14 +1,14 @@\\n use clap::{Arg, ArgAction, Command};\\n \\n pub fn parse_tag_values(argv: &[&str]) -> Vec<String> {\\n-    // E012 candidate slot.\\n     let command = Command::new(\\\"demo\\\")\\n-        .arg(Arg::new(\\\"tag\\\").long(\\\"tag\\\").action(ArgAction::Set));\\n+        .arg(Arg::new(\\\"tag\\\").long(\\\"tag\\\").action(ArgAction::Append));\\n     let matches = command\\n         .try_get_matches_from(argv.iter().copied())\\n         .expect(\\\"valid task arguments\\\");\\n     matches\\n         .get_many::<String>(\\\"tag\\\")\\n-        .map(|values| values.cloned().collect())\\n-        .unwrap_or_default()\\n+        .and_then(|mut values| values.next().cloned())\\n+        .into_iter()\\n+        .collect()\\n }\",\"patch_sha256\":\"bcbd82f2c55fb15aa17a4d5394bad7e25072fc5ee554d80dcf6b016dd82e49ee\"},{\"action\":{\"id\":27088,\"schema_id\":1},\"summary\":\"Apply the candidate change shown in the code excerpt.\",\"diff_excerpt\":\"@@ -1,9 +1,8 @@\\n use clap::{Arg, ArgAction, Command};\\n \\n pub fn parse_tag_values(argv: &[&str]) -> Vec<String> {\\n-    // E012 candidate slot.\\n     let command = Command::new(\\\"demo\\\")\\n-        .arg(Arg::new(\\\"tag\\\").long(\\\"tag\\\").action(ArgAction::Set));\\n+        .arg(Arg::new(\\\"tag\\\").long(\\\"tag\\\").action(ArgAction::Append));\\n     let matches = command\\n         .try_get_matches_from(argv.iter().copied())\\n         .expect(\\\"valid task arguments\\\");\",\"patch_sha256\":\"60e6328ced42e57e2f47d7814e62c13a99598e5fc6ebe584d0829aa5cce7e2fb\"},{\"action\":{\"id\":35639,\"schema_id\":1},\"summary\":\"Apply the candidate change shown in the code excerpt.\",\"diff_excerpt\":\"@@ -1,7 +1,6 @@\\n use clap::{Arg, ArgAction, Command};\\n \\n pub fn parse_tag_values(argv: &[&str]) -> Vec<String> {\\n-    // E012 candidate slot.\\n     let command = Command::new(\\\"demo\\\")\\n         .arg(Arg::new(\\\"tag\\\").long(\\\"tag\\\").action(ArgAction::Set));\\n     let matches = command\",\"patch_sha256\":\"f9152f572091dc98e7dbb137f4c167186cde3f00908633188ee32df81131c7f3\"},{\"action\":{\"id\":44597,\"schema_id\":1},\"summary\":\"Apply the candidate change shown in the code excerpt.\",\"diff_excerpt\":\"@@ -1,8 +1,8 @@\\n use clap::{Arg, ArgAction, Command};\\n \\n pub fn parse_tag_values(argv: &[&str]) -> Vec<String> {\\n-    // E012 candidate slot.\\n     let command = Command::new(\\\"demo\\\")\\n+        .args_override_self(true)\\n         .arg(Arg::new(\\\"tag\\\").long(\\\"tag\\\").action(ArgAction::Set));\\n     let matches = command\\n         .try_get_matches_from(argv.iter().copied())\",\"patch_sha256\":\"0b23d243d19890a25c35e823f9155e5ea8127331af90c6bfc7ba5eaa7dc6c709\"}]}"
+      }
+    ],
+    "temperature": 0,
+    "top_p": 1,
+    "seed": 0,
+    "max_tokens": 1024,
+    "stream": false,
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rdc_coding_observer_output_v1",
+        "strict": true,
+        "schema": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "rdc-coding-observer-output.v2",
+          "title": "RDC Coding Observer Output v2",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "action_choice",
+            "applicability_percent",
+            "abstention_percent"
+          ],
+          "properties": {
+            "action_choice": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 65535
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "applicability_percent": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "abstention_percent": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            }
+          }
+        }
+      }
+    }
+  },
+  "http_status": 200,
+  "response": {
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "{\"action_choice\":27088,\"applicability_percent\":10,\"abstention_percent\":80}"
+        }
+      }
+    ],
+    "created": 1790400265,
+    "model": "e009-small-v5",
+    "system_fingerprint": "b10982-fc82583e6",
+    "object": "chat.completion",
+    "usage": {
+      "completion_tokens": 22,
+      "prompt_tokens": 1467,
+      "total_tokens": 1489,
+      "prompt_tokens_details": {
+        "cached_tokens": 211
+      }
+    },
+    "id": "chatcmpl-EJteDrvAYtLZn8WYxAY2RWt13IrvfnqJ",
+    "timings": {
+      "cache_n": 211,
+      "prompt_n": 1256,
+      "prompt_ms": 106.138,
+      "prompt_per_token_ms": 0.0845047770700637,
+      "prompt_per_second": 11833.6505304415,
+      "predicted_n": 22,
+      "predicted_ms": 111.866,
+      "predicted_per_token_ms": 5.326952380952381,
+      "predicted_per_second": 187.72459907389197
+    }
+  },
+  "content": "{\"action_choice\":27088,\"applicability_percent\":10,\"abstention_percent\":80}",
+  "output": {
+    "action_choice": 27088,
+    "applicability_percent": 10,
+    "abstention_percent": 80
+  },
+  "normalized_output": {
+    "action_choice": 27088,
+    "applicability_milli": 100,
+    "abstention_milli": 800
+  },
+  "normalization_error": null,
+  "usage": {
+    "completion_tokens": 22,
+    "prompt_tokens": 1467,
+    "total_tokens": 1489,
+    "prompt_tokens_details": {
+      "cached_tokens": 211
+    }
+  },
+  "finish_reason": "stop",
+  "elapsed_ms": 252.448
+}

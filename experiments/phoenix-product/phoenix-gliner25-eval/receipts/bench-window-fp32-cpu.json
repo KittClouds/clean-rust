@@ -1,0 +1,17 @@
+{
+  "contract": "phoenix-gliner25-benchmark-v1",
+  "device_intent": "cpu",
+  "engine_load_ms": 7472.3074,
+  "graph_publications": 0,
+  "model_words": 313,
+  "p50_ms": 420.5125,
+  "p95_ms": 474.4853,
+  "p99_ms": 511.2712,
+  "peak_working_set_bytes": 1091297280,
+  "runs": 30,
+  "warmup": 3,
+  "whitespace_words": 270,
+  "working_set_after_bytes": 1091313664,
+  "working_set_before_bytes": 1090949120,
+  "working_set_delta_bytes": 364544
+}

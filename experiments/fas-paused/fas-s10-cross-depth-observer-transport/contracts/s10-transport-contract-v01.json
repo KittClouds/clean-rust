@@ -1,0 +1,52 @@
+{
+  "identity": "FAS-S10-CROSS-DEPTH-OBSERVER-TRANSPORT-V01",
+  "parents": {
+    "s09_result_tree_root_sha256": "664af5b22f071b28d52a67d748e9f6f93ae3e67d587edec80b921dd529945880",
+    "s09_feature_cache_root_sha256": "82f9eb6ba0b9c37e58c415b03ec1bc4be00032f73cc43e70b3987ac4108f7653",
+    "s09_protocol_root_sha256": "c1cf07e8b04ac1a3deff583e10257dcd3c5f3040e48bd4b05738cb3c4d4794b2",
+    "s09_analysis_seal_file_sha256": "44518d3901bf578a417d8897dda3485e9741262e80a676857d48297736cdcefc"
+  },
+  "population": {
+    "events": 106496,
+    "dimension": 2048,
+    "layers": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
+    "surfaces": {"M": "mean_full", "F": "final_position"},
+    "test_rows": 21272,
+    "fit_rows": 12769,
+    "labels": "S01-3 exact_target, class order [0,1,2], exact S09 grouped split"
+  },
+  "transport": {
+    "definition": "T[i,j] = BA of sealed layer-i observer pipeline on layer-j test features for the same surface",
+    "rows": "source observer layer i",
+    "columns": "target representation layer j",
+    "pipeline": "sealed source-layer scaler plus sealed source-layer linear probe",
+    "batch_rows": 16384,
+    "precision": "FP32 features, scaler, weights, bias, and probabilities; scaler state is cast to FP32 exactly as S09 runtime",
+    "device": "NVIDIA GeForce RTX 3080; torch 2.11.0+cu128; deterministic algorithms; TF32 disabled",
+    "diagonal_gate": "byte-exact equality to each sealed S09 native probability array and exact equality of all native metric fields before result acceptance"
+  },
+  "outputs": [
+    "M and F 16x16 balanced-accuracy matrices",
+    "M and F 16x16 accuracy matrices",
+    "ordered prediction SHA-256 per cell",
+    "per-cell support, class recall, and confusion matrix",
+    "diagonal, forward/backward by layer distance, adjacent bidirectional transport",
+    "retention ratio relative to each target layer's native diagonal",
+    "adjacent-layer rank-2 principal angles and normalized subspace overlap per surface"
+  ],
+  "analysis_status": "EXPLORATORY_DESCRIPTIVE_REPLAY",
+  "prohibitions": [
+    "no LFM load or feature extraction",
+    "no probe fit or probe modification",
+    "no FAS-00 data access",
+    "no significance testing or threshold selection",
+    "no layer selection or representation promotion",
+    "no adaptive mechanism"
+  ],
+  "authorization_state": {
+    "offline_s10_analysis_authorized": true,
+    "model_contact_authorized": false,
+    "probe_fitting_authorized": false,
+    "adaptive_mechanisms_authorized": false
+  }
+}

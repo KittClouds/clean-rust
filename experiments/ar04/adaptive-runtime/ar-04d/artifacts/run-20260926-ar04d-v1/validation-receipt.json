@@ -1,0 +1,14 @@
+{
+  "protocol": "AR-04D-sentinel-exposure-2026-09-26",
+  "valid": true,
+  "cells": 25,
+  "arms": 7,
+  "trajectories": 175,
+  "decisions": 735000,
+  "checkpoints": 700,
+  "master_panels": 26250,
+  "population_size": 4096,
+  "panel_seed_reuse": false,
+  "cyclic_blocked_counts_match": true,
+  "candidate_scoring_recorded": true
+}

@@ -1,0 +1,26 @@
+{
+  "task_id": "heldout-draft-cardinality-transitions-easy-01",
+  "lane": "small-then-large-on-abstention",
+  "action_id": 94,
+  "patch_sha256": "89ff38e3bf856a69a57ecf71e52d8af33186cfbd0ae9ac94a70a101a563ceb51",
+  "candidate_variant": "gold",
+  "test_filter": "palette::tests::draft_supports_empty_solid_and_gradient_states",
+  "command": [
+    "cargo",
+    "test",
+    "--manifest-path",
+    "C:\\rd-c\\experiment-009\\tasks\\expanded\\heldout-bank-v5\\families\\draft-cardinality-transitions\\candidates\\gold\\Cargo.toml",
+    "-p",
+    "gpui-animated-gradient-text",
+    "--lib",
+    "palette::tests::draft_supports_empty_solid_and_gradient_states",
+    "--",
+    "--exact"
+  ],
+  "exit_code": 0,
+  "status": "passed",
+  "passed": true,
+  "elapsed_ms": 7138.199,
+  "output_sha256": "2230c832c95d326072be2b41bdf3651ad0a3560721e0c5d63abcb07d81743637",
+  "output": "\nrunning 1 test\ntest palette::tests::draft_supports_empty_solid_and_gradient_states ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 10 filtered out; finished in 0.00s\n\n   Compiling gpui-animated-gradient-text v0.2.0 (C:\\rd-c\\experiment-009\\tasks\\expanded\\heldout-bank-v5\\families\\draft-cardinality-transitions\\candidates\\gold\\crates\\gpui-animated-gradient-text)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 6.87s\n     Running unittests src\\lib.rs (D:\\cargo-targets\\rdc-e009-expanded\\scoring\\debug\\deps\\gpui_animated_gradient_text-97c243e5a105215d.exe)\n"
+}

@@ -1,0 +1,269 @@
+{
+  "accepted_action_producer_ordinal": {
+    "0": {
+      "accepted": 4,
+      "correct": 1,
+      "wrong": 3
+    },
+    "1": {
+      "accepted": 9,
+      "correct": 3,
+      "wrong": 6
+    },
+    "2": {
+      "accepted": 2,
+      "correct": 1,
+      "wrong": 1
+    },
+    "3": {
+      "accepted": 1,
+      "correct": 1,
+      "wrong": 0
+    }
+  },
+  "artifact_id": "E012-RAW-PROPOSAL-YIELD-v1.0",
+  "counts": {
+    "all": {
+      "accepted": 16,
+      "accepted_correct": 6,
+      "accepted_wrong": 10,
+      "correct": 7,
+      "null": 30,
+      "tasks": 48,
+      "wrong": 11
+    },
+    "empty_valid_set": {
+      "accepted": 2,
+      "accepted_correct": 0,
+      "accepted_wrong": 2,
+      "correct": 0,
+      "null": 6,
+      "tasks": 8,
+      "wrong": 2
+    },
+    "nonempty_valid_set": {
+      "accepted": 14,
+      "accepted_correct": 6,
+      "accepted_wrong": 8,
+      "correct": 7,
+      "null": 24,
+      "tasks": 40,
+      "wrong": 9
+    }
+  },
+  "fitting_or_threshold_search": false,
+  "interpretation": [
+    "A null raw action choice is a no-proposal outcome, not a wrong proposal.",
+    "Every non-null proposal on an empty valid set is wrong by construction.",
+    "These are retrospective descriptive counts; no threshold, subgroup, or signal was fitted."
+  ],
+  "model_contact": false,
+  "raw_proposal_precision": {
+    "denominator": 18,
+    "numerator": 7,
+    "rate": 0.3888888888888889
+  },
+  "schema_version": 1,
+  "small_authorization_input_files": [
+    {
+      "name": "small_only--task-16eda64b__0f3c2599ec96.json",
+      "sha256": "0ef6f1ba3a9f2c31bc95a9a51e29726888c119f83f89e7333e0f2b33d5a0be4c"
+    },
+    {
+      "name": "small_only--task-16eda64b__a9c01e2db6bc.json",
+      "sha256": "c41c29d4a096fc2506633ae48e8655a8384f407224e4bece7c510c6e3a797a09"
+    },
+    {
+      "name": "small_only--task-17dc5b28__1815bf2d0751.json",
+      "sha256": "fb487bc04ec7bbb8226132b02f2f053f969abd797c0c57ae7ce26974742c441e"
+    },
+    {
+      "name": "small_only--task-17dc5b28__4e39603942aa.json",
+      "sha256": "0b519b03d2f4ba2074cfa3c4da9ee6ee90e8f6afc7c0a1f7120efc3e9482ed4e"
+    },
+    {
+      "name": "small_only--task-242065__45132915a681.json",
+      "sha256": "15c1897864d59c25d498b739fe307f3cdb847c6f256a66ab2a27bde145e9c7ce"
+    },
+    {
+      "name": "small_only--task-2c0d08b1__5352936600d4.json",
+      "sha256": "03bf63e97c60ded06d3a9fabc7568698f9968dd52e0757e2d0443b305a5270e1"
+    },
+    {
+      "name": "small_only--task-2c0d08b1__683f17375f96.json",
+      "sha256": "b764f8b16ef2b5bc97d849eca6baefc2e198b8c6d4a13277fdaaeb8e912d7d93"
+    },
+    {
+      "name": "small_only--task-479184__850e207427e2.json",
+      "sha256": "0fe1413d269c3391bd7a81fc3406e39a0077a99de0fa9315f4d917d64877766c"
+    },
+    {
+      "name": "small_only--task-4c1e6cb6__37e1918f8267.json",
+      "sha256": "2dc0e6268529c8217a8d4237ae110630097890c82c5c81810f750ace8b4ed077"
+    },
+    {
+      "name": "small_only--task-4c1e6cb6__f2723b8cdedb.json",
+      "sha256": "7e1565195321aaafbeb2e45d07cdf912e16035ae7f45008d4d8df6352b5ff254"
+    },
+    {
+      "name": "small_only--task-546859__37dc4e78b6f4.json",
+      "sha256": "d790978e160f21fb1db69cbfdb572879b078c835e58a73f1cc7a54ad156216e2"
+    },
+    {
+      "name": "small_only--task-555141__d5ba0efc7ebd.json",
+      "sha256": "ca209dea40f9f5c95cc8c9fda7cef5957563be320ad4da9badd7c4f0ef575f00"
+    },
+    {
+      "name": "small_only--task-555bd5d9__347b9728e68f.json",
+      "sha256": "43211c6967ceacb4840b5b6afa503143c1afd826d1905484c96dfb7365e62778"
+    },
+    {
+      "name": "small_only--task-555bd5d9__9de2411ef6e5.json",
+      "sha256": "16f907d5ef77bcb07c6dbb9a90426e18beb633b284f1acd96bfbf9edfac13bb8"
+    },
+    {
+      "name": "small_only--task-569812__1871bde99f3d.json",
+      "sha256": "feb8e1f41cbaadaf40f73c7830faeeaba4b7ff0c259943eb586be8e8bb10c88d"
+    },
+    {
+      "name": "small_only--task-5befee37__d7180233e684.json",
+      "sha256": "0319979f77281ccf11bfa671813e6115248d389f3df871f2038d9a496842cd27"
+    },
+    {
+      "name": "small_only--task-5befee37__e656e9f4d2a0.json",
+      "sha256": "dfbbbd199262aa9e3bde40dd0dea749ff7aa024bc2416ee6997b67e198a36f84"
+    },
+    {
+      "name": "small_only--task-620950__5cd20b8edf72.json",
+      "sha256": "4f76fe6730a1b498772e7eb3274b34cdea88886689bea50a8f030252a497208a"
+    },
+    {
+      "name": "small_only--task-6309c722__65c841c7de5a.json",
+      "sha256": "cca9ed8b76eee8d1335e904bb957f50d2999170d72cd9835fc7e8d4c8fbec309"
+    },
+    {
+      "name": "small_only--task-6309c722__b5fa9c9c197d.json",
+      "sha256": "a419f6b28f51ceeaac00b38c07df2770fdc7afaaf37cf9946284347d6dc5f5af"
+    },
+    {
+      "name": "small_only--task-894855__d2d13839f6d8.json",
+      "sha256": "bc42ac4deaee801c470cebf7aac44940b35785b412fd9d29e85eda637c92d7ec"
+    },
+    {
+      "name": "small_only--task-8c717407__55a28d5cfef8.json",
+      "sha256": "ada22a21da4768e1932a917a68e6df1da90b56d0fe9123d36cb0c9f6c71754a5"
+    },
+    {
+      "name": "small_only--task-8c717407__d5e9bc4ac1e9.json",
+      "sha256": "e92ed65ce824f376532b8d7083ffb799cf494a08131e1abed057d09f33e33972"
+    },
+    {
+      "name": "small_only--task-8f66a11b__060910fc4857.json",
+      "sha256": "970dbf50cd8fe1444acc8337ca713e7912d51a08b10553b264eba406c8192b49"
+    },
+    {
+      "name": "small_only--task-8f66a11b__44475855fd8d.json",
+      "sha256": "25798d06aa13ad8b7bf65a32a5306db804da2f4a08239078d72ecda39068484a"
+    },
+    {
+      "name": "small_only--task-965856__5f04e1ff1bfd.json",
+      "sha256": "4f2d86b8e492f6a07817838a903ff8ea55935408f4448bc2ebf509404047d0e9"
+    },
+    {
+      "name": "small_only--task-a1425719__3ab831f8f853.json",
+      "sha256": "29ef544e01d3c3ea7ab7d28a37a52601df2bc7d9957851a5172cb72ac36d23cd"
+    },
+    {
+      "name": "small_only--task-a1425719__ba349b7ab769.json",
+      "sha256": "463871da34dee0a7512cd4d44657ad984819e63ba7daa566fb681e646e23aed3"
+    },
+    {
+      "name": "small_only--task-a16e1f5c__b90ea9c8621d.json",
+      "sha256": "c5db0f5c58931276d6f944612167c0eb9c89e35021a7950331eac58bb790b5b6"
+    },
+    {
+      "name": "small_only--task-a16e1f5c__ccf8a004a866.json",
+      "sha256": "ec85c369ba63ebbcc3a82e3ea7e4e8c0c2c621f3619a44b93fda3968b49b7632"
+    },
+    {
+      "name": "small_only--task-a7e74853__205dea8e45df.json",
+      "sha256": "d900d8fca97c07087c627ff81a4d76bf35958cba13006e3c0e2b099ec1cdf986"
+    },
+    {
+      "name": "small_only--task-a7e74853__6c0bea05d1df.json",
+      "sha256": "0054f344194f7b912809f43a11b376c7b20383393f6793a9cee5d4c9474e7537"
+    },
+    {
+      "name": "small_only--task-a7e74853__6de65b23eefa.json",
+      "sha256": "de2db1948c780245e35935f2c79884dd5b0214937b6e8d6112bd4029631aeb36"
+    },
+    {
+      "name": "small_only--task-a7e74853__bbfbfa81460c.json",
+      "sha256": "d4146a07f7e96a3e983f7cd887ed361642eb465aea19f7319c7955e9ce5032b5"
+    },
+    {
+      "name": "small_only--task-b7f8545e__1aa3172d13f8.json",
+      "sha256": "6e885ee299a5ca3934919fc405cd42b53a749bbaccc48a8cccc0dee2a7343980"
+    },
+    {
+      "name": "small_only--task-b7f8545e__23e4d7ece244.json",
+      "sha256": "2882d59df22c18f573c633e34772ddc9349b6e3e76232d8bbf271d92d5b22036"
+    },
+    {
+      "name": "small_only--task-bbc69658__6b6f3db18a59.json",
+      "sha256": "195a9d2495d890de5c9ba43436f1088d61a69479b2970ed7fa44ddd3ba558fed"
+    },
+    {
+      "name": "small_only--task-bbc69658__9f2f260cd3f9.json",
+      "sha256": "ac49cc4b35d338e1e2ab51c61dab74e910bc6bdecc5e639a4ebaa499fa0f56e5"
+    },
+    {
+      "name": "small_only--task-e3f5bd9b__063b9f0955fe.json",
+      "sha256": "b81f222d64a757047683e34f322401d5b09e258dc01af38051b891da14439abd"
+    },
+    {
+      "name": "small_only--task-e3f5bd9b__b19cb65b944a.json",
+      "sha256": "838977a8ef3cde509c55c7c9e33d813af29b4b1a305f17a2e218d033a35bf90f"
+    },
+    {
+      "name": "small_only--task-e8fdd1f4__395ea35614ed.json",
+      "sha256": "8ab5fe0b02531d796e7547d53427e203ed7a6135455e0f9f5568084d254006be"
+    },
+    {
+      "name": "small_only--task-e8fdd1f4__7ab3d64ee684.json",
+      "sha256": "ce6d4abb6cb98764ad4dd2f59e05f9241eeaee9981d88bf0f0449d066ed7b513"
+    },
+    {
+      "name": "small_only--task-eab60ff9__7255df8bb721.json",
+      "sha256": "fbfa80497e2d771ffa75b1b85c39056224df669eb64fb8f3bfeccef24446b686"
+    },
+    {
+      "name": "small_only--task-eab60ff9__965613286f64.json",
+      "sha256": "2ee76fb7378170b102dde4c65d883b12e94ae52a69d19481d48ed777c3ff522e"
+    },
+    {
+      "name": "small_only--task-eab60ff9__ab3abfeb2a35.json",
+      "sha256": "7fbb1850557aaff4d87ca79e9551aec8c14212981d1731650461e446f18b30dc"
+    },
+    {
+      "name": "small_only--task-eab60ff9__ee69aeb31661.json",
+      "sha256": "e8a8bd5529ff6042028a261de129e331c3764b0f4878780b6551d86ed197b916"
+    },
+    {
+      "name": "small_only--task-f4b5a75d__22686fd530e9.json",
+      "sha256": "cd64e6efaf32d24645b7b98534a57433e4a2f45eb3df63d2dafc9f7c35998370"
+    },
+    {
+      "name": "small_only--task-f4b5a75d__d42aad4151b6.json",
+      "sha256": "9e885257fa4e0b9038e851438c973b930d85b22d7bfff5a9ae960112ae3d75e5"
+    }
+  ],
+  "source_run_id": "e012-20260926-frame-decomposition-01",
+  "source_run_modified": false,
+  "source_sha256": {
+    "baseline_report": "2155e62daf0650da8e44fb3c44704deb8c4bd2aff615e859ec215aabd6e1a6ed",
+    "evaluation_labels": "e9e81f71e46e167b077d4123a84d918b7d2f4afb791a009700f5390f61106caa",
+    "frozen_input_lock": "4bab6fd945248b6209fa33e3a1df10786298ac620342ce167251411c6a258cd8"
+  },
+  "state": "READ_ONLY_DESCRIPTIVE_RECOUNT"
+}

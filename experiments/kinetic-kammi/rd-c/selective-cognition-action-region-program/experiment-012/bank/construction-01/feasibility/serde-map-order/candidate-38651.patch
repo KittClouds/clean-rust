@@ -1,0 +1,10 @@
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -3,6 +3,5 @@
+ pub fn display_keys(input: &str) -> Option<Vec<String>> {
+     let value: Value = serde_json::from_str(input).ok()?;
+     let object = value.as_object()?;
+-    // E012 candidate slot.
+-    Some(object.keys().cloned().collect())
++    Some(object.keys().rev().cloned().collect())
+ }

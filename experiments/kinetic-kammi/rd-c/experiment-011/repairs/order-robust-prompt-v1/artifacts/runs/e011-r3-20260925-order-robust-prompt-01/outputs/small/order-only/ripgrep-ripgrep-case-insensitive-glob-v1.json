@@ -1,0 +1,144 @@
+{
+  "schema_version": 1,
+  "run_id": "e011-r3-20260925-order-robust-prompt-01",
+  "condition": "order-only",
+  "role": "small",
+  "bundle_id": "minicpm5-2b-q8-local-v5+candidate-order-instruction-v1",
+  "parent_weights_bundle_id": "minicpm5-2b-q8-local-v5",
+  "server_alias": "e009-small-v5",
+  "server_process_id": 28856,
+  "model_sha256": "c5415f8989bf88a8288f1b55a3cc371af53c07b0faa220a63bd7a990cfaba078",
+  "runtime_sha256": "ffaee576ad271ede87b92a7d8c3863dc8f331bbac666ee00099c250e8809e743",
+  "prompt_sha256": "3a673a9843cd1fb965ebd411d550bdb5a9b0019989cae727a0f67e7a62d073a6",
+  "input_lock_sha256": "519c96fb51adab9e736b8a978504373e3d8517679dbdaa86839523079df09a97",
+  "pre_model_seal_sha256": "d6623d1778d1d0d9b28f67d3ae0fc39a1b957f54cf3a06f1297dd42f729ca858",
+  "frame_lock_sha256": "8bcb8e379a5929be964969bc9fe9397aa66731f5c339695653b6d6c2fcc21ce6",
+  "frame_sha256": "a5131b62d0de318221479dd794c945d840da9f761da63739e48f96483e87dbc5",
+  "task_id": "ripgrep-ripgrep-case-insensitive-glob-v1",
+  "request_sha256": "4f54760eba62001d3c20d0d7ed0f0ea110ac5e28002b7208a03d0c0ea308e935",
+  "request": {
+    "model": "e009-small-v5",
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a typed observer in a deterministic coding workflow. The runtime owns workflow state and will execute only one action from the offered action_options after validating your output.\n\nRead the task_prompt and evidence, then compare the offered actions. Choose the action most likely to satisfy the task while preserving the repository's stated constraints. Do not write or propose code outside the offered choices. Do not claim to have executed tests. If no offered action is sufficiently supported, use null for action_choice and express uncertainty with abstention_percent.\n\nThe action_options array is an unordered set. Its displayed order is arbitrary and may change between equivalent requests. Numeric action IDs are opaque labels: never use their values or positions as evidence, a ranking, or a tie-break. Compare candidates using their summaries and diff content against the task and evidence. After choosing by content, return that candidate's current numeric action ID. If the content does not support one choice over the alternatives, abstain with action_choice null.\n\nReturn exactly one JSON object matching the provided schema. action_choice must be an offered numeric action ID or null. applicability_percent is your estimate from 0 to 100 that this observer can handle the task from the available evidence. abstention_percent is your estimate from 0 to 100 that the runtime should defer this choice. Use integer percentage points only. Do not add prose or fields.\n"
+      },
+      {
+        "role": "user",
+        "content": "{\"schema_id\":\"rdc-real-coding-observation.v1\",\"task_id\":\"ripgrep-ripgrep-case-insensitive-glob-v1\",\"task_family\":\"ripgrep-case-insensitive-glob\",\"repository_id\":\"ripgrep\",\"task_variant\":1,\"task_prompt\":\"Repair the case-insensitive glob option. The frozen mixed-case matching test fails; choose the patch that honors the requested mode.\",\"repository_revision\":\"e89fff89ac9af12e8d4ce9d5fd07beb408ca730f\",\"snapshot_sha256\":\"903dac98a558a3233b1671db0b60dc0293c7e56fbcd88bf9d13927763960b1a2\",\"evidence\":[{\"kind\":\"source_excerpt\",\"source_id\":\"crates/globset/src/glob.rs\",\"content_blake3\":\"89500240e7784a870e6b18f27f681038c546255659612a7dc36cbeaab44ee5ab\",\"content\":\"    /// This is disabled by default.\\n    pub fn case_insensitive(&mut self, yes: bool) -> &mut GlobBuilder<'a> {\\n        self.opts.case_insensitive = !yes;\\n        self\\n    }\"},{\"kind\":\"baseline_tool_result\",\"source_id\":\"cargo-test::glob::tests::matchcasei2\",\"content_blake3\":\"2960f397f49ea81a55a4d3f4f808c6cc2fe0729da5fc1069356f5018cca89842\",\"content\":\"Exact test `glob::tests::matchcasei2` failed on the frozen snapshot. Candidate patches have not been run in this task.\\n\\nrunning 1 test\\ntest glob::tests::matchcasei2 ... FAILED\\n\\nfailures:\\n\\n---- glob::tests::matchcasei2 stdout ----\\n\\nthread 'glob::tests::matchcasei2' (39748) panicked at crates\\\\globset\\\\src\\\\glob.rs:1461:5:\\nassertion failed: matcher.is_match(\\\"abcdefg\\\")\\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\\n\\n\\nfailures:\\n    glob::tests::matchcasei2\\n\\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 289 filtered out; finished in 0.00s\\n\\n   Compiling globset v0.4.19 (<frozen-repository-snapshot>\\\\crates\\\\globset)\\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.62s\\n     Running unittests src\\\\lib.rs (<cargo-target>\\\\debug\\\\deps\\\\globset-250b4c7d9a08c2e6.exe)\\nerror: test failed, to rerun pass `-p globset --lib`\\n\"}],\"action_options\":[{\"action\":{\"id\":68,\"schema_id\":1},\"summary\":\"Apply this alternative change in the same code path.\",\"diff_excerpt\":\"@@ -613,7 +613,7 @@\\n-        self.opts.case_insensitive = !yes;\\n+        self.opts.case_insensitive = false;\",\"patch_sha256\":\"645c24ac169e883eb1d6e47aa9032257ed6c19a9dc10e6fcacea938ffee66814\"},{\"action\":{\"id\":11,\"schema_id\":1},\"summary\":\"Leave the current implementation unchanged.\",\"diff_excerpt\":\"No source line changes are included.\",\"patch_sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"},{\"action\":{\"id\":94,\"schema_id\":1},\"summary\":\"Apply the focused source change shown here.\",\"diff_excerpt\":\"@@ -613,7 +613,7 @@\\n-        self.opts.case_insensitive = !yes;\\n+        self.opts.case_insensitive = yes;\",\"patch_sha256\":\"41fb794fb6ac8f8b265fa9bfe17155da8d26a63cbaee3c9fb70ed63c05a76cd5\"},{\"action\":{\"id\":37,\"schema_id\":1},\"summary\":\"Apply the source change and add a contract comment.\",\"diff_excerpt\":\"@@ -613,7 +613,8 @@\\n-        self.opts.case_insensitive = !yes;\\n+        // Preserve the caller's requested matching mode.\\n+        self.opts.case_insensitive = yes;\",\"patch_sha256\":\"ba2df6b3963a2e63bf04e89df67f324cd81986cda5b521dff1061b12d9bf2648\"}]}"
+      }
+    ],
+    "temperature": 0,
+    "top_p": 1,
+    "seed": 0,
+    "max_tokens": 1024,
+    "stream": false,
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rdc_coding_observer_output_v1",
+        "strict": true,
+        "schema": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "rdc-coding-observer-output.v2",
+          "title": "RDC Coding Observer Output v2",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "action_choice",
+            "applicability_percent",
+            "abstention_percent"
+          ],
+          "properties": {
+            "action_choice": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 65535
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "applicability_percent": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "abstention_percent": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            }
+          }
+        }
+      }
+    }
+  },
+  "normalization_contract": "percent-0-100-to-milli-x10-v1+line-endings-lf-v1",
+  "thresholds": {
+    "minimum_applicability_milli": 850,
+    "maximum_abstention_milli": 150
+  },
+  "http_status": 200,
+  "response": {
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "{\"action_choice\":11,\"applicability_percent\":100,\"abstention_percent\":0}"
+        }
+      }
+    ],
+    "created": 1790371217,
+    "model": "e009-small-v5",
+    "system_fingerprint": "b10982-fc82583e6",
+    "object": "chat.completion",
+    "usage": {
+      "completion_tokens": 21,
+      "prompt_tokens": 1364,
+      "total_tokens": 1385,
+      "prompt_tokens_details": {
+        "cached_tokens": 945
+      }
+    },
+    "id": "chatcmpl-98oRpmZ0qwT0JIRAu78mfGAD8BWgjkg8",
+    "timings": {
+      "cache_n": 945,
+      "prompt_n": 419,
+      "prompt_ms": 41.685,
+      "prompt_per_token_ms": 0.09948687350835322,
+      "prompt_per_second": 10051.577305985365,
+      "predicted_n": 21,
+      "predicted_ms": 126.146,
+      "predicted_per_token_ms": 6.3073,
+      "predicted_per_second": 158.54644618140884
+    }
+  },
+  "content": "{\"action_choice\":11,\"applicability_percent\":100,\"abstention_percent\":0}",
+  "output": {
+    "action_choice": 11,
+    "applicability_percent": 100,
+    "abstention_percent": 0
+  },
+  "normalized_output": {
+    "action_choice": 11,
+    "applicability_milli": 1000,
+    "abstention_milli": 0
+  },
+  "normalization_error": null,
+  "usage": {
+    "completion_tokens": 21,
+    "prompt_tokens": 1364,
+    "total_tokens": 1385,
+    "prompt_tokens_details": {
+      "cached_tokens": 945
+    }
+  },
+  "finish_reason": "stop",
+  "elapsed_ms": 222.092
+}

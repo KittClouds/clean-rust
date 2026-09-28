@@ -1,0 +1,9 @@
+{
+  "schema": "jev-v08p-r2-panel-ready-receipt-v01",
+  "manifest_path": "experiments/jev-information-density-v08p-r2/provenance/r2-panel-ready-manifest-v01.json",
+  "manifest_sha256": "c0d48381356113451bc72f9578204ade4ef7449a75264cd5018a34d002b313ac",
+  "status": "R2_PANEL_READY",
+  "training_authorized_by_user_packet": true,
+  "evaluation_firewall": "locked until all nine training trajectories, checkpoints, telemetry, and checkpoint hash tree are sealed",
+  "phoenix_access": false
+}

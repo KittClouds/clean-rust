@@ -1,0 +1,139 @@
+{
+  "protocol": "jev-information-density/v0.8i-phase-b-v01",
+  "run_identity": "phase-b-v01-clean",
+  "status": "authorized_by_user_2026-09-21_before_model_contact",
+  "scientific_question": "Does controlled single-fact choice-flip supervision improve held-out local choice discrimination relative to matched sham supervision?",
+  "primary_treatment": {
+    "fact_flip_arm": "F100",
+    "sham_arm": "S100",
+    "groups_per_arm": 100000,
+    "common_skeleton_groups": 90000,
+    "replacement_groups_per_arm": 10000,
+    "selected_contrast_anchors": 5000,
+    "expected_D_train": 0.05,
+    "phase_a_identity": "phase-a-v02-clean",
+    "v01_artifact_parentage": false
+  },
+  "phase_a_seal": {
+    "contract_sha256": "e81522b02ea293d4fd3e0e9f591e31b0a480fbc4bea6213520d516f18afc7a5f",
+    "generator_receipt_sha256": "e4c35c5198e6a16721c7799ec9f7b43766a6930bd2e7cb3a403a7d9bafaee22f",
+    "scope_receipt_sha256": "2e8c4328ca07468d4ebc0e11c9113d0e0c59ce3a2ab98a7985b2a1a38ec7b726",
+    "bank_receipt_sha256": "19ef7075e54af6b48b7b071ef60d2d578bb3366d9b7cc20619eb2544db76c32c",
+    "integrity_receipt_sha256": "412d40aa642357c925c3dbed6a107b589da8c222441fb7c263ec416b63ff9fe5",
+    "independent_bank_audit_sha256": "44f2fe7a088bab5cbd29bfc70a13928f4c6b1b0b23a22ebed4ce4db3fbb7fbd3",
+    "exact_world_train_audit_sha256": "b15ae165d07586a25b005c4701949920ee08c6ecf65319392e54ab2931e2d5c7",
+    "extra_fingerprint_audit_sha256": "cc3368017175bef9b9e3fb3930660fdc43b18e699f660229eac80212316d7f7d",
+    "S100_sha256": "7b1f85f57babfd2bd60100a9b956435917291ba5d101a9dbf7ff2675f0b516bc",
+    "F100_sha256": "fc298d2d38e04b269e648e89fe0431634f076e0c50f859d949e24f33ba33416e",
+    "selected_train_contrast_certificates_sha256": "4c67b9140fd7d3c423db059a0076fb995c34bd7b222ae6b9656be9d094bf00ed",
+    "train_canonical_episodes_sha256": "2e57136221e71e3a73ff722d50afb5d5642dc8ee8c7cf8880fb5205f95b95315",
+    "train_exact_world_episodes_sha256": "1373f38223ff01c8bc741b56ef8b16d723074641c867386a8b28dd0e3ce71fb6",
+    "train_contrast_certificates_sha256": "6f0809d8e02c13ba42f2b25bd0af1a0f957b4cf6584380e5075cae0e9449dfbf",
+    "heldout_canonical_episodes_sha256": "b7bd049594f79ac4347efe56a568d167cc21ffbfa222c218fa58ce8d866254e1",
+    "heldout_contrast_certificates_sha256": "e39661a8470aa7a7e0696ea2d92c859a0eb194bbb1595fc1c35d0dd85b468daf",
+    "state_inputs_sha256": "35b311ceae272e2917b92113c508d53debff395264399e1aadca6b02f2dad5c9",
+    "candidate_name_definition_sha256": "555b564ff1bb89f2e432ed1e2679a4e1d9863511228addb47af4ebf28673198a"
+  },
+  "reference_assets": {
+    "v08g_contract_sha256": "34e9c367bedc78d2b759c85f036e4baf6f9a3c604162fe3a7acc8616d62c2040",
+    "v08g_run_manifest_sha256": "5bf4156033ed2a56d8a337df82b9bebfcb5eca3e66b28b8d6f2abf4391f53eef",
+    "v08g_model_contact_receipt_sha256": "8f2eff9ea1f6d1b89f0753ca4fda1591759fdcaa53b116852585664c9018a180",
+    "v08g_materialization_receipt_sha256": "f9b845764a01c79584027265690823842f0d6d609008c5a95aacb1de8c97752e",
+    "v08g_extraction_receipt_sha256": "2a4d7a06eda97ec4adfd3d923b3ed175efd948e3e4d7d41ee8c5bd3489ea8653",
+    "v08g_newtight_eval_groups_sha256": "20981453d5c707e3e094a86a953b373e3fc006fabad439d04d6268d8f7c16ee4",
+    "v08g_feature_cache_sha256": "11dc5ad84fef64cb67d60b978af9942845ebed9b25a463c59b6938e463da28b1",
+    "v07_feature_cache_sha256": "56f2759b5a76d8ac85199f3903546b2c4ef6925094f05d6a221f6da60a9d36a7",
+    "v07_feature_manifest_sha256": "1ad6b2df5932dbcde307d8c91a25c6cf2246a75018bf575225849732aad70885",
+    "v07_binding_feature_cache_sha256": "f8557002153cc4bbff9c023f0e701dd1eba7eddf10133e8b58ee1f857785d0fb",
+    "v07_binding_feature_manifest_sha256": "fa6c8338da2e3cef6895ecd4293a23520be3c0614c7574d8f1638383659f46fa"
+  },
+  "model": {
+    "repo_id": "LiquidAI/LFM2.5-1.2B-Base",
+    "revision": "7453bca97ca1e67754c4035a4b4c584e1c9dd725",
+    "snapshot_directory": "D:\\codex-runs\\jev-lfm-variable-v07\\models\\lfm2.5-1.2b-base",
+    "snapshot_file_sha256": {
+      "config.json": "15d6157fb6df3f8272e2fe90e18f57727ccf02a125c94469198b0f3281510185",
+      "model.safetensors": "7678ab9546a0c51c1fca161876b1efc4f0906277f170b5822045f40fdaf9eeff",
+      "tokenizer.json": "d7a0ab0fc22e41ec8c6d7450a9ff9ce40e196ec5e5a2fa6a2105e064e0514ed7",
+      "tokenizer_config.json": "8cba5b0c7acab23a0d4cc9ac587346c9220a1b6d288fc5346fe118202fd6f43e",
+      "special_tokens_map.json": "742aefe2b7dec496e8caffdba03a75d0c1a9925d53bd3f3e0d388c96b591b6f4"
+    },
+    "backbone_frozen": true,
+    "trust_remote_code": false
+  },
+  "representation": {
+    "adapter": "experiments/jev-lfm-variable-v07/extract_lfm.py::encode_lfm_texts",
+    "adapter_sha256": "b8cd79a9a3265eca0fde5f509ba7c058bc2065d7747efe17ff7c7c1f6335b2d0",
+    "layer": "final",
+    "pooling": "mean_full",
+    "dtype": "bfloat16_backbone_float32_features",
+    "max_length": 1024,
+    "batch_size": 1,
+    "padding": false
+  },
+  "compiler": {
+    "implementation": "experiments/jev-frozen-readout-v01/probe.py::CompatibilityHead",
+    "head": "dynamic_mlp_compatibility",
+    "projection_width": 128,
+    "candidate_profile": "name_definition",
+    "loss_implementation": "experiments/jev-frozen-scaling-v05/train_v05.py::v05_loss + vectorized_invariant_loss",
+    "loss": "L3_source_typed",
+    "brier_weight": 0.25,
+    "invariance_weight": 0.10,
+    "invariant_pairs": "probe.invariant_pairs(train_groups, train); frozen selection and max_pairs=16 behavior",
+    "candidate_order_training_augmentation": "reverse candidate and target arrays per batch via fast_tensor_batch(reorder=true)"
+  },
+  "training": {
+    "optimizer": "AdamW(head_only)",
+    "learning_rate": 0.002,
+    "weight_decay": 0.01,
+    "batch_size_groups": 256,
+    "epochs": 3,
+    "scheduler": "none",
+    "gradient_clipping": "none",
+    "head_precision": "float32",
+    "paired_seeds": [20260927, 20260928, 20260929],
+    "paired_initialization": true,
+    "training_order": "sort by group_id then random.Random(seed + zero_based_epoch).shuffle",
+    "arm_schedule": [
+      ["seed-1", "S100"], ["seed-1", "F100"],
+      ["seed-2", "F100"], ["seed-2", "S100"],
+      ["seed-3", "S100"], ["seed-3", "F100"]
+    ],
+    "primary_checkpoint": "predeclared terminal epoch 3; no best-epoch selection"
+  },
+  "evaluation": {
+    "primary_surface": "all 2,000 Phase-A v02 held-out contrast certificates across four held-out world families",
+    "primary_pair_roles": ["anchor", "fact_flip", "sham"],
+    "primary_metrics": [
+      "new-winner probability movement and correct-direction rate",
+      "strict MAP old-to-new transition success",
+      "gold-rank and predicted-rank change",
+      "new-minus-old margin movement",
+      "model versus exact posterior delta agreement"
+    ],
+    "sham_metrics": [
+      "anchor-sham probability L1",
+      "MAP flip rate",
+      "gold-winner probability movement",
+      "new-minus-old margin movement"
+    ],
+    "secondary_surface": "frozen v0.8G NewTight-Eval and existing legacy typed panels",
+    "typed_panels": ["choice", "independent applicability", "ordinal", "schema binding", "intervention", "calibration"],
+    "temperature_fit": "final head only; legacy dev exact-generative-posterior rows only, same v0.8G procedure",
+    "result_driven_tuning": false,
+    "composite_score": false,
+    "arbitrary_win_threshold": false
+  },
+  "boundaries": {
+    "modify_phase_a_v02_or_v01": false,
+    "regenerate_or_modify_banks": false,
+    "backbone_weight_updates": false,
+    "LoRA_or_QLoRA": false,
+    "head_or_pooling_search": false,
+    "calibration_changes": false,
+    "Phoenix": false,
+    "follow_on_experiment_authorized": false
+  },
+  "external_output_root": "D:/codex-runs/jev-information-density-v08i/phase-b-v01"
+}

@@ -1,0 +1,17 @@
+{
+  "protocol": "jev-information-density/v0.8p-v03-source-allowlist-seal-v01",
+  "identity": "v0.8P-v03-source-allowlist-sealed-v01",
+  "status": "FROZEN_BEFORE_SOURCE_ACCESS; EXTRACTION_ATTEMPT_FAILED_CLOSED",
+  "allowlist_path": "experiments/jev-information-density-v08p-v03/identity/source-allowlist-v01.json",
+  "allowlist_sha256": "43bdf7408ef2b0e6fbcdd75b4848fd7631870d4312624e39b917ef554d62f854",
+  "extractor_path": "experiments/jev-information-density-v08p-v03/identity/extract_e1_neighborhood_denylist_v03.py",
+  "extractor_sha256": "e93cc70387c1acd526ad4245b35bec2dfc6ac1f5a68fb104e18010a1c33a6450",
+  "synthetic_only_tests": {
+    "count": 3,
+    "status": "PASS",
+    "real_e1_sources_opened_during_tests": false
+  },
+  "authorized_source_count": 3,
+  "directory_discovery_in_extractor": false,
+  "output_identity_root": "D:/codex-runs/jev-information-density-v08p-v03/identity"
+}

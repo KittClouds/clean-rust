@@ -1,0 +1,53 @@
+{
+  "contract_id": "FAS_S05_CROSSED_REPRESENTATION_READOUT_DECOMPOSITION_V01",
+  "experiment_id": "fas-s05-crossed-representation-readout-decomposition-v01",
+  "question": "How much of the sealed diagonal surface difference is present when changing representation under a fixed readout pipeline, changing readout under a fixed representation, or their interaction?",
+  "cells": {
+    "MM": {"representation": "mean_full", "readout": "mean_full scaler + probe"},
+    "FM": {"representation": "final_position", "readout": "mean_full scaler + probe"},
+    "MF": {"representation": "mean_full", "readout": "final_position scaler + probe"},
+    "FF": {"representation": "final_position", "readout": "final_position scaler + probe"}
+  },
+  "decomposition": {
+    "representation_at_M_readout": "Y(F,M)-Y(M,M)",
+    "readout_at_M_representation": "Y(M,F)-Y(M,M)",
+    "interaction": "Y(F,F)-Y(F,M)-Y(M,F)+Y(M,M)",
+    "diagonal_total": "Y(F,F)-Y(M,M)",
+    "identity": "representation_at_M_readout + readout_at_M_representation + interaction = diagonal_total"
+  },
+  "populations": {
+    "FAS00_ORIGINAL": {
+      "parent_s02_result_root_sha256": "1585488434830939e11cdf67dd9ff336ef133ab596a87c011394fb8d42db143d",
+      "parent_s02_final_cache_root_sha256": "ce7604bcd82b1b13ff4828b71dddf835e0c7f9d924ec1b886af5ad78c415ac11",
+      "events": "Deduplicated union of the sealed S02 context-term-3 and entity-term-7 test prediction rows.",
+      "expected_unique_events": 512,
+      "slices": {"UNION": 512, "CONTEXT_TERM_3": 412, "ENTITY_TERM_7": 212},
+      "mean_feature_row": "2 * Phase 1 row_index, selecting existing FULL row",
+      "final_feature_row": "Phase 1 row_index in sealed S02 final-position cache",
+      "class_order": ["safe", "risky", "idle"],
+      "golden_diagonal_argmax": "Exact S02 sealed prediction rows for MM and FF.",
+      "metric_tolerance": {"balanced_accuracy": 0.0, "accuracy": 0.0}
+    },
+    "S01_CONTROLLED": {
+      "parent_s04_result_root_sha256": "02e5d903cb2ddab7f995a1e31508a09c0b51cd57b3cd45b2a1b8f5e0ac4892a2",
+      "parent_s01_result_root_sha256": "2581b50d75382c197793ea46400bf2b8a27508df22b2ff5bdbe82eb20a5238b7",
+      "events": "Every event in the already-sealed S04 factorial-balanced held-out quartet population.",
+      "expected_quartets": 4933,
+      "expected_events": 19732,
+      "class_order": [0, 1, 2],
+      "golden_diagonal_argmax": "S01-3 saved exact-target prediction argmax mapped through sealed candidate identity order.",
+      "metric_tolerance": {"balanced_accuracy": 0.0, "accuracy": 0.0}
+    }
+  },
+  "arithmetic": {
+    "FAS00_ORIGINAL": "FP32 feature row cast to FP64; stored FP64 scaler mean and scale; FP64 linear weights and bias; NumPy FP64 matrix multiplication.",
+    "S01_CONTROLLED": "FP32 feature; stored FP64 scaler cast to FP32; FP32 standardization and linear replay; logits converted to FP64 only for margins.",
+    "class_tie_break": "lowest class slot, as NumPy argmax",
+    "target_margin": "target logit - max(other class logits)",
+    "pair_margins": [[0, 1], [0, 2], [1, 2]]
+  },
+  "metrics": ["accuracy", "balanced_accuracy", "per_class_support", "per_class_recall", "mean_pair_margins", "median_pair_margins", "nearest_rank_p10_pair_margins", "nearest_rank_p90_pair_margins", "mean_target_margin", "median_target_margin", "nearest_rank_p10_target_margin", "nearest_rank_p90_target_margin", "event_prediction_transition_matrices", "event_correctness_transitions"],
+  "required_outputs": ["preflight-receipt-v01.json", "event-populations-v01.json", "crossed-replay-ledger-v01.jsonl", "crossed-summary-v01.json", "prediction-transitions-v01.json", "execution-receipt-v01.json", "S05-RESULTS.md"],
+  "forbidden": ["LFM load", "tokenizer load", "feature extraction", "probe fitting", "optimizer continuation", "scaler fitting", "readout modification", "threshold selection", "significance test", "confidence interval", "new view", "adaptive mechanism", "SAE", "FAS00 or parent modification"],
+  "authority": {"existing_cache_analysis": true, "model_contact": false, "probe_fitting": false, "adaptive_mechanisms": false, "SAE_analysis": false, "FAS00_PHASE4_AUTHORIZED": false}
+}

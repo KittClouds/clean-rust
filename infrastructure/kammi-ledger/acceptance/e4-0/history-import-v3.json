@@ -1,0 +1,43 @@
+{
+  "evidence_access_global_conclusion": "UNKNOWN_OUTSIDE_EXPLICIT_RECEIPT_SCOPES",
+  "examined_json_entries": 223,
+  "fact_count": 557,
+  "fact_counts": {
+    "attempt_pass": 124,
+    "attempt_stop": 28,
+    "attempt_unknown": 14,
+    "contact_no_attested": 217,
+    "evidence_no_attested": 148,
+    "head": 1,
+    "nested_attempt_pass": 1,
+    "nested_attempt_stop": 1,
+    "nested_contact_no_attested": 6,
+    "supersession": 17
+  },
+  "flight_authorization_conferred": false,
+  "history_graph_count": 557,
+  "model_contact_global_conclusion": "UNKNOWN_OUTSIDE_EXPLICIT_RECEIPT_SCOPES",
+  "original_merkle_root": "sha256:234e568989f6c0e71fb69fa634b2e0bf085e7fb63336654202d3b221ef33f6fc",
+  "projection": {
+    "counts": {
+      "artifacts": 493,
+      "custodyfacts": 1208,
+      "events": 1723,
+      "runs": 2,
+      "seals": 3
+    },
+    "flight_gate": "CLOSED_PENDING_ACCEPTANCE",
+    "journal_events": 1723,
+    "journal_head": "sha256:c833a8ca40b5f406c27d3bbeb244ffaa40dc34d1c35094c3b1b1eebd172d4b7f",
+    "projection_head": "sha256:c833a8ca40b5f406c27d3bbeb244ffaa40dc34d1c35094c3b1b1eebd172d4b7f",
+    "projection_seq": 1723
+  },
+  "run_id": "E4-0-legacy-history-complete-v1",
+  "schema": "KAMMI_E4_HISTORY_IMPORT_V3",
+  "source_entries": 447,
+  "source_legacy_root": "sha256:278ae16eeb6852d3efad44221556a87be6df54964471f0870931fe2e99b305d1",
+  "source_merkle_root": "sha256:5da7b54cbb1b1a3e246efb61d11969334f3be9554103e7dafe38deee7a75d236",
+  "status": "PASS",
+  "supplemental_paths": 61,
+  "unresolved_declared_predecessors": []
+}

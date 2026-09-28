@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "attempt": "A14_PRECONTACT_AUDIT_LAUNCH_01",
+  "state": "AUDIT_FAILED_LATIN_ORDER_CONTRACT_CONFLICT",
+  "model_contact_authorized": false,
+  "audit_script_sha256": "c55cc7ad87cc24884445af2c6d61eb13312fec2898e5dca1fbe51b387213d4c8",
+  "audit_lock_sha256": "be81d26a20b4d69cfbb9e7890b62c3595aab4882386c503780d06f0378b557b1",
+  "error": "ValueError: producer_order_action_ids_hidden is not Latin in bounded-prefix-copy; audit expected all four IDs at every position despite paired twins sharing the locked presentation order",
+  "audit_output_written": false
+}

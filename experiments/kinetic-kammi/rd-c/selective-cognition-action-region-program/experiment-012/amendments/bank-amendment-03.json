@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "amendment_id": "E012-BANK-A03",
+  "base_bank_plan": "1.2",
+  "state": "PRETASK_EXECUTION_EVIDENCE_REPAIR",
+  "model_contact_authorized": false,
+  "scored_task_frames_created": false,
+  "family_allocation_changed": false,
+  "task_count_changed": false,
+  "selected_repairs": [
+    "bytes-cursor-repair-01",
+    "bytes-composite-repair-01",
+    "serde-offset-repair-02",
+    "serde-numeric-joint-repair-01"
+  ],
+  "preserved_original_trials": [
+    "bytes-cursor",
+    "bytes-composite",
+    "serde-offset-repair-01",
+    "serde-numeric-joint"
+  ],
+  "repair_scope": "Replace generic boolean assertions with equality assertions that report actual and expected pre-action values.",
+  "candidate_pass_matrices_unchanged": true,
+  "selected_base_cases_still_fail": true,
+  "selected_failures_reach_contract_assertion": true,
+  "changes": [
+    "E_x source payloads for four families now carry observed-versus-expected values.",
+    "No task family, support set, candidate patch, routing threshold, or model input was changed."
+  ]
+}

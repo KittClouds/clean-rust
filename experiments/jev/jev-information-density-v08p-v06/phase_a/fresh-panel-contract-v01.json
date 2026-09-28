@@ -1,0 +1,244 @@
+{
+  "protocol": "jev-information-density/v0.8p-v06-fresh-heldout-panel-contract-v01",
+  "identity": "v0.8P-v06-fresh-eval-panel-v01",
+  "status": "CONTRACT_SEALED_PANEL_NOT_CONSTRUCTED",
+  "purpose": "Contract-only fresh identity for the confirmatory optimizer-step trajectory panel. Preserve the sealed v0.8P treatment, measurement interface, families, templates, and analysis while applying the v05 digest-only E1 neighborhood-identity exclusion.",
+  "authorization_state": {
+    "contract_construction_authorized": true,
+    "contract_sealed": true,
+    "panel_generation_authorized": false,
+    "panel_materialized": false,
+    "lfm_contact": false,
+    "feature_extraction": false,
+    "training": false,
+    "head_loading": false,
+    "inference": false,
+    "evaluation": false,
+    "phoenix": false
+  },
+  "sealed_parent_bindings": {
+    "original_contract_bundle": {
+      "path": "experiments/jev-information-density-v08p/contracts/contract-bundle-seal-v01.json",
+      "sha256": "67cd6b7902111000dc93a0f81f9f20bc05a9c084732705ed8f9ad82fe965fa85",
+      "status": "CONTRACTS_SEALED_FOR_REVIEW_NOT_AUTHORIZED"
+    },
+    "run_contract": {
+      "path": "experiments/jev-information-density-v08p/phase_b/phase-b-p-run-contract-v01.json",
+      "sha256": "e345225b4a17fc18eb35fcab24cbe1d72bd0e34bed9de272f927a7be461853e6",
+      "identity": "v0.8P-fresh-trajectory-instrumented-rerun-v01"
+    },
+    "analysis_contract": {
+      "path": "experiments/jev-information-density-v08p/phase_b/phase-b-p-analysis-contract-v01.json",
+      "sha256": "84111122033fda65c84344317cfe3b50639b23be4c71f480ba665c67a23cc939",
+      "identity": "v0.8P-fresh-panel-optimizer-step-trajectory-analysis-v01"
+    },
+    "original_panel_design_contract": {
+      "path": "experiments/jev-information-density-v08p/phase_a/fresh-panel-contract-v01.json",
+      "sha256": "ce3b7b97caecb27f3ad99439c0e67dca6e40af5da3db9ca2e356ea5e9f06f823",
+      "identity": "v0.8P-fresh-eval-panel-v01"
+    },
+    "v05_denylist_root_seal": {
+      "path": "experiments/jev-information-density-v08p-v05/provenance/v05-denylist-root-seal-v01.json",
+      "sha256": "272a14e57c2dcf610568381c0c1c4673c7b40e368ac81b07d3e7160e4e5953a2",
+      "disposition": "DENYLIST_EXTRACTION_SEALED"
+    },
+    "opaque_e1_identity_denylist": {
+      "path": "D:/codex-runs/jev-information-density-v08p-v05/identity/run-1/canonical-e1-neighborhood-hash-denylist.json",
+      "sha256": "50eebeb5790c29b4a75c6f8df849eb4c2865d3c864932bbd7f636b7a0e52a2cd",
+      "schema": "canonical-neighborhood-id-sha256-set-v01",
+      "count_from_root_seal": 2000,
+      "role": "opaque binary membership set only; its entries are not decoded or reported during v06 contract construction"
+    }
+  },
+  "preserved_scientific_design": {
+    "arms": ["B-DUP", "B-MATCHED", "B-SHAM"],
+    "training_recipe_binding": "unchanged; exactly the sealed run-contract identity and hash above",
+    "analysis_binding": "unchanged; exactly the sealed analysis-contract identity and hash above",
+    "families": [
+      {"slug": "exposure_control", "neighborhoods": 500},
+      {"slug": "respiratory_monitoring", "neighborhoods": 500},
+      {"slug": "salinity_control", "neighborhoods": 500},
+      {"slug": "vibration_monitoring", "neighborhoods": 500}
+    ],
+    "total_neighborhoods": 2000,
+    "episodes_per_neighborhood": 11,
+    "episode_roles": [
+      "anchor", "fact_flip", "sham", "neutral_1", "neutral_2", "neutral_3",
+      "neutral_4", "neutral_5", "neutral_6", "neutral_7", "neutral_8"
+    ],
+    "selected_views": ["anchor", "fact_flip", "sham", "matched_neutral"],
+    "evaluated_view_rows": 8000,
+    "candidate_count_per_view": 4,
+    "templates": "same frozen p0-p3 surfaces; no novel-template claim",
+    "exact_world_gates": {
+      "sham_target_max_component_abs_error": 1e-12,
+      "each_neutral_target_max_component_abs_error": 1e-12,
+      "fact_flip_changes_exact_map_winner": true,
+      "same_query_schema_candidate_set_and_order": true,
+      "single_intended_intervention_per_sibling": true,
+      "independent_solver_receipt_per_episode": true
+    },
+    "surface_edit_gates": {
+      "changed_field_count": 1,
+      "changed_character_count": 1,
+      "changed_span_count": 1,
+      "sham_neutral_magnitude_equal": true,
+      "neutral_is_semantic_not_cosmetic": true
+    },
+    "representation_and_matching": {
+      "backbone": "LiquidAI/LFM2.5-1.2B-Base",
+      "revision": "7453bca97ca1e67754c4035a4b4c584e1c9dd725",
+      "snapshot_hashes_inherited_unchanged": true,
+      "pooling": "final-layer mean_full@16 over valid positions",
+      "input_mode": "exact-length, single-row, no padding",
+      "production_batch_size": 1,
+      "maximum_length": 1024,
+      "backbone_dtype": "bfloat16",
+      "output_dtype": "float32",
+      "feature_dimension": 2048,
+      "feature_scope_count": 22016,
+      "candidate_basis": {
+        "rows": 16,
+        "candidates_per_schema": 4,
+        "shape": [16, 2048],
+        "join_key": "schema_family_id + exact candidate_semantic_id",
+        "order_source": "authoritative FamilySpec order",
+        "reuse_e1_candidate_vectors": false,
+        "slot_or_position_crosswalk": false
+      },
+      "radius_matching": "For each anchor choose argmin over the eight neutral views of abs(||h_N-h_A||_2 - ||h_S-h_A||_2); deterministic tie-break is ascending SHA-256(anchor_id + '|' + neutral_role).",
+      "gates": {
+        "mean_relative_radius_error_max": 0.10,
+        "p95_absolute_radius_error_max": 0.25,
+        "per_family_mean_relative_radius_error_max": 0.15,
+        "all_required": true
+      },
+      "direction_or_cosine_selection": false,
+      "evaluation_outcome_selection": false
+    }
+  },
+  "generator_and_identity": {
+    "generator_family_spec": {
+      "path": "experiments/jev-information-density-v08n/generator/src/families.rs",
+      "sha256": "e56885005487b36b573c1bf4d47741413ca72df0992ff62bcf48891eecacb429"
+    },
+    "generator_identity_constructor": {
+      "path": "experiments/jev-information-density-v08n/generator/src/generator.rs",
+      "sha256": "f04a9b1d4f6682522e5957be3c0075db4bd7aa4e4e25968650f2ff24a42c7f5b"
+    },
+    "semantic_builder_reference": {
+      "path": "experiments/jev-information-density-v08n/phase_a/build_eval_panel_semantic.py",
+      "sha256": "55104d496d825e7aa58c55fa27f59f67b4b74efb34d2b7882d82ffeada8e7083"
+    },
+    "feature_and_matching_references": {
+      "frozen_extractor_path": "experiments/jev-lfm-variable-v07/extract_lfm.py",
+      "frozen_extractor_sha256": "b8cd79a9a3265eca0fde5f509ba7c058bc2065d7747efe17ff7c7c1f6335b2d0",
+      "matcher_path": "experiments/jev-information-density-v08n/phase_a/match_eval_panel_radius.py",
+      "matcher_sha256": "1036f3242c24bbc5d2d1f8112b2129b6454960591d3ea8f003d71ccec7cc9640",
+      "feature_extractor_path": "experiments/jev-information-density-v08n/phase_a/extract_eval_panel_features.py",
+      "feature_extractor_sha256": "460b02b3d262372f554c6fa4a3c3accb34379e8cd56ed3fda275775668dc1269",
+      "sealer_path": "experiments/jev-information-density-v08n/phase_a/seal_eval_panel.py",
+      "sealer_sha256": "71c301c02c173c02c585c0c8490b2d0058c11d4f96a6b487877112a886aa4628"
+    },
+    "source_policy": "These exact source hashes are inherited from the sealed original panel-design contract. No generator, feature, matcher, or sealer source was opened or executed to construct v06. Any later P-specific adapter must have its own source hash and tests sealed before a separate panel-generation authorization.",
+    "partition_namespace": "eval_v08p_v06",
+    "generator_seed_derivation": {
+      "label": "jev-information-density-v08p-v06/fresh-panel-generator-seed",
+      "algorithm": "SHA-256(UTF-8(label)); interpret the first four digest bytes as unsigned little-endian u32",
+      "sha256": "bd505cf5434f87c58fb55d4cf8467cad25ca9e0c4c190ee682292cc1bad7e4c2",
+      "seed_u32": 4116467901
+    },
+    "freshness": "New v06 partition namespace and seed; never copy or read v01/v02 generated panel material. Preserve the frozen family and template surfaces.",
+    "per_family_candidate_sequence": {
+      "first_sequence": 0,
+      "last_sequence_inclusive": 1999,
+      "format": "six-digit zero-padded sequence within family and v06 partition namespace",
+      "required_accepted_neighborhoods": 500
+    }
+  },
+  "identity_canonicalization_and_denylist": {
+    "denylist_source_is_opaque": true,
+    "denylist_source_sha256": "50eebeb5790c29b4a75c6f8df849eb4c2865d3c864932bbd7f636b7a0e52a2cd",
+    "denylist_root_seal_sha256": "272a14e57c2dcf610568381c0c1c4673c7b40e368ac81b07d3e7160e4e5953a2",
+    "denylist_count": 2000,
+    "canonicalization": {
+      "input": "authoritative neighborhood_id string emitted by the frozen identity constructor",
+      "requirements": ["nonempty", "already NFC", "no leading or trailing Unicode whitespace"],
+      "normalization_action": "reject if a requirement fails; do not trim, normalize, case-fold, or otherwise rewrite",
+      "bytes": "exact UTF-8 encoding of the validated string",
+      "digest": "lowercase hexadecimal SHA-256 of those exact bytes"
+    },
+    "membership_rule": "For each generated candidate n, compute SHA256(UTF8(canonical(n))). Reject iff that digest is a member of the sealed v05 denylist D.",
+    "collision_order": "Compute and validate the neighborhood identity and its digest before committing the candidate body to any panel output. The membership result is the only E1-derived decision input.",
+    "collision_reporting": "Record aggregate collision counts by family and sequence index only. Never emit a colliding raw neighborhood_id or the matched denylist digest; never reveal any denylist entry or historical E1 metadata.",
+    "collision_retry_rule": "Within each family, scan the fixed sequence stream in ascending order 000000 through 001999. A denylist collision rejects only that candidate identity and advances to the next already-defined sequence. Accept the first 500 non-colliding candidates in stream order.",
+    "exhaustion_rule": "If a family yields fewer than 500 non-colliding candidates by sequence 001999, fail the entire v06 panel identity. Do not enlarge the stream, change the seed/namespace, or relax the rule.",
+    "other_failure_rule": "Any non-collision identity invalidity, duplicate among accepted P identities, exact-world/schema/surface validation failure, overlap-gate failure, or radius-gate failure fails the panel identity. Do not skip or replace such a candidate.",
+    "post_audit_replacement": false,
+    "adaptive_generation_until_similarity": false
+  },
+  "overlap_and_support": {
+    "e1_identity_scope": "The v05 denylist provides the only E1-derived input: neighborhood identity membership. Do not read E1 panel bodies, raw IDs, candidate joins, features, targets, predictions, metrics, or geometry.",
+    "p_identity_scope": "Require zero duplicate accepted neighborhood IDs across all four families; v06 partition namespace and sequence define new generated identities.",
+    "training_overlap": "Retain the unchanged training-overlap requirement from the sealed original panel-design contract. Any identity-only training scope needed to execute that check must be separately allowlisted under a future panel-construction authorization and match the exact sealed bindings in the original P run contract; if not uniquely resolvable, fail before generation.",
+    "world_root_episode_and_rendered_input_scope": "Retain all original exact-world, family, schema, candidate-order, and training-scope checks. No E1 body-derived comparison is authorized; the v05 neighborhood-ID denylist is not a similarity oracle and supports no claim beyond its identity field.",
+    "no_training_or_prior_panel_identity_reuse": true,
+    "support_failure": "Fail the v06 panel identity; no family dropping, reweighting, replacement shopping, or threshold relaxation."
+  },
+  "required_panel_outputs_and_seal": {
+    "panel_root": "D:/codex-runs/jev-information-density-v08p-v06/fresh-panel",
+    "create_during_contract_construction": false,
+    "fail_if_panel_root_exists_at_future_authorization": true,
+    "required_artifacts_inherited_unchanged": [
+      "p-fresh-panel-contract.json",
+      "generator-and-seed-receipt.json",
+      "semantic-validation-receipt.json",
+      "training-and-prior-panel-identity-overlap-receipt.json",
+      "fresh-candidate-text-manifest.jsonl",
+      "fresh-candidate-feature-cache-receipt.json",
+      "fresh-state-feature-cache-receipt.json",
+      "matched-neutral-selection.jsonl",
+      "radius-gate-report.json",
+      "semantic-axis-composition.json",
+      "whole-panel-candidate-join.jsonl",
+      "whole-panel-join-preflight.json",
+      "panel-hash-tree.json",
+      "evaluation-firewall-lock.json",
+      "panel-seal-manifest.json"
+    ],
+    "sealing_order": [
+      "seal generator/seed and collision audit",
+      "seal exact-world semantic and surface validation",
+      "seal identity-overlap and support receipts",
+      "seal fresh candidate/state feature receipts and radius-only match outputs",
+      "seal full output hash tree",
+      "seal firewall lock with body_access_granted=false and opening_count=0",
+      "seal final panel manifest; do not grant trainer or evaluator access"
+    ],
+    "panel_claim_scope": "Fresh generated world instances within the four fixed semantic families and p0-p3 surfaces; neither novel-template nor novel-family generalization."
+  },
+  "forbidden_inputs_and_actions": {
+    "v01_generated_panel_or_raw_files": true,
+    "v01_trajectory_analysis_draft": true,
+    "v02_denylist_or_audit_or_contract": true,
+    "v03_failed_extraction_products": true,
+    "v04_e1_authority_material_beyond_v05_binding": true,
+    "e1_semantic_content_or_raw_neighborhood_ids": true,
+    "e1_candidates_features_targets_predictions_metrics_or_outcomes": true,
+    "head_or_checkpoint_contact": true,
+    "lfm_contact_or_feature_extraction_during_contract_construction": true,
+    "panel_generation_during_contract_construction": true,
+    "training_or_evaluation": true,
+    "newtight_or_legacy": true,
+    "phoenix": true
+  },
+  "future_authorization_boundary": {
+    "panel_generation_authorized_by_this_contract": false,
+    "lfm_contact_authorized_by_this_contract": false,
+    "training_authorized": false,
+    "head_loading_authorized": false,
+    "inference_authorized": false,
+    "evaluation_authorized": false,
+    "separate_explicit_authorization_required": true
+  }
+}

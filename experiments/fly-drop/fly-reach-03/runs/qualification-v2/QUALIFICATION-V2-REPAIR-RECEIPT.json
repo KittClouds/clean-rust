@@ -1,0 +1,12 @@
+{
+  "estimators_started": false,
+  "measured_namespace_created": false,
+  "reason": "append the frozen terminal F4 checkpoint 8192 in a fresh identity",
+  "rows_reused_without_mutation": 37748736,
+  "run_id": "qualification-v2",
+  "schema": "FLY-REACH-03-qualification-v2-repair-receipt-v1",
+  "source_preserved_nonpromotable": true,
+  "source_run_id": "qualification-v1",
+  "status": "REPLACEMENT_PREPARED",
+  "terminal_descriptors_added": 72
+}

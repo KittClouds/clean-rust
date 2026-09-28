@@ -1,0 +1,11 @@
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -1,7 +1,5 @@
+ use bytes::{Buf, Bytes};
+ 
+ pub fn take_prefix(input: Bytes, count: usize) -> Bytes {
+-    // E012 candidate slot.
+-    let _ = count;
+-    input
++    input.slice(..count)
+ }

@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "amendment_id": "E012-PROTOCOL-A01",
+  "base_protocol_version": 0,
+  "supersedes": "channel-contract-v0.task_bank_minimums.repositories_new_to_e010_e011",
+  "effective_requirement": {
+    "repositories": 3,
+    "all_absent_as_evaluation_repositories_in": ["E009", "E010", "E011"]
+  },
+  "unchanged": [
+    "48-task minimum",
+    "12-family minimum",
+    "two families per support stratum",
+    "all frame conditions and scoring rules",
+    "frozen E009 v5 observer, thresholds, and authority"
+  ],
+  "state": "PRECONSTRUCTION_CORRECTION",
+  "task_construction_started": false,
+  "model_contact_authorized": false
+}

@@ -1,0 +1,42 @@
+{
+  "schema": "R1_QTERMINAL_SEMANTIC_ISOTONIC_CALIBRATION_V04",
+  "version": 4,
+  "status": "FROZEN_ENGINEERING_CALIBRATION",
+  "created_utc": "2026-09-26",
+  "purpose": "Fit a monotone calibration from the v03 semantic log-product score to validity probability using only the Q-v02 training split; report validation/test and sensor-training-overlap strata without refitting Q-v02 or the identity head.",
+  "raw_semantic_source": {
+    "manifest_path": "../semantic-composition-v03/manifest-v03.json",
+    "manifest_sha256": "f12c8bcf99806955e8eb1566800ab08c1f667c22250052d062dc8df5ddcb8ed1",
+    "score_script_sha256": "c61d0400a218f8115f7c4cf33b8201d2c2c78fd05a06c8810c0c510a8e98fb9a",
+    "run_receipt_sha256": "cebb07822f02afaea96f272e3358606090ea51a0bee8210f52db2db6bddd0cbc",
+    "report_sha256": "ca2760677311efc7cd8eaec1fa958d54f222d1524104e07fe0b28f42725c7ec4",
+    "candidate_scores_sha256": "ab95a8cd3284372f090059086f3dd48c6a91d1bccf3893cc65c672a9e1071c19"
+  },
+  "training_contract": {
+    "algorithm": "weighted pool-adjacent-violators isotonic regression over unique training score values",
+    "input_score": "sum_j log(p_satisfied_j) from v03, with null encoded as negative infinity",
+    "target": "independent typed validator candidate label from Q-v02 selected-candidates.jsonl",
+    "fit_split": "train only",
+    "validation_and_test_labels_used_for_fit": false,
+    "temperature_or_other_parameter_fit": false,
+    "runtime_mapping": "nondecreasing step function; choose first inclusive upper score bound >= input score, saturating to the last block"
+  },
+  "dataset_lineage": {
+    "support_manifest_sha256": "b05e99f83cec97342582dbacec0a3c7ba0bf634130f301dd909a886bcbb66e46",
+    "q_mixture_manifest_sha256": "0cd7f5bd26e0ea59b2d29d83240cea013dc80ed75c3ac524ad16bc65473855a5",
+    "q_dataset_manifest_sha256": "6b38000ecf8295163d9eb547aed49b5d6df5804fbd34faff75686c31311257e3",
+    "selected_candidates_sha256": "05b75ffe1f49dc773732faaca74ae56c185313aeda30b88a7e3845075e3a39e3",
+    "q_fitted_checkpoint_sha256": "e484bdb0e51196002bcda997a96b9b5a40ace7a4b81e60e08396a32072c6e5f0"
+  },
+  "evaluation": {
+    "metrics": ["accuracy_at_0.5", "balanced_accuracy", "brier_score", "binary_cross_entropy", "roc_auc", "expected_calibration_error_10_bins", "top1_valid_rate_by_feature_and_source"],
+    "test_strata": ["overlap_sensor_identity_train", "unseen_to_identity_train"],
+    "test_group_rows_observed": {"overlap_sensor_identity_train": 11, "unseen_to_identity_train": 13},
+    "aggregate_test_is_not_unseen_generalization": true
+  },
+  "runtime_export": {
+    "format": "little-endian f64 upper score bounds followed by little-endian f32 probabilities",
+    "no_labels_or_training_data_included": true,
+    "binary_sha256_is_bound_in_export_metadata_and_receipt": true
+  }
+}

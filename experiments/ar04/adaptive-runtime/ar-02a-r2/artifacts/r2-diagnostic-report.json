@@ -1,0 +1,21 @@
+{
+  "protocol": "AR-02A-R2 frozen P16/V48 K2 snapshots; panel estimator diagnostic only",
+  "snapshots": 9,
+  "panel_replicates_per_snapshot_and_method": 64,
+  "placebo_partitions": 8,
+  "rows": 6912,
+  "methods": [
+    {"method":"iid_with_replacement","n":576,"mean_utility_rmse":0.000858986223,"mean_sign_error_rate":0.334222904,"mean_within_block_regret":0.000085467058,"mean_cross_block_opportunity_regret":0.000614510993,"mean_selected_program_regret":0.000775959540,"false_positive_authorization_rate":0.255208333},
+    {"method":"iid_without_replacement","n":576,"mean_utility_rmse":0.000598370102,"mean_sign_error_rate":0.293332987,"mean_within_block_regret":0.000067891061,"mean_cross_block_opportunity_regret":0.000562889382,"mean_selected_program_regret":0.000695768390,"false_positive_authorization_rate":0.215277778},
+    {"method":"cell_stratified_wor","n":576,"mean_utility_rmse":0.000433239728,"mean_sign_error_rate":0.218514561,"mean_within_block_regret":0.000050731280,"mean_cross_block_opportunity_regret":0.000412647887,"mean_selected_program_regret":0.000507342292,"false_positive_authorization_rate":0.142361111},
+    {"method":"margin_stratified_wor","n":576,"mean_utility_rmse":0.000508100738,"mean_sign_error_rate":0.259208127,"mean_within_block_regret":0.000059078149,"mean_cross_block_opportunity_regret":0.000499449247,"mean_selected_program_regret":0.000594240853,"false_positive_authorization_rate":0.166666667},
+    {"method":"hash_placebo_00","n":576,"mean_utility_rmse":0.000620895497,"mean_sign_error_rate":0.297539352,"mean_within_block_regret":0.000071642130,"mean_cross_block_opportunity_regret":0.000527446950,"mean_selected_program_regret":0.000639765166,"false_positive_authorization_rate":0.192708333},
+    {"method":"hash_placebo_01","n":576,"mean_utility_rmse":0.000632192528,"mean_sign_error_rate":0.303096873,"mean_within_block_regret":0.000073756882,"mean_cross_block_opportunity_regret":0.000573691639,"mean_selected_program_regret":0.000729545590,"false_positive_authorization_rate":0.250000000},
+    {"method":"hash_placebo_02","n":576,"mean_utility_rmse":0.000627037532,"mean_sign_error_rate":0.300505995,"mean_within_block_regret":0.000071622551,"mean_cross_block_opportunity_regret":0.000535982347,"mean_selected_program_regret":0.000649711409,"false_positive_authorization_rate":0.197916667},
+    {"method":"hash_placebo_03","n":576,"mean_utility_rmse":0.000624661608,"mean_sign_error_rate":0.293270399,"mean_within_block_regret":0.000067976052,"mean_cross_block_opportunity_regret":0.000526284389,"mean_selected_program_regret":0.000652315018,"false_positive_authorization_rate":0.199652778},
+    {"method":"hash_placebo_04","n":576,"mean_utility_rmse":0.000613993701,"mean_sign_error_rate":0.294953532,"mean_within_block_regret":0.000069763285,"mean_cross_block_opportunity_regret":0.000519261851,"mean_selected_program_regret":0.000642546522,"false_positive_authorization_rate":0.187500000},
+    {"method":"hash_placebo_05","n":576,"mean_utility_rmse":0.000619051871,"mean_sign_error_rate":0.294156973,"mean_within_block_regret":0.000069607559,"mean_cross_block_opportunity_regret":0.000513401723,"mean_selected_program_regret":0.000649073068,"false_positive_authorization_rate":0.199652778},
+    {"method":"hash_placebo_06","n":576,"mean_utility_rmse":0.000618075928,"mean_sign_error_rate":0.300295677,"mean_within_block_regret":0.000072269505,"mean_cross_block_opportunity_regret":0.000586224704,"mean_selected_program_regret":0.000719586008,"false_positive_authorization_rate":0.208333333},
+    {"method":"hash_placebo_07","n":576,"mean_utility_rmse":0.000616679759,"mean_sign_error_rate":0.300021095,"mean_within_block_regret":0.000071565111,"mean_cross_block_opportunity_regret":0.000533854900,"mean_selected_program_regret":0.000666011350,"false_positive_authorization_rate":0.218750000}
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "assembly": {
+    "beam_width": 48,
+    "exploit_width": 32,
+    "explore_width": 16,
+    "group_order": "descending baseline physical-support ULP burden, mismatch count, ascending palette size, support degree, group id",
+    "same_coordinate_different_prefix": "hard conflict",
+    "temporary_nonmonotonic_states": true,
+    "worker_count": 1,
+    "zero_candidate_required": true
+  },
+  "behavioral_probe": false,
+  "contexts": [
+    [
+      "seed9731-L-tau16.json",
+      2
+    ],
+    [
+      "seed9731-L-tau4.json",
+      3
+    ],
+    [
+      "seed9731-R-tau16.json",
+      1
+    ],
+    [
+      "seed9731-R-tau16.json",
+      3
+    ],
+    [
+      "seed9731-R-tau4.json",
+      0
+    ],
+    [
+      "seed9731-R-tau4.json",
+      1
+    ],
+    [
+      "seed9731-R-tau4.json",
+      2
+    ],
+    [
+      "seed9731-R-tau4.json",
+      3
+    ]
+  ],
+  "engineering_only": true,
+  "geometry_metrics": {
+    "final_method": "full PF5 geometry_metrics for every candidate plus independent reconstruction of the reported endpoint",
+    "final_refresh_margin": 0.0,
+    "intermediate_method": "incremental delta from parent geometry and changed committed coordinates; diagnostic only",
+    "readout_semantics_unchanged": true
+  },
+  "historical_execution_not_an_input": true,
+  "identity": "q10-gc1-lr1-requal1-par8-ref1-v1",
+  "inputs": {
+    "assembly_source": "experiments/drosophila-heresy/q10-gc1-par8-v1/scripts/run_gc1.py",
+    "closure": "../q10-gc1-lr1-requal1-domain-r2-v1/closures/twin-a",
+    "palette": "experiments/drosophila-heresy/q10-gc0-gp1-par2-v1/qualification/palettes.jsonl",
+    "pf5_contract": "experiments/drosophila-heresy/q10-pf5-v1/CONTRACT.json"
+  },
+  "intermediate_geometry_guardrails": {
+    "axis_normalized_abs": 0.000256,
+    "cue_linear_normalized_abs": 0.000256,
+    "norm_normalized_abs": 2.56e-05
+  },
+  "pair_replay_allowed": false,
+  "protocol": "REQUAL1-PAR8-REF1",
+  "sample": {
+    "expected_endpoint_set_count": 8,
+    "expected_palette_count": 4158,
+    "expected_raw_group_count": 462
+  },
+  "scientific_promotion": false
+}

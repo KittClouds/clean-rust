@@ -1,0 +1,28 @@
+{
+  "experiment": "RDC-C-004",
+  "run_id": "e004-1790274306797613300",
+  "seed": "0xE40420260924",
+  "episode_count": 128,
+  "budgets": [16, 32, 48, 64],
+  "experiment002_baseline_manifest_blake3": "c23e2ff0133c9be9780863598d3dfa9ce82fb8af16db28321961c44538722ff3",
+  "cargo_lock_blake3": "c36d3438369ea35ffef58ba4791c5cf698127f1aff0f5698060a429a9c04b147",
+  "artifacts_blake3": {
+    "inputs/episodes.csv": "3f7b8dfa34dc1aa3e928684cc721efa7c85832e7a81fee5e52a1827342a9e5bd",
+    "evaluation/hidden-labels.csv": "0a051f18debd931e79f7ed95192ac45e5d99a247caa04df613d7df961463c4e5",
+    "routing-plans.csv": "24a9bf9312732021ed2296efc3a6e695af3240e58d220fa0d4ae767bb4166c44",
+    "run-trace.csv": "6d4e1031ce9587c4ef27410f2f98e7d0936adb27639bc1d7bf50b911103cd11c",
+    "benchmark-report.md": "8873700f137300f83c80fed041d95fb0b6cb58ed5f18b89748f11a5e7ee2bb90",
+    "source/Cargo.toml": "f75c4e0653e4ee56a0fa3b88a80aef1d1caed18abcbd3d1bed57d05701d0435c",
+    "source/Cargo.lock": "c36d3438369ea35ffef58ba4791c5cf698127f1aff0f5698060a429a9c04b147",
+    "source/src/lib.rs": "84fe08a10c1ea847dfab150216aed423d732e6125b6ed3aff0972711b8a656c7",
+    "source/src/domain.rs": "dea6e1a3be7afa2fa606c660913aabbf0168e9dbdd8894ad431a60b8373f57f5",
+    "source/src/episodes.rs": "bde71c4e093963f46b33cfbaa62711068a76ba27887a6418952deed7a366ebe1",
+    "source/src/routing.rs": "7ad0d7924b1537f15fd87c201dbb6db79ec3285084484d242cc671cc106f3654",
+    "source/src/runtime.rs": "0f18cc2d0e1b9d8a5668f46f92a228a255c4b86b206a3d1026d48043b15a0d39",
+    "source/src/scoring.rs": "f223ee671257f49bdb1af8ac544c9a481cd6b81d0d8d3de2ad4f5add2ec97e47",
+    "source/src/report.rs": "7a7e92eddfe99f8c4d0b21110fb707d0c1384647875d219e23eeb87b0ab730f8",
+    "source/src/bin/bench.rs": "d91c85b79c0c29344635570b23771b15fe7f0782b43f8800c71f760484ab1f2e",
+    "source/tests/experiment004.rs": "46bb9a8ee4a1b0c48a7a74b0bca7c542b6c624167d7b24b7db405f40b509a16e",
+    "source/BASELINE.md": "7c7c6edb4118286cd16419583ad188a266c86627f08dae94ffc9251ed6efc3b9"
+  }
+}

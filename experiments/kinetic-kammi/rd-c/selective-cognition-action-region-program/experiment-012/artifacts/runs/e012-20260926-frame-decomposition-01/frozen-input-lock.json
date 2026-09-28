@@ -1,0 +1,656 @@
+{
+  "schema_version": 1,
+  "state": "FROZEN_BEFORE_MODEL_CONTACT",
+  "run_id": "e012-20260926-frame-decomposition-01",
+  "experiment": "R&D-C E012 Prospective Frame Decomposition",
+  "phase": "Phase 3 frozen full-frame admission baseline only",
+  "model_contact_authorized": true,
+  "authorization_basis": "User instructed continuation of the frozen E012 program after precontact gates passed.",
+  "frozen_claim": "No threshold fitting, prompts, models, observers, routing, authority, or candidate presentation may change.",
+  "observer_identity": {
+    "small_bundle_id": "minicpm5-2b-q8-local-v5",
+    "large_bundle_id": "ternary-bonsai-2-27b-ptq1-local-v5",
+    "small_thresholds_milli": {
+      "minimum_applicability_milli": 850,
+      "maximum_abstention_milli": 150
+    },
+    "large_thresholds_milli": {
+      "minimum_applicability_milli": 850,
+      "maximum_abstention_milli": 150
+    },
+    "normalization": "percent-0-100-to-milli-x10-v1+line-endings-lf-v1",
+    "reasoning_mode": "off",
+    "maximum_output_tokens": 1024,
+    "seed": 0,
+    "temperature": 0,
+    "top_p": 1,
+    "context_tokens": 4096,
+    "candidate_order": "producer order preserved and bound by E011 presentation receipts"
+  },
+  "precontact_gate": {
+    "report_path": "bank/construction-01/scored-bank-a14/vault/precontact-audit-a14-v1.json",
+    "report_state": "PRECONTACT_AUDIT_PASS_NO_MODEL_CONTACT",
+    "tasks": 48,
+    "families": 12,
+    "repositories": 3,
+    "conditions": 26,
+    "frames": 1248,
+    "receipt_replays": 1248
+  },
+  "authority": {
+    "implementation": "E011 producer-order runtime integration with E001/E002/E009 contracts",
+    "binary_path": "inputs/authority/e011-authorize.exe",
+    "compiled_target": "D:\\rdc-e012-target\\e012-authority-20260926\\release\\e011-authorize.exe",
+    "compiled_to": "D:",
+    "copied_and_tested_from": "C:",
+    "producer_order_live_path_tests": 4,
+    "synthetic_preflight": "AUTHORITY_PREFLIGHT_PASS_NO_MODEL_CONTACT",
+    "ledger_idempotency": "stable action ID; unique effect once; deterministic replay"
+  },
+  "task_bank": {
+    "candidate_tasks": 48,
+    "paired_items": 20,
+    "unique_public_task_ids": 26,
+    "repository_ids": [
+      "repo-01",
+      "repo-02",
+      "repo-03"
+    ],
+    "families": [
+      "fam-1137",
+      "fam-2372",
+      "fam-2921",
+      "fam-3129",
+      "fam-4846",
+      "fam-5333",
+      "fam-6397",
+      "fam-7432",
+      "fam-8072",
+      "fam-8973",
+      "fam-9358",
+      "fam-9476"
+    ],
+    "full_frame_hash": "e4d9c2e0c668bfa60445ac476ad1f1b695fe8f1bfc9fd07b5746c7b31dbbeb0b",
+    "presentation_bindings_hash": "4eddad73be939242c992d6df7030c8719bce1a26ffd8633da50313753e0f7763",
+    "hidden_label_hash": "e9e81f71e46e167b077d4123a84d918b7d2f4afb791a009700f5390f61106caa",
+    "hidden_labels_separated_from_model_payload": true
+  },
+  "input_contract": {
+    "same_full_frame_sent_to_each_observer": true,
+    "frame_channels": [
+      "E_t",
+      "E_c.content",
+      "E_x",
+      "E_r",
+      "E_p"
+    ],
+    "no_interventions_in_this_phase": true,
+    "no_development_fit_or_threshold_selection": true
+  },
+  "local_files": [
+    {
+      "path": "PROTOCOL.md",
+      "sha256": "4ff0e13a1ad48bf030a81aef8e0d0d9b31047048e78bd69a05b3eb7d49922390",
+      "bytes": 13734
+    },
+    {
+      "path": "amendments/bank-amendment-14.json",
+      "sha256": "5875a34c21d11eabfee5f587e9be10b414fd76323d052643a06e5c58bfc7f5e6",
+      "bytes": 469
+    },
+    {
+      "path": "amendments/bank-amendment-14.md",
+      "sha256": "9cc5c12413763adc44ae652757207d73c8221073bb6d1052840bdcc4cd65237d",
+      "bytes": 1321
+    },
+    {
+      "path": "amendments/bank-amendment-15.json",
+      "sha256": "b457029c7ac43392db53ad05819a9c1c36ac3efc3795acc80bf0d05776b6ad30",
+      "bytes": 332
+    },
+    {
+      "path": "amendments/bank-amendment-15.md",
+      "sha256": "cc7877576eae26271b6e58ef122a7861c2038427cfcdd0e3de816a7155a2b93b",
+      "bytes": 1362
+    },
+    {
+      "path": "amendments/bank-amendment-16.json",
+      "sha256": "ad38678cbe409085fbe241a796899677af0247e9ca89039c8beceaca34c255bc",
+      "bytes": 350
+    },
+    {
+      "path": "amendments/bank-amendment-16.md",
+      "sha256": "c1c683e6f911511443822908c1f2027b47fd2e50486b4c2df9478a6849f89690",
+      "bytes": 525
+    },
+    {
+      "path": "amendments/bank-amendment-17.json",
+      "sha256": "6e30bc2a28af08cf026a31806ded34e89a496665ecdf506c3131ee620c655523",
+      "bytes": 349
+    },
+    {
+      "path": "amendments/bank-amendment-17.md",
+      "sha256": "f762369d1e0b8b93c91e88f4ff7d69bc5725e1c03da2499049ea7488e9e63132",
+      "bytes": 518
+    },
+    {
+      "path": "amendments/bank-amendment-18.json",
+      "sha256": "ccda2fd394df8d9eba77d83c75ea7150d6d003960f3022687315974515f164b0",
+      "bytes": 359
+    },
+    {
+      "path": "amendments/bank-amendment-18.md",
+      "sha256": "982a5982b8b8de441fcb06ea28407376d23267deec90b18ddad540dea7cc032a",
+      "bytes": 456
+    },
+    {
+      "path": "amendments/bank-amendment-19.json",
+      "sha256": "2e0609ff2ef00c288d58da41a78a1e426ac82d27368b6c5b9afd5249cec5a2da",
+      "bytes": 346
+    },
+    {
+      "path": "amendments/bank-amendment-19.md",
+      "sha256": "ae5cdf0117d7906556e79e29c3dd6755d41b99733ae2084eac6eecca7c1d8864",
+      "bytes": 399
+    },
+    {
+      "path": "amendments/bank-amendment-20.json",
+      "sha256": "3861aa7da1d4433efbcc91079e953615516d6a42a75ab7c483a5931cf58104e8",
+      "bytes": 357
+    },
+    {
+      "path": "amendments/bank-amendment-20.md",
+      "sha256": "336f4b377596708ebeba4bbb831a9e57e62ff5dedbebf231402dfc90d45a7038",
+      "bytes": 956
+    },
+    {
+      "path": "amendments/bank-amendment-21.json",
+      "sha256": "7a3a0ca699f2b3318e1da7a4ac1e3186dee9c7659d992fc00bd1093b97a00914",
+      "bytes": 357
+    },
+    {
+      "path": "amendments/bank-amendment-21.md",
+      "sha256": "5273eca1ad9e7065e07a53b6bed01a7d8891529ea39d59f36746f40094094818",
+      "bytes": 562
+    },
+    {
+      "path": "artifacts/runs/e012-20260926-frame-decomposition-01/attempts/freeze-input-attempt-01.json",
+      "sha256": "94ad6f2725eaf5818c215487b3ad5cba82204891ca11dadf5d974b4cba39168e",
+      "bytes": 405
+    },
+    {
+      "path": "artifacts/runs/e012-20260926-frame-decomposition-01/attempts/full-frame-preparation-attempt-01.json",
+      "sha256": "bdcec115b858e42bebeaa554ee0e24be068274e6e026a4860ae2a92281c75388",
+      "bytes": 453
+    },
+    {
+      "path": "artifacts/runs/e012-20260926-frame-decomposition-01/attempts/full-frame-preparation-attempt-02.json",
+      "sha256": "22f4c5db561a30a4c00e7c3c49a80f533146e84e1c92fdb38b77aeecf1611ba1",
+      "bytes": 434
+    },
+    {
+      "path": "artifacts/runs/e012-20260926-frame-decomposition-01/attempts/full-frame-preparation-attempt-03.json",
+      "sha256": "d4ee7b83abb2882c42c4375a8878b32400c235a52bc8baae7c3af0a59232c1b3",
+      "bytes": 490
+    },
+    {
+      "path": "artifacts/runs/e012-20260926-frame-decomposition-01/inputs/full-frame-lock.json",
+      "sha256": "e4d9c2e0c668bfa60445ac476ad1f1b695fe8f1bfc9fd07b5746c7b31dbbeb0b",
+      "bytes": 193206
+    },
+    {
+      "path": "artifacts/runs/e012-20260926-frame-decomposition-01/inputs/presentation-bindings.json",
+      "sha256": "4eddad73be939242c992d6df7030c8719bce1a26ffd8633da50313753e0f7763",
+      "bytes": 49397
+    },
+    {
+      "path": "artifacts/runs/e012-20260926-frame-decomposition-01/preflight/authority-cargo-test.log",
+      "sha256": "7bebbc4cc56d1405f524dcf7f4d620c1efef8b65d371079159a5f60545d9633a",
+      "bytes": 1810
+    },
+    {
+      "path": "artifacts/runs/e012-20260926-frame-decomposition-01/preflight/authority-probe/action-ledger.bin",
+      "sha256": "6c6695c336c1ffc05fe57d0a4a20decfcd4684b8d1ce74994eaa3d9f4f973ff7",
+      "bytes": 315
+    },
+    {
+      "path": "artifacts/runs/e012-20260926-frame-decomposition-01/preflight/authority-probe/input.json",
+      "sha256": "f53817693d78e0296aea86cfdd8c76d0ef60f0d1a153e86e7d8dc85a2ca32c9c",
+      "bytes": 3971
+    },
+    {
+      "path": "artifacts/runs/e012-20260926-frame-decomposition-01/preflight/authority-probe/result.json",
+      "sha256": "84b4ac36ce98af374bdd2801068b863ef1b6cdd5e20b91edf3452a7c0efc439f",
+      "bytes": 7548
+    },
+    {
+      "path": "artifacts/runs/e012-20260926-frame-decomposition-01/vault/evaluation-labels.json",
+      "sha256": "e9e81f71e46e167b077d4123a84d918b7d2f4afb791a009700f5390f61106caa",
+      "bytes": 69376
+    },
+    {
+      "path": "bank-construction-plan-v1.4.md",
+      "sha256": "a4f6fd70e79dba35e22bafaa78ae5f71af34ea8cd5e7ac45d0bd98402bddcbb3",
+      "bytes": 3278
+    },
+    {
+      "path": "bank/construction-01/a14-design-lock-v1.json",
+      "sha256": "9601c8742240bec28b6c7372539d3b57756155f4a9ee8475d73cedbc2ab17726",
+      "bytes": 24943
+    },
+    {
+      "path": "bank/construction-01/frame-projection-lock-a14-v1.json",
+      "sha256": "dad661916cd060a8870c898c24136e5f09b55f1cb93d6749e45940d2762e17e5",
+      "bytes": 2593
+    },
+    {
+      "path": "bank/construction-01/label-finalization-lock-v1.json",
+      "sha256": "9080bd5aa4b7cc5974c7059c23f84519c5bb8b508ed688e44fd5f9765a2e394c",
+      "bytes": 2746
+    },
+    {
+      "path": "bank/construction-01/nuisance-audit-lock-a19-v1.json",
+      "sha256": "76cb19d0e9a15c6ca948a66d99c5a907596b0927c5a17ca97cc319a84db5bb7d",
+      "bytes": 4556
+    },
+    {
+      "path": "bank/construction-01/paired-truth-audit-lock-a16-v1.json",
+      "sha256": "094d910e7b438f08fa6c3d6c942fd93e0d880546e91353179737e75bd4c25c59",
+      "bytes": 3624
+    },
+    {
+      "path": "bank/construction-01/precontact-audit-lock-a20-v1.json",
+      "sha256": "9e64f31e07e5f46da74844d38f9f5ce5a196b613591143628dd29896d967cf73",
+      "bytes": 5705
+    },
+    {
+      "path": "bank/construction-01/precontact-audit-lock-a21-v1.json",
+      "sha256": "e142c491c21be184def7c58da5deae9556555532c1e01afbfe3c190a889a14b2",
+      "bytes": 4572
+    },
+    {
+      "path": "bank/construction-01/repository-source-audit-v1.json",
+      "sha256": "1d3d7fc4a46f5233e81c44a6e22c91ae04db119896d95cbe48b140eb4bd69ade",
+      "bytes": 1820
+    },
+    {
+      "path": "bank/construction-01/scored-bank-a14/attempts/precontact-audit-attempt-a14-01.json",
+      "sha256": "750d64d2ef5d936404baea55f66c48ff3140d9e834b71687ace54f978943702c",
+      "bytes": 585
+    },
+    {
+      "path": "bank/construction-01/scored-bank-a14/attempts/precontact-audit-attempt-a20-01.json",
+      "sha256": "97cf2e93dbf0bd837efd9f99a9d9164ffdb195a6a15ba65b0e658d5f0dc93611",
+      "bytes": 567
+    },
+    {
+      "path": "bank/construction-01/scored-bank-a14/observer-frames.json",
+      "sha256": "e17bb4b06a34c5636789c6e7fb338c84ca89252069425470634ff27da939c3b4",
+      "bytes": 4254101
+    },
+    {
+      "path": "bank/construction-01/scored-bank-a14/vault/candidate-check-labels-final-v3.json",
+      "sha256": "45b357bb7b443c84b75d11ce9d56b4f6e1051bfbd3e6a9ec94fd572fc3d187f3",
+      "bytes": 943366
+    },
+    {
+      "path": "bank/construction-01/scored-bank-a14/vault/candidate-check-results-precheck-v3.json",
+      "sha256": "372625d7828eed2fa10580acb8d1b548bddc0cbfa559649fde10414cb44de2f0",
+      "bytes": 948097
+    },
+    {
+      "path": "bank/construction-01/scored-bank-a14/vault/frame-truth-index.json",
+      "sha256": "3ab3df48b2d609f9c0d877955e94ffcbf5b570465a00feb5617c47cc76661ca3",
+      "bytes": 989149
+    },
+    {
+      "path": "bank/construction-01/scored-bank-a14/vault/label-finalization-report-v3.json",
+      "sha256": "b6b877eafc1b4d4ff1b5b2ceb03974fa464af3dc08740706e0c74f1acf99f39c",
+      "bytes": 8680
+    },
+    {
+      "path": "bank/construction-01/scored-bank-a14/vault/nuisance-baselines-a19-v1.json",
+      "sha256": "ef95818f4510cdfa9ff9dc9e571f7aac0d6844b45c4d776faafd41fec498bdd8",
+      "bytes": 63963
+    },
+    {
+      "path": "bank/construction-01/scored-bank-a14/vault/paired-truth-audit-a16-v1.json",
+      "sha256": "96429c2a362fe9b74bc124807ebd864f1b51a56e81a9f7ed37c275914575d460",
+      "bytes": 14087
+    },
+    {
+      "path": "bank/construction-01/scored-bank-a14/vault/precontact-audit-a14-v1.json",
+      "sha256": "15c99e27f48dbf0f383c78ea2d7775baa2c4970da99532ea932228395e9dee19",
+      "bytes": 4816
+    },
+    {
+      "path": "bank/construction-01/scored-bank-a14/vault/presentation-receipts.json",
+      "sha256": "1a8ccb1a72fa9cf21660d61ba2bee3241323c0c8d9302cba7028a78baf1816a8",
+      "bytes": 1227141
+    },
+    {
+      "path": "bank/construction-01/scored-bank-a14/vault/task-source-fixtures-final-v3.json",
+      "sha256": "5c74f424906f618e817a1cd1f2ba020f5ab02c0c9e39737631b4983e70847bea",
+      "bytes": 336595
+    },
+    {
+      "path": "bank/construction-01/scored-bank-a14/vault/task-source-fixtures-precheck-v3.json",
+      "sha256": "51e9f8f59c49ffe57c5f19a4d062dceb974d53ffe6acf74e6153069a63ff827e",
+      "bytes": 331705
+    },
+    {
+      "path": "bank/construction-01/scored-check-run-lock-a14-v1.json",
+      "sha256": "d2298083e389b02a9ee158cacaf8a1cc6da41da898a7bec15c388bc1bdd79514",
+      "bytes": 22212
+    },
+    {
+      "path": "bank/construction-01/task-construction-input-manifest-v1.1.json",
+      "sha256": "36d3e60e012ca06f48f4a5e26e26a7ef7421d71d258f2698b8289555028d7edb",
+      "bytes": 65241
+    },
+    {
+      "path": "bank/phase-03-full-frame-baseline-v1.json",
+      "sha256": "bdfd8d161cc889d386ba64b612838e3d8fed83f737eba3b40eb56952f6f30d49",
+      "bytes": 1590
+    },
+    {
+      "path": "bank/phase-03-full-frame-baseline-v1.md",
+      "sha256": "655673430cbe9b3d348916c5b5847059f1de2d6f005b7477a5f9db4fbd3be6e3",
+      "bytes": 3608
+    },
+    {
+      "path": "channel-contract-v0.json",
+      "sha256": "3dce1202084bc2d780e6d8f767324a6d53e0aa5927ce173d9ba690f0c09dcfba",
+      "bytes": 4000
+    },
+    {
+      "path": "inputs/authority/e011-authorize.exe",
+      "sha256": "dd71c292136d2e921438f1673b33ca35338c51074aa8822574aea574f775524a",
+      "bytes": 461824
+    },
+    {
+      "path": "inputs/authority/source/e011-runtime/Cargo.lock",
+      "sha256": "1ed113829db7f13cb48430d922dd6811985020878925ad0ad7c02d6820e205f1",
+      "bytes": 7396
+    },
+    {
+      "path": "inputs/authority/source/e011-runtime/Cargo.toml",
+      "sha256": "466f9e2979e5b1a56a4a16956acb02e74b00e4d8a25a3c5effe4f9f84c06ead0",
+      "bytes": 565
+    },
+    {
+      "path": "inputs/authority/source/e011-runtime/src/bin/e011-authorize.rs",
+      "sha256": "8c5c3e2ed6825b2847ba44f0e0f8c5c0554558acfa4e381b145025a183ec84b9",
+      "bytes": 10754
+    },
+    {
+      "path": "inputs/authority/source/e011-runtime/src/bin/e011-hash.rs",
+      "sha256": "0b2d3e6b8948a0438adf39d0f2c25bb457cde7e8c7341395bf1dc58e8e435a0f",
+      "bytes": 730
+    },
+    {
+      "path": "inputs/authority/source/e011-runtime/src/bin/e011-presentation.rs",
+      "sha256": "352f80c65c8cabdb83e5cc80d02c609b7f078875e8e50cef28fa1c1c29271726",
+      "bytes": 1867
+    },
+    {
+      "path": "inputs/authority/source/e011-runtime/src/lib.rs",
+      "sha256": "6716706b714b3525e83304f3336ae5d98a3de3ea4fd0e0fec08f5577163acdcf",
+      "bytes": 6573
+    },
+    {
+      "path": "inputs/authority/source/e011-runtime/tests/live_path.rs",
+      "sha256": "f2ca660dda354db975db6252374bb27e28bb855e2454f6d16f008053e9d1c56b",
+      "bytes": 4178
+    },
+    {
+      "path": "inputs/e009-v5/chat-template-large.jinja",
+      "sha256": "c3cf9e34abf4f9e36c2d72165aa9c132d3e2a725b6c2586aaa3a8af9d7a81041",
+      "bytes": 8952
+    },
+    {
+      "path": "inputs/e009-v5/chat-template-small.jinja",
+      "sha256": "6e54652d84d698ebb3b7b2172204b6eeafd7f27533e006c8c1ebf8e743a7fd99",
+      "bytes": 9059
+    },
+    {
+      "path": "inputs/e009-v5/e009-v5-bundle-lock.json",
+      "sha256": "a626836853bdb0755fd2e4e1569b6b91b33861306c7d1e4a51e3de54a9ee713d",
+      "bytes": 4038
+    },
+    {
+      "path": "inputs/e009-v5/e009-v5-thresholds.json",
+      "sha256": "846b0668db2a7796ac1ee90c190d45532a3065617ff1abca03df495496ddb173",
+      "bytes": 1926
+    },
+    {
+      "path": "inputs/e009-v5/e010-frozen-input-lock.json",
+      "sha256": "323f14b07c698d289af6f11a2e894014538bd6be0644de8786b30b1e954f8165",
+      "bytes": 2613
+    },
+    {
+      "path": "inputs/e009-v5/observer-output.v2.json",
+      "sha256": "97170fa0d6a44681f680ad0ac533a3f3913709757e4ee6cbf96d9c9f40d1b2fb",
+      "bytes": 611
+    },
+    {
+      "path": "inputs/e009-v5/system-observer-v2.txt",
+      "sha256": "976ef1cd914bacb366c64418825010124338a626a0400d459858acc7e48f5a48",
+      "bytes": 981
+    },
+    {
+      "path": "scripts/audit_nuisance_baselines_e012_a19_v1.py",
+      "sha256": "80088f4ad05a1c9e3d8c66b3206e6f18817abb831b0464ff6a37e9d87c87a26b",
+      "bytes": 15946
+    },
+    {
+      "path": "scripts/audit_paired_truth_e012_a16_v1.py",
+      "sha256": "d38f889c3689509a47690ce07c2b0bfe3fea95b48547a1514053fe6fda90e59b",
+      "bytes": 13961
+    },
+    {
+      "path": "scripts/audit_task_bank_e012_a21_v1.py",
+      "sha256": "9f4170877dd4ccd38325783ee9fb5cd9695b95bcbec44779cc8659a6f856908e",
+      "bytes": 22530
+    },
+    {
+      "path": "scripts/build_task_sources_e012_v1.py",
+      "sha256": "99cb994d80040f6cd388e250ee5ab8b89e59d0e5a978c91894f15d5620c804a9",
+      "bytes": 23605
+    },
+    {
+      "path": "scripts/finalize_pair_locked_bank_e012_a14_v3.py",
+      "sha256": "d6cc4037759cd5c5fdf9980279ead249d830d1fad2dc6858c9fa160e5c9e5ad9",
+      "bytes": 27971
+    },
+    {
+      "path": "scripts/freeze_frame_projection_e012_a14_v1.py",
+      "sha256": "b119df500b25506eb8092857e4ca0f841174bba19871b13b3727193bedf68b74",
+      "bytes": 2284
+    },
+    {
+      "path": "scripts/freeze_inputs_e012.py",
+      "sha256": "21a64eee6572412e63203cb9e9d42762f0fd15f1d1bca19b1ae3ac9571acb7fc",
+      "bytes": 19705
+    },
+    {
+      "path": "scripts/freeze_label_finalization_e012_v1.py",
+      "sha256": "e24907df41df07e5aafc51c970e27b9d39197f109bb2144f36345914a562f781",
+      "bytes": 3994
+    },
+    {
+      "path": "scripts/freeze_nuisance_audit_e012_a19_v1.py",
+      "sha256": "a3f9a384fe6158731e110cc600da67f06f1612a6956952d9f7c5f0c1c639a7e9",
+      "bytes": 2416
+    },
+    {
+      "path": "scripts/freeze_paired_truth_audit_e012_a16_v1.py",
+      "sha256": "bccae84291165da7de912093fd1a1d365ea83beddd3c201d07d770d989fc0cdb",
+      "bytes": 2134
+    },
+    {
+      "path": "scripts/freeze_precontact_audit_e012_a21_v1.py",
+      "sha256": "8d91e08453b7e9abc7fa9d24ffce3ab99e2872da0eeca7259e6f4456dc59e617",
+      "bytes": 2422
+    },
+    {
+      "path": "scripts/freeze_scored_check_runner_e012_a14_v1.py",
+      "sha256": "a57e71662efd386482d3437d4c3f6d1bd188bb78e81fdf57cee46e69d7fac47f",
+      "bytes": 5485
+    },
+    {
+      "path": "scripts/freeze_task_construction_e012_v1_1.py",
+      "sha256": "81f2cae08f006c37ca9d1310a9ae3783223021b3a4b0d4afdce1c001a92b13d1",
+      "bytes": 6946
+    },
+    {
+      "path": "scripts/preflight_authority_e012.py",
+      "sha256": "6fa54430c3b2ab3843fdbc1ed655c5dd1521c75331864b5fa50a8404477e47c9",
+      "bytes": 3344
+    },
+    {
+      "path": "scripts/prepare_full_frame_lock_e012.py",
+      "sha256": "4dc72eaedb9ae77cd39a115a24826365500f8b49c613b00b8528d4716a368b43",
+      "bytes": 7413
+    },
+    {
+      "path": "scripts/project_frames_e012_a14_v1.py",
+      "sha256": "dee48af049fbd94c5ef99c77899dd155e26a117b259e7086129e7f1058c5d440",
+      "bytes": 23068
+    },
+    {
+      "path": "scripts/run_observer_e012.py",
+      "sha256": "8b03cd91436c8cfc67c5b859a5b642c2b8eb218806b6db87abff9aaaa35b810d",
+      "bytes": 14531
+    },
+    {
+      "path": "scripts/score_full_frame_e012.py",
+      "sha256": "59cf10ef77d70bdfeadefd479ce317e6d4a7a45872a5cbbb04f5ea7a52c78144",
+      "bytes": 19862
+    },
+    {
+      "path": "scripts/seal_model_contact_gate_e012.py",
+      "sha256": "a75702d94e2b708b85f796d1d2b629668ae9c0702b4af384cad9764663d2e7e8",
+      "bytes": 2821
+    },
+    {
+      "path": "scripts/start_observer_e012.ps1",
+      "sha256": "f84911142d6baf645c811c10a45141c22465d876471b481415bba45ce45bdd1f",
+      "bytes": 6409
+    },
+    {
+      "path": "scripts/stop_observer_e012.ps1",
+      "sha256": "665ff6e03aa5ec1c298594a51579d7910c2c6bdef89b43de9b91d022a7a305d4",
+      "bytes": 1012
+    },
+    {
+      "path": "task-construction-spec-v1.1.json",
+      "sha256": "7110c34bb0fa91a5512a10e70cf6c36048d48c8f56b3ac558b16576734f97441",
+      "bytes": 1694
+    },
+    {
+      "path": "task-construction-spec-v1.1.md",
+      "sha256": "a9080f0c347bbaf026a902b1a0c3a03a9d3f8c4d78054246bb0a643cef8c6d73",
+      "bytes": 2788
+    },
+    {
+      "path": "task-construction-spec-v1.2.md",
+      "sha256": "7ee9cc4b2ba84b93a8027d7c749c03163d96828fafe1776d1ad84d0cbc3260b8",
+      "bytes": 2305
+    }
+  ],
+  "evaluation_files": [
+    {
+      "path": "artifacts/runs/e012-20260926-frame-decomposition-01/vault/evaluation-labels.json",
+      "sha256": "e9e81f71e46e167b077d4123a84d918b7d2f4afb791a009700f5390f61106caa",
+      "bytes": 69376
+    },
+    {
+      "path": "bank/construction-01/scored-bank-a14/vault/candidate-check-labels-final-v3.json",
+      "sha256": "45b357bb7b443c84b75d11ce9d56b4f6e1051bfbd3e6a9ec94fd572fc3d187f3",
+      "bytes": 943366
+    },
+    {
+      "path": "bank/construction-01/scored-bank-a14/vault/frame-truth-index.json",
+      "sha256": "3ab3df48b2d609f9c0d877955e94ffcbf5b570465a00feb5617c47cc76661ca3",
+      "bytes": 989149
+    }
+  ],
+  "source_trees": [
+    {
+      "path": "bank/construction-01/task-harnesses-a14",
+      "sha256": "8a0c0c4a2958665250942abb2e35ae88ca240b0bc84b026f2adcefb8caf4e3e5",
+      "file_count": 84,
+      "bytes": 67039
+    },
+    {
+      "path": "bank/construction-01/repositories/bytes",
+      "sha256": "ebe965176644a4992250652594a55c0787f680b866b5b76bd72c2fc3edac8bc7",
+      "file_count": 880,
+      "bytes": 164966511
+    },
+    {
+      "path": "bank/construction-01/repositories/clap",
+      "sha256": "8d38c0ad7bd539b13cf1ff188e6fb12e00325df068a541d82bc71e719345564c",
+      "file_count": 2814,
+      "bytes": 821687505
+    },
+    {
+      "path": "bank/construction-01/repositories/serde",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "file_count": 0,
+      "bytes": 0
+    },
+    {
+      "path": "inputs/authority/source",
+      "sha256": "8177a98d4b40e2405f4550843f50c18b19e5d7e21b4e5297ea38da3d2a01b5ef",
+      "file_count": 34,
+      "bytes": 212763
+    }
+  ],
+  "external_files": [
+    {
+      "name": "small_runtime",
+      "path": "D:\\phoenix-runtimes\\llama.cpp\\b10982\\runtime\\llama-server.exe",
+      "sha256": "ffaee576ad271ede87b92a7d8c3863dc8f331bbac666ee00099c250e8809e743",
+      "bytes": 9216,
+      "verified_before_freeze": true,
+      "reverified_by_start_script": true
+    },
+    {
+      "name": "small_model",
+      "path": "D:\\phoenix-models\\candidates\\minicpm5-2b\\2079a22f3beaa4e306449978533478fe0522f4b3\\MiniCPM5-2B-Q8_0.gguf",
+      "sha256": "c5415f8989bf88a8288f1b55a3cc371af53c07b0faa220a63bd7a990cfaba078",
+      "bytes": 2679710688,
+      "verified_before_freeze": true,
+      "reverified_by_start_script": true
+    },
+    {
+      "name": "large_runtime",
+      "path": "D:\\phoenix-runtimes\\prism-llama.cpp\\prism-b10685-7dffb15\\win-cuda-12.4\\runtime\\llama-server.exe",
+      "sha256": "e0ea4fd53e6f0c741cbd28093b427f333ada0eb03b83073e1f99c483793ea976",
+      "bytes": 10752,
+      "verified_before_freeze": true,
+      "reverified_by_start_script": true
+    },
+    {
+      "name": "large_model",
+      "path": "D:\\phoenix-models\\candidates\\ternary-bonsai-2-27b\\6ed5e12bf84b7a63069882c91dd9e9218647d17b\\Ternary-Bonsai-2-27B-PTQ1_0.gguf",
+      "sha256": "53107f530aa52eb00912263ab1ee29bd199261c87cd7b4ad4ca1318c1fe33ee3",
+      "bytes": 5946648928,
+      "verified_before_freeze": true,
+      "reverified_by_start_script": true
+    }
+  ],
+  "run_artifacts": {
+    "full_frame_lock_sha256": "e4d9c2e0c668bfa60445ac476ad1f1b695fe8f1bfc9fd07b5746c7b31dbbeb0b",
+    "presentation_bindings_sha256": "4eddad73be939242c992d6df7030c8719bce1a26ffd8633da50313753e0f7763",
+    "evaluation_labels_sha256": "e9e81f71e46e167b077d4123a84d918b7d2f4afb791a009700f5390f61106caa"
+  },
+  "build_environment": {
+    "cargo": "cargo 1.96.0 (30a34c682 2026-05-25)",
+    "rustc": "rustc 1.96.0 (ac68faa20 2026-05-25)",
+    "target_directory": "D:\\rdc-e012-target\\e012-authority-20260926"
+  },
+  "created_at_utc": "2026-09-26T05:22:50.027879+00:00"
+}

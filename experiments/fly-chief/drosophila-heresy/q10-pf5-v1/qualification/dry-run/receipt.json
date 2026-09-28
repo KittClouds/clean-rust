@@ -1,0 +1,231 @@
+{
+  "protocol": "Q10-PF5",
+  "status": "DRY_RUN_VALID__ONE_ENDPOINT_PREFIX_REPLAY",
+  "engineering_only": true,
+  "source_event": "seed9731-L-tau16.json",
+  "set_index": 0,
+  "endpoint": "seed9731-L-tau16.json#set0",
+  "parent_counts": {
+    "primary_endpoints": 28,
+    "excluded_endpoints": 4,
+    "mismatch_rows": 7003,
+    "components": 2738
+  },
+  "coordinate_count": 24355,
+  "row_count": 768,
+  "mismatch_rows": 243,
+  "raw_support_legal_coordinates": 3267,
+  "selected_coordinates": [
+    5,
+    20,
+    109
+  ],
+  "prefix_choice_count": 33,
+  "prefix_records": [
+    {
+      "coordinate": 5,
+      "choice": 0,
+      "stored_value_bits": 1035776624,
+      "readout_mismatch_count": 243
+    },
+    {
+      "coordinate": 5,
+      "choice": -1,
+      "stored_value_bits": 1035776623,
+      "readout_mismatch_count": 243
+    },
+    {
+      "coordinate": 5,
+      "choice": 1,
+      "stored_value_bits": 1035776625,
+      "readout_mismatch_count": 243
+    },
+    {
+      "coordinate": 5,
+      "choice": -2,
+      "stored_value_bits": 1035776622,
+      "readout_mismatch_count": 243
+    },
+    {
+      "coordinate": 5,
+      "choice": 2,
+      "stored_value_bits": 1035776626,
+      "readout_mismatch_count": 243
+    },
+    {
+      "coordinate": 5,
+      "choice": -4,
+      "stored_value_bits": 1035776620,
+      "readout_mismatch_count": 243
+    },
+    {
+      "coordinate": 5,
+      "choice": 4,
+      "stored_value_bits": 1035776628,
+      "readout_mismatch_count": 243
+    },
+    {
+      "coordinate": 5,
+      "choice": -8,
+      "stored_value_bits": 1035776616,
+      "readout_mismatch_count": 243
+    },
+    {
+      "coordinate": 5,
+      "choice": 8,
+      "stored_value_bits": 1035776632,
+      "readout_mismatch_count": 243
+    },
+    {
+      "coordinate": 5,
+      "choice": -16,
+      "stored_value_bits": 1035776608,
+      "readout_mismatch_count": 243
+    },
+    {
+      "coordinate": 5,
+      "choice": 16,
+      "stored_value_bits": 1035776640,
+      "readout_mismatch_count": 243
+    },
+    {
+      "coordinate": 20,
+      "choice": 0,
+      "stored_value_bits": 1051797212,
+      "readout_mismatch_count": 243
+    },
+    {
+      "coordinate": 20,
+      "choice": -1,
+      "stored_value_bits": 1051797211,
+      "readout_mismatch_count": 243
+    },
+    {
+      "coordinate": 20,
+      "choice": 1,
+      "stored_value_bits": 1051797213,
+      "readout_mismatch_count": 243
+    },
+    {
+      "coordinate": 20,
+      "choice": -2,
+      "stored_value_bits": 1051797210,
+      "readout_mismatch_count": 243
+    },
+    {
+      "coordinate": 20,
+      "choice": 2,
+      "stored_value_bits": 1051797214,
+      "readout_mismatch_count": 243
+    },
+    {
+      "coordinate": 20,
+      "choice": -4,
+      "stored_value_bits": 1051797208,
+      "readout_mismatch_count": 243
+    },
+    {
+      "coordinate": 20,
+      "choice": 4,
+      "stored_value_bits": 1051797216,
+      "readout_mismatch_count": 243
+    },
+    {
+      "coordinate": 20,
+      "choice": -8,
+      "stored_value_bits": 1051797204,
+      "readout_mismatch_count": 242
+    },
+    {
+      "coordinate": 20,
+      "choice": 8,
+      "stored_value_bits": 1051797220,
+      "readout_mismatch_count": 244
+    },
+    {
+      "coordinate": 20,
+      "choice": -16,
+      "stored_value_bits": 1051797196,
+      "readout_mismatch_count": 243
+    },
+    {
+      "coordinate": 20,
+      "choice": 16,
+      "stored_value_bits": 1051797228,
+      "readout_mismatch_count": 244
+    },
+    {
+      "coordinate": 109,
+      "choice": 0,
+      "stored_value_bits": 1050511097,
+      "readout_mismatch_count": 243
+    },
+    {
+      "coordinate": 109,
+      "choice": -1,
+      "stored_value_bits": 1050511096,
+      "readout_mismatch_count": 243
+    },
+    {
+      "coordinate": 109,
+      "choice": 1,
+      "stored_value_bits": 1050511098,
+      "readout_mismatch_count": 243
+    },
+    {
+      "coordinate": 109,
+      "choice": -2,
+      "stored_value_bits": 1050511095,
+      "readout_mismatch_count": 243
+    },
+    {
+      "coordinate": 109,
+      "choice": 2,
+      "stored_value_bits": 1050511099,
+      "readout_mismatch_count": 243
+    },
+    {
+      "coordinate": 109,
+      "choice": -4,
+      "stored_value_bits": 1050511093,
+      "readout_mismatch_count": 243
+    },
+    {
+      "coordinate": 109,
+      "choice": 4,
+      "stored_value_bits": 1050511101,
+      "readout_mismatch_count": 243
+    },
+    {
+      "coordinate": 109,
+      "choice": -8,
+      "stored_value_bits": 1050511089,
+      "readout_mismatch_count": 242
+    },
+    {
+      "coordinate": 109,
+      "choice": 8,
+      "stored_value_bits": 1050511105,
+      "readout_mismatch_count": 243
+    },
+    {
+      "coordinate": 109,
+      "choice": -16,
+      "stored_value_bits": 1050511081,
+      "readout_mismatch_count": 243
+    },
+    {
+      "coordinate": 109,
+      "choice": 16,
+      "stored_value_bits": 1050511113,
+      "readout_mismatch_count": 244
+    }
+  ],
+  "baseline_target_bitwise_match": true,
+  "execution_scope": {
+    "state": "cloned_f32_only",
+    "science": false,
+    "behavioral_probe": false,
+    "canonical_update": false
+  }
+}

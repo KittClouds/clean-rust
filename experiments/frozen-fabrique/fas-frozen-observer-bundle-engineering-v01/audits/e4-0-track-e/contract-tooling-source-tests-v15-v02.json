@@ -1,0 +1,44 @@
+{
+  "schema": "FAS_E4_0_CONTRACT_TOOLING_SOURCE_TESTS_V15_V02",
+  "receipt_id": "E4_0_CONTRACT_TOOLING_V15_SOURCE_TESTS_V02",
+  "status": "PASS_SYNTHETIC_CONTRACT_AND_SOURCE_MAP_TESTS_V02",
+  "commands": [
+    "python -m py_compile experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/build_e4_0_source_map_v15.py experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/finalize_e4_0_contract_v15.py experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/seal_e4_0_contract_v15.py experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/test_e4_0_contract_v15.py",
+    "python experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/test_e4_0_contract_v15.py (28 synthetic tests)"
+  ],
+  "unit_test_count": 28,
+  "py_compile": "PASS",
+  "source_bindings": [
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/build_e4_0_source_map_v15.py",
+      "bytes": 58444,
+      "sha256": "7b46ec7f2e1f58ff7b6be1139b01c1e2e05d63a980d01879a36d949703d7b93d"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/finalize_e4_0_contract_v15.py",
+      "bytes": 59449,
+      "sha256": "72f0bbb79ee448b6ab834035e51bbfb0cfa38b97a443ccd62d921973e92c0fb4"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/seal_e4_0_contract_v15.py",
+      "bytes": 17713,
+      "sha256": "132efa53faf93d52d2f2c49eaeb55b19f41931f7bbaf03af6fe37525b3659e69"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/test_e4_0_contract_v15.py",
+      "bytes": 26569,
+      "sha256": "bccb602956c4170d1ba420c9fd54d1416eeab70504ebfd14787c7d52031d6029"
+    }
+  ],
+  "runtime_access": {
+    "model_contact": false,
+    "tokenizer_contact": false,
+    "cuda_initialized": false,
+    "gpu_lease_acquired": false,
+    "cache_created": false,
+    "labels_opened": false
+  },
+  "scope": "Synthetic v15 source-map, contract finalizer, and sealer tests. Covers exact v06-v11 sealed ancestor closure, v14 failed-preseal lineage with absent runtime/contact keys and false truth flags, v13 finalization stop history, both preserved initial-v15 receipt identities, corrected v15 tooling receipt status/path, source-map Frozen Input closure, and duplicate-path rejection. No contract/map/seal/authorization or runtime contact.",
+  "execution_authorization_conferred": false,
+  "recorded_utc": "2026-09-27T04:33:36.001141+00:00"
+}

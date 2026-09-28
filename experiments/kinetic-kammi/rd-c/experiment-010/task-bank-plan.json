@@ -1,0 +1,168 @@
+{
+  "schema_version": 1,
+  "run_id": "e010-20260925-cross-repo-01",
+  "repositories": {
+    "turbovec": {
+      "source_path": "repositories/turbovec/source",
+      "workspace_manifest": "Cargo.toml",
+      "package_name": "turbovec",
+      "families": [
+        {
+          "family": "turbovec-mask-allowlist",
+          "file": "turbovec/src/search.rs",
+          "old": "(mask[slot >> 6] >> (slot & 63)) & 1 != 0",
+          "broken": "(mask[slot >> 6] >> (slot & 31)) & 1 != 0",
+          "gold": "(mask[slot >> 6] >> (slot & 63)) & 1 != 0",
+          "mutant": "(mask[slot >> 5] >> (slot & 63)) & 1 != 0",
+          "comment_anchor": "    (mask[slot >> 6] >> (slot & 63)) & 1 != 0",
+          "comment": "    // Slot indices select one bit from each complete u64 word.\n",
+          "test_args": ["--test", "filtering"],
+          "test_filter": "block_skip_at_one_percent_selectivity_matches_post_filter",
+          "features": [],
+          "evidence": "Masked search must return the same top-k set as an unmasked search filtered afterward.",
+          "prompts": [
+            "Repair masked vector search so the frozen allowlist parity test passes. Choose one offered patch.",
+            "The top-k result must contain only permitted vector slots and match post-hoc filtering. The exact regression test currently fails; choose the patch that restores the packed-mask contract."
+          ]
+        },
+        {
+          "family": "turbovec-id-remove-readd",
+          "file": "turbovec/src/id_map.rs",
+          "old": "        self.ids_mut().remove(&id);",
+          "broken": "        self.ids_mut().remove(&id);\n        self.ids_mut().insert(id, last);",
+          "gold": "        self.ids_mut().remove(&id);",
+          "mutant": "        self.ids_mut().remove(&id);\n        self.ids_mut().insert(id, slot);",
+          "comment_anchor": "        self.ids_mut().remove(&id);",
+          "comment": "        // Remove the external ID before it can be reinserted.\n",
+          "test_args": ["--test", "id_map"],
+          "test_filter": "remove_then_re_add_same_id_is_allowed",
+          "features": [],
+          "evidence": "After removal, the external ID must be absent so a replacement vector can reuse it.",
+          "prompts": [
+            "Repair the stable-ID removal path. The frozen remove-and-readd test fails on this snapshot; choose the patch that makes the ID reusable.",
+            "A deleted external ID should no longer be reported as present, and a new vector must be allowed to reuse it. Select the offered implementation that satisfies the exact test."
+          ]
+        },
+        {
+          "family": "turbovec-id-swap-repair",
+          "file": "turbovec/src/id_map.rs",
+          "old": "            self.ids_mut().insert(moved_id, slot);",
+          "broken": "            self.ids_mut().insert(moved_id, last);",
+          "gold": "            self.ids_mut().insert(moved_id, slot);",
+          "mutant": "            self.ids_mut().insert(moved_id, 0);",
+          "comment_anchor": "            self.ids_mut().insert(moved_id, slot);",
+          "comment": "            // The moved vector now occupies the vacated slot.\n",
+          "test_args": ["--test", "id_map"],
+          "test_filter": "remaining_ids_still_self_query_after_mixed_removes",
+          "features": [],
+          "evidence": "After swap-and-pop, every surviving external ID must continue to resolve to its vector.",
+          "prompts": [
+            "Repair the ID-to-slot update after removing vectors from mixed positions. Choose the patch that keeps the frozen survivor search test passing.",
+            "A swap removal moves the last vector into the deleted vector's slot. Later removals and self-queries must still agree about each external ID; select the patch that restores that invariant."
+          ]
+        },
+        {
+          "family": "turbovec-rotation-wire-format",
+          "file": "turbovec/src/rotation.rs",
+          "old": "164, 143, 161, 123,",
+          "broken": "165, 143, 161, 123,",
+          "gold": "164, 143, 161, 123,",
+          "mutant": "163, 143, 161, 123,",
+          "comment_anchor": "const ROTATION_SEED:",
+          "comment": "// This seed is part of the persisted v5 encoding contract.\n",
+          "test_args": ["--test", "rotation_determinism"],
+          "test_filter": "golden_rotation_bits_pin_the_chacha_stream",
+          "features": [],
+          "evidence": "The frozen v5 encoder must preserve its pinned deterministic rotation bytes.",
+          "prompts": [
+            "Restore the v5 deterministic rotation contract. The frozen golden-byte test fails; choose the patch that preserves existing encoded data.",
+            "Changing the rotation stream changes persisted vector bytes. Use the exact test output and offered changes to select the patch that restores the recorded v5 format."
+          ]
+        }
+      ]
+    },
+    "ripgrep": {
+      "source_path": "repositories/ripgrep/source",
+      "workspace_manifest": "Cargo.toml",
+      "package_name": null,
+      "families": [
+        {
+          "family": "ripgrep-case-insensitive-glob",
+          "package_name": "globset",
+          "file": "crates/globset/src/glob.rs",
+          "old": "        self.opts.case_insensitive = yes;",
+          "broken": "        self.opts.case_insensitive = !yes;",
+          "gold": "        self.opts.case_insensitive = yes;",
+          "mutant": "        self.opts.case_insensitive = false;",
+          "comment_anchor": "        self.opts.case_insensitive = yes;",
+          "comment": "        // Preserve the caller's requested matching mode.\n",
+          "test_args": ["--lib"],
+          "test_filter": "glob::tests::matchcasei2",
+          "features": [],
+          "evidence": "Case-insensitive mode must match the same pattern against an all-lowercase path.",
+          "prompts": [
+            "Repair the case-insensitive glob option. The frozen mixed-case matching test fails; choose the patch that honors the requested mode.",
+            "A caller enables case-insensitive matching for a mixed-case pattern. Select the patch that makes the lowercase candidate match in the exact regression test."
+          ]
+        },
+        {
+          "family": "ripgrep-literal-separator-glob",
+          "package_name": "globset",
+          "file": "crates/globset/src/glob.rs",
+          "old": "        self.opts.literal_separator = yes;",
+          "broken": "        self.opts.literal_separator = false;",
+          "gold": "        self.opts.literal_separator = yes;",
+          "mutant": "        self.opts.literal_separator = !yes;",
+          "comment_anchor": "        self.opts.literal_separator = yes;",
+          "comment": "        // Keep path separators literal when the option is enabled.\n",
+          "test_args": ["--lib"],
+          "test_filter": "glob::tests::matchslash2",
+          "features": [],
+          "evidence": "With literal separators enabled, a single-character wildcard must not consume a path separator.",
+          "prompts": [
+            "Repair literal-separator matching for glob patterns. The exact separator test fails; choose the patch that preserves the requested path boundary.",
+            "When this option is enabled, `?` must not cross a path separator. Select the offered patch that makes the frozen negative-match test pass."
+          ]
+        },
+        {
+          "family": "ripgrep-recursive-glob",
+          "package_name": "globset",
+          "file": "crates/globset/src/glob.rs",
+          "old": "            _ => {\n                if is_suffix {\n                    self.push_token(Token::RecursiveSuffix)?;\n                } else {\n                    self.push_token(Token::RecursiveZeroOrMore)?;\n                }\n            }",
+          "broken": "            _ => {\n                if is_suffix {\n                    self.push_token(Token::RecursiveSuffix)?;\n                } else {\n                    self.push_token(Token::RecursiveSuffix)?;\n                }\n            }",
+          "gold": "            _ => {\n                if is_suffix {\n                    self.push_token(Token::RecursiveSuffix)?;\n                } else {\n                    self.push_token(Token::RecursiveZeroOrMore)?;\n                }\n            }",
+          "mutant": "            _ => {\n                if is_suffix {\n                    self.push_token(Token::RecursiveSuffix)?;\n                } else {\n                    self.push_token(Token::RecursivePrefix)?;\n                }\n            }",
+          "comment_anchor": "            _ => {\n                if is_suffix {",
+          "comment": "            // A middle `**/` spans zero or more whole directories.\n",
+          "test_args": ["--lib"],
+          "test_filter": "glob::tests::re22",
+          "features": [],
+          "evidence": "A middle `**/` component must compile to the zero-or-more whole-directory regex, including a zero-directory match.",
+          "prompts": [
+            "Repair the token selected for a middle `**/` component. The frozen regex contract test fails; choose the patch that preserves zero-or-more whole-directory semantics.",
+            "The middle recursive wildcard must allow zero directories or any number of whole directories. Select the patch that restores the exact compiled-regex contract."
+          ]
+        },
+        {
+          "family": "ripgrep-gitignore-bom",
+          "package_name": "ignore",
+          "file": "crates/ignore/src/gitignore.rs",
+          "old": "                if i == 0 { line.trim_start_matches(UTF8_BOM) } else { &line };",
+          "broken": "                if i != 0 { line.trim_start_matches(UTF8_BOM) } else { &line };",
+          "gold": "                if i == 0 { line.trim_start_matches(UTF8_BOM) } else { &line };",
+          "mutant": "                if i == 1 { line.trim_start_matches(UTF8_BOM) } else { &line };",
+          "comment_anchor": "                if i == 0 { line.trim_start_matches(UTF8_BOM) } else { &line };",
+          "comment": "            // Git ignores a UTF-8 BOM only at the start of the ignore file.\n",
+          "test_args": ["--test", "gitignore_skip_bom"],
+          "test_filter": "gitignore_skip_bom",
+          "features": [],
+          "evidence": "A UTF-8 BOM at the start of a .gitignore file must not become part of its first pattern.",
+          "prompts": [
+            "Repair parsing of a .gitignore file that begins with a UTF-8 BOM. The frozen test cannot match its first rule; choose the patch that handles the file prefix.",
+            "Git-compatible parsing strips the BOM from the first line so that the rule still applies. Select the offered patch that makes the exact ignored-path check pass."
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,311 @@
+{
+  "arm_means": {
+    "mag_ref_native_sign": {
+      "excess_large": {
+        "competence_rate": 1.0,
+        "max": 0.199951171875,
+        "mean": 0.1019908763744213,
+        "median": 0.102447509765625,
+        "min": 0.039306640625
+      },
+      "loss_256": {
+        "competence_rate": 0.0,
+        "max": 0.3876953125,
+        "mean": 0.33501066984953703,
+        "median": 0.3359375,
+        "min": 0.2861328125
+      },
+      "loss_large": {
+        "competence_rate": 0.0,
+        "max": 0.37603759765625,
+        "mean": 0.33260232430917247,
+        "median": 0.334075927734375,
+        "min": 0.2633056640625
+      }
+    },
+    "native": {
+      "excess_large": {
+        "competence_rate": 0.9675925925925926,
+        "max": 0.31768798828125,
+        "mean": 0.08259328206380208,
+        "median": 0.06787109375,
+        "min": -0.067626953125
+      },
+      "loss_256": {
+        "competence_rate": 0.2037037037037037,
+        "max": 0.5419921875,
+        "mean": 0.3127034505208333,
+        "median": 0.29638671875,
+        "min": 0.1748046875
+      },
+      "loss_large": {
+        "competence_rate": 0.2037037037037037,
+        "max": 0.53076171875,
+        "mean": 0.31320472999855326,
+        "median": 0.294403076171875,
+        "min": 0.17449951171875
+      }
+    },
+    "reference_direction_full_support": {
+      "excess_large": {
+        "competence_rate": 1.0,
+        "max": 0.111083984375,
+        "mean": 0.01209117748119213,
+        "median": 0.012664794921875,
+        "min": -0.0428466796875
+      },
+      "loss_256": {
+        "competence_rate": 0.6296296296296297,
+        "max": 0.2841796875,
+        "mean": 0.2446017795138889,
+        "median": 0.2451171875,
+        "min": 0.2109375
+      },
+      "loss_large": {
+        "competence_rate": 0.9814814814814815,
+        "max": 0.251708984375,
+        "mean": 0.24270262541594328,
+        "median": 0.2427978515625,
+        "min": 0.21923828125
+      }
+    },
+    "reference_direction_native_support": {
+      "excess_large": {
+        "competence_rate": 1.0,
+        "max": 0.11572265625,
+        "mean": 0.017456619827835647,
+        "median": 0.01788330078125,
+        "min": -0.03753662109375
+      },
+      "loss_256": {
+        "competence_rate": 0.4583333333333333,
+        "max": 0.2890625,
+        "mean": 0.2501763237847222,
+        "median": 0.251953125,
+        "min": 0.2158203125
+      },
+      "loss_large": {
+        "competence_rate": 0.6111111111111112,
+        "max": 0.25799560546875,
+        "mean": 0.2480680677625868,
+        "median": 0.2481689453125,
+        "min": 0.2252197265625
+      }
+    },
+    "sign_ref_native_mag": {
+      "excess_large": {
+        "competence_rate": 1.0,
+        "max": 0.13250732421875,
+        "mean": 0.020087630660445603,
+        "median": 0.021392822265625,
+        "min": -0.09869384765625
+      },
+      "loss_256": {
+        "competence_rate": 0.4398148148148148,
+        "max": 0.3095703125,
+        "mean": 0.2519666883680556,
+        "median": 0.25341796875,
+        "min": 0.1328125
+      },
+      "loss_large": {
+        "competence_rate": 0.4074074074074074,
+        "max": 0.2796630859375,
+        "mean": 0.25069907859519674,
+        "median": 0.254486083984375,
+        "min": 0.140869140625
+      }
+    },
+    "weight_oracle": {
+      "excess_large": {
+        "competence_rate": 1.0,
+        "max": 0.0,
+        "mean": 0.0,
+        "median": 0.0,
+        "min": 0.0
+      },
+      "loss_256": {
+        "competence_rate": 0.7361111111111112,
+        "max": 0.30859375,
+        "mean": 0.23207826967592593,
+        "median": 0.23046875,
+        "min": 0.1201171875
+      },
+      "loss_large": {
+        "competence_rate": 0.7638888888888888,
+        "max": 0.29034423828125,
+        "mean": 0.23061144793475116,
+        "median": 0.23126220703125,
+        "min": 0.12811279296875
+      }
+    }
+  },
+  "artifact_hashes": [
+    {
+      "bytes": 6816,
+      "path": "manifests/REACH01-CONTRACT.json",
+      "sha256": "3ea2fde26332457f11215f7b55d44501bd9329172cb6384d6f8934b77529b982"
+    },
+    {
+      "bytes": 5491,
+      "path": "manifests/REACH01-MANIFEST.json",
+      "sha256": "397469a6b35edda079f203952626af8dacbaae32b9f8ffd60837ff52897be68d"
+    },
+    {
+      "bytes": 21014594,
+      "path": "inputs/banks/training.json",
+      "sha256": "1e8b718def045c0352c3305c399b3582c89758c730c1d89659fbe838f6e8b993"
+    },
+    {
+      "bytes": 120122,
+      "path": "inputs/banks/competence.json",
+      "sha256": "93f987163214fefd8c4ea5d25e91c2f5ca8a6dd176fd038d79df08266366b850"
+    },
+    {
+      "bytes": 1918361,
+      "path": "inputs/banks/evaluator-large.json",
+      "sha256": "dcb8dceafe4768a56fb48499189c4d85422ce69dc804fb5ebaef25453d415a3e"
+    },
+    {
+      "bytes": 2219799,
+      "path": "artifacts/REACH01-RUN1/outcomes.jsonl",
+      "sha256": "89ed15484a8b792f88232448855347e484d93cab4b6c593e7e81ec9350da2c1d"
+    },
+    {
+      "bytes": 753354,
+      "path": "artifacts/REACH01-RUN1/diagnostics.jsonl",
+      "sha256": "682cccb3d2da778914eeb663bf11615c647f1d05b367bca1b8fe7e65500e9225"
+    },
+    {
+      "bytes": 441843,
+      "path": "artifacts/REACH01-RUN1/trajectories.jsonl",
+      "sha256": "76548f085122684f0608849f79b817cbf2e2fe014e83f1d7f947ab36c31e51be"
+    },
+    {
+      "bytes": 706,
+      "path": "artifacts/REACH01-RUN1/collection-receipt.json",
+      "sha256": "0191b809b19643ee6edc9d2eb9cab667dee91192450e9924a40f099373155e20"
+    },
+    {
+      "bytes": 207,
+      "path": "artifacts/REACH01-RUN1/integrity-receipt.json",
+      "sha256": "2dd44455f4e4e129dc2b99a319a87b0c78aa4d53283c20f7e4a791db114dc3e1"
+    },
+    {
+      "bytes": 46434,
+      "path": "artifacts/REACH01-RUN1/reach01-analysis.json",
+      "sha256": "9c9b5bb3edf9aa3d446499e04b35a3b8644aaa2c2610255d5af42b190efed66d"
+    },
+    {
+      "bytes": 575,
+      "path": "artifacts/REACH01-RUN1/reach01-summary.csv",
+      "sha256": "a4bec8c58a7660fe7f9aae00539367018b4ddf205c309007ef0eb008db8fa1b2"
+    },
+    {
+      "bytes": 1551,
+      "path": "artifacts/REACH01-RUN1/RESULTS.md",
+      "sha256": "c390a6e0781c6148a4bc9a7e45f3f7e6c5f834d0bde809efae19b08ff883626b"
+    },
+    {
+      "bytes": 626176,
+      "path": "sealed/fly-reach-01.exe",
+      "sha256": "668711e015c26cd95b2e1322d291f460fb47a2ac0d012ffb543af374849eae63"
+    },
+    {
+      "bytes": 1026,
+      "path": "provenance/PROTECTED-DH08A-TREE-RECEIPT.json",
+      "sha256": "5a8f4beb9a9a4d50c35bbb73455d14551a23ff79f58e4ebcb00e07faedce0466"
+    }
+  ],
+  "closed_at_utc": "2026-09-22T10:45:22.842084+00:00",
+  "disposition": "DIRECTION_FAILURE_ANATOMY_PARTIAL_WITH_EVALUATOR_FLOOR",
+  "integrity_status": "INTEGRITY_PASS",
+  "interpretation": "Reference direction on native support improves the endpoint; native direction is the dominant shortfall.",
+  "native_stage_summary": {
+    "aggregation_cosine_mean": {
+      "competence_rate": 1.0,
+      "max": 0.015505445790479685,
+      "mean": 0.0027281627859879584,
+      "median": 0.0025389849534559264,
+      "min": -0.005132099931636997
+    },
+    "bound_clip_fraction": {
+      "competence_rate": 0.3611111111111111,
+      "max": 0.5078633384025028,
+      "mean": 0.27610266026315844,
+      "median": 0.2948729953015989,
+      "min": 0.02882468501948907
+    },
+    "cumulative_delivered_l2": {
+      "competence_rate": 0.0,
+      "max": 91.51708555370979,
+      "mean": 79.6978882735155,
+      "median": 80.97368407520501,
+      "min": 59.08363027905577
+    },
+    "delivered_cosine_mean": {
+      "competence_rate": 1.0,
+      "max": 0.0057453322005987925,
+      "mean": 0.0002997567483604066,
+      "median": 0.0003265387413958811,
+      "min": -0.003038081590752271
+    },
+    "eligibility_cosine_mean": {
+      "competence_rate": 1.0,
+      "max": 0.015531278543371373,
+      "mean": 0.0027673448624058084,
+      "median": 0.0026052740302250745,
+      "min": -0.004847510409452549
+    },
+    "magnitude_pearson_mean": {
+      "competence_rate": 1.0,
+      "max": 0.08081020512961049,
+      "mean": 0.013743952078926437,
+      "median": 0.0106382433670461,
+      "min": -0.006898622832959529
+    },
+    "modulation_cosine_mean": {
+      "competence_rate": 1.0,
+      "max": 0.015505445790479685,
+      "mean": 0.0027281627859879584,
+      "median": 0.0025389849534559264,
+      "min": -0.005132099931636997
+    },
+    "native_reference_norm_ratio_mean": {
+      "competence_rate": 0.0,
+      "max": 2484.7934750719724,
+      "mean": 182.04641495674096,
+      "median": 101.40694415249231,
+      "min": 12.280863793723132
+    },
+    "native_support_fraction_mean": {
+      "competence_rate": 0.0,
+      "max": 0.3896220636964948,
+      "mean": 0.37325493383675507,
+      "median": 0.37326627152400105,
+      "min": 0.3575153164774326
+    },
+    "reference_mass_on_native_support_mean": {
+      "competence_rate": 0.0,
+      "max": 0.8708493148258328,
+      "mean": 0.6486034376150066,
+      "median": 0.646672083528442,
+      "min": 0.5100053870883563
+    },
+    "sign_agreement_mean": {
+      "competence_rate": 0.0,
+      "max": 0.5073388895013362,
+      "mean": 0.3897530032232756,
+      "median": 0.3830781434524614,
+      "min": 0.3293977548308603
+    }
+  },
+  "no_biological_promotion": true,
+  "no_lesions": true,
+  "oracle_large_mean_below_threshold": true,
+  "pheno_reseal_authorized": false,
+  "protected_dh08a_receipt_sha256": "5a8f4beb9a9a4d50c35bbb73455d14551a23ff79f58e4ebcb00e07faedce0466",
+  "run_id": "FLY-REACH-01-RUN1",
+  "schema": "FLY-REACH-01-terminal-receipt-v1",
+  "status": "CLOSED_ENGINEERING_ONLY",
+  "study_id": "FLY-REACH-01"
+}

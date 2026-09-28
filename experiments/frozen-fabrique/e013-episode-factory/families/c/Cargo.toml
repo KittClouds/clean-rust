@@ -1,0 +1,12 @@
+[package]
+name = "e013-bank-c"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+e013-episode-factory = { path = "../../factory" }
+sha2 = "0.10"
+
+[dev-dependencies]
+tempfile = "3"

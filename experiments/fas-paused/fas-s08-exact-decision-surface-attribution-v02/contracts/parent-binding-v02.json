@@ -1,0 +1,200 @@
+{
+  "binding_id": "FAS_S08_PARENT_BINDING_V02",
+  "expected_roots": {
+    "s01_accessibility": "2581b50d75382c197793ea46400bf2b8a27508df22b2ff5bdbe82eb20a5238b7",
+    "s01_corpus": "51a55212ba89d55bd6df532673ad4546c95def1f5d75622661f7c17b3e4a7ad1",
+    "s01_feature_cache": "4964f35fb87a45a9447cd0f5f028668027ca3ad3a8f0d0c3f9eb7b9cbe7ccaaa",
+    "s06_protocol": "ab2bbd4fc1918132e6674e97ef05e29e2eee52945a0ac37229e52c6f9e10b4e7",
+    "s06_result": "b21e4cb026d0b3956f9a666c4928a79922e39ee33b9f64653181d6dbc9a0d1b0",
+    "s07_gate": "fe9bd0bd3de6769cf4374fd09b0cd600650560a7dbbd40d53e94ef0452f8c748",
+    "s08_v01_failed_attempt": "db9319719bab147d3f755370455df0c11604fc6f85dfff72c9aa0380cef8c805"
+  },
+  "fas00_sensor_pass": false,
+  "feature_extraction": false,
+  "files": [
+    {
+      "bytes": 3174,
+      "name": "s06_result_seal",
+      "path": "D:\\codex-runs\\fas-s06-representation-scaler-probe-compatibility-cube-v02\\result-tree-seal-v01.json",
+      "sha256": "25780d406106613a67c8e831c350b725a765a6e25de1353f15ac4b784f02c439"
+    },
+    {
+      "bytes": 3889,
+      "name": "s06_execution_receipt",
+      "path": "D:\\codex-runs\\fas-s06-representation-scaler-probe-compatibility-cube-v02\\execution-receipt-v01.json",
+      "sha256": "f12f7d115ba805c5239d7bb332a460e64d0dee4065591f906576e74aff9a156d"
+    },
+    {
+      "bytes": 2675,
+      "name": "s06_corrected_protocol_seal",
+      "path": "C:\\code land\\clean-rust\\experiments\\fas-s06-representation-scaler-probe-compatibility-cube-v01\\corrections\\input-hash-v02\\seals\\protocol-seal-v02.json",
+      "sha256": "a719fe5aad27c1e745f0235c48410cd05d572da97bf7ac8ad405c515a4231cba"
+    },
+    {
+      "bytes": 3611,
+      "name": "s06_corrected_parent_binding",
+      "path": "C:\\code land\\clean-rust\\experiments\\fas-s06-representation-scaler-probe-compatibility-cube-v01\\corrections\\input-hash-v02\\contracts\\parent-binding-v02.json",
+      "sha256": "0128af41fc07803161ad4f8a0ea63c9cf19c25c149f46b6ffab4a5e0d07df2c5"
+    },
+    {
+      "bytes": 124922890,
+      "name": "s06_ledger",
+      "path": "D:\\codex-runs\\fas-s06-representation-scaler-probe-compatibility-cube-v02\\crossed-cube-ledger-v01.jsonl",
+      "sha256": "55f4d7bc04218c3f54eea2fbe555a8d0942137a1bc12c049913eaf14e3b4c558"
+    },
+    {
+      "bytes": 296199,
+      "name": "s06_summary",
+      "path": "D:\\codex-runs\\fas-s06-representation-scaler-probe-compatibility-cube-v02\\compatibility-summary-v01.json",
+      "sha256": "d987b0a861e52639c84e97c2b88be11258167e49ca59812e298f5c8f13197606"
+    },
+    {
+      "bytes": 54176880,
+      "name": "s05_event_populations",
+      "path": "D:\\codex-runs\\fas-s05-crossed-representation-readout-decomposition-v07\\event-populations-v01.json",
+      "sha256": "3637a78e6d48d66c0c8c4106a3984d9c5dc2a38beb2289cada91e98d0ee6e4bb"
+    },
+    {
+      "bytes": 3226,
+      "name": "s01_feature_cache_seal",
+      "path": "D:\\codex-runs\\fas-s01-frozen-sensor-transfer-cartography\\s01-2-feature-geometry-v01\\seals\\feature-cache-seal-v01.json",
+      "sha256": "91901f79ed31b0bb36eb7b4b516f14ef9cb7512527fe0b04814eb92e8346d266"
+    },
+    {
+      "bytes": 10359,
+      "name": "s01_feature_cache_result_seal",
+      "path": "D:\\codex-runs\\fas-s01-frozen-sensor-transfer-cartography\\s01-2-feature-geometry-v01\\seals\\result-tree-seal-v01.json",
+      "sha256": "7e56d9f57acf8cc53c5394fe3868c9a8fe6545d3440855c65197c52d5cd874dc"
+    },
+    {
+      "bytes": 25454,
+      "name": "s01_accessibility_result_seal",
+      "path": "D:\\codex-runs\\fas-s01-frozen-sensor-transfer-cartography\\s01-3-linear-accessibility-v01\\seals\\result-tree-seal-v01.json",
+      "sha256": "a27655c6aef5ba972df1d57fae0902db24b30f5d09244cabb2b67d90471fc5d2"
+    },
+    {
+      "bytes": 15658966,
+      "name": "s01_event_metadata",
+      "path": "D:\\codex-runs\\fas-s01-frozen-sensor-transfer-cartography\\s01-3-linear-accessibility-v01\\metadata\\event-metadata-v01.npz",
+      "sha256": "8452759c748fc0b17fb20fd246d522e0dfa5521058f72226397f47baa74e38ec"
+    },
+    {
+      "bytes": 368110353,
+      "name": "s01_feature_rows",
+      "path": "D:\\codex-runs\\fas-s01-frozen-sensor-transfer-cartography\\s01-2-feature-geometry-v01\\feature-cache-v01\\feature-rows-v01.jsonl",
+      "sha256": "a8ea72310c0926962a0783d90eb3ceda19ca0b334bd2c00aafdd226e8aaaa40b"
+    },
+    {
+      "bytes": 872415232,
+      "name": "s01_mean_features",
+      "path": "D:\\codex-runs\\fas-s01-frozen-sensor-transfer-cartography\\s01-2-feature-geometry-v01\\feature-cache-v01\\V0_MEAN_FULL.f32le",
+      "sha256": "9cc840390abd2c9d186f33b6a62948b55d4cdd15d52a4cfe03bd32775a2fe76c"
+    },
+    {
+      "bytes": 872415232,
+      "name": "s01_final_features",
+      "path": "D:\\codex-runs\\fas-s01-frozen-sensor-transfer-cartography\\s01-2-feature-geometry-v01\\feature-cache-v01\\V1_FINAL_POSITION.f32le",
+      "sha256": "095366563e0ef08a38192c325c93a000614cbdbd3a467e2e8c5c92e14acd1409"
+    },
+    {
+      "bytes": 58644,
+      "name": "s01_mean_readout",
+      "path": "D:\\codex-runs\\fas-s01-frozen-sensor-transfer-cartography\\s01-3-linear-accessibility-v01\\probes\\V0_MEAN_FULL\\EXACT_TARGET\\probe-state-v01.npz",
+      "sha256": "1b3db11aa1fe691a98b40b0b9001c3f0125d1acd47f7c069ef53fd487a2d46e4"
+    },
+    {
+      "bytes": 58644,
+      "name": "s01_final_readout",
+      "path": "D:\\codex-runs\\fas-s01-frozen-sensor-transfer-cartography\\s01-3-linear-accessibility-v01\\probes\\V1_FINAL_POSITION\\EXACT_TARGET\\probe-state-v01.npz",
+      "sha256": "2cbbd450468ae7ebbe073ca9badaf229dcf9d3b55ff80ed102ccf9eb7e942641"
+    },
+    {
+      "bytes": 2111,
+      "name": "fas00_cache_seal",
+      "path": "D:\\codex-runs\\fas-frozen-adaptive-substrate-v00\\phase2a-v01\\phase2a-v01-cache-seal.json",
+      "sha256": "9696f404fd36569363cd2e523442920d9ff5f2550d5683e211da29d8572d8426"
+    },
+    {
+      "bytes": 536870912,
+      "name": "fas00_mean_features",
+      "path": "D:\\codex-runs\\fas-frozen-adaptive-substrate-v00\\phase2a-v01\\feature-cache-v01\\features-v01.f32le",
+      "sha256": "6205b7d7a224b798b387886b43ec27103b37f091dccd9b623847cb7a52b0c8c2"
+    },
+    {
+      "bytes": 82934,
+      "name": "fas00_mean_readout",
+      "path": "D:\\codex-runs\\fas-frozen-adaptive-substrate-v00\\phase3-v02\\results-v01\\probe-artifacts\\HELDOUT_TERM_EXACT_TARGET.npz",
+      "sha256": "be7c4fa016f1ad5887a8bf087a395a6ca02377d706be291a5ad1b6fbcc9cabbb"
+    },
+    {
+      "bytes": 2591,
+      "name": "s02_feature_seal",
+      "path": "D:\\codex-runs\\fas-s02-original-corpus-readout-surface-attribution-v01\\s02-1-final-position-v02\\seals\\s02-1-seal-v01.json",
+      "sha256": "5a88ed616a6d82d2210c27618dfc9e6e81a540774730a78235b9e6137816a2de"
+    },
+    {
+      "bytes": 268435456,
+      "name": "s02_final_features",
+      "path": "D:\\codex-runs\\fas-s02-original-corpus-readout-surface-attribution-v01\\s02-1-final-position-v02\\feature-cache-v01\\final-position-v01.f32le",
+      "sha256": "e4ef40343b10761236abdd2e77bb06aff69edb1ffe91a9344cf029a09790e3ba"
+    },
+    {
+      "bytes": 82934,
+      "name": "s02_final_readout",
+      "path": "D:\\codex-runs\\fas-s02-original-corpus-readout-surface-attribution-v01\\s02-2-readout-attribution-v01\\correction-v05\\results-v01\\final-position-probe-v01.npz",
+      "sha256": "928e8aca604efb5c09c733ed23e94228ea24336cb417ff190103638d269871cc"
+    },
+    {
+      "bytes": 3052,
+      "name": "s07_gate_seal",
+      "path": "D:\\codex-runs\\fas-s07-sparse-compatibility-cartography-v01\\gate-tree-seal-v01.json",
+      "sha256": "e461f665ee8de77d834c7398c8079a2a5e0e54e7e9bdf971782c73f1efecbfd1"
+    },
+    {
+      "bytes": 100377,
+      "name": "s07_gate_disposition",
+      "path": "D:\\codex-runs\\fas-s07-sparse-compatibility-cartography-v01\\reconstruction-gate-v01.json",
+      "sha256": "599a71c2a3cb602fe26917ed6a0b220bed5fea3be83a154b1c97cda4250f9c98"
+    },
+    {
+      "bytes": 1376,
+      "name": "s08_v01_failed_attempt_seal",
+      "path": "D:\\codex-runs\\fas-s08-exact-decision-surface-attribution-v01\\failed-attempt-seal-v01.json",
+      "sha256": "1ffe9fba6b5c1ee1820dde3b3bfb71b1bfdefd35e55e18d3b10151280525bebf"
+    },
+    {
+      "bytes": 1559,
+      "name": "s08_v01_failed_attempt_receipt",
+      "path": "D:\\codex-runs\\fas-s08-exact-decision-surface-attribution-v01\\failed-attempt-receipt-v01.json",
+      "sha256": "22def5c2fc0902a15378822d482c04904eea715a2beb5fb53b031a5cc17d488b"
+    }
+  ],
+  "model_contact": false,
+  "parent_modified": false,
+  "probe_fitting": false,
+  "s01_2_result_root_sha256": "1fc3aeb432ecdbef21a35aea8fed5b0d59671681eb8eb8032533c9ce751a4384",
+  "s01_3_result_root_sha256": "2581b50d75382c197793ea46400bf2b8a27508df22b2ff5bdbe82eb20a5238b7",
+  "s01_corpus_sha256": "51a55212ba89d55bd6df532673ad4546c95def1f5d75622661f7c17b3e4a7ad1",
+  "s01_feature_cache_root_sha256": "4964f35fb87a45a9447cd0f5f028668027ca3ad3a8f0d0c3f9eb7b9cbe7ccaaa",
+  "s01_feature_rows": 106496,
+  "s01_train_rows": 85224,
+  "s06_direct_input_hashes": {
+    "fas00_mean_features": "6205b7d7a224b798b387886b43ec27103b37f091dccd9b623847cb7a52b0c8c2",
+    "fas00_mean_readout": "be7c4fa016f1ad5887a8bf087a395a6ca02377d706be291a5ad1b6fbcc9cabbb",
+    "s01_final_features": "095366563e0ef08a38192c325c93a000614cbdbd3a467e2e8c5c92e14acd1409",
+    "s01_final_probabilities": "cc1451fdd4823cc6ce139375785af90b087793ce309ec5ec558bcf30593b3b03",
+    "s01_final_readout": "2cbbd450468ae7ebbe073ca9badaf229dcf9d3b55ff80ed102ccf9eb7e942641",
+    "s01_mean_features": "9cc840390abd2c9d186f33b6a62948b55d4cdd15d52a4cfe03bd32775a2fe76c",
+    "s01_mean_probabilities": "d94ff21e4f3e2377c26cede424775bf8ef3b6ac019e3902347b7f1b6b2c93e2f",
+    "s01_mean_readout": "1b3db11aa1fe691a98b40b0b9001c3f0125d1acd47f7c069ef53fd487a2d46e4",
+    "s02_final_features": "e4ef40343b10761236abdd2e77bb06aff69edb1ffe91a9344cf029a09790e3ba",
+    "s02_final_readout": "928e8aca604efb5c09c733ed23e94228ea24336cb417ff190103638d269871cc"
+  },
+  "s06_fas00_rows": 512,
+  "s06_protocol_root_sha256": "ab2bbd4fc1918132e6674e97ef05e29e2eee52945a0ac37229e52c6f9e10b4e7",
+  "s06_root_sha256": "b21e4cb026d0b3956f9a666c4928a79922e39ee33b9f64653181d6dbc9a0d1b0",
+  "s06_s01_rows": 19732,
+  "s07_disposition": "SAE_NOT_FAITHFUL_FOR_COMPATIBILITY_ANALYSIS",
+  "status": "SEALED_INPUTS_VERIFIED_BEFORE_S08_ANALYSIS",
+  "superseded_s08_v01_failed_attempt_root_sha256": "db9319719bab147d3f755370455df0c11604fc6f85dfff72c9aa0380cef8c805"
+}

@@ -1,0 +1,148 @@
+{
+  "schema_version": 1,
+  "run_id": "e011-20260925-causal-evidence-01",
+  "condition": "evidence-masked",
+  "role": "large",
+  "bundle_id": "ternary-bonsai-2-27b-ptq1-local-v5",
+  "bundle_blake3": "6d933aba093307e0c333f022426af46f3f5b243a8a10a2e1bb2f4cfc93b17b9d",
+  "frozen_input_lock_sha256": "3a91323be0abca07cd20ace84562cfbfb79a528cbd996811974eeb0eaa857b7a",
+  "frame_lock_sha256": "23a4c606555e8cc1b9e7768d3f4fa2ead71bd9393b413eeee777bb0ca7eaeffd",
+  "frame_sha256": "1db58858eec12493ed380ec0e50b1f4345185d29b201b9423e8cff91597c5299",
+  "task_id": "turbovec-turbovec-id-remove-readd-v2",
+  "pair_task_id": "turbovec-turbovec-id-remove-readd-v2",
+  "server_alias": "e009-large-v5",
+  "server_process_id": 47156,
+  "runtime_sha256": "e0ea4fd53e6f0c741cbd28093b427f333ada0eb03b83073e1f99c483793ea976",
+  "model_sha256": "53107f530aa52eb00912263ab1ee29bd199261c87cd7b4ad4ca1318c1fe33ee3",
+  "reasoning_mode": "off",
+  "chat_template_sha256": "c3cf9e34abf4f9e36c2d72165aa9c132d3e2a725b6c2586aaa3a8af9d7a81041",
+  "maximum_output_tokens": 1024,
+  "system_prompt_sha256": "976ef1cd914bacb366c64418825010124338a626a0400d459858acc7e48f5a48",
+  "output_schema_sha256": "97170fa0d6a44681f680ad0ac533a3f3913709757e4ee6cbf96d9c9f40d1b2fb",
+  "normalization_contract": "percent-0-100-to-milli-x10-v1+line-endings-lf-v1",
+  "thresholds": {
+    "minimum_applicability_milli": 850,
+    "maximum_abstention_milli": 150
+  },
+  "request_sha256": "3f56a1ea65f3602a305676f4721271105bece5958dae94a73d7ea2baebed5f77",
+  "request": {
+    "model": "e009-large-v5",
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a typed observer in a deterministic coding workflow. The runtime owns workflow state and will execute only one action from the offered action_options after validating your output.\n\nRead the task_prompt and evidence, then compare the offered actions. Choose the action most likely to satisfy the task while preserving the repository's stated constraints. Do not write or propose code outside the offered choices. Do not claim to have executed tests. If no offered action is sufficiently supported, use null for action_choice and express uncertainty with abstention_percent.\n\nReturn exactly one JSON object matching the provided schema. action_choice must be an offered numeric action ID or null. applicability_percent is your estimate from 0 to 100 that this observer can handle the task from the available evidence. abstention_percent is your estimate from 0 to 100 that the runtime should defer this choice. Use integer percentage points only. Do not add prose or fields.\n"
+      },
+      {
+        "role": "user",
+        "content": "{\"schema_id\":\"rdc-real-coding-observation.v1\",\"task_id\":\"turbovec-turbovec-id-remove-readd-v2\",\"task_family\":\"turbovec-id-remove-readd\",\"repository_id\":\"turbovec\",\"task_variant\":2,\"task_prompt\":\"A deleted external ID should no longer be reported as present, and a new vector must be allowed to reuse it. Select the offered implementation that satisfies the exact test.\",\"repository_revision\":\"8202f194a0cbbd52213a004290401e180e5c123d\",\"snapshot_sha256\":\"6f8992837d0fe84619bfd496ddef1555aa3b20c7612487362df8608ddbdd213c\",\"evidence\":[{\"kind\":\"source_excerpt\",\"source_id\":\"redacted-source-1\",\"content_blake3\":\"0ee6042e04b98523b6c1d8e9acd0706c19a2c718a5ecfc08ecb51400f36a44bf\",\"content\":\"[task-specific evidence body removed for E011]\"},{\"kind\":\"baseline_tool_result\",\"source_id\":\"redacted-source-2\",\"content_blake3\":\"0ee6042e04b98523b6c1d8e9acd0706c19a2c718a5ecfc08ecb51400f36a44bf\",\"content\":\"[task-specific evidence body removed for E011]\"}],\"action_options\":[{\"action\":{\"id\":11,\"schema_id\":1},\"summary\":\"Apply this alternative change in the same code path.\",\"diff_excerpt\":\"@@ -553,7 +553,7 @@\\n-        self.ids_mut().insert(id, last);\\n+        self.ids_mut().insert(id, slot);\",\"patch_sha256\":\"206a716d47a60ca5e1b0de9ccd26c71c9a1a710134b4a703b06af6fc81a87c5b\"},{\"action\":{\"id\":37,\"schema_id\":1},\"summary\":\"Apply the source change and add a contract comment.\",\"diff_excerpt\":\"@@ -552,8 +552,8 @@\\n+        // Remove the external ID before it can be reinserted.\\n-        self.ids_mut().insert(id, last);\",\"patch_sha256\":\"5071ceeede54082f166a1d50243cbc910e06dbc783b9911323ebe22c8d67ee7c\"},{\"action\":{\"id\":68,\"schema_id\":1},\"summary\":\"Apply the focused source change shown here.\",\"diff_excerpt\":\"@@ -553,7 +553,6 @@\\n-        self.ids_mut().insert(id, last);\",\"patch_sha256\":\"c38e076a8bc156f51817b22c9d46c450421eb8586893ca918d5cf68a3aab2c91\"},{\"action\":{\"id\":94,\"schema_id\":1},\"summary\":\"Leave the current implementation unchanged.\",\"diff_excerpt\":\"No source line changes are included.\",\"patch_sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"}]}"
+      }
+    ],
+    "temperature": 0,
+    "top_p": 1,
+    "seed": 0,
+    "max_tokens": 1024,
+    "stream": false,
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rdc_coding_observer_output_v1",
+        "strict": true,
+        "schema": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "rdc-coding-observer-output.v2",
+          "title": "RDC Coding Observer Output v2",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "action_choice",
+            "applicability_percent",
+            "abstention_percent"
+          ],
+          "properties": {
+            "action_choice": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 65535
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "applicability_percent": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "abstention_percent": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            }
+          }
+        }
+      }
+    }
+  },
+  "http_status": 200,
+  "response": {
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "{\n  \"action_choice\": 68,\n  \"applicability_percent\": 72,\n  \"abstention_percent\": 28\n}"
+        }
+      }
+    ],
+    "created": 1790367196,
+    "model": "e009-large-v5",
+    "system_fingerprint": "b10685-7dffb158d",
+    "object": "chat.completion",
+    "usage": {
+      "completion_tokens": 36,
+      "prompt_tokens": 1068,
+      "total_tokens": 1104,
+      "prompt_tokens_details": {
+        "cached_tokens": 192
+      }
+    },
+    "id": "chatcmpl-Fmf6aM0XVDtjslqHSRIgjmN96L2DEyoI",
+    "timings": {
+      "cache_n": 192,
+      "prompt_n": 876,
+      "prompt_ms": 1895.542,
+      "prompt_per_token_ms": 2.163860730593607,
+      "prompt_per_second": 462.13695080351687,
+      "predicted_n": 36,
+      "predicted_ms": 758.944,
+      "predicted_per_token_ms": 21.684114285714283,
+      "predicted_per_second": 46.116709533246194
+    }
+  },
+  "content": "{\n  \"action_choice\": 68,\n  \"applicability_percent\": 72,\n  \"abstention_percent\": 28\n}",
+  "output": {
+    "action_choice": 68,
+    "applicability_percent": 72,
+    "abstention_percent": 28
+  },
+  "normalized_output": {
+    "action_choice": 68,
+    "applicability_milli": 720,
+    "abstention_milli": 280
+  },
+  "normalization_error": null,
+  "usage": {
+    "completion_tokens": 36,
+    "prompt_tokens": 1068,
+    "total_tokens": 1104,
+    "prompt_tokens_details": {
+      "cached_tokens": 192
+    }
+  },
+  "finish_reason": "stop",
+  "elapsed_ms": 3005.481
+}

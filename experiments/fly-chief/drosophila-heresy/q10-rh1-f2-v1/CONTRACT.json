@@ -1,0 +1,126 @@
+{
+  "protocol": "Q10-PF6-RH1-F2",
+  "identity": "q10-rh1-f2-v1",
+  "status": "PREEXECUTION_SEALED_NO_BEHAVIOR",
+  "parent_bindings": [
+    {
+      "label": "rh1_cq1_contract",
+      "path": "experiments/drosophila-heresy/q10-rh1-cq1-v1/CONTRACT.json",
+      "sha256": "E28592C95AFCA90FC83817A98CB2558E5C6157F6CE0050D260F3420F324F24E4"
+    },
+    {
+      "label": "rh1_ac2_summary",
+      "path": "experiments/drosophila-heresy/q10-rh1-ac2-v1/qualification/SUMMARY.json",
+      "sha256": "C0D93364B17D0739DB47519EA458833DA15E9DF59E28C85E6BD1A7D9B757EB04"
+    },
+    {
+      "label": "rh1_ac2_effects",
+      "path": "experiments/drosophila-heresy/q10-rh1-ac2-v1/qualification/effects.jsonl",
+      "sha256": "4D45D48375385AE8886A744BF9CE8E926140F9181C30966316D7350608327EE5"
+    },
+    {
+      "label": "rh1_ac2_features",
+      "path": "experiments/drosophila-heresy/q10-rh1-ac2-v1/qualification/features.jsonl",
+      "sha256": "7EC54C783A97078243D4AA5B1AEDC65AC5FBE0475C8F11561D84FF4D8120C2F2"
+    },
+    {
+      "label": "rh1_q1_summary",
+      "path": "experiments/drosophila-heresy/q10-rh1-q1-v1/qualification/SUMMARY.json",
+      "sha256": "848BE1D1A72A7B5C50863539AA7E4838299FC12C21E5BBCEF46EDB879B1096B7"
+    },
+    {
+      "label": "s1_execution",
+      "path": "experiments/drosophila-heresy/q10-pf6-s1-v1/qualification/execution/execution.json",
+      "sha256": "E561D7392D471CC0B47E98E66EC5AD9FC772476F2F61103FBF5994A051BC0E17"
+    },
+    {
+      "label": "s1_sample",
+      "path": "experiments/drosophila-heresy/q10-pf6-s1-v1/qualification/sample.json",
+      "sha256": "0DE70DA72627D834C7D877F667469DA848F04312F072036245DFE312AD863BB9"
+    },
+    {
+      "label": "pf5_runner",
+      "path": "experiments/drosophila-heresy/q10-pf5-v1/scripts/run_q10_pf5.py",
+      "sha256": "A00078787DB732906416B3C7158DC777CD41C2E71C3AAE660D1AE525446FB82A"
+    },
+    {
+      "label": "rh1_runner",
+      "path": "experiments/drosophila-heresy/q10-rh1-f2-v1/scripts/run_rh1.py",
+      "sha256": "B42644BA0E2C4C8A0CC0F9997135CE18A9F9E6C0836810926300C4D84F198103"
+    },
+    {
+      "label": "pf5_contract",
+      "path": "experiments/drosophila-heresy/q10-pf5-v1/CONTRACT.json",
+      "sha256": "20995E1826A9C62E0E8689017A2F3E624CC9E63B76B210FBD4AB11D7E9E7D34F"
+    }
+  ],
+  "cohorts": {
+    "primary": {
+      "coordinate_count_min": 32,
+      "expected_groups": 32,
+      "horizons": [
+        16,
+        32
+      ]
+    },
+    "secondary": {
+      "coordinate_count_min": 17,
+      "coordinate_count_max": 31,
+      "expected_groups": 23,
+      "horizons": [
+        16,
+        "complete_available_coordinate_horizon"
+      ]
+    },
+    "excluded_selected_groups": 29
+  },
+  "ranking": {
+    "control": "frozen PF6 residual ordering from S1 group receipt",
+    "authority": [
+      "helpful_row_count_desc",
+      "helpful_ulp_burden_desc",
+      "median_first_helpful_scale_asc",
+      "declared_row_count_desc",
+      "coordinate_id_asc"
+    ],
+    "authority_features_source": "sealed AC2 features.jsonl; declared_row_count field",
+    "na_information_used": false
+  },
+  "candidate_state": {
+    "schema": "coordinate_id_to_prefix_choice_v1",
+    "canonical_order": "ascending_coordinate_id",
+    "unvisited_choice": 0,
+    "identity_excludes": [
+      "ranking_position",
+      "visitation_order",
+      "beam_lane",
+      "exploration_order"
+    ]
+  },
+  "beam": {
+    "exploit_width": 24,
+    "explore_width": 8,
+    "beam_width": 32,
+    "B16": 32768,
+    "B32": 65536,
+    "B32_equals_2_times_B16": true,
+    "objective_domain": "D_declared_group_rows",
+    "strict_score": [
+      "mismatch_count",
+      "total_ulp_distance",
+      "residual_l2",
+      "maximum_absolute_residual"
+    ]
+  },
+  "score_domains": {
+    "D": "declared group rows; search objective",
+    "P": "union of all rows containing any group coordinate; physical support diagnostic",
+    "G": "whole endpoint readout; global diagnostic"
+  },
+  "scope": {
+    "engineering_only": true,
+    "scientific_seed_bundles": 0,
+    "behavioral_probe": false,
+    "dh08b_authorized": false
+  }
+}

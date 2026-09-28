@@ -1,0 +1,214 @@
+{
+  "empty_Ustar_block_ids": [
+    304005
+  ],
+  "fit_count": 16,
+  "folds": [
+    {
+      "a_mean_sha256": "3864059578ff74e7928f6a455f3ade1e524e922ae76a8f9708a9837fce2c8e8e",
+      "a_scale_sha256": "009b4c0baa1ca4b61310bf3a4ca1a230c6cc4b0c1cf403f876b3c26d406e73f3",
+      "c_d_initial_tensor_equal": true,
+      "c_d_normalized_multiset_equal": true,
+      "c_d_raw_multiset_equal": true,
+      "fits": [
+        {
+          "feature_hash": "5eaa15f2afcfa9130d246edd8e76f71689974edf02b08ee9306498af03a79eaa",
+          "fit_id": "C-H304000",
+          "initial_tensor_hash": "c9abd49ac52d023e980c43dc95cccefd89ab527326972fe7c6e9a49f5fdc24bb"
+        },
+        {
+          "feature_hash": "a3324dc684d92f54d8f42d2d535a469481fdb56fd76b919d02bbd62a7eb4d2ed",
+          "fit_id": "D-H304000",
+          "initial_tensor_hash": "c9abd49ac52d023e980c43dc95cccefd89ab527326972fe7c6e9a49f5fdc24bb"
+        }
+      ],
+      "heldout_rows": 2333,
+      "holdout_block": 304000,
+      "normalization_sha256": "c55883cbbf2fa40ec96fb2c6e337e5768948ac530dcf9bee59779645c652f7c9",
+      "rel_mean_sha256": "5966c029896d849511d03fd0f3e274590d21fad50ca2b402b361635b482dbe22",
+      "rel_scale_sha256": "575008d77d313f0e9600bebe6f527d680856e0933bc89dfae948ce1cb66cc5eb",
+      "training_rows": 14009
+    },
+    {
+      "a_mean_sha256": "15a478ba7d63392ebd1414e9656c08edbd62778c007ac71aecc8855728c0620c",
+      "a_scale_sha256": "67d83afe83dab98fd8751b3ad7d4165996ef574d6703284d76daeb23b5917c6a",
+      "c_d_initial_tensor_equal": true,
+      "c_d_normalized_multiset_equal": true,
+      "c_d_raw_multiset_equal": true,
+      "fits": [
+        {
+          "feature_hash": "321fdd72d04c11a6de0ad82084aecdae87f65bb3aa41847f173584f96c639bfc",
+          "fit_id": "C-H304001",
+          "initial_tensor_hash": "f1df480750bd82cb468fadd4ec68431b2f945ed06e27e2a74e969e073855d3c1"
+        },
+        {
+          "feature_hash": "e5cfd1a1498448f52957f9c65647078116b1dea08f84f23c8b138779c301a6bb",
+          "fit_id": "D-H304001",
+          "initial_tensor_hash": "f1df480750bd82cb468fadd4ec68431b2f945ed06e27e2a74e969e073855d3c1"
+        }
+      ],
+      "heldout_rows": 1699,
+      "holdout_block": 304001,
+      "normalization_sha256": "a5265c65e971139a26c3d46a5611a78f030a86512d1b0a83ae077118ac0348bc",
+      "rel_mean_sha256": "b005c9c3ffc08e5354c99b9829faca898ce62dcbf60507eab6a153e9677f6e05",
+      "rel_scale_sha256": "348a2c542c74bb2e1f2e47d7ebd6684fc85c274dcd08720454cc4246c48cefac",
+      "training_rows": 14643
+    },
+    {
+      "a_mean_sha256": "1cf090b7fd8febd61fb03dc9f36663618f5d9a4ad1466899f1a1644d7e18fc1f",
+      "a_scale_sha256": "184d3758bd20429902786b421b88634cc7e5bd8847f9dd87aa415b1df65fb917",
+      "c_d_initial_tensor_equal": true,
+      "c_d_normalized_multiset_equal": true,
+      "c_d_raw_multiset_equal": true,
+      "fits": [
+        {
+          "feature_hash": "5911c00cf61d784ce5c4aeb0a3b4d41be668235c32ebc9f7302d0fd73be9bded",
+          "fit_id": "C-H304002",
+          "initial_tensor_hash": "e6d1ef55b8756aeefe1fd6682282a1178053d56efb574a19d372e1bb2327fd50"
+        },
+        {
+          "feature_hash": "cfc638693908170170c72be7aebaec7cf39371c277169978e49c489076ebb6e1",
+          "fit_id": "D-H304002",
+          "initial_tensor_hash": "e6d1ef55b8756aeefe1fd6682282a1178053d56efb574a19d372e1bb2327fd50"
+        }
+      ],
+      "heldout_rows": 422,
+      "holdout_block": 304002,
+      "normalization_sha256": "626c8f3541b41ba61ef05a7d15f05465bba1d1592d0af0236dfa6a3c6278c075",
+      "rel_mean_sha256": "28810cf5a9a6ba27f02d9817838efeb9f1c54f32ff9b69e8926ae51e8f848773",
+      "rel_scale_sha256": "843c756248df078faf2a99bc9c69355132e09972195e552c38d8a042e5d701b6",
+      "training_rows": 15920
+    },
+    {
+      "a_mean_sha256": "4ef4888335be3bc7c05fdadaf1af25c7ea7ff44ce48efbee393d64e3d7ec2e13",
+      "a_scale_sha256": "de3f4e10a3e374fc9e9ae52b7b42e1896e9b311ad3258238a3b1497171ce1192",
+      "c_d_initial_tensor_equal": true,
+      "c_d_normalized_multiset_equal": true,
+      "c_d_raw_multiset_equal": true,
+      "fits": [
+        {
+          "feature_hash": "9ab4032ef11d4b9ea07c05ea302b069b2f0bc3260ac72e87a4e10f79461ba3a0",
+          "fit_id": "C-H304003",
+          "initial_tensor_hash": "ee6f08e57e87cb35b4ce579f81e8240ee18de75e035f2545d3cb610d576fb486"
+        },
+        {
+          "feature_hash": "1c00ef547a6d27b2a4e8eb62554049235eb6b9c16b0fc2928ae4adac58b3e00b",
+          "fit_id": "D-H304003",
+          "initial_tensor_hash": "ee6f08e57e87cb35b4ce579f81e8240ee18de75e035f2545d3cb610d576fb486"
+        }
+      ],
+      "heldout_rows": 3412,
+      "holdout_block": 304003,
+      "normalization_sha256": "7aa307c75ce534057babe8cbdadfc1d32223cdd3233b96bb7f542143866855af",
+      "rel_mean_sha256": "beec81cb0465d0fedc499d468899dea6979170c282cd1eb598fb5fe95734be1f",
+      "rel_scale_sha256": "9bad8e8d08474284563763ad381c1dea7d303da99798192e0dbdbfb52cc1acba",
+      "training_rows": 12930
+    },
+    {
+      "a_mean_sha256": "03612dab883ddaf93f670633e21683c0af26d3b4ef5b0bbad8ac1215060de004",
+      "a_scale_sha256": "eae506d3ece943bec9d7d4972b1ff5f1c491a141d38fbf03f49d0ad3dd2e1daf",
+      "c_d_initial_tensor_equal": true,
+      "c_d_normalized_multiset_equal": true,
+      "c_d_raw_multiset_equal": true,
+      "fits": [
+        {
+          "feature_hash": "e23b5d8e822f1acfb4e603e4ca78db6e6cd56280809ec2553d933536eb5bc6d3",
+          "fit_id": "C-H304004",
+          "initial_tensor_hash": "b59eb9e65ac65d776560c32270c646c1c684b61edf0f07b7768617a36e50280b"
+        },
+        {
+          "feature_hash": "d0ebb11bba44c19ce263b98f1008f5c29103d3150aab6a3178857caf0398a773",
+          "fit_id": "D-H304004",
+          "initial_tensor_hash": "b59eb9e65ac65d776560c32270c646c1c684b61edf0f07b7768617a36e50280b"
+        }
+      ],
+      "heldout_rows": 3532,
+      "holdout_block": 304004,
+      "normalization_sha256": "8053b000146984dd439b71e7ac63c16d778e8754fd1ed8b1fc7177de37dc2461",
+      "rel_mean_sha256": "c0115f0db82e677b8643dd448520bdea20e9edc28aada6a110a1d7a18975f463",
+      "rel_scale_sha256": "939113a634dec3420fb746b048fd015ee01223e89c5b0ffdfd01c674b869d0a0",
+      "training_rows": 12810
+    },
+    {
+      "a_mean_sha256": "44802dcf7f04015d2cd33d67148c3ff369991c8502540470f8a2c0cd7c445c70",
+      "a_scale_sha256": "901eb89015ad57aba862d09d219c209991d4369cfb1e662262061cebaabb1ea7",
+      "c_d_initial_tensor_equal": true,
+      "c_d_normalized_multiset_equal": true,
+      "c_d_raw_multiset_equal": true,
+      "fits": [
+        {
+          "feature_hash": "11477d0b891fbe6368301fae4207c3a3361d08b4515bea7a918606d82a3118ae",
+          "fit_id": "C-H304005",
+          "initial_tensor_hash": "95925b5882169a6ced4331919d1fa02fbf79a941dc22b54184dd1c5ecb10c6f4"
+        },
+        {
+          "feature_hash": "f565827f1648ae0fc390538c274152a40ab845a502d5a9e855a4d2d4c143978a",
+          "fit_id": "D-H304005",
+          "initial_tensor_hash": "95925b5882169a6ced4331919d1fa02fbf79a941dc22b54184dd1c5ecb10c6f4"
+        }
+      ],
+      "heldout_rows": 0,
+      "holdout_block": 304005,
+      "normalization_sha256": "35474e1bc8046fc2836f7664e0dc7db21f53d7ebb0639e8a7bbe7e86e188ff25",
+      "rel_mean_sha256": "54028546f21328b5ef4e7bdb00eee244d5dcc11c6e5c8ec9487ed37ea291c8bc",
+      "rel_scale_sha256": "13ad676c6940ed161b7baf7fd42b99fe2fde2eed1d80a06a989e4d9a5bb73df4",
+      "training_rows": 16342
+    },
+    {
+      "a_mean_sha256": "fa1dd3e000d7e2e2c2ae4622651ca88a6f67cdb774c486a1fb04a4a8403a4636",
+      "a_scale_sha256": "db2eb9ff3c1beaa3f5d24b28662483212da9d78506e69053d9a7c7216d07dc44",
+      "c_d_initial_tensor_equal": true,
+      "c_d_normalized_multiset_equal": true,
+      "c_d_raw_multiset_equal": true,
+      "fits": [
+        {
+          "feature_hash": "d6b8441a9335a4af91cf40248c92546ea94d1e541640006a50e75ad7732b542e",
+          "fit_id": "C-H304006",
+          "initial_tensor_hash": "3b629bad19c62eff8ce39166f91b172c5ca066c6dd07992ab159e6166f2bca8e"
+        },
+        {
+          "feature_hash": "2fb9f33c563b8214c18f1e9a9d29306a8caae7cc89d1f82f86582a1d42896a66",
+          "fit_id": "D-H304006",
+          "initial_tensor_hash": "3b629bad19c62eff8ce39166f91b172c5ca066c6dd07992ab159e6166f2bca8e"
+        }
+      ],
+      "heldout_rows": 3816,
+      "holdout_block": 304006,
+      "normalization_sha256": "226cc3fb056c88f1ab6a12a58e17ebd9332723c48dbe8364902d373b3a31f811",
+      "rel_mean_sha256": "ea9e08de409f5c7f8c5b439a3d7b8328bebae802f0bb2c67a6d19680753ffbb0",
+      "rel_scale_sha256": "b9d60ee9991bb4dd64818351c6f4bb31121b903b4aa3f87583399f32f2064365",
+      "training_rows": 12526
+    },
+    {
+      "a_mean_sha256": "86f33f750c30060132d583c3328abdcbfff918cbf9db879d2e1f5467cafc17d9",
+      "a_scale_sha256": "bdac1328b1d752ff1f1b46264f36d1ae1eb56c26938c01ee532980ad8886275b",
+      "c_d_initial_tensor_equal": true,
+      "c_d_normalized_multiset_equal": true,
+      "c_d_raw_multiset_equal": true,
+      "fits": [
+        {
+          "feature_hash": "7c35d532c618998fc9041b60604587c394bf359511eed6dec1c74b2de573fef5",
+          "fit_id": "C-H304007",
+          "initial_tensor_hash": "4a21ed1a28cf4709a17e7dd1f720f14b3004a155c4a3eea2aafe212efcd87645"
+        },
+        {
+          "feature_hash": "37c512614939b059d7d05e3d20a55e52b33fda5ef4436dd735c6f22398f7f787",
+          "fit_id": "D-H304007",
+          "initial_tensor_hash": "4a21ed1a28cf4709a17e7dd1f720f14b3004a155c4a3eea2aafe212efcd87645"
+        }
+      ],
+      "heldout_rows": 1128,
+      "holdout_block": 304007,
+      "normalization_sha256": "9ef186a2791ed5c6c78c509b924ac2e36e05fce5229b3d9acc4ffb1f627058be",
+      "rel_mean_sha256": "661f499f96634f1bd5fa3e1b22b1bc1e85be86b68a1b0342e8681c044a6b3527",
+      "rel_scale_sha256": "6ce8a2a63cfaa078d1490318282baef56025f27086039f7254da149b93f56090",
+      "training_rows": 15214
+    }
+  ],
+  "manifest_sha256": "df61e78119c3273b3333c3a6f1f01ebb659b57338ebb0981a15d6f77b40b5f27",
+  "preparation_script_sha256": "9da88d9a2e147cad551e8e4e2c8b11ba460b435f5743f57527fbf46d7eb09497",
+  "row_count": 16342,
+  "schema": "F4-SYMMETRY-03-fit-preparation-v1",
+  "status": "PASS",
+  "truth_values_opened": false
+}

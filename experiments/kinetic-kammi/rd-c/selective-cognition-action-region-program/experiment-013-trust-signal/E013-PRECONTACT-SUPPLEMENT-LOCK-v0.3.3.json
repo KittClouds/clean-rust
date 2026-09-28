@@ -1,0 +1,28 @@
+{
+  "artifact_id": "E013-PRECONTACT-SUPPLEMENT-v0.3.3",
+  "artifact_paths": {
+    "generator": "C:\\Users\\shuga\\.codex\\worktrees\\e013-episode-factory\\clean-rust\\experiments\\e013-episode-factory\\precontact-v031\\supplement_precontact_v033.py",
+    "parent_correction_v032": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-013-trust-signal\\E013-PRECONTACT-CORRECTION-v0.3.2.md",
+    "parent_lock_v032": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-013-trust-signal\\E013-PROTOCOL-LOCK-v0.3.2.json",
+    "parent_projections_v032": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-013-trust-signal\\E013-FEASIBILITY-PROJECTIONS-v0.3.2.json",
+    "parent_receipt_v032": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-013-trust-signal\\E013-FEASIBILITY-RECEIPT-v0.3.2.md",
+    "supplement": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-013-trust-signal\\E013-PRECONTACT-FEASIBILITY-SUPPLEMENT-v0.3.3.md"
+  },
+  "bank_owner": "USER",
+  "banks_generated_by_agent": false,
+  "model_contact_authorized": false,
+  "model_contact_performed": false,
+  "parent_lock_v032_sha256": "fbac0d86ffd6a593793d2a35d00d2250ae63b52a0abec99864d36456d1af1adb",
+  "schema_version": 1,
+  "scope": "readable projection of already-locked T5 and confirmation-support probabilities",
+  "self_hash_note": "Lock excludes itself and the post-lock verification receipt.",
+  "sha256": {
+    "generator": "1039ff34d84fc9e8e39d543ff7820c4161f283664712367a78eb0531b8886f2e",
+    "parent_correction_v032": "dfd00ad2c48aed6dbeee8451bd7b13defcb9cf268d34cd33bda4f9503bcf5259",
+    "parent_lock_v032": "fbac0d86ffd6a593793d2a35d00d2250ae63b52a0abec99864d36456d1af1adb",
+    "parent_projections_v032": "7f71d0dc6d619dfbeea03cd25a1c9dc3d7e80737f47558cb8fa47cad1e944c88",
+    "parent_receipt_v032": "f985535550542b454c150a3815dbdaaa30687ca3b1694df7b814f7fbe4a4bf21",
+    "supplement": "9fa441e9567b776fa6f3e80779c0c7a31bfd8d8729ba1b02bcf5913065a4b5ef"
+  },
+  "state": "SEALED_PRECONTACT_DESIGN_ONLY"
+}

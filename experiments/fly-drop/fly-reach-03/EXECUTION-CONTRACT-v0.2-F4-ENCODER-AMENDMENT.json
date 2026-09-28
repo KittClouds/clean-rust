@@ -1,0 +1,25 @@
+{
+  "authoritative_math_contract_sha256": "6beb47c4784a7d6e37a91e45688dd86e50b15291a8f0dbf07c56c71aefbe47a7",
+  "base_execution_contract": "EXECUTION-CONTRACT-v0.1.json",
+  "exact_reconstruction_invariant": "Omega(F4)=1",
+  "f4_role": "calibration_ceiling_only; not a scientific filtration rung",
+  "feature_spec": {
+    "path": "F4-ENCODER-SPEC-v1.json",
+    "sha256": "3325e1b6ce91956162fa3022c9e2c3bdf3396b269e975da9c108f45d9129d43b"
+  },
+  "gate": {
+    "fold_failure_disposition": "ESTIMATOR_CAPACITY_STOP",
+    "per_fold_omega_hat_min": 0.7,
+    "pooled_balanced_error_max": 0.1,
+    "pooled_omega_hat_min": 0.8
+  },
+  "measured_execution_authorized": false,
+  "measured_namespace_created": false,
+  "no_post_gate_tuning": true,
+  "qualification_feature_identity": "f4-features-v1",
+  "qualification_input_run": "qualification-v2",
+  "qualification_only": true,
+  "schema": "FLY-REACH-03-execution-contract-v0.2-f4-encoder-amendment",
+  "status": "FROZEN_QUALIFICATION_AMENDMENT",
+  "study_id": "FLY-REACH-03"
+}

@@ -1,0 +1,44 @@
+{
+  "contract_id": "FAS_S09_DEPTHWISE_DECISION_SUBSPACE_ANALYSIS_V04",
+  "status": "FROZEN_BEFORE_V04_ANALYSIS",
+  "project_id": "fas-s09-depthwise-decision-subspace-emergence",
+  "run_id": "fas-s09-depthwise-decision-subspace-emergence-v04",
+  "supersedes": {
+    "run_id": "fas-s09-depthwise-decision-subspace-emergence-v03",
+    "protocol_root_sha256": "8e51be468fb78788bd8d3cb66f54d26d401a58d1706163d59290abbfa929de23",
+    "protocol_seal_file_sha256": "fe3f2baf40b0f71518ff410409825cb02cfdf20299b19d0f8219ae96ceef7326",
+    "analysis_failure": "terminal metrics comparator treated an extra aggregate and reference provenance as task metrics; M state and probabilities were exact, and no F fit or earlier-layer fit ran",
+    "recovery_cache_root_sha256": "82f9eb6ba0b9c37e58c415b03ec1bc4be00032f73cc43e70b3987ac4108f7653"
+  },
+  "inputs": {
+    "recovered_feature_cache_root_sha256": "82f9eb6ba0b9c37e58c415b03ec1bc4be00032f73cc43e70b3987ac4108f7653",
+    "recovery_receipt_sha256": "cdba6b96a43be1b16958371cf130b5e1d20e78367930b9e4cfd6f0ad9afd1668",
+    "recovery_cache_seal_file_sha256": "a1165b9d38c75209f7c008b7edc7cc2d2dc359be885fe0aae5762203ce34c306",
+    "S01_2_construction_root_sha256": "f6065b8163799239e0d7b1200b5dda4aad169772ead14b999130a473ff9d9049",
+    "S01_2_extraction_result_root_sha256": "1fc3aeb432ecdbef21a35aea8fed5b0d59671681eb8eb8032533c9ce751a4384",
+    "S01_2_feature_cache_root_sha256": "4964f35fb87a45a9447cd0f5f028668027ca3ad3a8f0d0c3f9eb7b9cbe7ccaaa",
+    "S01_3_result_root_sha256": "2581b50d75382c197793ea46400bf2b8a27508df22b2ff5bdbe82eb20a5238b7",
+    "S08_S01_analysis_root_sha256": "96be631597a6eddac8624d6dd744927577eb90921f7d07dda509ab4260bbd1fc"
+  },
+  "analysis": {
+    "task": "EXACT_TARGET",
+    "layers": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
+    "surfaces": ["M=mean_full", "F=final_position"],
+    "fit_count": 32,
+    "fit_and_test_split": "exactly the sealed S01-3 grouped split and masks",
+    "probe_and_optimizer": "unchanged from sealed S01-3 linear_core.py and S09-v02 contract",
+    "terminal_gate": "fit layer-16 M and F first; require exact saved probe state and test probability arrays, exact numeric fields for every contracted condition, and S08 plane tolerance before fitting layers 1-15",
+    "metric_comparison_correction": "exclude the computed ALL_TEST_ROWS aggregate and the reference-only interpretation_scope field; require exact equality of condition names and every remaining metric field",
+    "cells_per_layer": ["M_NATIVE", "F_NATIVE", "M_REP_F_PIPELINE", "F_REP_M_PIPELINE"],
+    "statistics": false,
+    "FAS00_access": false,
+    "model_contact": false,
+    "adaptive_mechanisms": false
+  },
+  "authority": {
+    "S09_FIXED_ANALYSIS_AUTHORIZED": true,
+    "S09_RESULT_READY": false,
+    "FAS00_PHASE4_AUTHORIZED": false,
+    "ADAPTIVE_MECHANISMS_AUTHORIZED": false
+  }
+}

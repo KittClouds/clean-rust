@@ -1,0 +1,10 @@
+{
+  "audited_events": 8,
+  "behavioral_inference": false,
+  "blocks_per_event": 6,
+  "complete": true,
+  "dh08b_authorized": false,
+  "joint_candidates_per_block": 125,
+  "protocol": "Q10-JBR1",
+  "scientific_seed_bundles": 0
+}

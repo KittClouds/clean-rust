@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "state": "FROZEN_BEFORE_PRECONTACT_AUDIT_RERUN",
+  "model_contact_authorized": false,
+  "audit": "scripts/audit_task_bank_e012_v1_2.py",
+  "audit_sha256": "d26387a3234bac76625cd0a1e194d2173a78563f9702ffcb808b59690d8ef04b",
+  "prior_audit_attempt": "3fcd5113a20011258a58c9ffedb807e224b3d2ab4d7b2a0cba100058557252df",
+  "frame_count": 1248,
+  "files": [
+    {
+      "path": "amendments/bank-amendment-09.md",
+      "sha256": "d65b271c448db1a468dda26702731713329a541fd3eaca82b0aab900e6725fa3",
+      "bytes": 754
+    },
+    {
+      "path": "amendments/bank-amendment-09.json",
+      "sha256": "9802e16ad024ee75111da6393d29f834e6c826917a325a0cbdf226edba433f20",
+      "bytes": 574
+    },
+    {
+      "path": "scripts/audit_task_bank_e012_v1_2.py",
+      "sha256": "d26387a3234bac76625cd0a1e194d2173a78563f9702ffcb808b59690d8ef04b",
+      "bytes": 20554
+    },
+    {
+      "path": "scripts/freeze_precontact_audit_e012_v1_2.py",
+      "sha256": "c7bf3568bb329d988b4ef6fe977d548ab19878eebf7974d1a5462ea2e5e3177c",
+      "bytes": 2225
+    },
+    {
+      "path": "bank/construction-01/frame-projection-lock-v1.1.json",
+      "sha256": "938e60fe593971db416e392d2e79ed247af7a08fac112fb518a55d3d0a447ea7",
+      "bytes": 4156
+    },
+    {
+      "path": "bank/construction-01/scored-bank-v1/attempts/precontact-audit-attempt-01.json",
+      "sha256": "3fcd5113a20011258a58c9ffedb807e224b3d2ab4d7b2a0cba100058557252df",
+      "bytes": 1131
+    },
+    {
+      "path": "bank/construction-01/scored-bank-v1/observer-frames.json",
+      "sha256": "77ef434369ad6addd43dafe9f7070182c34df003bda745295c9a3d9ffa61616f",
+      "bytes": 4247995
+    },
+    {
+      "path": "bank/construction-01/scored-bank-v1/vault/frame-truth-index.json",
+      "sha256": "8812e0eb0c4c6932140066c632e45e8693e792e6bc55baf7a70a0825cc0d9a15",
+      "bytes": 933977
+    },
+    {
+      "path": "bank/construction-01/scored-bank-v1/vault/presentation-receipts.json",
+      "sha256": "9c8b9c1d652e95fe530e269fd0e5e8660ac5563d6792585bec44e70bb3bf1f9d",
+      "bytes": 1225061
+    },
+    {
+      "path": "bank/construction-01/scored-bank-v1/vault/task-source-fixtures-final-v1.json",
+      "sha256": "4f675c5a66caeef388866971f8a7be9d44916007c94c97266d8465111f40676e",
+      "bytes": 330122
+    },
+    {
+      "path": "bank/construction-01/scored-bank-v1/vault/candidate-check-labels-final-v1.json",
+      "sha256": "0268384c7a859467e5533b54e73a25eb09aedde2cd34205e22a8ea27fb4f04b7",
+      "bytes": 970000
+    },
+    {
+      "path": "bank/construction-01/scored-bank-v1/vault/candidate-check-results.json",
+      "sha256": "22c8c6db459a124a91d8cc4971b33be0e5baf97d3450c23b34fac51fcb235d43",
+      "bytes": 961716
+    }
+  ],
+  "sha256_self_excluded": true
+}

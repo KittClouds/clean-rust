@@ -1,0 +1,148 @@
+{
+  "schema_version": 1,
+  "run_id": "e011-20260925-causal-evidence-01",
+  "condition": "candidate-permuted",
+  "role": "large",
+  "bundle_id": "ternary-bonsai-2-27b-ptq1-local-v5",
+  "bundle_blake3": "6d933aba093307e0c333f022426af46f3f5b243a8a10a2e1bb2f4cfc93b17b9d",
+  "frozen_input_lock_sha256": "3a91323be0abca07cd20ace84562cfbfb79a528cbd996811974eeb0eaa857b7a",
+  "frame_lock_sha256": "70f6c76971dbfff9a01aa1ab2a271b8055d5a0857fde6964985a642569eb7529",
+  "frame_sha256": "55cd9a1f467fc7a727fd4a80e604c67fc29d7123740c87d53b956f8dcd350ce3",
+  "task_id": "turbovec-turbovec-mask-allowlist-v2",
+  "pair_task_id": "turbovec-turbovec-mask-allowlist-v2",
+  "server_alias": "e009-large-v5",
+  "server_process_id": 47156,
+  "runtime_sha256": "e0ea4fd53e6f0c741cbd28093b427f333ada0eb03b83073e1f99c483793ea976",
+  "model_sha256": "53107f530aa52eb00912263ab1ee29bd199261c87cd7b4ad4ca1318c1fe33ee3",
+  "reasoning_mode": "off",
+  "chat_template_sha256": "c3cf9e34abf4f9e36c2d72165aa9c132d3e2a725b6c2586aaa3a8af9d7a81041",
+  "maximum_output_tokens": 1024,
+  "system_prompt_sha256": "976ef1cd914bacb366c64418825010124338a626a0400d459858acc7e48f5a48",
+  "output_schema_sha256": "97170fa0d6a44681f680ad0ac533a3f3913709757e4ee6cbf96d9c9f40d1b2fb",
+  "normalization_contract": "percent-0-100-to-milli-x10-v1+line-endings-lf-v1",
+  "thresholds": {
+    "minimum_applicability_milli": 850,
+    "maximum_abstention_milli": 150
+  },
+  "request_sha256": "ac133d8695a8e21b1113f70aea4f517d185905cd083bd65f74a72bf28db8e7ad",
+  "request": {
+    "model": "e009-large-v5",
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a typed observer in a deterministic coding workflow. The runtime owns workflow state and will execute only one action from the offered action_options after validating your output.\n\nRead the task_prompt and evidence, then compare the offered actions. Choose the action most likely to satisfy the task while preserving the repository's stated constraints. Do not write or propose code outside the offered choices. Do not claim to have executed tests. If no offered action is sufficiently supported, use null for action_choice and express uncertainty with abstention_percent.\n\nReturn exactly one JSON object matching the provided schema. action_choice must be an offered numeric action ID or null. applicability_percent is your estimate from 0 to 100 that this observer can handle the task from the available evidence. abstention_percent is your estimate from 0 to 100 that the runtime should defer this choice. Use integer percentage points only. Do not add prose or fields.\n"
+      },
+      {
+        "role": "user",
+        "content": "{\"schema_id\":\"rdc-real-coding-observation.v1\",\"task_id\":\"turbovec-turbovec-mask-allowlist-v2\",\"task_family\":\"turbovec-mask-allowlist\",\"repository_id\":\"turbovec\",\"task_variant\":2,\"task_prompt\":\"The top-k result must contain only permitted vector slots and match post-hoc filtering. The exact regression test currently fails; choose the patch that restores the packed-mask contract.\",\"repository_revision\":\"8202f194a0cbbd52213a004290401e180e5c123d\",\"snapshot_sha256\":\"209a6c9c47be7b48d3cf76c355407c60e85d366c8b4c7f292074cb8d74206a34\",\"evidence\":[{\"kind\":\"source_excerpt\",\"source_id\":\"turbovec/src/search.rs\",\"content_blake3\":\"38465efa53f0a24c7327297e0e59ca3b3d0dcbc140fc34051f8775de5fa4af48\",\"content\":\"    // Safety: caller validates mask length against n_vectors before reaching\\n    // any kernel; we never query past it in scoring loops.\\n    (mask[slot >> 6] >> (slot & 31)) & 1 != 0\\n}\\n\"},{\"kind\":\"baseline_tool_result\",\"source_id\":\"cargo-test::block_skip_at_one_percent_selectivity_matches_post_filter\",\"content_blake3\":\"dd9a061ae2ebdc824953b190603ed97521951f1b35d1b23139a5d4bbad881f1d\",\"content\":\"Exact test `block_skip_at_one_percent_selectivity_matches_post_filter` failed on the frozen snapshot. Candidate patches have not been run in this task.\\n\\nrunning 1 test\\ntest block_skip_at_one_percent_selectivity_matches_post_filter ... FAILED\\n\\nfailures:\\n\\n---- block_skip_at_one_percent_selectivity_matches_post_filter stdout ----\\n\\nthread 'block_skip_at_one_percent_selectivity_matches_post_filter' (3056) panicked at turbovec\\\\tests\\\\filtering.rs:352:9:\\nassertion `left == right` failed: rank 1: id mismatch (got 1940, want 2619)\\n  left: 1940\\n right: 2619\\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\\n\\n\\nfailures:\\n    block_skip_at_one_percent_selectivity_matches_post_filter\\n\\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 21 filtered out; finished in 1.27s\\n\\n   Compiling turbovec v0.9.0 (<frozen-repository-snapshot>\\\\turbovec)\\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 11.36s\\n     Running tests\\\\filtering.rs (<cargo-target>\\\\debug\\\\deps\\\\filtering-e398ca839dedcfa2.exe)\\nerror: test failed, to rerun pass `-p turbovec --test filtering`\\n\"}],\"action_options\":[{\"action\":{\"id\":52547,\"schema_id\":1},\"summary\":\"Leave the current implementation unchanged.\",\"diff_excerpt\":\"No source line changes are included.\",\"patch_sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"},{\"action\":{\"id\":60455,\"schema_id\":1},\"summary\":\"Apply the source change and add a contract comment.\",\"diff_excerpt\":\"@@ -3000,7 +3000,8 @@\\n-    (mask[slot >> 6] >> (slot & 31)) & 1 != 0\\n+    // Slot indices select one bit from each complete u64 word.\\n+    (mask[slot >> 6] >> (slot & 63)) & 1 != 0\",\"patch_sha256\":\"f977765cc076a1eb302b0c9310a0770c7c74035912ad92214d0a70ffb5325974\"},{\"action\":{\"id\":33790,\"schema_id\":1},\"summary\":\"Apply this alternative change in the same code path.\",\"diff_excerpt\":\"@@ -3000,7 +3000,7 @@\\n-    (mask[slot >> 6] >> (slot & 31)) & 1 != 0\\n+    (mask[slot >> 5] >> (slot & 63)) & 1 != 0\",\"patch_sha256\":\"027c3f06e442faa979b6e9381ceb566b4a2d4028837c4747ddad6f91984801ab\"},{\"action\":{\"id\":20300,\"schema_id\":1},\"summary\":\"Apply the focused source change shown here.\",\"diff_excerpt\":\"@@ -3000,7 +3000,7 @@\\n-    (mask[slot >> 6] >> (slot & 31)) & 1 != 0\\n+    (mask[slot >> 6] >> (slot & 63)) & 1 != 0\",\"patch_sha256\":\"0351d46c399b62825821094c90c92701d18d5e56718bc7af4825e6dc9b13ac74\"}]}"
+      }
+    ],
+    "temperature": 0,
+    "top_p": 1,
+    "seed": 0,
+    "max_tokens": 1024,
+    "stream": false,
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rdc_coding_observer_output_v1",
+        "strict": true,
+        "schema": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "rdc-coding-observer-output.v2",
+          "title": "RDC Coding Observer Output v2",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "action_choice",
+            "applicability_percent",
+            "abstention_percent"
+          ],
+          "properties": {
+            "action_choice": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 65535
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "applicability_percent": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "abstention_percent": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            }
+          }
+        }
+      }
+    }
+  },
+  "http_status": 200,
+  "response": {
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "{\n  \"action_choice\": 20300,\n  \"applicability_percent\": 95,\n  \"abstention_percent\": 5\n}"
+        }
+      }
+    ],
+    "created": 1790367369,
+    "model": "e009-large-v5",
+    "system_fingerprint": "b10685-7dffb158d",
+    "object": "chat.completion",
+    "usage": {
+      "completion_tokens": 38,
+      "prompt_tokens": 1572,
+      "total_tokens": 1610,
+      "prompt_tokens_details": {
+        "cached_tokens": 192
+      }
+    },
+    "id": "chatcmpl-NpHHKcJVRObAtTlv3TPPaCCE0N7uj5xL",
+    "timings": {
+      "cache_n": 192,
+      "prompt_n": 1380,
+      "prompt_ms": 2749.822,
+      "prompt_per_token_ms": 1.9926246376811596,
+      "prompt_per_second": 501.8506652430594,
+      "predicted_n": 38,
+      "predicted_ms": 814.421,
+      "predicted_per_token_ms": 22.011378378378378,
+      "predicted_per_second": 45.43104856087944
+    }
+  },
+  "content": "{\n  \"action_choice\": 20300,\n  \"applicability_percent\": 95,\n  \"abstention_percent\": 5\n}",
+  "output": {
+    "action_choice": 20300,
+    "applicability_percent": 95,
+    "abstention_percent": 5
+  },
+  "normalized_output": {
+    "action_choice": 20300,
+    "applicability_milli": 950,
+    "abstention_milli": 50
+  },
+  "normalization_error": null,
+  "usage": {
+    "completion_tokens": 38,
+    "prompt_tokens": 1572,
+    "total_tokens": 1610,
+    "prompt_tokens_details": {
+      "cached_tokens": 192
+    }
+  },
+  "finish_reason": "stop",
+  "elapsed_ms": 3805.291
+}

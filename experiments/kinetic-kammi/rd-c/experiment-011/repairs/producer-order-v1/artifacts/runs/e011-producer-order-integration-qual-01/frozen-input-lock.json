@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "state": "FROZEN_BEFORE_MODEL_CONTACT",
+  "run_id": "e011-producer-order-integration-qual-01",
+  "bank_id": "e011-fresh-integration-bank-v1c",
+  "sha256": {
+    "frame_lock": "8265011f22c0c372f7d742e0b948e5bac33e4f6b5a38120b9423be410004e566",
+    "prepared_frame_lock": "0fc0a92d14db74862b9f9d6cc282a706dc361fa8c3c6a65a940e536e843bb290",
+    "bank_freeze": "1c3ecf7b84c05942087ba1a074b49b9f3704089541c3d4d7ea9da724a29937cd",
+    "sealed_labels": "a75b3e09725fb1b16f14e124ffc27795af2b60795d633416f83ff01ea04aa146",
+    "system_prompt": "976ef1cd914bacb366c64418825010124338a626a0400d459858acc7e48f5a48",
+    "output_schema": "97170fa0d6a44681f680ad0ac533a3f3913709757e4ee6cbf96d9c9f40d1b2fb",
+    "bundle_lock": "a626836853bdb0755fd2e4e1569b6b91b33861306c7d1e4a51e3de54a9ee713d",
+    "thresholds": "846b0668db2a7796ac1ee90c190d45532a3065617ff1abca03df495496ddb173",
+    "runtime_integration_source_tree": "b27d2ae30bbcb0a85837fee9c9278eae3a64969a16fda684c04db1ed6d51cbd9",
+    "runtime_contract_candidate_presentation": "85053e46ccf8a27b649876ecf226456008019af7dee3301eb1268aedfd86f94d"
+  },
+  "bundle_lock_path": "C:\\rd-c\\experiment-010\\models\\bundle-lineage\\v5-final\\bundle-lock.json",
+  "prompt_path": "C:\\rd-c\\experiment-010\\prompts\\system-observer-v2.txt",
+  "schema_path": "C:\\rd-c\\experiment-010\\schemas\\observer-output.v2.json",
+  "thresholds": {
+    "minimum_applicability_milli": 850,
+    "maximum_abstention_milli": 150
+  },
+  "normalization_contract": "percent-0-100-to-milli-x10-v1+line-endings-lf-v1",
+  "reasoning_mode": "off",
+  "maximum_output_tokens": 1024,
+  "models": [
+    {
+      "role": "small",
+      "bundle_id": "minicpm5-2b-q8-local-v5",
+      "bundle_blake3": "03203842e1835233af8d9ef337bca1395be9c3828333c79eb96e199e52925842",
+      "bundle_lock_sha256": "a626836853bdb0755fd2e4e1569b6b91b33861306c7d1e4a51e3de54a9ee713d",
+      "bundle_lock_path": "models/bundle-lineage/v5-final/bundle-lock.json",
+      "server_alias": "e009-small-v5",
+      "model_sha256": "c5415f8989bf88a8288f1b55a3cc371af53c07b0faa220a63bd7a990cfaba078",
+      "runtime_sha256": "ffaee576ad271ede87b92a7d8c3863dc8f331bbac666ee00099c250e8809e743",
+      "chat_template_path": "models/chat-templates/minicpm5-2b-q8-local-v3.jinja"
+    },
+    {
+      "role": "large",
+      "bundle_id": "ternary-bonsai-2-27b-ptq1-local-v5",
+      "bundle_blake3": "6d933aba093307e0c333f022426af46f3f5b243a8a10a2e1bb2f4cfc93b17b9d",
+      "bundle_lock_sha256": "a626836853bdb0755fd2e4e1569b6b91b33861306c7d1e4a51e3de54a9ee713d",
+      "bundle_lock_path": "models/bundle-lineage/v5-final/bundle-lock.json",
+      "server_alias": "e009-large-v5",
+      "model_sha256": "53107f530aa52eb00912263ab1ee29bd199261c87cd7b4ad4ca1318c1fe33ee3",
+      "runtime_sha256": "e0ea4fd53e6f0c741cbd28093b427f333ada0eb03b83073e1f99c483793ea976",
+      "chat_template_path": "models/chat-templates/ternary-bonsai-2-27b-ptq1-local-v3.jinja"
+    }
+  ],
+  "routing": "small-then-large-on-abstention at frozen E009 v5 thresholds",
+  "response_binding": "request and response envelopes carry request ID and receipt digest; observer prompt remains unchanged",
+  "labels_opened": false
+}

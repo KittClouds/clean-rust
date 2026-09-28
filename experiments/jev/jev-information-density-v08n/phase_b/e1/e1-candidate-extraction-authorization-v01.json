@@ -1,0 +1,49 @@
+{
+  "protocol": "jev-information-density/v0.8n-e1-candidate-extraction-authorization-v01",
+  "identity": "v0.8N-E1-candidate-semantic-basis-extraction-authorization-v01",
+  "status": "EXPLICITLY_AUTHORIZED_EXTRACTION_AND_TARGET_FREE_JOIN_ONLY",
+  "authorized_at_utc": "2026-09-23T11:12:09Z",
+  "authorization_source": "Explicit user authorization in the active task; this receipt records scope and is not a cryptographic user signature.",
+  "bindings": {
+    "e1_repair_contract_sha256": "770d2e3a548e4e31e6a1e7af878f19db925f901666c5bceecd0c11454ee858e2",
+    "candidate_text_manifest_sha256": "7987ae385454b32ddec548e48ef6543253b7b061ee1f077c064363c06304a285",
+    "model_revision": "7453bca97ca1e67754c4035a4b4c584e1c9dd725",
+    "original_phase_b_status": "EVALUATION_INPUT_CONTRACT_INCOMPLETE"
+  },
+  "permitted": {
+    "load_pinned_frozen_lfm": true,
+    "encode_exactly_16_sealed_candidate_texts": true,
+    "frozen_extraction_recipe_only": true,
+    "independent_clean_process_repeat": true,
+    "materialize_under_separate_e1_path": true,
+    "target_free_whole_schema_identity_join_audit": true,
+    "seal_candidate_basis_and_join_disposition": true
+  },
+  "forbidden": {
+    "head_load": true,
+    "head_inference": true,
+    "predictions": true,
+    "heldout_targets_for_construction": true,
+    "treatment_metrics": true,
+    "slot_crosswalk": true,
+    "nearest_neighbor_or_semantic_role_substitution": true,
+    "feature_optimization_or_candidate_replacement": true,
+    "second_panel_opening": true,
+    "newtight_or_legacy_evaluation": true,
+    "phoenix": true,
+    "original_phase_b_artifact_modification": true
+  },
+  "stop_conditions": [
+    "any contract, manifest, model snapshot, tokenizer, extractor, or output identity mismatch",
+    "repeat extraction maximum absolute error exceeds 1e-5",
+    "any candidate identity or exact schema-local order is ambiguous",
+    "any of 2000 neighborhoods fails to resolve exactly four unique candidate features",
+    "the target-free join would require a second panel unlock or access to target/body contents"
+  ],
+  "panel_opening_count_before_and_after_authorized_operations": 1,
+  "second_panel_opening_authorized": false,
+  "head_inference_authorized": false,
+  "newtight_authorized": false,
+  "legacy_evaluation_authorized": false,
+  "phoenix_authorized": false
+}

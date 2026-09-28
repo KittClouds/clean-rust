@@ -1,0 +1,34 @@
+{
+  "task_id": "heldoutv6-overlapping-fill-replacement-splits-easy-01",
+  "frame_hash_hex": "aec14a4c3466c6e6e311f9bbbdf9da16c66c37cdd0525cb04def3679781fce15",
+  "selected_patch_sha256": null,
+  "action_ledger_path": "C:\\rd-c\\experiment-009\\artifacts\\runs\\e009-20260925-corrected-07\\ledgers\\hand-written\\heldoutv6-overlapping-fill-replacement-splits-easy-01.actions.bin",
+  "actions": [
+    {
+      "id": 11,
+      "schema_id": 1
+    },
+    {
+      "id": 37,
+      "schema_id": 1
+    },
+    {
+      "id": 68,
+      "schema_id": 1
+    },
+    {
+      "id": 94,
+      "schema_id": 1
+    }
+  ],
+  "observer_output": {
+    "action_choice": null,
+    "applicability_milli": 800,
+    "abstention_milli": 900
+  },
+  "thresholds": {
+    "minimum_applicability_milli": 850,
+    "maximum_abstention_milli": 150
+  },
+  "completion_check_passed": false
+}

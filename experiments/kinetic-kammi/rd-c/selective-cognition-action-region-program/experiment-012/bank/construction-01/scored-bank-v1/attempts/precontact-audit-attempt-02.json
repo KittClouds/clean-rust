@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "attempt_id": "E012-PRECONTACT-AUDIT-ATTEMPT-02",
+  "state": "FAILED_AUDIT_IMPLEMENTATION_ERROR_NO_BANK_MUTATION",
+  "model_contact_authorized": false,
+  "audit_script": "scripts/audit_task_bank_e012_v1_2.py",
+  "audit_script_sha256": "d26387a3234bac76625cd0a1e194d2173a78563f9702ffcb808b59690d8ef04b",
+  "precontact_audit_lock_sha256": "ad4d51812ab5a1648ccc4ff5196d994610ad183d1c940dad58040a1cb35d9d0c",
+  "frame_sha256": "77ef434369ad6addd43dafe9f7070182c34df003bda745295c9a3d9ffa61616f",
+  "frames_mutated": false,
+  "error": "ValueError: condition leave_out_E_t has an undeclared frame change for task-348504",
+  "root_cause": "expected absent-channel sentinel was applied to the already-absent actual frame and then compared to the full frame.",
+  "verified_frame_observation": "leave_out_E_t differs from full_frame only in task_prompt, as declared.",
+  "repair_scope": "construct expected frame from full_frame, apply absent-channel transforms, compare actual projected frame."
+}

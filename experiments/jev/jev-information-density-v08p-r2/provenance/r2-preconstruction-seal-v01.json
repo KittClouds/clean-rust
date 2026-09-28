@@ -1,0 +1,40 @@
+{
+  "schema": "jev-v08p-r2-preconstruction-seal-v01",
+  "identity": "v0.8P-R2-late-transition-localization-v01",
+  "status": "RUNNER_SEALED_BEFORE_CANDIDATE_CONSUMPTION",
+  "scientific_contract_sha256": "51cd8dee09688f1aa24ff575fa0a181d50b2a6ffc94dc6b7e7ed5b61c58ef14",
+  "runner": {
+    "source_path": "experiments/jev-information-density-v08p-r2/generator-r2/src/main.rs",
+    "source_sha256": "ec9309861583f6389fa2809dc3636f3cd1dbe0d49a2c0fee7c8cef7ee7f9ef1e",
+    "cargo_toml_sha256": "37648153586f2cc7a411ee1b11892ca3c85bc51705df53f556f96d49fe9d0813",
+    "cargo_lock_sha256": "1343fa1903314172c91d1d9a7062f373eb6eb56d56f54ff37199572a4a572abe",
+    "release_binary_path": "D:/cargo-targets/jev-v08p-r2/release/jev-information-density-v08p-r2-generator.exe",
+    "release_binary_sha256": "6d6f7e45ae196a578aca3ffcd8162c9403c4b507848d0ce477712596b2e90da3",
+    "target_directory": "D:/cargo-targets/jev-v08p-r2",
+    "unit_tests": {"passed": 6, "failed": 0},
+    "startup_binding_check": "PASS; all sealed parent identities verified before expected missing-mode exit"
+  },
+  "bound_scientific_parents": {
+    "original_p_run_contract_sha256": "e345225b4a17fc18eb35fcab24cbe1d72bd0e34bed9de272f927a7be461853e6",
+    "original_p_analysis_contract_sha256": "84111122033fda65c84344317cfe3b50639b23be4c71f480ba665c67a23cc939",
+    "original_p_panel_contract_sha256": "ce3b7b97caecb27f3ad99439c0e67dca6e40af5da3db9ca2e356ea5e9f06f823",
+    "original_p_contract_bundle_sha256": "67cd6b7902111000dc93a0f81f9f20bc05a9c084732705ed8f9ad82fe965fa85",
+    "v08n_base_contract_sha256": "f72947a53c7df85d12c7d9f91620c0c32925c047b0c556d9298038c80c51f103",
+    "v08n_eval_panel_contract_sha256": "3fa547c0a2490c4cfb5d578a32dffeb8414c35daa5e59ef339ab1e148e2e9cd6",
+    "r1_identity_schema_sha256": "a5d9bf108a1b14d05652b78021a55b74500ed55d6bdc759ff02c09560ea6f7ed",
+    "r1_terminal_disposition_sha256": "151e28a629cc6877084b5c4d5395309c3a73e346f5b589d1b0cc588027a6596b",
+    "v05_denylist_sha256": "50eebeb5790c29b4a75c6f8df849eb4c2865d3c864932bbd7f636b7a0e52a2cd",
+    "v05_denylist_root_seal_sha256": "272a14e57c2dcf610568381c0c1c4673c7b40e368ac81b07d3e7160e4e5953a2"
+  },
+  "execution_boundary": {
+    "output_root_absent_at_seal": true,
+    "candidate_stream_consumed": false,
+    "lfm_loaded": false,
+    "features_extracted": false,
+    "head_loaded": false,
+    "training": false,
+    "inference": false,
+    "evaluation": false,
+    "phoenix_access": false
+  }
+}

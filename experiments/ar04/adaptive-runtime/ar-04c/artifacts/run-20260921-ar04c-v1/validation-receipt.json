@@ -1,0 +1,11 @@
+{
+  "validation": "AR-04C read-only artifact audit",
+  "valid": true,
+  "cells": 25,
+  "trajectories": 75,
+  "decisions": 315000,
+  "checkpoints": 300,
+  "rotating_panels": 26250,
+  "dataset_hashes_verified": 10,
+  "panel_seed_reuse": false
+}

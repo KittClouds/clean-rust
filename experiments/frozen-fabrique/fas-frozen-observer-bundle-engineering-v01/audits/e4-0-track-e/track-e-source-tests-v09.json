@@ -1,0 +1,29 @@
+{
+  "actual_v07_contract_and_map_audited": false,
+  "command": "python -m unittest audits.e4-0-track-e.test_audit_e4_0_track_e_v07 -v; python -m py_compile audits/e4-0-track-e/audit_e4_0_track_e_v07.py audits/e4-0-track-e/test_audit_e4_0_track_e_v07.py",
+  "created_utc": "2026-09-26T23:55:58.459766+00:00",
+  "model_tokenizer_cuda_contact": false,
+  "python_compile": "PASS",
+  "schema": "FAS_E4_0_TRACK_E_SOURCE_TESTS_V03",
+  "scope": "Synthetic-only v07 contract/source/seal auditor: exact v06 science projection and supersession, source-map/source/receipt identity, inherited population and parity-panel seal/audit/authorization identities, exact seal member set and root recomputation, preseal/postseal status shape, and tamper rejection. Truth fixture intentionally absent. No actual v07 map/contract, E4 labels/population, model, tokenizer, or CUDA were accessed.",
+  "sources": [
+    {
+      "bytes": 40624,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/audit_e4_0_track_e_v07.py",
+      "sha256": "30a9db68fcafd2ec7a3c4ba5a95c3c89dea1688047e608ec45f4411c713abaca"
+    },
+    {
+      "bytes": 19539,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/test_audit_e4_0_track_e_v07.py",
+      "sha256": "bbaf9b30221d19fb0908ee66fbe46514a650520ad2e7b11766db70808bb34ff3"
+    }
+  ],
+  "status": "TRACK_E_SOURCE_TESTS_PASS_V07_PREMAP_SYNTHETIC_AUDITOR",
+  "tests": {
+    "discovered": 8,
+    "failed": 0,
+    "passed": 8,
+    "skipped": 0
+  },
+  "truth_payloads_opened": false
+}

@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "state": "SEALED_BEFORE_MODEL_CONTACT",
+  "run_id": "e012-20260926-frame-decomposition-01",
+  "frozen_input_lock_sha256": "4bab6fd945248b6209fa33e3a1df10786298ac620342ce167251411c6a258cd8",
+  "local_file_count": 94,
+  "evaluation_file_count": 3,
+  "source_tree_count": 5,
+  "external_file_count": 4,
+  "model_contact_started": false
+}

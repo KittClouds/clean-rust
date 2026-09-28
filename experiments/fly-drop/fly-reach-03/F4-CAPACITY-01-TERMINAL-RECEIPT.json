@@ -1,0 +1,319 @@
+{
+  "artifacts": {
+    "action_sign": {
+      "bytes": 1712,
+      "path": "F4-CAPACITY-01-ACTION-SIGN-RECEIPT.json",
+      "sha256": "b918e678d5163cd7efeb0af2cd6e688b5e2932fd99cdaa6e45482fe4c5d46f66"
+    },
+    "action_sign_contract": {
+      "bytes": 1212,
+      "path": "F4-CAPACITY-01-ACTION-SIGN-CONTRACT.json",
+      "sha256": "9ded206daa85c49ea8baa24bc87552aef638ff9fc2257c2782885c9a59fe0431"
+    },
+    "class_support": {
+      "bytes": 1481,
+      "path": "F4-CAPACITY-01-CLASS-SUPPORT-AUDIT.json",
+      "sha256": "348a4dab5bafab2693fbcd95daed503733e45f6ca71c50a85698dc6725ef4d06"
+    },
+    "contract": {
+      "bytes": 2149,
+      "path": "F4-CAPACITY-01-CONTRACT.json",
+      "sha256": "c997aef47e4d02287fd535977081625bcb4a1403ecf343c7abbee251ff758fff"
+    },
+    "first_probe": {
+      "bytes": 3704,
+      "path": "F4-CAPACITY-01-RECEIPT.json",
+      "sha256": "96846cf1c123c264615ea3a617c08ba8da783915e0e9df90fb0381af7689db07"
+    },
+    "margin": {
+      "bytes": 911,
+      "path": "F4-CAPACITY-01-REFERENCE-MARGIN-AUDIT.json",
+      "sha256": "d13c4052c1dacbea2785c77c9fd41c6a452225dfd9d436b88fda4ef6cf4a91d8"
+    },
+    "post_prob": {
+      "bytes": 1726,
+      "path": "F4-CAPACITY-01-POST-PROB-RECEIPT.json",
+      "sha256": "9121a89177fb82a170d23a6ba314a106f217766a78137888202a98e7d3a73fd7"
+    },
+    "post_prob_contract": {
+      "bytes": 1159,
+      "path": "F4-CAPACITY-01-POST-PROB-CONTRACT.json",
+      "sha256": "e81dd4cbde662d74ca5f2c971992f1d45a47785bc571c7b02244f82cfad3052b"
+    }
+  },
+  "biological_promotion": false,
+  "bounded_interpretation": [
+    "The frozen 80D encoder and MLP can memorize a balanced 256-row subset.",
+    "The temporal holdout is class-degenerate for three blocks, so its apparent perfect Omega values are not valid two-class generalization evidence.",
+    "Cross-block signed margins vary in sign and magnitude by held-out block.",
+    "Adding action_sign and then cue-specific post probabilities did not restore cross-block extraction under the unchanged estimator.",
+    "The target channel is numerically concentrated near EPS: 86.10% of rows are at or below 1e-8 and 65.24% at or below 1e-9.",
+    "This is consistent with representation precision pressure in the float32 compact map; it is not a theorem that raw F4 lacks or contains the signal."
+  ],
+  "estimator_tuning": false,
+  "findings": {
+    "cross_block_80d": [
+      {
+        "balanced_error": 0.7763285976028866,
+        "holdout_block": 303000,
+        "mean_abs_logit": 7.069185256958008,
+        "omega_hat": 0.0,
+        "positive_prediction_rate": 0.5282917672298203,
+        "rows": 3729,
+        "signed_margin": 2.4117834318829217,
+        "train_rows": 9691
+      },
+      {
+        "balanced_error": 0.5,
+        "holdout_block": 303001,
+        "mean_abs_logit": 16.883731842041016,
+        "omega_hat": 0.0,
+        "positive_prediction_rate": 0.0,
+        "rows": 2815,
+        "signed_margin": -10.159661304209628,
+        "train_rows": 10605
+      },
+      {
+        "balanced_error": 0.7578957773948782,
+        "holdout_block": 303002,
+        "mean_abs_logit": 6.796867370605469,
+        "omega_hat": 0.0,
+        "positive_prediction_rate": 0.3447793970852466,
+        "rows": 5009,
+        "signed_margin": -2.654239428155226,
+        "train_rows": 8411
+      },
+      {
+        "balanced_error": 0.23753629753061717,
+        "holdout_block": 303003,
+        "mean_abs_logit": 9.978906631469727,
+        "omega_hat": 0.5249274049387657,
+        "positive_prediction_rate": 0.4777718264595608,
+        "rows": 1867,
+        "signed_margin": 1.7660377898523079,
+        "train_rows": 11553
+      }
+    ],
+    "cross_block_81d_action_sign": [
+      {
+        "balanced_error": 0.7220447563479033,
+        "holdout_block": 303000,
+        "mean_abs_logit": 7.3121490478515625,
+        "omega_hat": 0.0,
+        "rows": 3729,
+        "signed_margin": 0.5848409263691458,
+        "train_rows": 9691
+      },
+      {
+        "balanced_error": 0.5005599104143337,
+        "holdout_block": 303001,
+        "mean_abs_logit": 10.795597076416016,
+        "omega_hat": 0.0,
+        "rows": 2815,
+        "signed_margin": -7.658956307839755,
+        "train_rows": 10605
+      },
+      {
+        "balanced_error": 0.5221131815786123,
+        "holdout_block": 303002,
+        "mean_abs_logit": 8.244290351867676,
+        "omega_hat": 0.0,
+        "rows": 5009,
+        "signed_margin": -0.7283419746407731,
+        "train_rows": 8411
+      },
+      {
+        "balanced_error": 0.24828444985479656,
+        "holdout_block": 303003,
+        "mean_abs_logit": 5.960533618927002,
+        "omega_hat": 0.5034311002904068,
+        "rows": 1867,
+        "signed_margin": -1.884081287709531,
+        "train_rows": 11553
+      }
+    ],
+    "cross_block_85d_action_sign_post_probability": [
+      {
+        "balanced_error": 0.7470125179587226,
+        "holdout_block": 303000,
+        "mean_abs_logit": 5.302682399749756,
+        "omega_hat": 0.0,
+        "rows": 3729,
+        "signed_margin": -1.5234146525293837,
+        "train_rows": 9691
+      },
+      {
+        "balanced_error": 0.5011198208286675,
+        "holdout_block": 303001,
+        "mean_abs_logit": 15.187152862548828,
+        "omega_hat": 0.0,
+        "rows": 2815,
+        "signed_margin": -10.007837840507129,
+        "train_rows": 10605
+      },
+      {
+        "balanced_error": 0.738227687805842,
+        "holdout_block": 303002,
+        "mean_abs_logit": 6.629322528839111,
+        "omega_hat": 0.0,
+        "rows": 5009,
+        "signed_margin": -2.672543197589628,
+        "train_rows": 8411
+      },
+      {
+        "balanced_error": 0.23620481604221685,
+        "holdout_block": 303003,
+        "mean_abs_logit": 8.355886459350586,
+        "omega_hat": 0.5275903679155662,
+        "rows": 1867,
+        "signed_margin": -0.18311380484513262,
+        "train_rows": 11553
+      }
+    ],
+    "memorization_80d": {
+      "balanced_error": 0.0,
+      "batch_size": 64,
+      "epochs": 1000,
+      "mean_abs_logit": 13.919451713562012,
+      "negative_rows": 128,
+      "omega_hat": 1.0,
+      "positive_prediction_rate": 0.5,
+      "positive_rows": 128,
+      "rows": 256,
+      "signed_margin": 13.918847472729224
+    },
+    "reference_margin_audit": {
+      "eps": 1e-12,
+      "fractions_at_or_below": {
+        "1e-05": 0.9771982116244411,
+        "1e-06": 0.9612518628912071,
+        "1e-07": 0.9225782414307004,
+        "1e-08": 0.8610283159463488,
+        "1e-09": 0.6523845007451565,
+        "1e-10": 0.4570789865871833,
+        "1e-12": 0.0
+      },
+      "identity": "F4-CAPACITY-01",
+      "interpretation_boundary": "diagnostic magnitude audit only; target and reference values were not supplied to any encoder",
+      "measured_namespace_created": false,
+      "quantiles": {
+        "0.0": 1.0005114141689586e-12,
+        "0.25": 1.7150674977428615e-11,
+        "0.5": 2.2161456697533666e-10,
+        "0.75": 2.3936782556077674e-09,
+        "0.9": 3.426699990427553e-08,
+        "0.99": 0.00024439574539428433,
+        "1.0": 0.0041634077206254005
+      },
+      "rows": 13420,
+      "schema": "FLY-REACH-03-F4-CAPACITY-01-reference-margin-audit-v1",
+      "scientific_interpretation_opened": false,
+      "status": "PASS"
+    },
+    "temporal_class_support": {
+      "303000:train": {
+        "both_classes": 1,
+        "negative": 2923,
+        "positive": 153,
+        "rows": 3076
+      },
+      "303000:validation": {
+        "both_classes": 0,
+        "negative": 653,
+        "positive": 0,
+        "rows": 653
+      },
+      "303001:train": {
+        "both_classes": 1,
+        "negative": 893,
+        "positive": 1453,
+        "rows": 2346
+      },
+      "303001:validation": {
+        "both_classes": 0,
+        "negative": 0,
+        "positive": 469,
+        "rows": 469
+      },
+      "303002:train": {
+        "both_classes": 1,
+        "negative": 2227,
+        "positive": 1530,
+        "rows": 3757
+      },
+      "303002:validation": {
+        "both_classes": 1,
+        "negative": 774,
+        "positive": 478,
+        "rows": 1252
+      },
+      "303003:train": {
+        "both_classes": 0,
+        "negative": 1410,
+        "positive": 0,
+        "rows": 1410
+      },
+      "303003:validation": {
+        "both_classes": 0,
+        "negative": 457,
+        "positive": 0,
+        "rows": 457
+      }
+    },
+    "within_block_temporal": [
+      {
+        "balanced_error": 0.0,
+        "block": 303000,
+        "mean_abs_logit": 10.285021781921387,
+        "omega_hat": 1.0,
+        "positive_prediction_rate": 0.0,
+        "rows": 653,
+        "signed_margin": 10.285021738107867,
+        "train_rows": 3076,
+        "validation_rule": "trial >= 6144"
+      },
+      {
+        "balanced_error": 0.0,
+        "block": 303001,
+        "mean_abs_logit": 9.933374404907227,
+        "omega_hat": 1.0,
+        "positive_prediction_rate": 1.0,
+        "rows": 469,
+        "signed_margin": 9.933373925019941,
+        "train_rows": 2346,
+        "validation_rule": "trial >= 6144"
+      },
+      {
+        "balanced_error": 0.0,
+        "block": 303002,
+        "mean_abs_logit": 10.30536937713623,
+        "omega_hat": 1.0,
+        "positive_prediction_rate": 0.3817891373801917,
+        "rows": 1252,
+        "signed_margin": 10.298589762995121,
+        "train_rows": 3757,
+        "validation_rule": "trial >= 6144"
+      },
+      {
+        "balanced_error": 0.0,
+        "block": 303003,
+        "mean_abs_logit": 9.030147552490234,
+        "omega_hat": 1.0,
+        "positive_prediction_rate": 0.0,
+        "rows": 457,
+        "signed_margin": 9.029477655584483,
+        "train_rows": 1410,
+        "validation_rule": "trial >= 6144"
+      }
+    ]
+  },
+  "identity": "F4-CAPACITY-01",
+  "measured_namespace_created": false,
+  "next_step": "If continued, freeze a new high-precision or margin-preserving representation audit before any estimator-capacity increase.",
+  "parent_status_preserved": "QUALIFICATION_STOP_F4_ENCODER_CAPACITY",
+  "prediction_flip_rescue": false,
+  "representation_ladder": "NOT_AUTHORED_FROM_OUTCOMES",
+  "schema": "FLY-REACH-03-F4-CAPACITY-01-terminal-receipt-v2",
+  "scientific_interpretation_opened": false,
+  "status": "DIAGNOSTIC_COMPLETE_REPRESENTATION_PRECISION_PRESSURE"
+}

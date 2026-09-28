@@ -1,0 +1,42 @@
+{
+  "schema": "FAS_E4_0_TRACK_E_SOURCE_TESTS_V01",
+  "status": "TRACK_E_SOURCE_TESTS_PASS_PREMAP_UNIT_TESTS",
+  "created_utc": "2026-09-26T22:27:09.075736+00:00",
+  "command": "python -B audits/e4-0-track-e/test_audit_e4_0_track_e_v06.py",
+  "scope": "Track E v06 independent source, exact sealed-v05 source-map fixture, semantic source-role path mapping, parser/path-uniqueness, seal-root, symlink/junction ordering, duplicate-member rejection, and Input Path normalization tests. The two actual v05-successor-map integration tests were skipped because the canonical map is not frozen yet. No E4 rows, labels, tokenizer/model, or CUDA were accessed.",
+  "sources": [
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/audit_e4_0_track_e_v06.py",
+      "bytes": 44565,
+      "sha256": "5ee06bb17dca4879f9866c0176aa41f23193dbec6f8b41631ffaff521439d16e"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/audit_e4_0_track_e_seal_v06.py",
+      "bytes": 12515,
+      "sha256": "397e999448aa5aac1252c8bb746301577d737653cd2e562523c0babf6a6d9647"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/test_audit_e4_0_track_e_v06.py",
+      "bytes": 7083,
+      "sha256": "721fe632f2940dc1edd42f345565343de3602f9b150849b2cec4fa036a2cf141"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/seal_e4_0_contract_v06.py",
+      "bytes": 9883,
+      "sha256": "8695b6091df5a1135d0468c52b524e6cd6a9c9602b8e4318f9456b0cc576f51e"
+    }
+  ],
+  "tests": {
+    "discovered": 8,
+    "passed": 6,
+    "skipped": 2,
+    "failed": 0
+  },
+  "supersedes": [
+    {
+      "path": "audits/e4-0-track-e/track-e-source-tests-v06.json",
+      "sha256": "05d7d621b0d7115dbe86ad9852e269adead5d59b1a0a2f874afb466d1fe883d9",
+      "reason": "Versioned Track E sources and exact-map fixture for v06 contract/source-map successor."
+    }
+  ]
+}

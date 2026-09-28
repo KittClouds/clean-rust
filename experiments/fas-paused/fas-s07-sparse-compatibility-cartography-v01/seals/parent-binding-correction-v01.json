@@ -1,0 +1,25 @@
+{
+  "correction_id": "FAS_S07_PARENT_BINDING_CORRECTION_V01",
+  "scope": "one bound input digest corrected; parent cache, scientific contract, and source data unchanged",
+  "historical_protocol_root_sha256": "9c8212fc5177a5cfabda57d05412e2e85e01fd261da850eebef774ab44eb88c9",
+  "verification_protocol_root_sha256": "2eb158821f0fe45b22b70ba1c2dcab72503c5dc2c253fa43d50f86359c1180cf",
+  "superseded_binding": {
+    "path": "contracts/parent-binding-v01.json",
+    "sha256": "1a467be3eb963d1ac0ec33e1d38f6e8cdfece304226056fe47da8f50c0e4f4e0",
+    "fas00_mean_features_sha256": "6205b7d7a224b798b387886b43ec27103b7f091dccd9b623847cb7a52b0c8c2"
+  },
+  "corrected_binding": {
+    "path": "contracts/parent-binding-v02.json",
+    "sha256": "08858bc948d20518bc52b7453d47dcbb9faf5867b63bd5efa9fe1e8abded9912",
+    "fas00_mean_features_sha256": "6205b7d7a224b798b387886b43ec27103b37f091dccd9b623847cb7a52b0c8c2"
+  },
+  "authoritative_phase2a_cache_root_sha256": "9af2c6c73a2f21608e8a2dc912d8838968eaebffb32b4b1ea0a18364e488d217",
+  "sealed_feature_tensor_sha256": "6205b7d7a224b798b387886b43ec27103b37f091dccd9b623847cb7a52b0c8c2",
+  "observed_file_sha256": "6205b7d7a224b798b387886b43ec27103b37f091dccd9b623847cb7a52b0c8c2",
+  "preflight_failure": "FAIL_CLOSED on local expected-digest mismatch before writing any run artifact",
+  "parent_artifacts_modified": false,
+  "feature_values_loaded": false,
+  "training_started": false,
+  "phase2a_cache_root_unchanged": true,
+  "scientific_contract_changed": false
+}

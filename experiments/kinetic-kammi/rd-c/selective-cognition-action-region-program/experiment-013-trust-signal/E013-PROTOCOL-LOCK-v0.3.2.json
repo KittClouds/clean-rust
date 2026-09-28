@@ -1,0 +1,43 @@
+{
+  "artifact_paths": {
+    "corrected_projections": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-013-trust-signal\\E013-FEASIBILITY-PROJECTIONS-v0.3.2.json",
+    "corrected_receipt": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-013-trust-signal\\E013-FEASIBILITY-RECEIPT-v0.3.2.md",
+    "correction_note": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-013-trust-signal\\E013-PRECONTACT-CORRECTION-v0.3.2.md",
+    "correction_script": "C:\\Users\\shuga\\.codex\\worktrees\\e013-episode-factory\\clean-rust\\experiments\\e013-episode-factory\\precontact-v031\\correct_precontact_v032.py",
+    "parent_lock_v031": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-013-trust-signal\\E013-PROTOCOL-LOCK-v0.3.1.json",
+    "parent_projections_v031": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-013-trust-signal\\E013-FEASIBILITY-PROJECTIONS-v0.3.1.json",
+    "parent_receipt_v031": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-013-trust-signal\\E013-FEASIBILITY-RECEIPT-v0.3.1.md",
+    "parent_verification_v031": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-013-trust-signal\\E013-PRECONTACT-VERIFICATION-v0.3.1.json"
+  },
+  "bank_generation_performed_by_agent": false,
+  "bank_owner": "USER",
+  "correction_scope": "asymptotic FAR formula only; finite exact-gate FAR and all gates unchanged",
+  "effective_lineage": [
+    "sealed v0.3 protocol",
+    "v0.3.1 pre-bank amendment",
+    "v0.3.2 asymptotic FAR arithmetic correction"
+  ],
+  "model_contact_authorized": false,
+  "model_contact_performed": false,
+  "parent_lock_v031_sha256": "2dde2c7c2fd3baa6c7bc08debfd01f5118f9ac4348318a9f9be633a0f7357d17",
+  "positive_control": {
+    "bank_status": "USER_BUILD_PENDING",
+    "contact_authorized": true,
+    "id": "E012-PC-01-v1.2",
+    "run_status": "NOT_RUN"
+  },
+  "protocol_id": "E013-TRUST-SIGNAL-DEVELOPMENT-v0.3.2",
+  "schema_version": 1,
+  "self_hash_note": "Lock does not hash itself or post-lock verification receipt.",
+  "sha256": {
+    "corrected_projections": "7f71d0dc6d619dfbeea03cd25a1c9dc3d7e80737f47558cb8fa47cad1e944c88",
+    "corrected_receipt": "f985535550542b454c150a3815dbdaaa30687ca3b1694df7b814f7fbe4a4bf21",
+    "correction_note": "dfd00ad2c48aed6dbeee8451bd7b13defcb9cf268d34cd33bda4f9503bcf5259",
+    "correction_script": "33ed505e90900324d1a4fe567c4671cd48612bd307ce1c8d070d91c86cc5acac",
+    "parent_lock_v031": "2dde2c7c2fd3baa6c7bc08debfd01f5118f9ac4348318a9f9be633a0f7357d17",
+    "parent_projections_v031": "fffd68e8d1c687cc648f81857cc3f593e8fa5c498884a5413a08d151e9b65f69",
+    "parent_receipt_v031": "c699207d35326e44d581c90a4e61caabb85412c0de6ad6e9d448bd9e4df6ea39",
+    "parent_verification_v031": "2d92f0f69f7531bf40e3d2d72703e7d599fffe0898efca27f069d67a1492e663"
+  },
+  "state": "SEALED_PRECONTACT_DESIGN_ONLY"
+}

@@ -1,0 +1,749 @@
+{
+  "accepted_swaps_per_edge": 4,
+  "algorithm": "directed-double-edge-swap",
+  "graph_seeds": [
+    63000,
+    63001,
+    63002,
+    63003,
+    63004,
+    63005,
+    63006,
+    63007
+  ],
+  "nodes": {
+    "L": {
+      "path": "inputs/anatomy/nodes-L.tsv",
+      "sha256": "3fc14bc6bf33e6a1fc2af7f377b7a23f6700ff916030b840bab4259d76e5232f"
+    },
+    "R": {
+      "path": "inputs/anatomy/nodes-R.tsv",
+      "sha256": "871cf14a0daf569139b2a880f1927a0f3be7b4d11f5feb47bd435178b74d347f"
+    }
+  },
+  "original_edge_overlap_is_reported_not_filtered": true,
+  "realizations": [
+    {
+      "seed": 63000,
+      "sides": {
+        "L": {
+          "layer_stats": {
+            "kc_dan": {
+              "accepted_swaps": 178312,
+              "attempts": 292330,
+              "edge_rows": 44578,
+              "original_pair_overlap": 9785,
+              "target_accepted_swaps": 178312
+            },
+            "kc_mb": {
+              "accepted_swaps": 97420,
+              "attempts": 295914,
+              "edge_rows": 24355,
+              "original_pair_overlap": 10256,
+              "target_accepted_swaps": 97420
+            },
+            "mb_dan": {
+              "accepted_swaps": 3516,
+              "attempts": 6027,
+              "edge_rows": 879,
+              "original_pair_overlap": 223,
+              "target_accepted_swaps": 3516
+            },
+            "pn_kc": {
+              "accepted_swaps": 44228,
+              "attempts": 53520,
+              "edge_rows": 11057,
+              "original_pair_overlap": 1073,
+              "target_accepted_swaps": 44228
+            },
+            "route": {
+              "accepted_swaps": 3356,
+              "attempts": 5823,
+              "edge_rows": 839,
+              "original_pair_overlap": 194,
+              "target_accepted_swaps": 3356
+            }
+          },
+          "path": "inputs/null-graphs/g001/edges-L.tsv",
+          "sha256": "1c318c907c40d26d2cc0301c93e5b73c15e4e218382ccdb07e7195513fdc12cb"
+        },
+        "R": {
+          "layer_stats": {
+            "kc_dan": {
+              "accepted_swaps": 170080,
+              "attempts": 275895,
+              "edge_rows": 42520,
+              "original_pair_overlap": 9151,
+              "target_accepted_swaps": 170080
+            },
+            "kc_mb": {
+              "accepted_swaps": 96364,
+              "attempts": 304732,
+              "edge_rows": 24091,
+              "original_pair_overlap": 10617,
+              "target_accepted_swaps": 96364
+            },
+            "mb_dan": {
+              "accepted_swaps": 3424,
+              "attempts": 5629,
+              "edge_rows": 856,
+              "original_pair_overlap": 192,
+              "target_accepted_swaps": 3424
+            },
+            "pn_kc": {
+              "accepted_swaps": 44248,
+              "attempts": 53115,
+              "edge_rows": 11062,
+              "original_pair_overlap": 1056,
+              "target_accepted_swaps": 44248
+            },
+            "route": {
+              "accepted_swaps": 3360,
+              "attempts": 6016,
+              "edge_rows": 840,
+              "original_pair_overlap": 217,
+              "target_accepted_swaps": 3360
+            }
+          },
+          "path": "inputs/null-graphs/g001/edges-R.tsv",
+          "sha256": "e4eed76163c743eedcb20f0a32bf1865258bf6a2988c20cb86ff2dfb51f82149"
+        }
+      },
+      "substrate": "g001"
+    },
+    {
+      "seed": 63001,
+      "sides": {
+        "L": {
+          "layer_stats": {
+            "kc_dan": {
+              "accepted_swaps": 178312,
+              "attempts": 292477,
+              "edge_rows": 44578,
+              "original_pair_overlap": 9895,
+              "target_accepted_swaps": 178312
+            },
+            "kc_mb": {
+              "accepted_swaps": 97420,
+              "attempts": 293017,
+              "edge_rows": 24355,
+              "original_pair_overlap": 10426,
+              "target_accepted_swaps": 97420
+            },
+            "mb_dan": {
+              "accepted_swaps": 3516,
+              "attempts": 5978,
+              "edge_rows": 879,
+              "original_pair_overlap": 211,
+              "target_accepted_swaps": 3516
+            },
+            "pn_kc": {
+              "accepted_swaps": 44228,
+              "attempts": 53429,
+              "edge_rows": 11057,
+              "original_pair_overlap": 1051,
+              "target_accepted_swaps": 44228
+            },
+            "route": {
+              "accepted_swaps": 3356,
+              "attempts": 5727,
+              "edge_rows": 839,
+              "original_pair_overlap": 195,
+              "target_accepted_swaps": 3356
+            }
+          },
+          "path": "inputs/null-graphs/g002/edges-L.tsv",
+          "sha256": "20ed3e802a8a3c57839cecb35369c0f9d3081f23658cc84519864cd29f909cdb"
+        },
+        "R": {
+          "layer_stats": {
+            "kc_dan": {
+              "accepted_swaps": 170080,
+              "attempts": 275015,
+              "edge_rows": 42520,
+              "original_pair_overlap": 9140,
+              "target_accepted_swaps": 170080
+            },
+            "kc_mb": {
+              "accepted_swaps": 96364,
+              "attempts": 304085,
+              "edge_rows": 24091,
+              "original_pair_overlap": 10576,
+              "target_accepted_swaps": 96364
+            },
+            "mb_dan": {
+              "accepted_swaps": 3424,
+              "attempts": 5724,
+              "edge_rows": 856,
+              "original_pair_overlap": 194,
+              "target_accepted_swaps": 3424
+            },
+            "pn_kc": {
+              "accepted_swaps": 44248,
+              "attempts": 53307,
+              "edge_rows": 11062,
+              "original_pair_overlap": 962,
+              "target_accepted_swaps": 44248
+            },
+            "route": {
+              "accepted_swaps": 3360,
+              "attempts": 6026,
+              "edge_rows": 840,
+              "original_pair_overlap": 210,
+              "target_accepted_swaps": 3360
+            }
+          },
+          "path": "inputs/null-graphs/g002/edges-R.tsv",
+          "sha256": "98858d3b62e4856cb675b8830da827d61471414fc40976e5254c18227bee12c2"
+        }
+      },
+      "substrate": "g002"
+    },
+    {
+      "seed": 63002,
+      "sides": {
+        "L": {
+          "layer_stats": {
+            "kc_dan": {
+              "accepted_swaps": 178312,
+              "attempts": 292824,
+              "edge_rows": 44578,
+              "original_pair_overlap": 9942,
+              "target_accepted_swaps": 178312
+            },
+            "kc_mb": {
+              "accepted_swaps": 97420,
+              "attempts": 295595,
+              "edge_rows": 24355,
+              "original_pair_overlap": 10413,
+              "target_accepted_swaps": 97420
+            },
+            "mb_dan": {
+              "accepted_swaps": 3516,
+              "attempts": 5983,
+              "edge_rows": 879,
+              "original_pair_overlap": 221,
+              "target_accepted_swaps": 3516
+            },
+            "pn_kc": {
+              "accepted_swaps": 44228,
+              "attempts": 53619,
+              "edge_rows": 11057,
+              "original_pair_overlap": 1041,
+              "target_accepted_swaps": 44228
+            },
+            "route": {
+              "accepted_swaps": 3356,
+              "attempts": 5790,
+              "edge_rows": 839,
+              "original_pair_overlap": 207,
+              "target_accepted_swaps": 3356
+            }
+          },
+          "path": "inputs/null-graphs/g003/edges-L.tsv",
+          "sha256": "0dd03bf7ce9d7924747d89ab66635d6e706558bfc5641922c34de6da1652d48d"
+        },
+        "R": {
+          "layer_stats": {
+            "kc_dan": {
+              "accepted_swaps": 170080,
+              "attempts": 275532,
+              "edge_rows": 42520,
+              "original_pair_overlap": 9088,
+              "target_accepted_swaps": 170080
+            },
+            "kc_mb": {
+              "accepted_swaps": 96364,
+              "attempts": 304564,
+              "edge_rows": 24091,
+              "original_pair_overlap": 10594,
+              "target_accepted_swaps": 96364
+            },
+            "mb_dan": {
+              "accepted_swaps": 3424,
+              "attempts": 5820,
+              "edge_rows": 856,
+              "original_pair_overlap": 196,
+              "target_accepted_swaps": 3424
+            },
+            "pn_kc": {
+              "accepted_swaps": 44248,
+              "attempts": 53427,
+              "edge_rows": 11062,
+              "original_pair_overlap": 1041,
+              "target_accepted_swaps": 44248
+            },
+            "route": {
+              "accepted_swaps": 3360,
+              "attempts": 5990,
+              "edge_rows": 840,
+              "original_pair_overlap": 226,
+              "target_accepted_swaps": 3360
+            }
+          },
+          "path": "inputs/null-graphs/g003/edges-R.tsv",
+          "sha256": "d05329f02e8fdf9d233e3606d531a4f3e29cd7fda30732c2e9326df9074770ba"
+        }
+      },
+      "substrate": "g003"
+    },
+    {
+      "seed": 63003,
+      "sides": {
+        "L": {
+          "layer_stats": {
+            "kc_dan": {
+              "accepted_swaps": 178312,
+              "attempts": 293013,
+              "edge_rows": 44578,
+              "original_pair_overlap": 9891,
+              "target_accepted_swaps": 178312
+            },
+            "kc_mb": {
+              "accepted_swaps": 97420,
+              "attempts": 294174,
+              "edge_rows": 24355,
+              "original_pair_overlap": 10432,
+              "target_accepted_swaps": 97420
+            },
+            "mb_dan": {
+              "accepted_swaps": 3516,
+              "attempts": 5947,
+              "edge_rows": 879,
+              "original_pair_overlap": 207,
+              "target_accepted_swaps": 3516
+            },
+            "pn_kc": {
+              "accepted_swaps": 44228,
+              "attempts": 53542,
+              "edge_rows": 11057,
+              "original_pair_overlap": 1068,
+              "target_accepted_swaps": 44228
+            },
+            "route": {
+              "accepted_swaps": 3356,
+              "attempts": 5768,
+              "edge_rows": 839,
+              "original_pair_overlap": 201,
+              "target_accepted_swaps": 3356
+            }
+          },
+          "path": "inputs/null-graphs/g004/edges-L.tsv",
+          "sha256": "0ce4c7278c58378101ed61eb759d71576ffb229dbd6542d56ee6f971bf6896f3"
+        },
+        "R": {
+          "layer_stats": {
+            "kc_dan": {
+              "accepted_swaps": 170080,
+              "attempts": 275757,
+              "edge_rows": 42520,
+              "original_pair_overlap": 9001,
+              "target_accepted_swaps": 170080
+            },
+            "kc_mb": {
+              "accepted_swaps": 96364,
+              "attempts": 304106,
+              "edge_rows": 24091,
+              "original_pair_overlap": 10718,
+              "target_accepted_swaps": 96364
+            },
+            "mb_dan": {
+              "accepted_swaps": 3424,
+              "attempts": 5770,
+              "edge_rows": 856,
+              "original_pair_overlap": 200,
+              "target_accepted_swaps": 3424
+            },
+            "pn_kc": {
+              "accepted_swaps": 44248,
+              "attempts": 53244,
+              "edge_rows": 11062,
+              "original_pair_overlap": 1034,
+              "target_accepted_swaps": 44248
+            },
+            "route": {
+              "accepted_swaps": 3360,
+              "attempts": 5898,
+              "edge_rows": 840,
+              "original_pair_overlap": 211,
+              "target_accepted_swaps": 3360
+            }
+          },
+          "path": "inputs/null-graphs/g004/edges-R.tsv",
+          "sha256": "85d4fd587c003b86098fc58c39f0fe7cc047c6c0fc5c8c919be412bd9bd53ad0"
+        }
+      },
+      "substrate": "g004"
+    },
+    {
+      "seed": 63004,
+      "sides": {
+        "L": {
+          "layer_stats": {
+            "kc_dan": {
+              "accepted_swaps": 178312,
+              "attempts": 291992,
+              "edge_rows": 44578,
+              "original_pair_overlap": 9714,
+              "target_accepted_swaps": 178312
+            },
+            "kc_mb": {
+              "accepted_swaps": 97420,
+              "attempts": 294386,
+              "edge_rows": 24355,
+              "original_pair_overlap": 10443,
+              "target_accepted_swaps": 97420
+            },
+            "mb_dan": {
+              "accepted_swaps": 3516,
+              "attempts": 5911,
+              "edge_rows": 879,
+              "original_pair_overlap": 201,
+              "target_accepted_swaps": 3516
+            },
+            "pn_kc": {
+              "accepted_swaps": 44228,
+              "attempts": 53333,
+              "edge_rows": 11057,
+              "original_pair_overlap": 1012,
+              "target_accepted_swaps": 44228
+            },
+            "route": {
+              "accepted_swaps": 3356,
+              "attempts": 5826,
+              "edge_rows": 839,
+              "original_pair_overlap": 187,
+              "target_accepted_swaps": 3356
+            }
+          },
+          "path": "inputs/null-graphs/g005/edges-L.tsv",
+          "sha256": "d80b94efd7d86f3b15ab4c49ab4be65964be052674e61a465b6f68e48c9c3fb3"
+        },
+        "R": {
+          "layer_stats": {
+            "kc_dan": {
+              "accepted_swaps": 170080,
+              "attempts": 275792,
+              "edge_rows": 42520,
+              "original_pair_overlap": 9133,
+              "target_accepted_swaps": 170080
+            },
+            "kc_mb": {
+              "accepted_swaps": 96364,
+              "attempts": 304265,
+              "edge_rows": 24091,
+              "original_pair_overlap": 10711,
+              "target_accepted_swaps": 96364
+            },
+            "mb_dan": {
+              "accepted_swaps": 3424,
+              "attempts": 5755,
+              "edge_rows": 856,
+              "original_pair_overlap": 193,
+              "target_accepted_swaps": 3424
+            },
+            "pn_kc": {
+              "accepted_swaps": 44248,
+              "attempts": 53313,
+              "edge_rows": 11062,
+              "original_pair_overlap": 1038,
+              "target_accepted_swaps": 44248
+            },
+            "route": {
+              "accepted_swaps": 3360,
+              "attempts": 6062,
+              "edge_rows": 840,
+              "original_pair_overlap": 195,
+              "target_accepted_swaps": 3360
+            }
+          },
+          "path": "inputs/null-graphs/g005/edges-R.tsv",
+          "sha256": "aa6a05a70b9b41ab8d80db76db509667afd45c1e253420dead02aab72706fcc0"
+        }
+      },
+      "substrate": "g005"
+    },
+    {
+      "seed": 63005,
+      "sides": {
+        "L": {
+          "layer_stats": {
+            "kc_dan": {
+              "accepted_swaps": 178312,
+              "attempts": 292460,
+              "edge_rows": 44578,
+              "original_pair_overlap": 9683,
+              "target_accepted_swaps": 178312
+            },
+            "kc_mb": {
+              "accepted_swaps": 97420,
+              "attempts": 295295,
+              "edge_rows": 24355,
+              "original_pair_overlap": 10407,
+              "target_accepted_swaps": 97420
+            },
+            "mb_dan": {
+              "accepted_swaps": 3516,
+              "attempts": 5973,
+              "edge_rows": 879,
+              "original_pair_overlap": 201,
+              "target_accepted_swaps": 3516
+            },
+            "pn_kc": {
+              "accepted_swaps": 44228,
+              "attempts": 53520,
+              "edge_rows": 11057,
+              "original_pair_overlap": 1070,
+              "target_accepted_swaps": 44228
+            },
+            "route": {
+              "accepted_swaps": 3356,
+              "attempts": 5694,
+              "edge_rows": 839,
+              "original_pair_overlap": 196,
+              "target_accepted_swaps": 3356
+            }
+          },
+          "path": "inputs/null-graphs/g006/edges-L.tsv",
+          "sha256": "2cb01059c684378a04ab9fd026901a98e42a9ca8cdc974b539ea1c06f94d2c19"
+        },
+        "R": {
+          "layer_stats": {
+            "kc_dan": {
+              "accepted_swaps": 170080,
+              "attempts": 275913,
+              "edge_rows": 42520,
+              "original_pair_overlap": 9036,
+              "target_accepted_swaps": 170080
+            },
+            "kc_mb": {
+              "accepted_swaps": 96364,
+              "attempts": 304297,
+              "edge_rows": 24091,
+              "original_pair_overlap": 10672,
+              "target_accepted_swaps": 96364
+            },
+            "mb_dan": {
+              "accepted_swaps": 3424,
+              "attempts": 5750,
+              "edge_rows": 856,
+              "original_pair_overlap": 204,
+              "target_accepted_swaps": 3424
+            },
+            "pn_kc": {
+              "accepted_swaps": 44248,
+              "attempts": 53366,
+              "edge_rows": 11062,
+              "original_pair_overlap": 1055,
+              "target_accepted_swaps": 44248
+            },
+            "route": {
+              "accepted_swaps": 3360,
+              "attempts": 5899,
+              "edge_rows": 840,
+              "original_pair_overlap": 215,
+              "target_accepted_swaps": 3360
+            }
+          },
+          "path": "inputs/null-graphs/g006/edges-R.tsv",
+          "sha256": "f91ce3b21dd2a77478c4ab892109ec016ca2b0064921d98c47a6064370fa2daa"
+        }
+      },
+      "substrate": "g006"
+    },
+    {
+      "seed": 63006,
+      "sides": {
+        "L": {
+          "layer_stats": {
+            "kc_dan": {
+              "accepted_swaps": 178312,
+              "attempts": 292637,
+              "edge_rows": 44578,
+              "original_pair_overlap": 9734,
+              "target_accepted_swaps": 178312
+            },
+            "kc_mb": {
+              "accepted_swaps": 97420,
+              "attempts": 295976,
+              "edge_rows": 24355,
+              "original_pair_overlap": 10410,
+              "target_accepted_swaps": 97420
+            },
+            "mb_dan": {
+              "accepted_swaps": 3516,
+              "attempts": 5908,
+              "edge_rows": 879,
+              "original_pair_overlap": 203,
+              "target_accepted_swaps": 3516
+            },
+            "pn_kc": {
+              "accepted_swaps": 44228,
+              "attempts": 53548,
+              "edge_rows": 11057,
+              "original_pair_overlap": 1002,
+              "target_accepted_swaps": 44228
+            },
+            "route": {
+              "accepted_swaps": 3356,
+              "attempts": 5698,
+              "edge_rows": 839,
+              "original_pair_overlap": 195,
+              "target_accepted_swaps": 3356
+            }
+          },
+          "path": "inputs/null-graphs/g007/edges-L.tsv",
+          "sha256": "b75973119accc9efdfcab28b9a731cfc1eee702c4fc3cbdea4a1b00b9fc8a03e"
+        },
+        "R": {
+          "layer_stats": {
+            "kc_dan": {
+              "accepted_swaps": 170080,
+              "attempts": 276177,
+              "edge_rows": 42520,
+              "original_pair_overlap": 9094,
+              "target_accepted_swaps": 170080
+            },
+            "kc_mb": {
+              "accepted_swaps": 96364,
+              "attempts": 306114,
+              "edge_rows": 24091,
+              "original_pair_overlap": 10616,
+              "target_accepted_swaps": 96364
+            },
+            "mb_dan": {
+              "accepted_swaps": 3424,
+              "attempts": 5658,
+              "edge_rows": 856,
+              "original_pair_overlap": 203,
+              "target_accepted_swaps": 3424
+            },
+            "pn_kc": {
+              "accepted_swaps": 44248,
+              "attempts": 53337,
+              "edge_rows": 11062,
+              "original_pair_overlap": 1056,
+              "target_accepted_swaps": 44248
+            },
+            "route": {
+              "accepted_swaps": 3360,
+              "attempts": 6079,
+              "edge_rows": 840,
+              "original_pair_overlap": 206,
+              "target_accepted_swaps": 3360
+            }
+          },
+          "path": "inputs/null-graphs/g007/edges-R.tsv",
+          "sha256": "58745c3a563ceb9f2be708796ae7e970f7b578ef6a9161f9544cd9ca7b3888bc"
+        }
+      },
+      "substrate": "g007"
+    },
+    {
+      "seed": 63007,
+      "sides": {
+        "L": {
+          "layer_stats": {
+            "kc_dan": {
+              "accepted_swaps": 178312,
+              "attempts": 292714,
+              "edge_rows": 44578,
+              "original_pair_overlap": 9809,
+              "target_accepted_swaps": 178312
+            },
+            "kc_mb": {
+              "accepted_swaps": 97420,
+              "attempts": 294514,
+              "edge_rows": 24355,
+              "original_pair_overlap": 10386,
+              "target_accepted_swaps": 97420
+            },
+            "mb_dan": {
+              "accepted_swaps": 3516,
+              "attempts": 5985,
+              "edge_rows": 879,
+              "original_pair_overlap": 208,
+              "target_accepted_swaps": 3516
+            },
+            "pn_kc": {
+              "accepted_swaps": 44228,
+              "attempts": 53594,
+              "edge_rows": 11057,
+              "original_pair_overlap": 1047,
+              "target_accepted_swaps": 44228
+            },
+            "route": {
+              "accepted_swaps": 3356,
+              "attempts": 5638,
+              "edge_rows": 839,
+              "original_pair_overlap": 199,
+              "target_accepted_swaps": 3356
+            }
+          },
+          "path": "inputs/null-graphs/g008/edges-L.tsv",
+          "sha256": "5b4f70518a00868a3a5435f1ad603959c425aca9eb3e069010aff3d63ca32f70"
+        },
+        "R": {
+          "layer_stats": {
+            "kc_dan": {
+              "accepted_swaps": 170080,
+              "attempts": 275683,
+              "edge_rows": 42520,
+              "original_pair_overlap": 9167,
+              "target_accepted_swaps": 170080
+            },
+            "kc_mb": {
+              "accepted_swaps": 96364,
+              "attempts": 305473,
+              "edge_rows": 24091,
+              "original_pair_overlap": 10562,
+              "target_accepted_swaps": 96364
+            },
+            "mb_dan": {
+              "accepted_swaps": 3424,
+              "attempts": 5777,
+              "edge_rows": 856,
+              "original_pair_overlap": 198,
+              "target_accepted_swaps": 3424
+            },
+            "pn_kc": {
+              "accepted_swaps": 44248,
+              "attempts": 53379,
+              "edge_rows": 11062,
+              "original_pair_overlap": 994,
+              "target_accepted_swaps": 44248
+            },
+            "route": {
+              "accepted_swaps": 3360,
+              "attempts": 6067,
+              "edge_rows": 840,
+              "original_pair_overlap": 203,
+              "target_accepted_swaps": 3360
+            }
+          },
+          "path": "inputs/null-graphs/g008/edges-R.tsv",
+          "sha256": "65c4f7e3c5c0301e53a061b8bac44701c56bbfddc994ce82d2a78bf6d3a77875"
+        }
+      },
+      "substrate": "g008"
+    }
+  ],
+  "reject": [
+    "duplicate-edge",
+    "same-pre",
+    "same-post",
+    "illegal-layer"
+  ],
+  "schema": "FLY-PHENO-00-null-graph-manifest-v1",
+  "substrates": [
+    "g001",
+    "g002",
+    "g003",
+    "g004",
+    "g005",
+    "g006",
+    "g007",
+    "g008"
+  ],
+  "weight_rule": "edge weight remains attached to its original source row"
+}

@@ -1,0 +1,35 @@
+{
+  "action_choice_schema_max": 65535,
+  "artifact_id": "E012-PC-ACTION-ID-SCHEMA-v1.3.2",
+  "artifact_paths": {
+    "amendment": "C:\\rd-c\\selective-cognition-action-region-program\\e012-readonly-anatomy-addendum\\E012-PC-ACTION-ID-SCHEMA-AMENDMENT-v1.3.2.md",
+    "generator": "C:\\Users\\shuga\\.codex\\worktrees\\e013-episode-factory\\clean-rust\\experiments\\e013-episode-factory\\precontact-v031\\seal_pc_id_schema_v132.py",
+    "parent_amendment_v131": "C:\\rd-c\\selective-cognition-action-region-program\\e012-readonly-anatomy-addendum\\E012-POSITIVE-CONTROL-RESERVE-POLICY-AMENDMENT-v1.3.1.md",
+    "parent_lock_v131": "C:\\rd-c\\selective-cognition-action-region-program\\e012-readonly-anatomy-addendum\\E012-POSITIVE-CONTROL-RESERVE-POLICY-LOCK-v1.3.1.json",
+    "parent_verification_v131": "C:\\rd-c\\selective-cognition-action-region-program\\e012-readonly-anatomy-addendum\\E012-POSITIVE-CONTROL-RESERVE-POLICY-VERIFICATION-v1.3.1.json"
+  },
+  "bank_generated_by_agent": false,
+  "bank_owner": "USER",
+  "candidate_action_id_encoding": "integer uint16 range 0..65535; unique within task",
+  "model_contact_performed": false,
+  "parent_amendment_sha256": "ed37d45de3dcb51367ba5f0bc56d82b318e0096682008766a9dbf4b4a9cdbde8",
+  "parent_lock_sha256": "1c8016c95c78c8fe2531644df8f18431bb8ee24ba66ec25322517a2a14bf5ea1",
+  "reserve_policy_inherited_sha256": "ed37d45de3dcb51367ba5f0bc56d82b318e0096682008766a9dbf4b4a9cdbde8",
+  "rng": {
+    "algorithm": "numpy Generator(PCG64)",
+    "draw_order": "all core task IDs then action IDs; then all reserves in cell order; record retries and full map",
+    "seed": 13064,
+    "stream": "opaque_ids fifth SeedSequence child"
+  },
+  "schema_version": 1,
+  "self_hash_note": "Lock excludes itself and post-lock verification receipt.",
+  "sha256": {
+    "amendment": "4d51d1b58188fb57b9526474cc83afb81a3f79b16280c5d01c674bba638607b9",
+    "generator": "c2462cf0b2d999f0857d53190b3749151ebedc88ff7d3b81929d4c297bd42d6e",
+    "parent_amendment_v131": "ed37d45de3dcb51367ba5f0bc56d82b318e0096682008766a9dbf4b4a9cdbde8",
+    "parent_lock_v131": "1c8016c95c78c8fe2531644df8f18431bb8ee24ba66ec25322517a2a14bf5ea1",
+    "parent_verification_v131": "977c062b392702f95de64ee00155b02042e09850f90ce64c396147bac114bfb2"
+  },
+  "state": "PREAUTHORING_SCHEMA_CORRECTION_SEALED_BANK_NOT_BUILT",
+  "task_id_encoding": "unique 128-bit lowercase hex"
+}

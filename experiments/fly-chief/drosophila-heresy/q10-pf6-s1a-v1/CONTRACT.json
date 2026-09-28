@@ -1,0 +1,126 @@
+{
+  "protocol": "Q10-PF6-S1A",
+  "status": "FROZEN_PREEXECUTION_RECEIPT_AUDIT_ONLY",
+  "purpose": "read-only receipt-semantic forensic audit of the immutable Q10-PF6-S1 execution",
+  "plan_sha256": "3C89F5ECB0BA48B5397B1574BEF13D108990CD73FDEA01EE25CCD7A610CC9EA1",
+  "parent": {
+    "protocol": "Q10-PF6-S1",
+    "root": "experiments/drosophila-heresy/q10-pf6-s1-v1",
+    "execution_sha256": "E561D7392D471CC0B47E98E66EC5AD9FC772476F2F61103FBF5994A051BC0E17",
+    "sample_sha256": "0DE70DA72627D834C7D877F667469DA848F04312F072036245DFE312AD863BB9",
+    "preexecution_sha256": "065D9FD8CCB1CDC615C8FA6E93FD7A3C3B2F04668FD90F7453674D77478C41BF"
+  },
+  "lineage_helpers": {
+    "q10_pf6_runner": {
+      "path": "experiments/drosophila-heresy/q10-pf6-v1/scripts/run_q10_pf6.py",
+      "sha256": "79B731A7D86FDA1D3FB45F3FA320C62BABD35933AE9ED5BCC25D0744B3F6EA46"
+    },
+    "q10_pf5_runtime_helper": {
+      "path": "experiments/drosophila-heresy/q10-pf5-v1/scripts/run_q10_pf5.py",
+      "sha256": "A00078787DB732906416B3C7158DC777CD41C2E71C3AAE660D1AE525446FB82A"
+    },
+    "q10_pf6_s1_runner": {
+      "path": "experiments/drosophila-heresy/q10-pf6-s1-v1/scripts/run_q10_pf6_s1.py",
+      "sha256": "9C5036F7BF85278ADFA5154E0C312E82952B16A96BF96A518E78C1C70BBB7FB8"
+    }
+  },
+  "support_topology": {
+    "purpose": "reconstruct P_G from immutable PF5/PF6 topology and support metadata without replay",
+    "pf5_audit_results": {
+      "path": "experiments/drosophila-heresy/q10-pf5-v1/qualification/full-run-v3-audit/results.json",
+      "sha256": "A2C90AB364BF5025A528A3E4E6A7192EBCF1F70939CD3EABAD0A22EE04ECDD92",
+      "field": "group_inventory"
+    },
+    "pf5_contract": {
+      "path": "experiments/drosophila-heresy/q10-pf5-v1/CONTRACT.json",
+      "sha256": "20995E1826A9C62E0E8689017A2F3E624CC9E63B76B210FBD4AB11D7E9E7D34F"
+    },
+    "rmt_receipts": {
+      "rows": {
+        "path": "experiments/drosophila-heresy/q10-rmt-v1/qualification/sample-9731-9732/rows.json",
+        "sha256": "A9AE4E5209E7BB32C4815666A32EA9C66B9E60A79C0E1A739C486E68DDE041C3"
+      },
+      "moves": {
+        "path": "experiments/drosophila-heresy/q10-rmt-v1/qualification/sample-9731-9732/moves.jsonl",
+        "sha256": "9FC2FB529A8EDA40F9F6AC1EB43DE1E76C8E7EB1331C2FD66CEC69AE7C1BF83F"
+      },
+      "components": {
+        "path": "experiments/drosophila-heresy/q10-rmt-v1/qualification/sample-9731-9732/components.json",
+        "sha256": "E873F1FAAA1C1D2093F5D90D483AF621D1B371FA205A52EBD3E74D0E7B841977"
+      },
+      "endpoints": {
+        "path": "experiments/drosophila-heresy/q10-rmt-v1/qualification/sample-9731-9732/endpoints.json",
+        "sha256": "1BE006961358B748CE0ECBCE635347274326494D546F82E6F32CA1FAAC0A7A8C"
+      }
+    }
+  },
+  "binding": {
+    "hash_algorithm": "sha256",
+    "hash_case": "uppercase",
+    "hash_refusal": true,
+    "source_documents": [
+      "execution.json",
+      "sample.json",
+      "PREEXECUTION.json"
+    ],
+    "helper_files_are_read_only_inputs": true
+  },
+  "reconstruction": {
+    "source": "receipt_fields_only",
+    "rerun_forbidden": true,
+    "candidate_generation_forbidden": true,
+    "search_forbidden": true,
+    "score_tuple": [
+      "mismatch_count",
+      "total_ulp_distance",
+      "residual_l2",
+      "max_residual"
+    ],
+    "current_search": "trajectory_point_top_level_objective",
+    "current_search_cross_check": "trajectory_point.best_search_state",
+    "best_search": "strict_running_minimum_of_current_search",
+    "best_valid": "strict_running_minimum_of_non_null_best_final_gate_valid_state",
+    "prefix_and_state_hash_excluded_from_score": true
+  },
+  "exposure": {
+    "round_zero_exposed": true,
+    "positive_round_rule": "round <= rounds_completed and round <= coordinates_total",
+    "padded_rounds_are_historical_only": true
+  },
+  "domains": {
+    "declared_group_rows": "row_identifiers_available_but_per_row_scores_unavailable",
+    "physical_support": "P_G_reconstructed_from_bound_pf5_group_inventory",
+    "whole_endpoint": "global_objective_tuple_observable",
+    "collateral_damage": "not_attributable_without_per_row_baseline_and_candidate_residual_sets"
+  },
+  "metadata": {
+    "bridge_count": "unavailable",
+    "thresholds": "reconstruct_only_from_row_level_source_records",
+    "best_state_hash": "prefix_identity_only"
+  },
+  "coverage": {
+    "receipt_semantics_coverage": "COMPLETE",
+    "numerical_replay_coverage": "PARTIAL",
+    "historical_replay_scope": "ONE_RETAINED_CANDIDATE_PER_GROUP"
+  },
+  "scope": {
+    "scientific_bundle_count": 0,
+    "behavioral_probe": false,
+    "canonical_state_updated": false,
+    "dh08b_authorized": false,
+    "parent_artifacts_modified": false
+  },
+  "forbidden_fields": [
+    "accuracy",
+    "reward",
+    "actions",
+    "old_map_margin",
+    "reversed_map_margin",
+    "behavior",
+    "behavioral_inference",
+    "scientific_seed_id",
+    "repair_applied",
+    "repair_applied_to_canonical_model",
+    "dh08b_authorized"
+  ]
+}

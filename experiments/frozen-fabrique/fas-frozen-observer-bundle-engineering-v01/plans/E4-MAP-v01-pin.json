@@ -1,0 +1,12 @@
+{
+  "identity": "FAS_FROZEN_CAPABILITY_FABRIC_E4_PLANNING_MAP_V01",
+  "status": "PLANNING_MAP_PIN_ONLY_NO_E4_EXECUTION_AUTHORITY",
+  "date_utc": "2026-09-26",
+  "proposal_source_copy": "experiments/fas-frozen-observer-bundle-engineering-v01/plans/e4-proposal-source-v01.md",
+  "proposal_source_bytes": 16014,
+  "proposal_source_sha256": "44d411190d69b317201e43b11126f3fad418caecbb0d8f98ec9b1180ee758bc6",
+  "codebase_map": "experiments/fas-frozen-observer-bundle-engineering-v01/plans/E4-CODEBASE-MAP-v01.md",
+  "codebase_map_sha256": "9f3f8c048d48ccc7084189bd41a5b62ee4d1847c5146d9f77605ccc211321f0e",
+  "bound_e3_score_root_sha256": "a104bffedbc3e31268c0f1c0103ad4326add5a9da93816007904b70cdf3c7d1f",
+  "scope": "Content identity of the proposal and codebase map only. E4-0, E4-A, companion branches, model contact, panel construction, label access, scoring, and serving measurements are not authorized or executed by this receipt."
+}

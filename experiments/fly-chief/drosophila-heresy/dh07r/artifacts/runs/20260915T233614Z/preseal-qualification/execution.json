@@ -1,0 +1,18 @@
+{
+  "autodiff": false,
+  "backprop": false,
+  "complete": true,
+  "configured_seeds": [
+    9006
+  ],
+  "fresh_seed_bundles": 0,
+  "intervention": "adaptive feasible residual direction replacement",
+  "mode": "qualify",
+  "outcome_rows": 16,
+  "protocol": "DH-07R",
+  "qualification_seed_bundles": 1,
+  "reward_rule": "action_contingent",
+  "shared": "exogenous task streams and simulator RNG",
+  "specimens": 1,
+  "wall_seconds": 2.6626163
+}

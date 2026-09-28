@@ -1,0 +1,11 @@
+{
+  "schema": "FLY-REACH-02-run1-nonpromotable-v1",
+  "study_id": "FLY-REACH-02",
+  "run_id": "FLY-REACH-02-RUN1",
+  "status": "NONPROMOTABLE_CONTRACT_DEFECT",
+  "reason": "The sign_ref_native_mag implementation zeroed native-supported coordinates when the reference delta was exactly zero, violating the declared native-support-preserving counterfactual.",
+  "scientific_data_preserved": true,
+  "measured_outcomes_eligible_for_inference": false,
+  "replacement_run": "experiments/fly-reach-02-v0.1b/artifacts/REACH02-RUN2",
+  "original_terminal_receipt_sha256": "90c6683f332b2d29c3588c3ef00cbf56102146c207a81274249a53430dca0d7d"
+}

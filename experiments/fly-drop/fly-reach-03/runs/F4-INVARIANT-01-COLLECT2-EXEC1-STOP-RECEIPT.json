@@ -1,0 +1,22 @@
+{
+  "schema": "F4-INVARIANT-01-fit-execution-attempt-stop-v1",
+  "attempt_id": "F4-INVARIANT-01-COLLECT2-EXEC1",
+  "parent_collection_run_id": "F4-INVARIANT-01-COLLECT2",
+  "status": "STOPPED_BEFORE_FIT_1",
+  "stage": "executor_startup",
+  "error_type": "NameError",
+  "error_message": "name 'IMPL' is not defined",
+  "fit_manifest_sha256": "67040f6e459644b479bceaa6e738afcb55b1626b7f587b5aeef54ceb4e61e862",
+  "source_manifest_file_sha256": "49e200717b870cb437523a98c98fca994f1cdb48cde4cea57dff10e679d145b8",
+  "preflight_receipt_sha256": "273ee7ce872b16e4d8b6cca235e78ec273a2cd13875a41289d1770a3bc85d349",
+  "fits_started": 0,
+  "fit_receipts_created": 0,
+  "prediction_streams_created": 0,
+  "prediction_lock_created": false,
+  "heldout_truth_opened": false,
+  "output_directories_were_empty_at_failure": true,
+  "heldout_class_complete_blocks": 7,
+  "support_disposition": "NOT_EVALUABLE_SUPPORT",
+  "scientific_outcomes_available": false,
+  "preserved_old_attempt": true
+}

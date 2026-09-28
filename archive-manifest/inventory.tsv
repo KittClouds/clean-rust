@@ -1,0 +1,309 @@
+old_path	kind	identity	classification	new_location_or_ref	reason	dependents
+C:/code land/clean-rust	shared checkout	codex/phoenix-native-cleanroom-cut3@9a88547372cd; dirty=498	REFERENCE	selected content copied per thread; see sources.tsv	live shared checkout used by several agents; left untouched	all active threads
+C:/code land/adaptive-runtime-cleanroom-20260920	worktree	codex/ar-03c-partition-frontier-20260921@f850f537e15e; dirty=0	DISPOSABLE	experiments/ar04/adaptive-runtime (from codex/ar-04e tip)	clean worktree; its branch is an ancestor of codex/ar-04e-verifier-size-reuse-20260926	
+C:/code land/adaptive-runtime-cleanroom-20260921-ar03d	worktree	codex/ar-03d-projected1d-vs-hash-20260921@2df36ced17a9; dirty=0	DISPOSABLE	experiments/ar04/adaptive-runtime (from codex/ar-04e tip)	clean worktree; its branch is an ancestor of codex/ar-04e-verifier-size-reuse-20260926	
+C:/code land/adaptive-runtime-cleanroom-20260921-ar03d-r1	worktree	codex/ar-03d-r1-independent-5x5-20260921@486b262cbd5c; dirty=0	DISPOSABLE	experiments/ar04/adaptive-runtime (from codex/ar-04e tip)	clean worktree; its branch is an ancestor of codex/ar-04e-verifier-size-reuse-20260926	
+C:/code land/adaptive-runtime-cleanroom-20260921-ar04a	worktree	codex/ar-04a-continuation-conditioned-action-value-20260921@6f731c135e56; dirty=0	DISPOSABLE	experiments/ar04/adaptive-runtime (from codex/ar-04e tip)	clean worktree; its branch is an ancestor of codex/ar-04e-verifier-size-reuse-20260926	
+C:/code land/clean-rust-fly-drop00-close-20260921	worktree	codex/fly-drop-00-close-20260921@a3cb9ddb002a; dirty=0	DISPOSABLE	experiments/fly-drop/fly-drop-00	clean worktree; branch on origin	
+C:/Users/shuga/.codex/worktrees/28cf/clean-rust	worktree	detached@e5a84994da60; dirty=0	DISPOSABLE	-	clean detached worktree at an old commit	
+C:/Users/shuga/.codex/worktrees/3b32/clean-rust	worktree	detached@9a88547372cd; dirty=430	REFERENCE	older snapshot of the shared checkout	uncommitted copy of the shared checkout from an earlier session; see duplicate-check in freeze notes	
+C:/Users/shuga/.codex/worktrees/3c8a/clean-rust	worktree	detached@e5a84994da60; dirty=1	DISPOSABLE	experiments/jev/jev-curated-c100-v01	unique content copied into the freeze; branch ref kept	
+C:/Users/shuga/.codex/worktrees/3dc2/clean-rust	worktree	detached@e5a84994da60; dirty=0	DISPOSABLE	-	clean detached worktree at an old commit	
+C:/Users/shuga/.codex/worktrees/5c65/clean-rust	worktree	detached@9a88547372cd; dirty=197	REFERENCE	older snapshot of the shared checkout	uncommitted copy of the shared checkout from an earlier session; see duplicate-check in freeze notes	
+C:/Users/shuga/.codex/worktrees/8b03/clean-rust	worktree	detached@e5a84994da60; dirty=1	REFERENCE	not copied	small uncommitted note outside active threads	
+C:/Users/shuga/.codex/worktrees/ar-04b-generalization-bridge-20260921/clean-rust	worktree	codex/ar-04b-generalization-objective-bridge-20260921@c6daf025d3db; dirty=0	DISPOSABLE	experiments/ar04/adaptive-runtime (from codex/ar-04e tip)	clean worktree; its branch is an ancestor of codex/ar-04e-verifier-size-reuse-20260926	
+C:/Users/shuga/.codex/worktrees/ar-04c-sentinel-reuse-20260921/clean-rust	worktree	codex/ar-04c-sentinel-reuse-20260921@b932975cca2e; dirty=0	DISPOSABLE	experiments/ar04/adaptive-runtime (from codex/ar-04e tip)	clean worktree; its branch is an ancestor of codex/ar-04e-verifier-size-reuse-20260926	
+C:/Users/shuga/.codex/worktrees/ar-04d-exposure-frontier-20260926/clean-rust	worktree	codex/ar-04d-sentinel-exposure-frontier-20260926@0055876cb9b9; dirty=0	DISPOSABLE	experiments/ar04/adaptive-runtime (from codex/ar-04e tip)	clean worktree; its branch is an ancestor of codex/ar-04e-verifier-size-reuse-20260926	
+C:/Users/shuga/.codex/worktrees/ar-04e-verifier-size-reuse-20260926/clean-rust	worktree	codex/ar-04e-verifier-size-reuse-20260926@4109350e37c9; dirty=0	DISPOSABLE	experiments/ar04/adaptive-runtime (from codex/ar-04e tip)	clean worktree; its branch is an ancestor of codex/ar-04e-verifier-size-reuse-20260926	
+C:/Users/shuga/.codex/worktrees/e013-episode-factory/clean-rust	worktree	codex/e013-episode-factory@e5a84994da60; dirty=1	DISPOSABLE	experiments/frozen-fabrique/e013-episode-factory	unique content copied into the freeze; branch ref kept	
+C:/Users/shuga/.codex/worktrees/e4-0-contract-work/clean-rust	worktree	detached@e5a84994da60; dirty=2	DISPOSABLE	experiments/frozen-fabrique/	unique content copied into the freeze; branch ref kept	
+C:/Users/shuga/.codex/worktrees/fas-r1-stage0-20260925/clean-rust	worktree	codex/fas-r1-stage0-20260925@fb984e362a20; dirty=2	DISPOSABLE	experiments/fas-r1/	unique content copied into the freeze; branch ref kept	
+branch codex/adaptive-runtime-cleanroom-20260920	git branch	6649f124 2026-09-21; origin=no	REFERENCE	kept as ref	AR chain; contained in codex/ar-04e-verifier-size-reuse-20260926	
+branch codex/app-native-ai-harness-slices-1-3	git branch	6b712b81 2026-07-22; origin=yes	REFERENCE	kept as ref	local branch	
+branch codex/ar-03c-partition-frontier-20260921	git branch	f850f537 2026-09-21; origin=yes	REFERENCE	kept as ref	AR chain; contained in codex/ar-04e-verifier-size-reuse-20260926	
+branch codex/ar-03d-projected1d-vs-hash-20260921	git branch	2df36ced 2026-09-21; origin=yes	REFERENCE	kept as ref	AR chain; contained in codex/ar-04e-verifier-size-reuse-20260926	
+branch codex/ar-03d-r1-independent-5x5-20260921	git branch	486b262c 2026-09-21; origin=yes	REFERENCE	kept as ref	AR chain; contained in codex/ar-04e-verifier-size-reuse-20260926	
+branch codex/ar-04a-continuation-conditioned-action-value-20260921	git branch	6f731c13 2026-09-21; origin=yes	REFERENCE	kept as ref	AR chain; contained in codex/ar-04e-verifier-size-reuse-20260926	
+branch codex/ar-04b-generalization-objective-bridge-20260921	git branch	c6daf025 2026-09-21; origin=yes	REFERENCE	kept as ref	AR chain; contained in codex/ar-04e-verifier-size-reuse-20260926	
+branch codex/ar-04c-sentinel-reuse-20260921	git branch	b932975c 2026-09-21; origin=yes	REFERENCE	kept as ref	AR chain; contained in codex/ar-04e-verifier-size-reuse-20260926	
+branch codex/ar-04d-sentinel-exposure-frontier-20260926	git branch	0055876c 2026-09-26; origin=yes	REFERENCE	kept as ref	AR chain; contained in codex/ar-04e-verifier-size-reuse-20260926	
+branch codex/ar-04e-verifier-size-reuse-20260926	git branch	4109350e 2026-09-26; origin=no	REFERENCE	kept as ref	AR chain; contained in codex/ar-04e-verifier-size-reuse-20260926	
+branch codex/calendar-temporal-registry-bridge	git branch	4ad6833c 2026-06-19; origin=yes	REFERENCE	kept as ref	local branch	
+branch codex/e013-episode-factory	git branch	e5a84994 2026-06-03; origin=no	REFERENCE	kept as ref	local branch	
+branch codex/fas-r1-stage0-20260925	git branch	fb984e36 2026-09-25; origin=no	REFERENCE	kept as ref	local branch	
+branch codex/fly-drop-00-close-20260921	git branch	a3cb9ddb 2026-09-21; origin=yes	REFERENCE	kept as ref	local branch	
+branch codex/live-graph-system-freeze-20260620	git branch	04879692 2026-07-15; origin=yes	REFERENCE	kept as ref	local branch	
+branch codex/phoenix-native-cleanroom-cut3	git branch	9a885473 2026-09-16; origin=yes	REFERENCE	kept as ref	local branch	
+branch codex/phoenix-native-standalone-cut6	git branch	78fb62e1 2026-08-03; origin=no	REFERENCE	kept as ref	local branch	
+branch codex/phoenix-native-standalone-initial	git branch	d27f3356 2026-07-26; origin=no	REFERENCE	kept as ref	local branch	
+branch main	git branch	e5a84994 2026-06-03; origin=no	REFERENCE	kept as ref	local branch	
+branch recovery	git branch	893eb180 2026-07-14; origin=no	REFERENCE	kept as ref	local branch	
+C:\code land\clean-rust\benches	folder	untracked	REFERENCE	-	legacy benches	
+C:\code land\clean-rust\dist	folder	untracked	DISPOSABLE	-	build output	
+C:\code land\clean-rust\docs	folder	tracked	REFERENCE	docs/jev, docs/lab	research notes copied; older docs remain in git history	
+C:\code land\clean-rust\experiments	folder	tracked	ACTIVE	experiments/<thread>/	per-thread research; see THREADS.md	
+C:\code land\clean-rust\gliclass-instruct-onnx	folder	tracked	ARCHIVE	-	model weights	
+C:\code land\clean-rust\gliclass-instruct-onnx-v2	folder	tracked	ARCHIVE	-	model weights	
+C:\code land\clean-rust\gliner-bi-onnx	folder	tracked	ARCHIVE	-	model weights	
+C:\code land\clean-rust\gliner-bi-small-onnx	folder	tracked	ARCHIVE	-	model weights	
+C:\code land\clean-rust\gliner-relex-onnx	folder	tracked	ARCHIVE	-	model weights	
+C:\code land\clean-rust\index-fund-prototype	folder	tracked	REFERENCE	-	index fund prototype (submodule); not an active thread	
+C:\code land\clean-rust\libs	folder	tracked	REFERENCE	-	legacy app libraries	
+C:\code land\clean-rust\node_modules	folder	untracked	DISPOSABLE	-	npm install output	
+C:\code land\clean-rust\northstar-auction-parity	folder	tracked	REFERENCE	-	NorthStar Uatu research; not an active thread	
+C:\code land\clean-rust\northstar-rl	folder	untracked	REFERENCE	-	NorthStar/Moxie trading research; not an active thread	
+C:\code land\clean-rust\phoenix-native	folder	tracked	REFERENCE	crates/, apps/	older in-repo copy of the product; superseded by KittClouds/phoenix-native product branch	
+C:\code land\clean-rust\program-infrastructure	folder	untracked	ACTIVE	infrastructure/	Kammi Library service and governance	
+C:\code land\clean-rust\public	folder	tracked	REFERENCE	-	legacy app assets	
+C:\code land\clean-rust\q10-gc1-lr1-requal1-csc1-pred1-v1	folder	untracked	DISPOSABLE	experiments/fly-chief/drosophila-heresy/_stray-at-repo-root/	Fly Chief output written to the repo root by mistake; copied	
+C:\code land\clean-rust\rust	folder	tracked	REFERENCE	-	legacy rust folder	
+C:\code land\clean-rust\rust-native	folder	tracked	REFERENCE	apps/analysis-bridge (bridge subset)	legacy Phoenix analysis workspace; bridge crates copied	
+C:\code land\clean-rust\scripts	folder	tracked	REFERENCE	-	legacy scripts	
+C:\code land\clean-rust\src	folder	tracked	REFERENCE	-	legacy Angular app	
+C:\code land\clean-rust\src-tauri	folder	tracked	REFERENCE	-	legacy Tauri shell	
+C:\code land\clean-rust\target	folder	untracked	DISPOSABLE	-	cargo build output	
+C:\code land\clean-rust\tasks	folder	untracked	REFERENCE	-	legacy task files	
+C:\code land\clean-rust\test	folder	tracked	REFERENCE	-	legacy tests	
+C:\code land\clean-rust\tests	folder	untracked	REFERENCE	-	legacy tests	
+C:\code land\clean-rust\tmp	folder	untracked	DISPOSABLE	-	scratch	
+C:\code land\clean-rust\tradingview	folder	tracked	REFERENCE	-	TradingView skill work; not an active thread	
+C:\rd-c	folder	not git	ACTIVE	experiments/kinetic-kammi/rd-c	R&D-C program; not a git repository	
+C:\code land\adaptive-runtime-cleanroom-archive-20260920	folder	not git	ARCHIVE	-	AR archive copy	
+C:\code land\clean-rust-staged-36bfcd07544a	folder	not git	REFERENCE	-	staged copy of clean-rust	
+C:\code land\northstar-singular-authority	folder	codex/northstar-singular-authority-v1	REFERENCE	-	NorthStar repository	
+C:\code land\xtest	folder	not git	DISPOSABLE	-	scratch	
+C:\code land\src	folder	not git	REFERENCE	-	stray src folder	
+D:\phoenix-product-snapshot-20260923	folder	codex/phoenix-graph-gate3b-20260924	REFERENCE	crates/, apps/, docs/, tools/	product repository (KittClouds/phoenix-native); source of the freeze	
+D:\phoenix-vault-product-20260927	folder	codex/phoenix-vault-product-20260927	DISPOSABLE	crates/phoenix-vault-adapter, vendor/	vault worktree; uncommitted adapter copied	
+D:\clean-rust-phoenix-bridge-20260923	folder	codex/phoenix-product-gliner25-bridge-20260923	REFERENCE	apps/analysis-bridge	bridge snapshot checkout	
+D:\phoenix-native-cleanroom-cut4-20260920	folder	codex/phoenix-native-p1p3-consensus-observability-20260924	REFERENCE	-	LT9 lexical-analysis research by the Breeze audit thread; not copied	
+D:\1kittvault	folder	not git	ARCHIVE	-	user vault; protected material — location only	
+D:\phoenix-kammi-qa-20260924	folder	not git	ARCHIVE	-	Kammi QA outputs	
+D:\phoenix-tts	folder	not git	ARCHIVE	-	TTS toolchain and old model copies (live copies are on C:)	
+D:\phoenix-models	folder	not git	ARCHIVE	-	model weights	
+D:\codex-runs	folder	not git	ARCHIVE	-	agent run outputs (JEV, FAS)	
+D:\drosophila-heresy	folder	not git	ARCHIVE	-	Fly Chief scratch/outputs	
+D:\phoenix-analysis-proof-shortrun-b-20260727-1	folder	run output	ARCHIVE	-	QA/proof run output	
+D:\phoenix-analysis-proof-shortrun-b-20260727-10	folder	run output	ARCHIVE	-	QA/proof run output	
+D:\phoenix-analysis-proof-shortrun-b-20260727-2	folder	run output	ARCHIVE	-	QA/proof run output	
+D:\phoenix-analysis-proof-shortrun-b-20260727-3	folder	run output	ARCHIVE	-	QA/proof run output	
+D:\phoenix-analysis-proof-shortrun-b-20260727-4	folder	run output	ARCHIVE	-	QA/proof run output	
+D:\phoenix-analysis-proof-shortrun-b-20260727-5	folder	run output	ARCHIVE	-	QA/proof run output	
+D:\phoenix-analysis-proof-shortrun-b-20260727-6	folder	run output	ARCHIVE	-	QA/proof run output	
+D:\phoenix-analysis-proof-shortrun-b-20260727-7	folder	run output	ARCHIVE	-	QA/proof run output	
+D:\phoenix-analysis-proof-shortrun-b-20260727-8	folder	run output	ARCHIVE	-	QA/proof run output	
+D:\phoenix-analysis-proof-shortrun-b-20260727-9	folder	run output	ARCHIVE	-	QA/proof run output	
+D:\phoenix-angular-cohort-graph-runs-20260726	folder	run output	ARCHIVE	-	QA/proof run output	
+D:\phoenix-angular-cohort-readonly-20260726	folder	run output	ARCHIVE	-	QA/proof run output	
+D:\phoenix-angular-cohort-root-20260726	folder	run output	ARCHIVE	-	QA/proof run output	
+D:\phoenix-atlas-core-tests-build.log	folder	run output	ARCHIVE	-	QA/proof run output	
+D:\phoenix-atlas-core-tests-final-build.log	folder	run output	ARCHIVE	-	QA/proof run output	
+D:\phoenix-atlas-core-tests-final.log	folder	run output	ARCHIVE	-	QA/proof run output	
+D:\phoenix-atlas-full-page-ui-20260728-000600	folder	run output	ARCHIVE	-	QA/proof run output	
+D:\phoenix-atlas-full-page-ui-20260728-002000	folder	run output	ARCHIVE	-	QA/proof run output	
+D:\phoenix-atlas-full-page-ui-20260728-004657	folder	run output	ARCHIVE	-	QA/proof run output	
+D:\phoenix-atlas-full-page-ui-20260728-005411	folder	run output	ARCHIVE	-	QA/proof run output	
+D:\phoenix-atlas-inspector-build.log	folder	run output	ARCHIVE	-	QA/proof run output	
+D:\phoenix-atlas-pipeline-headless-20260727	folder	run output	ARCHIVE	-	QA/proof run output	
+D:\phoenix-atlas-pipeline-headless2-20260727	folder	run output	ARCHIVE	-	QA/proof run output	
+D:\phoenix-atlas-pipeline-ui-20260727	folder	run output	ARCHIVE	-	QA/proof run output	
+D:\phoenix-atlas-polish-build.log	folder	run output	ARCHIVE	-	QA/proof run output	
+D:\phoenix-atlas-polish-check.log	folder	run output	ARCHIVE	-	QA/proof run output	
+D:\phoenix-atlas-polish-final-build.log	folder	run output	ARCHIVE	-	QA/proof run output	
+D:\phoenix-atlas-proposed-headless-20260727-232451	folder	run output	ARCHIVE	-	QA/proof run output	
+D:\phoenix-atlas-proposed-ui-20260727-232451	folder	run output	ARCHIVE	-	QA/proof run output	
+D:\phoenix-atlas-run-cut0-proof-20260728	folder	run output	ARCHIVE	-	QA/proof run output	
+D:\phoenix-cache-live-cold-20260802	folder	run output	ARCHIVE	-	QA/proof run output	
+D:\phoenix-cache-live-cold2-20260802	folder	run output	ARCHIVE	-	QA/proof run output	
+D:\phoenix-editor-realization-ui-20260728-081656	folder	run output	ARCHIVE	-	QA/proof run output	
+D:\phoenix-graph-gate3a-qa-20260924	folder	run output	ARCHIVE	-	QA/proof run output	
+D:\phoenix-graph-gate3b-qa-20260924	folder	run output	ARCHIVE	-	QA/proof run output	
+D:\phoenix-reader-clone-qa-20260924	folder	run output	ARCHIVE	-	QA/proof run output	
+D:\phoenix-reader-closeout-review-20260923	folder	run output	ARCHIVE	-	QA/proof run output	
+D:\phoenix-reader-ui-review-20260923	folder	run output	ARCHIVE	-	QA/proof run output	
+D:\phoenix-target	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-agent-control	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-agent-notes-cut	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-atlas-control-cut4	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-atlas-full-page	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-atlas-pipeline-ui	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-atlas-run-cut0	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-atlas-runtime-producer-20260813	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-atlas-runtime-shell-20260813	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-block-commands-20260730	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-block-commands-live-20260730	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-block-toolbar-cut2-20260731	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-camera-angular-parity-20260726	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-camera-canvas-20260804	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-caps-mosaic-20260803	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-caps-projection	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-cleanroom-contract-v2	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-cleanroom-entity-v2	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-cleanroom-graph	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-cleanroom-review-v1	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-cleanroom-scene-v2	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-cleanroom-story-v2	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-cleanroom-structural-v2	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-current-pipeline-audit-20260803	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-cut5	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-cut5-interaction	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-cut6	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-cut6-analysis-bridge	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-cut6-restore	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-cut9-release-lock	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-document-lease-cut5	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-drawer-shell-cut2	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-durable-review	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-edge-endpoint-visibility-20260729	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-editor-cut4	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-embed-qualification-20260811	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-entity-lanes	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-event-queue	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-font-backend-cleanup	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-footer-ab-20260802	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-footer-pulse-20260802	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-freeze-20260927	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-gliner-bi-eval	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-gliner-product-20260923	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-gliner25-eval	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-gpui-gradient-text	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-gradient-footer	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-gradient-text-v02	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-graph-controls-cut4	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-graph-generation-v1	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-graph-generation-v1-bridge	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-graph-ui-regressions-20260803	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-hierarchy-v4	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-hierarchy-v4-producer	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-highlights-20260729	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-hopf-fibration-20260803	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-hopf-fibration-legacy-20260803	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-hopf-semantic-20260803	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-hover-fix	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-hybrid-busemann-20260803	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-index-fund-cftc-final	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-index-fund-cftc-verify	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-index-fund-eurostat	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-index-fund-ledger	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-index-fund-ledger-auto	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-index-fund-ledger-typed	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-index-fund-macro-qa	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-index-fund-operating	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-k2-llama-cpu-35999d1	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-kammi-settings	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-kammi-stream-coalesce	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-lane-palette-camera-20260804	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-legacy-cohort	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-live-timings-20260802	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-llama-cpp-adapter-20260819	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-lt9-la2e1y	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-manifolds-cut1	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-memory-20260802	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-memory-cut0	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-memory-cut1	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-memory-cut2	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-memory-cut3	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-memory-cut4	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-memory-cut5	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-memory-embed-gemma	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-memory-runtime-registered-v1	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-memory-runtime-v1	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-memory-temporal-v1	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-model-cache-20260801	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-model-warm-bridge	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-model-warm-native	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-model-warm-split-bridge	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-model-warm-split-shell	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-native-cut5	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-node-visual	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-northstar-data-plane	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-northstar-herofx-macro	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-northstar-macro-cleanup	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-northstar-massive-entitlement	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-northstar-regional-macro	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-northstar-structural-warm	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-northstar-tradelocker	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-northstar-tradelocker-live2	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-northstar-visual-restore	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-phxq1-shadow-20260811	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-pipeline-nli-v3	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-product-20260923	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-projection-check-20260915	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-publish-20260730	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-qps-concurrency	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-qps-kammi-20260731	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-qps-posting-coherence	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-qps-shadow	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-qps-standalone-qualification	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-qps-v201-release-lock	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-qps-v3	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-qps-v3-bundles	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-qps-v3-checkpoints	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-qps-v3-curator-20260810	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-qps-v3-curator-v8-20260810	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-qps-v3-phase11	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-qps-v3-phase8	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-qps-v3-phase85-20260811	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-qps-v3-phase86-20260811	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-qps-v3-phase87-20260811	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-qps-v3-phase88-20260813	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-qps-v3-publish	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-reader-contract	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-reader-layout-20260914	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-reader-planner	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-registry-style-lab	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-resident-scene-cut4	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-reweight-publish	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-scene-product-cut2	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-scene-publication-cut3	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-scheduler-refactor-20260802	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-scope-test	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-selection-toolbar	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-semantic-coordinator	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-semantic-coordinator-bridge	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-semantic-lens-v1	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-semantic-parity	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-shell-cut2	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-shell-cut3	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-shell-publish	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-style-hub	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-text-analytics	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-text-analytics-release-20260803	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-topology-alignment-audit	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-topology-alignment-ea69ebc9	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-topology-alignment-release	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-topology-alignment-tests	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-topology-audit-20260729	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-topology-bridge-20260804	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-topology-color-contract	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-topology-contract-20260804	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-topology-final-20260804	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-topology-lanes	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-turboquant-batch-20260811	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-turboquant-batch-final-20260811	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-turboquant-blocktopk-20260811	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-turboquant-blocktopk-final-20260811	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-turboquant-gate-20260810	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-turboquant-opt-20260810	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-turboquant-physics-20260811	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-turboquant-physics-final-20260811	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-turboquant-physics-lean-20260811	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-turboquant-throughput-20260811	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-turboquant-throughput-final-20260811	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-v2-cutover	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-visual-v3	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-vivid-tags	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-wgpu-instance-policy-20260803	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-target-zoom-anchor-20260801	folder	cargo target	DISPOSABLE	-	cargo build output	
+D:\phoenix-turboquant-gate-20260810	folder	run output	ARCHIVE	-	QA/proof run output	
+D:\phoenix-turboquant-gate-20260811	folder	run output	ARCHIVE	-	QA/proof run output	
+D:\phoenix-turboquant-proof-20260810-compact16	folder	run output	ARCHIVE	-	QA/proof run output	
+D:\phoenix-turboquant-proof-20260810-e2e	folder	run output	ARCHIVE	-	QA/proof run output	
+D:\phoenix-turboquant-proof-20260810-final	folder	run output	ARCHIVE	-	QA/proof run output	
+D:\phoenix-turboquant-proof-20260810-lut	folder	run output	ARCHIVE	-	QA/proof run output	
+D:\phoenix-turboquant-proof-20260810-optimized	folder	run output	ARCHIVE	-	QA/proof run output	
+D:\phoenix-turboquant-proof-20260810-optimized-auto	folder	run output	ARCHIVE	-	QA/proof run output	
+D:\phoenix-turboquant-proof-20260810-optimized-topk	folder	run output	ARCHIVE	-	QA/proof run output	
+D:\phoenix-ui-idle-diagnostic-20260924	folder	run output	ARCHIVE	-	QA/proof run output	
+D:\phoenix-ui-review-20260923	folder	run output	ARCHIVE	-	QA/proof run output	
+D:\phoenix-ui-review-canvas-20260923	folder	run output	ARCHIVE	-	QA/proof run output	

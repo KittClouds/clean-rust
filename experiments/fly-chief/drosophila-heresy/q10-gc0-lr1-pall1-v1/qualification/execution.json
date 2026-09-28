@@ -1,0 +1,20 @@
+{
+  "checks_passed": true,
+  "global_assembly": false,
+  "identity": "q10-gc0-lr1-pall1-v1",
+  "library_sha256": "DD824FA684B31ED02DB5E3E08E2B057CF774888B302CE77C0CD923CE746721F5",
+  "per_case": {
+    "seed9731-L-tau16__set2": 29,
+    "seed9731-L-tau4__set3": 0,
+    "seed9731-R-tau16__set1": 0,
+    "seed9731-R-tau16__set3": 0,
+    "seed9731-R-tau4__set0": 0,
+    "seed9731-R-tau4__set1": 0,
+    "seed9731-R-tau4__set2": 0,
+    "seed9731-R-tau4__set3": 27
+  },
+  "protocol": "PALL1_VALID_WORSE_PAIR_MATERIALIZATION",
+  "records": 56,
+  "scientific_promotion": false,
+  "status": "COMPLETE"
+}

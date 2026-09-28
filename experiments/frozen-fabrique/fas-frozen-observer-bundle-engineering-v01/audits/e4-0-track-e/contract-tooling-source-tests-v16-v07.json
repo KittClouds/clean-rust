@@ -1,0 +1,44 @@
+{
+  "commands": [
+    "python -m py_compile experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/build_e4_0_source_map_v16_v07.py experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/finalize_e4_0_contract_v16_v07.py experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/seal_e4_0_contract_v16_v06.py experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/test_e4_0_contract_v16_v07.py",
+    "python -m unittest discover -s experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts -p test_e4_0_contract_v16_v07.py -v"
+  ],
+  "execution_authorization_conferred": false,
+  "py_compile": "PASS",
+  "receipt_id": "E4_0_CONTRACT_TOOLING_V16_V07_SOURCE_TESTS",
+  "recorded_utc": "2026-09-27T07:57:14+00:00",
+  "runtime_access": {
+    "cache_created": false,
+    "cuda_initialized": false,
+    "gpu_lease_acquired": false,
+    "labels_opened": false,
+    "model_contact": false,
+    "tokenizer_contact": false
+  },
+  "schema": "FAS_E4_0_CONTRACT_TOOLING_SOURCE_TESTS_V16_V07",
+  "scope": "Synthetic-only v16-v06 contract/source-map/sealer tests, including exact preservation and validation of the v16-v04 authorizer pre-contact stop, first generated map draft preservation, and no-contact boundary. No candidate contract, seal, E4 truth, tokenizer, model, CUDA, GPU lease, cache, or authorization was accessed.",
+  "source_bindings": [
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/build_e4_0_source_map_v16_v07.py",
+      "bytes": 91959,
+      "sha256": "7fa4577a6a7f0f5e2648ac844cd53b34b2ae8416202691e50446fe8abbf080a3"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/finalize_e4_0_contract_v16_v07.py",
+      "bytes": 92418,
+      "sha256": "e44120bf4488410897aa3ca08ae4ff4b8690e384d9e0c1c490284a98771a6630"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/seal_e4_0_contract_v16_v06.py",
+      "bytes": 18744,
+      "sha256": "0f828384b04dcc8531f631f71514bbbcebdea582ead7079147b7a5b2a0b035c3"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/test_e4_0_contract_v16_v07.py",
+      "bytes": 43382,
+      "sha256": "1ab10a4649be262c135903c2c6a3909cbaf74a92fe092ac851266fc3cf3b0584"
+    }
+  ],
+  "status": "PASS_SYNTHETIC_CONTRACT_AND_SOURCE_MAP_TESTS_V07",
+  "unit_test_count": 38
+}

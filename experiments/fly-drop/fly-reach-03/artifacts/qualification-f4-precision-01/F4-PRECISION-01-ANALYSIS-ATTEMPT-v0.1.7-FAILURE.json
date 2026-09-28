@@ -1,0 +1,14 @@
+{
+  "schema": "FLY-REACH-03-F4-PRECISION-01-analysis-attempt-v1",
+  "identity": "F4-PRECISION-01-ANALYSIS-01",
+  "contract_version": "0.1.7",
+  "status": "ANCHOR_SCORING_SEMANTICS_MISMATCH",
+  "failure": "Held-out task block 303003 has no positive target rows. The new scorer marked the fold undefined, while the frozen parent scorer uses max(1e-12, class_weight) for each class denominator.",
+  "class_degenerate_fold": 303003,
+  "arm_a_metrics_compared": false,
+  "arm_b_fits_started": false,
+  "arm_c_fits_started": false,
+  "analysis_output_created": false,
+  "measured_namespace_created": false,
+  "disposition": "Preserved as pre-fit evaluator mismatch. v0.1.8 will reproduce the frozen denominator floor and flag one-class fold summaries as class-degenerate; pooled OOF remains the balanced two-class summary."
+}

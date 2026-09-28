@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "amendment_id": "E012-AUDIT-A17",
+  "state": "NUISANCE_FEATURE_ROW_ADAPTER_REPAIR_NO_MODEL_CONTACT",
+  "diagnostic_parent": "E012-BANK-A14",
+  "preserved_attempt": "bank/construction-01/scored-bank-a14/attempts/nuisance-audit-attempt-a14-01.json",
+  "source_or_label_changes": false,
+  "model_contact_authorized": false
+}

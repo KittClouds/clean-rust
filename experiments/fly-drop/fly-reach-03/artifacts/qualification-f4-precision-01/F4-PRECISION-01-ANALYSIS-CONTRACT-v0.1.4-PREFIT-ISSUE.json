@@ -1,0 +1,12 @@
+{
+  "schema": "FLY-REACH-03-F4-PRECISION-01-analysis-contract-check-v1",
+  "identity": "F4-PRECISION-01-ANALYSIS-01",
+  "contract_version": "0.1.4",
+  "status": "PREFIT_DIAGNOSTIC_SUPPORT_ISSUE",
+  "finding": "The qualification population has one-class substrate-side panels. The v0.1.4 nearest-neighbor diagnostic required both labels in every panel and would stop on a valid frozen panel.",
+  "discovered_before_model_fit": true,
+  "classifier_fits_started": false,
+  "scientific_metrics_computed": false,
+  "measured_namespace_created": false,
+  "disposition": "v0.1.5 will retain same-label distances and report opposite-label comparisons as unavailable in one-class panels; no rows, folds, targets, or estimands change."
+}

@@ -1,0 +1,182 @@
+[
+  {
+    "candidate_id": 25335,
+    "candidate_role_hidden": "emit_big_endian_word",
+    "case_id": "case-01",
+    "exit_code": 0,
+    "passed": true,
+    "stdout": "\nrunning 1 test\ntest check_contract ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "     Locking 1 package to latest compatible version\n   Compiling bytes v1.11.1 (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\repositories\\bytes)\n   Compiling e012-bytes-endian-harness v0.1.0 (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\task-harnesses\\bytes-endian)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.33s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-453834dd467b935e.exe)\n"
+  },
+  {
+    "candidate_id": 25335,
+    "candidate_role_hidden": "emit_big_endian_word",
+    "case_id": "case-02",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (30832) panicked at tests\\contract.rs:13:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.02s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-453834dd467b935e.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 25335,
+    "candidate_role_hidden": "emit_big_endian_word",
+    "case_id": "case-03",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (17496) panicked at tests\\contract.rs:13:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.03s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-453834dd467b935e.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 25335,
+    "candidate_role_hidden": "emit_big_endian_word",
+    "case_id": "case-04",
+    "exit_code": 0,
+    "passed": true,
+    "stdout": "\nrunning 1 test\ntest check_contract ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.03s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-453834dd467b935e.exe)\n"
+  },
+  {
+    "candidate_id": 34126,
+    "candidate_role_hidden": "emit_little_endian_word",
+    "case_id": "case-01",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (8796) panicked at tests\\contract.rs:13:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "   Compiling e012-bytes-endian-harness v0.1.0 (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\task-harnesses\\bytes-endian)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.91s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-453834dd467b935e.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 34126,
+    "candidate_role_hidden": "emit_little_endian_word",
+    "case_id": "case-02",
+    "exit_code": 0,
+    "passed": true,
+    "stdout": "\nrunning 1 test\ntest check_contract ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.03s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-453834dd467b935e.exe)\n"
+  },
+  {
+    "candidate_id": 34126,
+    "candidate_role_hidden": "emit_little_endian_word",
+    "case_id": "case-03",
+    "exit_code": 0,
+    "passed": true,
+    "stdout": "\nrunning 1 test\ntest check_contract ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.02s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-453834dd467b935e.exe)\n"
+  },
+  {
+    "candidate_id": 34126,
+    "candidate_role_hidden": "emit_little_endian_word",
+    "case_id": "case-04",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (33312) panicked at tests\\contract.rs:13:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.03s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-453834dd467b935e.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 43520,
+    "candidate_role_hidden": "emit_zero_word",
+    "case_id": "case-01",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (36284) panicked at tests\\contract.rs:13:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "   Compiling e012-bytes-endian-harness v0.1.0 (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\task-harnesses\\bytes-endian)\nwarning: unused variable: `value`\n --> src\\lib.rs:3:25\n  |\n3 | pub fn encode_wire_word(value: u16) -> Bytes {\n  |                         ^^^^^ help: if this is intentional, prefix it with an underscore: `_value`\n  |\n  = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default\n\nwarning: `e012-bytes-endian-harness` (lib) generated 1 warning (run `cargo fix --lib -p e012-bytes-endian-harness` to apply 1 suggestion)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.72s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-453834dd467b935e.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 43520,
+    "candidate_role_hidden": "emit_zero_word",
+    "case_id": "case-02",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (23332) panicked at tests\\contract.rs:13:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "warning: unused variable: `value`\n --> src\\lib.rs:3:25\n  |\n3 | pub fn encode_wire_word(value: u16) -> Bytes {\n  |                         ^^^^^ help: if this is intentional, prefix it with an underscore: `_value`\n  |\n  = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default\n\nwarning: `e012-bytes-endian-harness` (lib) generated 1 warning (run `cargo fix --lib -p e012-bytes-endian-harness` to apply 1 suggestion)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.02s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-453834dd467b935e.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 43520,
+    "candidate_role_hidden": "emit_zero_word",
+    "case_id": "case-03",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (25908) panicked at tests\\contract.rs:13:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "warning: unused variable: `value`\n --> src\\lib.rs:3:25\n  |\n3 | pub fn encode_wire_word(value: u16) -> Bytes {\n  |                         ^^^^^ help: if this is intentional, prefix it with an underscore: `_value`\n  |\n  = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default\n\nwarning: `e012-bytes-endian-harness` (lib) generated 1 warning (run `cargo fix --lib -p e012-bytes-endian-harness` to apply 1 suggestion)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.02s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-453834dd467b935e.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 43520,
+    "candidate_role_hidden": "emit_zero_word",
+    "case_id": "case-04",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (27536) panicked at tests\\contract.rs:13:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "warning: unused variable: `value`\n --> src\\lib.rs:3:25\n  |\n3 | pub fn encode_wire_word(value: u16) -> Bytes {\n  |                         ^^^^^ help: if this is intentional, prefix it with an underscore: `_value`\n  |\n  = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default\n\nwarning: `e012-bytes-endian-harness` (lib) generated 1 warning (run `cargo fix --lib -p e012-bytes-endian-harness` to apply 1 suggestion)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.02s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-453834dd467b935e.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 56199,
+    "candidate_role_hidden": "emit_word_with_extra_byte",
+    "case_id": "case-01",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (6368) panicked at tests\\contract.rs:13:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "   Compiling e012-bytes-endian-harness v0.1.0 (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\task-harnesses\\bytes-endian)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.00s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-453834dd467b935e.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 56199,
+    "candidate_role_hidden": "emit_word_with_extra_byte",
+    "case_id": "case-02",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (46188) panicked at tests\\contract.rs:13:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.03s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-453834dd467b935e.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 56199,
+    "candidate_role_hidden": "emit_word_with_extra_byte",
+    "case_id": "case-03",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (17612) panicked at tests\\contract.rs:13:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.02s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-453834dd467b935e.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": 56199,
+    "candidate_role_hidden": "emit_word_with_extra_byte",
+    "case_id": "case-04",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (19888) panicked at tests\\contract.rs:13:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.02s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-453834dd467b935e.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": null,
+    "candidate_role_hidden": "base_snapshot",
+    "case_id": "case-01",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (44768) panicked at tests\\contract.rs:13:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "   Compiling e012-bytes-endian-harness v0.1.0 (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\task-harnesses\\bytes-endian)\nwarning: unused import: `BufMut`\n --> src\\lib.rs:1:13\n  |\n1 | use bytes::{BufMut, Bytes, BytesMut};\n  |             ^^^^^^\n  |\n  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default\n\nwarning: variable does not need to be mutable\n --> src\\lib.rs:4:9\n  |\n4 |     let mut out = BytesMut::with_capacity(2);\n  |         ----^^^\n  |         |\n  |         help: remove this `mut`\n  |\n  = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default\n\nwarning: `e012-bytes-endian-harness` (lib) generated 2 warnings (run `cargo fix --lib -p e012-bytes-endian-harness` to apply 2 suggestions)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.67s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-453834dd467b935e.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": null,
+    "candidate_role_hidden": "base_snapshot",
+    "case_id": "case-02",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (27084) panicked at tests\\contract.rs:13:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "warning: unused import: `BufMut`\n --> src\\lib.rs:1:13\n  |\n1 | use bytes::{BufMut, Bytes, BytesMut};\n  |             ^^^^^^\n  |\n  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default\n\nwarning: variable does not need to be mutable\n --> src\\lib.rs:4:9\n  |\n4 |     let mut out = BytesMut::with_capacity(2);\n  |         ----^^^\n  |         |\n  |         help: remove this `mut`\n  |\n  = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default\n\nwarning: `e012-bytes-endian-harness` (lib) generated 2 warnings (run `cargo fix --lib -p e012-bytes-endian-harness` to apply 2 suggestions)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.03s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-453834dd467b935e.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": null,
+    "candidate_role_hidden": "base_snapshot",
+    "case_id": "case-03",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (34624) panicked at tests\\contract.rs:13:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "warning: unused import: `BufMut`\n --> src\\lib.rs:1:13\n  |\n1 | use bytes::{BufMut, Bytes, BytesMut};\n  |             ^^^^^^\n  |\n  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default\n\nwarning: variable does not need to be mutable\n --> src\\lib.rs:4:9\n  |\n4 |     let mut out = BytesMut::with_capacity(2);\n  |         ----^^^\n  |         |\n  |         help: remove this `mut`\n  |\n  = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default\n\nwarning: `e012-bytes-endian-harness` (lib) generated 2 warnings (run `cargo fix --lib -p e012-bytes-endian-harness` to apply 2 suggestions)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.02s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-453834dd467b935e.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  },
+  {
+    "candidate_id": null,
+    "candidate_role_hidden": "base_snapshot",
+    "case_id": "case-04",
+    "exit_code": 101,
+    "passed": false,
+    "stdout": "\nrunning 1 test\ntest check_contract ... FAILED\n\nfailures:\n\n---- check_contract stdout ----\n\nthread 'check_contract' (44236) panicked at tests\\contract.rs:13:5:\ntask contract failed\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    check_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "warning: unused import: `BufMut`\n --> src\\lib.rs:1:13\n  |\n1 | use bytes::{BufMut, Bytes, BytesMut};\n  |             ^^^^^^\n  |\n  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default\n\nwarning: variable does not need to be mutable\n --> src\\lib.rs:4:9\n  |\n4 |     let mut out = BytesMut::with_capacity(2);\n  |         ----^^^\n  |         |\n  |         help: remove this `mut`\n  |\n  = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default\n\nwarning: `e012-bytes-endian-harness` (lib) generated 2 warnings (run `cargo fix --lib -p e012-bytes-endian-harness` to apply 2 suggestions)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.02s\n     Running tests\\contract.rs (C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\bank\\construction-01\\target\\bytes-harness\\debug\\deps\\contract-453834dd467b935e.exe)\nerror: test failed, to rerun pass `--test contract`\n"
+  }
+]

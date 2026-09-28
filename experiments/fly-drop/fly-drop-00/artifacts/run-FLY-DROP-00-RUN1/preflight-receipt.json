@@ -1,0 +1,14 @@
+{
+  "execution_manifest_sha256": "813ca75372255d500b26beb2b3d7a55eaf437a4c73ff34c8c27d8ecb777d7ebf",
+  "fit_manifest_count": 656,
+  "operator_count": 41,
+  "outcomes_accessed": false,
+  "paired_cells_verified": 16,
+  "run_contract_sha256": "273294417f579b2974a9dc6f3cb78ea2741363dd62c334017470a50c5c713fce",
+  "run_id": "FLY-DROP-00-RUN1",
+  "seal_sha256": "9dc9235c1b5ebf8c8a426f793100f9081cd1242523c27bab00331c2921e85918",
+  "status": "PASS",
+  "teacher_world_count": 4,
+  "total_optimizer_steps_declared": 839680,
+  "verified_sealed_file_count": 81
+}

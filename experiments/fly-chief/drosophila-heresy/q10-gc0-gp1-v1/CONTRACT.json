@@ -1,0 +1,125 @@
+{
+  "candidate_generation": {
+    "candidate_identity": "canonical coordinate_id to prefix mapping",
+    "cutoff_is_sealed": true,
+    "exact_replay": "sequential_f32_add_after_each_coordinate_from_negative_zero",
+    "exploit_width": 24,
+    "explore_width": 8,
+    "frontier_width": 32,
+    "horizon": "min(32, group_coordinate_count)",
+    "max_unique_replays_per_group": 512,
+    "nonzero_candidates_requested_per_group": 8,
+    "prefix_choices_in_expansion_order": [
+      0,
+      -1,
+      1,
+      -2,
+      2,
+      -4,
+      4,
+      -8,
+      8,
+      -16,
+      16
+    ],
+    "zero_candidate_required": true
+  },
+  "firewall": {
+    "behavioral_probe": false,
+    "engineering_only": true,
+    "gc1_authorized": false,
+    "global_assembly": false,
+    "parent_writes": false,
+    "scientific_promotion": false,
+    "write_root": "experiments/drosophila-heresy/q10-gc0-gp1-v1"
+  },
+  "identity": "q10-gc0-gp1-v1",
+  "parent_bindings": [
+    {
+      "label": "ac2_effects",
+      "path": "experiments/drosophila-heresy/q10-rh1-ac2-v1/qualification/effects.jsonl",
+      "sha256": "4D45D48375385AE8886A744BF9CE8E926140F9181C30966316D7350608327EE5"
+    },
+    {
+      "label": "ac2_features",
+      "path": "experiments/drosophila-heresy/q10-rh1-ac2-v1/qualification/features.jsonl",
+      "sha256": "7EC54C783A97078243D4AA5B1AEDC65AC5FBE0475C8F11561D84FF4D8120C2F2"
+    },
+    {
+      "label": "ac3_contract",
+      "path": "experiments/drosophila-heresy/q10-gc0-ac3-v1/CONTRACT.json",
+      "sha256": "60A5317355D07DC849BE35666587636A17E71821DA9E1CC0F209C77F278790A4"
+    },
+    {
+      "label": "ac3_effects",
+      "path": "experiments/drosophila-heresy/q10-gc0-ac3-v1/qualification/expanded_effects.jsonl",
+      "sha256": "6A0CFF57B00EFF8191F60F79B85A31E25C6138BD361346A93F4174243A7DCC97"
+    },
+    {
+      "label": "ac3_features",
+      "path": "experiments/drosophila-heresy/q10-gc0-ac3-v1/qualification/expanded_features.jsonl",
+      "sha256": "75AB83ED1D832D80D74E4D136F272F11FA9E5F3905E12897A26A4994FCE02268"
+    },
+    {
+      "label": "ac3_status",
+      "path": "experiments/drosophila-heresy/q10-gc0-ac3-v1/qualification/derived/STATUS.json",
+      "sha256": "41D0A104E0EB66349EDE05FF2C63BC4B72B79A7714DCE676B0C30C8359284568"
+    },
+    {
+      "label": "gc0_runner",
+      "path": "experiments/drosophila-heresy/q10-gc0-v1/scripts/run_gc0.py",
+      "sha256": "AEEC0DD2A8D06F65744710B099A581D378C4238139B488B0B67445026AC0CC88"
+    },
+    {
+      "label": "pf0_contract",
+      "path": "experiments/drosophila-heresy/q10-gc0-gp1-pf0-v1/CONTRACT.json",
+      "sha256": "5975F766B0D4F7F4D985971852A101416F050B5FC55CF1ADFAAF61AE33C30CA8"
+    },
+    {
+      "label": "pf0_execution",
+      "path": "experiments/drosophila-heresy/q10-gc0-gp1-pf0-v1/qualification/execution.json",
+      "sha256": "45A4800D22E300FED98FF30A7384BFC31931A13C24556EE48D39F8B46226B410"
+    },
+    {
+      "label": "pf0_plan",
+      "path": "experiments/drosophila-heresy/q10-gc0-gp1-pf0-v1/PLAN.md",
+      "sha256": "41ABC030B774CD63074CA711BB4B61F09553A4A0137B44555DD9ECA2C0E68854"
+    },
+    {
+      "label": "pf0_preexecution",
+      "path": "experiments/drosophila-heresy/q10-gc0-gp1-pf0-v1/PREEXECUTION.json",
+      "sha256": "80CEE4A6167357F556FF49D1259B0A30271025229158D01392CF6A6F2EAAC9FA"
+    },
+    {
+      "label": "pf0_runner",
+      "path": "experiments/drosophila-heresy/q10-gc0-gp1-pf0-v1/scripts/run_pf0.py",
+      "sha256": "C57BF2564279E0CB00C41CBA48641AB32336020B1009C04DEA419541180ED646"
+    },
+    {
+      "label": "pf0_status",
+      "path": "experiments/drosophila-heresy/q10-gc0-gp1-pf0-v1/qualification/derived/STATUS.json",
+      "sha256": "FF68C673B88C8AD010953E37C23B90B6EF203D77FDA1B9CCD2F5198CA10FD6A1"
+    },
+    {
+      "label": "pf0_summary",
+      "path": "experiments/drosophila-heresy/q10-gc0-gp1-pf0-v1/qualification/derived/SUMMARY.json",
+      "sha256": "AD44877A9B9AC92B51354E4EED8D0781E10132E3F98C0ABCAFAC72F91C2F69B7"
+    },
+    {
+      "label": "pf5_contract",
+      "path": "experiments/drosophila-heresy/q10-pf5-v1/CONTRACT.json",
+      "sha256": "20995E1826A9C62E0E8689017A2F3E624CC9E63B76B210FBD4AB11D7E9E7D34F"
+    }
+  ],
+  "plan_sha256": "F6F7CFC9C450114C7B30718126EB42B8C88EC77A79480135162941D288891C25",
+  "protocol": "Q10-GC0-GP1",
+  "sample": {
+    "expected_endpoint_set_count": 14,
+    "expected_raw_coordinate_context_count": 27075,
+    "expected_raw_group_count": 801,
+    "selection_is_not_post_outcome": true,
+    "selection_is_sealed": true,
+    "source": "sealed RA1 14 endpoint/set sample"
+  },
+  "status": "PREEXECUTION_SEALED_NO_EXECUTION"
+}

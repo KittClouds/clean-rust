@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "attempt_id": "E012-PRECONTACT-AUDIT-ATTEMPT-01",
+  "state": "FAILED_AUDIT_IMPLEMENTATION_ERROR_NO_BANK_MUTATION",
+  "model_contact_authorized": false,
+  "audit_script": "scripts/audit_task_bank_e012_v1_1.py",
+  "audit_script_sha256": "7a0e6e8b5392b799bdc105d2bf857ba9d9964bcecbaa45b5351e52820dfb5533",
+  "frame_projection_lock_sha256": "938e60fe593971db416e392d2e79ed247af7a08fac112fb518a55d3d0a447ea7",
+  "frame_sha256": "77ef434369ad6addd43dafe9f7070182c34df003bda745295c9a3d9ffa61616f",
+  "truth_index_sha256": "8812e0eb0c4c6932140066c632e45e8693e792e6bc55baf7a70a0825cc0d9a15",
+  "receipt_file_sha256": "9c8b9c1d652e95fe530e269fd0e5e8660ac5563d6792585bec44e70bb3bf1f9d",
+  "frames_created": 1248,
+  "frames_mutated": false,
+  "error": "ValueError: reverse coordinate control changed position validity counts in help-color-capability",
+  "root_cause": "audit expected identical ordered count vectors; reversing candidate rows should reverse the vector while preserving the count multiset and spread.",
+  "repair_scope": "audit comparator only; no bank or projected frame changes."
+}

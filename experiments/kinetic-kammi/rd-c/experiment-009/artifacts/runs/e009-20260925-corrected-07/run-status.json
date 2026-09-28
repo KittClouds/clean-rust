@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "run_id": "e009-20260925-corrected-07",
+  "phase": "HELDOUT_SCORE_COMPLETE",
+  "state": "SCORED_WITH_FROZEN_THRESHOLDS",
+  "observation_run_id": "e009-20260925-corrected-05",
+  "supersedes_score_attempt": "e009-20260925-corrected-06",
+  "task_bank": "heldout-bank-v6",
+  "completion_mode": "frozen-bank-receipt",
+  "heldout_labels_opened": true,
+  "heldout_labels_prior_access": "aborted scorer attempt e009-20260925-corrected-06; no lane results or tuning",
+  "scored_at_utc": "2026-09-25T18:10:43.810409+00:00",
+  "benchmark_summary_sha256": "d2d44a984330adfd27abcb7917bcac8f916f9793fc4cda60642567cb388427c0",
+  "benchmark_report_sha256": "e59eff2c26771bff95dc716de0a5ce7597486ee8109b968f2585ddfc9994fb15",
+  "promotion_gate_review_sha256": "10fc1dfaaf17d01954f158e2d3cf045a9b70346239ea811c73b38c064f191c90"
+}

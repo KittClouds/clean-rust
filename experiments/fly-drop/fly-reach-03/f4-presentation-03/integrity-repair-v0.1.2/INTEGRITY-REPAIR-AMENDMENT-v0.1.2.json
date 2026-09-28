@@ -1,0 +1,22 @@
+{
+  "analysis_modified": false,
+  "comparative_truth_opened_by_failed_integrity_attempt": false,
+  "exact_diff_path": "VERIFIER-DIFF-v0.1.2.patch",
+  "exact_diff_sha256": "e142eec8e6cc05a20f363c88ce13213852a563d37a1bc4702f4b96c6166a7846",
+  "fit_count": 144,
+  "fit_manifest_sha256": "f71d344c5bc58e86a68e7bd9163aed1ab5d945468bfe84f06a8981e6a1c2ce66",
+  "fits_rerun": false,
+  "full_integrity_audit_restarts_from_beginning": true,
+  "identity": "F4-PRESENTATION-03-INTEGRITY-REPAIR-v0.1.2",
+  "locked_fit_output_tree_manifest_sha256": "cffcb86b1263577cc627df1f62b8af92647b32e7bfe267b509359b4737328d3d",
+  "original_stop_receipt_sha256": "888ca14deee5c6ff738afa4fd7e8848b7c744c9fe0edebab67aac005da4bf362",
+  "original_verifier_sha256": "7c7a756b9bb5e577fe1683d2e4829f1d4e8b2fc9d0347157238b1fc77babcd57",
+  "prediction_lock_sha256": "dd387bcc52510eac947774cb6d9303d8cdd8142cee07a60b0e39cddd4dcb54ce",
+  "raw_outputs_modified": false,
+  "regression_test_sha256": "c62b8b759d3f82c5e29fa85bc8478680326da877a07e61ccefc00d3a89774d39",
+  "repair_admin_script_sha256": "29715600ee295fb2cb69a6473f706fffcaf163b0a03d5970503860cd66d7f299",
+  "repair_scope": "Indent the final stream offset check inside the with-open block in _truth_keys_only, so tell() runs while the file is open.",
+  "repaired_verifier_sha256": "d0b68d7d1d1f8c24db633f4502606281473d1f1d89acb4b8d59e9ad5a5236b3e",
+  "schema": "F4-PRESENTATION-03-integrity-repair-amendment-v0.1.2",
+  "status": "REPAIR_FROZEN_BEFORE_REAUDIT"
+}

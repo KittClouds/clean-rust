@@ -1,0 +1,148 @@
+{
+  "schema_version": 1,
+  "stage": "shadow-small-reasoning-off",
+  "run_id": "e009-20260925-pilot-01",
+  "protocol_amendment_id": "DECODING_AMENDMENT.md#v3",
+  "prior_output_budget_tokens": 128,
+  "output_budget_tokens": 1024,
+  "original_frozen_bundle_blake3": "3df2f05a5eb3641fb6b40c86b56366364e97a79360b5c3005b5f118964ed4b1c",
+  "amended_bundle_lock_sha256": "12bb804e3d26d479f8f539cea42ba2430a821db161acd9f3ed0f4f5a1f3ef03d",
+  "server_reasoning_mode": "off",
+  "server_process_id": 44988,
+  "server_runtime_args": [
+    "--model",
+    "D:\\phoenix-models\\candidates\\minicpm5-2b\\2079a22f3beaa4e306449978533478fe0522f4b3\\MiniCPM5-2B-Q8_0.gguf",
+    "--host",
+    "127.0.0.1",
+    "--port",
+    "18089",
+    "--alias",
+    "e009-small-v1",
+    "--ctx-size",
+    "4096",
+    "--n-gpu-layers",
+    "99",
+    "--reasoning",
+    "off"
+  ],
+  "role": "minicpm5-2b-q8-local-v1",
+  "model": "e009-small-v1",
+  "bundle_id": "minicpm5-2b-q8-local-v1",
+  "bundle_blake3": "076e993a91a522a20a4c555006462d9dcf176ed3b7778a78c0cc15f99d1d538f",
+  "task_id": "coding-embedding-batch-01",
+  "frame_blake3": "0b2cb36975a5440848a351f905363805d4b36dc06d48118e5fdfa84343afe0e3",
+  "request_sha256": "5efe1f147c7edae7730abe43f11fcb116c6a720e4922741a5f5bd4ef151e8355",
+  "request": {
+    "model": "e009-small-v1",
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a typed observer in a deterministic coding workflow. The runtime owns workflow state and will execute only one action from the offered action_options after validating your output.\n\nRead the task_prompt and evidence, then compare the offered actions. Choose the action most likely to satisfy the task while preserving the repository's stated constraints. Do not write or propose code outside the offered choices. Do not claim to have executed tests. If no offered action is sufficiently supported, use null for action_choice and express uncertainty with abstention_milli.\n\nReturn exactly one JSON object matching the provided schema. action_choice must be an offered numeric action ID or null. applicability_milli is your 0-to-1000 estimate that this observer can handle the task from the available evidence. abstention_milli is your 0-to-1000 estimate that the runtime should defer this choice. Use integer values only. Do not add prose or fields.\n"
+      },
+      {
+        "role": "user",
+        "content": "{\"schema_id\":\"rdc-real-coding-observation.v1\",\"task_id\":\"coding-embedding-batch-01\",\"task_family\":\"embedding-length-batched-execution\",\"task_prompt\":\"Reduce padding amplification in batched embedding inference by grouping similar-length inputs, restore output rows to their original positions, and expose padding telemetry. Preserve current model profiles and pooling. Add focused regression tests. Choose one offered patch.\",\"repository_revision\":\"0263e3884d5370f7a9bd2c2217527f4fd87ab33d\",\"snapshot_sha256\":\"2b4c1dccca270c26243164476a8e74f854bb6b3398fe2892d82d038936668235\",\"evidence\":[{\"kind\":\"source_excerpt\",\"source_id\":\"rust-native/phoenix/crates/phoenix-embed/src/lib.rs\",\"content_blake3\":\"23dbef80a6b3624b9e80d3b4430764c5b3656fdcb0462246999511280133a8a7\",\"content\":\"embed_batched_flat clamps batch_size to at least one, allocates a result batch, then passes contiguous input-order chunks to embed_batch_into. It records no padding telemetry and performs no length ordering before inference.\"},{\"kind\":\"baseline_tool_result\",\"source_id\":\"cargo-test-phoenix-embed-base\",\"content_blake3\":\"19c164c02985305379ee4d364e18cfaa03841e06c36586e5473a07cbb596d6f0\",\"content\":\"Frozen base commit: phoenix-embed library tests passed 7/7. No length-bucket stability or padding telemetry tests exist in the base.\"}],\"action_options\":[{\"action\":{\"id\":17,\"schema_id\":1},\"summary\":\"Group by input length and restore the original order without an explicit tie-break key; include run telemetry.\",\"diff_excerpt\":\"`order.sort_unstable_by_key(|&index| texts[index].as_ref().len());` then batch the ordered indices and scatter each output row back by its original index.\",\"patch_sha256\":\"172cf9ef3cb693e16e4200ced496b06755f20b13512bfd5f491727d07f3333fd\"},{\"action\":{\"id\":51,\"schema_id\":1},\"summary\":\"Group by input length, break equal-length ties by original index, restore output order, and report padding telemetry.\",\"diff_excerpt\":\"`order.sort_unstable_by_key(|&index| (texts[index].as_ref().len(), index));` then scatter outputs to original row indices and accumulate token and attention padding counters.\",\"patch_sha256\":\"f1ce1e32ff544355ead558bddf8a681e47be3db064f2f13b8cb2b85d60561a16\"},{\"action\":{\"id\":42,\"schema_id\":1},\"summary\":\"Keep contiguous input-order batching without length sorting or padding telemetry.\",\"diff_excerpt\":\"`for chunk in texts.chunks(batch_size) { self.embed_batch_into(chunk, &mut scratch, &mut rows)?; }`\",\"patch_sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"}]}"
+      }
+    ],
+    "temperature": 0,
+    "top_p": 1,
+    "seed": 0,
+    "max_tokens": 1024,
+    "stream": false,
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rdc_coding_observer_output_v1",
+        "strict": true,
+        "schema": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "rdc-coding-observer-output.v1",
+          "title": "RDC Coding Observer Output v1",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "action_choice",
+            "applicability_milli",
+            "abstention_milli"
+          ],
+          "properties": {
+            "action_choice": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 65535
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "applicability_milli": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1000
+            },
+            "abstention_milli": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1000
+            }
+          }
+        }
+      }
+    }
+  },
+  "http_status": 200,
+  "response": {
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "{\"action_choice\":51,\"applicability_milli\":95,\"abstention_milli\":0}"
+        }
+      }
+    ],
+    "created": 1790348122,
+    "model": "e009-small-v1",
+    "system_fingerprint": "b10982-fc82583e6",
+    "object": "chat.completion",
+    "usage": {
+      "completion_tokens": 23,
+      "prompt_tokens": 922,
+      "total_tokens": 945,
+      "prompt_tokens_details": {
+        "cached_tokens": 214
+      }
+    },
+    "id": "chatcmpl-CDImJRZaFIQdGmwYCwsgcK63GfvneHKH",
+    "timings": {
+      "cache_n": 214,
+      "prompt_n": 708,
+      "prompt_ms": 77.534,
+      "prompt_per_token_ms": 0.10951129943502826,
+      "prompt_per_second": 9131.4778032863,
+      "predicted_n": 23,
+      "predicted_ms": 140.489,
+      "predicted_per_token_ms": 6.385863636363637,
+      "predicted_per_second": 156.59589006968517
+    }
+  },
+  "content": "{\"action_choice\":51,\"applicability_milli\":95,\"abstention_milli\":0}",
+  "output": {
+    "action_choice": 51,
+    "applicability_milli": 95,
+    "abstention_milli": 0
+  },
+  "usage": {
+    "completion_tokens": 23,
+    "prompt_tokens": 922,
+    "total_tokens": 945,
+    "prompt_tokens_details": {
+      "cached_tokens": 214
+    }
+  },
+  "elapsed_ms": 242.364
+}

@@ -1,0 +1,24 @@
+{
+  "schema": "KAMMI_LEDGER_RUNTIME_QUALIFICATION_V1",
+  "status": "DEVELOPMENT_RUNTIME_ONLY",
+  "platform": "Windows x86-64",
+  "python": "CPython 3.13.15",
+  "python_packages": {
+    "ladybug": "0.20.2",
+    "jcs": "0.2.1",
+    "fastapi": "0.116.2",
+    "uvicorn": "0.35.0"
+  },
+  "native_ladybug_release": {
+    "source": "https://github.com/LadybugDB/ladybug/releases/download/v0.20.2/liblbug-windows-x86_64.zip",
+    "archive_sha256": "0877d978fe0015e7e63519de7e51028293226656574e2a2b62612d9d9ad2902b",
+    "lbug_shared_dll_sha256": "96e5ca489e34cd0df02c800afc653043bb783ab4fd660f21daae9d2f5ecd7f37"
+  },
+  "development_openssl": {
+    "source_directory": "C:\\Program Files\\Git\\mingw64\\bin",
+    "libssl_3_x64_sha256": "3f73db31036a78cc7f0749c199c8ca594c947ab991b9daed646d73729d1f5c4a",
+    "libcrypto_3_x64_sha256": "ef8dc7e412a064e8bdc9243f8b71dcece44d837794047a69f80b491df8ed25e6"
+  },
+  "qualification_observation": "The Python wheel alone failed to load because the native C API DLL was absent. With the pinned native DLL and the two listed OpenSSL DLLs discoverable, Ladybug 0.20.2 opened an on-disk database and executed a typed node write/read.",
+  "production_lock_status": "PENDING_PORTABLE_NATIVE_DEPENDENCIES_AND_CRASH_DURABILITY"
+}

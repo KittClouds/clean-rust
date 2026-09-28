@@ -1,0 +1,51 @@
+{
+  "engineering_only": true,
+  "identity": "q10-gc1-lr1-requal1-csc1-alg4-comp1-measure1-abort1-v1",
+  "launch_time": "2026-09-19T23:42:33.219218-04:00",
+  "measure1_contract_sha256": "1659201D2CAC0228F07A9E88619C9CB8A811A7192FEC457B065AF6617ACB5765",
+  "measure1_preexecution_sha256": "4A18DF472A9EEECF2EB8E4EEC57E7DFDADEF7572B6C5727340262AB3D5D7B035",
+  "parent_bindings": [
+    {
+      "bytes": 6596,
+      "label": "measure1_contract",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-alg4-comp1-measure1-v1/CONTRACT.json",
+      "sha256": "1659201D2CAC0228F07A9E88619C9CB8A811A7192FEC457B065AF6617ACB5765"
+    },
+    {
+      "bytes": 522,
+      "label": "measure1_preexecution",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-alg4-comp1-measure1-v1/PREEXECUTION.json",
+      "sha256": "4A18DF472A9EEECF2EB8E4EEC57E7DFDADEF7572B6C5727340262AB3D5D7B035"
+    },
+    {
+      "bytes": 1136,
+      "label": "measure1_plan",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-alg4-comp1-measure1-v1/PLAN.md",
+      "sha256": "7265BC05D67FAB83B960E346FFA843E45D3202E86C6FCF8DBB34CDD164618E50"
+    },
+    {
+      "bytes": 17873,
+      "label": "measure1_runner",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-alg4-comp1-measure1-v1/scripts/run_alg4_comp1_measure.py",
+      "sha256": "64BEB8F9BA231848F67EF9846D8624192EF1E164CC8182B136D7F814F67B8385"
+    }
+  ],
+  "parent_pid": 4644,
+  "pid": 5480,
+  "protocol": "Q10-ALG4-COMP1-MEASURE-ABORT1",
+  "reason": "NONPROMOTABLE_SCOPE_DEFECT",
+  "result_chunk_count": 0,
+  "scientific_promotion": false,
+  "status": "INTERRUPTION_AUDIT",
+  "stop_observed": "2026-09-19T23:47:51.6685058-04:00",
+  "write_allowlist": [
+    "PLAN.md",
+    "CONTRACT.json",
+    "PREEXECUTION.json",
+    "execution.json",
+    "STATUS.json",
+    "REPORT.md",
+    "tests/",
+    "tests/test_abort_audit_static.py"
+  ]
+}

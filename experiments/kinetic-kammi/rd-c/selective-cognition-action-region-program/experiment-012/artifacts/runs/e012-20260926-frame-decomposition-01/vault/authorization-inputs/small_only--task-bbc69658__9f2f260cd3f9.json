@@ -1,0 +1,62 @@
+{
+  "task_id": "small_only-task-bbc69658__9f2f260cd3f9",
+  "frame_digest_hex": "9f2f260cd3f98e0bbd59f024f32bc439ee4a0081ca0c288574a7542b55077c20",
+  "request_id_hex": "f0bb42a7d3cdca9c8b8133cd04a05d7cedc741f45eab4a6a50db23fb87bf9999",
+  "response_request_id_hex": "f0bb42a7d3cdca9c8b8133cd04a05d7cedc741f45eab4a6a50db23fb87bf9999",
+  "request_receipt_digest_hex": "7011aaf4823835cd24cc178d6138aa3a908d729afd140893e503f6ed8399f4cc",
+  "response_receipt_digest_hex": "7011aaf4823835cd24cc178d6138aa3a908d729afd140893e503f6ed8399f4cc",
+  "presentation_receipt_hex": "524443510100040000009f2f260cd3f98e0bbd59f024f32bc439ee4a0081ca0c288574a7542b55077c2098d59ccea967496a4195c5f5b86e07d913647a3c86e80407d9b12821f9c9e9e7366ea139f447a1d8ccc4f7a00a5231675c11e9dbe3fc0960a4cfd0b6047982fe70a5527a4ede4cf382e3b67c2f749059bc855f6f471c37ea9b575f08a242be2916826303fb96e8f6d8494b4bf08bc376ab4473801e8204840b2b37b2deff6e6efae1e00f6cc423e76b15dc6b9f7739c4bfefcd95f1ad263938d90733617aa22bf7849267319d2d5e",
+  "action_ledger_path": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\artifacts\\runs\\e012-20260926-frame-decomposition-01\\action-ledgers\\small_only\\task-bbc69658__9f2f260cd3f9.bin",
+  "ordered_options": [
+    {
+      "producer_ordinal": 0,
+      "action": {
+        "id": 28214,
+        "schema_id": 1
+      },
+      "summary": "Apply the candidate change shown in the code excerpt.",
+      "diff_excerpt": "@@ -4,6 +4,11 @@\n     let value: Value = serde_json::from_str(input).ok()?;\n     let mut object = value.as_object()?.clone();\n     object.sort_keys();\n-    // E012 candidate slot.\n-    Some(object.keys().cloned().collect())\n+    #[cfg(feature = \"preserve_order\")]\n+    {\n+        let original: Value = serde_json::from_str(input).ok()?;\n+        Some(original.as_object()?.keys().cloned().collect())\n+    }\n+    #[cfg(not(feature = \"preserve_order\"))]\n+    { None }\n }",
+      "patch_sha256": "a139f447a1d8ccc4f7a00a5231675c11e9dbe3fc0960a4cfd0b6047982fe70a5"
+    },
+    {
+      "producer_ordinal": 1,
+      "action": {
+        "id": 31314,
+        "schema_id": 1
+      },
+      "summary": "Apply the candidate change shown in the code excerpt.",
+      "diff_excerpt": "@@ -4,7 +4,8 @@\n     let value: Value = serde_json::from_str(input).ok()?;\n     let mut object = value.as_object()?.clone();\n     object.sort_keys();\n-    // E012 candidate slot.\n+    let mut object = object.clone();\n+    object.sort_keys();\n-    Some(object.keys().cloned().collect())\n+    Some(object.keys().skip(1).cloned().collect())\n }",
+      "patch_sha256": "4ede4cf382e3b67c2f749059bc855f6f471c37ea9b575f08a242be2916826303"
+    },
+    {
+      "producer_ordinal": 2,
+      "action": {
+        "id": 38651,
+        "schema_id": 1
+      },
+      "summary": "Apply the candidate change shown in the code excerpt.",
+      "diff_excerpt": "@@ -4,6 +4,8 @@\n     let value: Value = serde_json::from_str(input).ok()?;\n     let mut object = value.as_object()?.clone();\n     object.sort_keys();\n-    // E012 candidate slot.\n-    Some(object.keys().cloned().collect())\n+    #[cfg(not(feature = \"preserve_order\"))]\n+    { Some(object.keys().cloned().collect()) }\n+    #[cfg(feature = \"preserve_order\")]\n+    { None }\n }",
+      "patch_sha256": "e8f6d8494b4bf08bc376ab4473801e8204840b2b37b2deff6e6efae1e00f6cc4"
+    },
+    {
+      "producer_ordinal": 3,
+      "action": {
+        "id": 59171,
+        "schema_id": 1
+      },
+      "summary": "Apply the candidate change shown in the code excerpt.",
+      "diff_excerpt": "@@ -4,6 +4,5 @@\n     let value: Value = serde_json::from_str(input).ok()?;\n     let mut object = value.as_object()?.clone();\n     object.sort_keys();\n-    // E012 candidate slot.\n-    Some(object.keys().cloned().collect())\n+    Some(object.keys().rev().cloned().collect())\n }",
+      "patch_sha256": "6b15dc6b9f7739c4bfefcd95f1ad263938d90733617aa22bf7849267319d2d5e"
+    }
+  ],
+  "observer_output": {
+    "action_choice": null,
+    "applicability_milli": 0,
+    "abstention_milli": 1000
+  },
+  "thresholds": {
+    "minimum_applicability_milli": 850,
+    "maximum_abstention_milli": 150
+  },
+  "completion_check_passed": false
+}

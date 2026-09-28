@@ -1,0 +1,1391 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:kammi:wire:v1",
+  "$defs": {
+    "/v1/runs": {
+      "type": "object",
+      "properties": {
+        "run_id": {
+          "type": "string"
+        },
+        "lab": {
+          "type": "string"
+        },
+        "actor": {
+          "type": "string"
+        },
+        "request_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "run_id",
+        "lab",
+        "actor",
+        "request_id"
+      ],
+      "additionalProperties": false
+    },
+    "/v1/actors": {
+      "type": "object",
+      "properties": {
+        "actor_id": {
+          "type": "string"
+        },
+        "kind": {
+          "type": "string"
+        },
+        "lab": {
+          "type": "string"
+        },
+        "credential_sha256": {
+          "type": "string"
+        },
+        "request_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "actor_id",
+        "kind",
+        "lab",
+        "credential_sha256",
+        "request_id"
+      ],
+      "additionalProperties": false
+    },
+    "/v1/grants": {
+      "type": "object",
+      "properties": {
+        "grant_id": {
+          "type": "string"
+        },
+        "actor_id": {
+          "type": "string"
+        },
+        "action": {
+          "type": "string"
+        },
+        "run_id": {
+          "type": "string"
+        },
+        "stage_id": {
+          "type": "string"
+        },
+        "policy_hash": {
+          "type": "string"
+        },
+        "expires_utc": {
+          "type": "string"
+        },
+        "request_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "grant_id",
+        "actor_id",
+        "action",
+        "run_id",
+        "stage_id",
+        "policy_hash",
+        "expires_utc",
+        "request_id"
+      ],
+      "additionalProperties": false
+    },
+    "/v1/policies": {
+      "type": "object",
+      "properties": {
+        "policy": {
+          "type": "object"
+        },
+        "request_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "policy",
+        "request_id"
+      ],
+      "additionalProperties": false
+    },
+    "/v1/panels": {
+      "type": "object",
+      "properties": {
+        "panel_id": {
+          "type": "string"
+        },
+        "artifact_id": {
+          "type": "string"
+        },
+        "lab": {
+          "type": "string"
+        },
+        "request_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "panel_id",
+        "artifact_id",
+        "lab",
+        "request_id"
+      ],
+      "additionalProperties": false
+    },
+    "/v1/resources": {
+      "type": "object",
+      "properties": {
+        "resource_id": {
+          "type": "string"
+        },
+        "kind": {
+          "type": "string"
+        },
+        "host": {
+          "type": "string"
+        },
+        "constraints": {
+          "type": "object"
+        },
+        "request_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "resource_id",
+        "kind",
+        "host",
+        "constraints",
+        "request_id"
+      ],
+      "additionalProperties": false
+    },
+    "/v1/adapters": {
+      "type": "object",
+      "properties": {
+        "adapter_id": {
+          "type": "string"
+        },
+        "request_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "adapter_id",
+        "request_id"
+      ],
+      "additionalProperties": false
+    },
+    "/v1/artifacts/base64": {
+      "type": "object",
+      "properties": {
+        "bytes_base64": {
+          "type": "string"
+        },
+        "kind": {
+          "type": "string"
+        },
+        "actor": {
+          "type": "string"
+        },
+        "request_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "bytes_base64",
+        "kind",
+        "actor",
+        "request_id"
+      ],
+      "additionalProperties": false
+    },
+    "/v1/artifacts/import-local": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "expected_sha256": {
+          "type": "string"
+        },
+        "expected_bytes": {
+          "type": "integer"
+        },
+        "kind": {
+          "type": "string"
+        },
+        "actor": {
+          "type": "string"
+        },
+        "request_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "expected_sha256",
+        "expected_bytes",
+        "kind",
+        "actor",
+        "request_id"
+      ],
+      "additionalProperties": false
+    },
+    "/v1/facts": {
+      "type": "object",
+      "properties": {
+        "fact": {
+          "type": "object"
+        },
+        "actor": {
+          "type": "string"
+        },
+        "request_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "fact",
+        "actor",
+        "request_id"
+      ],
+      "additionalProperties": false
+    },
+    "/v1/specs/bind": {
+      "type": "object",
+      "properties": {
+        "run_id": {
+          "type": "string"
+        },
+        "stage_id": {
+          "type": "string"
+        },
+        "spec_kind": {
+          "type": "string"
+        },
+        "artifact_id": {
+          "type": "string"
+        },
+        "seal_root": {
+          "type": "string"
+        },
+        "actor_id": {
+          "type": "string"
+        },
+        "request_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "run_id",
+        "stage_id",
+        "spec_kind",
+        "artifact_id",
+        "seal_root",
+        "actor_id",
+        "request_id"
+      ],
+      "additionalProperties": false
+    },
+    "/v1/seals": {
+      "type": "object",
+      "properties": {
+        "direct_members": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "parents": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "actor": {
+          "type": "string"
+        },
+        "request_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "direct_members",
+        "parents",
+        "actor",
+        "request_id"
+      ],
+      "additionalProperties": false
+    },
+    "/v1/seals/{root}/verify-for-run": {
+      "type": "object",
+      "properties": {
+        "run_id": {
+          "type": "string"
+        },
+        "stage_id": {
+          "type": "string"
+        },
+        "actor_id": {
+          "type": "string"
+        },
+        "request_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "run_id",
+        "stage_id",
+        "actor_id",
+        "request_id"
+      ],
+      "additionalProperties": false
+    },
+    "/v1/policy/check": {
+      "type": "object",
+      "properties": {
+        "actor_id": {
+          "type": "string"
+        },
+        "run_id": {
+          "type": "string"
+        },
+        "stage_id": {
+          "type": "string"
+        },
+        "request_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "actor_id",
+        "run_id",
+        "stage_id",
+        "request_id"
+      ],
+      "additionalProperties": false
+    },
+    "/v1/authorize": {
+      "type": "object",
+      "properties": {
+        "actor_id": {
+          "type": "string"
+        },
+        "run_id": {
+          "type": "string"
+        },
+        "stage_id": {
+          "type": "string"
+        },
+        "expires_utc": {
+          "type": "string"
+        },
+        "request_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "actor_id",
+        "run_id",
+        "stage_id",
+        "expires_utc",
+        "request_id"
+      ],
+      "additionalProperties": false
+    },
+    "/v1/acceptance/stages/authorize": {
+      "type": "object",
+      "properties": {
+        "actor_id": {
+          "type": "string"
+        },
+        "run_id": {
+          "type": "string"
+        },
+        "stage_id": {
+          "type": "string"
+        },
+        "expires_utc": {
+          "type": "string"
+        },
+        "request_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "actor_id",
+        "run_id",
+        "stage_id",
+        "expires_utc",
+        "request_id"
+      ],
+      "additionalProperties": false
+    },
+    "/v1/panels/{panel_id}/open": {
+      "type": "object",
+      "properties": {
+        "purpose": {
+          "type": "string"
+        },
+        "actor_id": {
+          "type": "string"
+        },
+        "run_id": {
+          "type": "string"
+        },
+        "stage_id": {
+          "type": "string"
+        },
+        "authorization_id": {
+          "type": "string"
+        },
+        "request_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "purpose",
+        "actor_id",
+        "run_id",
+        "stage_id",
+        "authorization_id",
+        "request_id"
+      ],
+      "additionalProperties": false
+    },
+    "/v1/leases/acquire": {
+      "type": "object",
+      "properties": {
+        "resource_id": {
+          "type": "string"
+        },
+        "run_id": {
+          "type": "string"
+        },
+        "stage_id": {
+          "type": "string"
+        },
+        "actor_id": {
+          "type": "string"
+        },
+        "purpose": {
+          "type": "string"
+        },
+        "ttl_seconds": {
+          "type": "integer"
+        },
+        "request_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "resource_id",
+        "run_id",
+        "stage_id",
+        "actor_id",
+        "purpose",
+        "ttl_seconds",
+        "request_id"
+      ],
+      "additionalProperties": false
+    },
+    "/v1/leases/{lease_id}/renew": {
+      "type": "object",
+      "properties": {
+        "actor_id": {
+          "type": "string"
+        },
+        "fencing_token": {
+          "type": "integer"
+        },
+        "ttl_seconds": {
+          "type": "integer"
+        },
+        "request_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "actor_id",
+        "fencing_token",
+        "ttl_seconds",
+        "request_id"
+      ],
+      "additionalProperties": false
+    },
+    "/v1/leases/{lease_id}/release": {
+      "type": "object",
+      "properties": {
+        "actor_id": {
+          "type": "string"
+        },
+        "fencing_token": {
+          "type": "integer"
+        },
+        "request_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "actor_id",
+        "fencing_token",
+        "request_id"
+      ],
+      "additionalProperties": false
+    },
+    "/v1/leases/{lease_id}/validate": {
+      "type": "object",
+      "properties": {
+        "actor_id": {
+          "type": "string"
+        },
+        "resource_id": {
+          "type": "string"
+        },
+        "fencing_token": {
+          "type": "integer"
+        },
+        "run_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "actor_id",
+        "resource_id",
+        "fencing_token",
+        "run_id"
+      ],
+      "additionalProperties": false
+    },
+    "/v1/local/resolve": {
+      "type": "object",
+      "properties": {
+        "actor_id": {
+          "type": "string"
+        },
+        "run_id": {
+          "type": "string"
+        },
+        "stage_id": {
+          "type": "string"
+        },
+        "authorization_id": {
+          "type": "string"
+        },
+        "lease_id": {
+          "type": "string"
+        },
+        "resource_id": {
+          "type": "string"
+        },
+        "fencing_token": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "actor_id",
+        "run_id",
+        "stage_id",
+        "authorization_id",
+        "lease_id",
+        "resource_id",
+        "fencing_token"
+      ],
+      "additionalProperties": false
+    },
+    "/v1/local/validate": {
+      "type": "object",
+      "properties": {
+        "actor_id": {
+          "type": "string"
+        },
+        "run_id": {
+          "type": "string"
+        },
+        "stage_id": {
+          "type": "string"
+        },
+        "authorization_id": {
+          "type": "string"
+        },
+        "lease_id": {
+          "type": "string"
+        },
+        "resource_id": {
+          "type": "string"
+        },
+        "fencing_token": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "actor_id",
+        "run_id",
+        "stage_id",
+        "authorization_id",
+        "lease_id",
+        "resource_id",
+        "fencing_token"
+      ],
+      "additionalProperties": false
+    },
+    "/v1/local/import-output": {
+      "type": "object",
+      "properties": {
+        "actor_id": {
+          "type": "string"
+        },
+        "run_id": {
+          "type": "string"
+        },
+        "stage_id": {
+          "type": "string"
+        },
+        "authorization_id": {
+          "type": "string"
+        },
+        "lease_id": {
+          "type": "string"
+        },
+        "resource_id": {
+          "type": "string"
+        },
+        "fencing_token": {
+          "type": "integer"
+        },
+        "relative_path": {
+          "type": "string"
+        },
+        "expected_sha256": {
+          "type": "string"
+        },
+        "kind": {
+          "type": "string"
+        },
+        "request_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "actor_id",
+        "run_id",
+        "stage_id",
+        "authorization_id",
+        "lease_id",
+        "resource_id",
+        "fencing_token",
+        "relative_path",
+        "expected_sha256",
+        "kind",
+        "request_id"
+      ],
+      "additionalProperties": false
+    },
+    "/v1/local/finish": {
+      "type": "object",
+      "properties": {
+        "actor_id": {
+          "type": "string"
+        },
+        "attempt_id": {
+          "type": "string"
+        },
+        "result": {
+          "type": "object"
+        },
+        "request_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "actor_id",
+        "attempt_id",
+        "result",
+        "request_id"
+      ],
+      "additionalProperties": false
+    },
+    "/v1/local/contact": {
+      "type": "object",
+      "properties": {
+        "actor_id": {
+          "type": "string"
+        },
+        "run_id": {
+          "type": "string"
+        },
+        "stage_id": {
+          "type": "string"
+        },
+        "authorization_id": {
+          "type": "string"
+        },
+        "lease_id": {
+          "type": "string"
+        },
+        "resource_id": {
+          "type": "string"
+        },
+        "fencing_token": {
+          "type": "integer"
+        },
+        "attempt_id": {
+          "type": "string"
+        },
+        "request_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "actor_id",
+        "run_id",
+        "stage_id",
+        "authorization_id",
+        "lease_id",
+        "resource_id",
+        "fencing_token",
+        "attempt_id",
+        "request_id"
+      ],
+      "additionalProperties": false
+    },
+    "/v1/adapters/{adapter_id}/apply": {
+      "type": "object",
+      "properties": {
+        "source_artifact_id": {
+          "type": "string"
+        },
+        "actor_id": {
+          "type": "string"
+        },
+        "run_id": {
+          "type": "string"
+        },
+        "stage_id": {
+          "type": "string"
+        },
+        "authorization_id": {
+          "type": "string"
+        },
+        "purpose": {
+          "type": "string"
+        },
+        "request_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_artifact_id",
+        "actor_id",
+        "run_id",
+        "stage_id",
+        "authorization_id",
+        "purpose",
+        "request_id"
+      ],
+      "additionalProperties": false
+    },
+    "/v1/remote/worker-keys": {
+      "type": "object",
+      "properties": {
+        "worker_actor_id": {
+          "type": "string"
+        },
+        "public_key_hex": {
+          "type": "string"
+        },
+        "request_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "worker_actor_id",
+        "public_key_hex",
+        "request_id"
+      ],
+      "additionalProperties": false
+    },
+    "/v1/remote/bundles": {
+      "type": "object",
+      "properties": {
+        "bundle": {
+          "type": "object"
+        },
+        "actor_id": {
+          "type": "string"
+        },
+        "request_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "bundle",
+        "actor_id",
+        "request_id"
+      ],
+      "additionalProperties": false
+    },
+    "/v1/remote/bundles/{bundle_id}/start": {
+      "type": "object",
+      "properties": {
+        "worker_actor_id": {
+          "type": "string"
+        },
+        "request_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "worker_actor_id",
+        "request_id"
+      ],
+      "additionalProperties": false
+    },
+    "/v1/remote/bundles/{bundle_id}/return": {
+      "type": "object",
+      "properties": {
+        "worker_actor_id": {
+          "type": "string"
+        },
+        "receipt_base64": {
+          "type": "string"
+        },
+        "receipt_signature": {
+          "type": "string"
+        },
+        "outputs_base64": {
+          "type": "object"
+        },
+        "stdout_base64": {
+          "type": "string"
+        },
+        "stderr_base64": {
+          "type": "string"
+        },
+        "request_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "worker_actor_id",
+        "receipt_base64",
+        "receipt_signature",
+        "outputs_base64",
+        "stdout_base64",
+        "stderr_base64",
+        "request_id"
+      ],
+      "additionalProperties": false
+    },
+    "/v1/attempts/start": {
+      "type": "object",
+      "properties": {
+        "attempt_id": {
+          "type": "string"
+        },
+        "actor_id": {
+          "type": "string"
+        },
+        "run_id": {
+          "type": "string"
+        },
+        "stage_id": {
+          "type": "string"
+        },
+        "authorization_id": {
+          "type": "string"
+        },
+        "request_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "attempt_id",
+        "actor_id",
+        "run_id",
+        "stage_id",
+        "authorization_id",
+        "request_id"
+      ],
+      "additionalProperties": false
+    },
+    "/v1/attempts/finish": {
+      "type": "object",
+      "properties": {
+        "attempt_id": {
+          "type": "string"
+        },
+        "actor_id": {
+          "type": "string"
+        },
+        "outcome": {
+          "type": "string"
+        },
+        "evidence_artifact": {
+          "type": "string"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "request_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "attempt_id",
+        "actor_id",
+        "outcome",
+        "evidence_artifact",
+        "reason",
+        "request_id"
+      ],
+      "additionalProperties": false
+    },
+    "/v1/results/declare": {
+      "type": "object",
+      "properties": {
+        "run_id": {
+          "type": "string"
+        },
+        "stage_id": {
+          "type": "string"
+        },
+        "actor_id": {
+          "type": "string"
+        },
+        "authorization_id": {
+          "type": "string"
+        },
+        "seal_root": {
+          "type": "string"
+        },
+        "request_id": {
+          "type": "string"
+        },
+        "predecessor": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "run_id",
+        "stage_id",
+        "actor_id",
+        "authorization_id",
+        "seal_root",
+        "request_id"
+      ],
+      "additionalProperties": false
+    },
+    "/v1/memory": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string"
+        },
+        "scope": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        },
+        "actor_id": {
+          "type": "string"
+        },
+        "request_id": {
+          "type": "string"
+        },
+        "custody_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "confidence": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "scope",
+        "text",
+        "actor_id",
+        "request_id"
+      ],
+      "additionalProperties": false
+    },
+    "/v1/memory/search": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string"
+        },
+        "scope": {
+          "type": "string"
+        },
+        "actor_id": {
+          "type": "string"
+        },
+        "request_id": {
+          "type": "string"
+        },
+        "mode": {
+          "type": "string"
+        },
+        "limit": {
+          "type": "integer"
+        },
+        "grounded_only": {
+          "type": "boolean"
+        },
+        "exclude_kinds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "include_superseded": {
+          "type": "boolean"
+        },
+        "seed_memory": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "query",
+        "scope",
+        "actor_id",
+        "request_id"
+      ],
+      "additionalProperties": false
+    },
+    "/v1/memory/supersede": {
+      "type": "object",
+      "properties": {
+        "old_id": {
+          "type": "string"
+        },
+        "new_id": {
+          "type": "string"
+        },
+        "actor_id": {
+          "type": "string"
+        },
+        "request_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "old_id",
+        "new_id",
+        "actor_id",
+        "request_id"
+      ],
+      "additionalProperties": false
+    },
+    "/v1/vaults": {
+      "type": "object",
+      "properties": {
+        "vault_id": {
+          "type": "string"
+        },
+        "actor_id": {
+          "type": "string"
+        },
+        "request_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "vault_id",
+        "actor_id",
+        "request_id"
+      ],
+      "additionalProperties": false
+    },
+    "/v1/vaults/source": {
+      "type": "object",
+      "properties": {
+        "vault_id": {
+          "type": "string"
+        },
+        "source_id": {
+          "type": "string"
+        },
+        "base_revision": {
+          "type": "integer"
+        },
+        "content_base64": {
+          "type": "string"
+        },
+        "actor_id": {
+          "type": "string"
+        },
+        "request_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "vault_id",
+        "source_id",
+        "base_revision",
+        "content_base64",
+        "actor_id",
+        "request_id"
+      ],
+      "additionalProperties": false
+    },
+    "/v1/vaults/asset": {
+      "type": "object",
+      "properties": {
+        "vault_id": {
+          "type": "string"
+        },
+        "kind": {
+          "type": "string"
+        },
+        "content_base64": {
+          "type": "string"
+        },
+        "actor_id": {
+          "type": "string"
+        },
+        "request_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "vault_id",
+        "kind",
+        "content_base64",
+        "actor_id",
+        "request_id"
+      ],
+      "additionalProperties": false
+    },
+    "/v1/vaults/generation": {
+      "type": "object",
+      "properties": {
+        "vault_id": {
+          "type": "string"
+        },
+        "source_epoch": {
+          "type": "integer"
+        },
+        "generation_id": {
+          "type": "integer"
+        },
+        "manifest_artifact_id": {
+          "type": "string"
+        },
+        "asset_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "actor_id": {
+          "type": "string"
+        },
+        "request_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "vault_id",
+        "source_epoch",
+        "generation_id",
+        "manifest_artifact_id",
+        "asset_ids",
+        "actor_id",
+        "request_id"
+      ],
+      "additionalProperties": false
+    },
+    "/v1/vaults/reader": {
+      "type": "object",
+      "properties": {
+        "vault_id": {
+          "type": "string"
+        },
+        "source_id": {
+          "type": "string"
+        },
+        "revision": {
+          "type": "integer"
+        },
+        "offset": {
+          "type": "integer"
+        },
+        "actor_id": {
+          "type": "string"
+        },
+        "request_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "vault_id",
+        "source_id",
+        "revision",
+        "offset",
+        "actor_id",
+        "request_id"
+      ],
+      "additionalProperties": false
+    },
+    "/v1/vaults/product-primary": {
+      "type": "object",
+      "properties": {
+        "vault_id": {
+          "type": "string"
+        },
+        "source_epoch": {
+          "type": "integer"
+        },
+        "receipt_artifact_id": {
+          "type": "string"
+        },
+        "actor_id": {
+          "type": "string"
+        },
+        "request_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "vault_id",
+        "source_epoch",
+        "receipt_artifact_id",
+        "actor_id",
+        "request_id"
+      ],
+      "additionalProperties": false
+    },
+    "ArtifactResponse": {
+      "type": "object",
+      "properties": {
+        "artifact_id": {
+          "type": "string"
+        },
+        "event_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "artifact_id",
+        "event_id"
+      ],
+      "additionalProperties": false
+    },
+    "EventResponse": {
+      "type": "object",
+      "properties": {
+        "event_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "event_id"
+      ],
+      "additionalProperties": false
+    },
+    "AuthorizationResponse": {
+      "type": "object",
+      "properties": {
+        "event_id": {
+          "type": "string"
+        },
+        "receipt": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "event_id",
+        "receipt"
+      ],
+      "additionalProperties": false
+    },
+    "MemoryRecordResponse": {
+      "type": "object",
+      "properties": {
+        "memory_id": {
+          "type": "string"
+        },
+        "event_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "memory_id",
+        "event_id"
+      ],
+      "additionalProperties": false
+    },
+    "MemorySearchResponse": {
+      "type": "object",
+      "properties": {
+        "authority": {
+          "type": "string"
+        },
+        "mode": {
+          "type": "string"
+        },
+        "results": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      },
+      "required": [
+        "authority",
+        "mode",
+        "results"
+      ],
+      "additionalProperties": false
+    },
+    "ExposureResponse": {
+      "type": "object",
+      "properties": {
+        "bytes_base64": {
+          "type": "string"
+        },
+        "exposure_event": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "bytes_base64",
+        "exposure_event"
+      ],
+      "additionalProperties": false
+    },
+    "ErrorResponse": {
+      "type": "object",
+      "properties": {
+        "detail": {}
+      },
+      "required": [
+        "detail"
+      ]
+    }
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "task_id": "small_only-task-2c0d08b1__5352936600d4",
+  "frame_digest_hex": "5352936600d4a30e857653f6bc21fc95a51d3bbf26cbab32372c441a9fc25768",
+  "request_id_hex": "f322be99c72b439159c31eeaa21ec02ff4e1252a4864d7c03e278809f1dbd844",
+  "response_request_id_hex": "f322be99c72b439159c31eeaa21ec02ff4e1252a4864d7c03e278809f1dbd844",
+  "request_receipt_digest_hex": "67c950379893923cadc3660724780a65453c607ff494a49f566aa88080cbb8e1",
+  "response_receipt_digest_hex": "67c950379893923cadc3660724780a65453c607ff494a49f566aa88080cbb8e1",
+  "presentation_receipt_hex": "524443510100040000005352936600d4a30e857653f6bc21fc95a51d3bbf26cbab32372c441a9fc2576893eaac62da78c8d8754fe3160cfddc9aaef48936ad9023ac343b3112df345bf47b79e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b8556a85d3c5b1ecda36f3762a0912105d963d808f530d491febbf8f89b70ec52bca8a1c818f1e5ab6bec6680143154e285e9b5c8a2a175c0d8716d0190bd93e7d07b6e652347cfadbc163300c0b7246a40655f8497adf3911cff3733c5827550ca851c7c202eba5",
+  "action_ledger_path": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\artifacts\\runs\\e012-20260926-frame-decomposition-01\\action-ledgers\\small_only\\task-2c0d08b1__5352936600d4.bin",
+  "ordered_options": [
+    {
+      "producer_ordinal": 0,
+      "action": {
+        "id": 31099,
+        "schema_id": 1
+      },
+      "summary": "Apply the candidate change shown in the code excerpt.",
+      "diff_excerpt": "",
+      "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "producer_ordinal": 1,
+      "action": {
+        "id": 34154,
+        "schema_id": 1
+      },
+      "summary": "Apply the candidate change shown in the code excerpt.",
+      "diff_excerpt": "@@ -2,6 +2,6 @@\n \n pub fn byte_at_task_cursor(input: &[u8]) -> u8 {\n     let mut cursor = input;\n-    cursor.advance(0);\n+    cursor.advance(1);\n     cursor.get_u8()\n }",
+      "patch_sha256": "d3c5b1ecda36f3762a0912105d963d808f530d491febbf8f89b70ec52bca8a1c"
+    },
+    {
+      "producer_ordinal": 2,
+      "action": {
+        "id": 36737,
+        "schema_id": 1
+      },
+      "summary": "Apply the candidate change shown in the code excerpt.",
+      "diff_excerpt": "@@ -2,6 +2,6 @@\n \n pub fn byte_at_task_cursor(input: &[u8]) -> u8 {\n     let mut cursor = input;\n-    cursor.advance(0);\n+    cursor.advance(3);\n     cursor.get_u8()\n }",
+      "patch_sha256": "1e5ab6bec6680143154e285e9b5c8a2a175c0d8716d0190bd93e7d07b6e65234"
+    },
+    {
+      "producer_ordinal": 3,
+      "action": {
+        "id": 64124,
+        "schema_id": 1
+      },
+      "summary": "Apply the candidate change shown in the code excerpt.",
+      "diff_excerpt": "@@ -2,6 +2,6 @@\n \n pub fn byte_at_task_cursor(input: &[u8]) -> u8 {\n     let mut cursor = input;\n-    cursor.advance(0);\n+    cursor.advance(2);\n     cursor.get_u8()\n }",
+      "patch_sha256": "dbc163300c0b7246a40655f8497adf3911cff3733c5827550ca851c7c202eba5"
+    }
+  ],
+  "observer_output": {
+    "action_choice": 31099,
+    "applicability_milli": 1000,
+    "abstention_milli": 0
+  },
+  "thresholds": {
+    "minimum_applicability_milli": 850,
+    "maximum_abstention_milli": 150
+  },
+  "completion_check_passed": false
+}

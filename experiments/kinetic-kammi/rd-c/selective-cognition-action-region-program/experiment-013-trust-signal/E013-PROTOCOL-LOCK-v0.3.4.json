@@ -1,0 +1,52 @@
+{
+  "artifact_paths": {
+    "amendment": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-013-trust-signal\\E013-PROTOCOL-AMENDMENT-v0.3.4.md",
+    "generator": "C:\\Users\\shuga\\.codex\\worktrees\\e013-episode-factory\\clean-rust\\experiments\\e013-episode-factory\\precontact-v031\\lock_decisions_v034.py",
+    "parent_lock_v032": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-013-trust-signal\\E013-PROTOCOL-LOCK-v0.3.2.json",
+    "parent_verification_v032": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-013-trust-signal\\E013-PRECONTACT-VERIFICATION-v0.3.2.json",
+    "projections_v032": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-013-trust-signal\\E013-FEASIBILITY-PROJECTIONS-v0.3.2.json",
+    "supplement_lock_v033": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-013-trust-signal\\E013-PRECONTACT-SUPPLEMENT-LOCK-v0.3.3.json",
+    "supplement_verification_v033": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-013-trust-signal\\E013-PRECONTACT-SUPPLEMENT-VERIFICATION-v0.3.3.json"
+  },
+  "bank_owner": "USER",
+  "banks_generated_by_agent": false,
+  "effective_lineage": [
+    "sealed v0.3",
+    "v0.3.1 bank/resource amendment",
+    "v0.3.2 FAR correction",
+    "v0.3.3 feasibility supplement",
+    "v0.3.4 uncertainty and selection locks"
+  ],
+  "locked_signal_selection": "highest-coverage dev OOF point meeting n>=60 and exact one-sided CP95 upper risk<=5%; filter by measured T<Tmax; select lowest FAR at its operating point; exact ties by cost then T1,T2,T3,T4,T5,COMBINATION",
+  "locked_wall_time_rule": {
+    "bound": "one-sided 95% upper bound < 0 on mean paired routed-minus-large-only ms/task",
+    "method": "two-stage paired repository/family-block bootstrap",
+    "numpy_bit_generator": "PCG64",
+    "quantile": "nearest rank 95th percentile",
+    "replicates": 100000,
+    "seed": 13034
+  },
+  "model_contact_authorized": false,
+  "model_contact_performed": false,
+  "parent_v032_lock_sha256": "fbac0d86ffd6a593793d2a35d00d2250ae63b52a0abec99864d36456d1af1adb",
+  "positive_control": {
+    "bank_status": "USER_BUILD_PENDING",
+    "contact_authorized": true,
+    "id": "E012-PC-01-v1.2",
+    "run_status": "NOT_RUN"
+  },
+  "protocol_id": "E013-TRUST-SIGNAL-DEVELOPMENT-v0.3.4",
+  "schema_version": 1,
+  "self_hash_note": "Lock excludes itself and the post-lock verification receipt.",
+  "sha256": {
+    "amendment": "79a2475857f7d7ec72a61bdf65500b2744865a9951958870ab6ca05be78710e1",
+    "generator": "db4b2755d6a706813569b9860911735242232e50920ce1d5a7c5129714451683",
+    "parent_lock_v032": "fbac0d86ffd6a593793d2a35d00d2250ae63b52a0abec99864d36456d1af1adb",
+    "parent_verification_v032": "4081425f5cf6cb61be6674560c70afbc1a4803bcf721696aff086c72e880ca66",
+    "projections_v032": "7f71d0dc6d619dfbeea03cd25a1c9dc3d7e80737f47558cb8fa47cad1e944c88",
+    "supplement_lock_v033": "a3445cac2493e8b448f4ffeefd189fa7bd40e8b33a4ff99e2af995fdd255146b",
+    "supplement_verification_v033": "f3d31c61c37e3bb95dff3904185cdd436cc49a1e5bf12cfb4019aeafbcad223c"
+  },
+  "state": "SEALED_PRECONTACT_DESIGN_ONLY",
+  "supplement_v033_lock_sha256": "a3445cac2493e8b448f4ffeefd189fa7bd40e8b33a4ff99e2af995fdd255146b"
+}

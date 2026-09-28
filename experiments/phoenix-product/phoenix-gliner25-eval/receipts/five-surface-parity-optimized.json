@@ -1,0 +1,44 @@
+{
+  "contract": "phoenix-gliner25-five-surface-parity-v1",
+  "passed": true,
+  "thresholds": {
+    "max_probability_delta": 1e-05,
+    "max_objective_delta": 0.0001
+  },
+  "summary": {
+    "feature_names_exact": true,
+    "statuses_observed": true,
+    "all_structures_exact": true,
+    "max_probability_delta": 2.6226043701171875e-06,
+    "classification_objective_delta": 5.245208740234375e-06,
+    "graph_publications": 0
+  },
+  "features": {
+    "long_context": {
+      "structure_exact": true,
+      "max_probability_delta": 1.3709068298339844e-06
+    },
+    "unlimited_span_candidate": {
+      "structure_exact": true,
+      "max_probability_delta": 2.6226043701171875e-06
+    },
+    "span_attributes": {
+      "structure_exact": true,
+      "max_probability_delta": 6.258487701416016e-07
+    },
+    "constrained_classification": {
+      "structure_exact": true,
+      "max_probability_delta": 5.913237333121657e-08,
+      "objective_delta": 5.245208740234375e-06
+    },
+    "joint_information_extraction": {
+      "structure_exact": true,
+      "max_probability_delta": 3.4882139232639275e-07
+    }
+  },
+  "lineage": {
+    "python_receipt_sha256": "e71da8f54d8e2db0d5f21e52b97a2e6165fbe2bf16440c756c100c28c621ad87",
+    "rust_receipt_sha256": "5671c3b5e90ff3c296082808408a0db89374879fc25d1c0ed07e760988e31e5f",
+    "onnx_manifest_sha256": "2f07b983611c6c95f40400469ffadb3e3178c5e18053e34bded60dae434a8bf4"
+  }
+}

@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "program": "Selective Cognition / Action Region Program",
+  "experiment": "E012 Prospective Frame Decomposition",
+  "protocol_version": 0,
+  "state": "FROZEN_FOR_BANK_CONSTRUCTION",
+  "model_contact_authorized": false,
+  "decision_system": {
+    "candidate_producer": "E012 frozen generator; coordinate schedule is a preregistered constructor argument",
+    "presentation_contract": "rdc-candidate-presentation.v1; ordinal assigned at candidate creation; receipt binds task digest and ordered action-id/patch-digest pairs",
+    "observer": "E009 v5 small observer; large v5 used only on full-frame baseline/hybrid fallback",
+    "thresholds_milli": {
+      "minimum_applicability": 850,
+      "maximum_abstention": 150
+    },
+    "authority": "E002 deterministic authority plus E011 receipt binding and replay"
+  },
+  "channels": {
+    "E_t": {
+      "name": "task_request_evidence",
+      "truth_bearing": true,
+      "operations": ["PRESENT", "ABSENT", "NONINFORMATIVE_CONTROL", "SWAPPED"],
+      "absent_value": "fixed typed sentinel; original retained in bank vault"
+    },
+    "E_c": {
+      "name": "candidate_action_evidence",
+      "truth_bearing": true,
+      "operations": ["PRESENT", "ABSENT", "NONINFORMATIVE_CONTROL", "SWAPPED"],
+      "absent_value": "fixed typed sentinel for candidate text; stable independently randomized action IDs retained"
+    },
+    "E_x": {
+      "name": "pre_action_test_execution_evidence",
+      "truth_bearing": true,
+      "operations": ["PRESENT", "ABSENT", "NONINFORMATIVE_CONTROL", "SWAPPED"],
+      "absent_value": "fixed typed sentinel; no candidate-specific pass/fail or hidden completion label in any frame"
+    },
+    "E_r": {
+      "name": "repository_context_metadata",
+      "truth_bearing": true,
+      "operations": ["PRESENT", "ABSENT", "NONINFORMATIVE_CONTROL", "SWAPPED"],
+      "absent_value": "fixed typed sentinel; task semantics and source code remain in their own channels"
+    },
+    "E_p": {
+      "name": "candidate_positional_coordinates",
+      "truth_bearing": false,
+      "operations": ["PRESENT", "ABSENT_NOT_APPLICABLE", "NONINFORMATIVE_CONTROL", "SWAPPED"],
+      "absent_value": "not representable for ordered candidate arrays; no set-without-position claim",
+      "assignment": "prospective schedule at candidate construction; ordinals and receipt created for that exact sequence; no post-receipt reorder"
+    }
+  },
+  "task_bank_minimums": {
+    "task_count": 48,
+    "task_families": 12,
+    "repositories": 3,
+    "repositories_new_to_e010_e011": true,
+    "families_per_dependency_stratum_minimum": 2,
+    "strata": [
+      "task_request_dominant",
+      "candidate_action_dominant",
+      "pre_action_test_execution_dominant",
+      "joint_support",
+      "context_sensitive",
+      "abstention_positive"
+    ]
+  },
+  "locked_conditions": [
+    "full_frame",
+    "leave_out_E_t",
+    "leave_out_E_c",
+    "leave_out_E_x",
+    "leave_out_E_r",
+    "E_t_only",
+    "E_c_only",
+    "E_x_only",
+    "E_r_only",
+    "E_t_plus_E_c",
+    "E_c_plus_E_x",
+    "E_t_plus_E_x",
+    "E_t_plus_E_r",
+    "per_channel_noninformative_control",
+    "per_channel_isomorphic_swap",
+    "E_p_balanced_coordinate_control",
+    "E_p_isomorphic_donor_coordinate"
+  ],
+  "full_frame_admission": {
+    "minimum_direct_actions": 8,
+    "minimum_task_families": 3,
+    "minimum_repositories": 2,
+    "wrong_or_unsupported_direct_actions": 0,
+    "hybrid_completion_at_least_always_large": true,
+    "illegal_commits": 0,
+    "duplicate_effects": 0,
+    "presentation_binding_failures": 0,
+    "replay_mismatches": 0
+  },
+  "review_lifecycle": [
+    "seal_raw_results",
+    "independent_reviews_on_identical_packet",
+    "cross_review_delta_preserves_disagreement",
+    "synthesis_directs_next_experiment"
+  ],
+  "lineage_boundaries": {
+    "upstream_science_claims_mutable": false,
+    "observer_tuning_in_E012": false,
+    "prompt_or_threshold_changes_in_E012": false,
+    "posthoc_candidate_sorting": false
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "schema": "KAMMI_ACCEPTANCE_FAILURE_HISTORY_V1",
+  "parent": "FAILURES-PRESERVED-v1.json",
+  "failures": [
+    {"id":"memory-stress-v1","failure":"native process terminated after 1202 committed MemoryRecorded events; memory projection WAL failed reopening","evidence":"memory-20260927-123055/execution.log and .kammi-dev/memory-stress-20260927-123055/projection-recovery","repair":"preserve failed projection; pin C API backend; bound each database to 256 MiB/two threads; replay from CAS+journal","causal_claim":"backend ambiguity and runtime resource bounds corrected; native termination cause not independently established"},
+    {"id":"cleanroom-capi-v2","failure":"explicit native backend exposed leaked database/connection handles; restart fixtures could not acquire Ladybug lock","evidence":"cleanroom test failure transcript","repair":"explicitly close query-result-owning connections before databases; retain OS writer lock until closure; correct fixtures to use qualified close"}
+  ]
+}

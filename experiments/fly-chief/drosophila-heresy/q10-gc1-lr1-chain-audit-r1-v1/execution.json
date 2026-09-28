@@ -1,0 +1,32 @@
+{
+  "captured_at_utc": "2026-09-18T15:54:44.464580+00:00",
+  "decisions": [
+    "DO_NOT_RUN_RIS1",
+    "DO_NOT_RUN_NEW_SALL1",
+    "DO_NOT_REBIND_HISTORICAL_CONTRACTS_IN_PLACE",
+    "REQUALIFY_FROM_A_NEW_CURRENT_RUNTIME_CLOSURE_BELOW_PF5"
+  ],
+  "historical_measurements_used": false,
+  "identity": "q10-gc1-lr1-chain-audit-r1-v1",
+  "mutation_policy": "read_only",
+  "next_gate": "Q10-GC1-LR1-REQUAL1-CURRENT-CLOSURE-BELOW-PF5",
+  "parent_mutation": false,
+  "prior_audit": "q10-gc1-lr1-chain-audit-v1",
+  "prior_status": "FAILED_CURRENT_RUNTIME_CLOSURE",
+  "protocol": "Q10-GC1-LR1-RECURSIVE-RUNTIME-CLOSURE-AUDIT-R1",
+  "runtime_smokes": [
+    {
+      "error": "RH1-F2 parent drift: rh1_cq1_contract",
+      "runtime": "RH1-F2",
+      "status": "FAILED_BEFORE_REPLAY"
+    },
+    {
+      "error": "hash mismatch for Q10-PF5 PLAN.md",
+      "runtime": "PF5",
+      "status": "FAILED_BEFORE_STATE_RECONSTRUCTION"
+    }
+  ],
+  "scientific_promotion": false,
+  "scope": "read_only_recursive_parent_and_runtime_closure_audit_revision",
+  "status": "FAILED_CURRENT_RUNTIME_CLOSURE_BELOW_PF5"
+}

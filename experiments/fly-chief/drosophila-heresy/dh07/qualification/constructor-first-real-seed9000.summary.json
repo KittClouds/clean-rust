@@ -1,0 +1,37 @@
+{
+  "protocol": "DH-07",
+  "stage": "constructor_first_real_qualification",
+  "status": "BLOCKED",
+  "measured_sample": false,
+  "seed": 9000,
+  "side": "R",
+  "tau": 4.0,
+  "true_endpoint_compatibility": "exact final weights, curves, and acquisition hashes in both parallel contexts",
+  "null_perpendicular": {
+    "reversal_trial": 1,
+    "support_size": 8446,
+    "base_at_lower_bound": 228,
+    "base_at_upper_bound": 0,
+    "target_l2": 1.2357305702259622,
+    "true_axis_cosine": -0.0008165776171753395,
+    "attempts": 0,
+    "reason": "realized true intervention exceeds acquisition-axis leakage gate"
+  },
+  "parallel_null": {
+    "reversal_trial": 1,
+    "support_size": 8446,
+    "base_at_lower_bound": 0,
+    "base_at_upper_bound": 0,
+    "target_l2": 1.2361914082837924,
+    "true_axis_cosine": -4.72447759400283e-9,
+    "attempts": 64,
+    "bound_rejections": 64,
+    "reason": "frozen 64-candidate constructor found no feasible jointly orthogonal equal-L2 direction"
+  },
+  "failure_commit_semantics": "failure occurs before the causal weight target is committed",
+  "full_receipt": "constructor-first-real-seed9000.json",
+  "full_receipt_bytes": 1870758,
+  "full_receipt_sha256": "B0807C8BCF6A3A0595570AC7215890276A5E7A21A74F79D6AFEA6E265796CFAA",
+  "independent_replay": "../../supervision/dh07/snapshot_audit.json",
+  "limitation": "the receipt-producing executable was not hashed before later test-only compilation overwrote it"
+}

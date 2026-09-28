@@ -1,0 +1,24 @@
+{
+  "seeds": [
+    1000
+  ],
+  "settings": [
+    {
+      "name": "tau4_glut_inhibitory",
+      "tau": 4.0,
+      "glut_sign": -1.0
+    }
+  ],
+  "suites": [
+    {
+      "name": "primary",
+      "side": "R",
+      "cues": 16,
+      "distractors": 4,
+      "input_salt": 286326784
+    }
+  ],
+  "trials": 512,
+  "eta": 0.05,
+  "threads": 1
+}

@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "state": "SEALED_BEFORE_MODEL_CONTACT",
+  "run_id": "e011-r2-20260925-presentation-factorial-01",
+  "created_utc": "2026-09-25T20:46:10.034113+00:00",
+  "input_lock_sha256": "145ed40927e766f5da6db06c9beff573564a23bc54211872b24b79b8dddf12ca",
+  "code_sha256": {
+    "spec.md": "456c2323d1da87e098a22f4b60ae20454e43513389ca22b27fe9a71665dd3c7b",
+    "scripts/factorial.py": "bac0140848f5971cbcc1a3da0200222b87201a5b84a63b805a3b8a49ed9bb6d0",
+    "scripts/start_factorial_observer.ps1": "7b6f18693c66742da9548db624b64f0ac0b482021ba0cd4370307f9903ff1914",
+    "scripts/stop_factorial_observer.ps1": "008c0cb8484343d1c3f9795e211220f4b0788947f1965e8dffdf36c4779dd5c3"
+  },
+  "condition_frame_locks_sha256": {
+    "ids-only": "af319c25cc3f6cf11ecac2d506ad4e8cdd8606501d42de4a4d7564c252a8c319",
+    "order-only": "2bc405878bcb9f85d1ea6c4d62239a276b17697f799bd1a6d4360847ddb8ccad"
+  },
+  "model_contact_started": false
+}

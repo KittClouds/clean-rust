@@ -1,0 +1,98 @@
+{
+  "execution_hygiene": {
+    "environment": {
+      "PYTHONDONTWRITEBYTECODE": "1"
+    },
+    "preflight": [
+      "no scripts/__pycache__",
+      "no orphan temporary outputs"
+    ],
+    "python_invocation": [
+      "-B"
+    ],
+    "unexpected_path_policy": "FAIL_PROMOTION",
+    "write_allowlist": [
+      "shards/*.jsonl",
+      "execution.json",
+      "STATUS.json"
+    ]
+  },
+  "final_gates": {
+    "distinctness": "pair state distinct from S and target for exact-alternative label",
+    "domain": "only sealed geometry-screened pairs are replayed",
+    "geometry": "full PF5 geometry metrics and hard DA2 gates",
+    "readout": "exact sequential f32 bits and signed-zero identity"
+  },
+  "firewall": {
+    "behavioral_probe": false,
+    "historical_result_import": false,
+    "scientific_promotion": false
+  },
+  "identity": "q10-gc1-lr1-requal1-sreplace-pairs-rerun1-v1",
+  "identity_parent": "q10-gc1-lr1-requal1-sreplace-pairs-v1",
+  "parent_bindings": [
+    {
+      "label": "pair_domain_execution",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-sreplace-pair-domain-v1/execution.json",
+      "sha256": "B95B2AC4B26415A53DE865D39F3A64A2C60B0104D9134C688205729AB6B35EAB"
+    },
+    {
+      "label": "pair_domain_plan",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-sreplace-pair-domain-v1/PLAN.md",
+      "sha256": "1A93E99FBE74A9206B1E463A6E76CAD182EA52E89F05763EDBA7D7794C1EF3BD"
+    },
+    {
+      "label": "pair_domain_contract",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-sreplace-pair-domain-v1/CONTRACT.json",
+      "sha256": "FAA22B7F70B1C8E451534D0697DA4A5D4CEA681022ABC083D0B92B96CF759C44"
+    },
+    {
+      "label": "pair_domain_runner",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-sreplace-pair-domain-v1/scripts/derive_pair_domain.py",
+      "sha256": "D485E1C8A36779685F622419493F0AC0EBC2563D8DA4ED6573CF1E743C57ABCC"
+    },
+    {
+      "label": "candidate_execution",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-sreplace-candidates-v1/execution.json",
+      "sha256": "F2792DE092933E560CFF09757E71E8763D427663A836DE174A17FF133F6D1B8B"
+    },
+    {
+      "label": "fresh_reference_execution",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-par8-ref1-v1/execution.json",
+      "sha256": "9C47DBA6BF576FC6696E70153F0CE80FB0163B538794BE82158710C1064A04E5"
+    },
+    {
+      "label": "closure_manifest",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-domain-r2-v1/closures/twin-a/MANIFEST.json",
+      "sha256": "F84BB9D1D1E32FE603F29374AFA166B79468CCA7C9F1877B0A46CA1AF1A06606"
+    },
+    {
+      "label": "closure_derived",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-domain-r2-v1/closures/twin-a/DERIVED.json",
+      "sha256": "5BF46E18DFE942C259E46055B893301D86204E2FB8493AE44D41D0BBC3611BFE"
+    },
+    {
+      "label": "current_palette",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-domain-r2-v1/closures/twin-a/repo/experiments/drosophila-heresy/q10-gc0-gp1-par2-v1/qualification/palettes.jsonl",
+      "sha256": "54A2688080A65F5CFE31B11A12F5DA85B92D86BBDE2E42072FB0C0F32F3D3B1A"
+    },
+    {
+      "label": "current_pf5_contract",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-domain-r2-v1/closures/twin-a/repo/experiments/drosophila-heresy/q10-pf5-v1/CONTRACT.json",
+      "sha256": "730D6B03CEE7CE58A9002320372E9F77EC2AB593EC25A71583F59D90D690BC26"
+    }
+  ],
+  "plan_sha256": "0BE7BDEF529E8467FFEAA3B145A84CA1EE55791EE8B393C4F22C7B0F8B68D4FD",
+  "protocol": "REQUAL1-SREPLACE-PAIRS-RERUN1",
+  "runner_sha256": "F3F88BE71620084292568DA0992E9C8CB80A7D34814CF624000FDE52437602FA",
+  "scope": {
+    "behavioral_probe": false,
+    "contexts": 8,
+    "operation": "simultaneous replacement of two distinct groups from the same fresh S",
+    "pair_records": "sealed pair-domain count",
+    "pair_state": "S_AB independently replayed from S",
+    "scientific_promotion": false,
+    "singleton_controls": "S_A and S_B independently replayed from S"
+  },
+  "status": "FROZEN_PRE_EXECUTION__NOT_EXECUTED"
+}

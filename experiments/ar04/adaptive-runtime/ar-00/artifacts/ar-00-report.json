@@ -1,0 +1,31 @@
+{
+  "schema": "adaptive-runtime-ar-00/v1",
+  "scope": "engineering-only",
+  "task": "xor-four-point-mlp",
+  "metrics": {
+    "baseline_accuracy": 1.00000000,
+    "baseline_loss": 0.00009670,
+    "interposed_accuracy": 1.00000000,
+    "interposed_loss": 0.01905420
+  },
+  "arms": {
+    "adamw_baseline": {
+      "epochs": 3000,
+      "final_loss": 0.00009670,
+      "final_accuracy": 1.00000000,
+      "final_mse": 0.00000002,
+      "selected_actions": 0,
+      "no_op_actions": 0,
+      "blocked_actions": 0
+    },
+    "action_runtime": {
+      "epochs": 3000,
+      "final_loss": 0.01905420,
+      "final_accuracy": 1.00000000,
+      "final_mse": 0.00063685,
+      "selected_actions": 21929,
+      "no_op_actions": 29071,
+      "blocked_actions": 17588
+    }
+  }
+}

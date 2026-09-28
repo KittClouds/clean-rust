@@ -1,0 +1,170 @@
+{
+  "schema_version": 1,
+  "run_id": "e011-producer-order-integration-qual-01",
+  "role": "large",
+  "bundle_id": "ternary-bonsai-2-27b-ptq1-local-v5",
+  "task_id": "fresh-turbovec-search-results-trait-set-v2",
+  "repository_id": "turbovec",
+  "frame_blake3": "be58ec162c2406735f59c63d058d6d6dc496eba4df4c49e7ebadb7eabe190737",
+  "serialized_frame_sha256": "9ac8daf125a87ab7788257ed391eb8573b8e03325c23cd431437a6f843686971",
+  "normalization_contract": "percent-0-100-to-milli-x10-v1+line-endings-lf-v1",
+  "thresholds": {
+    "minimum_applicability_milli": 850,
+    "maximum_abstention_milli": 150
+  },
+  "server_alias": "e009-large-v5",
+  "server_process_id": 39896,
+  "server_runtime_args": [
+    "--model",
+    "D:\\phoenix-models\\candidates\\ternary-bonsai-2-27b\\6ed5e12bf84b7a63069882c91dd9e9218647d17b\\Ternary-Bonsai-2-27B-PTQ1_0.gguf",
+    "--host",
+    "127.0.0.1",
+    "--port",
+    "18190",
+    "--alias",
+    "e009-large-v5",
+    "--ctx-size",
+    "4096",
+    "--n-gpu-layers",
+    "99",
+    "--reasoning",
+    "off"
+  ],
+  "reasoning_mode": "off",
+  "chat_template_sha256": "c3cf9e34abf4f9e36c2d72165aa9c132d3e2a725b6c2586aaa3a8af9d7a81041",
+  "maximum_output_tokens": 1024,
+  "system_prompt_sha256": "976ef1cd914bacb366c64418825010124338a626a0400d459858acc7e48f5a48",
+  "output_schema_sha256": "97170fa0d6a44681f680ad0ac533a3f3913709757e4ee6cbf96d9c9f40d1b2fb",
+  "observer_rpc_request": {
+    "request_id_hex": "5b57275dc6e16ad894ab882af458e4dcee28929b6d9f25370b710d3612001203",
+    "receipt_digest_hex": "eb1e6d54f771676c4b0e4bdc26d07f708436dee055778ee2212d977e9a4b3701",
+    "presentation_receipt_hex": "52444351010004000000be58ec162c2406735f59c63d058d6d6dc496eba4df4c49e7ebadb7eabe190737ec6c0c1cc3c3f04672cc62ecf1619d617649b7bd98c0d888f68edd86567ee10c0b00d7c1e233f97f4ca98a72dc565d3133d301c4b3118dee9ead829d3ba18e06c1a32500f1ca29b631625189ac005bac09f87b8ad604ae23f7aa132f716107ebcc6090d8440017bba2661ae4036b0ce69de7fe9345b59183020ce8ba2bfeec7e03edd7141a065e00e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "frame_blake3": "be58ec162c2406735f59c63d058d6d6dc496eba4df4c49e7ebadb7eabe190737"
+  },
+  "request_sha256": "a6e8cf6ca25f6ef596abf714d277a16e15d0cee0ae8c1daefc3028496bc22378",
+  "request": {
+    "model": "e009-large-v5",
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a typed observer in a deterministic coding workflow. The runtime owns workflow state and will execute only one action from the offered action_options after validating your output.\n\nRead the task_prompt and evidence, then compare the offered actions. Choose the action most likely to satisfy the task while preserving the repository's stated constraints. Do not write or propose code outside the offered choices. Do not claim to have executed tests. If no offered action is sufficiently supported, use null for action_choice and express uncertainty with abstention_percent.\n\nReturn exactly one JSON object matching the provided schema. action_choice must be an offered numeric action ID or null. applicability_percent is your estimate from 0 to 100 that this observer can handle the task from the available evidence. abstention_percent is your estimate from 0 to 100 that the runtime should defer this choice. Use integer percentage points only. Do not add prose or fields.\n"
+      },
+      {
+        "role": "user",
+        "content": "{\"schema_id\":\"rdc-real-coding-observation.v1\",\"task_id\":\"fresh-turbovec-search-results-trait-set-v2\",\"task_family\":\"turbovec-search-results-clone-contract\",\"task_prompt\":\"A downstream caller needs to clone a SearchResults value. Repair the missing trait so the compile-time and behavior checks in the exact API test pass.\",\"repository_revision\":\"8202f194a0cbbd52213a004290401e180e5c123d\",\"snapshot_sha256\":\"c861cd20393d80fb2195e4278f754c87ff933c0cbe4bcfda0910113f6806213a\",\"evidence\":[{\"kind\":\"source_and_test_contract\",\"source_id\":\"turbovec/turbovec/src/lib.rs::search_results_implements_the_downstream_derive_set\",\"content_blake3\":\"ae4528a94bdf8c34bd4801fc17a18b2b5958f2744d98536673967c935f703382\",\"content\":\"The task snapshot removed Clone from SearchResults. The frozen public API test asserts Debug, Clone, and PartialEq support, then clones and compares the value.\"}],\"action_options\":[{\"action\":{\"id\":11,\"schema_id\":1},\"summary\":\"Apply the focused implementation patch.\",\"diff_excerpt\":\"--- a/turbovec/src/lib.rs\\n+++ b/turbovec/src/lib.rs\\n@@ -464,7 +464,7 @@\\n /// patterns. Good enough for `assert_eq!` on results the index actually\\n /// returns; not a substitute for comparing scores within a tolerance,\\n /// and not enough to key a map.\\n-#[derive(Debug, PartialEq)]\\n+#[derive(Debug, Clone, PartialEq)]\\n pub struct SearchResults {\\n     /// Scores, row-major `nq × k`, sorted descending within each row\\n     /// (best match first).\",\"patch_sha256\":\"d7c1e233f97f4ca98a72dc565d3133d301c4b3118dee9ead829d3ba18e06c1a3\"},{\"action\":{\"id\":37,\"schema_id\":1},\"summary\":\"Apply the focused patch with a contract comment.\",\"diff_excerpt\":\"--- a/turbovec/src/lib.rs\\n+++ b/turbovec/src/lib.rs\\n@@ -464,7 +464,8 @@\\n /// patterns. Good enough for `assert_eq!` on results the index actually\\n /// returns; not a substitute for comparing scores within a tolerance,\\n /// and not enough to key a map.\\n-#[derive(Debug, PartialEq)]\\n+/// Cloning owns independent result buffers.\\n+#[derive(Debug, Clone, PartialEq)]\\n pub struct SearchResults {\\n     /// Scores, row-major `nq × k`, sorted descending within each row\\n     /// (best match first).\",\"patch_sha256\":\"f1ca29b631625189ac005bac09f87b8ad604ae23f7aa132f716107ebcc6090d8\"},{\"action\":{\"id\":68,\"schema_id\":1},\"summary\":\"Apply this plausible alternate change.\",\"diff_excerpt\":\"--- a/turbovec/src/lib.rs\\n+++ b/turbovec/src/lib.rs\\n@@ -464,7 +464,7 @@\\n /// patterns. Good enough for `assert_eq!` on results the index actually\\n /// returns; not a substitute for comparing scores within a tolerance,\\n /// and not enough to key a map.\\n-#[derive(Debug, PartialEq)]\\n+#[derive(Debug, Copy, Clone, PartialEq)]\\n pub struct SearchResults {\\n     /// Scores, row-major `nq × k`, sorted descending within each row\\n     /// (best match first).\",\"patch_sha256\":\"17bba2661ae4036b0ce69de7fe9345b59183020ce8ba2bfeec7e03edd7141a06\"},{\"action\":{\"id\":94,\"schema_id\":1},\"summary\":\"Retain the current implementation.\",\"diff_excerpt\":\"No source changes; keep the broken implementation.\",\"patch_sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"}]}"
+      }
+    ],
+    "temperature": 0,
+    "top_p": 1,
+    "seed": 0,
+    "max_tokens": 1024,
+    "stream": false,
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rdc_coding_observer_output_v1",
+        "strict": true,
+        "schema": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "rdc-coding-observer-output.v2",
+          "title": "RDC Coding Observer Output v2",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "action_choice",
+            "applicability_percent",
+            "abstention_percent"
+          ],
+          "properties": {
+            "action_choice": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 65535
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "applicability_percent": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "abstention_percent": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            }
+          }
+        }
+      }
+    }
+  },
+  "http_status": 200,
+  "response": {
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "{\n  \"action_choice\": 11,\n  \"applicability_percent\": 95,\n  \"abstention_percent\": 5\n}"
+        }
+      }
+    ],
+    "created": 1790374437,
+    "model": "e009-large-v5",
+    "system_fingerprint": "b10685-7dffb158d",
+    "object": "chat.completion",
+    "usage": {
+      "completion_tokens": 35,
+      "prompt_tokens": 1280,
+      "total_tokens": 1315,
+      "prompt_tokens_details": {
+        "cached_tokens": 192
+      }
+    },
+    "id": "chatcmpl-EdQIwXMi8aVmxHvZlxBDyB3LkN5zjfkV",
+    "timings": {
+      "cache_n": 192,
+      "prompt_n": 1088,
+      "prompt_ms": 24373.196,
+      "prompt_per_token_ms": 22.40183455882353,
+      "prompt_per_second": 44.6392011946238,
+      "predicted_n": 35,
+      "predicted_ms": 8639.687,
+      "predicted_per_token_ms": 254.1084411764706,
+      "predicted_per_second": 3.935327749720563
+    }
+  },
+  "content": "{\n  \"action_choice\": 11,\n  \"applicability_percent\": 95,\n  \"abstention_percent\": 5\n}",
+  "output": {
+    "action_choice": 11,
+    "applicability_percent": 95,
+    "abstention_percent": 5
+  },
+  "normalized_output": {
+    "action_choice": 11,
+    "applicability_milli": 950,
+    "abstention_milli": 50
+  },
+  "normalization_error": null,
+  "usage": {
+    "completion_tokens": 35,
+    "prompt_tokens": 1280,
+    "total_tokens": 1315,
+    "prompt_tokens_details": {
+      "cached_tokens": 192
+    }
+  },
+  "finish_reason": "stop",
+  "observer_rpc_response": {
+    "request_id_hex": "5b57275dc6e16ad894ab882af458e4dcee28929b6d9f25370b710d3612001203",
+    "receipt_digest_hex": "eb1e6d54f771676c4b0e4bdc26d07f708436dee055778ee2212d977e9a4b3701",
+    "pairing": "synchronous response to the recorded request ID"
+  },
+  "elapsed_ms": 35558.948
+}

@@ -1,0 +1,38 @@
+{
+  "actual_v07_contract_and_map_audited": false,
+  "command": "python -m unittest audits.e4-0-track-e.test_audit_e4_0_track_e_v07 -v; python -m py_compile audits/e4-0-track-e/audit_e4_0_track_e_v07.py audits/e4-0-track-e/test_audit_e4_0_track_e_v07.py",
+  "created_utc": "2026-09-27T00:21:28.739633+00:00",
+  "model_tokenizer_cuda_contact": false,
+  "python_compile": "PASS",
+  "registered_source_test_receipts_checked": 18,
+  "schema": "FAS_E4_0_TRACK_E_SOURCE_TESTS_V03",
+  "scope": "Synthetic-only v07 contract/source/seal auditor. Validates exact registered (track,path,status) identity and payload status for all 12 inherited and 6 current source-map receipts; rejects substring bypasses, same-status track substitutions, duplicate/missing/unknown tracks, and payload status drift. Also verifies v06 scientific invariance, v07 lineage/inherited roots, source-role closure, source-map/member integrity, exact seal members/root, and tampering. Truth fixture absent. No actual v07 contract/map, E4 truth/population, tokenizer, model, or CUDA accessed.",
+  "sources": [
+    {
+      "bytes": 46420,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/audit_e4_0_track_e_v07.py",
+      "sha256": "3ce4018c7a8b7987ae7e06c726c91904093de8364f7a268db427121c6813bda0"
+    },
+    {
+      "bytes": 24980,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/test_audit_e4_0_track_e_v07.py",
+      "sha256": "99d764d915ebcf8dfedd0fc26ec572966df1b275e267bba59db1e4b6c5c7a961"
+    }
+  ],
+  "status": "TRACK_E_SOURCE_TESTS_PASS_V07_PREMAP_SYNTHETIC_AUDITOR",
+  "supersedes": [
+    {
+      "bytes": 2684,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-source-tests-v11.json",
+      "reason": "Superseded after exact registered track/path/status validation was added for all inherited and current source-map receipts, with payload-status, bypass, and track-substitution coverage. v11 remains unchanged history.",
+      "sha256": "a4ee5c8d7de5c8aa77c83c77618a05a25a83df68d76c4374a481cd0085e62280"
+    }
+  ],
+  "tests": {
+    "discovered": 13,
+    "failed": 0,
+    "passed": 13,
+    "skipped": 0
+  },
+  "truth_payloads_opened": false
+}

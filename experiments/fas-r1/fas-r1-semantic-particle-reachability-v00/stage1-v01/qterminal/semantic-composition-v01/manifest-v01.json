@@ -1,0 +1,64 @@
+{
+  "schema": "R1_QTERMINAL_SEMANTIC_COMPOSITION_V01",
+  "status": "FROZEN_ENGINEERING_DIAGNOSTIC",
+  "version": 1,
+  "created_utc": "2026-09-26",
+  "purpose": "Score the frozen Q-v02 selected candidate set with per-clause identity probabilities composed into a factorized terminal validity score; compare against the already-fitted Q-v02 selector without fitting or calibration.",
+  "q_split": {
+    "manifest": "../manifest-v02.json",
+    "manifest_sha256": "0cd7f5bd26e0ea59b2d29d83240cea013dc80ed75c3ac524ad16bc65473855a5",
+    "dataset_manifest_sha256": "6b38000ecf8295163d9eb547aed49b5d6df5804fbd34faff75686c31311257e3",
+    "selected_candidates_sha256": "05b75ffe1f49dc773732faaca74ae56c185313aeda30b88a7e3845075e3a39e3",
+    "candidate_generator_receipt_sha256": "69f48c2f605377efdbd410b6666f4559b9db2a87ceb22c5e0d260a74dd2247ae",
+    "raw_candidate_records_sha256": "f26fda46e3da041fe99ad5af29699471506d091eda3f6db8fdb63c9c8bfbeb50",
+    "fit_receipt_sha256": "b3586adddc4eee33771b183dc719dcf1e8e4e81cae4e62d298da4424b9afdaab",
+    "fitted_checkpoint_sha256": "e484bdb0e51196002bcda997a96b9b5a40ace7a4b81e60e08396a32072c6e5f0"
+  },
+  "identity_sensor_split": {
+    "support_manifest": "../../manifests/sensor-support-manifest-v02.json",
+    "support_manifest_sha256": "b05e99f83cec97342582dbacec0a3c7ba0bf634130f301dd909a886bcbb66e46",
+    "probe_fit_manifest": "../../manifests/sensor-probe-fit-manifest-v02.json",
+    "probe_fit_manifest_sha256": "58ec8d28565169d2a04816c97ef7406bfd6f30b68eae0d3f10ac65e692a8b811",
+    "probe_run_receipt_sha256": "4dc5a448fe93f6b86252ea19f83a90b61e3c7226ef6377bde346e64cfe18fa78",
+    "probe_report_sha256": "853696354ea7dd9dd1f5dc328d0e725113b18d90e1334e2832a554bcd8df0a4d",
+    "identity_model_sha256": "9ffd60dfe8b2134843b50cc1a614a3f05ce69d8cc2fcb458f7999486214f50ff",
+    "training_family_count": 48,
+    "overlap_rule": "candidate family_id in sensor-support-manifest-v02 family_roster where split=train"
+  },
+  "features": {
+    "public_tasks_sha256": "eed1f65aa9a1a51f7887808dae88655c1266cfeac674bf25611c0cd6cd8f6c58",
+    "extraction_receipt_sha256": "9d7714338ba0302d78d76eb75b4a7e8eb553921433e388b3d4b217e6d7ce3939",
+    "constraint_H_sha256": "8c09bbc2a5219b15047372720a46d11c3ce018369ada4d2200bf0068b8056181",
+    "global_h_sha256": "26152970dc396d50cbe87f90ef5b8f54b6b7b2147a846253904382457cdc3b72",
+    "rows_jsonl_sha256": "dd143f882f3bf0ba06ecec0db850b760290933cdfb6eb2945af23e62cd1f16ec",
+    "offline_label_summary_sha256": "ffbd6df8b38cc323f4bdae9df5c98c57e1a80057dadbdc330979047f36df9197",
+    "clause_labels_sha256": "179607e4313e79cfdf920db57c3a2917abb199f71e08c3e71be49dbc6832ee8e",
+    "action_labels_sha256": "98a0ae52d4e3d95611acd1f6ed5148b8d57d8845921c5b9d14d657c82557ce86"
+  },
+  "source_code": {
+    "qterminal_model_py_sha256": "3cdd09cf380878fb53b16b537de0e192ce8c342a149b833bdae3e655b2916f5a",
+    "qterminal_training_py_sha256": "73be5dcd23c7bd94aeb507ef8d03014848883a6566fbccd0fab812b268c8b82d",
+    "qterminal_data_loader_py_sha256": "59d3b01f36e1e5f969f292d1c009dcd184de32a696c15292b964860f34fc0514",
+    "candidate_generator_rs_sha256": "6d374611fff78f48519c4e307cc25f099ad342b960d21c624484262702376c05",
+    "identity_probe_script_sha256": "b4f3f37de1f348a905000ee4a74246ea289fbbf882879f8fc42d67dab1b6f860"
+  },
+  "composition": {
+    "identity_head_input": "train-normalized frozen constraint_H row only",
+    "per_clause_kind_probability": "softmax of frozen six-way identity head",
+    "per_clause_satisfaction_probability": "first mask p(kind|H_j) to clause kinds whose argument schema is fully grounded by public entity/role mention incidence; renormalize over supported kinds; then sum conditional p(kind|H_j,public incidence) times satisfaction under the candidate assignment",
+    "terminal_log_score": "sum_j log(p_satisfied_j); -infinity if any p_satisfied_j is zero",
+    "terminal_probability": "exp(terminal_log_score), interpreted under a factorized-across-clauses approximation",
+    "public_incidence_support": "two entities and no roles supports same/different; one entity and one role supports exactly_one/fixed/forbidden; multiple entities and one role supports exactly_one; one entity and two roles supports implies_not_role. Unsupported kinds are masked because their required arguments are absent from the public incidence.",
+    "classification_threshold": 0.5,
+    "calibration_or_fitting": "none",
+    "private_kind_oracle": "replace identity probabilities with one-hot private clause-kind targets; offline diagnostic only",
+    "implication_semantics": "current generator emits same-entity implication clauses with distinct roles; these are tautologies and contribute satisfaction probability 1. If a future task has two entities and two roles, average both public-incidence-compatible pairings and label the result approximate."
+  },
+  "evaluation": {
+    "candidate_data": "selected-candidates.jsonl from the prepared Q-v02 data; score each row once",
+    "q_v02_comparison": "recompute the existing frozen qterminal-v02 checkpoint on the same rows using its stored validation temperature; no refit",
+    "test_stratification": ["overlap_sensor_identity_train", "unseen_to_identity_train"],
+    "heldout_generalization_warning": "Q-v02 test families are not all unseen to the identity head; test metrics must be stratified and the aggregate is not an unseen-identity result.",
+    "metrics": ["accuracy_at_0.5", "balanced_accuracy", "brier_score", "binary_cross_entropy", "roc_auc", "expected_calibration_error_10_bins", "top1_valid_rate_by_feature_and_source"]
+  }
+}

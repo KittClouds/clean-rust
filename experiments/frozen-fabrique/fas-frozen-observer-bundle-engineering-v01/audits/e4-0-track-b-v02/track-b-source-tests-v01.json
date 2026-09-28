@@ -1,0 +1,65 @@
+{
+  "schema": "FAS_E4_0_TRACK_B_SOURCE_TESTS_V01",
+  "receipt_id": "FAS_E4_0_TRACK_B_V02_SOURCE_TESTS_V01",
+  "status": "PASS_SYNTHETIC_SOURCE_AND_CLI_TESTS",
+  "recorded_utc": "2026-09-26T22:22:00Z",
+  "source_unit": "E4-0 parity and feature runner v02, bound to contract v06",
+  "contract_identity": "FAS_FROZEN_CAPABILITY_FABRIC_E4_0_V06",
+  "commands": [
+    "python -m py_compile source/scripts/e4_online_parity_v02.py source/scripts/e4_runner_common_v02.py source/scripts/e4_runner_artifacts_v02.py source/scripts/e4_gpu_lease_v01.py source/scripts/e4_runner_modes_v02.py source/tests/test_e4_runner_v02.py",
+    "python -m unittest discover -s source\\tests -p test_e4_runner_v02.py -v",
+    "python source/scripts/e4_online_parity_v02.py --help",
+    "python --version"
+  ],
+  "results": {
+    "py_compile": "PASS",
+    "unittest": "PASS",
+    "tests_run": 13,
+    "tests_passed": 13,
+    "tests_failed": 0,
+    "cli_help_smoke": "PASS",
+    "authorization_issuer_cli_help_smoke": "PASS",
+    "python_version": "3.13.15"
+  },
+  "source_files": {
+    "source/scripts/e4_online_parity_v02.py": {
+      "bytes": 1375,
+      "sha256": "02a26b5f3b2b2327a2e21bdaadec5e250ecf9ba0381a6b7707882ab9302ecb16"
+    },
+    "source/scripts/e4_runner_common_v02.py": {
+      "bytes": 20575,
+      "sha256": "83d5a0a1dad9b9d56773bca7d38ae8ff98ada0e8ff46101c282e233ea1094899"
+    },
+    "source/scripts/e4_runner_artifacts_v02.py": {
+      "bytes": 15794,
+      "sha256": "9976bb9ece709631ab33dcecaf3caa59b99268fdd39d413ad38b28a8d959a4a3"
+    },
+    "source/scripts/e4_gpu_lease_v01.py": {
+      "bytes": 23022,
+      "sha256": "e95a6e40f4e9128d8c15cc758e91254e51936cb6b1e8942bbd1e76f635d82c21",
+      "status": "UNCHANGED_REUSED_DEPENDENCY"
+    },
+    "source/scripts/e4_runner_modes_v02.py": {
+      "bytes": 32754,
+      "sha256": "654974ee5c32c6482e868d9885ba9d92e4928ef25bc0713400cece253390f5af"
+    },
+    "source/tests/test_e4_runner_v02.py": {
+      "bytes": 16787,
+      "sha256": "4af0fcab1f33aa13d6d586c7cfe440675ec6c0e61b4ecb7b055759c30fc3edd6"
+    }
+  },
+  "boundary": {
+    "actual_e4_population_materialized": false,
+    "actual_e4_terminal_or_escrow_labels_read": false,
+    "tokenizer_contact": false,
+    "backbone_model_contact": false,
+    "cuda_initialized": false,
+    "cuda_runtime_contact": false,
+    "e4_predictions_emitted": false,
+    "e4_heads_scored": false,
+    "gpu_lease_live_process_scan": false,
+    "synthetic_gpu_lease_tests_only": true,
+    "real_stage_authorization_issued": false
+  },
+  "identity_change": "The runner module/import versions and sealed E4 contract identity advance to v02/v06; stage schema, stage scopes, predecessor roots, artifact schemas, representation ABI, model/tokenizer identities, resource gates, outputs, and truth boundaries are unchanged."
+}

@@ -1,0 +1,23 @@
+{
+  "seal_sha256": "6439892580573e420dc30a1df401fe874a195788b89272462b09c0a0d0964ad5",
+  "parent_dh01_reverified": true,
+  "frozen_inputs_reverified": true,
+  "resources": {
+    "exit_code": 0,
+    "wall_seconds_including_launch": 8.084171700000297,
+    "observed_peak_working_set_bytes": 16297984,
+    "method": "Windows GetProcessMemoryInfo peak working set sampled every 0.1 s; simulator only"
+  },
+  "output_hashes": {
+    "execution.json": "a40e4fc082e3bcef9e08868d311e4546875b89f8c52f9fe11a2fe960355a9eeb",
+    "L-tau16.jsonl": "f4ad83f777a927fa6d1644cedb911862a50c9eb678fe25378384070c9f838b07",
+    "L-tau4.jsonl": "def73c943ef0b1728e5b82ad6f43072356d30196c54e0a3f829cd438d51fc14c",
+    "R-tau16.jsonl": "89506196e9dc1789d4e98bf1888930313ba7043316c6f7fa64c27840bd2e8c5b",
+    "R-tau4.jsonl": "c8aafe5badca7d489640a8e5ac271d87b07d07e962bd97df8c109d5dca98d25c",
+    "REPORT.md": "6140eaaa11117ef13a140cabcfd9048e8e4d6d53e4f5445953f4f7e59f14de12",
+    "resources.json": "f528f0a37eedc97ee7297f2c7bd2169987935c9de51825f00256ec475a72b56e",
+    "seal.json": "6439892580573e420dc30a1df401fe874a195788b89272462b09c0a0d0964ad5",
+    "stdout.log": "aa7756f43d925f78195069ed21cf26f819b63d9992f70974b98045055b6f0bff",
+    "summary.json": "1464409838fc51631ec00fafd93b71c5d9d0d6f3de23f8fa09ef3e5623a358eb"
+  }
+}

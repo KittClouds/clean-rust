@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "state": "SCORED_AFTER_MODEL_CONTACT",
+  "run_id": "e011-producer-order-integration-qual-01",
+  "frozen_input_lock_sha256": "25156b4b2c0d4ed44700bef9fbf442b063a7574ddf424d961befcdc7948fd953",
+  "prepared_frame_lock_sha256": "0fc0a92d14db74862b9f9d6cc282a706dc361fa8c3c6a65a940e536e843bb290",
+  "sealed_labels_sha256": "a75b3e09725fb1b16f14e124ffc27795af2b60795d633416f83ff01ea04aa146",
+  "task_manifest_sha256": "1bf67633e5f24fbd533a3afdaa20e9e71da8c88d9af19b86c3af30c29b2e072d",
+  "small_observer_outputs_sha256": "c4cdc86ffc31aec83761a294bb65a1ba56f3c0885c388607108c4b54c9f0394a",
+  "large_observer_outputs_sha256": "283b13a6c812a448f344c3b721205dbc9a0b875f9743eb809c43c4215283b44d",
+  "scorer_sha256": "b522b57f79b4cfe4c1481df3f78ae725fc15e6646dfe830bab916414eba918a8",
+  "runtime_authorizer_sha256": "ed234a752e7456557be213b1779e8eaa173e40b1c34bff2d27ffe977dc0d4500",
+  "candidate_test_result_tree_sha256": "25c4770d3d4fd0d64f330c1210125abdc7057b65413a66259c3b1e569709bdee",
+  "completion_mode": "live cargo tests in isolated extracted task snapshots"
+}

@@ -1,0 +1,44 @@
+{
+  "schema": "FAS_E4_0_CONTRACT_TOOLING_SOURCE_TESTS_V12",
+  "receipt_id": "E4_0_CONTRACT_TOOLING_V12_SOURCE_TESTS_V11",
+  "status": "PASS_SYNTHETIC_CONTRACT_AND_SOURCE_MAP_TESTS",
+  "commands": [
+    "python -m py_compile experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/build_e4_0_source_map_v11.py experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/finalize_e4_0_contract_v12.py experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/seal_e4_0_contract_v12.py experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/test_e4_0_contract_v12.py",
+    "python experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/test_e4_0_contract_v12.py (22 synthetic tests)"
+  ],
+  "unit_test_count": 22,
+  "py_compile": "PASS",
+  "source_bindings": [
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/build_e4_0_source_map_v11.py",
+      "bytes": 47668,
+      "sha256": "131f0e6f41d7fde59e3417c28df8c5534f3a70c3adcf3b2107b8faefc407e2f9"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/finalize_e4_0_contract_v12.py",
+      "bytes": 46574,
+      "sha256": "af5c8f4451e67cb884d05f87aa2683033ccf2b6f65fe0f14bbb4c299f61cc5f3"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/seal_e4_0_contract_v12.py",
+      "bytes": 17969,
+      "sha256": "90a9594d6ed9bf590c3d025c8793d22306e476f2bc9b0fda9c2b5cbe669220a4"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/test_e4_0_contract_v12.py",
+      "bytes": 20603,
+      "sha256": "2d9aa41f918cb3658ddb6ad238b94ec08660369694ba5ec8128c7530c41cb804"
+    }
+  ],
+  "runtime_access": {
+    "model_contact": false,
+    "tokenizer_contact": false,
+    "cuda_initialized": false,
+    "gpu_lease_acquired": false,
+    "cache_created": false,
+    "labels_opened": false
+  },
+  "scope": "Synthetic v12 source-map, contract finalizer, and sealer tests. Includes exact v11 sealed predecessor, v11 postseal stop, complete derived v06-v11 sealed ancestor closure, duplicate-path rejection, source closure, and unchanged v06 scientific projection. No source map, contract candidate, seal, authorization, or runtime contact.",
+  "execution_authorization_conferred": false,
+  "recorded_utc": "2026-09-27T03:15:57.821033+00:00"
+}

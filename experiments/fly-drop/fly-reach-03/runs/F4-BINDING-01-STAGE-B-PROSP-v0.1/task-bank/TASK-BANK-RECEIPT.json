@@ -1,0 +1,17 @@
+{
+  "assignment_counts": {
+    "0": 4,
+    "1": 4,
+    "2": 4,
+    "3": 4,
+    "4": 4,
+    "5": 4
+  },
+  "block_count": 24,
+  "native_collection_started": false,
+  "schema": "F4-BINDING-01-stage-b-task-bank-receipt-v0.1",
+  "status": "PASS",
+  "task_bank_manifest_sha256": "9ed34090f909292cb67cd2ea59c6d43d2bf53899511284e08977dda7111e3bdd",
+  "task_bank_sha256": "8cac76b0618caaecca501e308eb9ffffe26d30c3980037385562fb53ed7c8188",
+  "task_payload_created": true
+}

@@ -1,0 +1,912 @@
+{
+  "manifest": "FAS-R1-SENSOR-SUPPORT-v02",
+  "status": "FROZEN_ENGINEERING_QUALIFICATION_SUPPORT",
+  "frozen_utc_date": "2026-09-26",
+  "source": {
+    "dataset": "Stage 0 construction-attempt-v02 public InferenceTask projection",
+    "path": "D:\\codex-runs\\fas-r1-semantic-particle-reachability-v00\\stage0-v01\\construction-attempt-v02\\public-tasks.jsonl",
+    "sha256": "eed1f65aa9a1a51f7887808dae88655c1266cfeac674bf25611c0cd6cd8f6c58",
+    "rows": 96,
+    "unique_task_families": 96,
+    "private fields consumed for roster/split": false
+  },
+  "split_rule": "Sort by SHA256(UTF8(\"FAS-R1-SENSOR-SPLIT-v01\\0\" + family_id)); first 48 train, next 16 validation, final 32 qualification. Family-level only.",
+  "split_counts": {
+    "train": 48,
+    "validation": 16,
+    "qualification": 32
+  },
+  "qualification_scope": "engineering sensor qualification only; generator has two paraphrase templates and is not a broad natural-language stress corpus",
+  "action_relevance_support": {
+    "states_per_family": 32,
+    "assignment_sampler": {
+      "population": "all complete assignments in [0,k)^n, sampled uniformly by one role draw per entity",
+      "state_indexing": "for each family task_id and state_index 0..31, independently initialize the PRNG",
+      "seed": "little-endian u64 from the first eight bytes of SHA256(UTF8(\"FAS-R1-ACTION-PROBE-v01\\0\" + task_id + \"\\0\" + decimal(state_index)))",
+      "prng": "SplitMix64: state += 0x9e3779b97f4a7c15; z=(z^(z>>30))*0xbf58476d1ce4e5b9; z=(z^(z>>27))*0x94d049bb133111eb; output=z^(z>>31), all arithmetic modulo 2^64",
+      "role_draw": "next_u64 modulo k for entity indices 0..n-1"
+    },
+    "edits_per_state": "enumerate every one-entity role change except no-op",
+    "label": "for every candidate edit, count satisfied typed clauses before and after; label -1/0/+1 by the sign of the integer difference; each typed clause contributes one",
+    "qualification_minimum": {
+      "examples_per_sign_class": 100,
+      "distinct_qualification_families_per_sign_class": 20
+    },
+    "sampling_is_class_stratified": false
+  },
+  "gates": {
+    "semantic_identity_balanced_accuracy_min": 0.9,
+    "binding_entity_role_f1_min": 0.9,
+    "action_relevance_heldout_macro_f1_min": 0.9,
+    "failure_action": "record rung failure, diagnose interface and issue a versioned support/adapter repair; do not erase failed run or infer a passing sensor claim"
+  },
+  "family_roster": [
+    {
+      "task_id": "task-16524ef31ae1597a7ebdad7593974ba07a52098f13146c73fda0583958221237",
+      "family_id": "fam-001bbe652a595ce8b0033616f67b04ee367bb37873574e3e6dd4107aadfb7b64",
+      "split": "qualification",
+      "n": 11,
+      "k": 2,
+      "role_anonymous": true,
+      "clause_count": 7
+    },
+    {
+      "task_id": "task-6923ee330516411c4b86c0290deb774864f0c4d4ef0a3e52fad952482f2212f4",
+      "family_id": "fam-07377a338ede762f0a589574f1f358f6c935f9072adf7cec39ec502771dc370d",
+      "split": "train",
+      "n": 10,
+      "k": 4,
+      "role_anonymous": false,
+      "clause_count": 15
+    },
+    {
+      "task_id": "task-57db98790eff6b7a7a3e88fad92b5ecd4dfb90948727637a19463cdc5f21ea56",
+      "family_id": "fam-0d3fa1f9a0c9777022585328a5cb1127ba64f3a19ef445931704acc72b41c24d",
+      "split": "train",
+      "n": 11,
+      "k": 4,
+      "role_anonymous": true,
+      "clause_count": 6
+    },
+    {
+      "task_id": "task-8bb9bd8de02080160329c17c905fd0273739862b4ca8b7beba9736bea2dccbe2",
+      "family_id": "fam-0da5ad78804d90dd74aba8c7817a4b5888874e843a3cb364db7403fb031fe16d",
+      "split": "train",
+      "n": 8,
+      "k": 2,
+      "role_anonymous": false,
+      "clause_count": 8
+    },
+    {
+      "task_id": "task-27c1019e39d764587c86dafb3ab989248a20d21e8a0f393bc6f45240642e5fc0",
+      "family_id": "fam-0dbabb541fabbaf6b1960707d74a60ba13d69eef42ab5d7b9b4658ef18254a7d",
+      "split": "qualification",
+      "n": 8,
+      "k": 2,
+      "role_anonymous": true,
+      "clause_count": 4
+    },
+    {
+      "task_id": "task-0ba2f4f01c5a34018c1ddcd87fa924a11708960593295ea9664cdc6b472d834a",
+      "family_id": "fam-0fdfa461b869b3c5843ab12c268e2b190e86033bf4527be1ab0da81141a1e76b",
+      "split": "qualification",
+      "n": 6,
+      "k": 2,
+      "role_anonymous": false,
+      "clause_count": 10
+    },
+    {
+      "task_id": "task-d20fe417a595d9fb2d9e74a8fae3152c52641bd51dfb8ab40965c59d1a45a9d5",
+      "family_id": "fam-1071260d2bfb5fa5c766bcf8cb05e97cb5a4cefec361eb04d1cbabfc9328a321",
+      "split": "qualification",
+      "n": 8,
+      "k": 2,
+      "role_anonymous": false,
+      "clause_count": 13
+    },
+    {
+      "task_id": "task-4cb2a2b75a5dde681770cdb4ccb6ab005c43101aa0128db7ef841957042f0667",
+      "family_id": "fam-10b65c6cc8b71c99616810207fad599b10399b64277efba0430eff63559da1c4",
+      "split": "train",
+      "n": 10,
+      "k": 2,
+      "role_anonymous": false,
+      "clause_count": 12
+    },
+    {
+      "task_id": "task-f5415e4a1d11ec5904f3d3e5579ba2d9bb4fc51d77f5a11b345e029759022952",
+      "family_id": "fam-15b804874b7b17ae6d08dd6710e4bc34384002d4928d8de6dbbd07a52a4320a1",
+      "split": "validation",
+      "n": 8,
+      "k": 4,
+      "role_anonymous": false,
+      "clause_count": 13
+    },
+    {
+      "task_id": "task-d6ae00375e4290fc517dc5ec25fcc114d2822a00901226ffe0b53dbc9233c1d9",
+      "family_id": "fam-1794d838888f0cbcd280972aea004ad232b935498413b1c38db47c8e1ef599f2",
+      "split": "qualification",
+      "n": 11,
+      "k": 4,
+      "role_anonymous": false,
+      "clause_count": 16
+    },
+    {
+      "task_id": "task-3e16a6a3b77c4290ce229693a4c5d24bed1b661a5b7dfcd07c13a9bce85dc715",
+      "family_id": "fam-19b597f68f7de72fde470d18c41d42ba4961a482e50f6ad088428ae0dcc5f1ea",
+      "split": "qualification",
+      "n": 8,
+      "k": 4,
+      "role_anonymous": true,
+      "clause_count": 7
+    },
+    {
+      "task_id": "task-532a82ca78fce47d7a7ad1569e494357e838a022223edf745da0e2f5e5a9559b",
+      "family_id": "fam-1a2d0410a4b1f237058e88c2b287235a66ca15d0933f2fc80c2d0aa307c92a45",
+      "split": "qualification",
+      "n": 10,
+      "k": 4,
+      "role_anonymous": false,
+      "clause_count": 12
+    },
+    {
+      "task_id": "task-aa5c1959114af26c5a1e37bd7fc47f5e3fa8c7a94a46fda931890afc16500751",
+      "family_id": "fam-1ace580d3618f3f8c507016f536d5f7e30594f5268cd4d375e4823bba8c05db5",
+      "split": "validation",
+      "n": 6,
+      "k": 4,
+      "role_anonymous": false,
+      "clause_count": 9
+    },
+    {
+      "task_id": "task-437202f46cef6c9e9d68060c9aa52cfa2686f4f62676997c5b9765c5ade6c353",
+      "family_id": "fam-1d73c825e6053b0008f4276b89037d0a3302d6507bb05a792a6a512cc7a9910b",
+      "split": "train",
+      "n": 6,
+      "k": 4,
+      "role_anonymous": true,
+      "clause_count": 3
+    },
+    {
+      "task_id": "task-6674cb99b59f57bc530fe8e4abc3ba983c4d0ab7627840326acc401a9651a6d2",
+      "family_id": "fam-20de696984fad9b81e4af5bd7e52027361f56b9469aa50e74b753242119b5530",
+      "split": "train",
+      "n": 9,
+      "k": 3,
+      "role_anonymous": true,
+      "clause_count": 6
+    },
+    {
+      "task_id": "task-ef9df440d38c8b2ad0c0799fe85cc443808ca627a5ce258629ccb4b73de553a4",
+      "family_id": "fam-20eee58e32d72b301e55f1e679b4201a2aa3b0e78ccefb9856137c47cba7b61b",
+      "split": "train",
+      "n": 12,
+      "k": 4,
+      "role_anonymous": false,
+      "clause_count": 16
+    },
+    {
+      "task_id": "task-7c9c644a5ebc801cbc7150ec4c53c197bf37be5fb5e0be90cd83c5f9bb08dafa",
+      "family_id": "fam-229112bf58b93d8de6f96ebc16959a1cff322dc03363af4693f1ceabee6306b5",
+      "split": "train",
+      "n": 6,
+      "k": 2,
+      "role_anonymous": true,
+      "clause_count": 4
+    },
+    {
+      "task_id": "task-be5dbed458f4ba025742cb2cdeaaab6a718705ca3ef9b939981547792fd7e4da",
+      "family_id": "fam-26b82555285cc42d90419298d0be0c3204f559c49723ffdb6e20d933247b0c41",
+      "split": "validation",
+      "n": 8,
+      "k": 4,
+      "role_anonymous": true,
+      "clause_count": 6
+    },
+    {
+      "task_id": "task-edbfeaa1bd4db091a1b7b5552c08e858ab671ebabc646a66721330f5d9426a8b",
+      "family_id": "fam-26fdcb004122b0229f7ee0c245d330174a91a27bc1ff30f7a885d3f930711b60",
+      "split": "train",
+      "n": 6,
+      "k": 3,
+      "role_anonymous": true,
+      "clause_count": 3
+    },
+    {
+      "task_id": "task-613f332b7bb84bb2c146f4c57621805ca826c315c5889aa3a22c306d26a77cf6",
+      "family_id": "fam-2e115b640fcd9e561b30580ce876dc2f5b76deafdae7e088730965814adb19b6",
+      "split": "qualification",
+      "n": 10,
+      "k": 3,
+      "role_anonymous": true,
+      "clause_count": 5
+    },
+    {
+      "task_id": "task-a7b84cf02626a663ad32ac3e87249b11c4286ade7e4b5464b5c561d123e90cf5",
+      "family_id": "fam-36faac021d93af2bba3fc563a8b5ab63023a7e5edcd40a11d8a983c397c619ee",
+      "split": "train",
+      "n": 6,
+      "k": 4,
+      "role_anonymous": false,
+      "clause_count": 7
+    },
+    {
+      "task_id": "task-a5653049180a8fdd4c3b8e6899a866c30aefaaf587efab22f78840bfe5d8590f",
+      "family_id": "fam-383f5c85996af1dcff8e6102248a1f9c3e41411d683c7a9b6ca359ed8168df50",
+      "split": "train",
+      "n": 7,
+      "k": 3,
+      "role_anonymous": false,
+      "clause_count": 11
+    },
+    {
+      "task_id": "task-747316475d107eb7d913198eedf85c2dcef82fb52fdb294e473b45af2d9a15a5",
+      "family_id": "fam-3c03cac646d44f95c74a80842bffc9e05c9b9461810f7e595faa55c296e411a3",
+      "split": "qualification",
+      "n": 12,
+      "k": 3,
+      "role_anonymous": true,
+      "clause_count": 9
+    },
+    {
+      "task_id": "task-37a73c1f30b29f5b282b3757b89e9cf29e151bfea076b794bc007770414e562c",
+      "family_id": "fam-3e24f15142303f50d40b2dfb0ff55760e5c4bf347ddd20bbfbca2fb660b035f7",
+      "split": "train",
+      "n": 12,
+      "k": 3,
+      "role_anonymous": false,
+      "clause_count": 14
+    },
+    {
+      "task_id": "task-2ea650cba5322b6a27e6637492f62c6c31650f31f9d4da6261c77e56d6e32290",
+      "family_id": "fam-3e8aa1e3183566648a91ac8731bdec641f95eef7337d79a2595b4c37a8019c52",
+      "split": "train",
+      "n": 7,
+      "k": 2,
+      "role_anonymous": true,
+      "clause_count": 3
+    },
+    {
+      "task_id": "task-d6f3061d670f2add127cda28bf22a2e7f6d70e96c4ad3f05700c03e9b2dcf128",
+      "family_id": "fam-43e78ccb8536f0d3fcfa8a00ea183d8f10f2e010152e5ef042a7189f1a1bdd52",
+      "split": "train",
+      "n": 10,
+      "k": 4,
+      "role_anonymous": true,
+      "clause_count": 7
+    },
+    {
+      "task_id": "task-ddfd5f10a12e889a5bb1bde933067615111f366962debe86c202586349d3aeff",
+      "family_id": "fam-4a3dcfbde43a1b933071355f81063663a7b81bdab53b3f428daf9fdde02fae28",
+      "split": "qualification",
+      "n": 10,
+      "k": 4,
+      "role_anonymous": false,
+      "clause_count": 13
+    },
+    {
+      "task_id": "task-d8401e5246f1bc02dcedf97658eb71b28a0986ff4debe69d6709a78edb74fafc",
+      "family_id": "fam-5457d1d5fb239dddf6fae3cdbe6f0c3699a78101eb11995c104b11be828e0c83",
+      "split": "train",
+      "n": 7,
+      "k": 3,
+      "role_anonymous": true,
+      "clause_count": 6
+    },
+    {
+      "task_id": "task-fcea8c663819f66e76339a08fa75246e4d43627f1db0e575a04b518d037a7a72",
+      "family_id": "fam-55223c4d2c16ee82a51a5045611e5e20161bc1efc3ec9df3e637323b2489174f",
+      "split": "train",
+      "n": 7,
+      "k": 3,
+      "role_anonymous": true,
+      "clause_count": 5
+    },
+    {
+      "task_id": "task-434ff5ed7ccb2bbadbc05efcb255a5110cf74f68487c0672939d30d3b6864dcf",
+      "family_id": "fam-5c3a960084b4cc869ff16575c08e0ec555faef0180a713b30971446cb69dfc92",
+      "split": "qualification",
+      "n": 9,
+      "k": 2,
+      "role_anonymous": false,
+      "clause_count": 13
+    },
+    {
+      "task_id": "task-d863a14eb3b2ee6a2c3ae554aa9c68a5eb786ba875a471125b9fba022304e266",
+      "family_id": "fam-5fcfc09f063292037a547cbef21f65689e38f175f099a6b94a75f3e4c163c1e1",
+      "split": "train",
+      "n": 12,
+      "k": 2,
+      "role_anonymous": false,
+      "clause_count": 12
+    },
+    {
+      "task_id": "task-82443908f336f96cfdbce4f4c9fd79022848c5bfe35d40f608d3d50f6f965844",
+      "family_id": "fam-5fe6b1701d7b828caa76ed7236216002c5b0f55e76230becaea720d3ca39b17a",
+      "split": "qualification",
+      "n": 12,
+      "k": 3,
+      "role_anonymous": false,
+      "clause_count": 15
+    },
+    {
+      "task_id": "task-e2a2db7d393d4d7bd24e8dc25ff39fda1cc1eea59498e6acb8f853445f4f0c10",
+      "family_id": "fam-61e59b4689c94e2eaecc342f2d1800063c1b02a761db99b3954d21d0b1d132c0",
+      "split": "qualification",
+      "n": 10,
+      "k": 3,
+      "role_anonymous": false,
+      "clause_count": 14
+    },
+    {
+      "task_id": "task-d27609f5fb7f33ebacfa747466e9193f6d80b74fd4b32b52f2dae9cdeb8d40aa",
+      "family_id": "fam-65e7e32f0c8a2a6d3276c4c812de1f340f090dd633572823b1ebed5737d60ec0",
+      "split": "validation",
+      "n": 7,
+      "k": 3,
+      "role_anonymous": false,
+      "clause_count": 12
+    },
+    {
+      "task_id": "task-5713dc175a0a30b1539079fa81c9016cb5290aa790eb0ce43ec0f6122aaf6151",
+      "family_id": "fam-65eac78de8e693927a04d086c73ad90ee99d3297c9fde1428275e6167f247aa2",
+      "split": "validation",
+      "n": 11,
+      "k": 3,
+      "role_anonymous": true,
+      "clause_count": 10
+    },
+    {
+      "task_id": "task-c55dc080ef83dae01811080c7c9f61840e035ec22229a419128e20cfd1ad4a01",
+      "family_id": "fam-67a817626d6f8f262c4db9d068938d783b04d2b9ee3c478ce71164f93e627a3d",
+      "split": "train",
+      "n": 9,
+      "k": 2,
+      "role_anonymous": false,
+      "clause_count": 14
+    },
+    {
+      "task_id": "task-8f8ca606d34aa6b4d507e4cab3ffd78c040a957f6c4e76f659fe350c96008a59",
+      "family_id": "fam-70084efc776fbb79bb3944013ace17b92a11e0c9444fe08a9c3453216296989e",
+      "split": "qualification",
+      "n": 7,
+      "k": 4,
+      "role_anonymous": false,
+      "clause_count": 12
+    },
+    {
+      "task_id": "task-e3359c5be75159802e5e6dc4a5f43e6c2efc2b80b07ad55d85a7e813fcad68c2",
+      "family_id": "fam-70248fd3697837b616649f55e4a5eafadc1efd1df31a221428ad714e232295f2",
+      "split": "train",
+      "n": 8,
+      "k": 4,
+      "role_anonymous": true,
+      "clause_count": 3
+    },
+    {
+      "task_id": "task-c08111b2a53234b0520ae3a09a6cd1bca6214c1871109bab49da92bfb7bcf545",
+      "family_id": "fam-758f5a9c6c9f6dd4df12bc1fb01f0ccfcb8959682bcc770adf3bd99652c122d0",
+      "split": "qualification",
+      "n": 12,
+      "k": 4,
+      "role_anonymous": true,
+      "clause_count": 10
+    },
+    {
+      "task_id": "task-7f2ad1975881e6f33b81f0d5169a45e2b39820546a0dca6c59e9464df882da6b",
+      "family_id": "fam-778591709ec0954917917da613d39dec686dd19826585e097efb0228a7c39929",
+      "split": "qualification",
+      "n": 11,
+      "k": 2,
+      "role_anonymous": false,
+      "clause_count": 11
+    },
+    {
+      "task_id": "task-e92bad5ca1349ac7d373d2ace99c433d539d60e49072b49a4b63f1f136780683",
+      "family_id": "fam-7ac0d2cc07eb59e98329d9c35524d35a50cb570e4e27af5879efee2939b39b2e",
+      "split": "qualification",
+      "n": 9,
+      "k": 4,
+      "role_anonymous": true,
+      "clause_count": 7
+    },
+    {
+      "task_id": "task-bd20cdc4be3593282ba0ea5e63f7808ae52972bf83199ff25356adb2c931b9d0",
+      "family_id": "fam-7b152e0669974e57ed619d4af61356e86bffceebd4e9e61d5dd1a7250e97b10f",
+      "split": "qualification",
+      "n": 10,
+      "k": 2,
+      "role_anonymous": true,
+      "clause_count": 8
+    },
+    {
+      "task_id": "task-1bdb953ad34629d11146cdc06ca8e72b709a006c4c89b7f812439d2b34b4cf2f",
+      "family_id": "fam-7c8891a0d37fa20e06fa23c3e8076b061d399102f2637bfec6cac02a9345e82c",
+      "split": "validation",
+      "n": 7,
+      "k": 4,
+      "role_anonymous": false,
+      "clause_count": 9
+    },
+    {
+      "task_id": "task-3980f3f0bb3f5e399ad3aaf49c362b767bac907cfbe0146d522c91e218ded8ed",
+      "family_id": "fam-7e1100c2a311ddb4cc8d582e409b222d8305dcf25f25a8056f7caa9db1231727",
+      "split": "train",
+      "n": 11,
+      "k": 2,
+      "role_anonymous": false,
+      "clause_count": 13
+    },
+    {
+      "task_id": "task-6bb891408fd80ae515ebf406aa0fcd0c501561bb4a6b4f886613d2f8e3684d51",
+      "family_id": "fam-7fdb194e844c990d02b9a7fb1056d1be5b1bb71f3210333b6ac6cdb6b1ff79e4",
+      "split": "validation",
+      "n": 7,
+      "k": 4,
+      "role_anonymous": true,
+      "clause_count": 2
+    },
+    {
+      "task_id": "task-72322deb56d070b6550e7fdb6d5a01ab33416c7ee93a84b5412b0cbbe0e2db1f",
+      "family_id": "fam-82c37b8bf11edc425c41af5d7c5752b4e892c9aa7cbe67ae1783a5ea143e17d9",
+      "split": "validation",
+      "n": 10,
+      "k": 3,
+      "role_anonymous": false,
+      "clause_count": 12
+    },
+    {
+      "task_id": "task-e38a041a69381474ed5045bf4e1b83753eba54eb1ea5da0f881a47cf0517986c",
+      "family_id": "fam-8416596c8833ee81daf33ede9558b4b87e2959ed4c88f9c50e02c1b0dd52a00b",
+      "split": "train",
+      "n": 6,
+      "k": 3,
+      "role_anonymous": true,
+      "clause_count": 5
+    },
+    {
+      "task_id": "task-0d539c9354b38faaa249f7dcce98437fc5d1fb54d14689e030510f93a62a6f55",
+      "family_id": "fam-852253ad0246a6786ae129b5692348e9b2ef63e5f1dbb5c8fb1c57331db57ea0",
+      "split": "validation",
+      "n": 11,
+      "k": 3,
+      "role_anonymous": false,
+      "clause_count": 15
+    },
+    {
+      "task_id": "task-72f4b3a7d53da2db8e258d3e731c4fe865d91d6d0a7c239b894fda59022e2798",
+      "family_id": "fam-85ba9b21ee874570db6693cdad60a84c2448855cba02b25d9f6bacea263ccda3",
+      "split": "train",
+      "n": 7,
+      "k": 4,
+      "role_anonymous": true,
+      "clause_count": 4
+    },
+    {
+      "task_id": "task-ee1e92846180b09a5a8de309e91e4859b35380e0c4f27c9b3717cc070de83f32",
+      "family_id": "fam-878daaa16cc1475da1e9023da788391255e07f0bda2fee1d08ea3320628e5870",
+      "split": "train",
+      "n": 12,
+      "k": 4,
+      "role_anonymous": true,
+      "clause_count": 11
+    },
+    {
+      "task_id": "task-f7526731bbcd20b35150bc6758f939e1cce3aa77877e7ab92ae1ad4bcd150c68",
+      "family_id": "fam-8894023541ab7597d416769fbf25d2c422eaa8cfd5c6608cb4c7d02f96b4e88a",
+      "split": "train",
+      "n": 9,
+      "k": 3,
+      "role_anonymous": false,
+      "clause_count": 12
+    },
+    {
+      "task_id": "task-41801b8764a3d3c3cd5b3b8d6f19ee5b452a7dc1ff51e4ad9c848c5e4967c52b",
+      "family_id": "fam-8ccf8eec6e851f6d4ea9f6d0850323e4165f3a128d5554a22bc6132839010369",
+      "split": "qualification",
+      "n": 9,
+      "k": 4,
+      "role_anonymous": true,
+      "clause_count": 6
+    },
+    {
+      "task_id": "task-4f88f068c987a6ea986ad135809f898db3ba37c5e645f4600f485c7c327dbbb4",
+      "family_id": "fam-8e41e646d5d92fac9c6d837e0f93a73ac0a1750f3b673cc33d58e549d7fa57c1",
+      "split": "validation",
+      "n": 11,
+      "k": 3,
+      "role_anonymous": false,
+      "clause_count": 14
+    },
+    {
+      "task_id": "task-0fb2074fb490e664d98f42464fce2cc57b1395689090d928adef19ef280e4abb",
+      "family_id": "fam-8e6125e23c5bfefd98bbc35e3cbde3891955b8ec79de25a4fbdedc532981aa68",
+      "split": "train",
+      "n": 10,
+      "k": 4,
+      "role_anonymous": true,
+      "clause_count": 5
+    },
+    {
+      "task_id": "task-35cd0dbe7bc62819dac3bdc5c1f2429e8f6f0f2c475542999e98ec35b5ec80cb",
+      "family_id": "fam-91509bd3fdc233dc624d7c560c7818f7379b7043314c198b9e011cdc018b8ed3",
+      "split": "train",
+      "n": 12,
+      "k": 4,
+      "role_anonymous": false,
+      "clause_count": 15
+    },
+    {
+      "task_id": "task-f8b792c961882feda7d13d9ad055d77c087e4010c280142ce8d8e39cb72d96d2",
+      "family_id": "fam-97f7d47faaefc7c1822253cb64befa0cc666376a660ab8987ea883d96253ddd1",
+      "split": "train",
+      "n": 12,
+      "k": 2,
+      "role_anonymous": true,
+      "clause_count": 6
+    },
+    {
+      "task_id": "task-b59464f4fb6c1bd5081cd737c4c5ae0e550d7aa53d9bacc38f52febdb23272a9",
+      "family_id": "fam-995cca9c470e0dee84517702eac2ba6fe2ca9a0731e40924d3a4b3709b6d2a85",
+      "split": "validation",
+      "n": 8,
+      "k": 4,
+      "role_anonymous": false,
+      "clause_count": 12
+    },
+    {
+      "task_id": "task-5936fc574717bfd69c4546e65af3926a0c9fe407a2afc22fa6f46330089cff61",
+      "family_id": "fam-9a79397737db8bd46223f648500a6d7c84e5518410cdae1320b65cc6e6a6e349",
+      "split": "qualification",
+      "n": 6,
+      "k": 3,
+      "role_anonymous": false,
+      "clause_count": 7
+    },
+    {
+      "task_id": "task-dfc5e5b5bf7e63ec358dc8d93a9ed9c68b53d895f999c5f49a68f646c6d2381d",
+      "family_id": "fam-9b557cd7f3c0cec8cb55e3ebe60d96af6264d314e0a6c04e627db10dbec5e1cb",
+      "split": "qualification",
+      "n": 7,
+      "k": 2,
+      "role_anonymous": true,
+      "clause_count": 5
+    },
+    {
+      "task_id": "task-9cbc8821af0413e8deb500c31ab95d52402ec2f1a6e019f8fbc50fe2556fb832",
+      "family_id": "fam-a31bdccf7e34d3e2a45463abc636c887d0309e064490dd8764de9395e4d5caee",
+      "split": "train",
+      "n": 9,
+      "k": 3,
+      "role_anonymous": false,
+      "clause_count": 11
+    },
+    {
+      "task_id": "task-649b728b06be1fa2ab5341aaf950c9ac4e24c67370dcca7c52f73df22d94abd6",
+      "family_id": "fam-a3db81cef98145589a907cbaa3d7cf963478b6592b91e7f659548a5a2436a29d",
+      "split": "train",
+      "n": 6,
+      "k": 3,
+      "role_anonymous": true,
+      "clause_count": 1
+    },
+    {
+      "task_id": "task-5e036fbe60249d679c15408c612cef08d9b48e0b440e4aba28dee930a4f2d81a",
+      "family_id": "fam-a6f14226fb104c84901b24f94bf1dd87299afd01790df744e17538905adecd60",
+      "split": "train",
+      "n": 10,
+      "k": 2,
+      "role_anonymous": false,
+      "clause_count": 14
+    },
+    {
+      "task_id": "task-043f22be1bdd14a7f6a2c8b8a5e0783d9a03d02167148874562ea794f9bfb908",
+      "family_id": "fam-a7efcecf8dcdd79d78d3f9b97a09dff0b28a0f7866acfbd5ac3e1c383d05846a",
+      "split": "qualification",
+      "n": 12,
+      "k": 2,
+      "role_anonymous": true,
+      "clause_count": 8
+    },
+    {
+      "task_id": "task-d35c4248687bd787ef20655ba662359ceca7bc6ade67255909c295764a0b43c4",
+      "family_id": "fam-a800e8a194aa93bc53d6c5f323a5fea15e6920f8d0b46dc0759309ab4b1e2d69",
+      "split": "validation",
+      "n": 9,
+      "k": 4,
+      "role_anonymous": false,
+      "clause_count": 12
+    },
+    {
+      "task_id": "task-d0b9c3609985fd51e77f3d052e9a6ab2f64a35ee9d8d1543f4889ef80e6cb4ba",
+      "family_id": "fam-a9037602a6254a160be7b41982eddc9cc41fa74f8bdd0b714160c5140f118806",
+      "split": "validation",
+      "n": 8,
+      "k": 3,
+      "role_anonymous": false,
+      "clause_count": 12
+    },
+    {
+      "task_id": "task-354cdedcca628c044a2fee31737c9514b16de654f11c4a7b13fe97072eb1b583",
+      "family_id": "fam-ab402083e1bca129fb8bd0283b64f1315478b9373dc91be20fcdccbc98442990",
+      "split": "qualification",
+      "n": 11,
+      "k": 4,
+      "role_anonymous": false,
+      "clause_count": 13
+    },
+    {
+      "task_id": "task-a0ae58e78eb16f8a15af46285a5eaaf8bff9c317c065d9bba131a68ce1f85add",
+      "family_id": "fam-b1ba19da78f7073cb4e7dae42a59d188ea83ac5c93bb595878dfc8a1dfb429e5",
+      "split": "train",
+      "n": 12,
+      "k": 2,
+      "role_anonymous": true,
+      "clause_count": 11
+    },
+    {
+      "task_id": "task-b036c915cac7732539eaee935b1b05889ab653ceacfa90f64366cec5cb6f1720",
+      "family_id": "fam-b470be3afe24ffb34e9ff0b8d499569f19bfde476515da3aafc3d7e93cce9c3a",
+      "split": "validation",
+      "n": 7,
+      "k": 2,
+      "role_anonymous": false,
+      "clause_count": 11
+    },
+    {
+      "task_id": "task-6709e246bdb3cee7cdb167c16d88ae9da7e56c2bf216ed3403794cff02766680",
+      "family_id": "fam-b5aba0da9455ddd0b7b908ccc3326c3a9757768abe8fffae871ef560afcfdfef",
+      "split": "qualification",
+      "n": 11,
+      "k": 3,
+      "role_anonymous": true,
+      "clause_count": 9
+    },
+    {
+      "task_id": "task-51c139c79e61019cd52ab3a21095f3b8adcbd7e460c921d222ffa9c27a2e3aef",
+      "family_id": "fam-b88ceeee89f4aa304ce81aace0954dd049da409b7780a349cea83442bfe79229",
+      "split": "train",
+      "n": 7,
+      "k": 3,
+      "role_anonymous": true,
+      "clause_count": 2
+    },
+    {
+      "task_id": "task-738ba7f444bd35e5034e4cbad1b1720e821470566255efb85aa84538dd606945",
+      "family_id": "fam-b978c9139d14825919add7d78b64591055b87ba9918cc751379b586bb5200705",
+      "split": "qualification",
+      "n": 8,
+      "k": 2,
+      "role_anonymous": false,
+      "clause_count": 10
+    },
+    {
+      "task_id": "task-464066c182a2b90356f278b4897b527c618acaa8d21fdbf2c672127ad31bb1de",
+      "family_id": "fam-c00fd84cc71401870a1cb3fc167b8d43aedda6a10572ca3fc4640b8413406e8d",
+      "split": "validation",
+      "n": 8,
+      "k": 2,
+      "role_anonymous": true,
+      "clause_count": 2
+    },
+    {
+      "task_id": "task-0cc29b54efa23cb395085e47acac75aa61bf6bb9b304a0682cb6f0231994a6ae",
+      "family_id": "fam-c05fd81d466b67cec015564b8128345a6e3cbba5149f47c836135c9d6d5b704d",
+      "split": "train",
+      "n": 8,
+      "k": 3,
+      "role_anonymous": false,
+      "clause_count": 11
+    },
+    {
+      "task_id": "task-3e45cac5b7e5144b7059889b03993c9b8e81f898ca27fde6212692ddd6fc15e7",
+      "family_id": "fam-c55e561fbff43d65c2499f3b8fd4bfa86bfa63718261a616ac050f99a670cae6",
+      "split": "qualification",
+      "n": 6,
+      "k": 4,
+      "role_anonymous": true,
+      "clause_count": 4
+    },
+    {
+      "task_id": "task-1ec329e066b0142114a512637162a4504fa9db129d9f67e0b935805fb2c6db46",
+      "family_id": "fam-c71b76c4b1c5766e4a3c88df4210d7c50462e9ee96229396076869dc03de8446",
+      "split": "qualification",
+      "n": 6,
+      "k": 3,
+      "role_anonymous": false,
+      "clause_count": 11
+    },
+    {
+      "task_id": "task-7e8e11c3ce28a1603653127f8681ac31f70510b831df2d30d8f5dabe02a15515",
+      "family_id": "fam-ca622edf0f68f0f2bffb058d4f847b0a8e921b5b406443ac227ebe0f863832b1",
+      "split": "train",
+      "n": 9,
+      "k": 2,
+      "role_anonymous": false,
+      "clause_count": 9
+    },
+    {
+      "task_id": "task-71a28b1c91df8cc3ea9c98041b30ade27aea6d5e6864a071ec9aa2dccb225f36",
+      "family_id": "fam-ce00d5a6d3af616536d794467f19b99d167534252cb0e6a5e8c5a8662aed3d15",
+      "split": "train",
+      "n": 8,
+      "k": 3,
+      "role_anonymous": true,
+      "clause_count": 6
+    },
+    {
+      "task_id": "task-d73beb47b3524feebc982f9528e4101ff88265541cb605143dffb2fda11729f1",
+      "family_id": "fam-d230a0319a62d8346dd52114af3c943bdd6270c8d24d9f9444d3f81746d99a22",
+      "split": "train",
+      "n": 8,
+      "k": 3,
+      "role_anonymous": true,
+      "clause_count": 5
+    },
+    {
+      "task_id": "task-852464025d9c31552a51c8212863b8b5b5f6747d3e218796b6e3355d22fbbd23",
+      "family_id": "fam-d75086568fbb4edd9ce4ec8104faf469e3ecb7b4108ddb82ed03bf2571eb7993",
+      "split": "train",
+      "n": 9,
+      "k": 2,
+      "role_anonymous": true,
+      "clause_count": 8
+    },
+    {
+      "task_id": "task-75caafb25438b04c105cbeef7c25ccf51351c310930111e8cff5dcbbd698c48a",
+      "family_id": "fam-d8f3fa72baaa330b5186dffee13f0cd07f186bd6801306c238e3bec5798e2846",
+      "split": "train",
+      "n": 9,
+      "k": 3,
+      "role_anonymous": false,
+      "clause_count": 14
+    },
+    {
+      "task_id": "task-8c157e81faac71a64651d0d2a0b741bb6af4457c2edbacd660aeca100de3aa7f",
+      "family_id": "fam-da332a8eb305257e8daea66f3cfb975b5c9423ca5f083b3579139d3696585c51",
+      "split": "train",
+      "n": 9,
+      "k": 4,
+      "role_anonymous": false,
+      "clause_count": 13
+    },
+    {
+      "task_id": "task-705b37f465b9913eec0838e1b496d137f2c7e70885f7b843e0317ee94d7de960",
+      "family_id": "fam-dd814ef688222b41718f25317138cb9b3800ee628d38c6927d558aa3966d78fc",
+      "split": "train",
+      "n": 10,
+      "k": 3,
+      "role_anonymous": false,
+      "clause_count": 15
+    },
+    {
+      "task_id": "task-d103f1b2f01f43d294a5d0973d52faabdac540f0d34036e70b046377018cab6a",
+      "family_id": "fam-e1596f2745687cba2a8b19cd00e3e95e132f48a59b216f22ff8aa5752e63b51b",
+      "split": "train",
+      "n": 7,
+      "k": 4,
+      "role_anonymous": true,
+      "clause_count": 6
+    },
+    {
+      "task_id": "task-5ef43d06e1ba428a5a5bc707cb7060a8737294330dddabd289db7f6a8915f9da",
+      "family_id": "fam-e3658573fb4a336b4d815391cbc7c6501ecb9ec1afe9865f660ef58990e81e14",
+      "split": "train",
+      "n": 9,
+      "k": 3,
+      "role_anonymous": true,
+      "clause_count": 4
+    },
+    {
+      "task_id": "task-f334dddf88b5443d0dd91e705b496e70302d70e4bbff647257b2600f35db4ec6",
+      "family_id": "fam-e38ab7398051161e7f809590d12a7f2afd11ab4147a4b8ab8bc23a5ef3a64c71",
+      "split": "qualification",
+      "n": 6,
+      "k": 2,
+      "role_anonymous": false,
+      "clause_count": 11
+    },
+    {
+      "task_id": "task-8793271a622c86834e7c361060a0956a419e7ccaf3959d3197609e54537a5a98",
+      "family_id": "fam-e4ea97e24a8a7cfbb1f619166ad004b5543dffcfbddc218aeb13142d84a0ea40",
+      "split": "qualification",
+      "n": 7,
+      "k": 2,
+      "role_anonymous": false,
+      "clause_count": 8
+    },
+    {
+      "task_id": "task-39904777ca287830282f7a6d0babc06373228ff34f8a2aa7c30d287213ccd582",
+      "family_id": "fam-e6590cf5d0ac2ee114567f8d328fada53db4dce9f9b71be878711f7fbdda369b",
+      "split": "qualification",
+      "n": 12,
+      "k": 2,
+      "role_anonymous": false,
+      "clause_count": 17
+    },
+    {
+      "task_id": "task-997c4a7480310c5ebabb0d4e23878ae692dfa29435fe3f89cd28d056d666845f",
+      "family_id": "fam-e8be59f1bab0a9cefee438eb48c47907834d8acde5991540043b35e269a49ee7",
+      "split": "train",
+      "n": 11,
+      "k": 4,
+      "role_anonymous": true,
+      "clause_count": 10
+    },
+    {
+      "task_id": "task-1eb6b81a2c152914ace63cfd6d28cf2db07befdc40fb4eb558885ab56d25213e",
+      "family_id": "fam-eb3bcdb02d98179206d03b2ae77ad57d2f552e304d73e29a00b4642738e21a95",
+      "split": "train",
+      "n": 11,
+      "k": 4,
+      "role_anonymous": false,
+      "clause_count": 15
+    },
+    {
+      "task_id": "task-1955be0f6ce6510149e6d288c888d6d26374a35c4d2d618a46d5bac5edae1f2e",
+      "family_id": "fam-ebbfc54dbd5debd2dca53a8e7dbc1908795dfb3b2cb3e7257aeb7fef9f7802f2",
+      "split": "train",
+      "n": 9,
+      "k": 2,
+      "role_anonymous": true,
+      "clause_count": 3
+    },
+    {
+      "task_id": "task-8375df385218c86c4b7b059f7249d0d4c7f897c62c34e1205e7556a0d50c1f5f",
+      "family_id": "fam-ed1b1153ec5ffdef7377131a4a25aa4f023040f9b03dc030c2d922586fbf9765",
+      "split": "qualification",
+      "n": 12,
+      "k": 3,
+      "role_anonymous": true,
+      "clause_count": 10
+    },
+    {
+      "task_id": "task-d36eec712ffb7c535a83a07949586fcad886c409c89f0a3aa5f8f08c0bf7fdb3",
+      "family_id": "fam-f2a80998f7312fa14a3c94ba079c2b9d3b6e23457a18bcece7e98ed2ad1e6651",
+      "split": "train",
+      "n": 6,
+      "k": 2,
+      "role_anonymous": true,
+      "clause_count": 5
+    },
+    {
+      "task_id": "task-64455755a9f9b3cf8134a5ac640fe648c343069026a60e108694084214dc08a6",
+      "family_id": "fam-f4b8072f92d53a63b636beefb89e509890d08d3066922a69b936a7d6883d8f2f",
+      "split": "train",
+      "n": 10,
+      "k": 2,
+      "role_anonymous": true,
+      "clause_count": 9
+    },
+    {
+      "task_id": "task-ca0f642e9cf73c77512a3c0c25a2158ad072018bd64ca830645e073519690242",
+      "family_id": "fam-f924349872e39ae8feac2d92726d6d0c3ce0f091c03c1ed1edade7828b8cbdfc",
+      "split": "train",
+      "n": 10,
+      "k": 3,
+      "role_anonymous": true,
+      "clause_count": 9
+    },
+    {
+      "task_id": "task-8edfc353167548fa7a57e59ea5c1873e403772449ac80c3b5cc9ea5cb25cb825",
+      "family_id": "fam-fcee373b1b85b9aa3330149a92471674d6bc392072d31b194148ff3cf4ec969e",
+      "split": "qualification",
+      "n": 11,
+      "k": 2,
+      "role_anonymous": true,
+      "clause_count": 9
+    },
+    {
+      "task_id": "task-bacf5023ee9cec6b78459c52e973982023fac1291dc031da7563cf9637d56bae",
+      "family_id": "fam-fd33fb3020e3adc89fea9aca8fd2e9ed2ec3d815e1d7021ba304f06656b57bd2",
+      "split": "validation",
+      "n": 6,
+      "k": 2,
+      "role_anonymous": true,
+      "clause_count": 0
+    }
+  ],
+  "version": 2,
+  "supersedes": "FAS-R1-SENSOR-SUPPORT-v01",
+  "change_reason": "Normalize split_counts keys to match the extractor contract after attempt-v01 rejected the otherwise matching 48/16/32 roster."
+}

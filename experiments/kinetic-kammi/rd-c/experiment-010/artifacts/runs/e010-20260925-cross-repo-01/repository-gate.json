@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "reporter_sha256": "024c99fad92a4b503dc5816258fe8fd57698f84c4901a914c011844b4646e815",
+  "gate_pass": true,
+  "repository_order": {
+    "ripgrep": "Repo A (ripgrep)",
+    "turbovec": "Repo B (turbovec)"
+  },
+  "repositories": {
+    "ripgrep": {
+      "task_count": 8,
+      "direct_small_actions": 8,
+      "direct_small_successes": 8,
+      "direct_small_errors": 0,
+      "direct_small_wrong_legal_actions": 0,
+      "small_coverage": 1.0,
+      "direct_action_precision": 1.0,
+      "hybrid_completions": 8,
+      "always_large_completions": 8,
+      "hybrid_large_calls": 0,
+      "always_large_calls": 8,
+      "large_calls_avoided": 8,
+      "hybrid_total_tokens": 11363,
+      "always_large_total_tokens": 12627,
+      "hybrid_total_elapsed_ms": 43978.624,
+      "always_large_total_elapsed_ms": 131785.945,
+      "authority_clean_all_lanes": true,
+      "hybrid_retains_completion": true,
+      "displaces_large_call": true,
+      "zero_direct_action_errors": true,
+      "repository_gate_pass": true,
+      "families": [
+        "ripgrep-case-insensitive-glob",
+        "ripgrep-gitignore-bom",
+        "ripgrep-literal-separator-glob",
+        "ripgrep-recursive-glob"
+      ],
+      "report_label": "Repo A (ripgrep)"
+    },
+    "turbovec": {
+      "task_count": 8,
+      "direct_small_actions": 5,
+      "direct_small_successes": 5,
+      "direct_small_errors": 0,
+      "direct_small_wrong_legal_actions": 0,
+      "small_coverage": 0.625,
+      "direct_action_precision": 1.0,
+      "hybrid_completions": 8,
+      "always_large_completions": 5,
+      "hybrid_large_calls": 3,
+      "always_large_calls": 8,
+      "large_calls_avoided": 5,
+      "hybrid_total_tokens": 16289,
+      "always_large_total_tokens": 13715,
+      "hybrid_total_elapsed_ms": 101187.237,
+      "always_large_total_elapsed_ms": 110350.661,
+      "authority_clean_all_lanes": true,
+      "hybrid_retains_completion": true,
+      "displaces_large_call": true,
+      "zero_direct_action_errors": true,
+      "repository_gate_pass": true,
+      "families": [
+        "turbovec-id-remove-readd",
+        "turbovec-id-swap-repair",
+        "turbovec-mask-allowlist",
+        "turbovec-rotation-wire-format"
+      ],
+      "report_label": "Repo B (turbovec)"
+    }
+  },
+  "pooled_descriptive": {
+    "task_count": 16,
+    "small_coverage": 0.8125,
+    "direct_action_precision": 1.0,
+    "hybrid_completions": 16,
+    "always_large_completions": 13,
+    "hybrid_large_calls": 3,
+    "always_large_calls": 16,
+    "large_calls_avoided": 13,
+    "hybrid_total_tokens": 27652,
+    "always_large_total_tokens": 26342,
+    "hybrid_total_elapsed_ms": 145165.861,
+    "always_large_total_elapsed_ms": 242136.606,
+    "interpretation": "pooled descriptive totals only; repository gates are evaluated independently"
+  }
+}

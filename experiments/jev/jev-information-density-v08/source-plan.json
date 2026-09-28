@@ -1,0 +1,31 @@
+{
+  "contract": "jev-decision-data-information-density/v0.8",
+  "policy": "read source model-visible fields only; never inspect gold targets or predictions in protected sources",
+  "strict_novel_root_metadata": "C:/Users/shuga/.codex/worktrees/3c8a/clean-rust/experiments/jev-curated-c100-v01/selected-metadata.jsonl",
+  "sources": [
+    {"id": "v04-s1k-train", "role": "prior_training", "path": "D:/codex-runs/jev-frozen-saturation-v04/banks/s1k/train.jsonl"},
+    {"id": "v04-s5k-train", "role": "prior_training", "path": "D:/codex-runs/jev-frozen-saturation-v04/banks/s5k/train.jsonl"},
+    {"id": "v04-s10k-train", "role": "prior_training", "path": "D:/codex-runs/jev-frozen-saturation-v04/banks/s10k/train.jsonl"},
+    {"id": "v04-s20k-train", "role": "prior_training", "path": "D:/codex-runs/jev-frozen-saturation-v04/banks/s20k/train.jsonl"},
+    {"id": "v04-dev", "role": "protected_evaluation", "path": "D:/codex-runs/jev-frozen-saturation-v04/banks/s10k/dev.jsonl"},
+    {"id": "v04-test", "role": "protected_evaluation", "path": "D:/codex-runs/jev-frozen-saturation-v04/banks/s10k/test.jsonl"},
+    {"id": "v04-external-eval", "role": "protected_evaluation", "path": "D:/codex-runs/jev-frozen-saturation-v04/banks/s10k/external-eval.jsonl"},
+    {"id": "v04-all-generated", "role": "protected_family_registry", "path": "D:/codex-runs/jev-frozen-saturation-v04/banks/all-episodes.jsonl"},
+    {"id": "v04-all-metadata", "role": "protected_metadata", "path": "D:/codex-runs/jev-frozen-saturation-v04/banks/all-metadata.jsonl", "format": "v04_metadata"},
+    {"id": "v05-s50k-train", "role": "prior_training", "path": "D:/codex-runs/jev-frozen-scaling-v05/banks/s50k/train.jsonl"},
+    {"id": "v05-s100k-train", "role": "prior_training", "path": "D:/codex-runs/jev-frozen-scaling-v05/banks/s100k/train.jsonl"},
+    {"id": "v05-feature-train", "role": "prior_training", "path": "D:/codex-runs/jev-frozen-scaling-v05/banks/feature-bank/train.jsonl"},
+    {"id": "v05-feature-dev", "role": "protected_evaluation", "path": "D:/codex-runs/jev-frozen-scaling-v05/banks/feature-bank/dev.jsonl"},
+    {"id": "v05-feature-test", "role": "protected_evaluation", "path": "D:/codex-runs/jev-frozen-scaling-v05/banks/feature-bank/test.jsonl"},
+    {"id": "v05-feature-external", "role": "protected_evaluation", "path": "D:/codex-runs/jev-frozen-scaling-v05/banks/feature-bank/external-eval.jsonl"},
+    {"id": "v06-s250k-train", "role": "prior_training", "path": "D:/codex-runs/jev-frozen-scaling-v06/banks/s250k/train.jsonl"},
+    {"id": "v06-feature-train", "role": "prior_training", "path": "D:/codex-runs/jev-frozen-scaling-v06/banks/feature-bank/train.jsonl"},
+    {"id": "v06-feature-dev", "role": "protected_evaluation", "path": "D:/codex-runs/jev-frozen-scaling-v06/banks/feature-bank/dev.jsonl"},
+    {"id": "v06-feature-test", "role": "protected_evaluation", "path": "D:/codex-runs/jev-frozen-scaling-v06/banks/feature-bank/test.jsonl"},
+    {"id": "v06-feature-external", "role": "protected_evaluation", "path": "D:/codex-runs/jev-frozen-scaling-v06/banks/feature-bank/external-eval.jsonl"},
+    {"id": "v07-ontology-id-world-id", "role": "protected_evaluation", "path": "D:/codex-runs/jev-lfm-variable-v07/banks/ood/ontology-id-world-id/test.jsonl"},
+    {"id": "v07-ontology-id-world-ood", "role": "protected_evaluation", "path": "D:/codex-runs/jev-lfm-variable-v07/banks/ood/ontology-id-world-ood/test.jsonl"},
+    {"id": "v07-joint-ood", "role": "protected_evaluation", "path": "D:/codex-runs/jev-lfm-variable-v07/banks/ood/ontology-ood-world-ood/test.jsonl"},
+    {"id": "StrictNovel93", "role": "prior_candidate_firewall", "path": "C:/Users/shuga/.codex/worktrees/3c8a/clean-rust/experiments/jev-curated-c100-v01/train.jsonl"}
+  ]
+}

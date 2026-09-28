@@ -1,0 +1,204 @@
+{
+  "comparative_scoring_or_analysis_emitted": false,
+  "failure": "Cphi_unshared-H309000-I0 failed epoch-200 deterministic prediction mismatch between checkpoint inference and repeated inference.",
+  "fit_manifest_sha256": "e8737570938fb43ebe26325a3d04697f4caedb3e00027ae4da0c119be18d6c08",
+  "fits_completed_receipt_count": 2,
+  "identity": "F4-PRESENTATION-03-EXECUTION-CONTINUATION-v0.1",
+  "partial_artifact_count": 37,
+  "partial_artifacts": [
+    {
+      "bytes": 3071,
+      "path": "fit-receipts/Cphi-H309000-I0.json",
+      "sha256": "d42b594a12e00954d11732161b7437edd0fd67c76a3b15c2666e33462ebbbfdb"
+    },
+    {
+      "bytes": 2862,
+      "path": "fit-receipts/D-H309000-I0.json",
+      "sha256": "27e489d39237121d920e8311cd5b4822a964693709665d956e2d8dc97022a980"
+    },
+    {
+      "bytes": 138546,
+      "path": "predictions/Cphi-H309000-I0.bin",
+      "sha256": "bbe550c61c65be34f1609a3f2d643e2db96e23e7ad7d5f57059bb1e85e5f25eb"
+    },
+    {
+      "bytes": 138546,
+      "path": "predictions/D-H309000-I0.bin",
+      "sha256": "9be3603748f04d1c245555e9cdd7d9f2b6992d6788fdcbbd4be741e8ca4b9fd6"
+    },
+    {
+      "bytes": 79895,
+      "path": "final-tensors/Cphi-H309000-I0.bin",
+      "sha256": "62b9a6c75d3e784df9611fae2a1b3ca27ad8f9e038da8799368b7315530b668a"
+    },
+    {
+      "bytes": 79954,
+      "path": "final-tensors/D-H309000-I0.bin",
+      "sha256": "cd35436ccfe79cdb15f83652c694bffc08923329ad049a191b70e234ce71854c"
+    },
+    {
+      "bytes": 44669,
+      "path": "training-traces/Cphi-H309000-I0.csv",
+      "sha256": "a8ab3dcd08ee56f021617c197c9d5684c533bd3b5f1089db4f7d298b5d0aa4ef"
+    },
+    {
+      "bytes": 35697,
+      "path": "training-traces/D-H309000-I0.csv",
+      "sha256": "b0084acef0af4c095d580edff986a7ffc0f43fa496faae009330c1e4aec8be1b"
+    },
+    {
+      "bytes": 79895,
+      "path": "checkpoint-tensors/Cphi-H309000-I0/epoch-001.bin",
+      "sha256": "818eab32561b53f443d44915ddf1952894b2579d0f83fc89104949e205f108ec"
+    },
+    {
+      "bytes": 79895,
+      "path": "checkpoint-tensors/Cphi-H309000-I0/epoch-002.bin",
+      "sha256": "2a1a97f1bd296ed28f11fc4654069aa6564dc27afc4be3fdaea83a528464daf9"
+    },
+    {
+      "bytes": 79895,
+      "path": "checkpoint-tensors/Cphi-H309000-I0/epoch-004.bin",
+      "sha256": "89cad6ac0fdea602418ed7218505468cfb861d8e554b2e58fe6453770e5d7092"
+    },
+    {
+      "bytes": 79895,
+      "path": "checkpoint-tensors/Cphi-H309000-I0/epoch-008.bin",
+      "sha256": "1a6a059434d895b489e703a66a4236d19b73f9e88ea8164d168d9886f3228c84"
+    },
+    {
+      "bytes": 79895,
+      "path": "checkpoint-tensors/Cphi-H309000-I0/epoch-016.bin",
+      "sha256": "2c3398ff90e02885b50155f9e00fb8dc5be00612df7753e6ef686ead5ab7a2ab"
+    },
+    {
+      "bytes": 79895,
+      "path": "checkpoint-tensors/Cphi-H309000-I0/epoch-032.bin",
+      "sha256": "9fbd2dadddea2efb0918b0227eee6d8d1090ba0294207637383fe9e4e6052214"
+    },
+    {
+      "bytes": 79895,
+      "path": "checkpoint-tensors/Cphi-H309000-I0/epoch-064.bin",
+      "sha256": "cfa3dd92be22b0b1e6beca563e435e0a1c3a348c166e7e9875adc262cedad30a"
+    },
+    {
+      "bytes": 79895,
+      "path": "checkpoint-tensors/Cphi-H309000-I0/epoch-128.bin",
+      "sha256": "9a77a238b71ec8040d8e4a2f458c7c3404c5d7d64dc26eca8955dacd188ecf5f"
+    },
+    {
+      "bytes": 79895,
+      "path": "checkpoint-tensors/Cphi-H309000-I0/epoch-200.bin",
+      "sha256": "62b9a6c75d3e784df9611fae2a1b3ca27ad8f9e038da8799368b7315530b668a"
+    },
+    {
+      "bytes": 81247,
+      "path": "checkpoint-tensors/Cphi_unshared-H309000-I0/epoch-001.bin",
+      "sha256": "8070b41919e4e46d43fba8dd6e0f0a61809cb35c45890cfb2a404b63df68019e"
+    },
+    {
+      "bytes": 81247,
+      "path": "checkpoint-tensors/Cphi_unshared-H309000-I0/epoch-002.bin",
+      "sha256": "d761bd5e9f20115702d402effc14dbdc47e911238862a87ecd645ad2b0e986ba"
+    },
+    {
+      "bytes": 81247,
+      "path": "checkpoint-tensors/Cphi_unshared-H309000-I0/epoch-004.bin",
+      "sha256": "22be0e790b1f700b1c12dbbac3061912af9c7c1ffc42b1be767d7e4523d8f8a3"
+    },
+    {
+      "bytes": 81247,
+      "path": "checkpoint-tensors/Cphi_unshared-H309000-I0/epoch-008.bin",
+      "sha256": "c275e0409f9d9b5f9f51191d77b5b8e0e81c663ce2dc76cdb2f2459d43da357e"
+    },
+    {
+      "bytes": 81247,
+      "path": "checkpoint-tensors/Cphi_unshared-H309000-I0/epoch-016.bin",
+      "sha256": "9464d176e0764ee1f323229cf4ea14cd5748dac0b684721b1fb1e2745a42d0c8"
+    },
+    {
+      "bytes": 81247,
+      "path": "checkpoint-tensors/Cphi_unshared-H309000-I0/epoch-032.bin",
+      "sha256": "f2e7202bf07cbe36f5d03ddc2f2aebdcdef04a4cc5ffc5396690edb5065a5296"
+    },
+    {
+      "bytes": 81247,
+      "path": "checkpoint-tensors/Cphi_unshared-H309000-I0/epoch-064.bin",
+      "sha256": "9bfbfae218e60d368c3e119740d4911bfd5ec7360fcaa72206c7098dcd22c9f9"
+    },
+    {
+      "bytes": 81247,
+      "path": "checkpoint-tensors/Cphi_unshared-H309000-I0/epoch-128.bin",
+      "sha256": "6b5a9202601a072c55b9f6389a8df81f9479fa4b032a26ce685db78f07e4cb1e"
+    },
+    {
+      "bytes": 81247,
+      "path": "checkpoint-tensors/Cphi_unshared-H309000-I0/epoch-200.bin",
+      "sha256": "7114011ebaa4a0c67a1f03a31998e05d2cbe4b8703d92bebbddd3c1d66d17c67"
+    },
+    {
+      "bytes": 79954,
+      "path": "checkpoint-tensors/D-H309000-I0/epoch-001.bin",
+      "sha256": "071d10297c886c9fae76d3efa93324176c0c5dfba35f04cfa95288d7c28331c7"
+    },
+    {
+      "bytes": 79954,
+      "path": "checkpoint-tensors/D-H309000-I0/epoch-002.bin",
+      "sha256": "81df72a7a7e4df7aed572b1c6df21857f60c8e106bb77af22df2db633ed6de08"
+    },
+    {
+      "bytes": 79954,
+      "path": "checkpoint-tensors/D-H309000-I0/epoch-004.bin",
+      "sha256": "76bdce3ff99ebb8427b845ec111cb0e0ea1bbd9e1d6e85d7ec74a472e44e8e59"
+    },
+    {
+      "bytes": 79954,
+      "path": "checkpoint-tensors/D-H309000-I0/epoch-008.bin",
+      "sha256": "bd7828b81805aade0ab76fc44a73bdaa010478bd718187406ad74dfae22cf95d"
+    },
+    {
+      "bytes": 79954,
+      "path": "checkpoint-tensors/D-H309000-I0/epoch-016.bin",
+      "sha256": "9b9245fc40af4411ebf947384e0187f457c569c6e46f94bb5d2ad405f85bc272"
+    },
+    {
+      "bytes": 79954,
+      "path": "checkpoint-tensors/D-H309000-I0/epoch-032.bin",
+      "sha256": "39766a423f83227166c8baa87fc949f3669e51fdd6404206e20b304d6184e0a5"
+    },
+    {
+      "bytes": 79954,
+      "path": "checkpoint-tensors/D-H309000-I0/epoch-064.bin",
+      "sha256": "b01435a12e2df9b28fa8f22e88d8ef0e7fac2fe6280757ba3463a202490bb9e2"
+    },
+    {
+      "bytes": 79954,
+      "path": "checkpoint-tensors/D-H309000-I0/epoch-128.bin",
+      "sha256": "8cde6dbd3b921d9078929cb50e6e6701411ea644bc81e01c3766345754613154"
+    },
+    {
+      "bytes": 79954,
+      "path": "checkpoint-tensors/D-H309000-I0/epoch-200.bin",
+      "sha256": "cd35436ccfe79cdb15f83652c694bffc08923329ad049a191b70e234ce71854c"
+    },
+    {
+      "bytes": 3156090,
+      "path": "heldout-state/Cphi-H309000-I0.npz",
+      "sha256": "7f15303a128507507a87ab969b165e0950d9569c50e4304612af37b65684df42"
+    },
+    {
+      "bytes": 1636878,
+      "path": "heldout-state/D-H309000-I0.npz",
+      "sha256": "8a01d4f6bc87459b499d6dc36e7872be6869e75fbd13b254d8bb308c7e0e0ae5"
+    }
+  ],
+  "prediction_lock_exists": false,
+  "prediction_stream_count": 2,
+  "repair_decision": "Preserve this attempt; any corrected full execution requires a separately versioned identity and a complete fresh fit surface over the same frozen tasks/collection.",
+  "resume_same_identity_authorized": false,
+  "schema": "F4-PRESENTATION-03-fit-execution-stop-receipt-v0.1",
+  "scoring_truth_fields_opened_by_runner": false,
+  "source_sha256": "551683dcca848b9caf76612729c1f6ec964e806aeb072bcaed2b85b6b0904b74",
+  "status": "STOP_DETERMINISTIC_EPOCH200_REPLAY_MISMATCH",
+  "target_polarity_only_preopen_support_gate": true
+}

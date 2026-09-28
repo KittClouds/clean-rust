@@ -1,0 +1,11 @@
+{
+  "schema": "KAMMI_E4_HISTORY_IMPORT_FAILED_ATTEMPT_V1",
+  "status": "STOPPED_PARTIAL_APPEND_PRESERVED",
+  "run_id": "E4-0-legacy-snapshot",
+  "failure": "The v3 import expanded source coverage but reused the v2 run identity. Its final strict count check found previously committed v2 facts outside the revised extraction set.",
+  "committed_journal_events_at_stop": 1165,
+  "committed_fact_count_at_stop": 651,
+  "journal_head_at_stop": "sha256:c5694d5aafa06db938d5ad6bf1cd90ad40717df34d6e2c810e2ae55db2fb289f",
+  "disposition": "Preserve this run and use a distinct v3 run identity. No deletion or reinterpretation of the partial append.",
+  "flight_authorization_conferred": false
+}

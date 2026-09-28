@@ -1,0 +1,191 @@
+{
+  "contract_id": "FAS00_SENSOR_QUALIFICATION_V01",
+  "paperwork_bundle_id": "FAS00_SENSOR_CONTACT_PAPERWORK_V01",
+  "project_id": "fas-frozen-adaptive-substrate-v00",
+  "phase": 3,
+  "status": "SEALED_PROSPECTIVE_CONTRACT; PROBE_TRAINING_NOT_AUTHORIZED",
+  "phase2a_packet_id": "FAS00_PHASE2A_FEATURE_EXTRACTION_V01",
+  "phase2a_packet_sha256_is_bound_by_bundle_seal": true,
+  "model_contact_authorized": false,
+  "sensor_probe_authorized": false,
+  "online_mechanisms_authorized": false,
+  "phase5_corpus_generation_authorized": false,
+  "parents": {
+    "phase0_pre_model_root_sha256": "c7227d2a10da05f902ed5d16e94a8e12866d2e0ae6b2b2a357ed2da93431b3e6",
+    "phase1_v03_root_sha256": "d3ca9f8ef988a6f0ae93318fc0ea7c504b23b3be801dbf133d66f67746a69274",
+    "phase1_qualification_corpus_sha256": "9fdd7ce9e49b86ac9acb3da035429c616865f527123bd0ac7c312b1b912439ca"
+  },
+  "scientific_question": "Before any adaptive mechanism is introduced, can fixed linear probes decode the task-relevant factors from FAS_FEATURE_V1 while query-only and cheap metadata controls remain below their sealed leakage ceilings?",
+  "scope": {
+    "allowed_after_separate_probe_authorization": "Offline fitting and scoring of the static probes and negative controls defined here, using only the sealed Phase 1 v03 qualification corpus and verified Phase 2A feature cache.",
+    "not_authorized_by_this_contract": ["probe fitting or scoring", "online updates", "arm execution", "Phase 5 stream creation", "protected evaluation", "manual labels", "LLM judging", "feature or threshold changes", "layer or pooling search", "MLP or nonlinear rescue"],
+    "feature_cache_is_infrastructure": true,
+    "probe_parameters_are_phase3_diagnostics_only": true
+  },
+  "data_and_split": {
+    "only_dataset": "FAS00_WORLD_QUALIFICATION_V03; the Phase 1 v03 corpus and no other generated worlds.",
+    "feature_source": "Verified FULL and QUERY_ONLY rows from the Phase 2A v01 cache; cache rows contain no labels.",
+    "group_unit": "world_seed; all families, task structures, feedback conditions, and events for one world_seed remain in one partition.",
+    "train_world_seeds": "0 through 15 inclusive",
+    "validation_world_seeds": "16 through 23 inclusive",
+    "test_world_seeds": "24 through 31 inclusive",
+    "train_surface_template_ids": [3, 4],
+    "validation_surface_template_ids": [5],
+    "test_surface_template_ids": [5],
+    "row_selection": "Keep only rows meeting both the assigned world_seed range and assigned surface_template_id. No event-level random split, resampling, or reassignment.",
+    "validation_use": "Locked acceptance check only. It cannot select a model, threshold, epoch, normalization, or hyperparameter.",
+    "test_use": "One sealed held-out report after all choices and implementation hashes are frozen.",
+    "template_transfer": "Train uses only qualification templates 3 and 4; validation and test use unseen qualification template 5.",
+    "world_seed_transfer": "Validation and test seeds are disjoint from all training seeds and from one another.",
+    "class_support_gate": "Every scored target class must have at least 30 examples in each validation/test slice; every fitted class must have at least 30 training examples. Otherwise fail closed as SENSOR_FAIL_NO_SIGNAL."
+  },
+  "probe_family": {
+    "model": "One multinomial linear softmax probe family; logits are Wx+b and prediction is argmax, ties to the lowest integer class.",
+    "objective": "Mean multiclass cross-entropy plus (lambda/2) * squared Frobenius norm of W; bias b is not regularized.",
+    "regularization_lambda": 1.0,
+    "feature_scaling": "For each fit, compute per-dimension mean and population standard deviation on that fit's training rows only; transform as (x-mean)/max(std, 1e-6). Apply the same frozen statistics to validation/test. No other normalization, clipping, whitening, PCA, or feature selection.",
+    "optimizer": "Deterministic full-batch float64 L-BFGS with fixed Wolfe line search, maximum 1000 iterations, and convergence only when infinity norm of the objective gradient is at most 1e-8.",
+    "randomness": "None in fitting; no minibatches, shuffling, early stopping, or seed search.",
+    "implementation_hash_gate": "The exact probe implementation source hash and numerical-library versions must be recorded and sealed before Phase 3 probe authorization. If the fixed optimizer does not converge, fail closed; do not change the solver or lambda in this contract.",
+    "normalization_rationale": "A single train-fitted affine scaling makes regularization scale explicit while preserving linear decodability; the rule is fixed for every probe fit and cannot be compared against alternatives."
+  },
+  "positive_probes": [
+    {
+      "probe_id": "OBSERVATION_STATE",
+      "view": "FULL",
+      "rows": "Events with non-null observation_text.",
+      "label": "observation_answer_index",
+      "metric": "three-class balanced accuracy",
+      "minimum": 0.90,
+      "threshold_source": "FAS-00-PROTOCOL.md sealed sensor qualification gate"
+    },
+    {
+      "probe_id": "CONTEXT_IDENTITY",
+      "view": "FULL",
+      "rows": "All selected events.",
+      "label": "context_term_id, the visible qualification-split context lexeme identity; do not use the arbitrary latent context_id.",
+      "metric": "balanced accuracy over qualification context term IDs 2 and 3",
+      "minimum": 0.90,
+      "threshold_source": "FAS-00-PROTOCOL.md sealed sensor qualification gate"
+    },
+    {
+      "probe_id": "ENTITY_IDENTITY",
+      "view": "FULL",
+      "rows": "All selected events.",
+      "label": "entity_term_id, the visible qualification-split entity lexeme identity; do not use the arbitrary latent entity_id.",
+      "metric": "balanced accuracy over qualification entity term IDs 4 through 7",
+      "minimum": 0.90,
+      "threshold_source": "FAS-00-PROTOCOL.md sealed sensor qualification gate"
+    },
+    {
+      "probe_id": "QUERY_RELATION",
+      "view": "FULL",
+      "rows": "All selected events.",
+      "label": "relation_id",
+      "metric": "balanced accuracy over the two declared query relations",
+      "minimum": 0.90,
+      "threshold_source": "FAS-00-PROTOCOL.md sealed sensor qualification gate"
+    },
+    {
+      "probe_id": "EXACT_TARGET",
+      "view": "FULL",
+      "rows": "Events with non-null observation_text.",
+      "label": "exact_target in canonical candidate identity order safe=0, risky=1, idle=2.",
+      "metric": "three-class balanced accuracy",
+      "minimum": 0.60,
+      "threshold_source": "FAS-00-PROTOCOL.md sealed sensor qualification gate"
+    }
+  ],
+  "heldout_term_transfer": {
+    "purpose": "Test target decoding when one context lexeme and one entity lexeme were absent from target-probe fitting; arbitrary unseen identity labels are not treated as learnable classes.",
+    "fit_rows": "EXACT_TARGET training rows with context_term_id != 3 and entity_term_id != 7; retain only non-null observation_text.",
+    "test_slices": [
+      {"slice": "HELDOUT_CONTEXT_TERM_3", "rows": "test rows with non-null observation_text and context_term_id == 3", "metric": "three-class balanced accuracy", "minimum": 0.60},
+      {"slice": "HELDOUT_ENTITY_TERM_7", "rows": "test rows with non-null observation_text and entity_term_id == 7", "metric": "three-class balanced accuracy", "minimum": 0.60}
+    ],
+    "support_gate": "At least 30 test examples for each target class in each slice; otherwise SENSOR_FAIL_NO_SIGNAL.",
+    "threshold_source": "Reuses the sealed exact-target 0.60 balanced-accuracy threshold; no new outcome-derived threshold."
+  },
+  "negative_controls": [
+    {
+      "control_id": "QUERY_ONLY_TARGET",
+      "input": "QUERY_ONLY feature view; no observation text, with the same query and canonical candidates.",
+      "label": "exact_target, all selected test events",
+      "metric": "ordinary accuracy",
+      "maximum": 0.40,
+      "upper_95_percent_confidence_bound_maximum": 0.45,
+      "threshold_source": "FAS-00-PROTOCOL.md sealed query-only leakage gate"
+    },
+    {
+      "control_id": "TEMPLATE_ID_ONLY_TARGET",
+      "input": "One-hot surface_template_id only.",
+      "label": "exact_target",
+      "metric": "ordinary accuracy",
+      "maximum": 0.40,
+      "threshold_source": "FAS-00-PROTOCOL.md sealed template-only leakage gate"
+    },
+    {
+      "control_id": "CONTEXT_TERM_ID_ONLY_TARGET",
+      "input": "One-hot context_term_id only.",
+      "label": "exact_target",
+      "metric": "ordinary accuracy",
+      "maximum": 0.45,
+      "threshold_source": "FAS00_WORLD_QUALIFICATION_V03 cheap-target-leakage ceiling"
+    },
+    {
+      "control_id": "ENTITY_TERM_ID_ONLY_TARGET",
+      "input": "One-hot entity_term_id only.",
+      "label": "exact_target",
+      "metric": "ordinary accuracy",
+      "maximum": 0.45,
+      "threshold_source": "FAS00_WORLD_QUALIFICATION_V03 cheap-target-leakage ceiling"
+    },
+    {
+      "control_id": "TERM_PAIR_ONLY_TARGET",
+      "input": "One-hot (context_term_id, entity_term_id) pair only.",
+      "label": "exact_target",
+      "metric": "ordinary accuracy",
+      "maximum": 0.45,
+      "threshold_source": "FAS00_WORLD_QUALIFICATION_V03 cheap-target-leakage ceiling"
+    },
+    {
+      "control_id": "CANDIDATE_ORDER_ONLY_TARGET",
+      "input": "One-hot candidate identity permutation only; six canonical permutations, independent of target.",
+      "label": "exact_target",
+      "metric": "ordinary accuracy",
+      "maximum": 0.45,
+      "threshold_source": "FAS00_WORLD_QUALIFICATION_V03 cheap-target-leakage ceiling"
+    }
+  ],
+  "confidence_interval": {
+    "applies_to": "QUERY_ONLY_TARGET test accuracy only.",
+    "cluster": "world_seed; each of the eight test seed groups is one bootstrap unit.",
+    "replicates": 10000,
+    "sample_per_replicate": "Draw eight test world_seed groups with replacement; compute their unweighted mean of per-seed accuracies.",
+    "deterministic_draw": "For replicate b=0..9999 and draw j=0..7, SHA-256 UTF-8 bytes 'FAS_SENSOR_CI_V01' || uint32_le(20260923) || uint32_le(b) || uint32_le(j); interpret first eight digest bytes as uint64_le and use value modulo 8 as the test-seed index.",
+    "interval": "Two-sided percentile interval using nearest-rank 2.5th and 97.5th percentiles; the reported upper endpoint must be <=0.45.",
+    "point_estimate": "Unweighted mean of the eight per-seed test accuracies; must also be <=0.40."
+  },
+  "metrics_and_reporting": {
+    "primary_metric": "Balanced accuracy for positive multiclass probes; ordinary accuracy for negative target-leakage controls.",
+    "report_by": ["train", "validation", "test", "world family", "task structure", "feedback condition", "surface template", "world seed"],
+    "report_full_temporal_curves": false,
+    "why": "Phase 3 is static sensor qualification over the existing fixed corpus, not online adaptation or a Phase 5 temporal result.",
+    "no_composite_score": true,
+    "no_threshold_relaxation": true
+  },
+  "dispositions": {
+    "SENSOR_PASS": "All positive gates pass on both validation and test; both held-out-term target gates pass; query-only and all metadata-only ceilings pass; cache and implementation hashes verify.",
+    "SENSOR_FAIL_NO_SIGNAL": "Any required positive probe misses its frozen threshold, solver fails, or required class support is absent.",
+    "SENSOR_FAIL_TARGET_LEAKAGE": "Query-only target control exceeds either frozen limit.",
+    "SENSOR_FAIL_SURFACE_SHORTCUT": "Any template, context/entity term, term-pair, or candidate-order control exceeds its frozen ceiling.",
+    "non_pass_rule": "Any failed, missing, invalid, or nonconverged gate blocks Phase 4/5 eligibility; no post-result repair or alternate probe is permitted under this contract."
+  },
+  "phase_boundary": {
+    "sensor_probe_training_authorized": false,
+    "online_mechanisms_authorized": false,
+    "phase5_corpus_generation_authorized": false,
+    "sensor_pass_does_not_auto_authorize_later_phases": true,
+    "next_authorization": "Separate explicit authorization is required to train and run these static sensor probes after the Phase 2A feature cache passes its own seal."
+  }
+}

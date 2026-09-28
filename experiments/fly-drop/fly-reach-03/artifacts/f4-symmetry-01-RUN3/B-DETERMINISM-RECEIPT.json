@@ -1,0 +1,42 @@
+{
+  "folds": [
+    {
+      "a_normalizer_sha256": "2d1ce4a8cab4ebc307478dde37af540b8d676e772bd8cb532560ca2775a7a96a",
+      "b_normalizer_sha256": "b241a96cc1b65e74e9e3cba183a5a2af07a72be81443a8150422027a4e488a22",
+      "b_output_sha256": "320a701fb8497cdd520d27e82346795a257c49f9da014f9ce2edb6d78135d9d0",
+      "holdout_block": 303000,
+      "projection_sha256": "cb4072585ef6adec5c728fc5d865258415fae8b1c889a00c0cd07eea34bd01b8",
+      "repeat_identical": true
+    },
+    {
+      "a_normalizer_sha256": "7011cdb0b08dae5b9d89a0ef0290de60392110e4d65fd537e21481b22c474243",
+      "b_normalizer_sha256": "fd20bac0e81af23782955dd57694c9e5fbfb776f89319769793861038cfee0a0",
+      "b_output_sha256": "fbaae390038ed8caf6fdb487fa52d882d4c2dcfedcadf900c1e4b92a569653db",
+      "holdout_block": 303001,
+      "projection_sha256": "cb4072585ef6adec5c728fc5d865258415fae8b1c889a00c0cd07eea34bd01b8",
+      "repeat_identical": true
+    },
+    {
+      "a_normalizer_sha256": "bf20336fe535ff61f8416805f139488a7af2ef16e1b6f036b307dea85b58cc52",
+      "b_normalizer_sha256": "8baf8c2c1b7091be32545d42d37fa0a6eafc7d9453ac6d3beebc73dea4d9259c",
+      "b_output_sha256": "ba8aee05f88695a0118fa9ec22a006d9b0ae8ea3283e90eb62afa3514828052c",
+      "holdout_block": 303002,
+      "projection_sha256": "cb4072585ef6adec5c728fc5d865258415fae8b1c889a00c0cd07eea34bd01b8",
+      "repeat_identical": true
+    },
+    {
+      "a_normalizer_sha256": "a4b30eab24b598ba57b2acefc0bcc579601277b8e42afa11ac07abc456a0b2ec",
+      "b_normalizer_sha256": "4603294d9280d1761150fe6f74b4833001b570004a4ed566c32217dd9be9c747",
+      "b_output_sha256": "c38732a9f296418c971c14123c4a3373ff2e49df4d695e0866d34282af88d8a6",
+      "holdout_block": 303003,
+      "projection_sha256": "cb4072585ef6adec5c728fc5d865258415fae8b1c889a00c0cd07eea34bd01b8",
+      "repeat_identical": true
+    }
+  ],
+  "gate_id": "B_DETERMINISM",
+  "no_row_or_target_key_used": true,
+  "projection_regenerated_identically": true,
+  "projection_sha256": "cb4072585ef6adec5c728fc5d865258415fae8b1c889a00c0cd07eea34bd01b8",
+  "schema": "F4-SYMMETRY-01-B-determinism-v1",
+  "status": "PASS"
+}

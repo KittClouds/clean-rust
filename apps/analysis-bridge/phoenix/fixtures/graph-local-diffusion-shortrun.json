@@ -1,0 +1,65 @@
+{
+  "packName": "shortrun_diffusion_pack",
+  "cases": [
+    {
+      "caseName": "ryan_location",
+      "worldAnchor": {
+        "entityId": "er-post-shortrun::ryan",
+        "slotKey": "entity.location",
+        "queryText": "current entity.location for er-post-shortrun::ryan"
+      },
+      "causalTarget": {
+        "vertexId": "graph::event::memory::event:state_started:state:er-post-shortrun::ryan:entity.location",
+        "queryText": "what led to entity.location for er-post-shortrun::ryan"
+      }
+    },
+    {
+      "caseName": "ryan_employer",
+      "worldAnchor": {
+        "entityId": "er-post-shortrun::ryan",
+        "slotKey": "entity.employer",
+        "queryText": "current entity.employer for er-post-shortrun::ryan"
+      },
+      "causalTarget": {
+        "vertexId": "graph::event::memory::event:state_started:state:er-post-shortrun::ryan:entity.employer",
+        "queryText": "what led to entity.employer for er-post-shortrun::ryan"
+      }
+    },
+    {
+      "caseName": "wyvern_membership",
+      "worldAnchor": {
+        "entityId": "er-post-shortrun::wyvern",
+        "slotKey": "entity.membership",
+        "queryText": "current entity.membership for er-post-shortrun::wyvern"
+      },
+      "causalTarget": {
+        "vertexId": "graph::event::memory::event:state_started:state:er-post-shortrun::wyvern:entity.membership",
+        "queryText": "what led to entity.membership for er-post-shortrun::wyvern"
+      }
+    },
+    {
+      "caseName": "zanbato_location",
+      "worldAnchor": {
+        "entityId": "er-post-shortrun::zanbato",
+        "slotKey": "entity.location",
+        "queryText": "current entity.location for er-post-shortrun::zanbato"
+      },
+      "causalTarget": {
+        "vertexId": "graph::event::memory::event:state_started:state:er-post-shortrun::zanbato:entity.location",
+        "queryText": "what led to entity.location for er-post-shortrun::zanbato"
+      }
+    },
+    {
+      "caseName": "new_rome_employer",
+      "worldAnchor": {
+        "entityId": "er-post-shortrun::new_rome",
+        "slotKey": "entity.employer",
+        "queryText": "current entity.employer for er-post-shortrun::new_rome"
+      },
+      "causalTarget": {
+        "vertexId": "graph::event::memory::event:state_started:state:er-post-shortrun::new_rome:entity.employer",
+        "queryText": "what led to entity.employer for er-post-shortrun::new_rome"
+      }
+    }
+  ]
+}

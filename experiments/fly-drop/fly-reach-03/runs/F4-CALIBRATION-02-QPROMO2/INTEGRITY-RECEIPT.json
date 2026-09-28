@@ -1,0 +1,115 @@
+{
+  "actual_fit_count": 12,
+  "actual_native_stream_count": 216,
+  "all_fit_receipts_pass": true,
+  "all_predictions_finite_and_complete": true,
+  "block_ids": [
+    305012,
+    305013,
+    305014,
+    305015,
+    305016,
+    305017,
+    305018,
+    305019,
+    305020,
+    305021,
+    305022,
+    305023
+  ],
+  "contract_sha256": "192b0c3c01b2b7978aedfe55e5490012226e62e0b7660c4410797a08b44a01b8",
+  "duplicate_count": 0,
+  "empty_Ustar_block_ids": [],
+  "expected_fit_count": 12,
+  "expected_native_stream_count": 216,
+  "extra_count": 0,
+  "heldout_truth_state": "SEALED",
+  "heldout_truth_values_opened": false,
+  "missing_count": 0,
+  "native_collection_sha256": "d08966471e6af1c38365f370b9749794931c8ef588a9343ce4945bc1cac05601",
+  "nonfinite_count": 0,
+  "preexecution_seal_sha256": "5eabdcfef3410c0ae0724c1a2240f4710354d4223ad990c946c823b9f712ab11",
+  "row_count": 23486,
+  "run_id": "F4-CALIBRATION-02-QPROMO2",
+  "schema": "F4-CALIBRATION-02-integrity-receipt-v1",
+  "source_manifest": {
+    "canonical_sha256": "c6c3feacdbd63325fd0c484abae28b486f6cdc284e5deebc02851b5552bda110",
+    "entry_count": 56,
+    "file_sha256": "bb9de9d1c7e02ff922c0d29f2fba6e6bdc09e10490942f00ca957ff8958055a3"
+  },
+  "status": "PASS",
+  "verified_fits": [
+    {
+      "fit_id": "D-H305012",
+      "fit_receipt_sha256": "639df17bf8dde14e18778e4f1310eed7f995410de646019f324d155ee1f89675",
+      "prediction_rows": 1715,
+      "prediction_sha256": "1629d5e6418e5c854a0eb74545b3b584ccee448a90aabcf3ede351a858c1817a"
+    },
+    {
+      "fit_id": "D-H305013",
+      "fit_receipt_sha256": "9e7317ffdabb8e56a96114b77e734eeebe585c0c3dea44491dc4b2f209ef9e67",
+      "prediction_rows": 1627,
+      "prediction_sha256": "45fd586ac716508c76bb700e2ca50fc49924cfb4adae84482f34f77432975e12"
+    },
+    {
+      "fit_id": "D-H305014",
+      "fit_receipt_sha256": "c0170e5d62c1fa3f646386b0fbef70bdb2f322490659132b94a4b169788393d6",
+      "prediction_rows": 4216,
+      "prediction_sha256": "8046cbd93ec9be6e1de87b0216ebf485e19eb53a1f5d1f25c4c3359400cdfb4d"
+    },
+    {
+      "fit_id": "D-H305015",
+      "fit_receipt_sha256": "284fd9a10b32914509ee240d5c84d4261dbe15fd1ecf1198bf2b73e96992bf5b",
+      "prediction_rows": 1352,
+      "prediction_sha256": "478355331417cdb2f350de10708dd5341721ce2c5706779067d975066598767a"
+    },
+    {
+      "fit_id": "D-H305016",
+      "fit_receipt_sha256": "66bd279891ae3de3dcfe333c7dc106346dcbe83a0ec5494091075ee4dc302ca5",
+      "prediction_rows": 1523,
+      "prediction_sha256": "cc25dba7c81b3db53c726074c637a2f62f9923085c1078198e4dbcddba48ff1c"
+    },
+    {
+      "fit_id": "D-H305017",
+      "fit_receipt_sha256": "e58727c3ca4114cfff670d083561e2f6b22ba4a02946612c07943cbbda3d1b22",
+      "prediction_rows": 1825,
+      "prediction_sha256": "fd6739b2fb5274fbf00813c07162823cd9b12d88d9dc62c657090e64356b40af"
+    },
+    {
+      "fit_id": "D-H305018",
+      "fit_receipt_sha256": "38cc41be5ca995e4bc64561ca2a6d9ae9a08a70bbaa07234eb4b68f0137ebd9b",
+      "prediction_rows": 4899,
+      "prediction_sha256": "a4dd7e54e296f476f4b32d3b2fed278242326bd3cada016d8b4c80f8dfc582b4"
+    },
+    {
+      "fit_id": "D-H305019",
+      "fit_receipt_sha256": "35f184e294e0dc00167fd9e2d021be8a0ba6901a298cfff1f7382e78f92d8abb",
+      "prediction_rows": 939,
+      "prediction_sha256": "46653722b6ef7810fe105a5093379a65d6d56ceb044db0d11b70e8cdd443a0e0"
+    },
+    {
+      "fit_id": "D-H305020",
+      "fit_receipt_sha256": "6907c57374e9a97cce94b75e059d9f22961226ec57f6657ecfba1ce3952f3243",
+      "prediction_rows": 247,
+      "prediction_sha256": "a7cc12e090838d1c2ec17c913a4dd7a437f08785c64d65a560ff594b9a2ae3ed"
+    },
+    {
+      "fit_id": "D-H305021",
+      "fit_receipt_sha256": "c1a0fd3b246cc62327e3bd82858ae2e442dfd40869432068ac1485d457bd393f",
+      "prediction_rows": 1564,
+      "prediction_sha256": "bd18f234e5ed72d934cdeadc9737379eb26dddcbc3378218e1c7ae840626288d"
+    },
+    {
+      "fit_id": "D-H305022",
+      "fit_receipt_sha256": "63c72b833d1a76f73dab9032c5505ecddc3213d20e01e12c80b3db403dd4c2cc",
+      "prediction_rows": 3510,
+      "prediction_sha256": "7461a13a356103d9a491b8e651ad2947c4f99fbfd80b41eaaf4f7adf2ec48f95"
+    },
+    {
+      "fit_id": "D-H305023",
+      "fit_receipt_sha256": "4bb2764a08b6735ef15a3e11acc9cc6a17c3295a21f67703b358882046850909",
+      "prediction_rows": 69,
+      "prediction_sha256": "65d3073d365d639ce82b23f0d69d9b6268645379cf99d3034674f30c780083bb"
+    }
+  ]
+}

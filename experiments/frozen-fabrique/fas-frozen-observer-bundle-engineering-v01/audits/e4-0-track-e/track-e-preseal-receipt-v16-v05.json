@@ -1,0 +1,2475 @@
+{
+  "contract": {
+    "bytes": 116783,
+    "path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/e4-0-contract-v16-v04-final.json",
+    "sha256": "801f7516b4630e62e3770243cedba7d12f12f1c9e9143ab0c2ace1ede6bb8c02"
+  },
+  "final_seal": null,
+  "immediate_v11_predecessor": {
+    "contract": {
+      "bytes": 72068,
+      "contract_id": "FAS_FROZEN_CAPABILITY_FABRIC_E4_0_V11",
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/e4-0-contract-v11-final.json",
+      "sha256": "9cefc7cf9ca8f367bceff3c1c9b7e84ab3e15f684326edf94354e33e3d1fb2fd"
+    },
+    "postseal_stop": {
+      "bytes": 102930,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-postseal-receipt-v11.json",
+      "sha256": "09822f935ef94c9307f3a9754dc8a408294de0f77832b7ef09f8e47d56272aa9",
+      "status": "E4_0_TRACK_E_POSTSEAL_STOP_MISMATCHES_RECORDED_V11"
+    },
+    "seal": {
+      "bytes": 90814,
+      "contract_member_artifact_id": "E4_0_CONTRACT_V11_FINAL",
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/seals/e4-0-contract-v11-seal.json",
+      "root_sha256": "dc7ec0731a6f637bd8aa6416bd74aba8e074e8bf0c936a1bda830e79c0afa6c3",
+      "seal_id": "FAS_E4_0_CONTRACT_V11_SEAL",
+      "sha256": "7f27371f3cb886208ff67ea7a19e2ca51577bfbc74e4f6611ca496ab9c13ebcd"
+    }
+  },
+  "inherited_roots": {
+    "parity_panel": {
+      "contract_root_at_creation_sha256": "7344badf07476d19d9c6228f80d026a112c339e93daa75593e61031f68456e64",
+      "panel_root_sha256": "6ef00306df0df20ada7b7a86b09567ae46e07f112f66d974d7885e8f1e5d4d95",
+      "selection_authorization_sha256": "3e3f06bbe12db1bb9608cf56cb1699039d70b6ed79aed757b056e87cc0209d59"
+    },
+    "population": {
+      "audit_receipt_sha256": "7dd3eea3133dbed779071fd14e22df06ff5a0ddce994e4446cf4c6ef7b9cbe5a",
+      "contract_root_at_creation_sha256": "7344badf07476d19d9c6228f80d026a112c339e93daa75593e61031f68456e64",
+      "population_root_sha256": "27731b483b8242aaef15ca22b97796b7b305a79db9bbb235765e13dcd9d08967"
+    }
+  },
+  "issues": [],
+  "mode": "PRESEAL",
+  "pass": true,
+  "population_truth_files_opened": false,
+  "preseal_receipt": null,
+  "preserved_v07_authorization_stop": {
+    "audit_bridge": {
+      "bytes": 49530,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/e4-0-contract-audit-bridge-v02.json",
+      "sha256": "9fd4bd2d470146e9cd5604e833c6653b7f3ec38fb82f6454244103441f664511"
+    },
+    "authorization_written": false,
+    "bindings": {
+      "bytes": 4721,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-auth-issuer-v07/online-parity-bindings-v01.json",
+      "sha256": "3693ffe40ad8c5e077f2da54ef5fbbd4bf297d10b9289bbab4069ac6c652d3fe"
+    },
+    "cuda_initialized": false,
+    "feature_cache_created": false,
+    "gpu_lease_acquired": false,
+    "labels_opened": false,
+    "model_contact": false,
+    "stage": "ONLINE_CACHE_PARITY",
+    "status": "PRECONTACT_STOP",
+    "stop_class": "AUTHORIZER_CONTRACT_PREDECESSOR_SCHEMA_MISMATCH",
+    "stop_receipt": {
+      "bytes": 2387,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-auth-issuer-v07/online-parity-precontact-stop-v01.json",
+      "sha256": "65b68607cf2596453d3b85bf0b607d14a4372833c99a7d430d82488954392b17"
+    },
+    "tokenizer_contact": false
+  },
+  "preserved_v07_lineage": {
+    "contract": {
+      "bytes": 48881,
+      "contract_id": "FAS_FROZEN_CAPABILITY_FABRIC_E4_0_V07",
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/e4-0-contract-v07-final.json",
+      "sha256": "33b56e95cbf083036f436b5496c2db3c0c052bacfdce593869a6f4aa3125a2d7"
+    },
+    "postseal_audit": {
+      "bytes": 48718,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-postseal-receipt-v07.json",
+      "root_sha256": "ee7339c3ab04272354b4cae03294c794a6e823fdb1766ad44f71978dfee0c62c",
+      "sha256": "b328770fbdf25b96b40bac33ccec67ca1673c331328e5413727392d586f857f2",
+      "status": "E4_0_TRACK_E_POSTSEAL_PASS_V07_SEAL_ROOT_AND_MEMBERS_RECOMPUTED"
+    },
+    "seal": {
+      "contract_member_artifact_id": "E4_0_CONTRACT_V07_FINAL",
+      "manifest_bytes": 52723,
+      "manifest_sha256": "22e2d05255a87334d27713d222fc4023fd1cac61dafc4264c5de434bbf4c71ef",
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/seals/e4-0-contract-v07-seal.json",
+      "root_sha256": "ee7339c3ab04272354b4cae03294c794a6e823fdb1766ad44f71978dfee0c62c",
+      "seal_id": "FAS_E4_0_CONTRACT_V07_SEAL"
+    }
+  },
+  "preserved_v08_authorization_stop": {
+    "authorization_written": false,
+    "bindings": {
+      "bytes": 4719,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-auth-issuer-v08/online-parity-bindings-v01.json",
+      "sha256": "0c3e29a78d2d5eb14ffb573fdf1bc9baa91957488b2f95c7c0fe17412b550cdc"
+    },
+    "cuda_initialized": false,
+    "feature_cache_created": false,
+    "gpu_lease_acquired": false,
+    "labels_opened": false,
+    "model_contact": false,
+    "stage": "ONLINE_CACHE_PARITY",
+    "status": "E4_0_V08_AUTHORIZATION_STOP_POPULATION_AUDIT_SCHEMA_MISMATCH",
+    "stop_class": "PRECONTACT_AUTHORIZATION_VERIFIER_SCHEMA_MISMATCH",
+    "stop_receipt": {
+      "bytes": 1997,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-auth-issuer-v08/online-parity-precontact-stop-v01.json",
+      "sha256": "99c937b1f8a2242609621b1210828b6ae1411e701cbe2074d655d90328904e4d"
+    },
+    "tokenizer_contact": false
+  },
+  "receipt_id": "FAS_E4_0_TRACK_E_V16_V05_PRESEAL_AUDIT_V01",
+  "science_fields_compared": [
+    "purpose",
+    "authorization",
+    "predecessors",
+    "representation_abi",
+    "population",
+    "parity",
+    "fresh_qualification",
+    "truth_access",
+    "resources",
+    "phase_gates",
+    "stop_rule",
+    "E4_A_dependency",
+    "execution_identity",
+    "identity_collision_correction",
+    "design_inputs (excluding implementation_source_map_* bindings)"
+  ],
+  "scope": "Contract/source/seal integrity only; no truth payload, population labels, tokenizer, model, CUDA, scoring, or runtime behavior access.",
+  "source_map": {
+    "bytes": 114232,
+    "path": "experiments/fas-frozen-observer-bundle-engineering-v01/plans/E4-0-IMPLEMENTATION-SOURCE-MAP-v16-v05.md",
+    "sha256": "e524655342e1227223c05599e579be1a87640a7bece805a81bf58e4af4e99ea2"
+  },
+  "status": "E4_0_TRACK_E_PRESEAL_PASS_V16_V05_CONTRACT_AND_SOURCE_MAP_CLOSED",
+  "template_or_joint_truth_opened": false,
+  "v06_lineage": {
+    "contract": {
+      "bytes": 43208,
+      "contract_id": "FAS_FROZEN_CAPABILITY_FABRIC_E4_0_V06",
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/e4-0-contract-v06-final.json",
+      "sha256": "ea4f11cec5d65a3be7716c77febf5d448d8ebf1a5a4049aee5d25d51c0c50958"
+    },
+    "seal": {
+      "contract_member_artifact_id": "E4_0_CONTRACT_V06_FINAL",
+      "manifest_bytes": 35340,
+      "manifest_sha256": "799d1535a16ea6fbf2269206443addf96736ef8a70ca5ab3373cdd5e6a44605c",
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/seals/e4-0-contract-v06-seal.json",
+      "root_sha256": "7344badf07476d19d9c6228f80d026a112c339e93daa75593e61031f68456e64",
+      "seal_id": "FAS_E4_0_CONTRACT_V06_SEAL"
+    }
+  },
+  "verified_nontruth_frozen_inputs": [
+    {
+      "bytes": 2500,
+      "path": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e1-panel-v04\\e1-seal-v01.json",
+      "role": "Sealed E1 v04 population root and member inventory.",
+      "sha256": "973b53e93e2c56b0cc1054fd545a558dcce4de07068c9729bcd4fa4f1fc86168"
+    },
+    {
+      "bytes": 1633,
+      "path": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e2-v07\\e2-v07-independent-audit-v01.json",
+      "role": "Independent E2 v07 audit.",
+      "sha256": "35a8a34f458ea8e35142778b72ca5a389fb1d8ea5efb4c534553d2126eb4e299"
+    },
+    {
+      "bytes": 4793,
+      "path": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e2-v07\\e2-v07-seal.json",
+      "role": "Sealed E2 v07 representation cache root.",
+      "sha256": "30981abe10b4e97ab4f39eb006f5fc24aaaa799f5381be13170dca49c3ddb7f7"
+    },
+    {
+      "bytes": 12497,
+      "path": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e3-v02\\e3-v02-independent-audit-v01.json",
+      "role": "Independent E3 v02 bundle audit.",
+      "sha256": "a0950baf5aa64f77b9789a6fcb64a7c3afd2c3c03dea87d66c76a47049ab6cbe"
+    },
+    {
+      "bytes": 19475,
+      "path": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e3-v02\\e3-v02-seal.json",
+      "role": "Sealed E3 v02 observer bundle root and head inventory.",
+      "sha256": "b8dce8dc7ff2d1a1739619f1ed00444d970ccc46872bb1acca2f1e07bf31a485"
+    },
+    {
+      "bytes": 2443,
+      "path": "d:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e4-0-v01\\parity-panel\\selection-receipt-v01.json",
+      "role": "Inherited label-free tokenizer-only panel selection receipt. SHA-256=00388e9a5f80c8c7c5cf332cc7f5102b384e03efbbe5fb75a2dab76933077e67, bytes=2443",
+      "sha256": "00388e9a5f80c8c7c5cf332cc7f5102b384e03efbbe5fb75a2dab76933077e67"
+    },
+    {
+      "bytes": 1864,
+      "path": "d:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e4-0-v01\\parity-panel\\stage-seal-v01.json",
+      "role": "Inherited v06 tokenizer-only parity-panel seal; root is immutable. SHA-256=f67eabda02b19a1f1c0219278b65a656011f728141d94e49c83e0170f339ca5b, bytes=1864",
+      "sha256": "f67eabda02b19a1f1c0219278b65a656011f728141d94e49c83e0170f339ca5b"
+    },
+    {
+      "bytes": 2167,
+      "path": "d:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e4-0-v01\\stage-seal-v01.json",
+      "role": "Inherited v06 population stage seal; root is immutable. SHA-256=ad8175710b4f2db9aa6529e787962b0fbce92260f0b7020a322242342fc1af2d, bytes=2167",
+      "sha256": "ad8175710b4f2db9aa6529e787962b0fbce92260f0b7020a322242342fc1af2d"
+    },
+    {
+      "bytes": 2383,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e0-v10-independent-audit-v01.json",
+      "role": "Independent E0 v10 audit.",
+      "sha256": "e5462e6374a0e547965bec802183e42fb8b16d3518d65ed06eac2e343a5b178b"
+    },
+    {
+      "bytes": 1068,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e1-independent-audit-v04.json",
+      "role": "Independent E1 v04 population audit.",
+      "sha256": "4bdb261a2c1c553377b6064ee6662ffb257a4e7e70dba97bf9d13d685d93dbf1"
+    },
+    {
+      "bytes": 1452,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e3-score-v02-independent-audit.json",
+      "role": "Independent E3 score replay audit.",
+      "sha256": "d7d384b1b5294e99bc3219c4c349f3e33beaf0f5fd246a5bef04b5ac0f95e227"
+    },
+    {
+      "bytes": 9884,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-auth-issuer-v02/online-parity-authorization-v01.json",
+      "role": "Failed v06 parity authorization; preserved and never reused.",
+      "sha256": "59d6ed54ca401ce6606cd2f3053a19ded24252c1a725aa53508cb0625a8197aa"
+    },
+    {
+      "bytes": 4711,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-auth-issuer-v02/online-parity-bindings-v01.json",
+      "role": "Failed v06 parity stage bindings; preserved as history.",
+      "sha256": "8bf9a339e08605f25811251af5a7d1ef47f46d41e8258a67bf9e71554eea7536"
+    },
+    {
+      "bytes": 8250,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-auth-issuer-v02/parity-panel-authorization-v01.json",
+      "role": "Historical v06 tokenizer-only parity-panel authorization.",
+      "sha256": "3e3f06bbe12db1bb9608cf56cb1699039d70b6ed79aed757b056e87cc0209d59"
+    },
+    {
+      "bytes": 3940,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-auth-issuer-v02/parity-panel-bindings-v01.json",
+      "role": "Historical v06 tokenizer-only panel selection bindings.",
+      "sha256": "dc6547dbda2521a9fff643577f01143a5e0b63e304d304bad58797fe91a2626d"
+    },
+    {
+      "bytes": 8074,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-auth-issuer-v02/population-authorization-v01.json",
+      "role": "Historical v06 population-only scoped authorization.",
+      "sha256": "7cba2693e9a9e8864bbe2a896d036bdd979888ffa92973a62ff6c6ad01a1a58f"
+    },
+    {
+      "bytes": 3979,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-auth-issuer-v02/population-bindings-v01.json",
+      "role": "Historical v06 population source/identity bindings.",
+      "sha256": "3ddfa90b10b634b6d30789dab66c6c6110b71e50d2bb0e579d32e84d8a214772"
+    },
+    {
+      "bytes": 4721,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-auth-issuer-v07/online-parity-bindings-v01.json",
+      "role": "Preserved exact attempted v07 authorization bindings.",
+      "sha256": "3693ffe40ad8c5e077f2da54ef5fbbd4bf297d10b9289bbab4069ac6c652d3fe"
+    },
+    {
+      "bytes": 2387,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-auth-issuer-v07/online-parity-precontact-stop-v01.json",
+      "role": "Preserved v07 precontact issuer stop; model/runtime contact did not occur.",
+      "sha256": "65b68607cf2596453d3b85bf0b607d14a4372833c99a7d430d82488954392b17"
+    },
+    {
+      "bytes": 4719,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-auth-issuer-v08/online-parity-bindings-v01.json",
+      "role": "Preserved exact attempted v08 authorization bindings.",
+      "sha256": "0c3e29a78d2d5eb14ffb573fdf1bc9baa91957488b2f95c7c0fe17412b550cdc"
+    },
+    {
+      "bytes": 1997,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-auth-issuer-v08/online-parity-precontact-stop-v01.json",
+      "role": "Preserved v08 issuer stop; no authorization or model/runtime contact occurred.",
+      "sha256": "99c937b1f8a2242609621b1210828b6ae1411e701cbe2074d655d90328904e4d"
+    },
+    {
+      "bytes": 2950,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-execution/online-parity-precontact-stop-v01.json",
+      "role": "Preserved v06 pre-contact plumbing stop; no runtime/model/CUDA contact occurred.",
+      "sha256": "69d9e4ab7699c1ac390739a8588a4027c8d862971522391576a51030b066ea33"
+    },
+    {
+      "bytes": 858,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-execution/population-independent-audit-receipt-v01.json",
+      "role": "Independent model-free audit of inherited E4 population; labels unopened.",
+      "sha256": "7dd3eea3133dbed779071fd14e22df06ff5a0ddce994e4446cf4c6ef7b9cbe5a"
+    },
+    {
+      "bytes": 8151,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-execution/wddm-gpu-lease-preflight-v02.json",
+      "role": "Read-only WDDM pmon process-type snapshot motivating Type-C-only contention classification; no lease/model/runtime contact.",
+      "sha256": "20ad334b87b3c6a36435f71382a906f6009e7427760d617d2d73a3baa380cc34"
+    },
+    {
+      "bytes": 1889,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-support-plan-v11-source-tests.json",
+      "role": "Support planner source/replay validation.",
+      "sha256": "833c011ff9a9770756f106f390a275949751b9b71d46dbb4efa92f806a82b0c6"
+    },
+    {
+      "bytes": 2042,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/contract-seal-stop-v16-v04-v01.json",
+      "role": "Exact no-contact record of the v16-v04 duplicate source/input member stop; no seal was written.",
+      "sha256": "e7fc5c6018470ffc45388ef9f00fe417cdd074e03eb8fcaa60ef691db9c87df2"
+    },
+    {
+      "bytes": 49530,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/e4-0-contract-audit-bridge-v02.json",
+      "role": "Preserved v07 audit bridge; not used to authorize execution.",
+      "sha256": "9fd4bd2d470146e9cd5604e833c6653b7f3ec38fb82f6454244103441f664511"
+    },
+    {
+      "bytes": 1658,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/finalization-stop-v13-v01.json",
+      "role": "Exact pre-finalization receipt-status registry stop; no contract candidate or contact occurred.",
+      "sha256": "43e1270f5d395154ab713401558814503dc4fc143048d980447932750fa577dc"
+    },
+    {
+      "bytes": 1767,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/finalization-stop-v16-v01.json",
+      "role": "Exact no-contact record of the first v16 finalizer source-closure stop; no contract or seal was written.",
+      "sha256": "ed84d2392b800a18ad66c38d89dff230d7f71f93900f98a23b92652ee8cee53f"
+    },
+    {
+      "bytes": 53441,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/history/E4-0-IMPLEMENTATION-SOURCE-MAP-v07-first-build.md",
+      "role": "Preserved first v08 source-map attempt; not authoritative.",
+      "sha256": "e065c482515e41f41e9bcd65b1b85e0bdda25f6ab9e3bd81d091d404f4043ea2"
+    },
+    {
+      "bytes": 53442,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/history/E4-0-IMPLEMENTATION-SOURCE-MAP-v07-predecessor-track-audit-stop.md",
+      "role": "Preserved corrected-map attempt associated with the failed independent audit; not authoritative.",
+      "sha256": "d1d9647c47743970cd5e9d8122fb2f4a5d25d2c07d19e37c4fbe0fcf25a35d3d"
+    },
+    {
+      "bytes": 54430,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/history/e4-0-contract-v08-preseal-candidate-v01.json",
+      "role": "Preserved nonauthoritative v08 preseal contract candidate.",
+      "sha256": "3fbb3f52d6f193b18abb93039e3eb8fb2606808005fddebdab2245b6603e724a"
+    },
+    {
+      "bytes": 69728,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/history/track-e-preseal-stop-v08-v01.json",
+      "role": "Preserved v08 preseal stop receipt; not authoritative.",
+      "sha256": "5defca6d7a23f1f767a0d03118594d34998107fdaed6e1db972daec0ed950385"
+    },
+    {
+      "bytes": 48718,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-postseal-receipt-v07.json",
+      "role": "Independent passing audit of immutable v07 contract/seal.",
+      "sha256": "b328770fbdf25b96b40bac33ccec67ca1673c331328e5413727392d586f857f2"
+    },
+    {
+      "bytes": 68220,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-postseal-receipt-v08.json",
+      "role": "Independent passing audit of immutable v08 contract/seal.",
+      "sha256": "8e2fb068f0ce4acda3d91fe53f4f9b37fab9cffa49a2067ffdd939e95c862898"
+    },
+    {
+      "bytes": 92830,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-postseal-receipt-v10-v02.json",
+      "role": "Immutable v10 postseal audit stop identifying missing transitive v07 seal members.",
+      "sha256": "e4561320636702663836d39f1deee4320d465efbc00feaea0369754a6a32f221"
+    },
+    {
+      "bytes": 91693,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-postseal-receipt-v10.json",
+      "role": "Immutable v10 postseal invocation stop; required --seal argument was omitted.",
+      "sha256": "b82b1c6404a293436e99eee5816f0e14fdd1d28b9da2cab6ec419272c56458d0"
+    },
+    {
+      "bytes": 102930,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-postseal-receipt-v11.json",
+      "role": "Immutable v11 postseal stop identifying missing transitive v08 contract/seal members.",
+      "sha256": "09822f935ef94c9307f3a9754dc8a408294de0f77832b7ef09f8e47d56272aa9"
+    },
+    {
+      "bytes": 84023,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-preseal-receipt-v09.json",
+      "role": "Immutable v09 failed-preseal receipt; not authorization or a seal.",
+      "sha256": "7ee376b87c41f727274f58f72f2db524806206ea216b3c18a8d82843e94d1bf8"
+    },
+    {
+      "bytes": 91652,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-preseal-receipt-v10.json",
+      "role": "Immutable passing v10 preseal receipt bound to its candidate/map.",
+      "sha256": "dfc41a61d69384a26ea4c743ba27cf84d48f9859827a32cc6c6caab28aa22f83"
+    },
+    {
+      "bytes": 101751,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-preseal-receipt-v11.json",
+      "role": "Immutable passing v11 preseal receipt bound to its candidate/map.",
+      "sha256": "a3ccc4181717af9a84b2e16fc57a7f8819d0fc646918f6f09f760e8bf2c0392d"
+    },
+    {
+      "bytes": 111784,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-preseal-receipt-v12.json",
+      "role": "Immutable v12 preseal verifier-schema stop; no authorization or runtime contact occurred.",
+      "sha256": "4ac87653ae964e3ede95876ba3a9a7a32402672331d1c25f9b41d06725131f24"
+    },
+    {
+      "bytes": 112879,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-preseal-receipt-v14.json",
+      "role": "Immutable v14 failed preseal receipt; no authorization or runtime contact occurred.",
+      "sha256": "d97d00209cc485d80af1d8a7faa0da15cbdf54a79357b13efe9b458ec4d97995"
+    },
+    {
+      "bytes": 118505,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-preseal-receipt-v15.json",
+      "role": "Immutable v15 failed preseal receipt; no authorization or runtime contact occurred.",
+      "sha256": "66b9059a9b92c6711d704d1849bb60158003746b394c8d5bb1ebedb4b2a3113b"
+    },
+    {
+      "bytes": 128288,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-preseal-receipt-v16-v02.json",
+      "role": "Exact no-contact v16-v02 preseal stop with the five recorded source/lineage mismatches.",
+      "sha256": "7d3636112ff63acb467e397f1a9a9cc8c1ffabbdddb026a8c6d5606090ae2c52"
+    },
+    {
+      "bytes": 132329,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-preseal-receipt-v16-v03.json",
+      "role": "Exact no-contact v16-v03 preseal stop recording the single amendment-scope mismatch.",
+      "sha256": "c6eddaa8144d57263613f7ba466be4ce396a55de8e70aa2e8bf94ec767de2109"
+    },
+    {
+      "bytes": 136715,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-preseal-receipt-v16-v04.json",
+      "role": "Passing preseal audit for the preserved v16-v04 candidate; included only as failed-seal history.",
+      "sha256": "721478570cd3d9a15645424045046ea788ad572430305cd16e19956eddee6c09"
+    },
+    {
+      "bytes": 35176,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/e0-freeze-v10-sealed-v01.json",
+      "role": "Frozen E0 v10 predecessor contract.",
+      "sha256": "a47c66391d9f691ed182ab327c6fd6d68a6ed18c5c08ac6250a46c5dde2556f3"
+    },
+    {
+      "bytes": 2267,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/e4-0-artifact-seal-schema-v01.json",
+      "role": "Normative artifact seal schema.",
+      "sha256": "8a43f3a945fefbf983b734f51b98093a4538e2ebceef6199f543cbd86b5ef6f9"
+    },
+    {
+      "bytes": 43208,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/e4-0-contract-v06-final.json",
+      "role": "Immutable v06 scientific-baseline contract.",
+      "sha256": "ea4f11cec5d65a3be7716c77febf5d448d8ebf1a5a4049aee5d25d51c0c50958"
+    },
+    {
+      "bytes": 48881,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/e4-0-contract-v07-final.json",
+      "role": "Immutable v07 historical lineage contract.",
+      "sha256": "33b56e95cbf083036f436b5496c2db3c0c052bacfdce593869a6f4aa3125a2d7"
+    },
+    {
+      "bytes": 54286,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/e4-0-contract-v08-final.json",
+      "role": "Immutable last-sealed v08 predecessor contract.",
+      "sha256": "ec17befa2a65e0da589ee51792cde3c028e900aa919179b2c9c3365cc20c3e9b"
+    },
+    {
+      "bytes": 61414,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/e4-0-contract-v09-final.json",
+      "role": "Preserved v09 contract candidate stopped at independent preseal; no seal exists.",
+      "sha256": "f973bbd7d5bebeb6a60b8586060c8c65424deefdfce64ddcfd45246ebdfabd44"
+    },
+    {
+      "bytes": 66628,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/e4-0-contract-v10-final.json",
+      "role": "Immutable v10 sealed contract; postseal audit member-inventory stop is retained as history.",
+      "sha256": "c00e140c4cb503717cbf0aa2515f613fde86ac2b81d24a9819d785e9ff959369"
+    },
+    {
+      "bytes": 72068,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/e4-0-contract-v11-final.json",
+      "role": "Immutable v11 sealed contract; postseal audit found missing transitive v08 members.",
+      "sha256": "9cefc7cf9ca8f367bceff3c1c9b7e84ab3e15f684326edf94354e33e3d1fb2fd"
+    },
+    {
+      "bytes": 78271,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/e4-0-contract-v12-final.json",
+      "role": "Immutable v12 candidate preserved as failed-preseal lineage; no seal exists.",
+      "sha256": "9dee0e26b3eb1fcdbcc7146214745f8d699459bfdd23f15b8532e87cc9da3e75"
+    },
+    {
+      "bytes": 86587,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/e4-0-contract-v14-final.json",
+      "role": "Immutable v14 candidate stopped at independent preseal; no seal exists.",
+      "sha256": "9a195eaa7cbbdfff79ee9095c283c52bfb2e78baf40608eab86c0435c443b8f8"
+    },
+    {
+      "bytes": 95055,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/e4-0-contract-v15-final.json",
+      "role": "Immutable v15 candidate stopped at independent preseal; no seal exists.",
+      "sha256": "a29963988af2c7d1456e403a1cf219a915d29b2b7f4559b44ef175f60aa1d698"
+    },
+    {
+      "bytes": 97804,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/e4-0-contract-v16-final.json",
+      "role": "Preserved failed v16-v02 candidate contract; its preseal receipt confirms no seal exists.",
+      "sha256": "65aea43be84c0016f6ecd95657020353d4f969c915d267d7add20779f2a3ad1c"
+    },
+    {
+      "bytes": 105950,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/e4-0-contract-v16-v02-final.json",
+      "role": "Preserved failed v16-v03 candidate; amendment scope serialization mismatch only, no seal or execution authorization.",
+      "sha256": "b708b3e0411b4189371fbfd91f330839aa39ef8939e9a622565a47966a1a0c32"
+    },
+    {
+      "bytes": 110905,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/e4-0-contract-v16-v03-final.json",
+      "role": "Preserved v16-v04 preseal-passed candidate; its sealer stopped before manifest creation.",
+      "sha256": "44dc5b8fd06874c5478cc7b026d30d543a8c8a0f38697c59ea4ce0ce583d9a06"
+    },
+    {
+      "bytes": 3020,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/e4-0-stage-authorization-schema-v01.json",
+      "role": "Normative staged authorization schema.",
+      "sha256": "73a7cb5e4bb23463bc73e0591f903644c46ad17129f1bc3c1b1f58bccb87aed3"
+    },
+    {
+      "bytes": 3613,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/representation-abi-v07.json",
+      "role": "Frozen model/representation ABI.",
+      "sha256": "3b36b066111872290b9f37a877b9043650867fa81658476c783a5c7e7485d319"
+    },
+    {
+      "bytes": 24469,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/plans/E4-0-CONTRACT-DRAFT-v05.json",
+      "role": "Immutable scientific/protocol baseline; all gates compared against this file.",
+      "sha256": "e2910965b53313a34c3a7d870075d83dbc9e035a230fc68f3c177c12c71e9fcf"
+    },
+    {
+      "bytes": 1690,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/plans/E4-0-HELDOUT-TEMPLATES-v02-audit.json",
+      "role": "Exact/normalized template exclusion audit.",
+      "sha256": "c5a6eb4412652122a5cfd126e50fc5c907d9fd9f94bd101d4549be2796535f87"
+    },
+    {
+      "bytes": 6716,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/plans/E4-0-HELDOUT-TEMPLATES-v02.json",
+      "role": "Frozen held-out template bytes.",
+      "sha256": "e3b8a70b90b06fc4185d2e379cbfc7cf3724238d9505590add1cf8bba2e9b068"
+    },
+    {
+      "bytes": 38628,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/plans/E4-0-IMPLEMENTATION-SOURCE-MAP-v06.md",
+      "role": "Exact implementation source map sealed by v07.",
+      "sha256": "3adf09a7f75839c7442bdf10586b7ae0acbb87b378b39ad993e2b8e504a2ea70"
+    },
+    {
+      "bytes": 53298,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/plans/E4-0-IMPLEMENTATION-SOURCE-MAP-v07.md",
+      "role": "Exact implementation source map sealed by v08.",
+      "sha256": "2b8c88eef79eaa5dff840d6a04844861f6a9a048068a1b514c71642f37e8a02d"
+    },
+    {
+      "bytes": 65000,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/plans/E4-0-IMPLEMENTATION-SOURCE-MAP-v08.md",
+      "role": "Preserved v09 source map from the failed preseal attempt.",
+      "sha256": "c79306de009e82a5bdd5bd650e64744d115b870c8c4309dd5863a4d7b339b267"
+    },
+    {
+      "bytes": 73060,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/plans/E4-0-IMPLEMENTATION-SOURCE-MAP-v09.md",
+      "role": "Preserved v10 source map bound into its sealed contract.",
+      "sha256": "6f53cb299ab9aefd0ee3ea7ea485d86f20b6a64acde15ee498a50f3e4efd7945"
+    },
+    {
+      "bytes": 82088,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/plans/E4-0-IMPLEMENTATION-SOURCE-MAP-v10.md",
+      "role": "Preserved v11 source map bound into its sealed contract.",
+      "sha256": "d464e0e4898da33afcab6153f7f7df34be9f2a3f9ec499896ac703807f986b6e"
+    },
+    {
+      "bytes": 91198,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/plans/E4-0-IMPLEMENTATION-SOURCE-MAP-v11.md",
+      "role": "Exact source map bound by failed v12 candidate; direct predecessor history.",
+      "sha256": "61df89861d9540641305cdb0020a7bc95772a8adab529e5fdd62898e4c066930"
+    },
+    {
+      "bytes": 100147,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/plans/E4-0-IMPLEMENTATION-SOURCE-MAP-v12.md",
+      "role": "Immutable failed v12 source-map build with stale v11 heading/status; preserved without contract binding.",
+      "sha256": "697a438d99ae8897a3dcb390783ef8ab65c17bd1ffcca16465ffb7f3a4d74073"
+    },
+    {
+      "bytes": 86052,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/plans/E4-0-IMPLEMENTATION-SOURCE-MAP-v13.md",
+      "role": "Immutable reviewed v13 map preserved after the v13 finalizer stopped before candidate materialization.",
+      "sha256": "a06d436c5cee8305ab65a7cb77f34165f48ccdeee932b788a511a70663c47fc6"
+    },
+    {
+      "bytes": 89298,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/plans/E4-0-IMPLEMENTATION-SOURCE-MAP-v14.md",
+      "role": "Exact v14 map bound by the failed v14 preseal candidate; direct failed-candidate history.",
+      "sha256": "40f1d41123dd75093766c01f3e8073f584cf3a7c265d2fba0461ed72ced4fe8f"
+    },
+    {
+      "bytes": 94630,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/plans/E4-0-IMPLEMENTATION-SOURCE-MAP-v15.md",
+      "role": "Exact v15 map bound by the failed v15 preseal candidate; direct failed-candidate history.",
+      "sha256": "3747444405a905ed8918d7939ce7e968915b02d6ebcee422d588f010d7fe50f1"
+    },
+    {
+      "bytes": 102759,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/plans/E4-0-IMPLEMENTATION-SOURCE-MAP-v16-v02.md",
+      "role": "Preserved failed v16-v02 source map bound by its preseal stop.",
+      "sha256": "ae35747bd1108917c09b3ecba236d6a83f794367f0f0abb5b39834151628387d"
+    },
+    {
+      "bytes": 106461,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/plans/E4-0-IMPLEMENTATION-SOURCE-MAP-v16-v03.md",
+      "role": "Preserved v16-v03 map bound by the exact scope-literal preseal stop.",
+      "sha256": "b75ce6021d4f52ccf1791d8d473dcb56527dfba3edde16066b98135bb0f004a0"
+    },
+    {
+      "bytes": 110067,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/plans/E4-0-IMPLEMENTATION-SOURCE-MAP-v16-v04.md",
+      "role": "Preserved v16-v04 source map bound by the exact failed v16-v04 seal attempt.",
+      "sha256": "29c304ce6943d8d982e0ca7bae2d66be3bf2fb4b1d54ed5cec7a0090bf8ac414"
+    },
+    {
+      "bytes": 100236,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/plans/E4-0-IMPLEMENTATION-SOURCE-MAP-v16.md",
+      "role": "Preserved first v16 source-map candidate; its finalizer stopped on a version-specific receipt source-closure mismatch.",
+      "sha256": "34543f8b437adcc5ae003e1638ff77e0503b0089d39c456bbadc6b1dcff03f07"
+    },
+    {
+      "bytes": 12665,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/plans/E4-0-PRECONDITIONS-DESIGN-v03.md",
+      "role": "Resolved E4-0 scientific design.",
+      "sha256": "ce7ba083f359eb252a04e3c3971edf8251995dfe41d43f21a499c50727f5b42b"
+    },
+    {
+      "bytes": 7785,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/plans/E4-0-SYMBOLIC-SUPPORT-PLAN-v11.json",
+      "role": "Frozen 18,667-quartet support/collision plan.",
+      "sha256": "a15bca5d78867ea32905299fabd21f85cf6846a5a02a0c55dd32337e0396847f"
+    },
+    {
+      "bytes": 3718,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/plans/E4-0-TEMPLATE-STRUCTURAL-AUDIT-v01.md",
+      "role": "Descriptive structural novelty audit.",
+      "sha256": "aeca3020f0cbcb779ddb7dac7aea1b9b9f6f4db0fa1abb8221740e2ff188b9ff"
+    },
+    {
+      "bytes": 10008,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/plans/E4-CODEBASE-MAP-v01.md",
+      "role": "Pinned E4 codebase orientation.",
+      "sha256": "9f3f8c048d48ccc7084189bd41a5b62ee4d1847c5146d9f77605ccc211321f0e"
+    },
+    {
+      "bytes": 27253,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/seals/e0-seal-v10.json",
+      "role": "Frozen E0 v10 seal manifest.",
+      "sha256": "f5138b5b90ea187c226521da2c8eaf8d60bb133b5c66ed54c8a822edf565197d"
+    },
+    {
+      "bytes": 4149,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/seals/e3-score-v02-seal.json",
+      "role": "Sealed E3 score replay artifact.",
+      "sha256": "7874bd0c8e9b47973b7cae5cac44da394a6ad1113a98c80ce89d886bae729169"
+    },
+    {
+      "bytes": 35340,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/seals/e4-0-contract-v06-seal.json",
+      "role": "Immutable v06 scientific-baseline seal manifest.",
+      "sha256": "799d1535a16ea6fbf2269206443addf96736ef8a70ca5ab3373cdd5e6a44605c"
+    },
+    {
+      "bytes": 52723,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/seals/e4-0-contract-v07-seal.json",
+      "role": "Immutable v07 historical lineage seal manifest.",
+      "sha256": "22e2d05255a87334d27713d222fc4023fd1cac61dafc4264c5de434bbf4c71ef"
+    },
+    {
+      "bytes": 68666,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/seals/e4-0-contract-v08-seal.json",
+      "role": "Immutable last-sealed v08 predecessor seal manifest.",
+      "sha256": "238d1fdb46ba3d8a9de1ae90e41a9b3c455ba65661bc98e8fe6fa5d21e3d3156"
+    },
+    {
+      "bytes": 84494,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/seals/e4-0-contract-v10-seal.json",
+      "role": "Immutable v10 seal whose root recomputes but member inventory is incomplete per independent audit.",
+      "sha256": "2e6372ba6d34ef4e2c309abd26b857cd69e3a982e3a78398a099c708e9207efa"
+    },
+    {
+      "bytes": 90814,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/seals/e4-0-contract-v11-seal.json",
+      "role": "Immutable v11 seal whose root recomputes but transitive inventory is incomplete per independent audit.",
+      "sha256": "7f27371f3cb886208ff67ea7a19e2ca51577bfbc74e4f6611ca496ab9c13ebcd"
+    },
+    {
+      "bytes": 52511,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/finalize_e4_0_contract_v13.py",
+      "role": "Preserved v13 finalizer source identity associated with the pre-finalization status-registry stop.",
+      "sha256": "03025d1e0e5ed52e7ef3920db0ef780139944fd209fa9d221ca071b42f16ed11"
+    },
+    {
+      "bytes": 17761,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/seal_e4_0_contract_v16_v04.py",
+      "role": "Exact sealer source for the preserved v16-v04 duplicate-member stop.",
+      "sha256": "87cd4e9aa33ca450d5be4dfe771ae0c21a8acb52344b35efafa206e444eee013"
+    }
+  ],
+  "verified_sources_and_receipts": [
+    {
+      "bytes": 1999,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-b-v02/attempt-note-v01.json",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: Preserved Track B v02 failed-import attempt and repair provenance",
+      "sha256": "90342d5884adaec5506586e0ac7b8cdd61cc015de82c95f6da9ccc878cd2ecc5"
+    },
+    {
+      "bytes": 2859,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-b-v03/attempt-note-v01.json",
+      "role": "Track B v03 repair lineage and unbound-v02 provenance note",
+      "sha256": "0dbcd344fd780ca5f4e906090685baccb8e4ffa9dd0b97ab116b9df1511f9841"
+    },
+    {
+      "bytes": 12515,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/audit_e4_0_track_e_seal_v06.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: Independent Track E v06 seal-root/member auditor",
+      "sha256": "397e999448aa5aac1252c8bb746301577d737653cd2e562523c0babf6a6d9647"
+    },
+    {
+      "bytes": 45759,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/audit_e4_0_track_e_v06.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: Independent Track E v06 contract/source auditor",
+      "sha256": "86049aa4041922972690f4c7edc95411d095cab1266a04e95b493416f0c327f9"
+    },
+    {
+      "bytes": 46525,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/audit_e4_0_track_e_v07.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Independent Track E v07 contract/source audit",
+      "sha256": "862ff2af9bfff1ec7f70086679fdf0db2eecc7ee29cb180b0c0336860bf5cfa8"
+    },
+    {
+      "bytes": 60552,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/audit_e4_0_track_e_v08.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Independent Track E v08 contract/source audit",
+      "sha256": "df13a5cd3e0301af2fcd835e89ff15bf62a93ed9ffddb45dda05565feb738e11"
+    },
+    {
+      "bytes": 77792,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/audit_e4_0_track_e_v09.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Independent Track E v09 contract/source audit",
+      "sha256": "d370f38e6bcd5c8381db2d974ec79d05577161408fc334e5bbfb2dcb717bce25"
+    },
+    {
+      "bytes": 84189,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/audit_e4_0_track_e_v10.py",
+      "role": "Preserved v10 predecessor source: Independent Track E v10 contract/source audit",
+      "sha256": "78a7625cb6fb06321e92a5c587c18b6675ad86391bb39d0aaa161d1cfcc38e84"
+    },
+    {
+      "bytes": 92951,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/audit_e4_0_track_e_v11.py",
+      "role": "Independent Track E v11 contract/source audit",
+      "sha256": "e77d5dcf8ff2c696d40e323f86e7330ac8e01c4cfceef5f5847c2b647922503f"
+    },
+    {
+      "bytes": 100902,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/audit_e4_0_track_e_v12.py",
+      "role": "Independent Track E v12 contract/source audit",
+      "sha256": "954ecd94f3c6da626a5802d752159dbf0291e7289b84454bd84d4445af2c5cb2"
+    },
+    {
+      "bytes": 107598,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/audit_e4_0_track_e_v13.py",
+      "role": "Independent Track E v13 contract/source audit",
+      "sha256": "a369d8cc0b37a28c92777c658bce376a6b91afea0eae087f264309d541708392"
+    },
+    {
+      "bytes": 112628,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/audit_e4_0_track_e_v14.py",
+      "role": "Independent Track E v14 contract/source audit",
+      "sha256": "627db699fe05eb354f9eba59b9a3c3cd4755cdb5cbdbe71b390fd62247cfa2bc"
+    },
+    {
+      "bytes": 121442,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/audit_e4_0_track_e_v15.py",
+      "role": "Independent Track E v15 contract/source audit",
+      "sha256": "d842b6d3ce53a5833c8d1a759bad3c10a5ef66c9d4a2cc00e91a1ba55e879972"
+    },
+    {
+      "bytes": 122741,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/audit_e4_0_track_e_v15_v02.py",
+      "role": "Independent Track E v15 v02 contract/source audit",
+      "sha256": "19828ed550e989a8d605be1429eb9d51c6fe78e7fbec32eaef0d067680a39962"
+    },
+    {
+      "bytes": 129655,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/audit_e4_0_track_e_v16.py",
+      "role": "Preserved initial Track E v16 contract/source audit associated with receipt v28",
+      "sha256": "637ea26244c6de73cfdd8f918289fa1361f7b77f4e39a4ca5c2e01440a222f7d"
+    },
+    {
+      "bytes": 129655,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/audit_e4_0_track_e_v16_v02.py",
+      "role": "Independent Track E v16 v02 contract/source audit",
+      "sha256": "637ea26244c6de73cfdd8f918289fa1361f7b77f4e39a4ca5c2e01440a222f7d"
+    },
+    {
+      "bytes": 132537,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/audit_e4_0_track_e_v16_v03.py",
+      "role": "Independent Track E v16 v03 contract/source audit",
+      "sha256": "72fb54faa85ab31806923321cd2adf9511b6fdc8614a6d3afdf85136d2c499ad"
+    },
+    {
+      "bytes": 135146,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/audit_e4_0_track_e_v16_v04.py",
+      "role": "Independent Track E v16 v04 contract/source audit",
+      "sha256": "b34fd588539774588af376421dff2055d8c9073a49dafeed7ab9c7283f3d19dc"
+    },
+    {
+      "bytes": 139470,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/audit_e4_0_track_e_v16_v05.py",
+      "role": "Independent Track E v16 v05 contract/source audit",
+      "sha256": "2995b12b3156bb2d5b49ae489aaea0a8fa9640779296add97f979de120da344b"
+    },
+    {
+      "bytes": 145824,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/audit_e4_0_track_e_v16_v06.py",
+      "role": "Independent Track E v16 v06 contract/source audit",
+      "sha256": "2d595eea1bf4247da46e9b09131577e6613a4737d92bf0aa8c3c42a2d0aa8a0d"
+    },
+    {
+      "bytes": 20808,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/fixtures/sealed-v05-source-map-v04.md",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: Exact immutable v05 map fixture for semantic-role parser regression",
+      "sha256": "cd460160797c91e3655a06cf6bda9d2598fbb46c6564c729c4eaa1f6d5a9a4f9"
+    },
+    {
+      "bytes": 748,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/history/build_e4_0_source_map_v05-zero-byte-attempt-v01.json",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: Receipt for preserved empty failed builder-write attempt",
+      "sha256": "dbedbb2d84ba11588a86fc9300a0d12b7540fdba425bcfeea4d50381f2ac7a47"
+    },
+    {
+      "bytes": 0,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/history/build_e4_0_source_map_v05-zero-byte-attempt-v01.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: Preserved empty failed builder-write attempt; history only",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 7083,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/test_audit_e4_0_track_e_v06.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: Independent Track E v06 source auditor tests",
+      "sha256": "721fe632f2940dc1edd42f345565343de3602f9b150849b2cec4fa036a2cf141"
+    },
+    {
+      "bytes": 26696,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/test_audit_e4_0_track_e_v07.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Independent Track E v07 audit tests",
+      "sha256": "077f42be145034615c6e443703d927b986f36b160278a0261caf01072f41b2a9"
+    },
+    {
+      "bytes": 33169,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/test_audit_e4_0_track_e_v08.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Independent Track E v08 audit tests",
+      "sha256": "ff3f6349ecea51c2f69a1a88ca70508d0ccac2cfd75634ed73d68931b4e200ce"
+    },
+    {
+      "bytes": 40675,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/test_audit_e4_0_track_e_v09.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Independent Track E v09 audit tests",
+      "sha256": "744dcbdaacfe6ed45756a8f872567a379373d495c1c5ef474cc612d08efb96ca"
+    },
+    {
+      "bytes": 43629,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/test_audit_e4_0_track_e_v10.py",
+      "role": "Preserved v10 predecessor source: Independent Track E v10 audit tests",
+      "sha256": "1936faf6a0427970231dab56affa5800d8e7ac4cc51e85f554c169fe46dd93fe"
+    },
+    {
+      "bytes": 4835,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/test_audit_e4_0_track_e_v11.py",
+      "role": "Independent Track E v11 audit tests",
+      "sha256": "c798761ddc3f12a5e26ac39415cff889e6e9627a25894a6582c0b8e223e0e529"
+    },
+    {
+      "bytes": 4339,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/test_audit_e4_0_track_e_v12.py",
+      "role": "Independent Track E v12 audit tests",
+      "sha256": "4b0541bbac4557806754845d6e77e422b4814ffc0fe2ed9ef8e6c5c16aff8d06"
+    },
+    {
+      "bytes": 7527,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/test_audit_e4_0_track_e_v13.py",
+      "role": "Independent Track E v13 audit tests",
+      "sha256": "54bf95e47919e43f0adc6c2a2288854cfcd2a7092f2c14e1091f8cacd0f50c78"
+    },
+    {
+      "bytes": 7365,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/test_audit_e4_0_track_e_v14.py",
+      "role": "Independent Track E v14 audit tests",
+      "sha256": "8514f38c42a762259a21d44d446b5d45c38fb49fc67c0644e5608e9dfa747ac1"
+    },
+    {
+      "bytes": 6328,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/test_audit_e4_0_track_e_v15.py",
+      "role": "Independent Track E v15 audit tests",
+      "sha256": "125670b35e77ac6569c7c6d914c81f43220a90641edb618276c03601625a5e85"
+    },
+    {
+      "bytes": 8244,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/test_audit_e4_0_track_e_v15_v02.py",
+      "role": "Independent Track E v15 v02 audit tests",
+      "sha256": "1bfbdde3924708ae1d9e2320560269c2cb111f187b590f2a419266e10a354790"
+    },
+    {
+      "bytes": 8376,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/test_audit_e4_0_track_e_v16.py",
+      "role": "Preserved initial Track E v16 audit tests associated with receipt v28",
+      "sha256": "42ed788051ffb716e97a9a461cdb8fdbe3610b66d8d529064a1383664e059e9d"
+    },
+    {
+      "bytes": 8376,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/test_audit_e4_0_track_e_v16_v02.py",
+      "role": "Independent Track E v16 v02 audit tests",
+      "sha256": "42ed788051ffb716e97a9a461cdb8fdbe3610b66d8d529064a1383664e059e9d"
+    },
+    {
+      "bytes": 9711,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/test_audit_e4_0_track_e_v16_v03.py",
+      "role": "Independent Track E v16 v03 audit tests",
+      "sha256": "a7df3420601e663ec3bb7ab4fe317cfbe90b0012ff4b2cb01ac9db16194efff2"
+    },
+    {
+      "bytes": 10613,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/test_audit_e4_0_track_e_v16_v04.py",
+      "role": "Independent Track E v16 v04 audit tests",
+      "sha256": "f79afdf818c56e727f2c9875cedd3e46ebe80d30dbb794dbedf5b22a46c1766d"
+    },
+    {
+      "bytes": 10704,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/test_audit_e4_0_track_e_v16_v05.py",
+      "role": "Independent Track E v16 v05 audit tests",
+      "sha256": "bf8bbba8185f2312e1ed374b5ff7a93dded4a8f2916fda12b4ff788967daba97"
+    },
+    {
+      "bytes": 11933,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/test_audit_e4_0_track_e_v16_v06.py",
+      "role": "Independent Track E v16 v06 audit tests",
+      "sha256": "90b07fc1b27594acb5a9480df02e9ae341b665a12d268ac46d7aadda30c7124d"
+    },
+    {
+      "bytes": 19005,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/e4-population-v02/Cargo.lock",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: Track A v06 population generator / Rust build closure",
+      "sha256": "ebe38c4657bf638886f81916734b31506ea535dd4840d36dba9d1974b208a9ca"
+    },
+    {
+      "bytes": 500,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/e4-population-v02/Cargo.toml",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: Track A v06 population generator / Rust build closure",
+      "sha256": "faa0515d9a4308bd3e128c49131fdc3a95eb795e385518b2c47ae26f647e436c"
+    },
+    {
+      "bytes": 2522,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/e4-population-v02/benches/population_hot_path.rs",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: Track A v06 population generator / Rust build closure",
+      "sha256": "c87bb976feea504935d8f3042f577d74f5809314294507f2881a8c192835deda"
+    },
+    {
+      "bytes": 16107,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/e4-population-v02/src/bin/e4-population-v02.rs",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: Track A v06 population generator / Rust build closure",
+      "sha256": "ffa41e08ca9f5d06fe7eb9d414d470e208d864e679bce688b4b84c4d4c319ea7"
+    },
+    {
+      "bytes": 14033,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/e4-population-v02/src/identity.rs",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: Track A v06 population generator / Rust build closure",
+      "sha256": "58e5c95ad5d00daeafc810b70d28aefa605f0320b2d7144651e85b5a598f3b5d"
+    },
+    {
+      "bytes": 3760,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/e4-population-v02/src/lib.rs",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: Track A v06 population generator / Rust build closure",
+      "sha256": "8de3e3ddf932011d83ca3131310fb97607e0bb00535e395b36c6712407ce014c"
+    },
+    {
+      "bytes": 30119,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/e4-population-v02/src/population.rs",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: Track A v06 population generator / Rust build closure",
+      "sha256": "674a610a29d5903ec34562d537fd45b573237d96b7a5450978545fc46d4363cf"
+    },
+    {
+      "bytes": 9345,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/e4-population-v02/src/render.rs",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: Track A v06 population generator / Rust build closure",
+      "sha256": "4bfe046c905b19733f809bc59434db781245f5c7412d77723d5bc13358f6f984"
+    },
+    {
+      "bytes": 4529,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/e4-population-v02/src/schema.rs",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: Track A v06 population generator / Rust build closure",
+      "sha256": "bc31c30b5f0bf512edcce7c306fd03fb1511cfe0c570cab03208b0707fdabef9"
+    },
+    {
+      "bytes": 5793,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/e4-population-v02/src/support.rs",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: Track A v06 population generator / Rust build closure",
+      "sha256": "8cbb8b4c2b61238481dfbe0815eb35930c67d1bce1cb8b000358079a33992a88"
+    },
+    {
+      "bytes": 12143,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/e4-population-v02/src/writer.rs",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: Track A v06 population generator / Rust build closure",
+      "sha256": "b9d70061432319991138f19585c2115555deabfbb372963edc56cd9c22a52997"
+    },
+    {
+      "bytes": 6002,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/e4-support-plan-v11/Cargo.lock",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: Model-free symbolic support planner",
+      "sha256": "8a84004756324303676bae7acc1bd041d54530a93e9e85b074d65b162e9e3a8c"
+    },
+    {
+      "bytes": 324,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/e4-support-plan-v11/Cargo.toml",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: Model-free symbolic support planner",
+      "sha256": "5634d636df04da59a64d5e1ed890641ebc3823ec9971b94673ffd123f3591379"
+    },
+    {
+      "bytes": 33181,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/e4-support-plan-v11/src/main.rs",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: Model-free symbolic support planner",
+      "sha256": "d3cc9b9c36bbcde3bfdaac07f571e53a88374c26d076fb808b273bae4d3155ae"
+    },
+    {
+      "bytes": 6015,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/panel-generator-v04/Cargo.lock",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: Frozen local E1 schedule dependency",
+      "sha256": "4ed5fca0a39c8869c082daf94cb0afd183533714a8253e44acf8d610129e17d7"
+    },
+    {
+      "bytes": 321,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/panel-generator-v04/Cargo.toml",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: Frozen local E1 schedule dependency",
+      "sha256": "c7448c046ceb9722a96ef3318bbc0b55e459ecdf06f6ea1c87634b10a27d022a"
+    },
+    {
+      "bytes": 25895,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/panel-generator-v04/src/generate.rs",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: Frozen local E1 schedule dependency",
+      "sha256": "fa2bd0617135a0dce4e12f0e0967f82e461133b394a7d969daba5afb11e2cce1"
+    },
+    {
+      "bytes": 33,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/panel-generator-v04/src/lib.rs",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: Frozen local E1 schedule dependency",
+      "sha256": "e57ddf18054a9c7d049d849d28654bbf85419e13993bc917906cfef3d4669cc7"
+    },
+    {
+      "bytes": 31954,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/panel-generator-v04/src/main.rs",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: Frozen local E1 schedule dependency",
+      "sha256": "7ce62779ddf8dd994ad9ace6a10dd5bda76de3bd87c1c0e19459cf38b428ec0f"
+    },
+    {
+      "bytes": 3680,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/panel-generator-v04/src/model.rs",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: Frozen local E1 schedule dependency",
+      "sha256": "94cca0249f5508be13e186921bc2441a830fa4af695211cd7fb08126a79c11e2"
+    },
+    {
+      "bytes": 10706,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/audit_e4_0_contract_draft_v05.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: Historical v05 draft auditor",
+      "sha256": "08c57c91d5d3f3df6770098cac56dbdbfbde035859446801397eae5803919e2a"
+    },
+    {
+      "bytes": 7896,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/build_e4_0_contract_draft_v05.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: Historical v05 draft builder",
+      "sha256": "e980635bf79e7d33f07bf9cf35397101909247ec9c18cee3b2a183235da88eea"
+    },
+    {
+      "bytes": 13638,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/build_e4_0_source_map_v04.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: Preserved v04 source map builder",
+      "sha256": "532af82be19ca3bac28fd37d64ee57ebefe24d37e2a4ef26d113f006a177ae4b"
+    },
+    {
+      "bytes": 16381,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/build_e4_0_source_map_v05.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: v05 source map builder",
+      "sha256": "8640e7cb869a261f545ebc6ea78298e45901f6dd86c1121994ac314999033c0b"
+    },
+    {
+      "bytes": 27215,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/build_e4_0_source_map_v06.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: v07 implementation source-map builder",
+      "sha256": "5202f36c9e4577b8bc2dbf8d69fb347d8b626243567047f93d557e2f20990a0e"
+    },
+    {
+      "bytes": 31527,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/build_e4_0_source_map_v07.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: v08 implementation source-map builder",
+      "sha256": "de7b65de540ea28f700ee6a1025e559a3675c17c7571f4b45e64d381fe77e195"
+    },
+    {
+      "bytes": 37286,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/build_e4_0_source_map_v08.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: v09 implementation source-map builder",
+      "sha256": "06ce339350ed5494bd0bd58c8b82dd9f740a80a748ca3b483a9290293d6cf97c"
+    },
+    {
+      "bytes": 39952,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/build_e4_0_source_map_v09.py",
+      "role": "Preserved v10 predecessor source: v10 implementation source-map builder",
+      "sha256": "b360b4f7cbbad3b5b5a40a095d24c22a1fb23992034c9477b75bbc3ef1cb71b8"
+    },
+    {
+      "bytes": 43170,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/build_e4_0_source_map_v10.py",
+      "role": "v11 implementation source-map builder",
+      "sha256": "24b7f65882fc6b3103bb6c86c8b34c55643879d7c5e71d7795edf4a6530094cd"
+    },
+    {
+      "bytes": 47668,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/build_e4_0_source_map_v11.py",
+      "role": "v12 implementation source-map builder",
+      "sha256": "131f0e6f41d7fde59e3417c28df8c5534f3a70c3adcf3b2107b8faefc407e2f9"
+    },
+    {
+      "bytes": 51571,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/build_e4_0_source_map_v13.py",
+      "role": "v13 corrected implementation source-map builder",
+      "sha256": "8cc2aff4af1db9e9a4a94d490fbc8f75d21905cd8ef3a49f669e17d789f3f19d"
+    },
+    {
+      "bytes": 53355,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/build_e4_0_source_map_v14.py",
+      "role": "v14 corrected implementation source-map builder",
+      "sha256": "e6ee1d8f2ff0461a621ede0d8ff52d9d2aef3e6c3cf38dab0e57bd3d45e741fe"
+    },
+    {
+      "bytes": 59987,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/build_e4_0_source_map_v15.py",
+      "role": "v15 corrected implementation source-map builder",
+      "sha256": "4a3c9b57cd11a12bdf82462f71df3da170d0709d4075814f3cc1270c270e1a9b"
+    },
+    {
+      "bytes": 63790,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/build_e4_0_source_map_v16.py",
+      "role": "Preserved initial v16 source-map builder associated with tooling receipt v16-v01",
+      "sha256": "12259849489956542abcb4619b605cd31c051f8c1cacde5db6f54019a025dc65"
+    },
+    {
+      "bytes": 66788,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/build_e4_0_source_map_v16_v02.py",
+      "role": "v16 source-map builder with exact v15 failed-preseal lineage",
+      "sha256": "9c0f1a525513b11ae47356681346ad7a4ad361b837da8c1a2e267a8d81649e8b"
+    },
+    {
+      "bytes": 69908,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/build_e4_0_source_map_v16_v03.py",
+      "role": "v16-v02 source-map builder preserving the first v16 map and finalizer stop",
+      "sha256": "daa0ab8295a4f3131218cb1c1bbef38db6ae8f43d99452996e7f01de9a34fa7c"
+    },
+    {
+      "bytes": 72881,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/build_e4_0_source_map_v16_v04.py",
+      "role": "v16-v03 source-map builder with exact failed v16-v02 attempt history",
+      "sha256": "0babb46a2a0dd02fddf94bac1813bef1482cb3af6f98172ce54f0d4fa46ff5ee"
+    },
+    {
+      "bytes": 77129,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/build_e4_0_source_map_v16_v05.py",
+      "role": "v16-v04 source-map builder preserving the v16-v03 candidate and stop",
+      "sha256": "910587e002feba128ad2282f890270ed741b6ba37acbc0038aaf8101e30d8af2"
+    },
+    {
+      "bytes": 84160,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/build_e4_0_source_map_v16_v06.py",
+      "role": "v16-v05 source-map builder preserving the v16-v04 failed seal attempt",
+      "sha256": "25a52c131d78ddf5c85c3e1f9d9a14d5f42acc0cf6bcebc6b51615c7eb5da5f0"
+    },
+    {
+      "bytes": 8585,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_fresh_scorer_v02/README.md",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: Track C v06 scorer / synthetic tests",
+      "sha256": "5a24f8ae2339cd972a3963c1ef3a81badf99270c4b451188e74ce025eb303b57"
+    },
+    {
+      "bytes": 5887,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_fresh_scorer_v02/output_artifacts.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: Track C v06 scorer / synthetic tests",
+      "sha256": "73fbdd184d01df6de913676a0caa0be8f38f264bc9667e3985b52485425b33d4"
+    },
+    {
+      "bytes": 44491,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_fresh_scorer_v02/runner.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: Track C v06 scorer / synthetic tests",
+      "sha256": "49c21eaee43b2e9d4d1f67b32ba299c0ed238fdc8783a020554517a745ed4e41"
+    },
+    {
+      "bytes": 33616,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_fresh_scorer_v02/scorer.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: Track C v06 scorer / synthetic tests",
+      "sha256": "58bc957de63d430933570430ee0760a5833bc9c6ef5a82dae6dba78115b8b866"
+    },
+    {
+      "bytes": 27529,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_fresh_scorer_v02/test_runner.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: Track C v06 scorer / synthetic tests",
+      "sha256": "51366268036367a3443925ad200e2035792c43a73a8ba1182ecc232b6c1dce89"
+    },
+    {
+      "bytes": 11470,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_fresh_scorer_v02/test_scorer.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: Track C v06 scorer / synthetic tests",
+      "sha256": "49918704b151c9055432f4fb6199e3621a619b21acfb85d2a0427883283132c6"
+    },
+    {
+      "bytes": 9727,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_fresh_scorer_v03/README.md",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Track C v03 frozen fresh qualification scorer and tests",
+      "sha256": "cc430b9c0a9cd95a0fe6cdcbaf240b8040b0774432b7b055f39592fe50def4b0"
+    },
+    {
+      "bytes": 5887,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_fresh_scorer_v03/output_artifacts.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Track C v03 frozen fresh qualification scorer and tests",
+      "sha256": "73fbdd184d01df6de913676a0caa0be8f38f264bc9667e3985b52485425b33d4"
+    },
+    {
+      "bytes": 45677,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_fresh_scorer_v03/runner.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Track C v03 frozen fresh qualification scorer and tests",
+      "sha256": "cfadd516be315f83c7e097e20157f7e52d1311769fe8686a4c7cec372b6ba787"
+    },
+    {
+      "bytes": 33616,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_fresh_scorer_v03/scorer.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Track C v03 frozen fresh qualification scorer and tests",
+      "sha256": "58bc957de63d430933570430ee0760a5833bc9c6ef5a82dae6dba78115b8b866"
+    },
+    {
+      "bytes": 29049,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_fresh_scorer_v03/test_runner.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Track C v03 frozen fresh qualification scorer and tests",
+      "sha256": "31bd94056135ca7f94de1c547953805c90a339be2c6447ae4b780adb77c485f3"
+    },
+    {
+      "bytes": 11470,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_fresh_scorer_v03/test_scorer.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Track C v03 frozen fresh qualification scorer and tests",
+      "sha256": "49918704b151c9055432f4fb6199e3621a619b21acfb85d2a0427883283132c6"
+    },
+    {
+      "bytes": 9749,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_fresh_scorer_v04/README.md",
+      "role": "Track C v04 frozen fresh qualification scorer and tests",
+      "sha256": "12c340e03ac754ebad68d3b46119a1da66ba9463450574527295efb92cd576a0"
+    },
+    {
+      "bytes": 5887,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_fresh_scorer_v04/output_artifacts.py",
+      "role": "Track C v04 frozen fresh qualification scorer and tests",
+      "sha256": "73fbdd184d01df6de913676a0caa0be8f38f264bc9667e3985b52485425b33d4"
+    },
+    {
+      "bytes": 53258,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_fresh_scorer_v04/runner.py",
+      "role": "Track C v04 frozen fresh qualification scorer and tests",
+      "sha256": "d3507898b848d4911361751d44acb80dac6fbcd4fc99736c40fa53bee8a9b26c"
+    },
+    {
+      "bytes": 33616,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_fresh_scorer_v04/scorer.py",
+      "role": "Track C v04 frozen fresh qualification scorer and tests",
+      "sha256": "58bc957de63d430933570430ee0760a5833bc9c6ef5a82dae6dba78115b8b866"
+    },
+    {
+      "bytes": 33583,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_fresh_scorer_v04/test_runner.py",
+      "role": "Track C v04 frozen fresh qualification scorer and tests",
+      "sha256": "3df29d5540c96e20bdfe5d3edbc2cbd5e62b40848c82484fc438d55096cb515d"
+    },
+    {
+      "bytes": 11856,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_fresh_scorer_v04/test_scorer.py",
+      "role": "Track C v04 frozen fresh qualification scorer and tests",
+      "sha256": "f7d8225e60b6c15e9bfd1fa81ae71182c8507eb591967e0d34890f85c7b97a15"
+    },
+    {
+      "bytes": 23022,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_gpu_lease_v01.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: Track B process lease and resource telemetry",
+      "sha256": "e95a6e40f4e9128d8c15cc758e91254e51936cb6b1e8942bbd1e76f635d82c21"
+    },
+    {
+      "bytes": 23201,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_gpu_lease_v03.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Track B v03 process-scoped GPU lease/resource telemetry",
+      "sha256": "c80e8aeae942e1d4c851822b2eb07f4a5b9eb7c3b819d7fe10a8a23a1d0d79d4"
+    },
+    {
+      "bytes": 25284,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_gpu_lease_v04.py",
+      "role": "Track B v04 WDDM-aware Type-C CUDA lease/resource telemetry",
+      "sha256": "45a14179765501fbda6e56fe93969cb28bd5ef3705b37a7ef6727833c4f84a3f"
+    },
+    {
+      "bytes": 1305,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v02/README.md",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: Track D independent population/parity/scoring replay auditor",
+      "sha256": "95e71f621cd3ce2bfda319d32c27e8aed249d59cfa01ea884f2ea837be2d3ca4"
+    },
+    {
+      "bytes": 71,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v02/__init__.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: Track D independent population/parity/scoring replay auditor",
+      "sha256": "c5c6939552ed8fc92be9b0dd26f6732123dcccc44ef316eb3ab685f8bf291f12"
+    },
+    {
+      "bytes": 48,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v02/__main__.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: Track D independent population/parity/scoring replay auditor",
+      "sha256": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d"
+    },
+    {
+      "bytes": 23715,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v02/cli.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: Track D independent population/parity/scoring replay auditor",
+      "sha256": "13ef86c35c6b853b0a889823fe7e2210c2114f4edfd9a4bf032ca89a19065b9a"
+    },
+    {
+      "bytes": 3849,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v02/constants.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: Track D independent population/parity/scoring replay auditor",
+      "sha256": "32b4ff47c2ffcc4d7f34df5f152ab902e9cb0c17c70a2af6e21ba1f02ae0d9b4"
+    },
+    {
+      "bytes": 12661,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v02/features.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: Track D independent population/parity/scoring replay auditor",
+      "sha256": "eb5d2ba1d94e932502db9b595f53e3e61da28ef8679ea8b95403e79fa909a4f0"
+    },
+    {
+      "bytes": 22115,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v02/integrity.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: Track D independent population/parity/scoring replay auditor",
+      "sha256": "3c2f9f4e5eb6b9deada4eb367003ea477ab5dae0aff70214ca20734306676fbe"
+    },
+    {
+      "bytes": 16377,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v02/population.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: Track D independent population/parity/scoring replay auditor",
+      "sha256": "455ccef43a2889610134442ffe5edcd2a460a32fd3b21201574093a9118f62cb"
+    },
+    {
+      "bytes": 24720,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v02/replay.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: Track D independent population/parity/scoring replay auditor",
+      "sha256": "64c72105ce71c775395a8406366c7f1e8837d1c8da1b253f78b880c2122c1848"
+    },
+    {
+      "bytes": 30122,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v02/tests/test_audit.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: Track D independent population/parity/scoring replay auditor",
+      "sha256": "aca08a95b71cbca4a72f4e10b47ceeda0a90a0d7c9121f08150b3ca5c2e5a6c0"
+    },
+    {
+      "bytes": 2186,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v03/README.md",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Track D v03 independent stage/replay auditor and tests",
+      "sha256": "d0ee84a89cdd23e8237d017705ceebfd60320fbad4d753add922e0718043456e"
+    },
+    {
+      "bytes": 71,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v03/__init__.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Track D v03 independent stage/replay auditor and tests",
+      "sha256": "c5c6939552ed8fc92be9b0dd26f6732123dcccc44ef316eb3ab685f8bf291f12"
+    },
+    {
+      "bytes": 48,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v03/__main__.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Track D v03 independent stage/replay auditor and tests",
+      "sha256": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d"
+    },
+    {
+      "bytes": 30266,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v03/cli.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Track D v03 independent stage/replay auditor and tests",
+      "sha256": "d30865fbb844f650db0e70c08d2fddda92209862367ca73f26f6922c80e3f4a6"
+    },
+    {
+      "bytes": 4652,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v03/constants.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Track D v03 independent stage/replay auditor and tests",
+      "sha256": "119bd0b949519c6c8a21bb11c2b803b6600b507bd9a09fa7cefd77b4e81f3028"
+    },
+    {
+      "bytes": 13065,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v03/features.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Track D v03 independent stage/replay auditor and tests",
+      "sha256": "241f84f6874cf272b173acb52a1541c472445c109c270c230858210b8ab529b5"
+    },
+    {
+      "bytes": 26840,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v03/integrity.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Track D v03 independent stage/replay auditor and tests",
+      "sha256": "f63881593394f4f1a122e53b0cf921dda8aae60fa39c949fcd1cd0fcf4853e55"
+    },
+    {
+      "bytes": 16583,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v03/population.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Track D v03 independent stage/replay auditor and tests",
+      "sha256": "721f7d965777e9c2cb1baee6d4459ef7dbffea8b84c58cb123dedc72e5bf3309"
+    },
+    {
+      "bytes": 24743,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v03/replay.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Track D v03 independent stage/replay auditor and tests",
+      "sha256": "fc2d49b6efe7b300b425d8a69858f4256da7218a400872d2560798456a44b421"
+    },
+    {
+      "bytes": 40977,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v03/tests/test_audit.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Track D v03 independent stage/replay auditor and tests",
+      "sha256": "d1ccaa8664ab85371bd65d8ec7750eae71ac89225c0d5670cc201df05740852a"
+    },
+    {
+      "bytes": 2186,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v04/README.md",
+      "role": "Track D v04 independent stage/replay auditor and tests",
+      "sha256": "b6b9dae8f77187726a01a12a9bcbd97024d60febf49789979b34d48799758356"
+    },
+    {
+      "bytes": 71,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v04/__init__.py",
+      "role": "Track D v04 independent stage/replay auditor and tests",
+      "sha256": "c5c6939552ed8fc92be9b0dd26f6732123dcccc44ef316eb3ab685f8bf291f12"
+    },
+    {
+      "bytes": 48,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v04/__main__.py",
+      "role": "Track D v04 independent stage/replay auditor and tests",
+      "sha256": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d"
+    },
+    {
+      "bytes": 30254,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v04/cli.py",
+      "role": "Track D v04 independent stage/replay auditor and tests",
+      "sha256": "d9ff5fc35eabeb1c9465fccdabfb41b463774a8588e652fdba099ea3227632e8"
+    },
+    {
+      "bytes": 6388,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v04/constants.py",
+      "role": "Track D v04 independent stage/replay auditor and tests",
+      "sha256": "2d2399f856119d144d4fd7ebfe38042c89a6a69176dd49ce05b60e5f8e7a416d"
+    },
+    {
+      "bytes": 13065,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v04/features.py",
+      "role": "Track D v04 independent stage/replay auditor and tests",
+      "sha256": "241f84f6874cf272b173acb52a1541c472445c109c270c230858210b8ab529b5"
+    },
+    {
+      "bytes": 34207,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v04/integrity.py",
+      "role": "Track D v04 independent stage/replay auditor and tests",
+      "sha256": "11377c12adc1c74df712434da2f402c26dbd24cecbb9fe0a863c648824036c63"
+    },
+    {
+      "bytes": 16583,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v04/population.py",
+      "role": "Track D v04 independent stage/replay auditor and tests",
+      "sha256": "721f7d965777e9c2cb1baee6d4459ef7dbffea8b84c58cb123dedc72e5bf3309"
+    },
+    {
+      "bytes": 24743,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v04/replay.py",
+      "role": "Track D v04 independent stage/replay auditor and tests",
+      "sha256": "fc2d49b6efe7b300b425d8a69858f4256da7218a400872d2560798456a44b421"
+    },
+    {
+      "bytes": 50260,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v04/tests/test_audit.py",
+      "role": "Track D v04 independent stage/replay auditor and tests",
+      "sha256": "00b1832743715342221d022ce99fa8c4f6c3e54d3d2ba50287a8cc91e79261fb"
+    },
+    {
+      "bytes": 1375,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_online_parity_v02.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: Track B v06 parity/feature runner entrypoint",
+      "sha256": "02a26b5f3b2b2327a2e21bdaadec5e250ecf9ba0381a6b7707882ab9302ecb16"
+    },
+    {
+      "bytes": 1213,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_online_parity_v03.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Track B v03 parity/feature runner entrypoint",
+      "sha256": "0b7b547c912b0e3e32ba648ea3236c03d4b9bd35d4db804230e75928e79f6dd3"
+    },
+    {
+      "bytes": 1213,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_online_parity_v04.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Track B v04 parity/feature runner entrypoint",
+      "sha256": "c30ebbc7c5002aaa65d753159c5b4ca1e4292616924e42c5636c65d45f460700"
+    },
+    {
+      "bytes": 1213,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_online_parity_v05.py",
+      "role": "Track B v05 parity/feature runner entrypoint",
+      "sha256": "23c04759d07cf91d85cb36d86c8bdf2cc2dda1e3383ea93bc3e27d6c3a722604"
+    },
+    {
+      "bytes": 15794,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_runner_artifacts_v02.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: Track B v06 artifact custody and seals",
+      "sha256": "9976bb9ece709631ab33dcecaf3caa59b99268fdd39d413ad38b28a8d959a4a3"
+    },
+    {
+      "bytes": 16642,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_runner_artifacts_v03.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Track B v03 artifact custody and sealing",
+      "sha256": "25cd2900dd8c33d3b111649506c1e3973b13d13a1e42c05788d981a9fb3fe474"
+    },
+    {
+      "bytes": 16642,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_runner_artifacts_v04.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Track B v04 artifact custody and sealing",
+      "sha256": "9256dc8648bb2f9cd23f93195a67e810ff19e5a4c1eefb2563a310c09cfdc2f3"
+    },
+    {
+      "bytes": 16642,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_runner_artifacts_v05.py",
+      "role": "Track B v05 artifact custody and sealing",
+      "sha256": "25c708eeeecd3c2a71beb03847446ff4301779e44114ada5399c93a437fe6d37"
+    },
+    {
+      "bytes": 20575,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_runner_common_v02.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: Track B v06 auth, identity, and parity selection",
+      "sha256": "83d5a0a1dad9b9d56773bca7d38ae8ff98ada0e8ff46101c282e233ea1094899"
+    },
+    {
+      "bytes": 23451,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_runner_common_v03.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Track B v03 stage identity and validation",
+      "sha256": "5bf0dea7ba6b1bdb2f295bd8fafcb0208ef4dabd8dd28d56b51d7ba08634d02f"
+    },
+    {
+      "bytes": 23451,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_runner_common_v04.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Track B v04 stage identity and validation",
+      "sha256": "9a6f89f4c626e40b66780044acfe4c95a09faee20fa9d19a65e7f5e015393c45"
+    },
+    {
+      "bytes": 23451,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_runner_common_v05.py",
+      "role": "Track B v05 stage identity and validation",
+      "sha256": "0b508de5c61737ff2b7d4a1838d8277ac9fe5428874e7b9bec834ee1145ca8a4"
+    },
+    {
+      "bytes": 32754,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_runner_modes_v02.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: Track B v06 panel, parity, and feature modes",
+      "sha256": "654974ee5c32c6482e868d9885ba9d92e4928ef25bc0713400cece253390f5af"
+    },
+    {
+      "bytes": 32820,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_runner_modes_v03.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Track B v03 parity and feature modes",
+      "sha256": "69b65332fb99381e0a4e30fd5dbf563f53d5622ea96eafd27e35cf9e5c196ff3"
+    },
+    {
+      "bytes": 32820,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_runner_modes_v04.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Track B v04 parity and feature modes",
+      "sha256": "e40774d52e55682ac8c3c2a054b741caee4532f1622ccfccbb714fdbfc69dbdd"
+    },
+    {
+      "bytes": 32820,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_runner_modes_v05.py",
+      "role": "Track B v05 parity and feature modes",
+      "sha256": "a173a1366799f8a63b5793ed99275fa3f1371c4c0ba7275e357d39dd1eef34f1"
+    },
+    {
+      "bytes": 8851,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/finalize_e4_0_contract_v05.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: Preserved v05 contract metadata binder",
+      "sha256": "cde570cf362265aae3055120447d6840bbe5658952413b8f727240b750276a9c"
+    },
+    {
+      "bytes": 10360,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/finalize_e4_0_contract_v06.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: v06 contract metadata binder",
+      "sha256": "384d1c9d5b8d5340b7b04406cf03a1c7c2a199aeab799103705733508bec8876"
+    },
+    {
+      "bytes": 20376,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/finalize_e4_0_contract_v07.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: v07 contract finalizer with v06 scientific invariance checks",
+      "sha256": "600491a97f94b810d0025f433aced2edce06751591925a58c2bb1a85dbf30344"
+    },
+    {
+      "bytes": 24059,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/finalize_e4_0_contract_v08.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: v08 contract finalizer with v06 scientific invariance checks",
+      "sha256": "563e7af0739a4f5895662261e2a91a81a50b3b3d1efb389e833896842de858e6"
+    },
+    {
+      "bytes": 29436,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/finalize_e4_0_contract_v09.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: v09 contract finalizer with v06 scientific invariance checks",
+      "sha256": "5c2f1911cbd3598322581c2855b6dde9d5d073d935ebe8d4b6f2cd3e50fc7fcb"
+    },
+    {
+      "bytes": 32666,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/finalize_e4_0_contract_v10.py",
+      "role": "Preserved v10 predecessor source: v10 contract finalizer with v06 scientific invariance checks",
+      "sha256": "8aea5c19ac837e2b84050b22fd038e34c7e19664c586fcb7829b7911cf553cf4"
+    },
+    {
+      "bytes": 40379,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/finalize_e4_0_contract_v11.py",
+      "role": "v11 contract finalizer with v06 scientific invariance checks",
+      "sha256": "4e98e1e027f80717f10fb17b74ee60598cf93001f7016ddc4812b0ec7145f56c"
+    },
+    {
+      "bytes": 46574,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/finalize_e4_0_contract_v12.py",
+      "role": "v12 contract finalizer with v06 scientific invariance checks",
+      "sha256": "af5c8f4451e67cb884d05f87aa2683033ccf2b6f65fe0f14bbb4c299f61cc5f3"
+    },
+    {
+      "bytes": 52511,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/finalize_e4_0_contract_v13.py",
+      "role": "Preserved v13 finalizer source for the pre-finalization status-registry stop",
+      "sha256": "03025d1e0e5ed52e7ef3920db0ef780139944fd209fa9d221ca071b42f16ed11"
+    },
+    {
+      "bytes": 54978,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/finalize_e4_0_contract_v14.py",
+      "role": "v14 contract finalizer with v06 scientific invariance checks",
+      "sha256": "9e8c6b3bc716920d6b7d669aa2d2aa92c263cf61035e4f7e2bbf4632f0eacecc"
+    },
+    {
+      "bytes": 61220,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/finalize_e4_0_contract_v15.py",
+      "role": "v15 contract finalizer with v06 scientific invariance checks",
+      "sha256": "381e0590c9dd5a56761f7f46371fd39204ede76052c7c1bc20e36bdebbedd0cd"
+    },
+    {
+      "bytes": 64008,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/finalize_e4_0_contract_v16.py",
+      "role": "Preserved initial v16 contract finalizer associated with tooling receipt v16-v01",
+      "sha256": "801bc2a0c6dd7acf77c103e118406f6404d52d72714a2aade96cd8a5e1a8b379"
+    },
+    {
+      "bytes": 64434,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/finalize_e4_0_contract_v16_v02.py",
+      "role": "v16 contract finalizer with v06 scientific invariance checks",
+      "sha256": "a3142cb3ca38d7a4f48d5c80f4b3e20798f010226904b25e40ffd465f00a6dc8"
+    },
+    {
+      "bytes": 68187,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/finalize_e4_0_contract_v16_v03.py",
+      "role": "v16-v02 contract finalizer with version-specific receipt source closure",
+      "sha256": "02dc2899e304c8d6de64cf9d499167cd303fc07b871b6c617061c77421adf1e3"
+    },
+    {
+      "bytes": 74341,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/finalize_e4_0_contract_v16_v04.py",
+      "role": "v16-v03 contract finalizer with complete no-contact amendment lineage",
+      "sha256": "4a13849d03857308301b78d9fe039132d2dc1db0a6cfcbb6779fbf91433fd25e"
+    },
+    {
+      "bytes": 79158,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/finalize_e4_0_contract_v16_v05.py",
+      "role": "v16-v04 contract finalizer with exact new failed-attempt lineage",
+      "sha256": "4b0510eec61339dba28b6e2e16120dbea964c5d61c4cbbbaa264df874e7c5e6b"
+    },
+    {
+      "bytes": 85620,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/finalize_e4_0_contract_v16_v06.py",
+      "role": "v16-v05 contract finalizer with exact failed-seal lineage",
+      "sha256": "a5dc8334f74450526bef282191cf86a352084061446dad9fad913efc0d995aa1"
+    },
+    {
+      "bytes": 20639,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/issue_e4_stage_authorization_v02.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: Normative v06 stage authorization issuer",
+      "sha256": "be597668d7a637d94a138dfccfc061066d484000818f69ee679a419f5c5c419c"
+    },
+    {
+      "bytes": 33672,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/issue_e4_stage_authorization_v07.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Track E v07 staged authorization issuer",
+      "sha256": "284097928a0a0bf0ab64ee75b516e7d3e3e9d176beb84ae918ef1b377c02b9c8"
+    },
+    {
+      "bytes": 36155,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/issue_e4_stage_authorization_v08.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Track E v08 staged authorization issuer",
+      "sha256": "b882252799e7120e4131da033cf11c2f8cfd1eb75dfeda298bb817f4eb6e1888"
+    },
+    {
+      "bytes": 37200,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/issue_e4_stage_authorization_v09.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Track E v09 staged authorization issuer",
+      "sha256": "d1a1627f12ab9ff82b53365a6759ae2b9489254fb836ddb1cd882b17388bdcbe"
+    },
+    {
+      "bytes": 42119,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/issue_e4_stage_authorization_v10.py",
+      "role": "Preserved v10 predecessor source: Track E v10 staged authorization issuer",
+      "sha256": "70e81c08fce718239c5b31a46a0c32e6ae5090717043fbcd151ffdc07ad61d65"
+    },
+    {
+      "bytes": 46696,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/issue_e4_stage_authorization_v11.py",
+      "role": "Track E v11 staged authorization issuer",
+      "sha256": "397af4d0c4d5ecb6bcb2e8f32a5cdd6828eb6679f07731f0e5310e1d6ee5f0c6"
+    },
+    {
+      "bytes": 45778,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/issue_e4_stage_authorization_v12.py",
+      "role": "Track E v12 staged authorization issuer",
+      "sha256": "98b914b9614ab5b05a24296774b68871b6006a6b767b690d9486171db6ea74c2"
+    },
+    {
+      "bytes": 46077,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/issue_e4_stage_authorization_v13.py",
+      "role": "Track E v13 staged authorization issuer",
+      "sha256": "b400bd162be61cb2a40b9db75de2e79824856673f54e0918b639f8a1a9bb9a09"
+    },
+    {
+      "bytes": 48384,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/issue_e4_stage_authorization_v14.py",
+      "role": "Track E v14 staged authorization issuer",
+      "sha256": "4e91a2a3d8c266295d36fc5375ebe8f06837d5b066d1ddc77e19514efd6ecca9"
+    },
+    {
+      "bytes": 45868,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/issue_e4_stage_authorization_v15.py",
+      "role": "Track E v15 staged authorization issuer",
+      "sha256": "6e6839ac8515742e760844e885a84c715eb4381cbb18361a5451679dfb136ba8"
+    },
+    {
+      "bytes": 47279,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/issue_e4_stage_authorization_v16.py",
+      "role": "Track E v16 staged authorization issuer",
+      "sha256": "9ef5d9ae1bc06dee0fafb7234b6b5cc79bfe48bd205773025ad2c67b71861bf7"
+    },
+    {
+      "bytes": 52480,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/issue_e4_stage_authorization_v16_v02.py",
+      "role": "Track E v16-v02 staged authorization issuer with complete sealed-lineage validation",
+      "sha256": "8ddd1e35e36a46939835cccb6bae8e2481ebfdb2b6fa07a4fb162a69f0b18a98"
+    },
+    {
+      "bytes": 55894,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/issue_e4_stage_authorization_v16_v03.py",
+      "role": "Track E v16-v03 staged authorization issuer bound to the current contract and stop history",
+      "sha256": "30699f4d8900932b4684f2667e351a96f778eea35c91518c12e6614fcf971372"
+    },
+    {
+      "bytes": 61049,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/issue_e4_stage_authorization_v16_v04.py",
+      "role": "Track E v16-v04 staged authorization issuer bound to exact contract seal and failed seal-attempt history",
+      "sha256": "774317d0b7e5cd1c07dfee7d0d99c42db9579ccf9d008dd07bc9e7e0352fdff6"
+    },
+    {
+      "bytes": 8620,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/seal_e4_0_contract_v05.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: Preserved v05 contract seal builder",
+      "sha256": "e6eb28a5c1a5a116650ed2e01c615c46f9d94fc9b3f868d3746bb9a157ab7c25"
+    },
+    {
+      "bytes": 9883,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/seal_e4_0_contract_v06.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: v06 contract seal builder",
+      "sha256": "8695b6091df5a1135d0468c52b524e6cd6a9c9602b8e4318f9456b0cc576f51e"
+    },
+    {
+      "bytes": 11276,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/seal_e4_0_contract_v07.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: v07 workspace-rooted contract sealer",
+      "sha256": "3877605712d489df1d291e9b7c94514f700f152bf3d9216a0c584b7fe3cb8ece"
+    },
+    {
+      "bytes": 12682,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/seal_e4_0_contract_v08.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: v08 workspace-rooted contract sealer",
+      "sha256": "280145f01619225455fcc9923076c7a481745fcbbe276f87d25b00b97e41b090"
+    },
+    {
+      "bytes": 12807,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/seal_e4_0_contract_v09.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: v09 workspace-rooted contract sealer",
+      "sha256": "5e400d99afb03141f4b93a8b43fc032bd80f60eb6e4a9398cb11956918f24c63"
+    },
+    {
+      "bytes": 12807,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/seal_e4_0_contract_v10.py",
+      "role": "Preserved v10 predecessor source: v10 workspace-rooted contract sealer",
+      "sha256": "f36db6dc6aa6b6788dd5bddb372d61015cadb530eb13d7899467fa4d897b036f"
+    },
+    {
+      "bytes": 13799,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/seal_e4_0_contract_v11.py",
+      "role": "v11 workspace-rooted contract sealer",
+      "sha256": "3b3346f5e8f2cce8acb8bc69c4588de38c4a8815bc51e2e675d290101299a856"
+    },
+    {
+      "bytes": 17969,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/seal_e4_0_contract_v12.py",
+      "role": "v12 workspace-rooted contract sealer",
+      "sha256": "90a9594d6ed9bf590c3d025c8793d22306e476f2bc9b0fda9c2b5cbe669220a4"
+    },
+    {
+      "bytes": 18046,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/seal_e4_0_contract_v13.py",
+      "role": "v13 workspace-rooted contract sealer",
+      "sha256": "0ba5a42184d0b1baa3a4afc536ed3c4d0f43dc9c9c1d3faa911c055bcfc9cab6"
+    },
+    {
+      "bytes": 17713,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/seal_e4_0_contract_v14.py",
+      "role": "v14 workspace-rooted contract sealer",
+      "sha256": "6f73091e75eb04d814a1416c5c99849c01ebcbe0e1d1d36a8251442bc5dd572e"
+    },
+    {
+      "bytes": 17713,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/seal_e4_0_contract_v15.py",
+      "role": "v15 workspace-rooted contract sealer",
+      "sha256": "132efa53faf93d52d2f2c49eaeb55b19f41931f7bbaf03af6fe37525b3659e69"
+    },
+    {
+      "bytes": 17713,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/seal_e4_0_contract_v16.py",
+      "role": "Preserved initial v16 contract sealer associated with tooling receipt v16-v01",
+      "sha256": "2d4a695c62250b4a16534619834333eef372d3adab90b3720776da54c16c32d4"
+    },
+    {
+      "bytes": 17713,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/seal_e4_0_contract_v16_v02.py",
+      "role": "v16 workspace-rooted contract sealer",
+      "sha256": "2d4a695c62250b4a16534619834333eef372d3adab90b3720776da54c16c32d4"
+    },
+    {
+      "bytes": 17757,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/seal_e4_0_contract_v16_v03.py",
+      "role": "v16-v03 workspace-rooted contract sealer",
+      "sha256": "5b6f57cb83ef6c30dbdaa4914220d62df1aa54b0db3377ba49485ca3ae720a41"
+    },
+    {
+      "bytes": 17761,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/seal_e4_0_contract_v16_v04.py",
+      "role": "v16-v04 workspace-rooted contract sealer",
+      "sha256": "87cd4e9aa33ca450d5be4dfe771ae0c21a8acb52344b35efafa206e444eee013"
+    },
+    {
+      "bytes": 18744,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/seal_e4_0_contract_v16_v05.py",
+      "role": "v16-v05 sealer that collapses exact source/input path overlap after identity verification",
+      "sha256": "1620485705a47fdb7f719a5c7a64d1851e16302c48f3b0690abb464010e02459"
+    },
+    {
+      "bytes": 9817,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/test_e4_0_contract_v07.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: v07 contract finalizer/sealer synthetic tests",
+      "sha256": "6c31a5f5dd94ff7c7aa9623800e2c510577e2679c715769b4c6d8b81600c52e6"
+    },
+    {
+      "bytes": 10954,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/test_e4_0_contract_v08.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: v08 contract finalizer/sealer synthetic tests",
+      "sha256": "1bd4d2310b9524ddbe908b54d7921eb1956048794ee62a5092f8856567ad7e45"
+    },
+    {
+      "bytes": 14070,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/test_e4_0_contract_v09.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: v09 contract finalizer/sealer synthetic tests",
+      "sha256": "0a2d2f784f298b360fc93af6bec91211c93a8be6140b9a03bdc161f20c09587e"
+    },
+    {
+      "bytes": 15546,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/test_e4_0_contract_v10.py",
+      "role": "Preserved v10 predecessor source: v10 contract finalizer/sealer synthetic tests",
+      "sha256": "edf01c9c88597170c04f770af0fc7ab599234bfeaa88f810384b53c0cfc5d6b3"
+    },
+    {
+      "bytes": 18628,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/test_e4_0_contract_v11.py",
+      "role": "v11 contract finalizer/sealer synthetic tests",
+      "sha256": "6eed1ba593d7e2434815c7509e8491198762f1a29ed83d35c6f8310e8fb32a66"
+    },
+    {
+      "bytes": 20603,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/test_e4_0_contract_v12.py",
+      "role": "v12 contract finalizer/sealer synthetic closure tests",
+      "sha256": "2d9aa41f918cb3658ddb6ad238b94ec08660369694ba5ec8128c7530c41cb804"
+    },
+    {
+      "bytes": 22847,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/test_e4_0_contract_v13.py",
+      "role": "v13 contract finalizer/sealer synthetic closure tests",
+      "sha256": "091360219242ca356e08d2bea9c3164d65b4fb8d6cea850921b8d2f0eff22305"
+    },
+    {
+      "bytes": 24406,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/test_e4_0_contract_v14.py",
+      "role": "v14 contract finalizer/sealer synthetic closure tests",
+      "sha256": "79bab1c21900e5b37416e4ad416030ff3217a13089210728c04509a8ba1a2de3"
+    },
+    {
+      "bytes": 28030,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/test_e4_0_contract_v15.py",
+      "role": "v15 contract finalizer/sealer synthetic closure tests",
+      "sha256": "fb55e3536c448380715c091eb114de5527baf97b6350be9c28248db84e2b2bff"
+    },
+    {
+      "bytes": 31146,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/test_e4_0_contract_v16.py",
+      "role": "Preserved initial v16 tooling tests associated with tooling receipt v16-v01",
+      "sha256": "ef3057b355c4d483fb9a66b85a99a17ee9c2f1aa8b2877d279e21a830e699551"
+    },
+    {
+      "bytes": 32680,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/test_e4_0_contract_v16_v02.py",
+      "role": "v16 contract finalizer/sealer synthetic closure tests",
+      "sha256": "2bb580a87108ab0ed8f5295d06c52b2f25084214112541f5518f775fce51a797"
+    },
+    {
+      "bytes": 34518,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/test_e4_0_contract_v16_v03.py",
+      "role": "v16-v02 contract finalizer/sealer synthetic closure tests",
+      "sha256": "84dda6c34aa9cc25eb6b84025e2caa1b21cc7a533f7f677061da9553e05823bc"
+    },
+    {
+      "bytes": 38393,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/test_e4_0_contract_v16_v04.py",
+      "role": "v16-v03 contract finalizer/sealer synthetic closure tests",
+      "sha256": "c73970bc8abf181b8c044a91f629f83c6768e4f1c4fc1b4db3e7a43dedbda76c"
+    },
+    {
+      "bytes": 38739,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/test_e4_0_contract_v16_v05.py",
+      "role": "v16-v04 contract finalizer/sealer synthetic closure tests",
+      "sha256": "fa93dc7cbfeb3ebf24fc9c615922bf661a4589f55bcc278fddc08a5018795901"
+    },
+    {
+      "bytes": 39785,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/test_e4_0_contract_v16_v06.py",
+      "role": "v16-v05 tooling tests including source/input overlap regression",
+      "sha256": "3eda226c2982a85ed8fa816d987afe41ac94dfa87e7f2eaa624bf63dd7a90973"
+    },
+    {
+      "bytes": 16787,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/tests/test_e4_runner_v02.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: Track B v06 synthetic source tests",
+      "sha256": "4af0fcab1f33aa13d6d586c7cfe440675ec6c0e61b4ecb7b055759c30fc3edd6"
+    },
+    {
+      "bytes": 22412,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/tests/test_e4_runner_v03.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Track B v03 synthetic-only runtime tests",
+      "sha256": "d77355829aa2a91e1bd61e36a236f86646e5a32dbc6d1cf6e7a7e106551d86ae"
+    },
+    {
+      "bytes": 22412,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/tests/test_e4_runner_v04.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Track B v04 synthetic-only runtime tests",
+      "sha256": "872174ab3c60533526c924924d3dfd4ec073f739ac67496bf75b8752004415e1"
+    },
+    {
+      "bytes": 26636,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/tests/test_e4_runner_v05.py",
+      "role": "Track B v05 synthetic-only runtime and WDDM lease tests",
+      "sha256": "3f6ae0fcad7d5c913f6bad503ed054d66608e9b7c85fb43f3d839227728f11e8"
+    },
+    {
+      "bytes": 14259,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/tests/test_e4_stage_authorization_v02.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Preserved v06 predecessor source: v06 stage authorization issuer synthetic tests",
+      "sha256": "1ce5e19eb106b42f48828307c991cfb7298e64292a3c1a0b85a4c5c12b37c154"
+    },
+    {
+      "bytes": 26207,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/tests/test_e4_stage_authorization_v07.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Preserved v07 predecessor source: Track E v07 authorization issuer tests",
+      "sha256": "c709bcb4df0891c0dd6fdc7f7ecb80255cffd199014bcfb0fd78909a1d233df4"
+    },
+    {
+      "bytes": 30709,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/tests/test_e4_stage_authorization_v08.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Preserved v08 predecessor source: Track E v08 authorization issuer tests",
+      "sha256": "e3217260ae4a553d698cbe8b31d0386657c52d0a20471e11d1aa0e28aa967cff"
+    },
+    {
+      "bytes": 33120,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/tests/test_e4_stage_authorization_v09.py",
+      "role": "Preserved v10 predecessor source: Preserved v08 predecessor source: Track E v09 authorization issuer tests",
+      "sha256": "67736b7c223d4571b222abe0041d7715c0e95078c1af87469af7d3d24674ffb4"
+    },
+    {
+      "bytes": 37475,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/tests/test_e4_stage_authorization_v10.py",
+      "role": "Preserved v10 predecessor source: Track E v10 authorization issuer tests",
+      "sha256": "77996f041dfc3f9a7490a6da051614ec45c075e7a4efbb14177f138e52f2b570"
+    },
+    {
+      "bytes": 41202,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/tests/test_e4_stage_authorization_v11.py",
+      "role": "Track E v11 authorization issuer tests",
+      "sha256": "6fb0a577e915badd542cae018b383dce39f62b1cec763b56c1f118b6193e7674"
+    },
+    {
+      "bytes": 44576,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/tests/test_e4_stage_authorization_v12.py",
+      "role": "Track E v12 authorization issuer tests",
+      "sha256": "67ac8708957bff2d7ca10cd772630e8a8ee9be04c7a80f8fb74769428fbf7c41"
+    },
+    {
+      "bytes": 49503,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/tests/test_e4_stage_authorization_v13.py",
+      "role": "Track E v13 authorization issuer tests",
+      "sha256": "320a5ac9fcae0e2b52f1ba942935b0f6fb9d1f67826e74998ec46e69799bd8d1"
+    },
+    {
+      "bytes": 51156,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/tests/test_e4_stage_authorization_v14.py",
+      "role": "Track E v14 authorization issuer tests",
+      "sha256": "7a148db980b5cd9b05aade893f5b778b0380d605de2b06b8c5c9dfead227afa7"
+    },
+    {
+      "bytes": 48053,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/tests/test_e4_stage_authorization_v15.py",
+      "role": "Track E v15 authorization issuer tests",
+      "sha256": "30ee3a267e2abc9943605a6285f54fc955f4e20996a5d9732086a4e226bd1a67"
+    },
+    {
+      "bytes": 47812,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/tests/test_e4_stage_authorization_v16.py",
+      "role": "Track E v16 authorization issuer tests",
+      "sha256": "124be48d96f9fcbc49db86420be4c88952070503dbb6986de93f1f279d6c11a4"
+    },
+    {
+      "bytes": 48372,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/tests/test_e4_stage_authorization_v16_v02.py",
+      "role": "Track E v16-v02 authorization issuer synthetic tests",
+      "sha256": "d1f3d0bec6f6fffbe9879b80bdb67f64648b971559257f288a5241b03fe8d43d"
+    },
+    {
+      "bytes": 48771,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/tests/test_e4_stage_authorization_v16_v03.py",
+      "role": "Track E v16-v03 authorization issuer synthetic tests",
+      "sha256": "13728f8806f30a3a55b99f2e720ede162aaa5ed4f371abc4b1a130819eb4bcc4"
+    },
+    {
+      "bytes": 49158,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/tests/test_e4_stage_authorization_v16_v04.py",
+      "role": "Track E v16-v04 authorization issuer synthetic tests",
+      "sha256": "a210423284efba2a22129020ac54d0a52c7174b1cbce6a85f77746c17fe7beef"
+    },
+    {
+      "bytes": 4915,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-a/track-a-receipt-v03.json",
+      "role": "TRACK_A_COMPLETE_PREAUTHORIZATION",
+      "sha256": "1d992466421569ed1318ed9132c02902eefa9cc3341df150c857a26c69f6d51e"
+    },
+    {
+      "bytes": 6821,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-a/track-a-receipt-v02.json",
+      "role": "TRACK_A_COMPLETE_PREAUTHORIZATION",
+      "sha256": "54e143b1657d5f99a8f730604e4095bc0ece2521492124e6bb5effc52da92dcb"
+    },
+    {
+      "bytes": 5369,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-a/track-a-receipt-v01.json",
+      "role": "TRACK_A_COMPLETE_PREAUTHORIZATION",
+      "sha256": "6ff04e3eefae26d419560d30158fb863545f5d348478fdd59cc3013daba867d7"
+    },
+    {
+      "bytes": 2800,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-b-v02/track-b-source-tests-v01.json",
+      "role": "PASS_SYNTHETIC_SOURCE_AND_CLI_TESTS",
+      "sha256": "a1e691405e3aea33845aacdf14dbe24617569b64f1a9450c63378d80d304dbbf"
+    },
+    {
+      "bytes": 7170,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-b/track-b-source-tests-v01.json",
+      "role": "PASS_SYNTHETIC_SOURCE_AND_CLI_TESTS",
+      "sha256": "acba272c3eb177e8e15b178343a7fcc87ecc43e0bfb6bc665dda9ddf25e400a3"
+    },
+    {
+      "bytes": 6584,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-c-v02/track-c-source-tests-v01.json",
+      "role": "PASS_SYNTHETIC_SOURCE_AND_CLI_TESTS",
+      "sha256": "04514426de6e72ea0dcc63f2b5f1e72f37620da11ec01f297da1196fa11614a1"
+    },
+    {
+      "bytes": 4768,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-c/track-c-source-tests-v02.json",
+      "role": "PASS_SYNTHETIC_SOURCE_AND_CLI_TESTS",
+      "sha256": "e8ada9ff5288baa87c4aefc07a5acb2a31e1227862c36876004da958d5ce571b"
+    },
+    {
+      "bytes": 5510,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-d/track-d-receipt-v06.json",
+      "role": "TRACK_D_COMPLETE_PREAUTHORIZATION",
+      "sha256": "d53cf6bf67700746875fb1ead3572006bc36a12163156689b9c8287dfa3bfc0a"
+    },
+    {
+      "bytes": 5241,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-d/track-d-receipt-v05.json",
+      "role": "TRACK_D_COMPLETE_PREAUTHORIZATION",
+      "sha256": "dfadc86ce0ec5d8e70c512b6980b4e66753659461ac7e555b6df006a0878d23b"
+    },
+    {
+      "bytes": 2081,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-source-tests-v08.json",
+      "role": "TRACK_E_SOURCE_TESTS_PASS_PREMAP_UNIT_TESTS",
+      "sha256": "7550268d61495c1a4bd211109d849c33490dafed36516b6cc4475a332f38df4a"
+    },
+    {
+      "bytes": 1565,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-auth-issuer-v02/source-tests-v01.json",
+      "role": "PASS_SYNTHETIC_TESTS",
+      "sha256": "22c4d3137e9adb05f3312be638c02517f39f816bf50bb9711d8498c54c7291ff"
+    },
+    {
+      "bytes": 1334,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-auth-issuer-source-tests-v01.json",
+      "role": "PASS_SYNTHETIC_TESTS",
+      "sha256": "0b5d809100319ae8674e60732f76e606fa6d787335fcbf72bad84ca58866b9dc"
+    },
+    {
+      "bytes": 3011,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-b-v03/track-b-source-tests-v03.json",
+      "role": "PASS_SYNTHETIC_SOURCE_AND_CLI_TESTS",
+      "sha256": "135c6777859e0ba9f5a4e4857e6d4749dc3bb65fd9c866077e6a0274ad92ad93"
+    },
+    {
+      "bytes": 8015,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-c-v03/track-c-source-tests-v03.json",
+      "role": "PASS_SYNTHETIC_SOURCE_AND_CLI_TESTS",
+      "sha256": "6c71612455b3285f5f8258568a193d5d840b9a7f06946bab5b792242c26616f9"
+    },
+    {
+      "bytes": 8449,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-d-v03/track-d-source-tests-v02.json",
+      "role": "PASS_SYNTHETIC_SOURCE_AND_CLI_TESTS",
+      "sha256": "ac172e415c7a75837c44023e6b8c1e507815ecce2fffa2ff13fcfaf56c8920ac"
+    },
+    {
+      "bytes": 2048,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-source-tests-v14.json",
+      "role": "TRACK_E_SOURCE_TESTS_PASS_V07_PREMAP_SYNTHETIC_AUDITOR",
+      "sha256": "2aaeb1c15fef047e702002bef053774a4df008931b3a7481a034441d2d7d1243"
+    },
+    {
+      "bytes": 2403,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-auth-issuer-v07/source-tests-v02.json",
+      "role": "PASS_SYNTHETIC_TESTS",
+      "sha256": "fe5ae63d98c7eacdaa8c7a3d250121e7d9e0b00db2d310936e5c950bd81f919e"
+    },
+    {
+      "bytes": 3051,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/contract-tooling-source-tests-v04.json",
+      "role": "PASS_SYNTHETIC_CONTRACT_AND_SOURCE_MAP_TESTS",
+      "sha256": "dee1f1646bfe4580b194c830519539741d28dd56eadda7b2e10cf78b4d85f233"
+    },
+    {
+      "bytes": 1792,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-b-v04/track-b-source-tests-v04.json",
+      "role": "PASS_SYNTHETIC_SOURCE_AND_CLI_TESTS",
+      "sha256": "c47882ad3492608d1c8b1868fbff5c79e8079ad7be7ebdec3fc4b6f61ecc5c50"
+    },
+    {
+      "bytes": 1883,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-c-v04/track-c-source-tests-v04.json",
+      "role": "PASS_SYNTHETIC_SOURCE_AND_CLI_TESTS",
+      "sha256": "f6c54f916c56140d2b136d2596e5240180419f730db45d3d2a41abfcacbcae3b"
+    },
+    {
+      "bytes": 2661,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-d-v04/track-d-source-tests-v04.json",
+      "role": "PASS_SYNTHETIC_SOURCE_AND_CLI_TESTS",
+      "sha256": "805ad94df66259e977c4970c94e83b966f959ddf28f02c298e962b4ca3670802"
+    },
+    {
+      "bytes": 1219,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-source-tests-v16.json",
+      "role": "TRACK_E_SOURCE_TESTS_PASS_V08_PREMAP_SYNTHETIC_AUDITOR",
+      "sha256": "1fc363eaf45e1f734c7f043ad970f23dbbfaffc6796138ce3a52484354c82da4"
+    },
+    {
+      "bytes": 1159,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-auth-issuer-v08/source-tests-v01.json",
+      "role": "PASS_SYNTHETIC_TESTS",
+      "sha256": "b02ee89e4d518ea4c5874cda0acc6560dcddf4893ec84aa97059222c87cd5b0b"
+    },
+    {
+      "bytes": 1464,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/contract-tooling-source-tests-v07.json",
+      "role": "PASS_SYNTHETIC_CONTRACT_AND_SOURCE_MAP_TESTS",
+      "sha256": "59c7e789ccc996e3ccf8628af0287bd129eb201830f50f5e60a62eccdd1482ab"
+    },
+    {
+      "bytes": 1986,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-b-v05/track-b-source-tests-v05.json",
+      "role": "PASS_SYNTHETIC_SOURCE_AND_CLI_TESTS",
+      "sha256": "ac08dd8d461cee351e8bbf0dab3e73265f58bc8b0aeb86627d6a6dc337ede6f6"
+    },
+    {
+      "bytes": 1210,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-source-tests-v17.json",
+      "role": "TRACK_E_SOURCE_TESTS_PASS_V09_PREMAP_SYNTHETIC_AUDITOR",
+      "sha256": "1d800e9a70bfa31468a43f89474ef4a5d71d171adad57d200dc3d451e5374fb2"
+    },
+    {
+      "bytes": 1256,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-auth-issuer-v09/source-tests-v01.json",
+      "role": "PASS_SYNTHETIC_TESTS",
+      "sha256": "faa8df7c25365d7dae89afdea565501c548b548276b335dbc476d2af19255006"
+    },
+    {
+      "bytes": 1430,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/contract-tooling-source-tests-v08.json",
+      "role": "PASS_SYNTHETIC_CONTRACT_AND_SOURCE_MAP_TESTS",
+      "sha256": "8318e375ef3292b2c5166c1077b0304bc2621ab27035ce27de3a481ff1348a1d"
+    },
+    {
+      "bytes": 1559,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-source-tests-v18.json",
+      "role": "TRACK_E_SOURCE_TESTS_PASS_V10_PREMAP_SYNTHETIC_AUDITOR",
+      "sha256": "4a190ff991f527036e08fb352f745e3fae43f4ec7a01c30e549738d5c475b14c"
+    },
+    {
+      "bytes": 1548,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-auth-issuer-v10/source-tests-v01.json",
+      "role": "PASS_SYNTHETIC_TESTS",
+      "sha256": "38f88541dbdcefb2017643ba42fdf42ed98729efa7d716cececabb5bf03799ad"
+    },
+    {
+      "bytes": 1805,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/contract-tooling-source-tests-v09.json",
+      "role": "PASS_SYNTHETIC_CONTRACT_AND_SOURCE_MAP_TESTS",
+      "sha256": "7537cfaea60b789499366485ecbe75c7fd7b76e40dfc42195b4c9f780276fe29"
+    },
+    {
+      "bytes": 1796,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-source-tests-v19.json",
+      "role": "TRACK_E_SOURCE_TESTS_PASS_V11_PREMAP_SYNTHETIC_AUDITOR",
+      "sha256": "a41961341767ac7b874d9e13eaa0a961d0fc7e761b3e1cf7521da8c7da8f38cb"
+    },
+    {
+      "bytes": 1700,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-auth-issuer-v11/source-tests-v01.json",
+      "role": "PASS_SYNTHETIC_TESTS",
+      "sha256": "cc30e3f489a024cf96442501152183f19f53031466f5234fc8f7bc3cfe78a324"
+    },
+    {
+      "bytes": 2440,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/contract-tooling-source-tests-v10.json",
+      "role": "PASS_SYNTHETIC_CONTRACT_AND_SOURCE_MAP_TESTS",
+      "sha256": "8ef95f3e53aed642e51d04201de79d4fc08360b165bedd0f2b2577860588a235"
+    },
+    {
+      "bytes": 1717,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-source-tests-v20.json",
+      "role": "TRACK_E_SOURCE_TESTS_PASS_V12_PREMAP_SYNTHETIC_AUDITOR",
+      "sha256": "f048eae363c0f9561c870f382f789e46847bb06b10724dfbee823b1d6c7c975d"
+    },
+    {
+      "bytes": 1693,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-auth-issuer-v12/source-tests-v01.json",
+      "role": "PASS_SYNTHETIC_TESTS",
+      "sha256": "dccd78fa8e4720bbe313575ba097e86ad0e44cc5cb9fec303fcfdbab87fddd22"
+    },
+    {
+      "bytes": 2411,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/contract-tooling-source-tests-v11.json",
+      "role": "PASS_SYNTHETIC_CONTRACT_AND_SOURCE_MAP_TESTS",
+      "sha256": "23bdcb5bcc5ce8b0a5b5a052d45782a7f6c562c7ad7114d1459eb3a0a17ee523"
+    },
+    {
+      "bytes": 1787,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-source-tests-v22.json",
+      "role": "TRACK_E_SOURCE_TESTS_PASS_V13_MAP_V13_PREMAP_SYNTHETIC_AUDITOR",
+      "sha256": "fd1bf9fb96587ee4826adbd0db1ef679981cd78b5bdf022fff6d86bfe1f4290a"
+    },
+    {
+      "bytes": 1743,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-auth-issuer-v13/source-tests-v02.json",
+      "role": "PASS_SYNTHETIC_TESTS",
+      "sha256": "eea9c95507abc3479b8bf00cc5e06919fc373eccb6fa60760710e82466933b56"
+    },
+    {
+      "bytes": 2490,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/contract-tooling-source-tests-v13.json",
+      "role": "PASS_SYNTHETIC_CONTRACT_AND_SOURCE_MAP_TESTS",
+      "sha256": "48eb1c2d25c0087136396749d0fc37b255f1dc29d1e55995ea9c0c3579a905e3"
+    },
+    {
+      "bytes": 1783,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-source-tests-v23.json",
+      "role": "TRACK_E_SOURCE_TESTS_PASS_V14_PREMAP_SYNTHETIC_AUDITOR",
+      "sha256": "2afa573eb52321c1402beada10d1008f22cedf5a0dfcbf6705478ca886084e0d"
+    },
+    {
+      "bytes": 1685,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-auth-issuer-v14/source-tests-v01.json",
+      "role": "PASS_SYNTHETIC_TESTS",
+      "sha256": "1358aec791f30a4b98b776e572fb0de7912b3c9961b77a48af7b2233c5462534"
+    },
+    {
+      "bytes": 2408,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/contract-tooling-source-tests-v14.json",
+      "role": "PASS_SYNTHETIC_CONTRACT_AND_SOURCE_MAP_TESTS",
+      "sha256": "716934a9d2930bf0db8104b139a44ff7e56dda98df6558121282d753987edde9"
+    },
+    {
+      "bytes": 1916,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-source-tests-v25.json",
+      "role": "TRACK_E_SOURCE_TESTS_PASS_V15_PREMAP_SYNTHETIC_AUDITOR_V02",
+      "sha256": "68575fda116794075170b12d38314332fb68a10ee3d9a88e9c4f5f8a3fd9d4ca"
+    },
+    {
+      "bytes": 2031,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-source-tests-v27.json",
+      "role": "TRACK_E_SOURCE_TESTS_PASS_V15_PREMAP_SYNTHETIC_AUDITOR_V03",
+      "sha256": "b3535a9c8166bbc055e7669e8ee1581c4baecaff967430a50cbe0036c7213d50"
+    },
+    {
+      "bytes": 1724,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-auth-issuer-v15/source-tests-v01.json",
+      "role": "PASS_SYNTHETIC_TESTS",
+      "sha256": "d012c5c2a0d90fbc2d15037425c73f0a8b6f5e1a7eac1821b1c06efaf50ceb00"
+    },
+    {
+      "bytes": 1746,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-auth-issuer-v15/source-tests-v02.json",
+      "role": "PASS_SYNTHETIC_TESTS_V02",
+      "sha256": "efd8fca169d2bb021942380d5556cde221422f06de55774a44a27e6004a835da"
+    },
+    {
+      "bytes": 2462,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/contract-tooling-source-tests-v15.json",
+      "role": "PASS_SYNTHETIC_CONTRACT_AND_SOURCE_MAP_TESTS",
+      "sha256": "4d30464ff0d24580173cbfb9e3186eb1b97fe8d0a4f4a448150fbba25f9884d5"
+    },
+    {
+      "bytes": 2520,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/contract-tooling-source-tests-v15-v02.json",
+      "role": "PASS_SYNTHETIC_CONTRACT_AND_SOURCE_MAP_TESTS_V02",
+      "sha256": "cd588fe105bf05328085cd8fbc86a4099972a2fd9b299a0ee0d13784f3e1f785"
+    },
+    {
+      "bytes": 2516,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/contract-tooling-source-tests-v15-v03.json",
+      "role": "PASS_SYNTHETIC_CONTRACT_AND_SOURCE_MAP_TESTS_V03",
+      "sha256": "703c55c7dcbb50634727f5a94eb38bd06c01c3d2ca4840707f045c027ff9b568"
+    },
+    {
+      "bytes": 1928,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-source-tests-v28.json",
+      "role": "TRACK_E_SOURCE_TESTS_PASS_V16_PREMAP_SYNTHETIC_AUDITOR",
+      "sha256": "ab724ca9752459b5fd3b3120c9f1ba6ac4e612d0d7ec4de63069a96a62f9a8c8"
+    },
+    {
+      "bytes": 1911,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-source-tests-v29.json",
+      "role": "TRACK_E_SOURCE_TESTS_PASS_V16_PREMAP_SYNTHETIC_AUDITOR_V02",
+      "sha256": "c4d146ce9d070799ed031525409e4e700966f9f1ffa436a749ee22ba648eb443"
+    },
+    {
+      "bytes": 1583,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-source-tests-v30.json",
+      "role": "TRACK_E_SOURCE_TESTS_PASS_V16_PREMAP_SYNTHETIC_AUDITOR_V03",
+      "sha256": "c17615ed78184ba7e5f086265221febcb5b2b3a4a2c5c102f249febe0031cfc6"
+    },
+    {
+      "bytes": 1732,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-auth-issuer-v16/source-tests-v01.json",
+      "role": "PASS_SYNTHETIC_TESTS",
+      "sha256": "5e7dc960589903ebc89318a8376c484656e5688e9843f15b8771e4705187842c"
+    },
+    {
+      "bytes": 1759,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-auth-issuer-v16-v02/source-tests-v01.json",
+      "role": "PASS_SYNTHETIC_TESTS_V16_V02",
+      "sha256": "3787f1bb0c41783acc1f91a01ae059af1daf8e5dd4ab7b5f59e6d1bfdf9ff980"
+    },
+    {
+      "bytes": 2478,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/contract-tooling-source-tests-v16.json",
+      "role": "PASS_SYNTHETIC_CONTRACT_AND_SOURCE_MAP_TESTS",
+      "sha256": "a5d48c005e30e8d126521fff3429a1133a5a231f28d5589d6f8130e874d3ac6f"
+    },
+    {
+      "bytes": 2347,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/contract-tooling-source-tests-v16-v02.json",
+      "role": "PASS_SYNTHETIC_CONTRACT_AND_SOURCE_MAP_TESTS_V02",
+      "sha256": "d20f2c6b58bd78cff4fda7e6197270e515dff92bfdf575e666ee29f36de468ee"
+    },
+    {
+      "bytes": 2335,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/contract-tooling-source-tests-v16-v03.json",
+      "role": "PASS_SYNTHETIC_CONTRACT_AND_SOURCE_MAP_TESTS_V03",
+      "sha256": "87e5f205e3331a8116979487853de27c760c6384cbf69b803fcd9611ad6d3b54"
+    },
+    {
+      "bytes": 1714,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-source-tests-v31-v02.json",
+      "role": "TRACK_E_SOURCE_TESTS_PASS_V16_PREMAP_SYNTHETIC_AUDITOR_V04",
+      "sha256": "53f798ceda5b33affb3eb70a139b0bdc86114a723012c5103f63220f03977669"
+    },
+    {
+      "bytes": 2507,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/contract-tooling-source-tests-v16-v04-v02.json",
+      "role": "PASS_SYNTHETIC_CONTRACT_AND_SOURCE_MAP_TESTS_V04",
+      "sha256": "eb1a95213ae6373ce350cda3cb11849a9950afa8bdd4becf4e881829a1ac3d50"
+    },
+    {
+      "bytes": 1566,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-source-tests-v32.json",
+      "role": "TRACK_E_SOURCE_TESTS_PASS_V16_PREMAP_SYNTHETIC_AUDITOR_V05",
+      "sha256": "c0a49447c874d306bbfccecc75c07d186d45379f08b861a3a19e38176856c74d"
+    },
+    {
+      "bytes": 1666,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-auth-issuer-v16-v03/source-tests-v01.json",
+      "role": "PASS_SYNTHETIC_TESTS_V16_V03",
+      "sha256": "d33a6c2013c284304c0cbef267c8179a9f70294571cec8bfc3dd67ef5661309f"
+    },
+    {
+      "bytes": 2258,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/contract-tooling-source-tests-v16-v05.json",
+      "role": "PASS_SYNTHETIC_CONTRACT_AND_SOURCE_MAP_TESTS_V05",
+      "sha256": "c457287254717bdedbf0803a16d8f36d17cf7d2bab7685f68e7ba39f0ae298f7"
+    },
+    {
+      "bytes": 1586,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-source-tests-v33.json",
+      "role": "TRACK_E_SOURCE_TESTS_PASS_V16_PREMAP_SYNTHETIC_AUDITOR_V06",
+      "sha256": "fea5f355fd7e3458b701643be91141e773d23a6c3e1355b5c40d75ffd85c9aeb"
+    },
+    {
+      "bytes": 1646,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-auth-issuer-v16-v04/source-tests-v01.json",
+      "role": "PASS_SYNTHETIC_TESTS_V16_V04",
+      "sha256": "bc433b692619183c04d2c50a5f475edf957a2ecd35cb7b774b9b9252d69fd494"
+    },
+    {
+      "bytes": 2274,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/contract-tooling-source-tests-v16-v06.json",
+      "role": "PASS_SYNTHETIC_CONTRACT_AND_SOURCE_MAP_TESTS_V06",
+      "sha256": "c1bb79489501f8955274b8e2b7fd0aad5e920c409ebec3f7448da9d7b37e254c"
+    }
+  ]
+}

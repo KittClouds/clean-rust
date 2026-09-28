@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "state": "FROZEN_BEFORE_TASK_FIXTURES",
+  "model_contact_authorized": false,
+  "task_fixtures_created": false,
+  "seed": 20260925,
+  "sha256": {
+    "effective_protocol_lock": "a40040b1616250f393c0f6972ded38c4be0002b367263adae6bd3bb8c49c5fe3",
+    "bank_plan": "8c6c511e05491dde51591b5d8d3f458918bda93673d36792875c2894bff0209e",
+    "family_design": "a00220fbdbfd2b5d1d1c1057c869e0cdf141daaf692ba573497fc27fb2d54a23",
+    "source_inventory": "f5a3268e2446f00b31b05a0dca887b79e08665010bd922206749f7257293b9bc"
+  }
+}

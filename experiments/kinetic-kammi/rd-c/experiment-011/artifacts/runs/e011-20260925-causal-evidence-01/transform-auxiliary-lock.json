@@ -1,0 +1,118 @@
+{
+  "candidate_permutation_map": {
+    "turbovec-turbovec-mask-allowlist-v1": {
+      "f977765cc076a1eb302b0c9310a0770c7c74035912ad92214d0a70ffb5325974": 53854,
+      "0351d46c399b62825821094c90c92701d18d5e56718bc7af4825e6dc9b13ac74": 33686,
+      "027c3f06e442faa979b6e9381ceb566b4a2d4028837c4747ddad6f91984801ab": 22647,
+      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855": 40765
+    },
+    "turbovec-turbovec-mask-allowlist-v2": {
+      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855": 52547,
+      "f977765cc076a1eb302b0c9310a0770c7c74035912ad92214d0a70ffb5325974": 60455,
+      "027c3f06e442faa979b6e9381ceb566b4a2d4028837c4747ddad6f91984801ab": 33790,
+      "0351d46c399b62825821094c90c92701d18d5e56718bc7af4825e6dc9b13ac74": 20300
+    },
+    "turbovec-turbovec-id-remove-readd-v1": {
+      "c38e076a8bc156f51817b22c9d46c450421eb8586893ca918d5cf68a3aab2c91": 24738,
+      "206a716d47a60ca5e1b0de9ccd26c71c9a1a710134b4a703b06af6fc81a87c5b": 34162,
+      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855": 30940,
+      "5071ceeede54082f166a1d50243cbc910e06dbc783b9911323ebe22c8d67ee7c": 44283
+    },
+    "turbovec-turbovec-id-remove-readd-v2": {
+      "c38e076a8bc156f51817b22c9d46c450421eb8586893ca918d5cf68a3aab2c91": 51799,
+      "206a716d47a60ca5e1b0de9ccd26c71c9a1a710134b4a703b06af6fc81a87c5b": 35938,
+      "5071ceeede54082f166a1d50243cbc910e06dbc783b9911323ebe22c8d67ee7c": 45733,
+      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855": 35021
+    },
+    "turbovec-turbovec-id-swap-repair-v1": {
+      "4e9f6d2ebebddf364cc4cd528d7822e691de77588fe01a1afc0152cd5f5003e4": 30373,
+      "f92aef127b434ce4962d0cf28b159dfe3049b0572d67553880f97da5ced86edd": 35443,
+      "3f16db25c03d7158b34d061e6a263bff6dcbd7977dee404cc7028c9b7a185f9b": 47676,
+      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855": 49767
+    },
+    "turbovec-turbovec-id-swap-repair-v2": {
+      "4e9f6d2ebebddf364cc4cd528d7822e691de77588fe01a1afc0152cd5f5003e4": 27796,
+      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855": 33698,
+      "3f16db25c03d7158b34d061e6a263bff6dcbd7977dee404cc7028c9b7a185f9b": 25686,
+      "f92aef127b434ce4962d0cf28b159dfe3049b0572d67553880f97da5ced86edd": 50849
+    },
+    "turbovec-turbovec-rotation-wire-format-v1": {
+      "007e449ffd08981da2a14e8ad064b052c3b914a91563dddfcaf8b08d8d89f579": 24490,
+      "0f250400d060f791524f689a9a43a98af396f0da5dc2daf3b3f492ac9d3353d4": 27283,
+      "620ba171f88123de86b3582f0b41b48c45f3820f4aa76105319ba60f286a8f76": 29008,
+      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855": 36832
+    },
+    "turbovec-turbovec-rotation-wire-format-v2": {
+      "0f250400d060f791524f689a9a43a98af396f0da5dc2daf3b3f492ac9d3353d4": 22701,
+      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855": 55140,
+      "007e449ffd08981da2a14e8ad064b052c3b914a91563dddfcaf8b08d8d89f579": 33093,
+      "620ba171f88123de86b3582f0b41b48c45f3820f4aa76105319ba60f286a8f76": 42177
+    },
+    "ripgrep-ripgrep-case-insensitive-glob-v1": {
+      "645c24ac169e883eb1d6e47aa9032257ed6c19a9dc10e6fcacea938ffee66814": 55180,
+      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855": 42479,
+      "41fb794fb6ac8f8b265fa9bfe17155da8d26a63cbaee3c9fb70ed63c05a76cd5": 56512,
+      "ba2df6b3963a2e63bf04e89df67f324cd81986cda5b521dff1061b12d9bf2648": 43807
+    },
+    "ripgrep-ripgrep-case-insensitive-glob-v2": {
+      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855": 21655,
+      "645c24ac169e883eb1d6e47aa9032257ed6c19a9dc10e6fcacea938ffee66814": 40961,
+      "41fb794fb6ac8f8b265fa9bfe17155da8d26a63cbaee3c9fb70ed63c05a76cd5": 60104,
+      "ba2df6b3963a2e63bf04e89df67f324cd81986cda5b521dff1061b12d9bf2648": 44972
+    },
+    "ripgrep-ripgrep-literal-separator-glob-v1": {
+      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855": 56682,
+      "65bd186d034e483ee8e56fde06f3ea4f20665eb6a920922c1c2bf87625467ffe": 33936,
+      "75c4ee5bf57f0293b5a6ec8c79a83a50a9d36b0533db14b10a0566ab402f448a": 24174,
+      "943ccba73ac87d1fabb3c88f78a4812aff99bb9246779665de9b69f3711a0342": 58009
+    },
+    "ripgrep-ripgrep-literal-separator-glob-v2": {
+      "943ccba73ac87d1fabb3c88f78a4812aff99bb9246779665de9b69f3711a0342": 22224,
+      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855": 29623,
+      "75c4ee5bf57f0293b5a6ec8c79a83a50a9d36b0533db14b10a0566ab402f448a": 32272,
+      "65bd186d034e483ee8e56fde06f3ea4f20665eb6a920922c1c2bf87625467ffe": 45630
+    },
+    "ripgrep-ripgrep-recursive-glob-v1": {
+      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855": 62799,
+      "1c12b124f8575708682a41748896ab7424fc398835f5b33879fb378939813db9": 38439,
+      "8203baf35e2cb5d2e1edf344f977b04891aa2508439c978d2e4203b69620060f": 26504,
+      "141751f0596f2515235db26a90bd3ffe4cdf8edf586f4f01e29631341392b1ca": 25428
+    },
+    "ripgrep-ripgrep-recursive-glob-v2": {
+      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855": 51944,
+      "8203baf35e2cb5d2e1edf344f977b04891aa2508439c978d2e4203b69620060f": 45225,
+      "1c12b124f8575708682a41748896ab7424fc398835f5b33879fb378939813db9": 46356,
+      "141751f0596f2515235db26a90bd3ffe4cdf8edf586f4f01e29631341392b1ca": 24165
+    },
+    "ripgrep-ripgrep-gitignore-bom-v1": {
+      "ab2085ede44153fec30518b5ed0ab39d5ca6857004a7998783ce2a91a936fecd": 54075,
+      "5000d6bc36df5a03c4f167b335cc6d248a22bac17ad2b7041182b31fa05e97af": 43620,
+      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855": 33221,
+      "48fa64eaccc75e7448cc9bd2806c6344120c775dc45a53944cce0c7f7f443fd2": 44717
+    },
+    "ripgrep-ripgrep-gitignore-bom-v2": {
+      "5000d6bc36df5a03c4f167b335cc6d248a22bac17ad2b7041182b31fa05e97af": 43135,
+      "ab2085ede44153fec30518b5ed0ab39d5ca6857004a7998783ce2a91a936fecd": 26391,
+      "48fa64eaccc75e7448cc9bd2806c6344120c775dc45a53944cce0c7f7f443fd2": 56613,
+      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855": 51764
+    }
+  },
+  "evidence_swap_donors": {
+    "turbovec-turbovec-mask-allowlist-v1": "turbovec-turbovec-rotation-wire-format-v1",
+    "turbovec-turbovec-mask-allowlist-v2": "turbovec-turbovec-rotation-wire-format-v2",
+    "turbovec-turbovec-id-remove-readd-v1": "turbovec-turbovec-id-swap-repair-v1",
+    "turbovec-turbovec-id-remove-readd-v2": "turbovec-turbovec-id-swap-repair-v2",
+    "turbovec-turbovec-id-swap-repair-v1": "turbovec-turbovec-mask-allowlist-v1",
+    "turbovec-turbovec-id-swap-repair-v2": "turbovec-turbovec-mask-allowlist-v2",
+    "turbovec-turbovec-rotation-wire-format-v1": "turbovec-turbovec-id-remove-readd-v1",
+    "turbovec-turbovec-rotation-wire-format-v2": "turbovec-turbovec-id-remove-readd-v2",
+    "ripgrep-ripgrep-case-insensitive-glob-v1": "ripgrep-ripgrep-gitignore-bom-v1",
+    "ripgrep-ripgrep-case-insensitive-glob-v2": "ripgrep-ripgrep-gitignore-bom-v2",
+    "ripgrep-ripgrep-literal-separator-glob-v1": "ripgrep-ripgrep-recursive-glob-v1",
+    "ripgrep-ripgrep-literal-separator-glob-v2": "ripgrep-ripgrep-recursive-glob-v2",
+    "ripgrep-ripgrep-recursive-glob-v1": "ripgrep-ripgrep-case-insensitive-glob-v1",
+    "ripgrep-ripgrep-recursive-glob-v2": "ripgrep-ripgrep-case-insensitive-glob-v2",
+    "ripgrep-ripgrep-gitignore-bom-v1": "ripgrep-ripgrep-literal-separator-glob-v1",
+    "ripgrep-ripgrep-gitignore-bom-v2": "ripgrep-ripgrep-literal-separator-glob-v2"
+  }
+}

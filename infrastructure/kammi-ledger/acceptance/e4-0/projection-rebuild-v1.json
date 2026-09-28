@@ -1,0 +1,24 @@
+{
+  "fresh_db_path": "C:\\Users\\shuga\\AppData\\Local\\Temp\\kammi-e4-rebuild-k7ascusc\\custody.lbdb",
+  "original_counts": {
+    "artifacts": 433,
+    "events": 451,
+    "runs": 0,
+    "seals": 2
+  },
+  "original_head": "sha256:406eca0d89811ad474f33dcf1a4f15c402c92f181339a084749f84f12e07ea0e",
+  "rebuilt_counts": {
+    "artifacts": 433,
+    "events": 451,
+    "runs": 0,
+    "seals": 2
+  },
+  "rebuilt_from": [
+    "CAS raw bytes",
+    "journal event frames"
+  ],
+  "rebuilt_head": "sha256:406eca0d89811ad474f33dcf1a4f15c402c92f181339a084749f84f12e07ea0e",
+  "schema": "KAMMI_E4_PROJECTION_REBUILD_V1",
+  "status": "PASS",
+  "verified_closure_count": 433
+}

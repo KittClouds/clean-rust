@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "state": "OFFLINE_FEASIBILITY_ONLY",
+  "model_contact_authorized": false,
+  "family": "wire-endian-contract",
+  "candidate_ids_hidden_role_map": {
+    "emit_big_endian_word": 25335,
+    "emit_little_endian_word": 34126,
+    "emit_zero_word": 43520,
+    "emit_word_with_extra_byte": 56199
+  },
+  "baseline_pass_by_case": {
+    "case-01": false,
+    "case-02": false,
+    "case-03": false,
+    "case-04": false
+  },
+  "candidate_pass_matrix_hidden_roles": {
+    "emit_big_endian_word": {
+      "case-01": true,
+      "case-02": false,
+      "case-03": false,
+      "case-04": true
+    },
+    "emit_little_endian_word": {
+      "case-01": false,
+      "case-02": true,
+      "case-03": true,
+      "case-04": false
+    },
+    "emit_zero_word": {
+      "case-01": false,
+      "case-02": false,
+      "case-03": false,
+      "case-04": false
+    },
+    "emit_word_with_extra_byte": {
+      "case-01": false,
+      "case-02": false,
+      "case-03": false,
+      "case-04": false
+    }
+  },
+  "code_sha256": {
+    "base": "1cf4b820f5c07d38ac8c0905e37e17883384ce4e394ba3bb08a9f653f53f2add",
+    "emit_big_endian_word": "641d39930eb4f78659821e506d19505b7af1ba3cada4078798116e89ae6e576f",
+    "emit_little_endian_word": "f33b6c703bb75ba2ae9cacd69433fd79ceb24de490546184bdd291f6cdf73bf5",
+    "emit_zero_word": "ac34c61978ceeba834c025f0b2eeaadec3adcac512351fb652b9194352b60040",
+    "emit_word_with_extra_byte": "56b4d7138a056eb58ca9e7b356d608b429d98599d5bec224cdf87655d6791243"
+  },
+  "records_path": "candidate-test-records.json",
+  "intended_positive_sets": {
+    "case-01": [
+      "emit_big_endian_word"
+    ],
+    "case-02": [
+      "emit_little_endian_word"
+    ],
+    "case-03": [
+      "emit_little_endian_word"
+    ],
+    "case-04": [
+      "emit_big_endian_word"
+    ]
+  }
+}

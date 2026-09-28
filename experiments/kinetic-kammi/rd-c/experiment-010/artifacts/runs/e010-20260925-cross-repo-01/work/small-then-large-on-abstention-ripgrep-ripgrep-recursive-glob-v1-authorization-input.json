@@ -1,0 +1,34 @@
+{
+  "task_id": "ripgrep-ripgrep-recursive-glob-v1",
+  "frame_hash_hex": "c733c1d68824ab88b9b7b0e267c824ffe52bb6d531ff19e2c34110f61251acac",
+  "selected_patch_sha256": "8203baf35e2cb5d2e1edf344f977b04891aa2508439c978d2e4203b69620060f",
+  "action_ledger_path": "C:\\rd-c\\experiment-010\\artifacts\\runs\\e010-20260925-cross-repo-01\\ledgers\\small-then-large-on-abstention\\ripgrep-ripgrep-recursive-glob-v1.actions.bin",
+  "actions": [
+    {
+      "id": 11,
+      "schema_id": 1
+    },
+    {
+      "id": 37,
+      "schema_id": 1
+    },
+    {
+      "id": 68,
+      "schema_id": 1
+    },
+    {
+      "id": 94,
+      "schema_id": 1
+    }
+  ],
+  "observer_output": {
+    "action_choice": 11,
+    "applicability_milli": 1000,
+    "abstention_milli": 0
+  },
+  "thresholds": {
+    "minimum_applicability_milli": 850,
+    "maximum_abstention_milli": 150
+  },
+  "completion_check_passed": true
+}

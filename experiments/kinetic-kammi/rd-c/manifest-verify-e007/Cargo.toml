@@ -1,0 +1,8 @@
+[package]
+name = "rdc-manifest-verify-e007"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+blake3 = "=1.8.5"
+serde_json = "=1.0.151"

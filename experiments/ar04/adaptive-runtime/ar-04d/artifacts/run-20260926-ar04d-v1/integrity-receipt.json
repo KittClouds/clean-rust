@@ -1,0 +1,28 @@
+{
+  "protocol": "AR-04D-sentinel-exposure-2026-09-26",
+  "source_commit": "8fd4fbea3402aa492d45b0feb5c08685fd1a1873",
+  "cells": 25,
+  "arms": 7,
+  "trajectories": 175,
+  "decisions": 735000,
+  "checkpoints": 700,
+  "master_panels": 26250,
+  "population_size_per_dataset": 4096,
+  "unique_sample_rows": 3381440,
+  "exposure_slots": 183750,
+  "integrity_valid": true,
+  "files": {
+    "arm-summary.csv": "532d0f3699c78dddbaf4ae2d04ec2aecef149c6afd97ee4782bab79cdaaa9e0b",
+    "cell-contrasts.csv": "e3a2f94bb021daa30b2a5e141dfe82796078312da39e901cbdeaca9bdeb25b10",
+    "checkpoint-manifest.csv": "b547ee22e3388863930fad580ab1c71c7c482d39dff2e2a86d3f4c8506ae4a9f",
+    "checkpoint-models.bin": "aa90f722d1337f0e67304580f14e1448f4a1b30e2eb8c23a6725d23b3e29ad63",
+    "checkpoint-outcomes.csv": "56ac9ae796a2b8213b15661761899da5081572ddcf9bb382c057341db030c38d",
+    "dataset-manifest.csv": "ad98b9f73640c0e642d1c8f1b0c9d9573dad99b8a0c87bc981c6327ddbd27ea2",
+    "exposure-summary.csv": "a75211bf92b963945d4d70a62a8b6581e6c7793878843a77b584d0cfa2235118",
+    "panel-manifest.csv": "6e22604d32a87b5b7e1007fa941e22ecd62c945469e6f1622396583b4690e7b9",
+    "pooled-panel-manifest.csv": "82dac8438ac1a30a3dbf2a0939373ca640a8c1d73efaa52f3d94ef32094d11e2",
+    "RESULTS.md": "7742f88731d8ab8a0c8a9c443115ed91e635164808045ad1f2443415aafd94bc",
+    "summary.json": "f0021a4a541a6428d70f3f130ff46c9705dc167ebe34cdca1e6f97b867cf0ee2",
+    "trajectory-decisions.csv.gz": "3a66dbe30017bf5c13f43ac26a5bd23bf4e4f01ce984b2582753dd294aaf6a40"
+  }
+}

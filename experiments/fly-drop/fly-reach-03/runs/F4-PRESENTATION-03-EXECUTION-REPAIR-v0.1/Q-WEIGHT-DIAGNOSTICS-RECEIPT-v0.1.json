@@ -1,0 +1,219 @@
+{
+  "archived_scorer_comparison": "prohibited; archived outputs use different stored-p semantics",
+  "coverage": {
+    "assignment_scopes": 6,
+    "block_scopes": 12,
+    "mapped_weighted_output_scopes": 465,
+    "pooled_scope_present": true
+  },
+  "ess_interpretation": "descriptive only",
+  "input_hashes": {
+    "analysis_sha256": "d79f885d3d8b8bef0579312cc72c2b5c8fa08b6edb1fcf52b66bcf5abf1b51c5",
+    "fit_manifest_sha256": "f71d344c5bc58e86a68e7bd9163aed1ab5d945468bfe84f06a8981e6a1c2ce66",
+    "integrity_receipt_sha256": "cf52cc787b3bf501b3f80944d452af3247e569f82f110c06c597e499bfca2591",
+    "prediction_lock_sha256": "dd387bcc52510eac947774cb6d9303d8cdd8142cee07a60b0e39cddd4dcb54ce",
+    "q_diagnostics_source_sha256": "487e7875d1b44becd7a14da20391dfaa015b23e8e77cae44169951583262517c",
+    "q_diagnostics_test_source_sha256": "1af28aefd07e883bcec04acacc1792e9d45443f6f7d7222ab6393fb90253e305",
+    "raw_weight_diagnostics_sha256": "0d7ef29f0667b4fab030a13211c5c9089e60a297b454f5381e945efef0894b37",
+    "task_bank_manifest_sha256": "ad339f4a710c9cb803e68a7076da923a68486f81b7552aa767c710f885deb0a1",
+    "truth_file_sha256": "ff9d000145fc503e83710ca99d65b0304d52c1f94533d92c78e28b9730214d50"
+  },
+  "output_hashes": {
+    "map_sha256": "8cc2fea4a3dad03aac46ffee8c2cc09af89cafa9633d152e817bcf12a92ff352",
+    "report_sha256": "21dae4bde9ca05c95b08397995f10e92d4c5b4de6c9c8ab40584730e88c558c0"
+  },
+  "q_diagnostics_by_assignment": {
+    "0": {
+      "all_rows": {
+        "count": 4478,
+        "ess": 4477.868147744304,
+        "max_q": 380.546875,
+        "mean_q": 378.283559903975,
+        "min_q": 376.421875,
+        "sum_q": 1693953.78125
+      },
+      "target_negative": {
+        "count": 3983,
+        "ess": 3982.8817710035364,
+        "max_q": 380.546875,
+        "mean_q": 378.5149267198092,
+        "min_q": 376.421875,
+        "sum_q": 1507624.953125
+      },
+      "target_positive": {
+        "count": 495,
+        "ess": 495.0,
+        "max_q": 376.421875,
+        "mean_q": 376.421875,
+        "min_q": 376.421875,
+        "sum_q": 186328.828125
+      }
+    },
+    "1": {
+      "all_rows": {
+        "count": 4914,
+        "ess": 4913.862309831018,
+        "max_q": 380.546875,
+        "mean_q": 378.9636942918193,
+        "min_q": 376.421875,
+        "sum_q": 1862227.59375
+      },
+      "target_negative": {
+        "count": 2461,
+        "ess": 2460.9398193158877,
+        "max_q": 380.546875,
+        "mean_q": 377.60858771840714,
+        "min_q": 376.421875,
+        "sum_q": 929294.734375
+      },
+      "target_positive": {
+        "count": 2453,
+        "ess": 2452.985202727207,
+        "max_q": 380.546875,
+        "mean_q": 380.3232202914798,
+        "min_q": 376.421875,
+        "sum_q": 932932.859375
+      }
+    },
+    "2": {
+      "all_rows": {
+        "count": 6289,
+        "ess": 6288.851390644772,
+        "max_q": 380.546875,
+        "mean_q": 379.40756429877564,
+        "min_q": 376.421875,
+        "sum_q": 2386094.171875
+      },
+      "target_negative": {
+        "count": 1665,
+        "ess": 1665.0,
+        "max_q": 376.421875,
+        "mean_q": 376.421875,
+        "min_q": 376.421875,
+        "sum_q": 626742.421875
+      },
+      "target_positive": {
+        "count": 4624,
+        "ess": 4623.991669053531,
+        "max_q": 380.546875,
+        "mean_q": 380.4826448961938,
+        "min_q": 376.421875,
+        "sum_q": 1759351.75
+      }
+    },
+    "3": {
+      "all_rows": {
+        "count": 7287,
+        "ess": 7286.863728789436,
+        "max_q": 380.546875,
+        "mean_q": 379.7322908089749,
+        "min_q": 376.421875,
+        "sum_q": 2767109.203125
+      },
+      "target_negative": {
+        "count": 5504,
+        "ess": 5503.878682173981,
+        "max_q": 380.546875,
+        "mean_q": 379.5231195494186,
+        "min_q": 376.421875,
+        "sum_q": 2088895.25
+      },
+      "target_positive": {
+        "count": 1783,
+        "ess": 1782.9917665325456,
+        "max_q": 380.546875,
+        "mean_q": 380.3779882922041,
+        "min_q": 376.421875,
+        "sum_q": 678213.953125
+      }
+    },
+    "4": {
+      "all_rows": {
+        "count": 2195,
+        "ess": 2194.9518546747126,
+        "max_q": 380.546875,
+        "mean_q": 377.4216472095672,
+        "min_q": 376.421875,
+        "sum_q": 828440.515625
+      },
+      "target_negative": {
+        "count": 1792,
+        "ess": 1791.9553716973285,
+        "max_q": 380.546875,
+        "mean_q": 377.646484375,
+        "min_q": 376.421875,
+        "sum_q": 676742.5
+      },
+      "target_positive": {
+        "count": 403,
+        "ess": 403.0,
+        "max_q": 376.421875,
+        "mean_q": 376.421875,
+        "min_q": 376.421875,
+        "sum_q": 151698.015625
+      }
+    },
+    "5": {
+      "all_rows": {
+        "count": 4112,
+        "ess": 4111.942051420643,
+        "max_q": 380.546875,
+        "mean_q": 379.97406979571986,
+        "min_q": 376.421875,
+        "sum_q": 1562453.375
+      },
+      "target_negative": {
+        "count": 1046,
+        "ess": 1046.0,
+        "max_q": 380.546875,
+        "mean_q": 380.546875,
+        "min_q": 380.546875,
+        "sum_q": 398052.03125
+      },
+      "target_positive": {
+        "count": 3066,
+        "ess": 3065.94518321586,
+        "max_q": 380.546875,
+        "mean_q": 379.7786509295499,
+        "min_q": 376.421875,
+        "sum_q": 1164401.34375
+      }
+    }
+  },
+  "q_diagnostics_pooled": {
+    "all_rows": {
+      "count": 29275,
+      "ess": 29274.230288168907,
+      "max_q": 380.546875,
+      "mean_q": 379.17262649444916,
+      "min_q": 376.421875,
+      "sum_q": 11100278.640625
+    },
+    "target_negative": {
+      "count": 16451,
+      "ess": 16450.511982102125,
+      "max_q": 380.546875,
+      "mean_q": 378.5394134475108,
+      "min_q": 376.421875,
+      "sum_q": 6227351.890625
+    },
+    "target_positive": {
+      "count": 12824,
+      "ess": 12823.82217177758,
+      "max_q": 380.546875,
+      "mean_q": 379.9849305988771,
+      "min_q": 376.421875,
+      "sum_q": 4872926.75
+    }
+  },
+  "schema": "F4-PRESENTATION-03-Q-WEIGHT-DIAGNOSTICS-RECEIPT-v0.1",
+  "scope": "diagnostic-only; no score recomputation",
+  "score_semantics": "q diagnostics accompany existing frozen weighted score scopes; scores in ANALYSIS.json were not recomputed or modified",
+  "status": "PASS",
+  "test_result": {
+    "command": "python -m unittest discover -s <validation-repair-v0.1.1> -p test_q_weight_diagnostics.py -v",
+    "failed": 0,
+    "passed": 3
+  },
+  "weight_rule": "q=1/p_inclusion; no trimming, capping, normalization, or winsorization"
+}

@@ -1,0 +1,444 @@
+{
+  "actual_rows": 13420,
+  "duplicate": 0,
+  "expected_rows": 13420,
+  "extra": 0,
+  "gate_id": "ROW_RECONCILIATION",
+  "missing": 0,
+  "schema": "F4-SYMMETRY-01-row-reconciliation-v1",
+  "status": "PASS",
+  "streams": [
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "fly-L-303000.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "fly-L-303001.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "fly-L-303002.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "8346e8e93791ccc1a32f479b92f585e5f0485b96e83c251dcd5faa018231ef9b",
+      "path": "fly-L-303003.bin",
+      "rows": 899,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "08504729eecf91d8eabac34b2ffe87839e69af9e3cb3575a5aef455dea5189cd",
+      "path": "fly-R-303000.bin",
+      "rows": 1553,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "fly-R-303001.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "fly-R-303002.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "fly-R-303003.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "g001-L-303000.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "g001-L-303001.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "g001-L-303002.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "g001-L-303003.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "g001-R-303000.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "g001-R-303001.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "g001-R-303002.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "g001-R-303003.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "g002-L-303000.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "01a230ac038c3503c0816c92ef4de592f5670098a4ffb4ecc2d4e1ea3733976c",
+      "path": "g002-L-303001.bin",
+      "rows": 56,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "g002-L-303002.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "g002-L-303003.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "g002-R-303000.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "g002-R-303001.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "g002-R-303002.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "g002-R-303003.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "g003-L-303000.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "g003-L-303001.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "g003-L-303002.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "g003-L-303003.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "330c11b8a3019353ca8a4a20104ace052760985b8e559510159abb8ba742dcf1",
+      "path": "g003-R-303000.bin",
+      "rows": 147,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "g003-R-303001.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "g003-R-303002.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "g003-R-303003.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "g004-L-303000.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "g004-L-303001.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "g004-L-303002.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "g004-L-303003.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "g004-R-303000.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "g004-R-303001.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "g004-R-303002.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "g004-R-303003.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "g005-L-303000.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e67f9743fb465bb392b51cf45bc7615031846305db2820a2196d5ecc9ba9ddad",
+      "path": "g005-L-303001.bin",
+      "rows": 1866,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "a44d6e135434e0913f5aa39e290aaff2f519f87d7a42ace3aa5d72d0f9f54dd4",
+      "path": "g005-L-303002.bin",
+      "rows": 1731,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "g005-L-303003.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "g005-R-303000.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "g005-R-303001.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "a5218195c2e4f29ff3717bdb2cb1f5b8b295256fef30083702c6857353892746",
+      "path": "g005-R-303002.bin",
+      "rows": 1939,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "g005-R-303003.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "g006-L-303000.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "g006-L-303001.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "g006-L-303002.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "g006-L-303003.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "g006-R-303000.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "g006-R-303001.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "g006-R-303002.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "g006-R-303003.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "g007-L-303000.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "g007-L-303001.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "g007-L-303002.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "g007-L-303003.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "g007-R-303000.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "g007-R-303001.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "g007-R-303002.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "f97133115745990fb8524c88bcd65f3e38c3c14bbae4fd03dea7f40d350bdac2",
+      "path": "g007-R-303003.bin",
+      "rows": 968,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "24ffd4d5218b793320207c7e16cd9b17631c505fc1a9796456ab3426315a85dd",
+      "path": "g008-L-303000.bin",
+      "rows": 1058,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "9fd8383d4a01551529859baafb0c88a4db044dff637037845beef86d81720d27",
+      "path": "g008-L-303001.bin",
+      "rows": 893,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "g008-L-303002.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "g008-L-303003.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "55012b66c90f96bf02a738843ba430f0ffe75d53b8f5e56f09f89cc8f7db10c8",
+      "path": "g008-R-303000.bin",
+      "rows": 971,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "g008-R-303001.bin",
+      "rows": 0,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "b35f55243a9c38d9a133bb728179c0587f70975905de00d7ace972a4bdd87301",
+      "path": "g008-R-303002.bin",
+      "rows": 1339,
+      "status": "PASS"
+    },
+    {
+      "ordered_key_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "g008-R-303003.bin",
+      "rows": 0,
+      "status": "PASS"
+    }
+  ]
+}

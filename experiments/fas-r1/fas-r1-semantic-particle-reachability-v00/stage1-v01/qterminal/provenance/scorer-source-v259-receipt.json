@@ -1,0 +1,8 @@
+{
+  "warning": "Read-only mmap global-vector tensor was accepted but emitted a PyTorch non-writable-array warning; V261 uses an owned copy.",
+  "source_sha256": "b7204db5226600ccda500ac3ca118be6c329370424e149e33f4485fee5728a30",
+  "source_file": "C:\\Users\\shuga\\.codex\\worktrees\\fas-r1-stage0-20260925\\clean-rust\\experiments\\fas-r1-semantic-particle-reachability-v00\\stage1-v01\\qterminal\\provenance\\score_traces_v05_v02_run_v259.py",
+  "run_id": "V259",
+  "scoring_receipt_sha256": "6a37200913e576498d10433eee392c0fa53ed816363b432dcf3b2c2deef898a2",
+  "schema": "R1_QTERMINAL_V05_V02_SCORER_SOURCE_ARCHIVE_V01"
+}

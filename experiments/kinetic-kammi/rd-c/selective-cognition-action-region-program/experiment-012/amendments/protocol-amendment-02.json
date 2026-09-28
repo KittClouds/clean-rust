@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "amendment_id": "E012-PROTOCOL-A02",
+  "base_protocol_version": "0.1",
+  "state": "PRECONSTRUCTION_IDENTIFIABILITY_REPAIR",
+  "task_construction_started": false,
+  "model_contact_authorized": false,
+  "candidate_channel": {
+    "identity_envelope": "E_c.identity; invariant typed offered-action IDs/schema required by the frozen output contract",
+    "manipulated_content": "E_c.content; candidate summaries and patch evidence",
+    "opaque_ids_have_semantics": false,
+    "candidate_identity_remains_present_when_content_absent": true
+  },
+  "support_sets": {
+    "task_request_dominant": ["E_c.content", "E_t"],
+    "candidate_action_dominant": ["E_c.content"],
+    "pre_action_test_execution_dominant": ["E_c.content", "E_x"],
+    "joint_support": ["E_c.content", "E_t", "E_x"],
+    "context_sensitive": ["E_c.content", "E_r"],
+    "abstention_positive": []
+  },
+  "singleton_interpretation": {
+    "E_t_only": "diagnostic, not sufficient to select opaque action ID",
+    "E_x_only": "diagnostic, not sufficient to select opaque action ID",
+    "E_r_only": "diagnostic, not sufficient to select opaque action ID",
+    "E_c_content_only": "sufficiency condition only for generator-qualified candidate/action-dominant tasks"
+  },
+  "pair_sufficiency_cells": [
+    ["E_c.content"],
+    ["E_c.content", "E_t"],
+    ["E_c.content", "E_x"],
+    ["E_c.content", "E_r"],
+    ["E_c.content", "E_t", "E_x"],
+    ["E_c.content", "E_t", "E_r"]
+  ],
+  "necessary_channel_test": "paired worlds identical on all other visible truth-bearing fields and candidate identities but with conflicting correct-action sets when the designated channel changes"
+}

@@ -1,0 +1,27 @@
+{
+  "schema": "jev-v08p-r2-matcher-integrity-correction-v01",
+  "status": "IMPLEMENTATION_ONLY_CORRECTION_SEALED_BEFORE_SELECTION",
+  "parent_feature_instrument_seal_sha256": "c679eab3b2edf0e7bffa792b48fd9ee7ea243d3fc2184373ed036d64aea94bb0",
+  "original_matcher_source_sha256": "f3f55099c4fcbbb45194d2e8d09014c532b5a69e1683d5eaf5036dc1e098e9bd",
+  "corrected_matcher_source_path": "experiments/jev-information-density-v08p-r2/runner/match_r2_panel_radius.py",
+  "corrected_matcher_source_sha256": "a02d66151c50fe4ba79fa33305226b08ea0c87b3accdad04a0f3764e03d099c",
+  "failure_record": {
+    "attempt": "first frozen matcher invocation",
+    "exit_code": 1,
+    "error": "R2 panel feature-scope or candidate text hash differs from its seal",
+    "root_cause": "candidate text hash is bound under panel_manifest.admission.candidate_text_manifest_sha256, not panel_manifest.construction_outputs",
+    "failure_stage": "target-free input-integrity preflight before tensor loading or radius selection",
+    "matching_output_created": false,
+    "candidate_selection_completed": false,
+    "treatment_metric_or_prediction_created": false
+  },
+  "correction": "Read the candidate-text binding from the already-sealed admission subsection and verify it against the same exact candidate manifest bytes; retain the frozen radius-only selector, tie-break, thresholds, join keys, and all scientific semantics unchanged.",
+  "verification": {
+    "matcher_self_test": "PASS",
+    "feature_tensor_contents_used_for_selection_during_failed_attempt": false,
+    "heldout_targets_read": false,
+    "head_loaded": false,
+    "inference": false,
+    "phoenix_access": false
+  }
+}

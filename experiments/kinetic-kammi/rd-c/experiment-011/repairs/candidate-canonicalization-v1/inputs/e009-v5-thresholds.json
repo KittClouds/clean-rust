@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "selection_source": "development bank only",
+  "selection_objective": [
+    "maximize complete tasks",
+    "minimize large model calls",
+    "minimize input plus generated tokens",
+    "minimize measured observer wall time",
+    "prefer higher minimum applicability",
+    "prefer lower maximum abstention"
+  ],
+  "search_grid": {
+    "minimum_applicability_milli": {
+      "min": 700,
+      "max": 1000,
+      "step": 1
+    },
+    "maximum_abstention_milli": {
+      "min": 0,
+      "max": 1000,
+      "step": 1
+    },
+    "candidate_pairs": 301301
+  },
+  "selected_thresholds": {
+    "minimum_applicability_milli": 850,
+    "maximum_abstention_milli": 150
+  },
+  "development_fit": {
+    "minimum_applicability_milli": 850,
+    "maximum_abstention_milli": 150,
+    "development_task_count": 8,
+    "hybrid_completions": 8,
+    "hybrid_completion_rate": 1.0,
+    "large_calls": 3,
+    "large_call_rate": 0.375,
+    "small_accepted": 5,
+    "small_correct_among_accepted": 5,
+    "input_plus_generated_tokens": 12564,
+    "modeled_observer_wall_ms": 11991.8
+  },
+  "development_frame_lock_sha256": "f25338bdd754898de614d1aa57445acc8a04a35a97d2785bfba628da7038430b",
+  "development_candidate_lock_sha256": "5c07a6faee1c1751c60227a157f7ad56bed6952afda018f0dd62fffc9d4dd261",
+  "development_labels_sha256": "a5ee26fdd05d9b96561d8c670c24afbc58874dbed61474fd74ef3f2951025dbf",
+  "development_small_outputs_sha256": "c0c063ceea1b340d0424a24d4d07605c721d403ed9a4701987d29919995ddf21",
+  "development_large_outputs_sha256": "ecb6c642a02440bcbc59438ff71343a8ecd0f09af8851305eb3d9aab06f268d9",
+  "frozen_development_input_lock_sha256": "5fa26125b00a7e69da00a2d256e20bb06bca5ca5202122e42c519aad7fbcb3c8",
+  "heldout_labels_read": false,
+  "authority_execution_guard_milli": 700,
+  "normalization_contract": "percent-0-100-to-milli-x10-v1+line-endings-lf-v1"
+}

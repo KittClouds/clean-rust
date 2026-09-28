@@ -1,0 +1,68 @@
+{
+  "status": "P_R2_SCOPE_INDEX_PREFLIGHT_PASS_NO_HEADS",
+  "opening_count": 1,
+  "opening_receipt_sha256": "500d15bf4ae454c964ed52a955e995f8daeea479c3149f9b3b454c31c922a789",
+  "prior_failures": {
+    "target_schema_failure_sha256": "b1255eb0a4f815aa23622985e77e34e9df107719e787e3fa21cfc7c3c8ce8fdf",
+    "scope_index_failure_sha256": "f9f907bbaf04c985313644d454d17bc5b3c6ea4763c8bca45f455104512e642f",
+    "empty_prediction_archive_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "training_seal_sha256": "14ad978234a90f228fb85aeec8fcda635ae42ff420f5c047aa2a40e3c3f37508",
+  "checkpoint_hash_tree_sha256": "a901890434000dcb928fabe3e0eee0d1ab9cd6d7744b0d02f26d04456ea15c21",
+  "panel_ready_manifest_sha256": "c0d48381356113451bc72f9578204ade4ef7449a75264cd5018a34d002b313ac",
+  "feature_receipt_sha256": "74e701cd87e677c88ea10e0f7a026474ecc7bafab97c021de6c6fcd56c455e09",
+  "scope_index_correction_sha256": "79017a3101f69eab0f84cee1868eb2bb78285e72d0c9386a51ae8a221fb54f39",
+  "evaluator_sha256": "4c36feb7f1e1b2b493a7d10061f3bf6d89b9c8ffa6f758c659675d374d1cc859",
+  "target_join_adapter_sha256": "e7673ba4bdf0bbac924ffe863dfb7cd2f1aa60ac2dfe8d7e0919fda1e9b350eb",
+  "panel_input_audit": {
+    "state_feature_rows": 22000,
+    "candidate_feature_rows": 16,
+    "join_rows": 8000,
+    "family_counts": {
+      "exposure_control": 500,
+      "respiratory_monitoring": 500,
+      "salinity_control": 500,
+      "vibration_monitoring": 500
+    },
+    "exact_world_target_join": {
+      "status": "EXACT_WORLD_TARGET_JOIN_PASS",
+      "join_key": "episode_id",
+      "scope_rows": 22000,
+      "exact_world_rows": 22000,
+      "canonical_rows": 22000,
+      "unique_episode_ids": 22000,
+      "neighborhoods": 2000,
+      "candidate_schema_count": 4,
+      "invariant_target_role_count": 20000,
+      "fact_map_flip_count": 2000,
+      "target_vectors_sha256": "c2bbc318b6146cb59f3dc61b8ee37ddbd0fa74da58368166ce0e4323588dff02"
+    },
+    "opened_input_hashes": {
+      "panel/panel-canonical-episodes.jsonl": "9eef39a0f3967f06016b2a67c7b6699c66594236751ac8f07b7d69de83bfeae0",
+      "panel/panel-exact-world-episodes.jsonl": "7b93a6d90d65b20997454c995010bffc231620f4d10d63add9d98c5f71f78463",
+      "panel/panel-contrast-certificates.jsonl": "249dbf2a1990a8a7c71e3171fbc2255cb2658368f62e77ecab6797da632c5277",
+      "panel/panel-feature-scope.jsonl": "e8f36c8537e6b24c54baf205762ce1d915eeb91aa35786164ff820b778067853",
+      "panel/panel-neighborhoods.jsonl": "8f274aade4afc9f943df88e8248c0b9a867b63878ad3bb7df120a00eb6be32df",
+      "panel/panel-occurrence-identities.jsonl": "08ba6f9676ad6ec816a946f9bb1be37086c7401d7e1c4413f8c09ffe1e6b7573",
+      "panel/fresh-candidate-text-manifest.jsonl": "2111eeedba30408863dd98c91ececf6a011a48f93b7c8266b8561aa0a958b8be",
+      "panel/online-admission-log.jsonl": "16ebea3f2d6740287841e5e4749d58d8497066d1b10da0e26d28d9582005b8a8",
+      "panel/online-admission-receipt.json": "3f87a5af6ce80d1d4f7f45d50e4381aff867053e4aa27a3a5064af68e265ba95",
+      "features/r2-state-features.pt": "9285214a16100a6f708ae6ce65bd67502fabd8c6df62d909a5027d34d4a74ed8",
+      "features/r2-state-feature-manifest.jsonl": "3b8e76a512afe064cd11eb51dc91949ebd746af3a963e36cf0d9d768418b6346",
+      "features/r2-candidate-features.pt": "ce653d23fece96127a3df043d4730041dfffbf2662adafe3800fc9205d96acd8",
+      "features/r2-candidate-feature-manifest.jsonl": "458c910629f3187a231fb956705dec99ec8c15ef8b62cd2e8e935e5a5bd7bbd4",
+      "features/r2-feature-extraction-receipt.json": "74e701cd87e677c88ea10e0f7a026474ecc7bafab97c021de6c6fcd56c455e09",
+      "matching/matched-neutral-selection.jsonl": "d5fa428eb54496ef996313e8071427d7f2233e15f08cde233de189897ef5496f",
+      "matching/radius-gate-report.json": "7b0cc009e42174e98d526a84d1835c167ecda93c33582b2e3bec28fd902de196",
+      "matching/semantic-axis-composition.json": "0da05d2ab86322f4f79a71847a9e1dbae8a1eccf86d578143af988b34c238acc",
+      "matching/whole-panel-candidate-join.jsonl": "4f5c3a287008933a11250c9eed110a8335ac4e834de25935af3dba10718393a1",
+      "matching/whole-panel-join-preflight.json": "5b0a2b47ff12238f474959a247636b5bff40eb675b2b8f9e0b7fab12a1a9410e",
+      "matching/r2-matching-and-join-receipt.json": "b598e1a8427cfb0ba7e39ac386fca9c876693aba2df1b6024fe99cf5ad54dbec"
+    }
+  },
+  "selected_view_episode_join_count": 8000,
+  "head_payloads_deserialized": false,
+  "predictions_created": false,
+  "newtight": false,
+  "phoenix_access": false
+}

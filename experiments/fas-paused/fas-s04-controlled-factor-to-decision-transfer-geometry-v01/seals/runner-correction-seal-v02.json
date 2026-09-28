@@ -1,0 +1,47 @@
+{
+  "experiment_id": "fas-s04-controlled-factor-to-decision-transfer-geometry-v01",
+  "files": [
+    {
+      "bytes": 1375,
+      "path": "corrections/runner-correction-v02.json",
+      "sha256": "83be336e784cfc7845ce63c96d3e89ee5836d3f96e00d07be8ef9cde843374d3"
+    },
+    {
+      "bytes": 13562,
+      "path": "scripts-v02/s04_common_v02.py",
+      "sha256": "159044baea858770469f9c9c75772f7171a53f9f8a9465ab9a9575fe0774f983"
+    },
+    {
+      "bytes": 14942,
+      "path": "scripts-v02/s04_preflight_v02.py",
+      "sha256": "171a8a0803b3ad8ed460c0e0f898239175e4e874f16ccddaf46f5a6a516243ba"
+    },
+    {
+      "bytes": 27618,
+      "path": "scripts-v02/s04_analyze_v02.py",
+      "sha256": "b8cf8aded6fdde0b6d8f61b5e800bdde26230bfa40cf2f5f544762cf2cccfea1"
+    },
+    {
+      "bytes": 5424,
+      "path": "scripts-v02/s04_seal_results_v02.py",
+      "sha256": "d20e3651ca2e65d64f80ceedfd44e3e9646c21c6ac13744250061e89cdfbce5f"
+    },
+    {
+      "bytes": 1807,
+      "path": "scripts-v02/test_s04_math_v02.py",
+      "sha256": "dc54f6969c733d7158f0e56e8207bd9be0209a21dff0e9e7ac29dbe21312d7dd"
+    },
+    {
+      "bytes": 3001,
+      "path": "scripts-v02/seal_runner_v02.py",
+      "sha256": "b10c3d371dc5ac823e13048c82cc5b7a96d6879c7148335fb87cdfd4ee55a745"
+    }
+  ],
+  "model_contact": false,
+  "parent_protocol_root_sha256": "3806a541b09351760f168643d2a46747f26e11ff72c852f04f6c8e91ed88880f",
+  "probe_fitting": false,
+  "root_sha256": "bff644394fbdca31c5dcd63e0b3483b34b5370112932de3f44e2b0615e92a949",
+  "scientific_contract_changed": false,
+  "seal_id": "FAS_S04_RUNNER_CORRECTION_SEAL_V02",
+  "status": "PASS"
+}

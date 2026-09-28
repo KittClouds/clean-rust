@@ -1,0 +1,44 @@
+{
+  "contract": "phoenix-gliner25-five-surface-parity-v1",
+  "passed": false,
+  "thresholds": {
+    "max_probability_delta": 1e-05,
+    "max_objective_delta": 0.0001
+  },
+  "summary": {
+    "feature_names_exact": true,
+    "statuses_observed": true,
+    "all_structures_exact": false,
+    "max_probability_delta": Infinity,
+    "classification_objective_delta": 17.15482234954834,
+    "graph_publications": 0
+  },
+  "features": {
+    "long_context": {
+      "structure_exact": false,
+      "max_probability_delta": Infinity
+    },
+    "unlimited_span_candidate": {
+      "structure_exact": false,
+      "max_probability_delta": Infinity
+    },
+    "span_attributes": {
+      "structure_exact": false,
+      "max_probability_delta": Infinity
+    },
+    "constrained_classification": {
+      "structure_exact": false,
+      "max_probability_delta": 0.7480588553799341,
+      "objective_delta": 17.15482234954834
+    },
+    "joint_information_extraction": {
+      "structure_exact": false,
+      "max_probability_delta": 0.4804009679369444
+    }
+  },
+  "lineage": {
+    "python_receipt_sha256": "e71da8f54d8e2db0d5f21e52b97a2e6165fbe2bf16440c756c100c28c621ad87",
+    "rust_receipt_sha256": "69f027e41b98af0599d8a752f311f0fa4becd4ee9303b53819190d623c92a67f",
+    "onnx_manifest_sha256": "3a064ff678262c76cc836b35961edff1eb97bb5312cf1a78c56de9f3bd450af8"
+  }
+}

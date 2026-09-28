@@ -1,0 +1,12 @@
+{
+  "status": "VERIFIED",
+  "stage": "stage1-a",
+  "new_audited_states": 1024,
+  "cumulative_audited_states": 1024,
+  "event_statuses": [
+    "Q10_SM_STAGE1_VALID__F32_SAFE_FREEDOM_PRESENT",
+    "Q10_SM_STAGE1_VALID__SAFETY_MARGIN_DOMINATED"
+  ],
+  "replay": "VERIFIED_BY_STDLIB_F32",
+  "behavioral_inference": false
+}

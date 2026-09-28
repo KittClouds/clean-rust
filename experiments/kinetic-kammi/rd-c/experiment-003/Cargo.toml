@@ -1,0 +1,14 @@
+[package]
+name = "rdc-experiment-003"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[dependencies]
+blake3 = "=1.8.5"
+rdc-experiment-001 = { path = "../experiment-002/baseline/rdc-experiment-001" }
+rdc-experiment-002 = { path = "../experiment-002" }
+
+[[bin]]
+name = "rdc003-bench"
+path = "src/bin/bench.rs"

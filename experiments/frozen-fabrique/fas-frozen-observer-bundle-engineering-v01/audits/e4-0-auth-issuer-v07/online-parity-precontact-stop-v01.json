@@ -1,0 +1,39 @@
+{
+  "schema": "FAS_E4_0_STAGE_AUTHORIZATION_PRECONTACT_STOP_V01",
+  "receipt_id": "FAS_E4_0_V07_ONLINE_CACHE_PARITY_AUTHORIZATION_STOP_V01",
+  "status": "PRECONTACT_STOP",
+  "stop_class": "AUTHORIZER_CONTRACT_PREDECESSOR_SCHEMA_MISMATCH",
+  "stage": "ONLINE_CACHE_PARITY",
+  "contract": {
+    "path": "C:\\Users\\shuga\\.codex\\worktrees\\e4-0-contract-work\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\contracts\\e4-0-contract-v07-final.json",
+    "bytes": 48881,
+    "sha256": "33b56e95cbf083036f436b5496c2db3c0c052bacfdce593869a6f4aa3125a2d7"
+  },
+  "contract_seal": {
+    "path": "C:\\Users\\shuga\\.codex\\worktrees\\e4-0-contract-work\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\seals\\e4-0-contract-v07-seal.json",
+    "bytes": 52723,
+    "sha256": "22e2d05255a87334d27713d222fc4023fd1cac61dafc4264c5de434bbf4c71ef"
+  },
+  "contract_seal_root_sha256": "ee7339c3ab04272354b4cae03294c794a6e823fdb1766ad44f71978dfee0c62c",
+  "independent_postseal_audit": {
+    "path": "C:\\Users\\shuga\\.codex\\worktrees\\e4-0-contract-work\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\audits\\e4-0-track-e\\track-e-postseal-receipt-v07.json",
+    "bytes": 48718,
+    "sha256": "b328770fbdf25b96b40bac33ccec67ca1673c331328e5413727392d586f857f2"
+  },
+  "bindings": {
+    "path": "C:\\Users\\shuga\\.codex\\worktrees\\e4-0-contract-work\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\audits\\e4-0-auth-issuer-v07\\online-parity-bindings-v01.json",
+    "bytes": 4721,
+    "sha256": "3693ffe40ad8c5e077f2da54ef5fbbd4bf297d10b9289bbab4069ac6c652d3fe"
+  },
+  "observed_error": "AuthorizationError: final E4 contract does not preserve exact E0/E1/E2/E3 predecessors",
+  "classification": "ISSUER_SCHEMA_IMPLEMENTATION_DEFECT; the sealed contract preserves additional frozen E1 identity fields while matching all four registered predecessor roots; no experiment stage was authorized or started.",
+  "authorization_written": false,
+  "tokenizer_contact": false,
+  "model_contact": false,
+  "cuda_initialized": false,
+  "gpu_lease_acquired": false,
+  "feature_cache_created": false,
+  "labels_opened": false,
+  "created_utc": "2026-09-27T00:40:16.407688+00:00",
+  "preservation_rule": "Preserve v07 seal and audit unchanged. Correct the issuer/runner interfaces in a new versioned contract/source closure."
+}

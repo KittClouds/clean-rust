@@ -1,0 +1,38 @@
+{
+  "protocol": "Q10-PF6-RH1-Q1",
+  "status": "PREEXECUTION_SEALED_NO_FACTORIAL",
+  "parent_bindings": [
+    {
+      "label": "rh1_cq1_contract",
+      "path": "experiments/drosophila-heresy/q10-rh1-cq1-v1/CONTRACT.json",
+      "sha256": "E28592C95AFCA90FC83817A98CB2558E5C6157F6CE0050D260F3420F324F24E4"
+    },
+    {
+      "label": "s1_execution",
+      "path": "experiments/drosophila-heresy/q10-pf6-s1-v1/qualification/execution/execution.json",
+      "sha256": "E561D7392D471CC0B47E98E66EC5AD9FC772476F2F61103FBF5994A051BC0E17"
+    },
+    {
+      "label": "s1_sample",
+      "path": "experiments/drosophila-heresy/q10-pf6-s1-v1/qualification/sample.json",
+      "sha256": "0DE70DA72627D834C7D877F667469DA848F04312F072036245DFE312AD863BB9"
+    },
+    {
+      "label": "pf5_runner",
+      "path": "experiments/drosophila-heresy/q10-pf5-v1/scripts/run_q10_pf5.py",
+      "sha256": "A00078787DB732906416B3C7158DC777CD41C2E71C3AAE660D1AE525446FB82A"
+    }
+  ],
+  "sample": {
+    "primary_groups": 8,
+    "selection": "lexicographically first eight frozen RH1 primary identities",
+    "visitation_orders": 2
+  },
+  "scope": {
+    "ranking": false,
+    "measured_factorial": false,
+    "scientific_seed_bundles": 0,
+    "behavioral_probe": false,
+    "dh08b_authorized": false
+  }
+}

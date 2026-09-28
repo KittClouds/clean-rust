@@ -1,0 +1,15 @@
+{
+  "schema": "adaptive-runtime-ar-00e-aud1/v1",
+  "scope": "engineering-only",
+  "source": "AR-00C-INT1 frozen interaction map and AR-00E scheduler seed",
+  "summaries": [
+    {"epoch": 0, "partition": "E2-structural", "absolute_capture_fraction": 0.06075126, "harmful_capture_fraction": 0.08436401, "synergy_capture_fraction": 0.01547678, "top10_captured": 0, "same_hidden_captured": 12, "same_hidden_pairs": 12, "w1_b1_captured": 8, "w1_b1_pairs": 8},
+    {"epoch": 0, "partition": "E3-randomized", "absolute_capture_fraction": 0.03653632, "harmful_capture_fraction": 0.01900794, "synergy_capture_fraction": 0.07014478, "top10_captured": 0, "same_hidden_captured": 1, "same_hidden_pairs": 12, "w1_b1_captured": 1, "w1_b1_pairs": 8},
+    {"epoch": 100, "partition": "E2-structural", "absolute_capture_fraction": 0.47504163, "harmful_capture_fraction": 0.53442800, "synergy_capture_fraction": -0.00000000, "top10_captured": 2, "same_hidden_captured": 12, "same_hidden_pairs": 12, "w1_b1_captured": 8, "w1_b1_pairs": 8},
+    {"epoch": 100, "partition": "E3-randomized", "absolute_capture_fraction": 0.06445457, "harmful_capture_fraction": 0.05717186, "synergy_capture_fraction": 0.12271024, "top10_captured": 1, "same_hidden_captured": 2, "same_hidden_pairs": 12, "w1_b1_captured": 1, "w1_b1_pairs": 8},
+    {"epoch": 1000, "partition": "E2-structural", "absolute_capture_fraction": 0.91700834, "harmful_capture_fraction": 0.91700834, "synergy_capture_fraction": 0.00000000, "top10_captured": 4, "same_hidden_captured": 12, "same_hidden_pairs": 12, "w1_b1_captured": 8, "w1_b1_pairs": 8},
+    {"epoch": 1000, "partition": "E3-randomized", "absolute_capture_fraction": 0.00000000, "harmful_capture_fraction": -0.00000000, "synergy_capture_fraction": 0.00000000, "top10_captured": 0, "same_hidden_captured": 1, "same_hidden_pairs": 12, "w1_b1_captured": 1, "w1_b1_pairs": 8},
+    {"epoch": 3000, "partition": "E2-structural", "absolute_capture_fraction": 0.91700834, "harmful_capture_fraction": 0.91700834, "synergy_capture_fraction": 0.00000000, "top10_captured": 4, "same_hidden_captured": 12, "same_hidden_pairs": 12, "w1_b1_captured": 8, "w1_b1_pairs": 8},
+    {"epoch": 3000, "partition": "E3-randomized", "absolute_capture_fraction": 0.00008304, "harmful_capture_fraction": 0.00008304, "synergy_capture_fraction": 0.00000000, "top10_captured": 1, "same_hidden_captured": 0, "same_hidden_pairs": 12, "w1_b1_captured": 0, "w1_b1_pairs": 8}
+  ]
+}

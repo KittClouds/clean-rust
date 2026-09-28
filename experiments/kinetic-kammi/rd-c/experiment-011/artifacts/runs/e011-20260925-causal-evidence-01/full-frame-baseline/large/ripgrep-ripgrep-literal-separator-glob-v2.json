@@ -1,0 +1,163 @@
+{
+  "schema_version": 1,
+  "run_id": "e010-20260925-cross-repo-01",
+  "stage": "heldout-shadow-large",
+  "role": "large",
+  "bundle_id": "ternary-bonsai-2-27b-ptq1-local-v5",
+  "bundle_blake3": "6d933aba093307e0c333f022426af46f3f5b243a8a10a2e1bb2f4cfc93b17b9d",
+  "bundle_lock_sha256": "a626836853bdb0755fd2e4e1569b6b91b33861306c7d1e4a51e3de54a9ee713d",
+  "frozen_input_lock_sha256": "323f14b07c698d289af6f11a2e894014538bd6be0644de8786b30b1e954f8165",
+  "frame_lock_sha256": "de330f467dfe8d14d66dba428211b8a27c3eb8a62dd175ba01cf5847728eb587",
+  "frame_blake3": "fa44c8d7b0eee0ce2e43b155c033f237171db8c9f611e12ef16bec0e3bc1acaa",
+  "task_id": "ripgrep-ripgrep-literal-separator-glob-v2",
+  "server_alias": "e009-large-v5",
+  "server_process_id": 41968,
+  "server_runtime_args": [
+    "--model",
+    "D:\\phoenix-models\\candidates\\ternary-bonsai-2-27b\\6ed5e12bf84b7a63069882c91dd9e9218647d17b\\Ternary-Bonsai-2-27B-PTQ1_0.gguf",
+    "--host",
+    "127.0.0.1",
+    "--port",
+    "18190",
+    "--alias",
+    "e009-large-v5",
+    "--ctx-size",
+    "4096",
+    "--n-gpu-layers",
+    "99",
+    "--reasoning",
+    "off"
+  ],
+  "reasoning_mode": "off",
+  "chat_template_sha256": "c3cf9e34abf4f9e36c2d72165aa9c132d3e2a725b6c2586aaa3a8af9d7a81041",
+  "maximum_output_tokens": 1024,
+  "system_prompt_sha256": "976ef1cd914bacb366c64418825010124338a626a0400d459858acc7e48f5a48",
+  "output_schema_sha256": "97170fa0d6a44681f680ad0ac533a3f3913709757e4ee6cbf96d9c9f40d1b2fb",
+  "normalization_contract": "percent-0-100-to-milli-x10-v1+line-endings-lf-v1",
+  "thresholds": {
+    "minimum_applicability_milli": 850,
+    "maximum_abstention_milli": 150
+  },
+  "model": "e009-large-v5",
+  "request_sha256": "080502e07dc0e3b77406c10c814cb1f76f6a7613a42f659d003d20ca7749f0d3",
+  "request": {
+    "model": "e009-large-v5",
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a typed observer in a deterministic coding workflow. The runtime owns workflow state and will execute only one action from the offered action_options after validating your output.\n\nRead the task_prompt and evidence, then compare the offered actions. Choose the action most likely to satisfy the task while preserving the repository's stated constraints. Do not write or propose code outside the offered choices. Do not claim to have executed tests. If no offered action is sufficiently supported, use null for action_choice and express uncertainty with abstention_percent.\n\nReturn exactly one JSON object matching the provided schema. action_choice must be an offered numeric action ID or null. applicability_percent is your estimate from 0 to 100 that this observer can handle the task from the available evidence. abstention_percent is your estimate from 0 to 100 that the runtime should defer this choice. Use integer percentage points only. Do not add prose or fields.\n"
+      },
+      {
+        "role": "user",
+        "content": "{\"schema_id\":\"rdc-real-coding-observation.v1\",\"task_id\":\"ripgrep-ripgrep-literal-separator-glob-v2\",\"task_family\":\"ripgrep-literal-separator-glob\",\"repository_id\":\"ripgrep\",\"task_variant\":2,\"task_prompt\":\"When this option is enabled, `?` must not cross a path separator. Select the offered patch that makes the frozen negative-match test pass.\",\"repository_revision\":\"e89fff89ac9af12e8d4ce9d5fd07beb408ca730f\",\"snapshot_sha256\":\"1678dbbeed2ef50c42989b13607335ca1e16ff863e0158235e25e407842ba483\",\"evidence\":[{\"kind\":\"source_excerpt\",\"source_id\":\"crates/globset/src/glob.rs\",\"content_blake3\":\"244e1812d671015fd7538f67b97c7e8ab88508b4347f504830230cdd2b1df22e\",\"content\":\"    /// By default this is false: `*` and `?` will match `/`.\\n    pub fn literal_separator(&mut self, yes: bool) -> &mut GlobBuilder<'a> {\\n        self.opts.literal_separator = false;\\n        self\\n    }\"},{\"kind\":\"baseline_tool_result\",\"source_id\":\"cargo-test::glob::tests::matchslash2\",\"content_blake3\":\"4db59b6bce385fae7cc42b027b87e57afe8b4f164c72e1c9553b1cbf548bc91a\",\"content\":\"Exact test `glob::tests::matchslash2` failed on the frozen snapshot. Candidate patches have not been run in this task.\\n\\nrunning 1 test\\ntest glob::tests::matchslash2 ... FAILED\\n\\nfailures:\\n\\n---- glob::tests::matchslash2 stdout ----\\n\\nthread 'glob::tests::matchslash2' (21220) panicked at crates\\\\globset\\\\src\\\\glob.rs:1489:5:\\nassertion failed: !matcher.is_match(\\\"abc\\\\\\\\def\\\")\\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\\n\\n\\nfailures:\\n    glob::tests::matchslash2\\n\\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 289 filtered out; finished in 0.00s\\n\\n   Compiling globset v0.4.19 (<frozen-repository-snapshot>\\\\crates\\\\globset)\\nwarning: unused variable: `yes`\\n   --> crates\\\\globset\\\\src\\\\glob.rs:623:41\\n    |\\n623 |     pub fn literal_separator(&mut self, yes: bool) -> &mut GlobBuilder<'a> {\\n    |                                         ^^^ help: if this is intentional, prefix it with an underscore: `_yes`\\n    |\\n    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default\\n\\nwarning: `globset` (lib test) generated 1 warning (run `cargo fix --lib -p globset --tests` to apply 1 suggestion)\\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.25s\\n     Running unittests src\\\\lib.rs (<cargo-target>\\\\debug\\\\deps\\\\globset-250b4c7d9a08c2e6.exe)\\nerror: test failed, to rerun pass `-p globset --lib`\\n\"}],\"action_options\":[{\"action\":{\"id\":11,\"schema_id\":1},\"summary\":\"Apply this alternative change in the same code path.\",\"diff_excerpt\":\"@@ -621,7 +621,7 @@\\n-        self.opts.literal_separator = false;\\n+        self.opts.literal_separator = !yes;\",\"patch_sha256\":\"943ccba73ac87d1fabb3c88f78a4812aff99bb9246779665de9b69f3711a0342\"},{\"action\":{\"id\":37,\"schema_id\":1},\"summary\":\"Apply the source change and add a contract comment.\",\"diff_excerpt\":\"@@ -621,7 +621,8 @@\\n-        self.opts.literal_separator = false;\\n+        // Keep path separators literal when the option is enabled.\\n+        self.opts.literal_separator = yes;\",\"patch_sha256\":\"65bd186d034e483ee8e56fde06f3ea4f20665eb6a920922c1c2bf87625467ffe\"},{\"action\":{\"id\":68,\"schema_id\":1},\"summary\":\"Leave the current implementation unchanged.\",\"diff_excerpt\":\"No source line changes are included.\",\"patch_sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"},{\"action\":{\"id\":94,\"schema_id\":1},\"summary\":\"Apply the focused source change shown here.\",\"diff_excerpt\":\"@@ -621,7 +621,7 @@\\n-        self.opts.literal_separator = false;\\n+        self.opts.literal_separator = yes;\",\"patch_sha256\":\"75c4ee5bf57f0293b5a6ec8c79a83a50a9d36b0533db14b10a0566ab402f448a\"}]}"
+      }
+    ],
+    "temperature": 0,
+    "top_p": 1,
+    "seed": 0,
+    "max_tokens": 1024,
+    "stream": false,
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rdc_coding_observer_output_v1",
+        "strict": true,
+        "schema": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "rdc-coding-observer-output.v2",
+          "title": "RDC Coding Observer Output v2",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "action_choice",
+            "applicability_percent",
+            "abstention_percent"
+          ],
+          "properties": {
+            "action_choice": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 65535
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "applicability_percent": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "abstention_percent": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            }
+          }
+        }
+      }
+    }
+  },
+  "http_status": 200,
+  "response": {
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "{\n  \"action_choice\": 94,\n  \"applicability_percent\": 95,\n  \"abstention_percent\": 5\n}"
+        }
+      }
+    ],
+    "created": 1790364122,
+    "model": "e009-large-v5",
+    "system_fingerprint": "b10685-7dffb158d",
+    "object": "chat.completion",
+    "usage": {
+      "completion_tokens": 35,
+      "prompt_tokens": 1564,
+      "total_tokens": 1599,
+      "prompt_tokens_details": {
+        "cached_tokens": 192
+      }
+    },
+    "id": "chatcmpl-S3kIvDzGwxvSnLU1KrBZl4bZsYdlnSjg",
+    "timings": {
+      "cache_n": 192,
+      "prompt_n": 1372,
+      "prompt_ms": 3938.197,
+      "prompt_per_token_ms": 2.870405976676385,
+      "prompt_per_second": 348.38277516335523,
+      "predicted_n": 35,
+      "predicted_ms": 1029.225,
+      "predicted_per_token_ms": 30.271323529411763,
+      "predicted_per_second": 33.03456484247857
+    }
+  },
+  "content": "{\n  \"action_choice\": 94,\n  \"applicability_percent\": 95,\n  \"abstention_percent\": 5\n}",
+  "output": {
+    "action_choice": 94,
+    "applicability_percent": 95,
+    "abstention_percent": 5
+  },
+  "normalized_output": {
+    "action_choice": 94,
+    "applicability_milli": 950,
+    "abstention_milli": 50
+  },
+  "normalization_error": null,
+  "usage": {
+    "completion_tokens": 35,
+    "prompt_tokens": 1564,
+    "total_tokens": 1599,
+    "prompt_tokens_details": {
+      "cached_tokens": 192
+    }
+  },
+  "finish_reason": "stop",
+  "elapsed_ms": 5439.616
+}

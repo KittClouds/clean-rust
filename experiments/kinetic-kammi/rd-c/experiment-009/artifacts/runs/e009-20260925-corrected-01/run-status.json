@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "run_id": "e009-20260925-corrected-01",
+  "phase": "DEVELOPMENT_SHADOW_CALIBRATION",
+  "state": "FROZEN_BEFORE_MODEL_CONTACT",
+  "development_input_lock_sha256": "df5b44b6f8e3d9d36fdf65f8f774500a9c7a5ef5f94c2ecbeedb04aae8d7fec6",
+  "heldout_labels_opened": false
+}

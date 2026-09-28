@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "amendment_id": "E012-BANK-A08",
+  "state": "LABEL_FINALIZATION_FROZEN_BEFORE_DERIVATION",
+  "model_contact_authorized": false,
+  "inputs": [
+    "consistent content-addressed candidate checks",
+    "locked feasibility task truth and candidate role identities"
+  ],
+  "observed_contract_mismatch": "bounded-prefix-copy: copy_prefix also passes prefix-value and shared-backing-storage assertions",
+  "repair": "derive all expected valid action IDs from the consistent executable pass rows",
+  "opaque_id_assignment": "preserve primary gold role-to-ID schedule; deterministically optimize remaining role-to-ID mappings for balanced executable validity counts; reject any perfect ID indicator",
+  "position_schedule": "rebuild from executable pass sets using the frozen A05 schedule algorithm",
+  "raw_source_fixture_preserved": true,
+  "raw_candidate_check_results_preserved": true,
+  "quarantined_attempt_02_excluded": true,
+  "observer_prompt_model_thresholds_and_authority_changed": false,
+  "output_artifacts": [
+    "task-source-fixtures-final-v1.json",
+    "candidate-check-labels-final-v1.json",
+    "label-finalization-report-v1.json"
+  ]
+}

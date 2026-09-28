@@ -1,0 +1,20 @@
+{
+  "experiment": "AR-02D generic source-conditioning null",
+  "seeds": 9,
+  "snapshots": 27,
+  "pair_snapshots": 27,
+  "matched_selected_control_controls": 34,
+  "D1_exact_vector_triplets": 13,
+  "D2_magnitude_only_triplets": 23,
+  "generated_source_paths": 102,
+  "invalid_source_paths": 0,
+  "invalid_replays": 0,
+  "complete_G_C1": 36,
+  "complete_C1_C2": 34,
+  "divergent_G_C1": 18,
+  "divergent_C1_C2": 18,
+  "max_telescoping_residual": 0.000000000000e0,
+  "max_source_identity_residual": 0.000000000000e0,
+  "max_parameter_distance_drift": 7.450580596924e-9,
+  "elapsed_seconds": 76.087518
+}

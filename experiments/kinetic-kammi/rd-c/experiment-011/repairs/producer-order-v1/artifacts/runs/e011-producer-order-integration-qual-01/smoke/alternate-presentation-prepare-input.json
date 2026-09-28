@@ -1,0 +1,45 @@
+{
+  "task_digest_hex": "90a6cafe5605872778e2ef9ed0aa1b263b8bf8f9e99b54b89fa17ca85492976a",
+  "options": [
+    {
+      "producer_ordinal": 3,
+      "action": {
+        "id": 11,
+        "schema_id": 1
+      },
+      "summary": "Apply the focused implementation patch.",
+      "diff_excerpt": "--- a/crates/globset/src/glob.rs\n+++ b/crates/globset/src/glob.rs\n@@ -661,7 +661,7 @@\n     /// might want to enable this when compatibility (e.g., with POSIX glob\n     /// implementations) is more important than good error messages.\n     pub fn allow_unclosed_class(&mut self, yes: bool) -> &mut GlobBuilder<'a> {\n-        self.opts.allow_unclosed_class = !yes;\n+        self.opts.allow_unclosed_class = yes;\n         self\n     }\n }",
+      "patch_sha256": "e47d23b20f7029ce2f0f92c9d01bd6263c1bc470134441b1b10bc7e84186ce46"
+    },
+    {
+      "producer_ordinal": 2,
+      "action": {
+        "id": 37,
+        "schema_id": 1
+      },
+      "summary": "Apply the focused patch with a contract comment.",
+      "diff_excerpt": "--- a/crates/globset/src/glob.rs\n+++ b/crates/globset/src/glob.rs\n@@ -661,7 +661,8 @@\n     /// might want to enable this when compatibility (e.g., with POSIX glob\n     /// implementations) is more important than good error messages.\n     pub fn allow_unclosed_class(&mut self, yes: bool) -> &mut GlobBuilder<'a> {\n-        self.opts.allow_unclosed_class = !yes;\n+        // Preserve the caller's opt-in parser setting.\n+        self.opts.allow_unclosed_class = yes;\n         self\n     }\n }",
+      "patch_sha256": "fc4d68e44e43320591232d87667f6796e22b8b39aac4e81640905721ee053b90"
+    },
+    {
+      "producer_ordinal": 1,
+      "action": {
+        "id": 68,
+        "schema_id": 1
+      },
+      "summary": "Apply this plausible alternate change.",
+      "diff_excerpt": "--- a/crates/globset/src/glob.rs\n+++ b/crates/globset/src/glob.rs\n@@ -661,7 +661,7 @@\n     /// might want to enable this when compatibility (e.g., with POSIX glob\n     /// implementations) is more important than good error messages.\n     pub fn allow_unclosed_class(&mut self, yes: bool) -> &mut GlobBuilder<'a> {\n-        self.opts.allow_unclosed_class = !yes;\n+        self.opts.allow_unclosed_class = false;\n         self\n     }\n }",
+      "patch_sha256": "0fe59c27bee439e611d2a8b681f71fb1100a25fc7d13a193aac5c454512f1917"
+    },
+    {
+      "producer_ordinal": 0,
+      "action": {
+        "id": 94,
+        "schema_id": 1
+      },
+      "summary": "Retain the current implementation.",
+      "diff_excerpt": "No source changes; keep the broken implementation.",
+      "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "attempt": "A18_NUISANCE_AUDIT_LAUNCH_01",
+  "state": "AUDIT_DID_NOT_START_STALE_LOCK_PATH",
+  "model_contact_authorized": false,
+  "lock_sha256": "ef29bc5bbd679c171db95b416873373c301906b8239494f545267187b6fd2820",
+  "audit_script_sha256": "f3b149d4f92ace78503ac5c6209570997f9cbf3de410ca99b23a8e3e1a896890",
+  "error": "A18 script still requested the A17 lock filename and therefore rejected the A18 lock state",
+  "audit_output_written": false
+}

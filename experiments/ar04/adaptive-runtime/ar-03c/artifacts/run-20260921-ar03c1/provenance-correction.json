@@ -1,0 +1,16 @@
+{
+  "experiment": "AR-03C",
+  "run_id": "run-20260921-ar03c1",
+  "correction_type": "post-run source revision metadata erratum",
+  "raw_report_source_revision": "8d03df54b2749dbb1ad87256b0b33114557b0940",
+  "raw_report_source_revision_is_git_object": false,
+  "actual_frozen_source_revision": "8d03df54315ff403d928e8f0abc33bcbcfd3de46",
+  "source_revision_at_build_and_run": "8d03df54315ff403d928e8f0abc33bcbcfd3de46",
+  "executable_sha256": "976585a5d6f83fb1c34052ee2ee2464942afbfcb68bf11a3e53964b737045cad",
+  "build_target": "D:\\adaptive-runtime-targets\\ar-03c\\release\\adaptive-runtime-ar-03c.exe",
+  "build_profile": "release --locked",
+  "raw_receipts_preserved": true,
+  "measurement_data_modified": false,
+  "protocol_or_runtime_logic_modified": false,
+  "note": "The executable was built after the frozen source commit. Only the environment string used to label that revision was mistyped; the wrong value is preserved in the raw JSON, and this addendum supplies the correct source identity."
+}

@@ -1,0 +1,77 @@
+{
+  "identity": "JEV-V08Q-SINGLE-DOSE-GAIN-RUN-V02",
+  "source_lock": {
+    "path": "contracts/q-source-lock-v02.json",
+    "root_sha256": "5e973916fb62747cde2de51f7deb2e29616ea1ead13ce384dcdb254901d936d3",
+    "file_sha256": "d6d70768242ac12801069e2bdb27cb976679c907206e81ae8c0921867bea2363"
+  },
+  "question": "Does halving the SHAM auxiliary-event weight increase fact-response gain while preserving direction, anchor performance, and a material locality advantage over concurrent DUP?",
+  "arms": ["B-DUP", "B-MATCHED", "B-SHAM", "B-SHAM-LOW"],
+  "treatment": {
+    "only_change": "B-SHAM-LOW auxiliary event loss multiplier = 0.5",
+    "semantic_and_brier_terms_scaled": true,
+    "reduction": "sum weighted per-event contributions divided by unchanged total active event count",
+    "sham_and_sham_low_auxiliary_identity_manifest_must_be_byte_identical": true
+  },
+  "paired_design": {
+    "seeds": [2540205348, 2603246505, 3565067208],
+    "seed_derivation": "SHA-256 UTF-8 jev-information-density-v08q-run-v01/optimizer-seed/{index}; first 4 bytes unsigned little-endian",
+    "arms_per_seed": 4,
+    "runs": 12,
+    "same_seed_initialization_shared_across_arms": true,
+    "arm_order": {
+      "2540205348": ["B-DUP", "B-MATCHED", "B-SHAM", "B-SHAM-LOW"],
+      "2603246505": ["B-MATCHED", "B-SHAM", "B-SHAM-LOW", "B-DUP"],
+      "3565067208": ["B-SHAM", "B-SHAM-LOW", "B-DUP", "B-MATCHED"]
+    },
+    "seed_scope": "three observed paired trajectories; not a population estimate"
+  },
+  "frozen_training_basis": {
+    "head": "CompatibilityHead(2048, mlp, 128); 590081 trainable parameters",
+    "optimizer": {"name": "AdamW", "learning_rate": 0.002, "weight_decay": 0.01, "betas": [0.9, 0.999], "epsilon": 1e-8, "amsgrad": false},
+    "base_objective": "cross entropy plus 0.25 multiclass Brier using frozen v0.5 row semantics",
+    "batch_size": 256,
+    "epochs": 3,
+    "steps_per_epoch": 40,
+    "total_steps": 120,
+    "precision": "FP32 head/features, autocast disabled, TF32 matmul disabled",
+    "scheduler": null,
+    "gradient_clipping": null,
+    "gradient_accumulation": null,
+    "early_stopping": false,
+    "extra_seeds_or_restarts": false,
+    "checkpoints_per_run": 42,
+    "checkpoint_steps": [40, 80, {"inclusive_range": [81, 120]}],
+    "trained_checkpoints": 504,
+    "shared_initial_templates": 3,
+    "sealed_training_objects_total": 507
+  },
+  "source_data_bindings": {
+    "common_primary_stream": "sealed v0.8N common-primary-occurrence-manifest; 10000 occurrences",
+    "training_arm_sources": "sealed original B-DUP, B-MATCHED, and B-SHAM manifests; Q creates no alternate SHAM identities",
+    "feature_sources": "sealed training-only state cache and candidate feature cache",
+    "schedule": "new deterministic 360-row schedule derived from the three Q seeds and the sealed primary stream",
+    "fresh_q_panel_is_evaluation_panel": true
+  },
+  "restart_semantics": {
+    "resume_only_from_hash_validated_latest_checkpoint_with_complete_prefix_and_rng_state": true,
+    "uncheckpointed_committed_optimizer_step": "terminal fail closed",
+    "corrupt_or_ambiguous_attempt": "preserve and stop; no reseed or replacement",
+    "evaluation_feedback_during_training": false
+  },
+  "evaluation_firewall": {
+    "require_all_runs_checkpoints_templates_and_telemetry_sealed_before_panel_open": true,
+    "panel_open_count": 1,
+    "prediction_table_sealed_before_analysis": true,
+    "checkpoint_selection": false,
+    "intermediate_feedback": false
+  },
+  "authority": {
+    "bundle_seal_only": true,
+    "panel_construction": false,
+    "model_contact": false,
+    "head_initialization": false,
+    "training": false,
+    "evaluation": false
+  }
+}

@@ -1,0 +1,18 @@
+[package]
+name = "r1-search"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lib]
+name = "r1_search"
+path = "src/lib.rs"
+
+[dependencies]
+r1-world = { path = "../world" }
+hashbrown = { version = "0.14", features = ["serde"] }
+memchr = "2"
+memmap2 = "0.9"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"

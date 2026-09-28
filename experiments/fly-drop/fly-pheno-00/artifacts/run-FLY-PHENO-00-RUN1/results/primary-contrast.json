@@ -1,0 +1,21 @@
+{
+  "bootstrap": {
+    "executed": false,
+    "percentile_interval": null,
+    "replicates_declared": 20000,
+    "resample_units": [
+      "s",
+      "m",
+      "g"
+    ]
+  },
+  "estimand": "Delta_C = mean C_0.10(fly) - mean C_0.10(degree-preserving-shuffle)",
+  "fly_C_mean_raw_all_declared_cells": 5.340576171875e-05,
+  "global_complete_blocks": [],
+  "minimum_global_complete_blocks": 8,
+  "null_C_mean_raw_all_declared_cells": 0.002574920654296875,
+  "raw_descriptive_delta_all_declared_cells": -0.002521514892578125,
+  "reason": "0 of 12 learner/task blocks reached competence on every substrate",
+  "status": "PRIMARY_NOT_EVALUABLE",
+  "support_rule": "global intersection across fly and every null realization; no replacement"
+}

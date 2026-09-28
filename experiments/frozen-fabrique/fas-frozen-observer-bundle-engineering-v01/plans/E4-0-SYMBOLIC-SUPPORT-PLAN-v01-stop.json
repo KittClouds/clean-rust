@@ -1,0 +1,14 @@
+{
+  "receipt_id": "FAS_E4_0_SYMBOLIC_SUPPORT_PLAN_V01_STOP",
+  "status": "PREMODEL_PLANNING_STOP_SOURCE_PARSER_DEFECT",
+  "source_path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/e4-support-plan-v01/src/main.rs",
+  "source_sha256": "f2879a3a361e99f43b05b62deb61b6d2739a235dadf654aa88b06cfb4e903695",
+  "failure": "The planner attempted to deserialize JSON-escaped input_text into a borrowed str. The input contains escaped newline sequences, so serde_json correctly rejected borrowing the decoded string.",
+  "classification": "PLANNING_TOOL_PARSER_DEFECT",
+  "e1_artifact_modified": false,
+  "e4_population_rows_written": false,
+  "tokenizer_contacted": false,
+  "model_contacted": false,
+  "labels_opened": false,
+  "repair_policy": "Preserve v01 and implement owned per-line decoding in a new v02 planner identity."
+}

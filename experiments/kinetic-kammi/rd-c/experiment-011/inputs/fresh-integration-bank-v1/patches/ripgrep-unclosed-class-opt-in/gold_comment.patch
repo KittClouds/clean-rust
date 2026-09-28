@@ -1,0 +1,5 @@
+--- a/crates/globset/src/glob.rs
++++ b/crates/globset/src/glob.rs
+@@ -1 +1,2 @@
+-        self.opts.allow_unclosed_class = !yes;+        // Preserve the caller's opt-in parser setting.
++        self.opts.allow_unclosed_class = yes;

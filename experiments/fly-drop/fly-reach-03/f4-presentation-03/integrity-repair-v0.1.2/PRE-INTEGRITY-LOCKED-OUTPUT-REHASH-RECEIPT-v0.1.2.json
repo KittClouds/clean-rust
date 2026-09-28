@@ -1,0 +1,17 @@
+{
+  "analysis_artifacts_previously_absent": true,
+  "comparative_scoring_values_read_by_rehash": false,
+  "fit_manifest_sha256": "f71d344c5bc58e86a68e7bd9163aed1ab5d945468bfe84f06a8981e6a1c2ce66",
+  "integrity_receipt_previously_absent": true,
+  "locked_output_file_count": 2016,
+  "locked_tree_manifest_sha256": "cffcb86b1263577cc627df1f62b8af92647b32e7bfe267b509359b4737328d3d",
+  "locked_tree_sha256": "d6ea28f26ae6684320f40113d95c31b4b708af8245f8dcde288de110c4699894",
+  "prediction_lock_sha256": "dd387bcc52510eac947774cb6d9303d8cdd8142cee07a60b0e39cddd4dcb54ce",
+  "raw_predictor_sha256": "495c68070624e4b8eaeeba217aeb03bdac6636d75e6691292a59872c11a9455f",
+  "raw_truth_file_sha256": "ff9d000145fc503e83710ca99d65b0304d52c1f94533d92c78e28b9730214d50",
+  "rehash_source_sha256": "700a08048ba1e614242ed9c6ea5b2e6fa70f3d7387b865316d4380e8ad5a6400",
+  "repair_amendment_sha256": "3f2f036cfe70348313abb94e8b9d697ed4883cc6ea135f976c47acc6c93a8592",
+  "schema": "F4-PRESENTATION-03-pre-integrity-locked-output-rehash-v1",
+  "status": "PASS",
+  "task_bank_manifest_sha256": "ad339f4a710c9cb803e68a7076da923a68486f81b7552aa767c710f885deb0a1"
+}

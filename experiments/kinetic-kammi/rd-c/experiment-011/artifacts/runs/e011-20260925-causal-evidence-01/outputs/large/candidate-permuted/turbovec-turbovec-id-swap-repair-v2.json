@@ -1,0 +1,148 @@
+{
+  "schema_version": 1,
+  "run_id": "e011-20260925-causal-evidence-01",
+  "condition": "candidate-permuted",
+  "role": "large",
+  "bundle_id": "ternary-bonsai-2-27b-ptq1-local-v5",
+  "bundle_blake3": "6d933aba093307e0c333f022426af46f3f5b243a8a10a2e1bb2f4cfc93b17b9d",
+  "frozen_input_lock_sha256": "3a91323be0abca07cd20ace84562cfbfb79a528cbd996811974eeb0eaa857b7a",
+  "frame_lock_sha256": "70f6c76971dbfff9a01aa1ab2a271b8055d5a0857fde6964985a642569eb7529",
+  "frame_sha256": "63a68a36fd09ae1a4ae11f24e59b67ffff3185a6c63ea690e06ea2831a34bd95",
+  "task_id": "turbovec-turbovec-id-swap-repair-v2",
+  "pair_task_id": "turbovec-turbovec-id-swap-repair-v2",
+  "server_alias": "e009-large-v5",
+  "server_process_id": 47156,
+  "runtime_sha256": "e0ea4fd53e6f0c741cbd28093b427f333ada0eb03b83073e1f99c483793ea976",
+  "model_sha256": "53107f530aa52eb00912263ab1ee29bd199261c87cd7b4ad4ca1318c1fe33ee3",
+  "reasoning_mode": "off",
+  "chat_template_sha256": "c3cf9e34abf4f9e36c2d72165aa9c132d3e2a725b6c2586aaa3a8af9d7a81041",
+  "maximum_output_tokens": 1024,
+  "system_prompt_sha256": "976ef1cd914bacb366c64418825010124338a626a0400d459858acc7e48f5a48",
+  "output_schema_sha256": "97170fa0d6a44681f680ad0ac533a3f3913709757e4ee6cbf96d9c9f40d1b2fb",
+  "normalization_contract": "percent-0-100-to-milli-x10-v1+line-endings-lf-v1",
+  "thresholds": {
+    "minimum_applicability_milli": 850,
+    "maximum_abstention_milli": 150
+  },
+  "request_sha256": "775c6b9747754f6fd3d70b26ac790cad9fdff353b1a4e7a17996ce2f8673a67d",
+  "request": {
+    "model": "e009-large-v5",
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a typed observer in a deterministic coding workflow. The runtime owns workflow state and will execute only one action from the offered action_options after validating your output.\n\nRead the task_prompt and evidence, then compare the offered actions. Choose the action most likely to satisfy the task while preserving the repository's stated constraints. Do not write or propose code outside the offered choices. Do not claim to have executed tests. If no offered action is sufficiently supported, use null for action_choice and express uncertainty with abstention_percent.\n\nReturn exactly one JSON object matching the provided schema. action_choice must be an offered numeric action ID or null. applicability_percent is your estimate from 0 to 100 that this observer can handle the task from the available evidence. abstention_percent is your estimate from 0 to 100 that the runtime should defer this choice. Use integer percentage points only. Do not add prose or fields.\n"
+      },
+      {
+        "role": "user",
+        "content": "{\"schema_id\":\"rdc-real-coding-observation.v1\",\"task_id\":\"turbovec-turbovec-id-swap-repair-v2\",\"task_family\":\"turbovec-id-swap-repair\",\"repository_id\":\"turbovec\",\"task_variant\":2,\"task_prompt\":\"A swap removal moves the last vector into the deleted vector's slot. Later removals and self-queries must still agree about each external ID; select the patch that restores that invariant.\",\"repository_revision\":\"8202f194a0cbbd52213a004290401e180e5c123d\",\"snapshot_sha256\":\"608d68fd4875ae1cae9221e43a947fc7a8610b8b2a791773028f6b52185a0219\",\"evidence\":[{\"kind\":\"source_excerpt\",\"source_id\":\"turbovec/src/id_map.rs\",\"content_blake3\":\"4d9b51057e438341ff6f1f1fe88da6098b68f809fdc1c76f9744f404101206c7\",\"content\":\"            self.slot_to_id[slot] = moved_id;\\n            // The previously-last id now lives at `slot`.\\n            self.ids_mut().insert(moved_id, last);\\n        }\\n        self.slot_to_id.pop();\"},{\"kind\":\"baseline_tool_result\",\"source_id\":\"cargo-test::remaining_ids_still_self_query_after_mixed_removes\",\"content_blake3\":\"199f34031fed00e478e30f0d2a6b0f59cb58d99540b7861f6d60217cedeb1d79\",\"content\":\"Exact test `remaining_ids_still_self_query_after_mixed_removes` failed on the frozen snapshot. Candidate patches have not been run in this task.\\n\\nrunning 1 test\\ntest remaining_ids_still_self_query_after_mixed_removes ... FAILED\\n\\nfailures:\\n\\n---- remaining_ids_still_self_query_after_mixed_removes stdout ----\\n\\nthread 'remaining_ids_still_self_query_after_mixed_removes' (28152) panicked at turbovec\\\\src\\\\lib.rs:2943:9:\\nindex 19 out of bounds (n_vectors = 19)\\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\\n\\n\\nfailures:\\n    remaining_ids_still_self_query_after_mixed_removes\\n\\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 22 filtered out; finished in 1.33s\\n\\n   Compiling turbovec v0.9.0 (<frozen-repository-snapshot>\\\\turbovec)\\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 8.66s\\n     Running tests\\\\id_map.rs (<cargo-target>\\\\debug\\\\deps\\\\id_map-6028bbdd1bdac666.exe)\\nerror: test failed, to rerun pass `-p turbovec --test id_map`\\n\"}],\"action_options\":[{\"action\":{\"id\":27796,\"schema_id\":1},\"summary\":\"Apply this alternative change in the same code path.\",\"diff_excerpt\":\"@@ -559,7 +559,7 @@\\n-            self.ids_mut().insert(moved_id, last);\\n+            self.ids_mut().insert(moved_id, 0);\",\"patch_sha256\":\"4e9f6d2ebebddf364cc4cd528d7822e691de77588fe01a1afc0152cd5f5003e4\"},{\"action\":{\"id\":33698,\"schema_id\":1},\"summary\":\"Leave the current implementation unchanged.\",\"diff_excerpt\":\"No source line changes are included.\",\"patch_sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"},{\"action\":{\"id\":25686,\"schema_id\":1},\"summary\":\"Apply the focused source change shown here.\",\"diff_excerpt\":\"@@ -559,7 +559,7 @@\\n-            self.ids_mut().insert(moved_id, last);\\n+            self.ids_mut().insert(moved_id, slot);\",\"patch_sha256\":\"3f16db25c03d7158b34d061e6a263bff6dcbd7977dee404cc7028c9b7a185f9b\"},{\"action\":{\"id\":50849,\"schema_id\":1},\"summary\":\"Apply the source change and add a contract comment.\",\"diff_excerpt\":\"@@ -559,7 +559,8 @@\\n-            self.ids_mut().insert(moved_id, last);\\n+            // The moved vector now occupies the vacated slot.\\n+            self.ids_mut().insert(moved_id, slot);\",\"patch_sha256\":\"f92aef127b434ce4962d0cf28b159dfe3049b0572d67553880f97da5ced86edd\"}]}"
+      }
+    ],
+    "temperature": 0,
+    "top_p": 1,
+    "seed": 0,
+    "max_tokens": 1024,
+    "stream": false,
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rdc_coding_observer_output_v1",
+        "strict": true,
+        "schema": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "rdc-coding-observer-output.v2",
+          "title": "RDC Coding Observer Output v2",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "action_choice",
+            "applicability_percent",
+            "abstention_percent"
+          ],
+          "properties": {
+            "action_choice": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 65535
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "applicability_percent": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "abstention_percent": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            }
+          }
+        }
+      }
+    }
+  },
+  "http_status": 200,
+  "response": {
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "{\n  \"action_choice\": 25686,\n  \"applicability_percent\": 92,\n  \"abstention_percent\": 8\n}"
+        }
+      }
+    ],
+    "created": 1790367384,
+    "model": "e009-large-v5",
+    "system_fingerprint": "b10685-7dffb158d",
+    "object": "chat.completion",
+    "usage": {
+      "completion_tokens": 38,
+      "prompt_tokens": 1471,
+      "total_tokens": 1509,
+      "prompt_tokens_details": {
+        "cached_tokens": 192
+      }
+    },
+    "id": "chatcmpl-blUWox1GA9DIrch1tJasloWNpJkULL6J",
+    "timings": {
+      "cache_n": 192,
+      "prompt_n": 1279,
+      "prompt_ms": 2539.311,
+      "prompt_per_token_ms": 1.9853878029710712,
+      "prompt_per_second": 503.679935226524,
+      "predicted_n": 38,
+      "predicted_ms": 850.932,
+      "predicted_per_token_ms": 22.998162162162163,
+      "predicted_per_second": 43.48173532080119
+    }
+  },
+  "content": "{\n  \"action_choice\": 25686,\n  \"applicability_percent\": 92,\n  \"abstention_percent\": 8\n}",
+  "output": {
+    "action_choice": 25686,
+    "applicability_percent": 92,
+    "abstention_percent": 8
+  },
+  "normalized_output": {
+    "action_choice": 25686,
+    "applicability_milli": 920,
+    "abstention_milli": 80
+  },
+  "normalization_error": null,
+  "usage": {
+    "completion_tokens": 38,
+    "prompt_tokens": 1471,
+    "total_tokens": 1509,
+    "prompt_tokens_details": {
+      "cached_tokens": 192
+    }
+  },
+  "finish_reason": "stop",
+  "elapsed_ms": 3644.52
+}

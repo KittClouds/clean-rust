@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "amendment_id": "E012-BANK-A02",
+  "base_bank_plan": "1.1",
+  "state": "PRETASK_FEASIBILITY_CLOSURE",
+  "model_contact_authorized": false,
+  "scored_task_frames_created": false,
+  "family_allocation_changed": false,
+  "task_count_changed": false,
+  "effective_selected_feasibility_set": [
+    "bytes-endian",
+    "bytes-prefix",
+    "bytes-cursor",
+    "bytes-composite",
+    "clap-repeat-repair-01",
+    "clap-values",
+    "clap-color-repair-01",
+    "clap-alias",
+    "serde-offset-repair-01",
+    "serde-numeric-joint",
+    "serde-map-order-repair-02",
+    "serde-raw-number"
+  ],
+  "preserved_failed_trials": [
+    "clap-color",
+    "serde-offset",
+    "clap-repeat",
+    "serde-map-order",
+    "serde-map-order-repair-01"
+  ],
+  "total_candidate_and_baseline_case_records": 240,
+  "candidate_case_rows": 192,
+  "baseline_case_rows": 48,
+  "selected_candidate_compile_errors": 0,
+  "repository_source_audit": "REPOSITORY_SOURCE_AUDIT_PASS",
+  "changes": [
+    {
+      "family": "clap/repeated-option-policy",
+      "reason": "The initial first-value mutant did not compile because an iterator binding was not mutable.",
+      "repair": "A sibling feasibility rerun fixed only that binding and verified the full matrix."
+    },
+    {
+      "family": "serde-json/map-order-feature-contract",
+      "reason": "The untouched initial baseline already satisfied the proposed contract.",
+      "repair": "A canonical-sort base exposes the real difference between preserve_order enabled and disabled; repair 02 passes feature-specific candidate checks."
+    }
+  ],
+  "preserved": [
+    "locked family names and strata",
+    "repository commits and source archives",
+    "48-task bank size and 4-task family blocks",
+    "all frame conditions and audit gates",
+    "producer-order and authority contracts"
+  ]
+}

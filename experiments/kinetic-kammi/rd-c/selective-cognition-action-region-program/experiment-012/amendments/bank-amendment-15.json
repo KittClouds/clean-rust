@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "amendment_id": "E012-AUDIT-A15",
+  "state": "AUDIT_LOGIC_CORRECTION_NO_MODEL_CONTACT",
+  "diagnostic_parent": "E012-BANK-A14",
+  "preserved_diagnostic": "bank/construction-01/scored-bank-a14/vault/paired-truth-audit-a14-v1.json",
+  "source_or_label_changes": false,
+  "model_contact_authorized": false
+}

@@ -1,0 +1,11 @@
+--- validation-repair-v0.1.1/analyze_results.py
++++ analysis-repair-v0.1.2/analyze_results.py
+@@ -180,7 +180,7 @@
+     if sha_file(truth_path) != integrity.get("truth_file_sha256"):
+         raise RuntimeError("truth file changed after integrity PASS")
+     raw = load_raw_panel(raw_path)
+-    truth = load_scoring_truth(truth_path)
++    truth = load_scoring_truth(raw.keys, truth_path)
+     if len(raw.keys) != len(truth.y):
+         raise RuntimeError("truth/predictor row count mismatch")
+     return raw, truth

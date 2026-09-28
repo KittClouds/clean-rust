@@ -1,0 +1,12 @@
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -5,7 +5,8 @@
+         .about("A compact command-line example")
+         .arg(Arg::new("speed").long("speed").help("Execution speed"))
+         // E012 candidate slot.
+-        .color(ColorChoice::Auto)
++        .color(ColorChoice::Never)
++        .term_width(72)
+         .render_help()
+         .to_string()
+ }

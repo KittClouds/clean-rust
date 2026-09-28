@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "amendment_id": "E012-BANK-A05",
+  "state": "FROZEN_BEFORE_SCORED_TASK_FIXTURES",
+  "model_contact_authorized": false,
+  "supersedes": ["E012-BANK-A04 coordinate and donor implementation details only"],
+  "pre_fixture_defect": [
+    "candidate options were numerically sorted instead of following a prospective producer sequence",
+    "some swap donors could cross the locked pair_id boundary"
+  ],
+  "producer_order": {
+    "seed_prefix": "E012-A05",
+    "seed_suffix": 20260925,
+    "per_family_action_ids_per_position": "exactly one of each action ID in every candidate position across the four tasks",
+    "primary_gold_position_balance": "exactly one gold action in each position across the four action tasks",
+    "passing_candidate_position_balance": "among schedules satisfying ID and gold balance, minimize passing-candidate count spread across positions; every position must contain both passing and failing cases in action families",
+    "schedule": "seeded four-row Latin schedule built by deterministic backtracking under exact position-balance constraints",
+    "abstention_family_schedule": "first seeded base permutation; no gold action exists"
+  },
+  "coordinate_control": {
+    "schedule": "reverse each task's producer-native sequence",
+    "action_position_balance": "exactly balanced within family",
+    "gold_position_balance": "exactly balanced within family",
+    "passing_candidate_count_spread": "preserved from producer schedule",
+    "presentation_receipt": "condition-specific"
+  },
+  "donors": {
+    "truth_channel_swap": "nonself donor from the same pair_id; prefer a donor differing on the swapped channel while minimizing off-channel differences; otherwise use the next nonself pair member as a preregistered sham",
+    "candidate_coordinate": "next nonself same-pair task; transfer role-to-position schedule and map to recipient action IDs",
+    "observer_visibility": false
+  },
+  "diagnostic_test_overlay": {
+    "allowed_change": "generic assertion message to field-specific assert_eq diagnostics",
+    "pass_fail_predicate_changed": false,
+    "source_harness_modified": false,
+    "overlay_hash_recorded": true
+  },
+  "nuisance_predictor_audit": {
+    "features": ["action_id", "candidate_position", "task_family_code", "repository_id", "action_id_within_family", "position_within_family"],
+    "gate": "no action ID or candidate position is a perfect correctness indicator within an action family",
+    "model_contact": false
+  },
+  "conditions_per_task": 26,
+  "task_count": 48,
+  "frame_count": 1248,
+  "sha256_self_excluded": true
+}

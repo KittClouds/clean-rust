@@ -1,0 +1,35 @@
+{
+  "protocol": "jev-information-density/v0.8p-r1-implementation-seal-v02",
+  "identity": "v0.8P-R1-fresh-trajectory-instrumented-rerun-v01",
+  "bundle_path": "experiments/jev-information-density-v08p-r1/contracts/r1-execution-bundle-v02.json",
+  "bundle_sha256": "27ac16f06037db9f9c78340e1ea2b783ca547c84d79c1099e1cc2b404626494a",
+  "scientific_contracts": {
+    "identity_schema_sha256": "a5d9bf108a1b14d05652b78021a55b74500ed55d6bdc759ff02c09560ea6f7ed",
+    "execution_contract_sha256": "d692acbef984c98d7f3ac6c5861112d4fbdcf162c4906a93bf548a84dc5e82fa",
+    "original_p_run_sha256": "e345225b4a17fc18eb35fcab24cbe1d72bd0e34bed9de272f927a7be461853e6",
+    "original_p_analysis_sha256": "84111122033fda65c84344317cfe3b50639b23be4c71f480ba665c67a23cc939",
+    "original_p_panel_sha256": "ce3b7b97caecb27f3ad99439c0e67dca6e40af5da3db9ca2e356ea5e9f06f823"
+  },
+  "implementation": {
+    "generator_source_sha256": "f66b9ea267cddeff56b28f13d2345ff8c48ce39465f45656237174aaf54d11f1",
+    "release_binary_sha256": "b6e3227555c289adff9e5c3ef2f90f2e31e30eeaf352ffb60e44109b87a8e1fb",
+    "release_binary_bytes": 811520,
+    "unit_tests_passed": 5,
+    "unit_tests_failed": 0
+  },
+  "supersedes": "implementation binding in r1-contract-seal-v01.json only",
+  "does_not_supersede": [
+    "identity-schema-r1-v01.json",
+    "r1-execution-contract-v01.json",
+    "original v0.8P sealed scientific contracts"
+  ],
+  "phase_boundary": {
+    "training_identity_replay": "authorized next operation",
+    "fresh_panel_generation": "authorized only after replay parity passes",
+    "model_contact": false,
+    "training": false,
+    "inference": false,
+    "evaluation": false,
+    "phoenix_access": false
+  }
+}

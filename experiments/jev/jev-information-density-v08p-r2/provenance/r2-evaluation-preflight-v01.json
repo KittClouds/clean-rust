@@ -1,0 +1,3511 @@
+{
+  "status": "P_R2_EVALUATION_PREFLIGHT_PASS_ALL_TRAINING_SEALED",
+  "identity": "v0.8P-R2-late-transition-localization-v01",
+  "run_contract_sha256": "e345225b4a17fc18eb35fcab24cbe1d72bd0e34bed9de272f927a7be461853e6",
+  "analysis_contract_sha256": "84111122033fda65c84344317cfe3b50639b23be4c71f480ba665c67a23cc939",
+  "r2_contract_sha256": "51cd8dee09688f1aae24ff575fa0a181d50b2a6ffc94dc6b7e7ed5b61c58ef14",
+  "addendum_sha256": "4cd14671ffe7c032864fdc0bd5f75db1d1edea666cc58eb43aae0e6c820d0431",
+  "training_seal_sha256": "14ad978234a90f228fb85aeec8fcda635ae42ff420f5c047aa2a40e3c3f37508",
+  "checkpoint_hash_tree_sha256": "a901890434000dcb928fabe3e0eee0d1ab9cd6d7744b0d02f26d04456ea15c21",
+  "pretraining_instrument_receipt_sha256": "691d6ea34d0b042e2968d829b7458e0a2ea43deec6f5a1f15170cb0754bb2140",
+  "checkpoint_count": 378,
+  "template_count": 3,
+  "panel_ready_manifest_sha256": "c0d48381356113451bc72f9578204ade4ef7449a75264cd5018a34d002b313ac",
+  "panel_materialization_sha256": "565d5e2650db375230fed15eb94471c92a25810c1644d629e7bb9d1490bf4822",
+  "feature_receipt_sha256": "74e701cd87e677c88ea10e0f7a026474ecc7bafab97c021de6c6fcd56c455e09",
+  "evaluator_correction_receipt_sha256": "a1c2c7fecd787cd40828282cb9cb65ba74fbb7305c75cf52affdf4ff6ccbe24a",
+  "expected_panel_and_evaluation_input_hashes": {
+    "panel/panel-canonical-episodes.jsonl": "9eef39a0f3967f06016b2a67c7b6699c66594236751ac8f07b7d69de83bfeae0",
+    "panel/panel-exact-world-episodes.jsonl": "7b93a6d90d65b20997454c995010bffc231620f4d10d63add9d98c5f71f78463",
+    "panel/panel-contrast-certificates.jsonl": "249dbf2a1990a8a7c71e3171fbc2255cb2658368f62e77ecab6797da632c5277",
+    "panel/panel-feature-scope.jsonl": "e8f36c8537e6b24c54baf205762ce1d915eeb91aa35786164ff820b778067853",
+    "panel/panel-neighborhoods.jsonl": "8f274aade4afc9f943df88e8248c0b9a867b63878ad3bb7df120a00eb6be32df",
+    "panel/panel-occurrence-identities.jsonl": "08ba6f9676ad6ec816a946f9bb1be37086c7401d7e1c4413f8c09ffe1e6b7573",
+    "panel/fresh-candidate-text-manifest.jsonl": "2111eeedba30408863dd98c91ececf6a011a48f93b7c8266b8561aa0a958b8be",
+    "panel/online-admission-log.jsonl": "16ebea3f2d6740287841e5e4749d58d8497066d1b10da0e26d28d9582005b8a8",
+    "panel/online-admission-receipt.json": "3f87a5af6ce80d1d4f7f45d50e4381aff867053e4aa27a3a5064af68e265ba95",
+    "features/r2-state-features.pt": "9285214a16100a6f708ae6ce65bd67502fabd8c6df62d909a5027d34d4a74ed8",
+    "features/r2-state-feature-manifest.jsonl": "3b8e76a512afe064cd11eb51dc91949ebd746af3a963e36cf0d9d768418b6346",
+    "features/r2-candidate-features.pt": "ce653d23fece96127a3df043d4730041dfffbf2662adafe3800fc9205d96acd8",
+    "features/r2-candidate-feature-manifest.jsonl": "458c910629f3187a231fb956705dec99ec8c15ef8b62cd2e8e935e5a5bd7bbd4",
+    "features/r2-feature-extraction-receipt.json": "74e701cd87e677c88ea10e0f7a026474ecc7bafab97c021de6c6fcd56c455e09",
+    "matching/matched-neutral-selection.jsonl": "d5fa428eb54496ef996313e8071427d7f2233e15f08cde233de189897ef5496f",
+    "matching/radius-gate-report.json": "7b0cc009e42174e98d526a84d1835c167ecda93c33582b2e3bec28fd902de196",
+    "matching/semantic-axis-composition.json": "0da05d2ab86322f4f79a71847a9e1dbae8a1eccf86d578143af988b34c238acc",
+    "matching/whole-panel-candidate-join.jsonl": "4f5c3a287008933a11250c9eed110a8335ac4e834de25935af3dba10718393a1",
+    "matching/whole-panel-join-preflight.json": "5b0a2b47ff12238f474959a247636b5bff40eb675b2b8f9e0b7fab12a1a9410e",
+    "matching/r2-matching-and-join-receipt.json": "b598e1a8427cfb0ba7e39ac386fca9c876693aba2df1b6024fe99cf5ad54dbec"
+  },
+  "checkpoint_inventory": [
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-DUP\\step-040.pt",
+      "sha256": "ba3e6c42aa9909ee4effc1b44f9a54341a7f2b93ce2fce5863ea45bcc9491258",
+      "head_sha256": "dbfb491a50ef04ba4e7eb2c6a13cc816fcf6df368464159ffadf6a2c534fbbb4",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-DUP",
+      "global_step": 40
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-DUP\\step-080.pt",
+      "sha256": "29acd3b34f0d6a8771a2c3e952a9298f9ed60c9e36362f45dcda81a1c0f8fc57",
+      "head_sha256": "0351ad400b6a84536ffa4783503b936ba1f380cefec8a1015472e60f2e23cb49",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-DUP",
+      "global_step": 80
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-DUP\\step-081.pt",
+      "sha256": "0aafd6f7c045890440839e51fe61e2d2d01ede60922e82fe548a65a38018ecce",
+      "head_sha256": "9f049bcfcf45b0030a86bfc0a6b340ce6b96edfbabc296d7077506546f782c05",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-DUP",
+      "global_step": 81
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-DUP\\step-082.pt",
+      "sha256": "3edd2ff2c722fff91003a6faa34e61ce0cb67506ae10120954ee559e037eb371",
+      "head_sha256": "c4f9a9d237f8ea6d72565e0cde756cacfc9e9a64602704a6a54893e5e5ebb320",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-DUP",
+      "global_step": 82
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-DUP\\step-083.pt",
+      "sha256": "b1853b37166d6dc96b4bb299d8c74ede90f6e415ab247788d7072bfc725cdbe1",
+      "head_sha256": "73ecde941605428a3fe4ecbfc98edb553997a13f1d9935eb30515d0ec87739a0",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-DUP",
+      "global_step": 83
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-DUP\\step-084.pt",
+      "sha256": "ffcad33bba3bbcc76ab8de05bdf5c113ae49df5bc7bf4cf115734723e4d5e085",
+      "head_sha256": "eb122bfe339e4c560d549d80289bcf59267647666b9631ef93f6ebb97429eefe",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-DUP",
+      "global_step": 84
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-DUP\\step-085.pt",
+      "sha256": "640a1b31f19d0e36f2814331b870a0db8f08209e095a11244979f107056dc3b0",
+      "head_sha256": "c6e9ebfcb9405cb10585159a073c646d29b3387436b3e111766f6bcaa13a2fcf",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-DUP",
+      "global_step": 85
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-DUP\\step-086.pt",
+      "sha256": "154357b90b81a4c0c22f8e097a16353320f17c5606b8a0737fd96ba43770a8fa",
+      "head_sha256": "9711b13b99d4909f3c93f3f0710ed610963917caedd76ced42f13796612cedd4",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-DUP",
+      "global_step": 86
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-DUP\\step-087.pt",
+      "sha256": "653a03fe20016611ff3f7bc71c02a612ab85a819247248df60df8767022f567e",
+      "head_sha256": "7c1036b6e4d4d77baeda502cbb9dccc899f267c79b116c69e5791da1dda9bb24",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-DUP",
+      "global_step": 87
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-DUP\\step-088.pt",
+      "sha256": "a4b77092488eebeda0fa12fc470ea5241e7272fa75eb0e586f864444162068b6",
+      "head_sha256": "7deaa2b1cae5bd540be96103d3d6860244e318da8163913d260befc1ca18e4e0",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-DUP",
+      "global_step": 88
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-DUP\\step-089.pt",
+      "sha256": "87ae86a505ff0af60be0d8964cc6ab0e6da2e27811ee04dc58d7a4646b59d968",
+      "head_sha256": "97cd9642e6fcf19d4abfcb5d90abc4c02f8d4895ef6e9710145604dce3d44a43",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-DUP",
+      "global_step": 89
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-DUP\\step-090.pt",
+      "sha256": "0d64c68d2faceed0fe9f81c8dd3ce3577c37568562f4f7bbb42a4ea8f6b0e713",
+      "head_sha256": "20bd31370c588abbebf913fa57a56b9afe916bd49cd6b0e98b3f0f5580543ed1",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-DUP",
+      "global_step": 90
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-DUP\\step-091.pt",
+      "sha256": "1e1d2118cf03c5dd44515406adbe1738d01597ff79dff2bfa751e9b2d9038dad",
+      "head_sha256": "b1fb3633d85f9d74475a00e4fff7826311d52d7ee7b1018190761e043772aa33",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-DUP",
+      "global_step": 91
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-DUP\\step-092.pt",
+      "sha256": "285628d4a6edc16b46f512e0a7f2954eae25912cc3609b6e4653b7304f988be3",
+      "head_sha256": "cd4be7629372b799e48ce0683bfc706af2e1f854db30aaf635f602cfc19b3521",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-DUP",
+      "global_step": 92
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-DUP\\step-093.pt",
+      "sha256": "494d9a990c89bbb77b3fd59fc5b6b2ca9f121886f71686e885d3ee26b339979e",
+      "head_sha256": "86895a1af5e157695e5884b55f4e19e190c06f8734f314f70624b5c5630d674f",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-DUP",
+      "global_step": 93
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-DUP\\step-094.pt",
+      "sha256": "eff9dbeab4e54d1442823784db450d11b366b1e567f437c3e62e8827cc378334",
+      "head_sha256": "6cae810b8270964a6d6e1f98b4931cf69095ca0abb5cdd901e658fc717f78de8",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-DUP",
+      "global_step": 94
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-DUP\\step-095.pt",
+      "sha256": "55c81cd805f14bee4c9e1e8f747613576b89cb7e378223f3671fdfb1ede6448a",
+      "head_sha256": "9d6a1045659b7e2107575049eda6b6359ff6ff580e1d9c975292fde2829edba7",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-DUP",
+      "global_step": 95
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-DUP\\step-096.pt",
+      "sha256": "462cdb3a9800273b07a56c97b59b19f36756168525d3f165399b17aee1d327c2",
+      "head_sha256": "a09d6a0b41b5ac65a1506a13cabdba068373757039c85fab83da28f4e573a873",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-DUP",
+      "global_step": 96
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-DUP\\step-097.pt",
+      "sha256": "cfd0237f88bb09f44cc03e0cf94bb3c47744f4348c1aae7259cdf29a7ead2f11",
+      "head_sha256": "b26351cc0a3e9b3420c73fa5d73e435b87f1e892043c4fd46d5f546fa815c0d9",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-DUP",
+      "global_step": 97
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-DUP\\step-098.pt",
+      "sha256": "069bfd833c51df4cbf0aa072ebad6b9f135313d84b4527bc77daa4c26c978ee5",
+      "head_sha256": "6c17357fbf8d437b7b729e006e3f9edc1ea9b8051d5918a1a1f1b690baaf91b8",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-DUP",
+      "global_step": 98
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-DUP\\step-099.pt",
+      "sha256": "90706232fe3734433e3d5774643f37e262ccf2a8828d88cd15edf4acecc78757",
+      "head_sha256": "300c935398b02eb241d364021dfdc32264e3ddad8d5cef93763714fae1ca70bb",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-DUP",
+      "global_step": 99
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-DUP\\step-100.pt",
+      "sha256": "b1d3967deda4ec2fe1aed2089c7cbe43ee65348dad1b9a1e2f30480f3a0dd1e7",
+      "head_sha256": "3bc27799786e5db0f49df094490df8da838a695825147b35d6a99091b5c62acd",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-DUP",
+      "global_step": 100
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-DUP\\step-101.pt",
+      "sha256": "8c8721395370f4d073d07b389af3ffd1ad7366df16a655dde949a3bff5764427",
+      "head_sha256": "ada6f941f61436e774b518f73321ea33155d75ce0643d9e59dad73298c9a74e1",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-DUP",
+      "global_step": 101
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-DUP\\step-102.pt",
+      "sha256": "bae22d38a6e130ee553a1d281b116e2748840cdd96bb07ea04b5f0b6b0c2176c",
+      "head_sha256": "3e7485d65e5e9cbe7465d6401c8604afb33da7c8eb8194023688070671a89968",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-DUP",
+      "global_step": 102
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-DUP\\step-103.pt",
+      "sha256": "b88cff4fec5cacccc8d45cf50529b85eeae38c1afc49dac2e56fadc1a7ad578c",
+      "head_sha256": "04a2f7b1f9b31b2c36221557b3061ed2ec7b249ed4c1b2e65743bd3cb6d7f03c",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-DUP",
+      "global_step": 103
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-DUP\\step-104.pt",
+      "sha256": "009250669b3a182bef1e8d6f55f11a1b4538a8cf95818ce7f1ce6637d87f4151",
+      "head_sha256": "3e472b071025011da2bec884fe1ddaab55833b411ecbe8ae0660d00e2150b4fa",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-DUP",
+      "global_step": 104
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-DUP\\step-105.pt",
+      "sha256": "36e12cfb372b5a7c2b742ab415a860f1aa8f260553d2786501ad129b021a53b6",
+      "head_sha256": "762df6db17d2e98bec994768c355c48c3724e942908f30aec1d4d4e8315bca4b",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-DUP",
+      "global_step": 105
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-DUP\\step-106.pt",
+      "sha256": "36ba63665f5cada21798d860b06cdcec326501d1af14563a4b402b577e79ade9",
+      "head_sha256": "cf26793975331af49d7281cbd756c97b29da67c862cfea61c0670b3fe0c86868",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-DUP",
+      "global_step": 106
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-DUP\\step-107.pt",
+      "sha256": "866ba64eb32af980582214fddbb084bc30ba959826d10ffd5513b5b526847f5c",
+      "head_sha256": "d34560d325c482620f48ca180fc2ba53fdf79a068a9e36491aafc20a2c416379",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-DUP",
+      "global_step": 107
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-DUP\\step-108.pt",
+      "sha256": "f614214d56322158fd0b07e222357446ba3f8438c622f8c39a7d333effa263fa",
+      "head_sha256": "6e51135074b63ff94c4514ce0e20dc81d901021386baba34d78ad2b9a47e7e9b",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-DUP",
+      "global_step": 108
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-DUP\\step-109.pt",
+      "sha256": "57eae843c7ed05acc30dc7b5d0a4517c4bf4b0b07fa8a4086edd71a6ad5277df",
+      "head_sha256": "2c5954b2708f6e935d9feaec272a47a76f538c2221bfbc373c46a1b9ac515040",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-DUP",
+      "global_step": 109
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-DUP\\step-110.pt",
+      "sha256": "3c584cf85a8e8266d556e9621d422b5ceadda84b2e72d32bfbf86f11f858fe80",
+      "head_sha256": "b77e37e501825798a78f6eae07ec4dff2817361da29a650cba0398b4d6fe0a34",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-DUP",
+      "global_step": 110
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-DUP\\step-111.pt",
+      "sha256": "775e7a0dce5cbf7cff983c9bfe51e1a74253140ca2f448159207d9c1076856f6",
+      "head_sha256": "7db9f847c2a9162e0941f821dfcf316fbe30ef0417907b2cd7adc1079399154c",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-DUP",
+      "global_step": 111
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-DUP\\step-112.pt",
+      "sha256": "7f4629f6960c4a4298a92d9dab5a187ad86e71f4dd14221be9e86a10c25d65fe",
+      "head_sha256": "57a3a9e18097e253953acbe7f2dbad60787a915627cc6560f1fc3d9a0dde24fa",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-DUP",
+      "global_step": 112
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-DUP\\step-113.pt",
+      "sha256": "2432730adbe8fbd8aa5071c93a012499b9826dbeaae721a42395cf7e9021427c",
+      "head_sha256": "abb4f01f68cf0d86b5750db31e71adc3b97ef995c823a5127026880fd0078965",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-DUP",
+      "global_step": 113
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-DUP\\step-114.pt",
+      "sha256": "802892a2ad6121487600c87a188011f47acc028b7ce5174f1431f6cd4da4d724",
+      "head_sha256": "84978e821cd253461e016f3ec399d4b0620aa0a07b56605154c64da9d067fa22",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-DUP",
+      "global_step": 114
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-DUP\\step-115.pt",
+      "sha256": "8ad404aeeef5f40320624cfbf74d352e78d4a5b521f5ecda5b6f8cc6ce93047b",
+      "head_sha256": "2dcf1345c85ea4c540abc63652202a1dded770de8f78d71a23bb64f474d6629e",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-DUP",
+      "global_step": 115
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-DUP\\step-116.pt",
+      "sha256": "7754eb1b67373956425aecc925c724fdec38aa193958bd902d7ebb8d150be175",
+      "head_sha256": "0b193c2a27289c54c625858370252f9ea165009297ad18740a42b93eadd4aeb3",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-DUP",
+      "global_step": 116
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-DUP\\step-117.pt",
+      "sha256": "b291c26b604fde39f5d19de7349cf478a3c35a2811ba019ef032ecc49963b7e6",
+      "head_sha256": "e0bc7e71bc97327102625764051461a7089aff87962d7b99279f5032f967476e",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-DUP",
+      "global_step": 117
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-DUP\\step-118.pt",
+      "sha256": "1fbe0a59bf959f6b47a081a7eab9e6492ca02bdf8492c90b08886a7ef37d7eb5",
+      "head_sha256": "3d05de859df076f930389082cf7015141d2ab0f3a5eb67e4cf1b39ca7cd91042",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-DUP",
+      "global_step": 118
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-DUP\\step-119.pt",
+      "sha256": "dce8523039d3c9a2c92c6eedfdf9967859cfe012b592541ab546620b3ca7adde",
+      "head_sha256": "7d38d92f39c2a89d52114d72adc53aec716572a2a38e4d7011938363d3263444",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-DUP",
+      "global_step": 119
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-DUP\\step-120.pt",
+      "sha256": "4083b82057ceab085e133413faf7e3b47b851131c93a0e66fcf54ede1dae539b",
+      "head_sha256": "75d717a737f1577b9a00433aa61743d7c83bf0917755e8bde5f760fafaa4bd24",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-DUP",
+      "global_step": 120
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-MATCHED\\step-040.pt",
+      "sha256": "100911a1b75d92188bb1ae2c6101e9d45dedd4330c69b1453c87c4c7668d286d",
+      "head_sha256": "5b574c5ce631525fb4b1c63d671da73360e254dd9638b9a6d7d160f813a3b3f2",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-MATCHED",
+      "global_step": 40
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-MATCHED\\step-080.pt",
+      "sha256": "6c0ea7cba2d275324d146796f861f5ad909f61da48c8c77072419db26bda75cf",
+      "head_sha256": "6bcc440f9d9fb54aabc66b24fb99d69d5f3c086415230c47a4584006ac3d6794",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-MATCHED",
+      "global_step": 80
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-MATCHED\\step-081.pt",
+      "sha256": "46d5c721efb81764eba81c32d1c91209ed8a95ac125f5fee0fa3ee14278bf32e",
+      "head_sha256": "94b67e7eb3b4701bbc472550c3fd9dbb1f319fd87a08f29006f6dfb97c1dc9a4",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-MATCHED",
+      "global_step": 81
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-MATCHED\\step-082.pt",
+      "sha256": "5692bd92a678a2e222b3027bbaf30acd7efba4f6d3852445147e70a086f79a2c",
+      "head_sha256": "3aca5aecc7a281cee20827c8d695b77f986dee410817ab2501d24e1594956ad0",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-MATCHED",
+      "global_step": 82
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-MATCHED\\step-083.pt",
+      "sha256": "06eddc9f1e051b997ecca484270cfb53cf02da4808b6cf9ec6ebde2561dd01a7",
+      "head_sha256": "31e7889965f5c97afd92aa92e7b81e4e2dbb593a7a7da915cd298149c3d39459",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-MATCHED",
+      "global_step": 83
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-MATCHED\\step-084.pt",
+      "sha256": "a2537dde7ea78fa027befbca3872e088dd5a95d9f2ba1526367d03e9680bc4eb",
+      "head_sha256": "f2a7fb0af4a427dd8a121c52d8ad44ec6326ba1afa84a7f7647d306f3807e0bd",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-MATCHED",
+      "global_step": 84
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-MATCHED\\step-085.pt",
+      "sha256": "62a1aba82428d9192a0443e9dcc3a404302801cdda304ad25f04ff179c6b2248",
+      "head_sha256": "2fbf53b39010aaacffd93b68a80e47889fad0fbc7410ec3e83d17f8dc38fff07",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-MATCHED",
+      "global_step": 85
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-MATCHED\\step-086.pt",
+      "sha256": "3227134befeff175ee1016f1bf33d9f00c76e823935b2f5805a89d247a1c7adb",
+      "head_sha256": "c5d81c7d52fb51a15d213f418c290abccaad0c5ad87d9fc9d904f6039e86c3c6",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-MATCHED",
+      "global_step": 86
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-MATCHED\\step-087.pt",
+      "sha256": "89a851e02915128a534915254fa623197befa101d43dac2d793bf9541b88348a",
+      "head_sha256": "3cec6dcadd2a26a7e4dae62599b6d237a548e5a9fd2c83d331b4893a9f1356e4",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-MATCHED",
+      "global_step": 87
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-MATCHED\\step-088.pt",
+      "sha256": "2b6d9e74d1260d0d99692cd71343456ddfd34f073fce1032dc5a1cd8edfacbe0",
+      "head_sha256": "ca9d37a250ae48ee52e5d1afc886ca0f1213c4f7d3763b20800ff0b64eeba055",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-MATCHED",
+      "global_step": 88
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-MATCHED\\step-089.pt",
+      "sha256": "85bdd131cc195bce1e7653a93130434c047ceed4a8582746c6d047f17090ec94",
+      "head_sha256": "9dcadd4d7075e76ec2d33dad32311af0ac9f42201fbb18fe2bfaec60bd8ec881",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-MATCHED",
+      "global_step": 89
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-MATCHED\\step-090.pt",
+      "sha256": "0da30f3f7cef545e8197c6e7ef4a4ad523d3cdb6221236e35ee72808940456ee",
+      "head_sha256": "237ffd004f365bc3bb2788eec20ac8f9d825ff6b308ea6a9684674b72bebe918",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-MATCHED",
+      "global_step": 90
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-MATCHED\\step-091.pt",
+      "sha256": "8ef139af3329085a15fb491baf5b612336da494784ee0fd10016edf30f2f7927",
+      "head_sha256": "a64ea9e326d4ab888070cfa856b96c9da1d7e247862f35563eae13e4b4d520b7",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-MATCHED",
+      "global_step": 91
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-MATCHED\\step-092.pt",
+      "sha256": "98027ce5a10e4adfb466a3109661ee0633ac2728b33fcea2f98c02ca11b6d152",
+      "head_sha256": "a684f1f9ab2c86cba6a25c987cf94a630baf097ce7fa9eaab024e881d80e3868",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-MATCHED",
+      "global_step": 92
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-MATCHED\\step-093.pt",
+      "sha256": "c68f150a158950a060980bee65f6ea284f6097e1bd59b54af335074d4375eea4",
+      "head_sha256": "382d813596f5ceb304ccfa17338634bc0be9de1346c6a9c3773f8e3167b6d0d6",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-MATCHED",
+      "global_step": 93
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-MATCHED\\step-094.pt",
+      "sha256": "62e3feb0700df6f501a886a6e425f17c2aac76a724ab7bfd5a73a2d1afaa8314",
+      "head_sha256": "8d4c940a9003de5747c061501af19c81d5642077f878f2999cecd72c43630226",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-MATCHED",
+      "global_step": 94
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-MATCHED\\step-095.pt",
+      "sha256": "0927a53f6d56d6f1d1a11d58a4ef126402adbe65bdaad81e07034e3f081b2ec0",
+      "head_sha256": "26847bfa0f32d9fca341d368b8e3a752a1fe354b6b6b3e835a0f4f2d21972e93",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-MATCHED",
+      "global_step": 95
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-MATCHED\\step-096.pt",
+      "sha256": "4e5e3907e45a9f56c2f60440c688e42eb45e129b4a8f8bd15a54c056ff400451",
+      "head_sha256": "15c3e4a077b55272d6aeecfee5dc08f474fe561447bab32a9a5b75031d2243ef",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-MATCHED",
+      "global_step": 96
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-MATCHED\\step-097.pt",
+      "sha256": "4b434326db29de55219a99655af322de5d6368a9915d056598753ec972b4cbb1",
+      "head_sha256": "81cfb930fdae064ecb74f7c911df4ebcc6ade74918de6326d74f09a41ebd2dfc",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-MATCHED",
+      "global_step": 97
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-MATCHED\\step-098.pt",
+      "sha256": "d6ede6e25c0af8323e15665ae56a0e9ca7623e8b7367c40f1c05f891e22ff067",
+      "head_sha256": "16199511aea062d2a579aba7566adf736faeeab4939310a16fd9a6a3718cce50",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-MATCHED",
+      "global_step": 98
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-MATCHED\\step-099.pt",
+      "sha256": "46d138194245f08cab4637e391ae8b4675405d4a34d35aac42026239104b7fde",
+      "head_sha256": "ffa6c1f47ffd7f992eb9922da3ef4482244a833816fc34cf047375d267d3c32c",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-MATCHED",
+      "global_step": 99
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-MATCHED\\step-100.pt",
+      "sha256": "7a0d72a77f7c454b73dc394ca709dec842c761d521ecdf491f3f10cdca90c5c1",
+      "head_sha256": "b3cb58ec437574db8db724ca5855f36cb174d733a92e62f7ef1f959a9b72601a",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-MATCHED",
+      "global_step": 100
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-MATCHED\\step-101.pt",
+      "sha256": "480a48796ee3e604f71eb3740871834508dcdc4c613ba3e085a1f23205c4dd5e",
+      "head_sha256": "c251ac5b61be13a1940459c13cfd0ca992598fd16b8b7928e18f57c1e81075f4",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-MATCHED",
+      "global_step": 101
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-MATCHED\\step-102.pt",
+      "sha256": "2d2d027d0e3f8d2b87fb6e0f37a295f7f5fc68b66a87dc3c135860752319be5c",
+      "head_sha256": "44519e63cac5cb692571a5ae44788b42885a5332ae9abeee2b36aad88d2507c6",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-MATCHED",
+      "global_step": 102
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-MATCHED\\step-103.pt",
+      "sha256": "6b9ac7a6920fdbcb8c51087f0ba9c19eccc45a6ad48c44a25bf7354ee14c6d2b",
+      "head_sha256": "f1002c6a1daeed9a94243736811c04a6bc09e4c3b5666b944c78553e584a1b8a",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-MATCHED",
+      "global_step": 103
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-MATCHED\\step-104.pt",
+      "sha256": "ff4a05f4b142cc56f97b1b2e22345b70ce595bbd7fea99543fd45789fa1e7462",
+      "head_sha256": "c45110dc18ce7ad67b8cc425a44ffde2462eabb1c0ca38ac56df4d2394215bc8",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-MATCHED",
+      "global_step": 104
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-MATCHED\\step-105.pt",
+      "sha256": "6cc12f92a66120f6133a95e79f50ff753c4d8b0736e7e029a8ee545a3dae535f",
+      "head_sha256": "3f93df926878abf8b353688433f68b8fd0434a6da6f5dcfad5ec689cf227328c",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-MATCHED",
+      "global_step": 105
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-MATCHED\\step-106.pt",
+      "sha256": "8b413e1c23183d9a3e6a3783085467f352f7fcbfe150bb6dbaf101ecc31a5d20",
+      "head_sha256": "dfd8d89c49091a627300d568f874525c7ede49aae829ca8e7687ce1b19b1a4d7",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-MATCHED",
+      "global_step": 106
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-MATCHED\\step-107.pt",
+      "sha256": "4136e9d0ca3e1ee44f8bc9634e47fce2b7824c68ce2842dad31ebfdbb828dd54",
+      "head_sha256": "d7aab622ed302e7203ce698ee86c724fea419643ab41a1b9a82abc5976d4dc36",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-MATCHED",
+      "global_step": 107
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-MATCHED\\step-108.pt",
+      "sha256": "65ea04167661139784afb56edb6d46956ad06659a8f1865c37c0e7db43fe8b7b",
+      "head_sha256": "f73180a7ce7dc889df5be84fa1460530b17f039150f27980e9a7a0ec1527a3fd",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-MATCHED",
+      "global_step": 108
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-MATCHED\\step-109.pt",
+      "sha256": "c92f41ba20501bc677d79f909910212ebafdd09e565b211852eaf421f84f2000",
+      "head_sha256": "1e144ef8e19044c123c80108db857debb378018694222c83baef5652ddbb0025",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-MATCHED",
+      "global_step": 109
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-MATCHED\\step-110.pt",
+      "sha256": "782442a79acb22141321b53ac17373419ac230220355f19fae6b0d6654f0c457",
+      "head_sha256": "d7a89d4245969d4271a1facce6a1ceb9dcae2a4c705d63857e1657400039528a",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-MATCHED",
+      "global_step": 110
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-MATCHED\\step-111.pt",
+      "sha256": "75302749d84d684111ed319287005b155aad22b5017d8892c960b74c536b6628",
+      "head_sha256": "f0b800d19be98f61b64d5ba8fe7dcc0959f354f85f4e2f57c9eb67ede8027abf",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-MATCHED",
+      "global_step": 111
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-MATCHED\\step-112.pt",
+      "sha256": "32b541b38f32bd6360153de0a0bca5526d027df5b0486c5e2b5487b135baf71a",
+      "head_sha256": "efcdd71f1f789c44ae1d5f6ac124c4733a8dde51acbb8fe555b00683362a4798",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-MATCHED",
+      "global_step": 112
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-MATCHED\\step-113.pt",
+      "sha256": "45de71c2216628b3b01d66535f595d7d9c75709bf291e5275392120d59fd9f6d",
+      "head_sha256": "e12eedabac41f61368c3b5d2498926a9323b7837427ea4d64a080945af60b029",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-MATCHED",
+      "global_step": 113
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-MATCHED\\step-114.pt",
+      "sha256": "ba4c5be709adf35ecb386f97e996f5237eb932a6d78632f5cf8ab2af0d9f60b5",
+      "head_sha256": "8a3a107a65385093b2be4c12b8cf2ae7adc15e67182f6e0a86fde98a1fd5e1b5",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-MATCHED",
+      "global_step": 114
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-MATCHED\\step-115.pt",
+      "sha256": "01eba72369e122984319efe312502c6acfb51a9ad0aa1b405cbb779294e4bc63",
+      "head_sha256": "89bf08ca999016b8702a542ee9e83e247159270ea675c273c957f3da0dcfaced",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-MATCHED",
+      "global_step": 115
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-MATCHED\\step-116.pt",
+      "sha256": "77672904087da3be8970a4e141fd12e423708969624b26025b0bb5e2ef10bf49",
+      "head_sha256": "7d0cad81d92668d43b68d04eae6fa228296d285b5e47587f0b9341513489680d",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-MATCHED",
+      "global_step": 116
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-MATCHED\\step-117.pt",
+      "sha256": "e20feefcc21413b6ea2cf3501298612f204bbab6905d88d0daf82940f944635a",
+      "head_sha256": "932ce4c3283a4b095c37738df607f508a66ecaeacda3f94d2b4560a96ce69e5a",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-MATCHED",
+      "global_step": 117
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-MATCHED\\step-118.pt",
+      "sha256": "848d8039218ac509131028555626551ba45ace1c1dd6d86ab9edb4b56b1f8301",
+      "head_sha256": "cca8f7427eaac0044618bf2423aee247c4136b40fb6c5ca46dc0fc0ac43450ab",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-MATCHED",
+      "global_step": 118
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-MATCHED\\step-119.pt",
+      "sha256": "6fe6adb16ef4407e8795fe7831d7f3609ceec1e3f4e5fd03cfb31f09518c2afd",
+      "head_sha256": "880200c7df3ec1301dc00eb86f60e29a041c6cc3fe80854b69fee82c39decbfb",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-MATCHED",
+      "global_step": 119
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-MATCHED\\step-120.pt",
+      "sha256": "876cf4977699cd9a2ff32d6b8db3579c8c1c06286b2a81bdc5e4d66a668612c9",
+      "head_sha256": "a92273927cf27650ea89151192ce27b87752678c204e98f59a19c2aaa9d95276",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-MATCHED",
+      "global_step": 120
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-SHAM\\step-040.pt",
+      "sha256": "2707feb7181a31a35321da6a19e78341457ead1797af3c02210bb4021447cf38",
+      "head_sha256": "ad5ec2b18c89dbbabbbd2e5376e39753b000bd7f11e853d131d25c285dec8177",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-SHAM",
+      "global_step": 40
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-SHAM\\step-080.pt",
+      "sha256": "97c5a4fa4960839babf3db2f21db59d4300d3e95d051d5821e7f89b16904a351",
+      "head_sha256": "cbbbc0b9828ba7351ed01bedc64bb755a207837b5e2f2064c859f34a54a39775",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-SHAM",
+      "global_step": 80
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-SHAM\\step-081.pt",
+      "sha256": "a507026130fa9e958a3c1e2500b1d95da344c335c9a29e72e7940d533434b92b",
+      "head_sha256": "3fe5cb8ff0307d08d0c54396f074d45f3232b981c95468d99d2de389b3b4cf81",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-SHAM",
+      "global_step": 81
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-SHAM\\step-082.pt",
+      "sha256": "8263436e3abca8c08b4a173b3033255c8681d8a31b835b2ae54f7acb56f14e9e",
+      "head_sha256": "d99b5a3bbb7e76f2642cc95b12a49a1b174b4ad9811e21520677a846ac873556",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-SHAM",
+      "global_step": 82
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-SHAM\\step-083.pt",
+      "sha256": "ff728a4255643136ed92f06f1bb0f8dcb4fbb89097a61e50cc191cee4b915845",
+      "head_sha256": "018ee405452688ca3ff469db0c9656bfb1a90c76cb50e0095752602bb3a3dd5c",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-SHAM",
+      "global_step": 83
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-SHAM\\step-084.pt",
+      "sha256": "0b3d7d33a58b70d5ba1130800b76d654ab6120ac38598fa7203e2e334b10d93d",
+      "head_sha256": "6a205833238f6de5e788c250dfca3ba125ffe7d7c7fa315731634011f7856b98",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-SHAM",
+      "global_step": 84
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-SHAM\\step-085.pt",
+      "sha256": "3808a043bbd68ddb78ff9d8cd6e327473844c62859e34e0e12509f92a1953d05",
+      "head_sha256": "ddab335d0fe107d16e094a5d5d4456091617a28ee1589b4a91941bed521aa6ea",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-SHAM",
+      "global_step": 85
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-SHAM\\step-086.pt",
+      "sha256": "e4f62167b9fe4fa54c3b83725364248cd3f4c3d8e4c68f1033439f940072e573",
+      "head_sha256": "c47b90612f94243cb213188f779fc516643782a3e9dd419dc184b3e27a415317",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-SHAM",
+      "global_step": 86
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-SHAM\\step-087.pt",
+      "sha256": "604b40611e47cff1b1236c4f99bf0f324ac3ed8fe410ef43faf376e5573f43e7",
+      "head_sha256": "970b81f89f8cf3ede61101648f2cc1dbe4920a9ed16b6c555899ef128ee5ed04",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-SHAM",
+      "global_step": 87
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-SHAM\\step-088.pt",
+      "sha256": "409af8322ce6ecc8827d978cb55af4b1920b31351ce090402206d97a1390cb3a",
+      "head_sha256": "ca78c0c9ce85b9f018288db98eba3cfb3ae63785bb63697d25c8e64b251f806b",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-SHAM",
+      "global_step": 88
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-SHAM\\step-089.pt",
+      "sha256": "12678013d34b52332e2b6f9ae2396b2e353e996c074da4d134edcefc2029bc74",
+      "head_sha256": "0090f8c08b6bf2722e95807b402a9b8a011ea23da93fc4324f7502d82b2526b2",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-SHAM",
+      "global_step": 89
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-SHAM\\step-090.pt",
+      "sha256": "17648feeb576971006fa542bbdcff4de6506168ae5a6a41d578b2ced8c027f9e",
+      "head_sha256": "34d2d07d8d0088b2895c601e57b9545ccbb6a1533ba06248fd3e06193d9e66d8",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-SHAM",
+      "global_step": 90
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-SHAM\\step-091.pt",
+      "sha256": "8060b3c9284ec38c5426bc4ad96682c1f55acd723edf01868d8e5cdfd2570c29",
+      "head_sha256": "630d980527ee8df569dd6f01132d47934e0468867aab49717431c79650690166",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-SHAM",
+      "global_step": 91
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-SHAM\\step-092.pt",
+      "sha256": "7faf78fbe9948713e6f4390411c27d0f8e9ea9065154c68919da1016117af45b",
+      "head_sha256": "931223f33a2a9a2dcd1e8c110df71daeb326dc6a4140342898b8efe6266324ab",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-SHAM",
+      "global_step": 92
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-SHAM\\step-093.pt",
+      "sha256": "4fad2305f5480ae23116faaebe331241034dc8238a20f350113b6f0328d2476f",
+      "head_sha256": "6ba5594ec786064ff47b471b276478a86ae27ec46cf5310bfee216f4b3abd246",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-SHAM",
+      "global_step": 93
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-SHAM\\step-094.pt",
+      "sha256": "bbd4f19129b14e6d63b72201c8f8cc93daaaef6fb08a315a26c184f5065f6dc1",
+      "head_sha256": "04e32bbdae8eaf4c5ab451c9f9b01b020f565671d73ef6e95c7c5ad42f69bf72",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-SHAM",
+      "global_step": 94
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-SHAM\\step-095.pt",
+      "sha256": "68bfb330488011b4fdcb930f95c9aa03bcc329926284e43528bee006b07389b2",
+      "head_sha256": "6e49ba2e7e78bd68c9aaca27f3b736e0cde4276f5452ada5c249bb713c50cedb",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-SHAM",
+      "global_step": 95
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-SHAM\\step-096.pt",
+      "sha256": "44735a6175404997b2731c073ef216040e48fe7f0fd60866fac770e3f0724aa8",
+      "head_sha256": "55c77065913b93d00ca463b83cba09757690d23811fb26a447b66f13f45cac63",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-SHAM",
+      "global_step": 96
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-SHAM\\step-097.pt",
+      "sha256": "65849c83f1339f01cc8b73b218c5871c74fb53ea07950438a048a2bdfe951292",
+      "head_sha256": "cee8ab79fd3ba58adaca49d244663b9ac4f66e9e92acd966c80253a28ec2a477",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-SHAM",
+      "global_step": 97
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-SHAM\\step-098.pt",
+      "sha256": "56297ee70a445820a953272b26b6ef3857e3b9579640e40b75b2396758c45efd",
+      "head_sha256": "0093ccc2248eb18ba9de142dd33a2bea608f6d53997b8e737291fe02469422ca",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-SHAM",
+      "global_step": 98
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-SHAM\\step-099.pt",
+      "sha256": "b71381c46f297066490e159cf35aa142ad5466b16aaffb62b28232731669d723",
+      "head_sha256": "06b32341598edd68803b19da0cc7447ca702f43df9c83b556055c2a29858d882",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-SHAM",
+      "global_step": 99
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-SHAM\\step-100.pt",
+      "sha256": "55696c3dc4edb840adde870d8950426b75535c0571efbeafbfd493fed9b5c7c6",
+      "head_sha256": "9bcce4bced88c566b5d5e96ef005f86982896c2b8f2758db315994161bb926cb",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-SHAM",
+      "global_step": 100
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-SHAM\\step-101.pt",
+      "sha256": "36ec9364f73170b7932112eee4fce56f17bcf0b23064a0ab9e693d1562a89e7f",
+      "head_sha256": "afa04f52737cf000d300ad29ab8969be167ce38401e63e163c4e32941818eead",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-SHAM",
+      "global_step": 101
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-SHAM\\step-102.pt",
+      "sha256": "ee46a66ecc0e6b9cddfc61080ac4226daa39a28a78b4d36677c1e454ee0fbd7a",
+      "head_sha256": "af6df45ea28a96b12be09d86e395ab2c79670b707c94f1ff55c44f785303cc6e",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-SHAM",
+      "global_step": 102
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-SHAM\\step-103.pt",
+      "sha256": "5a6d841b5a3f8734941ed41dedee99966779d8e3e5a4de8967b00de362613af5",
+      "head_sha256": "dd4b18b9d85708a45e3332df121e6fc17eaa90b94c162267d7f3a5a04b8830d4",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-SHAM",
+      "global_step": 103
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-SHAM\\step-104.pt",
+      "sha256": "c52f328adf574755fa7fd61aab3e9c964ff1742f388b9c22a710d75fdec4a738",
+      "head_sha256": "8f6fb1396eea3291332ad9796ab5f9114adc2f07b0c5b971989dbfce960e65c3",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-SHAM",
+      "global_step": 104
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-SHAM\\step-105.pt",
+      "sha256": "2c978cbd2cea960030d708041934f790f6060eaa8892740e3528802e215d38bc",
+      "head_sha256": "ac05d75fd83820a2150917a8ef7999bc6145960669e30af6ca99579341b9119f",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-SHAM",
+      "global_step": 105
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-SHAM\\step-106.pt",
+      "sha256": "c85c7494707a8c6e747490e097df8d60a0d084706f991a159518b42704a24f5e",
+      "head_sha256": "9ed9c107c987f755257015dfdace333bc62be0691df18552501411b0c1c16b82",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-SHAM",
+      "global_step": 106
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-SHAM\\step-107.pt",
+      "sha256": "9037360443e92a0f915d2eacdda407f4b7bcb0c380695d7fa67717b03345bafd",
+      "head_sha256": "b05d91e32241598a7494edcb7951d1122be739820901a6249f32dd130201b633",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-SHAM",
+      "global_step": 107
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-SHAM\\step-108.pt",
+      "sha256": "785806323e4243835a3ef4390bb704d45c67fafda8d648438f0f4064d3e6598f",
+      "head_sha256": "c06f2a245c86ca6629eb5e89296ce74852f508921cbeaf78b9ee5ee121384075",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-SHAM",
+      "global_step": 108
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-SHAM\\step-109.pt",
+      "sha256": "1ff48b218743aed2ff3c51854f1eb831c281172e8d8883293b8dd8ef685ddbb8",
+      "head_sha256": "7fbb52ec3de498f2cf3f0907553b80afe6ccd3573e109931fb3a6e5bd85779d6",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-SHAM",
+      "global_step": 109
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-SHAM\\step-110.pt",
+      "sha256": "7afa7723e125bd9e55320eb7c96985350ea665f34aefefbaffb1b2ee542d45ec",
+      "head_sha256": "a9508ee5174a85e77ab0666293a688fb167ac28598e6242fe7cbffb0d067e6ca",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-SHAM",
+      "global_step": 110
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-SHAM\\step-111.pt",
+      "sha256": "2e3a6e8a19bfe31766531943aefddcfb38dc08b38bb0e72e7f6a631b31c437ae",
+      "head_sha256": "0168901f5e0c38c4c6b06f4216d95c9d2dea9d8f768afca3d3c6d4827423732c",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-SHAM",
+      "global_step": 111
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-SHAM\\step-112.pt",
+      "sha256": "21aa7782bb1d0b02fb3463919325473370498b55691d8b855947fa40381a726e",
+      "head_sha256": "94cafdb87d96db9f1d44aee1a5a5d79dd3b23c4316feb5b3e1dce6512bf432a0",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-SHAM",
+      "global_step": 112
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-SHAM\\step-113.pt",
+      "sha256": "37e3dc5a9531dabb78bf7208a4c1f7c380f098c208c9d82a73ba2b8109a2243c",
+      "head_sha256": "bb1d44ac829e8d988afce3c51393c2532c5a7a26e2ce1258b8b36ab3b1582460",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-SHAM",
+      "global_step": 113
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-SHAM\\step-114.pt",
+      "sha256": "fb5fc4c206d6f69c662f47d330122c40cc501feb11ea9cb138a4999f41652702",
+      "head_sha256": "ccd4284af54df6f3c456f9fa578672033867f58c13d02f80bc182840cc964d16",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-SHAM",
+      "global_step": 114
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-SHAM\\step-115.pt",
+      "sha256": "10a913e3bf53ae5415ae73df80d8eae913386309decb7d41f6d2622051026e68",
+      "head_sha256": "06f9d5b4805feec59fddd2c9d10befc2ef79e0b12ba54efda409986d5bdb5e4c",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-SHAM",
+      "global_step": 115
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-SHAM\\step-116.pt",
+      "sha256": "31cafe96a66032841aac2efdaadc36c3579f97aa50ed448bab1fecc35897769e",
+      "head_sha256": "e83e484b9223b2ce51a773c73c19abc1a3a5457a3aab7180c76c583e4ebd1e80",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-SHAM",
+      "global_step": 116
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-SHAM\\step-117.pt",
+      "sha256": "e0cdf13cac47b3a6b6662cd5c2e5f9d646171e66b664b3656215d031184362f9",
+      "head_sha256": "f96def78d1fd7b57b37dc142f80d2b1a68c2d803eff25eb7aaaffc6b0fe355d1",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-SHAM",
+      "global_step": 117
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-SHAM\\step-118.pt",
+      "sha256": "29640258c42249f2353a76c60cf68d793c7a5354af4317529d711656af552653",
+      "head_sha256": "e8ad43da4bca6f6ceddefede7b1567a2e7d3e9ae9cbf46326a57a5f35046e917",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-SHAM",
+      "global_step": 118
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-SHAM\\step-119.pt",
+      "sha256": "a749be6ab3514648bc83aafaf534612838a599b516398b8ae1be737d8ef5dfdb",
+      "head_sha256": "b4e3dd7a0cc3992f39e4e20ab33af89fceee8adc88c20e6916f7cd93aef4bd47",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-SHAM",
+      "global_step": 119
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3243871208\\B-SHAM\\step-120.pt",
+      "sha256": "e20e6b07fcf130d1d28b4418425aff5aa1e88a42b7cdab66d0a8edbc98abd40a",
+      "head_sha256": "96aa45d57ebe777e1398703516ce7d62388c8ee693ed7e9cb806da7092bc1e1b",
+      "initial_head_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166",
+      "seed": 3243871208,
+      "arm": "B-SHAM",
+      "global_step": 120
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-DUP\\step-040.pt",
+      "sha256": "5e1cf3853ac609f6abe8798c8c32cd02573e1bbc4c60b60a48410e3917f25abf",
+      "head_sha256": "4aa9e7411604975491206b9c1eb1584d835b694b70aa76f6a9c90b1c61e28e3f",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-DUP",
+      "global_step": 40
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-DUP\\step-080.pt",
+      "sha256": "4b00b45317e9b352a6b80f79be61d26ad67cb6517312c925353def5afcfa693c",
+      "head_sha256": "913eb2c5439cfbc09ee64b166e707e2bebc79d439a68ffeac5d6dc44919602cf",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-DUP",
+      "global_step": 80
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-DUP\\step-081.pt",
+      "sha256": "7984c99c3c249799b672c12fa2ca63c4125c31227253b8f4efd01a180eedc3c5",
+      "head_sha256": "f7da8e3fb582c7741008f3a74d651859b8c6be3d57e0d9e643c321303f246d14",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-DUP",
+      "global_step": 81
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-DUP\\step-082.pt",
+      "sha256": "4db9bf9a4bfc7fa8f02b6ed52088f89cbdac97d36daf2452b16e5330f7ade974",
+      "head_sha256": "bc587e90c26b80fe991f1867f1ba00ac50ee30b5350b49fee5572fae1ef9faf0",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-DUP",
+      "global_step": 82
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-DUP\\step-083.pt",
+      "sha256": "1f8489a3840776bf849fdedef0a2698b7853eb21743f3ca904502442afde9198",
+      "head_sha256": "07c847008dc570254d59a1ccecb8a4042753f817b1e923e43c11d0c559632d1a",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-DUP",
+      "global_step": 83
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-DUP\\step-084.pt",
+      "sha256": "fe8383496b10649f5329dc6ddff0e4658c8e2eb56f45ee5ec4a38ca160c105e4",
+      "head_sha256": "f04b35b98a58ad177646d26df3a9d709972661bf74ef3f352fc9aeae2f710754",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-DUP",
+      "global_step": 84
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-DUP\\step-085.pt",
+      "sha256": "c14e7faccda0b18b0abe1b7b2056db61628c7d53dc8a01a493069cee00d7250e",
+      "head_sha256": "c7395cc2f0961ec4da323cb400d307a34fa4bbf10886b040363a23e16a50fb16",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-DUP",
+      "global_step": 85
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-DUP\\step-086.pt",
+      "sha256": "78e2850517228143ef52bb318e89dfa47af1efe55f837c6116c09101bfcf0ea4",
+      "head_sha256": "e87107cf40b0230672857b6cb81da9a90f8d705705108bf4422ea0fc9f865dfd",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-DUP",
+      "global_step": 86
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-DUP\\step-087.pt",
+      "sha256": "de52c110854070d455a145b116f6eeceaa2350f4d01c5bd5a0b672d87b688826",
+      "head_sha256": "fd114b50a26b6176e1bc211788e7ac618cc8a8424db3a5ab75fe53cb638a39f6",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-DUP",
+      "global_step": 87
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-DUP\\step-088.pt",
+      "sha256": "80869492f8ee24402ba473eafea7fd91487b865bf761614ee25a9cec2f7043db",
+      "head_sha256": "4115b36e7d6d0cac1cbb81fb782e98ecec2f0ef0c6417890020da65c73a58cc5",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-DUP",
+      "global_step": 88
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-DUP\\step-089.pt",
+      "sha256": "57dc78356303b0d0cc8220712ae095507f3be0562476176c82854455db3cce78",
+      "head_sha256": "c3cee330c1a4a9a635fc7490aaad9886c6ab5ea4c5d84700d7424c0973273ca4",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-DUP",
+      "global_step": 89
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-DUP\\step-090.pt",
+      "sha256": "dcc5e6606062de9564db26075962455cf022c7620ff2e3b2512a104bac71cf72",
+      "head_sha256": "1899704bc2c369a89d56ae27921d69a13e19a0ed1d135c3c58e027d9b33b4dc4",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-DUP",
+      "global_step": 90
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-DUP\\step-091.pt",
+      "sha256": "e07ff92d81aabc09dfac2683b0db044f370c0fb7a9420dbe4c1aa3f33da0d21a",
+      "head_sha256": "3574453302bcf8fdd77db0726e3eb845bb98d56caf277e4c6e22dd80ebfb7ad4",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-DUP",
+      "global_step": 91
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-DUP\\step-092.pt",
+      "sha256": "166414302e022d4e515b11ea9846ca93f0ca7dbe8c4a437a81060d1ae3ae954e",
+      "head_sha256": "74888aa269362c32245170fc5a3968d1958796aa143ed7cf3d59986778e47c8d",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-DUP",
+      "global_step": 92
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-DUP\\step-093.pt",
+      "sha256": "3dad5d172cc3e2bf1391967860482137a1557424dc4ab74020c4cd99af0fb2f1",
+      "head_sha256": "6556e6ace5220d4b467ead9e4145f0e77b93f8ef27bff6b0dd0cfc9ab4902550",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-DUP",
+      "global_step": 93
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-DUP\\step-094.pt",
+      "sha256": "4cca069507290813248b05605ac73a9887d47b2f5a34566c41ac7a19627872aa",
+      "head_sha256": "977866c1c3e5f08fa9ab7e346e31988bd411b23ceb61298d9693a4d344d674f3",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-DUP",
+      "global_step": 94
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-DUP\\step-095.pt",
+      "sha256": "183e2e1757987ff31cfa7ee96a6743be1fcccecb8b4813c37ecc031c2207dab7",
+      "head_sha256": "c498e0d6f92e271ca72f6407e6eb69c3d536f29f11bb679b7a0f4fb3e17ad44f",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-DUP",
+      "global_step": 95
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-DUP\\step-096.pt",
+      "sha256": "2da4b5532623f51d17ffbc1134222f17802da868ce3e6e1c37bedbfc78cfb883",
+      "head_sha256": "d1aeff608fa2f326a9862efb2bbbb926c4f798feaf14fd89fd00253a8d6c2f03",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-DUP",
+      "global_step": 96
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-DUP\\step-097.pt",
+      "sha256": "2565951c4c839199f4c506c44cffd6e403b8234232200119b59ca87044f6c39e",
+      "head_sha256": "da3846dc0bc3313932295b18b0eb3c36c7673064ed8ad77abcb69c48157a25af",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-DUP",
+      "global_step": 97
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-DUP\\step-098.pt",
+      "sha256": "09640204b65b8128608a0963a93f34ee9bd19d66c1a7ee05b1b0b586de2c1417",
+      "head_sha256": "8bfd8c0b9aae5a69ee3e56d15863b4bd3f12198b4562773f6fd94d72b6870e4d",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-DUP",
+      "global_step": 98
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-DUP\\step-099.pt",
+      "sha256": "91c53d2eea4539bc9252185d5ab763f2bb9fee7b931b4828cc4aecf9cac1df48",
+      "head_sha256": "a1fe82c716ba2ac94847f0bd137f223630aa20b88beb47cf6a401dc4f8d53212",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-DUP",
+      "global_step": 99
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-DUP\\step-100.pt",
+      "sha256": "f3b34f95b5ce428d4dcaa0a7b49c4e178eebdf51361b7400271e0c4def53e3dc",
+      "head_sha256": "bd70a603978bfd00c125b1aef6783b3a8a75735b52812550de0f39e3aaa27eef",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-DUP",
+      "global_step": 100
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-DUP\\step-101.pt",
+      "sha256": "d208909f421cef844613b36009e79506578f82d64215203c83c5415aa39c47b2",
+      "head_sha256": "81c9b303245cf8fc8b1aa501098b0e3f68743e270adab7804d1229ef6eb3f53e",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-DUP",
+      "global_step": 101
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-DUP\\step-102.pt",
+      "sha256": "9249cbfd240b272317f5a78e4c341a0a6ab81aaf61a8948ab6f04361661d8125",
+      "head_sha256": "dc299751ecccda764cab27f2074592f3abe0f469d56a0e7dafb559ccc2aaeba2",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-DUP",
+      "global_step": 102
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-DUP\\step-103.pt",
+      "sha256": "28173c093a8adc95bfab690fb0ca637631c05da4bd71c723b1b1ffa31eba0475",
+      "head_sha256": "aa4bbfe26b76f5aacefeb58f71da383bff7c3274d8906cac42f3069f6517bac2",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-DUP",
+      "global_step": 103
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-DUP\\step-104.pt",
+      "sha256": "45612e6321e1c18e48a023c9018307535eb58d7dcc8ddd9fa550a8583b48cc2a",
+      "head_sha256": "0c37e728b7baf5aa1e5136ddb57e390dc8749ca8ca95952c1451129ee3179bbc",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-DUP",
+      "global_step": 104
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-DUP\\step-105.pt",
+      "sha256": "60fe15f9002691db601782923c76521e304357e402ef05ce630aa25926d63e70",
+      "head_sha256": "c492b15d489e25eef801d53ad3b896a0a0be6c9dfb5b614018fdf310007eed88",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-DUP",
+      "global_step": 105
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-DUP\\step-106.pt",
+      "sha256": "f7529ec90d415c6279a62dc117b91eb3048886fd60bfa782020f2a0a1cc18e42",
+      "head_sha256": "d4a6c3572742293e85b9c00713fb7e3adcd7d697bbb9cc130e91ad4e297d7aac",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-DUP",
+      "global_step": 106
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-DUP\\step-107.pt",
+      "sha256": "b3c0abb5128ab69b117394dd6e0a2f91ae9896eec22c6202859a04798f1b8e22",
+      "head_sha256": "ce6293b4ca3a8c13d34f4c984c5afa6ada0b85c898c0b1c0b0c84371245fd4ac",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-DUP",
+      "global_step": 107
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-DUP\\step-108.pt",
+      "sha256": "d17d73f5a3b56d23029834c2553a42745c07a2cb058b45458b6ec56aec0d0187",
+      "head_sha256": "12d307c77a354d51b4a43d8f81da6227ef866b4132d8fbaf48a56624b7c7bf90",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-DUP",
+      "global_step": 108
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-DUP\\step-109.pt",
+      "sha256": "cf5247033c5d762a8e4319f7775f308088d51ba81f16d7602beefc5a19f8b1a2",
+      "head_sha256": "41f9be691b162cf83054a7535340818777748d4d3733ddca41a0ca6471ec8546",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-DUP",
+      "global_step": 109
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-DUP\\step-110.pt",
+      "sha256": "48ddee2811799f919b29876fc72f0f7744d13105423201af37b6a213487e6e3d",
+      "head_sha256": "f54ecef1086a63d8b7b9255e0c95b0fc0c19a989651a943c84dd2c8745c85591",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-DUP",
+      "global_step": 110
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-DUP\\step-111.pt",
+      "sha256": "4e2f3885806c77c12019f733a91f5750775bc086d5d9d807ca23ffa79f23ff44",
+      "head_sha256": "7c30dbb354a8e2e2542815c2b4949a2209d2fb9630829bce69629d38bfd1c68e",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-DUP",
+      "global_step": 111
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-DUP\\step-112.pt",
+      "sha256": "b6456ed44d7ea72bed239616c7db0546b0bc2c78b5807684a72d138487819847",
+      "head_sha256": "fee2e6d29a8e55a37727fb314d24db26a40fd06277d79bb038798d3100ad3a3e",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-DUP",
+      "global_step": 112
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-DUP\\step-113.pt",
+      "sha256": "213e9fe3ec906dfa36e06db8444c843409e8867b83587e74dc3b4761c9e7d515",
+      "head_sha256": "50ffee594559f1fa59010116851901b3d6cf0010a8292863b696f0ff81948d53",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-DUP",
+      "global_step": 113
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-DUP\\step-114.pt",
+      "sha256": "f7c402510d32f3fdced564ec990d16149d6cea72d52af4a5c206f997dddbcef6",
+      "head_sha256": "58a12e64a9137a22c7ff4cf7b60646fad4217f1f3025a5aedc40373b466bccdd",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-DUP",
+      "global_step": 114
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-DUP\\step-115.pt",
+      "sha256": "30cb068f356cfd818b4616da1c94c70af50e700f3327bc579ebe17ce6e1e4dd1",
+      "head_sha256": "3125f55895f57cd10b391983ad5fa458b2d8df18eb60a0c71ecb8d21ef4936f0",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-DUP",
+      "global_step": 115
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-DUP\\step-116.pt",
+      "sha256": "39fc87da154ef523b007b065b2b935df8ebeeaeb80a89aaf0f971f9329d14f97",
+      "head_sha256": "5913f582eabe8a07d251b16da05a2a38591767d948764125d3440c3cb628b2c3",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-DUP",
+      "global_step": 116
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-DUP\\step-117.pt",
+      "sha256": "267a349d12070125928ecd12a41b6ceb2917b6b14b29b0fdb80140e9ed5952a9",
+      "head_sha256": "034f90dbb322a2de973c34e31c8a60606d76c20d73a6a23a737c3511c93febab",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-DUP",
+      "global_step": 117
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-DUP\\step-118.pt",
+      "sha256": "a509c97e842b6cb2ad055810e92fcd1a78afc83659c2073eb34147c3234bb80a",
+      "head_sha256": "2110bdb42e357449808070bc5f239d7a0554286f83d04c2d87d25e79977123b6",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-DUP",
+      "global_step": 118
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-DUP\\step-119.pt",
+      "sha256": "7f2f8e32ee0cf96169115e86e87b447ced1e418f84e41a0b48c39ba931e1bfde",
+      "head_sha256": "293afb4ee061cfac312ad3da08de7473beb26810f57a30fc189950bc849aedf8",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-DUP",
+      "global_step": 119
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-DUP\\step-120.pt",
+      "sha256": "04cf908dbc3881aa4b4bd32cda1919cdfff4a13efa79963e36b72c00984cf314",
+      "head_sha256": "06022def893ab5ef19d1c4239eb15757d89fa760a33db1d7ea4f2713c9301272",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-DUP",
+      "global_step": 120
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-MATCHED\\step-040.pt",
+      "sha256": "2deacf6c42934e50f3f5bf9f03d0784532711f434218c820262c5eb413202495",
+      "head_sha256": "0fa63e081cd3e401ca402ab14b7a6216a32f7a1c889cdf5a129dadefa857bcd9",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-MATCHED",
+      "global_step": 40
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-MATCHED\\step-080.pt",
+      "sha256": "11f8ed0bee91aa2448f65f73c6cb2b26b7d7b28c81cfdd1d42e0066ac1fb0228",
+      "head_sha256": "cf8d58d72ecb64ceafed4deb405171747232aee5efe42c4bc9e9e05e024888fa",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-MATCHED",
+      "global_step": 80
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-MATCHED\\step-081.pt",
+      "sha256": "ef408eb5a6848e8d1b46b9788929a0c24cc14928b447cb233a775863a4cd8af1",
+      "head_sha256": "4da4e346456cbb90029841809d0579ee6d43220e7fd3d0bd82f01483bb185ac7",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-MATCHED",
+      "global_step": 81
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-MATCHED\\step-082.pt",
+      "sha256": "6b08f7d1f0637eaad325a790240a1e9de6e47942313f53a7209f10fddf84a04c",
+      "head_sha256": "ce27530e723413c5a88af0f2c2e72e0ed8d51f117de2c5196a00f7ffefd758dc",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-MATCHED",
+      "global_step": 82
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-MATCHED\\step-083.pt",
+      "sha256": "62954f7a7a9b58a16654f2cd00ab99cb7e79e8fe5d5d7ea5f72c70c163915910",
+      "head_sha256": "baedaaee960b21714406fe70bc1ed0776f969ad2f6c62138c6da09f96d787192",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-MATCHED",
+      "global_step": 83
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-MATCHED\\step-084.pt",
+      "sha256": "20349fbbaa8fc413159366ad9bf10c4a15617863588c7d6f2b995937d672c574",
+      "head_sha256": "62a062f1dd2c516b17bb8af20370527ad8ad4ef3472f233396aff9e76f7545d5",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-MATCHED",
+      "global_step": 84
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-MATCHED\\step-085.pt",
+      "sha256": "771d6a995e73824eca0d31499e5f9b24ff7e804cc50ee5d4a80cdb9f8f0e05ee",
+      "head_sha256": "6faae0d086fdb52ac1c1c75d799f89ca12716f860ccd6624d00adb7c4a2b8631",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-MATCHED",
+      "global_step": 85
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-MATCHED\\step-086.pt",
+      "sha256": "dd4768e3dd7eb60d30eea6373e0e97d4eaddf093659b0f37857dcf3e4f1b0d6e",
+      "head_sha256": "1442c272bbf7ce29cc69bbb5ef77f5b3a3cb4e5641826136722034fd0a7a0895",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-MATCHED",
+      "global_step": 86
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-MATCHED\\step-087.pt",
+      "sha256": "2ecc7a12c68daed3a00740e0e100277fc65fa73dae91b3d047c96ea22b490c0f",
+      "head_sha256": "af204c3ee39e93e5b06c9d91e428cbce73c27615a7cd8731a6d9e6b96d0b8905",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-MATCHED",
+      "global_step": 87
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-MATCHED\\step-088.pt",
+      "sha256": "4a5493fd9d251ff55b315fd21695aaf2d5b10b78e04845089962788b94c328e8",
+      "head_sha256": "fb41794a009fc5d81125b61c0f82a03ae27aca4e6e94c7503129d98c960a43d8",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-MATCHED",
+      "global_step": 88
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-MATCHED\\step-089.pt",
+      "sha256": "ac533f40a4852a9fd5f61f75ed9b353fd216499530a537beee731a9cfca230d7",
+      "head_sha256": "952549ede39d5803767d07ccb305136f66801bf27423f44d941c2eab4a0bea4b",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-MATCHED",
+      "global_step": 89
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-MATCHED\\step-090.pt",
+      "sha256": "8104c1997862d55df97e8b3029978ff6fea46ed9468582f43053b5ee8db253ff",
+      "head_sha256": "5b08040342cfc1b16360872011c491ae8740d7b9520e04efc5f9c86f625ad65e",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-MATCHED",
+      "global_step": 90
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-MATCHED\\step-091.pt",
+      "sha256": "209ce9f94381682d4f4fd95b6fc7214e0aca5bf8468540c0093326b78639a90f",
+      "head_sha256": "08fd336cbdf4787c3f37c191dc713b426795320a7215461e6dfada18b72f37a8",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-MATCHED",
+      "global_step": 91
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-MATCHED\\step-092.pt",
+      "sha256": "e705dd555563e0138b1271b5a3aaf7e9475ac45fae3d8770b23f162bcbc272c8",
+      "head_sha256": "8ca76c02097a48195fd454bc3c9cd328595196cc435f4a8c1cdb32fd4707b144",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-MATCHED",
+      "global_step": 92
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-MATCHED\\step-093.pt",
+      "sha256": "833efef7a3092d306865359429017d311d261fef7ea0a5649af0597b5d72447e",
+      "head_sha256": "1061154850ee14dfa8393a4f0498dd7c656bb893a542c318fa64643692b35ac7",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-MATCHED",
+      "global_step": 93
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-MATCHED\\step-094.pt",
+      "sha256": "a4df433de000f80b5c71f6e14527247091a18851c5b38a38f9c769ab354111a8",
+      "head_sha256": "552bbfb60741c92a0d1762a87a60726d9d386410b712a361ed8efe0a1da07a84",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-MATCHED",
+      "global_step": 94
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-MATCHED\\step-095.pt",
+      "sha256": "64daec0d8bd7ad2f7e350d09709d1fe9e73dde28a22966523f5285598b5bcf68",
+      "head_sha256": "e4810fa8b58ab795a2d7a9542aa26352747e0c2318440665b7bc51ead329ac83",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-MATCHED",
+      "global_step": 95
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-MATCHED\\step-096.pt",
+      "sha256": "e9cc23bfb57f18eaa2d63e6406655c255c607ce92efcdc110c08f84e8d2f4950",
+      "head_sha256": "3d27ed6ab86b1a74ec49fdd3acf79ba120e6b13ecf6415d1291378917cc58d72",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-MATCHED",
+      "global_step": 96
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-MATCHED\\step-097.pt",
+      "sha256": "5922c56a0c0673e389d8b014cde548068df7d09b2ef71bdf053df1c9e4a4f8c7",
+      "head_sha256": "9a428e1a7fc60d8011534d0e0abc290a8e47502a0e1bbec71545555788d963d2",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-MATCHED",
+      "global_step": 97
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-MATCHED\\step-098.pt",
+      "sha256": "ebfbac510806d54b60beeaf91374862ea358e528676cdb3290ac80e9c583b19b",
+      "head_sha256": "709327e581370754afe4b9e42d0a109d576d431d09d70b16142b243f79b5c960",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-MATCHED",
+      "global_step": 98
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-MATCHED\\step-099.pt",
+      "sha256": "4f6107d5eb8fd8468271e6800de709cc5673471edc6477846a8e227650f71ec0",
+      "head_sha256": "3fcd2898b8c123be2e5ebea76e533b0efc14dc0707a1da5a83396b283d664b62",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-MATCHED",
+      "global_step": 99
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-MATCHED\\step-100.pt",
+      "sha256": "7134b27e221d18ff277336c846003be6aa3af05457c337f1855d529d31c507de",
+      "head_sha256": "bafedac1b76ac4832fb5d0198c442cfb1cc5377663b6236341b740dfd1d7a1ed",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-MATCHED",
+      "global_step": 100
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-MATCHED\\step-101.pt",
+      "sha256": "13b05c17e149448036d1854c92a71e19acd0c4ea083b142d8542bf82dcb974ae",
+      "head_sha256": "c52259f9673a4fa9775c95970354ed1d268967d411711f65cc94397796e0a71b",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-MATCHED",
+      "global_step": 101
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-MATCHED\\step-102.pt",
+      "sha256": "3c659a29a344778f61c8b27b401961bdfd9522dbd4d6f72ea68187544490d35d",
+      "head_sha256": "a9df1ab5640b32a19105b62b4e70d865ab50e5582ee6aa4fb7c397f207444204",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-MATCHED",
+      "global_step": 102
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-MATCHED\\step-103.pt",
+      "sha256": "8d56010c4b950dea8f8baf202fdf7d4ab733ab806450d254c88ff895be0c9993",
+      "head_sha256": "4dcee57f72508a4182fb3b0ec81e6e2ae6d5478f7a193f34918d18389e3cbb04",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-MATCHED",
+      "global_step": 103
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-MATCHED\\step-104.pt",
+      "sha256": "1e59784d152a33df163ae2efd2d93399356112592183e45344944a673b35aac2",
+      "head_sha256": "2042c88b125932e5e87c1b2940ffca0788d7dc46d1c727d10c19dff41a0919be",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-MATCHED",
+      "global_step": 104
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-MATCHED\\step-105.pt",
+      "sha256": "e18e9c9d036dc5f30ab23bdc0eeb6e4c207a25509a00f486ee697f7b292ac9a5",
+      "head_sha256": "1669e7e65f5126a2251188198a522f219a00864678cd46e42a0e708d959267ff",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-MATCHED",
+      "global_step": 105
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-MATCHED\\step-106.pt",
+      "sha256": "0da9553e7d5fcfc8b90c112428690d4da62a6c3654a59d6ec344e64737df48b4",
+      "head_sha256": "a0a8463b382f2938beb6f0395a43957ff698d2f6c425723527d76ff38a825c47",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-MATCHED",
+      "global_step": 106
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-MATCHED\\step-107.pt",
+      "sha256": "d4ea3f5e64c7a2772c0b828411cb0e340304948de477e312d2fc8c149654a05a",
+      "head_sha256": "b600e99dcd5bf8ff3cedf3e8e688012bfa89c6c7024b8b8c9bd2cbafc57a45f3",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-MATCHED",
+      "global_step": 107
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-MATCHED\\step-108.pt",
+      "sha256": "74905be1fd3aa01478d6264938cda36c9fcdbd93a9a5974fe4f0aa0ad8e1c146",
+      "head_sha256": "dcbe5a0d37884030287cda5e3a2dace82dd86fbf7db2497b6d0e81a6f16f73db",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-MATCHED",
+      "global_step": 108
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-MATCHED\\step-109.pt",
+      "sha256": "c67743830f8800458e860d576f08cc599cbcb03fad6d34370ea0d62b3c02f0ac",
+      "head_sha256": "4e51082072727f23e5bb098622929fce17344b7fe4b2a55977fc052b3197ac1b",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-MATCHED",
+      "global_step": 109
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-MATCHED\\step-110.pt",
+      "sha256": "003a695a90b9f3a4953e450185d8c9f99a9e543521bf48cbb08a34979102b7eb",
+      "head_sha256": "15d7f45043cac964a047aeb3026f5d35a91e879e98a02979d79d9f4228934563",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-MATCHED",
+      "global_step": 110
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-MATCHED\\step-111.pt",
+      "sha256": "4d62e49820c4e1506aef04ae44e26c16ece5e9d271b97d05fc02aad6ba50ee0d",
+      "head_sha256": "8c7cb71118d9af08e0cacefe1457c296d85e2eb89785edf192b8b97696f85a20",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-MATCHED",
+      "global_step": 111
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-MATCHED\\step-112.pt",
+      "sha256": "0c8090b8d3b9fde64bbd436ece727cf6b4d0cee9146437f44860a89225a04f24",
+      "head_sha256": "de0f81cc0fd4df16bceee282ee83b892236bb5186f9d20bfc49c7c3257929c6e",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-MATCHED",
+      "global_step": 112
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-MATCHED\\step-113.pt",
+      "sha256": "70ed31edf30e8563853db3f12eb6d0b33328da94b9c5a0e0efe1ecdc2afc1051",
+      "head_sha256": "14eee3ddf149cff07946fa43187a45a57938f626c299afab94eba577d52281c5",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-MATCHED",
+      "global_step": 113
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-MATCHED\\step-114.pt",
+      "sha256": "b186322eae2071611ae8f6a2630dac1eb7f9aaf9f3fb10b2242ea43610e22608",
+      "head_sha256": "39555839ca2d8d615ffa08b8f091afe847ac65013c87cce83c4f81b8c535bda0",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-MATCHED",
+      "global_step": 114
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-MATCHED\\step-115.pt",
+      "sha256": "185d3ec291cae1f1752d899c090a3472485ac838d87fc60678bcf09957cc4a5b",
+      "head_sha256": "33da8a346bbb13707c1e1edf3f137bdca072811d2cd8902b0eff35c3f1397605",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-MATCHED",
+      "global_step": 115
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-MATCHED\\step-116.pt",
+      "sha256": "5b4babb3fa6f9c40c99d9fb13056042bd902b94b43f53c2e805bd089e4173346",
+      "head_sha256": "ec965e18ae6dd6060de17f58946307c358bfa084625493ab2556a5288fa42ede",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-MATCHED",
+      "global_step": 116
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-MATCHED\\step-117.pt",
+      "sha256": "2cb58399fb70afa620ffc9007a48d9023f8c6060aa85ef95bd064789ebd12b36",
+      "head_sha256": "bb1bd5b8e853284874d7e5458a831dfdd6b2ce628bea694eb344ad7cab9c4d5c",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-MATCHED",
+      "global_step": 117
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-MATCHED\\step-118.pt",
+      "sha256": "44bcee2274fe584889199f642d7dd2e3139b77fa21a21719fae2651f0a939847",
+      "head_sha256": "ebc63374ad05a07989031f1e347594c2922931279f4972b6da697b9ddfb0805a",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-MATCHED",
+      "global_step": 118
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-MATCHED\\step-119.pt",
+      "sha256": "be970d09f19bf6cb2be1381b76933c0e9e993be2875dc112e5025ef646cde672",
+      "head_sha256": "2dede681e6fc7dce89b7703e48b59a1c616f29d4947aaaacceddeb4393b4c55c",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-MATCHED",
+      "global_step": 119
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-MATCHED\\step-120.pt",
+      "sha256": "50e05316f4730fdefe2b72414fc5dce48b1d8a9151bc408f4fbec8eafd416222",
+      "head_sha256": "562864799ecdadc60167fbb5bc15bd92a7b71b0647645ba71ac81033ceee93a8",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-MATCHED",
+      "global_step": 120
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-SHAM\\step-040.pt",
+      "sha256": "3597c8af3fe7489c3a46e689ee9fa5f4c893f476b7a5f29fb2c684a74df18ac6",
+      "head_sha256": "3f2e0d871ec353a7c61957030b599152041bd57ae8861dd4b29bb795a671fac4",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-SHAM",
+      "global_step": 40
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-SHAM\\step-080.pt",
+      "sha256": "31ac9b85cfe2a514df6714872701c077a0d0a2623cd20e10cdc5306f85d463e1",
+      "head_sha256": "7c1e3865638223ca1cb53c4e86279d9f49bb1fa1ce6fb752131888ea59d2f869",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-SHAM",
+      "global_step": 80
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-SHAM\\step-081.pt",
+      "sha256": "a6f219023e84570f49d691578ccf43d4b007f7b0fcc2f6216028689d886c72a7",
+      "head_sha256": "39e27b9c75b86277f2ff8322ab1d6c0b10c8c14fda94ebdfceef5fdb8cc1d135",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-SHAM",
+      "global_step": 81
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-SHAM\\step-082.pt",
+      "sha256": "7eecf1e81e6e5c0c34ad4b7a82f1e42907c85e6b2b7c5a40b9e1a1f40d92846f",
+      "head_sha256": "c3c6429025e9a58d4ef1fd553ba5dffe361871e8a5cad6954996ebe09fbd5005",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-SHAM",
+      "global_step": 82
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-SHAM\\step-083.pt",
+      "sha256": "d26524bfb8aa2a4c9674449782ed6959c51f4e199120e68f1e512c5441a6f56d",
+      "head_sha256": "b3d7bb3ff5b5e08ba903c21d23d6b53968c7734a92d572bcc8db372a431ab7de",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-SHAM",
+      "global_step": 83
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-SHAM\\step-084.pt",
+      "sha256": "b51529fd9d1aa759319dbb9ab0bdc9e9b15152f93956a05f753758b85b84f15e",
+      "head_sha256": "74c916624d4406ddf6309015925bc4cf5a602ca4ec49698e6dd106e8b26ab42b",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-SHAM",
+      "global_step": 84
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-SHAM\\step-085.pt",
+      "sha256": "f53b29237f20b4da6004958775f005afd068f628220f04b3b0d17db3d69cf4d4",
+      "head_sha256": "3d882099f806c17d2ee72d5ccc655fa30cc5bdc0aab2e664d2e5b5291ccbb7ba",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-SHAM",
+      "global_step": 85
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-SHAM\\step-086.pt",
+      "sha256": "2b0c6172e4521e026c3abb798dfbcbd7a63f0c875c7b70ad7b8a52285c81cd2e",
+      "head_sha256": "fc53355ea6a5d78de8c1fd8ae8047fd572366eb081e08eca16e5121c7ab83c64",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-SHAM",
+      "global_step": 86
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-SHAM\\step-087.pt",
+      "sha256": "a3ce635fe506291675edd5bf4c4445ceaeb3bf1c2280c384a13ac046bc6638ae",
+      "head_sha256": "c26e0751de505fa1f3fc9cb4a996932ae54c56a53ff455d4ed9ff8c9917f54fc",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-SHAM",
+      "global_step": 87
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-SHAM\\step-088.pt",
+      "sha256": "dd2f3c0af76d44a254e3e2f8ee281d4e39995fa30dd2bdcd055ad88df373c040",
+      "head_sha256": "07a027ba4badbd9e49b5cea8bd1c05720906d910bc33cbe8f45b69cb9c26bd12",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-SHAM",
+      "global_step": 88
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-SHAM\\step-089.pt",
+      "sha256": "340564658f13cc22acc80ca82b1f2b55c7590ec126b2474ded40020448e94f23",
+      "head_sha256": "ed00697b0f25a5064d63781e06bfeca79d5fd5e56b218837f34cfd4ba72a4b5d",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-SHAM",
+      "global_step": 89
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-SHAM\\step-090.pt",
+      "sha256": "cffcec252cf3abe04071b7372d1e10e6b5555d69e5204cc84768f2d8feb38740",
+      "head_sha256": "acb6c4aca29c7107c0769ba5153ea52380a063ac0a545565b520bfc259db8a1c",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-SHAM",
+      "global_step": 90
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-SHAM\\step-091.pt",
+      "sha256": "7bb0ab154021940bf6d21d94da44b36093279ecb0e409240b3fbc9d1f4fe3a48",
+      "head_sha256": "c02dab46560003e5846903e18c9d4bd95f8b24f2f8289eefd177fe63c982a78f",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-SHAM",
+      "global_step": 91
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-SHAM\\step-092.pt",
+      "sha256": "5fa8c5f431a89d8da5920a21764a3186d7abeae14f2bf760d912dc3848bc93c9",
+      "head_sha256": "e9e380b885adc94916441ea5d9738b9a538bdd0db80a18bc34f05398ecc276a4",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-SHAM",
+      "global_step": 92
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-SHAM\\step-093.pt",
+      "sha256": "ba4181d302476011d3472bd67b7b3bcb8809839ca0a4498728f9f4c9c5849339",
+      "head_sha256": "9eff370899b33be0770514a0adf8b39bf143ef9248db07b2fee4f8f55e10c276",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-SHAM",
+      "global_step": 93
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-SHAM\\step-094.pt",
+      "sha256": "2596de2cc559caac7634b1f8e9e8a6d8295bebc1c9784038b2b6b0d566e15a96",
+      "head_sha256": "492e871cdf84e29b06f5399f58ce9773408466b469c9d82d1699b69317a326a4",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-SHAM",
+      "global_step": 94
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-SHAM\\step-095.pt",
+      "sha256": "983cfcb6dbbd36fb4b560ff0369f0207b1cdde7b58d1457d31f38fe22ab2cd25",
+      "head_sha256": "ad7136e19a1322659ffd80705dd8628099a2a45468ae4f334f4cbcad0cb8f3cc",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-SHAM",
+      "global_step": 95
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-SHAM\\step-096.pt",
+      "sha256": "1e6f02fff25cbe769764697679495805f07107a94cdaa6faaf00d66f33021135",
+      "head_sha256": "ef24129615b2d24162b3a0191384bcf43eb039b06322041132cbe96783ec46c7",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-SHAM",
+      "global_step": 96
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-SHAM\\step-097.pt",
+      "sha256": "14b57ae3ea53f8aeabba5e5f92aee1a9a27e3ee565a5f69580c67616da56c524",
+      "head_sha256": "24ca033682a6632542bb8b4da3406af10f94d82f2c3c41d41947e8337dfb40c5",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-SHAM",
+      "global_step": 97
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-SHAM\\step-098.pt",
+      "sha256": "9310422687ddf30633fe5c14e5e28ef24e44e100ba199e405137dfe5ae4aa0bc",
+      "head_sha256": "5b760b4b8bb328a3bf788a2193e8b788b4208676f803706bfbd346b9c9225e9a",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-SHAM",
+      "global_step": 98
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-SHAM\\step-099.pt",
+      "sha256": "113b2762ab00e526d96fa4bc35dbf5b3575e66ca61fb836b2c8a5f09e60f7868",
+      "head_sha256": "394f1232403ebc44a5ff319707f41bcb85b37b8fa01c09c8e5502faac993cd53",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-SHAM",
+      "global_step": 99
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-SHAM\\step-100.pt",
+      "sha256": "5d7472a9ebe996b025d65051c6191821c08576536499fc9b21765172ebe341de",
+      "head_sha256": "cc1d209ff3bcac52969c6106210ac82ab640002ed5ee9a17a26cd9f7f01cd9cc",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-SHAM",
+      "global_step": 100
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-SHAM\\step-101.pt",
+      "sha256": "480c4c6dd43198fc3c39cd6156b36f5cea9b80ef1786af793d0a90641143c871",
+      "head_sha256": "19e66a7e12c2684c563b7d2c8acd21392e5b774072b2a3bda0079db73ae337a9",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-SHAM",
+      "global_step": 101
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-SHAM\\step-102.pt",
+      "sha256": "571dbaf240bbd401ba09220df8831b46822cd43c5a5be47f5321c7f5154a0b48",
+      "head_sha256": "bf105d5a0a1e1a378b0b7f8832ea052acd7f09c506bdb045714b7601742acee4",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-SHAM",
+      "global_step": 102
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-SHAM\\step-103.pt",
+      "sha256": "2dacb269a71c92db8c53c23fe6f8c06aacbd641a7b159d71254a2709ac327bd3",
+      "head_sha256": "69d805cba5a44c04eef424cc438eeefbdf77df53526d46160d4179e70dbfa24d",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-SHAM",
+      "global_step": 103
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-SHAM\\step-104.pt",
+      "sha256": "4147423ccc485b3e6572459bfb90a61712960071db82f5e651da41635f35adf3",
+      "head_sha256": "d313f5ec55d865e9000bff8de269a513d6c37d4895edce3b853d646e318ba0c5",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-SHAM",
+      "global_step": 104
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-SHAM\\step-105.pt",
+      "sha256": "1af4e897c4464abfd2c80e4c50357f30d81fbabfaac7ba256ef299d6eb36dffd",
+      "head_sha256": "c33a107abe668085c46854ee4c009ec6b5432199cfdd3fad6fb66de465583623",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-SHAM",
+      "global_step": 105
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-SHAM\\step-106.pt",
+      "sha256": "aa8db1953eb38e9092849b799d28b1fe8756a3f3a9f7c18a3d6cb08c01e57561",
+      "head_sha256": "27d037afd05c447fef2a68806cce57c399f09936571d44aca340b7a11cad1111",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-SHAM",
+      "global_step": 106
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-SHAM\\step-107.pt",
+      "sha256": "c094366043df60f9e6fbee4fc944fa5d895f1dc558ed0d0ddfb6374991a54906",
+      "head_sha256": "18a1b99ba5052c25d6b3997175a05a76be449ebc56a9350d3141ea6475bbf851",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-SHAM",
+      "global_step": 107
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-SHAM\\step-108.pt",
+      "sha256": "30e317b985ea0dcd2798dd8e745820673cb36dbd7443cfdfbd3a7781b1ce41d2",
+      "head_sha256": "ba2f3ee1cc684fe89c93b9ff519619801bf82a82a752178828c680be416d38dd",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-SHAM",
+      "global_step": 108
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-SHAM\\step-109.pt",
+      "sha256": "ccc74a309e8abb034f6bae184ef29326c675b8c7cd108023094b8794a1945fed",
+      "head_sha256": "79c0bf3946158f7bd258ace285f381f35a69a8a481dbb43c90a4c532ca30a89b",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-SHAM",
+      "global_step": 109
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-SHAM\\step-110.pt",
+      "sha256": "51e818b98c5861202246cb5e7d0ad2d50b2788ba1771de529a8d36263899f39e",
+      "head_sha256": "0e6ffb3c9c13004f64297ef118adea916f396d29477aae2d814cb7d27550d6f9",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-SHAM",
+      "global_step": 110
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-SHAM\\step-111.pt",
+      "sha256": "8513ca80411418d0872a7b807df8d992e0bdd68b9c581bace3fca36d7adabb19",
+      "head_sha256": "24255b0b764a7b72be07827e82e69a695ca467068f5b98cce0b0f49f47be0c7b",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-SHAM",
+      "global_step": 111
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-SHAM\\step-112.pt",
+      "sha256": "f4811dbf289fbb60ab7b499d7c76e3ee64339d6002bd660debdacd56409bce9d",
+      "head_sha256": "70482c37ec91da8710a8aa98affb22fa67441e91be554a19f4b80ce21c63dd95",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-SHAM",
+      "global_step": 112
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-SHAM\\step-113.pt",
+      "sha256": "198d07329baaa0b4f3dc096eea6f94564ae56dd6a78df4a60c5edb73157a6960",
+      "head_sha256": "78a13d42772cc223165b15f98ced431cafad2744d8956b8189eeab4d269385f5",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-SHAM",
+      "global_step": 113
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-SHAM\\step-114.pt",
+      "sha256": "3666a8e9d91cc7ce4bdf8ab4a79d0c8b9c41a9118c76cd89f370b7d8afe48b2c",
+      "head_sha256": "25b6b3edeac3a95e0dfb2d5d04548e6da8c0eb27653d269462f01aeefb8ef7c8",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-SHAM",
+      "global_step": 114
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-SHAM\\step-115.pt",
+      "sha256": "680cfee9020d0d354c736f15e048fa50150deccd1f4538ba504b2b01c3288c42",
+      "head_sha256": "56bad856e4e23588ea9dc08d22d5d48cfd878d1e8c7a926b79e03025b064c76b",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-SHAM",
+      "global_step": 115
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-SHAM\\step-116.pt",
+      "sha256": "c2505f04664ef246b8c98430bc9952e55bc61729220951527cac9cf7ad96e0ae",
+      "head_sha256": "3ac37cfe9ac222696d393e15b26e86e07e1b2525ffd5fc942eb2bcd079c595c2",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-SHAM",
+      "global_step": 116
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-SHAM\\step-117.pt",
+      "sha256": "1d1a364a7344acac3277503865b9f6a3f33e59f2c1c66af4a1fb6ab72d192cc5",
+      "head_sha256": "1649e187f2b872b418d1dbacfe3ac9af2fa2caa856f7efd1686b6905fdcdf490",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-SHAM",
+      "global_step": 117
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-SHAM\\step-118.pt",
+      "sha256": "292d8b99960bfa8cc6935144a37152775671a32ef6d5a7a638be0be14a18af2d",
+      "head_sha256": "0af1d93bfc00b261a1f0a70878c0eef65d2f2fa79cbfe06281f51ed13351924f",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-SHAM",
+      "global_step": 118
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-SHAM\\step-119.pt",
+      "sha256": "77e4fa245c9f8e4afcaf1f9c1818916db13cd3a8c88c1b07a8ce8ccefb43722d",
+      "head_sha256": "b2f5f784a0fe23ac74de1a13de377c0ffb4c092f71a113cc21d2f59671eca109",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-SHAM",
+      "global_step": 119
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-669993655\\B-SHAM\\step-120.pt",
+      "sha256": "b735bea76382bfa5701d5bb427318646fb5c9e95d9f94073124236cd2b81cd51",
+      "head_sha256": "ffed9c92cf6e632f550e845db31396dcae8b9cfb529ed8826014c53115c97331",
+      "initial_head_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee",
+      "seed": 669993655,
+      "arm": "B-SHAM",
+      "global_step": 120
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-DUP\\step-040.pt",
+      "sha256": "5e8c55e15cec773bb3c648b13746f8a7c88278757d5127675733261fb33bd0cb",
+      "head_sha256": "48fa2bb4491165cd2072c861e3c37381a561d18d153210a44e308a6436bec046",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-DUP",
+      "global_step": 40
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-DUP\\step-080.pt",
+      "sha256": "e0ce93fd764e255cd27e081261a5e787fe153bcbdf8effd9362871c4ee61976e",
+      "head_sha256": "db9367b0565db6d9b1162ca7abea6528f2c78837cfd11b080235597f579cc336",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-DUP",
+      "global_step": 80
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-DUP\\step-081.pt",
+      "sha256": "8e2cd6d2a4c70576584c84552c1f2750124782473e4e606f34c0f9b63767001b",
+      "head_sha256": "2ba8963ab02aacd5f41dcadf03dc7fcb4750043c31601b006b07f4b7f950b611",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-DUP",
+      "global_step": 81
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-DUP\\step-082.pt",
+      "sha256": "c67c4c4202ec411df4e2132b98dbc06835da746aaa221667ce80b66d9e1f2141",
+      "head_sha256": "78506869a154afc4712f3b8f4f8e9fd581cc4428786cc51382c44f61b20f9494",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-DUP",
+      "global_step": 82
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-DUP\\step-083.pt",
+      "sha256": "964a7b5b53e746b4792fedf125d1f56d41cac08db0fb740ec5d0ea6e810162c9",
+      "head_sha256": "26c6e051cc2968b53c65b1f720e7ede2c387865ed40531967a613003423dc03d",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-DUP",
+      "global_step": 83
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-DUP\\step-084.pt",
+      "sha256": "fa2311cde755c62f9818cd6442c0306489fa31f4721439b9c0e8f23f39eeb976",
+      "head_sha256": "b642271481f51cef99c650aaeb075f3207b1e36d256256092000f8524bd2e1d8",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-DUP",
+      "global_step": 84
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-DUP\\step-085.pt",
+      "sha256": "4978d2d47e62e216434aec7d739975fdaca2958900aadef1a91bf35af443d4e8",
+      "head_sha256": "6e6259eb0842520c3691b67cf2e731be831cd035b9e03fda91f88e8d65d3ee63",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-DUP",
+      "global_step": 85
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-DUP\\step-086.pt",
+      "sha256": "47eae02dcd185a60571b7dbd77d21b17e97160cf4d749a50bbc8fee59e502ff1",
+      "head_sha256": "8071bfd6d8edcd2fc838103dbcb7a245901df10b285793e17af7f5308069d156",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-DUP",
+      "global_step": 86
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-DUP\\step-087.pt",
+      "sha256": "9e4d8ae04b98ccbf6cd09d7a1a94b39706204a854cf64d8654413e0cf6cfb4c5",
+      "head_sha256": "3fd93d965abb8ce2d4b11f5894a7bb1126b6d69e701934a6fa8455bcd5c2be1f",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-DUP",
+      "global_step": 87
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-DUP\\step-088.pt",
+      "sha256": "e144cb47cdebc0974445c4e258cec7ace96317bb52e5a8bc741cc2443b2bf5b0",
+      "head_sha256": "bbe85d131f09513ac2eadfd1d40e21df6b4adb613fd8e37cb183f121a388129a",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-DUP",
+      "global_step": 88
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-DUP\\step-089.pt",
+      "sha256": "b1c043f81d592428f18cfd5e4ce439c0da50d1be29ab369b97dbef3399da8ad9",
+      "head_sha256": "bce52234846dabb816d9668604c734fb7e90ccd014f0f0a082cc37ac8028a3ce",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-DUP",
+      "global_step": 89
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-DUP\\step-090.pt",
+      "sha256": "6ae7df57b68d3aac4db88e7d5d8802cc88739e89ad921e6c3f6a06095279cdb3",
+      "head_sha256": "3fb84978a1e28b4cc5e78901e10c4b3c86db5412c380828271cd77981c639d80",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-DUP",
+      "global_step": 90
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-DUP\\step-091.pt",
+      "sha256": "2a0c44fd12674b341cbeecb344886d19e39b9dcc2bec2ef585fd7a7f0cf4cfbd",
+      "head_sha256": "53301f2d89a06f95e4a3e98174307f3474fe1e88295c326b087f6fdea3915776",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-DUP",
+      "global_step": 91
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-DUP\\step-092.pt",
+      "sha256": "4615b5e5791d206f53c35199f661364c007b9768acb64bc6d1e0291bf8cc984d",
+      "head_sha256": "a2f78a76c00f065816d450e67ae53ca906df3a7fddf46e5ece20465b47808af3",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-DUP",
+      "global_step": 92
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-DUP\\step-093.pt",
+      "sha256": "2f7a4e4c7b162372f795edf0b65b82b8074ca720cb0ab0915b18669dc618a5c9",
+      "head_sha256": "d755dfd991f88d19b862e8331aa103e59ced0e77d1287dad2d25eed8c2ce6e59",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-DUP",
+      "global_step": 93
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-DUP\\step-094.pt",
+      "sha256": "2b66cf973d7d63b3a1304bf32f1aa15786d4a1022b8eb340a740b4dd46bc2e99",
+      "head_sha256": "c4ab2db8e1e9138b2652c1ed908f451ad6d98a92ba22512d0a94eb117475c7e9",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-DUP",
+      "global_step": 94
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-DUP\\step-095.pt",
+      "sha256": "2a322d9e4c02d22b13123277a1096c6d440b6b92742caf80ab7450d7aa0e35bc",
+      "head_sha256": "ae57f91264d8f60d91def847db6d9df4611fa4af39dd7a674c12792e1426a8a7",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-DUP",
+      "global_step": 95
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-DUP\\step-096.pt",
+      "sha256": "32a1388a51e7adbadb53d8badf3a5b4bb90dc1df280f56b42bf370c9a2448ac5",
+      "head_sha256": "839b4805211f82ee70f061381633397003adb0d61c467d1acb4956ed40c942cc",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-DUP",
+      "global_step": 96
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-DUP\\step-097.pt",
+      "sha256": "0eeb6233379139bf2f21d1d5d1656ccd285fcae5b7cf4612c58e4e98fca4d5d1",
+      "head_sha256": "5b4578fdd1c23a788ec1958217ec3b0a518041c5930ef33c38e5e8e3b6edc09d",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-DUP",
+      "global_step": 97
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-DUP\\step-098.pt",
+      "sha256": "19210c149c245e10356fe33e198a7073524676d07f804eb157f6efc9a8c2c53f",
+      "head_sha256": "682e08c249d43a13bba3a24f51eecc94d02cfc2033435537b3883604780bfa96",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-DUP",
+      "global_step": 98
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-DUP\\step-099.pt",
+      "sha256": "4f614b00ef154266ec305c017600b88f92eb38e1e8f30f6e0b5c9dbc9f8b3f8d",
+      "head_sha256": "9a76ca943d3d18c88758d30d519208169e962b6a3adaf6c1e5708072d6408f12",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-DUP",
+      "global_step": 99
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-DUP\\step-100.pt",
+      "sha256": "e354366d0cbc29692584c73e4cafb0b44d1324e2a5530bd594a32d4a81d2953e",
+      "head_sha256": "73ae5ad0c0f0eeeaa16c5ca466355b385d6bb60350f81f41998f5c456fd7bd23",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-DUP",
+      "global_step": 100
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-DUP\\step-101.pt",
+      "sha256": "79dbc6d67e08addf0a616b166f48d558d4954e78d07fb568f544de5e4c92ae51",
+      "head_sha256": "5d7cc51f2293e6be337d78e7973d1b33a3bb5fe18db2e04998b2cc1001a2e350",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-DUP",
+      "global_step": 101
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-DUP\\step-102.pt",
+      "sha256": "7d6ee3502952383b08056fad1c0a8abc5302f34e363a2986c62e463240dedd2d",
+      "head_sha256": "65c129e40b5ab9f30d0ea5457960b2469d33fcd59ab979b97b2ee296d3696e74",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-DUP",
+      "global_step": 102
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-DUP\\step-103.pt",
+      "sha256": "af4bee8fe5b7ca0ac55362e02b9e6bad5274db779d92977a8ef78108a3747b1e",
+      "head_sha256": "05984522fa707d383160ed3e8d416523351128f4780567db8dc3718b5854313b",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-DUP",
+      "global_step": 103
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-DUP\\step-104.pt",
+      "sha256": "8b2ef977fcd06af0788043b32157c1966ab7d37202987d1b607c035a5fc7ef41",
+      "head_sha256": "d2b205dfd84c08e7d16e666bc948f72db7ee85ccc59b46f4bd7433dd5a52a627",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-DUP",
+      "global_step": 104
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-DUP\\step-105.pt",
+      "sha256": "2228e929bafc37e96dee42d388e5bc6a3bb54f4db271d3f07eecf196f4bf23b0",
+      "head_sha256": "4c16f1a806c163f9fa747b09f33ab2ac74442e02eeddb8f847e221f27bb7d3e3",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-DUP",
+      "global_step": 105
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-DUP\\step-106.pt",
+      "sha256": "2fa7de2b27920da8074191476b4b54cd70c0ec3f893f8d5e91c333eb56dc408e",
+      "head_sha256": "12a66fde1cbeb38a5392c46cd7aa680d13bd1bf67dfa1823ee76e20c59981718",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-DUP",
+      "global_step": 106
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-DUP\\step-107.pt",
+      "sha256": "1892095940e374ce26ee3475b435262c90a9bb6d795e6de0a3e83cd296468291",
+      "head_sha256": "ce85a58b25768db87372a3db5947e5c83d6c4f3d9ed5825ec9c755536b916694",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-DUP",
+      "global_step": 107
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-DUP\\step-108.pt",
+      "sha256": "87a3a4928cd0d66e9dd3acc99104beda3da7dbad8fe558d6056818189a2b34f5",
+      "head_sha256": "6a19a9f015c75b1ab7e3c93b8dd14e6bcf170d2169dcfda2919ae0d5511bdc62",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-DUP",
+      "global_step": 108
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-DUP\\step-109.pt",
+      "sha256": "f766d040f5547588d4067aec04b5d040622498a4767829533f1b05265ebfd9dd",
+      "head_sha256": "232ab1e9e77ec290b8ca6e52a7c37f58833050592f4745ca236ff2659253cb8b",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-DUP",
+      "global_step": 109
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-DUP\\step-110.pt",
+      "sha256": "3a19dc6d17fd88dc95e7950b7e883f6933ac96d44b4801e3ebf8e07962ea682a",
+      "head_sha256": "5d1671abe3034956bdff6fc1d63ef8fbf421aee73af9ff342689f602423390bd",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-DUP",
+      "global_step": 110
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-DUP\\step-111.pt",
+      "sha256": "30fed0d38717f5beaccf5634af4024fccb7ff168c0e89668242dceebe5d6f943",
+      "head_sha256": "7f76def2b9127d54074d9d9cd9e63832247c12322fe0d9de84b565c06a91aa6b",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-DUP",
+      "global_step": 111
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-DUP\\step-112.pt",
+      "sha256": "9c624556b7b2cf851526ff6efce1ee0d708f50a8ca6902465df75a031dc4d0c0",
+      "head_sha256": "def1f063ebac05545013d41cd1f47cae29a27c64ba00a9e8916e0b3099991df7",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-DUP",
+      "global_step": 112
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-DUP\\step-113.pt",
+      "sha256": "ca18e31dc9c73bb0c0a1a04728e0fb978534f605d82759897d889b76e1b9b994",
+      "head_sha256": "f5aa58753af40c12f8f57cce03f5ee36011aa3308cf2e484357abfcaaa4d176b",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-DUP",
+      "global_step": 113
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-DUP\\step-114.pt",
+      "sha256": "ec5aa559e5335a7b84b0b01c11c6b0e6262a43ee69b69d8474003a88203ac736",
+      "head_sha256": "d8844eef0962b685b02f151b4c7ea94d81deefc91a973b5a27aebaa04bbf3774",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-DUP",
+      "global_step": 114
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-DUP\\step-115.pt",
+      "sha256": "a9e47e4874c521b3ca1b9c1907c06f30bb2c65426849cee407c043a474ed6612",
+      "head_sha256": "15d61e6dfc48901db9f01fa90e16e0ea4198a6f59b9afb923635620204f2f83c",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-DUP",
+      "global_step": 115
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-DUP\\step-116.pt",
+      "sha256": "1ff9c81bcc45da88631e17872728b11c57c35192b654ba0d4353283afea8bf39",
+      "head_sha256": "63e2cb38c89ce768675c6d2d81f503d83af2d1cdf8d03da1f2d4c0b13c66f5e1",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-DUP",
+      "global_step": 116
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-DUP\\step-117.pt",
+      "sha256": "9cdea223c13aa6b31326e7007169501f80d7a74767451caf7d14e3566266069f",
+      "head_sha256": "067b5a44929008c27efff7e8a9616162670b4765b9c27dc260707ecaadee32b9",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-DUP",
+      "global_step": 117
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-DUP\\step-118.pt",
+      "sha256": "8b37b97e0f494a70da7aba0be515695a0187910c84be7344e969b305ab80adfd",
+      "head_sha256": "2fe2882f2bcec772e7e19582991eebad3a2316f2cdc1b063d09e837b92bce81d",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-DUP",
+      "global_step": 118
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-DUP\\step-119.pt",
+      "sha256": "9d402597670604e2fad7a1710daabacc6a89b0a8ce4770bbd5bd65efc1c6ec55",
+      "head_sha256": "ff3a2d545208944d18c17e56ba7cb0efe8fc429f1e4760397b3e9512044f71a2",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-DUP",
+      "global_step": 119
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-DUP\\step-120.pt",
+      "sha256": "18f775d2250cf53035d10cbfd38f45451e8d7766f7ac3d7dd623bcb6c67ade23",
+      "head_sha256": "2d4270326ebc24a910253e668a5da921240babad7a71e829abbdc35a79484cfc",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-DUP",
+      "global_step": 120
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-MATCHED\\step-040.pt",
+      "sha256": "2d880ae5b26d692f4d63237f53be700ad34ae83579d2ffa938f6e481cc0a11d1",
+      "head_sha256": "bcb5bfe1af48e7ab51a790ff30bbd3f4426f5b385ba4f6dd11f532f802f9d914",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-MATCHED",
+      "global_step": 40
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-MATCHED\\step-080.pt",
+      "sha256": "cc9cbb8f376a22d8cc558e2cd23121a8c97baba9586207dcc33098e9edc43b33",
+      "head_sha256": "ca8388f4f6d87ce50e8852431916bda2c47fcc79ac9f0c250b54ea4eada96983",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-MATCHED",
+      "global_step": 80
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-MATCHED\\step-081.pt",
+      "sha256": "a2b53e05e2debaf06eff410296e804368b358732894f14a394bec78619f8cd94",
+      "head_sha256": "354a81c37736a299cb969424704e55adacc4a92b5c86f4adba96346725d9d301",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-MATCHED",
+      "global_step": 81
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-MATCHED\\step-082.pt",
+      "sha256": "7e8f3e160c94922d28501e3cf54cab07097fb75447c30eb443f25800f86cd0d1",
+      "head_sha256": "7f2d24ac5f7f20016624eebc453367922b06ee7b0b5d4c8ea39a40205b09f13d",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-MATCHED",
+      "global_step": 82
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-MATCHED\\step-083.pt",
+      "sha256": "e553d7984de249d927d6b8c55936060e9982f61875de3635052629f17ab5bb42",
+      "head_sha256": "f2f7b68998d1ce140741dac56be7f34cace19ff71f03e65352a0690579392ac4",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-MATCHED",
+      "global_step": 83
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-MATCHED\\step-084.pt",
+      "sha256": "099f4e4a47ea6caa45b66597bd844dca4d0f2d91581e7c7bbaf041b5f6dea64a",
+      "head_sha256": "153b333483124ac9eb1f3dc087ed9dbe80b4150f5e2b6b0876541544960d8ef7",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-MATCHED",
+      "global_step": 84
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-MATCHED\\step-085.pt",
+      "sha256": "ef1d73384bca807013ff74be6a6e13d3f3847736f7ebb91a4157276f9c591177",
+      "head_sha256": "1a8a9b3b141dfd1a5297de35727fd65a7e9c04a44ac4160ef111507eddf38561",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-MATCHED",
+      "global_step": 85
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-MATCHED\\step-086.pt",
+      "sha256": "e04d2e116fc0d64a1c1ddacc9fbc0c74f77249bfaacd178ee91bc83fa3308428",
+      "head_sha256": "d3aaf3127f95b7fab4715f15949fcc9a42cab655d1a5773b9c5c4a789ddcff2e",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-MATCHED",
+      "global_step": 86
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-MATCHED\\step-087.pt",
+      "sha256": "bc63f44c7d14fcfede5af7b098eba6fff9ff3ab1b22a35abeb8363c428647198",
+      "head_sha256": "1917edf8adfd83588feb41b9598b0e8674f832b5b912eb1e4179e5ef202d366e",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-MATCHED",
+      "global_step": 87
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-MATCHED\\step-088.pt",
+      "sha256": "6d08b18f05aed1c6fcc3c7df7d2f800cd507f856ca02a5d96c36a32541b15aec",
+      "head_sha256": "0f731f9373ea35b39a8f7168ef06016bc7713ca40d17876d4f975beaabb42a30",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-MATCHED",
+      "global_step": 88
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-MATCHED\\step-089.pt",
+      "sha256": "9cb5fe19156abbc363eac1e80f8b66dd5a6e068dc548651005255f4ae4a85f19",
+      "head_sha256": "489b3c1b6a5e5c51a4e0b7e3e96b00a153a5c538f3c142c53a0e2ca129f42fa1",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-MATCHED",
+      "global_step": 89
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-MATCHED\\step-090.pt",
+      "sha256": "fa106e60ff243556721a559837365b69a79841ba0367d3f581a62406db212c84",
+      "head_sha256": "f98d4e2bb4e811cb568f1c327c93894a8029859f2df9ae3f1450d1d95c061449",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-MATCHED",
+      "global_step": 90
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-MATCHED\\step-091.pt",
+      "sha256": "6239d6ec2c285210a84e69acd00f7bba270deb2e89b39014d2b2750ac1966f2b",
+      "head_sha256": "3f03dd033bbb0997955d1a20ce928721e26cb48e5091d91dfa4a5d8bebd5e872",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-MATCHED",
+      "global_step": 91
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-MATCHED\\step-092.pt",
+      "sha256": "c90d1edccdfe600225265af06192c75b67e45e3e821ba01660b669163be328ea",
+      "head_sha256": "a15851a61fe80ef02c58e44ef1de236a2d369ce6e9e0912de673e386c59279d8",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-MATCHED",
+      "global_step": 92
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-MATCHED\\step-093.pt",
+      "sha256": "ad3f981df2c5cc5aec1e2c138c3b58436b58a5834361cdf0951aeb73ff21ac96",
+      "head_sha256": "1a4c66e60ee8aeb90e8bd80ba11089f03d4e98527b0cd6de2e2003c481e75541",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-MATCHED",
+      "global_step": 93
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-MATCHED\\step-094.pt",
+      "sha256": "c19805013a15d4b16c6222f4cdaa9fc8a636dfd0f7b44412a1f1fb3faec636d9",
+      "head_sha256": "124cf79d55c93d6cfe0b875a56843f5b28e88e2a11b4ef5a2d22517197afc63b",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-MATCHED",
+      "global_step": 94
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-MATCHED\\step-095.pt",
+      "sha256": "6a3c71904559d3e331df71fa0ed5c48e7ea93e937f9f9e56619e43e6756cc4a7",
+      "head_sha256": "e7df5390d07e6634c41a9823a13939dcace46bd2172cf5df3644b66b444a3361",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-MATCHED",
+      "global_step": 95
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-MATCHED\\step-096.pt",
+      "sha256": "452761150112475c8ac3af477a745fb8ab7df4c826de166a36b7dfdc6bb71a44",
+      "head_sha256": "5e56bb8f7c9fb3198d3ccf52d653baae7e3b33787adb8f3373d7b783b8323fe3",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-MATCHED",
+      "global_step": 96
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-MATCHED\\step-097.pt",
+      "sha256": "6e0807f5c1aea730ebf8194a4248c8a4e6e6ca3b46fbfc52dad72ddeb21a8c28",
+      "head_sha256": "9a21d788eb282f87725c00bbf46560429ffbee98bf179277c4d5b95c104fd7bd",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-MATCHED",
+      "global_step": 97
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-MATCHED\\step-098.pt",
+      "sha256": "23fc86b75372bef7206bc0c4fa5e588d11301ed87f2aeae7380e44a2b2f3f2ca",
+      "head_sha256": "f1e6b42c2decec406ad14b78701d6cd73986e85020ef6dbc46b43980b99bd226",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-MATCHED",
+      "global_step": 98
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-MATCHED\\step-099.pt",
+      "sha256": "b3e4a73198bdc13ccb0ba6f38367f63cc9d7ef921560c66f643db6b88e5ac953",
+      "head_sha256": "5093861c00354ec659dff9f1edbd57060a87d6ec0602c73aff3df5dee1ae2f37",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-MATCHED",
+      "global_step": 99
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-MATCHED\\step-100.pt",
+      "sha256": "e83eb092e593523fa75f7282a96af3527dc4acc8cf5789d5f26f226d997c85bd",
+      "head_sha256": "dc57c80359ab89a5d5a9819d62fb41f05c45f2f1ec5b23a105455cddf05c383f",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-MATCHED",
+      "global_step": 100
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-MATCHED\\step-101.pt",
+      "sha256": "c8602a2fac11fcd664c38f8bf3a743a0d609b5f344bd05d8b9a898cdb31cfae4",
+      "head_sha256": "1687297650293b03b4eaa3dec58deb9adcce1e57fd2c25dc476460a77d8a3c7b",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-MATCHED",
+      "global_step": 101
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-MATCHED\\step-102.pt",
+      "sha256": "60a3ae92598f696391a2ddfd12dc09129a9a9edc14cfd85129461322c46e0567",
+      "head_sha256": "af5294b1d7110a5a61a2068285439dfe75e9d4557eed1323bc4bc1af9b9167ce",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-MATCHED",
+      "global_step": 102
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-MATCHED\\step-103.pt",
+      "sha256": "1712b73a680fed64ab8992683c7977060737bba3c6e8042c1d81a209abbeb483",
+      "head_sha256": "26ed45cbe9e9b33a24c082e66470ecc8aee9a0d03c18759340a3047c793797ea",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-MATCHED",
+      "global_step": 103
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-MATCHED\\step-104.pt",
+      "sha256": "786c4944331da74beabda410f12653560771401087cf8d32e5f4255dd2b499c9",
+      "head_sha256": "f83dce0c2c091f2c6fb6bc210520f1bf838be00e21d5210b2ecdbe22bf138b97",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-MATCHED",
+      "global_step": 104
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-MATCHED\\step-105.pt",
+      "sha256": "c3e4d5951c5eed9756fa99d6a1b0c4f1313deb1fb28d05e4561cc0a5213a4ae0",
+      "head_sha256": "a4e9dae75923f211214839d19fd959817c325b5116da2bb481e1388e0060dc01",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-MATCHED",
+      "global_step": 105
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-MATCHED\\step-106.pt",
+      "sha256": "53f3ed5d1a7486ff14dfb4baca1143177af8387daf7006c2bd2ffb9931b083a1",
+      "head_sha256": "4685d2ce13c26deb272924da55becae325c0f9b88938104ca21a682799c21e3f",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-MATCHED",
+      "global_step": 106
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-MATCHED\\step-107.pt",
+      "sha256": "62d59cb9cdd7f791b61e81ae2db9ac527485b419225c4c3edab6ae659407f59b",
+      "head_sha256": "548f6b1e56fcfc6c60db6b487802004c52bd16ba6120376d1e569a85503b3a1f",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-MATCHED",
+      "global_step": 107
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-MATCHED\\step-108.pt",
+      "sha256": "8c3710f3111d0c32f40d1e63eb87102b2cf2d4a19529817ee6cf3880ddadad13",
+      "head_sha256": "722d1f4b3211fc06e99978e7f5c2dc7e705272bffab72a80b63515bd5bf05b0c",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-MATCHED",
+      "global_step": 108
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-MATCHED\\step-109.pt",
+      "sha256": "b19dd27ecd5af27082a3e1eacb2a133a8786b7bf84647ba1201deee9e195f5a1",
+      "head_sha256": "1f57e77fa2b88b62d00a0be721e3cab10f4ff6317f0d6a704c45066ac5fe3717",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-MATCHED",
+      "global_step": 109
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-MATCHED\\step-110.pt",
+      "sha256": "38b7b2e5e562633d73c41e30a881c149f593e8115d5e6600e6035f10b90a3924",
+      "head_sha256": "678607698d64a4cacfcde006dc41bc335f9eb9223825a100b44ba2053f20e1c0",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-MATCHED",
+      "global_step": 110
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-MATCHED\\step-111.pt",
+      "sha256": "da83df10a543883c90d4170ef1d82d865f852e6e5414efe58048a9f7e63524ea",
+      "head_sha256": "c496135d9316a22969b8374ab111fc01968b453ea4ef541dba85adfb3ce914c1",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-MATCHED",
+      "global_step": 111
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-MATCHED\\step-112.pt",
+      "sha256": "e59a417934e512347fbaabbb109722b10c51e562038e3045d6dbe35cff2520e2",
+      "head_sha256": "fb71ac9461a313746a2e58b43840453c6086bf94a92fbde0b27c6ec95dafd054",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-MATCHED",
+      "global_step": 112
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-MATCHED\\step-113.pt",
+      "sha256": "c96a8dcbdd1ed9794511e408cd4abbab21f5b100a62204739349898e99921557",
+      "head_sha256": "37740e3bfbb32f1ed2909260dbc448422bb667e6bc7d1547ba3699539754c2dc",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-MATCHED",
+      "global_step": 113
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-MATCHED\\step-114.pt",
+      "sha256": "ee8b048f1a2542aa478a855d85ee033438820afd0a0fc7ab57a56ee009ad17db",
+      "head_sha256": "3b2dabb7ad88583ec728b41f89d76210c5eff22054535fbaffbbb48f5ffa5dea",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-MATCHED",
+      "global_step": 114
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-MATCHED\\step-115.pt",
+      "sha256": "d91d763ec33e61d358d0832c91ae745acf2a0234eebf169c4577937195eb5a10",
+      "head_sha256": "686aad0d14e81a24f442078f65677e3f997333a2dfa61739e1e35a08e0c5c236",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-MATCHED",
+      "global_step": 115
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-MATCHED\\step-116.pt",
+      "sha256": "4f35a6f17fb64fe29715cda85cd6c974e4c5a5e50df6a97924833eb74cd0aba0",
+      "head_sha256": "a3a64d27b736b50d1c6e65de343d356d165ae77bcd94fe6223a2a314f378383c",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-MATCHED",
+      "global_step": 116
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-MATCHED\\step-117.pt",
+      "sha256": "a92984d896020b4d8be8f2f4c575b5a3569c4fe614097c02c683242c51cf3369",
+      "head_sha256": "19d7f683428e85e8df76646387d0b0486f26f97cea5440e3a4140b9eafa9332c",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-MATCHED",
+      "global_step": 117
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-MATCHED\\step-118.pt",
+      "sha256": "a61ad76719ca8a73a9b1ac922f251799ab1b172ba222add76f4b6fd6898e8d0a",
+      "head_sha256": "da255a9f882188f931f94fe3bdc26e29ac1c9a5b015d110e1c4f6d1b8a43cdbd",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-MATCHED",
+      "global_step": 118
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-MATCHED\\step-119.pt",
+      "sha256": "7f519b4cf01dc1c426ee1a6380a6bddbf8edc6b51699c017f91f37900ebe44ca",
+      "head_sha256": "3562d954e5831859165c4229680c665303940d247d080b16d3d7c817b75da834",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-MATCHED",
+      "global_step": 119
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-MATCHED\\step-120.pt",
+      "sha256": "280ecde309e4f5f33ac26cee652fcab839026815af9e59d74c14663b1104c5c6",
+      "head_sha256": "d7995b7a5b69471f19432e21e15a29d5211c1ac0520e0e064de2864b2460535c",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-MATCHED",
+      "global_step": 120
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-SHAM\\step-040.pt",
+      "sha256": "66ba682ddd607fbd1bed787f9b0836683f0f47724aca682a01096be4c90ead86",
+      "head_sha256": "bebab7f57bed89b70f15c85176b5649929a5da2e3e2ca6bbab608689e4a313a7",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-SHAM",
+      "global_step": 40
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-SHAM\\step-080.pt",
+      "sha256": "0cf8e9fb23ba16ba031e5984d918ef59604671105ee80a9b18c5327cd3274be8",
+      "head_sha256": "41da185bf4de1f5a9ea754ddacd83abcfa0310d37d0b362e88f72866f1c42758",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-SHAM",
+      "global_step": 80
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-SHAM\\step-081.pt",
+      "sha256": "14d7447709243f3bb48b12525dcbe1193ed049ae4bd8997878f0f723fc64c261",
+      "head_sha256": "10f6e79e2579d206b12cfe162627a808dbd9d23587a20acc14c50f77f60f8d2e",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-SHAM",
+      "global_step": 81
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-SHAM\\step-082.pt",
+      "sha256": "636cb6814a624cae0947ff15c00b323dd3049d625b069923b5e03e55285c3199",
+      "head_sha256": "730290c46767f8807047ef743e8d857b77c117a52befc87cdd0dbeee9246d4f4",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-SHAM",
+      "global_step": 82
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-SHAM\\step-083.pt",
+      "sha256": "29a279680de06cca4be7d9124a5f4ce40137d1a35c6e416071552bc70e68f983",
+      "head_sha256": "408b6766666833be1a5ca2edd07e059afba6a55c8a548e080dd5af14ac89f366",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-SHAM",
+      "global_step": 83
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-SHAM\\step-084.pt",
+      "sha256": "b060863456fda4ac6cb9f648f544d184d732f619a6f67afe1cdadfa917e9d260",
+      "head_sha256": "f9d8f9e5593c3453ceaa01cbad6bd4b44ce49ab046da151862e24dd336fe3db7",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-SHAM",
+      "global_step": 84
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-SHAM\\step-085.pt",
+      "sha256": "da75e7486bb361f3ace2246b19beac98197bcde12fd7d281eea4313bed2cb536",
+      "head_sha256": "5843804e42ea249bfd56835679252c1f90291ce1184948c64d031b6c40abbfe9",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-SHAM",
+      "global_step": 85
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-SHAM\\step-086.pt",
+      "sha256": "f21b301bba844db7114acba54c3b10b74e15e2ac2be7ad6fd0e63bd669500e02",
+      "head_sha256": "7969be213f3611ad59ac0b73a54c459706924ea404e55f2f1b1f7cc865a0d69b",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-SHAM",
+      "global_step": 86
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-SHAM\\step-087.pt",
+      "sha256": "9ddc9418afd00ff74941d23816a93b73c7565bab6fd117137006abf889ff070f",
+      "head_sha256": "a816b36aea52634cd0c5910ccf9121a17fff51bd37af9ebd26c68a2eda9c99d7",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-SHAM",
+      "global_step": 87
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-SHAM\\step-088.pt",
+      "sha256": "f178d064b919e70c5a9c1e43001a55e769c731ee45235a37d234a82f99fb9946",
+      "head_sha256": "935a26b0962088577a953f032873593684f3227f8054c4334a12b1e3586ca1d9",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-SHAM",
+      "global_step": 88
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-SHAM\\step-089.pt",
+      "sha256": "de92c1ac7f7fd146fa928eaa218b1c50014bcfe7bcdbf4b90014acc9ee74d7ae",
+      "head_sha256": "2854928bd47dd4003602dc93593842008b71f7ad9f66b89802d6b56c11e0642c",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-SHAM",
+      "global_step": 89
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-SHAM\\step-090.pt",
+      "sha256": "239f7b4071311f16d438d15323796576e4480a7261c8b1ee5a57c15f8d3fd894",
+      "head_sha256": "d3ee3c47642d327119ba6091bc3bcdb9986828529a43b794f0b07eb22ff6eed0",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-SHAM",
+      "global_step": 90
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-SHAM\\step-091.pt",
+      "sha256": "ffd091dacedd05b4fd712c1fd6a7036235b976ecd1366182e2485fbcfbf7b904",
+      "head_sha256": "1fc1d4663718e7e0e1a18f90acdfe6e870b2fe713b32a7b687b4e46fcd45aa00",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-SHAM",
+      "global_step": 91
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-SHAM\\step-092.pt",
+      "sha256": "e0e8e830f490ce65f70bff1d209528f3607227c36c6aab05e4c19f14accfa285",
+      "head_sha256": "2086a292a4410e0440e8cb02d203f887f21083223bba5b357b194595466eefa6",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-SHAM",
+      "global_step": 92
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-SHAM\\step-093.pt",
+      "sha256": "d1227d5be51c01886ef80692a043133481b94cf06d8d9e232b1e0328738d6fac",
+      "head_sha256": "812529764dd8f09c635611d133ca14c9a8082d87b39b37dc95ca383d5b62adf1",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-SHAM",
+      "global_step": 93
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-SHAM\\step-094.pt",
+      "sha256": "4623f3a7e6e3d463bc274bc8762a91934dcda97caa272d76274723cd148b3184",
+      "head_sha256": "f4b83e30ea4b410b2e6fee3e80cbcfbfc16025cee21cc4246ea23fc40bbb8178",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-SHAM",
+      "global_step": 94
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-SHAM\\step-095.pt",
+      "sha256": "966ed5d5f1b1aca2eba502c5b5f253741f566b7ab48226fb905b8156ea900ea0",
+      "head_sha256": "3e28f7b8d7ec362e72ea7ba7e0dbd7b65af5e8495240179a682ea3dfad618fb6",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-SHAM",
+      "global_step": 95
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-SHAM\\step-096.pt",
+      "sha256": "4946bec8bfd69d320ffcc6b1fcbd799933d655f7889b654a5ae4f304c93c5713",
+      "head_sha256": "f5b9006e6a2f2c3e4baf8a9a7b5c28646a462415b9744f2637f0de74036d91e9",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-SHAM",
+      "global_step": 96
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-SHAM\\step-097.pt",
+      "sha256": "a769ef9b04f4b633b7d3262b89962aaafe3b85489b56d5c0ed031e356350fb3d",
+      "head_sha256": "228cdb9ae2d8cff40c86c30f13ac194437c1c0b0a06784e9e6b71ac9fc1c2b1a",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-SHAM",
+      "global_step": 97
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-SHAM\\step-098.pt",
+      "sha256": "10873233e3f4cfd3665c16de08977eb4ae2bed528e847ca44cd4bf66dd1e1752",
+      "head_sha256": "fbeeee768748937c3ae76365702104cee806bbd1283faa367dff03d12d21aaa8",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-SHAM",
+      "global_step": 98
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-SHAM\\step-099.pt",
+      "sha256": "d17f59768d715362880b9b65c8a49301507955a1325ed9d10bc0b4da6d19025c",
+      "head_sha256": "b53bb4d5712ff97729254c64a6f2ed7d9e4ec438026e6b4dc3a2252793e4d7c6",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-SHAM",
+      "global_step": 99
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-SHAM\\step-100.pt",
+      "sha256": "7984f1ffbd9977122bd003ab43cfc4013a659169df065a8a7ae557faaa8a00c4",
+      "head_sha256": "96dfea6b51775a9645d50b759d33e973d60a472786d4cbdacbfb1070453fdfea",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-SHAM",
+      "global_step": 100
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-SHAM\\step-101.pt",
+      "sha256": "4b9f55f044b0e6cdf8e905331343b23a4c4cc2a065383cffd218a1537b3bcc81",
+      "head_sha256": "e7ff60ae6ac1df3623d58bc14d450a9e8b5f444c6ccc07f8c05e0f38306d93af",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-SHAM",
+      "global_step": 101
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-SHAM\\step-102.pt",
+      "sha256": "486ae212cf7a3b2bb87c5bcf5882bcff93992e823c1db8bb9f8362f992466254",
+      "head_sha256": "6d210c4e7440fadb34c641a549df5f423da5751d7c80987c4a9fcba1f000c419",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-SHAM",
+      "global_step": 102
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-SHAM\\step-103.pt",
+      "sha256": "59c334809f61c687152568aec0844a6eb927a8064aac57a8b7fc34bc4484a720",
+      "head_sha256": "a6633635849cb8b875c9dc96802d6259c5156abc696c73afa8ef9088486639ab",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-SHAM",
+      "global_step": 103
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-SHAM\\step-104.pt",
+      "sha256": "c895a564ecec95ce7c8f7dd20bd1b405001f0d1b902fc274f70348a3e9ced91f",
+      "head_sha256": "db93303f0cefa9a56970fb200fb4a00b75d6c03f7a4d95a9ce44eaca3f028cc6",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-SHAM",
+      "global_step": 104
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-SHAM\\step-105.pt",
+      "sha256": "7b3082153984343f1e35a87a9c5a928c8301f651e287d647e74c1051b5e24113",
+      "head_sha256": "996d89fd69441ba58bbd937450dc66c0af75a61610ca0d838adef9830b2d8f02",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-SHAM",
+      "global_step": 105
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-SHAM\\step-106.pt",
+      "sha256": "ce7a461232f364179e14c7fe040b4ac96ab984cb24013970fd82b3f86110d1f3",
+      "head_sha256": "b2a60133d6d5d9faf395d6f44b670420538d06f8d4fff18c38fab6e20ee39575",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-SHAM",
+      "global_step": 106
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-SHAM\\step-107.pt",
+      "sha256": "35592a7622686c71b30b4ef93b4f647dc07e3485ae9b0faa36d32d6ed9340d47",
+      "head_sha256": "f40bf3beea1855cf215aa1beb85b4daeeb2f143d49bbc7498ff2d505ebb57b84",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-SHAM",
+      "global_step": 107
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-SHAM\\step-108.pt",
+      "sha256": "9ce318b81ae3bd5dc5f8dda8fa40f79644291826a8780220b1ddee8b14abdeef",
+      "head_sha256": "eb115ee6c3a431130b5184d66e019ef86981945a6f8734384fe2d902d2c3889a",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-SHAM",
+      "global_step": 108
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-SHAM\\step-109.pt",
+      "sha256": "1fe48e2f7b840cdec3520c23c8c1775dd173b213ba0d762b8bf7c376c044aa8c",
+      "head_sha256": "1e9812d36e5354934616b1e5fcc217e7a23e707cf0cc212221a9bb69c660aef1",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-SHAM",
+      "global_step": 109
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-SHAM\\step-110.pt",
+      "sha256": "c9de5f243439098b96c05655e559ebd9d98d87b4c4478fd987392714656bb3bf",
+      "head_sha256": "95fbf3925165d747686ae85b08fe683727f4c24f8940f1a667bbc0ce134410fc",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-SHAM",
+      "global_step": 110
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-SHAM\\step-111.pt",
+      "sha256": "79cd6a384f4eba54842b11d3470a3697b362c76e01d3a7d0f70711d35392497f",
+      "head_sha256": "0df7f2c453e55af867cdea16b513b88d26a017f14650979440e44d6c36fe4a2a",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-SHAM",
+      "global_step": 111
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-SHAM\\step-112.pt",
+      "sha256": "ca9d6c9ab9877c544e7f7f5dc43d8529a52fd8a6775aa78344f171a531c88279",
+      "head_sha256": "c94e70aab70a012c980721be6fbafd9736308f92349eef87c35f3c7e973aa4ee",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-SHAM",
+      "global_step": 112
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-SHAM\\step-113.pt",
+      "sha256": "dd1d20adb3bf59e435711ed533446703b9a1990415e2560ddad7ce18380cbf89",
+      "head_sha256": "0416e7646d7e74ac05c2cde743e9c9e2afb57081eecbb53b61f2d0536b4c5694",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-SHAM",
+      "global_step": 113
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-SHAM\\step-114.pt",
+      "sha256": "bd84e16c4393930d688b6edc392fa8c7347c945138157bf928729559fbae5b37",
+      "head_sha256": "fdb741829b0c7dc5defaff0faea30584e636551da19fa1abe3af6aa389139d79",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-SHAM",
+      "global_step": 114
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-SHAM\\step-115.pt",
+      "sha256": "35be7fedae2aac7c0d73800aa7d5a551fd2578c1b19478aebf7ebe56986dafa2",
+      "head_sha256": "95070f8573ac0b4087663139d7979d63a58371d441057c20397166d6c1fe2fe5",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-SHAM",
+      "global_step": 115
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-SHAM\\step-116.pt",
+      "sha256": "cdf597510b207830dfedfe220dd8027fa44b3cf2cb03ffa5880a6fea2429b626",
+      "head_sha256": "2d982a14e89b03da2e3951e4ef39e2c2263bd484049497ab9e8dff18c1410882",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-SHAM",
+      "global_step": 116
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-SHAM\\step-117.pt",
+      "sha256": "159ad97ff2ea77810a0609def25a6bd844661539e8936bc120f0f38bde44c91f",
+      "head_sha256": "773d74d3dff863f8ff6c9f1e82b83b3064f8b687aa674c902f27e09197a9fecc",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-SHAM",
+      "global_step": 117
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-SHAM\\step-118.pt",
+      "sha256": "91df8816e96dd90520a120323a45bb20bfd85adcd0fd493bc512e5bbcef6b2fa",
+      "head_sha256": "880a03f9cc04671cd925230a78eeb0c8f8d352ff2314516b5f7ae0d7f3ec70de",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-SHAM",
+      "global_step": 118
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-SHAM\\step-119.pt",
+      "sha256": "b97bbd157258db8193c0324c23b8885bfc3fd6364e113a48f0e48aec878422a9",
+      "head_sha256": "b88c5b596a8200a32d8352e41d2d3e6103c530731140c1e1876dc570f7f9b4c9",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-SHAM",
+      "global_step": 119
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\runs\\seed-3076094663\\B-SHAM\\step-120.pt",
+      "sha256": "2929cbe2d8f77fe267d0ec0261cca04958b84738f74464b3d9944a55570f6589",
+      "head_sha256": "84e319ab1827921c1e6a9fe6b5cad9c248296e72024da4f4ed6db08754238097",
+      "initial_head_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0",
+      "seed": 3076094663,
+      "arm": "B-SHAM",
+      "global_step": 120
+    }
+  ],
+  "template_inventory": [
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\initial-templates\\seed-3243871208.pt",
+      "sha256": "1e23bbaca5646d399a247406557fa82fda101da4ccd486729a68692f1a4d9554",
+      "bytes": 2363545,
+      "kind": "initial_template",
+      "seed": 3243871208,
+      "state_sha256": "a3685a8db4f1cca239590aa6c992bde8d5fb140c36045e5450d5d68e2ec88166"
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\initial-templates\\seed-669993655.pt",
+      "sha256": "dcc7e961e6b194b188812b24c4fc7ae48c126fdcbc8cc698e649b0e12a614f36",
+      "bytes": 2363533,
+      "kind": "initial_template",
+      "seed": 669993655,
+      "state_sha256": "e9dadf2520cfd19e8f3f91f5ace87efc204adba0e6c1cbb77abcb19cdc6e4aee"
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08p-r2\\v0.8P-R2\\training\\initial-templates\\seed-3076094663.pt",
+      "sha256": "d2fcba81f83feeb048d51531c9bd072719c8dad836800e069977ca36bbb11b14",
+      "bytes": 2363545,
+      "kind": "initial_template",
+      "seed": 3076094663,
+      "state_sha256": "a0971ff9175afb7ea8e07001c335680f8d5cbd01dd371ae01fc78993ac2653f0"
+    }
+  ],
+  "implementation_hashes": {
+    "run_contract": "e345225b4a17fc18eb35fcab24cbe1d72bd0e34bed9de272f927a7be461853e6",
+    "analysis_contract": "84111122033fda65c84344317cfe3b50639b23be4c71f480ba665c67a23cc939",
+    "r2_contract": "51cd8dee09688f1aae24ff575fa0a181d50b2a6ffc94dc6b7e7ed5b61c58ef14",
+    "addendum": "4cd14671ffe7c032864fdc0bd5f75db1d1edea666cc58eb43aae0e6c820d0431",
+    "panel_materialization": "565d5e2650db375230fed15eb94471c92a25810c1644d629e7bb9d1490bf4822",
+    "panel_ready": "c0d48381356113451bc72f9578204ade4ef7449a75264cd5018a34d002b313ac",
+    "panel_seal": "cdd68eee06ef9b4239cfbc3ffbb4f65f18c4ced655e474cba1a3981dbb2c0cb5",
+    "final_audit": "328650b3fd638bdf7eb147351e6c897abe8b36899b05af35ef5aa925851c5e89",
+    "feature_receipt": "74e701cd87e677c88ea10e0f7a026474ecc7bafab97c021de6c6fcd56c455e09",
+    "metric_source": "fa22bc8febff89d2b635091c6cb40be6f3beba4549c4a135d16e213f6fd3dda4",
+    "probe_source": "a3049d52e1183c806c84522a617a05646eb86fbcb69af72b5bb26f4808852cb1",
+    "trainer": "88879bef1eb1843445429aeef81423143b67def453054952ca968022755ed956",
+    "evaluator": "0dda5980c224b7bfdfa2f640180cd0ec42933fdb106175d346f1792ebf40e10a",
+    "analysis": "ba62d0f494fe788e929120d07a50c427d9e3cb7a7f7689b308695f79d81409e9",
+    "analysis_adapter": "4e86d2ae412982a2a6ac30952517a00105807568000e0d2c764ea696342d1535",
+    "analysis_test": "de9d3a4d769d14305d02ccac5ce1c0c68eb06b3ae0ede5beddddfbf5ac8e44c2",
+    "evaluator_test": "60e2199d734b536e2e45c7db9fc6491278785ff9ab9b41d4ec34439dacfdacda",
+    "trajectory_helper": "706b8987b3fd637d03f07a0efffe34efde6370dbb4ae6c9b94f66bbb42b3ca70",
+    "metric_analyzer": "dbde07fe1ec009f2bca7f1f22ad913a2a79f4f8dfb8120a1f31ebf37d5f59b70"
+  },
+  "runtime": {
+    "python": "3.13.15",
+    "torch": "2.11.0+cu128",
+    "numpy": "2.5.3",
+    "cuda": "12.8",
+    "cudnn": 91900,
+    "device": "NVIDIA GeForce RTX 3080",
+    "compute_capability": [
+      8,
+      6
+    ],
+    "matmul_tf32": false,
+    "cudnn_tf32": true,
+    "deterministic_algorithms": false
+  },
+  "head_payloads_deserialized": false,
+  "panel_records_or_targets_parsed": false,
+  "predictions_created": false,
+  "newtight": false,
+  "legacy_evaluation": false,
+  "phoenix_access": false
+}

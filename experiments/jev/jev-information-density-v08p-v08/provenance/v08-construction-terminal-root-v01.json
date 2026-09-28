@@ -1,0 +1,57 @@
+{
+  "protocol": "jev-information-density/v0.8p-v08-construction-terminal-root-v01",
+  "identity": "v0.8P-v08-construction-terminal-root-v01",
+  "disposition": "SOURCE_BYTES_UNAVAILABLE",
+  "artifacts": {
+    "execution_packet": {
+      "path": "experiments/jev-information-density-v08p-v08/protocol/v08-source-resolution-and-panel-construction-v01.json",
+      "sha256": "0b91c228b35aa9fb87adcc4203849f8efdd76bec2faf7c805772e3a32ba94da6"
+    },
+    "input_binding_root": {
+      "path": "experiments/jev-information-density-v08p-v08/provenance/v08-input-binding-root-v01.json",
+      "sha256": "1abe2a9240a2773119d14160fcefbb0c6c8fec3c5933edb305c2b368a21f1463"
+    },
+    "initial_incomplete_scan_receipt": {
+      "path": "experiments/jev-information-density-v08p-v08/provenance/source-resolution-receipt-v01.json",
+      "sha256": "8f2fb6db5521f2ba973f647cbf9eb02ca8080a493b744f4cffa4f2130abaf4b3",
+      "status": "RETAINED_SUPERSEDED_ATTEMPT"
+    },
+    "authoritative_source_resolution_receipt": {
+      "path": "experiments/jev-information-density-v08p-v08/provenance/source-resolution-final-v02.json",
+      "sha256": "e697455f497f5df0ba6a9dbc5548f277ddc5f0cc541c618d1adc5f59dbdb0fdc"
+    }
+  },
+  "execution_summary": {
+    "bounded_roots_searched": 3,
+    "regular_files_hashed": 99,
+    "metadata_inventory_sha256": "4bb5de654f06b6f3be762023df8a134ac25052c9f57757f4b74a307db9322d14",
+    "full_file_hash_ledger_sha256": "0d3d8a9220ab529cab76ab5607857243698c88619b50a84f33ed7393419a64cf",
+    "common_primary_occurrence_manifest": "EXACT_HASH_MATCHED",
+    "training_only_state_scope_source": "NO_EXACT_HASH_MATCH",
+    "failure_code": "SOURCE_BYTES_UNAVAILABLE"
+  },
+  "terminal_state": {
+    "training_identity_rows_acquired": false,
+    "training_identity_manifest": "ABSENT",
+    "candidate_staging": "NOT_STARTED",
+    "e1_id_collision_check": "NOT_RUN",
+    "training_scope_overlap": "NONE",
+    "fresh_panel_generated": false,
+    "fresh_panel_validation": "NOT_RUN",
+    "lfm_contact": false,
+    "feature_extraction": false,
+    "head_loading": false,
+    "training": false,
+    "inference": false,
+    "evaluation": false,
+    "phoenix": false
+  },
+  "scope_and_claim_limits": {
+    "v01_through_v07_modified": false,
+    "v06_not_evaluable_reinterpreted": false,
+    "overlap_failure_claimed": false,
+    "os_level_file_open_telemetry_claimed": false,
+    "next_scientific_boundary": "No panel can be staged until the exact training-only scope source bytes resolve within the already-authorized bounded search roots."
+  },
+  "root_hash_rule": "SHA-256 of exact root bytes; no self-hash field."
+}

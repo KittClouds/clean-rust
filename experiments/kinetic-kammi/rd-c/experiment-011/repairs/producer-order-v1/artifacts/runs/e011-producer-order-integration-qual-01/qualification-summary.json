@@ -1,0 +1,141 @@
+{
+  "run_id": "e011-producer-order-integration-qual-01",
+  "bank_id": "e011-fresh-integration-bank-v1c",
+  "task_count": 4,
+  "underlying_task_families": 2,
+  "repositories": {
+    "ripgrep": {
+      "small": {
+        "tasks": 2,
+        "coverage": "2/2",
+        "direct_precision": "2/2",
+        "completions": "2/2",
+        "large_calls": 0,
+        "large_calls_avoided_vs_always_large": 2,
+        "wrong_legal_actions": 0
+      },
+      "small-then-large-on-abstention": {
+        "tasks": 2,
+        "coverage": "2/2",
+        "direct_precision": null,
+        "completions": "2/2",
+        "large_calls": 0,
+        "large_calls_avoided_vs_always_large": 2,
+        "wrong_legal_actions": 0
+      },
+      "always-large": {
+        "tasks": 2,
+        "coverage": "2/2",
+        "direct_precision": null,
+        "completions": "2/2",
+        "large_calls": 2,
+        "large_calls_avoided_vs_always_large": 0,
+        "wrong_legal_actions": 0
+      }
+    },
+    "turbovec": {
+      "small": {
+        "tasks": 2,
+        "coverage": "2/2",
+        "direct_precision": "2/2",
+        "completions": "2/2",
+        "large_calls": 0,
+        "large_calls_avoided_vs_always_large": 2,
+        "wrong_legal_actions": 0
+      },
+      "small-then-large-on-abstention": {
+        "tasks": 2,
+        "coverage": "2/2",
+        "direct_precision": null,
+        "completions": "2/2",
+        "large_calls": 0,
+        "large_calls_avoided_vs_always_large": 2,
+        "wrong_legal_actions": 0
+      },
+      "always-large": {
+        "tasks": 2,
+        "coverage": "2/2",
+        "direct_precision": null,
+        "completions": "2/2",
+        "large_calls": 2,
+        "large_calls_avoided_vs_always_large": 0,
+        "wrong_legal_actions": 0
+      }
+    }
+  },
+  "pooled_descriptive_totals": {
+    "small": {
+      "task_count": 4,
+      "completions": 4,
+      "wrong_legal_actions": 0,
+      "abstentions": 0,
+      "large_calls": 0,
+      "small_calls": 4,
+      "input_tokens": 4633,
+      "generated_tokens": 84,
+      "observer_model_wall_ms": 2730.778,
+      "completion_check_wall_ms": 30566.997,
+      "authority_wall_ms": 132.485,
+      "illegal_commits": 0,
+      "duplicate_action_effects": 0,
+      "replay_identity_all_equal": true
+    },
+    "small-then-large-on-abstention": {
+      "task_count": 4,
+      "completions": 4,
+      "wrong_legal_actions": 0,
+      "abstentions": 0,
+      "large_calls": 0,
+      "small_calls": 4,
+      "input_tokens": 4633,
+      "generated_tokens": 84,
+      "observer_model_wall_ms": 2730.778,
+      "completion_check_wall_ms": 0.0,
+      "authority_wall_ms": 124.349,
+      "illegal_commits": 0,
+      "duplicate_action_effects": 0,
+      "replay_identity_all_equal": true
+    },
+    "always-large": {
+      "task_count": 4,
+      "completions": 4,
+      "wrong_legal_actions": 0,
+      "abstentions": 0,
+      "large_calls": 4,
+      "small_calls": 0,
+      "input_tokens": 5094,
+      "generated_tokens": 140,
+      "observer_model_wall_ms": 141027.912,
+      "completion_check_wall_ms": 10527.36,
+      "authority_wall_ms": 113.301,
+      "illegal_commits": 0,
+      "duplicate_action_effects": 0,
+      "replay_identity_all_equal": true
+    }
+  },
+  "repository_level_gates": {
+    "ripgrep": {
+      "hybrid_completion_at_least_always_large": true,
+      "at_least_one_large_call_displaced": true,
+      "small_direct_coverage_nonzero": true,
+      "all_small_direct_actions_correct": true,
+      "authority_and_replay_clean": true,
+      "passed": true
+    },
+    "turbovec": {
+      "hybrid_completion_at_least_always_large": true,
+      "at_least_one_large_call_displaced": true,
+      "small_direct_coverage_nonzero": true,
+      "all_small_direct_actions_correct": true,
+      "authority_and_replay_clean": true,
+      "passed": true
+    }
+  },
+  "all_repository_gates_passed": true,
+  "thresholds": {
+    "minimum_applicability_milli": 850,
+    "maximum_abstention_milli": 150
+  },
+  "prompt_and_model_bundle_unchanged": true,
+  "observer_requests_received_restored_producer_order": true
+}

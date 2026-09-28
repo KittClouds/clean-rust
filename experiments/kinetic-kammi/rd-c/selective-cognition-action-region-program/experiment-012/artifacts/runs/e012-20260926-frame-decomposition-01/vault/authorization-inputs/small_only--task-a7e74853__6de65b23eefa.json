@@ -1,0 +1,62 @@
+{
+  "task_id": "small_only-task-a7e74853__6de65b23eefa",
+  "frame_digest_hex": "6de65b23eefa579b5d369b860ffa761862928175b7ac9244873ec0233f51da40",
+  "request_id_hex": "d203c1fd1e88893a971aabe6b14df06c72f012082edb60cdb0d686646780810f",
+  "response_request_id_hex": "d203c1fd1e88893a971aabe6b14df06c72f012082edb60cdb0d686646780810f",
+  "request_receipt_digest_hex": "263082224ecae036afd50d19714669ed85906f0c44c4b114b8bc04946fcb882b",
+  "response_receipt_digest_hex": "263082224ecae036afd50d19714669ed85906f0c44c4b114b8bc04946fcb882b",
+  "presentation_receipt_hex": "524443510100040000006de65b23eefa579b5d369b860ffa761862928175b7ac9244873ec0233f51da40762da43954d1cef09d4e375e5c0c79b66aa1829522b1e93062fc0f1b81bb807f6356fd2180588b73d63fe6386938a5a0a44e62a69d02a6bf3ff76df62fe4687bf947fa6fbc54b3c09db64c2eddcfdc106235d4760cde33bd10facb9862ec745452b27c30c9c764c7016b5388f20a31af5145c4d11e1822cd645543e224c80b27dbd5a197fbf1fcf579265b71013a2ce09d634bf0705cf06622f21b4a667b9a879e6fd328d240d9b3",
+  "action_ledger_path": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-012\\artifacts\\runs\\e012-20260926-frame-decomposition-01\\action-ledgers\\small_only\\task-a7e74853__6de65b23eefa.bin",
+  "ordered_options": [
+    {
+      "producer_ordinal": 0,
+      "action": {
+        "id": 22115,
+        "schema_id": 1
+      },
+      "summary": "Apply the candidate change shown in the code excerpt.",
+      "diff_excerpt": "@@ -1,7 +1,6 @@\n use bytes::Buf;\n \n pub fn read_selected_field(input: &[u8]) -> u16 {\n-    // E012 candidate slot.\n-    let _ = input;\n-    0\n+    let mut field = input;\n+    field.get_u16()\n }",
+      "patch_sha256": "fd2180588b73d63fe6386938a5a0a44e62a69d02a6bf3ff76df62fe4687bf947"
+    },
+    {
+      "producer_ordinal": 1,
+      "action": {
+        "id": 28666,
+        "schema_id": 1
+      },
+      "summary": "Apply the candidate change shown in the code excerpt.",
+      "diff_excerpt": "@@ -1,7 +1,6 @@\n use bytes::Buf;\n \n pub fn read_selected_field(input: &[u8]) -> u16 {\n-    // E012 candidate slot.\n-    let _ = input;\n-    0\n+    let mut field = input;\n+    field.get_u16_le()\n }",
+      "patch_sha256": "bc54b3c09db64c2eddcfdc106235d4760cde33bd10facb9862ec745452b27c30"
+    },
+    {
+      "producer_ordinal": 2,
+      "action": {
+        "id": 51145,
+        "schema_id": 1
+      },
+      "summary": "Apply the candidate change shown in the code excerpt.",
+      "diff_excerpt": "@@ -1,7 +1,6 @@\n use bytes::Buf;\n \n pub fn read_selected_field(input: &[u8]) -> u16 {\n-    // E012 candidate slot.\n-    let _ = input;\n-    0\n+    let mut field = &input[2..];\n+    field.get_u16()\n }",
+      "patch_sha256": "64c7016b5388f20a31af5145c4d11e1822cd645543e224c80b27dbd5a197fbf1"
+    },
+    {
+      "producer_ordinal": 3,
+      "action": {
+        "id": 62972,
+        "schema_id": 1
+      },
+      "summary": "Apply the candidate change shown in the code excerpt.",
+      "diff_excerpt": "@@ -1,7 +1,6 @@\n use bytes::Buf;\n \n pub fn read_selected_field(input: &[u8]) -> u16 {\n-    // E012 candidate slot.\n-    let _ = input;\n-    0\n+    let mut field = &input[2..];\n+    field.get_u16_le()\n }",
+      "patch_sha256": "79265b71013a2ce09d634bf0705cf06622f21b4a667b9a879e6fd328d240d9b3"
+    }
+  ],
+  "observer_output": {
+    "action_choice": null,
+    "applicability_milli": 0,
+    "abstention_milli": 1000
+  },
+  "thresholds": {
+    "minimum_applicability_milli": 850,
+    "maximum_abstention_milli": 150
+  },
+  "completion_check_passed": false
+}

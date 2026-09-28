@@ -1,0 +1,14 @@
+{
+  "parent_inputs": {
+    "seal.json": "a21f2e19688181955d5d01180e218a6b66f19f0d560305919aa21c6f579d3a13",
+    "analysis/summary.json": "718adaec2c027767bc4de93d97ac9b563c90382954b1d0c5a966fc0899f1dac8",
+    "analysis/seeds.csv": "f9341954d0b7c08221dbc177171ba7e1662de965823c4d77e3e3d3e77ef94574",
+    "analysis/events.csv": "063ca5300838668997e57bfb0c8694ed6ec5ca5f8833bd3bee7678462c6abb98"
+  },
+  "outputs": {
+    "analyze_shape.py": "aaae1b18287441576610ac08d3bb19579243148a92a617121d59a5af475753b3",
+    "summary.json": "47533e51c28bd49ab8e8c9682ad2f3af84406d990d662b6d1319efd0c64fef61",
+    "REPORT.md": "c1170b468ef57e179e84c8e291e0b1d289f9483950309845b212392ca3df013a"
+  },
+  "scientific_sample_size_increased": false
+}

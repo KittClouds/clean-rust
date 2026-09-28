@@ -1,0 +1,44 @@
+{
+  "protocol": "jev-information-density/v0.8p-v02-e1-identity-denylist-audit-v01",
+  "identity": "v0.8P-v02-e1-identity-denylist-v02",
+  "status": "HASH_OUTPUT_AUDIT_PASS",
+  "extraction_contract": {
+    "path": "experiments/jev-information-density-v08p-v02/identity/e1-identity-denylist-extraction-contract-v03.json",
+    "sha256": "1c890e9c38bb16ca839adb83c903a1d8deff75845d20d8ff1a0ee35195be3f89"
+  },
+  "extractor": {
+    "path": "experiments/jev-information-density-v08p-v02/identity/extract_e1_neighborhood_denylist_v02.py",
+    "sha256": "68c1e0f66deac589d84ded1b7b9560cd53d030c28af66b1eeb1f36887d18b21f",
+    "synthetic_tests": 6,
+    "synthetic_tests_passed": 6
+  },
+  "source_hashes": {
+    "panel_manifest_sha256": "80e09c0f203b8a6505e062a2091a594273dca808258ff2f4539ab8414db9eabe",
+    "seal_manifest_sha256": "425cef320df94e2b47b448203f8a916ebcbb2019539b2d09e51f5b4ced92f614",
+    "firewall_lock_sha256": "79d25ac82fba1bc6332e16d8bc5f877fadd11cccaed5ef3f07eacfe5e1877da2",
+    "panel_contract_sha256": "3fa547c0a2490c4cfb5d578a32dffeb8414c35daa5e59ef339ab1e148e2e9cd6",
+    "manifest_producer_sha256": "1036f3242c24bbc5d2d1f8112b2129b6454960591d3ea8f003d71ccec7cc9640"
+  },
+  "denylist": {
+    "source_identity_field": "neighborhood_id",
+    "count": 2000,
+    "sorted": true,
+    "unique": true,
+    "each_row_contains_only_identity_sha256": true,
+    "raw_e1_identity_values_emitted": false,
+    "denylist_jsonl_sha256": "11cac12e40bd13dfbd615c0045ed8ea7c87b81ad85d7f0f61ffbc4d7e2819846",
+    "denylist_seal_sha256": "0501a7f2f4c6c71ce6bf31abf26e94311e60117df47d045eb8b36f5643ceec5c"
+  },
+  "audit_scope": {
+    "checks_performed": [
+      "denylist line count",
+      "JSONL row key set",
+      "lowercase SHA-256 syntax",
+      "lexical sorting and uniqueness",
+      "output hash against denylist seal"
+    ],
+    "e1_panel_content_revalidated": false,
+    "e1_targets_or_candidate_join_read": false,
+    "p_panel_collision_check_performed": false
+  }
+}
