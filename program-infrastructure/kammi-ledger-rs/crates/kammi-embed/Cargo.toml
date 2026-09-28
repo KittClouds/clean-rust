@@ -12,5 +12,6 @@ kammi-core.workspace = true
 kammi-jcs.workspace = true
 phoenix-embed = { path = "../../../../rust-native/phoenix/crates/phoenix-embed" }
 base64 = "0.22"
+ort = { version = "=2.0.0-rc.9", default-features = false, features = ["ndarray", "load-dynamic"] }
 serde_json.workspace = true
 tokenizers = { version = "0.22.2", default-features = false, features = ["onig"] }

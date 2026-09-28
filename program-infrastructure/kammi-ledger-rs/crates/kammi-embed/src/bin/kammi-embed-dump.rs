@@ -34,7 +34,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let embedder = PhoenixEmbedder::load(family, &root)?;
     let max_length = family.config(root.clone()).max_length;
 
-    let tokenizer = kammi_embed::family_tokenizer(&root, max_length)?;
+    let tokenizer = kammi_embed::family_tokenizer(embedder.model_dir(), max_length)?;
 
     let mut out = serde_json::Map::new();
     for (section, role) in [
@@ -84,7 +84,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         "family": family.label(),
         "identity": embedder.model_identity().id,
         "dims": embedder.dimension(),
-        "model_root": root,
+        "model_root": embedder.model_dir(),
         "model_path": embedder.model_path(),
         "max_length": max_length,
         "scheduler": format!("{:?}", family.scheduler()),

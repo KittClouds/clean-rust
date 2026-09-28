@@ -56,6 +56,7 @@ fn check(family: Family) {
         Family::Gemma300 => phoenix_embed::OrtTextEmbedConfig::embedding_gemma_query(root.clone()),
         Family::JinaV5 => phoenix_embed::OrtTextEmbedConfig::jina_v5_retrieval_query(root.clone()),
         Family::Mdbr => phoenix_embed::OrtTextEmbedConfig::mdbr_leaf_mt_query(root.clone()),
+        Family::Bge => unreachable!("phoenix families only"),
     };
     let reference = OrtTextEmbedder::load(&phoenix_query)
         .unwrap()

@@ -907,6 +907,7 @@ dependencies = [
  "base64 0.22.1",
  "kammi-core",
  "kammi-jcs",
+ "ort",
  "phoenix-embed",
  "serde_json",
  "tokenizers",

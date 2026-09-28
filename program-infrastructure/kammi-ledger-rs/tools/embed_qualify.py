@@ -23,7 +23,8 @@ import numpy as np
 import onnxruntime as ort
 from tokenizers import Tokenizer
 
-POOLING = {"embeddinggemma-300m": "mean", "jina-embeddings-v5-text-nano-retrieval": "last", "mdbr-leaf-mt": "mean"}
+POOLING = {"embeddinggemma-300m": "mean", "jina-embeddings-v5-text-nano-retrieval": "last", "mdbr-leaf-mt": "mean",
+           "bge-small-en-v1.5": "cls"}
 TIE = 1e-3          # score gap below which an order swap is a tie
 K = 10
 BARS = {
@@ -75,7 +76,7 @@ class Reference:
         else:
             name = "last_hidden_state" if "last_hidden_state" in self.outputs else self.outputs[0]
             hidden = self.session.run([name], feed)[0][0].astype(np.float64)
-            pooled = hidden.mean(axis=0) if self.pooling == "mean" else hidden[-1]
+            pooled = {"mean": lambda h: h.mean(axis=0), "last": lambda h: h[-1], "cls": lambda h: h[0]}[self.pooling](hidden)
             source = f"{name}:{self.pooling}"
         return pooled / max(np.linalg.norm(pooled), 1e-12), source
 
@@ -173,6 +174,24 @@ def main():
     layer4 = retrieval(queries, dr, df, qr, qf)
     layer4["batch_vs_single_top10_identical_fraction"] = retrieval(queries, dr, ds, qr, qs)["top10_identical_fraction"]
 
+    fastembed = None
+    if dump["family"] == "bge-small-en-v1.5":
+        # The Python Library's own embedder (ledgerd.embedding over fastembed): stored vectors
+        # are its exact float32 bytes, so compare bytes, not just cosine.
+        sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "kammi-ledger"))
+        from ledgerd.embedding import Embedder as LibraryEmbedder
+        library = LibraryEmbedder(Path(__file__).resolve().parents[2] / "kammi-ledger/vendor/runtime-v1/embedding-cache")
+        exact = total = 0
+        worst = 1.0
+        for name, section in sections.items():
+            for row in section["rows"]:
+                ours = base64.b64decode(row["vector"])
+                theirs = library.encode([row["prompt"]])[0]
+                total += 1
+                exact += ours == theirs
+                worst = min(worst, cos(np.frombuffer(ours, "<f4").astype(np.float64), np.frombuffer(theirs, "<f4").astype(np.float64)))
+        fastembed = {"byte_identical_fraction": exact / total, "rows": total, "cosine_min": worst}
+
     cos_arr = np.array(cosines)
     measured = {
         "tokens_identical": token_equal / token_rows,
@@ -201,6 +220,7 @@ def main():
                             "max_abs_error": max(abs_errors), "batch_single_cosine_min": measured["batch_single_cosine_min"],
                             "repeat_identical_fraction": measured["repeat_identical"]},
         "layer4_retrieval": layer4,
+        "library_fastembed": fastembed,
         "bars": BARS, "gates": gates, "edge_gate": edge_ok,
         "throughput_ms": {k: round(v["batch_ms"], 1) for k, v in sections.items()},
     }
