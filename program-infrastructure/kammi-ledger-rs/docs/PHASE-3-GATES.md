@@ -31,3 +31,25 @@ Phase 3 turns the Phase 2 components into the live serving topology. It adds no 
 
 `PHASE_3_STATUS = COMPLETE` only when every gate is `PASS`. After that comes Phase 4 (stress,
 shadow-follow, cutover).
+
+## Results (2026-09-28)
+
+| Gate | Status | Evidence |
+| --- | --- | --- |
+| G1 | PASS | `/v1/status.projection`: `RUNNING` with a pid |
+| G2 | PASS | 40 writes during the outage, all 200; searches 200 or 503; restarted with a new pid, lag 0. The kill tore the WAL, so the projection was quarantined and bulk-rebuilt |
+| G3 | PASS | process, pid, restarts, projection and memory seq/head/lag, journal head, `last_verify`, `last_quarantine`; lag reached 0 |
+| G4 | PASS | Corruption crashed the engine on open (0xc0000005, three times). The supervisor breaker restarted with `--reset`: quarantined, bulk-rebuilt in 1.15 s. 20 writes during the rebuild, all 200; the healed projection passes `verify --deep` |
+| G5 | PASS | Memory, CustodyRef, Cites, About, tags and Supersedes rows identical to Python's |
+| G6-G11 | PASS | `tools/memory_differential.py`: 656 steps byte-identical, fixed clock, bge, including every event ID, across a restart of both daemons. By category: fts 67, vector 53, hybrid 132, graph 41, get 73, trace 72, neighbours 72, supersession 6, restart 48, records 82 |
+| G12 | PASS | Empty projection rebuilt with bulk (1,785 events, 1.7 s): `verify --deep` passes, and all 20 custody tables match Python's rebuild |
+| G13 | PASS | 12 of 12 searches returned their own just-committed record |
+| G14 | PASS | Exit 91 at `projection.mid_transaction`; the resume reached the journal head; `verify --deep` passes |
+| G15 | PASS | Bulk rows identical to Python and to a statement-built projection (deep verify re-derives through bulk) |
+| G16 | PASS | Live-store replay with the 1.2 GB reference: full 4.6 s, first 1.4 s, checkpointed 0.47 s, derived state identical. Touch forces a re-hash, a flipped byte is refused, a corrupt checkpoint is ignored. The declared metadata-trust boundary is demonstrated, and full mode refuses it |
+| G17 | PASS | HTTP differential with the supervised projector and bge: 116 steps, 0 mismatches, both crash retries exact |
+| G18 | PASS | Python `independent_verify` and `Ledger` replay accept the Rust export at the same head (1,785 events). The memory journal is included (bge) |
+
+Workspace tests: 57 passed, 0 failed.
+
+`PHASE_3_STATUS = COMPLETE`

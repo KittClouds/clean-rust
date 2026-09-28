@@ -5,7 +5,36 @@ and this workspace must stay outside it: `kammi-ledger/ledgerd/release.py` hashe
 `.py/.rs/.toml/.lock/.md/.json/.txt` file under `kammi-ledger/`, so Rust code there would close
 the live daemon's flight gate. Build output goes to `G:/kammi-ledger-rs-target`.
 
-## Status: Phase 2 complete (core, `/v1`, embedders, Ladybug projector)
+## Status: Phase 3 complete (integrated serving system)
+
+Phase 3 turned the Phase 2 components into the live topology without new semantics. The
+daemon owns authority (journal and CAS) and supervises a disposable `kammi-projector` child.
+That child serves memory retrieval from Ladybug and never blocks a custody write. All 18
+gates are `PASS`; see [docs/PHASE-3-GATES.md](docs/PHASE-3-GATES.md) for the proof of each.
+
+| Area | Result |
+| --- | --- |
+| Supervision (G1-G4, G13, G14) | Restart with backoff; `/v1/status.projection` shows the process, position, lag and health; read-your-writes. A projector kill or corrupt projection never refuses a write: it is quarantined and rebuilt. Two crash-loop breakers, one in the supervisor (`--reset`) and one in the projector, handle engine crashes |
+| Memory parity (G5-G11) | `tools/memory_differential.py`: 656 steps byte-identical to Python (fts, vector, hybrid, graph, get, trace, neighbours, supersession, restart) and memory table row parity. Both daemons use a fixed clock, so even the memory journal's event IDs match |
+| bge embedder | Dedicated runner reproducing fastembed exactly (numpy pairwise float32 norm): 191/191 vectors byte-identical to Python's embedder, and Python's identity formula. Memory recorded by Rust rolls back into Python |
+| Bulk rebuild (G12, G15) | Pure-Rust row model plus `COPY FROM`: 1,785 events in 1.7 s (vs 17 s by statements); deep verify 0.8 s (was 18 s); rows identical to Python and to the statement path |
+| Verification checkpoint (G16) | Live-store replay with the 1.2 GB custody reference: 4.6 s full, 0.47 s checkpointed, derived state identical. The metadata-trust boundary is declared and demonstrated |
+| End to end (G17, G18) | HTTP differential 116/116. Python's verifier and replay accept Rust history, including the memory journal |
+
+Things found and fixed on the way:
+- empty CAS objects were misread as torn pack tails;
+- two projectors could race on one database;
+- `serde_json`'s default float parser lost the last bit of search scores on the RPC pipe;
+- a Ladybug WAL torn by a kill cannot be dropped safely (the engine crashes), so the whole
+  projection is rebuilt;
+- corruption can crash the engine on open, hence the breakers;
+- strict identity JSON rejected FILETIME-sized integers, which silently disabled the
+  verification checkpoint.
+
+ONNX Runtime is fetched by manifest, never committed: `vendor/onnxruntime-1.30.0/fetch.ps1`
+or `fetch.sh`.
+
+## Phase 2 (core, `/v1`, embedders, Ladybug projector)
 
 | Crate | Role | Proof |
 | --- | --- | --- |
@@ -156,9 +185,11 @@ kammi-migrate compare   --v1 <original> --v1 <exported>
 
 ## Next
 
-- Wire the projector into the daemon: supervise the process, serve `projection_seq/head` in
-  `/v1/status`, and add the memory graph (FTS and vector extensions) for `/v1` search parity.
-- Bulk-load rebuilds (`COPY FROM`) in the projector. Rebuild throughput is currently bound by
-  Ladybug statement execution, about 100 events/s.
-- Custody-ref verification cost at replay: use a verified-this-run bitset or a checkpoint.
-- Phase 4 stress program, then shadow-follow and cutover.
+Phase 4: the stress and soak program, then shadow-follow of the live Python store, cutover and
+rehearsed `export-v1` rollback. Items carried into it:
+- Memory events are applied one per transaction to match Python's FTS scores bit for bit.
+  Large memory journals will want a bulk path for them too, once parity is re-proven on it.
+- The deep verification at every projector start is cheap now (0.8 s on E4). Measure it at
+  scale and decide on periodic versus per-start.
+- The declared checkpoint trust boundary (metadata-identified files) should be revisited if
+  the object store ever becomes writable by anything but the daemon.
