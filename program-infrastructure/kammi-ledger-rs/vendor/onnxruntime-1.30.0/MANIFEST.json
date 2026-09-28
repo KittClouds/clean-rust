@@ -1,0 +1,9 @@
+{
+  "name": "onnxruntime",
+  "version": "1.30.0",
+  "source": "PyPI onnxruntime 1.30.0 wheel (onnxruntime/capi), copied from kammi-ledger/.venv",
+  "files": {
+    "onnxruntime.dll": "sha256:5e58353170677b13f05d867f93648c8783b11ac9146f330651d281701180c186"
+  },
+  "reason": "EmbeddingGemma q4 numerics depend on the ORT version: 1.20.1 vs 1.30 changed top-10 membership for 12% of frozen queries (see tools/embed_qualify.py). The Library pins 1.30 and binds this DLL's hash into every embedder identity."
+}

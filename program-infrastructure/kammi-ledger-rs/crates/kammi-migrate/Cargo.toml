@@ -1,0 +1,19 @@
+[package]
+name = "kammi-migrate"
+version = "0.1.0"
+description = "Import a Python (v1) Kammi store into the v2 store, and export it back byte-exactly"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+hashbrown.workspace = true
+kammi-jcs.workspace = true
+kammi-store.workspace = true
+kammi-v1.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true

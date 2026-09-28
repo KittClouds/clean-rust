@@ -1,0 +1,16 @@
+[package]
+name = "kammi-embed"
+version = "0.1.0"
+description = "Memory embedders for the Kammi Library over the Phoenix ONNX runners (EmbeddingGemma 300M, Jina v5, MDBR)"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+kammi-core.workspace = true
+kammi-jcs.workspace = true
+phoenix-embed = { path = "../../../../rust-native/phoenix/crates/phoenix-embed" }
+base64 = "0.22"
+serde_json.workspace = true
+tokenizers = { version = "0.22.2", default-features = false, features = ["onig"] }

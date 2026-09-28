@@ -1,0 +1,3 @@
+__pycache__/
+# Binary runtimes are fetched per vendor/*/MANIFEST.json (source + sha256), not committed.
+vendor/**/*.dll

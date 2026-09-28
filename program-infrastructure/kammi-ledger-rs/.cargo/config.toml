@@ -1,0 +1,12 @@
+# Keep build output off the C: source tree, matching the Python SDK convention
+# (G:\kammi-ledger-target). This workspace never builds inside kammi-ledger/.
+[build]
+target-dir = "G:/kammi-ledger-rs-target"
+
+# Link the projector's lbug against the qualified Ladybug 0.20.2 release (dynamic), not a
+# fresh source build. Runtime needs lbug_shared.dll and the OpenSSL DLLs on PATH:
+# kammi-ledger/vendor/runtime-v1/native.
+[env]
+LBUG_SHARED = "1"
+LBUG_LIBRARY_DIR = "C:/code land/clean-rust/program-infrastructure/kammi-ledger/vendor/ladybug-v0.20.2/extracted"
+LBUG_INCLUDE_DIR = "C:/code land/clean-rust/program-infrastructure/kammi-ledger/vendor/ladybug-v0.20.2/extracted"

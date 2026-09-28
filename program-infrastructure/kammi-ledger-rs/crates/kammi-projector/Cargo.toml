@@ -1,0 +1,13 @@
+[package]
+name = "kammi-projector"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+kammi-core.workspace = true
+kammi-jcs.workspace = true
+kammi-store.workspace = true
+lbug = "=0.20.2"

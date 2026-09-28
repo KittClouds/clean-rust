@@ -1,0 +1,1035 @@
+{
+ "documents": [
+  {
+   "heading": null,
+   "id": "d0",
+   "source": "ACCEPTANCE-STATUS-v0.1.md",
+   "text": "Date: 2026-09-27. Architecture is locked; implementation is a development slice. **New-flight gate: CLOSED.** This document is a status report, not an authorization or a scientific result."
+  },
+  {
+   "heading": null,
+   "id": "d1",
+   "source": "ACCEPTANCE-STATUS-v0.1.md",
+   "text": "- Single-process Ladybug custody projection behind a narrow FastAPI service and Python client/CLI. Service runs one Uvicorn worker on loopback; direct database writes are absent from the client API. Its current local HTTP token and filesystem permissions are development controls, not qualified production isolation. - Streaming SHA-256 CAS, strict RFC 8785 canonicalization, framed hash-chained event journal, recovery of incomplete journal tails, typed graph tables, idempotent request IDs, Merkle seal creation/recursive verification, and replay after journal commit but before graph projection. - Read-only generic flat-seal verifier plus an E4-specific fixture adapter outside the custody engine. It verified the frozen legacy E4-0 `v16-v09` seal's 447/447 entries and reproduced legacy root `278ae16eeb6852d3efad44221556a87be6df54964471f0870931fe2e99b305d1`. - Disposable E4 import produced base root `sha256:b7444f51049d53d5c5210498ae0c74ccb4f70dbe838ac5cf504ccb7bbc298e47` and successor root `sha256:234e568989f6c0e71fb69fa634b2e0bf085e7fb63336654202d3b221ef33f6fc`. The successor has two direct members and one parent. The 447 legacy entries resolve to 432 unique CAS objects; its successor closure has 433 unique objects after deduplication. - A fresh Ladybug projection rebuilt from only the imported CAS and event journal reproduced the same event head, graph counts, and 433-object successor closure. Five focused unit/API tests pass."
+  },
+  {
+   "heading": "Acceptance gate status",
+   "id": "d2",
+   "source": "ACCEPTANCE-STATUS-v0.1.md",
+   "text": "| Gate | State | Current evidence / remaining requirement | |---|---|---| | 1. One-byte tamper | Prototype pass | Synthetic object alteration makes recursive seal verification fail. Repeat against frozen fixture and independent verifier. | | 2. DB deletion/rebuild | Prototype pass | Disposable E4 projection rebuilt from CAS and journal with identical heads/counts/closure. Independent replay and backup/restore qualification remain. | | 3. Crash recovery | Partial | Journal-to-DB replay and incomplete-tail recovery tested. CAS-publication crash, power-loss durability, and Windows filesystem semantics remain. | | 4. GPU lease | Pending | Fencing tokens, host executor enforcement, and two-agent collision test are unimplemented. | | 5. Exposure gate | Pending | Program-wide exposure events, guarded panel access, and terminal denial test are unimplemented. | | 6. Adapter | Pending | Registry, immutable source identity, and gate-linked adapter receipt are unimplemented. | | 7. Failure history | Pending | Legacy attempts are stored as raw objects, but typed failure/head projections and generic queries are unimplemented. | | 8. Remote execution | Pending | Signed bundle, disposable worker, and return receipt verification are unimplemented. | | 9. Memory retrieval | Pending | `memory.lbdb`, trust classes, search, and custody-ref tracing are unimplemented. | | 10. Legacy Fabrique | Partial | 447/447 bytes and legacy root verified; disposable Merkle successor and rebuild pass. Complete typed history, failed-attempt/contact queries, and independent authoritative-head reconstruction remain. |"
+  },
+  {
+   "heading": "Acceptance gate status",
+   "id": "d3",
+   "source": "ACCEPTANCE-STATUS-v0.1.md",
+   "text": "The `/v1/authorize` endpoint explicitly denies new flights while these gates remain open. This denial is only effective for clients routed through the service; program coordination has notified Frozen Fabrique, JEV, FAS-R1, and Kinetic Kammi of the hold. Existing authorized work retains its own contracts and lab ownership."
+  },
+  {
+   "heading": "Evidence and limitations",
+   "id": "d4",
+   "source": "ACCEPTANCE-STATUS-v0.1.md",
+   "text": "- [Architecture](ARCHITECTURE-v1.md) SHA-256 `c9e9d5bb54ee863ce99760ee26c0f0e912b952ff3e8a3b502cc23f2d78eb3524`. - [Architecture lock](ARCHITECTURE-LOCK-v1.json) SHA-256 `94bcba258bd3658ccda3d917aaedf75aaf2a228edf8e9fda23f37159a9ccd364`. - [Runtime qualification](runtime/QUALIFICATION-v1.json) SHA-256 `9466c05fc7351370173f0d0dcfd7dd9cc400d25c8d4655aa8cd00bf234e0f861`. The Python wheel required a separate native DLL; the current OpenSSL DLLs come from a local Git installation and are not yet a portable production lock. - [Legacy 447/447 receipt](acceptance/e4-0/legacy-flat-verification-v1.json) SHA-256 `bd45cde3c3079c3d432e2253780b4c1cabf294842439773e7fb4e00f07faec97`. - [Disposable Merkle import receipt](acceptance/e4-0/merkle-import-v1.json) SHA-256 `4a95cc7ccbd63cbf36e157f150e9a6a42227640679d472562eb5e06290b5c601`. - [Projection rebuild receipt](acceptance/e4-0/projection-rebuild-v1.json) SHA-256 `c0ba6e3528dfad0e06c9483e7d0831a1a15eab6bfce9003963158533af1d43dd`. - Source snapshot has 17 files, root `2f28022a8aca9c12fd1f6f00181b2043ae6610f559a319e7eab8b3b733116cb1`. See [source manifest](acceptance/source-manifest-v0.1.json)."
+  },
+  {
+   "heading": "Evidence and limitations",
+   "id": "d5",
+   "source": "ACCEPTANCE-STATUS-v0.1.md",
+   "text": "Next implementation slice: import complete E4 attempt/supersession/head/contact semantics into generic custody events and queries; then implement policy, enforced leases, panel exposures, schema adapters, remote bundles, and the separate memory plane. Every gate needs an independent acceptance receipt before changing the flight state."
+  },
+  {
+   "heading": null,
+   "id": "d6",
+   "source": "ACCEPTANCE-STATUS-v0.2.md",
+   "text": "**New-flight gate: CLOSED_PENDING_ACCEPTANCE.** Existing authorized lab work is outside this gate. The architecture lock remains v1 and was not edited."
+  },
+  {
+   "heading": "E4 generic history slice",
+   "id": "d7",
+   "source": "ACCEPTANCE-STATUS-v0.2.md",
+   "text": "- The 447-entry final E4 seal still verifies exactly. Its 432 unique byte objects remain bound under the original Merkle import root. - A separate oversight supplement captured 61 E4 audit/contract/seal JSON paths that the final scientific seal omitted. Its 60 unique new objects are bound to the original Merkle import as a child; the scientific seal is intact. - A distinct, versioned E4 history run contains 557 typed facts: 168 attempt assertions (including nested stages), 17 supersession edges, 223 contact assertions, 148 evidence-access assertions, and one snapshot head. The counts are parsed legacy assertions, not live telemetry. - A fresh Ladybug projection rebuilt from only CAS and journal reproduced the journal head, fact rows, counts, and 493-object supplemental closure. - The stopped partial v3 import into the earlier run remains in the journal with its failure receipt. The completed pass uses a new run identity. - No positive contact assertion was found in the captured sources. That is not a program-wide no-contact attestation. Source coverage is limited to the verified final seal and the captured E4 JSON supplement."
+  },
+  {
+   "heading": "E4 generic history slice",
+   "id": "d8",
+   "source": "ACCEPTANCE-STATUS-v0.2.md",
+   "text": "The generic history API returns heads, stopped and other attempts, supersessions, predecessor chains, scoped contact claims, and scoped evidence access claims. It always reports no authorization conferred by these facts."
+  },
+  {
+   "heading": "Remaining acceptance gates",
+   "id": "d9",
+   "source": "ACCEPTANCE-STATUS-v0.2.md",
+   "text": "The E4 fixture demonstrates history reconstruction for the captured snapshot. The following remain open: policy and exposure enforcement; GPU/resource leases; schema adapters; remote bundles; memory retrieval; crash and power-loss qualification; independent actor authorization; and production one-writer process fencing. No new flight is authorized by this v0.2 status."
+  },
+  {
+   "heading": "Immutable adapters v1",
+   "id": "d10",
+   "source": "ADAPTERS-v1.md",
+   "text": "Only registered, allowlisted implementations can transform a custody view. Adapter identity binds source schema, target schema, version and exact implementation source bytes. AdapterApplied binds source, derived view, implementation, actor, authorization and purpose. Original source bytes and identity remain unchanged."
+  },
+  {
+   "heading": "Immutable adapters v1",
+   "id": "d11",
+   "source": "ADAPTERS-v1.md",
+   "text": "EVAL_CELLS_RENAME_V1 maps evaluation_checkpoint_cells to evaluation_cells and changes evaluation-v1 to evaluation-v2. Missing or ambiguous source fields fail closed. Independent verification implements the transformation separately. New adapters require Library Lab code review and qualification, never arbitrary Cypher."
+  },
+  {
+   "heading": null,
+   "id": "d12",
+   "source": "ARCHITECTURE-AMENDMENT-v2-PHOENIX-VAULT.md",
+   "text": "Authority: user direction in Chief Kammi, 2026-09-27. This amends the physical projection layout and adds a Phoenix product domain. It does not amend any scientific protocol or grant model contact."
+  },
+  {
+   "heading": "One service, one database, distinct authority domains",
+   "id": "d13",
+   "source": "ARCHITECTURE-AMENDMENT-v2-PHOENIX-VAULT.md",
+   "text": "`kammi-ledgerd` owns one writable Ladybug database object. Custody, contextual agent memory, and Phoenix vault tables share that object and have separate schemas and APIs. No client writes Ladybug directly. The old `memory.lbdb` projection remains preserved as a historical file; memory journal replay builds its tables in `custody.lbdb`. No memory claim becomes product or custody truth."
+  },
+  {
+   "heading": "One service, one database, distinct authority domains",
+   "id": "d14",
+   "source": "ARCHITECTURE-AMENDMENT-v2-PHOENIX-VAULT.md",
+   "text": "The CAS and hash-chained journals remain durable authority. Ladybug remains a rebuildable projection, including for Phoenix vault state. Phoenix vault events are part of the main Library journal so one commit sequence decides the active source revision, generation, and Reader locator. Memory retains its separate contextual journal and trust class."
+  },
+  {
+   "heading": "Phoenix ownership",
+   "id": "d15",
+   "source": "ARCHITECTURE-AMENDMENT-v2-PHOENIX-VAULT.md",
+   "text": "Phoenix owns note content, stable entry IDs, human decisions, Reader locators, generation qualification, and product semantics. Library owns immutable byte identity, event commit, replay, physical transaction, authentication, and single-writer arbitration. A vault is scoped to a Phoenix service actor. It is not a scientific run and needs no lab-stage authorization for ordinary editing."
+  },
+  {
+   "heading": "Phoenix ownership",
+   "id": "d16",
+   "source": "ARCHITECTURE-AMENDMENT-v2-PHOENIX-VAULT.md",
+   "text": "`VaultCreated`, `VaultSourceCommitted`, `VaultGenerationSelected`, and `VaultReaderPositionSet`, and `VaultProductPrimarySelected` events describe the product state. Source commits use an expected revision and increment a vault source epoch. A derived generation may become active only against the exact current source epoch. A later source commit makes it stale without erasing the generation. Readers can retain the immutable asset identities returned by the active-generation view. A rename changes the workspace source object, not its stable entry IDs."
+  },
+  {
+   "heading": "Phoenix ownership",
+   "id": "d17",
+   "source": "ARCHITECTURE-AMENDMENT-v2-PHOENIX-VAULT.md",
+   "text": "The vault starts in legacy-mirror mode. The product can select Library as its one-way primary authority only with a scoped cutover receipt and exact source epoch. Phoenix owns the proof that its old local state and cold-open behavior are ready; Library records the declaration and enforces its ordering."
+  },
+  {
+   "heading": "Phoenix ownership",
+   "id": "d18",
+   "source": "ARCHITECTURE-AMENDMENT-v2-PHOENIX-VAULT.md",
+   "text": "The Phoenix-facing API is narrow and owner-scoped. It never exposes arbitrary Cypher, Library administrative credentials, or scientific stage controls. Source bytes and generation manifests enter CAS before a journal event can select them. A crash before event commit leaves an unreferenced object. A crash after journal commit is repaired by replaying the Ladybug projection."
+  },
+  {
+   "heading": "Portability",
+   "id": "d19",
+   "source": "ARCHITECTURE-AMENDMENT-v2-PHOENIX-VAULT.md",
+   "text": "The vault's stable ID is generated once and stored in the authoritative event. Filesystem paths are locations. A portable export must include the vault's referenced CAS objects and its event slice plus a verifier manifest. Copying only the Ladybug projection is not a portable vault. Import verifies bytes and source/generation lineage before replaying semantic events on another Library host. The package root is an integrity identity supplied out of band; v2 does not assert origin authenticity if an attacker can replace both package and expected root."
+  },
+  {
+   "heading": "Portability",
+   "id": "d20",
+   "source": "ARCHITECTURE-AMENDMENT-v2-PHOENIX-VAULT.md",
+   "text": "This amendment requires successor Library qualification. Existing accepted scientific receipts remain valid; new service source bytes close the flight gate until the successor acceptance passes."
+  },
+  {
+   "heading": null,
+   "id": "d21",
+   "source": "ARCHITECTURE-v1.md",
+   "text": "Status: **locked for implementation**. This is program infrastructure, not a new laboratory protocol or authorization to run a model. Any change to these decisions requires a numbered architecture amendment and a new lock receipt. Existing lab seals and scientific claims retain their own authority."
+  },
+  {
+   "heading": "Purpose and flight gate",
+   "id": "d22",
+   "source": "ARCHITECTURE-v1.md",
+   "text": "Kammi Ledger provides one program-wide custody service and a separate agent-memory service. Custody is authoritative evidence; memory is contextual and can only point to custody evidence. E4-1 and every other **new flight** wait for the acceptance gates below. Existing authorized work keeps its own lab ownership and contracts. The daemon's deployment must not silently modify them."
+  },
+  {
+   "heading": "Purpose and flight gate",
+   "id": "d23",
+   "source": "ARCHITECTURE-v1.md",
+   "text": "The first implementation slice is content-addressed storage (CAS), an immutable event journal, a custody graph, Merkle seals, and one writer daemon. The E4-0 legacy import is its first acceptance fixture. Policy, enforced leases, exposures, remote bundles, and memory follow in that order before the flight gate can pass. No “airspace reopens” claim is valid from a design lock alone."
+  },
+  {
+   "heading": "Trust and ownership",
+   "id": "d24",
+   "source": "ARCHITECTURE-v1.md",
+   "text": "- One `kammi-ledgerd` process owns the read-write Ladybug `Database` object for `custody.lbdb` and, later, a separate read-write object for `memory.lbdb`. Clients use narrow Python/Rust SDK, CLI, and MCP APIs. They do not obtain database paths or arbitrary Cypher write access. - The daemon authenticates actors and scopes each operation to a lab, run, and role. Local transport uses an ACL-protected named pipe; remote transport uses authenticated TLS. Audit events retain actor identity and request identity. A request ID is idempotent. - Ladybug is a **rebuildable projection/index**, never the sole source of custody truth. CAS bytes and a durable, hash-chained event journal are authoritative. The two Ladybug files can be deleted and reconstructed from those bytes. - Lab owners control scientific content, decisions, and claims. Chief Kammi coordinates identity, access, resources, exposure accounting, and the common gate vocabulary. Shared SDK code is not shared lab evidence. - Memory queries may retrieve a claim and its `custody_ref`, but a memory record never satisfies an authorization predicate or becomes an observed result by changing its trust class."
+  },
+  {
+   "heading": "Trust and ownership",
+   "id": "d25",
+   "source": "ARCHITECTURE-v1.md",
+   "text": "Ladybug's documented concurrency pattern allows one read-write database object and concurrent connections from that object; it does not allow another database object to open the same file concurrently. The daemon therefore also owns read queries while live. Its transactions are serializable, atomic, and durable **within Ladybug**, but cannot atomically include filesystem CAS writes, journal appends, remote work, or process launches. The journal/replay protocol below covers those boundaries. [Concurrency](https://docs.ladybugdb.com/concurrency/), [transactions](https://docs.ladybugdb.com/cypher/transaction/)."
+  },
+  {
+   "heading": "Identity and immutable bytes",
+   "id": "d26",
+   "source": "ARCHITECTURE-v1.md",
+   "text": "An artifact ID is `sha256:` plus the SHA-256 of its **raw bytes**. A location is metadata and may change without changing identity. An artifact registration records digest, byte count, media type, schema ID, kind, producer, observed source path/URI, and custody scope. It reads the source once into a temporary CAS object, hashes while copying, flushes, then atomically publishes the digest path. Existing digest paths are verified before reuse. Source paths are never embedded in content identity."
+  },
+  {
+   "heading": "Identity and immutable bytes",
+   "id": "d27",
+   "source": "ARCHITECTURE-v1.md",
+   "text": "Structured custody objects use RFC 8785 JSON Canonicalization Scheme (JCS) and SHA-256. The SDK rejects duplicate keys, invalid Unicode, non-finite numbers, and ambiguous or out-of-range numeric representations; large integers and decimal quantities use schema-defined strings. Required/missing/null semantics are explicit per schema. Identifiers are domain-separated and schema-versioned:"
+  },
+  {
+   "heading": "Identity and immutable bytes",
+   "id": "d28",
+   "source": "ARCHITECTURE-v1.md",
+   "text": "Only content fields appear in these payloads. Timestamps, mutable locations, and display labels are excluded unless a schema explicitly makes them semantic. Members and parents are sorted by full typed ID; duplicates are rejected. A cross-language conformance corpus must give the same bytes and IDs in Python and Rust. [RFC 8785](https://www.rfc-editor.org/rfc/rfc8785.html)."
+  },
+  {
+   "heading": "Event journal and crash protocol",
+   "id": "d29",
+   "source": "ARCHITECTURE-v1.md",
+   "text": "Every accepted operation creates an immutable event. The daemon assigns a monotonically increasing sequence, a previous-event digest, actor/request IDs, scope, event type, payload object reference, and UTC event time. The journal is framed with length and checksum; each committed frame links to the previous digest. Incomplete tails are recognizable. Records are appended only by the daemon."
+  },
+  {
+   "heading": "Event journal and crash protocol",
+   "id": "d30",
+   "source": "ARCHITECTURE-v1.md",
+   "text": "1. Validate policy and canonical payload; stage all referenced immutable CAS objects. 2. Flush and publish CAS objects. An unreferenced object after a crash is an orphan, never a false committed event. 3. Append and durably flush the event frame. This is the custody commit point. A retry with the same request ID returns the same event. 4. Apply the event to Ladybug in a transaction. On restart, replay committed events not yet projected. If the DB is missing or inconsistent, rebuild from the beginning."
+  },
+  {
+   "heading": "Event journal and crash protocol",
+   "id": "d31",
+   "source": "ARCHITECTURE-v1.md",
+   "text": "Windows durable rename/flush behavior and journal-tail recovery must be demonstrated on the actual filesystem before deployment. A Ladybug WAL checkpoint does not substitute for the event journal. The verifier compares the event chain, CAS digests, projection sequence, and projected heads."
+  },
+  {
+   "heading": "Event journal and crash protocol",
+   "id": "d32",
+   "source": "ARCHITECTURE-v1.md",
+   "text": "Events include `RunCreated`, `ScientificSpecBound`, `ExecutionSpecBound`, `ToolchainBound`, `ArtifactRegistered`, `SealCreated`, `SealVerified`, `HeadPromoted`, `StageAuthorized`, `LeaseAcquired`, `LeaseReleased`, `ContactRecorded`, `ExposureRecorded`, `AttemptStopped`, `OutputsRegistered`, `ReplayVerified`, and `RunClosed`. New event types require a registered schema. Failed attempts stay in the journal; authoritative heads change only through an explicit, policy-valid promotion event."
+  },
+  {
+   "heading": "Custody graph and seals",
+   "id": "d33",
+   "source": "ARCHITECTURE-v1.md",
+   "text": "The typed Ladybug custody schema starts with `Lab`, `Agent`, `Run`, `Stage`, `Artifact`, `Event`, `Seal`, `Authorization`, `Host`, `Resource`, and `Panel`. Scientific specs, execution specs, toolchains, manifests, and results initially use typed `Artifact.kind` values. Relationship tables include `BELONGS_TO`, `EXECUTED_BY`, `HAS_STAGE`, `HAS_EVENT`, `INPUT_TO`, `OUTPUT_OF`, `DERIVED_FROM`, `SUPERSEDES`, `SEALED_BY`, `PARENT_SEAL`, `VERIFIED_BY`, `AUTHORIZED_BY`, `RUNS_ON`, `USES_RESOURCE`, and `EXPOSES`. The daemon alone maps versioned event schemas into this graph; no lab writes its own synonyms. Ladybug's node and relationship tables are explicitly typed. [Schema documentation](https://docs.ladybugdb.com/cypher/data-definition/create-table/)."
+  },
+  {
+   "heading": "Custody graph and seals",
+   "id": "d34",
+   "source": "ARCHITECTURE-v1.md",
+   "text": "A v1 seal payload contains schema ID, sorted direct artifact IDs, and sorted parent seal roots. Parents must already exist and be verified; cycles and duplicate members are rejected. The root binds the complete transitive ancestry without serializing it into every successor. `kammi lineage` walks parent edges, validates every root and artifact byte, and can export a flat closure when an old verifier requires one. A contract binds an ancestor using its exact digest; a verifier loads that ancestor to check any property it needs."
+  },
+  {
+   "heading": "Custody graph and seals",
+   "id": "d35",
+   "source": "ARCHITECTURE-v1.md",
+   "text": "`ScientificSpec`, `ExecutionSpec`, `Toolchain`, `Run`, and `Result` are distinct artifact kinds/relations. A verifier repair changes the toolchain identity and produces a new attempt/event, not a scientific revision. A hypothesis or task-contract change produces a new scientific spec. Importers preserve historical contract bytes and roots even if the new graph expresses them more compactly."
+  },
+  {
+   "heading": "Contacts, gates, leases, and exposures",
+   "id": "d36",
+   "source": "ARCHITECTURE-v1.md",
+   "text": "Contact classes are `POPULATION_GENERATED`, `TOKENIZER`, `MODEL`, `CUDA`, `TRUTH_LABEL`, `EVAL_PANEL`, `SCORING`, and `HUMAN_INSPECTION`. A contact event binds run, class, target artifact/panel, actor, time, and authorization. `contact-status` is a projection over events. **No recorded contact** is only a complete negative claim when all relevant contact-capable access paths are mediated and their coverage is attested; unmanaged shell, process, or file access cannot be disproved by an empty ledger."
+  },
+  {
+   "heading": "Contacts, gates, leases, and exposures",
+   "id": "d37",
+   "source": "ARCHITECTURE-v1.md",
+   "text": "Stage policies are declarative, versioned artifacts with a policy-engine implementation hash. `authorize` evaluates sealed scientific/execution specs, verified roots, contact and exposure histories, resource leases, and stage-specific predicates. It returns an event-backed authorization or a structured denial. An adapter or policy update may alter future gate results; it cannot rewrite existing event history or a lab's sealed protocol."
+  },
+  {
+   "heading": "Contacts, gates, leases, and exposures",
+   "id": "d38",
+   "source": "ARCHITECTURE-v1.md",
+   "text": "Resources have leases with owner, run, host, purpose, start, expiry, and a monotonic fencing token. The host executor checks the token immediately before launch and during long jobs; a lease record alone is advisory. Unmanaged GPU users must be detected and treated as an occupancy conflict or an explicit unknown. Expiry/restart reconciliation cannot cause two valid executors to own the same GPU simultaneously."
+  },
+  {
+   "heading": "Contacts, gates, leases, and exposures",
+   "id": "d39",
+   "source": "ARCHITECTURE-v1.md",
+   "text": "Panel exposures use the program-wide purpose vocabulary `generation`, `fit`, `selection`, `thresholding`, `diagnostic`, and `terminal`. Every mediated open records lab, run, actor, purpose, date/time, and decision. Reports show the vector of counts and sequence of decisions across labs. Terminal-panel access is denied before its authorization. File ACLs or a guarded panel gateway must make this an actual access control, not just a logging convention."
+  },
+  {
+   "heading": "Contacts, gates, leases, and exposures",
+   "id": "d40",
+   "source": "ARCHITECTURE-v1.md",
+   "text": "Remote workers receive a signed, immutable RunBundle containing run/spec/root identities, clean git state, input roots, environment lock, device requirements, seeds, command, expected outputs, and authorization. The worker returns environment, execution, and output receipts plus artifacts; the daemon verifies and ingests them. Worker evidence cannot promote a head by itself."
+  },
+  {
+   "heading": "Memory plane",
+   "id": "d41",
+   "source": "ARCHITECTURE-v1.md",
+   "text": "`memory.lbdb` has its own schema, migration stream, retention policy, and retrieval indexes. Nodes include `Memory`, `Decision`, `Hypothesis`, `Procedure`, `FailureMode`, `ResultSummary`, `Concept`, `Task`, `Agent`, `Lab`, and `Project`, with `ABOUT`, `DERIVED_FROM`, `SUPPORTS`, `CONTRADICTS`, `SUPERSEDES`, `APPLIES_TO`, `DISCOVERED_BY`, `USED_BY`, and `RELATED_TO` edges. Each record has a stable ID, trust class, scope, text, author/time, confidence, supersedes references, and optional custody refs."
+  },
+  {
+   "heading": "Memory plane",
+   "id": "d42",
+   "source": "ARCHITECTURE-v1.md",
+   "text": "Trust classes are `OBSERVED`, `DERIVED`, `INTERPRETIVE`, `HYPOTHESIS`, `PREFERENCE`, and `PROCEDURE`. Changes create a new record and supersession edge. `OBSERVED` requires verified custody refs and still does not become custody evidence. A memory write checks referenced custody IDs through the daemon; there is no cross-database atomic transaction, so replay marks unresolved references rather than inventing evidence. Retrieval combines graph neighborhood and full-text search first, then versioned embedding/vector search after the authoritative spine is qualified. Retrieval responses show trust class and evidence links. Ladybug supports FTS over node string properties and a disk-backed vector index over node vector properties; extension/version qualification is required on the deployed Windows build. [FTS](https://docs.ladybugdb.com/extensions/full-text-search/), [vector](https://docs.ladybugdb.com/extensions/vector/)."
+  },
+  {
+   "heading": "Schema evolution and interfaces",
+   "id": "d43",
+   "source": "ARCHITECTURE-v1.md",
+   "text": "Original object bytes remain immutable. A registered adapter has source schema, target schema, implementation artifact/hash, and deterministic output. `AdapterApplied` binds source and output IDs. Any adapter used for a gate or result is named in that event. Adapters never mutate an old ID."
+  },
+  {
+   "heading": "Schema evolution and interfaces",
+   "id": "d44",
+   "source": "ARCHITECTURE-v1.md",
+   "text": "The daemon exposes typed operations only: artifact registration/get/verify, run creation/status, lineage, seal create/verify, authorization request, contact status/record, lease acquire/release, exposure open/report, memory search/record/supersede, and import/replay. SDKs share wire schemas and JCS fixtures. The MCP façade exposes these same scoped operations; raw Ladybug MCP is restricted to offline read-only inspection, never a live second database object or write path."
+  },
+  {
+   "heading": "E4-0 acceptance fixture",
+   "id": "d45",
+   "source": "ARCHITECTURE-v1.md",
+   "text": "The current frozen legacy fixture is the E4-0 `v16-v09` final contract and seal. At this architecture lock, the contract file SHA-256 is `21fc77d5a288b9adef995d88f089890235f8dcb2fbc3c9e452725bb67892a22f`; the seal-file SHA-256 is `0635de4a384b4d5121d8b2295e88a73f649c53e402ffcda311fcaf9c8d93099c`; its recorded legacy root is `278ae16eeb6852d3efad44221556a87be6df54964471f0870931fe2e99b305d1`, with 447 declared and 447 present entries. These are fixture anchors, not proof that every referenced byte has already been independently reverified by Kammi Ledger."
+  },
+  {
+   "heading": "E4-0 acceptance fixture",
+   "id": "d46",
+   "source": "ARCHITECTURE-v1.md",
+   "text": "The importer runs read-only over the complete E4-0 history, including failed attempts, contracts, receipts, seals, and lineage. It preserves original raw digests, legacy root algorithms, names, and statuses. It must reproduce the existing verifier's 447/447 closure and identify the same authoritative head without experiment-specific code in the custody engine. A separate new Merkle seal may bind the imported legacy seal; its root will be different and must never be presented as the legacy root. Future successors reference that root rather than copying 447 entries."
+  },
+  {
+   "heading": "Flight acceptance gates",
+   "id": "d47",
+   "source": "ARCHITECTURE-v1.md",
+   "text": "Before new flights, independently demonstrate and retain receipts for:"
+  },
+  {
+   "heading": "Flight acceptance gates",
+   "id": "d48",
+   "source": "ARCHITECTURE-v1.md",
+   "text": "1. One-byte CAS tamper detection and rejection. 2. Full deletion/rebuild of `custody.lbdb` with identical event head, graph heads, and seal roots. 3. Crash after CAS publication/before journal commit, and after journal commit/before DB projection; recovery is idempotent and preserves committed history. 4. Two simultaneous GPU lease requests: exactly one valid fencing token and one executable launch. 5. Pre-authorization terminal-panel open rejected by the mediated access path; exposure vectors and decisions reconstruct across labs. 6. Registered schema adapter changes a field view while source bytes and ID remain unchanged. 7. Failed execution remains queryable without scientific-spec revision or silent head promotion. 8. Signed bundle executes on a disposable worker and returns independently verified evidence. 9. Fresh agent retrieves a relevant historical failure through memory and follows its custody refs to verified evidence; memory cannot satisfy a custody gate. 10. Complete E4-0 legacy import identifies the authoritative head and reproduces the legacy 447/447 closure and root, then verifies a new successor using only direct members plus parent roots."
+  },
+  {
+   "heading": "Flight acceptance gates",
+   "id": "d49",
+   "source": "ARCHITECTURE-v1.md",
+   "text": "The acceptance report records implementation versions, source hashes, environment, test fixtures, failures, independent reviewer, and exact roots. Any failed gate keeps the new-flight hold in place. Individual labs seal their own instantiated inputs, splits, seeds, and results; Kammi stores those identities and custody relations without merging evidence across labs."
+  },
+  {
+   "heading": "Implementation qualifications",
+   "id": "d50",
+   "source": "ARCHITECTURE-v1.md",
+   "text": "Pin a Ladybug release, Python runtime, FTS/vector extension builds, JCS library, Windows filesystem, and remote-worker signature implementation in an execution lock before coding against them. The locally available `py` is 3.13; the online Ladybug system-requirements page appears older than current PyPI wheels, so actual wheel and extension compatibility must be proved rather than inferred. Python/FastAPI is the initial daemon preference; the wire contract allows a later Rust daemon. No agent receives direct database write permissions."
+  },
+  {
+   "heading": "Projection-free backup/restore v1",
+   "id": "d51",
+   "source": "BACKUP-RESTORE-v1.md",
+   "text": "ledgerd.backup.backup takes custody and memory writer locks and copies objects/sha256, journal, memory/journal and nonsecret configuration into a new external destination. Policies/adapters/actors/grants are immutable journal facts, so the journal captures registries. BACKUP.json binds path, size and SHA-256 plus custody/memory heads."
+  },
+  {
+   "heading": "Projection-free backup/restore v1",
+   "id": "d52",
+   "source": "BACKUP-RESTORE-v1.md",
+   "text": "restore verifies every declared file and safe relative path before creating a new destination. Never restore over a live store. Start a new daemon to reconstruct projections and compare heads/counts/seals. Ladybug files are intentionally unnecessary. Back up credentials/signing keys separately into an appropriately restricted secret store. CAS orphans/staging bytes are not authoritative; committed referenced objects are essential."
+  },
+  {
+   "heading": null,
+   "id": "d53",
+   "source": "CUSTODY-VOCABULARY-v1.md",
+   "text": "This is Library Lab's controlled vocabulary for imported historical assertions. The authoritative record is the CAS object plus journal event. Ladybug indexes it. An assertion cites a registered evidence artifact and has a scope; it does not grant execution authority or turn a legacy self-report into direct observation."
+  },
+  {
+   "heading": null,
+   "id": "d54",
+   "source": "CUSTODY-VOCABULARY-v1.md",
+   "text": "`FactRecorded` has exactly these fields: `run_id`, `kind`, `subject`, `object`, `value`, `evidence_artifact`, and `scope`. Its `fact_id` is domain-separated canonical JSON identity. A fact's evidence must already be registered in CAS."
+  },
+  {
+   "heading": null,
+   "id": "d55",
+   "source": "CUSTODY-VOCABULARY-v1.md",
+   "text": "| Kind | Permitted values | Meaning | | --- | --- | --- | | `ATTEMPT` | `PASS`, `STOP`, `UNKNOWN` | Cited attempt or audit outcome. | | `SUPERSESSION` | `DECLARED` | `subject` declares that it supersedes `object`. | | `CONTACT` | `YES`, `NO_ATTESTED`, `UNKNOWN` | Contact claim for the cited scope and class. | | `EVIDENCE_ACCESS` | `YES`, `NO_ATTESTED`, `UNKNOWN` | Access claim for the cited scope and class. | | `HEAD` | `SEALED`, `SUPERSEDED`, `UNKNOWN` | Head claim for the cited snapshot and role. |"
+  },
+  {
+   "heading": null,
+   "id": "d56",
+   "source": "CUSTODY-VOCABULARY-v1.md",
+   "text": "`NO_ATTESTED` means a cited receipt explicitly says no. It does not prove absence outside that receipt's scope. Missing fields are never silently treated as false. An imported `HEAD` identifies a legacy snapshot head; it is not a Kammi flight authorization. Supersession is a declared edge until independent source identity and closure checks qualify it."
+  },
+  {
+   "heading": null,
+   "id": "d57",
+   "source": "CUSTODY-VOCABULARY-v1.md",
+   "text": "The E4 importer is a versioned adapter. Its path and legacy-field rules do not enter the daemon vocabulary. The public service exposes generic history queries and master-authorized scoped fact registration. Fact registration preserves source assertions; it cannot create a live authorization."
+  },
+  {
+   "heading": null,
+   "id": "d58",
+   "source": "CUSTODY-VOCABULARY-v1.md",
+   "text": "Scientific labs request new custody terms from Library Lab. They may not add lab-specific receipt keys as substitute authority. Memory schemas may evolve separately and never confer custody status."
+  },
+  {
+   "heading": "Live vocabulary",
+   "id": "d59",
+   "source": "CUSTODY-VOCABULARY-v1.md",
+   "text": "ledgerd/vocabulary.py is the closed event registry. Actor kinds, contact classes, exposure purposes, policy predicates, resource kinds and adapter identities each have one centrally controlled registry. Unknown authoritative events fail replay. Generic Entity/Link projection tables represent the shared ontology without a new specialized table for every receipt type. Specification and receipt bytes remain Artifact kinds. The immutable event/payload graph is always retained."
+  },
+  {
+   "heading": "Closure accounting",
+   "id": "d60",
+   "source": "CUSTODY-VOCABULARY-v1.md",
+   "text": "`verify_seal` returns unique transitive **data members**. It excludes Kammi seal envelope objects and parent envelope objects; their identities are separately bound and recursively verified. Direct members and parents are ordered duplicate-free sets. Count CAS objects, seal envelopes and journal payload objects separately."
+  },
+  {
+   "heading": "Closure accounting",
+   "id": "d61",
+   "source": "CUSTODY-VOCABULARY-v1.md",
+   "text": "E4's actual imported closure is 432 original data objects + 1 serialized **legacy** seal file + 60 newly registered supplement objects = 493 data members. The contract among the successor's two direct members already exists in the parent's 432 objects and is counted once. A Kammi child seal envelope is not that extra member. 447 legacy entries are paths/identities, not 447 unique byte objects."
+  },
+  {
+   "heading": "Exposure v1",
+   "id": "d62",
+   "source": "EXPOSURE-v1.md",
+   "text": "Purposes: generation, fit, selection, thresholding, diagnostic, terminal. Each panel report contains all events, counts and the six-coordinate exposure vector."
+  },
+  {
+   "heading": "Exposure v1",
+   "id": "d63",
+   "source": "EXPOSURE-v1.md",
+   "text": "POST /v1/panels/{id}/open authenticates actor and lab ownership, checks a scoped grant and current stage authorization, commits ExposureOpened, then reads bytes. ExposureClosed describes gateway delivery, not proof that a human read the response. A lost response may overcount an opening conservatively; it cannot reveal unrecorded bytes. Retrying the same intent returns the same event without a second opening."
+  },
+  {
+   "heading": "Exposure v1",
+   "id": "d64",
+   "source": "EXPOSURE-v1.md",
+   "text": "Panel bytes in CAS remain inaccessible through ordinary actor download endpoints. Master administration and direct filesystem access are outside guarded panel operation. Such access must be explicitly logged and cannot be represented as qualified secrecy. Remote bundles cannot bypass the panel gateway. Declaring a protected panel as an input requires a prior opening for the same producer/run/stage. Input delivery rechecks current authorization and exposure while holding the authority lock."
+  },
+  {
+   "heading": "Failure recovery v1",
+   "id": "d65",
+   "source": "FAILURE-RECOVERY-v1.md",
+   "text": "An incomplete journal tail is quarantined by digest before truncation to a valid prefix. Complete checksum/chain corruption fails closed; it is not repaired by truncating history. CAS writes stage/fsync/rename before events. An orphan CAS object may survive a crash; it gains authority only through committed events. Projection errors return the committed event identity so a retry/rebuild can converge without duplicating the action."
+  },
+  {
+   "heading": "Failure recovery v1",
+   "id": "d66",
+   "source": "FAILURE-RECOVERY-v1.md",
+   "text": "Single-writer locks are held by the OS and released on process death. A PID file is diagnostic. Kill the owned Windows process tree, not merely its launcher. Preserve stopped attempts, failed acceptance logs and any recovered tail before retrying."
+  },
+  {
+   "heading": "Failure recovery v1",
+   "id": "d67",
+   "source": "FAILURE-RECOVERY-v1.md",
+   "text": "Qualified durability is process-crash prefix recovery on this pinned Windows runtime. File fsync calls request OS flushing; rename/open-handle behavior is characterized. No physical power-cut/reboot test or storage-controller persistence certification was performed. Directory metadata durability after power loss is not guaranteed by this release's evidence. Maintain backups; do not claim stronger power-loss guarantees from process-kill tests."
+  },
+  {
+   "heading": "Lab integration v1",
+   "id": "d68",
+   "source": "LAB-INTEGRATION-v1.md",
+   "text": "Existing authorized work retains its original contracts. Do not migrate running experiments. Future branches submit their scientific/engineering bytes, ownership, stage requirements, evidence classes and policy declarations to Library Lab."
+  },
+  {
+   "heading": "Lab integration v1",
+   "id": "d69",
+   "source": "LAB-INTEGRATION-v1.md",
+   "text": "Register inputs; seal direct members plus parent roots; bind specs; obtain actor grants and stage authorization; acquire a fenced resource; open evidence through the exposure gateway; start an attempt; execute; register receipts/results; close the attempt; seal and verify lineage."
+  },
+  {
+   "heading": "Lab integration v1",
+   "id": "d70",
+   "source": "LAB-INTEGRATION-v1.md",
+   "text": "Labs own hypotheses, thresholds, data, results and interpretation. Shared implementations do not constitute shared scientific evidence. Keep each lab's inputs/splits/seeds/results separate. Use artifact IDs across hosts/worktrees. Never copy ancestor receipt fields into descendants. Never infer no contact from absent assertions. Historical import confers no live authorization. Request new custody terms centrally; contextual memory tags may evolve more freely."
+  },
+  {
+   "heading": "Fenced resources v1",
+   "id": "d71",
+   "source": "LEASES-v1.md",
+   "text": "Exclusive resource kinds: GPU, CPU_POOL, HOST, REMOTE_WORKER, DATASET_LOCK, PANEL_LOCK, FILESYSTEM_EXCLUSIVE. Pools are coarse exclusive units in v1; register separate resource IDs for independently reservable units."
+  },
+  {
+   "heading": "Fenced resources v1",
+   "id": "d72",
+   "source": "LEASES-v1.md",
+   "text": "Leases bind actor/run/stage/purpose, constraints, expiry and a monotonically increasing resource fencing token. Acquire/renew/release carry request IDs. Expiry permits a new holder; a stale token cannot execute through a qualified executor."
+  },
+  {
+   "heading": "Fenced resources v1",
+   "id": "d73",
+   "source": "LEASES-v1.md",
+   "text": "Local and remote executors check at launch and during execution. They terminate their owned process tree on expiry. Arbitration fixtures use logical GPU resources and CPU commands: they prove fencing semantics without consuming CUDA or scientific observers. Direct CUDA launches that bypass the executor are outside qualified operation."
+  },
+  {
+   "heading": "Fenced resources v1",
+   "id": "d74",
+   "source": "LEASES-v1.md",
+   "text": "Clock is the host UTC clock; admin clock rollback is outside the trusted-host boundary. Lease TTL is 1..3600 seconds. Clients must renew before expiry and stop after denial."
+  },
+  {
+   "heading": "Narrow MCP v1",
+   "id": "d75",
+   "source": "MCP-v1.md",
+   "text": "Run python -m ledgerd.mcp with KAMMI_URL and the appropriate KAMMI_TOKEN. Supported transport: UTF-8 newline-delimited JSON-RPC on stdio, protocol 2025-06-18. Initialization, ping, tools/list and tools/call are supported. Stdout is protocol only. Frames are bounded to 1 MiB. API body limits also apply."
+  },
+  {
+   "heading": "Narrow MCP v1",
+   "id": "d76",
+   "source": "MCP-v1.md",
+   "text": "Tools bind fixed HTTP endpoints for custody, authorization, exposure, leases, adapters, remote returns and memory. No arbitrary Cypher, raw DB writes or user-controlled URLs. The tools/list response publishes machine-readable input schemas. Body request objects use the shared versioned wire schemas; service scope/validation remains authoritative. Configure a separate MCP process per credential role; credentials are not tool arguments."
+  },
+  {
+   "heading": "Contextual institutional memory v1",
+   "id": "d77",
+   "source": "MEMORY-v1.md",
+   "text": "Memory has a separate journal and memory.lbdb projection. Shared CAS is byte storage, not an authority promotion. Memory writes never mutate the custody journal."
+  },
+  {
+   "heading": "Contextual institutional memory v1",
+   "id": "d78",
+   "source": "MEMORY-v1.md",
+   "text": "Kinds: OBSERVED, DERIVED, INTERPRETIVE, HYPOTHESIS, PREFERENCE, PROCEDURE, DECISION, FAILURE_MODE, RESULT_SUMMARY. Observed/derived records require existing custody references. A cited interpretation remains an interpretation."
+  },
+  {
+   "heading": "Contextual institutional memory v1",
+   "id": "d79",
+   "source": "MEMORY-v1.md",
+   "text": "Records bind scope, author, time, text, confidence, tags, custody references and exact embedding bytes/model identity. Supersession adds events/edges; prior records remain queryable. Search defaults to current memories. Filters can exclude hypotheses or require cited evidence. Evidence-cited does not mean the memory's prose is independently proven true."
+  },
+  {
+   "heading": "Contextual institutional memory v1",
+   "id": "d80",
+   "source": "MEMORY-v1.md",
+   "text": "FTS, HNSW vector search and graph neighbors feed reciprocal-rank fusion. FTS refreshes after writes before querying. Vector bytes are preserved for exact reconstruction; query embeddings run CPU-only from local pinned model assets, without network download. Search responses include trust class, grounding, references, supersession and retrieval surfaces. Request retries return the previously committed search response, not a new ranking. ## Incremental lexical visibility"
+  },
+  {
+   "heading": "Contextual institutional memory v1",
+   "id": "d81",
+   "source": "MEMORY-v1.md",
+   "text": "Native FTS indexes a frozen portion of the memory table. A Unicode word postings overlay exposes recent committed records immediately. Full FTS reconstruction occurs at doubling boundaries; vector-only queries do not rebuild FTS. Native scores are BM25 and overlay scores are term overlap; they are retrieval ranks, not correctness estimates. Projections and overlays rebuild from exact journals."
+  },
+  {
+   "heading": null,
+   "id": "d82",
+   "source": "OPERATIONS-v1.md",
+   "text": "One daemon owns one store. Run `python -m ledgerd.api` from the qualified environment. Set KAMMI_ROOT, KAMMI_TOKEN, KAMMI_PORT (default 8765), KAMMI_SIGNING_KEY_FILE (32 raw Ed25519 private bytes), KAMMI_EMBEDDING_CACHE, KAMMI_LBUG_DLL, KAMMI_OPENSSL_DLL_DIR, and KAMMI_EXTENSION_DIR. Native/model/extension paths are the hash-qualified copies under vendor/runtime-v1, not mutable global installs."
+  },
+  {
+   "heading": null,
+   "id": "d83",
+   "source": "OPERATIONS-v1.md",
+   "text": "Bind only 127.0.0.1. Keep credentials and signing keys outside CAS, source manifests, and backups intended for ordinary lab access. Generate high entropy credentials. Do not enable KAMMI_ACCEPTANCE_FAULTS in ordinary operation."
+  },
+  {
+   "heading": null,
+   "id": "d84",
+   "source": "OPERATIONS-v1.md",
+   "text": "GET /v1/status reports journal/projection heads and lag, leases, denials, exposures, remote bundles, memory health, and flight status. Diagnostic logs do not confer authority. Only the acceptance artifact registered in the journal can open the infrastructure gate. Opening infrastructure never replaces a lab's scientific authorization."
+  },
+  {
+   "heading": null,
+   "id": "d85",
+   "source": "OPERATIONS-v1.md",
+   "text": "For a large local artifact, an administrator may call `POST /v1/artifacts/import-local` with an absolute file path, expected SHA-256 identity, expected byte count, kind, actor, and request ID. The daemon streams the file into CAS, checks its identity, then journals registration. This is custody intake only: protected panel access still requires a separate stage authorization and `open_panel` exposure event. The endpoint accepts at most 8 GiB and never gives the worker a Ledger credential."
+  },
+  {
+   "heading": null,
+   "id": "d86",
+   "source": "OPERATIONS-v1.md",
+   "text": "Stop the full owned process tree on Windows: virtualenv launchers may have children. An OS-held byte lock, not a PID file or timestamp, controls writer ownership. Archive immutable authority before maintenance. Never delete a live projection."
+  },
+  {
+   "heading": null,
+   "id": "d87",
+   "source": "OPERATIONS-v1.md",
+   "text": "The supported initial deployment is local Windows x86-64 / CPython 3.13. Other hosts require qualification against their own pinned native runtime."
+  },
+  {
+   "heading": "Phoenix vault product extension",
+   "id": "d88",
+   "source": "PHOENIX-VAULT-v1.md",
+   "text": "This is an extension of the existing Kammi Library service. Phoenix does not open Ladybug and does not create another database. The one service owns CAS, the hash-chained journal, a single Ladybug projection, replay, and the HTTP boundary. Phoenix remains the owner of note/document meaning, accepted graph facts, UI decisions, generation eligibility, and Reader behavior."
+  },
+  {
+   "heading": "Phoenix vault product extension",
+   "id": "d89",
+   "source": "PHOENIX-VAULT-v1.md",
+   "text": "The extension is introduced by [architecture amendment v2](ARCHITECTURE-AMENDMENT-v2-PHOENIX-VAULT.md). It is a product API. It grants no scientific stage or model contact."
+  },
+  {
+   "heading": "Identity and commit flow",
+   "id": "d90",
+   "source": "PHOENIX-VAULT-v1.md",
+   "text": "Register a Phoenix **service actor** with its own credential. Generate a stable vault ID once. Source IDs are stable across renames; source revisions are optimistic and append-only. A source commit increments the vault source epoch."
+  },
+  {
+   "heading": "Identity and commit flow",
+   "id": "d91",
+   "source": "PHOENIX-VAULT-v1.md",
+   "text": "Phoenix writes graph/index/scene bytes as immutable assets, then writes a canonical JSON manifest:"
+  },
+  {
+   "heading": "Identity and commit flow",
+   "id": "d92",
+   "source": "PHOENIX-VAULT-v1.md",
+   "text": "It stages the manifest as a vault asset and selects the generation with that manifest's ID, the asset IDs, and the exact current source epoch. Selection fails if a source changed meanwhile. A subsequent edit marks the generation stale; it does not erase existing assets or the Reader's source revision."
+  },
+  {
+   "heading": "HTTP surface",
+   "id": "d93",
+   "source": "PHOENIX-VAULT-v1.md",
+   "text": "All calls require the service actor's bearer credential. Write calls also require a currently accepted Library source/runtime unless the caller is an isolated acceptance fixture. The JSON body includes `actor_id` and `request_id`."
+  },
+  {
+   "heading": "HTTP surface",
+   "id": "d94",
+   "source": "PHOENIX-VAULT-v1.md",
+   "text": "| Operation | Route | Result | | --- | --- | --- | | Create vault | `POST /v1/vaults` | Stable vault ID | | Commit source bytes | `POST /v1/vaults/source` | Revision, epoch, CAS ID | | Stream source bytes through 16 MiB | `POST /v1/vaults/source-stream` | Revision, epoch, CAS ID; headers carry actor, vault, source, base revision, request ID | | Stage small asset | `POST /v1/vaults/asset` | CAS ID | | Stream large asset | `POST /v1/vaults/asset-stream` | CAS ID; headers carry actor, vault, kind, request ID | | Select generation | `POST /v1/vaults/generation` | Generation receipt | | Save Reader locator | `POST /v1/vaults/reader` | Source ID, revision, byte offset | | Select Library as product primary | `POST /v1/vaults/product-primary` | One-way authority event bound to the source epoch and cutover receipt | | Read vault and source | `GET /v1/vaults/{id}` and `/sources/{source_id}` | Current view/content | | Stream source bytes | `GET /v1/vaults/{id}/sources/{source_id}/bytes` | Verified bytes, revision and CAS identity headers | | Read asset | `GET /v1/vaults/{id}/assets/{sha256_id}` | Verified byte stream | | Export portable package | `GET /v1/vaults/{id}/package` | ZIP64 stream and `X-Vault-Package-Root` | | Import portable package | `POST /v1/vaults/package` | Verified semantic replay |"
+  },
+  {
+   "heading": "HTTP surface",
+   "id": "d95",
+   "source": "PHOENIX-VAULT-v1.md",
+   "text": "The Rust `kammi-client` offers the same narrow calls. It streams asset upload, asset download, export, and import instead of loading large files into memory. The package root must be preserved separately from the package bytes; import requires that expected root. This checks integrity but is not an origin signature."
+  },
+  {
+   "heading": "HTTP surface",
+   "id": "d96",
+   "source": "PHOENIX-VAULT-v1.md",
+   "text": "The JSON source route is suitable for sources up to 8 MiB before base64 expansion. The streaming route accepts an exact 16 MiB document and rejects larger content before a journal commit. Phoenix's 16 MiB document limit can therefore be preserved. The Rust client exposes file-backed source upload and streamed source download."
+  },
+  {
+   "heading": "Provisioning and pinned client",
+   "id": "d97",
+   "source": "PHOENIX-VAULT-v1.md",
+   "text": "The Library administrator registers one actor per Phoenix installation with `POST /v1/actors`: `kind=service`, `lab=phoenix`, and `credential_sha256=SHA256(random 256-bit bearer token)`. Generate the token locally with the operating system CSPRNG. Store the token in an ACL-restricted Phoenix installation secret file; send only the hash to the administrative endpoint. Phoenix loads the token at runtime and sends it only over loopback HTTP or authenticated HTTPS. Do not place it in source, logs, vault packages, memory, or chat. The Library administrative credential never enters Phoenix."
+  },
+  {
+   "heading": "Provisioning and pinned client",
+   "id": "d98",
+   "source": "PHOENIX-VAULT-v1.md",
+   "text": "The versioned Rust client is distributed as a `.crate` package with an exact SHA-256 and accepted Library source root in `dist/SDK-HANDOFF-v1.json`. Product builds pin both the package digest and service API major version. The SDK is an HTTP client; it never opens Ladybug. Credential rotation is not yet an online endpoint; coordinate a versioned actor migration through Library Lab."
+  },
+  {
+   "heading": "One-way product cutover and recovery",
+   "id": "d99",
+   "source": "PHOENIX-VAULT-v1.md",
+   "text": "New vaults begin in `LEGACY_MIRROR` mode. While Phoenix's current local save is authoritative, the adapter commits locally first and writes an outbox entry keyed by stable source ID, local revision, content digest, and an idempotent Library request ID. It then mirrors the same bytes to Library in revision order. A crash before mirroring leaves an outbox item to replay. A lost Library response is resolved by retrying the same request ID and bytes. The UI must not describe an unmirrored edit as current in Library."
+  },
+  {
+   "heading": "One-way product cutover and recovery",
+   "id": "d100",
+   "source": "PHOENIX-VAULT-v1.md",
+   "text": "For cutover, Phoenix pauses edits, drains the outbox, compares stable IDs, revisions, digests, and the Reader locator against the Library view, and performs a product-level cold-open from an independently copied package. Phoenix stages a canonical `PHOENIX_VAULT_CUTOVER_V1` receipt as a vault asset of kind `cutover-receipt`. The receipt binds `vault_id`, `source_epoch`, `legacy_snapshot_id`, and `cold_open_root`; the last two are SHA-256 IDs of the product's exact legacy snapshot and cold-open proof. It then calls `POST /v1/vaults/product-primary` with that asset ID and exact source epoch. The Library event is the durable one-way authority selector. A source change before the call rejects the transition; Phoenix rechecks before retrying."
+  },
+  {
+   "heading": "One-way product cutover and recovery",
+   "id": "d101",
+   "source": "PHOENIX-VAULT-v1.md",
+   "text": "After the selector commits, Library is primary. A save is acknowledged only after its vault source commit is confirmed. Phoenix may update its local files afterward as a disposable cache. If the process dies between vault commit and local cache update, the next launch reads the Library vault view and refreshes the cache. If the Library service is unavailable, Phoenix cannot silently accept a local authoritative edit. Divergent revisions or digests stop reconciliation for explicit product repair; no last-writer-wins merge."
+  },
+  {
+   "heading": "One-way product cutover and recovery",
+   "id": "d102",
+   "source": "PHOENIX-VAULT-v1.md",
+   "text": "The Library records the selected mode and receipt but does not certify Phoenix's cold-open semantics. That qualification belongs to Phoenix product."
+  },
+  {
+   "heading": "Phoenix migration boundary",
+   "id": "d103",
+   "source": "PHOENIX-VAULT-v1.md",
+   "text": "Phoenix's existing workspace saves, revision-bound document commits, memory generations, and scene publications remain its product semantics. The product adapter should map those existing commit points to the Library calls above. Only the service credential crosses into Phoenix. It must never receive the Library administrative credential or a direct Ladybug handle."
+  },
+  {
+   "heading": "Phoenix migration boundary",
+   "id": "d104",
+   "source": "PHOENIX-VAULT-v1.md",
+   "text": "Cold-open qualification requires a copied package to import into another Library host and recover source bytes, active generation assets, and Reader locator. Existing Phoenix-native UI/storage migration and end-to-end app qualification are separate product work; the Library acceptance suite qualifies the service boundary."
+  },
+  {
+   "heading": "Policy and actor authority v1",
+   "id": "d105",
+   "source": "POLICY-v1.md",
+   "text": "The controlled KAMMI_POLICY_V1 vocabulary permits sealed scientific/execution specifications, verified predecessor seals, exact actor grants and fenced GPU leases. Forbidden conditions are truth-label contact and evaluation-panel exposure. Unknown predicate keys fail closed. A policy check emits a receipt and confers no authority."
+  },
+  {
+   "heading": "Policy and actor authority v1",
+   "id": "d106",
+   "source": "POLICY-v1.md",
+   "text": "Grants bind actor, action, run, stage, policy hash and expiry. Credentials are hashed; raw credentials are not journal payloads. API credentials authenticate callers; grants and policy decisions authorize operations. Master credentials administer the registry."
+  },
+  {
+   "heading": "Policy and actor authority v1",
+   "id": "d107",
+   "source": "POLICY-v1.md",
+   "text": "AuthorizationIssued binds current spec identities, policy identity and evidence head. Another actor/run/stage, policy replacement, spec replacement or expiry invalidates reuse. Historical imported assertions cannot satisfy live prerequisites. Acceptance fixture authorization is restricted to acceptance.* run identities. New-flight authorization requires an accepted current LibraryAcceptanceV1."
+  },
+  {
+   "heading": "Policy and actor authority v1",
+   "id": "d108",
+   "source": "POLICY-v1.md",
+   "text": "Artifact type names describe bytes. They cannot introduce new authorization predicates. Custody vocabulary changes require Library Lab implementation and qualification. Every capability consumer rechecks current live predicates under the authority lock. A new forbidden truth contact or expired required resource invalidates consumption even when the policy hash, actor and nominal authorization expiry still match. Remote returns are rechecked after output ingestion and immediately before the verification event is journaled. Partial uploads remain in history; they do not become accepted results."
+  },
+  {
+   "heading": null,
+   "id": "d109",
+   "source": "README.md",
+   "text": "One local authority process serves custody, authorization, exposure, leases, remote bundles and contextual agent memory through HTTP, Python, Rust and MCP. Phoenix vaults use the same service. CAS plus the append-only journals are authoritative; one Ladybug database is the disposable custody, memory, and Phoenix product projection."
+  },
+  {
+   "heading": "Qualification and service",
+   "id": "d110",
+   "source": "README.md",
+   "text": "Run the complete immutable qualification with the offline cleanroom environment:"
+  },
+  {
+   "heading": "Qualification and service",
+   "id": "d111",
+   "source": "README.md",
+   "text": "It preserves each attempt under acceptance/endstate, binds the current source and runtime, independently audits every gate, then emits LibraryAcceptanceV1. An ordinary test run cannot reopen the operational store."
+  },
+  {
+   "heading": "Qualification and service",
+   "id": "d112",
+   "source": "README.md",
+   "text": "Credentials and signing keys reside in .kammi-dev/operational, outside CAS. Provision lab actors and exact scope grants through the administrative service. Never distribute the administrative credential to lab agents. The daemon listens on loopback; remote deployments require an authenticated transport boundary."
+  },
+  {
+   "heading": "Qualification and service",
+   "id": "d113",
+   "source": "README.md",
+   "text": "See [operations](OPERATIONS-v1.md), [lab integration](LAB-INTEGRATION-v1.md), [security boundary](SECURITY-BOUNDARY-v1.md), [runtime provenance](RUNTIME-PROVENANCE-v1.md) and [backup/restore](BACKUP-RESTORE-v1.md). The Phoenix product extension is described in [PHOENIX-VAULT-v1.md](PHOENIX-VAULT-v1.md). Public wire definitions are in schemas."
+  },
+  {
+   "heading": "Qualified boundary",
+   "id": "d114",
+   "source": "README.md",
+   "text": "Windows, pinned CPython/runtime/native assets, one trusted OS account, guarded service/executor paths. No hostile local administrator isolation, hardware attestation or physical power-loss/reboot durability claim. GPU stress uses logical GPU leases and CPU fixture commands. No scientific model or evaluation flight is started by infrastructure acceptance. Memory never authorizes scientific actions."
+  },
+  {
+   "heading": "Qualified boundary",
+   "id": "d115",
+   "source": "README.md",
+   "text": "Rebuilding projections replays exact stored vectors; it does not rerun embeddings. Source or runtime changes close the flight gate and require a new qualification."
+  },
+  {
+   "heading": "Portable remote execution v1",
+   "id": "d116",
+   "source": "REMOTE-EXECUTION-v1.md",
+   "text": "The daemon signs canonical bundles with Ed25519. Workers pin the issuer public key; the bundle cannot nominate a replacement trust anchor. A registered worker has its own signing key and scoped credential. Bundles bind specifications, Git commit, clean-tree policy, sealed inputs, environment, GPU/runtime requirements, seeds, command, outputs, authorization, assigned worker and optional lease fence."
+  },
+  {
+   "heading": "Portable remote execution v1",
+   "id": "d117",
+   "source": "REMOTE-EXECUTION-v1.md",
+   "text": "Workers receive declared input bytes, a limited process environment and disposable input/output roots. They validate hashes/signature/environment/fence before execution. Record RemoteWorkerStarted through the API before launch. Only exact declared outputs are returned. Worker returns signed environment/execution receipt and stream/output hashes."
+  },
+  {
+   "heading": "Portable remote execution v1",
+   "id": "d118",
+   "source": "REMOTE-EXECUTION-v1.md",
+   "text": "The daemon checks identity, signature, environment and outputs before acceptance. Duplicates return the existing verified result; conflicting returns fail closed. Acceptance does not promote a scientific result head."
+  },
+  {
+   "heading": "Portable remote execution v1",
+   "id": "d119",
+   "source": "REMOTE-EXECUTION-v1.md",
+   "text": "Environment identity is a trusted worker's signed assertion, not hardware attestation. The disposable worker is an isolation fixture, not a hostile-code sandbox or a proof that the command cannot access unrelated files under its OS account."
+  },
+  {
+   "heading": "Runtime provenance and licenses v1",
+   "id": "d120",
+   "source": "RUNTIME-PROVENANCE-v1.md",
+   "text": "runtime/ASSET-MANIFEST-v1.json hashes the captured runtime files. requirements-lock-v1.txt pins Python distributions; wheel archives retain their metadata/licenses. Native Ladybug comes from the official v0.20.2 Windows release; FTS/vector extensions were captured from the official extension installer. The extension ABI directory is 0.20.0, as reported by the installed native runtime; it is not inferred to be package version 0.20.2."
+  },
+  {
+   "heading": "Runtime provenance and licenses v1",
+   "id": "d121",
+   "source": "RUNTIME-PROVENANCE-v1.md",
+   "text": "OpenSSL DLLs were captured from the installed Git for Windows distribution. Their hashes are qualified alongside Ladybug. These are local runtime assets, not an assertion of relicensed redistribution. Retain upstream licenses when packaging outside this host."
+  },
+  {
+   "heading": "Runtime provenance and licenses v1",
+   "id": "d122",
+   "source": "RUNTIME-PROVENANCE-v1.md",
+   "text": "FastEmbed BAAI/bge-small-en-v1.5 CPU ONNX assets and tokenizer bytes were captured from the downloaded model snapshot. Embedding.manifest binds actual files/dimensions; no automatic runtime network update is permitted. This model is infrastructure retrieval, not an E013/JEV/Fabrique frozen scientific observer."
+  },
+  {
+   "heading": "Service clients v1",
+   "id": "d123",
+   "source": "SDK-v1.md",
+   "text": "Python: ledgerd.client.KammiClient; client.py imports no Ledger or Ladybug. Rust: sdk/rust, blocking reqwest with a reused client, streamed artifact upload, borrowed JSON views, bytes buffers and compact header maps. Cargo.lock pins resolution. Build targets on G:\\kammi-ledger-target; C: test path uses a directory junction."
+  },
+  {
+   "heading": "Service clients v1",
+   "id": "d124",
+   "source": "SDK-v1.md",
+   "text": "CLI: python -m ledgerd.cli. `call METHOD /v1/endpoint --body request.json` exercises the same stable service contract; it never opens a database. Every retryable write needs an explicit request_id. Reuse only for identical intent. The SDK performs no local policy decision. Actor credentials and master credentials have different roles. See schemas/wire-v1.json and schemas/openapi-v1.json."
+  },
+  {
+   "heading": "Service clients v1",
+   "id": "d125",
+   "source": "SDK-v1.md",
+   "text": "Phoenix/external harness fixture starts a distinct daemon/client process and uses HTTP for artifact registration, scoped historical fact, grounded memory, retrieval and trace."
+  },
+  {
+   "heading": "Security boundary v1",
+   "id": "d126",
+   "source": "SECURITY-BOUNDARY-v1.md",
+   "text": "Qualified scope: cooperating local agents on a trusted Windows account/host, authenticated loopback HTTP, pinned runtime, narrow write tools, exact grants and guarded executors. Protect filesystem permissions, credentials, signing keys and backups with OS administration."
+  },
+  {
+   "heading": "Security boundary v1",
+   "id": "d127",
+   "source": "SECURITY-BOUNDARY-v1.md",
+   "text": "The daemon refuses a second writable owner using an OS byte lock; Ladybug also locks its database. Direct writable database access by clients is forbidden. A user controlling the OS account can bypass filesystem/API controls and is outside this threat model. Do not expose loopback service directly to an untrusted network. Remote use requires an authenticated TLS tunnel/proxy and separate deployment qualification."
+  },
+  {
+   "heading": "Security boundary v1",
+   "id": "d128",
+   "source": "SECURITY-BOUNDARY-v1.md",
+   "text": "Master credentials authorize infrastructure administration and can inspect protected bytes. Ordinary agents use actor credentials plus grants. Raw secrets are not journal artifacts. Remote worker signatures establish origin/integrity; they do not prove honest computation. Memory is contextual and may be false, contradictory or superseded. Acceptance fault hooks are explicitly opt-in; enabling them invalidates ordinary operation."
+  },
+  {
+   "heading": "Security boundary v1",
+   "id": "d129",
+   "source": "SECURITY-BOUNDARY-v1.md",
+   "text": "CAS + journal integrity is hash-based, with OS protection as the append-only enforcement boundary. A hostile administrator can rewrite/re-sign local state; external anchoring is not implemented in v1. This release does not claim hostile multi-user or physical security."
+  }
+ ],
+ "edge_cases": [
+  {
+   "id": "e-empty",
+   "text": ""
+  },
+  {
+   "id": "e-space",
+   "text": "   "
+  },
+  {
+   "id": "e-single",
+   "text": "a"
+  },
+  {
+   "id": "e-unicode",
+   "text": "Réplica ñandú — 数据 保管 链 — مرحبا — 🙂🧪 custody ledger"
+  },
+  {
+   "id": "e-code",
+   "text": "fn main() { let x: Vec<u8> = vec![0; 16]; println!(\"{:?}\", x); }"
+  },
+  {
+   "id": "e-case-a",
+   "text": "THE LEDGER COMMITS EVENTS"
+  },
+  {
+   "id": "e-case-b",
+   "text": "the ledger commits events"
+  },
+  {
+   "id": "e-dup-a",
+   "text": "The `/v1/authorize` endpoint explicitly denies new flights while these gates remain open. This denial is only effective for clients routed through the service; program coordination has notified Frozen Fabrique, JEV, FAS-R1, and Kinetic Kammi of the hold. Existing authorized work retains its own contracts and lab ownership."
+  },
+  {
+   "id": "e-long",
+   "text": "Date: 2026-09-27. Architecture is locked; implementation is a development slice. **New-flight gate: CLOSED.** This document is a status report, not an authorization or a scientific result. - Single-process Ladybug custody projection behind a narrow FastAPI service and Python client/CLI. Service runs one Uvicorn worker on loopback; direct database writes are absent from the client API. Its current local HTTP token and filesystem permissions are development controls, not qualified production isolation. - Streaming SHA-256 CAS, strict RFC 8785 canonicalization, framed hash-chained event journal, recovery of incomplete journal tails, typed graph tables, idempotent request IDs, Merkle seal creation/recursive verification, and replay after journal commit but before graph projection. - Read-only generic flat-seal verifier plus an E4-specific fixture adapter outside the custody engine. It verified the frozen legacy E4-0 `v16-v09` seal's 447/447 entries and reproduced legacy root `278ae16eeb6852d3efad44221556a87be6df54964471f0870931fe2e99b305d1`. - Disposable E4 import produced base root `sha256:b7444f51049d53d5c5210498ae0c74ccb4f70dbe838ac5cf504ccb7bbc298e47` and successor root `sha256:234e568989f6c0e71fb69fa634b2e0bf085e7fb63336654202d3b221ef33f6fc`. The successor has two direct members and one parent. The 447 legacy entries resolve to 432 unique CAS objects; its successor closure has 433 unique objects after deduplication. - A fresh Ladybug projection rebuilt from only the imported CAS and event journal reproduced the same event head, graph counts, and 433-object successor closure. Five focused unit/API tests pass. | Gate | State | Current evidence / remaining requirement | |---|---|---| | 1. One-byte tamper | Prototype pass | Synthetic object alteration makes recursive seal verification fail. Repeat against frozen fixture and independent verifier. | | 2. DB deletion/rebuild | Prototype pass | Disposable E4 projection rebuilt from CAS and journal with identical heads/counts/closure. Independent replay and backup/restore qualification remain. | | 3. Crash recovery | Partial | Journal-to-DB replay and incomplete-tail recovery tested. CAS-publication crash, power-loss durability, and Windows filesystem semantics remain. | | 4. GPU lease | Pending | Fencing tokens, host executor enforcement, and two-agent collision test are unimplemented. | | 5. Exposure gate | Pending | Program-wide exposure events, guarded panel access, and terminal denial test are unimplemented. | | 6. Adapter | Pending | Registry, immutable source identity, and gate-linked adapter receipt are unimplemented. | | 7. Failure history | Pending | Legacy attempts are stored as raw objects, but typed failure/head projections and generic queries are unimplemented. | | 8. Remote execution | Pending | Signed bundle, disposable worker, and return receipt verification are unimplemented. | | 9. Memory retrieval | Pending | `memory.lbdb`, trust classes, search, and custody-ref tracing are unimplemented. | | 10. Legacy Fabrique | Partial | 447/447 bytes and legacy root verified; disposable Merkle successor and rebuild pass. Complete typed history, failed-attempt/contact queries, and independent authoritative-head reconstruction remain. | The `/v1/authorize` endpoint explicitly denies new flights while these gates remain open. This denial is only effective for clients routed through the service; program coordination has notified Frozen Fabrique, JEV, FAS-R1, and Kinetic Kammi of the hold. Existing authorized work retains its own contracts and lab ownership. - [Architecture](ARCHITECTURE-v1.md) SHA-256 `c9e9d5bb54ee863ce99760ee26c0f0e912b952ff3e8a3b502cc23f2d78eb3524`. - [Architecture lock](ARCHITECTURE-LOCK-v1.json) SHA-256 `94bcba258bd3658ccda3d917aaedf75aaf2a228edf8e9fda23f37159a9ccd364`. - [Runtime qualification](runtime/QUALIFICATION-v1.json) SHA-256 `9466c05fc7351370173f0d0dcfd7dd9cc400d25c8d4655aa8cd00bf234e0f861`. The Python wheel required a separate native DLL; the current OpenSSL DLLs come from a local Git installation and are not yet a portable production lock. - [Legacy 447/447 receipt](acceptance/e4-0/legacy-flat-verification-v1.json) SHA-256 `bd45cde3c3079c3d432e2253780b4c1cabf294842439773e7fb4e00f07faec97`. - [Disposable Merkle import receipt](acceptance/e4-0/merkle-import-v1.json) SHA-256 `4a95cc7ccbd63cbf36e157f150e9a6a42227640679d472562eb5e06290b5c601`. - [Projection rebuild receipt](acceptance/e4-0/projection-rebuild-v1.json) SHA-256 `c0ba6e3528dfad0e06c9483e7d0831a1a15eab6bfce9003963158533af1d43dd`. - Source snapshot has 17 files, root `2f28022a8aca9c12fd1f6f00181b2043ae6610f559a319e7eab8b3b733116cb1`. See [source manifest](acceptance/source-manifest-v0.1.json). Next implementation slice: import complete E4 attempt/supersession/head/contact semantics into generic custody events and queries; then implement policy, enforced leases, panel exposures, schema adapters, remote bundles, and the separate memory plane. Every gate needs an independent acceptance receipt before changing the flight state. **New-flight gate: CLOSED_PENDING_ACCEPTANCE.** Existing authorized lab work is outside this gate. The architecture lock remains v1 and was not edited. - The 447-entry final E4 seal still verifies exactly. Its 432 unique byte objects remain bound under the original Merkle import root. - A separate oversight supplement captured 61 E4 audit/contract/seal JSON paths that the final scientific seal omitted. Its 60 unique new objects are bound to the original Merkle import as a child; the scientific seal is intact. - A distinct, versioned E4 history run contains 557 typed facts: 168 attempt assertions (including nested stages), 17 supersession edges, 223 contact assertions, 148 evidence-access assertions, and one snapshot head. The counts are parsed legacy assertions, not live telemetry. - A fresh Ladybug projection rebuilt from only CAS and journal reproduced the journal head, fact rows, counts, and 493-object supplemental closure. - The stopped partial v3 import into the earlier run remains in the journal with its failure receipt. The completed pass uses a new run identity. - No positive contact assertion was found in the captured sources. That is not a program-wide no-contact attestation. Source coverage is limited to the verified final seal and the captured E4 JSON supplement. The generic history API returns heads, stopped and other attempts, supersessions, predecessor chains, scoped contact claims, and scoped evidence access claims. It always reports no authorization conferred by these facts. The E4 fixture demonstrates history reconstruction for the captured snapshot. The following remain open: policy and exposure enforcement; GPU/resource leases; schema adapters; remote bundles; memory retrieval; crash and power-loss qualification; independent actor authorization; and production one-writer process fencing. No new flight is authorized by this v0.2 status. Only registered, allowlisted implementations can transform a custody view. Adapter identity binds source schema, target schema, version and exact implementation source bytes. AdapterApplied binds source, derived view, implementation, actor, authorization and purpose. Original source bytes and identity remain unchanged. EVAL_CELLS_RENAME_V1 maps evaluation_checkpoint_cells to evaluation_cells and changes evaluation-v1 to evaluation-v2. Missing or ambiguous source fields fail closed. Independent verification implements the transformation separately. New adapters require Library Lab code review and qualification, never arbitrary Cypher. Authority: user direction in Chief Kammi, 2026-09-27. This amends the physical projection layout and adds a Phoenix product domain. It does not amend any scientific protocol or grant model contact. `kammi-ledgerd` owns one writable Ladybug database object. Custody, contextual agent memory, and Phoenix vault tables share that object and have separate schemas and APIs. No client writes Ladybug directly. The old `memory.lbdb` projection remains preserved as a historical file; memory journal replay builds its tables in `custody.lbdb`. No memory claim becomes product or custody truth. The CAS and hash-chained journals remain durable authority. Ladybug remains a rebuildable projection, including for Phoenix vault state. Phoenix vault events are part of the main Library journal so one commit sequence decides the active source revision, generation, and Reader locator. Memory retains its separate contextual journal and trust class. Phoenix owns note content, stable entry IDs, human decisions, Reader locators, generation qualification, and product semantics. Library owns immutable byte identity, event commit, replay, physical transaction, authentication, and single-writer arbitration. A vault is scoped to a Phoenix service actor. It is not a scientific run and needs no lab-stage authorization for ordinary editing. `VaultCreated`, `VaultSourceCommitted`, `VaultGenerationSelected`, and `VaultReaderPositionSet`, and `VaultProductPrimarySelected` events describe the product state. Source commits use an expected revision and increment a vault source epoch. A derived generation may become active only against the exact current source epoch. A later source commit makes it stale without erasing the generation. Readers can retain the immutable asset identities returned by the active-generation view. A rename changes the workspace source object, not its stable entry IDs. The vault starts in legacy-mirror mode. The product can select Library as its one-way primary authority only with a scoped cutover receipt and exact source epoch. Phoenix owns the proof that its old local state and cold-open behavior are ready; Library records the declaration and enforces its ordering. The Phoenix-facing API is narrow and owner-scoped. It never exposes arbitrary Cypher, Library administrative credentials, or scientific stage controls. Source bytes and generation manifests enter CAS before a journal event can select them. A crash before event commit leaves an unreferenced object. A crash after journal commit is repaired by replaying the Ladybug projection. The vault's stable ID is generated once and stored in the authoritative event. Filesystem paths are locations. A portable export must include the vault's referenced CAS objects and its event slice plus a verifier manifest. Copying only the Ladybug projection is not a portable vault. Import verifies bytes and source/generation lineage before replaying semantic events on another Library host. The package root is an integrity identity supplied out of band; v2 does not assert origin authenticity if an attacker can replace both package and expected root. This amendment requires successor Library qualification. Existing accepted scientific receipts remain valid; new service source bytes close the flight gate until the successor acceptance passes. Status: **locked for implementation**. This is program infrastructure, not a new laboratory protocol or authorization to run a model. Any change to these decisions requires a numbered architecture amendment and a new lock receipt. Existing lab seals and scientific claims retain their own authority. Kammi Ledger provides one program-wide custody service and a separate agent-memory service. Custody is authoritative evidence; memory is contextual and can only point to custody evidence. E4-1 and every other **new flight** wait for the acceptance gates below. Existing authorized work keeps its own lab ownership and contracts. The daemon's deployment must not silently modify them. The first implementation slice is content-addressed storage (CAS), an immutable event journal, a custody graph, Merkle seals, and one writer daemon. The E4-0 legacy import is its first acceptance fixture. Policy, enforced leases, exposures, remote bundles, and memory follow in that order before the flight gate can pass. No “airspace reopens” claim is valid from a design lock alone. - One `kammi-ledgerd` process owns the read-write Ladybug `Database` object for `custody.lbdb` and, later, a separate read-write object for `memory.lbdb`. Clients use narrow Python/Rust SDK, CLI, and MCP APIs. They do not obtain database paths or arbitrary Cypher write access. - The daemon authenticates actors and scopes each operation to a lab, run, and role. Local transport uses an ACL-protected named pipe; remote transport uses authenticated TLS. Audit events retain actor identity and request identity. A request ID is idempotent. - Ladybug is a **rebuildable projection/index**, never the sole source of custody truth. CAS bytes and a durable, hash-chained event journal are authoritative. The two Ladybug files can be deleted and reconstructed from those bytes. - Lab owners control scientific content, decisions, and claims. Chief Kammi coordinates identity, access, resources, exposure accounting, and the common gate vocabulary. Shared SDK code is not shared lab evidence. - Memory queries may retrieve a claim and its `custody_ref`, but a memory record never satisfies an authorization predicate or becomes an observed result by changing its trust class. Ladybug's documented concurrency pattern allows one read-write database object and concurrent connections from that object; it does not allow another database object to open the same file concurrently. The daemon therefore also owns read queries while live. Its transactions are serializable, atomic, and durable **within Ladybug**, but cannot atomically include filesystem CAS writes, journal appends, remote work, or process launches. The journal/replay protocol below covers those boundaries. [Concurrency](https://docs.ladybugdb.com/concurrency/), [transactions](https://docs.ladybugdb.com/cypher/transaction/). An artifact ID is `sha256:` plus the SHA-256 of its **raw bytes**. A location is metadata and may change without changing identity. An artifact registration records digest, byte count, media type, schema ID, kind, producer, observed source path/URI, and custody scope. It reads the source once into a temporary CAS object, hashes while copying, flushes, then atomically publishes the digest path. Existing digest paths are verified before reuse. Source paths are never embedded in content identity. Structured custody objects use RFC 8785 JSON Canonicalization Scheme (JCS) and SHA-256. The SDK rejects duplicate keys, invalid Unicode, non-finite numbers, and ambiguous or out-of-range numeric representations; large integers and decimal quantities use schema-defined strings. Required/missing/null semantics are explicit per schema. Identifiers are domain-separated and schema-versioned: Only content fields appear in these payloads. Timestamps, mutable locations, and display labels are excluded unless a schema explicitly makes them semantic. Members and parents are sorted by full typed ID; duplicates are rejected. A cross-language conformance corpus must give the same bytes and IDs in Python and Rust. [RFC 8785](https://www.rfc-editor.org/rfc/rfc8785.html). Every accepted operation creates an immutable event. The daemon assigns a monotonically increasing sequence, a previous-event digest, actor/request IDs, scope, event type, payload object reference, and UTC event time. The journal is framed with length and checksum; each committed frame links to the previous digest. Incomplete tails are recognizable. Records are appended only by the daemon. 1. Validate policy and canonical payload; stage all referenced immutable CAS objects. 2. Flush and publish CAS objects. An unreferenced object after a crash is an orphan, never a false committed event. 3. Append and durably flush the event frame. This is the custody commit point. A retry with the same request ID returns the same event. 4. Apply the event to Ladybug in a transaction. On restart, replay committed events not yet projected. If the DB is missing or inconsistent, rebuild from the beginning. Windows durable rename/flush behavior and journal-tail recovery must be demonstrated on the actual filesystem before deployment. A Ladybug WAL checkpoint does not substitute for the event journal. The verifier compares the event chain, CAS digests, projection sequence, and projected heads. Events include `RunCreated`, `ScientificSpecBound`, `ExecutionSpecBound`, `ToolchainBound`, `ArtifactRegistered`, `SealCreated`, `SealVerified`, `HeadPromoted`, `StageAuthorized`, `LeaseAcquired`, `LeaseReleased`, `ContactRecorded`, `ExposureRecorded`, `AttemptStopped`, `OutputsRegistered`, `ReplayVerified`, and `RunClosed`. New event types require a registered schema. Failed attempts stay in the journal; authoritative heads change only through an explicit, policy-valid promotion event. The typed Ladybug custody schema starts with `Lab`, `Agent`, `Run`, `Stage`, `Artifact`, `Event`, `Seal`, `Authorization`, `Host`, `Resource`, and `Panel`. Scientific specs, execution specs, toolchains, manifests, and results initially use typed `Artifact.kind` values. Relationship tables include `BELONGS_TO`, `EXECUTED_BY`, `HAS_STAGE`, `HAS_EVENT`, `INPUT_TO`, `OUTPUT_OF`, `DERIVED_FROM`, `SUPERSEDES`, `SEALED_BY`, `PARENT_SEAL`, `VERIFIED_BY`, `AUTHORIZED_BY`, `RUNS_ON`, `USES_RESOURCE`, and `EXPOSES`. The daemon alone maps versioned event schemas into this graph; no lab writes its own synonyms. Ladybug's node and relationship tables are explicitly typed. [Schema documentation](https://docs.ladybugdb.com/cypher/data-definition/create-table/). A v1 seal payload contains schema ID, sorted direct artifact IDs, and sorted parent seal roots. Parents must already exist and be verified; cycles and duplicate members are rejected. The root binds the complete transitive ancestry without serializing it into every successor. `kammi lineage` walks parent edges, validates every root and artifact byte, and can export a flat closure when an old verifier requires one. A contract binds an ancestor using its exact digest; a verifier loads that ancestor to check any property it needs. `ScientificSpec`, `ExecutionSpec`, `Toolchain`, `Run`, and `Result` are distinct artifact kinds/relations. A verifier repair changes the toolchain identity and produces a new attempt/event, not a scientific revision. A hypothesis or task-contract change produces a new scientific spec. Importers preserve historical contract bytes and roots even if the new graph expresses them more compactly. Contact classes are `POPULATION_GENERATED`, `TOKENIZER`, `MODEL`, `CUDA`, `TRUTH_LABEL`, `EVAL_PANEL`, `SCORING`, and `HUMAN_INSPECTION`. A contact event binds run, class, target artifact/panel, actor, time, and authorization. `contact-status` is a projection over events. **No recorded contact** is only a complete negative claim when all relevant contact-capable access paths are mediated and their coverage is attested; unmanaged shell, process, or file access cannot be disproved by an empty ledger. Stage policies are declarative, versioned artifacts with a policy-engine implementation hash. `authorize` evaluates sealed scientific/execution specs, verified roots, contact and exposure histories, resource leases, and stage-specific predicates. It returns an event-backed authorization or a structured denial. An adapter or policy update may alter future gate results; it cannot rewrite existing event history or a lab's sealed protocol. Resources have leases with owner, run, host, purpose, start, expiry, and a monotonic fencing token. The host executor checks the token immediately before launch and during long jobs; a lease record alone is advisory. Unmanaged GPU users must be detected and treated as an occupancy conflict or an explicit unknown. Expiry/restart reconciliation cannot cause two valid executors to own the same GPU simultaneously. Panel exposures use the program-wide purpose vocabulary `generation`, `fit`, `selection`, `thresholding`, `diagnostic`, and `terminal`. Every mediated open records lab, run, actor, purpose, date/time, and decision. Reports show the vector of counts and sequence of decisions across labs. Terminal-panel access is denied before its authorization. File ACLs or a guarded panel gateway must make this an actual access control, not just a logging convention. Remote workers receive a signed, immutable RunBundle containing run/spec/root identities, clean git state, input roots, environment lock, device requirements, seeds, command, expected outputs, and authorization. The worker returns environment, execution, and output receipts plus artifacts; the daemon verifies and ingests them. Worker evidence cannot promote a head by itself. `memory.lbdb` has its own schema, migration stream, retention policy, and retrieval indexes. Nodes include `Memory`, `Decision`, `Hypothesis`, `Procedure`, `FailureMode`, `ResultSummary`, `Concept`, `Task`, `Agent`, `Lab`, and `Project`, with `ABOUT`, `DERIVED_FROM`, `SUPPORTS`, `CONTRADICTS`, `SUPERSEDES`, `APPLIES_TO`, `DISCOVERED_BY`, `USED_BY`, and `RELATED_TO` edges. Each record has a stable ID, trust class, scope, text, author/time, confidence, supersedes references, and optional custody refs. Trust classes are `OBSERVED`, `DERIVED`, `INTERPRETIVE`, `HYPOTHESIS`, `PREFERENCE`, and `PROCEDURE`. Changes create a new record and supersession edge. `OBSERVED` requires verified custody refs and still does not become custody evidence. A memory write checks referenced custody IDs through the daemon; there is no cross-database atomic transaction, so replay marks unresolved references rather than inventing evidence. Retrieval combines graph neighborhood and full-text search first, then versioned embedding/vector search after the authoritative spine is qualified. Retrieval responses show trust class and evidence links. Ladybug supports FTS over node string properties and a disk-backed vector index over node vector properties; extension/version qualification is required on the deployed Windows build. [FTS](https://docs.ladybugdb.com/extensions/full-text-search/), [vector](https://docs.ladybugdb.com/extensions/vector/). Original object bytes remain immutable. A registered adapter has source schema, target schema, implementation artifact/hash, and deterministic output. `AdapterApplied` binds source and output IDs. Any adapter used for a gate or result is named in that event. Adapters never mutate an old ID. The daemon exposes typed operations only: artifact registration/get/verify, run creation/status, lineage, seal create/verify, authorization request, contact status/record, lease acquire/release, exposure open/report, memory search/record/supersede, and import/replay. SDKs share wire schemas and JCS fixtures. The MCP façade exposes these same scoped operations; raw Ladybug MCP is restricted to offline read-only inspection, never a live second database object or write path. The current frozen legacy fixture is the E4-0 `v16-v09` final contract and seal. At this architecture lock, the contract file SHA-256 is `21fc77d5a288b9adef995d88f089890235f8dcb2fbc3c9e452725bb67892a22f`; the seal-file SHA-256 is `0635de4a384b4d5121d8b2295e88a73f649c53e402ffcda311fcaf9c8d93099c`; its recorded legacy root is `278ae16eeb6852d3efad44221556a87be6df54964471f0870931fe2e99b305d1`, with 447 declared and 447 present entries. These are fixture anchors, not proof that every referenced byte has already been independently reverified by Kammi Ledger. The importer runs read-only over the complete E4-0 history, including failed attempts, contracts, receipts, seals, and lineage. It preserves original raw digests, legacy root algorithms, names, and statuses. It must reproduce the existing verifier's 447/447 closure and identify the same authoritative head without experiment-specific code in the custody engine. A separate new Merkle seal may bind the imported legacy seal; its root will be different and must never be presented as the legacy root. Future successors reference that root rather than copying 447 entries. Before new flights, independently demonstrate and retain receipts for: 1. One-byte CAS tamper detection and rejection. 2. Full deletion/rebuild of `custody.lbdb` with identical event head, graph heads, and seal roots. 3. Crash after CAS publication/before journal commit, and after journal commit/before DB projection; recovery is idempotent and preserves committed history. 4. Two simultaneous GPU lease requests: exactly one valid fencing token and one executable launch. 5. Pre-authorization terminal-panel open rejected by the mediated access path; exposure vectors and decisions reconstruct across labs. 6. Registered schema adapter changes a field view while source bytes and ID remain unchanged. 7. Failed execution remains queryable without scientific-spec revision or silent head promotion. 8. Signed bundle executes on a disposable worker and returns independently verified evidence. 9. Fresh agent retrieves a relevant historical failure through memory and follows its custody refs to verified evidence; memory cannot satisfy a custody gate. 10. Complete E4-0 legacy import identifies the authoritative head and reproduces the legacy 447/447 closure and root, then verifies a new successor using only direct members plus parent roots. The acceptance report records implementation versions, source hashes, environment, test fixtures, failures, independent reviewer, and exact roots. Any failed gate keeps the new-flight hold in place. Individual labs seal their own instantiated inputs, splits, seeds, and results; Kammi stores those identities and custody relations without merging evidence across labs. Pin a Ladybug release, Python runtime, FTS/vector extension builds, JCS library, Windows filesystem, and remote-worker signature implementation in an execution lock before coding against them. The locally available `py` is 3.13; the online Ladybug system-requirements page appears older than current PyPI wheels, so actual wheel and extension compatibility must be proved rather than inferred. Python/FastAPI is the initial daemon preference; the wire contract allows a later Rust daemon. No agent receives direct database write permissions. ledgerd.backup.backup takes custody and memory writer locks and copies objects/sha256, journal, memory/journal and nonsecret configuration into a new external destination. Policies/adapters/actors/grants are immutable journal facts, so the journal captures registries. BACKUP.json binds path, size and SHA-256 plus custody/memory heads. restore verifies every declared file and safe relative path before creating a new destination. Never restore over a live store. Start a new daemon to reconstruct projections and compare heads/counts/seals. Ladybug files are intentionally unnecessary. Back up credentials/signing keys separately into an appropriately restricted secret store. CAS orphans/staging bytes are not authoritative; committed referenced objects are essential. This is Library Lab's controlled vocabulary for imported historical assertions. The authoritative record is the CAS object plus journal event. Ladybug indexes it. An assertion cites a registered evidence artifact and has a scope; it does not grant execution authority or turn a legacy self-report into direct observation. `FactRecorded` has exactly these fields: `run_id`, `kind`, `subject`, `object`, `value`, `evidence_artifact`, and `scope`. Its `fact_id` is domain-separated canonical JSON identity. A fact's evidence must already be registered in CAS. | Kind | Permitted values | Meaning | | --- | --- | --- | | `ATTEMPT` | `PASS`, `STOP`, `UNKNOWN` | Cited attempt or audit outcome. | | `SUPERSESSION` | `DECLARED` | `subject` declares that it supersedes `object`. | | `CONTACT` | `YES`, `NO_ATTESTED`, `UNKNOWN` | Contact claim for the cited scope and class. | | `EVIDENCE_ACCESS` | `YES`, `NO_ATTESTED`, `UNKNOWN` | Access claim for the cited scope and class. | | `HEAD` | `SEALED`, `SUPERSEDED`, `UNKNOWN` | Head claim for the cited snapshot and role. | `NO_ATTESTED` means a cited receipt explicitly says no. It does not prove absence outside that receipt's scope. Missing fields are never silently treated as false. An imported `HEAD` identifies a legacy snapshot head; it is not a Kammi flight authorization. Supersession is a declared edge until independent source identity and closure checks qualify it. The E4 importer is a versioned adapter. Its path and legacy-field rules do not enter the daemon vocabulary. The public service exposes generic history queries and master-authorized scoped fact registration. Fact registration preserves source assertions; it cannot create a live authorization. Scientific labs request new custody terms from Library Lab. They may not add lab-specific receipt keys as substitute authority. Memory schemas may evolve separately and never confer custody status. ledgerd/vocabulary.py is the closed event registry. Actor kinds, contact classes, exposure purposes, policy predicates, resource kinds and adapter identities each have one centrally controlled registry. Unknown authoritative events fail replay. Generic Entity/Link projection tables represent the shared ontology without a new specialized table for every receipt type. Specification and receipt bytes remain Artifact kinds. The immutable event/payload graph is always retained. `verify_seal` returns unique transitive **data members**. It excludes Kammi seal envelope objects and parent envelope objects; their identities are separately bound and recursively verified. Direct members and parents are ordered duplicate-free sets. Count CAS objects, seal envelopes and journal payload objects separately. E4's actual imported closure is 432 original data objects + 1 serialized **legacy** seal file + 60 newly registered supplement objects = 493 data members. The contract among the successor's two direct members already exists in the parent's 432 objects and is counted once. A Kammi child seal envelope is not that extra member. 447 legacy entries are paths/identities, not 447 unique byte objects. Purposes: generation, fit, selection, thresholding, diagnostic, terminal. Each panel report contains all events, counts and the six-coordinate exposure vector. POST /v1/panels/{id}/open authenticates actor and lab ownership, checks a scoped grant and current stage authorization, commits ExposureOpened, then reads bytes. ExposureClosed describes gateway delivery, not proof that a human read the response. A lost response may overcount an opening conservatively; it cannot reveal unrecorded bytes. Retrying the same intent returns the same event without a second opening. Panel bytes in CAS remain inaccessible through ordinary actor download endpoints. Master administration and direct filesystem access are outside guarded panel operation. Such access must be explicitly logged and cannot be represented as qualified secrecy. Remote bundles cannot bypass the panel gateway. Declaring a protected panel as an input requires a prior opening for the same producer/run/stage. Input delivery rechecks current authorization and exposure while holding the authority lock. An incomplete journal tail is quarantined by digest before truncation to a valid prefix. Complete checksum/chain corruption fails closed; it is not repaired by truncating history. CAS writes stage/fsync/rename before events. An orphan CAS object may survive a crash; it gains authority only through committed events. Projection errors return the committed event identity so a retry/rebuild can converge without duplicating the action. Single-writer locks are held by the OS and released on process death. A PID file is diagnostic. Kill the owned Windows process tree, not merely its launcher. Preserve stopped attempts, failed acceptance logs and any recovered tail before retrying. Qualified durability is process-crash prefix recovery on this pinned Windows runtime. File fsync calls request OS flushing; rename/open-handle behavior is characterized. No physical power-cut/reboot test or storage-controller persistence certification was performed. Directory metadata durability after power loss is not guaranteed by this release's evidence. Maintain backups; do not claim stronger power-loss guarantees from process-kill tests. Existing authorized work retains its original contracts. Do not migrate running experiments. Future branches submit their scientific/engineering bytes, ownership, stage requirements, evidence classes and policy declarations to Library Lab. Register inputs; seal direct members plus parent roots; bind specs; obtain actor grants and stage authorization; acquire a fenced resource; open evidence through the exposure gateway; start an attempt; execute; register receipts/results; close the attempt; seal and verify lineage. Labs own hypotheses, thresholds, data, results and interpretation. Shared implementations do not constitute shared scientific evidence. Keep each lab's inputs/splits/seeds/results separate. Use artifact IDs across hosts/worktrees. Never copy ancestor receipt fields into descendants. Never infer no contact from absent assertions. Historical import confers no live authorization. Request new custody terms centrally; contextual memory tags may evolve more freely. Exclusive resource kinds: GPU, CPU_POOL, HOST, REMOTE_WORKER, DATASET_LOCK, PANEL_LOCK, FILESYSTEM_EXCLUSIVE. Pools are coarse exclusive units in v1; register separate resource IDs for independently reservable units. Leases bind actor/run/stage/purpose, constraints, expiry and a monotonically increasing resource fencing token. Acquire/renew/release carry request IDs. Expiry permits a new holder; a stale token cannot execute through a qualified executor. Local and remote executors check at launch and during execution. They terminate their owned process tree on expiry. Arbitration fixtures use logical GPU resources and CPU commands: they prove fencing semantics without consuming CUDA or scientific observers. Direct CUDA launches that bypass the executor are outside qualified operation. Clock is the host UTC clock; admin clock rollback is outside the trusted-host boundary. Lease TTL is 1..3600 seconds. Clients must renew before expiry and stop after denial. Run python -m ledgerd.mcp with KAMMI_URL and the appropriate KAMMI_TOKEN. Supported transport: UTF-8 newline-delimited JSON-RPC on stdio, protocol 2025-06-18. Initialization, ping, tools/list and tools/call are supported. Stdout is protocol only. Frames are bounded to 1 MiB. API body limits also apply. Tools bind fixed HTTP endpoints for custody, authorization, exposure, leases, adapters, remote returns and memory. No arbitrary Cypher, raw DB writes or user-controlled URLs. The tools/list response publishes machine-readable input schemas. Body request objects use the shared versioned wire schemas; service scope/validation remains authoritative. Configure a separate MCP process per credential role; credentials are not tool arguments. Memory has a separate journal and memory.lbdb projection. Shared CAS is byte storage, not an authority promotion. Memory writes never mutate the custody journal. Kinds: OBSERVED, DERIVED, INTERPRETIVE, HYPOTHESIS, PREFERENCE, PROCEDURE, DECISION, FAILURE_MODE, RESULT_SUMMARY. Observed/derived records require existing custody references. A cited interpretation remains an interpretation. Records bind scope, author, time, text, confidence, tags, custody references and exact embedding bytes/model identity. Supersession adds events/edges; prior records remain queryable. Search defaults to current memories. Filters can exclude hypotheses or require cited evidence. Evidence-cited does not mean the memory's prose is independently proven true."
+  },
+  {
+   "id": "e-control",
+   "text": "tab\tnewline\nnull-ish \u0001 end"
+  }
+ ],
+ "queries": [
+  {
+   "id": "q0",
+   "source": "ACCEPTANCE-STATUS-v0.1.md",
+   "text": "Acceptance gate status"
+  },
+  {
+   "id": "q1",
+   "source": "ACCEPTANCE-STATUS-v0.1.md",
+   "text": "Evidence and limitations"
+  },
+  {
+   "id": "q2",
+   "source": "ACCEPTANCE-STATUS-v0.2.md",
+   "text": "E4 generic history slice"
+  },
+  {
+   "id": "q3",
+   "source": "ACCEPTANCE-STATUS-v0.2.md",
+   "text": "Remaining acceptance gates"
+  },
+  {
+   "id": "q4",
+   "source": "ADAPTERS-v1.md",
+   "text": "Immutable adapters v1"
+  },
+  {
+   "id": "q5",
+   "source": "ARCHITECTURE-AMENDMENT-v2-PHOENIX-VAULT.md",
+   "text": "One service, one database, distinct authority domains"
+  },
+  {
+   "id": "q6",
+   "source": "ARCHITECTURE-AMENDMENT-v2-PHOENIX-VAULT.md",
+   "text": "Phoenix ownership"
+  },
+  {
+   "id": "q7",
+   "source": "ARCHITECTURE-AMENDMENT-v2-PHOENIX-VAULT.md",
+   "text": "Portability"
+  },
+  {
+   "id": "q8",
+   "source": "ARCHITECTURE-v1.md",
+   "text": "Purpose and flight gate"
+  },
+  {
+   "id": "q9",
+   "source": "ARCHITECTURE-v1.md",
+   "text": "Trust and ownership"
+  },
+  {
+   "id": "q10",
+   "source": "ARCHITECTURE-v1.md",
+   "text": "Identity and immutable bytes"
+  },
+  {
+   "id": "q11",
+   "source": "ARCHITECTURE-v1.md",
+   "text": "Event journal and crash protocol"
+  },
+  {
+   "id": "q12",
+   "source": "ARCHITECTURE-v1.md",
+   "text": "Custody graph and seals"
+  },
+  {
+   "id": "q13",
+   "source": "ARCHITECTURE-v1.md",
+   "text": "Contacts, gates, leases, and exposures"
+  },
+  {
+   "id": "q14",
+   "source": "ARCHITECTURE-v1.md",
+   "text": "Memory plane"
+  },
+  {
+   "id": "q15",
+   "source": "ARCHITECTURE-v1.md",
+   "text": "Schema evolution and interfaces"
+  },
+  {
+   "id": "q16",
+   "source": "ARCHITECTURE-v1.md",
+   "text": "E4-0 acceptance fixture"
+  },
+  {
+   "id": "q17",
+   "source": "ARCHITECTURE-v1.md",
+   "text": "Flight acceptance gates"
+  },
+  {
+   "id": "q18",
+   "source": "ARCHITECTURE-v1.md",
+   "text": "Implementation qualifications"
+  },
+  {
+   "id": "q19",
+   "source": "BACKUP-RESTORE-v1.md",
+   "text": "Projection-free backup/restore v1"
+  },
+  {
+   "id": "q20",
+   "source": "CUSTODY-VOCABULARY-v1.md",
+   "text": "Live vocabulary"
+  },
+  {
+   "id": "q21",
+   "source": "CUSTODY-VOCABULARY-v1.md",
+   "text": "Closure accounting"
+  },
+  {
+   "id": "q22",
+   "source": "EXPOSURE-v1.md",
+   "text": "Exposure v1"
+  },
+  {
+   "id": "q23",
+   "source": "FAILURE-RECOVERY-v1.md",
+   "text": "Failure recovery v1"
+  },
+  {
+   "id": "q24",
+   "source": "LAB-INTEGRATION-v1.md",
+   "text": "Lab integration v1"
+  },
+  {
+   "id": "q25",
+   "source": "LEASES-v1.md",
+   "text": "Fenced resources v1"
+  },
+  {
+   "id": "q26",
+   "source": "MCP-v1.md",
+   "text": "Narrow MCP v1"
+  },
+  {
+   "id": "q27",
+   "source": "MEMORY-v1.md",
+   "text": "Contextual institutional memory v1"
+  },
+  {
+   "id": "q28",
+   "source": "PHOENIX-VAULT-v1.md",
+   "text": "Phoenix vault product extension"
+  },
+  {
+   "id": "q29",
+   "source": "PHOENIX-VAULT-v1.md",
+   "text": "Identity and commit flow"
+  },
+  {
+   "id": "q30",
+   "source": "PHOENIX-VAULT-v1.md",
+   "text": "HTTP surface"
+  },
+  {
+   "id": "q31",
+   "source": "PHOENIX-VAULT-v1.md",
+   "text": "Provisioning and pinned client"
+  },
+  {
+   "id": "q32",
+   "source": "PHOENIX-VAULT-v1.md",
+   "text": "One-way product cutover and recovery"
+  },
+  {
+   "id": "q33",
+   "source": "PHOENIX-VAULT-v1.md",
+   "text": "Phoenix migration boundary"
+  },
+  {
+   "id": "q34",
+   "source": "POLICY-v1.md",
+   "text": "Policy and actor authority v1"
+  },
+  {
+   "id": "q35",
+   "source": "README.md",
+   "text": "Qualification and service"
+  },
+  {
+   "id": "q36",
+   "source": "README.md",
+   "text": "Qualified boundary"
+  },
+  {
+   "id": "q37",
+   "source": "REMOTE-EXECUTION-v1.md",
+   "text": "Portable remote execution v1"
+  },
+  {
+   "id": "q38",
+   "source": "RUNTIME-PROVENANCE-v1.md",
+   "text": "Runtime provenance and licenses v1"
+  },
+  {
+   "id": "q39",
+   "source": "SDK-v1.md",
+   "text": "Service clients v1"
+  },
+  {
+   "id": "q40",
+   "source": "SECURITY-BOUNDARY-v1.md",
+   "text": "Security boundary v1"
+  }
+ ],
+ "schema": "KAMMI_EMBED_QUALIFICATION_CORPUS_V1",
+ "source": "kammi-ledger/*.md paragraphs (documents) and headings (queries), code fences removed"
+}
