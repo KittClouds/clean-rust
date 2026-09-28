@@ -352,6 +352,17 @@ pub fn ensure_ort_dylib() -> Option<PathBuf> {
     }
     let pinned = pinned_ort_dylib();
     if !pinned.is_file() {
+        eprintln!("kammi-embed: {} missing; run vendor/onnxruntime-1.30.0/fetch.ps1", pinned.display());
+        return None;
+    }
+    // Refuse anything but the pinned bytes (vendor/onnxruntime-1.30.0/SHA256SUMS).
+    let expected = include_str!("../../../vendor/onnxruntime-1.30.0/SHA256SUMS")
+        .lines()
+        .find(|l| l.ends_with("  onnxruntime.dll"))
+        .and_then(|l| l.split_whitespace().next())
+        .map(|h| format!("sha256:{h}"));
+    if file_sha256(&pinned).ok() != expected {
+        eprintln!("kammi-embed: {} does not match SHA256SUMS; rerun fetch.ps1", pinned.display());
         return None;
     }
     // SAFETY: documented precondition — called while the process is single-threaded.

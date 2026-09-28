@@ -78,8 +78,10 @@ Two findings are now encoded in the families:
 
 - **ONNX Runtime version changes Gemma retrieval.** On ORT 1.20.1, which the Phoenix apps
   resolve from `node_modules`, only 88 % of queries kept the same top-10, with 14 order flips.
-  The Library pins ORT 1.30 (`vendor/onnxruntime-1.30.0`), and the DLL hash is part of every
-  embedder identity.
+  The Library pins ORT 1.30, and the DLL hash is part of every embedder identity. The DLLs
+  are fetched, never committed: `vendor/onnxruntime-1.30.0/fetch.ps1` (or `fetch.sh`) downloads
+  the pinned PyPI wheel and refuses any wheel or DLL whose SHA-256 or size differs from
+  `manifest.json` / `SHA256SUMS`. The embedder also refuses a mismatched DLL.
 - **The Gemma q4 export is not padding-invariant** (a padded row drifts to cosine about 0.9997,
   in the reference runtime too). Gemma therefore batches only inputs of identical token length,
   which is also faster (15.3 s vs 21.6 s for the corpus). Jina measured padding-invariant and
