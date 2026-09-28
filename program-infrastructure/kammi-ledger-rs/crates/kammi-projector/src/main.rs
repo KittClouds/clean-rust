@@ -14,6 +14,7 @@
 //! never a mix. A database that fails to open (for example a WAL that will not replay) is
 //! moved to `quarantine/` and rebuilt from genesis.
 
+mod bulk;
 mod memory;
 mod serve;
 
@@ -617,6 +618,34 @@ fn open(db_path: &Path) -> Result<Database, Error> {
     }
 }
 
+/// A private scratch directory for bulk CSV files (never inside authority directories).
+fn scratch_dir(store: &Path) -> PathBuf {
+    store
+        .join("projection")
+        .join(format!("bulk-{}", std::process::id()))
+}
+
+/// Bulk-loads custody from genesis into an empty projection; statement path otherwise.
+fn bulk_if_empty(graph: &Graph, store: &Path) -> Result<Option<Json>, Error> {
+    if graph.position()?.0 != 0 {
+        return Ok(None);
+    }
+    let started = Instant::now();
+    let (model, follower) = bulk::CustodyModel::derive(store, None)?;
+    if follower.seq() == 0 {
+        return Ok(None);
+    }
+    let loaded = graph.bulk_load(&model, &scratch_dir(store))?;
+    eprintln!(
+        "kammi-projector: bulk-loaded {} events in {:.2}s",
+        follower.seq(),
+        started.elapsed().as_secs_f64()
+    );
+    Ok(Some(
+        kammi_core::obj! {"events" => follower.seq(), "seconds" => started.elapsed().as_secs_f64(), "rows" => loaded},
+    ))
+}
+
 /// Re-derives the projection in memory up to the stored position and compares every row.
 /// The engine does not catch every corrupt page (a damaged rel page can re-point edges
 /// silently), so content is checked against a fresh derivation. Returns tables compared.
@@ -639,15 +668,13 @@ fn deep_verify(graph: &Graph, store: &Path) -> Result<usize, Error> {
             return Err("memory journal is shorter than the projection position".into());
         }
     }
-    let mut follower = JournalFollower::new(store, "main");
-    while follower.seq() < target {
-        let want = usize::try_from(target - follower.seq())
-            .unwrap_or(usize::MAX)
-            .min(4096);
-        if expected.step(&mut follower, want)? == 0 {
-            return Err("journal is shorter than the projection position".into());
-        }
+    // Custody is re-derived through the bulk model, so this also cross-checks the bulk path
+    // against the statement path that built the live projection.
+    let (model, follower) = bulk::CustodyModel::derive(store, Some(target))?;
+    if follower.seq() < target {
+        return Err("journal is shorter than the projection position".into());
     }
+    expected.bulk_load(&model, &scratch_dir(store))?;
     let (actual, wanted) = (graph.dump()?, expected.dump()?);
     let differing: std::collections::BTreeSet<&String> = wanted
         .keys()
@@ -811,6 +838,7 @@ fn main() -> Result<(), Error> {
     match command {
         "serve" => {
             let store = store.ok_or("--store required")?;
+            bulk_if_empty(&graph, &store)?;
             let (main, memory) = serve::followers(&graph, &store)?;
             let mut server = serve::Server {
                 graph: &graph,
@@ -841,6 +869,9 @@ fn main() -> Result<(), Error> {
                 .map(|b| b.parse())
                 .transpose()?
                 .unwrap_or(256);
+            if args.iter().any(|a| a == "--bulk") {
+                bulk_if_empty(&graph, &store)?;
+            }
             let (mut follower, mut memory) = serve::followers(&graph, &store)?;
             let mut objects = ObjectReader::new(&store);
             let started = Instant::now();
