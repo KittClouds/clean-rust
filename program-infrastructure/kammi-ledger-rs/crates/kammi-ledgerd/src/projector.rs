@@ -79,7 +79,7 @@ impl Projector {
         projector
     }
 
-    fn spawn(&self) -> std::io::Result<Child> {
+    fn spawn(&self, reset: bool) -> std::io::Result<Child> {
         let c = &self.config;
         let mut command = Command::new(&c.exe);
         command
@@ -96,6 +96,9 @@ impl Projector {
         if c.verify {
             command.arg("--verify");
         }
+        if reset {
+            command.arg("--reset"); // after the subcommand: the projector reads argv[1] as it
+        }
         if let Some(dir) = &c.native_dir {
             let path = std::env::var_os("PATH").unwrap_or_default();
             let mut joined = std::ffi::OsString::from(dir.as_os_str());
@@ -108,8 +111,18 @@ impl Projector {
 
     fn supervise(self: Arc<Self>) {
         let mut backoff = Duration::from_millis(250);
+        // Crash-loop breaker: abnormal exits soon after start. After three in a row the next
+        // projector quarantines its database before opening (`--reset`) and rebuilds.
+        let mut fast_crashes = 0u32;
         while !self.stopping.load(Ordering::Relaxed) {
-            match self.spawn() {
+            let reset = fast_crashes >= 3;
+            if reset {
+                eprintln!(
+                    "kammi-ledgerd: projector crash loop; restarting with a fresh projection"
+                );
+                fast_crashes = 0;
+            }
+            match self.spawn(reset) {
                 Ok(mut child) => {
                     let started = Instant::now();
                     let stdout = child.stdout.take().expect("piped stdout");
@@ -122,10 +135,16 @@ impl Projector {
                     }
                     let reader = self.clone();
                     let lines = std::thread::spawn(move || reader.read_replies(stdout));
-                    let exit = child
-                        .wait()
+                    let status = child.wait();
+                    let clean = status.as_ref().is_ok_and(|s| s.success());
+                    let exit = status
                         .map(|s| s.to_string())
                         .unwrap_or_else(|e| e.to_string());
+                    if !clean && started.elapsed() < Duration::from_secs(30) {
+                        fast_crashes += 1;
+                    } else {
+                        fast_crashes = 0;
+                    }
                     let _ = lines.join();
                     {
                         let mut process = self.process.lock();

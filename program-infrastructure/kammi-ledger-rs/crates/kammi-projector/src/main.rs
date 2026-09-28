@@ -607,7 +607,13 @@ fn config() -> SystemConfig {
         .enable_checksums(true)
 }
 
-/// Opens the projection database, quarantining one that will not open.
+/// Opens the projection database; one that will not open is quarantined whole and rebuilt.
+///
+/// A projector killed mid-write leaves a torn WAL that Ladybug refuses to replay. Dropping
+/// only the WAL was tried and is unsafe: the database then opens but the process crashes
+/// with an access violation on use (the main file depends on WAL state even at the last
+/// checkpoint). The projection is disposable and bulk rebuilds take seconds, so the whole
+/// projection goes to quarantine.
 fn open(db_path: &Path) -> Result<Database, Error> {
     match Database::new(db_path, config()) {
         Ok(db) => Ok(db),
@@ -616,6 +622,31 @@ fn open(db_path: &Path) -> Result<Database, Error> {
             Ok(Database::new(db_path, config())?)
         }
     }
+}
+
+/// Starts that never reached a healthy, serving state (crashes inside the engine included).
+/// After `CRASH_LOOP_LIMIT` in a row the projection is quarantined before opening.
+const CRASH_LOOP_LIMIT: u64 = 3;
+
+fn begin_start(db_path: &Path) -> Result<(), Error> {
+    let mut health = Health::load(db_path);
+    if health.unhealthy_starts >= CRASH_LOOP_LIMIT && db_path.exists() {
+        let starts = health.unhealthy_starts;
+        quarantine(
+            db_path,
+            &format!("crash loop: {starts} starts never became healthy"),
+        )?;
+        health = Health::load(db_path);
+        health.unhealthy_starts = 0;
+    }
+    health.unhealthy_starts += 1;
+    health.save(db_path)
+}
+
+fn mark_healthy(db_path: &Path) -> Result<(), Error> {
+    let mut health = Health::load(db_path);
+    health.unhealthy_starts = 0;
+    health.save(db_path)
 }
 
 /// A private scratch directory for bulk CSV files (never inside authority directories).
@@ -695,6 +726,8 @@ fn deep_verify(graph: &Graph, store: &Path) -> Result<usize, Error> {
 pub struct Health {
     pub last_verify: Json,
     pub last_quarantine: Json,
+    /// Consecutive starts that did not reach serving (crash-loop breaker).
+    pub unhealthy_starts: u64,
 }
 
 fn health_path(db_path: &Path) -> PathBuf {
@@ -715,11 +748,16 @@ impl Health {
         Health {
             last_verify: value["last_verify"].clone(),
             last_quarantine: value["last_quarantine"].clone(),
+            unhealthy_starts: value["unhealthy_starts"].as_u64().unwrap_or(0),
         }
     }
 
     fn save(&self, db_path: &Path) -> Result<(), Error> {
-        let value = kammi_core::obj! {"last_verify" => self.last_verify.clone(), "last_quarantine" => self.last_quarantine.clone()};
+        let value = kammi_core::obj! {
+            "last_verify" => self.last_verify.clone(),
+            "last_quarantine" => self.last_quarantine.clone(),
+            "unhealthy_starts" => self.unhealthy_starts,
+        };
         let temp = PathBuf::from(format!("{}.tmp", health_path(db_path).display()));
         std::fs::write(&temp, value.to_string())?;
         std::fs::rename(&temp, health_path(db_path))?;
@@ -730,7 +768,8 @@ impl Health {
 /// Moves an existing projection aside (it is derived data; authority is untouched).
 fn quarantine(db_path: &Path, reason: &str) -> Result<(), Error> {
     let mut health = Health::load(db_path);
-    health.last_quarantine = kammi_core::obj! {"utc" => now_utc(), "reason" => reason};
+    health.last_quarantine =
+        kammi_core::obj! {"utc" => now_utc(), "scope" => "database", "reason" => reason};
     health.save(db_path)?;
     let quarantine = db_path
         .parent()
@@ -827,6 +866,16 @@ fn main() -> Result<(), Error> {
     // One projector per database: a restarted daemon's new projector waits for the previous
     // one (which exits when its stdin closes) instead of racing it on the same files.
     let _owner = lock_projection(&db_path, Duration::from_secs(120))?;
+    if command == "serve" {
+        // The supervisor passes --reset after repeated fast crashes of a started projector.
+        if args.iter().any(|a| a == "--reset") && db_path.exists() {
+            quarantine(
+                &db_path,
+                "reset by supervisor: repeated crashes after start",
+            )?;
+        }
+        begin_start(&db_path)?;
+    }
     if matches!(command, "project" | "serve") && args.iter().any(|a| a == "--verify") {
         verify_or_quarantine(&db_path, store.as_deref().ok_or("--store required")?, dims)?;
     }
@@ -840,6 +889,9 @@ fn main() -> Result<(), Error> {
             let store = store.ok_or("--store required")?;
             bulk_if_empty(&graph, &store)?;
             let (main, memory) = serve::followers(&graph, &store)?;
+            graph.counts()?; // touch the tables: a start that crashes here stays unhealthy
+            kammi_store::fault::hit("projector.before_healthy");
+            mark_healthy(&db_path)?;
             let mut server = serve::Server {
                 graph: &graph,
                 main,
