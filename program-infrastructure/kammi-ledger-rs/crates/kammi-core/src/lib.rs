@@ -25,5 +25,5 @@ pub use error::{LedgerError, Result};
 #[doc(hidden)]
 pub use kammi_jcs as __jcs;
 pub use ledger::{FlightIdentity, Ledger, LedgerOptions, Prior};
-pub use memory::HashingEmbedder;
+pub use memory::{HashingEmbedder, MemoryIndex};
 pub use time::{Clock, ManualClock, SystemClock, Timestamp};

@@ -229,3 +229,130 @@ impl JournalFollower {
         }))
     }
 }
+
+const PACK_HEADER_LEN: u64 = 16;
+const PACK_RECORD_HEADER: u64 = 36;
+const MAX_PACKED_OBJECT: u64 = 64 * 1024 * 1024;
+
+struct PackCursor {
+    number: u32,
+    path: PathBuf,
+    file: File,
+    scanned: u64,
+}
+
+/// Read-only CAS access for processes other than the writer.
+///
+/// Packs are scanned forward record by record (`len u32 | id [32] | bytes`); only complete
+/// records are indexed, so a record being appended is simply not visible yet. The derived
+/// index files are never read or written. Every returned object is re-hashed.
+pub struct ObjectReader {
+    dir: PathBuf,
+    packs: Vec<PackCursor>,
+    located: hashbrown::HashMap<Sha256Id, (usize, u64, u32)>,
+}
+
+impl ObjectReader {
+    pub fn new(store_root: &Path) -> ObjectReader {
+        ObjectReader {
+            dir: store_root.join("objects"),
+            packs: Vec::new(),
+            located: hashbrown::HashMap::new(),
+        }
+    }
+
+    fn loose_path(&self, id: &Sha256Id) -> PathBuf {
+        let text = id.to_string();
+        self.dir.join("sha256").join(&text[7..9]).join(&text[9..])
+    }
+
+    /// Indexes records appended since the last scan.
+    fn refresh(&mut self) -> Result<()> {
+        let packs_dir = self.dir.join("packs");
+        let mut numbers = Vec::new();
+        if let Ok(entries) = std::fs::read_dir(&packs_dir) {
+            for entry in entries {
+                let path = entry.map_err(|e| io(&packs_dir)(e))?.path();
+                let name = path.file_name().and_then(|n| n.to_str()).unwrap_or("");
+                if let Some(number) = name
+                    .strip_prefix("pack-")
+                    .and_then(|n| n.strip_suffix(".pack"))
+                    .and_then(|n| n.parse::<u32>().ok())
+                {
+                    numbers.push((number, path));
+                }
+            }
+        }
+        numbers.sort();
+        for (number, path) in numbers {
+            if !self.packs.iter().any(|p| p.number == number) {
+                let file = open_shared(&path).map_err(|e| io(&path)(e))?;
+                self.packs.push(PackCursor {
+                    number,
+                    path,
+                    file,
+                    scanned: PACK_HEADER_LEN,
+                });
+            }
+        }
+        for (slot, pack) in self.packs.iter_mut().enumerate() {
+            let size = pack.file.metadata().map_err(|e| io(&pack.path)(e))?.len();
+            while pack.scanned + PACK_RECORD_HEADER <= size {
+                let mut header = [0u8; PACK_RECORD_HEADER as usize];
+                if read_full(&pack.file, &mut header, pack.scanned)
+                    .map_err(|e| io(&pack.path)(e))?
+                    < header.len()
+                {
+                    break;
+                }
+                let len = u32::from_le_bytes(header[..4].try_into().unwrap());
+                // A real empty object carries sha256(""); a zero-filled tail carries zeros.
+                let empty_object = len == 0 && header[4..36] == raw_id(b"").0;
+                if (len == 0 && !empty_object) || u64::from(len) > MAX_PACKED_OBJECT {
+                    break; // zero-filled or torn tail: not committed
+                }
+                if pack.scanned + PACK_RECORD_HEADER + u64::from(len) > size {
+                    break;
+                }
+                let id = Sha256Id(header[4..36].try_into().unwrap());
+                self.located
+                    .entry(id)
+                    .or_insert((slot, pack.scanned + PACK_RECORD_HEADER, len));
+                pack.scanned += PACK_RECORD_HEADER + u64::from(len);
+            }
+        }
+        Ok(())
+    }
+
+    fn read_packed(&self, id: &Sha256Id) -> Result<Option<Vec<u8>>> {
+        let Some(&(slot, offset, len)) = self.located.get(id) else {
+            return Ok(None);
+        };
+        let pack = &self.packs[slot];
+        let mut bytes = vec![0u8; len as usize];
+        if read_full(&pack.file, &mut bytes, offset).map_err(|e| io(&pack.path)(e))? < bytes.len() {
+            return Err(StoreError::ObjectCorrupt(*id));
+        }
+        if raw_id(&bytes) != *id {
+            return Err(StoreError::ObjectCorrupt(*id));
+        }
+        Ok(Some(bytes))
+    }
+
+    /// Verified bytes of an object, or `None` if it is not (yet) stored.
+    pub fn get(&mut self, id: &Sha256Id) -> Result<Option<Vec<u8>>> {
+        if let Some(bytes) = self.read_packed(id)? {
+            return Ok(Some(bytes));
+        }
+        let loose = self.loose_path(id);
+        if loose.is_file() {
+            let bytes = std::fs::read(&loose).map_err(|e| io(&loose)(e))?;
+            if raw_id(&bytes) != *id {
+                return Err(StoreError::ObjectCorrupt(*id));
+            }
+            return Ok(Some(bytes));
+        }
+        self.refresh()?;
+        self.read_packed(id)
+    }
+}

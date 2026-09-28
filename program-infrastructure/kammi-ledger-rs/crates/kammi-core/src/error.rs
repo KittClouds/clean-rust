@@ -17,6 +17,10 @@ pub enum LedgerError {
     /// Authority storage failed; never a client mistake.
     #[error(transparent)]
     Store(#[from] StoreError),
+    /// A derived service the operation needs (the memory projection) is down; authority is
+    /// unaffected. HTTP maps this to 503.
+    #[error("{0}")]
+    Unavailable(String),
     #[error("I/O error on {path}: {source}")]
     Io {
         path: std::path::PathBuf,

@@ -118,3 +118,47 @@ fn committed_corruption_is_an_error_not_a_stop() {
         Err(StoreError::Corrupt { .. })
     ));
 }
+
+#[test]
+fn object_reader_sees_packed_and_loose_objects_beside_a_live_writer() {
+    use kammi_store::{ObjectReader, Store, StoreOptions};
+    let root = tempfile::tempdir().unwrap();
+    let mut store = Store::create(root.path(), StoreOptions::default()).unwrap();
+    let empty = store.objects.put(b"").unwrap();
+    let small = store.objects.put(b"small packed object").unwrap();
+    let large_bytes = vec![7u8; 300 * 1024];
+    let large = store.objects.put(&large_bytes).unwrap();
+    let mut reader = ObjectReader::new(root.path());
+    assert_eq!(reader.get(&small).unwrap().unwrap(), b"small packed object");
+    assert_eq!(
+        reader.get(&empty).unwrap().unwrap(),
+        b"",
+        "an empty object is not a torn tail"
+    );
+    assert_eq!(reader.get(&large).unwrap().unwrap(), large_bytes);
+    assert!(reader
+        .get(&kammi_jcs::raw_id(b"never stored"))
+        .unwrap()
+        .is_none());
+
+    // Appended after the reader first scanned: visible on the next lookup.
+    let later = store.objects.put(b"written later").unwrap();
+    assert_eq!(reader.get(&later).unwrap().unwrap(), b"written later");
+
+    // A flipped byte inside a packed object is refused, never returned.
+    drop(store);
+    let pack = fs::read_dir(root.path().join("objects").join("packs"))
+        .unwrap()
+        .map(|e| e.unwrap().path())
+        .find(|p| p.extension().is_some_and(|x| x == "pack"))
+        .unwrap();
+    let mut bytes = fs::read(&pack).unwrap();
+    let at = bytes.windows(5).position(|w| w == b"small").unwrap();
+    bytes[at] ^= 1;
+    fs::write(&pack, bytes).unwrap();
+    let mut fresh = ObjectReader::new(root.path());
+    assert!(matches!(
+        fresh.get(&small),
+        Err(StoreError::ObjectCorrupt(_))
+    ));
+}

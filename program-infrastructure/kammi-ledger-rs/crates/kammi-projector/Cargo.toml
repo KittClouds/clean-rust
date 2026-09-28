@@ -10,4 +10,6 @@ publish.workspace = true
 kammi-core.workspace = true
 kammi-jcs.workspace = true
 kammi-store.workspace = true
+base64 = "0.22"
 lbug = "=0.20.2"
+serde_json.workspace = true

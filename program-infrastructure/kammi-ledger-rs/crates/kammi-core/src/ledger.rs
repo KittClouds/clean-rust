@@ -92,6 +92,13 @@ impl Ledger {
         Ok(ledger)
     }
 
+    /// Serves memory retrieval channels from `index` (the supervised projection).
+    pub fn set_memory_index(&mut self, index: std::sync::Arc<dyn crate::memory::MemoryIndex>) {
+        if let Some(memory) = self.memory.as_mut() {
+            memory.set_index(index);
+        }
+    }
+
     pub fn now(&self) -> Timestamp {
         self.clock.now()
     }

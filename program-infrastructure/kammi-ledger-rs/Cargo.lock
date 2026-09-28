@@ -959,10 +959,12 @@ dependencies = [
 name = "kammi-projector"
 version = "0.1.0"
 dependencies = [
+ "base64 0.22.1",
  "kammi-core",
  "kammi-jcs",
  "kammi-store",
  "lbug",
+ "serde_json",
 ]
 
 [[package]]

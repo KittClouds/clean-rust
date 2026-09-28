@@ -4,7 +4,10 @@
 //!   `KAMMI_SIGNING_KEY_FILE` (raw 32-byte Ed25519 seed), `KAMMI_ACCEPTANCE_MODE=1`;
 //! - `KAMMI_EMBEDDER` enables memory: `gemma300[:<model dir>]`, `jina-v5[:<model dir>]`,
 //!   `mdbr[:<model dir>]` (Phoenix ONNX runners) or `hashing:<dims>` (test embedder);
-//! - `KAMMI_SOURCE_DIR` overrides the source tree bound into the flight identity.
+//! - `KAMMI_SOURCE_DIR` overrides the source tree bound into the flight identity;
+//! - `KAMMI_PROJECTOR`: path to `kammi-projector` (default: beside this binary) or `off`;
+//!   `KAMMI_PROJECTION_DB` (default `<root>/projection/custody.lbdb`), `KAMMI_LBUG_NATIVE_DIR`
+//!   (Ladybug runtime DLLs), `KAMMI_PROJECTION_VERIFY=0` skips deep verification on start.
 
 #![allow(clippy::result_large_err)]
 
@@ -126,14 +129,28 @@ async fn serve() -> Result<(), Error> {
     let root = PathBuf::from(root);
     let started = std::time::Instant::now();
     let store = Store::open(&root, StoreOptions::default())?;
+    // A fixed clock makes differential runs mint identical identities on both sides. It
+    // would freeze lease and grant expiry, so it exists only in acceptance fixture mode.
+    let clock: Arc<dyn kammi_core::Clock> = match env("KAMMI_TEST_CLOCK") {
+        Some(at) if env("KAMMI_ACCEPTANCE_MODE").as_deref() == Some("1") => Arc::new(
+            kammi_core::ManualClock::new(kammi_core::time::parse_utc(&at)?),
+        ),
+        Some(_) => return Err("KAMMI_TEST_CLOCK requires KAMMI_ACCEPTANCE_MODE=1".into()),
+        None => Arc::new(SystemClock),
+    };
     let options = LedgerOptions {
-        clock: Arc::new(SystemClock),
+        clock,
         signing_key,
         embedder: embedder()?,
         flight: flight_identity()?,
         writer: kammi_core::obj! {"pid" => std::process::id(), "implementation" => "kammi-ledgerd"},
     };
-    let ledger = tokio::task::spawn_blocking(move || Ledger::open(store, options)).await??;
+    let dims = options.embedder.as_ref().map_or(384, |e| e.dimension());
+    let mut ledger = tokio::task::spawn_blocking(move || Ledger::open(store, options)).await??;
+    let projector = projector_config(&root, dims)?.map(kammi_ledgerd::projector::Projector::start);
+    if let Some(projector) = &projector {
+        ledger.set_memory_index(projector.clone());
+    }
     eprintln!(
         "kammi-ledgerd: replayed {} events in {:.2}s; flight {}",
         ledger.store.main.seq(),
@@ -145,6 +162,7 @@ async fn serve() -> Result<(), Error> {
         token,
         acceptance_mode: env("KAMMI_ACCEPTANCE_MODE").as_deref() == Some("1"),
         staging: root.join("staging"),
+        projector: projector.clone(),
     });
     let port: u16 = env("KAMMI_PORT")
         .map(|p| p.parse())
@@ -157,5 +175,41 @@ async fn serve() -> Result<(), Error> {
             let _ = tokio::signal::ctrl_c().await;
         })
         .await?;
+    if let Some(projector) = projector {
+        projector.stop();
+    }
     Ok(())
+}
+
+fn projector_config(
+    root: &Path,
+    memory_dims: usize,
+) -> Result<Option<kammi_ledgerd::projector::ProjectorConfig>, Error> {
+    let exe = match env("KAMMI_PROJECTOR") {
+        Some(value) if value.eq_ignore_ascii_case("off") => return Ok(None),
+        Some(path) => PathBuf::from(path),
+        None => std::env::current_exe()?.with_file_name("kammi-projector.exe"),
+    };
+    if !exe.is_file() {
+        eprintln!(
+            "kammi-ledgerd: projector {} not found; memory retrieval uses native indexes",
+            exe.display()
+        );
+        return Ok(None);
+    }
+    let native_dir = env("KAMMI_LBUG_NATIVE_DIR").map(PathBuf::from).or_else(|| {
+        let default = Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("../../../kammi-ledger/vendor/runtime-v1/native");
+        default.is_dir().then_some(default)
+    });
+    Ok(Some(kammi_ledgerd::projector::ProjectorConfig {
+        exe,
+        store: root.to_path_buf(),
+        db: env("KAMMI_PROJECTION_DB")
+            .map(PathBuf::from)
+            .unwrap_or_else(|| root.join("projection").join("custody.lbdb")),
+        memory_dims,
+        verify: env("KAMMI_PROJECTION_VERIFY").as_deref() != Some("0"),
+        native_dir,
+    }))
 }

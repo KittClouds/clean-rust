@@ -71,7 +71,29 @@ async fn status(State(app): State<App>, headers: HeaderMap) -> Response {
     done(
         async {
             authenticate(&app, &headers)?;
-            read(&app, StatusCode::BAD_REQUEST, |l| l.status()).await
+            let projector = app.projector.clone();
+            read(&app, StatusCode::BAD_REQUEST, move |l| {
+                let mut status = l.status()?;
+                if let Some(projector) = projector {
+                    // Python reports the Ladybug projection's own position; so does Rust.
+                    let block = projector.status(
+                        l.store.main.seq(),
+                        &l.store.main.head().to_string(),
+                        l.store.memory.seq(),
+                    );
+                    status["projection_seq"] = block["projection_seq"].clone();
+                    status["projection_head"] = block["projection_head"].clone();
+                    status["projection_lag"] = block["lag"].clone();
+                    if status["memory"]["enabled"] == true {
+                        status["memory"]["fts_rebuilds"] = block["memory"]["fts_rebuilds"].clone();
+                        status["memory"]["fts_pending_records"] =
+                            block["memory"]["fts_pending_records"].clone();
+                    }
+                    status["projection"] = block;
+                }
+                Ok(status)
+            })
+            .await
         }
         .await,
     )

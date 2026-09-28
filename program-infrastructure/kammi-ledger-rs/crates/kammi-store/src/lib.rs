@@ -27,7 +27,7 @@ mod store;
 
 pub use checkpoint::{Checkpoint, Checkpoints, Position};
 pub use error::{Result, StoreError};
-pub use follow::JournalFollower;
+pub use follow::{JournalFollower, ObjectReader};
 pub use idx::IdxRecord;
 pub use journal::{
     Journal, JournalOptions, JournalReport, NewEvent, StoredEvent, EVENT_FIELDS, EVENT_SCHEMA,

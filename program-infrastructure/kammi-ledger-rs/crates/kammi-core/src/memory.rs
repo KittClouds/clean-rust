@@ -32,6 +32,20 @@ pub const KINDS: [&str; 9] = [
 
 pub use crate::embed::{Embedder, Embeddings, Input, ModelIdentity, Role};
 
+/// The three retrieval channels of `/v1` memory search. The daemon serves them from the
+/// Ladybug projection (FTS and vector indexes, graph relationships) in the supervised
+/// projector, exactly as Python serves them from its `MemoryGraph`; the in-process native
+/// channels are the fallback for embedded use and tests. Every call carries the memory
+/// journal position the caller has committed, so answers always include its own writes.
+pub trait MemoryIndex: Send + Sync {
+    /// Top `count` lexical matches as (memory id, score), best first.
+    fn fts(&self, query: &str, count: usize, memory_seq: u64) -> Result<Vec<(String, f64)>>;
+    /// Top `count` vector matches as (memory id, similarity), best first.
+    fn vector(&self, vector: &[f32], count: usize, memory_seq: u64) -> Result<Vec<(String, f64)>>;
+    /// Memories sharing a tag or a custody reference with `identity`, sorted.
+    fn neighbors(&self, identity: &str, memory_seq: u64) -> Result<Vec<String>>;
+}
+
 pub fn pack_vector(vector: &[f32]) -> Vec<u8> {
     vector.iter().flat_map(|v| v.to_le_bytes()).collect()
 }
@@ -79,6 +93,8 @@ pub struct Memory {
     postings: HashMap<String, HashSet<String>>,
     total_length: u64,
     embedder: Arc<dyn Embedder>,
+    /// When set, retrieval channels come from the projection instead of native indexes.
+    index: Option<Arc<dyn MemoryIndex>>,
 }
 
 impl Memory {
@@ -91,6 +107,7 @@ impl Memory {
             postings: HashMap::new(),
             total_length: 0,
             embedder,
+            index: None,
         };
         for seq in 1..=ledger.store.memory.seq() {
             let stored = ledger.store.memory.read(seq)?;
@@ -168,6 +185,10 @@ impl Memory {
                 model,
             },
         );
+    }
+
+    pub fn set_index(&mut self, index: Arc<dyn MemoryIndex>) {
+        self.index = Some(index);
     }
 
     pub fn embedder_identity(&self) -> &str {
@@ -470,8 +491,11 @@ impl Ledger {
     pub fn memory_neighbors(&self, identity: &str) -> Result<Vec<Value>> {
         let memory = self.memory_ref()?;
         let scope = memory.view(identity)?["scope"].clone();
-        memory
-            .neighbors(identity)
+        let neighbors = match &memory.index {
+            Some(index) => index.neighbors(identity, self.store.memory.seq())?,
+            None => memory.neighbors(identity),
+        };
+        neighbors
             .into_iter()
             .map(|id| memory.view(&id))
             .filter(|v| v.as_ref().map_or(true, |v| v["scope"] == scope))
@@ -533,43 +557,64 @@ impl Ledger {
         let limit_usize = limit as usize;
         // Adaptive over-fetch: the ranks that fuse are positions in the fetched pool, which
         // may include ineligible records, exactly as in Python.
-        let filtered_pool = |full: Vec<(String, f64)>| -> Vec<(String, f64)> {
-            let mut count = maximum.min(32.max(limit_usize * 4));
-            loop {
-                let rows: Vec<(String, f64)> = full.iter().take(count).cloned().collect();
-                let enough = rows.iter().filter(|(id, _)| eligible(id)).count() >= limit_usize;
-                if enough || count == maximum || rows.len() < count {
-                    return rows;
+        // Python calls `fetch(count)` again with a doubled count; the index is asked again
+        // (not sliced) because approximate indexes and the FTS overlay may reorder.
+        let filtered_pool =
+            |fetch: &dyn Fn(usize) -> Result<Vec<(String, f64)>>| -> Result<Vec<(String, f64)>> {
+                let mut count = maximum.min(32.max(limit_usize * 4));
+                loop {
+                    let rows = fetch(count)?;
+                    let enough = rows
+                        .iter()
+                        .filter(|(id, _)| memory.records.contains_key(id.as_str()) && eligible(id))
+                        .count()
+                        >= limit_usize;
+                    if enough || count == maximum || rows.len() < count {
+                        return Ok(rows);
+                    }
+                    count = maximum.min(count * 2);
                 }
-                count = maximum.min(count * 2);
-            }
-        };
+            };
+        let memory_seq = self.store.memory.seq();
         let mut lists: Vec<(&str, Vec<(String, f64)>)> = Vec::new();
         if !memory.records.is_empty() && matches!(mode, "fts" | "hybrid") {
-            lists.push(("fts", filtered_pool(memory.fts(query))));
+            let rows = match &memory.index {
+                Some(index) => filtered_pool(&|count| index.fts(query, count, memory_seq))?,
+                None => {
+                    let full = memory.fts(query);
+                    filtered_pool(&|count| Ok(full.iter().take(count).cloned().collect()))?
+                }
+            };
+            lists.push(("fts", rows));
         }
         if !memory.records.is_empty() && matches!(mode, "vector" | "hybrid") {
             let query_vector = memory
                 .embedder
                 .embed_one(Input::query(query))
                 .map_err(LedgerError::Value)?;
-            lists.push(("vector", filtered_pool(memory.vector(&query_vector))));
+            let rows = match &memory.index {
+                Some(index) => {
+                    filtered_pool(&|count| index.vector(&query_vector, count, memory_seq))?
+                }
+                None => {
+                    let full = memory.vector(&query_vector);
+                    filtered_pool(&|count| Ok(full.iter().take(count).cloned().collect()))?
+                }
+            };
+            lists.push(("vector", rows));
         }
         if let Some(seed) = seed_memory.filter(|_| matches!(mode, "graph" | "hybrid")) {
             memory.view(seed)?;
-            lists.push((
-                "graph",
-                memory
-                    .neighbors(seed)
-                    .into_iter()
-                    .map(|id| (id, 1.0))
-                    .collect(),
-            ));
+            let neighbors = match &memory.index {
+                Some(index) => index.neighbors(seed, memory_seq)?,
+                None => memory.neighbors(seed),
+            };
+            lists.push(("graph", neighbors.into_iter().map(|id| (id, 1.0)).collect()));
         }
         let mut scores: IndexMap<String, (f64, kammi_jcs::Map<String, Value>)> = IndexMap::new();
         for (surface, rows) in &lists {
             for (rank, (identity, score)) in rows.iter().enumerate() {
-                if eligible(identity) {
+                if memory.records.contains_key(identity.as_str()) && eligible(identity) {
                     let entry = scores
                         .entry(identity.clone())
                         .or_insert((0.0, kammi_jcs::Map::new()));

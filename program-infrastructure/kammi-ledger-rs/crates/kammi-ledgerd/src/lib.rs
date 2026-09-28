@@ -4,6 +4,7 @@
 
 #![allow(clippy::result_large_err)]
 
+pub mod projector;
 mod routes_access;
 mod routes_custody;
 mod routes_local;
@@ -39,6 +40,8 @@ pub struct AppState {
     pub acceptance_mode: bool,
     /// Where streamed uploads land before they enter CAS.
     pub staging: PathBuf,
+    /// The supervised Ladybug projection, when enabled.
+    pub projector: Option<Arc<projector::Projector>>,
 }
 
 pub type App = Arc<AppState>;
@@ -108,6 +111,9 @@ pub fn detail(status: StatusCode, detail: impl Into<Value>) -> Response {
 /// Maps a domain error the way a Python route's `except (ValueError, KeyError, TypeError)`
 /// does; anything else is an unhandled 500.
 pub fn ledger_error(error: LedgerError, status: StatusCode) -> Response {
+    if let LedgerError::Unavailable(message) = &error {
+        return detail(StatusCode::SERVICE_UNAVAILABLE, message.clone());
+    }
     if error.is_client() {
         detail(status, error.detail())
     } else {

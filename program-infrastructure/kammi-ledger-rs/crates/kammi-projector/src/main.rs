@@ -14,11 +14,14 @@
 //! never a mix. A database that fails to open (for example a WAL that will not replay) is
 //! moved to `quarantine/` and rebuilt from genesis.
 
+mod memory;
+mod serve;
+
 use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
 
 use kammi_jcs::{strict_json, Sha256Id, Value as Json};
-use kammi_store::JournalFollower;
+use kammi_store::{JournalFollower, ObjectReader};
 use lbug::{Connection, Database, SystemConfig, Value};
 
 type Error = Box<dyn std::error::Error + Send + Sync>;
@@ -108,11 +111,48 @@ struct Graph<'db> {
     /// Compiled once per statement text; the projection reuses a small fixed set.
     statements:
         std::cell::RefCell<std::collections::HashMap<&'static str, lbug::PreparedStatement>>,
+    /// Python `MemoryGraph` per-process lexical state.
+    memory: std::cell::RefCell<memory::MemoryState>,
+}
+
+/// Every table the projection declares (dumps ignore engine-internal index tables).
+fn known_tables() -> Vec<&'static str> {
+    let mut names: Vec<&'static str> = DDL
+        .iter()
+        .map(|ddl| {
+            let rest = ddl.split("EXISTS ").nth(1).unwrap_or("");
+            &rest[..rest.find('(').unwrap_or(rest.len())]
+        })
+        .collect();
+    names.extend_from_slice(memory::MEMORY_TABLES);
+    names
+}
+
+/// The qualified FTS and vector extensions (`KAMMI_EXTENSION_DIR`, else the pinned runtime).
+fn extension_dir() -> PathBuf {
+    std::env::var_os("KAMMI_EXTENSION_DIR")
+        .map(PathBuf::from)
+        .unwrap_or_else(|| {
+            Path::new(env!("CARGO_MANIFEST_DIR"))
+                .join("../../../kammi-ledger/vendor/runtime-v1/extensions")
+        })
 }
 
 impl<'db> Graph<'db> {
-    fn new(db: &'db Database) -> Result<Self, Error> {
+    fn new(db: &'db Database, memory_dims: usize) -> Result<Self, Error> {
         let conn = Connection::new(db)?;
+        for extension in ["fts", "vector"] {
+            let path = extension_dir()
+                .join(extension)
+                .join(format!("lib{extension}.lbug_extension"));
+            let path =
+                std::fs::canonicalize(&path).map_err(|e| format!("{}: {e}", path.display()))?;
+            let text = path
+                .to_string_lossy()
+                .trim_start_matches(r"\\?\")
+                .replace('\\', "/");
+            conn.query(&format!("LOAD EXTENSION '{}'", text.replace('\'', "\\'")))?;
+        }
         for ddl in DDL {
             conn.query(ddl)?;
         }
@@ -126,10 +166,13 @@ impl<'db> Graph<'db> {
                 Sha256Id::ZERO
             ))?;
         }
-        Ok(Graph {
+        let graph = Graph {
             conn,
             statements: Default::default(),
-        })
+            memory: Default::default(),
+        };
+        graph.init_memory(memory_dims)?;
+        Ok(graph)
     }
 
     fn run(&self, query: &'static str, params: Vec<(&str, Value)>) -> Result<(), Error> {
@@ -476,6 +519,9 @@ impl<'db> Graph<'db> {
             let (Value::String(name), Value::String(kind)) = (&table[0], &table[1]) else {
                 continue;
             };
+            if !known_tables().contains(&name.as_str()) {
+                continue;
+            }
             let props: Vec<String> = self
                 .conn
                 .query(&format!("CALL TABLE_INFO('{name}') RETURN name"))?
@@ -549,10 +595,13 @@ impl<'db> Graph<'db> {
     }
 }
 
+/// Python's projection settings (`projection_runtime.py`: 256 MiB pool, 2 threads). The
+/// thread count is part of search parity: BM25 aggregation order follows it, and a 4-thread
+/// pool changed FTS scores in the last bit, which changes search receipts and the chain.
 fn config() -> SystemConfig {
     SystemConfig::default()
         .buffer_pool_size(256 << 20)
-        .max_num_threads(4)
+        .max_num_threads(2)
         .throw_on_wal_replay_failure(true)
         .enable_checksums(true)
 }
@@ -573,12 +622,23 @@ fn open(db_path: &Path) -> Result<Database, Error> {
 /// silently), so content is checked against a fresh derivation. Returns tables compared.
 fn deep_verify(graph: &Graph, store: &Path) -> Result<usize, Error> {
     let target = graph.position()?.0;
+    let memory_target = graph.memory_position()?.0;
     let fresh = Database::in_memory(
         SystemConfig::default()
             .buffer_pool_size(256 << 20)
-            .max_num_threads(4),
+            .max_num_threads(2),
     )?;
-    let expected = Graph::new(&fresh)?;
+    let expected = Graph::new(&fresh, graph.memory.borrow().dims)?;
+    let mut objects = ObjectReader::new(store);
+    let mut memory = JournalFollower::new(store, "memory");
+    while memory.seq() < memory_target {
+        let want = usize::try_from(memory_target - memory.seq())
+            .unwrap_or(usize::MAX)
+            .min(4096);
+        if expected.step_memory(&mut memory, &mut objects, want)? == 0 {
+            return Err("memory journal is shorter than the projection position".into());
+        }
+    }
     let mut follower = JournalFollower::new(store, "main");
     while follower.seq() < target {
         let want = usize::try_from(target - follower.seq())
@@ -602,8 +662,49 @@ fn deep_verify(graph: &Graph, store: &Path) -> Result<usize, Error> {
     Ok(wanted.len())
 }
 
+/// Last deep verification and last quarantine, kept beside the projection so they survive
+/// projector restarts (`<db>.health.json`).
+#[derive(Default)]
+pub struct Health {
+    pub last_verify: Json,
+    pub last_quarantine: Json,
+}
+
+fn health_path(db_path: &Path) -> PathBuf {
+    PathBuf::from(format!("{}.health.json", db_path.display()))
+}
+
+fn now_utc() -> String {
+    use kammi_core::Clock;
+    kammi_core::SystemClock.now().isoformat()
+}
+
+impl Health {
+    fn load(db_path: &Path) -> Health {
+        let value: Json = std::fs::read(health_path(db_path))
+            .ok()
+            .and_then(|b| serde_json::from_slice(&b).ok())
+            .unwrap_or(Json::Null);
+        Health {
+            last_verify: value["last_verify"].clone(),
+            last_quarantine: value["last_quarantine"].clone(),
+        }
+    }
+
+    fn save(&self, db_path: &Path) -> Result<(), Error> {
+        let value = kammi_core::obj! {"last_verify" => self.last_verify.clone(), "last_quarantine" => self.last_quarantine.clone()};
+        let temp = PathBuf::from(format!("{}.tmp", health_path(db_path).display()));
+        std::fs::write(&temp, value.to_string())?;
+        std::fs::rename(&temp, health_path(db_path))?;
+        Ok(())
+    }
+}
+
 /// Moves an existing projection aside (it is derived data; authority is untouched).
 fn quarantine(db_path: &Path, reason: &str) -> Result<(), Error> {
+    let mut health = Health::load(db_path);
+    health.last_quarantine = kammi_core::obj! {"utc" => now_utc(), "reason" => reason};
+    health.save(db_path)?;
     let quarantine = db_path
         .parent()
         .unwrap_or(Path::new("."))
@@ -630,30 +731,99 @@ fn flag(args: &[String], name: &str) -> Option<String> {
     args.windows(2).find(|w| w[0] == name).map(|w| w[1].clone())
 }
 
+/// Takes the OS lock `<db>.lock`, waiting up to `limit` for a previous owner to exit.
+fn lock_projection(db_path: &Path, limit: Duration) -> Result<std::fs::File, Error> {
+    let path = PathBuf::from(format!("{}.lock", db_path.display()));
+    let file = std::fs::OpenOptions::new()
+        .create(true)
+        .truncate(false)
+        .write(true)
+        .open(&path)?;
+    let deadline = Instant::now() + limit;
+    loop {
+        match file.try_lock() {
+            Ok(()) => return Ok(file),
+            Err(std::fs::TryLockError::WouldBlock) if Instant::now() < deadline => {
+                std::thread::sleep(Duration::from_millis(100))
+            }
+            Err(e) => {
+                return Err(format!(
+                    "projection {} is owned by another projector: {e:?}",
+                    db_path.display()
+                )
+                .into())
+            }
+        }
+    }
+}
+
+/// Verifies an existing projection (quick scan plus deep re-derivation); quarantines it on
+/// failure. Records the outcome in the health file.
+fn verify_or_quarantine(db_path: &Path, store: &Path, dims: usize) -> Result<(), Error> {
+    if !db_path.exists() {
+        return Ok(());
+    }
+    let started = Instant::now();
+    let failure = {
+        let db = open(db_path)?;
+        let graph = Graph::new(&db, dims)?;
+        graph
+            .verify(store)
+            .and_then(|_| deep_verify(&graph, store))
+            .err()
+            .map(|e| e.to_string())
+    };
+    let mut health = Health::load(db_path);
+    health.last_verify = kammi_core::obj! {
+        "utc" => now_utc(), "ok" => failure.is_none(), "seconds" => started.elapsed().as_secs_f64(),
+        "detail" => failure.clone().map_or(Json::Null, Json::from),
+    };
+    health.save(db_path)?;
+    if let Some(reason) = failure {
+        quarantine(db_path, &format!("verification failed: {reason}"))?;
+    }
+    Ok(())
+}
+
 fn main() -> Result<(), Error> {
     let args: Vec<String> = std::env::args().collect();
     let command = args.get(1).map(String::as_str).unwrap_or("");
     let db_path = PathBuf::from(flag(&args, "--db").ok_or("--db required")?);
-    if command == "project" && args.iter().any(|a| a == "--verify") && db_path.exists() {
-        let store = PathBuf::from(flag(&args, "--store").ok_or("--store required")?);
-        let failure = {
-            let db = open(&db_path)?;
-            let graph = Graph::new(&db)?;
-            graph
-                .verify(&store)
-                .and_then(|_| deep_verify(&graph, &store))
-                .err()
-                .map(|e| e.to_string())
-        };
-        if let Some(reason) = failure {
-            quarantine(&db_path, &format!("verification failed: {reason}"))?;
-        }
+    let dims: usize = flag(&args, "--memory-dims")
+        .map(|d| d.parse())
+        .transpose()?
+        .unwrap_or(384);
+    let store = flag(&args, "--store").map(PathBuf::from);
+    if let Some(parent) = db_path.parent() {
+        std::fs::create_dir_all(parent)?;
+    }
+    // One projector per database: a restarted daemon's new projector waits for the previous
+    // one (which exits when its stdin closes) instead of racing it on the same files.
+    let _owner = lock_projection(&db_path, Duration::from_secs(120))?;
+    if matches!(command, "project" | "serve") && args.iter().any(|a| a == "--verify") {
+        verify_or_quarantine(&db_path, store.as_deref().ok_or("--store required")?, dims)?;
+    }
+    if let Some(parent) = db_path.parent() {
+        std::fs::create_dir_all(parent)?;
     }
     let db = open(&db_path)?;
-    let graph = Graph::new(&db)?;
+    let graph = Graph::new(&db, dims)?;
     match command {
+        "serve" => {
+            let store = store.ok_or("--store required")?;
+            let (main, memory) = serve::followers(&graph, &store)?;
+            let mut server = serve::Server {
+                graph: &graph,
+                main,
+                memory,
+                objects: ObjectReader::new(&store),
+                health: Health::load(&db_path),
+                started: Instant::now(),
+            };
+            server.run()?;
+        }
         "verify" => {
-            let store = PathBuf::from(flag(&args, "--store").ok_or("--store required")?);
+            let store = store.ok_or("--store required")?;
             let mut report = graph.verify(&store)?;
             if args.iter().any(|a| a == "--deep") {
                 let started = Instant::now();
@@ -666,17 +836,18 @@ fn main() -> Result<(), Error> {
             println!("{report}");
         }
         "project" => {
-            let store = PathBuf::from(flag(&args, "--store").ok_or("--store required")?);
+            let store = store.ok_or("--store required")?;
             let batch: usize = flag(&args, "--batch")
                 .map(|b| b.parse())
                 .transpose()?
                 .unwrap_or(256);
-            let (seq, head) = graph.position()?;
-            let mut follower = JournalFollower::resume(&store, "main", seq, head);
+            let (mut follower, mut memory) = serve::followers(&graph, &store)?;
+            let mut objects = ObjectReader::new(&store);
             let started = Instant::now();
             let mut total = 0;
             loop {
-                let applied = graph.step(&mut follower, batch)?;
+                let applied = graph.step(&mut follower, batch)?
+                    + graph.step_memory(&mut memory, &mut objects, batch)?;
                 total += applied;
                 if applied == 0 {
                     if !args.iter().any(|a| a == "--follow") {
@@ -690,16 +861,57 @@ fn main() -> Result<(), Error> {
                 "{}",
                 kammi_core::obj! {
                     "projected" => total, "seconds" => elapsed, "events_per_second" => if elapsed > 0.0 { total as f64 / elapsed } else { 0.0 },
-                    "seq" => follower.seq(), "head" => follower.head().to_string(), "counts" => graph.counts()?,
+                    "seq" => follower.seq(), "head" => follower.head().to_string(), "memory_seq" => memory.seq(),
+                    "counts" => graph.counts()?, "memory" => graph.memory_counts()?,
                 }
             );
         }
         "counts" => println!("{}", graph.counts()?),
+        // Diagnostic: raw FTS rows through this binding (no overlay, no index rebuild).
+        "fts" => {
+            let query = flag(&args, "--query").ok_or("--query required")?;
+            let count: i64 = flag(&args, "--count")
+                .map(|c| c.parse())
+                .transpose()?
+                .unwrap_or(40);
+            if args.iter().any(|a| a == "--rebuild") {
+                if graph.memory.borrow().fts_exists {
+                    graph
+                        .conn
+                        .query("CALL DROP_FTS_INDEX('Memory', 'memory_text')")?;
+                }
+                graph.conn.query(
+                    "CALL CREATE_FTS_INDEX('Memory', 'memory_text', ['text'], stemmer := 'none')",
+                )?;
+            }
+            let mut statement = graph.conn.prepare("CALL QUERY_FTS_INDEX('Memory', 'memory_text', $query, TOP := $count) RETURN node.id, score ORDER BY score DESC, node.id")?;
+            let rows: Vec<Json> = graph
+                .conn
+                .execute(
+                    &mut statement,
+                    vec![
+                        ("query", Value::String(query)),
+                        ("count", Value::Int64(count)),
+                    ],
+                )?
+                .map(|row| {
+                    Json::from(vec![
+                        Json::from(format!("{:?}", row[0])),
+                        Json::from(format!("{:?}", row[1])),
+                    ])
+                })
+                .collect();
+            println!("{}", Json::from(rows));
+        }
         "history" => println!(
             "{}",
             graph.history(&flag(&args, "--run").ok_or("--run required")?)?
         ),
-        _ => return Err("usage: kammi-projector project|counts|history --db <path> ...".into()),
+        _ => {
+            return Err(
+                "usage: kammi-projector serve|project|verify|counts|history --db <path> ...".into(),
+            )
+        }
     }
     Ok(())
 }
