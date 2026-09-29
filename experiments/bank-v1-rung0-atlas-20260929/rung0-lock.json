@@ -1,0 +1,362 @@
+{
+  "artifacts": [
+    {
+      "path": "D:/phoenix-target-overgraph/bank-v1-surface-extremes-20260929/source-lock.json",
+      "role": "surface input and BANK identity lock",
+      "sha256": "c9b9443926cf8344f7797b076bbfcc9717b8f117a6a151d1e361595dcd88446d"
+    },
+    {
+      "path": "D:/phoenix-target-overgraph/bank-v1-surface-extremes-20260929/features/extraction-seal.json",
+      "role": "surface extraction receipt and primitive-cache hashes",
+      "sha256": "d31c7c9902fe154c653dbbe62acda29aeed1dfb7ab8b2279152972bf5cfae955"
+    },
+    {
+      "path": "D:/phoenix-target-overgraph/bank-v1-surface-extremes-20260929/all-surfaces-prediction-seal.json",
+      "role": "all-ten-surface prediction seal; truth joined only after predictions sealed",
+      "sha256": "876984c304723fbb4bbb29c157444bd3933f6b4c6bbcd6ebb9ba32edcaa3b613"
+    },
+    {
+      "path": "D:/phoenix-target-overgraph/bank-v1-surface-extremes-20260929/surface-score.json",
+      "role": "surface sweep scored results",
+      "sha256": "bd9ad0a50a20f6155090bedbc2e0aabe2f1eb3dec8e96f354149a37e4ba87faf"
+    },
+    {
+      "path": "D:/phoenix-target-overgraph/bank-v1-graph-capability-appendix-20260929/graph-capability-results.json",
+      "role": "cached graph readout results",
+      "sha256": "872dcd286046e4855539ccd057979f3dbb91ae879591735106b69106c5d44abf"
+    },
+    {
+      "path": "D:/phoenix-target-overgraph/bank-v1-graph-capability-appendix-20260929/models/middle_plus_final-linear.pt",
+      "role": "graph readout weights: midpoint plus final, linear",
+      "sha256": "be81c6db1281df05c98d1c0dc604af66b3b8fd7d940bf9185d84a518ecc72d21"
+    },
+    {
+      "path": "D:/phoenix-target-overgraph/bank-v1-graph-capability-appendix-20260929/models/middle_plus_final-tiny_mlp.pt",
+      "role": "graph readout weights: midpoint plus final, tiny MLP",
+      "sha256": "1a7725b95f026f4e10a702bf63cd0b79751e2f82cce3b28ee6f0c6b9b8f04bab"
+    },
+    {
+      "path": "D:/phoenix-target-overgraph/bank-v1-graph-capability-appendix-20260929/models/final_plus_mean-linear.pt",
+      "role": "graph readout weights: final plus mean, linear",
+      "sha256": "f040cb091549f60cad4a5a01d2ec4723e734670ab43c8ebafd27da30e9bbd49e"
+    },
+    {
+      "path": "D:/phoenix-target-overgraph/bank-v1-graph-capability-appendix-20260929/models/final_plus_mean-tiny_mlp.pt",
+      "role": "graph readout weights: final plus mean, tiny MLP",
+      "sha256": "d73a17cafc4c9ed41b819e2d0496b730977d879e8d21d66d796ae90a9b878abc"
+    },
+    {
+      "path": "D:/phoenix-target-overgraph/bank-v1-graph-capability-appendix-20260929/models/layer_m4_final-linear.pt",
+      "role": "graph readout weights: layer minus four, linear",
+      "sha256": "152c11ca7606d1305151e75dd3d6795c274ec71e7e24d6aa447786f366041099"
+    },
+    {
+      "path": "D:/phoenix-target-overgraph/bank-v1-graph-capability-appendix-20260929/models/layer_m4_final-tiny_mlp.pt",
+      "role": "graph readout weights: layer minus four, tiny MLP",
+      "sha256": "af2c6eaf2fe2d5e62dfa7a4e6328a0d6e0d5cd042f222958e43176b36bd9286a"
+    },
+    {
+      "path": "D:/phoenix-target-overgraph/bank-v1-graph-capability-appendix-20260929/models/full_mean-linear.pt",
+      "role": "graph readout weights: full mean, linear",
+      "sha256": "7d565a9dcbb30c4eab3d591e54c3adebef9c440d24b5516630ba1173ccf186be"
+    },
+    {
+      "path": "D:/phoenix-target-overgraph/bank-v1-graph-capability-appendix-20260929/models/full_mean-tiny_mlp.pt",
+      "role": "graph readout weights: full mean, tiny MLP",
+      "sha256": "9be45c8550af2b1eb1b28503ca68ca58a36f155139f31ea865d25b23101d410a"
+    }
+  ],
+  "backbone": {
+    "config_sha256": "f7d0bcc454b7a30fa471b1e7b9e359e11fb25b56f5b4ffd59bb18248e3c2ea3d",
+    "fine_tuning": false,
+    "generation": false,
+    "name": "LFM2.5-230M-Base",
+    "revision_path": "D:/phoenix-models/lfm2.5-230m-base-9d2be55",
+    "tokenizer_sha256": "df1d8d5ec5d091b460562ffd545e4a5e91d17d4a0db7ebe733be34ed374377bd",
+    "weights_sha256": "e91eb22c0aeae0bcbea8ade56f5cfe3cf91bca0c34e859adacae8f4445416fe6"
+  },
+  "bank": {
+    "graph_primary_world_rows": {
+      "DEV": 20000,
+      "TEST": 40000,
+      "TRAIN": 120000
+    },
+    "input_rows": 215996,
+    "manifest_sha256": "cb51aac13052c72388a826496badc1445894be5347a70f97c4b5430185516417",
+    "release": "BANK-v1",
+    "root": "C:/code land/clean-rust/experiments/ff-s15-bank-01/releases/BANK-v1",
+    "rowmap_sha256": "86282fadbb5eb2cac1db816ee4681b43bd39166dd5fd94a373fc2f452fa13da4",
+    "surface_primary_world_rows": {
+      "DEV": 24000,
+      "TEST_CANONICAL": 40000,
+      "TEST_PAIRED_RENDERERS": 8000,
+      "TRAIN": 143996
+    }
+  },
+  "cached_primitives": [
+    {
+      "name": "final_token",
+      "path": "D:/phoenix-target-overgraph/bank-v1-surface-extremes-20260929/features/final_token.npy",
+      "sha256": "f98916ba5ce18a56d124c7c250abc3cc3e1b13b16a33823a22483da5e6198351"
+    },
+    {
+      "name": "first_token",
+      "path": "D:/phoenix-target-overgraph/bank-v1-surface-extremes-20260929/features/first_token.npy",
+      "sha256": "f133ed8c74ffe2bd87f19ca56764a0f69767573686a04e56366ec5b881d3a99e"
+    },
+    {
+      "name": "full_mean",
+      "path": "D:/phoenix-target-overgraph/bank-v1-surface-extremes-20260929/features/full_mean.npy",
+      "sha256": "145d605f4fd6e3297869244de2e0c34353a7193f0d7668b83ccf619dc29d4d6a"
+    },
+    {
+      "name": "layer_m4_final",
+      "path": "D:/phoenix-target-overgraph/bank-v1-surface-extremes-20260929/features/layer_m4_final.npy",
+      "sha256": "d46a7faeae0eb9594b2a255511e70b88b2c246d1c02e52e0dc1a51e181ba7cab"
+    },
+    {
+      "name": "middle_final",
+      "path": "D:/phoenix-target-overgraph/bank-v1-surface-extremes-20260929/features/middle_final.npy",
+      "sha256": "31d5cf3bd719f327294dc110cc0bc543cce9b0db67858be7c227d47b47520a77"
+    }
+  ],
+  "fixed_task_definitions": {
+    "graph_appendix": {
+      "entity_type_presence": [
+        "OBJECT",
+        "AGENT",
+        "LOCATION",
+        "SWITCH",
+        "CONTAINER",
+        "RESOURCE"
+      ],
+      "goal_path_distance": {
+        "classes": [
+          "ALREADY_AT_GOAL",
+          "ONE_HOP",
+          "MULTI_HOP",
+          "DISCONNECTED"
+        ],
+        "definition": "For an unambiguous OBJECT AT goal with one initial AT origin, shortest undirected CONNECTED-path length from origin to destination; bucket exact 0, exact 1, 2+, or disconnected."
+      },
+      "granularity_limit": "Whole rendered row/world only. No node-, edge-, neighbor-, or candidate-link prediction is included in Rung 0.",
+      "relation_type_presence": [
+        "AT",
+        "HAS",
+        "CONNECTED",
+        "REQUIRES",
+        "STATE",
+        "BLOCKED",
+        "ENABLES",
+        "BEFORE",
+        "PART_OF",
+        "OWNS"
+      ],
+      "state_value_presence": [
+        "ACTIVE",
+        "INACTIVE"
+      ]
+    },
+    "surface_sweep": {
+      "abstain_reason": [
+        "INSUFFICIENT_EVIDENCE",
+        "CONFLICTING_EVIDENCE",
+        "UNKNOWN_ENTITY",
+        "UNKNOWN_TARGET",
+        "MISSING_ARGUMENT",
+        "NO_VALID_ACTION",
+        "IMPOSSIBLE_GOAL",
+        "AMBIGUOUS_REFERENCE",
+        "MULTIPLE_UNRESOLVED_ACTIONS",
+        "PRECONDITION_UNKNOWN",
+        "OUT_OF_SCOPE"
+      ],
+      "action_type": [
+        "MOVE",
+        "ACTIVATE",
+        "DEACTIVATE",
+        "TAKE",
+        "DROP",
+        "TRANSFER",
+        "OPEN",
+        "CLOSE",
+        "SELECT",
+        "ASSIGN",
+        "REQUEST",
+        "VERIFY",
+        "WAIT",
+        "NOOP"
+      ],
+      "decision": [
+        "ACT",
+        "ASK",
+        "ABSTAIN"
+      ],
+      "entity_types": [
+        "OBJECT",
+        "AGENT",
+        "LOCATION",
+        "SWITCH",
+        "CONTAINER",
+        "RESOURCE"
+      ],
+      "evidence_predicates": [
+        "AT",
+        "HAS",
+        "CONNECTED",
+        "REQUIRES",
+        "STATE",
+        "BLOCKED",
+        "ENABLES",
+        "BEFORE",
+        "PART_OF",
+        "OWNS"
+      ],
+      "nli": [
+        "ENTAILED",
+        "CONTRADICTED",
+        "UNKNOWN"
+      ],
+      "relation_predicates": [
+        "AT",
+        "HAS",
+        "CONNECTED",
+        "REQUIRES",
+        "STATE",
+        "BLOCKED",
+        "ENABLES",
+        "BEFORE",
+        "PART_OF",
+        "OWNS"
+      ],
+      "state_predicates": [
+        "AT",
+        "HAS",
+        "CONNECTED",
+        "REQUIRES",
+        "STATE",
+        "BLOCKED",
+        "ENABLES",
+        "BEFORE",
+        "PART_OF",
+        "OWNS"
+      ]
+    }
+  },
+  "locked_on": "2026-09-29",
+  "negative_control": {
+    "display": "first non-padding token",
+    "id": "first_token",
+    "reason": "near-constant vectors and weak task performance despite perfect renderer invariance; retain as a negative control, never as a candidate surface",
+    "status": "DEAD_CONTROL"
+  },
+  "readout_contract": {
+    "graph_appendix": "Four selected surfaces; train-only population mean/std; linear and 256-hidden-unit MLP readouts; AdamW, 8 epochs, batch 2048, learning rate 0.001, weight decay 0.0001, seed 20260929.",
+    "graph_appendix_scoring_worlds": 20000,
+    "graph_appendix_test_partitions": [
+      "TEST-IID",
+      "TEST-LEXICAL",
+      "TEST-ENTITY",
+      "TEST-TEMPLATE",
+      "TEST-COMPOSITION",
+      "TEST-DEPTH",
+      "TEST-ABSTENTION",
+      "TEST-JOINT"
+    ],
+    "graph_appendix_training_worlds": 120000,
+    "surface_sweep": "Frozen 230M backbone; one extracted row cache; same train-only standardization and linear typed heads, seed 20260929; no per-surface feature or threshold tuning."
+  },
+  "reproducibility_gate": {
+    "interpretation": "The immutable result receipts, prediction seal, extraction seal, BANK identity, model identity, fixed task enums, and source-code hashes are bound below. This gate verifies the cached Rung 0 artifacts; it does not claim external qualification.",
+    "status": "PASS_HASH_BOUND_CACHED_SCORES_AND_FIXED_TASKS"
+  },
+  "rung": 0,
+  "schema": "phoenix.bank-v1-rung0-atlas-lock/v1",
+  "scope": "230M BANK-v1 surface sweep plus cached-vector graph-capability appendix",
+  "selected_surfaces": [
+    {
+      "display": "midpoint + final token",
+      "id": "middle_plus_final",
+      "role": "primary decision/router reference"
+    },
+    {
+      "display": "final token + full token mean",
+      "id": "final_plus_mean",
+      "role": "complementary decision/abstention reference"
+    },
+    {
+      "display": "layer minus four, final token",
+      "id": "layer_m4_final",
+      "role": "intermediate-layer NLI reference"
+    },
+    {
+      "display": "full token mean",
+      "id": "full_mean",
+      "role": "ABSTAIN-specialist reference"
+    }
+  ],
+  "source_commit": "13796d7f60707a7ee2c681a55d02517c70bce16b",
+  "source_files": [
+    {
+      "path": "experiments/bank-v1-surface-extremes-20260929/README.md",
+      "sha256": "44b273fb67eb16acd11101aca8efa225f3edef82ca3c8ea8a7844cfd5322b519"
+    },
+    {
+      "path": "experiments/bank-v1-surface-extremes-20260929/common.py",
+      "sha256": "b8fa7e13d95a3a7f34f1ac38b19c6d12f1266cdfada1485a3030b9a9d6337f41"
+    },
+    {
+      "path": "experiments/bank-v1-surface-extremes-20260929/fit_predict.py",
+      "sha256": "6c2873f02da50c2bfa93f589e94d6a10ed03773fbdf278cba1d37b8abc7ef7ac"
+    },
+    {
+      "path": "experiments/bank-v1-surface-extremes-20260929/score.py",
+      "sha256": "d3cc9cc9397aeb1c806c39446a85cf7548263fd6f56d1bf1d846d61c4606e78d"
+    },
+    {
+      "path": "experiments/bank-v1-graph-capability-appendix-20260929/README.md",
+      "sha256": "7308c97067b12afbf45067b55627590447eec05128f1c581cb43373217f920e0"
+    },
+    {
+      "path": "experiments/bank-v1-graph-capability-appendix-20260929/graph_targets.py",
+      "sha256": "58bae4d88f200b2492071d025cb861ed87d82a41d3f895872a5dc52305f4c16f"
+    },
+    {
+      "path": "experiments/bank-v1-graph-capability-appendix-20260929/run_appendix.py",
+      "sha256": "be71515618629895bd4eb2ab92c5659efbd6900673dd942ab2d2d93a0b8af6e8"
+    },
+    {
+      "path": "experiments/bank-v1-graph-capability-appendix-20260929/tests/test_graph_targets.py",
+      "sha256": "813afd1ede740eb6c4ba1eed2ee9dc5671d205b052c026492796eba0563cf89d"
+    },
+    {
+      "path": "experiments/bank-v1-surface-extremes-20260929/extract.py",
+      "sha256": "1719179777a96a39410b01097ab846db3e1fe391129b1d6991597d916c3549b5"
+    },
+    {
+      "path": "experiments/bank-v1-surface-extremes-20260929/RESULTS.md",
+      "sha256": "108325e6a387f957bb64224c6c94a7eb3c56183a21074713058d4dba6b3f224f"
+    },
+    {
+      "path": "experiments/bank-v1-surface-extremes-20260929/tests/test_contract.py",
+      "sha256": "7ef98881d1af034dd7b59c8d4ca64bdb9d1039934f7145744256d0642e31414c"
+    },
+    {
+      "path": "experiments/bank-v1-graph-capability-appendix-20260929/RESULTS.md",
+      "sha256": "625aeb816d08d6366a107af08a9596e8c9772b26591b83d5befe622125d48214"
+    },
+    {
+      "path": "experiments/bank-v1-rung0-atlas-20260929/verify_rung0_lock.py",
+      "sha256": "dc114d52989054aeac611edb1fa576d66819ebf103fd97dbbd81d69496a6cb8b"
+    },
+    {
+      "path": "experiments/bank-v1-rung0-atlas-20260929/README.md",
+      "sha256": "f1f7ab0ac144038a45481b5a7afcdbb4dc4495522640756b48ae0041465e037b"
+    }
+  ],
+  "status": "LOCKED_ENGINEERING_BASELINE",
+  "surface_search_policy": {
+    "rule": "Do not repeat or expand the ten-surface sweep unless a later rung states a concrete capability-specific hypothesis and names the additional surface before scoring.",
+    "status": "CLOSED_AT_RUNG_0"
+  }
+}
