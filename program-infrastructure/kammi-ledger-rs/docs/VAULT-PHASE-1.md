@@ -38,7 +38,7 @@ Stress with workspace traffic (Gate 1, item 4):
 | Claude app subagents | Verified | **3/3**. The three agents ran concurrently, so real 409s occurred and were recovered by re-reading `work`. Two runs were interrupted by an account rate limit and resumed as the same agents |
 | llama.cpp (`D:\phoenix-runtimes\llama.cpp\b10982`) | Verified end to end: tool calls executed through `kammi-mcp` and recorded | MiniCPM5-2B: 0/3. The model stops early. Not counted |
 | OpenRouter | Adapter ready (OpenAI-compatible) | Unverified: no key configured |
-| Codex app (bundled `codex exec`) | Adapter ready, behind `--accept-codex-account-use` | Unverified: a scored run would spend Codex account quota |
+| Codex app (bundled `codex exec`, `gpt-6-sol`, medium effort) | Verified, on the released binaries | **3/3**, about 97k tokens for the three. The first attempt did nothing: `--ignore-user-config` also dropped the user's `[windows] sandbox = "elevated"`, so Codex ran read-only and refused to launch any command. Restating that setting (now in `CODEX_DEFAULT_ARGS`) fixed it, with a workspace-write sandbox and loopback network only |
 
 The agents found three usability gaps, now fixed: no `--help`, `find` refused the packet's
 `seal:` prefix, and a handoff has to state its own next step.

@@ -63,13 +63,28 @@ def check():
     """Amendment v4 section 5, conditions 1-3 (4 and 5 happen inside the procedure)."""
     samples = [json.loads(line) for line in (svc.OPS / "monitor.jsonl").read_text().splitlines() if line.strip()] if (svc.OPS / "monitor.jsonl").exists() else []
     releases = [json.loads(line) for line in (svc.OPS / "releases.jsonl").read_text().splitlines() if line.strip()] if (svc.OPS / "releases.jsonl").exists() else []
+    # A sample taken while the daemon was down is explained only by a recorded release downtime.
+    windows = []
+    for r in releases:
+        try:
+            windows.append((datetime.strptime(r["downtime"][0], "%Y%m%dT%H%M%SZ").replace(tzinfo=timezone.utc),
+                            datetime.strptime(r["downtime"][1], "%Y%m%dT%H%M%SZ").replace(tzinfo=timezone.utc)))
+        except (KeyError, ValueError, TypeError):
+            pass
+
+    def explained(sample):
+        at = datetime.fromisoformat(sample["utc"])
+        return any(start <= at <= end for start, end in windows)
+
+    unexplained = [s for s in samples if s.get("flight_gate") != "OPEN" and not explained(s)]
     first = samples[0]["utc"] if samples else None
     days = (now() - datetime.fromisoformat(first)).total_seconds() / 86400 if first else 0
     report = {
         "1_seven_days_since_cutover": {"ok": now() >= datetime.fromisoformat(FLOOR.replace("Z", "+00:00")), "now": now().isoformat(), "floor": FLOOR},
         "2_monitor_history": {
-            "ok": bool(samples) and days >= 7 and all(s.get("flight_gate") == "OPEN" for s in samples) and not any(s.get("warning") for s in samples),
-            "samples": len(samples), "span_days": round(days, 2), "gate_always_open": all(s.get("flight_gate") == "OPEN" for s in samples),
+            "ok": bool(samples) and days >= 7 and not unexplained and not any(s.get("warning") for s in samples),
+            "samples": len(samples), "span_days": round(days, 2), "unexplained_not_open_samples": len(unexplained),
+            "rss_warnings": sum(1 for s in samples if s.get("warning")),
             "note": "run `rust_service.py monitor` on a schedule so the window has evidence",
         },
         "3_no_rollback_predicate": {

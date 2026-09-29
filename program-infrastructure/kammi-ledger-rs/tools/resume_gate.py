@@ -273,11 +273,21 @@ def codex_binary():
     return str(bundled[-1]) if bundled else None
 
 
+# A sandboxed shell and nothing else: the agent gets no plugin tools (--ignore-user-config), but
+# the user's Windows sandbox mode must be restated, because --ignore-user-config drops it and
+# Codex then falls back to a read-only sandbox that refuses to launch any command (seen on the
+# first attempt, 2026-09-29). Medium effort keeps the quota cost of one pass low.
+CODEX_DEFAULT_ARGS = [
+    "-s", "workspace-write", "-c", "sandbox_workspace_write.network_access=true", "-c", 'windows.sandbox="elevated"',
+    "--ignore-user-config", "--ignore-rules", "--ephemeral", "-m", "gpt-6-sol", "-c", "model_reasoning_effort=medium",
+]
+
+
 def run_codex(work: Path, scenario: str, codex_bin: str, extra: list[str]):
     """The Codex app's bundled CLI, headless (`codex exec`). Spends the user's Codex quota and gives
     that agent a shell, so it runs only with --accept-codex-account-use."""
     folder = work / "agents" / scenario
-    r = subprocess.run([codex_bin, "exec", "--skip-git-repo-check", "-C", str(folder), *extra, prompt(work, scenario)],
+    r = subprocess.run([codex_bin, "exec", "--skip-git-repo-check", "-C", str(folder), *(extra or CODEX_DEFAULT_ARGS), prompt(work, scenario)],
                        capture_output=True, text=True, timeout=1800)
     (folder / "codex-transcript.txt").write_text(r.stdout[-20000:] + "\n--- stderr ---\n" + r.stderr[-5000:])
     print(json.dumps({"scenario": scenario, "codex_exit": r.returncode}, indent=1))
@@ -352,7 +362,7 @@ def main():
     parser.add_argument("--api-key-env")
     parser.add_argument("--output", type=Path)
     parser.add_argument("--accept-codex-account-use", action="store_true")
-    parser.add_argument("--codex-arg", action="append", default=[], help="extra argument for codex exec (repeatable)")
+    parser.add_argument("--codex-arg", action="append", default=[], help="replace the default codex exec arguments (repeatable); see CODEX_DEFAULT_ARGS")
     args = parser.parse_args()
     work = args.work.resolve()
     if args.operation == "setup":

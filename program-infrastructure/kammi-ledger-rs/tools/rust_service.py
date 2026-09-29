@@ -119,7 +119,9 @@ def pids():
     out = subprocess.run(["powershell", "-NoProfile", "-Command",
                           "Get-CimInstance Win32_Process | Where-Object { $_.ExecutablePath -like '" + str(BIN) + "\\*' } | "
                           "ForEach-Object { '{0} {1} {2}' -f $_.ProcessId, $_.Name, $_.WorkingSetSize }"],
-                         capture_output=True, text=True).stdout.split("\n")
+                         capture_output=True, text=True,
+                         # No console window: the monitor runs from the Task Scheduler.
+                         creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0)).stdout.split("\n")
     return [(int(p), n, int(w) / 2**20) for p, n, w in (line.split() for line in out if line.strip())]
 
 
