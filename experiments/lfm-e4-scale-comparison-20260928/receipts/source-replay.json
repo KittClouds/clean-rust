@@ -1,0 +1,11 @@
+{
+  "schema": "phoenix.e4-scale-source-replay/v1",
+  "same_primary_rows": true,
+  "same_quartets": true,
+  "identical_files": {
+    "inputs.jsonl": "5339da50c2a9f8c24cf7fab3f9474ad6999a617e3fccc06816b71b4ce6911785",
+    "rows.jsonl": "05ab991dd42c00b53b002ecb19680f65a790c70ac23b2e8267f7f7cf8e7caff4",
+    "labels-sealed.jsonl": "877277e6aca5dc7c0d162b1759a929ce07a0ce8d66141f106840cd7b39208781"
+  },
+  "truth_opened": false
+}

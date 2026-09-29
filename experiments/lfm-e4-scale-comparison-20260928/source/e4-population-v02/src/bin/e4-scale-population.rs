@@ -2,7 +2,9 @@ use std::fs::{self, File, OpenOptions};
 use std::io::{BufWriter, Read, Write};
 use std::path::{Path, PathBuf};
 
-use fas_frozen_capability_fabric_e4_population_v02::{PopulationPaths, PopulationPermit, prepare_population};
+use fas_frozen_capability_fabric_e4_population_v02::{
+    PopulationPaths, PopulationPermit, prepare_population,
+};
 use serde::Serialize;
 use sha2::{Digest, Sha256};
 
@@ -33,7 +35,9 @@ fn hash_file(path: &Path) -> Result<(String, u64), String> {
     let mut buffer = [0u8; 1 << 20];
     loop {
         let n = file.read(&mut buffer).map_err(|e| e.to_string())?;
-        if n == 0 { break; }
+        if n == 0 {
+            break;
+        }
         hash.update(&buffer[..n]);
         bytes += n as u64;
     }
@@ -41,7 +45,10 @@ fn hash_file(path: &Path) -> Result<(String, u64), String> {
 }
 
 fn new_writer(path: &Path) -> Result<BufWriter<File>, String> {
-    let file = OpenOptions::new().write(true).create_new(true).open(path)
+    let file = OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .open(path)
         .map_err(|e| format!("{}: {e}", path.display()))?;
     Ok(BufWriter::with_capacity(1 << 20, file))
 }
@@ -52,7 +59,9 @@ fn line<T: Serialize>(writer: &mut BufWriter<File>, row: &T) -> Result<(), Strin
 }
 
 fn run(output: PathBuf) -> Result<(), String> {
-    if output.exists() { return Err("output already exists".into()); }
+    if output.exists() {
+        return Err("output already exists".into());
+    }
     let plan = prepare_population(&PopulationPaths::workstation_defaults())?;
     let permit = PopulationPermit::scale_comparison(output.clone());
     fs::create_dir(&output).map_err(|e| e.to_string())?;
@@ -74,20 +83,29 @@ fn run(output: PathBuf) -> Result<(), String> {
         writer.get_ref().sync_all().map_err(|e| e.to_string())?;
     }
     drop((inputs, manifest, labels));
-    if count != plan.quartet_count() * 4 { return Err("row count mismatch".into()); }
+    if count != plan.quartet_count() * 4 {
+        return Err("row count mismatch".into());
+    }
     let mut files = Vec::new();
     for name in ["inputs.jsonl", "rows.jsonl", "labels-sealed.jsonl"] {
         let (sha256, bytes) = hash_file(&output.join(name))?;
-        files.push(Entry { path: name, bytes, sha256 });
+        files.push(Entry {
+            path: name,
+            bytes,
+            sha256,
+        });
     }
     let seal = Seal {
         schema: "phoenix.e4-scale-independent-population/v1",
         purpose: "Same fresh E4-shaped primary TEST for 230M and 1.2B; labels stay closed until predictions seal",
-        population_namespace: fas_frozen_capability_fabric_e4_population_v02::identity::POPULATION_NAMESPACE,
+        population_namespace:
+            fas_frozen_capability_fabric_e4_population_v02::identity::POPULATION_NAMESPACE,
         seed: fas_frozen_capability_fabric_e4_population_v02::identity::WORLD_RENDER_SEED,
-        quartets: plan.quartet_count(), primary_rows: count,
+        quartets: plan.quartet_count(),
+        primary_rows: count,
         class_support_minimum: plan.receipt.selected_primary_support.minimum_class_count(),
-        protected_e4_panel_read: false, files,
+        protected_e4_panel_read: false,
+        files,
     };
     let mut out = new_writer(&output.join("population-seal.json"))?;
     serde_json::to_writer_pretty(&mut out, &seal).map_err(|e| e.to_string())?;
@@ -99,7 +117,10 @@ fn run(output: PathBuf) -> Result<(), String> {
 
 fn main() {
     let mut args = std::env::args_os().skip(1);
-    let output = args.next().map(PathBuf::from).expect("output directory required");
+    let output = args
+        .next()
+        .map(PathBuf::from)
+        .expect("output directory required");
     assert!(args.next().is_none(), "one output directory only");
     let result = std::thread::Builder::new()
         .name("e4-scale-population".to_owned())

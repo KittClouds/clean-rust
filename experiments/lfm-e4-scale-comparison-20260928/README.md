@@ -46,6 +46,8 @@ Generated caches, model artifacts, and TEST labels live under
 The first population emission hit a Windows stack limit; its partial output
 was retained as `test-v1-failed-stack`. The successful replay used a 16 MiB
 worker stack and emitted the full fresh population.
+An independent replay from this checkout reproduced all three emitted file
+hashes byte-for-byte; see `receipts/source-replay.json`.
 
 ## Execution order
 
