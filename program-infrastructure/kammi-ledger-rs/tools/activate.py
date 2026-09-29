@@ -270,8 +270,82 @@ def rollback_audit():
     }
 
 
-def check():
-    """Live factual preflight. Gaps are measured and disclosed, never fabricated as a pass."""
+def owner_closure_acknowledges(decision: dict | None) -> bool:
+    """Whether an explicit owner CLOSE decision accepts the immediate, fix-forward route."""
+    if not isinstance(decision, dict):
+        return False
+    risk = decision.get("risk_acceptance")
+    required = (
+        "early_activation", "known_monitoring_gaps", "known_rollback_evidence", "fix_forward",
+        "rollback_to_python_ends", "backup_policy_reviewed", "monitoring_policy_reviewed",
+        "restart_policy_reviewed", "source_publicity_reviewed",
+    )
+    return (
+        decision.get("schema") == CLOSURE_SCHEMA
+        and decision.get("decision") == "CLOSE"
+        and decision.get("decision_authority") == "PROGRAM_OWNER"
+        and bool(decision.get("decision_record"))
+        and isinstance(risk, dict)
+        and all(risk.get(field) is True for field in required)
+    )
+
+
+def monitoring_gate(monitoring: dict, decision: dict | None) -> dict:
+    """Keep live health strict; allow only explicitly accepted historical/operational gaps."""
+    task = monitoring.get("windows_task_audit") or {}
+    risk = (decision or {}).get("risk_acceptance") or {}
+    owner_valid = owner_closure_acknowledges(decision)
+    history_deviations = []
+    if monitoring.get("gap_count", 0):
+        history_deviations.append(f"monitor_gaps:{monitoring['gap_count']}")
+    if monitoring.get("unexplained_closed_samples"):
+        history_deviations.append(
+            f"unexplained_closed_samples:{len(monitoring['unexplained_closed_samples'])}"
+        )
+    if task.get("scheduled_backup_configured") is False:
+        history_deviations.append("scheduled_backup_not_configured")
+    if task.get("monitor_requires_interactive_logon") is True:
+        history_deviations.append("monitor_requires_interactive_logon")
+    if task.get("daemon_autostart_configured") is False:
+        history_deviations.append("daemon_autostart_not_configured")
+
+    current_health = (
+        monitoring.get("sample_count", 0) > 0
+        and not monitoring.get("malformed_lines")
+        and monitoring.get("strictly_ordered") is True
+        and monitoring.get("warning_count") == 0
+        and monitoring.get("latest_sample_fresh") is True
+        and monitoring.get("latest_flight_gate") == "OPEN"
+        and monitoring.get("latest_projection_lag") == 0
+        and task.get("ok") is True
+        and task.get("monitor_enabled") is True
+        and task.get("monitor_period_30m") is True
+    )
+    required_acceptances = []
+    if monitoring.get("gap_count", 0) or monitoring.get("unexplained_closed_samples"):
+        required_acceptances.extend(("known_monitoring_gaps", "monitoring_policy_reviewed"))
+    if task.get("scheduled_backup_configured") is False:
+        required_acceptances.append("backup_policy_reviewed")
+    if task.get("monitor_requires_interactive_logon") is True:
+        required_acceptances.append("monitoring_policy_reviewed")
+    if task.get("daemon_autostart_configured") is False:
+        required_acceptances.append("restart_policy_reviewed")
+    missing_acceptance = [field for field in dict.fromkeys(required_acceptances) if risk.get(field) is not True]
+    accepted = owner_valid and not missing_acceptance
+    return {
+        "ok": current_health and (not history_deviations or accepted),
+        "current_health_ok": current_health,
+        "strict_monitoring_ok": monitoring.get("ok") is True,
+        "owner_closure_valid": owner_valid,
+        "history_deviations": history_deviations,
+        "missing_owner_acceptances": missing_acceptance,
+        "snapshot_sha256": monitoring.get("snapshot_sha256"),
+        "accepted_deviations": history_deviations if accepted else [],
+    }
+
+
+def check(owner_decision: dict | None = None):
+    """Live factual preflight; historic deviations require explicit owner risk acceptance."""
     monitor_path = svc.OPS / "monitor.jsonl"
     monitor_raw = monitor_path.read_bytes() if monitor_path.is_file() else b""
     monitoring = monitoring_audit(monitor_raw)
@@ -294,9 +368,11 @@ def check():
         library = {"ok": False, "error": f"{type(error).__name__}: {error}"}
     rollback["ok"] = (rollback["rollback_available"] and rollback["previous_release_rollback_proven"]
                        and rollback["release_reports_valid"])
+    monitor_gate = monitoring_gate(monitoring, owner_decision)
     report = {
         "evaluated_at": now().isoformat(),
         "1_monitoring": monitoring,
+        "monitoring_activation_gate": monitor_gate,
         "2_rollback_evidence": rollback,
         "3_library_quiescence": library,
         "decision_required": {
@@ -306,7 +382,7 @@ def check():
             "fix_forward_after_activation": True,
         },
     }
-    report["ok"] = monitoring["ok"] and rollback["ok"] and library["ok"]
+    report["ok"] = monitor_gate["ok"] and rollback["ok"] and library["ok"]
     return report
 
 
@@ -401,8 +477,10 @@ def procedure(daemon: Daemon, work: Path, decision: dict, report: dict, rollback
         svc.monitor()
     monitor_raw = (svc.OPS / "monitor.jsonl").read_bytes()
     monitor = monitoring_audit(monitor_raw, at=now())
-    if not monitor["ok"]:
-        raise RuntimeError("monitoring preflight changed or became stale before evidence registration: " + json.dumps(monitor))
+    monitor_gate = monitoring_gate(monitor, decision)
+    if not monitor_gate["ok"]:
+        raise RuntimeError("monitoring preflight changed or current health failed before evidence registration: "
+                           + json.dumps({"audit": monitor, "activation_gate": monitor_gate}))
     monitoring_artifact = register_raw(monitor_raw, "activation-monitor-history", f"v4-monitor-{stamp}")
     rollback_id = register_json(rollback, "rollback-evidence-audit", f"v4-rollback-audit-{stamp}")
     inventory_id = register_raw((work / "backup-inventory.json").read_bytes(),
@@ -425,6 +503,12 @@ def procedure(daemon: Daemon, work: Path, decision: dict, report: dict, rollback
             "sample_count": monitor["sample_count"], "gap_count": monitor["gap_count"],
             "max_gap_seconds": monitor["max_gap_seconds"], "warning_count": monitor["warning_count"],
             "latest_sample_utc": monitor["latest_sample_utc"], "latest_sample_fresh": monitor["latest_sample_fresh"],
+            "malformed_lines": monitor["malformed_lines"], "strictly_ordered": monitor["strictly_ordered"],
+            "unexplained_closed_samples": monitor["unexplained_closed_samples"], "gaps": monitor["gaps"],
+            "latest_flight_gate": monitor["latest_flight_gate"],
+            "latest_projection_lag": monitor["latest_projection_lag"],
+            "strict_monitoring_ok": monitor["ok"],
+            "owner_accepted_deviations": monitor_gate["accepted_deviations"],
             "scheduled_backup_configured": monitor["scheduled_backup_configured"],
             "monitor_requires_interactive_logon": monitor["monitor_requires_interactive_logon"],
             "daemon_autostart_configured": monitor["daemon_autostart_configured"],
@@ -498,17 +582,21 @@ def rehearse(work: Path, live_copy: bool):
         live_daemon.start()
     admin = base64.urlsafe_b64encode(os.urandom(24)).decode()
     daemon = Daemon(copy, False, None, admin, bin_dir)
-    preflight = check()
-    if not preflight["ok"]:
-        raise SystemExit("live preflight not ready for current-copy rehearsal: " + json.dumps(preflight, indent=1))
     effective_at = now().isoformat(timespec="milliseconds").replace("+00:00", "Z")
     decision = {"schema": CLOSURE_SCHEMA, "decision": "CLOSE", "decision_authority": "PROGRAM_OWNER",
+                "decision_record": "Program owner authorized immediate activation; rehearsal only, no live journal write.",
                 "effective_at": effective_at, "rehearsal": True,
                 "risk_acceptance": {"early_activation": True, "known_monitoring_gaps": True,
                                     "known_rollback_evidence": True, "fix_forward": True,
                                     "rollback_to_python_ends": True, "backup_policy_reviewed": True,
                                     "monitoring_policy_reviewed": True, "restart_policy_reviewed": True,
                                     "source_publicity_reviewed": True}}
+    # Refresh only the monitor file before auditing. The operation appends a truthful live sample;
+    # it does not mutate the Library journal.
+    svc.monitor()
+    preflight = check(decision)
+    if not preflight["ok"]:
+        raise SystemExit("live preflight not ready for current-copy rehearsal: " + json.dumps(preflight, indent=1))
     report = {"schema": "KAMMI_ACTIVATION_REHEARSAL_V1", "copy_of": "current live store",
               "source_release": info["commit"], "clock": "real", "steps": []}
     daemon.start()
@@ -551,7 +639,7 @@ def live(decision_file: Path | None):
         decision["effective_at"] = effective_at
     # This is a real, truthful sample; historic gaps remain visible in the subsequent audit.
     svc.monitor()
-    conditions = check()
+    conditions = check(decision)
     if not conditions["ok"]:
         raise SystemExit("closure conditions not met: " + json.dumps(conditions, indent=1))
     info, _ = svc.release()

@@ -29,6 +29,26 @@ class MonitoringAuditTests(unittest.TestCase):
             return activate.monitoring_audit(raw, at=self.at, reports=[])
 
     @staticmethod
+    def owner_decision():
+        return {
+            "schema": activate.CLOSURE_SCHEMA,
+            "decision": "CLOSE",
+            "decision_authority": "PROGRAM_OWNER",
+            "decision_record": "Immediate activation and known operational risks accepted.",
+            "risk_acceptance": {
+                "early_activation": True,
+                "known_monitoring_gaps": True,
+                "known_rollback_evidence": True,
+                "fix_forward": True,
+                "rollback_to_python_ends": True,
+                "backup_policy_reviewed": True,
+                "monitoring_policy_reviewed": True,
+                "restart_policy_reviewed": True,
+                "source_publicity_reviewed": True,
+            },
+        }
+
+    @staticmethod
     def row(utc, **extra):
         return {"utc": utc, "flight_gate": "OPEN", "projection_lag": 0,
                 "warning": False, **extra}
@@ -49,6 +69,46 @@ class MonitoringAuditTests(unittest.TestCase):
         self.assertEqual(audit["warning_count"], 1)
         self.assertEqual(len(audit["unexplained_closed_samples"]), 1)
         self.assertFalse(audit["ok"])
+
+    def test_owner_can_accept_historical_gaps_but_not_bad_current_health(self):
+        audit = self.audit([
+            self.row("2026-09-29T15:00:00+00:00"),
+            self.row("2026-09-29T16:00:00+00:00", flight_gate="CLOSED_PENDING_ACCEPTANCE"),
+            self.row("2026-09-29T17:00:00+00:00"),
+        ])
+        self.assertEqual(audit["gap_count"], 2)
+        self.assertEqual(len(audit["unexplained_closed_samples"]), 1)
+        self.assertFalse(activate.monitoring_gate(audit, None)["ok"])
+
+        gate = activate.monitoring_gate(audit, self.owner_decision())
+        self.assertTrue(gate["ok"])
+        self.assertFalse(gate["strict_monitoring_ok"])
+        self.assertEqual(gate["snapshot_sha256"], audit["snapshot_sha256"])
+        self.assertIn("monitor_gaps:2", gate["accepted_deviations"])
+        self.assertIn("unexplained_closed_samples:1", gate["accepted_deviations"])
+
+    def test_owner_ack_does_not_override_bad_latest_status_or_warning(self):
+        for rows in (
+            [self.row("2026-09-29T16:30:00+00:00"),
+             self.row("2026-09-29T17:00:00+00:00", flight_gate="CLOSED")],
+            [self.row("2026-09-29T17:00:00+00:00", warning=True)],
+        ):
+            with self.subTest(rows=rows):
+                audit = self.audit(rows)
+                self.assertFalse(activate.monitoring_gate(audit, self.owner_decision())["ok"])
+
+    def test_owner_cannot_accept_malformed_monitor_history(self):
+        raw = b'{"utc":"broken"}\n' + json.dumps(self.row("2026-09-29T17:00:00+00:00")).encode() + b"\n"
+        with patch.object(activate, "windows_task_audit", return_value=self.task):
+            audit = activate.monitoring_audit(raw, at=self.at, reports=[])
+        self.assertEqual(audit["malformed_lines"], [1])
+        self.assertFalse(activate.monitoring_gate(audit, self.owner_decision())["ok"])
+
+    def test_owner_decision_must_be_explicit_and_accept_all_risks(self):
+        decision = self.owner_decision()
+        self.assertTrue(activate.owner_closure_acknowledges(decision))
+        decision["risk_acceptance"]["fix_forward"] = False
+        self.assertFalse(activate.owner_closure_acknowledges(decision))
 
     def test_out_of_order_history_fails_preflight(self):
         audit = self.audit([
