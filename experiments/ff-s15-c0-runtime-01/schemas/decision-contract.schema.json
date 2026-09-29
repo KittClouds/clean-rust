@@ -1,0 +1,152 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "s15/DecisionContract-v1",
+  "title": "DecisionContract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "contract_id",
+    "name",
+    "version",
+    "decision_type",
+    "question",
+    "candidate_schema",
+    "output_schema",
+    "abstention_allowed",
+    "unknown_allowed",
+    "cost_class",
+    "authority_class"
+  ],
+  "properties": {
+    "schema": {
+      "const": "S15_DECISION_CONTRACT_V1"
+    },
+    "contract_id": {
+      "$ref": "#/$defs/sha256_id"
+    },
+    "name": {
+      "$ref": "#/$defs/ident"
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 1000000
+    },
+    "decision_type": {
+      "enum": [
+        "CHOICE",
+        "MULTI_CHOICE",
+        "APPLICABILITY",
+        "ORDINAL",
+        "ABSTENTION",
+        "ESCALATION"
+      ]
+    },
+    "question": {
+      "$ref": "#/$defs/ident"
+    },
+    "candidate_schema": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "labels"
+          ],
+          "properties": {
+            "kind": {
+              "const": "LABELS"
+            },
+            "labels": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 64,
+              "uniqueItems": true,
+              "items": {
+                "$ref": "#/$defs/ident"
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind"
+          ],
+          "properties": {
+            "kind": {
+              "const": "OBSERVATION_SUPPLIED"
+            }
+          }
+        }
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "labels",
+        "scale_ppm"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "SIMPLEX",
+            "INDEPENDENT"
+          ]
+        },
+        "labels": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 64,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/ident"
+          }
+        },
+        "scale_ppm": {
+          "const": 1000000
+        }
+      }
+    },
+    "abstention_allowed": {
+      "type": "boolean"
+    },
+    "unknown_allowed": {
+      "type": "boolean"
+    },
+    "cost_class": {
+      "enum": [
+        "T0_RULE",
+        "T1_LINEAR",
+        "T2_MLP",
+        "T3_OBSERVER_SET",
+        "T4_LATENT",
+        "T5_SPECIALIST",
+        "T6_REASONER",
+        "T7_HUMAN"
+      ]
+    },
+    "authority_class": {
+      "enum": [
+        "ADVISORY",
+        "PROPOSES_ACTION",
+        "ESCALATION_ONLY"
+      ]
+    }
+  },
+  "$defs": {
+    "ident": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"
+    },
+    "sha256_id": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    }
+  }
+}

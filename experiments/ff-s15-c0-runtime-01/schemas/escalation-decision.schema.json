@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "s15/EscalationDecision-v1",
+  "title": "EscalationDecision",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "choice",
+    "reason",
+    "confidence_ppm",
+    "confidence_signal",
+    "triggering_observers",
+    "cost_estimate",
+    "rule_id"
+  ],
+  "properties": {
+    "schema": {
+      "const": "S15_ESCALATION_DECISION_V1"
+    },
+    "choice": {
+      "$ref": "#/$defs/escalation_label"
+    },
+    "reason": {
+      "$ref": "#/$defs/text"
+    },
+    "confidence_ppm": {
+      "$ref": "#/$defs/ppm"
+    },
+    "confidence_signal": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/signal"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "triggering_observers": {
+      "type": "array",
+      "maxItems": 16,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/alias"
+      }
+    },
+    "cost_estimate": {
+      "$ref": "#/$defs/units"
+    },
+    "rule_id": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/name"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "$defs": {
+    "alias": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]{0,31}$"
+    },
+    "escalation_label": {
+      "enum": [
+        "DIRECT",
+        "USE_OBSERVER",
+        "USE_OBSERVER_SET",
+        "USE_LARGER_MODEL",
+        "USE_REASONER",
+        "ASK_HUMAN",
+        "ABSTAIN"
+      ]
+    },
+    "name": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_.-]{0,63}$"
+    },
+    "ppm": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 1000000
+    },
+    "signal": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_.]{0,127}$"
+    },
+    "text": {
+      "type": "string",
+      "pattern": "^[\\x20-\\x7e]{0,256}$"
+    },
+    "units": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 1000000000000
+    }
+  }
+}

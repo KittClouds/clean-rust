@@ -1,0 +1,464 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "s15/RuntimePolicy-v1",
+  "title": "RuntimePolicy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "policy_id",
+    "name",
+    "policy_revision",
+    "actions",
+    "observers",
+    "escalation_rules",
+    "authority_rules",
+    "default_escalation",
+    "on_incomplete_evidence",
+    "on_require_escalation",
+    "default_authority",
+    "costs"
+  ],
+  "properties": {
+    "schema": {
+      "const": "S15_RUNTIME_POLICY_V1"
+    },
+    "policy_id": {
+      "$ref": "#/$defs/sha256_id"
+    },
+    "name": {
+      "$ref": "#/$defs/ident"
+    },
+    "policy_revision": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 1000000
+    },
+    "actions": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 64,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/ident"
+      }
+    },
+    "observers": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 32,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "alias",
+          "bundle_id"
+        ],
+        "properties": {
+          "alias": {
+            "$ref": "#/$defs/alias"
+          },
+          "bundle_id": {
+            "$ref": "#/$defs/sha256_id"
+          }
+        }
+      }
+    },
+    "escalation_rules": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "rule_id",
+          "when",
+          "then",
+          "reason",
+          "confidence_signal"
+        ],
+        "properties": {
+          "rule_id": {
+            "$ref": "#/$defs/name"
+          },
+          "when": {
+            "$ref": "#/$defs/cond"
+          },
+          "then": {
+            "$ref": "#/$defs/escalation_label"
+          },
+          "reason": {
+            "$ref": "#/$defs/text"
+          },
+          "confidence_signal": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/signal"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "propose": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "from"
+                ],
+                "properties": {
+                  "from": {
+                    "$ref": "#/$defs/alias"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "literal"
+                ],
+                "properties": {
+                  "literal": {
+                    "$ref": "#/$defs/ident"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "authority_rules": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "rule_id",
+          "when",
+          "effect",
+          "reason_code",
+          "declared_neural_inputs"
+        ],
+        "properties": {
+          "rule_id": {
+            "$ref": "#/$defs/name"
+          },
+          "when": {
+            "$ref": "#/$defs/cond"
+          },
+          "effect": {
+            "enum": [
+              "ALLOW",
+              "DENY",
+              "REQUIRE_ESCALATION"
+            ]
+          },
+          "reason_code": {
+            "$ref": "#/$defs/code"
+          },
+          "declared_neural_inputs": {
+            "type": "array",
+            "maxItems": 64,
+            "uniqueItems": true,
+            "items": {
+              "$ref": "#/$defs/signal"
+            }
+          }
+        }
+      }
+    },
+    "default_escalation": {
+      "enum": [
+        "USE_LARGER_MODEL",
+        "USE_REASONER",
+        "ASK_HUMAN",
+        "ABSTAIN"
+      ]
+    },
+    "on_incomplete_evidence": {
+      "enum": [
+        "USE_LARGER_MODEL",
+        "USE_REASONER",
+        "ASK_HUMAN",
+        "ABSTAIN"
+      ]
+    },
+    "on_require_escalation": {
+      "enum": [
+        "USE_LARGER_MODEL",
+        "USE_REASONER",
+        "ASK_HUMAN",
+        "ABSTAIN"
+      ]
+    },
+    "default_authority": {
+      "enum": [
+        "DENY",
+        "REQUIRE_ESCALATION"
+      ]
+    },
+    "costs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "backbone_units",
+        "cost_class_units",
+        "label_units"
+      ],
+      "properties": {
+        "backbone_units": {
+          "$ref": "#/$defs/units"
+        },
+        "cost_class_units": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "T0_RULE": {
+              "$ref": "#/$defs/units"
+            },
+            "T1_LINEAR": {
+              "$ref": "#/$defs/units"
+            },
+            "T2_MLP": {
+              "$ref": "#/$defs/units"
+            },
+            "T3_OBSERVER_SET": {
+              "$ref": "#/$defs/units"
+            },
+            "T4_LATENT": {
+              "$ref": "#/$defs/units"
+            },
+            "T5_SPECIALIST": {
+              "$ref": "#/$defs/units"
+            },
+            "T6_REASONER": {
+              "$ref": "#/$defs/units"
+            },
+            "T7_HUMAN": {
+              "$ref": "#/$defs/units"
+            }
+          }
+        },
+        "label_units": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "DIRECT",
+            "USE_OBSERVER",
+            "USE_OBSERVER_SET",
+            "USE_LARGER_MODEL",
+            "USE_REASONER",
+            "ASK_HUMAN",
+            "ABSTAIN"
+          ],
+          "properties": {
+            "DIRECT": {
+              "$ref": "#/$defs/units"
+            },
+            "USE_OBSERVER": {
+              "$ref": "#/$defs/units"
+            },
+            "USE_OBSERVER_SET": {
+              "$ref": "#/$defs/units"
+            },
+            "USE_LARGER_MODEL": {
+              "$ref": "#/$defs/units"
+            },
+            "USE_REASONER": {
+              "$ref": "#/$defs/units"
+            },
+            "ASK_HUMAN": {
+              "$ref": "#/$defs/units"
+            },
+            "ABSTAIN": {
+              "$ref": "#/$defs/units"
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "alias": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]{0,31}$"
+    },
+    "code": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9_]{0,63}$"
+    },
+    "cond": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "all"
+          ],
+          "properties": {
+            "all": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 16,
+              "items": {
+                "$ref": "#/$defs/cond"
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "any"
+          ],
+          "properties": {
+            "any": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 16,
+              "items": {
+                "$ref": "#/$defs/cond"
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "not"
+          ],
+          "properties": {
+            "not": {
+              "$ref": "#/$defs/cond"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "cmp"
+          ],
+          "properties": {
+            "cmp": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "signal",
+                "op",
+                "value"
+              ],
+              "properties": {
+                "signal": {
+                  "$ref": "#/$defs/signal"
+                },
+                "op": {
+                  "enum": [
+                    "eq",
+                    "ne",
+                    "lt",
+                    "le",
+                    "gt",
+                    "ge"
+                  ]
+                },
+                "value": {
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "$ref": "#/$defs/text"
+                    },
+                    {
+                      "type": "boolean"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "agree"
+          ],
+          "properties": {
+            "agree": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 8,
+              "uniqueItems": true,
+              "items": {
+                "$ref": "#/$defs/alias"
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "disagree"
+          ],
+          "properties": {
+            "disagree": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 8,
+              "uniqueItems": true,
+              "items": {
+                "$ref": "#/$defs/alias"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "escalation_label": {
+      "enum": [
+        "DIRECT",
+        "USE_OBSERVER",
+        "USE_OBSERVER_SET",
+        "USE_LARGER_MODEL",
+        "USE_REASONER",
+        "ASK_HUMAN",
+        "ABSTAIN"
+      ]
+    },
+    "ident": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"
+    },
+    "name": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_.-]{0,63}$"
+    },
+    "sha256_id": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "signal": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_.]{0,127}$"
+    },
+    "text": {
+      "type": "string",
+      "pattern": "^[\\x20-\\x7e]{0,256}$"
+    },
+    "units": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 1000000000000
+    }
+  }
+}

@@ -1,0 +1,1 @@
+{"actor":"fixture-agent","authority_state":{"flags":{},"forbidden_actions":[],"granted_actions":["read"]},"facts":{"cache_hit":true,"task_kind":"code_change"},"observation_id":"c01-direct-cache","schema":"S15_OBSERVATION_V1","state_hash":"sha256:d27da2e71de9000b774e0bc83c0263b7ac138d296b711557c23644c716887b49"}

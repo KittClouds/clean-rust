@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "s15/AuthorityDecision-v1",
+  "title": "AuthorityDecision",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "effect",
+    "reason_code",
+    "policy_id",
+    "policy_revision",
+    "proposed_action",
+    "actor",
+    "rule_id",
+    "neural_inputs_used"
+  ],
+  "properties": {
+    "schema": {
+      "const": "S15_AUTHORITY_DECISION_V1"
+    },
+    "effect": {
+      "enum": [
+        "ALLOW",
+        "DENY",
+        "REQUIRE_ESCALATION"
+      ]
+    },
+    "reason_code": {
+      "$ref": "#/$defs/code"
+    },
+    "policy_id": {
+      "$ref": "#/$defs/sha256_id"
+    },
+    "policy_revision": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 1000000
+    },
+    "proposed_action": {
+      "$ref": "#/$defs/ident"
+    },
+    "actor": {
+      "$ref": "#/$defs/name"
+    },
+    "rule_id": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/name"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "neural_inputs_used": {
+      "type": "array",
+      "maxItems": 64,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/signal"
+      }
+    }
+  },
+  "$defs": {
+    "code": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9_]{0,63}$"
+    },
+    "ident": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"
+    },
+    "name": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_.-]{0,63}$"
+    },
+    "sha256_id": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "signal": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_.]{0,127}$"
+    }
+  }
+}

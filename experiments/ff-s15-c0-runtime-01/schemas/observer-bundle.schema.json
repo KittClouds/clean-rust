@@ -1,0 +1,171 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "s15/ObserverBundle-v1",
+  "title": "ObserverBundle",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "bundle_id",
+    "name",
+    "bundle_version",
+    "backbone",
+    "representation",
+    "normalization",
+    "head",
+    "calibration",
+    "decision_contract_id",
+    "training_identity",
+    "source_hashes"
+  ],
+  "properties": {
+    "schema": {
+      "const": "S15_OBSERVER_BUNDLE_V1"
+    },
+    "bundle_id": {
+      "$ref": "#/$defs/sha256_id"
+    },
+    "name": {
+      "$ref": "#/$defs/ident"
+    },
+    "bundle_version": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 1000000
+    },
+    "backbone": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "model_id",
+        "revision"
+      ],
+      "properties": {
+        "model_id": {
+          "$ref": "#/$defs/text"
+        },
+        "revision": {
+          "$ref": "#/$defs/text"
+        }
+      }
+    },
+    "representation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "layer",
+        "surface",
+        "dimensions"
+      ],
+      "properties": {
+        "layer": {
+          "$ref": "#/$defs/token"
+        },
+        "surface": {
+          "$ref": "#/$defs/token"
+        },
+        "dimensions": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000000
+        }
+      }
+    },
+    "normalization": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "center_hash",
+        "scale_hash"
+      ],
+      "properties": {
+        "center_hash": {
+          "$ref": "#/$defs/sha256_id"
+        },
+        "scale_hash": {
+          "$ref": "#/$defs/sha256_id"
+        }
+      }
+    },
+    "head": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "architecture",
+        "weights_hash",
+        "class_order"
+      ],
+      "properties": {
+        "architecture": {
+          "$ref": "#/$defs/token"
+        },
+        "weights_hash": {
+          "$ref": "#/$defs/sha256_id"
+        },
+        "class_order": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 64,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/ident"
+          }
+        }
+      }
+    },
+    "calibration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "parameters_hash"
+      ],
+      "properties": {
+        "method": {
+          "enum": [
+            "NONE",
+            "TEMPERATURE",
+            "PLATT",
+            "ISOTONIC",
+            "HISTOGRAM"
+          ]
+        },
+        "parameters_hash": {
+          "$ref": "#/$defs/sha256_id"
+        }
+      }
+    },
+    "decision_contract_id": {
+      "$ref": "#/$defs/sha256_id"
+    },
+    "training_identity": {
+      "$ref": "#/$defs/text"
+    },
+    "source_hashes": {
+      "type": "array",
+      "maxItems": 64,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/sha256_id"
+      }
+    }
+  },
+  "$defs": {
+    "ident": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"
+    },
+    "sha256_id": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "text": {
+      "type": "string",
+      "pattern": "^[\\x20-\\x7e]{0,256}$"
+    },
+    "token": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.+:-]{0,63}$"
+    }
+  }
+}

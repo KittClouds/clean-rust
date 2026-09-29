@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "s15/ObservationEnvelope-v1",
+  "title": "ObservationEnvelope",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "observation_id",
+    "state_hash",
+    "actor",
+    "facts",
+    "authority_state"
+  ],
+  "properties": {
+    "schema": {
+      "const": "S15_OBSERVATION_V1"
+    },
+    "observation_id": {
+      "$ref": "#/$defs/name"
+    },
+    "state_hash": {
+      "$ref": "#/$defs/sha256_id"
+    },
+    "actor": {
+      "$ref": "#/$defs/name"
+    },
+    "facts": {
+      "type": "object",
+      "additionalProperties": {
+        "oneOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "$ref": "#/$defs/text"
+          },
+          {
+            "type": "boolean"
+          }
+        ]
+      }
+    },
+    "authority_state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "granted_actions",
+        "forbidden_actions",
+        "flags"
+      ],
+      "properties": {
+        "granted_actions": {
+          "type": "array",
+          "maxItems": 64,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/ident"
+          }
+        },
+        "forbidden_actions": {
+          "type": "array",
+          "maxItems": 64,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/ident"
+          }
+        },
+        "flags": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "ident": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"
+    },
+    "name": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_.-]{0,63}$"
+    },
+    "sha256_id": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "text": {
+      "type": "string",
+      "pattern": "^[\\x20-\\x7e]{0,256}$"
+    }
+  }
+}

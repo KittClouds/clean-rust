@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "s15/DecisionVector-v1",
+  "title": "DecisionVector",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "decision_vector_id",
+    "observation_id",
+    "producer",
+    "entries"
+  ],
+  "properties": {
+    "schema": {
+      "const": "S15_DECISION_VECTOR_V1"
+    },
+    "decision_vector_id": {
+      "$ref": "#/$defs/sha256_id"
+    },
+    "observation_id": {
+      "$ref": "#/$defs/name"
+    },
+    "producer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "source"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "PRERECORDED",
+            "LIVE"
+          ]
+        },
+        "source": {
+          "$ref": "#/$defs/text"
+        }
+      }
+    },
+    "entries": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "bundle_id",
+          "probabilities_ppm"
+        ],
+        "properties": {
+          "bundle_id": {
+            "$ref": "#/$defs/sha256_id"
+          },
+          "candidate": {
+            "$ref": "#/$defs/name"
+          },
+          "probabilities_ppm": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 64,
+            "items": {
+              "$ref": "#/$defs/ppm"
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "name": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_.-]{0,63}$"
+    },
+    "ppm": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 1000000
+    },
+    "sha256_id": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "text": {
+      "type": "string",
+      "pattern": "^[\\x20-\\x7e]{0,256}$"
+    }
+  }
+}

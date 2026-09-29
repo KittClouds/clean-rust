@@ -1,0 +1,1 @@
+{"actor":"fixture-agent","authority_state":{"flags":{},"forbidden_actions":[],"granted_actions":[]},"facts":{"cache_hit":false,"task_kind":"code_change"},"observation_id":"c08-confident-but-not-granted","schema":"S15_OBSERVATION_V1","state_hash":"sha256:5947955846e6306379af072b5db4261a697f4dc4c0ff699ea851016883f1912d"}

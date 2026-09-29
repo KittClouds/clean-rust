@@ -1,0 +1,533 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "s15/RuntimeReceipt-v1",
+  "title": "RuntimeReceipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "receipt_id",
+    "runtime",
+    "observation",
+    "inputs",
+    "observers",
+    "disagreements",
+    "escalation_trace",
+    "escalation",
+    "proposed_action",
+    "authority",
+    "authority_trace",
+    "disposition",
+    "disposition_target",
+    "cost"
+  ],
+  "properties": {
+    "schema": {
+      "const": "S15_RUNTIME_RECEIPT_V1"
+    },
+    "receipt_id": {
+      "$ref": "#/$defs/sha256_id"
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "version"
+      ],
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/token"
+        },
+        "version": {
+          "$ref": "#/$defs/token"
+        }
+      }
+    },
+    "observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "observation_id",
+        "state_hash",
+        "actor"
+      ],
+      "properties": {
+        "observation_id": {
+          "$ref": "#/$defs/name"
+        },
+        "state_hash": {
+          "$ref": "#/$defs/sha256_id"
+        },
+        "actor": {
+          "$ref": "#/$defs/name"
+        }
+      }
+    },
+    "inputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "policy_id",
+        "policy_revision",
+        "decision_vector_id",
+        "contract_ids",
+        "bundle_ids"
+      ],
+      "properties": {
+        "policy_id": {
+          "$ref": "#/$defs/sha256_id"
+        },
+        "policy_revision": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000000
+        },
+        "decision_vector_id": {
+          "$ref": "#/$defs/sha256_id"
+        },
+        "contract_ids": {
+          "type": "array",
+          "maxItems": 64,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/sha256_id"
+          }
+        },
+        "bundle_ids": {
+          "type": "array",
+          "maxItems": 64,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/sha256_id"
+          }
+        }
+      }
+    },
+    "observers": {
+      "type": "array",
+      "maxItems": 32,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "alias",
+          "bundle_id",
+          "contract_id",
+          "present",
+          "consulted",
+          "candidate",
+          "probabilities_ppm",
+          "top_label",
+          "top_ppm",
+          "margin_ppm"
+        ],
+        "properties": {
+          "alias": {
+            "$ref": "#/$defs/alias"
+          },
+          "bundle_id": {
+            "$ref": "#/$defs/sha256_id"
+          },
+          "contract_id": {
+            "$ref": "#/$defs/sha256_id"
+          },
+          "present": {
+            "type": "boolean"
+          },
+          "consulted": {
+            "type": "boolean"
+          },
+          "candidate": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/name"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "probabilities_ppm": {
+            "oneOf": [
+              {
+                "type": "array",
+                "minItems": 2,
+                "maxItems": 64,
+                "items": {
+                  "$ref": "#/$defs/ppm"
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "top_label": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/ident"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "top_ppm": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/ppm"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "margin_ppm": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/ppm"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "disagreements": {
+      "type": "array",
+      "maxItems": 32,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "contract_id",
+          "positions"
+        ],
+        "properties": {
+          "contract_id": {
+            "$ref": "#/$defs/sha256_id"
+          },
+          "positions": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 64,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "label",
+                "aliases"
+              ],
+              "properties": {
+                "label": {
+                  "$ref": "#/$defs/ident"
+                },
+                "aliases": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 16,
+                  "items": {
+                    "$ref": "#/$defs/alias"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "escalation_trace": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "rule_id",
+          "result"
+        ],
+        "properties": {
+          "rule_id": {
+            "$ref": "#/$defs/name"
+          },
+          "result": {
+            "enum": [
+              "TRUE",
+              "FALSE",
+              "UNKNOWN"
+            ]
+          }
+        }
+      }
+    },
+    "escalation": {
+      "$ref": "#/$defs/escalation_decision"
+    },
+    "proposed_action": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/ident"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "authority": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/authority_decision"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "authority_trace": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "rule_id",
+          "result"
+        ],
+        "properties": {
+          "rule_id": {
+            "$ref": "#/$defs/name"
+          },
+          "result": {
+            "enum": [
+              "TRUE",
+              "FALSE",
+              "UNKNOWN"
+            ]
+          }
+        }
+      }
+    },
+    "disposition": {
+      "enum": [
+        "EXECUTE_ALLOWED",
+        "DENIED",
+        "ESCALATED",
+        "ASKED",
+        "ABSTAINED"
+      ]
+    },
+    "disposition_target": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/ident"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "cost": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "units",
+        "backbone",
+        "observers",
+        "label"
+      ],
+      "properties": {
+        "units": {
+          "$ref": "#/$defs/units"
+        },
+        "backbone": {
+          "$ref": "#/$defs/units"
+        },
+        "observers": {
+          "$ref": "#/$defs/units"
+        },
+        "label": {
+          "$ref": "#/$defs/units"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "alias": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]{0,31}$"
+    },
+    "authority_decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "effect",
+        "reason_code",
+        "policy_id",
+        "policy_revision",
+        "proposed_action",
+        "actor",
+        "rule_id",
+        "neural_inputs_used"
+      ],
+      "properties": {
+        "schema": {
+          "const": "S15_AUTHORITY_DECISION_V1"
+        },
+        "effect": {
+          "enum": [
+            "ALLOW",
+            "DENY",
+            "REQUIRE_ESCALATION"
+          ]
+        },
+        "reason_code": {
+          "$ref": "#/$defs/code"
+        },
+        "policy_id": {
+          "$ref": "#/$defs/sha256_id"
+        },
+        "policy_revision": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000000
+        },
+        "proposed_action": {
+          "$ref": "#/$defs/ident"
+        },
+        "actor": {
+          "$ref": "#/$defs/name"
+        },
+        "rule_id": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/name"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "neural_inputs_used": {
+          "type": "array",
+          "maxItems": 64,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/signal"
+          }
+        }
+      }
+    },
+    "code": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9_]{0,63}$"
+    },
+    "escalation_decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "choice",
+        "reason",
+        "confidence_ppm",
+        "confidence_signal",
+        "triggering_observers",
+        "cost_estimate",
+        "rule_id"
+      ],
+      "properties": {
+        "schema": {
+          "const": "S15_ESCALATION_DECISION_V1"
+        },
+        "choice": {
+          "$ref": "#/$defs/escalation_label"
+        },
+        "reason": {
+          "$ref": "#/$defs/text"
+        },
+        "confidence_ppm": {
+          "$ref": "#/$defs/ppm"
+        },
+        "confidence_signal": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/signal"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "triggering_observers": {
+          "type": "array",
+          "maxItems": 16,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/alias"
+          }
+        },
+        "cost_estimate": {
+          "$ref": "#/$defs/units"
+        },
+        "rule_id": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/name"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "escalation_label": {
+      "enum": [
+        "DIRECT",
+        "USE_OBSERVER",
+        "USE_OBSERVER_SET",
+        "USE_LARGER_MODEL",
+        "USE_REASONER",
+        "ASK_HUMAN",
+        "ABSTAIN"
+      ]
+    },
+    "ident": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"
+    },
+    "name": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_.-]{0,63}$"
+    },
+    "ppm": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 1000000
+    },
+    "sha256_id": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "signal": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_.]{0,127}$"
+    },
+    "text": {
+      "type": "string",
+      "pattern": "^[\\x20-\\x7e]{0,256}$"
+    },
+    "token": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.+:-]{0,63}$"
+    },
+    "units": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 1000000000000
+    }
+  }
+}

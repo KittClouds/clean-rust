@@ -1,0 +1,1 @@
+{"actor":"fixture-agent","authority_state":{"flags":{"tests_green":true},"forbidden_actions":[],"granted_actions":["edit"]},"facts":{"cache_hit":false,"task_kind":"code_change"},"observation_id":"c12-medium-risk-edit","schema":"S15_OBSERVATION_V1","state_hash":"sha256:09ab584d5a927306b4f1a24840d4ece2bcc0dd6a881d74d2e76d1a732a6f4a86"}
