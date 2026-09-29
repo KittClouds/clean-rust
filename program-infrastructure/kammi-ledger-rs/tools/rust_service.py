@@ -10,6 +10,10 @@ Mirrors `kammi-ledger/scripts/service.py`: same port, same admin and signing sec
 (`kammi-ledger/.kammi-dev/operational/*.secret`), credentials never in argv. The Rust store
 and binaries live in `program-infrastructure/kammi-ledger-rs-operational/`, outside both source
 trees (each Library hashes its own tree into its flight identity).
+
+The daemon hashes the release's source snapshot (`release.json` -> `source/<commit>`), never
+the development tree, so editing the repository cannot close the live flight gate; only a
+release (`tools/release.py`) changes what the daemon is bound to.
 """
 from __future__ import annotations
 
@@ -64,12 +68,21 @@ def install():
     return installed
 
 
+def release():
+    """The installed release: which source snapshot the daemon hashes (never the dev tree)."""
+    info = json.loads((OPS / "release.json").read_text())
+    source = OPS / info["source_dir"]
+    if not source.is_dir():
+        raise RuntimeError(f"release source snapshot missing: {source}")
+    return info, source
+
+
 def environment(port=PORT):
     env = {k: v for k, v in os.environ.items()
            if not k.startswith("KAMMI_") or k in {"KAMMI_OBJECT_VERIFY"}}
     env.update(KAMMI_ROOT=str(STORE), KAMMI_PORT=str(port), KAMMI_TOKEN_FILE=str(PY_SERVICE / "admin.secret"),
                KAMMI_SIGNING_KEY_FILE=str(PY_SERVICE / "signing.secret"), KAMMI_EMBEDDER="bge",
-               KAMMI_SOURCE_DIR=str(RS), KAMMI_LBUG_NATIVE_DIR=str(PY / "vendor/runtime-v1/native"))
+               KAMMI_SOURCE_DIR=str(release()[1]), KAMMI_LBUG_NATIVE_DIR=str(PY / "vendor/runtime-v1/native"))
     env["PATH"] = str(PY / "vendor/runtime-v1/native") + os.pathsep + env.get("PATH", "")
     return env
 

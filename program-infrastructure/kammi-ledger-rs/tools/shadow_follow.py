@@ -32,7 +32,8 @@ HERE = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from http_differential import PY, TARGET, Side  # noqa: E402
 
-LIVE = PY / ".kammi-dev/operational/store"
+# Since the 4E cutover (2026-09-29) the Python store is fenced; its final v1 history is here.
+LIVE = PY / ".kammi-dev/operational/store-v1-fenced-20260928"
 CACHE = PY / "vendor/runtime-v1/embedding-cache"
 ENV = {**os.environ, "PATH": str(PY / "vendor/runtime-v1/native") + os.pathsep + os.environ.get("PATH", ""), "PYTHONDONTWRITEBYTECODE": "1"}
 CUSTODY_TABLES = ["LedgerMeta", "Artifact", "Event", "Seal", "Run", "CustodyFact", "SealMember", "SealParent", "HasEvent", "HasFact",

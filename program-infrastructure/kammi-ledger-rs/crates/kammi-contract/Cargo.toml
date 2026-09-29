@@ -1,0 +1,15 @@
+[package]
+name = "kammi-contract"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+description = "Amendment v4 contract: six-clock memory time, workspace events, shell verbs (frozen, not active)"
+
+[dependencies]
+serde_json.workspace = true
+
+[dev-dependencies]
+kammi-v1.workspace = true
+phoenix-memory-contract = { path = "../../../../phoenix-native/crates/phoenix-memory-contract" }

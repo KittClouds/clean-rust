@@ -36,7 +36,8 @@ from http_differential import PY, TARGET, Side, free_port  # noqa: E402
 sys.path.insert(0, str(PY))
 from ledgerd.client import KammiClient  # noqa: E402
 
-LIVE = PY / ".kammi-dev/operational/store"
+# Since the 4E cutover (2026-09-29) the Python store is fenced; its final v1 history is here.
+LIVE = PY / ".kammi-dev/operational/store-v1-fenced-20260928"
 CACHE = PY / "vendor/runtime-v1/embedding-cache"
 SDK_SMOKE = Path(os.environ.get("KAMMI_SDK_TARGET", "D:/codex-runs/jev-v08q-r3-rust-target/kammi-ledger-target")) / "release" / "kammi-client-smoke.exe"
 ENV = {**os.environ, "PATH": str(PY / "vendor/runtime-v1/native") + os.pathsep + os.environ.get("PATH", ""), "PYTHONDONTWRITEBYTECODE": "1"}

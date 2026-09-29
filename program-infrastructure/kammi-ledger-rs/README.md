@@ -6,7 +6,22 @@ and this workspace must stay outside it: `kammi-ledger/ledgerd/release.py` hashe
 the live daemon's flight gate. Build output goes to `$CARGO_TARGET_DIR` (this machine:
 `D:/codex-runs/jev-v08q-r3-rust-target/kammi-ledger-rs-target`); the harnesses read the same variable.
 
-## Status: Phase 4A-4D complete; 4E (real cutover) awaits an explicit go
+## Status: live since 2026-09-29; Vault Phase 0 (contracts) delivered
+
+The Rust Library has served the live store since the Phase 4E cutover (2026-09-29). Releases go
+through `tools/release.py` ([docs/RELEASE.md](docs/RELEASE.md)); the daemon is bound to a
+per-release source snapshot, not to this tree. Vault Phase 0 froze the next contract, without
+activating it ([docs/VAULT-PHASE-0.md](docs/VAULT-PHASE-0.md),
+[amendment v4](ARCHITECTURE-AMENDMENT-v4-VAULT-WORKSPACE.md)):
+
+- the six-clock memory record;
+- the workspace events;
+- the `kammi` verb list;
+- the receipt stream;
+- the conditions for closing the rollback window;
+- the Rust shell (`kammi`, `kammi-mcp`).
+
+## Phase 4 (4A-4D, then the 4E cutover)
 
 Phase 4 asked whether Rust can live in production, take authority cleanly and give it back.
 See [docs/PHASE-4-GATES.md](docs/PHASE-4-GATES.md) for each gate, the evidence and the
@@ -167,7 +182,7 @@ python tools/projection_parity.py <python custody.lbdb> <rust custody.lbdb>
 
 ```powershell
 $L = "C:\code land\clean-rust\program-infrastructure\kammi-ledger"
-$env:KAMMI_V1_CORPUS = "$L\.kammi-dev\operational\store;$L\.kammi-dev\e4-import"
+$env:KAMMI_V1_CORPUS = "$L\.kammi-dev\operational\store-v1-fenced-20260928;$L\.kammi-dev\e4-import"
 $env:KAMMI_JCS_PYTHON = "$L\.venv\Scripts\python.exe"
 $env:KAMMI_LEDGER_PY = $L
 $env:KAMMI_JCS_ORACLE_CASES = "1000000"
