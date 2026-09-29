@@ -1,0 +1,10 @@
+{
+  "schema": "phoenix.e4-scale-extraction-parity/v1",
+  "rows": 256,
+  "dimension": 2048,
+  "bytes_compared": 2097152,
+  "byte_identical": true,
+  "slice_sha256": "4619536f4838034fdaacb0efe85b6f29640c3d1aa81bfab82631661c47a9d83e",
+  "historical_full_cache_sha256": "8eb80df5f73e761fe6c025fc1c66abef2027d639b6c14f56d4177d6e6a7a45a4",
+  "new_smoke_cache_sha256": "4619536f4838034fdaacb0efe85b6f29640c3d1aa81bfab82631661c47a9d83e"
+}

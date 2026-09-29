@@ -1,0 +1,88 @@
+{
+  "schema": "FAS_E4_0_STAGE_AUTH_V01",
+  "status_values": ["AUTHORIZED"],
+  "required_top_level_fields": [
+    "schema",
+    "authorization_id",
+    "status",
+    "stage",
+    "contract_sha256",
+    "contract_seal_manifest_sha256",
+    "contract_seal_root_sha256",
+    "exact_predecessor_roots",
+    "output_root",
+    "scope",
+    "authorized_by",
+    "issued_utc_unix_seconds",
+    "valid_from_utc_unix_seconds",
+    "valid_until_utc_unix_seconds"
+  ],
+  "authorized_by_value": "ACTIVE_USER_REQUEST",
+  "predecessor_roots_always_required": [
+    "e0_v10_root_sha256",
+    "e1_v04_root_sha256",
+    "e2_v07_root_sha256",
+    "e3_v02_bundle_root_sha256"
+  ],
+  "scope_fields_exact": [
+    "population_generation",
+    "tokenizer_contact",
+    "model_contact",
+    "feature_extraction",
+    "evaluation_label_opening",
+    "scoring",
+    "fitting",
+    "e4_a",
+    "heldout_template_label_opening",
+    "joint_template_label_opening"
+  ],
+  "stages": {
+    "POPULATION_GENERATION": {
+      "required_additional_roots": [],
+      "true_scope_fields": ["population_generation"]
+    },
+    "PARITY_PANEL_MATERIALIZATION": {
+      "required_additional_roots": [
+        "e4_population_root_sha256",
+        "e4_population_audit_root_sha256"
+      ],
+      "true_scope_fields": ["tokenizer_contact"]
+    },
+    "ONLINE_CACHE_PARITY": {
+      "required_additional_roots": [
+        "e4_population_root_sha256",
+        "e4_population_audit_root_sha256",
+        "e4_parity_panel_root_sha256"
+      ],
+      "true_scope_fields": ["model_contact", "feature_extraction"]
+    },
+    "FRESH_FEATURE_EXTRACTION": {
+      "required_additional_roots": [
+        "e4_population_root_sha256",
+        "e4_population_audit_root_sha256",
+        "e4_parity_panel_root_sha256",
+        "e4_parity_receipt_root_sha256"
+      ],
+      "true_scope_fields": ["model_contact", "feature_extraction"]
+    },
+    "FRESH_SCORING": {
+      "required_additional_roots": [
+        "e4_population_root_sha256",
+        "e4_population_audit_root_sha256",
+        "e4_parity_panel_root_sha256",
+        "e4_parity_receipt_root_sha256",
+        "e4_feature_cache_root_sha256"
+      ],
+      "true_scope_fields": ["evaluation_label_opening", "scoring"]
+    }
+  },
+  "scope_default": false,
+  "time_rule": "All time fields are integer Unix seconds in UTC; issued <= valid_from < valid_until; authorization is checked at execution start.",
+  "authorization_basis": "Active user request explicitly directs completion of the full E4-0 DAG under the staged authorization boundaries.",
+  "notes": [
+    "This receipt schema records stage-specific authorization and does not alter the sealed contract, predecessor, or scientific gates.",
+    "Every scope field must be present as a JSON boolean; unlisted scopes remain false.",
+    "A stage may bind additional exact predecessor root fields only when the stage definition requires them.",
+    "No authorization receipt permits E4-A, fitting, heldout-template label access, or joint-template label access."
+  ]
+}

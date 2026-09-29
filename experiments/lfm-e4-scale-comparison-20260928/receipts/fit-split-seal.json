@@ -1,0 +1,21 @@
+{
+  "schema": "phoenix.e4-scale-fit-split/v1",
+  "split": "SHA256(E4-SCALE-DEV-20260928:quartet_id) first64 mod10=0 => DEV",
+  "source": "E1 FIT only; historical E1 TEST excluded",
+  "source_hashes": {
+    "split-manifest-v01.jsonl": "fb20dd79b5d02a46e7ac65f8a69b621c19f47b193db4e9c5f898778032464e70",
+    "panel-inputs-v01.jsonl": "9f0076daa147bac37aa80d4f9a55f9225289910ceb8acc41998354c5a166917a",
+    "row-manifest-v01.jsonl": "ebfdf0064430ecae7a9ae2edd139f47c0c61291aa6c30c8ccb97daa195f835bc",
+    "fit-labels-v01.jsonl": "1c4223544ff8e164a393f6313db46dd814c50e3ea484a14ebdbed5070ebdfc15"
+  },
+  "counts": {
+    "TRAIN": 76804,
+    "DEV": 8400
+  },
+  "quartet_counts": {
+    "TRAIN": 19201,
+    "DEV": 2100
+  },
+  "fit_inputs_sha256": "646801a75496e675a5e6679a017daa966f6fa3be255e4f22081b0301f94f9964",
+  "fit_row_map_sha256": "5ef9e7a01b9f2f3fa0b29afa353775ac3f1ae686428460ece2c1f4dc3482860e"
+}

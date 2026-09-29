@@ -1,0 +1,11 @@
+{
+  "schema": "phoenix.e4-scale-independent-freshness-audit/v1",
+  "e1_rows": 106496,
+  "test_rows": 74668,
+  "duplicate_test_texts": 0,
+  "test_text_overlap_with_e1": 0,
+  "test_row_id_overlap_with_e1": 0,
+  "e1_input_sha256": "9f0076daa147bac37aa80d4f9a55f9225289910ceb8acc41998354c5a166917a",
+  "test_population_seal_sha256": "f9a368c85766f8b24e43c2fb9bcd90a03e0acf9bd0acfd10035783da73e3ebba",
+  "truth_accessed": false
+}

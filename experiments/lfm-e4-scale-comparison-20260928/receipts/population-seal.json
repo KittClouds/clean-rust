@@ -1,0 +1,27 @@
+{
+  "schema": "phoenix.e4-scale-independent-population/v1",
+  "purpose": "Same fresh E4-shaped primary TEST for 230M and 1.2B; labels stay closed until predictions seal",
+  "population_namespace": "FAS-E4-SCALE-COMPARE-20260928",
+  "seed": 2026092801,
+  "quartets": 18667,
+  "primary_rows": 74668,
+  "class_support_minimum": 276,
+  "protected_e4_panel_read": false,
+  "files": [
+    {
+      "path": "inputs.jsonl",
+      "bytes": 24031958,
+      "sha256": "5339da50c2a9f8c24cf7fab3f9474ad6999a617e3fccc06816b71b4ce6911785"
+    },
+    {
+      "path": "rows.jsonl",
+      "bytes": 19731462,
+      "sha256": "05ab991dd42c00b53b002ecb19680f65a790c70ac23b2e8267f7f7cf8e7caff4"
+    },
+    {
+      "path": "labels-sealed.jsonl",
+      "bytes": 39363264,
+      "sha256": "877277e6aca5dc7c0d162b1759a929ce07a0ce8d66141f106840cd7b39208781"
+    }
+  ]
+}
