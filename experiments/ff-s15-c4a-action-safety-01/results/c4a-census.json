@@ -1,0 +1,1175 @@
+{
+  "cal_rows": 11890,
+  "decision": {
+    "c4b_earned": false,
+    "gate_by_surface": {
+      "final_plus_mean": false,
+      "full_mean": false,
+      "layer_m4_final": false,
+      "middle_plus_final": false
+    },
+    "robust": false
+  },
+  "levels": [
+    0.03,
+    0.05,
+    0.07,
+    0.1
+  ],
+  "schema": "c4a-census/v1",
+  "surfaces": {
+    "final_plus_mean": {
+      "candidates": 7324,
+      "coherence": {
+        "c1_executed": 537,
+        "c1_harmful": 14,
+        "c1_harmful_impossible": 0,
+        "c1_impossible_executed": 0,
+        "impossible_action_candidates": 155,
+        "impossible_action_safe": 0,
+        "impossible_by_action": {
+          "REQUEST": 155
+        }
+      },
+      "conditional_harm_at_global_threshold": {
+        "0.03": {
+          "ACTIVATE": {
+            "executed": 1,
+            "harm_rate": 0.0,
+            "harmful": 0
+          },
+          "MOVE": {
+            "executed": 4,
+            "harm_rate": 0.0,
+            "harmful": 0
+          },
+          "NOOP": {
+            "executed": 552,
+            "harm_rate": 0.028985507246376812,
+            "harmful": 16
+          }
+        },
+        "0.05": {
+          "ACTIVATE": {
+            "executed": 2,
+            "harm_rate": 0.0,
+            "harmful": 0
+          },
+          "MOVE": {
+            "executed": 12,
+            "harm_rate": 0.16666666666666666,
+            "harmful": 2
+          },
+          "NOOP": {
+            "executed": 667,
+            "harm_rate": 0.047976011994003,
+            "harmful": 32
+          }
+        },
+        "0.07": {
+          "ACTIVATE": {
+            "executed": 8,
+            "harm_rate": 0.375,
+            "harmful": 3
+          },
+          "MOVE": {
+            "executed": 20,
+            "harm_rate": 0.15,
+            "harmful": 3
+          },
+          "NOOP": {
+            "executed": 860,
+            "harm_rate": 0.06511627906976744,
+            "harmful": 56
+          }
+        },
+        "0.1": {
+          "ACTIVATE": {
+            "executed": 39,
+            "harm_rate": 0.3076923076923077,
+            "harmful": 12
+          },
+          "MOVE": {
+            "executed": 72,
+            "harm_rate": 0.2777777777777778,
+            "harmful": 20
+          },
+          "NOOP": {
+            "executed": 1202,
+            "harm_rate": 0.08236272878535773,
+            "harmful": 99
+          }
+        }
+      },
+      "eligible_actions": [
+        "MOVE",
+        "ACTIVATE",
+        "NOOP"
+      ],
+      "eligible_candidates": 7169,
+      "excluded_by_action": {
+        "REQUEST": 155
+      },
+      "excluded_candidates": 155,
+      "gate_levels_passed": {
+        "0.03": false,
+        "0.05": false
+      },
+      "gate_passed": false,
+      "global_correct_at_harm": {
+        "0.03": 541,
+        "0.05": 647,
+        "0.07": 826,
+        "0.1": 1182
+      },
+      "global_correct_at_harm_all_candidates": {
+        "0.03": 541,
+        "0.05": 647,
+        "0.07": 826,
+        "0.1": 1182
+      },
+      "noise_band": {
+        "0.03": {
+          "max": 0.20147874306839197,
+          "median": 0.05360443622920519,
+          "p95": 0.10720887245841038
+        },
+        "0.05": {
+          "max": 0.22411128284389492,
+          "median": 0.1236476043276662,
+          "p95": 0.19319938176197837
+        },
+        "0.07": {
+          "max": 0.20217917675544794,
+          "median": 0.09987893462469732,
+          "p95": 0.1852300242130751
+        },
+        "0.1": {
+          "max": 0.1277495769881556,
+          "median": 0.08883248730964466,
+          "p95": 0.11336717428087995
+        }
+      },
+      "oracle": {
+        "0.03": {
+          "correct": 544,
+          "harmful": 16,
+          "per_action": {
+            "ACTIVATE": {
+              "correct": 2,
+              "executed": 2,
+              "harmful": 0,
+              "threshold": 870509.0
+            },
+            "MOVE": {
+              "correct": 6,
+              "executed": 6,
+              "harmful": 0,
+              "threshold": 879794.0
+            },
+            "NOOP": {
+              "correct": 536,
+              "executed": 552,
+              "harmful": 16,
+              "threshold": 882672.0
+            }
+          }
+        },
+        "0.05": {
+          "correct": 697,
+          "harmful": 36,
+          "per_action": {
+            "ACTIVATE": {
+              "correct": 2,
+              "executed": 2,
+              "harmful": 0,
+              "threshold": 870509.0
+            },
+            "MOVE": {
+              "correct": 6,
+              "executed": 6,
+              "harmful": 0,
+              "threshold": 879794.0
+            },
+            "NOOP": {
+              "correct": 689,
+              "executed": 725,
+              "harmful": 36,
+              "threshold": 859300.0
+            }
+          }
+        },
+        "0.07": {
+          "correct": 865,
+          "harmful": 65,
+          "per_action": {
+            "ACTIVATE": {
+              "correct": 2,
+              "executed": 2,
+              "harmful": 0,
+              "threshold": 870509.0
+            },
+            "MOVE": {
+              "correct": 17,
+              "executed": 20,
+              "harmful": 3,
+              "threshold": 844009.0
+            },
+            "NOOP": {
+              "correct": 846,
+              "executed": 908,
+              "harmful": 62,
+              "threshold": 835696.0
+            }
+          }
+        },
+        "0.1": {
+          "correct": 1398,
+          "harmful": 155,
+          "per_action": {
+            "ACTIVATE": {
+              "correct": 3,
+              "executed": 4,
+              "harmful": 1,
+              "threshold": 861965.0
+            },
+            "MOVE": {
+              "correct": 19,
+              "executed": 23,
+              "harmful": 4,
+              "threshold": 841115.0
+            },
+            "NOOP": {
+              "correct": 1376,
+              "executed": 1526,
+              "harmful": 150,
+              "threshold": 762582.0
+            }
+          }
+        }
+      },
+      "oracle_gain": {
+        "0.03": 0.005545286506469571,
+        "0.05": 0.07727975270479126,
+        "0.07": 0.04721549636803868,
+        "0.1": 0.18274111675126914
+      },
+      "post_hoc": {
+        "c1_a05_executions_by_predicted_action": {
+          "ACTIVATE": {
+            "correct": 1,
+            "executed": 1,
+            "harmful": 0
+          },
+          "MOVE": {
+            "correct": 4,
+            "executed": 4,
+            "harmful": 0
+          },
+          "NOOP": {
+            "correct": 518,
+            "executed": 532,
+            "harmful": 14
+          }
+        },
+        "note": "added after the conditional-harm table was read",
+        "top_k_harm_by_predicted_action": {
+          "ACTIVATE": {
+            "100": 0.32999999999999996,
+            "200": 0.30500000000000005,
+            "25": 0.36,
+            "50": 0.28
+          },
+          "MOVE": {
+            "100": 0.28,
+            "200": 0.31999999999999995,
+            "25": 0.24,
+            "50": 0.24
+          },
+          "NOOP": {
+            "100": 0.0,
+            "200": 0.0,
+            "25": 0.0,
+            "50": 0.0
+          }
+        },
+        "truth_act_distribution": {
+          "ACTIVATE": 829,
+          "MOVE": 1946,
+          "NOOP": 2756
+        }
+      },
+      "support": {
+        "ACTIVATE": {
+          "candidates": 1168,
+          "safe": 664
+        },
+        "MOVE": {
+          "candidates": 2575,
+          "safe": 1416
+        },
+        "NOOP": {
+          "candidates": 3426,
+          "safe": 2553
+        }
+      }
+    },
+    "full_mean": {
+      "candidates": 7501,
+      "coherence": {
+        "c1_executed": 0,
+        "c1_harmful": 0,
+        "c1_harmful_impossible": 0,
+        "impossible_action_candidates": 169,
+        "impossible_action_safe": 0,
+        "impossible_by_action": {
+          "DEACTIVATE": 1,
+          "REQUEST": 168
+        }
+      },
+      "conditional_harm_at_global_threshold": {
+        "0.03": null,
+        "0.05": {
+          "ACTIVATE": {
+            "executed": 0,
+            "harm_rate": null,
+            "harmful": 0
+          },
+          "MOVE": {
+            "executed": 0,
+            "harm_rate": null,
+            "harmful": 0
+          },
+          "NOOP": {
+            "executed": 151,
+            "harm_rate": 0.046357615894039736,
+            "harmful": 7
+          }
+        },
+        "0.07": {
+          "ACTIVATE": {
+            "executed": 0,
+            "harm_rate": null,
+            "harmful": 0
+          },
+          "MOVE": {
+            "executed": 0,
+            "harm_rate": null,
+            "harmful": 0
+          },
+          "NOOP": {
+            "executed": 181,
+            "harm_rate": 0.06629834254143646,
+            "harmful": 12
+          }
+        },
+        "0.1": {
+          "ACTIVATE": {
+            "executed": 1,
+            "harm_rate": 1.0,
+            "harmful": 1
+          },
+          "MOVE": {
+            "executed": 1,
+            "harm_rate": 0.0,
+            "harmful": 0
+          },
+          "NOOP": {
+            "executed": 263,
+            "harm_rate": 0.09505703422053231,
+            "harmful": 25
+          }
+        }
+      },
+      "eligible_actions": [
+        "MOVE",
+        "ACTIVATE",
+        "NOOP"
+      ],
+      "eligible_candidates": 7332,
+      "excluded_by_action": {
+        "DEACTIVATE": 1,
+        "REQUEST": 168
+      },
+      "excluded_candidates": 169,
+      "gate_levels_passed": {
+        "0.03": false,
+        "0.05": false
+      },
+      "gate_passed": false,
+      "global_correct_at_harm": {
+        "0.03": 0,
+        "0.05": 144,
+        "0.07": 169,
+        "0.1": 239
+      },
+      "global_correct_at_harm_all_candidates": {
+        "0.03": 0,
+        "0.05": 144,
+        "0.07": 169,
+        "0.1": 239
+      },
+      "noise_band": {
+        "0.03": {
+          "max": "inf",
+          "median": "inf",
+          "p95": "inf"
+        },
+        "0.05": {
+          "max": 0.5347222222222223,
+          "median": 0.19444444444444442,
+          "p95": 0.39583333333333326
+        },
+        "0.07": {
+          "max": 0.5917159763313609,
+          "median": 0.2721893491124261,
+          "p95": 0.4378698224852071
+        },
+        "0.1": {
+          "max": 0.4351464435146444,
+          "median": 0.2217573221757323,
+          "p95": 0.35983263598326354
+        }
+      },
+      "oracle": {
+        "0.03": {
+          "correct": 98,
+          "harmful": 3,
+          "per_action": {
+            "ACTIVATE": {
+              "correct": 0,
+              "executed": 0,
+              "harmful": 0,
+              "threshold": "inf"
+            },
+            "MOVE": {
+              "correct": 2,
+              "executed": 2,
+              "harmful": 0,
+              "threshold": 828361.0
+            },
+            "NOOP": {
+              "correct": 96,
+              "executed": 99,
+              "harmful": 3,
+              "threshold": 903917.0
+            }
+          }
+        },
+        "0.05": {
+          "correct": 146,
+          "harmful": 7,
+          "per_action": {
+            "ACTIVATE": {
+              "correct": 0,
+              "executed": 0,
+              "harmful": 0,
+              "threshold": "inf"
+            },
+            "MOVE": {
+              "correct": 2,
+              "executed": 2,
+              "harmful": 0,
+              "threshold": 828361.0
+            },
+            "NOOP": {
+              "correct": 144,
+              "executed": 151,
+              "harmful": 7,
+              "threshold": 881125.0
+            }
+          }
+        },
+        "0.07": {
+          "correct": 173,
+          "harmful": 13,
+          "per_action": {
+            "ACTIVATE": {
+              "correct": 0,
+              "executed": 0,
+              "harmful": 0,
+              "threshold": "inf"
+            },
+            "MOVE": {
+              "correct": 4,
+              "executed": 5,
+              "harmful": 1,
+              "threshold": 810425.0
+            },
+            "NOOP": {
+              "correct": 169,
+              "executed": 181,
+              "harmful": 12,
+              "threshold": 871981.0
+            }
+          }
+        },
+        "0.1": {
+          "correct": 244,
+          "harmful": 27,
+          "per_action": {
+            "ACTIVATE": {
+              "correct": 2,
+              "executed": 3,
+              "harmful": 1,
+              "threshold": 814147.0
+            },
+            "MOVE": {
+              "correct": 4,
+              "executed": 5,
+              "harmful": 1,
+              "threshold": 810425.0
+            },
+            "NOOP": {
+              "correct": 238,
+              "executed": 263,
+              "harmful": 25,
+              "threshold": 849247.0
+            }
+          }
+        }
+      },
+      "oracle_gain": {
+        "0.03": "inf",
+        "0.05": 0.01388888888888884,
+        "0.07": 0.023668639053254337,
+        "0.1": 0.02092050209205021
+      },
+      "post_hoc": {
+        "c1_a05_executions_by_predicted_action": {},
+        "note": "added after the conditional-harm table was read",
+        "top_k_harm_by_predicted_action": {
+          "ACTIVATE": {
+            "100": 0.38,
+            "200": 0.41000000000000003,
+            "25": 0.4,
+            "50": 0.36
+          },
+          "MOVE": {
+            "100": 0.52,
+            "200": 0.515,
+            "25": 0.48,
+            "50": 0.52
+          },
+          "NOOP": {
+            "100": 0.040000000000000036,
+            "200": 0.07499999999999996,
+            "25": 0.040000000000000036,
+            "50": 0.040000000000000036
+          }
+        },
+        "truth_act_distribution": {
+          "ACTIVATE": 829,
+          "MOVE": 1946,
+          "NOOP": 2756
+        }
+      },
+      "support": {
+        "ACTIVATE": {
+          "candidates": 948,
+          "safe": 495
+        },
+        "MOVE": {
+          "candidates": 3026,
+          "safe": 1230
+        },
+        "NOOP": {
+          "candidates": 3358,
+          "safe": 2064
+        }
+      }
+    },
+    "layer_m4_final": {
+      "candidates": 7531,
+      "coherence": {
+        "c1_executed": 461,
+        "c1_harmful": 15,
+        "c1_harmful_impossible": 0,
+        "c1_impossible_executed": 0,
+        "impossible_action_candidates": 84,
+        "impossible_action_safe": 0,
+        "impossible_by_action": {
+          "REQUEST": 84
+        }
+      },
+      "conditional_harm_at_global_threshold": {
+        "0.03": {
+          "ACTIVATE": {
+            "executed": 0,
+            "harm_rate": null,
+            "harmful": 0
+          },
+          "MOVE": {
+            "executed": 1,
+            "harm_rate": 0.0,
+            "harmful": 0
+          },
+          "NOOP": {
+            "executed": 456,
+            "harm_rate": 0.02850877192982456,
+            "harmful": 13
+          }
+        },
+        "0.05": {
+          "ACTIVATE": {
+            "executed": 0,
+            "harm_rate": null,
+            "harmful": 0
+          },
+          "MOVE": {
+            "executed": 7,
+            "harm_rate": 0.14285714285714285,
+            "harmful": 1
+          },
+          "NOOP": {
+            "executed": 613,
+            "harm_rate": 0.048939641109298535,
+            "harmful": 30
+          }
+        },
+        "0.07": {
+          "ACTIVATE": {
+            "executed": 1,
+            "harm_rate": 1.0,
+            "harmful": 1
+          },
+          "MOVE": {
+            "executed": 21,
+            "harm_rate": 0.3333333333333333,
+            "harmful": 7
+          },
+          "NOOP": {
+            "executed": 793,
+            "harm_rate": 0.0617906683480454,
+            "harmful": 49
+          }
+        },
+        "0.1": {
+          "ACTIVATE": {
+            "executed": 7,
+            "harm_rate": 0.5714285714285714,
+            "harmful": 4
+          },
+          "MOVE": {
+            "executed": 38,
+            "harm_rate": 0.39473684210526316,
+            "harmful": 15
+          },
+          "NOOP": {
+            "executed": 945,
+            "harm_rate": 0.08465608465608465,
+            "harmful": 80
+          }
+        }
+      },
+      "eligible_actions": [
+        "MOVE",
+        "ACTIVATE",
+        "NOOP"
+      ],
+      "eligible_candidates": 7447,
+      "excluded_by_action": {
+        "REQUEST": 84
+      },
+      "excluded_candidates": 84,
+      "gate_levels_passed": {
+        "0.03": false,
+        "0.05": false
+      },
+      "gate_passed": false,
+      "global_correct_at_harm": {
+        "0.03": 444,
+        "0.05": 589,
+        "0.07": 758,
+        "0.1": 891
+      },
+      "global_correct_at_harm_all_candidates": {
+        "0.03": 444,
+        "0.05": 589,
+        "0.07": 758,
+        "0.1": 891
+      },
+      "noise_band": {
+        "0.03": {
+          "max": 0.3153153153153154,
+          "median": 0.1936936936936937,
+          "p95": 0.277027027027027
+        },
+        "0.05": {
+          "max": 0.20203735144312396,
+          "median": 0.1307300509337861,
+          "p95": 0.17317487266553488
+        },
+        "0.07": {
+          "max": 0.13984168865435365,
+          "median": 0.03891820580474936,
+          "p95": 0.08970976253298146
+        },
+        "0.1": {
+          "max": 0.18630751964085301,
+          "median": 0.1156004489337823,
+          "p95": 0.17508417508417518
+        }
+      },
+      "oracle": {
+        "0.03": {
+          "correct": 456,
+          "harmful": 14,
+          "per_action": {
+            "ACTIVATE": {
+              "correct": 0,
+              "executed": 0,
+              "harmful": 0,
+              "threshold": "inf"
+            },
+            "MOVE": {
+              "correct": 13,
+              "executed": 14,
+              "harmful": 1,
+              "threshold": 831455.0
+            },
+            "NOOP": {
+              "correct": 443,
+              "executed": 456,
+              "harmful": 13,
+              "threshold": 870710.0
+            }
+          }
+        },
+        "0.05": {
+          "correct": 609,
+          "harmful": 32,
+          "per_action": {
+            "ACTIVATE": {
+              "correct": 0,
+              "executed": 0,
+              "harmful": 0,
+              "threshold": "inf"
+            },
+            "MOVE": {
+              "correct": 13,
+              "executed": 14,
+              "harmful": 1,
+              "threshold": 831455.0
+            },
+            "NOOP": {
+              "correct": 596,
+              "executed": 627,
+              "harmful": 31,
+              "threshold": 846121.0
+            }
+          }
+        },
+        "0.07": {
+          "correct": 776,
+          "harmful": 58,
+          "per_action": {
+            "ACTIVATE": {
+              "correct": 0,
+              "executed": 0,
+              "harmful": 0,
+              "threshold": "inf"
+            },
+            "MOVE": {
+              "correct": 13,
+              "executed": 14,
+              "harmful": 1,
+              "threshold": 831455.0
+            },
+            "NOOP": {
+              "correct": 763,
+              "executed": 820,
+              "harmful": 57,
+              "threshold": 819216.0
+            }
+          }
+        },
+        "0.1": {
+          "correct": 1122,
+          "harmful": 123,
+          "per_action": {
+            "ACTIVATE": {
+              "correct": 0,
+              "executed": 0,
+              "harmful": 0,
+              "threshold": "inf"
+            },
+            "MOVE": {
+              "correct": 13,
+              "executed": 14,
+              "harmful": 1,
+              "threshold": 831455.0
+            },
+            "NOOP": {
+              "correct": 1109,
+              "executed": 1231,
+              "harmful": 122,
+              "threshold": 765073.0
+            }
+          }
+        }
+      },
+      "oracle_gain": {
+        "0.03": 0.027027027027026973,
+        "0.05": 0.03395585738539908,
+        "0.07": 0.0237467018469657,
+        "0.1": 0.2592592592592593
+      },
+      "post_hoc": {
+        "c1_a05_executions_by_predicted_action": {
+          "MOVE": {
+            "correct": 1,
+            "executed": 1,
+            "harmful": 0
+          },
+          "NOOP": {
+            "correct": 445,
+            "executed": 460,
+            "harmful": 15
+          }
+        },
+        "note": "added after the conditional-harm table was read",
+        "top_k_harm_by_predicted_action": {
+          "ACTIVATE": {
+            "100": 0.42000000000000004,
+            "200": 0.395,
+            "25": 0.48,
+            "50": 0.42000000000000004
+          },
+          "MOVE": {
+            "100": 0.43999999999999995,
+            "200": 0.42500000000000004,
+            "25": 0.36,
+            "50": 0.36
+          },
+          "NOOP": {
+            "100": 0.0,
+            "200": 0.0,
+            "25": 0.0,
+            "50": 0.0
+          }
+        },
+        "truth_act_distribution": {
+          "ACTIVATE": 829,
+          "MOVE": 1946,
+          "NOOP": 2756
+        }
+      },
+      "support": {
+        "ACTIVATE": {
+          "candidates": 1214,
+          "safe": 643
+        },
+        "MOVE": {
+          "candidates": 2673,
+          "safe": 1378
+        },
+        "NOOP": {
+          "candidates": 3560,
+          "safe": 2496
+        }
+      }
+    },
+    "middle_plus_final": {
+      "candidates": 7420,
+      "coherence": {
+        "c1_executed": 768,
+        "c1_harmful": 28,
+        "c1_harmful_impossible": 0,
+        "c1_impossible_executed": 0,
+        "impossible_action_candidates": 112,
+        "impossible_action_safe": 0,
+        "impossible_by_action": {
+          "REQUEST": 112
+        }
+      },
+      "conditional_harm_at_global_threshold": {
+        "0.03": {
+          "ACTIVATE": {
+            "executed": 2,
+            "harm_rate": 0.5,
+            "harmful": 1
+          },
+          "MOVE": {
+            "executed": 23,
+            "harm_rate": 0.17391304347826086,
+            "harmful": 4
+          },
+          "NOOP": {
+            "executed": 679,
+            "harm_rate": 0.023564064801178203,
+            "harmful": 16
+          }
+        },
+        "0.05": {
+          "ACTIVATE": {
+            "executed": 3,
+            "harm_rate": 0.6666666666666666,
+            "harmful": 2
+          },
+          "MOVE": {
+            "executed": 44,
+            "harm_rate": 0.22727272727272727,
+            "harmful": 10
+          },
+          "NOOP": {
+            "executed": 815,
+            "harm_rate": 0.03803680981595092,
+            "harmful": 31
+          }
+        },
+        "0.07": {
+          "ACTIVATE": {
+            "executed": 5,
+            "harm_rate": 0.6,
+            "harmful": 3
+          },
+          "MOVE": {
+            "executed": 67,
+            "harm_rate": 0.2835820895522388,
+            "harmful": 19
+          },
+          "NOOP": {
+            "executed": 924,
+            "harm_rate": 0.050865800865800864,
+            "harmful": 47
+          }
+        },
+        "0.1": {
+          "ACTIVATE": {
+            "executed": 9,
+            "harm_rate": 0.4444444444444444,
+            "harmful": 4
+          },
+          "MOVE": {
+            "executed": 122,
+            "harm_rate": 0.36065573770491804,
+            "harmful": 44
+          },
+          "NOOP": {
+            "executed": 1109,
+            "harm_rate": 0.06853020739404869,
+            "harmful": 76
+          }
+        }
+      },
+      "eligible_actions": [
+        "MOVE",
+        "ACTIVATE",
+        "NOOP"
+      ],
+      "eligible_candidates": 7308,
+      "excluded_by_action": {
+        "REQUEST": 112
+      },
+      "excluded_candidates": 112,
+      "gate_levels_passed": {
+        "0.03": false,
+        "0.05": false
+      },
+      "gate_passed": false,
+      "global_correct_at_harm": {
+        "0.03": 683,
+        "0.05": 819,
+        "0.07": 927,
+        "0.1": 1116
+      },
+      "global_correct_at_harm_all_candidates": {
+        "0.03": 683,
+        "0.05": 819,
+        "0.07": 927,
+        "0.1": 1116
+      },
+      "noise_band": {
+        "0.03": {
+          "max": 0.13762811127379204,
+          "median": 0.049780380673499325,
+          "p95": 0.09516837481698381
+        },
+        "0.05": {
+          "max": 0.09523809523809534,
+          "median": 0.04761904761904767,
+          "p95": 0.06959706959706957
+        },
+        "0.07": {
+          "max": 0.1046386192017259,
+          "median": 0.05555555555555547,
+          "p95": 0.09492988133764824
+        },
+        "0.1": {
+          "max": 0.19713261648745517,
+          "median": 0.09677419354838701,
+          "p95": 0.1415770609318996
+        }
+      },
+      "oracle": {
+        "0.03": {
+          "correct": 733,
+          "harmful": 22,
+          "per_action": {
+            "ACTIVATE": {
+              "correct": 0,
+              "executed": 0,
+              "harmful": 0,
+              "threshold": "inf"
+            },
+            "MOVE": {
+              "correct": 3,
+              "executed": 3,
+              "harmful": 0,
+              "threshold": 939824.0
+            },
+            "NOOP": {
+              "correct": 730,
+              "executed": 752,
+              "harmful": 22,
+              "threshold": 852708.0
+            }
+          }
+        },
+        "0.05": {
+          "correct": 881,
+          "harmful": 46,
+          "per_action": {
+            "ACTIVATE": {
+              "correct": 0,
+              "executed": 0,
+              "harmful": 0,
+              "threshold": "inf"
+            },
+            "MOVE": {
+              "correct": 5,
+              "executed": 6,
+              "harmful": 1,
+              "threshold": 911495.0
+            },
+            "NOOP": {
+              "correct": 876,
+              "executed": 921,
+              "harmful": 45,
+              "threshold": 827940.0
+            }
+          }
+        },
+        "0.07": {
+          "correct": 1051,
+          "harmful": 79,
+          "per_action": {
+            "ACTIVATE": {
+              "correct": 0,
+              "executed": 0,
+              "harmful": 0,
+              "threshold": "inf"
+            },
+            "MOVE": {
+              "correct": 19,
+              "executed": 23,
+              "harmful": 4,
+              "threshold": 870089.0
+            },
+            "NOOP": {
+              "correct": 1032,
+              "executed": 1107,
+              "harmful": 75,
+              "threshold": 804284.0
+            }
+          }
+        },
+        "0.1": {
+          "correct": 1454,
+          "harmful": 161,
+          "per_action": {
+            "ACTIVATE": {
+              "correct": 0,
+              "executed": 0,
+              "harmful": 0,
+              "threshold": "inf"
+            },
+            "MOVE": {
+              "correct": 3,
+              "executed": 3,
+              "harmful": 0,
+              "threshold": 939824.0
+            },
+            "NOOP": {
+              "correct": 1451,
+              "executed": 1612,
+              "harmful": 161,
+              "threshold": 739127.0
+            }
+          }
+        }
+      },
+      "oracle_gain": {
+        "0.03": 0.07320644216691075,
+        "0.05": 0.07570207570207566,
+        "0.07": 0.1337648327939589,
+        "0.1": 0.30286738351254483
+      },
+      "post_hoc": {
+        "c1_a05_executions_by_predicted_action": {
+          "ACTIVATE": {
+            "correct": 1,
+            "executed": 2,
+            "harmful": 1
+          },
+          "MOVE": {
+            "correct": 24,
+            "executed": 31,
+            "harmful": 7
+          },
+          "NOOP": {
+            "correct": 715,
+            "executed": 735,
+            "harmful": 20
+          }
+        },
+        "note": "added after the conditional-harm table was read",
+        "top_k_harm_by_predicted_action": {
+          "ACTIVATE": {
+            "100": 0.39,
+            "200": 0.38,
+            "25": 0.24,
+            "50": 0.38
+          },
+          "MOVE": {
+            "100": 0.35,
+            "200": 0.37,
+            "25": 0.19999999999999996,
+            "50": 0.26
+          },
+          "NOOP": {
+            "100": 0.0,
+            "200": 0.0,
+            "25": 0.0,
+            "50": 0.0
+          }
+        },
+        "truth_act_distribution": {
+          "ACTIVATE": 829,
+          "MOVE": 1946,
+          "NOOP": 2756
+        }
+      },
+      "support": {
+        "ACTIVATE": {
+          "candidates": 1108,
+          "safe": 619
+        },
+        "MOVE": {
+          "candidates": 2693,
+          "safe": 1431
+        },
+        "NOOP": {
+          "candidates": 3507,
+          "safe": 2566
+        }
+      }
+    }
+  },
+  "truth_act_actions_on_cal": [
+    "ACTIVATE",
+    "MOVE",
+    "NOOP"
+  ]
+}
