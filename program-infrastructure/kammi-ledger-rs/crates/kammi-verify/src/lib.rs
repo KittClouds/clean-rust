@@ -511,8 +511,14 @@ mod tests {
 
     #[test]
     fn instants_compare_across_journal_timestamp_forms() {
-        assert_eq!(instant("2026-10-07T09:00:00Z"), instant("2026-10-07T09:00:00+00:00"));
-        assert_eq!(instant("2026-10-07T09:00:00.5Z"), instant("2026-10-07T09:00:00.500000+00:00"));
+        assert_eq!(
+            instant("2026-10-07T09:00:00Z"),
+            instant("2026-10-07T09:00:00+00:00")
+        );
+        assert_eq!(
+            instant("2026-10-07T09:00:00.5Z"),
+            instant("2026-10-07T09:00:00.500000+00:00")
+        );
         assert!(instant("2026-10-07T09:00:00+00:00") > instant("2026-10-06T23:59:59.999999Z"));
         assert!(instant("2026-10-07T09:00:00.000001+00:00") > instant("2026-10-07T09:00:00Z"));
     }
