@@ -89,7 +89,7 @@ def main() -> int:
             if not path.is_file():
                 failures.append(f"missing primitive: {path}")
                 continue
-            actual = sha256(path, normalize_text=(group == "source_files"))
+            actual = sha256(path)
             checked += 1
             if actual != primitive["sha256"]:
                 failures.append(
