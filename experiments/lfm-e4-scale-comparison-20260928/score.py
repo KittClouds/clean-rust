@@ -70,22 +70,22 @@ def bootstrap_pair(truth: np.ndarray, a: np.ndarray, b: np.ndarray, quartet_ids:
     if any(len(indices) == 0 for indices in strata_indices):
         raise RuntimeError("bootstrap lacks a class stratum")
     rng = generator if generator is not None else np.random.Generator(np.random.PCG64(seed))
-    values_a = np.empty(replicates, dtype=np.float64)
-    values_b = np.empty(replicates, dtype=np.float64)
-    for start in range(0, replicates, 64):
-        batch = min(64, replicates - start)
-        support = np.zeros((batch, classes), dtype=np.int64)
-        correct_a = np.zeros_like(support)
-        correct_b = np.zeros_like(support)
-        for population in strata_indices:
-            sampled = rng.choice(population, size=(batch, len(population)), replace=True)
-            support += q_support[sampled].sum(axis=1)
-            correct_a += q_a[sampled].sum(axis=1)
-            correct_b += q_b[sampled].sum(axis=1)
-        if np.any(support == 0):
-            raise RuntimeError("bootstrap replicate omitted a scored truth class")
-        values_a[start : start + batch] = (correct_a / support).mean(axis=1)
-        values_b[start : start + batch] = (correct_b / support).mean(axis=1)
+    boot_support = np.zeros((replicates, classes), dtype=np.int64)
+    boot_a = np.zeros_like(boot_support)
+    boot_b = np.zeros_like(boot_support)
+    for population in strata_indices:
+        q_count = len(population)
+        for start in range(0, replicates, 64):
+            stop = min(start + 64, replicates)
+            draws = rng.integers(0, q_count, size=(stop - start, q_count), dtype=np.int32)
+            sampled = population[draws]
+            boot_support[start:stop] += q_support[sampled].sum(axis=1)
+            boot_a[start:stop] += q_a[sampled].sum(axis=1)
+            boot_b[start:stop] += q_b[sampled].sum(axis=1)
+    if np.any(boot_support == 0):
+        raise RuntimeError("bootstrap replicate omitted a scored truth class")
+    values_a = (boot_a / boot_support).mean(axis=1)
+    values_b = (boot_b / boot_support).mean(axis=1)
     delta = values_b - values_a
     return {
         "unit": "whole quartet, class-stratified by baseline A truth",
