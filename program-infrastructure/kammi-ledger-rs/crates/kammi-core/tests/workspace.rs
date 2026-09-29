@@ -9,6 +9,7 @@ use kammi_store::{Store, StoreOptions};
 use serde_json::{json, Value};
 
 const ADMIN: Principal<'static> = Principal::Admin("admin");
+const CHIEF_ADMIN: Principal<'static> = Principal::Admin("chief-kammi");
 const CHIEF: Principal<'static> = Principal::Actor("chief-kammi");
 const REVIEWER: Principal<'static> = Principal::Actor("reviewer");
 
@@ -62,15 +63,25 @@ fn setup(ledger: &mut Ledger) {
 /// before its own registration, and returns the activation payload.
 fn activation_payload(ledger: &mut Ledger, decision: &str) -> Value {
     let n = ledger.store.main.seq();
-    let (closure, _) = ledger.register_bytes(json!({"schema": "KAMMI_ROLLBACK_WINDOW_CLOSURE_V1", "decision": decision, "decided_by": "user", "n": n}).to_string().as_bytes(), "decision", "admin", &format!("closure-{n}")).unwrap();
-    let (backup, _) = ledger
+    let effective_at = ledger.now().event_utc();
+    let (amendment, _) = ledger.register_bytes(json!({"schema": "KAMMI_V4_EARLY_ACTIVATION_AMENDMENT_V1", "decision_authority": "PROGRAM_OWNER", "effective_at": effective_at, "removes_fixed_floor": true, "n": n}).to_string().as_bytes(), "protocol-amendment", "admin", &format!("amendment-{n}")).unwrap();
+    let monitoring_bytes = b"{\"utc\":\"2026-10-01T00:00:00Z\",\"flight_gate\":\"OPEN\",\"projection_lag\":0,\"warning\":false}\n";
+    let (monitoring_snapshot, _) = ledger
         .register_bytes(
-            json!({"backup": "manifest", "n": n}).to_string().as_bytes(),
-            "backup",
+            monitoring_bytes,
+            "monitoring-snapshot",
             "admin",
-            &format!("backup-{n}"),
+            &format!("monitoring-{n}"),
         )
         .unwrap();
+    let (rollback_evidence, _) = ledger.register_bytes(json!({"schema": "KAMMI_ROLLBACK_EVIDENCE_AUDIT_V1", "rollback_available": true, "previous_release_rollback_proven": true, "python_verification": {"status": "PASS"}, "release_reports_valid": true, "n": n}).to_string().as_bytes(), "rollback-evidence", "admin", &format!("rollback-{n}")).unwrap();
+    let inventory_hash = "c07aa359b59ec448bbb0b4fdb3802a733ffb9e72794ea42335d8716d4cc53c14";
+    let (inventory, _) = ledger.register_bytes(json!({"schema": "KAMMI_BACKUP_INVENTORY_V1", "inventory_sha256": inventory_hash, "file_count": 1, "total_bytes": 1, "files": [{"path": "fixture.bin", "bytes": 1, "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"}]}).to_string().as_bytes(), "backup-inventory", "admin", &format!("inventory-{n}")).unwrap();
+    let source_head = "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+    let (backup, _) = ledger.register_bytes(json!({"schema": "KAMMI_PRE_ACTIVATION_BACKUP_V2", "source_head": source_head, "file_count": 1, "total_bytes": 1, "inventory_sha256": inventory_hash, "inventory_artifact": inventory, "kammi_verify": {"status": "PASS", "journal_head": source_head}, "python_export_verify": {"status": "PASS", "journal_head": source_head}, "n": n}).to_string().as_bytes(), "backup", "admin", &format!("backup-{n}")).unwrap();
+    let monitoring_audit = json!({"snapshot_artifact": monitoring_snapshot, "snapshot_sha256": monitoring_snapshot.strip_prefix("sha256:").unwrap(), "sample_count": 1, "gap_count": 0, "max_gap_seconds": 0, "warning_count": 0, "latest_sample_utc": "2026-10-01T00:00:00Z", "latest_sample_fresh": true, "scheduled_backup_configured": false, "monitor_requires_interactive_logon": true, "daemon_autostart_configured": false});
+    let risk_acceptance = json!({"early_activation": true, "known_monitoring_gaps": true, "known_rollback_evidence": true, "fix_forward": true, "rollback_to_python_ends": true, "backup_policy_reviewed": true, "monitoring_policy_reviewed": true, "restart_policy_reviewed": true, "source_publicity_reviewed": true});
+    let (closure, _) = ledger.register_bytes(json!({"schema": "KAMMI_ROLLBACK_WINDOW_CLOSURE_V2", "decision": decision, "decision_authority": "PROGRAM_OWNER", "amendment_artifact": amendment, "monitoring_snapshot_artifact": monitoring_snapshot, "rollback_evidence_artifact": rollback_evidence, "monitoring_audit": monitoring_audit, "effective_at": effective_at, "risk_acceptance": risk_acceptance, "n": n}).to_string().as_bytes(), "decision", "admin", &format!("closure-{n}")).unwrap();
     let head = ledger.store.main.head().to_string();
     let (verification, _) = ledger
         .register_bytes(
@@ -82,7 +93,7 @@ fn activation_payload(ledger: &mut Ledger, decision: &str) -> Value {
             &format!("verify-{n}"),
         )
         .unwrap();
-    json!({"vocabulary": "v4", "not_before": "2026-10-06T00:00:00Z", "closure_decision": closure, "verification": verification, "backup": backup})
+    json!({"vocabulary": "v4", "effective_at": effective_at, "amendment": amendment, "closure_decision": closure, "verification": verification, "backup": backup, "monitoring_snapshot": monitoring_snapshot, "rollback_evidence": rollback_evidence})
 }
 
 fn activate(ledger: &mut Ledger) {
@@ -135,18 +146,19 @@ fn v4_is_refused_until_the_journaled_activation() {
 }
 
 #[test]
-fn activation_is_dated_decided_verified_and_one_way() {
+fn activation_uses_owner_decision_without_clock_override_and_is_one_way() {
     let dir = tempfile::tempdir().unwrap();
     let c = clock("2026-10-01T00:00:00Z");
     let mut ledger = open(dir.path(), &c);
     setup(&mut ledger);
     let early = activation_payload(&mut ledger, "CLOSE");
+    let mut future = early.clone();
+    future["effective_at"] = json!("2026-10-02T00:00:00Z");
     assert!(ledger
-        .activate_vocabulary(early.clone(), "admin", "a1")
+        .activate_vocabulary(future, "admin", "a1")
         .unwrap_err()
         .detail()
-        .contains("cannot close before"));
-    c.set(parse_utc("2026-10-06T00:00:00Z").unwrap());
+        .contains("future"));
     let keep = activation_payload(&mut ledger, "KEEP_OPEN");
     assert!(ledger
         .activate_vocabulary(keep, "admin", "a2")
@@ -198,11 +210,11 @@ fn workspace_life_cycle_and_replay_identity() {
     let created = cmd(&mut ledger, "WorkspaceCreated", json!({"workspace_id": ws, "expected_head": "genesis", "title": "Frozen Fabrique E4-0", "lab": "frozen-fabrique", "owners": ["chief-kammi"]}), ADMIN, "ws-create").unwrap();
     assert!(cmd(&mut ledger, "WorkspaceCreated", json!({"workspace_id": "x", "expected_head": "genesis", "title": "t", "lab": "l", "owners": ["chief-kammi"]}), CHIEF, "x").is_err(), "only admin creates");
     let h = created["head"].as_str().unwrap().to_string();
-    cmd(&mut ledger, "WorkspaceObjectiveSet", json!({"workspace_id": ws, "expected_head": h, "objective": "Reach a single scoped E4-0 scoring decision", "refs": [format!("artifact:{evidence}")]}), CHIEF, "objective").unwrap();
+    cmd(&mut ledger, "WorkspaceObjectiveSet", json!({"workspace_id": ws, "expected_head": h, "objective": "Reach a single scoped E4-0 scoring decision", "refs": [format!("artifact:{evidence}")]}), CHIEF_ADMIN, "objective").unwrap();
     let h = head(&ledger, ws);
-    cmd(&mut ledger, "WorkspaceScopeSet", json!({"workspace_id": ws, "expected_head": h, "authorized": ["bookkeeping on the E4-0 record"], "forbidden": ["open protected labels", "enter E4-01"], "refs": []}), CHIEF, "scope").unwrap();
+    cmd(&mut ledger, "WorkspaceScopeSet", json!({"workspace_id": ws, "expected_head": h, "authorized": ["bookkeeping on the E4-0 record"], "forbidden": ["open protected labels", "enter E4-01"], "refs": []}), CHIEF_ADMIN, "scope").unwrap();
     let h = head(&ledger, ws);
-    cmd(&mut ledger, "WorkspaceHandoffSent", json!({"workspace_id": ws, "expected_head": h, "handoff_id": "h-review", "to": "reviewer", "summary": "Review the scoring packet", "next_step": "Return READY or BLOCKED", "refs": [format!("artifact:{evidence}")]}), CHIEF, "handoff").unwrap();
+    cmd(&mut ledger, "WorkspaceHandoffSent", json!({"workspace_id": ws, "expected_head": h, "handoff_id": "h-review", "to": "reviewer", "summary": "Review the scoring packet", "next_step": "Return READY or BLOCKED", "refs": [format!("artifact:{evidence}")]}), CHIEF_ADMIN, "handoff").unwrap();
 
     // The outsider may not write; the handoff recipient may take part but not set scope.
     let h = head(&ledger, ws);
@@ -251,7 +263,7 @@ fn workspace_life_cycle_and_replay_identity() {
     let h = head(&ledger, ws);
     cmd(&mut ledger, "WorkspaceDecisionRecorded", json!({"workspace_id": ws, "expected_head": h, "decision_id": "d1", "text": "READY for scoped scoring authorization", "rationale": "bindings match", "refs": [format!("event:{}", attached["event_id"].as_str().unwrap())]}), REVIEWER, "decide").unwrap();
     let h = head(&ledger, ws);
-    cmd(&mut ledger, "WorkspaceNextStepSet", json!({"workspace_id": ws, "expected_head": h, "next_step": "Chief prepares the scoped scoring grant", "refs": []}), CHIEF, "next").unwrap();
+    cmd(&mut ledger, "WorkspaceNextStepSet", json!({"workspace_id": ws, "expected_head": h, "next_step": "Chief prepares the scoped scoring grant", "refs": []}), CHIEF_ADMIN, "next").unwrap();
 
     let packet = ledger.work_packet(ws).unwrap();
     let text = packet["text"].as_str().unwrap();
@@ -284,7 +296,7 @@ fn workspace_life_cycle_and_replay_identity() {
     let view = ledger.workspace_view(ws).unwrap();
 
     let h = head(&ledger, ws);
-    cmd(&mut ledger, "WorkspaceClosed", json!({"workspace_id": ws, "expected_head": h, "outcome": "handed to scoring", "summary": "review complete"}), CHIEF, "close").unwrap();
+    cmd(&mut ledger, "WorkspaceClosed", json!({"workspace_id": ws, "expected_head": h, "outcome": "handed to scoring", "summary": "review complete"}), CHIEF_ADMIN, "close").unwrap();
     let h = head(&ledger, ws);
     assert!(cmd(&mut ledger, "WorkspaceNoteRecorded", json!({"workspace_id": ws, "expected_head": h, "note_id": "n9", "text": "after", "refs": []}), CHIEF, "n9").unwrap_err().detail().contains("closed"));
     let closed_packet = serde_json::to_string(&ledger.work_packet(ws).unwrap()).unwrap();
@@ -352,7 +364,7 @@ fn random_command_sequences_keep_every_invariant() {
         state ^= state << 17;
         state % n
     };
-    let principals = [ADMIN, CHIEF, REVIEWER, Principal::Actor("outsider")];
+    let principals = [ADMIN, CHIEF_ADMIN, REVIEWER, Principal::Actor("outsider")];
     let mut seen_heads: Vec<String> = Vec::new();
     let mut committed: Vec<(String, Value, String, String)> = Vec::new();
     let (mut ok, mut refused, mut conflicts, mut replays) = (0, 0, 0, 0);
@@ -362,11 +374,16 @@ fn random_command_sequences_keep_every_invariant() {
             // Retry a committed command with its original request ID and payload.
             let (kind, payload, request, event) =
                 committed[next(committed.len() as u64) as usize].clone();
-            let who = if kind == "WorkspaceObjectiveSet"
-                || kind == "WorkspaceScopeSet"
-                || kind == "WorkspaceClosed"
+            let who = if [
+                "WorkspaceObjectiveSet",
+                "WorkspaceScopeSet",
+                "WorkspaceNextStepSet",
+                "WorkspaceHandoffSent",
+                "WorkspaceClosed",
+            ]
+            .contains(&kind.as_str())
             {
-                CHIEF
+                CHIEF_ADMIN
             } else {
                 ADMIN
             };

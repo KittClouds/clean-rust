@@ -177,11 +177,11 @@ fn verb_abi_is_unique_and_phased() {
 fn activation_payload() {
     use kammi_contract::activation;
     let a = "sha256:3333333333333333333333333333333333333333333333333333333333333333";
-    let ok = json!({"vocabulary": "v4", "not_before": activation::NOT_BEFORE, "closure_decision": a, "verification": a, "backup": a});
+    let ok = json!({"vocabulary": "v4", "effective_at": "2026-09-29T14:00:00Z", "amendment": a, "closure_decision": a, "verification": a, "backup": a, "monitoring_snapshot": a, "rollback_evidence": a});
     activation::validate(&ok).unwrap();
     for (field, bad) in [
         ("vocabulary", json!("v5")),
-        ("not_before", json!("2026-10-01T00:00:00Z")),
+        ("effective_at", json!("2026-10-01T00:00:00-05:00")),
         ("backup", json!("nope")),
     ] {
         let mut p = ok.clone();

@@ -91,7 +91,7 @@ const SCOPE: Arg = arg(
 pub const SPECS: [VerbSpec; 20] = [
     VerbSpec { verb: "create", event: Some("WorkspaceCreated"), about: "Create a workspace (Library admin only; Chief Kammi)", args: &[
         arg("workspace", Text, true, Some(0), "New workspace ID"), arg("title", Text, true, None, "Title"),
-        arg("lab", Text, true, None, "Owning lab"), arg("owners", Texts, true, None, "Owner actors (registered)"),
+        arg("lab", Text, true, None, "Source lab identity"), arg("owners", Texts, true, None, "Must be [chief-kammi]; agents join by Chief handoff"),
     ]},
     VerbSpec { verb: "open", event: Some("WorkspaceAgentAttached"), about: "Attach this agent to a workspace and read its work packet", args: &[
         arg("workspace", Text, true, Some(0), "Workspace ID"),

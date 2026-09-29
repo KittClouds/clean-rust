@@ -2,7 +2,7 @@
 
   python tools/workspace_e2e.py <work dir> [--output report.json]
 
-A real daemon (acceptance fixture mode, fixed clock after the rollback-window floor) on an
+A real daemon (acceptance fixture mode with a deterministic test clock) on an
 import of the E4 fixture:
 - v4 refused until the journaled activation; activation rules;
 - an owner (chief-kammi) and a handoff recipient (reviewer) working through `kammi` CLI
@@ -28,6 +28,7 @@ HERE = Path(__file__).resolve().parents[1]
 PY = HERE.parent / "kammi-ledger"
 sys.path.insert(0, str(HERE / "tools"))
 from http_differential import free_port  # noqa: E402
+from activation_fixture import register_v4_records  # noqa: E402
 
 TARGET = Path(os.environ["KAMMI_BIN_DIR"]) if os.environ.get("KAMMI_BIN_DIR") else Path(os.environ.get("CARGO_TARGET_DIR", "")) / "release"
 NATIVE = str(PY / "vendor/runtime-v1/native")
@@ -107,11 +108,11 @@ def main():
             raw = json.dumps(obj).encode()
             return daemon.call("POST", "/v1/artifacts/base64", {"bytes_base64": base64.b64encode(raw).decode(), "kind": kind, "actor": "admin", "request_id": request})[1]["artifact_id"]
 
-        closure = register({"schema": "KAMMI_ROLLBACK_WINDOW_CLOSURE_V1", "decision": "CLOSE", "decided_by": "e2e fixture"}, "decision", "closure")
-        backup = register({"backup": "e2e fixture"}, "backup", "backup")
+        head = daemon.call("GET", "/v1/status")[1]["journal_head"]
+        payload = register_v4_records(register, prefix="e2e-v4", effective_at="2026-10-07T09:00:00Z", source_head=head)
         head = daemon.call("GET", "/v1/status")[1]["journal_head"]
         verification = register({"status": "PASS", "journal_head": head, "verifier": "e2e fixture"}, "verification", "verification")
-        payload = {"vocabulary": "v4", "not_before": "2026-10-06T00:00:00Z", "closure_decision": closure, "verification": verification, "backup": backup}
+        payload["verification"] = verification
         status, body = daemon.call("POST", "/v2/vocabulary/activate", {**payload, "request_id": "activate"}, token=tokens["chief-kammi"])
         checks["activation_needs_admin"] = status == 401
         status, body = daemon.call("POST", "/v2/vocabulary/activate", {**payload, "request_id": "activate"})
@@ -132,9 +133,18 @@ def main():
             ("next", "Engineering reviewer returns READY or BLOCKED on the scoring packet"),
             ("handoff", "--to", "reviewer", "--summary", "Review the E4-0 scoring packet", "--next-step", "Return READY or BLOCKED with the exact mismatch"),
         ]
+        admin_shell = lambda actor, session, *argv: subprocess.run(
+            [str(TARGET / "kammi.exe"), *argv],
+            env={**os.environ, "KAMMI_URL": daemon.url, "KAMMI_TOKEN": ADMIN, "KAMMI_ACTOR": actor,
+                 "KAMMI_SESSION": str(root / f"{session}.session.json")},
+            capture_output=True, text=True, timeout=60)
+        restricted = [admin_shell("chief-kammi", "chief", *step).returncode for step in steps]
+        checks["chief_controls_with_admin"] = restricted == [0, 0, 0, 0]
         codes = [shell("chief-kammi", "chief", *s).returncode for s in steps]
-        checks["owner_writes_follow_session_head"] = codes == [0, 0, 0, 0]
-        if codes != [0, 0, 0, 0]:
+        checks["lab_actor_cannot_control_workspace"] = codes == [1, 1, 1, 1]
+        checks["owner_writes_follow_session_head"] = restricted == [0, 0, 0, 0]
+        # A participant can still contribute after Chief routes a handoff.
+        if restricted != [0, 0, 0, 0]:
             detail["owner_writes"] = [shell("chief-kammi", "chief", "work").stdout[-800:]]
 
         # --- outsider refused; reviewer (handoff recipient) takes part

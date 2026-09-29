@@ -28,6 +28,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from http_differential import PY, TARGET, Side  # noqa: E402
+from activation_fixture import register_v4_records  # noqa: E402
 
 ADMIN = "cleanroom-admin"
 RUN, STAGE, LAB = "stress.run", "STRESS", "library"
@@ -78,12 +79,11 @@ def token_of(actor):
     return "stress-token-" + actor
 
 
-# A1 and A7 run with the fixed clock after the rollback-window floor, so their stores can take
-# the journaled v4 activation (neither depends on the clock: no leases, no grant expiry).
-V4_CLOCK = {"KAMMI_TEST_CLOCK": "2026-10-07T00:00:00Z"}
+# A1 and A7 use a deterministic fixture clock. The activation path has no waiting-period clock gate.
+V4_CLOCK = {"KAMMI_TEST_CLOCK": "2026-09-29T00:00:00Z"}
 
 
-def activate_v4(port, workspaces, owner="a0"):
+def activate_v4(port, workspaces, workspace_participants=None):
     """Journaled activation on a stress store (fixture decision and verification), then workspaces."""
     c = Client(port)
 
@@ -93,18 +93,33 @@ def activate_v4(port, workspaces, owner="a0"):
         assert status == 200, body
         return body["artifact_id"]
 
-    closure = register({"schema": "KAMMI_ROLLBACK_WINDOW_CLOSURE_V1", "decision": "CLOSE", "decided_by": "stress fixture"}, "decision", "v4-closure")
-    backup = register({"backup": "stress fixture"}, "backup", "v4-backup")
+    c.call("POST", "/v1/actors", {"actor_id": "chief-kammi", "kind": "service", "lab": "kammi-ops",
+                                    "credential_sha256": hashlib.sha256(token_of("chief-kammi").encode()).hexdigest(),
+                                    "request_id": "actor-chief-kammi"})
+    head = c.call("GET", "/v1/status")[1]["journal_head"]
+    payload = register_v4_records(register, prefix="v4-activation", effective_at="2026-09-29T00:00:00Z", source_head=head)
     head = c.call("GET", "/v1/status")[1]["journal_head"]
     verification = register({"status": "PASS", "journal_head": head, "verifier": "stress fixture"}, "verification", "v4-verification")
-    status, body = c.call("POST", "/v2/vocabulary/activate", {"vocabulary": "v4", "not_before": "2026-10-06T00:00:00Z", "closure_decision": closure,
-                          "verification": verification, "backup": backup, "request_id": "v4-activate"})
+    payload.update({"verification": verification, "request_id": "v4-activate"})
+    status, body = c.call("POST", "/v2/vocabulary/activate", payload)
     assert status == 200, body
     heads = {}
     for w in workspaces:
-        status, body = c.call("POST", "/v2/workspaces", {"workspace_id": w, "title": w, "lab": LAB, "owners": [owner], "request_id": f"ws-{w}"})
+        status, body = c.call("POST", "/v2/workspaces", {"workspace_id": w, "title": w, "lab": LAB, "owners": ["chief-kammi"], "request_id": f"ws-{w}"})
         assert status == 200, body
         heads[w] = body["head"]
+    for ws, actors in (workspace_participants or {}).items():
+        for index, actor in enumerate(actors):
+            status, body = c.call("POST", f"/v2/workspaces/{ws}/commands", {
+                "type": "WorkspaceHandoffSent", "actor_id": "chief-kammi",
+                "request_id": f"chief-handoff-{ws}-{actor}",
+                "payload": {"workspace_id": ws, "expected_head": heads[ws],
+                            "handoff_id": f"h-{ws}-{actor}", "to": actor,
+                            "summary": "Contribute bounded test records as a routed participant",
+                            "next_step": "Write notes in this workspace only; Chief retains workspace control.", "refs": []},
+            })
+            assert status == 200, body
+            heads[ws] = body["head"]
     return heads
 
 
@@ -295,7 +310,9 @@ def a1(work, seconds):
     rig.start(V4_CLOCK)
     setup(rig.side.port)
     port = rig.side.port
-    heads = activate_v4(port, [f"ws{i}" for i in range(4)] + ["ws-shared"])
+    participants = {f"ws{i}": [f"a{i}"] for i in range(4)}
+    participants["ws-shared"] = [f"a{i}" for i in range(4, 8)]
+    heads = activate_v4(port, [f"ws{i}" for i in range(4)] + ["ws-shared"], participants)
 
     def writer(i, stop, out):
         c, acked, statuses, n = Client(port), {}, Counter(), 0
@@ -308,7 +325,7 @@ def a1(work, seconds):
                 # One writer per workspace: its own HEAD chain, never stale.
                 body = {"type": "WorkspaceNoteRecorded", "payload": {"expected_head": head, "note_id": f"n{i}-{n}", "text": f"a1 note {rid}", "refs": []},
                         "actor_id": "a0", "request_id": rid}
-                status, reply = c.retry("POST", f"/v2/workspaces/ws{i}/commands", body)
+                status, reply = c.retry("POST", f"/v2/workspaces/ws{i}/commands", body, token=token_of(f"a{i}"))
                 ws_statuses[status] += 1
                 if status == 200:
                     head = reply["head"]
@@ -319,7 +336,7 @@ def a1(work, seconds):
                 current = c.retry("GET", "/v2/workspaces/ws-shared")[1]["head"]
                 body = {"type": "WorkspaceNoteRecorded", "payload": {"expected_head": current, "note_id": f"s{i}-{n}", "text": f"a1 shared {rid}", "refs": []},
                         "actor_id": "a0", "request_id": rid}
-                status, reply = c.retry("POST", "/v2/workspaces/ws-shared/commands", body)
+                status, reply = c.retry("POST", "/v2/workspaces/ws-shared/commands", body, token=token_of(f"a{i}"))
                 ws_statuses[status] += 1
                 if status == 200:
                     acked[rid] = reply["event_id"]
@@ -583,9 +600,16 @@ def a7(work, minutes, kill_every):
     rig.start(V4_CLOCK)
     setup(rig.side.port)
     port = rig.side.port
-    activate_v4(port, ["soak-ws"])
+    heads = activate_v4(port, ["soak-ws"], {"soak-ws": ["a0"]})
     Client(port).call("POST", "/v1/actors", {"actor_id": "soak", "kind": "agent", "lab": LAB,
                       "credential_sha256": hashlib.sha256(token_of("soak").encode()).hexdigest(), "request_id": "actor-soak"})
+    current = Client(port).call("GET", "/v2/workspaces/soak-ws")[1]["head"]
+    status, handoff = Client(port).call("POST", "/v2/workspaces/soak-ws/commands", {
+        "type": "WorkspaceHandoffSent", "actor_id": "chief-kammi", "request_id": "chief-handoff-soak",
+        "payload": {"workspace_id": "soak-ws", "expected_head": current, "handoff_id": "h-soak",
+                    "to": "soak", "summary": "Contribute bounded soak notes as a participant",
+                    "next_step": "Write notes and recall workspace memory as routed.", "refs": []}})
+    assert status == 200, handoff
     samples, statuses, lock = [], Counter(), threading.Lock()
 
     def load(i, stop, out):
@@ -598,9 +622,9 @@ def a7(work, minutes, kill_every):
             elif i == 2 and n % 10 == 0:
                 current = c.retry("GET", "/v2/workspaces/soak-ws")[1]["head"]
                 status, _ = c.retry("POST", "/v2/workspaces/soak-ws/commands", {"type": "WorkspaceNoteRecorded", "actor_id": "a0", "request_id": f"soak-ws-{n}",
-                                    "payload": {"expected_head": current, "note_id": f"n{n}", "text": f"soak note {n}", "refs": []}})
+                                    "payload": {"expected_head": current, "note_id": f"n{n}", "text": f"soak note {n}", "refs": []}}, token=token_of("a0"))
             elif i == 3 and n % 7 == 0:
-                status, _ = c.retry("POST", "/v2/recall", {"query": "soak note", "scope": "workspace:soak-ws", "actor_id": "a0", "request_id": f"soak-recall-{n}"})
+                status, _ = c.retry("POST", "/v2/recall", {"query": "soak note", "scope": "workspace:soak-ws", "actor_id": "a0", "request_id": f"soak-recall-{n}"}, token=token_of("a0"))
             elif i == 1 and n % 5 == 0:
                 status, _ = c.retry("POST", "/v1/memory/search", {"query": "restarts leases", "scope": LAB, "actor_id": "soak", "mode": "hybrid",
                                     "limit": 10, "request_id": f"soak-s-{n}"}, token=token_of("soak"))

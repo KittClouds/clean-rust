@@ -94,14 +94,44 @@ impl Builder {
 
 fn activated() -> Builder {
     let mut b = Builder::new();
-    let decision = b.register(b"decision");
-    let backup = b.register(b"backup");
+    let effective_at = "2026-10-07T00:00:00Z";
+    let amendment = b.register(json!({"schema":"KAMMI_V4_EARLY_ACTIVATION_AMENDMENT_V1",
+        "decision_authority":"PROGRAM_OWNER", "effective_at":effective_at, "removes_fixed_floor":true}).to_string().as_bytes());
+    let monitor_line =
+        json!({"utc":effective_at,"flight_gate":"OPEN","projection_lag":0,"warning":false})
+            .to_string()
+            + "\n";
+    let monitoring = b.register(monitor_line.as_bytes());
+    let rollback = b.register(br#"{"schema":"KAMMI_ROLLBACK_EVIDENCE_AUDIT_V1","rollback_available":true,"previous_release_rollback_proven":true,"python_verification":{"status":"PASS"},"release_reports_valid":true}"#);
+    let inventory_hash = "c07aa359b59ec448bbb0b4fdb3802a733ffb9e72794ea42335d8716d4cc53c14";
+    let inventory = b.register(json!({"schema":"KAMMI_BACKUP_INVENTORY_V1","inventory_sha256":inventory_hash,"file_count":1,"total_bytes":1,
+        "files":[{"path":"fixture.bin","bytes":1,"sha256":"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"}]}).to_string().as_bytes());
+    let backup = b.register(json!({"schema":"KAMMI_PRE_ACTIVATION_BACKUP_V2","source_head":"sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "file_count":1,"total_bytes":1,"inventory_sha256":inventory_hash,"inventory_artifact":inventory,
+        "kammi_verify":{"status":"PASS","journal_head":"sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
+        "python_export_verify":{"status":"PASS","journal_head":"sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}}).to_string().as_bytes());
     let verification = b.register(b"verification");
+    let monitoring_audit = json!({"snapshot_artifact":monitoring,"snapshot_sha256":monitoring.strip_prefix("sha256:").unwrap(),
+        "sample_count":1,"gap_count":0,"max_gap_seconds":0,"warning_count":0,"latest_sample_utc":effective_at,"latest_sample_fresh":true,
+        "scheduled_backup_configured":false,"monitor_requires_interactive_logon":true,"daemon_autostart_configured":false});
+    let decision = b.register(
+        json!({"schema": "KAMMI_ROLLBACK_WINDOW_CLOSURE_V2", "decision": "CLOSE",
+            "decision_authority": "PROGRAM_OWNER", "amendment_artifact": amendment,
+            "monitoring_snapshot_artifact": monitoring,"rollback_evidence_artifact":rollback,
+            "monitoring_audit":monitoring_audit,"effective_at": effective_at,
+            "risk_acceptance": {"early_activation": true, "known_monitoring_gaps": true,
+                "known_rollback_evidence": true, "fix_forward": true,"rollback_to_python_ends":true,
+                "backup_policy_reviewed":true,"monitoring_policy_reviewed":true,
+                "restart_policy_reviewed":true,"source_publicity_reviewed":true}})
+        .to_string()
+        .as_bytes(),
+    );
     b.event(
         "LibraryVocabularyActivated",
-        json!({"vocabulary": "v4", "not_before": "2026-10-06T00:00:00Z",
-        "closure_decision": decision, "verification": verification, "backup": backup}),
-        "2026-10-07T00:00:00Z",
+        json!({"vocabulary": "v4", "effective_at": effective_at, "amendment": amendment,
+        "closure_decision": decision, "verification": verification, "backup": backup,
+        "monitoring_snapshot":monitoring,"rollback_evidence":rollback}),
+        effective_at,
     );
     b
 }
@@ -113,7 +143,7 @@ fn verify(b: &Builder) -> kammi_verify::Report {
 }
 
 fn created(b: &mut Builder) -> String {
-    b.event("WorkspaceCreated", json!({"workspace_id": "w", "expected_head": "genesis", "title": "t", "lab": "l", "owners": ["o"]}), "2026-10-07T01:00:00Z")
+    b.event("WorkspaceCreated", json!({"workspace_id": "w", "expected_head": "genesis", "title": "t", "lab": "l", "owners": ["chief-kammi"]}), "2026-10-07T01:00:00Z")
 }
 
 #[test]
@@ -160,23 +190,47 @@ fn v4_before_activation_and_unknown_types_fail() {
 }
 
 #[test]
-fn an_early_or_malformed_activation_fails() {
+fn an_activation_with_future_effective_time_fails() {
     let mut b = Builder::new();
-    let a = b.register(b"a");
+    let effective_at = "2026-10-06T00:00:00Z";
+    let amendment = b.register(json!({"schema":"KAMMI_V4_EARLY_ACTIVATION_AMENDMENT_V1",
+        "decision_authority":"PROGRAM_OWNER", "effective_at":effective_at, "removes_fixed_floor":true}).to_string().as_bytes());
+    let monitor_line = json!({"utc":"2026-10-05T00:00:00Z","flight_gate":"OPEN","projection_lag":0,"warning":false}).to_string() + "\n";
+    let monitoring = b.register(monitor_line.as_bytes());
+    let rollback = b.register(br#"{"schema":"KAMMI_ROLLBACK_EVIDENCE_AUDIT_V1","rollback_available":true,"previous_release_rollback_proven":true,"python_verification":{"status":"PASS"},"release_reports_valid":true}"#);
+    let inventory_hash = "c07aa359b59ec448bbb0b4fdb3802a733ffb9e72794ea42335d8716d4cc53c14";
+    let inventory = b.register(json!({"schema":"KAMMI_BACKUP_INVENTORY_V1","inventory_sha256":inventory_hash,"file_count":1,"total_bytes":1,
+        "files":[{"path":"fixture.bin","bytes":1,"sha256":"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"}]}).to_string().as_bytes());
+    let backup = b.register(json!({"schema":"KAMMI_PRE_ACTIVATION_BACKUP_V2","source_head":"sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "file_count":1,"total_bytes":1,"inventory_sha256":inventory_hash,"inventory_artifact":inventory,
+        "kammi_verify":{"status":"PASS","journal_head":"sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
+        "python_export_verify":{"status":"PASS","journal_head":"sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}}).to_string().as_bytes());
+    let decision = b.register(
+        json!({"schema": "KAMMI_ROLLBACK_WINDOW_CLOSURE_V2", "decision": "CLOSE",
+            "decision_authority": "PROGRAM_OWNER", "amendment_artifact": amendment,
+            "monitoring_snapshot_artifact":monitoring,"rollback_evidence_artifact":rollback,
+            "monitoring_audit":{"snapshot_artifact":monitoring,"snapshot_sha256":monitoring.strip_prefix("sha256:").unwrap(),
+                "sample_count":1,"gap_count":0,"max_gap_seconds":0,"warning_count":0,"latest_sample_utc":"2026-10-05T00:00:00Z","latest_sample_fresh":true,
+                "scheduled_backup_configured":false,"monitor_requires_interactive_logon":true,"daemon_autostart_configured":false},
+            "effective_at": effective_at,
+            "risk_acceptance": {"early_activation": true, "known_monitoring_gaps": true,
+                "known_rollback_evidence": true, "fix_forward": true,"rollback_to_python_ends":true,
+                "backup_policy_reviewed":true,"monitoring_policy_reviewed":true,
+                "restart_policy_reviewed":true,"source_publicity_reviewed":true}})
+            .to_string()
+            .as_bytes(),
+    );
+    let verification = b.register(b"verification");
     b.event(
         "LibraryVocabularyActivated",
-        json!({"vocabulary": "v4", "not_before": "2026-10-06T00:00:00Z",
-        "closure_decision": a, "verification": a, "backup": format!("sha256:{}", "2".repeat(64))}),
+        json!({"vocabulary": "v4", "effective_at": effective_at, "amendment": amendment,
+        "closure_decision": decision, "verification": verification, "backup": backup,
+        "monitoring_snapshot":monitoring,"rollback_evidence":rollback}),
         "2026-10-05T00:00:00Z",
     );
     let r = verify(&b);
     assert!(
-        r.errors.iter().any(|e| e.contains("before 2026-10-06")),
-        "{:?}",
-        r.errors
-    );
-    assert!(
-        r.errors.iter().any(|e| e.contains("artifacts invalid")),
+        r.errors.iter().any(|e| e.contains("activation fields")),
         "{:?}",
         r.errors
     );

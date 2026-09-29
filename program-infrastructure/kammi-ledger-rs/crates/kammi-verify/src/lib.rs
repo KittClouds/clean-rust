@@ -118,12 +118,89 @@ fn instant(utc: &str) -> String {
     format!("{seconds}.{:0<9}", &fraction[..fraction.len().min(9)])
 }
 
+fn valid_utc(utc: &str) -> bool {
+    let base = utc.strip_suffix('Z').or_else(|| utc.strip_suffix("+00:00"));
+    let Some(base) = base else { return false };
+    let (whole, fraction) = base.split_once('.').unwrap_or((base, ""));
+    whole.len() == 19
+        && whole.as_bytes()[4] == b'-'
+        && whole.as_bytes()[7] == b'-'
+        && whole.as_bytes()[10] == b'T'
+        && whole.as_bytes()[13] == b':'
+        && whole.as_bytes()[16] == b':'
+        && whole.bytes().enumerate().all(|(i, b)| {
+            matches!(i, 4 | 7) && b == b'-'
+                || i == 10 && b == b'T'
+                || matches!(i, 13 | 16) && b == b':'
+                || matches!(i, 0..=3 | 5..=6 | 8..=9 | 11..=12 | 14..=15 | 17..=18)
+                    && b.is_ascii_digit()
+        })
+        && (fraction.is_empty()
+            || (fraction.len() <= 9 && fraction.bytes().all(|b| b.is_ascii_digit())))
+}
+
 fn sha256_hex(parts: &[&[u8]]) -> String {
     let mut h = Sha256::new();
     for p in parts {
         h.update(p);
     }
     h.finalize().iter().map(|b| format!("{b:02x}")).collect()
+}
+
+/// Independently reconstruct the path/size/content-hash commitment used by the backup tool.
+fn backup_inventory_matches(
+    manifest: &Value,
+    expected_hash: &str,
+    expected_count: u64,
+    expected_bytes: u64,
+) -> bool {
+    let Some(files) = manifest["files"].as_array() else {
+        return false;
+    };
+    if files.len() as u64 != expected_count
+        || manifest["file_count"].as_u64() != Some(expected_count)
+        || manifest["total_bytes"].as_u64() != Some(expected_bytes)
+    {
+        return false;
+    }
+    let mut hash_input = Vec::new();
+    let mut prior_path: Option<&str> = None;
+    let mut total_bytes = 0u64;
+    for file in files {
+        let (Some(path), Some(bytes), Some(content_hash)) = (
+            file["path"].as_str(),
+            file["bytes"].as_u64(),
+            file["sha256"].as_str(),
+        ) else {
+            return false;
+        };
+        if path.is_empty()
+            || path.starts_with('/')
+            || path.contains('\\')
+            || path
+                .split('/')
+                .any(|part| part.is_empty() || part == "." || part == "..")
+            || prior_path.is_some_and(|previous| previous >= path)
+            || content_hash.len() != 64
+            || !content_hash
+                .bytes()
+                .all(|byte| matches!(byte, b'0'..=b'9' | b'a'..=b'f'))
+        {
+            return false;
+        }
+        let Some(next_total) = total_bytes.checked_add(bytes) else {
+            return false;
+        };
+        total_bytes = next_total;
+        prior_path = Some(path);
+        hash_input.extend_from_slice(path.as_bytes());
+        hash_input.push(0);
+        hash_input.extend_from_slice(bytes.to_string().as_bytes());
+        hash_input.push(0);
+        hash_input.extend_from_slice(content_hash.as_bytes());
+        hash_input.push(b'\n');
+    }
+    total_bytes == expected_bytes && sha256_hex(&[&hash_input]) == expected_hash
 }
 
 pub struct Report {
@@ -343,6 +420,47 @@ fn verify_objects(root: &Path, errors: &mut Vec<String>) -> HashSet<String> {
     ids
 }
 
+fn read_object_bytes(root: &Path, id: &str) -> Option<Vec<u8>> {
+    let hex = id.strip_prefix("sha256:")?;
+    if hex.len() != 64 {
+        return None;
+    }
+    let loose = root.join("objects/sha256").join(&hex[..2]).join(&hex[2..]);
+    if let Ok(bytes) = fs::read(loose) {
+        return Some(bytes);
+    }
+    let mut packs: Vec<PathBuf> = fs::read_dir(root.join("objects/packs"))
+        .ok()?
+        .flatten()
+        .map(|entry| entry.path())
+        .filter(|path| path.extension().is_some_and(|ext| ext == "pack"))
+        .collect();
+    packs.sort();
+    for pack in packs {
+        let bytes = fs::read(pack).ok()?;
+        if bytes.len() < 16 || &bytes[..8] != PACK_MAGIC {
+            continue;
+        }
+        let mut off = 16usize;
+        while off + 36 <= bytes.len() {
+            let len = u32::from_le_bytes(bytes[off..off + 4].try_into().ok()?) as usize;
+            if off + 36 + len > bytes.len() {
+                break;
+            }
+            if bytes[off + 4..off + 36]
+                .iter()
+                .map(|byte| format!("{byte:02x}"))
+                .collect::<String>()
+                == hex
+            {
+                return Some(bytes[off + 36..off + 36 + len].to_vec());
+            }
+            off += 36 + len;
+        }
+    }
+    None
+}
+
 fn check_workspaces(main: &JournalSummary, errors: &mut Vec<String>) -> usize {
     let mut heads: HashMap<String, String> = HashMap::new();
     let mut closed: HashSet<String> = HashSet::new();
@@ -368,6 +486,11 @@ fn check_workspaces(main: &JournalSummary, errors: &mut Vec<String>) -> usize {
         });
         if !all_required || !only_known {
             errors.push(format!("main: seq {seq}: {kind} fields {keys:?}"));
+        }
+        if kind == "WorkspaceCreated" && payload["owners"] != json!(["chief-kammi"]) {
+            errors.push(format!(
+                "main: seq {seq}: Chief Kammi must be the sole workspace owner"
+            ));
         }
         let ws = object
             .get("workspace_id")
@@ -415,6 +538,7 @@ pub fn verify(root: &Path) -> Report {
 
     // Vocabulary: v1 always; v4 only after the activation, which is the first v4 event.
     let mut activation: Option<(u64, String, String)> = None;
+    let mut registered_artifacts = HashSet::new();
     let mut counts: BTreeMap<String, u64> = BTreeMap::new();
     for (seq, event_id, event, payload) in &main.items {
         let kind = event["type"].as_str().unwrap_or_default();
@@ -430,20 +554,153 @@ pub fn verify(root: &Path) -> Report {
             if activation.is_some() {
                 errors.push(format!("main: seq {seq}: second activation"));
             }
+            let artifact_ids_ok = [
+                "amendment",
+                "backup",
+                "closure_decision",
+                "monitoring_snapshot",
+                "rollback_evidence",
+                "verification",
+            ]
+            .iter()
+            .all(|field| {
+                payload[*field]
+                    .as_str()
+                    .is_some_and(|id| objects.contains(id) && registered_artifacts.contains(id))
+            });
+            let effective_at = payload["effective_at"].as_str().unwrap_or_default();
+            let amendment_id = payload["amendment"].as_str().unwrap_or_default();
+            let closure_id = payload["closure_decision"].as_str().unwrap_or_default();
+            let backup_id = payload["backup"].as_str().unwrap_or_default();
+            let monitoring_id = payload["monitoring_snapshot"].as_str().unwrap_or_default();
+            let rollback_id = payload["rollback_evidence"].as_str().unwrap_or_default();
+            let amendment = read_object_bytes(root, amendment_id)
+                .and_then(|bytes| kammi_jcs::strict_json(&bytes).ok());
+            let closure = read_object_bytes(root, closure_id)
+                .and_then(|bytes| kammi_jcs::strict_json(&bytes).ok());
+            let backup = read_object_bytes(root, backup_id)
+                .and_then(|bytes| kammi_jcs::strict_json(&bytes).ok());
+            let rollback = read_object_bytes(root, rollback_id)
+                .and_then(|bytes| kammi_jcs::strict_json(&bytes).ok());
+            let inventory_id = backup
+                .as_ref()
+                .and_then(|doc| doc["inventory_artifact"].as_str())
+                .unwrap_or_default();
+            let inventory_registered =
+                objects.contains(inventory_id) && registered_artifacts.contains(inventory_id);
+            let inventory = read_object_bytes(root, inventory_id)
+                .and_then(|bytes| kammi_jcs::strict_json(&bytes).ok());
+            let backup_ok = backup.as_ref().is_some_and(|doc| {
+                let count = doc["file_count"].as_u64().unwrap_or_default();
+                let total_bytes = doc["total_bytes"].as_u64().unwrap_or_default();
+                let inventory_hash = doc["inventory_sha256"].as_str().unwrap_or_default();
+                let source_head = doc["source_head"].as_str().unwrap_or_default();
+                doc["schema"] == "KAMMI_PRE_ACTIVATION_BACKUP_V2"
+                    && doc["source_head"]
+                        .as_str()
+                        .is_some_and(|head| head.starts_with("sha256:"))
+                    && count > 0
+                    && total_bytes > 0
+                    && inventory_hash.len() == 64
+                    && doc["kammi_verify"]["status"] == "PASS"
+                    && doc["kammi_verify"]["journal_head"] == source_head
+                    && doc["python_export_verify"]["status"] == "PASS"
+                    && doc["python_export_verify"]["journal_head"] == source_head
+                    && inventory_registered
+                    && inventory.as_ref().is_some_and(|manifest| {
+                        manifest["schema"] == "KAMMI_BACKUP_INVENTORY_V1"
+                            && manifest["inventory_sha256"] == inventory_hash
+                            && backup_inventory_matches(
+                                manifest,
+                                inventory_hash,
+                                count,
+                                total_bytes,
+                            )
+                    })
+            });
+            let monitor_bytes = read_object_bytes(root, monitoring_id);
+            let monitor_rows: Vec<Value> = monitor_bytes
+                .as_deref()
+                .unwrap_or_default()
+                .split(|byte| *byte == b'\n')
+                .filter(|line| !line.is_empty())
+                .filter_map(|line| kammi_jcs::strict_json(line).ok())
+                .collect();
+            let actual_warnings = monitor_rows
+                .iter()
+                .filter(|row| row["warning"].as_bool() != Some(false))
+                .count() as u64;
+            let latest_monitor_utc = monitor_rows
+                .last()
+                .and_then(|row| row["utc"].as_str())
+                .unwrap_or_default();
+            let monitor_audit_ok = closure.as_ref().is_some_and(|doc| {
+                let audit = &doc["monitoring_audit"];
+                audit["snapshot_artifact"] == monitoring_id
+                    && audit["snapshot_sha256"]
+                        == monitoring_id.strip_prefix("sha256:").unwrap_or_default()
+                    && audit["sample_count"].as_u64() == Some(monitor_rows.len() as u64)
+                    && audit["warning_count"].as_u64() == Some(actual_warnings)
+                    && audit["latest_sample_utc"] == latest_monitor_utc
+                    && audit["gap_count"].as_u64().is_some()
+                    && audit["max_gap_seconds"].as_u64().is_some()
+                    && audit["latest_sample_fresh"] == true
+                    && audit["scheduled_backup_configured"].as_bool().is_some()
+                    && audit["monitor_requires_interactive_logon"]
+                        .as_bool()
+                        .is_some()
+                    && audit["daemon_autostart_configured"].as_bool().is_some()
+                    && !monitor_rows.is_empty()
+            });
+            let risk_ok = closure.as_ref().is_some_and(|decision| {
+                let risk = &decision["risk_acceptance"];
+                [
+                    "early_activation",
+                    "known_monitoring_gaps",
+                    "known_rollback_evidence",
+                    "fix_forward",
+                    "rollback_to_python_ends",
+                    "backup_policy_reviewed",
+                    "monitoring_policy_reviewed",
+                    "restart_policy_reviewed",
+                    "source_publicity_reviewed",
+                ]
+                .iter()
+                .all(|field| risk[*field] == true)
+            });
+            let docs_ok = amendment.as_ref().is_some_and(|doc| {
+                doc["schema"] == "KAMMI_V4_EARLY_ACTIVATION_AMENDMENT_V1"
+                    && doc["decision_authority"] == "PROGRAM_OWNER"
+                    && doc["effective_at"] == effective_at
+                    && doc["removes_fixed_floor"] == true
+            }) && closure.as_ref().is_some_and(|doc| {
+                doc["schema"] == "KAMMI_ROLLBACK_WINDOW_CLOSURE_V2"
+                    && doc["decision"] == "CLOSE"
+                    && doc["decision_authority"] == "PROGRAM_OWNER"
+                    && doc["amendment_artifact"] == amendment_id
+                    && doc["monitoring_snapshot_artifact"] == monitoring_id
+                    && doc["rollback_evidence_artifact"] == rollback_id
+                    && doc["effective_at"] == effective_at
+            }) && backup_ok
+                && rollback.as_ref().is_some_and(|doc| {
+                    doc["schema"] == "KAMMI_ROLLBACK_EVIDENCE_AUDIT_V1"
+                        && doc["rollback_available"] == true
+                        && doc["previous_release_rollback_proven"] == true
+                        && doc["release_reports_valid"] == true
+                        && doc["python_verification"]["status"] == "PASS"
+                });
             let fields_ok = payload["vocabulary"] == "v4"
-                && payload["not_before"] == "2026-10-06T00:00:00Z"
-                && ["backup", "closure_decision", "verification"]
-                    .iter()
-                    .all(|f| payload[*f].as_str().is_some_and(|id| objects.contains(id)))
-                && payload.as_object().is_some_and(|o| o.len() == 5);
+                && valid_utc(effective_at)
+                && instant(event["utc"].as_str().unwrap_or_default()) >= instant(effective_at)
+                && payload.as_object().is_some_and(|o| o.len() == 8)
+                && artifact_ids_ok
+                && docs_ok
+                && monitor_audit_ok
+                && risk_ok;
             if !fields_ok {
                 errors.push(format!(
-                    "main: seq {seq}: activation fields or artifacts invalid"
+                    "main: seq {seq}: activation fields, registered artifacts, owner decision or risk acceptance invalid"
                 ));
-            }
-            if instant(event["utc"].as_str().unwrap_or_default()) < instant("2026-10-06T00:00:00Z")
-            {
-                errors.push(format!("main: seq {seq}: activation before 2026-10-06"));
             }
             activation = Some((
                 *seq,
@@ -461,6 +718,8 @@ pub fn verify(root: &Path) -> Report {
                     errors.push(format!(
                         "main: seq {seq}: registered artifact {id} is missing"
                     ));
+                } else {
+                    registered_artifacts.insert(id.to_string());
                 }
             }
         }

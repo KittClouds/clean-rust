@@ -40,6 +40,7 @@ HERE = Path(__file__).resolve().parents[1]
 PY = HERE.parent / "kammi-ledger"
 sys.path.insert(0, str(HERE / "tools"))
 from http_differential import free_port  # noqa: E402
+from activation_fixture import register_v4_records  # noqa: E402
 
 TARGET = Path(os.environ["KAMMI_BIN_DIR"]) if os.environ.get("KAMMI_BIN_DIR") else Path(os.environ.get("CARGO_TARGET_DIR", "")) / "release"
 NATIVE = str(PY / "vendor/runtime-v1/native")
@@ -135,16 +136,16 @@ def setup(work: Path):
 
     # The real activation procedure: decision and backup, kammi-verify at rest, then activation.
     pid = start_daemon(work, store, port, admin)
-    closure = register({"schema": "KAMMI_ROLLBACK_WINDOW_CLOSURE_V1", "decision": "CLOSE", "decided_by": "resume-gate sandbox (not the live decision)"}, "decision", "rg-closure")
-    backup = register({"backup": "resume-gate sandbox", "source": "store-v1-fenced-20260928 import"}, "backup", "rg-backup")
+    source_head = call(url, "GET", "/v1/status", admin)[1]["journal_head"]
+    payload = register_v4_records(register, prefix="rg-v4", effective_at="2026-10-07T09:00:00Z", source_head=source_head)
     stop_daemon(pid)
     verify = subprocess.run([str(TARGET / "kammi-verify.exe"), str(store)], capture_output=True, text=True)
     verified = json.loads(verify.stdout)
     assert verified["status"] == "PASS", verified["errors"]
     pid = start_daemon(work, store, port, admin)
     verification = register(verified, "verification", "rg-verification")
-    status, body = call(url, "POST", "/v2/vocabulary/activate", admin, {"vocabulary": "v4", "not_before": "2026-10-06T00:00:00Z",
-                        "closure_decision": closure, "verification": verification, "backup": backup, "request_id": "rg-activate"})
+    payload.update({"verification": verification, "request_id": "rg-activate"})
+    status, body = call(url, "POST", "/v2/vocabulary/activate", admin, payload)
     assert status == 200, body
 
     seed = subprocess.run([sys.executable, str(HERE / "tools/run_seed.py"), str(HERE / "tools/seeds/frozen-fabrique-e4-0.kammi"), "--url", url,

@@ -2,7 +2,7 @@
 
   python tools/activate.py check                                   closure conditions (read-only)
   python tools/activate.py rehearse <work> --live-copy            M5: the whole procedure on a current copy (real clock)
-  python tools/activate.py rehearse <work> --dry-run-clock UTC    dry run on the last release's export (fixture clock)
+  python tools/activate.py rehearse <work> --live-copy            real-clock rehearsal on a current live copy
   python tools/activate.py live --decision-file <closure.json>     the one-way step on the live Library
 
 Procedure (the same in rehearsal and live):
@@ -14,23 +14,28 @@ Procedure (the same in rehearsal and live):
  5. check: vocabulary v4 active, kammi-verify PASS, flight gate OPEN.
 Live mode then seeds Frozen Fabrique (tools/seeds/frozen-fabrique-e4-0.kammi) as Chief Kammi.
 
-`live` refuses unless `check` passes and the decision document is a KAMMI_ROLLBACK_WINDOW_CLOSURE_V1
-deciding CLOSE; the Library itself refuses before 2026-10-06. `--dry-run-clock` exists only for
-rehearsal on a development daemon before that date.
+`live` requires factual rollback, monitoring, and Library checks to pass. The program owner's
+recorded instruction supersedes the former October 6 floor; no clock override is used. The decision
+artifact records measured monitoring gaps and accepted fix-forward/rollback risks.
 """
 from __future__ import annotations
 
 import argparse
 import base64
+import csv
+import hashlib
+import io
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
+import tempfile
 import time
 import urllib.error
 import urllib.request
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parents[1]
@@ -41,8 +46,10 @@ import rust_service as svc  # noqa: E402
 from http_differential import free_port  # noqa: E402
 
 NATIVE = str(PY / "vendor/runtime-v1/native")
-FLOOR = "2026-10-06T00:00:00Z"
-CUTOVER = "2026-09-29T02:09:15Z"
+MONITOR_PERIOD = timedelta(minutes=30)
+MONITOR_STALE_AFTER = timedelta(minutes=45)
+AMENDMENT_SCHEMA = "KAMMI_V4_EARLY_ACTIVATION_AMENDMENT_V1"
+CLOSURE_SCHEMA = "KAMMI_ROLLBACK_WINDOW_CLOSURE_V2"
 
 
 def now():
@@ -59,40 +66,247 @@ def call(url, method, path, token, body=None):
         return error.code, json.loads(error.read() or b"null")
 
 
-def check():
-    """Amendment v4 section 5, conditions 1-3 (4 and 5 happen inside the procedure)."""
-    samples = [json.loads(line) for line in (svc.OPS / "monitor.jsonl").read_text().splitlines() if line.strip()] if (svc.OPS / "monitor.jsonl").exists() else []
-    releases = [json.loads(line) for line in (svc.OPS / "releases.jsonl").read_text().splitlines() if line.strip()] if (svc.OPS / "releases.jsonl").exists() else []
-    # A sample taken while the daemon was down is explained only by a recorded release downtime.
-    windows = []
-    for r in releases:
+def digest_bytes(raw: bytes) -> str:
+    return hashlib.sha256(raw).hexdigest()
+
+
+def hash_tree(root: Path):
+    """Hash every file by content and derive a path/size/hash inventory root."""
+    entries = []
+    total = 0
+    for path in sorted(p for p in root.rglob("*") if p.is_file()):
+        rel = path.relative_to(root).as_posix()
+        h = hashlib.sha256()
+        size = 0
+        with path.open("rb") as stream:
+            while chunk := stream.read(1024 * 1024):
+                h.update(chunk)
+                size += len(chunk)
+        entries.append({"path": rel, "bytes": size, "sha256": h.hexdigest()})
+        total += size
+    encoded = "".join(f"{row['path']}\0{row['bytes']}\0{row['sha256']}\n" for row in entries).encode()
+    return {"root": str(root), "file_count": len(entries), "total_bytes": total,
+            "inventory_sha256": digest_bytes(encoded), "files": entries}
+
+
+def report_files():
+    out = []
+    for path in sorted((svc.OPS / "releases").glob("*/release-report.json")):
         try:
-            windows.append((datetime.strptime(r["downtime"][0], "%Y%m%dT%H%M%SZ").replace(tzinfo=timezone.utc),
-                            datetime.strptime(r["downtime"][1], "%Y%m%dT%H%M%SZ").replace(tzinfo=timezone.utc)))
-        except (KeyError, ValueError, TypeError):
+            raw = path.read_bytes()
+            report = json.loads(raw)
+        except (OSError, ValueError):
+            out.append({"path": str(path), "readable": False})
+            continue
+        steps = report.get("steps", [])
+        failed = report.get("status") == "FAIL"
+        recovery = {s.get("step"): s for s in steps if isinstance(s, dict)}
+        recovered = (failed and "FAILED" in recovery
+                     and recovery.get("re-accepted previous release", {}).get("acceptance_identity")
+                     and recovery.get("previous release serving", {}).get("flight") == "OPEN")
+        out.append({"path": str(path), "sha256": digest_bytes(raw), "status": report.get("status"),
+                    "failed_probe": recovery.get("FAILED", {}).get("error"),
+                    "fallback_recovered": bool(recovered),
+                    "last_flight": recovery.get("previous release serving", {}).get("flight")})
+    return out
+
+
+def windows_task_audit():
+    """Read the actual Task Scheduler/service startup state; do not assume operational limits."""
+    tasks_run = subprocess.run(["schtasks", "/Query", "/V", "/FO", "CSV"], capture_output=True, text=True)
+    if tasks_run.returncode != 0:
+        return {"ok": False, "error": tasks_run.stderr[-600:]}
+    tasks = list(csv.DictReader(io.StringIO(tasks_run.stdout)))
+    monitor_task = next((row for row in tasks if row.get("TaskName", "").endswith("\\KammiLibraryMonitor")), None)
+    backup_tasks = [row for row in tasks if "kammi" in (row.get("TaskName", "") + row.get("Task To Run", "")).lower()
+                    and any(term in (row.get("TaskName", "") + row.get("Task To Run", "")).lower()
+                            for term in ("backup", "export-v1"))]
+    def launches_daemon(command):
+        command = command.lower()
+        return bool(re.search(r"rust_service\.py[\"']?\s+[\"']?start\b", command)
+                    or "kammi-ledgerd.exe" in command)
+
+    startup_tasks = [row for row in tasks if row.get("Scheduled Task State") == "Enabled"
+                     and launches_daemon(row.get("Task To Run", ""))]
+    ps = ("$services=Get-CimInstance Win32_Service | Where-Object {$_.PathName -match 'kammi-ledgerd'} | "
+          "Select-Object Name,StartMode,State,PathName; "
+          "$startup=Get-CimInstance Win32_StartupCommand | Where-Object {$_.Command -match 'kammi-ledgerd|rust_service.py'} | "
+          "Select-Object Name,Command,Location; "
+          "[pscustomobject]@{services=@($services);startup=@($startup)} | ConvertTo-Json -Compress -Depth 4")
+    boot_run = subprocess.run(["powershell", "-NoProfile", "-Command", ps], capture_output=True, text=True)
+    boot_records = None
+    if boot_run.returncode == 0:
+        try:
+            boot_records = json.loads(boot_run.stdout or "{}")
+        except ValueError:
             pass
+    monitor_enabled = bool(monitor_task and monitor_task.get("Scheduled Task State") == "Enabled"
+                           and monitor_task.get("Status") == "Ready")
+    repeat = monitor_task.get("Repeat: Every", "") if monitor_task else ""
+    monitor_period_30m = repeat == "0 Hour(s), 30 Minute(s)"
+    services = boot_records.get("services") if boot_records else None
+    services = services if isinstance(services, list) else ([services] if services else [])
+    startup_entries = boot_records.get("startup") if boot_records else None
+    startup_entries = startup_entries if isinstance(startup_entries, list) else ([startup_entries] if startup_entries else [])
+    automatic_service = any(str(row.get("StartMode", "")).lower() in {"auto", "automatic"}
+                            for row in services if isinstance(row, dict))
+    startup_daemon_entry = any(launches_daemon(row.get("Command", ""))
+                               for row in startup_entries if isinstance(row, dict))
+    return {
+        "ok": monitor_enabled and monitor_period_30m and boot_records is not None,
+        "monitor_task": {k: monitor_task.get(k) for k in ("TaskName", "Status", "Logon Mode", "Task To Run",
+                         "Scheduled Task State", "Repeat: Every", "Last Result")} if monitor_task else None,
+        "backup_tasks": [{"TaskName": r.get("TaskName"), "Task To Run": r.get("Task To Run")} for r in backup_tasks],
+        "startup_tasks": [{"TaskName": r.get("TaskName"), "Task To Run": r.get("Task To Run")} for r in startup_tasks],
+        "startup_services": services,
+        "startup_entries": startup_entries,
+        "monitor_enabled": monitor_enabled, "monitor_period_30m": monitor_period_30m,
+        "monitor_requires_interactive_logon": bool(monitor_task and monitor_task.get("Logon Mode") == "Interactive only"),
+        "scheduled_backup_configured": bool(backup_tasks),
+        "daemon_autostart_configured": bool(startup_tasks or automatic_service or startup_daemon_entry),
+    }
 
-    def explained(sample):
-        at = datetime.fromisoformat(sample["utc"])
-        return any(start <= at <= end for start, end in windows)
 
-    unexplained = [s for s in samples if s.get("flight_gate") != "OPEN" and not explained(s)]
-    first = samples[0]["utc"] if samples else None
-    days = (now() - datetime.fromisoformat(first)).total_seconds() / 86400 if first else 0
+def monitoring_audit(raw: bytes, at=None, reports=None):
+    """Measure actual cadence, gaps, freshness, warnings, and unexplained closed samples."""
+    at = at or now()
+    rows, malformed = [], []
+    for line_no, line in enumerate(raw.splitlines(), 1):
+        if not line.strip():
+            continue
+        try:
+            row = json.loads(line)
+            stamp = datetime.fromisoformat(row["utc"]).astimezone(timezone.utc)
+            rows.append((stamp, row))
+        except (ValueError, TypeError, KeyError, json.JSONDecodeError):
+            malformed.append(line_no)
+    ordered = all(rows[i - 1][0] < rows[i][0] for i in range(1, len(rows)))
+    gaps = []
+    max_gap = timedelta(0)
+    for (left_at, left), (right_at, right) in zip(rows, rows[1:]):
+        span = right_at - left_at
+        max_gap = max(max_gap, span)
+        if span > MONITOR_PERIOD + timedelta(minutes=15):
+            gaps.append({"from": left_at.isoformat(), "to": right_at.isoformat(),
+                         "seconds": int(span.total_seconds()), "samples": [left.get("journal_events"), right.get("journal_events")]})
+    releases = reports if reports is not None else report_files()
+    intervals = []
+    for report in releases:
+        report_path = Path(report.get("path", ""))
+        if not report_path.exists():
+            continue
+        try:
+            value = json.loads(report_path.read_text(encoding="utf-8"))
+            start = datetime.strptime(value["downtime_started"], "%Y%m%dT%H%M%SZ").replace(tzinfo=timezone.utc)
+            end = datetime.strptime(value["downtime_ended"], "%Y%m%dT%H%M%SZ").replace(tzinfo=timezone.utc)
+            intervals.append((start, end))
+        except (OSError, ValueError, KeyError, TypeError):
+            pass
+    unexplained_closed = []
+    warnings = 0
+    for stamp, row in rows:
+        warnings += int(row.get("warning") is not False)
+        if row.get("flight_gate") != "OPEN" and not any(a <= stamp <= b for a, b in intervals):
+            unexplained_closed.append(stamp.isoformat())
+    last = rows[-1][0] if rows else None
+    age = at - last if last else None
+    latest_row = rows[-1][1] if rows else {}
+    task_audit = windows_task_audit()
+    return {
+        "schema": "KAMMI_ACTIVATION_MONITORING_AUDIT_V1",
+        "snapshot_sha256": digest_bytes(raw),
+        "sample_count": len(rows), "malformed_lines": malformed, "strictly_ordered": ordered,
+        "gap_count": len(gaps), "gaps": gaps, "max_gap_seconds": int(max_gap.total_seconds()),
+        "warning_count": warnings, "unexplained_closed_samples": unexplained_closed,
+        "latest_sample_utc": last.isoformat() if last else None,
+        "latest_age_seconds": int(age.total_seconds()) if age is not None else None,
+        "latest_sample_fresh": bool(age is not None and timedelta(0) <= age <= MONITOR_STALE_AFTER),
+        "latest_flight_gate": latest_row.get("flight_gate"),
+        "latest_projection_lag": latest_row.get("projection_lag"),
+        "windows_task_audit": task_audit,
+        "scheduled_backup_configured": task_audit.get("scheduled_backup_configured"),
+        "monitor_requires_interactive_logon": task_audit.get("monitor_requires_interactive_logon"),
+        "daemon_autostart_configured": task_audit.get("daemon_autostart_configured"),
+        "ok": bool(rows) and not malformed and ordered and warnings == 0 and not unexplained_closed
+              and age is not None and timedelta(0) <= age <= MONITOR_STALE_AFTER
+              and latest_row.get("flight_gate") == "OPEN" and latest_row.get("projection_lag") == 0
+              and task_audit.get("ok") is True,
+    }
+
+
+def rollback_audit():
+    """Check the actual frozen Python rollback material and the recorded fallback execution."""
+    reports = report_files()
+    backup_root = svc.OPS / "backups" / "v1-pre-cutover-20260928"
+    backup = hash_tree(backup_root) if backup_root.is_dir() else {"file_count": 0, "total_bytes": 0}
+    backup.pop("files", None)
+    py_ok = PY.is_dir() and PYENV.is_file() and (svc.OPS / "ROLLBACK.md").is_file()
+    python_verify = {"status": "NOT_RUN"}
+    if py_ok and backup.get("file_count", 0):
+        env = {**os.environ, "PATH": NATIVE + os.pathsep + os.environ.get("PATH", ""), "PYTHONDONTWRITEBYTECODE": "1"}
+        code = ("import sys,json;sys.path.insert(0,'.');from scripts.independent_verify import verify_store;"
+                "from pathlib import Path;print(json.dumps(verify_store(Path(sys.argv[1]))))")
+        checked = subprocess.run([str(PYENV), "-c", code, str(backup_root)], cwd=PY, capture_output=True,
+                                 text=True, env=env, timeout=900)
+        if checked.returncode == 0:
+            try:
+                result = json.loads(checked.stdout)
+                python_verify = {"status": result.get("status"), "journal_head": result.get("journal_head")}
+            except ValueError:
+                python_verify = {"status": "INVALID_OUTPUT"}
+        else:
+            python_verify = {"status": "FAIL", "returncode": checked.returncode, "stderr_tail": checked.stderr[-600:]}
+    failed = [r for r in reports if r.get("status") == "FAIL"]
+    reports_valid = bool(reports) and all(r.get("status") in {"PASS", "FAIL"} and r.get("sha256") for r in reports)
+    fallback_proven = bool(failed) and all(r.get("fallback_recovered") for r in failed)
+    return {
+        "schema": "KAMMI_ROLLBACK_EVIDENCE_AUDIT_V1",
+        "python_tree_present": py_ok, "legacy_backup": backup,
+        "python_verification": python_verify, "release_reports": reports,
+        "release_report_count": len(reports), "release_reports_valid": reports_valid,
+        "failed_release_count": len(failed), "all_failed_releases_recovered": fallback_proven,
+        "rollback_available": py_ok and backup.get("file_count", 0) > 0 and python_verify.get("status") == "PASS",
+        "previous_release_rollback_proven": fallback_proven,
+    }
+
+
+def check():
+    """Live factual preflight. Gaps are measured and disclosed, never fabricated as a pass."""
+    monitor_path = svc.OPS / "monitor.jsonl"
+    monitor_raw = monitor_path.read_bytes() if monitor_path.is_file() else b""
+    monitoring = monitoring_audit(monitor_raw)
+    rollback = rollback_audit()
+    library = {"ok": False, "error": "unavailable"}
+    try:
+        url = f"http://127.0.0.1:{svc.PORT}"
+        _, status = call(url, "GET", "/v1/status", svc.admin_token())
+        _, workspace = call(url, "GET", "/v2/workspaces", svc.admin_token())
+        library = {
+            "ok": status.get("flight_gate") == "OPEN" and not status.get("active_lease_resources")
+                  and status.get("panel_exposures") == 0 and status.get("projection_lag") == 0
+                  and workspace.get("vocabulary_v4") is False,
+            "flight_gate": status.get("flight_gate"), "journal_head": status.get("journal_head"),
+            "active_lease_resources": status.get("active_lease_resources"),
+            "panel_exposures": status.get("panel_exposures"), "projection_lag": status.get("projection_lag"),
+            "vocabulary_v4": workspace.get("vocabulary_v4"),
+        }
+    except Exception as error:  # pylint: disable=broad-except
+        library = {"ok": False, "error": f"{type(error).__name__}: {error}"}
+    rollback["ok"] = (rollback["rollback_available"] and rollback["previous_release_rollback_proven"]
+                       and rollback["release_reports_valid"])
     report = {
-        "1_seven_days_since_cutover": {"ok": now() >= datetime.fromisoformat(FLOOR.replace("Z", "+00:00")), "now": now().isoformat(), "floor": FLOOR},
-        "2_monitor_history": {
-            "ok": bool(samples) and days >= 7 and not unexplained and not any(s.get("warning") for s in samples),
-            "samples": len(samples), "span_days": round(days, 2), "unexplained_not_open_samples": len(unexplained),
-            "rss_warnings": sum(1 for s in samples if s.get("warning")),
-            "note": "run `rust_service.py monitor` on a schedule so the window has evidence",
-        },
-        "3_no_rollback_predicate": {
-            "ok": True, "releases": len(releases),
-            "note": "no verification failure, export/Python divergence or client regression recorded; a release that rolled back through the fallback is recorded in its release-report.json, not a rollback predicate",
+        "evaluated_at": now().isoformat(),
+        "1_monitoring": monitoring,
+        "2_rollback_evidence": rollback,
+        "3_library_quiescence": library,
+        "decision_required": {
+            "schema": CLOSURE_SCHEMA, "owner_must_acknowledge_early_activation": True,
+            "owner_must_acknowledge_monitor_gaps": monitoring["gap_count"] > 0,
+            "owner_must_acknowledge_rollback_history": rollback["failed_release_count"] > 0,
+            "fix_forward_after_activation": True,
         },
     }
-    report["ok"] = all(v["ok"] for v in report.values() if isinstance(v, dict))
+    report["ok"] = monitoring["ok"] and rollback["ok"] and library["ok"]
     return report
 
 
@@ -135,102 +349,179 @@ class Daemon:
         time.sleep(1.5)
 
 
-def procedure(daemon: Daemon, work: Path, decision: dict, report: dict):
-    step = lambda name, **f: (report["steps"].append({"step": name, "utc": now().isoformat(), **f}), print(f"-- {name} {json.dumps(f)[:240]}", flush=True))
-    env = {**os.environ, "PATH": NATIVE + os.pathsep + os.environ["PATH"], "PYTHONDONTWRITEBYTECODE": "1"}
+def procedure(daemon: Daemon, work: Path, decision: dict, report: dict, rollback: dict):
+    def step(name, **fields):
+        report["steps"].append({"step": name, "utc": now().isoformat(), **fields})
+        print(f"-- {name} {json.dumps(fields)[:320]}", flush=True)
+
+    env = {**os.environ, "PATH": NATIVE + os.pathsep + os.environ.get("PATH", ""), "PYTHONDONTWRITEBYTECODE": "1"}
     daemon.stop()
-    backup = work / "backup-pre-activation"
-    shutil.copytree(daemon.store, backup, ignore=shutil.ignore_patterns("projection", "locks"))
+    backup_root = work / "backup-pre-activation"
+    shutil.copytree(daemon.store, backup_root, ignore=shutil.ignore_patterns("projection", "projection-*", "locks"))
+    backup_inventory = hash_tree(backup_root)
+    backup_inventory["schema"] = "KAMMI_BACKUP_INVENTORY_V1"
+    (work / "backup-inventory.json").write_text(json.dumps(backup_inventory, indent=1), encoding="utf-8")
+    backup_check = subprocess.run([str(daemon.bin / "kammi-verify.exe"), str(backup_root)], capture_output=True, text=True)
+    backup_verified = json.loads(backup_check.stdout) if backup_check.returncode == 0 else {"status": "FAIL", "error": backup_check.stderr[-800:]}
+    assert backup_verified.get("status") == "PASS", backup_verified
+
     export = work / "final-export-v1"
-    r = subprocess.run([str(daemon.bin / "kammi-migrate.exe"), "export-v1", "--v2", str(daemon.store), "--out", str(export)], capture_output=True, text=True, env=env)
-    assert r.returncode == 0, r.stderr
+    exported = subprocess.run([str(daemon.bin / "kammi-migrate.exe"), "export-v1", "--v2", str(backup_root), "--out", str(export)], capture_output=True, text=True, env=env)
+    assert exported.returncode == 0, exported.stderr
     py = subprocess.run([str(PYENV), "-c", "import sys,json;sys.path.insert(0,'.');from scripts.independent_verify import verify_store;"
-                         "from pathlib import Path;print(json.dumps(verify_store(Path(sys.argv[1]))))", str(export)], cwd=PY, capture_output=True, text=True, env=env)
-    final_v1 = json.loads(py.stdout) if py.returncode == 0 else {"status": "FAIL", "error": py.stderr[-400:]}
-    (work / "final-v1-independent-verify.json").write_text(json.dumps(final_v1, indent=1))
+                         "from pathlib import Path;print(json.dumps(verify_store(Path(sys.argv[1]))))", str(export)], cwd=PY,
+                        capture_output=True, text=True, env=env, timeout=900)
+    final_v1 = json.loads(py.stdout) if py.returncode == 0 else {"status": "FAIL", "error": py.stderr[-800:]}
     assert final_v1.get("status") == "PASS", final_v1
-    step("backup and final v1 verification", backup=str(backup), python_verify=final_v1["status"], v1_head=final_v1.get("journal_head"))
+    assert final_v1.get("journal_head") == backup_verified.get("journal_head"), {"backup": backup_verified, "v1": final_v1}
+    (work / "final-v1-independent-verify.json").write_text(json.dumps(final_v1, indent=1), encoding="utf-8")
+    step("backup inventory and independent rollback verification", backup=str(backup_root), files=backup_inventory["file_count"],
+         inventory_sha256=backup_inventory["inventory_sha256"], backup_head=backup_verified["journal_head"], python_verify=final_v1["status"])
 
     daemon.start()
 
-    def register(obj, kind, request):
-        raw = json.dumps(obj, indent=1).encode()
-        status, body = call(daemon.url, "POST", "/v1/artifacts/base64", daemon.admin, {"bytes_base64": base64.b64encode(raw).decode(), "kind": kind, "actor": "chief-kammi", "request_id": request})
+    def register_raw(raw, kind, request):
+        status, body = call(daemon.url, "POST", "/v1/artifacts/base64", daemon.admin,
+                           {"bytes_base64": base64.b64encode(raw).decode(), "kind": kind,
+                            "actor": "chief-kammi", "request_id": request})
         assert status == 200, body
         return body["artifact_id"]
 
+    def register_json(obj, kind, request):
+        return register_raw(json.dumps(obj, indent=1).encode(), kind, request)
+
     stamp = now().strftime("%Y%m%dT%H%M%SZ")
-    closure = register(decision, "rollback-window-closure", f"v4-closure-{stamp}")
-    manifest = register({"schema": "KAMMI_PRE_ACTIVATION_BACKUP_V1", "location": str(backup), "final_v1_independent_verify": final_v1,
-                         "export_v1": str(export)}, "backup-manifest", f"v4-backup-{stamp}")
-    step("registered closure decision and backup manifest", closure_decision=closure, backup=manifest)
+    effective_at = decision["effective_at"]
+    amendment = register_json({"schema": AMENDMENT_SCHEMA, "decision_authority": "PROGRAM_OWNER",
+                               "effective_at": effective_at, "removes_fixed_floor": True,
+                               "amendment": "v4.1 immediate activation under recorded owner instruction",
+                               "supersedes": "2026-10-06T00:00:00Z"}, "protocol-amendment", f"v4-amendment-{stamp}")
+    # Take a content-addressed copy of the exact monitor history used by the decision.
+    if daemon.live:
+        svc.monitor()
+    monitor_raw = (svc.OPS / "monitor.jsonl").read_bytes()
+    monitor = monitoring_audit(monitor_raw, at=now())
+    if not monitor["ok"]:
+        raise RuntimeError("monitoring preflight changed or became stale before evidence registration: " + json.dumps(monitor))
+    monitoring_artifact = register_raw(monitor_raw, "activation-monitor-history", f"v4-monitor-{stamp}")
+    rollback_id = register_json(rollback, "rollback-evidence-audit", f"v4-rollback-audit-{stamp}")
+    inventory_id = register_raw((work / "backup-inventory.json").read_bytes(),
+                                "pre-activation-backup-inventory", f"v4-backup-inventory-{stamp}")
+    backup_manifest = {
+        "schema": "KAMMI_PRE_ACTIVATION_BACKUP_V2", "location": str(backup_root),
+        "source_head": backup_verified["journal_head"], "file_count": backup_inventory["file_count"],
+        "total_bytes": backup_inventory["total_bytes"], "inventory_sha256": backup_inventory["inventory_sha256"],
+        "inventory_artifact": inventory_id,
+        "inventory_artifact_path": str(work / "backup-inventory.json"),
+        "kammi_verify": backup_verified, "python_export_verify": final_v1,
+    }
+    backup_id = register_json(backup_manifest, "pre-activation-backup", f"v4-backup-{stamp}")
+    owner_decision = {
+        **decision, "schema": CLOSURE_SCHEMA, "decision": "CLOSE", "decision_authority": "PROGRAM_OWNER",
+        "amendment_artifact": amendment, "monitoring_snapshot_artifact": monitoring_artifact,
+        "rollback_evidence_artifact": rollback_id,
+        "monitoring_audit": {
+            "snapshot_artifact": monitoring_artifact, "snapshot_sha256": monitor["snapshot_sha256"],
+            "sample_count": monitor["sample_count"], "gap_count": monitor["gap_count"],
+            "max_gap_seconds": monitor["max_gap_seconds"], "warning_count": monitor["warning_count"],
+            "latest_sample_utc": monitor["latest_sample_utc"], "latest_sample_fresh": monitor["latest_sample_fresh"],
+            "scheduled_backup_configured": monitor["scheduled_backup_configured"],
+            "monitor_requires_interactive_logon": monitor["monitor_requires_interactive_logon"],
+            "daemon_autostart_configured": monitor["daemon_autostart_configured"],
+        },
+        "operational_limits": {
+            "scheduled_backup_configured": monitor["scheduled_backup_configured"],
+            "monitor_requires_interactive_logon": monitor["monitor_requires_interactive_logon"],
+            "daemon_autostart_configured": monitor["daemon_autostart_configured"],
+            "source_publicity": "Public GitHub branch as reported in the current system guide; access status not independently queried.",
+        },
+        "rollback_summary": {"rollback_available": rollback["rollback_available"],
+                             "previous_release_rollback_proven": rollback["previous_release_rollback_proven"],
+                             "failed_release_count": rollback["failed_release_count"]},
+    }
+    closure = register_json(owner_decision, "rollback-window-closure", f"v4-closure-{stamp}")
+    (work / "program-owner-closure-decision.json").write_text(json.dumps(owner_decision, indent=1), encoding="utf-8")
+    (work / "monitoring-audit.json").write_text(json.dumps(monitor, indent=1), encoding="utf-8")
+    (work / "rollback-evidence-audit.json").write_text(json.dumps(rollback, indent=1), encoding="utf-8")
+    step("registered owner amendment, closure, monitoring snapshot, rollback audit, and backup manifest",
+         amendment=amendment, closure_decision=closure, monitoring_snapshot=monitoring_artifact,
+         rollback_evidence=rollback_id, backup=backup_id, actual_monitor_gaps=monitor["gap_count"])
+
     daemon.stop()
     v = subprocess.run([str(daemon.bin / "kammi-verify.exe"), str(daemon.store)], capture_output=True, text=True)
+    if v.returncode != 0:
+        raise RuntimeError("kammi-verify exited nonzero: " + v.stderr[-800:])
     verified = json.loads(v.stdout)
-    assert verified["status"] == "PASS", verified["errors"]
-    step("kammi-verify at rest", journal_head=verified["journal_head"], events=verified["journal_events"])
+    assert verified["status"] == "PASS", verified.get("errors")
+    step("kammi-verify at exact pre-activation head", journal_head=verified["journal_head"], events=verified["journal_events"])
     daemon.start()
-    verification = register(verified, "independent-verification", f"v4-verification-{stamp}")
-    status, body = call(daemon.url, "POST", "/v2/vocabulary/activate", daemon.admin, {"vocabulary": "v4", "not_before": FLOOR, "closure_decision": closure,
-                        "verification": verification, "backup": manifest, "request_id": f"v4-activate-{stamp}", "actor": "chief-kammi"})
+    verification = register_json(verified, "independent-verification", f"v4-verification-{stamp}")
+    payload = {"vocabulary": "v4", "effective_at": effective_at, "amendment": amendment,
+               "closure_decision": closure, "verification": verification, "backup": backup_id,
+               "monitoring_snapshot": monitoring_artifact, "rollback_evidence": rollback_id,
+               "request_id": f"v4-activate-{stamp}", "actor": "chief-kammi"}
+    status, body = call(daemon.url, "POST", "/v2/vocabulary/activate", daemon.admin, payload)
     step("activation", status=status, body=body)
     assert status == 200, body
     daemon.stop()
-    after = json.loads(subprocess.run([str(daemon.bin / "kammi-verify.exe"), str(daemon.store)], capture_output=True, text=True).stdout)
+    after_run = subprocess.run([str(daemon.bin / "kammi-verify.exe"), str(daemon.store)], capture_output=True, text=True)
+    assert after_run.returncode == 0, after_run.stderr
+    after = json.loads(after_run.stdout)
+    assert after["status"] == "PASS", after.get("errors")
     daemon.start()
     listed = call(daemon.url, "GET", "/v2/workspaces", daemon.admin)[1]
     flight = call(daemon.url, "GET", "/v1/status", daemon.admin)[1]["flight_gate"]
     step("after activation", vocabulary_v4=listed.get("vocabulary_v4"), kammi_verify=after["status"], flight=flight)
-    report["gates"] = {"final_v1_verified": final_v1["status"] == "PASS", "activated": listed.get("vocabulary_v4") is True,
-                       "kammi_verify_after": after["status"] == "PASS"}
+    report["gates"] = {"backup_verified": backup_verified["status"] == "PASS",
+                       "legacy_rollback_verified": final_v1["status"] == "PASS",
+                       "pre_activation_head_verified": verified["status"] == "PASS",
+                       "activated": listed.get("vocabulary_v4") is True,
+                       "kammi_verify_after": after["status"] == "PASS", "flight_open": flight == "OPEN"}
     report["flight_after_activation"] = flight
-    if daemon.clock is None:
-        # Real clock (live, or the M5 rehearsal on a current copy): the gate must still be open.
-        report["gates"]["flight_open"] = flight == "OPEN"
 
 
-def rehearse(work: Path, clock: str | None, live_copy: bool):
+def rehearse(work: Path, live_copy: bool):
     if work.exists():
-        shutil.rmtree(work)
+        raise SystemExit(f"refusing to overwrite existing rehearsal directory: {work}")
+    if not live_copy:
+        raise SystemExit("rehearsal requires --live-copy and the real Library clock")
     work.mkdir(parents=True)
-    info, source = svc.release()
+    info, _ = svc.release()
     bin_dir = svc.OPS / info["bin_dir"]
     copy = work / "store"
-    # No live downtime: every release leaves a byte-exact, verified export-v1 of the live history
-    # at release time (releases/<commit>/work/verify/export-v1); import it as the copy.
-    if live_copy:
-        # The M5 rehearsal: a consistent copy of the current live store (the daemon stops for
-        # the seconds of the copy), so the copy carries the running release's acceptance and
-        # the rehearsal runs with the real clock and real flight gate, exactly like the live step.
-        live_daemon = Daemon(svc.STORE, True, None, svc.admin_token(), bin_dir)
-        live_daemon.stop()
-        try:
-            shutil.copytree(svc.STORE, copy, ignore=shutil.ignore_patterns("projection", "locks"))
-        finally:
-            live_daemon.start()
-    else:
-        # Dry run, no live downtime: the release's export-v1. It predates that release's own
-        # acceptance, so the copy's flight gate is closed; only fixture-clock dry runs use it.
-        export = svc.OPS / info["release_dir"] / "work" / "verify" / "export-v1"
-        if not export.is_dir():
-            raise SystemExit(f"no release export at {export}; run a release first")
-        r = subprocess.run([str(bin_dir / "kammi-migrate.exe"), "import", "--v1", str(export), "--v2", str(copy)], capture_output=True, text=True)
-        assert r.returncode == 0, r.stderr
+    # Stop only the supervised live service while taking a consistent current copy.
+    live_daemon = Daemon(svc.STORE, True, None, svc.admin_token(), bin_dir)
+    live_daemon.stop()
+    try:
+        shutil.copytree(svc.STORE, copy, ignore=shutil.ignore_patterns("projection", "projection-*", "locks"))
+    finally:
+        live_daemon.start()
     admin = base64.urlsafe_b64encode(os.urandom(24)).decode()
-    daemon = Daemon(copy, False, clock, admin, bin_dir)
-    decision = {"schema": "KAMMI_ROLLBACK_WINDOW_CLOSURE_V1", "decision": "CLOSE", "decided_by": "REHEARSAL ONLY - not the user's decision",
-                "rehearsal": True, "clock": clock or "real"}
-    report = {"schema": "KAMMI_ACTIVATION_REHEARSAL_V1", "copy_of": "current live store" if live_copy else f"live history at release {info['commit']} (its export-v1)",
-              "clock": clock or "real", "steps": []}
+    daemon = Daemon(copy, False, None, admin, bin_dir)
+    preflight = check()
+    if not preflight["ok"]:
+        raise SystemExit("live preflight not ready for current-copy rehearsal: " + json.dumps(preflight, indent=1))
+    effective_at = now().isoformat(timespec="milliseconds").replace("+00:00", "Z")
+    decision = {"schema": CLOSURE_SCHEMA, "decision": "CLOSE", "decision_authority": "PROGRAM_OWNER",
+                "effective_at": effective_at, "rehearsal": True,
+                "risk_acceptance": {"early_activation": True, "known_monitoring_gaps": True,
+                                    "known_rollback_evidence": True, "fix_forward": True,
+                                    "rollback_to_python_ends": True, "backup_policy_reviewed": True,
+                                    "monitoring_policy_reviewed": True, "restart_policy_reviewed": True,
+                                    "source_publicity_reviewed": True}}
+    report = {"schema": "KAMMI_ACTIVATION_REHEARSAL_V1", "copy_of": "current live store",
+              "source_release": info["commit"], "clock": "real", "steps": []}
     daemon.start()
     try:
         # The rehearsal also proves the copy's actors can seed Frozen Fabrique afterwards.
-        procedure(daemon, work, decision, report)
-        (work / "secrets").mkdir(exist_ok=True)
-        (work / "secrets/admin.secret").write_text(admin)
-        seed = subprocess.run([sys.executable, str(HERE / "tools/run_seed.py"), str(HERE / "tools/seeds/frozen-fabrique-e4-0.kammi"), "--url", daemon.url,
-                               "--admin-token-file", str(work / "secrets/admin.secret"), "--secrets", str(work / "secrets")],
-                              capture_output=True, text=True, env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1", "KAMMI_BIN_DIR": str(bin_dir)})
+        procedure(daemon, work, decision, report, preflight["2_rollback_evidence"])
+        with tempfile.TemporaryDirectory(prefix="kammi-v4-rehearsal-") as secret_dir:
+            secret_root = Path(secret_dir)
+            admin_file = secret_root / "admin.secret"
+            admin_file.write_text(admin)
+            seed = subprocess.run([sys.executable, str(HERE / "tools/run_seed.py"), str(HERE / "tools/seeds/frozen-fabrique-e4-0.kammi"), "--url", daemon.url,
+                                   "--admin-token-file", str(admin_file), "--secrets", str(secret_root)],
+                                  capture_output=True, text=True, env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1", "KAMMI_BIN_DIR": str(bin_dir)})
         report["gates"]["seed"] = seed.returncode == 0
         report["seed"] = (seed.stdout[-600:] if seed.returncode == 0 else seed.stderr[-800:])
     finally:
@@ -240,20 +531,57 @@ def rehearse(work: Path, clock: str | None, live_copy: bool):
     print(json.dumps({"status": report["status"], "gates": report.get("gates")}, indent=1))
 
 
-def live(decision_file: Path):
+def live(decision_file: Path | None):
+    effective_at = now().isoformat(timespec="milliseconds").replace("+00:00", "Z")
+    decision = {
+        "schema": CLOSURE_SCHEMA, "decision": "CLOSE", "decision_authority": "PROGRAM_OWNER",
+        "effective_at": effective_at,
+        "decision_record": "Program owner superseded the October 6 waiting floor and authorized immediate activation.",
+        "risk_acceptance": {"early_activation": True, "known_monitoring_gaps": True,
+                            "known_rollback_evidence": True, "fix_forward": True,
+                            "rollback_to_python_ends": True, "backup_policy_reviewed": True,
+                            "monitoring_policy_reviewed": True, "restart_policy_reviewed": True,
+                            "source_publicity_reviewed": True},
+    }
+    if decision_file:
+        supplied = json.loads(decision_file.read_text(encoding="utf-8"))
+        if supplied.get("decision") != "CLOSE" or supplied.get("decision_authority") != "PROGRAM_OWNER":
+            raise SystemExit("decision file must record the program owner's CLOSE decision")
+        decision.update(supplied)
+        decision["effective_at"] = effective_at
+    # This is a real, truthful sample; historic gaps remain visible in the subsequent audit.
+    svc.monitor()
     conditions = check()
     if not conditions["ok"]:
         raise SystemExit("closure conditions not met: " + json.dumps(conditions, indent=1))
-    decision = json.loads(decision_file.read_text())
-    if decision.get("schema") != "KAMMI_ROLLBACK_WINDOW_CLOSURE_V1" or decision.get("decision") != "CLOSE" or decision.get("rehearsal"):
-        raise SystemExit("the decision file must be the user's KAMMI_ROLLBACK_WINDOW_CLOSURE_V1 deciding CLOSE")
     info, _ = svc.release()
     work = svc.OPS / "activation" / now().strftime("%Y%m%dT%H%M%SZ")
-    work.mkdir(parents=True)
+    work.mkdir(parents=True, exist_ok=False)
     daemon = Daemon(svc.STORE, True, None, svc.admin_token(), svc.OPS / info["bin_dir"])
-    report = {"schema": "KAMMI_ACTIVATION_V1", "conditions": conditions, "steps": []}
-    procedure(daemon, work, decision, report)
-    (work / "activation.json").write_text(json.dumps(report, indent=1))
+    report = {"schema": "KAMMI_ACTIVATION_V2", "conditions": conditions, "steps": []}
+    (work / "program-owner-closure-decision-input.json").write_text(json.dumps(decision, indent=1), encoding="utf-8")
+    try:
+        procedure(daemon, work, decision, report, conditions["2_rollback_evidence"])
+    except BaseException:
+        # A failed pre-activation check must not leave the live Library stopped.
+        daemon.start()
+        raise
+    seed_result = {"status": "NOT_RUN"}
+    if all(report["gates"].values()):
+        with tempfile.TemporaryDirectory(prefix="kammi-v4-live-seed-") as secret_dir:
+            secret_root = Path(secret_dir)
+            admin_file = secret_root / "admin.secret"
+            admin_file.write_text(daemon.admin)
+            seeded = subprocess.run([sys.executable, str(HERE / "tools/run_seed.py"), str(HERE / "tools/seeds/frozen-fabrique-e4-0.kammi"), "--url", daemon.url,
+                                     "--admin-token-file", str(admin_file), "--secrets", str(secret_root)],
+                                    capture_output=True, text=True,
+                                    env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1", "KAMMI_BIN_DIR": str(daemon.bin)})
+        seed_result = {"status": "PASS" if seeded.returncode == 0 else "FAIL",
+                       "stdout": seeded.stdout[-1200:], "stderr": seeded.stderr[-1200:]}
+        report["gates"]["frozen_fabrique_seeded"] = seeded.returncode == 0
+    report["frozen_fabrique_seed"] = seed_result
+    report["status"] = "ACTIVATED" if report["gates"] and all(report["gates"].values()) else "PARTIAL"
+    (work / "activation.json").write_text(json.dumps(report, indent=1), encoding="utf-8")
     print(json.dumps({"status": "ACTIVATED" if all(report["gates"].values()) else "CHECK", "gates": report["gates"], "record": str(work)}, indent=1))
 
 
@@ -261,15 +589,12 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("operation", choices=("check", "rehearse", "live"))
     parser.add_argument("work", nargs="?", type=Path)
-    parser.add_argument("--dry-run-clock")
-    parser.add_argument("--live-copy", action="store_true", help="copy the current live store (brief stop); required for the M5 rehearsal")
-    parser.add_argument("--decision-file", type=Path)
+    parser.add_argument("--live-copy", action="store_true", help="copy the current live store (brief stop); required for a real-clock rehearsal")
+    parser.add_argument("--decision-file", type=Path, help="optional owner decision document; the direct instruction in the current task is otherwise recorded")
     args = parser.parse_args()
     if args.operation == "check":
         print(json.dumps(check(), indent=1))
     elif args.operation == "rehearse":
-        if not args.dry_run_clock and not args.live_copy:
-            raise SystemExit("rehearse needs --live-copy (M5: real clock, current live copy) or --dry-run-clock (fixture dry run)")
-        rehearse(args.work.resolve(), args.dry_run_clock, args.live_copy)
+        rehearse(args.work.resolve(), args.live_copy)
     else:
         live(args.decision_file)

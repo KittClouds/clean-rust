@@ -1,25 +1,84 @@
 //! Vocabulary activation and workspace commands (amendment v4), plus the work packet.
 //!
-//! Authorization is decided here, at command time: the Library admin (master token) may do
-//! anything; owners may do anything in their workspace; an actor a handoff was sent to may take
-//! part (attach, note, decide, ask, resolve, pin, hand off, receive), but only owners set the
-//! objective or scope and close the workspace. The work packet is rendered from state and
-//! journal envelopes only, so replay reproduces it byte for byte.
+//! Authorization is decided here, at command time: the Library admin (Chief Kammi) governs the
+//! workspace; handoff recipients may attach and contribute, while Chief alone controls objectives,
+//! scope, next steps, handoffs and closure. The work packet is rendered from state and journal
+//! envelopes only, so replay reproduces it byte for byte.
 
-use kammi_jcs::{Sha256Id, Value};
+use kammi_jcs::{Sha256Hasher, Sha256Id, Value};
 
 use crate::error::{value_error, LedgerError, Result};
 use crate::json::get_str;
 use crate::ledger::Ledger;
 use crate::workspace::{Line, Workspace};
 
-const OWNER_ONLY: [&str; 3] = [
+const OWNER_ONLY: [&str; 5] = [
     "WorkspaceObjectiveSet",
     "WorkspaceScopeSet",
+    "WorkspaceNextStepSet",
+    "WorkspaceHandoffSent",
     "WorkspaceClosed",
 ];
 /// Text packet budget in bytes (about 2,000 tokens).
 pub const PACKET_BUDGET: usize = 8192;
+
+/// Recompute the backup tree commitment from its ordered path/size/content-hash rows.
+/// This is deliberately done at activation time, outside any hot path.
+fn backup_inventory_matches(
+    inventory: &Value,
+    expected_hash: &str,
+    expected_count: u64,
+    expected_bytes: u64,
+) -> bool {
+    let Some(files) = inventory.get("files").and_then(Value::as_array) else {
+        return false;
+    };
+    if files.len() as u64 != expected_count
+        || inventory.get("file_count").and_then(Value::as_u64) != Some(expected_count)
+        || inventory.get("total_bytes").and_then(Value::as_u64) != Some(expected_bytes)
+    {
+        return false;
+    }
+    let mut hasher = Sha256Hasher::new();
+    let mut prior_path: Option<&str> = None;
+    let mut total_bytes = 0u64;
+    for file in files {
+        let (Some(path), Some(bytes), Some(content_hash)) = (
+            file.get("path").and_then(Value::as_str),
+            file.get("bytes").and_then(Value::as_u64),
+            file.get("sha256").and_then(Value::as_str),
+        ) else {
+            return false;
+        };
+        if path.is_empty()
+            || path.starts_with('/')
+            || path.contains('\\')
+            || path
+                .split('/')
+                .any(|part| part.is_empty() || part == "." || part == "..")
+            || prior_path.is_some_and(|previous| previous >= path)
+            || content_hash.len() != 64
+            || !content_hash
+                .bytes()
+                .all(|byte| matches!(byte, b'0'..=b'9' | b'a'..=b'f'))
+        {
+            return false;
+        }
+        let Some(next_total) = total_bytes.checked_add(bytes) else {
+            return false;
+        };
+        total_bytes = next_total;
+        prior_path = Some(path);
+        hasher.update(path.as_bytes());
+        hasher.update(b"\0");
+        hasher.update(bytes.to_string().as_bytes());
+        hasher.update(b"\0");
+        hasher.update(content_hash.as_bytes());
+        hasher.update(b"\n");
+    }
+    total_bytes == expected_bytes
+        && hasher.finish().to_string().strip_prefix("sha256:") == Some(expected_hash)
+}
 
 /// Who issues a command: the admin credential, or an authenticated actor.
 #[derive(Clone, Copy, Debug)]
@@ -63,9 +122,9 @@ impl Ledger {
         self.state.vocabulary_v4.is_some()
     }
 
-    /// `LibraryVocabularyActivated`: the one-way switch. Admin only; refused before the
-    /// rollback-window floor, and unless the closure decision and a passing verification of
-    /// this store at its current head are registered.
+    /// `LibraryVocabularyActivated`: the one-way switch. Admin only; requires the recorded
+    /// amendment, the program owner's effective closure decision, a backup, and a passing
+    /// verification of this store at its current head.
     pub fn activate_vocabulary(
         &mut self,
         payload: Value,
@@ -78,15 +137,12 @@ impl Ledger {
             }
         }
         kammi_contract::activation::validate(&payload).map_err(LedgerError::Value)?;
-        let floor = crate::time::parse_utc(kammi_contract::activation::NOT_BEFORE)?;
-        if self.now() < floor {
-            return value_error(format!(
-                "the rollback window cannot close before {}",
-                kammi_contract::activation::NOT_BEFORE
-            ));
-        }
         if self.vocabulary_v4_active() {
             return value_error("vocabulary v4 is already active");
+        }
+        let effective_at = get_str(&payload, "effective_at")?;
+        if crate::time::parse_utc(effective_at)? > self.now() {
+            return value_error("activation effective_at cannot be in the future");
         }
         for field in kammi_contract::activation::ARTIFACT_FIELDS {
             let id = get_str(&payload, field)?;
@@ -96,13 +152,183 @@ impl Ledger {
                 ));
             }
         }
+        let amendment_id = get_str(&payload, "amendment")?;
+        let amendment = self.object_json(amendment_id)?;
+        if amendment.get("schema").and_then(Value::as_str)
+            != Some(kammi_contract::activation::AMENDMENT_SCHEMA)
+            || amendment.get("decision_authority").and_then(Value::as_str) != Some("PROGRAM_OWNER")
+            || amendment.get("effective_at").and_then(Value::as_str) != Some(effective_at)
+            || amendment
+                .get("removes_fixed_floor")
+                .and_then(Value::as_bool)
+                != Some(true)
+        {
+            return value_error(
+                "amendment artifact must record the owner's immediate activation amendment",
+            );
+        }
+        let backup = self.object_json(get_str(&payload, "backup")?)?;
+        let inventory_id = backup
+            .get("inventory_artifact")
+            .and_then(Value::as_str)
+            .ok_or_else(|| {
+                LedgerError::Value("backup manifest has no inventory artifact".into())
+            })?;
+        if !self.state.artifacts.contains_key(inventory_id) || !self.cas_verify(inventory_id) {
+            return value_error("backup inventory must be a registered, verified artifact");
+        }
+        let inventory = self.object_json(inventory_id)?;
+        let inventory_hash = backup
+            .get("inventory_sha256")
+            .and_then(Value::as_str)
+            .unwrap_or_default();
+        let backup_count = backup
+            .get("file_count")
+            .and_then(Value::as_u64)
+            .unwrap_or(0);
+        let backup_bytes = backup
+            .get("total_bytes")
+            .and_then(Value::as_u64)
+            .unwrap_or(0);
+        let rollback_id = get_str(&payload, "rollback_evidence")?;
+        let rollback = self.object_json(rollback_id)?;
+        let source_head = backup.get("source_head").and_then(Value::as_str);
+        let backup_verification_ok = source_head.is_some_and(|head| {
+            ["kammi_verify", "python_export_verify"]
+                .iter()
+                .all(|field| {
+                    backup
+                        .get(*field)
+                        .and_then(Value::as_object)
+                        .is_some_and(|report| {
+                            report.get("status").and_then(Value::as_str) == Some("PASS")
+                                && report.get("journal_head").and_then(Value::as_str) == Some(head)
+                        })
+                })
+        });
+        if backup.get("schema").and_then(Value::as_str) != Some("KAMMI_PRE_ACTIVATION_BACKUP_V2")
+            || backup
+                .get("source_head")
+                .and_then(Value::as_str)
+                .and_then(|head| Sha256Id::parse(head).ok())
+                .is_none()
+            || !backup_verification_ok
+            || backup
+                .get("file_count")
+                .and_then(Value::as_u64)
+                .is_none_or(|n| n == 0)
+            || backup
+                .get("total_bytes")
+                .and_then(Value::as_u64)
+                .is_none_or(|n| n == 0)
+            || inventory_hash.len() != 64
+            || !inventory_hash
+                .bytes()
+                .all(|b| matches!(b, b'0'..=b'9' | b'a'..=b'f'))
+            || inventory.get("schema").and_then(Value::as_str) != Some("KAMMI_BACKUP_INVENTORY_V1")
+            || inventory.get("inventory_sha256").and_then(Value::as_str) != Some(inventory_hash)
+            || inventory.get("file_count").and_then(Value::as_u64)
+                != backup.get("file_count").and_then(Value::as_u64)
+            || inventory
+                .get("files")
+                .and_then(Value::as_array)
+                .is_none_or(|files| {
+                    files.len() as u64
+                        != backup
+                            .get("file_count")
+                            .and_then(Value::as_u64)
+                            .unwrap_or(0)
+                })
+            || !backup_inventory_matches(&inventory, inventory_hash, backup_count, backup_bytes)
+        {
+            return value_error("backup artifact must bind a registered, hashed file inventory and pre-activation head");
+        }
+        if rollback.get("schema").and_then(Value::as_str)
+            != Some("KAMMI_ROLLBACK_EVIDENCE_AUDIT_V1")
+            || rollback.get("rollback_available").and_then(Value::as_bool) != Some(true)
+            || rollback
+                .get("previous_release_rollback_proven")
+                .and_then(Value::as_bool)
+                != Some(true)
+            || rollback
+                .get("python_verification")
+                .and_then(Value::as_object)
+                .is_none_or(|v| v.get("status").and_then(Value::as_str) != Some("PASS"))
+            || rollback
+                .get("release_reports_valid")
+                .and_then(Value::as_bool)
+                != Some(true)
+        {
+            return value_error(
+                "rollback artifact must contain passing, source-backed rollback evidence",
+            );
+        }
+        let monitoring_id = get_str(&payload, "monitoring_snapshot")?;
         let decision = self.object_json(get_str(&payload, "closure_decision")?)?;
         if decision.get("schema").and_then(Value::as_str)
             != Some(kammi_contract::activation::CLOSURE_SCHEMA)
             || decision.get("decision").and_then(Value::as_str) != Some("CLOSE")
+            || decision.get("decision_authority").and_then(Value::as_str) != Some("PROGRAM_OWNER")
+            || decision.get("amendment_artifact").and_then(Value::as_str) != Some(amendment_id)
+            || decision
+                .get("monitoring_snapshot_artifact")
+                .and_then(Value::as_str)
+                != Some(monitoring_id)
+            || decision
+                .get("rollback_evidence_artifact")
+                .and_then(Value::as_str)
+                != Some(rollback_id)
+            || decision.get("effective_at").and_then(Value::as_str) != Some(effective_at)
+            || decision
+                .get("monitoring_audit")
+                .and_then(Value::as_object)
+                .is_none_or(|audit| {
+                    audit.get("snapshot_artifact").and_then(Value::as_str) != Some(monitoring_id)
+                        || audit
+                            .get("sample_count")
+                            .and_then(Value::as_u64)
+                            .is_none_or(|n| n == 0)
+                        || audit.get("gap_count").and_then(Value::as_u64).is_none()
+                        || audit
+                            .get("max_gap_seconds")
+                            .and_then(Value::as_u64)
+                            .is_none()
+                        || audit.get("warning_count").and_then(Value::as_u64) != Some(0)
+                        || audit.get("latest_sample_fresh").and_then(Value::as_bool) != Some(true)
+                        || audit
+                            .get("scheduled_backup_configured")
+                            .and_then(Value::as_bool)
+                            .is_none()
+                        || audit
+                            .get("monitor_requires_interactive_logon")
+                            .and_then(Value::as_bool)
+                            .is_none()
+                        || audit
+                            .get("daemon_autostart_configured")
+                            .and_then(Value::as_bool)
+                            .is_none()
+                })
+            || decision
+                .get("risk_acceptance")
+                .and_then(Value::as_object)
+                .is_none_or(|risk| {
+                    [
+                        "early_activation",
+                        "known_monitoring_gaps",
+                        "known_rollback_evidence",
+                        "fix_forward",
+                        "rollback_to_python_ends",
+                        "backup_policy_reviewed",
+                        "monitoring_policy_reviewed",
+                        "restart_policy_reviewed",
+                        "source_publicity_reviewed",
+                    ]
+                    .iter()
+                    .any(|key| risk.get(*key).and_then(Value::as_bool) != Some(true))
+                })
         {
             return value_error(format!(
-                "closure_decision must be a {} document deciding CLOSE",
+                "closure_decision must be a {} program-owner document deciding CLOSE and accepting the recorded risks",
                 kammi_contract::activation::CLOSURE_SCHEMA
             ));
         }
@@ -222,9 +448,7 @@ impl Ledger {
             }
         } else {
             let ws = self.workspace(&workspace_id)?;
-            let allowed = who.admin()
-                || ws.owner(actor)
-                || (ws.participant(actor) && !OWNER_ONLY.contains(&kind));
+            let allowed = who.admin() || (ws.participant(actor) && !OWNER_ONLY.contains(&kind));
             if !allowed {
                 return value_error("actor may not write this workspace");
             }

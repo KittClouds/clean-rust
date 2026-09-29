@@ -7,6 +7,7 @@
 use serde_json::Value;
 
 pub const GENESIS: &str = "genesis";
+pub const WORKSPACE_GOVERNOR: &str = "chief-kammi";
 
 /// Reference kinds a `refs` entry may name (`<kind>:<identity>`).
 pub const REF_KINDS: [&str; 6] = ["artifact", "event", "memory", "run", "seal", "workspace"];
@@ -173,6 +174,18 @@ pub fn validate(event_type: &str, payload: &Value) -> Result<(), String> {
             None if *required => return Err(format!("{name}: required")),
             None => {}
         }
+    }
+    if event_type == "WorkspaceCreated"
+        && object
+            .get("owners")
+            .and_then(Value::as_array)
+            .is_none_or(|owners| {
+                owners.len() != 1 || owners[0].as_str() != Some(WORKSPACE_GOVERNOR)
+            })
+    {
+        return Err(format!(
+            "owners: must be exactly [{WORKSPACE_GOVERNOR}]; labs and agents participate by handoff"
+        ));
     }
     if let Some(extra) = object.keys().find(|k| {
         !matches!(k.as_str(), "workspace_id" | "expected_head")
