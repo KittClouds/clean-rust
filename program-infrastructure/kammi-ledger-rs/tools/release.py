@@ -121,7 +121,10 @@ def plan():
 def run_tests(evidence: Path):
     env = {**os.environ, "KAMMI_V1_CORPUS": ";".join(map(str, V1_CORPUS)), "KAMMI_JCS_PYTHON": str(PY / ".venv/Scripts/python.exe"),
            "KAMMI_LEDGER_PY": str(PY), "KAMMI_JCS_ORACLE_CASES": "1000000", "KAMMI_CRASH_RANDOM": "300",
-           "KAMMI_WORK_DIR": str(Path(os.environ["CARGO_TARGET_DIR"]) / "acceptance-work")}
+           "KAMMI_WORK_DIR": str(Path(os.environ["CARGO_TARGET_DIR"]) / "acceptance-work"),
+           # Tests build with unified features; a separate target keeps them from relinking the
+           # release binaries that later steps and harnesses run.
+           "CARGO_TARGET_DIR": os.environ["CARGO_TARGET_DIR"].rstrip("/\\") + "-tests"}
     with (evidence / "workspace-tests.txt").open("w") as log:
         code = subprocess.run(["cargo", "test", "--release", "--workspace", "--", "--nocapture"], cwd=RS, env=env,
                               stdout=log, stderr=subprocess.STDOUT).returncode
@@ -263,7 +266,7 @@ def run(args):
                 shutil.copy2(f, evidence / f.name)
     step("evidence: workspace tests (fresh)")
     run_tests(evidence)
-    shell_env = {**os.environ, "PYTHONDONTWRITEBYTECODE": "1"}
+    shell_env = {**os.environ, "PYTHONDONTWRITEBYTECODE": "1", "KAMMI_BIN_DIR": str(new_dir / "bin")}
     conformance = sh([sys.executable, str(RS / "tools/shell_conformance.py"), str(new_dir / "work/shell"), "--output", str(evidence / "shell-conformance.json")],
                      cwd=PY, env=shell_env)
     if conformance.returncode != 0:

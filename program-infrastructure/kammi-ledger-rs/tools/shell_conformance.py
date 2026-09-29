@@ -29,7 +29,8 @@ sys.path.insert(0, str(HERE / "tools"))
 from ledgerd.client import KammiClient  # noqa: E402
 from http_differential import free_port  # noqa: E402
 
-TARGET = Path(os.environ.get("CARGO_TARGET_DIR", "G:/kammi-ledger-rs-target")) / "release"
+# KAMMI_BIN_DIR: run exactly a release's staged binaries (tools/release.py) instead of the build output.
+TARGET = Path(os.environ["KAMMI_BIN_DIR"]) if os.environ.get("KAMMI_BIN_DIR") else Path(os.environ.get("CARGO_TARGET_DIR", "G:/kammi-ledger-rs-target")) / "release"
 
 
 def run(cmd, env, stdin=None):
