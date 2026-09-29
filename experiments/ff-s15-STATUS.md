@@ -50,6 +50,12 @@ The ASK line: the failure is ASK versus ABSTAIN — two forms of missing informa
 - **C8 observer lifecycle / ABI stress: postponed** until there are graph ObserverBundles worth hardening (hot-swaps, stale scalers, mismatched bundles, replay, corruption, upgrades).
 - **Closed doors:** no more same-surface coordination; no more ASK/NLI rescue; no new representation search; no generic MLP observer sweep; no goal-sufficiency model inside System 1.5; no attention-head work; no BANK-policy capability mining.
 
+## C-G0 residual edge-pruning census (2026-09-29; ran on the program owner's go)
+
+`ff-s15-cg0-edge-pruning-01`: Lexi's frozen edge-existence observer (T1) on the natural ordered-pair universe vs a deterministic type-pair table (T0). **Preregistered gate PASSED** (pooled TEST gain +11.9 / +14.5 points at 1% / 2% edge loss, bar 10; positive on S7/S8/S9; above noise), development-grade.
+Caveats that decide C-G1: T0 alone prunes 76% of non-edges at zero edge loss; the held-renderer gain is only +7.1 / +9.3 (S9 +4.3 / +5.2, where T1 alone is worse than T0); and T1's DEV-fitted threshold does not transfer (a 1% budget loses 6.65% of edges on TEST, 17% on S9).
+C-G1 (contract) and later steps are not started.
+
 ## Next (not started; waits for Lexi)
 
 ```
@@ -69,4 +75,4 @@ Lexi finishes Rung 1
 ## Queued
 
 The fresh sealed split request (`ff-s15-c2-coordination-01/CONFIRM-SPLIT-REQUEST.md`) stays unsent. It was drafted to confirm BANK-policy results; with that branch closed nothing is waiting on it. Keep the draft as a template for whenever a surviving graph architecture needs a sealed confirmation set.
-Harvest-style drafts: `ff-s15-c2-coordination-01/HARVEST-ENTRY.md`, `ff-s15-ask-01/HARVEST-ENTRY.md`, `ff-s15-nli-census-01/HARVEST-ENTRY.md`, `ff-s15-c3a-risk-geometry-01/HARVEST-ENTRY.md`, `ff-s15-c4a-action-safety-01/HARVEST-ENTRY.md`.
+Harvest-style drafts: `ff-s15-c2-coordination-01/HARVEST-ENTRY.md`, `ff-s15-ask-01/HARVEST-ENTRY.md`, `ff-s15-nli-census-01/HARVEST-ENTRY.md`, `ff-s15-c3a-risk-geometry-01/HARVEST-ENTRY.md`, `ff-s15-c4a-action-safety-01/HARVEST-ENTRY.md`, `ff-s15-cg0-edge-pruning-01/HARVEST-ENTRY.md`.
