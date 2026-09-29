@@ -1,0 +1,12 @@
+def evaluation_cells_rename_v1(raw: bytes) -> bytes:
+    from .identity import canonical
+
+    value = strict_json(raw)
+    if not isinstance(value, dict) or value.get("schema") != "evaluation-v1":
+        raise ValueError("adapter source schema mismatch")
+    if "evaluation_checkpoint_cells" not in value or "evaluation_cells" in value:
+        raise ValueError("adapter source field is missing or ambiguous")
+    result = dict(value)
+    result["evaluation_cells"] = result.pop("evaluation_checkpoint_cells")
+    result["schema"] = "evaluation-v2"
+    return canonical(result)
