@@ -14,8 +14,7 @@ use crate::time::parse_utc;
 
 pub const MAX_LOCAL_IMPORT_BYTES: u64 = 8 * 1024 * 1024 * 1024;
 
-/// Gates the Rust build's acceptance must demonstrate: the 28 Python gates plus the four
-/// migration and isolation gates.
+/// Pre-v4 acceptance gates. This remains the profile until the first v4 activation event.
 pub const GATES: [&str; 32] = [
     "artifact_tamper",
     "journal_tamper",
@@ -50,6 +49,55 @@ pub const GATES: [&str; 32] = [
     "projector_isolation",
     "export_v1_rollback",
 ];
+
+/// Post-v4 profile retires the Python export rollback proof and adds the four one-way
+/// activation proofs. The old acceptance remains historical; the next acceptance after the
+/// activation event must use this profile.
+pub const GATES_V4: [&str; 35] = [
+    "artifact_tamper",
+    "journal_tamper",
+    "db_deletion_rebuild",
+    "crash_recovery",
+    "windows_durability_characterization",
+    "backup_restore",
+    "single_writer_fencing",
+    "actor_authorization",
+    "policy_engine",
+    "exposure_enforcement",
+    "resource_leases",
+    "stale_fencing_rejection",
+    "adapter_registry",
+    "failure_history_queries",
+    "contact_evidence_scope",
+    "remote_execution",
+    "remote_tamper_replay",
+    "memory_plane",
+    "fts_retrieval",
+    "vector_retrieval",
+    "graph_retrieval",
+    "memory_custody_trace",
+    "mcp_interface",
+    "python_sdk",
+    "rust_sdk",
+    "e4_legacy_reconstruction",
+    "cleanroom_replay",
+    "phoenix_vault",
+    "v1_import_parity",
+    "shadow_zero_diff",
+    "projector_isolation",
+    "rust_independent_verifier",
+    "v4_replay_identity",
+    "resume_gate",
+    "activation_rehearsal",
+];
+
+pub fn acceptance_gates(vocabulary_v4: bool) -> &'static [&'static str] {
+    if vocabulary_v4 {
+        &GATES_V4
+    } else {
+        &GATES
+    }
+}
 
 impl Ledger {
     fn artifact_payload(
@@ -660,11 +708,12 @@ impl Ledger {
         acceptance: &Value,
         request_id: &str,
     ) -> Result<(String, String)> {
+        let required_gates = acceptance_gates(self.vocabulary_v4_active());
         let gates = acceptance.get("gates").and_then(Value::as_object);
         let gate_names: std::collections::BTreeSet<&str> = gates
             .map(|g| g.keys().map(String::as_str).collect())
             .unwrap_or_default();
-        let expected: std::collections::BTreeSet<&str> = GATES.iter().copied().collect();
+        let expected: std::collections::BTreeSet<&str> = required_gates.iter().copied().collect();
         if acceptance.get("schema").and_then(Value::as_str) != Some("LibraryAcceptanceV2")
             || gate_names != expected
         {
@@ -746,6 +795,33 @@ impl Ledger {
     /// Checks a caller-supplied object is a registered artifact (helper for routes).
     pub fn is_registered_artifact(&self, id: &str) -> bool {
         is_id(id) && self.state.artifacts.contains_key(id)
+    }
+}
+
+#[cfg(test)]
+mod acceptance_gate_tests {
+    use super::{acceptance_gates, GATES, GATES_V4};
+    use std::collections::BTreeSet;
+
+    #[test]
+    fn activation_switches_to_the_post_v4_gate_profile() {
+        let pre_v4 = acceptance_gates(false);
+        let post_v4 = acceptance_gates(true);
+        assert_eq!(pre_v4.len(), 32);
+        assert_eq!(post_v4.len(), 35);
+        assert!(pre_v4.contains(&"export_v1_rollback"));
+        assert!(!post_v4.contains(&"export_v1_rollback"));
+        for gate in [
+            "rust_independent_verifier",
+            "v4_replay_identity",
+            "resume_gate",
+            "activation_rehearsal",
+        ] {
+            assert!(post_v4.contains(&gate));
+        }
+        assert_eq!(GATES.len(), 32);
+        assert_eq!(GATES_V4.len(), 35);
+        assert_eq!(post_v4.iter().copied().collect::<BTreeSet<_>>().len(), 35);
     }
 }
 

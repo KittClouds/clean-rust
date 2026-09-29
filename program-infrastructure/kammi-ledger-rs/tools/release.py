@@ -14,9 +14,10 @@ source snapshot, never this working tree, so nothing here touches the live fligh
 - full: a daemon or projector binary changed. --evidence-from must hold fresh harness reports
   and a binaries.json showing they were produced by exactly the staged binaries.
 
-The switch: stop the daemon, export-v1 plus restore check and Python's independent_verify at the
-live head, `kammi-ledgerd accept` (staged binary, staged source snapshot), install, start,
-probes. A failure after acceptance re-accepts and restarts the previous release.
+The switch verifies the stopped live store at its current head, issues `kammi-ledgerd accept`
+(staged binary, staged source snapshot), installs, starts and probes. Before v4 this uses the
+Python export/restore verifier; after activation it uses a native-v2 copy and `kammi-verify`.
+The post-v4 profile retires Python rollback and binds the four v4-specific acceptance gates.
 """
 from __future__ import annotations
 
@@ -82,6 +83,12 @@ def installed():
     return info, OPS / info["release_dir"]
 
 
+def evidence_dir(info: dict, release_dir: Path) -> Path:
+    """Resolve the active evidence profile, including post-activation reacceptance evidence."""
+    relative = info.get("evidence_dir", str(release_dir.relative_to(OPS) / "evidence"))
+    return OPS / relative
+
+
 # Phase 1 proofs, registered under the gates they support when present in the evidence.
 SUPPLEMENTARY = {
     "verify-agreement.json": ["artifact_tamper", "journal_tamper", "cleanroom_replay"],
@@ -89,7 +96,7 @@ SUPPLEMENTARY = {
 }
 
 
-def evidence_map(evidence: Path | None = None):
+def evidence_map(evidence: Path | None = None, vocabulary_v4: bool = False):
     source = (RS / "tools/cutover_rehearsal.py").read_text(encoding="utf-8")
     start = source.index("EVIDENCE = {")
     namespace = {}
@@ -103,6 +110,16 @@ def evidence_map(evidence: Path | None = None):
         if evidence is not None and (evidence / name).exists():
             for gate in supported:
                 gates[gate] = gates[gate] + [name]
+    if vocabulary_v4:
+        gates.pop("export_v1_rollback", None)
+        gates.update({
+            "rust_independent_verifier": ["verify-agreement.json"],
+            "v4_replay_identity": ["workspace-e2e.json"],
+            # The local 2B runner is a deliberately non-qualifying diagnostic and previously
+            # failed 0/3; the gate is met by the qualified Claude resume run (3/3).
+            "resume_gate": ["resume-gate-claude-devbuild.json"],
+            "activation_rehearsal": ["activation-rehearsal.json"],
+        })
     return {"gates": gates, "independent_verification": "independent-verify.json"}
 
 
@@ -145,12 +162,34 @@ def run_tests(evidence: Path):
         raise RuntimeError("workspace tests failed; see workspace-tests.txt")
 
 
-def verify_at_head(bin_dir: Path, work: Path, evidence: Path):
-    """export-v1 + restore round trip + Python's independent_verify of the stopped live store."""
+def verify_at_head(bin_dir: Path, work: Path, evidence: Path, vocabulary_v4: bool = False):
+    """Verify the stopped store using the active format's restore and verifier path."""
     if work.exists():
         shutil.rmtree(work)
     work.mkdir(parents=True)
     env = {**os.environ, "PATH": NATIVE + os.pathsep + os.environ["PATH"], "PYTHONDONTWRITEBYTECODE": "1"}
+    if vocabulary_v4:
+        restored = work / "restored-v2"
+        shutil.copytree(STORE, restored, ignore=shutil.ignore_patterns("projection", "projection-*", "locks"))
+        live = sh([str(bin_dir / "kammi-verify.exe"), str(STORE)], env=env)
+        back = sh([str(bin_dir / "kammi-verify.exe"), str(restored)], env=env)
+        live_result = json.loads(live.stdout) if live.returncode == 0 and live.stdout.strip() else {"status": "FAIL", "error": live.stderr[-600:]}
+        back_result = json.loads(back.stdout) if back.returncode == 0 and back.stdout.strip() else {"status": "FAIL", "error": back.stderr[-600:]}
+        comparable = ("journal_head", "journal_events", "objects_verified", "vocabulary_v4", "workspaces")
+        identical = (live_result.get("status") == back_result.get("status") == "PASS"
+                     and all(live_result.get(k) == back_result.get(k) for k in comparable))
+        (evidence / "backup-restore.json").write_text(json.dumps({
+            "schema": "KAMMI_RUST_BACKUP_RESTORE_V2", "status": "PASS" if identical else "FAIL",
+            "scope": "release: byte-copy of the stopped native v2 store; Rust verifier state agrees",
+            "restore_method": "copytree excluding disposable projection and locks",
+            "restored_state_identical": identical,
+            "live": {k: live_result.get(k) for k in comparable + ("status",)},
+            "restored": {k: back_result.get(k) for k in comparable + ("status",)},
+        }, indent=1))
+        (evidence / "independent-verify.json").write_text(json.dumps(live_result, indent=1))
+        if not identical:
+            raise RuntimeError(f"native v2 verification/restore mismatch: live={live_result}, restored={back_result}")
+        return live_result["journal_head"]
     export, restored = work / "export-v1", work / "restored"
     for cmd in ([bin_dir / "kammi-migrate.exe", "export-v1", "--v2", STORE, "--out", export],
                 [bin_dir / "kammi-migrate.exe", "import", "--v1", export, "--v2", restored]):
@@ -204,6 +243,72 @@ def install(release_dir: Path, info: dict):
     (OPS / "release.json").write_text(json.dumps(info, indent=1))
 
 
+def reaccept_v4(evidence_from: Path):
+    """Bind the current v4 flight to the post-activation acceptance profile, without a code switch."""
+    if not svc.vocabulary_v4_active():
+        raise SystemExit("reaccept-v4 requires LibraryVocabularyActivated in the live journal")
+    info, release_dir = installed()
+    bin_dir = OPS / info["bin_dir"]
+    source_dir = OPS / info["source_dir"]
+    produced = json.loads((evidence_from / "binaries.json").read_text(encoding="utf-8"))
+    installed_hashes = {name: sha256(bin_dir / name) for name in BINARIES}
+    if any(produced.get(name) != digest for name, digest in installed_hashes.items()):
+        raise SystemExit("v4 evidence was not produced by the currently installed release binaries")
+
+    stamp = now()
+    work = OPS / "v4-acceptance" / stamp
+    evidence = work / "evidence"
+    evidence.mkdir(parents=True, exist_ok=False)
+    replaced_during_reacceptance = {"backup-restore.json", "independent-verify.json", "evidence-map.json", "reuse.json"}
+    for item in evidence_from.iterdir():
+        if item.is_file() and item.name not in replaced_during_reacceptance and item.name != "binaries.json":
+            shutil.copy2(item, evidence / item.name)
+    (evidence / "binaries.json").write_text(json.dumps(produced, indent=1), encoding="utf-8")
+    mapping = evidence_map(evidence, vocabulary_v4=True)
+    if len(mapping["gates"]) != 35:
+        raise RuntimeError(f"post-v4 evidence map has {len(mapping['gates'])} gates, expected 35")
+    (evidence / "evidence-map.json").write_text(json.dumps(mapping, indent=1), encoding="utf-8")
+
+    report = {"schema": "KAMMI_V4_REACCEPTANCE_V1", "started": now(), "commit": info["commit"],
+              "gates": len(mapping["gates"]), "steps": []}
+    try:
+        stop_all()
+        head = verify_at_head(bin_dir, work / "verify", evidence, vocabulary_v4=True)
+        report["verified_head"] = head
+        receipt = accept(bin_dir, source_dir, evidence, f"rust-v4-reaccept-{stamp}")
+        report["acceptance"] = receipt
+        restarted = svc.start()
+        status = restarted["status"]
+        if status.get("flight_gate") != "OPEN" or status.get("acceptance_identity") != receipt["acceptance_identity"]:
+            raise RuntimeError(f"post-v4 reacceptance did not reopen the same release: {status}")
+        report["status"] = "PASS"
+        report["flight_gate"] = status["flight_gate"]
+    except BaseException as exc:
+        report["status"] = "FAIL"
+        report["error"] = f"{type(exc).__name__}: {exc}"
+        try:
+            svc.start()
+        except Exception as restart_error:  # noqa: BLE001
+            report["restart_error"] = str(restart_error)
+        (work / "reacceptance-report.json").write_text(json.dumps(report, indent=1), encoding="utf-8")
+        raise
+
+    destination = release_dir / f"evidence-v4-{stamp}"
+    shutil.copytree(evidence, destination)
+    report["evidence_dir"] = str(destination)
+    (destination / "reacceptance-report.json").write_text(json.dumps(report, indent=1), encoding="utf-8")
+    info["acceptance_identity"] = receipt["acceptance_identity"]
+    info["evidence_dir"] = str(destination.relative_to(OPS)).replace("\\", "/")
+    info["acceptance_profile"] = "v4"
+    (OPS / "release.json").write_text(json.dumps(info, indent=1), encoding="utf-8")
+    with (OPS / "reacceptance-history.jsonl").open("a", encoding="utf-8") as history:
+        history.write(json.dumps({"commit": info["commit"], "acceptance_identity": info["acceptance_identity"],
+                                  "profile": "v4", "journal_head": head, "utc": now(),
+                                  "evidence_dir": info["evidence_dir"]}) + "\n")
+    print(json.dumps({"status": report["status"], "acceptance_identity": info["acceptance_identity"],
+                      "journal_head": head, "evidence_dir": info["evidence_dir"]}, indent=1))
+
+
 def probes(commit: str, acceptance: str):
     token = svc.admin_token()
     env = {**os.environ, "KAMMI_URL": f"http://127.0.0.1:{svc.PORT}", "KAMMI_TOKEN": token, "PYTHONDONTWRITEBYTECODE": "1"}
@@ -231,6 +336,8 @@ def probes(commit: str, acceptance: str):
 def run(args):
     report = {"schema": "KAMMI_LIBRARY_RELEASE_V1", "started": now(), "steps": []}
     step = lambda name, **fields: (report["steps"].append({"step": name, "utc": now(), **fields}), print(f"-- {name} {json.dumps(fields)[:300]}", flush=True))
+    vocabulary_v4 = svc.vocabulary_v4_active()
+    report["vocabulary_profile"] = "v4" if vocabulary_v4 else "v1"
     p = plan()
     if not p["tree_clean"]:
         raise SystemExit(f"working tree not clean (commit first): {p['dirty']}")
@@ -263,7 +370,8 @@ def run(args):
     evidence.mkdir()
     if p["tier"] == "source-only":
         reused = []
-        for f in sorted((old_dir / "evidence").iterdir()):
+        old_evidence = evidence_dir(old_info, old_dir)
+        for f in sorted(old_evidence.iterdir()):
             if f.name not in FRESH and f.name != "stress-run1-original-a7.json":
                 shutil.copy2(f, evidence / f.name)
                 reused.append(f.name)
@@ -285,7 +393,7 @@ def run(args):
                      cwd=PY, env=shell_env)
     if conformance.returncode != 0:
         raise SystemExit("shell conformance failed:\n" + conformance.stdout[-1500:])
-    (evidence / "evidence-map.json").write_text(json.dumps(evidence_map(evidence), indent=1))
+    (evidence / "evidence-map.json").write_text(json.dumps(evidence_map(evidence, vocabulary_v4), indent=1))
     step("evidence ready", files=sorted(f.name for f in evidence.iterdir()))
 
     # --- switch: from here the live Library is briefly down
@@ -293,7 +401,7 @@ def run(args):
     step("stop", **stop_all())
     accepted = None
     try:
-        head = verify_at_head(new_dir / "bin", new_dir / "work/verify", evidence)
+        head = verify_at_head(new_dir / "bin", new_dir / "work/verify", evidence, vocabulary_v4)
         step("verified at head", journal_head=head)
         receipt = accept(new_dir / "bin", new_dir / "source", evidence, f"rust-release-{commit}-{now()}")
         accepted = receipt["acceptance_identity"]
@@ -314,8 +422,9 @@ def run(args):
         stop_all()
         if accepted:
             fallback = old_dir / f"evidence-fallback-{now()}"
-            shutil.copytree(old_dir / "evidence", fallback)
-            verify_at_head(old_dir / "bin", new_dir / "work/fallback", fallback)
+            old_evidence = evidence_dir(old_info, old_dir)
+            shutil.copytree(old_evidence, fallback)
+            verify_at_head(old_dir / "bin", new_dir / "work/fallback", fallback, vocabulary_v4)
             old_receipt = accept(old_dir / "bin", old_dir / "source", fallback, f"rust-release-fallback-{old_info['commit']}-{now()}")
             old_info = {**old_info, "acceptance_identity": old_receipt["acceptance_identity"], "released_utc": now(), "via": f"fallback from {commit}"}
             step("re-accepted previous release", acceptance_identity=old_receipt["acceptance_identity"])
@@ -336,7 +445,7 @@ def run(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("operation", choices=("build", "plan", "run"))
+    parser.add_argument("operation", choices=("build", "plan", "run", "reaccept-v4"))
     parser.add_argument("--evidence-from", type=Path)
     args = parser.parse_args()
     if args.operation == "build":
@@ -344,5 +453,9 @@ if __name__ == "__main__":
         print(json.dumps({name: sha256(TARGET / name) for name in BINARIES}, indent=1))
     elif args.operation == "plan":
         print(json.dumps(plan(), indent=1))
+    elif args.operation == "reaccept-v4":
+        if not args.evidence_from:
+            raise SystemExit("reaccept-v4 requires --evidence-from <qualified evidence directory>")
+        reaccept_v4(args.evidence_from.resolve())
     else:
         run(args)

@@ -17,13 +17,14 @@
 //! exactly the source root and runtime identity the daemon computes. Every evidence file is
 //! checked (a JSON report must say `PASS`; a test log must show `test result: ok` and no
 //! failures), registered as an artifact, and cited; the core then applies its own
-//! `accept_library` checks (all 32 gates, evidence registered and verified, identities bound).
+//! `accept_library` checks against the active pre-v4 or post-v4 gate profile, with evidence
+//! registered and verified and all current identities bound.
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
-use kammi_core::ops_custody::GATES;
+use kammi_core::ops_custody::acceptance_gates;
 use kammi_core::{Clock, FlightIdentity, Ledger, LedgerOptions, SystemClock};
 use kammi_jcs::{raw_id, Value};
 use kammi_store::{Store, StoreOptions};
@@ -73,6 +74,7 @@ pub fn run(args: &[String], flight: FlightIdentity) -> Result<(), Error> {
         writer: kammi_core::obj! {"pid" => std::process::id(), "implementation" => "kammi-ledgerd accept"},
     };
     let mut ledger = Ledger::open(store, options)?;
+    let required_gates = acceptance_gates(ledger.vocabulary_v4_active());
     let head_before = ledger.store.main.head().to_string();
 
     // The independent verification must cover this store at its current head.
@@ -96,12 +98,12 @@ pub fn run(args: &[String], flight: FlightIdentity) -> Result<(), Error> {
 
     // Register every evidence file once.
     let gates = map["gates"].as_object().ok_or("gates missing")?;
-    let wanted: BTreeSet<&str> = GATES.iter().copied().collect();
+    let wanted: BTreeSet<&str> = required_gates.iter().copied().collect();
     let named: BTreeSet<&str> = gates.keys().map(String::as_str).collect();
     if named != wanted {
         return Err(format!(
             "evidence map must name exactly the {} gates; missing {:?}, extra {:?}",
-            GATES.len(),
+            required_gates.len(),
             wanted.difference(&named).collect::<Vec<_>>(),
             named.difference(&wanted).collect::<Vec<_>>()
         )
@@ -156,7 +158,11 @@ pub fn run(args: &[String], flight: FlightIdentity) -> Result<(), Error> {
         "schema" => "KAMMI_ENDSTATE_INDEPENDENT_AUDIT_V1", "status" => "PASS",
         "source_root" => flight.source_root.clone(), "runtime_identity" => flight.runtime_identity.clone(),
         "acceptance_suite_root" => suite_id.clone(),
-        "independent_verifier" => "kammi-ledger/scripts/independent_verify.py (unmodified Python) over export-v1 of this store",
+        "independent_verifier" => if ledger.vocabulary_v4_active() {
+            "kammi-verify (independent Rust verifier) over the native v2 store"
+        } else {
+            "kammi-ledger/scripts/independent_verify.py (unmodified Python) over export-v1 of this store"
+        },
         "verified_head" => head_before.clone(), "result" => audit_result,
     };
     let (audit_id, _) = ledger.register_bytes(
@@ -193,7 +199,7 @@ pub fn run(args: &[String], flight: FlightIdentity) -> Result<(), Error> {
         "source_root" => flight.source_root.clone(), "runtime_identity" => flight.runtime_identity.clone(),
         "acceptance_suite_root" => suite_id.clone(), "independent_verification_root" => audit_id.clone(),
         "evidence_merkle_root" => evidence_root.clone(),
-        "gates" => Value::Object(GATES.iter().map(|g| (g.to_string(), Value::from("PASS"))).collect()),
+        "gates" => Value::Object(required_gates.iter().map(|g| (g.to_string(), Value::from("PASS"))).collect()),
         "issued_at" => stamp, "predecessor_acceptance" => prior.clone().map_or(Value::Null, Value::from),
         "scope" => "Infrastructure acceptance of the Rust Library only; scientific protocols retain their own authorization.",
     };

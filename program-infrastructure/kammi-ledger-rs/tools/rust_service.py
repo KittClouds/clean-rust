@@ -55,6 +55,12 @@ def status(port=PORT, timeout=5):
         return json.loads(response.read())
 
 
+def vocabulary_v4_active(port=PORT, timeout=5):
+    request = urllib.request.Request(f"http://127.0.0.1:{port}/v2/workspaces", headers={"Authorization": "Bearer " + admin_token()})
+    with urllib.request.urlopen(request, timeout=timeout) as response:
+        return json.loads(response.read()).get("vocabulary_v4") is True
+
+
 def install():
     target = Path(os.environ["CARGO_TARGET_DIR"]) / "release"
     BIN.mkdir(parents=True, exist_ok=True)

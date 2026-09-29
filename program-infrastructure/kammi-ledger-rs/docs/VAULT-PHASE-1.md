@@ -68,10 +68,24 @@ The agents found three usability gaps, now fixed: no `--help`, `find` refused th
   - A fixture-clock dry run on the last release's export passes: final v1 verified by Python,
     activation, `kammi-verify` after, and the seed. It cannot prove the flight gate, because
     that export predates its release's own acceptance; the `--live-copy` rehearsal does.
-- **M5:** after the rollback window closes:
+- **M5:** after the program owner's recorded rollback-window closure decision:
   - check the closure conditions and register the decision;
   - rehearse activation on a current copy of the live store;
   - activate live and seed Frozen Fabrique live;
   - run the resume gate against a copy of the live store;
   - change the gate list: retire `export_v1_rollback`, and add `rust_independent_verifier`,
     `v4_replay_identity`, `resume_gate` and `activation_rehearsal`.
+
+### Immediate-activation amendment (v4.1)
+
+The program owner's explicit decision may close the rollback window before the former October 6
+floor. The activation tool records that decision and its effective time, measures actual monitor
+gaps and rollback evidence, and removes the date floor through the registered amendment; it does
+not alter the clock. It still requires the ordinary current backup, exact-head verification, and
+real-clock live-copy rehearsal before the one-way activation event.
+
+The first post-activation acceptance uses 35 gates: the original pre-v4 profile minus
+`export_v1_rollback`, plus the four v4-specific gates above. Native-v2 backup/restore and
+`kammi-verify` replace Python export verification for fix-forward releases. Chief Kammi owns
+workspace creation, scope, routing and lifecycle; labs retain authorship and authority over their
+scientific evidence and claims.
