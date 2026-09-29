@@ -324,7 +324,7 @@ def a1(work, seconds):
             if i < 4:
                 # One writer per workspace: its own HEAD chain, never stale.
                 body = {"type": "WorkspaceNoteRecorded", "payload": {"expected_head": head, "note_id": f"n{i}-{n}", "text": f"a1 note {rid}", "refs": []},
-                        "actor_id": "a0", "request_id": rid}
+                        "actor_id": f"a{i}", "request_id": rid}
                 status, reply = c.retry("POST", f"/v2/workspaces/ws{i}/commands", body, token=token_of(f"a{i}"))
                 ws_statuses[status] += 1
                 if status == 200:
@@ -335,7 +335,7 @@ def a1(work, seconds):
                 # Contending writers on one workspace: read HEAD, write, and on 409 read again.
                 current = c.retry("GET", "/v2/workspaces/ws-shared")[1]["head"]
                 body = {"type": "WorkspaceNoteRecorded", "payload": {"expected_head": current, "note_id": f"s{i}-{n}", "text": f"a1 shared {rid}", "refs": []},
-                        "actor_id": "a0", "request_id": rid}
+                        "actor_id": f"a{i}", "request_id": rid}
                 status, reply = c.retry("POST", "/v2/workspaces/ws-shared/commands", body, token=token_of(f"a{i}"))
                 ws_statuses[status] += 1
                 if status == 200:
