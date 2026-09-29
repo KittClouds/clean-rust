@@ -170,6 +170,8 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("work", type=Path)
     parser.add_argument("--output", type=Path)
+    parser.add_argument("--rust-embedder", default="bge",
+                        help="Rust embedder spec; use bge:<cache path> when the source tree is in a long worktree")
     args = parser.parse_args()
     work = args.work.resolve()
     if work.exists():
@@ -190,9 +192,11 @@ def main():
     common = {"KAMMI_SIGNING_KEY_FILE": str(key), "KAMMI_TEST_CLOCK": clock}
     python = Side("python", v1, [sys.executable, str(HERE / "tools/py_fixed_clock.py")],
                   {**common, "KAMMI_EMBEDDING_CACHE": str(PY / "vendor/runtime-v1/embedding-cache")}, PY)
-    rust = Side("rust", v2, [str(TARGET / "kammi-ledgerd.exe")], {**common, "KAMMI_EMBEDDER": "bge"}, HERE)
+    rust = Side("rust", v2, [str(TARGET / "kammi-ledgerd.exe")],
+                {**common, "KAMMI_EMBEDDER": args.rust_embedder}, HERE)
     corpus = json.loads((HERE / "crates/kammi-embed/fixtures/qualification-corpus-v1.json").read_text(encoding="utf-8"))
-    report = {"schema": "KAMMI_MEMORY_DIFFERENTIAL_V1", "clock": clock}
+    report = {"schema": "KAMMI_MEMORY_DIFFERENTIAL_V1", "clock": clock,
+              "rust_embedder": args.rust_embedder}
 
     def restart(side):
         side.stop()
