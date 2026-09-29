@@ -15,11 +15,13 @@ pub mod ops_custody;
 pub mod ops_local;
 pub mod ops_remote;
 pub mod ops_vault;
+pub mod ops_workspace;
 pub mod rules;
 pub mod safe;
 pub mod state;
 pub mod time;
 pub mod verify_cache;
+pub mod workspace;
 
 pub use embed::{Embedder, Embeddings, Input, ModelIdentity, Role};
 pub use error::{LedgerError, Result};

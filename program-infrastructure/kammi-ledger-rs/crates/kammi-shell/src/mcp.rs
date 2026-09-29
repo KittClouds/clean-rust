@@ -99,6 +99,8 @@ pub fn tool_schema(name: &str) -> Value {
 pub struct Mcp {
     client: Client,
     initialized: bool,
+    /// The agent this server acts for (`KAMMI_ACTOR`), for the workspace verbs.
+    actor: Option<String>,
 }
 
 fn invalid_params(identity: &Value, message: impl Into<String>) -> Value {
@@ -110,6 +112,7 @@ impl Mcp {
         Mcp {
             client,
             initialized: false,
+            actor: std::env::var("KAMMI_ACTOR").ok().filter(|a| !a.is_empty()),
         }
     }
 
@@ -134,7 +137,12 @@ impl Mcp {
             "ping" => json!({}),
             _ if !self.initialized => return Some(invalid_params(&identity, "initialize first")),
             "tools/list" => {
-                json!({"tools": TOOLS.iter().map(|(n, _, _)| tool_schema(n)).collect::<Vec<_>>()})
+                // The 24 fixed v1 tools first (unchanged), then the workspace verbs.
+                let mut tools: Vec<Value> = TOOLS.iter().map(|(n, _, _)| tool_schema(n)).collect();
+                tools.extend(crate::verbs::functions().into_iter().map(|f| {
+                    json!({"name": f["name"], "description": f["description"], "inputSchema": f["parameters"]})
+                }));
+                json!({ "tools": tools })
             }
             "tools/call" => match self.call(message) {
                 Ok(result) => result,
@@ -162,6 +170,19 @@ impl Mcp {
             Some(Value::Object(map)) => map,
             Some(_) => return Err("tool arguments do not match schema".into()),
         };
+        if let Some(spec) = name.strip_prefix("kammi_").and_then(crate::verbs::spec) {
+            return match crate::verbs::execute(&self.client, self.actor.as_deref(), spec.verb, args)
+            {
+                Ok(value) => Ok(
+                    json!({"content": [{"type": "text", "text": crate::ascii(&python_dumps(&value))}],
+                                       "structuredContent": value, "isError": false}),
+                ),
+                Err(crate::verbs::VerbError::Usage(message)) => Err(message),
+                Err(crate::verbs::VerbError::Client(error)) => Ok(
+                    json!({"content": [{"type": "text", "text": error.to_string()}], "isError": true}),
+                ),
+            };
+        }
         let (verb, template) = tool(name).ok_or("unknown narrow tool")?;
         let schema = tool_schema(name);
         let mut required: Vec<&str> = schema["inputSchema"]["required"]

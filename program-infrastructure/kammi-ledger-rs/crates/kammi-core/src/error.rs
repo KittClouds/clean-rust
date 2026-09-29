@@ -1,4 +1,4 @@
-use kammi_jcs::JcsError;
+use kammi_jcs::{JcsError, Value};
 use kammi_store::StoreError;
 
 /// Errors carry the Python exception kind they replace, so the HTTP layer can reproduce the
@@ -21,6 +21,9 @@ pub enum LedgerError {
     /// unaffected. HTTP maps this to 503.
     #[error("{0}")]
     Unavailable(String),
+    /// A stale expected HEAD (amendment v4): HTTP 409 with the current HEAD in the body.
+    #[error("{0}")]
+    Conflict(Value),
     #[error("I/O error on {path}: {source}")]
     Io {
         path: std::path::PathBuf,

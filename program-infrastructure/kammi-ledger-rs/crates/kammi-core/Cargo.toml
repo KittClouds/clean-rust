@@ -12,8 +12,10 @@ base64 = "0.22"
 ed25519-dalek = "2.1"
 hashbrown.workspace = true
 indexmap = { version = "2.7", features = ["serde"] }
+kammi-contract = { path = "../kammi-contract" }
 kammi-jcs.workspace = true
 kammi-store.workspace = true
+kammi-v1.workspace = true
 serde_json.workspace = true
 parking_lot = "0.12"
 thiserror.workspace = true

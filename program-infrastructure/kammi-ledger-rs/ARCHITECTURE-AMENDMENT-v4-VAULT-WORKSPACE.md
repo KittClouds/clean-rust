@@ -1,12 +1,21 @@
 # Kammi Library architecture amendment v4: Vault workspace, six-clock memory, shell ABI
 
-Authority: the KAMMI Vault Gold Path Audit (2026-09-28), revised after the Rust cutover, and
-the user's go for Phase 0 (2026-09-29). This is the Phase 0 contract: it **freezes** schemas
-and the verb list. It does **not activate** them. No v4 event can be journaled until the
-activation rule below is met, so the Python rollback path stays valid until then.
+Authority: the KAMMI Vault Gold Path Audit (2026-09-28), revised after the Rust cutover; the
+user's go for Phase 0 (2026-09-29); and the user's Phase 1 decisions (2026-09-29), revision 2
+below. Phase 0 froze these schemas. Phase 1 implements them in a binary that runs with v4 off.
+The vocabulary becomes journalable on a store only through the journaled activation (§6). So
+the Python rollback path stays valid until then.
 
 Machine-readable form: the `kammi-contract` crate (`crates/kammi-contract`). Its types are the
 normative field lists, and its tests pin the invariants stated here.
+
+Revision 2 (Phase 1 decisions):
+
+- **Activation:** a journaled action (`LibraryVocabularyActivated`), not a code release.
+- **Closure:** accepted as one-way, and not before 2026-10-06.
+- **Resume test:** runs through a provider-neutral function interface.
+- **Ownership:** Chief Kammi owns the ledger and the Frozen Fabrique workspace.
+- **Gate list:** changes at activation.
 
 ## 1. One memory record: the six-clock envelope
 
@@ -81,6 +90,23 @@ refused. A work packet line always cites the event that established it.
 | `WorkspaceAgentAttached` / `WorkspaceAgentDetached` | `session_id`, `agent`, `tool` / `session_id`, `outcome` | Who is working now |
 | `WorkspaceClosed` | `outcome`, `summary` | Read-only afterwards |
 
+**Who may write.**
+
+- **Admin:** the Library admin (the master token, held by Chief Kammi) may do anything,
+  including creating workspaces.
+- **Owners:** they own their workspace. Owners must be registered actors.
+- **Handoff recipients:** an actor that a handoff in the workspace was sent to becomes a
+  participant. It may attach, note, decide, ask, resolve, pin, hand off and receive. Handoffs
+  are how access is delegated.
+- **Owners only:** setting the objective or the scope, and closing the workspace.
+- **Guidance, not enforcement:** the do-not-do list tells agents what not to do. Gated
+  operations stay behind grants and policy.
+- **Protected material:** work packets may name it by classification and location only, never
+  by content.
+
+**Commit safety.** A workspace command runs replay's own checks on a copy of the state before
+the append. Anything replay would refuse never reaches the journal.
+
 **Scope.** Memory scope may be the actor's lab (unchanged) or `workspace:<id>`, which the
 workspace's owners and attached agents may read and write. This is how memory is shared across
 labs, without weakening lab isolation.
@@ -101,7 +127,8 @@ the expected HEAD (`--expect-head`; `kammi open` records the HEAD it read). Exit
 | `work` | Work packet: objective, scope, do-not-do list, recent events, pending handoffs, open questions, next step; each line cites an event | 1 |
 | `objective`, `scope`, `next`, `note`, `decide`, `ask`, `resolve`, `pin`, `unpin` | Workspace writes, one event each | 1 |
 | `handoff`, `receive` | Send or acknowledge a handoff | 1 |
-| `close` | Detach the session, or close the workspace (`--workspace`) | 1 |
+| `close` | Detach the session, or close the workspace (`--end`, owners only) | 1 |
+| `log` | The workspace's events after a given event (the record behind the packet) | 1 |
 | `remember`, `recall`, `trace` | Memory write, cited retrieval, evidence trace | 1 (recall quality: 3) |
 | `find` | Custody lookup by name or identity | 1 |
 
@@ -139,16 +166,51 @@ The window closes only when all of the following hold:
 
 After closure the Python tree is archived read-only history. It is not deleted.
 
-## 6. Activation
+## 6. Activation (journaled, one-way)
 
-v4 vocabulary becomes journalable through an ordinary release (`docs/RELEASE.md`) that adds
-the v4 types to the closed registry, and only after §5 is satisfied. Until then the registry
-stays exactly v1's 47 types. A test pins this: no v4 type is accepted by `kammi-v1`.
+A store starts with only the v1 vocabulary active. The binary understands v4, but the core
+refuses every v4 event, on the command path and on replay, until the journal contains
+`LibraryVocabularyActivated`. That event is itself the first v4 event, so the active vocabulary
+is derived from the journal like everything else. No side file can disagree with history.
 
-Because Python cannot verify v4 events, the release that activates v4 must replace Python's
-`independent_verify` as the audit's independent verifier. Its replacement is a Rust verifier
-that shares no decision code with `kammi-core`, as in the plan's `kammi-qualify
-verify-store`.
+**Payload:**
+
+- `vocabulary` is `"v4"`, and `not_before` is `2026-10-06T00:00:00Z`.
+- Three registered artifacts:
+  - `closure_decision`: a `KAMMI_ROLLBACK_WINDOW_CLOSURE_V1` document deciding `CLOSE`,
+    recording the user's decision;
+  - `verification`: a Rust independent verification (`kammi-verify`) that PASSes at the head
+    just before its own registration, and that registration must be the latest event, so
+    nothing enters unverified;
+  - `backup`: the manifest of the backup taken just before.
+
+**Command rules:** admin only; refused before `not_before` by the Library clock; refused if v4
+is already active.
+
+**Replay rules:** v4 must not already be active, the fields must be exact, and the artifacts
+must be registered.
+
+**The one-way door:** after activation, `export-v1` rollback ends, and no pre-Phase-1 Rust
+binary can read the journal either. Recovery is forward-fix only. Before activation, the
+procedure is rehearsed on a current copy of the live store, and a backup is taken.
+
+**Independent verifier:** Python cannot verify v4 events. From activation on, `kammi-verify`
+(which shares nothing with `kammi-core` or `kammi-store` except the JCS canonicalizer)
+replaces Python's `independent_verify` as the audit's independent verifier.
+
+**Gate list:** `export_v1_rollback` stays in the acceptance through the rollback window. After
+activation it is retired, and four gates are added: `rust_independent_verifier`,
+`v4_replay_identity`, `resume_gate` and `activation_rehearsal`.
+
+**Resume test (Phase 1 gate):** fresh agents work from `kammi` alone, through one
+provider-neutral function interface (`kammi verbs --functions`; the same definitions are the
+MCP tools). Runners:
+
+- Claude app subagents;
+- local llama.cpp and OpenRouter, both through the OpenAI-compatible tool-calling API;
+- the Codex app.
+
+A runner counts as a passing headless test only when its path has been verified end to end.
 
 ## 7. Compact state (scheduled, not Phase 0)
 

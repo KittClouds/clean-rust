@@ -94,13 +94,19 @@ enum Failure {
 
 fn run(command: &str, raw: &[String]) -> Result<Value, Failure> {
     let usage = Failure::Usage;
-    let args = Args::parse(raw, &["summary", "json"]).map_err(usage)?;
+    let args = Args::parse(raw, &["summary", "json", "functions"]).map_err(usage)?;
     if command == "verbs" {
+        if raw.iter().any(|a| a == "--functions") {
+            return Ok(Value::Array(kammi_shell::verbs::functions()));
+        }
         args.only(&[], 0).map_err(Failure::Usage)?;
         let list: Vec<Value> = verbs::VERBS
             .iter()
-            .map(|v| serde_json::json!({"verb": v.name, "phase": v.phase, "writes": v.writes, "summary": v.summary,
-                                        "mcp_tool": verbs::mcp_tool(v), "available": v.phase == 0}))
+            .map(|v| {
+                let available = v.phase == 0 || kammi_shell::verbs::spec(v.name).is_some();
+                serde_json::json!({"verb": v.name, "phase": v.phase, "writes": v.writes, "summary": v.summary,
+                                   "mcp_tool": verbs::mcp_tool(v), "available": available})
+            })
             .collect();
         return Ok(Value::Array(list));
     }
@@ -180,14 +186,214 @@ fn run(command: &str, raw: &[String]) -> Result<Value, Failure> {
     result.map_err(Failure::Client)
 }
 
+/// The CLI session (`KAMMI_SESSION`, default `.kammi/session.json`): the workspace, session
+/// and HEAD this agent last read, so writes carry the expected HEAD without being asked.
+fn session_path() -> std::path::PathBuf {
+    std::env::var_os("KAMMI_SESSION")
+        .map(Into::into)
+        .unwrap_or_else(|| std::path::Path::new(".kammi").join("session.json"))
+}
+
+fn load_session() -> serde_json::Map<String, Value> {
+    std::fs::read(session_path())
+        .ok()
+        .and_then(|b| serde_json::from_slice::<Value>(&b).ok())
+        .and_then(|v| v.as_object().cloned())
+        .unwrap_or_default()
+}
+
+fn save_session(session: &serde_json::Map<String, Value>) {
+    let path = session_path();
+    if let Some(dir) = path.parent() {
+        let _ = std::fs::create_dir_all(dir);
+    }
+    let _ = std::fs::write(path, serde_json::to_vec_pretty(session).unwrap_or_default());
+}
+
+/// A Phase 1 workspace verb from the command line: positionals and `--flags` become the
+/// verb's JSON arguments; the session fills `workspace`, `expected_head` and `session_id`.
+fn workspace_verb(
+    spec: &'static kammi_shell::verbs::VerbSpec,
+    raw: &[String],
+) -> Result<(Value, String), Failure> {
+    use kammi_shell::verbs::Kind;
+    let mut args = serde_json::Map::new();
+    let mut positional = Vec::new();
+    let mut json_out = false;
+    let mut iter = raw.iter();
+    while let Some(a) = iter.next() {
+        if a == "--json" {
+            json_out = true;
+        } else if let Some(name) = a.strip_prefix("--") {
+            let name = name.replace('-', "_");
+            let def =
+                spec.args.iter().find(|d| d.name == name).ok_or_else(|| {
+                    Failure::Usage(format!("{}: unknown option --{name}", spec.verb))
+                })?;
+            match def.kind {
+                Kind::Bool => {
+                    args.insert(name, Value::Bool(true));
+                }
+                Kind::Text => {
+                    let v = iter
+                        .next()
+                        .ok_or_else(|| Failure::Usage(format!("--{name} needs a value")))?;
+                    args.insert(name, Value::from(v.clone()));
+                }
+                Kind::Texts => {
+                    let v = iter
+                        .next()
+                        .ok_or_else(|| Failure::Usage(format!("--{name} needs a value")))?;
+                    args.entry(name)
+                        .or_insert_with(|| Value::Array(Vec::new()))
+                        .as_array_mut()
+                        .expect("a list")
+                        .push(Value::from(v.clone()));
+                }
+            }
+        } else {
+            positional.push(a.clone());
+        }
+    }
+    let positioned: Vec<_> = spec.args.iter().filter(|d| d.position.is_some()).collect();
+    if positional.len() > positioned.len() {
+        return Err(Failure::Usage(format!("{}: too many arguments", spec.verb)));
+    }
+    for def in positioned {
+        if let Some(v) = positional.get(def.position.expect("positioned")) {
+            args.insert(def.name.into(), Value::from(v.clone()));
+        }
+    }
+    let mut session = load_session();
+    let actor = std::env::var("KAMMI_ACTOR").ok().or_else(|| {
+        session
+            .get("actor")
+            .and_then(Value::as_str)
+            .map(str::to_string)
+    });
+    if spec.verb != "open" && !args.contains_key("workspace") {
+        if let Some(ws) = session.get("workspace").cloned() {
+            args.insert("workspace".into(), ws);
+        }
+    }
+    let same_workspace = args.get("workspace") == session.get("workspace");
+    let takes_head = spec.args.iter().any(|d| d.name == "expected_head");
+    if takes_head && !args.contains_key("expected_head") && same_workspace {
+        if let Some(head) = session.get("head").cloned() {
+            args.insert("expected_head".into(), head);
+        }
+    }
+    if spec.verb == "close"
+        && !args.contains_key("session_id")
+        && !args.contains_key("end")
+        && same_workspace
+    {
+        if let Some(sid) = session.get("session_id").cloned() {
+            args.insert("session_id".into(), sid);
+        }
+    }
+    let client = Client::from_environment().map_err(Failure::Client)?;
+    let value = match kammi_shell::verbs::execute(&client, actor.as_deref(), spec.verb, &args) {
+        Ok(v) => v,
+        Err(kammi_shell::verbs::VerbError::Usage(m)) => return Err(Failure::Usage(m)),
+        Err(kammi_shell::verbs::VerbError::Client(ClientError::Refused {
+            status: 409,
+            message,
+        })) => {
+            // Show what moved since the HEAD this session last read, then exit 3.
+            let mut note = format!(
+                "{message}\nHEAD moved since you last read the workspace. Run `kammi work`, then retry."
+            );
+            let ws = args.get("workspace").and_then(Value::as_str);
+            if let (Some(ws), Some(head)) = (ws, session.get("head").and_then(Value::as_str)) {
+                let mut log = serde_json::Map::new();
+                log.insert("workspace".into(), ws.into());
+                log.insert("after".into(), head.into());
+                if let Ok(changes) =
+                    kammi_shell::verbs::execute(&client, actor.as_deref(), "log", &log)
+                {
+                    for e in changes["events"].as_array().into_iter().flatten() {
+                        note.push_str(&format!(
+                            "\n  {} {} {}",
+                            e["utc"].as_str().unwrap_or(""),
+                            e["actor"].as_str().unwrap_or(""),
+                            e["summary"].as_str().unwrap_or("")
+                        ));
+                    }
+                }
+            }
+            return Err(Failure::Client(ClientError::Refused {
+                status: 409,
+                message: note,
+            }));
+        }
+        Err(kammi_shell::verbs::VerbError::Client(e)) => return Err(Failure::Client(e)),
+    };
+    // Remember what this agent has now seen.
+    let ws = args.get("workspace").cloned().unwrap_or(Value::Null);
+    let seen_head = match spec.verb {
+        "work" => value["workspace"]["head"].clone(),
+        "open" => value["packet"]["workspace"]["head"].clone(),
+        "log" => Value::Null,
+        _ => value["head"].clone(),
+    };
+    if spec.verb == "open" {
+        session = serde_json::Map::new();
+        session.insert("session_id".into(), value["session_id"].clone());
+        if let Some(a) = &actor {
+            session.insert("actor".into(), Value::from(a.clone()));
+        }
+    }
+    if !seen_head.is_null() {
+        session.insert("workspace".into(), ws);
+        session.insert("head".into(), seen_head);
+        save_session(&session);
+    }
+    let text = |v: &Value| v.as_str().unwrap_or("").to_string();
+    let human = match spec.verb {
+        "work" => text(&value["text"]),
+        "open" => format!(
+            "attached as session {}\n{}",
+            text(&value["session_id"]),
+            text(&value["packet"]["text"])
+        ),
+        "log" => value["events"]
+            .as_array()
+            .into_iter()
+            .flatten()
+            .map(|e| {
+                format!(
+                    "{} {} {} {}\n",
+                    text(&e["utc"]),
+                    text(&e["actor"]),
+                    text(&e["summary"]),
+                    text(&e["event"])
+                )
+            })
+            .collect(),
+        _ => format!(
+            "ok {} {}; HEAD now {}\n",
+            spec.event.unwrap_or(""),
+            text(&value["event_id"]),
+            text(&value["head"])
+        ),
+    };
+    Ok((value, if json_out { String::new() } else { human }))
+}
+
 fn main() {
     let argv: Vec<String> = std::env::args().skip(1).collect();
     let Some(command) = argv.first() else {
         eprintln!("usage: kammi <verb> [args]; `kammi verbs` lists the ABI");
         std::process::exit(exit::USAGE);
     };
-    match run(command, &argv[1..]) {
-        Ok(value) => println!("{}", kammi_shell::dumps_pretty(&value)),
+    let outcome = match kammi_shell::verbs::spec(command) {
+        Some(spec) => workspace_verb(spec, &argv[1..]),
+        None => run(command, &argv[1..]).map(|v| (v, String::new())),
+    };
+    match outcome {
+        Ok((_, human)) if !human.is_empty() => print!("{human}"),
+        Ok((value, _)) => println!("{}", kammi_shell::dumps_pretty(&value)),
         Err(Failure::Usage(message)) => {
             eprintln!("kammi: {message}");
             std::process::exit(exit::USAGE);

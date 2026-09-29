@@ -7,6 +7,7 @@
 
 pub mod client;
 pub mod mcp;
+pub mod verbs;
 
 /// Python's `json.dumps(value, indent=2, sort_keys=True)`: serde's pretty form with sorted
 /// keys, plus `ensure_ascii` escaping.

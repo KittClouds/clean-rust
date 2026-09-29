@@ -4,15 +4,19 @@
 //! - [`workspace`]: the workspace event vocabulary and payload rules.
 //! - [`verbs`]: the frozen shell ABI shared by the `kammi` CLI and MCP.
 //!
-//! Frozen, not active: nothing here is linked into `kammi-ledgerd`, and the journal's closed
-//! registry (`kammi-v1`) accepts none of [`V4_EVENT_TYPES`] until the activation release.
+//! - [`activation`]: `LibraryVocabularyActivated`, the journaled switch that turns v4 on.
+//!
+//! A store starts with only the v1 vocabulary active. The core accepts v4 events only after the
+//! journal contains the activation event, itself the first v4 event (amendment v4 section 6).
 
+pub mod activation;
 pub mod time;
 pub mod verbs;
 pub mod workspace;
 
 /// Every event type amendment v4 adds, sorted for binary search.
-pub const V4_EVENT_TYPES: [&str; 16] = [
+pub const V4_EVENT_TYPES: [&str; 17] = [
+    "LibraryVocabularyActivated",
     "MemoryRecordedV2",
     "WorkspaceAgentAttached",
     "WorkspaceAgentDetached",

@@ -172,3 +172,24 @@ fn verb_abi_is_unique_and_phased() {
         "kammi_recall"
     );
 }
+
+#[test]
+fn activation_payload() {
+    use kammi_contract::activation;
+    let a = "sha256:3333333333333333333333333333333333333333333333333333333333333333";
+    let ok = json!({"vocabulary": "v4", "not_before": activation::NOT_BEFORE, "closure_decision": a, "verification": a, "backup": a});
+    activation::validate(&ok).unwrap();
+    for (field, bad) in [
+        ("vocabulary", json!("v5")),
+        ("not_before", json!("2026-10-01T00:00:00Z")),
+        ("backup", json!("nope")),
+    ] {
+        let mut p = ok.clone();
+        p[field] = bad;
+        assert!(activation::validate(&p).is_err(), "{field} accepted");
+    }
+    let mut extra = ok.clone();
+    extra["force"] = json!(true);
+    assert!(activation::validate(&extra).is_err());
+    assert!(kammi_contract::is_v4_event_type(activation::EVENT));
+}

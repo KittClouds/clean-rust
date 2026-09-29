@@ -19,7 +19,7 @@ const fn verb(name: &'static str, phase: u8, writes: bool, summary: &'static str
     }
 }
 
-pub const VERBS: [Verb; 26] = [
+pub const VERBS: [Verb; 27] = [
     verb("status", 0, false, "Library status and flight gate"),
     verb(
         "call",
@@ -74,12 +74,13 @@ pub const VERBS: [Verb; 26] = [
         "close",
         1,
         true,
-        "Detach the session, or close the workspace",
+        "Detach the session, or close the workspace (--end)",
     ),
     verb("remember", 1, true, "Record a memory"),
     verb("recall", 1, true, "Cited retrieval (writes a receipt)"),
     verb("trace", 1, false, "Evidence trace of a memory"),
     verb("find", 1, false, "Custody lookup by name or identity"),
+    verb("log", 1, false, "Workspace events after an event ID"),
     verb("verbs", 0, false, "List this ABI"),
 ];
 

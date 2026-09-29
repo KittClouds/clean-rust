@@ -149,6 +149,16 @@ impl Client {
         self.request(method, path, body, &[], 30)
     }
 
+    /// A `/v2` request (amendment v4 routes); `path` includes any query string.
+    pub fn v2(&self, method: &str, path: &str, body: Option<&Value>) -> Result<Value> {
+        if !path.starts_with("/v2/") {
+            return Err(ClientError::Usage(
+                "only v2 service endpoints are supported here".into(),
+            ));
+        }
+        self.request(method, path, body, &[], 30)
+    }
+
     pub fn register_bytes(
         &self,
         bytes: &[u8],

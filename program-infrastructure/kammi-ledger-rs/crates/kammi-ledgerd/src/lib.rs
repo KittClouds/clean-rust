@@ -1,6 +1,7 @@
-//! `/v1` HTTP surface of the Kammi Library, byte-compatible in behaviour with the Python
+//! HTTP surface of the Kammi Library. `/v1` is byte-compatible in behaviour with the Python
 //! FastAPI service: the same 64 routes, middleware order (16 MiB cap, strict JSON, wire-v1
 //! validation, then authentication), auth kinds, status codes and `{"detail": ...}` bodies.
+//! `/v2` (amendment v4) adds vocabulary activation and workspaces.
 
 #![allow(clippy::result_large_err)]
 
@@ -11,6 +12,7 @@ mod routes_local;
 mod routes_memory;
 mod routes_remote;
 mod routes_vault;
+mod routes_workspace;
 pub mod wire;
 
 use std::path::PathBuf;
@@ -55,6 +57,7 @@ pub fn router(state: App) -> Router {
         .merge(routes_memory::routes())
         .merge(routes_vault::routes())
         .merge(routes_local::routes())
+        .merge(routes_workspace::routes())
         .fallback(|| async { detail(StatusCode::NOT_FOUND, "Not Found") })
         .method_not_allowed_fallback(|| async {
             detail(StatusCode::METHOD_NOT_ALLOWED, "Method Not Allowed")
@@ -113,6 +116,9 @@ pub fn detail(status: StatusCode, detail: impl Into<Value>) -> Response {
 pub fn ledger_error(error: LedgerError, status: StatusCode) -> Response {
     if let LedgerError::Unavailable(message) = &error {
         return detail(StatusCode::SERVICE_UNAVAILABLE, message.clone());
+    }
+    if let LedgerError::Conflict(body) = error {
+        return detail(StatusCode::CONFLICT, body);
     }
     if error.is_client() {
         detail(status, error.detail())

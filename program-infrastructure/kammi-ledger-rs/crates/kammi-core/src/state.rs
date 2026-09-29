@@ -581,6 +581,9 @@ pub struct State {
     pub lifecycle: Lifecycle,
     pub vaults: Vaults,
     pub library_acceptance: Option<String>,
+    /// The `LibraryVocabularyActivated` event that made v4 journalable, once it exists.
+    pub vocabulary_v4: Option<String>,
+    pub workspaces: crate::workspace::Workspaces,
 }
 
 impl State {
@@ -593,6 +596,45 @@ impl State {
         event_id: &str,
         object_len: &dyn Fn(&str) -> Option<u64>,
     ) -> Result<()> {
+        // The closed vocabulary (amendment v4 section 6): v1 always; v4 only after the journaled
+        // activation, which is itself the first v4 event.
+        let v4 = kammi_contract::is_v4_event_type(kind);
+        if !kammi_v1::EVENT_TYPES.contains(&kind) && !v4 {
+            return value_error(format!("{kind} is not a registered event type"));
+        }
+        if v4 {
+            if kind == kammi_contract::activation::EVENT {
+                kammi_contract::activation::validate(payload).map_err(LedgerError::Value)?;
+                if self.vocabulary_v4.is_some() {
+                    return value_error("vocabulary v4 is already active");
+                }
+                for field in kammi_contract::activation::ARTIFACT_FIELDS {
+                    if !self.artifacts.contains_key(get_str(payload, field)?) {
+                        return value_error(format!(
+                            "activation {field} must be a registered artifact"
+                        ));
+                    }
+                }
+                self.vocabulary_v4 = Some(event_id.to_string());
+                return Ok(());
+            }
+            if self.vocabulary_v4.is_none() {
+                return value_error(format!(
+                    "{kind} requires vocabulary v4, which is not active"
+                ));
+            }
+            if kind.starts_with("Workspace") {
+                let (artifacts, seals, runs) = (&self.artifacts, &self.seal_artifacts, &self.runs);
+                let known = |reference: &str| match reference.split_once(':') {
+                    Some(("artifact", id)) => artifacts.contains_key(id),
+                    Some(("seal", id)) => seals.contains_key(id),
+                    Some(("run", id)) => runs.contains_key(id),
+                    _ => false,
+                };
+                return self.workspaces.apply(kind, payload, event_id, &known);
+            }
+            return value_error(format!("{kind} is not a main-journal event"));
+        }
         // AuthorityState
         match kind {
             "ActorRegistered" => {
