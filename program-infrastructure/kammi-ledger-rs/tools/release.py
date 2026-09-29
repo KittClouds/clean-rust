@@ -216,7 +216,9 @@ def probes(commit: str, acceptance: str):
                                                         {"jsonrpc": "2.0", "id": 2, "method": "tools/list"}))
     mcp = sh([str(svc.BIN / "kammi-mcp.exe")], env=env, input=messages)
     replies = [json.loads(line) for line in mcp.stdout.splitlines()] if mcp.returncode == 0 else []
-    out["rust_kammi_mcp"] = len(replies) == 2 and len(replies[1]["result"]["tools"]) == 24
+    # The 24 fixed v1 tools come first, unchanged; releases from Vault Phase 1 on add kammi_* verbs.
+    names = [t["name"] for t in replies[1]["result"]["tools"]] if len(replies) == 2 else []
+    out["rust_kammi_mcp"] = len(names) >= 24 and names[23] == "memory_neighbors" and all(n.startswith("kammi_") for n in names[24:])
     cli = sh([str(PYENV), "-m", "ledgerd.cli", "status"], env=env, cwd=PY)
     out["python_cli"] = cli.returncode == 0 and json.loads(cli.stdout)["flight_gate"] == "OPEN"
     sys.path.insert(0, str(PY))
