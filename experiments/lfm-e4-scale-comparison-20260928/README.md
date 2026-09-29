@@ -75,3 +75,17 @@ This is an E4-shaped synthetic capability parity experiment. A strong 230M
 result would show linear accessibility of the old E4 capabilities under this
 new population. It would not by itself prove safe lexical transport, natural
 context compatibility, or authority-memory qualification.
+
+## Result (2026-09-29)
+
+The paired run completed on the fresh 74,668-row TEST. Both arms cleared the
+E4-shaped eight-endpoint floor diagnostic. They were effectively tied on
+context/entity identity, relation, observed state, and exact-target-in-domain.
+The 1.2B arm was stronger on the three exact-target novelty strata, by about
+0.6–1.2 percentage points in balanced accuracy. The detailed paired intervals,
+integrated metrics, and cost diagnostics are in [report.md](report.md), with the
+machine-readable result and fit/extraction/prediction seals in `receipts/`.
+
+This result is limited to the new synthetic capability panel. It neither opens
+nor qualifies the protected E4-0 panel, and it makes no lexical-transport,
+retrieval, or serving claim.
