@@ -48,7 +48,7 @@ def main() -> None:
         f"230M TEST prediction seal: `{score['a_prediction_seal_sha256']}`.",
         f"1.2B TEST prediction seal: `{score['b_prediction_seal_sha256']}`.",
         "",
-        "| Endpoint | 230M balanced | 1.2B balanced | 230M 5th percentile | 1.2B 5th percentile | 1.2B minus 230M paired 90% interval |",
+        "| Endpoint | 230M balanced | 1.2B balanced | 230M E4 0.625th percentile | 1.2B E4 0.625th percentile | 1.2B minus 230M paired 90% interval |",
         "|---|---:|---:|---:|---:|---:|",
     ]
     for endpoint in ENDPOINTS:
@@ -57,10 +57,19 @@ def main() -> None:
         interval = f"[{percent(boot['b_minus_a_5th_percentile'])}, {percent(boot['b_minus_a_95th_percentile'])}]"
         lines.append(
             f"| `{endpoint}` | {percent(row['a']['balanced_accuracy'])} | "
-            f"{percent(row['b']['balanced_accuracy'])} | {percent(boot['a_5th_percentile'])} | "
-            f"{percent(boot['b_5th_percentile'])} | {interval} |"
+            f"{percent(row['b']['balanced_accuracy'])} | {percent(boot['a_0p625th_percentile'])} | "
+            f"{percent(boot['b_0p625th_percentile'])} | {interval} |"
         )
-    lines.extend(["", "| Integrated on in-domain rows | 230M | 1.2B |", "|---|---:|---:|"])
+    gate = score["e4_shaped_gate_diagnostic"]
+    lines.extend([
+        "",
+        f"E4-shaped eight-endpoint floor diagnostic (0.90, Bonferroni 0.00625): "
+        f"230M **{'PASS' if gate['a_all_eight'] else 'FAIL'}**, "
+        f"1.2B **{'PASS' if gate['b_all_eight'] else 'FAIL'}**. "
+        "This comparison does not score or qualify the protected E4-0 panel.",
+        "",
+        "| Integrated on in-domain rows | 230M | 1.2B |", "|---|---:|---:|",
+    ])
     for field, label in (("route_accuracy_four_heads", "All four route heads correct"),
                          ("end_to_end_all_five_heads", "Route and exact target correct")):
         lines.append(f"| {label} | {percent(metrics['integrated_a'][field])} | {percent(metrics['integrated_b'][field])} |")

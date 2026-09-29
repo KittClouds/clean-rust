@@ -22,7 +22,8 @@ retrieval, serving, or the protected E4-0 panel.
   fit only where both lexical terms are on the E1 training side.
 - Same prediction and scoring code for both arms. Primary metrics are the eight
   historical endpoints (five capabilities with exact target split into four
-  strata), plus paired whole-quartet bootstrap and integrated route/target
+  strata), plus paired whole-quartet bootstrap using E4's 10,000-replicate,
+  0.00625 lower-tail diagnostic and integrated route/target
   summaries. Timings and cache sizes are engineering diagnostics.
 
 The historical 1.2B E2 feature cache is reused for the E1 FIT rows only. A

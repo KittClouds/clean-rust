@@ -50,7 +50,8 @@ def summary(truth: np.ndarray, predicted: np.ndarray, classes: int) -> dict:
 
 
 def bootstrap_pair(truth: np.ndarray, a: np.ndarray, b: np.ndarray, quartet_ids: list[str],
-                   strata: list[int], classes: int, seed: int, replicates: int) -> dict:
+                   strata: list[int], classes: int, seed: int, replicates: int,
+                   generator: np.random.Generator | None = None) -> dict:
     qids = list(dict.fromkeys(quartet_ids))
     q_index = {q: i for i, q in enumerate(qids)}
     q_support = np.zeros((len(qids), classes), dtype=np.int64)
@@ -68,7 +69,7 @@ def bootstrap_pair(truth: np.ndarray, a: np.ndarray, b: np.ndarray, quartet_ids:
     strata_indices = [np.flatnonzero(q_stratum == cls) for cls in range(classes)]
     if any(len(indices) == 0 for indices in strata_indices):
         raise RuntimeError("bootstrap lacks a class stratum")
-    rng = np.random.Generator(np.random.PCG64(seed))
+    rng = generator if generator is not None else np.random.Generator(np.random.PCG64(seed))
     values_a = np.empty(replicates, dtype=np.float64)
     values_b = np.empty(replicates, dtype=np.float64)
     for start in range(0, replicates, 64):
@@ -89,6 +90,8 @@ def bootstrap_pair(truth: np.ndarray, a: np.ndarray, b: np.ndarray, quartet_ids:
     return {
         "unit": "whole quartet, class-stratified by baseline A truth",
         "replicates": replicates, "seed": seed,
+        "a_0p625th_percentile": float(np.quantile(values_a, 0.00625, method="linear")),
+        "b_0p625th_percentile": float(np.quantile(values_b, 0.00625, method="linear")),
         "a_5th_percentile": float(np.quantile(values_a, 0.05, method="linear")),
         "b_5th_percentile": float(np.quantile(values_b, 0.05, method="linear")),
         "b_minus_a_5th_percentile": float(np.quantile(delta, 0.05, method="linear")),
@@ -132,7 +135,9 @@ def main() -> None:
     if len(by_quartet) != seal["quartets"] or any(set(variants) != {"A", "C", "E", "P"} for variants in by_quartet.values()):
         raise RuntimeError("fresh TEST is not whole-quartet complete")
     metrics = {}
-    for endpoint_index, endpoint in enumerate(ENDPOINTS):
+    bootstrap_seed = 2026092604
+    bootstrap_rng = np.random.Generator(np.random.PCG64(bootstrap_seed))
+    for endpoint in ENDPOINTS:
         task = "exact_target" if endpoint in STRATA else endpoint
         field, classes = TASKS[task]
         selected = [i for i, row in enumerate(labels)
@@ -147,7 +152,7 @@ def main() -> None:
         metrics[endpoint] = {
             "a": summary(truth, left, classes), "b": summary(truth, right, classes),
             "paired_bootstrap": bootstrap_pair(truth, left, right, qids, strata, classes,
-                                               20260928 + endpoint_index, args.replicates),
+                                               bootstrap_seed, args.replicates, bootstrap_rng),
         }
         print(json.dumps({"endpoint": endpoint,
                           "a_balanced": metrics[endpoint]["a"]["balanced_accuracy"],
@@ -176,6 +181,14 @@ def main() -> None:
         "a_prediction_seal_sha256": sha256(args.a_predictions / "prediction-seal.json"),
         "b_prediction_seal_sha256": sha256(args.b_predictions / "prediction-seal.json"),
         "test_labels_sha256": sha256(args.test_labels),
+        "e4_shaped_gate_diagnostic": {
+            "endpoint_floor": 0.90,
+            "bonferroni_lower_tail_alpha_per_endpoint": 0.00625,
+            "bootstrap_seed": bootstrap_seed,
+            "bootstrap_rng": "NumPy PCG64; one generator consumed in frozen endpoint order",
+            "a_all_eight": all(metrics[e]["paired_bootstrap"]["a_0p625th_percentile"] >= 0.90 for e in ENDPOINTS),
+            "b_all_eight": all(metrics[e]["paired_bootstrap"]["b_0p625th_percentile"] >= 0.90 for e in ENDPOINTS),
+        },
         "metrics": metrics,
     }
     (args.output / "paired-score.json").write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8")
