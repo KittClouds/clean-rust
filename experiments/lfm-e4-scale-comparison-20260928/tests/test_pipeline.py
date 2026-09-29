@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+import hashlib
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -52,6 +54,56 @@ class PipelineTests(unittest.TestCase):
             }), encoding="utf-8")
             with self.assertRaises(RuntimeError):
                 verified_predictions(path, 1)
+
+    def test_end_to_end_scorer_accepts_sealed_paired_predictions(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            inputs, labels, predictions = [], [], []
+            strata = ("IN_DOMAIN", "CONTEXT_NOVEL", "ENTITY_NOVEL", "BOTH_NOVEL")
+            for q in range(48):
+                qid = f"q{q:03d}"
+                for variant in ("A", "C", "E", "P"):
+                    common = {"row_id": f"{qid}:{variant}", "quartet_id": qid, "variant_id": variant}
+                    inputs.append({**common, "input_text": f"text {q} {variant}"})
+                    label = {**common, "context_term_id": q % 32, "entity_term_id": q % 32,
+                             "relation_id": q % 2, "state_id": q % 3, "exact_target": q % 3,
+                             "both_terms_train_side": q % 32 < 16,
+                             "score_strata": strata[q % 4]}
+                    labels.append(label)
+                    predictions.append({**common, "context_identity": q % 32,
+                                        "entity_identity": q % 32, "relation": q % 2,
+                                        "observed_state": q % 3, "exact_target": q % 3})
+
+            def jsonl(path: Path, rows: list[dict]) -> str:
+                path.write_text("".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8")
+                return hashlib.sha256(path.read_bytes()).hexdigest()
+
+            input_hash = jsonl(root / "inputs.jsonl", inputs)
+            label_hash = jsonl(root / "labels-sealed.jsonl", labels)
+            seal = {"primary_rows": len(inputs), "quartets": 48,
+                    "population_namespace": "FAS-E4-SCALE-COMPARE-20260928",
+                    "files": [{"path": "inputs.jsonl", "sha256": input_hash},
+                              {"path": "labels-sealed.jsonl", "sha256": label_hash}]}
+            (root / "population-seal.json").write_text(json.dumps(seal), encoding="utf-8")
+            for arm in ("a", "b"):
+                directory = root / arm
+                directory.mkdir()
+                pred_hash = jsonl(directory / "predictions.jsonl", predictions)
+                (directory / "prediction-seal.json").write_text(json.dumps({
+                    "arm": arm, "partition": "TEST", "rows": len(inputs),
+                    "prediction_sha256": pred_hash, "truth_join_performed": False,
+                }), encoding="utf-8")
+            command = [sys.executable, str(Path(__file__).resolve().parents[1] / "score.py"),
+                       "--test-inputs", str(root / "inputs.jsonl"),
+                       "--test-labels", str(root / "labels-sealed.jsonl"),
+                       "--population-seal", str(root / "population-seal.json"),
+                       "--a-predictions", str(root / "a"),
+                       "--b-predictions", str(root / "b"),
+                       "--output", str(root / "score"), "--replicates", "32"]
+            subprocess.run(command, check=True, capture_output=True, text=True)
+            result = json.loads((root / "score" / "paired-score.json").read_text())
+            self.assertEqual(result["metrics"]["context_identity"]["a"]["accuracy"], 1.0)
+            self.assertEqual(result["metrics"]["integrated_b"]["end_to_end_all_five_heads"], 1.0)
 
 
 if __name__ == "__main__":

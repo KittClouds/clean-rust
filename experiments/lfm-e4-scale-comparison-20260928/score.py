@@ -115,7 +115,9 @@ def main() -> None:
     if sha256(args.test_inputs) != hashes["inputs.jsonl"] or sha256(args.test_labels) != hashes["labels-sealed.jsonl"]:
         raise RuntimeError("fresh population hashes differ from its pre-model seal")
     inputs = list(read_jsonl(args.test_inputs))
-    if len(inputs) != seal["primary_rows"] or len(inputs) != 74_668:
+    if seal["population_namespace"] != "FAS-E4-SCALE-COMPARE-20260928":
+        raise RuntimeError("not the independent E4 scale-comparison population")
+    if len(inputs) != seal["primary_rows"]:
         raise RuntimeError("fresh E4-shaped population row count differs")
     a_seal, a = verified_predictions(args.a_predictions, len(inputs))
     b_seal, b = verified_predictions(args.b_predictions, len(inputs))
@@ -127,7 +129,7 @@ def main() -> None:
     by_quartet: dict[str, dict[str, dict]] = defaultdict(dict)
     for row in labels:
         by_quartet[row["quartet_id"]][row["variant_id"]] = row
-    if len(by_quartet) != 18_667 or any(set(variants) != {"A", "C", "E", "P"} for variants in by_quartet.values()):
+    if len(by_quartet) != seal["quartets"] or any(set(variants) != {"A", "C", "E", "P"} for variants in by_quartet.values()):
         raise RuntimeError("fresh TEST is not whole-quartet complete")
     metrics = {}
     for endpoint_index, endpoint in enumerate(ENDPOINTS):
