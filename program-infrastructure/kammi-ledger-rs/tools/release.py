@@ -42,7 +42,8 @@ OPS, STORE = svc.OPS, svc.STORE
 TARGET = Path(os.environ.get("CARGO_TARGET_DIR", "")) / "release"
 HASHED = {".rs", ".toml", ".lock", ".md", ".json", ".txt", ".wgsl"}
 SKIP = {"target", "vendor", ".git", "tmp", "__pycache__"}
-BINARIES = svc.BINARIES + ("kammi.exe", "kammi-mcp.exe")
+# kammi-verify ships with every release: the audit's independent verifier from activation on.
+BINARIES = svc.BINARIES + ("kammi.exe", "kammi-mcp.exe", "kammi-verify.exe")
 BEHAVIOUR = ("kammi-ledgerd.exe", "kammi-projector.exe")
 NATIVE = str(PY / "vendor/runtime-v1/native")
 V1_CORPUS = [PY / ".kammi-dev/operational/store-v1-fenced-20260928", PY / ".kammi-dev/e4-import"]
@@ -109,7 +110,7 @@ def build():
     """Reproducible build (docs/RELEASE.md): each behaviour binary alone, so feature unification
     with unrelated workspace members cannot change its bytes; /Brepro comes from .cargo/config.toml."""
     for packages in (["-p", "kammi-ledgerd"], ["-p", "kammi-projector"],
-                     ["-p", "kammi-migrate", "-p", "kammi-core", "-p", "kammi-shell"]):
+                     ["-p", "kammi-migrate", "-p", "kammi-core", "-p", "kammi-shell", "-p", "kammi-verify"]):
         result = sh(["cargo", "build", "--release", *packages], cwd=RS)
         if result.returncode != 0:
             raise SystemExit("build failed:\n" + result.stderr[-2000:])
