@@ -608,6 +608,54 @@ impl Ledger {
         })
     }
 
+    /// `find`: custody lookup by name or identity (amendment v4 verb list). Case-insensitive
+    /// substring over workspace IDs and titles and run IDs; prefix over artifact identities and
+    /// seal roots; an exact event ID resolves to its envelope. At most 20 per kind.
+    pub fn find(&self, query: &str, who: Principal<'_>) -> Result<Value> {
+        let q = query.trim().to_lowercase();
+        if q.len() < 3 {
+            return value_error("find needs at least 3 characters");
+        }
+        let workspaces: Vec<Value> = self.state.workspaces.map.values()
+            .filter(|ws| (ws.id.to_lowercase().contains(&q) || ws.title.to_lowercase().contains(&q)) && (who.admin() || ws.participant(who.actor())))
+            .take(20)
+            .map(|ws| crate::obj! {"workspace_id" => ws.id.clone(), "title" => ws.title.clone(), "head" => ws.head().to_string()})
+            .collect();
+        let runs: Vec<Value> = self
+            .state
+            .runs
+            .iter()
+            .filter(|(id, _)| id.to_lowercase().contains(&q))
+            .take(20)
+            .map(|(id, lab)| crate::obj! {"run_id" => id.clone(), "lab" => lab.clone()})
+            .collect();
+        let mut artifacts: Vec<Value> = self.state.artifacts.iter().filter(|(id, _)| id.starts_with(&q) || id.trim_start_matches("sha256:").starts_with(&q))
+            .map(|(id, record)| crate::obj! {"artifact_id" => id.clone(), "kind" => record.get("kind").cloned().unwrap_or(Value::Null), "bytes" => record.get("bytes").cloned().unwrap_or(Value::Null)})
+            .collect();
+        artifacts.sort_by(|a, b| a["artifact_id"].as_str().cmp(&b["artifact_id"].as_str()));
+        artifacts.truncate(20);
+        let mut seals: Vec<Value> = self
+            .state
+            .seal_artifacts
+            .keys()
+            .filter(|root| {
+                root.starts_with(&q) || root.trim_start_matches("sha256:").starts_with(&q)
+            })
+            .map(|root| crate::obj! {"root" => root.clone()})
+            .collect();
+        seals.sort_by(|a, b| a["root"].as_str().cmp(&b["root"].as_str()));
+        seals.truncate(20);
+        let event = match self.envelope(query.trim()) {
+            Ok((seq, envelope, _)) => {
+                crate::obj! {"event_id" => query.trim(), "seq" => seq, "type" => envelope["type"].clone(), "actor" => envelope["actor"].clone(), "utc" => envelope["utc"].clone()}
+            }
+            Err(_) => Value::Null,
+        };
+        Ok(
+            crate::obj! {"query" => query, "workspaces" => workspaces, "runs" => runs, "artifacts" => artifacts, "seals" => seals, "event" => event},
+        )
+    }
+
     /// Workspaces the principal may read, in creation order.
     pub fn workspace_list(&self, who: Principal<'_>) -> Value {
         let items: Vec<Value> = self.state.workspaces.map.values()

@@ -73,8 +73,22 @@ const REFS: Arg = arg(
     None,
     "References: artifact:, event:, seal:, memory:, run:, workspace:",
 );
+const WS_SCOPE: Arg = arg(
+    "workspace",
+    Text,
+    false,
+    None,
+    "Workspace whose memory scope to use when scope is omitted (the CLI session supplies it)",
+);
+const SCOPE: Arg = arg(
+    "scope",
+    Text,
+    false,
+    None,
+    "Memory scope: your lab, or workspace:<id> (default: the workspace)",
+);
 
-pub const SPECS: [VerbSpec; 15] = [
+pub const SPECS: [VerbSpec; 19] = [
     VerbSpec { verb: "open", event: Some("WorkspaceAgentAttached"), about: "Attach this agent to a workspace and read its work packet", args: &[
         arg("workspace", Text, true, Some(0), "Workspace ID"),
         arg("tool", Text, false, None, "The client tool (default kammi-cli)"),
@@ -100,6 +114,26 @@ pub const SPECS: [VerbSpec; 15] = [
     VerbSpec { verb: "close", event: Some("WorkspaceAgentDetached"), about: "Detach this session; with end=true close the workspace (owners only)", args: &[WS, HEAD,
         arg("outcome", Text, true, None, "What was achieved"), arg("session_id", Text, false, None, "Session to detach (the CLI session supplies it)"),
         arg("end", Bool, false, None, "Close the whole workspace"), arg("summary", Text, false, None, "Closing summary (with end)")] },
+    VerbSpec { verb: "remember", event: Some("MemoryRecordedV2"), about: "Record a memory with its time: when it was said, when it happened, when it holds", args: &[
+        arg("text", Text, true, Some(0), "What to remember"), WS_SCOPE, SCOPE,
+        arg("kind", Text, false, None, "OBSERVED, DERIVED, INTERPRETIVE (default), HYPOTHESIS, PREFERENCE, PROCEDURE, DECISION, FAILURE_MODE, RESULT_SUMMARY"),
+        arg("custody_refs", Texts, false, None, "Custody evidence (artifact or event sha256 IDs); required for OBSERVED and DERIVED"),
+        arg("tags", Texts, false, None, "Tags"),
+        arg("asserted_at", Text, false, None, "When the statement was made (RFC 3339 UTC)"),
+        arg("source_time", Text, false, None, "Timestamp carried by the source"),
+        arg("occurred_from", Text, false, None, "Start of the event described (with occurred_to)"),
+        arg("occurred_to", Text, false, None, "End of the event described (with occurred_from)"),
+        arg("valid_from", Text, false, None, "Start of when the statement holds"),
+        arg("valid_to", Text, false, None, "End of when it holds (default open)"),
+        arg("precision", Text, false, None, "unknown, instant, minute, hour, day, month, year, interval, relative, ordinal"),
+        arg("original_text", Text, false, None, "The source's own wording of the time"),
+    ]},
+    VerbSpec { verb: "recall", event: None, about: "Cited retrieval over memory (writes a receipt to the receipt stream)", args: &[
+        arg("query", Text, true, Some(0), "What to look for"), WS_SCOPE, SCOPE,
+        arg("mode", Text, false, None, "hybrid (default), fts, vector, graph"), arg("limit", Text, false, None, "Results, 1-100 (default 10)"),
+    ]},
+    VerbSpec { verb: "trace", event: None, about: "Evidence trace of a memory: its custody references, verified", args: &[arg("memory_id", Text, true, Some(0), "The memory")] },
+    VerbSpec { verb: "find", event: None, about: "Custody lookup: workspaces and runs by name, artifacts and seals by identity prefix, an event by ID", args: &[arg("query", Text, true, Some(0), "At least 3 characters")] },
     VerbSpec { verb: "log", event: None, about: "Workspace events after an event ID (the full record behind the packet)", args: &[WS, arg("after", Text, false, None, "Event ID to start after")] },
 ];
 
@@ -198,7 +232,79 @@ pub fn execute(
         .map(|a| format!("?actor_id={}", quote(a, "")))
         .unwrap_or_default();
     let base = format!("/v2/workspaces/{}", quote(&ws, ""));
+    let memory_scope = || -> Result<String, VerbError> {
+        match (text(args, "scope"), text(args, "workspace")) {
+            (Some(scope), _) => Ok(scope.to_string()),
+            (None, Some(ws)) => Ok(format!("workspace:{ws}")),
+            (None, None) => Err(VerbError::Usage(format!(
+                "{verb}: give scope, or a workspace (kammi open sets one)"
+            ))),
+        }
+    };
     match verb {
+        "remember" => {
+            let mut time = Map::new();
+            for key in ["asserted_at", "source_time", "precision", "original_text"] {
+                if let Some(v) = args.get(key) {
+                    time.insert(key.into(), v.clone());
+                }
+            }
+            match (args.get("occurred_from"), args.get("occurred_to")) {
+                (Some(from), Some(to)) => {
+                    time.insert("occurred".into(), json!({"from": from, "to": to}));
+                }
+                (None, None) => {}
+                _ => {
+                    return Err(VerbError::Usage(
+                        "remember: occurred_from and occurred_to go together".into(),
+                    ))
+                }
+            }
+            if args.contains_key("valid_from") || args.contains_key("valid_to") {
+                time.insert("valid".into(), json!({"from": args.get("valid_from").cloned().unwrap_or_else(|| json!("unknown")), "to": args.get("valid_to").cloned().unwrap_or_else(|| json!("open"))}));
+            }
+            let mut body = json!({"kind": text(args, "kind").unwrap_or("INTERPRETIVE"), "scope": memory_scope()?, "text": args["text"],
+                "custody_refs": args.get("custody_refs").cloned().unwrap_or_else(|| json!([])), "tags": args.get("tags").cloned().unwrap_or_else(|| json!([])),
+                "time": time, "request_id": crate::request_id()});
+            if let Some(a) = actor {
+                body["actor_id"] = a.into();
+            }
+            return Ok(client.v2("POST", "/v2/memory", Some(&body))?);
+        }
+        "recall" => {
+            let limit = match text(args, "limit") {
+                Some(l) => l
+                    .parse::<i64>()
+                    .map_err(|_| VerbError::Usage("recall: limit must be a number".into()))?,
+                None => 10,
+            };
+            let mut body = json!({"query": args["query"], "scope": memory_scope()?, "mode": text(args, "mode").unwrap_or("hybrid"), "limit": limit, "request_id": crate::request_id()});
+            if let Some(a) = actor {
+                body["actor_id"] = a.into();
+            }
+            return Ok(client.v2("POST", "/v2/recall", Some(&body))?);
+        }
+        "trace" => {
+            return Ok(client.v2(
+                "GET",
+                &format!(
+                    "/v2/memory/{}/trace{who}",
+                    quote(text(args, "memory_id").unwrap_or_default(), ":")
+                ),
+                None,
+            )?)
+        }
+        "find" => {
+            let sep = if who.is_empty() { "?" } else { "&" };
+            return Ok(client.v2(
+                "GET",
+                &format!(
+                    "/v2/find{who}{sep}q={}",
+                    quote(text(args, "query").unwrap_or_default(), "")
+                ),
+                None,
+            )?);
+        }
         "work" => return Ok(client.v2("GET", &format!("{base}/work{who}"), None)?),
         "log" => {
             let sep = if who.is_empty() { "?" } else { "&" };

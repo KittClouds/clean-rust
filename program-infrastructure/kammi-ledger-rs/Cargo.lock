@@ -1149,6 +1149,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "kammi-verify"
+version = "0.1.0"
+dependencies = [
+ "kammi-jcs",
+ "serde_json",
+ "sha2",
+ "tempfile",
+]
+
+[[package]]
 name = "lbug"
 version = "0.20.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"

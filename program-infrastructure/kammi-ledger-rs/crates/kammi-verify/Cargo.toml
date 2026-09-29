@@ -1,0 +1,18 @@
+[package]
+name = "kammi-verify"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+description = "Independent verifier of a Kammi v2 store; shares nothing with kammi-core or kammi-store"
+
+[dependencies]
+# Only the canonicalizer and strict parser (identity primitives, differential-tested against
+# Python's jcs). Everything else is re-derived here from the written formats.
+kammi-jcs.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true

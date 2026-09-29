@@ -114,7 +114,12 @@ impl Memory {
             let event = strict_json(&stored.event)?;
             let payload = strict_json(&stored.payload)?;
             memory
-                .apply(ledger, get_str(&event, "type")?, &payload)
+                .apply(
+                    ledger,
+                    get_str(&event, "type")?,
+                    &payload,
+                    event["utc"].as_str().unwrap_or(""),
+                )
                 .map_err(|e| {
                     LedgerError::Value(format!(
                         "memory replay of event {seq} failed: {}",
@@ -125,10 +130,22 @@ impl Memory {
         Ok(memory)
     }
 
-    fn apply(&mut self, ledger: &Ledger, kind: &str, payload: &Value) -> Result<()> {
+    fn apply(&mut self, ledger: &Ledger, kind: &str, payload: &Value, utc: &str) -> Result<()> {
         match kind {
-            "MemoryRecorded" => {
+            "MemoryRecorded" | "MemoryRecordedV2" => {
                 let record = ledger.object_json(get_str(payload, "record_artifact_id")?)?;
+                if kind == "MemoryRecordedV2" {
+                    if ledger.state.vocabulary_v4.is_none() {
+                        return value_error(
+                            "MemoryRecordedV2 requires vocabulary v4, which is not active",
+                        );
+                    }
+                    kammi_contract::time::validate(
+                        record.get("time").unwrap_or(&Value::Null),
+                        Some(utc),
+                    )
+                    .map_err(|e| LedgerError::Value(format!("memory time envelope: {e}")))?;
+                }
                 let identity = get_str(&record, "memory_id")?.to_string();
                 if raw_id(&canonical(&without(&record, &["memory_id"]))?).to_string() != identity {
                     return value_error("memory identity mismatch");
@@ -154,7 +171,8 @@ impl Memory {
                     targets.push(new.to_string());
                 }
             }
-            _ => {}
+            "MemoryRetrieved" => {}
+            other => return value_error(format!("{other} is not a memory event type")),
         }
         Ok(())
     }
@@ -321,6 +339,46 @@ impl Ledger {
         actor: &str,
         request_id: &str,
     ) -> Result<String> {
+        let at = self.now();
+        self.journal_emit(false, kind, payload, actor, request_id, at)
+    }
+
+    /// Appends to the memory journal, or with `receipts` to the receipt stream (amendment v4
+    /// section 4), at the given instant.
+    fn journal_emit(
+        &mut self,
+        receipts: bool,
+        kind: &str,
+        payload: &Value,
+        actor: &str,
+        request_id: &str,
+        at: crate::time::Timestamp,
+    ) -> Result<String> {
+        if receipts {
+            let payload_bytes = canonical(payload)?;
+            let payload_id = raw_id(&payload_bytes).to_string();
+            let journal = self.store.receipts_mut()?;
+            if let Some(prior) = journal.by_request(request_id)? {
+                let event = strict_json(&prior.event)?;
+                if event["type"].as_str() != Some(kind)
+                    || event["payload_artifact"].as_str() != Some(payload_id.as_str())
+                {
+                    return value_error("receipt request ID reused for another action");
+                }
+                return Ok(prior.event_id.to_string());
+            }
+            let event = crate::obj! {
+                "schema" => "KAMMI_EVENT_V1", "seq" => journal.seq() + 1, "prev" => journal.head().to_string(),
+                "type" => kind, "payload_artifact" => payload_id, "actor" => actor, "request_id" => request_id,
+                "utc" => at.isoformat(),
+            };
+            let event_bytes = canonical(&event)?;
+            let ids = journal.append_batch(&[NewEvent {
+                event: &event_bytes,
+                payload: &payload_bytes,
+            }])?;
+            return Ok(ids[0].to_string());
+        }
         let payload_bytes = canonical(payload)?;
         let payload_id = raw_id(&payload_bytes).to_string();
         if let Some(prior) = self.store.memory.by_request(request_id)? {
@@ -340,7 +398,7 @@ impl Ledger {
             "payload_artifact" => payload_id,
             "actor" => actor,
             "request_id" => request_id,
-            "utc" => self.now().isoformat(),
+            "utc" => at.isoformat(),
         };
         let event_bytes = canonical(&event)?;
         let ids = self.store.memory.append_batch(&[NewEvent {
@@ -361,6 +419,70 @@ impl Ledger {
         tags: &[String],
         confidence: Option<f64>,
         request_id: &str,
+    ) -> Result<(String, String)> {
+        self.record_memory(
+            kind,
+            scope,
+            text,
+            actor,
+            custody_refs,
+            tags,
+            confidence,
+            request_id,
+            None,
+        )
+    }
+
+    /// `MemoryRecordedV2` (amendment v4 section 1): a record with the six-clock envelope.
+    /// `time` carries the client clocks (every key optional, `observed_at` excluded); the
+    /// Library fills `observed_at` with the commit instant and validates the whole envelope.
+    #[allow(clippy::too_many_arguments)]
+    pub fn memory_record_v2(
+        &mut self,
+        kind: &str,
+        scope: &str,
+        text: &str,
+        actor: &str,
+        custody_refs: &[String],
+        tags: &[String],
+        confidence: Option<f64>,
+        time: &Value,
+        request_id: &str,
+    ) -> Result<(String, String)> {
+        if self.state.vocabulary_v4.is_none() {
+            return value_error("vocabulary v4 is not active on this Library");
+        }
+        let client = time
+            .as_object()
+            .ok_or_else(|| LedgerError::Value("time must be an object".into()))?;
+        if client.contains_key("observed_at") {
+            return value_error("observed_at is set by the Library");
+        }
+        self.record_memory(
+            kind,
+            scope,
+            text,
+            actor,
+            custody_refs,
+            tags,
+            confidence,
+            request_id,
+            Some(time.clone()),
+        )
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn record_memory(
+        &mut self,
+        kind: &str,
+        scope: &str,
+        text: &str,
+        actor: &str,
+        custody_refs: &[String],
+        tags: &[String],
+        confidence: Option<f64>,
+        request_id: &str,
+        time: Option<Value>,
     ) -> Result<(String, String)> {
         self.memory_ref()?;
         if !KINDS.contains(&kind)
@@ -386,16 +508,24 @@ impl Ledger {
             let set: std::collections::BTreeSet<&String> = items.iter().collect();
             set.into_iter().cloned().collect()
         };
-        let intent = crate::obj! {
+        let mut intent = crate::obj! {
             "kind" => kind, "scope" => scope, "text" => text, "created_by" => actor,
             "confidence" => confidence.map_or(Value::Null, Value::from),
             "custody_refs" => sorted(custody_refs), "tags" => sorted(tags),
         };
+        let event_kind = if time.is_some() {
+            "MemoryRecordedV2"
+        } else {
+            "MemoryRecorded"
+        };
+        if let Some(client_time) = &time {
+            intent = merged(&intent, crate::obj! {"time" => client_time.clone()});
+        }
         let intent_hash = raw_id(&canonical(&intent)?).to_string();
         if let Some(prior) = self.store.memory.by_request(request_id)? {
             let event = strict_json(&prior.event)?;
             let payload = strict_json(&prior.payload)?;
-            if event["type"] != "MemoryRecorded"
+            if event["type"] != event_kind
                 || payload["intent_hash"].as_str() != Some(intent_hash.as_str())
             {
                 return value_error("memory request ID reused");
@@ -411,10 +541,25 @@ impl Ledger {
             .map_err(LedgerError::Value)?;
         let embedding_bytes = pack_vector(&vector);
         let (embedding_id, _) = self.put_bytes(&embedding_bytes)?;
+        // One clock reading: created_at, observed_at and the event's utc are the same instant.
+        let now = self.now();
+        let intent = match &time {
+            Some(client_time) => {
+                let mut envelope = kammi_contract::time::v1_view(&now.isoformat(), 1.0);
+                for (key, value) in client_time.as_object().into_iter().flatten() {
+                    envelope[key] = value.clone();
+                }
+                envelope["observed_at"] = Value::from(now.isoformat());
+                kammi_contract::time::validate(&envelope, Some(&now.isoformat()))
+                    .map_err(|e| LedgerError::Value(format!("memory time envelope: {e}")))?;
+                merged(&intent, crate::obj! {"time" => envelope})
+            }
+            None => intent,
+        };
         let mut record = merged(
             &intent,
             crate::obj! {
-                "created_at" => self.now().isoformat(),
+                "created_at" => now.isoformat(),
                 "embedding_status" => "READY",
                 "embedding_artifact_id" => embedding_id,
                 "embedding_model_id" => embedder.model_identity().id.clone(),
@@ -425,7 +570,7 @@ impl Ledger {
         record = merged(&record, crate::obj! {"memory_id" => memory_id.clone()});
         let (record_id, _) = self.put_bytes(&canonical(&record)?)?;
         let payload = crate::obj! {"memory_id" => memory_id.clone(), "record_artifact_id" => record_id, "intent_hash" => intent_hash};
-        let event = self.memory_emit("MemoryRecorded", &payload, actor, request_id)?;
+        let event = self.journal_emit(false, event_kind, &payload, actor, request_id, now)?;
         let memory = self.memory.as_mut().unwrap();
         memory.index(&memory_id, &record, vector);
         memory.records.insert(memory_id.clone(), record);
@@ -503,8 +648,73 @@ impl Ledger {
     }
 
     #[allow(clippy::too_many_arguments)]
+    #[allow(clippy::too_many_arguments)]
     pub fn memory_search(
         &mut self,
+        query: &str,
+        scope: &str,
+        actor: &str,
+        request_id: &str,
+        mode: &str,
+        limit: i64,
+        grounded_only: bool,
+        exclude_kinds: &[String],
+        include_superseded: bool,
+        seed_memory: Option<&str>,
+    ) -> Result<Value> {
+        self.search_memory(
+            false,
+            query,
+            scope,
+            actor,
+            request_id,
+            mode,
+            limit,
+            grounded_only,
+            exclude_kinds,
+            include_superseded,
+            seed_memory,
+        )
+    }
+
+    /// `/v2` recall: the same retrieval, with its receipt in the receipt stream instead of the
+    /// memory journal (amendment v4 section 4). A retry answers from that journal's index.
+    #[allow(clippy::too_many_arguments)]
+    pub fn memory_recall(
+        &mut self,
+        query: &str,
+        scope: &str,
+        actor: &str,
+        request_id: &str,
+        mode: &str,
+        limit: i64,
+        grounded_only: bool,
+        exclude_kinds: &[String],
+        include_superseded: bool,
+        seed_memory: Option<&str>,
+    ) -> Result<Value> {
+        if self.state.vocabulary_v4.is_none() {
+            return value_error("vocabulary v4 is not active on this Library");
+        }
+        self.search_memory(
+            true,
+            query,
+            scope,
+            actor,
+            request_id,
+            mode,
+            limit,
+            grounded_only,
+            exclude_kinds,
+            include_superseded,
+            seed_memory,
+        )
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn search_memory(
+        &mut self,
+        receipts: bool,
         query: &str,
         scope: &str,
         actor: &str,
@@ -530,7 +740,15 @@ impl Ledger {
             "seed_memory" => seed_memory.map_or(Value::Null, Value::from),
         };
         let intent_hash = raw_id(&canonical(&intent)?).to_string();
-        if let Some(prior) = self.store.memory.by_request(request_id)? {
+        let prior = if receipts {
+            match &self.store.receipts {
+                Some(journal) => journal.by_request(request_id)?,
+                None => None,
+            }
+        } else {
+            self.store.memory.by_request(request_id)?
+        };
+        if let Some(prior) = prior {
             let event = strict_json(&prior.event)?;
             let payload = strict_json(&prior.payload)?;
             if event["type"] != "MemoryRetrieved"
@@ -649,7 +867,8 @@ impl Ledger {
             "query" => query, "scope" => scope, "mode" => mode, "result_ids" => ids,
             "request_id" => request_id, "intent_hash" => intent_hash, "response_artifact_id" => response_id,
         };
-        self.memory_emit("MemoryRetrieved", &payload, actor, request_id)?;
+        let at = self.now();
+        self.journal_emit(receipts, "MemoryRetrieved", &payload, actor, request_id, at)?;
         Ok(result)
     }
 }

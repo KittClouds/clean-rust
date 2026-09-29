@@ -41,6 +41,10 @@ pub struct Store {
     root: PathBuf,
     pub main: Journal,
     pub memory: Journal,
+    /// The receipt stream (amendment v4 section 4): search receipts, outside the memory state.
+    /// Opened when `journal/receipts` exists; created by [`Store::receipts_mut`] on first use.
+    pub receipts: Option<Journal>,
+    journal_opts: crate::journal::JournalOptions,
     pub objects: Objects,
     pub checkpoints: Checkpoints,
     _lock: StoreLock,
@@ -77,12 +81,24 @@ impl Store {
             "memory",
             opts.journal.clone(),
         )?;
+        let receipts_dir = root.join("journal").join("receipts");
+        let receipts = if receipts_dir.is_dir() {
+            Some(Journal::open(
+                &receipts_dir,
+                "receipts",
+                opts.journal.clone(),
+            )?)
+        } else {
+            None
+        };
         let objects = Objects::open(&root.join("objects"), opts.objects.clone())?;
         let checkpoints = Checkpoints::open(&root.join("checkpoints"))?;
         Ok(Store {
             root: root.to_path_buf(),
             main,
             memory,
+            receipts,
+            journal_opts: opts.journal.clone(),
             objects,
             checkpoints,
             _lock: lock,
@@ -93,6 +109,15 @@ impl Store {
         &self.root
     }
 
+    /// The receipt journal, created on first use.
+    pub fn receipts_mut(&mut self) -> Result<&mut Journal> {
+        if self.receipts.is_none() {
+            let dir = self.root.join("journal").join("receipts");
+            self.receipts = Some(Journal::open(&dir, "receipts", self.journal_opts.clone())?);
+        }
+        Ok(self.receipts.as_mut().expect("just opened"))
+    }
+
     pub fn recovery(&self) -> Recovery {
         Recovery {
             journal_tails: self
@@ -100,6 +125,7 @@ impl Store {
                 .recovered_tails()
                 .iter()
                 .chain(self.memory.recovered_tails())
+                .chain(self.receipts.iter().flat_map(|r| r.recovered_tails()))
                 .cloned()
                 .collect(),
             object_tails: self.objects.recovered_tails().to_vec(),
@@ -114,13 +140,23 @@ impl Store {
         if let Some(bytes) = self.main.payload(id)? {
             return Ok(Some(bytes));
         }
-        self.memory.payload(id)
+        if let Some(bytes) = self.memory.payload(id)? {
+            return Ok(Some(bytes));
+        }
+        match &self.receipts {
+            Some(receipts) => receipts.payload(id),
+            None => Ok(None),
+        }
     }
 
     pub fn contains_object(&self, id: &Sha256Id) -> bool {
         self.objects.contains(id)
             || self.main.contains_payload(id)
             || self.memory.contains_payload(id)
+            || self
+                .receipts
+                .as_ref()
+                .is_some_and(|r| r.contains_payload(id))
     }
 
     fn position(journal: &Journal) -> Position {
@@ -167,6 +203,9 @@ impl Store {
     pub fn verify_deep(&self) -> Result<VerifyReport> {
         let main = self.main.verify_deep()?;
         let memory = self.memory.verify_deep()?;
+        if let Some(receipts) = &self.receipts {
+            receipts.verify_deep()?;
+        }
         let objects = self.objects.verify_deep()?;
         let (checkpoint, rejected) = self.latest_checkpoint()?;
         Ok(VerifyReport {

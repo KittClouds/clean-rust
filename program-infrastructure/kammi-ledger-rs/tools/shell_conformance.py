@@ -131,8 +131,8 @@ def main():
         checks["cli_refused"] = p.returncode != 0 and r.returncode == 1 and ("HTTP 404" in p.stderr) == ("HTTP 404" in r.stderr)
         r = rs_cli(env, "call", "GET", "/v2/anything")
         checks["cli_v1_only"] = r.returncode == 2 and "only v1 service endpoints" in r.stderr
-        r = rs_cli(env, "remember", "x")
-        checks["cli_reserved_verb"] = r.returncode == 2 and "Phase 1" in r.stderr
+        r = rs_cli(env, "branch")
+        checks["cli_unknown_verb"] = r.returncode == 2 and "kammi verbs" in r.stderr
         r = rs_cli(env, "verbs")
         checks["cli_verbs"] = r.returncode == 0 and len(json.loads(r.stdout)) == 27
         r = run([str(TARGET / "kammi.exe"), "status"], {**env, "KAMMI_URL": f"http://127.0.0.1:{free_port()}"})
@@ -173,7 +173,7 @@ def main():
             if reply.get("id") == 4 and tools:
                 extra = [t["name"] for t in tools[24:]]
                 reply["result"]["tools"] = tools[:24]
-        checks["mcp_v1_tools_then_workspace_verbs"] = len(extra) == 15 and all(n.startswith("kammi_") for n in extra)
+        checks["mcp_v1_tools_then_workspace_verbs"] = len(extra) == 19 and all(n.startswith("kammi_") for n in extra)
         mismatches = [{"python": a, "rust": b} for a, b in zip(py_replies, rs_replies) if a != b]
         checks["mcp_session_equal"] = py_code == rs_code == 0 and len(py_replies) == len(rs_replies) == 14 and not mismatches
         if mismatches or len(py_replies) != len(rs_replies):

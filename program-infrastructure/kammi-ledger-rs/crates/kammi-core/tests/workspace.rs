@@ -327,3 +327,166 @@ fn the_packet_stays_inside_its_budget() {
     );
     assert!(text.contains("older omitted"));
 }
+
+/// Random command sequences (a fixed-seed generator, so failures reproduce): refused commands
+/// never touch the journal, successes add exactly one event, retries replay, and replay
+/// reproduces every workspace byte for byte.
+#[test]
+fn random_command_sequences_keep_every_invariant() {
+    let dir = tempfile::tempdir().unwrap();
+    let c = clock("2026-10-07T09:00:00Z");
+    let mut ledger = open(dir.path(), &c);
+    setup(&mut ledger);
+    let (evidence, _) = ledger
+        .register_bytes(b"evidence", "evidence", "admin", "evidence")
+        .unwrap();
+    activate(&mut ledger);
+    let workspaces = ["w0", "w1", "w2"];
+    for ws in workspaces {
+        cmd(&mut ledger, "WorkspaceCreated", json!({"workspace_id": ws, "expected_head": "genesis", "title": ws, "lab": "kammi-ops", "owners": ["chief-kammi"]}), ADMIN, &format!("create-{ws}")).unwrap();
+    }
+    let mut state: u64 = 0x9e37_79b9_7f4a_7c15;
+    let mut next = |n: u64| {
+        state ^= state << 13;
+        state ^= state >> 7;
+        state ^= state << 17;
+        state % n
+    };
+    let principals = [ADMIN, CHIEF, REVIEWER, Principal::Actor("outsider")];
+    let mut seen_heads: Vec<String> = Vec::new();
+    let mut committed: Vec<(String, Value, String, String)> = Vec::new();
+    let (mut ok, mut refused, mut conflicts, mut replays) = (0, 0, 0, 0);
+    for i in 0..400 {
+        let before = ledger.store.main.seq();
+        if !committed.is_empty() && next(10) == 0 {
+            // Retry a committed command with its original request ID and payload.
+            let (kind, payload, request, event) =
+                committed[next(committed.len() as u64) as usize].clone();
+            let who = if kind == "WorkspaceObjectiveSet"
+                || kind == "WorkspaceScopeSet"
+                || kind == "WorkspaceClosed"
+            {
+                CHIEF
+            } else {
+                ADMIN
+            };
+            let out = cmd(&mut ledger, &kind, payload, who, &request).unwrap();
+            assert_eq!(out["event_id"].as_str(), Some(event.as_str()));
+            assert_eq!(ledger.store.main.seq(), before, "a retry appends nothing");
+            replays += 1;
+            continue;
+        }
+        let ws = workspaces[next(3) as usize];
+        let current = head(&ledger, ws);
+        let expected = if next(4) == 0 && !seen_heads.is_empty() {
+            seen_heads[next(seen_heads.len() as u64) as usize].clone()
+        } else {
+            current.clone()
+        };
+        let who = principals[next(4) as usize];
+        let (kind, mut payload) = match next(9) {
+            0 => (
+                "WorkspaceNoteRecorded",
+                json!({"note_id": format!("n{}", next(40)), "text": format!("note {i}"), "refs": []}),
+            ),
+            1 => (
+                "WorkspaceDecisionRecorded",
+                json!({"decision_id": format!("d{}", next(20)), "text": "decide", "rationale": "because", "refs": [format!("artifact:{evidence}")]}),
+            ),
+            2 => (
+                "WorkspaceQuestionOpened",
+                json!({"question_id": format!("q{}", next(10)), "text": "why?", "refs": []}),
+            ),
+            3 => (
+                "WorkspaceQuestionResolved",
+                json!({"question_id": format!("q{}", next(10)), "resolution": "because", "refs": []}),
+            ),
+            4 => (
+                "WorkspaceObjectiveSet",
+                json!({"objective": format!("objective {i}"), "refs": []}),
+            ),
+            5 => (
+                "WorkspaceHandoffSent",
+                json!({"handoff_id": format!("h{}", next(10)), "to": "reviewer", "summary": "s", "next_step": "n", "refs": []}),
+            ),
+            6 => (
+                "WorkspaceHandoffReceived",
+                json!({"handoff_id": format!("h{}", next(10))}),
+            ),
+            7 => (
+                "WorkspacePinned",
+                json!({"ref": if next(3) == 0 { format!("artifact:sha256:{}", "7".repeat(64)) } else { format!("artifact:{evidence}") }}),
+            ),
+            _ => (
+                "WorkspaceNextStepSet",
+                json!({"next_step": format!("step {i}"), "refs": []}),
+            ),
+        };
+        payload["workspace_id"] = json!(ws);
+        payload["expected_head"] = json!(expected);
+        let request = format!("cmd-{i}");
+        match cmd(&mut ledger, kind, payload.clone(), who, &request) {
+            Ok(out) => {
+                assert_eq!(
+                    ledger.store.main.seq(),
+                    before + 1,
+                    "a success appends exactly one event"
+                );
+                assert_eq!(out["head"], out["event_id"]);
+                assert_eq!(expected, current, "a stale HEAD must never be accepted");
+                seen_heads.push(current);
+                committed.push((
+                    kind.to_string(),
+                    payload,
+                    request,
+                    out["event_id"].as_str().unwrap().to_string(),
+                ));
+                ok += 1;
+            }
+            Err(e) => {
+                assert_eq!(
+                    ledger.store.main.seq(),
+                    before,
+                    "a refused command must not reach the journal: {}",
+                    e.detail()
+                );
+                if matches!(e, LedgerError::Conflict(_)) {
+                    assert_ne!(expected, current);
+                    conflicts += 1;
+                } else {
+                    refused += 1;
+                }
+            }
+        }
+    }
+    assert!(
+        ok > 50 && refused > 20 && conflicts > 10 && replays > 10,
+        "coverage: {ok} ok, {refused} refused, {conflicts} conflicts, {replays} replays"
+    );
+    let snapshot: Vec<String> = workspaces
+        .iter()
+        .map(|ws| {
+            serde_json::to_string(&(
+                ledger.workspace_view(ws).unwrap(),
+                ledger.work_packet(ws).unwrap(),
+            ))
+            .unwrap()
+        })
+        .collect();
+    drop(ledger);
+    let replayed = open(dir.path(), &c);
+    let again: Vec<String> = workspaces
+        .iter()
+        .map(|ws| {
+            serde_json::to_string(&(
+                replayed.workspace_view(ws).unwrap(),
+                replayed.work_packet(ws).unwrap(),
+            ))
+            .unwrap()
+        })
+        .collect();
+    assert_eq!(
+        snapshot, again,
+        "replay reproduces every workspace byte for byte"
+    );
+}

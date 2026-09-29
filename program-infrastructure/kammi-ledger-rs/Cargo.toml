@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["crates/kammi-jcs", "crates/kammi-v1", "crates/kammi-store", "crates/kammi-migrate", "crates/kammi-projector", "crates/kammi-core", "crates/kammi-ledgerd", "crates/kammi-embed", "crates/kammi-contract", "crates/kammi-shell"]
+members = ["crates/kammi-jcs", "crates/kammi-v1", "crates/kammi-store", "crates/kammi-migrate", "crates/kammi-projector", "crates/kammi-core", "crates/kammi-ledgerd", "crates/kammi-embed", "crates/kammi-contract", "crates/kammi-shell", "crates/kammi-verify"]
 
 [workspace.package]
 edition = "2021"

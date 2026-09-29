@@ -271,7 +271,8 @@ fn workspace_verb(
             .and_then(Value::as_str)
             .map(str::to_string)
     });
-    if spec.verb != "open" && !args.contains_key("workspace") {
+    let takes_workspace = spec.args.iter().any(|d| d.name == "workspace");
+    if spec.verb != "open" && takes_workspace && !args.contains_key("workspace") {
         if let Some(ws) = session.get("workspace").cloned() {
             args.insert("workspace".into(), ws);
         }
@@ -357,6 +358,34 @@ fn workspace_verb(
             text(&value["session_id"]),
             text(&value["packet"]["text"])
         ),
+        "recall" => {
+            value["results"]
+                .as_array()
+                .into_iter()
+                .flatten()
+                .map(|r| {
+                    let m = &r["memory"];
+                    format!(
+                        "- {} {}: {} (fused {:.4}; {})\n",
+                        text(&m["memory_id"]),
+                        text(&m["kind"]),
+                        text(&m["text"]),
+                        r["scores"]["fused"].as_f64().unwrap_or(0.0),
+                        r["reason"]
+                            .as_array()
+                            .map(|a| a
+                                .iter()
+                                .filter_map(Value::as_str)
+                                .collect::<Vec<_>>()
+                                .join("+"))
+                            .unwrap_or_default()
+                    )
+                })
+                .collect::<String>()
+                + "(memory is contextual, not custody: check trace before relying on it)\n"
+        }
+        "remember" => format!("ok MemoryRecordedV2 {}\n", text(&value["memory_id"])),
+        "trace" | "find" => kammi_shell::dumps_pretty(&value) + "\n",
         "log" => value["events"]
             .as_array()
             .into_iter()

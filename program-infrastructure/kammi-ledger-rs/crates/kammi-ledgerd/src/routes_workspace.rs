@@ -31,6 +31,212 @@ pub fn routes() -> Router<App> {
         .route("/v2/workspaces/{workspace_id}/work", get(work))
         .route("/v2/workspaces/{workspace_id}/history", get(history))
         .route("/v2/workspaces/{workspace_id}/commands", post(command))
+        .route("/v2/memory", post(remember))
+        .route("/v2/recall", post(recall))
+        .route("/v2/memory/{identity}", get(memory_get))
+        .route("/v2/memory/{identity}/trace", get(memory_trace))
+        .route("/v2/find", get(find))
+}
+
+/// Memory scope under v4: the actor's lab (as in v1), or `workspace:<id>` for its participants.
+/// The admin may use any scope.
+fn scope_allowed(ledger: &kammi_core::Ledger, who: &Caller, scope: &str) -> bool {
+    match who {
+        Caller::Admin(_) => true,
+        Caller::Actor(actor) => match scope.strip_prefix("workspace:") {
+            Some(ws) => ledger
+                .workspace_readable(ws, Principal::Actor(actor))
+                .is_ok(),
+            None => ledger.state.authority.actor_lab(actor) == Some(scope),
+        },
+    }
+}
+
+fn memory_ready(app: &AppState) -> Result<(), Response> {
+    if app.ledger.read().memory.is_none() {
+        return Err(detail(
+            StatusCode::SERVICE_UNAVAILABLE,
+            "memory runtime is not configured",
+        ));
+    }
+    Ok(())
+}
+
+fn strings(body: &Value, key: &str) -> Result<Vec<String>, Response> {
+    match body.get(key) {
+        None | Some(Value::Null) => Ok(Vec::new()),
+        Some(_) => kammi_core::json::string_list(body, key)
+            .map_err(|e| crate::ledger_error(e, StatusCode::BAD_REQUEST)),
+    }
+}
+
+async fn remember(State(app): State<App>, headers: HeaderMap, body: Bytes) -> Response {
+    done(
+        async {
+            let body = body_json(&body)?;
+            let who = caller(&app, &headers, body.get("actor_id").and_then(Value::as_str))?;
+            flight(&app)?;
+            memory_ready(&app)?;
+            let scope = field_str(&body, "scope")?.to_string();
+            if !scope_allowed(&app.ledger.read(), &who, &scope) {
+                return Err(detail(
+                    StatusCode::FORBIDDEN,
+                    "memory scope does not belong to actor",
+                ));
+            }
+            let (kind, text, request_id) = (
+                field_str(&body, "kind")?.to_string(),
+                field_str(&body, "text")?.to_string(),
+                field_str(&body, "request_id")?.to_string(),
+            );
+            let (refs, tags) = (strings(&body, "custody_refs")?, strings(&body, "tags")?);
+            let confidence = body.get("confidence").and_then(Value::as_f64);
+            let time = body.get("time").cloned().unwrap_or_else(|| obj! {});
+            let actor = match &who {
+                Caller::Admin(a) | Caller::Actor(a) => a.clone(),
+            };
+            v2_write(&app, move |l| {
+                let (memory_id, event) = l.memory_record_v2(
+                    &kind,
+                    &scope,
+                    &text,
+                    &actor,
+                    &refs,
+                    &tags,
+                    confidence,
+                    &time,
+                    &request_id,
+                )?;
+                Ok(obj! {"memory_id" => memory_id, "event_id" => event})
+            })
+            .await
+        }
+        .await,
+    )
+}
+
+async fn recall(State(app): State<App>, headers: HeaderMap, body: Bytes) -> Response {
+    done(
+        async {
+            let body = body_json(&body)?;
+            let who = caller(&app, &headers, body.get("actor_id").and_then(Value::as_str))?;
+            flight(&app)?;
+            memory_ready(&app)?;
+            let scope = field_str(&body, "scope")?.to_string();
+            if !scope_allowed(&app.ledger.read(), &who, &scope) {
+                return Err(detail(
+                    StatusCode::FORBIDDEN,
+                    "memory scope does not belong to actor",
+                ));
+            }
+            let query = field_str(&body, "query")?.to_string();
+            let request_id = field_str(&body, "request_id")?.to_string();
+            let mode = body
+                .get("mode")
+                .and_then(Value::as_str)
+                .unwrap_or("hybrid")
+                .to_string();
+            let limit = body.get("limit").and_then(Value::as_i64).unwrap_or(10);
+            let grounded = body
+                .get("grounded_only")
+                .and_then(Value::as_bool)
+                .unwrap_or(false);
+            let include_superseded = body
+                .get("include_superseded")
+                .and_then(Value::as_bool)
+                .unwrap_or(false);
+            let exclude = strings(&body, "exclude_kinds")?;
+            let seed = body
+                .get("seed_memory")
+                .and_then(Value::as_str)
+                .map(str::to_string);
+            let actor = match &who {
+                Caller::Admin(a) | Caller::Actor(a) => a.clone(),
+            };
+            v2_write(&app, move |l| {
+                l.memory_recall(
+                    &query,
+                    &scope,
+                    &actor,
+                    &request_id,
+                    &mode,
+                    limit,
+                    grounded,
+                    &exclude,
+                    include_superseded,
+                    seed.as_deref(),
+                )
+            })
+            .await
+        }
+        .await,
+    )
+}
+
+async fn memory_read(
+    app: &App,
+    headers: &HeaderMap,
+    query: &BTreeMap<String, String>,
+    identity: &str,
+) -> Result<(), Response> {
+    let who = caller(app, headers, query.get("actor_id").map(String::as_str))?;
+    memory_ready(app)?;
+    let ledger = app.ledger.read();
+    let record = ledger
+        .memory_get(identity)
+        .map_err(|_| detail(StatusCode::NOT_FOUND, "unknown memory"))?;
+    if !scope_allowed(&ledger, &who, record["scope"].as_str().unwrap_or_default()) {
+        return Err(detail(
+            StatusCode::FORBIDDEN,
+            "memory scope does not belong to actor",
+        ));
+    }
+    Ok(())
+}
+
+async fn memory_get(
+    State(app): State<App>,
+    Path(identity): Path<String>,
+    Query(query): Query<BTreeMap<String, String>>,
+    headers: HeaderMap,
+) -> Response {
+    done(
+        async {
+            memory_read(&app, &headers, &query, &identity).await?;
+            v2_read(&app, move |l| l.memory_get(&identity)).await
+        }
+        .await,
+    )
+}
+
+async fn memory_trace(
+    State(app): State<App>,
+    Path(identity): Path<String>,
+    Query(query): Query<BTreeMap<String, String>>,
+    headers: HeaderMap,
+) -> Response {
+    done(
+        async {
+            memory_read(&app, &headers, &query, &identity).await?;
+            v2_read(&app, move |l| l.memory_trace(&identity)).await
+        }
+        .await,
+    )
+}
+
+async fn find(
+    State(app): State<App>,
+    Query(query): Query<BTreeMap<String, String>>,
+    headers: HeaderMap,
+) -> Response {
+    done(
+        async {
+            let who = caller(&app, &headers, query.get("actor_id").map(String::as_str))?;
+            let q = query.get("q").cloned().unwrap_or_default();
+            v2_read(&app, move |l| l.find(&q, who.principal())).await
+        }
+        .await,
+    )
 }
 
 /// Who is calling: admin (master token) or an authenticated actor.

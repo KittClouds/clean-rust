@@ -42,7 +42,7 @@ class Daemon:
 
     def start(self):
         env = {**os.environ, "KAMMI_ROOT": str(self.store), "KAMMI_PORT": str(self.port), "KAMMI_TOKEN": ADMIN,
-               "KAMMI_ACCEPTANCE_MODE": "1", "KAMMI_TEST_CLOCK": "2026-10-07T09:00:00Z",
+               "KAMMI_ACCEPTANCE_MODE": "1", "KAMMI_TEST_CLOCK": "2026-10-07T09:00:00Z", "KAMMI_EMBEDDER": "hashing",
                "PATH": NATIVE + os.pathsep + os.environ["PATH"]}
         self.log = (self.store.parent / "daemon.log").open("a")
         self.proc = subprocess.Popen([str(TARGET / "kammi-ledgerd.exe")], env=env, stdout=self.log, stderr=self.log)
@@ -159,7 +159,7 @@ def main():
 
         # --- MCP and the provider-neutral function list
         functions = json.loads(shell("reviewer", "reviewer", "verbs", "--functions").stdout)
-        checks["function_list"] = len(functions) == 15 and all(f["name"].startswith("kammi_") and f["parameters"]["type"] == "object" for f in functions)
+        checks["function_list"] = len(functions) == 19 and all(f["name"].startswith("kammi_") and f["parameters"]["type"] == "object" for f in functions)
         env = {**os.environ, "KAMMI_URL": daemon.url, "KAMMI_TOKEN": tokens["reviewer"], "KAMMI_ACTOR": "reviewer"}
         messages = [{"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {}},
                     {"jsonrpc": "2.0", "id": 2, "method": "tools/list"},
@@ -168,12 +168,38 @@ def main():
         replies = [json.loads(line) for line in mcp.stdout.splitlines()]
         tools = [t["name"] for t in replies[1]["result"]["tools"]] if len(replies) == 3 else []
         head_now = replies[2]["result"]["structuredContent"]["workspace"]["head"] if len(replies) == 3 else None
-        checks["mcp_lists_v1_then_verbs"] = len(tools) == 39 and tools[23] == "memory_neighbors" and tools[24] == "kammi_open"
+        checks["mcp_lists_v1_then_verbs"] = len(tools) == 43 and tools[23] == "memory_neighbors" and tools[24] == "kammi_open"
         messages = [messages[0], {"jsonrpc": "2.0", "id": 4, "method": "tools/call", "params": {"name": "kammi_note", "arguments": {"workspace": WS, "expected_head": head_now, "text": "Written through MCP"}}},
                     {"jsonrpc": "2.0", "id": 5, "method": "tools/call", "params": {"name": "kammi_note", "arguments": {"workspace": WS, "expected_head": head_now, "text": "Stale through MCP"}}}]
         mcp = subprocess.run([str(TARGET / "kammi-mcp.exe")], env=env, input="".join(json.dumps(m) + "\n" for m in messages), capture_output=True, text=True, timeout=60)
         replies = [json.loads(line) for line in mcp.stdout.splitlines()]
         checks["mcp_write_and_conflict"] = len(replies) == 3 and replies[1]["result"]["isError"] is False and replies[2]["result"]["isError"] is True and "409" in replies[2]["result"]["content"][0]["text"]
+
+        # --- memory under v4: time-aware remember, recall receipts off the memory state, trace, find
+        r = shell("reviewer", "reviewer", "remember", "The scoring packet review found no binding mismatch",
+                  "--asserted-at", "2026-10-07T08:30:00Z", "--occurred-from", "2026-10-07T08:00:00Z", "--occurred-to", "2026-10-07T08:30:00Z",
+                  "--precision", "minute", "--original-text", "this morning", "--json")
+        remembered = json.loads(r.stdout) if r.returncode == 0 else {}
+        memory_id = remembered.get("memory_id")
+        checks["remember_with_time"] = bool(memory_id)
+        status, record = daemon.call("GET", f"/v2/memory/{memory_id}?actor_id=reviewer", token=tokens["reviewer"])
+        time_ok = status == 200 and record.get("scope") == f"workspace:{WS}" and record.get("time", {}).get("occurred", {}).get("from") == "2026-10-07T08:00:00Z" \
+            and record["time"]["observed_at"] == record["created_at"] and record["time"]["source_time"] == "unknown"
+        checks["record_carries_six_clocks"] = time_ok
+        detail["record_time"] = record.get("time")
+        r = shell("reviewer", "reviewer", "recall", "scoring packet review")
+        checks["recall_finds_it"] = r.returncode == 0 and "binding mismatch" in r.stdout and "contextual, not custody" in r.stdout
+        recall_body = {"query": "binding mismatch", "scope": f"workspace:{WS}", "actor_id": "reviewer", "request_id": "fixed-recall"}
+        first = daemon.call("POST", "/v2/recall", recall_body, token=tokens["reviewer"])
+        again = daemon.call("POST", "/v2/recall", recall_body, token=tokens["reviewer"])
+        checks["recall_retry_identical"] = first[0] == 200 and first == again
+        r = shell("reviewer", "reviewer", "trace", memory_id or "none")
+        checks["trace"] = r.returncode == 0 and memory_id in r.stdout
+        r = shell("outsider", "outsider", "recall", "binding", "--scope", f"workspace:{WS}")
+        checks["outsider_cannot_recall_workspace_memory"] = r.returncode == 1 and "403" in r.stderr
+        r = shell("reviewer", "reviewer", "find", "fabrique", "--json")
+        found = json.loads(r.stdout) if r.returncode == 0 else {}
+        checks["find"] = any(w["workspace_id"] == WS for w in found.get("workspaces", []))
 
         # --- every content line cites an event; the packet is inside its budget
         status, packet = daemon.call("GET", f"/v2/workspaces/{WS}/work")
@@ -189,10 +215,16 @@ def main():
         daemon.start()
         after = [daemon.call("GET", f"/v2/workspaces/{WS}/work")[1], daemon.call("GET", f"/v2/workspaces/{WS}")[1]]
         checks["replay_identity"] = json.dumps(before, sort_keys=True) == json.dumps(after, sort_keys=True)
+        checks["recall_retry_answered_from_disk_after_restart"] = daemon.call("POST", "/v2/recall", recall_body, token=tokens["reviewer"]) == first
         v1 = daemon.call("GET", "/v1/status")[1]
         checks["v1_still_serves"] = v1["journal_events"] > 1700
     finally:
         daemon.stop()
+    verify = subprocess.run([str(TARGET / "kammi-verify.exe"), str(store)], capture_output=True, text=True)
+    verified = json.loads(verify.stdout) if verify.stdout.strip() else {}
+    checks["independent_verifier_passes"] = verified.get("status") == "PASS" and verified.get("workspaces") == 1
+    checks["recall_receipts_in_receipt_stream"] = (verified.get("receipts_events") or 0) >= 2 and verified.get("event_types", {}).get("MemoryRetrieved") is None
+    detail["verify"] = {k: verified.get(k) for k in ("status", "journal_events", "memory_events", "receipts_events", "workspaces", "errors")}
     report = {"schema": "KAMMI_WORKSPACE_E2E_V1", "status": "PASS" if all(checks.values()) else "FAIL", "checks": checks, "detail": detail}
     if args.output:
         args.output.write_text(json.dumps(report, indent=2))

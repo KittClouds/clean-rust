@@ -201,7 +201,8 @@ impl Graph<'_> {
         objects: &mut ObjectReader,
     ) -> Result<(), Error> {
         match kind {
-            "MemoryRecorded" => {
+            // A v2 record is indexed like a v1 record; its time envelope rides in the record.
+            "MemoryRecorded" | "MemoryRecordedV2" => {
                 let record_id = Sha256Id::parse(field(payload, "record_artifact_id")?)?;
                 let record = strict_json(
                     &objects
