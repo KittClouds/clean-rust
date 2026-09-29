@@ -10,3 +10,9 @@ target-dir = "G:/kammi-ledger-rs-target"
 LBUG_SHARED = "1"
 LBUG_LIBRARY_DIR = "C:/code land/clean-rust/program-infrastructure/kammi-ledger/vendor/ladybug-v0.20.2/extracted"
 LBUG_INCLUDE_DIR = "C:/code land/clean-rust/program-infrastructure/kammi-ledger/vendor/ladybug-v0.20.2/extracted"
+
+# Reproducible release binaries: the flight gate binds the SHA-256 of kammi-ledgerd.exe, so the
+# same sources must link to the same bytes. /Brepro replaces the PE timestamp with a content
+# hash (MSVC link.exe). docs/RELEASE.md relies on this to tell source-only releases apart.
+[target.x86_64-pc-windows-msvc]
+rustflags = ["-C", "link-arg=/Brepro"]

@@ -32,6 +32,22 @@ python tools/release.py run    # release the committed HEAD to the live Library
 Run them from the kammi-ledger venv, with `CARGO_TARGET_DIR` set. `run` refuses a dirty tree
 and a HEAD that is already installed.
 
+## Reproducible binaries
+
+The tier is decided by comparing binary hashes, so a rebuild from unchanged sources must give
+the same bytes. Two things broke that and are now fixed:
+
+- MSVC `link.exe` stamps a time into every PE header. `.cargo/config.toml` passes `/Brepro`,
+  which replaces it with a content hash.
+- Cargo unifies features across every package built together. Measured on 2026-09-29: the same
+  daemon source linked to three different hashes, depending on whether it was built alone,
+  with the projector, or with `--workspace`. `release.py build` builds `kammi-ledgerd` alone,
+  then `kammi-projector` alone, then the tools. A binary's bytes then depend only on its own
+  dependency closure, the lockfile and the flags.
+
+Never copy a daemon or projector binary from a `--workspace` or `cargo test` build into a
+release.
+
 ## Evidence tiers
 
 | Tier | When | Evidence |

@@ -1,5 +1,6 @@
 """The Library release routine (docs/RELEASE.md): stage, evidence, accept, switch, probe.
 
+  python tools/release.py build                      reproducible build of the release binaries
   python tools/release.py plan                       what changed since the installed release, and the tier
   python tools/release.py run [--evidence-from DIR]  release HEAD to the live Library
 
@@ -91,6 +92,16 @@ def evidence_map():
     for gate in ("mcp_interface", "python_sdk", "rust_sdk"):
         gates[gate] = gates[gate] + ["shell-conformance.json"]
     return {"gates": gates, "independent_verification": "independent-verify.json"}
+
+
+def build():
+    """Reproducible build (docs/RELEASE.md): each behaviour binary alone, so feature unification
+    with unrelated workspace members cannot change its bytes; /Brepro comes from .cargo/config.toml."""
+    for packages in (["-p", "kammi-ledgerd"], ["-p", "kammi-projector"],
+                     ["-p", "kammi-migrate", "-p", "kammi-core", "-p", "kammi-shell"]):
+        result = sh(["cargo", "build", "--release", *packages], cwd=RS)
+        if result.returncode != 0:
+            raise SystemExit("build failed:\n" + result.stderr[-2000:])
 
 
 def plan():
@@ -210,9 +221,7 @@ def run(args):
     commit = p["head"]
     if commit == old_info["commit"]:
         raise SystemExit(f"{commit} is already the installed release")
-    build = sh(["cargo", "build", "--release", "--workspace"], cwd=RS)
-    if build.returncode != 0:
-        raise SystemExit("build failed:\n" + build.stderr[-2000:])
+    build()
     p = plan()
     step("plan", tier=p["tier"], installed=p["installed"], head=commit, hashed_files_changed=p["hashed_files_changed"])
 
@@ -310,10 +319,13 @@ def run(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("operation", choices=("plan", "run"))
+    parser.add_argument("operation", choices=("build", "plan", "run"))
     parser.add_argument("--evidence-from", type=Path)
     args = parser.parse_args()
-    if args.operation == "plan":
+    if args.operation == "build":
+        build()
+        print(json.dumps({name: sha256(TARGET / name) for name in BINARIES}, indent=1))
+    elif args.operation == "plan":
         print(json.dumps(plan(), indent=1))
     else:
         run(args)
