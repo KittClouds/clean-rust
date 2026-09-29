@@ -1,0 +1,55 @@
+# Vault Phase 1: workspace and shell
+
+**Goal:** a fresh agent resumes work from `kammi work` alone, and replay rebuilds the same
+status byte for byte. Contract: amendment v4, revision 2. Decisions of 2026-09-29:
+
+- **Activation:** a journaled action, with a v4-capable binary that runs with v4 off.
+- **Closure:** one-way, and not before 2026-10-06.
+- **Resume runners:** Claude subagents are the counted runner, behind a provider-neutral
+  function interface.
+- **Ownership:** Chief Kammi owns the ledger and the Frozen Fabrique workspace.
+- **Gates:** `export_v1_rollback` is kept until activation.
+
+## Delivered
+
+| # | Workstream | Where | Proof |
+| --- | --- | --- | --- |
+| W1 | Workspace core: 15 events, per-workspace HEAD (409), authorization, references, trial apply before append | `kammi-core/src/workspace.rs`, `ops_workspace.rs` | `tests/workspace.rs`: life cycle, replay identity, budget, and a 400-command property test (refused commands never reach the journal, retries replay, replay is byte-identical) |
+| W2 | Journaled activation, closed vocabulary on command and replay; receipts journal | `kammi-contract/src/activation.rs`, `state.rs`, `kammi-store` | Activation tests (date floor, decision, verification ordering, one-way); recall receipts land in the receipt stream |
+| W3 | `/v2`: activate, workspaces, commands, work, log, memory with six clocks, recall, trace, find | `kammi-ledgerd/src/routes_workspace.rs` | `tools/workspace_e2e.py` 29/29 |
+| W4 | Work packet: ASCII, every line cites its event, 8 KB budget with explicit truncation | `ops_workspace.rs` | e2e packet checks; replay identity after deleting the projection and restarting |
+| W5 | Shell: 20 workspace verbs from one spec table, as CLI (session file, automatic HEAD, exit 3 with what changed, `--help`), MCP tools and provider-neutral functions | `kammi-shell` | e2e; v1 shell conformance 20/20 |
+| W6 | `kammi-verify`, the independent verifier | `crates/kammi-verify` | `tools/verify_agreement.py`: agrees with Python on the live v1 history, the E4 fixture and the rehearsal's Rust writes; refuses every tamper case; synthetic tests for the v4 rules |
+| W7 | Frozen Fabrique seed | `tools/seeds/frozen-fabrique-e4-0.kammi`, `tools/run_seed.py` | Runs clean on a sandbox of the live history; every reference resolves |
+| W8 | Resume gate | `tools/resume_gate.py` | Claude subagents: 3/3 scenarios (see below) |
+| W9 | Replay identity | e2e and core tests | Identical packet and state bytes after reopen and after deleting the projection |
+
+Stress with workspace traffic (Gate 1, item 4):
+
+- **A1:** 4 owners, each writing its own workspace, plus 4 writers contending on a shared one.
+  On NVMe it reached 607 writes per second, with every acknowledged write present exactly once
+  and 633 conflicts recovered.
+- **A7:** the soak also writes workspace notes and recalls.
+
+## Resume gate results (2026-09-29, sandbox of the live history)
+
+| Runner | Path | Result |
+| --- | --- | --- |
+| Claude app subagents | Verified | **3/3**. The three agents ran concurrently, so real 409s occurred and were recovered by re-reading `work`. Two runs were interrupted by an account rate limit and resumed as the same agents |
+| llama.cpp (`D:\phoenix-runtimes\llama.cpp\b10982`) | Verified end to end: tool calls executed through `kammi-mcp` and recorded | MiniCPM5-2B: 0/3. The model stops early. Not counted |
+| OpenRouter | Adapter ready (OpenAI-compatible) | Unverified: no key configured |
+| Codex app (bundled `codex exec`) | Adapter ready, behind `--accept-codex-account-use` | Unverified: a scored run would spend Codex account quota |
+
+The agents found three usability gaps, now fixed: no `--help`, `find` refused the packet's
+`seal:` prefix, and a handoff has to state its own next step.
+
+## Remaining
+
+- **M4:** one full-tier release of this binary with v4 off, before 2026-10-06.
+- **M5:** after the rollback window closes:
+  - check the closure conditions and register the decision;
+  - rehearse activation on a current copy of the live store;
+  - activate live and seed Frozen Fabrique live;
+  - run the resume gate against a copy of the live store;
+  - change the gate list: retire `export_v1_rollback`, and add `rust_independent_verifier`,
+    `v4_replay_identity`, `resume_gate` and `activation_rehearsal`.

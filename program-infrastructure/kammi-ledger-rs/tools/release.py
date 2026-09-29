@@ -81,7 +81,14 @@ def installed():
     return info, OPS / info["release_dir"]
 
 
-def evidence_map():
+# Phase 1 proofs, registered under the gates they support when present in the evidence.
+SUPPLEMENTARY = {
+    "verify-agreement.json": ["artifact_tamper", "journal_tamper", "cleanroom_replay"],
+    "workspace-e2e.json": ["cleanroom_replay", "mcp_interface", "memory_plane"],
+}
+
+
+def evidence_map(evidence: Path | None = None):
     source = (RS / "tools/cutover_rehearsal.py").read_text(encoding="utf-8")
     start = source.index("EVIDENCE = {")
     namespace = {}
@@ -91,6 +98,10 @@ def evidence_map():
         gates[gate] = gates[gate] + ["cutover-rollback-rehearsal.json"]
     for gate in ("mcp_interface", "python_sdk", "rust_sdk"):
         gates[gate] = gates[gate] + ["shell-conformance.json"]
+    for name, supported in SUPPLEMENTARY.items():
+        if evidence is not None and (evidence / name).exists():
+            for gate in supported:
+                gates[gate] = gates[gate] + [name]
     return {"gates": gates, "independent_verification": "independent-verify.json"}
 
 
@@ -271,7 +282,7 @@ def run(args):
                      cwd=PY, env=shell_env)
     if conformance.returncode != 0:
         raise SystemExit("shell conformance failed:\n" + conformance.stdout[-1500:])
-    (evidence / "evidence-map.json").write_text(json.dumps(evidence_map(), indent=1))
+    (evidence / "evidence-map.json").write_text(json.dumps(evidence_map(evidence), indent=1))
     step("evidence ready", files=sorted(f.name for f in evidence.iterdir()))
 
     # --- switch: from here the live Library is briefly down

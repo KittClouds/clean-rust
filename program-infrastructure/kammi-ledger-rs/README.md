@@ -6,7 +6,19 @@ and this workspace must stay outside it: `kammi-ledger/ledgerd/release.py` hashe
 the live daemon's flight gate. Build output goes to `$CARGO_TARGET_DIR` (this machine:
 `D:/codex-runs/jev-v08q-r3-rust-target/kammi-ledger-rs-target`); the harnesses read the same variable.
 
-## Status: live since 2026-09-29; Vault Phase 0 (contracts) delivered
+## Status: live since 2026-09-29; Vault Phase 0 delivered; Vault Phase 1 built (v4 off)
+
+Vault Phase 1 is built and proven on sandboxes:
+
+- workspaces, the journaled v4 activation, six-clock memory, the receipt stream;
+- the `kammi` verbs and MCP tools, the Frozen Fabrique seed;
+- the independent verifier `kammi-verify`;
+- a resume gate that fresh Claude agents pass 3/3.
+
+It ships with v4 off. Activation is a journaled step, not before 2026-10-06
+([docs/VAULT-PHASE-1.md](docs/VAULT-PHASE-1.md)).
+
+## Earlier status: Vault Phase 0 (contracts)
 
 The Rust Library has served the live store since the Phase 4E cutover (2026-09-29). Releases go
 through `tools/release.py` ([docs/RELEASE.md](docs/RELEASE.md)); the daemon is bound to a

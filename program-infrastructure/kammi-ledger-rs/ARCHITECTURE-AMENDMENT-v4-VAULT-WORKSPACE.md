@@ -129,6 +129,8 @@ the expected HEAD (`--expect-head`; `kammi open` records the HEAD it read). Exit
 | `handoff`, `receive` | Send or acknowledge a handoff | 1 |
 | `close` | Detach the session, or close the workspace (`--end`, owners only) | 1 |
 | `log` | The workspace's events after a given event (the record behind the packet) | 1 |
+| `create` | Create a workspace (Library admin only, so Chief Kammi) | 1 |
+| `help` / `--help` | Usage for all verbs, or one verb's arguments | 1 |
 | `remember`, `recall`, `trace` | Memory write, cited retrieval, evidence trace | 1 (recall quality: 3) |
 | `find` | Custody lookup by name or identity | 1 |
 

@@ -78,6 +78,42 @@ def token_of(actor):
     return "stress-token-" + actor
 
 
+# A1 and A7 run with the fixed clock after the rollback-window floor, so their stores can take
+# the journaled v4 activation (neither depends on the clock: no leases, no grant expiry).
+V4_CLOCK = {"KAMMI_TEST_CLOCK": "2026-10-07T00:00:00Z"}
+
+
+def activate_v4(port, workspaces, owner="a0"):
+    """Journaled activation on a stress store (fixture decision and verification), then workspaces."""
+    c = Client(port)
+
+    def register(obj, kind, request):
+        raw = json.dumps(obj).encode()
+        status, body = c.call("POST", "/v1/artifacts/base64", {"bytes_base64": base64.b64encode(raw).decode(), "kind": kind, "actor": "auditor", "request_id": request})
+        assert status == 200, body
+        return body["artifact_id"]
+
+    closure = register({"schema": "KAMMI_ROLLBACK_WINDOW_CLOSURE_V1", "decision": "CLOSE", "decided_by": "stress fixture"}, "decision", "v4-closure")
+    backup = register({"backup": "stress fixture"}, "backup", "v4-backup")
+    head = c.call("GET", "/v1/status")[1]["journal_head"]
+    verification = register({"status": "PASS", "journal_head": head, "verifier": "stress fixture"}, "verification", "v4-verification")
+    status, body = c.call("POST", "/v2/vocabulary/activate", {"vocabulary": "v4", "not_before": "2026-10-06T00:00:00Z", "closure_decision": closure,
+                          "verification": verification, "backup": backup, "request_id": "v4-activate"})
+    assert status == 200, body
+    heads = {}
+    for w in workspaces:
+        status, body = c.call("POST", "/v2/workspaces", {"workspace_id": w, "title": w, "lab": LAB, "owners": [owner], "request_id": f"ws-{w}"})
+        assert status == 200, body
+        heads[w] = body["head"]
+    return heads
+
+
+def independent_verify(store: Path):
+    r = subprocess.run([str(TARGET / "kammi-verify.exe"), str(store)], capture_output=True, text=True)
+    report = json.loads(r.stdout) if r.stdout.strip() else {"status": "CRASH"}
+    return report.get("status") == "PASS", {k: report.get(k) for k in ("status", "journal_events", "workspaces", "receipts_events", "errors")}
+
+
 def setup(port, actors=16, resources=4):
     c = Client(port)
     for i in range(actors):
@@ -205,8 +241,8 @@ class Rig:
                          {"KAMMI_SIGNING_KEY_FILE": str(key), "KAMMI_EMBEDDER": embedder}, HERE)
         self.side.root = self.dir / "store"
 
-    def start(self):
-        seconds = self.side.start()
+    def start(self, extra=None):
+        seconds = self.side.start(extra)
         return seconds
 
     def status(self):
@@ -256,15 +292,40 @@ def run_threads(n, target, seconds):
 
 def a1(work, seconds):
     rig = Rig(work, "a1")
-    rig.start()
+    rig.start(V4_CLOCK)
     setup(rig.side.port)
     port = rig.side.port
+    heads = activate_v4(port, [f"ws{i}" for i in range(4)] + ["ws-shared"])
 
     def writer(i, stop, out):
         c, acked, statuses, n = Client(port), {}, Counter(), 0
+        ws_statuses, conflicts = Counter(), 0
+        head = heads.get(f"ws{i}")
         while not stop.is_set():
             n += 1
             rid = f"w{i}-{n}"
+            if i < 4:
+                # One writer per workspace: its own HEAD chain, never stale.
+                body = {"type": "WorkspaceNoteRecorded", "payload": {"expected_head": head, "note_id": f"n{i}-{n}", "text": f"a1 note {rid}", "refs": []},
+                        "actor_id": "a0", "request_id": rid}
+                status, reply = c.retry("POST", f"/v2/workspaces/ws{i}/commands", body)
+                ws_statuses[status] += 1
+                if status == 200:
+                    head = reply["head"]
+                    acked[rid] = reply["event_id"]
+                continue
+            if i < 8:
+                # Contending writers on one workspace: read HEAD, write, and on 409 read again.
+                current = c.retry("GET", "/v2/workspaces/ws-shared")[1]["head"]
+                body = {"type": "WorkspaceNoteRecorded", "payload": {"expected_head": current, "note_id": f"s{i}-{n}", "text": f"a1 shared {rid}", "refs": []},
+                        "actor_id": "a0", "request_id": rid}
+                status, reply = c.retry("POST", "/v2/workspaces/ws-shared/commands", body)
+                ws_statuses[status] += 1
+                if status == 200:
+                    acked[rid] = reply["event_id"]
+                elif status == 409:
+                    conflicts += 1
+                continue
             if n % 5 == 0:
                 status, body = c.retry("POST", "/v1/runs", {"run_id": "run-" + rid, "lab": LAB, "actor": "auditor", "request_id": rid})
             else:
@@ -274,7 +335,7 @@ def a1(work, seconds):
             statuses[status] += 1
             if status == 200:
                 acked[rid] = body["event_id"]
-        out.update(acked=acked, statuses=statuses)
+        out.update(acked=acked, statuses=statuses, ws_statuses=ws_statuses, conflicts=conflicts)
 
     started = time.time()
     results = run_threads(32, writer, seconds)
@@ -283,13 +344,20 @@ def a1(work, seconds):
     rig.stop()
     acked = {k: v for r in results for k, v in r["acked"].items()}
     statuses = sum((r["statuses"] for r in results), Counter())
+    ws_own = sum((r["ws_statuses"] for r in results[:4]), Counter())
+    ws_shared = sum((r["ws_statuses"] for r in results[4:8]), Counter())
+    conflicts = sum(r["conflicts"] for r in results)
     events, _ = export_and_read(rig.store, rig.dir)
     once = exactly_once(events, acked)
     store_ok, store_detail = verify_store(rig.store)
     proj_ok, proj_detail = verify_projection(rig.store)
-    ok = once["lost"] == 0 and once["duplicated"] == 0 and once["event_id_mismatch"] == 0 and set(statuses) == {200} and store_ok and proj_ok
-    return ok, {"clients": 32, "seconds": round(elapsed, 1), "writes": sum(statuses.values()), "writes_per_second": round(sum(statuses.values()) / elapsed),
-                "statuses": dict(statuses), "exactly_once": once, "store_verify": store_ok, "projection_deep_verify": proj_ok, "projection": proj_detail}
+    indep_ok, indep = independent_verify(rig.store)
+    ok = (once["lost"] == 0 and once["duplicated"] == 0 and once["event_id_mismatch"] == 0 and set(statuses) == {200} and store_ok and proj_ok
+          and set(ws_own) == {200} and set(ws_shared) <= {200, 409} and ws_shared[200] > 0 and indep_ok)
+    total = sum(statuses.values()) + sum(ws_own.values()) + sum(ws_shared.values())
+    return ok, {"clients": 32, "seconds": round(elapsed, 1), "writes": total, "writes_per_second": round(total / elapsed),
+                "statuses": dict(statuses), "workspace": {"own_writer_statuses": dict(ws_own), "shared_writer_statuses": dict(ws_shared), "conflicts_recovered": conflicts},
+                "exactly_once": once, "store_verify": store_ok, "projection_deep_verify": proj_ok, "projection": proj_detail, "independent_verify": indep}
 
 
 def a2(work, seconds):
@@ -512,9 +580,10 @@ def a6(work, events):
 
 def a7(work, minutes, kill_every):
     rig = Rig(work, "a7")
-    rig.start()
+    rig.start(V4_CLOCK)
     setup(rig.side.port)
     port = rig.side.port
+    activate_v4(port, ["soak-ws"])
     Client(port).call("POST", "/v1/actors", {"actor_id": "soak", "kind": "agent", "lab": LAB,
                       "credential_sha256": hashlib.sha256(token_of("soak").encode()).hexdigest(), "request_id": "actor-soak"})
     samples, statuses, lock = [], Counter(), threading.Lock()
@@ -526,6 +595,12 @@ def a7(work, minutes, kill_every):
             if i == 0 and n % 10 == 0:
                 status, _ = c.retry("POST", "/v1/memory", {"kind": "INTERPRETIVE", "scope": LAB, "text": f"soak memory {n} about restarts and leases",
                                     "actor_id": "soak", "tags": ["soak"], "request_id": f"soak-m-{n}"}, token=token_of("soak"))
+            elif i == 2 and n % 10 == 0:
+                current = c.retry("GET", "/v2/workspaces/soak-ws")[1]["head"]
+                status, _ = c.retry("POST", "/v2/workspaces/soak-ws/commands", {"type": "WorkspaceNoteRecorded", "actor_id": "a0", "request_id": f"soak-ws-{n}",
+                                    "payload": {"expected_head": current, "note_id": f"n{n}", "text": f"soak note {n}", "refs": []}})
+            elif i == 3 and n % 7 == 0:
+                status, _ = c.retry("POST", "/v2/recall", {"query": "soak note", "scope": "workspace:soak-ws", "actor_id": "a0", "request_id": f"soak-recall-{n}"})
             elif i == 1 and n % 5 == 0:
                 status, _ = c.retry("POST", "/v1/memory/search", {"query": "restarts leases", "scope": LAB, "actor_id": "soak", "mode": "hybrid",
                                     "limit": 10, "request_id": f"soak-s-{n}"}, token=token_of("soak"))
@@ -598,7 +673,8 @@ def a7(work, minutes, kill_every):
     first, last = sum(legacy[:lthird]) / lthird, sum(legacy[-lthird:]) / lthird
     legacy_ok = last <= 1.2 * first
 
-    ok = no_leak and residual_ok and store_ok and proj_ok and set(statuses) <= {200, 503}
+    indep_ok, indep = independent_verify(rig.store)
+    ok = no_leak and residual_ok and store_ok and proj_ok and indep_ok and set(statuses) <= {200, 503, 409}
     return ok, {"criterion": "A7 v2 (amended 2026-09-28): soak-final RSS <= 1.10x fresh-replay RSS at the same head; "
                              "no residual growth (> 5% of fresh RSS) after conditioning on event count",
                 "minutes": minutes, "operations": sum(statuses.values()), "statuses": dict(statuses), "projector_kills": kills,
@@ -609,7 +685,8 @@ def a7(work, minutes, kill_every):
                 "original_criterion": {"rule": "last third <= 1.2x first third", "daemon_mb_first_third": round(first, 1),
                                        "daemon_mb_last_third": round(last, 1), "verdict": "PASS" if legacy_ok else "FAIL_BY_SPEC"},
                 "daemon_mb_max": max(daemon), "projector_mb_max": max((s["projector_mb"] or 0) for s in samples),
-                "samples": samples[:: max(1, len(samples) // 30)], "store_verify": store_ok, "projection_deep_verify": proj_ok}
+                "samples": samples[:: max(1, len(samples) // 30)], "store_verify": store_ok, "projection_deep_verify": proj_ok,
+                "workspace_traffic": "notes on soak-ws and recall into the receipt stream", "independent_verify": indep}
 
 
 def main():
