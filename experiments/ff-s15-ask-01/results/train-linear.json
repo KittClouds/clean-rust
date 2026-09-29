@@ -1,0 +1,135 @@
+{
+  "identity": {
+    "all-surfaces-prediction-seal.json": "876984c304723fbb4bbb29c157444bd3933f6b4c6bbcd6ebb9ba32edcaa3b613",
+    "backbone": {
+      "config_sha256": "f7d0bcc454b7a30fa471b1e7b9e359e11fb25b56f5b4ffd59bb18248e3c2ea3d",
+      "fine_tuning": false,
+      "generation": false,
+      "name": "LFM2.5-230M-Base",
+      "revision_path": "D:/phoenix-models/lfm2.5-230m-base-9d2be55",
+      "tokenizer_sha256": "df1d8d5ec5d091b460562ffd545e4a5e91d17d4a0db7ebe733be34ed374377bd",
+      "weights_sha256": "e91eb22c0aeae0bcbea8ade56f5cfe3cf91bca0c34e859adacae8f4445416fe6"
+    },
+    "bank_manifest_sha256": "cb51aac13052c72388a826496badc1445894be5347a70f97c4b5430185516417",
+    "extraction-seal.json": "d31c7c9902fe154c653dbbe62acda29aeed1dfb7ab8b2279152972bf5cfae955",
+    "lock_sha256": "daa0406aa3f7caccfd84e09712b9448580eb6959faa0e7fba827557f7751c405",
+    "primitives": {
+      "final_token": "f98916ba5ce18a56d124c7c250abc3cc3e1b13b16a33823a22483da5e6198351",
+      "full_mean": "145d605f4fd6e3297869244de2e0c34353a7193f0d7668b83ccf619dc29d4d6a",
+      "layer_m4_final": "d46a7faeae0eb9594b2a255511e70b88b2c246d1c02e52e0dc1a51e181ba7cab",
+      "middle_final": "31d5cf3bd719f327294dc110cc0bc543cce9b0db67858be7c227d47b47520a77"
+    },
+    "rowmap_sha256": "86282fadbb5eb2cac1db816ee4681b43bd39166dd5fd94a373fc2f452fa13da4",
+    "source-lock.json": "c9b9443926cf8344f7797b076bbfcc9717b8f117a6a151d1e361595dcd88446d",
+    "surfaces": {
+      "final_plus_mean": {
+        "fit_receipt_sha256": "cca08295865b33fc473c4b536ee24e01656c38c7f1e620cb421f93359a3748d0",
+        "model_sha256": "f54a69468e5f3c2c77daea02ead7a6c0ea34fc46aff4db3ff42e151c53b357d4",
+        "prediction_seal_sha256": "82d0319ec94ca623b439dd290d93d0c5bbae5288aaab76ae0a77df9e5a3f0dee",
+        "prediction_sha256": "1ae166a456a4c12cd75cfe5ee39ea376ed30a4c86d85d8d54a3ef27858620e3c"
+      },
+      "full_mean": {
+        "fit_receipt_sha256": "b65a183e7cbc4bf20b07c03ced0b829d03b36df17eafdee2f9d36ebc53d489d4",
+        "model_sha256": "f9a1780ec23a4a84258dd1830f89128b07e55d9d8e8e135b8d349c29803c041a",
+        "prediction_seal_sha256": "014fe6a76fb38cb816f3a8abf5f626a98a5d2b0c44696f6b0438f1586e033f69",
+        "prediction_sha256": "74401163dd0bcca8e661712dc4ead26db868199cdc29d453f8ce8bc7fa536bfd"
+      },
+      "layer_m4_final": {
+        "fit_receipt_sha256": "4ca3596472fdd17c395431f767b47490c81c1a52ff5427cc6fde22598c382d67",
+        "model_sha256": "9713983c22e92865def36ef00de1c7edf102b005fad10539cb659b60f9e5e625",
+        "prediction_seal_sha256": "fc7799c266381dba2d85309607d4ffde68b88f703537b8bb74b24ced30993c40",
+        "prediction_sha256": "f3a402a959e12334f3d4bb60b409a76c7d4bdaf904cffc7015a0f26081bb3336"
+      },
+      "middle_plus_final": {
+        "fit_receipt_sha256": "4b9adf85c38f5dd26c28c41003f418a1e04d9ecdce02192a03424f8a6036b485",
+        "model_sha256": "ab0e0090702da5064d7220e822b980fbc2a797dfab566415e33725642e4449d7",
+        "prediction_seal_sha256": "13349093a08ceafbf81b871bbbac891e22e6e484cc0e253bb25752477324b92d",
+        "prediction_sha256": "51b004b6489b0f2f7ce72d2dfd853627ac56aac8e653e5c227161c746e1df0bc"
+      }
+    }
+  },
+  "ppm_sha256": "803d54370b0310a429496d0233dab2e1a76dd11dd89c9152c2f332ae97eb1f2c",
+  "receipts": {
+    "final_plus_mean": {
+      "epoch_losses": [
+        0.17314771783183996,
+        0.16096475657442927,
+        0.15571343111740032,
+        0.1531049065606695,
+        0.15026071583720998,
+        0.14882336892712283,
+        0.14732532538998294,
+        0.14573841405586457
+      ],
+      "head": "linear",
+      "numpy_vs_torch_max_difference": 2.037594405424059e-07,
+      "seed": 20260929,
+      "surface": "final_plus_mean",
+      "train_file_sha256": "a7d17a8bf33960cad004774bec1a9d9aef10434dd16143f76da517382d7015d7",
+      "train_positives": 6852,
+      "train_rows": 143996,
+      "weights_sha256": "b8c553d657a3c3f8852e5055c332aea6d9ef82aa67719c1f3905c0d9aec13a2d"
+    },
+    "full_mean": {
+      "epoch_losses": [
+        0.1793124174148264,
+        0.169298283440966,
+        0.16434379415193073,
+        0.16214704009848582,
+        0.15949152452005466,
+        0.15836096922276724,
+        0.15689197896232068,
+        0.15543177409071318
+      ],
+      "head": "linear",
+      "numpy_vs_torch_max_difference": 1.711269216331246e-07,
+      "seed": 20260929,
+      "surface": "full_mean",
+      "train_file_sha256": "a7d17a8bf33960cad004774bec1a9d9aef10434dd16143f76da517382d7015d7",
+      "train_positives": 6852,
+      "train_rows": 143996,
+      "weights_sha256": "fbbf80c330df9a39c18763e7dd46d42fdde5caf099c878267be9b3c57212ac1a"
+    },
+    "layer_m4_final": {
+      "epoch_losses": [
+        0.1823849917297632,
+        0.17261567858742996,
+        0.16832311923654986,
+        0.16720518280922528,
+        0.1644144639582701,
+        0.16361133355489918,
+        0.16262403256456617,
+        0.16143618335186596
+      ],
+      "head": "linear",
+      "numpy_vs_torch_max_difference": 1.3968122297702834e-07,
+      "seed": 20260929,
+      "surface": "layer_m4_final",
+      "train_file_sha256": "a7d17a8bf33960cad004774bec1a9d9aef10434dd16143f76da517382d7015d7",
+      "train_positives": 6852,
+      "train_rows": 143996,
+      "weights_sha256": "6dc3b4b2afb5cea6d943f3fba2f670bc3bb2114a7a1367d5dc393ba64041ee24"
+    },
+    "middle_plus_final": {
+      "epoch_losses": [
+        0.17847507940211765,
+        0.168073102621965,
+        0.16317891298045575,
+        0.1613025530962877,
+        0.15867101831335417,
+        0.15779914276700624,
+        0.1560251918477072,
+        0.15522147715091705
+      ],
+      "head": "linear",
+      "numpy_vs_torch_max_difference": 1.4237726708721254e-07,
+      "seed": 20260929,
+      "surface": "middle_plus_final",
+      "train_file_sha256": "a7d17a8bf33960cad004774bec1a9d9aef10434dd16143f76da517382d7015d7",
+      "train_positives": 6852,
+      "train_rows": 143996,
+      "weights_sha256": "36d89f3df2172f2da0bedd414e4a234c420c6c4a1441734be70231fbb4e40343"
+    }
+  },
+  "train_file_sha256": "a7d17a8bf33960cad004774bec1a9d9aef10434dd16143f76da517382d7015d7"
+}

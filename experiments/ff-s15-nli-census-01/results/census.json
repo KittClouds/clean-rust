@@ -1,0 +1,756 @@
+{
+  "a_false_positive_anatomy_post_hoc": {
+    "by_true_nli": {
+      "-1": 13,
+      "0": 7,
+      "1": 1,
+      "2": 84
+    },
+    "by_truth_decision": {
+      "ABSTAIN": 87,
+      "ACT": 18
+    },
+    "false_positives": 105,
+    "removable_by_a_perfect_veto": 8
+  },
+  "ask_alone": {
+    "ap": 0.2686028511633387,
+    "auroc": 0.8019125583097045
+  },
+  "cal_ask_rows": 580,
+  "cal_rows": 11890,
+  "ceiling_perfect_nli_pass_through_unlabelled": {
+    "baseline_recall": 0.1810344827586207,
+    "headroom": 0.06666666666666665,
+    "precision": 0.5,
+    "recall": 0.19310344827586207,
+    "rows": 224
+  },
+  "ceiling_perfect_nli_strict_unknown_only": {
+    "baseline_recall": 0.1810344827586207,
+    "headroom": -0.07619047619047614,
+    "precision": 0.5,
+    "recall": 0.16724137931034483,
+    "rows": 194
+  },
+  "crosstab_truth_decision_by_true_nli": {
+    "ABSTAIN": {
+      "-1": 966,
+      "0": 0,
+      "1": 809,
+      "2": 4004
+    },
+    "ACT": {
+      "-1": 958,
+      "0": 2254,
+      "1": 0,
+      "2": 2319
+    },
+    "ASK": {
+      "-1": 98,
+      "0": 0,
+      "1": 0,
+      "2": 482
+    }
+  },
+  "decision": {
+    "U_union_earned": false,
+    "V_veto_earned": false,
+    "route_earned": false
+  },
+  "heads": {
+    "final_plus_mean": {
+      "conjunction": {
+        "a_threshold": 307410,
+        "b": 0,
+        "baseline_recall": 0.1810344827586207,
+        "headroom": 0.0,
+        "recall": 0.1810344827586207,
+        "rows": 210,
+        "true_positives": 105
+      },
+      "lift_table": {
+        "ask_rate": [
+          [
+            0.0,
+            0.003663003663003663,
+            0.0
+          ],
+          [
+            0.005115089514066497,
+            0.014577259475218658,
+            0.006593406593406593
+          ],
+          [
+            0.012195121951219513,
+            0.008982035928143712,
+            0.01928374655647383
+          ],
+          [
+            0.002197802197802198,
+            0.02729528535980149,
+            0.01812688821752266
+          ],
+          [
+            0.017897091722595078,
+            0.026004728132387706,
+            0.050156739811912224
+          ],
+          [
+            0.015113350125944584,
+            0.04367816091954023,
+            0.036414565826330535
+          ],
+          [
+            0.014814814814814815,
+            0.0467706013363029,
+            0.04776119402985075
+          ],
+          [
+            0.03361344537815126,
+            0.0728051391862955,
+            0.057534246575342465
+          ],
+          [
+            0.038461538461538464,
+            0.09009009009009009,
+            0.10073710073710074
+          ],
+          [
+            0.15140845070422534,
+            0.22448979591836735,
+            0.2475633528265107
+          ]
+        ],
+        "rows": [
+          [
+            398,
+            273,
+            518
+          ],
+          [
+            391,
+            343,
+            455
+          ],
+          [
+            492,
+            334,
+            363
+          ],
+          [
+            455,
+            403,
+            331
+          ],
+          [
+            447,
+            423,
+            319
+          ],
+          [
+            397,
+            435,
+            357
+          ],
+          [
+            405,
+            449,
+            335
+          ],
+          [
+            357,
+            467,
+            365
+          ],
+          [
+            338,
+            444,
+            407
+          ],
+          [
+            284,
+            392,
+            513
+          ]
+        ]
+      },
+      "noise": {
+        "max": 0.00952380952380949,
+        "median": 0.0,
+        "p95": 0.0,
+        "permutations": 200
+      },
+      "standalone": {
+        "ap": 0.0720968728458592,
+        "auroc": 0.6089907466691058
+      },
+      "union": {
+        "A": {
+          "false_positives": 105,
+          "precision": 0.5,
+          "recall": 0.1810344827586207,
+          "rows": 210,
+          "threshold": 307410,
+          "true_positives": 105
+        },
+        "N": {
+          "false_positives": 190,
+          "kind": "size_matched",
+          "precision": 0.09523809523809523,
+          "recall": 0.034482758620689655,
+          "rows": 210,
+          "threshold": null,
+          "true_positives": 20
+        },
+        "a_false_positives": 105,
+        "ask_misses": 475,
+        "available": true,
+        "false_positive_share_shared": 0.0761904761904762,
+        "false_positives_removed_if_n_required": 97,
+        "false_positives_shared_with_n": 8,
+        "intersection": {
+          "false_positives": 8,
+          "precision": 0.6,
+          "recall": 0.020689655172413793,
+          "rows": 20,
+          "true_positives": 12
+        },
+        "misses_recovered_by_n": 8,
+        "misses_recovered_share": 0.016842105263157894,
+        "oracle_union_headroom": 0.07619047619047614,
+        "realizable_union_headroom": 0.07619047619047614,
+        "true_positives_lost_if_n_required": 93,
+        "union": {
+          "false_positives": 287,
+          "precision": 0.2825,
+          "recall": 0.19482758620689655,
+          "rows": 400,
+          "true_positives": 113
+        }
+      }
+    },
+    "full_mean": {
+      "conjunction": {
+        "a_threshold": 307410,
+        "b": 0,
+        "baseline_recall": 0.1810344827586207,
+        "headroom": 0.0,
+        "recall": 0.1810344827586207,
+        "rows": 210,
+        "true_positives": 105
+      },
+      "lift_table": {
+        "ask_rate": [
+          [
+            0.0,
+            0.004366812227074236,
+            0.0
+          ],
+          [
+            0.005076142131979695,
+            0.017921146953405017,
+            0.005813953488372093
+          ],
+          [
+            0.01059322033898305,
+            0.021212121212121213,
+            0.0103359173126615
+          ],
+          [
+            0.0045351473922902496,
+            0.014962593516209476,
+            0.02881844380403458
+          ],
+          [
+            0.02188183807439825,
+            0.0345679012345679,
+            0.03363914373088685
+          ],
+          [
+            0.019002375296912115,
+            0.041304347826086954,
+            0.03571428571428571
+          ],
+          [
+            0.02891566265060241,
+            0.03296703296703297,
+            0.050156739811912224
+          ],
+          [
+            0.036312849162011177,
+            0.04480651731160896,
+            0.09411764705882353
+          ],
+          [
+            0.04504504504504504,
+            0.07707910750507099,
+            0.11294765840220386
+          ],
+          [
+            0.156794425087108,
+            0.2,
+            0.2676348547717842
+          ]
+        ],
+        "rows": [
+          [
+            386,
+            229,
+            574
+          ],
+          [
+            394,
+            279,
+            516
+          ],
+          [
+            472,
+            330,
+            387
+          ],
+          [
+            441,
+            401,
+            347
+          ],
+          [
+            457,
+            405,
+            327
+          ],
+          [
+            421,
+            460,
+            308
+          ],
+          [
+            415,
+            455,
+            319
+          ],
+          [
+            358,
+            491,
+            340
+          ],
+          [
+            333,
+            493,
+            363
+          ],
+          [
+            287,
+            420,
+            482
+          ]
+        ]
+      },
+      "noise": {
+        "max": 0.06666666666666665,
+        "median": 0.0,
+        "p95": 0.009999999999999802,
+        "permutations": 200
+      },
+      "standalone": {
+        "ap": 0.05989678643984969,
+        "auroc": 0.5989024817829812
+      },
+      "union": {
+        "A": {
+          "false_positives": 105,
+          "precision": 0.5,
+          "recall": 0.1810344827586207,
+          "rows": 210,
+          "threshold": 307410,
+          "true_positives": 105
+        },
+        "N": {
+          "false_positives": 197,
+          "kind": "size_matched",
+          "precision": 0.06190476190476191,
+          "recall": 0.022413793103448276,
+          "rows": 210,
+          "threshold": null,
+          "true_positives": 13
+        },
+        "a_false_positives": 105,
+        "ask_misses": 475,
+        "available": true,
+        "false_positive_share_shared": 0.05714285714285714,
+        "false_positives_removed_if_n_required": 99,
+        "false_positives_shared_with_n": 6,
+        "intersection": {
+          "false_positives": 6,
+          "precision": 0.45454545454545453,
+          "recall": 0.008620689655172414,
+          "rows": 11,
+          "true_positives": 5
+        },
+        "misses_recovered_by_n": 8,
+        "misses_recovered_share": 0.016842105263157894,
+        "oracle_union_headroom": 0.07619047619047614,
+        "realizable_union_headroom": 0.07619047619047614,
+        "true_positives_lost_if_n_required": 100,
+        "union": {
+          "false_positives": 296,
+          "precision": 0.2762836185819071,
+          "recall": 0.19482758620689655,
+          "rows": 409,
+          "true_positives": 113
+        }
+      }
+    },
+    "layer_m4_final": {
+      "conjunction": {
+        "a_threshold": 307410,
+        "b": 0,
+        "baseline_recall": 0.1810344827586207,
+        "headroom": 0.0,
+        "recall": 0.1810344827586207,
+        "rows": 210,
+        "true_positives": 105
+      },
+      "lift_table": {
+        "ask_rate": [
+          [
+            0.0,
+            0.004016064257028112,
+            0.0
+          ],
+          [
+            0.007853403141361256,
+            0.011730205278592375,
+            0.006437768240343348
+          ],
+          [
+            0.01282051282051282,
+            0.011904761904761904,
+            0.015584415584415584
+          ],
+          [
+            0.008928571428571428,
+            0.01808785529715762,
+            0.01977401129943503
+          ],
+          [
+            0.029017857142857144,
+            0.028169014084507043,
+            0.031746031746031744
+          ],
+          [
+            0.02356020942408377,
+            0.03917525773195876,
+            0.031055900621118012
+          ],
+          [
+            0.017632241813602016,
+            0.047619047619047616,
+            0.04242424242424243
+          ],
+          [
+            0.06301369863013699,
+            0.04585152838427948,
+            0.06284153005464481
+          ],
+          [
+            0.05491329479768786,
+            0.09523809523809523,
+            0.08274231678486997
+          ],
+          [
+            0.19076923076923077,
+            0.2681704260651629,
+            0.1913978494623656
+          ]
+        ],
+        "rows": [
+          [
+            403,
+            249,
+            537
+          ],
+          [
+            382,
+            341,
+            466
+          ],
+          [
+            468,
+            336,
+            385
+          ],
+          [
+            448,
+            387,
+            354
+          ],
+          [
+            448,
+            426,
+            315
+          ],
+          [
+            382,
+            485,
+            322
+          ],
+          [
+            397,
+            462,
+            330
+          ],
+          [
+            365,
+            458,
+            366
+          ],
+          [
+            346,
+            420,
+            423
+          ],
+          [
+            325,
+            399,
+            465
+          ]
+        ]
+      },
+      "noise": {
+        "max": 0.04761904761904745,
+        "median": 0.0,
+        "p95": 0.0,
+        "permutations": 200
+      },
+      "standalone": {
+        "ap": 0.053793459408898556,
+        "auroc": 0.5409174822403122
+      },
+      "union": {
+        "A": {
+          "false_positives": 105,
+          "precision": 0.5,
+          "recall": 0.1810344827586207,
+          "rows": 210,
+          "threshold": 307410,
+          "true_positives": 105
+        },
+        "N": {
+          "false_positives": 192,
+          "kind": "size_matched",
+          "precision": 0.08571428571428572,
+          "recall": 0.03103448275862069,
+          "rows": 210,
+          "threshold": null,
+          "true_positives": 18
+        },
+        "a_false_positives": 105,
+        "ask_misses": 475,
+        "available": true,
+        "false_positive_share_shared": 0.01904761904761905,
+        "false_positives_removed_if_n_required": 103,
+        "false_positives_shared_with_n": 2,
+        "intersection": {
+          "false_positives": 2,
+          "precision": 0.8,
+          "recall": 0.013793103448275862,
+          "rows": 10,
+          "true_positives": 8
+        },
+        "misses_recovered_by_n": 10,
+        "misses_recovered_share": 0.021052631578947368,
+        "oracle_union_headroom": 0.09523809523809534,
+        "realizable_union_headroom": 0.09523809523809534,
+        "true_positives_lost_if_n_required": 97,
+        "union": {
+          "false_positives": 295,
+          "precision": 0.2804878048780488,
+          "recall": 0.19827586206896552,
+          "rows": 410,
+          "true_positives": 115
+        }
+      }
+    },
+    "middle_plus_final": {
+      "conjunction": {
+        "a_threshold": 301005,
+        "b": 100000,
+        "baseline_recall": 0.1810344827586207,
+        "headroom": 0.01904761904761898,
+        "recall": 0.18448275862068966,
+        "rows": 214,
+        "true_positives": 107
+      },
+      "lift_table": {
+        "ask_rate": [
+          [
+            0.0024691358024691358,
+            0.0,
+            0.0
+          ],
+          [
+            0.0079155672823219,
+            0.014792899408284023,
+            0.00423728813559322
+          ],
+          [
+            0.014227642276422764,
+            0.014285714285714285,
+            0.011527377521613832
+          ],
+          [
+            0.0041753653444676405,
+            0.028423772609819122,
+            0.015479876160990712
+          ],
+          [
+            0.024608501118568233,
+            0.02968036529680365,
+            0.03618421052631579
+          ],
+          [
+            0.028277634961439587,
+            0.033264033264033266,
+            0.034482758620689655
+          ],
+          [
+            0.020151133501259445,
+            0.04338394793926247,
+            0.045317220543806644
+          ],
+          [
+            0.04788732394366197,
+            0.06422018348623854,
+            0.05527638190954774
+          ],
+          [
+            0.06306306306306306,
+            0.08413461538461539,
+            0.08636363636363636
+          ],
+          [
+            0.1701388888888889,
+            0.2581453634085213,
+            0.21115537848605578
+          ]
+        ],
+        "rows": [
+          [
+            405,
+            257,
+            527
+          ],
+          [
+            379,
+            338,
+            472
+          ],
+          [
+            492,
+            350,
+            347
+          ],
+          [
+            479,
+            387,
+            323
+          ],
+          [
+            447,
+            438,
+            304
+          ],
+          [
+            389,
+            481,
+            319
+          ],
+          [
+            397,
+            461,
+            331
+          ],
+          [
+            355,
+            436,
+            398
+          ],
+          [
+            333,
+            416,
+            440
+          ],
+          [
+            288,
+            399,
+            502
+          ]
+        ]
+      },
+      "noise": {
+        "max": 0.0,
+        "median": 0.0,
+        "p95": 0.0,
+        "permutations": 200
+      },
+      "standalone": {
+        "ap": 0.05816259583239895,
+        "auroc": 0.562316610262508
+      },
+      "union": {
+        "A": {
+          "false_positives": 105,
+          "precision": 0.5,
+          "recall": 0.1810344827586207,
+          "rows": 210,
+          "threshold": 307410,
+          "true_positives": 105
+        },
+        "N": {
+          "false_positives": 193,
+          "kind": "size_matched",
+          "precision": 0.08095238095238096,
+          "recall": 0.029310344827586206,
+          "rows": 210,
+          "threshold": null,
+          "true_positives": 17
+        },
+        "a_false_positives": 105,
+        "ask_misses": 475,
+        "available": true,
+        "false_positive_share_shared": 0.02857142857142857,
+        "false_positives_removed_if_n_required": 102,
+        "false_positives_shared_with_n": 3,
+        "intersection": {
+          "false_positives": 3,
+          "precision": 0.75,
+          "recall": 0.015517241379310345,
+          "rows": 12,
+          "true_positives": 9
+        },
+        "misses_recovered_by_n": 8,
+        "misses_recovered_share": 0.016842105263157894,
+        "oracle_union_headroom": 0.07619047619047614,
+        "realizable_union_headroom": 0.07619047619047614,
+        "true_positives_lost_if_n_required": 96,
+        "union": {
+          "false_positives": 295,
+          "precision": 0.2769607843137255,
+          "recall": 0.19482758620689655,
+          "rows": 408,
+          "true_positives": 113
+        }
+      }
+    }
+  },
+  "prevalence": 0.04878048780487805,
+  "primary_ask_scorer": "middle_plus_final decision head P(ASK)",
+  "primary_nli_head": "layer_m4_final",
+  "schema": "nli-census/v1",
+  "true_nli_standalone": {
+    "ask_rate_given_entailed_or_contradicted": 0.0,
+    "ask_rate_given_unknown": 0.07083027185892726,
+    "ask_rate_given_unknown_or_unlabelled": 0.06570748838790076
+  }
+}
