@@ -12,6 +12,7 @@ or until the program owner gives an explicit go for a controller-only rung (see 
 | C2a same-backbone surface coordination | `ff-s15-c2-coordination-01` | **STOP** — oracle headroom 15.3% vs 25% bar; the four surfaces share errors |
 | ASK dedicated head | `ff-s15-ask-01` | **STOP** — linear adds nothing; MLP +13% AP, below the 1.25× bar; existing head already asks at ~50% precision, 15–20% recall |
 | NLI-UNKNOWN as independent ASK evidence | `ff-s15-nli-census-01` | **STOP** — a *perfect* NLI veto lifts ASK recall only +6.7% (bar 25%) |
+| C3a selective-risk geometry census | `ff-s15-c3a-risk-geometry-01` | **STOP** — no zero-training score beats C1's `min(P_decision, P_action)` at matched harm (only a one-level win at 10% harm); C3b not earned |
 
 All results are development evidence on BANK-v1 DEV. No TEST row was read. Confirmation needs the fresh sealed split.
 
@@ -41,10 +42,11 @@ No more same-surface coordination. No more ASK/NLI rescue. No new representation
 ## Queued, not sent
 
 The fresh sealed split request (`ff-s15-c2-coordination-01/CONFIRM-SPLIT-REQUEST.md`) stays unsent until Lexi finishes the current rung; it matters only when there is a candidate architecture worth confirming.
-Harvest-style drafts: `ff-s15-c2-coordination-01/HARVEST-ENTRY.md`, `ff-s15-ask-01/HARVEST-ENTRY.md`, `ff-s15-nli-census-01/HARVEST-ENTRY.md`.
+Harvest-style drafts: `ff-s15-c2-coordination-01/HARVEST-ENTRY.md`, `ff-s15-ask-01/HARVEST-ENTRY.md`, `ff-s15-nli-census-01/HARVEST-ENTRY.md`, `ff-s15-c3a-risk-geometry-01/HARVEST-ENTRY.md`.
 
 ## Proposed, not started (needs an explicit go)
 
-A controller-only ladder that uses only information the runtime already has: C3a selective-risk geometry census (other zero-training risk scores vs C1's `min(P_decision, P_action)` at matched harm),
-C4a action-conditional safety census, C5 paired-renderer stability, C6 applicability-boundary census, C7 escalation economics (break-even for the larger tier), C8 observer lifecycle / ABI stress.
+*C3a was run on the program owner's explicit go ("C3a only, then stop") and stopped at its own rule; the rest below has not been started.*
+
+A controller-only ladder that uses only information the runtime already has: C4a action-conditional safety census, C5 paired-renderer stability, C6 applicability-boundary census, C7 escalation economics (break-even for the larger tier), C8 observer lifecycle / ABI stress.
 This conflicts with "idle until new capability evidence", so it has not been started.
