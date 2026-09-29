@@ -3,9 +3,27 @@
 Rust port of the Kammi Library (`../kammi-ledger`, Python). The Python tree is never modified,
 and this workspace must stay outside it: `kammi-ledger/ledgerd/release.py` hashes every
 `.py/.rs/.toml/.lock/.md/.json/.txt` file under `kammi-ledger/`, so Rust code there would close
-the live daemon's flight gate. Build output goes to `G:/kammi-ledger-rs-target`.
+the live daemon's flight gate. Build output goes to `$CARGO_TARGET_DIR` (this machine:
+`D:/codex-runs/jev-v08q-r3-rust-target/kammi-ledger-rs-target`); the harnesses read the same variable.
 
-## Status: Phase 3 complete (integrated serving system)
+## Status: Phase 4A-4D complete; 4E (real cutover) awaits an explicit go
+
+Phase 4 asked whether Rust can live in production, take authority cleanly and give it back.
+See [docs/PHASE-4-GATES.md](docs/PHASE-4-GATES.md) for each gate, the evidence and the
+findings.
+
+| Part | Result |
+| --- | --- |
+| 4A stress (Rust only) | A1-A7 PASS: 32 writers exactly once; 0 lease violations; 10 hard kills with 0 lost or duplicated writes; projector kill loop; read-your-writes; 1M-event scale; 30-minute soak. A7 was amended from an RSS ratio to a leak test, and the original run is kept as FAIL_BY_SPEC |
+| 4B live shadow | 6 cycles: head, derived-state, projection and search parity with Python, live store read only |
+| 4C cutover rehearsal | On a copy: fence, full verification, import, Rust `LibraryAcceptanceV2` over 32 gates with registered evidence, same-port switch; CLI, SDK, MCP and `/v1/authorize` work |
+| 4D rollback rehearsal | Rust writes custody, lease, bge memory and vault, then is fenced. `export-v1` is accepted by Python's unmodified verifier and replay. Python is re-accepted by its own `accept_library`, serves on the same port, reads the Rust-written state and writes |
+
+Open finding: daemon memory is O(events), about 1-1.7 KB per event (1.7 GB at 1M events)
+because derived state keeps full payloads. It is negligible at live scale (2,940 events). It
+will be fixed after cutover as its own qualified change (compact state plus checkpoints).
+
+## Phase 3 (integrated serving system)
 
 Phase 3 turned the Phase 2 components into the live topology without new semantics. The
 daemon owns authority (journal and CAS) and supervises a disposable `kammi-projector` child.

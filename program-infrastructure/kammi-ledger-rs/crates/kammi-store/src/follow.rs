@@ -197,14 +197,26 @@ impl JournalFollower {
         let frame = match self.frame_at()? {
             Some(frame) => frame,
             None => {
-                // Caught up in this segment; a newer segment starting at the next seq means
-                // the writer rolled over.
+                // Caught up in this segment. A *newer* segment starting at the next seq means
+                // the writer rolled over; the current segment itself may also start at the
+                // next seq (created, no complete frame yet), which is simply "caught up".
                 let next = self.seq + 1;
-                if self.segments()?.iter().any(|(first, _)| *first == next) {
-                    self.segment = None;
-                    return self.next_event();
+                let current = self.segment.as_ref().map(|(first, _)| *first);
+                let rolled = self
+                    .segments()?
+                    .iter()
+                    .any(|(first, _)| *first == next && Some(*first) != current);
+                if !rolled {
+                    return Ok(None);
                 }
-                return Ok(None);
+                self.segment = None;
+                if !self.locate()? {
+                    return Ok(None);
+                }
+                match self.frame_at()? {
+                    Some(frame) => frame,
+                    None => return Ok(None),
+                }
             }
         };
         let (len, event_id, event, payload) = frame;

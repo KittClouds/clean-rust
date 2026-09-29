@@ -11,6 +11,8 @@
 
 #![allow(clippy::result_large_err)]
 
+mod accept;
+
 use std::net::SocketAddr;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
@@ -99,6 +101,10 @@ fn embedder() -> Result<Option<Arc<dyn Embedder>>, Error> {
 }
 
 fn main() -> Result<(), Error> {
+    let args: Vec<String> = std::env::args().collect();
+    if args.get(1).map(String::as_str) == Some("accept") {
+        return accept::run(&args, flight_identity()?);
+    }
     // Mutates the process environment, so it runs before the runtime starts threads.
     kammi_embed::ensure_ort_dylib();
     tokio::runtime::Builder::new_multi_thread()

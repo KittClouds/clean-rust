@@ -27,6 +27,7 @@ from __future__ import annotations
 import argparse
 import base64
 import hashlib
+import http.client
 import json
 import os
 import re
@@ -60,9 +61,17 @@ DIAGNOSTIC = {"bad-json", "vault-import-bad-zip"}
 
 
 def free_port() -> int:
-    with socket.socket() as sock:
-        sock.bind(("127.0.0.1", 0))
-        return sock.getsockname()[1]
+    # Below the Windows ephemeral range (49152+): polling a not-yet-listening ephemeral port
+    # can TCP self-connect and read back our own request as the "response".
+    import random
+    while True:
+        port = random.randint(20000, 45000)
+        with socket.socket() as sock:
+            try:
+                sock.bind(("127.0.0.1", port))
+            except OSError:
+                continue
+            return port
 
 
 class Side:
@@ -75,13 +84,14 @@ class Side:
         self.process = None
         self.transcript = []
         self.logs = []
+        self.startup_timeout = 180
 
     def start(self, extra=None):
         log = (self.root.parent / f"{self.name}-daemon-{len(self.logs)}.log").open("w")
         self.logs.append(log)
         self.process = subprocess.Popen(self.command, cwd=self.cwd, env={**self.env, **(extra or {})}, stdout=log, stderr=log)
         started = time.time()
-        while time.time() - started < 180:
+        while time.time() - started < self.startup_timeout:
             if self.process.poll() is not None:
                 log.flush()
                 raise RuntimeError(f"{self.name} daemon exited: " + Path(log.name).read_text())
@@ -89,7 +99,7 @@ class Side:
                 status, _ = self.raw("GET", "/v1/status", token="cleanroom-admin")
                 if status == 200:
                     return time.time() - started
-            except OSError:
+            except (OSError, http.client.HTTPException):
                 pass
             time.sleep(0.05)
         raise RuntimeError(f"{self.name} daemon startup timed out")
@@ -298,6 +308,25 @@ def workflow(side: Side, expiry: str, worker_seed: bytes, results: dict):
     package_root = {k.lower(): v for k, v in package_headers.items()}["x-vault-package-root"]
     c("vault-import-self", "POST", "/v1/vaults/package", data=package, token=phoenix, expect=None,
       headers={"X-Actor-Id": "phoenix", "X-Package-Root": package_root, "Content-Type": "application/zip"})
+
+    # Remote adversarial cases (remote_tamper_replay): both daemons must refuse identically.
+    receipt_raw, signature = result[0], result[1]
+    tampered = bytearray(receipt_raw)
+    tampered[len(tampered) // 2] ^= 1
+    base_return = {"worker_actor_id": "worker", "receipt_base64": enc(receipt_raw), "receipt_signature": signature,
+                   "outputs_base64": {k: enc(v) for k, v in result[2].items()}, "stdout_base64": enc(result[3]), "stderr_base64": enc(result[4])}
+    c("remote-replay-different-payload", "POST", f"/v1/remote/bundles/{bundle_id}/return",
+      {**base_return, "stdout_base64": enc(b"forged stdout"), "request_id": "worker-return"}, token=worker, expect=None)
+    c("remote-tampered-receipt", "POST", f"/v1/remote/bundles/{bundle_id}/return",
+      {**base_return, "receipt_base64": enc(bytes(tampered)), "request_id": "worker-return-tampered"}, token=worker, expect=None)
+    c("remote-forged-signature", "POST", f"/v1/remote/bundles/{bundle_id}/return",
+      {**base_return, "receipt_signature": "0" * len(signature), "request_id": "worker-return-forged"}, token=worker, expect=None)
+    c("remote-second-return", "POST", f"/v1/remote/bundles/{bundle_id}/return",
+      {**base_return, "request_id": "worker-return-second"}, token=worker, expect=None)
+    c("remote-lease-release", "POST", f"/v1/leases/{lease['lease_id']}/release",
+      {"actor_id": "agent", "fencing_token": lease["fencing_token"], "request_id": "release-before-bundle"}, token=agent, expect=None)
+    c("remote-bundle-stale-lease", "POST", "/v1/remote/bundles", {"bundle": {**bundle, "seeds": [8]}, "actor_id": "agent",
+      "request_id": "bundle-stale-lease"}, token=agent, expect=None)
     results.update(retrieved=retrieved, memory_ids=memory_ids, lease=lease, package_root=package_root, receipt=returned)
 
 

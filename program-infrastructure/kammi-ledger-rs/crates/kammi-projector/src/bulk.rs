@@ -308,12 +308,15 @@ impl CustodyModel {
 }
 
 /// One CSV field: strings always quoted with `"` doubled; integers bare.
-enum Cell<'a> {
+pub(crate) enum Cell<'a> {
     S(&'a str),
     I(i64),
 }
 
-fn write_csv<'a>(path: &Path, rows: impl Iterator<Item = Vec<Cell<'a>>>) -> Result<usize, Error> {
+pub(crate) fn write_csv<'a>(
+    path: &Path,
+    rows: impl Iterator<Item = Vec<Cell<'a>>>,
+) -> Result<usize, Error> {
     let mut out = std::io::BufWriter::new(std::fs::File::create(path)?);
     let mut count = 0;
     for row in rows {
@@ -478,6 +481,9 @@ impl Graph<'_> {
             model.seq, model.head
         ))?;
         let _ = std::fs::remove_dir_all(scratch);
+        // The loaded entities, artifacts and links are now committed rows; the statement path
+        // must see all of them or it would CREATE duplicates.
+        self.load_keys()?;
         Ok(Json::Object(loaded))
     }
 }

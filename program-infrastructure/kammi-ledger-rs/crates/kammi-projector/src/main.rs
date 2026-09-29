@@ -114,6 +114,54 @@ struct Graph<'db> {
         std::cell::RefCell<std::collections::HashMap<&'static str, lbug::PreparedStatement>>,
     /// Python `MemoryGraph` per-process lexical state.
     memory: std::cell::RefCell<memory::MemoryState>,
+    /// When set, `node`/`edge` record into it instead of executing (batched runs).
+    recorder: std::cell::RefCell<Option<Recorded>>,
+    /// Existing `Link` rows as 16-byte hashes of (from, to, kind). Ladybug checks relationship
+    /// existence for `MERGE` by scanning, which grows with the table (quadratic ingest); the
+    /// projector is the only writer, so it knows which links exist and creates only new ones.
+    links: std::cell::RefCell<std::collections::HashSet<[u8; 16]>>,
+    /// Links created in the open transaction; merged into `links` on commit, dropped on rollback.
+    pending_links: std::cell::RefCell<std::collections::HashSet<[u8; 16]>>,
+    /// Existing `Entity` and `Artifact` primary keys (16-byte hashes), same discipline: Ladybug
+    /// resolves keys inside UNWIND by joining the whole table, so new rows are COPYed instead.
+    entities: std::cell::RefCell<std::collections::HashSet<[u8; 16]>>,
+    pending_entities: std::cell::RefCell<std::collections::HashSet<[u8; 16]>>,
+    artifacts: std::cell::RefCell<std::collections::HashSet<[u8; 16]>>,
+    pending_artifacts: std::cell::RefCell<std::collections::HashSet<[u8; 16]>>,
+}
+
+fn key_of(id: &str) -> [u8; 16] {
+    kammi_jcs::raw_id(id.as_bytes()).0[..16].try_into().unwrap()
+}
+
+fn link_key(a: &str, b: &str, kind: &str) -> [u8; 16] {
+    let digest = kammi_jcs::raw_id(format!("{a}\0{b}\0{kind}").as_bytes());
+    digest.0[..16].try_into().unwrap()
+}
+
+/// Entity nodes (id, kind, payload) and links (from, to, kind) recorded in call order.
+type Recorded = (Vec<(String, String, String)>, Vec<(String, String, String)>);
+
+/// Events whose custody effects are only `Event` CREATE, optional `Artifact` MERGE, and
+/// entities/links: they can be applied in batches with identical results. The others carry
+/// MATCH-gated edges whose outcome depends on exact interleaving, so they stay per event.
+fn batchable(kind: &str) -> bool {
+    !matches!(kind, "RunCreated" | "SealCreated" | "FactRecorded") && !kind.starts_with("Vault")
+}
+
+fn struct_list(fields: &[(&str, lbug::LogicalType)], rows: Vec<Vec<Value>>) -> Value {
+    let child = lbug::LogicalType::Struct {
+        fields: fields
+            .iter()
+            .map(|(n, t)| (n.to_string(), t.clone()))
+            .collect(),
+    };
+    Value::List(
+        child,
+        rows.into_iter()
+            .map(|row| Value::Struct(fields.iter().map(|(n, _)| n.to_string()).zip(row).collect()))
+            .collect(),
+    )
 }
 
 /// Every table the projection declares (dumps ignore engine-internal index tables).
@@ -171,7 +219,15 @@ impl<'db> Graph<'db> {
             conn,
             statements: Default::default(),
             memory: Default::default(),
+            recorder: Default::default(),
+            links: Default::default(),
+            pending_links: Default::default(),
+            entities: Default::default(),
+            pending_entities: Default::default(),
+            artifacts: Default::default(),
+            pending_artifacts: Default::default(),
         };
+        graph.load_keys()?;
         graph.init_memory(memory_dims)?;
         Ok(graph)
     }
@@ -182,7 +238,20 @@ impl<'db> Graph<'db> {
             std::collections::hash_map::Entry::Occupied(e) => e.into_mut(),
             std::collections::hash_map::Entry::Vacant(e) => e.insert(self.conn.prepare(query)?),
         };
+        if std::env::var_os("KAMMI_PROJECTOR_TRACE").is_some_and(|v| v == "2") {
+            eprintln!("[projector-trace] run {}", &query[..query.len().min(90)]);
+        }
+        let started = Instant::now();
         self.conn.execute(statement, params)?;
+        if std::env::var_os("KAMMI_PROJECTOR_TRACE").is_some_and(|v| v == "1")
+            && started.elapsed() > Duration::from_millis(50)
+        {
+            eprintln!(
+                "[projector-trace] {:>8.1} ms  {}",
+                started.elapsed().as_secs_f64() * 1e3,
+                &query[..query.len().min(70)]
+            );
+        }
         Ok(())
     }
 
@@ -214,13 +283,21 @@ impl<'db> Graph<'db> {
         )?;
         kammi_store::fault::hit("projection.mid_transaction");
         match kind {
-            "ArtifactRegistered" => self.run(
-                "MERGE (a:Artifact {id:$id}) SET a.byte_count = $bytes",
-                vec![
-                    ("id", s(field(payload, "artifact_id")?)),
-                    ("bytes", int(payload, "byte_count")?),
-                ],
-            )?,
+            "ArtifactRegistered" => {
+                let id = field(payload, "artifact_id")?;
+                let key = key_of(id);
+                let query = if self.artifacts.borrow().contains(&key)
+                    || !self.pending_artifacts.borrow_mut().insert(key)
+                {
+                    "MATCH (a:Artifact {id:$id}) SET a.byte_count = $bytes"
+                } else {
+                    "CREATE (a:Artifact {id:$id, byte_count:$bytes})"
+                };
+                self.run(
+                    query,
+                    vec![("id", s(id)), ("bytes", int(payload, "byte_count")?)],
+                )?
+            }
             "RunCreated" => self.run(
                 "CREATE (r:Run {id:$id, lab:$lab})",
                 vec![
@@ -277,17 +354,104 @@ impl<'db> Graph<'db> {
     }
 
     fn node(&self, id: &str, kind: &str, data: &str) -> Result<(), Error> {
-        self.run(
-            "MERGE (n:Entity {id:$id}) SET n.kind=$kind, n.payload=$payload",
-            vec![("id", s(id)), ("kind", s(kind)), ("payload", s(data))],
-        )
+        if let Some(recorded) = self.recorder.borrow_mut().as_mut() {
+            recorded
+                .0
+                .push((id.to_string(), kind.to_string(), data.to_string()));
+            return Ok(());
+        }
+        // MERGE ... SET semantics: update an existing node, create a new one.
+        let key = key_of(id);
+        if self.entities.borrow().contains(&key) || self.pending_entities.borrow().contains(&key) {
+            self.run(
+                "MATCH (n:Entity {id:$id}) SET n.kind=$kind, n.payload=$payload",
+                vec![("id", s(id)), ("kind", s(kind)), ("payload", s(data))],
+            )
+        } else {
+            self.pending_entities.borrow_mut().insert(key);
+            self.run(
+                "CREATE (n:Entity {id:$id, kind:$kind, payload:$payload})",
+                vec![("id", s(id)), ("kind", s(kind)), ("payload", s(data))],
+            )
+        }
     }
 
     fn edge(&self, a: &str, b: &str, kind: &str) -> Result<(), Error> {
+        if let Some(recorded) = self.recorder.borrow_mut().as_mut() {
+            recorded
+                .1
+                .push((a.to_string(), b.to_string(), kind.to_string()));
+            return Ok(());
+        }
+        // MERGE semantics without Ladybug's relationship scan: existing links are a no-op.
+        let key = link_key(a, b, kind);
+        if self.links.borrow().contains(&key) || !self.pending_links.borrow_mut().insert(key) {
+            return Ok(());
+        }
         self.run(
-            "MATCH (a:Entity {id:$a}), (b:Entity {id:$b}) MERGE (a)-[r:Link {kind:$kind}]->(b)",
+            "MATCH (a:Entity {id:$a}), (b:Entity {id:$b}) CREATE (a)-[r:Link {kind:$kind}]->(b)",
             vec![("a", s(a)), ("b", s(b)), ("kind", s(kind))],
         )
+    }
+
+    /// Loads the existing entity, artifact and link keys (startup, or after a bulk load).
+    fn load_keys(&self) -> Result<(), Error> {
+        let mut links = std::collections::HashSet::new();
+        for row in self
+            .conn
+            .query("MATCH (a:Entity)-[l:Link]->(b:Entity) RETURN a.id, b.id, l.kind")?
+        {
+            if let (Value::String(a), Value::String(b), Value::String(k)) =
+                (&row[0], &row[1], &row[2])
+            {
+                links.insert(link_key(a, b, k));
+            }
+        }
+        *self.links.borrow_mut() = links;
+        self.pending_links.borrow_mut().clear();
+        for (query, set) in [
+            ("MATCH (n:Entity) RETURN n.id", &self.entities),
+            ("MATCH (a:Artifact) RETURN a.id", &self.artifacts),
+        ] {
+            let mut keys = std::collections::HashSet::new();
+            for row in self.conn.query(query)? {
+                if let Value::String(id) = &row[0] {
+                    keys.insert(key_of(id));
+                }
+            }
+            *set.borrow_mut() = keys;
+        }
+        self.pending_entities.borrow_mut().clear();
+        self.pending_artifacts.borrow_mut().clear();
+        Ok(())
+    }
+
+    fn commit(&self) -> Result<(), Error> {
+        let started = Instant::now();
+        self.conn.query("COMMIT")?;
+        if std::env::var_os("KAMMI_PROJECTOR_TRACE").is_some() {
+            eprintln!(
+                "[projector-trace] {:>8.1} ms  COMMIT",
+                started.elapsed().as_secs_f64() * 1e3
+            );
+        }
+        for (pending, set) in [
+            (&self.pending_links, &self.links),
+            (&self.pending_entities, &self.entities),
+            (&self.pending_artifacts, &self.artifacts),
+        ] {
+            let drained: Vec<[u8; 16]> = pending.borrow_mut().drain().collect();
+            set.borrow_mut().extend(drained);
+        }
+        Ok(())
+    }
+
+    fn rollback(&self) -> Result<(), Error> {
+        self.pending_links.borrow_mut().clear();
+        self.pending_entities.borrow_mut().clear();
+        self.pending_artifacts.borrow_mut().clear();
+        self.conn.query("ROLLBACK")?;
+        Ok(())
     }
 
     fn entities(&self, event: &Json, event_id: &str, payload: &Json) -> Result<(), Error> {
@@ -387,26 +551,192 @@ impl<'db> Graph<'db> {
         }
     }
 
-    /// Applies up to `batch` followed events in one transaction; returns how many.
+    /// Applies a run of consecutive batchable events with the per-event semantics: events
+    /// appended, artifacts and entities last-writer-wins, links de-duplicated. New rows are
+    /// COPYed from per-batch CSV files (Ladybug resolves keys inside UNWIND by joining the
+    /// whole table, which grows quadratically); updates to existing rows go one statement per
+    /// key, which uses the primary-key index.
+    fn apply_run(&self, run: &[(Json, String, Json)]) -> Result<(), Error> {
+        use lbug::LogicalType::{Int64, String as Str};
+        let mut artifacts: std::collections::HashMap<String, (usize, i64)> = Default::default();
+        *self.recorder.borrow_mut() = Some((Vec::new(), Vec::new()));
+        let recorded = (|| -> Result<(), Error> {
+            for (index, (event, id, payload)) in run.iter().enumerate() {
+                kammi_store::fault::hit("projection.mid_transaction");
+                if field(event, "type")? == "ArtifactRegistered" {
+                    let bytes = payload["byte_count"]
+                        .as_i64()
+                        .ok_or("projection: byte_count missing")?;
+                    artifacts.insert(field(payload, "artifact_id")?.to_string(), (index, bytes));
+                }
+                self.entities(event, id, payload)?;
+            }
+            Ok(())
+        })();
+        let (nodes, edges) = self.recorder.borrow_mut().take().unwrap_or_default();
+        recorded?;
+
+        // Last writer per entity id, in first-seen order of the final write.
+        let mut last: std::collections::HashMap<&str, usize> = Default::default();
+        for (i, (id, _, _)) in nodes.iter().enumerate() {
+            last.insert(id, i);
+        }
+        let mut order: Vec<usize> = last.into_values().collect();
+        order.sort_unstable();
+        let (mut new_entities, mut entity_updates) = (Vec::new(), Vec::new());
+        {
+            let existing = self.entities.borrow();
+            let mut pending = self.pending_entities.borrow_mut();
+            for i in order {
+                let key = key_of(&nodes[i].0);
+                if existing.contains(&key) || pending.contains(&key) {
+                    entity_updates.push(i);
+                } else {
+                    pending.insert(key);
+                    new_entities.push(i);
+                }
+            }
+        }
+        let mut artifact_order: Vec<(&String, &(usize, i64))> = artifacts.iter().collect();
+        artifact_order.sort_by_key(|(_, (i, _))| *i);
+        let (mut new_artifacts, mut artifact_updates) = (Vec::new(), Vec::new());
+        {
+            let existing = self.artifacts.borrow();
+            let mut pending = self.pending_artifacts.borrow_mut();
+            for (id, (_, bytes)) in artifact_order {
+                let key = key_of(id);
+                if existing.contains(&key) || pending.contains(&key) {
+                    artifact_updates.push((id.as_str(), *bytes));
+                } else {
+                    pending.insert(key);
+                    new_artifacts.push((id.as_str(), *bytes));
+                }
+            }
+        }
+        let new_links: Vec<&(String, String, String)> = {
+            let links = self.links.borrow();
+            let mut pending = self.pending_links.borrow_mut();
+            edges
+                .iter()
+                .filter(|(a, b, k)| {
+                    let key = link_key(a, b, k);
+                    !links.contains(&key) && pending.insert(key)
+                })
+                .collect()
+        };
+
+        // New rows through UNWIND ... CREATE (no key lookup, so no table join). COPY is not
+        // used here: mixing COPY with statement writes in one Ladybug 0.20.2 transaction
+        // corrupts the transaction's local state and the next statement crashes the engine.
+        let mut event_rows = Vec::with_capacity(run.len());
+        for (event, id, _) in run {
+            event_rows.push(vec![
+                s(id),
+                int(event, "seq")?,
+                s(field(event, "type")?),
+                s(field(event, "payload_artifact")?),
+                s(field(event, "prev")?),
+            ]);
+        }
+        self.run(
+            "UNWIND $rows AS r CREATE (e:Event {id:r.id, seq:r.seq, typ:r.typ, payload:r.payload, prev:r.prev})",
+            vec![("rows", struct_list(&[("id", Str), ("seq", Int64), ("typ", Str), ("payload", Str), ("prev", Str)], event_rows))],
+        )?;
+        if !new_artifacts.is_empty() {
+            self.run(
+                "UNWIND $rows AS r CREATE (a:Artifact {id:r.id, byte_count:r.bytes})",
+                vec![(
+                    "rows",
+                    struct_list(
+                        &[("id", Str), ("bytes", Int64)],
+                        new_artifacts
+                            .iter()
+                            .map(|(id, bytes)| vec![s(id), Value::Int64(*bytes)])
+                            .collect(),
+                    ),
+                )],
+            )?;
+        }
+        for (id, bytes) in artifact_updates {
+            self.run(
+                "MATCH (a:Artifact {id:$id}) SET a.byte_count = $bytes",
+                vec![("id", s(id)), ("bytes", Value::Int64(bytes))],
+            )?;
+        }
+        if !new_entities.is_empty() {
+            self.run(
+                "UNWIND $rows AS r CREATE (n:Entity {id:r.id, kind:r.kind, payload:r.payload})",
+                vec![(
+                    "rows",
+                    struct_list(
+                        &[("id", Str), ("kind", Str), ("payload", Str)],
+                        new_entities
+                            .iter()
+                            .map(|&i| vec![s(&nodes[i].0), s(&nodes[i].1), s(&nodes[i].2)])
+                            .collect(),
+                    ),
+                )],
+            )?;
+        }
+        for i in entity_updates {
+            let (id, kind, data) = &nodes[i];
+            self.run(
+                "MATCH (n:Entity {id:$id}) SET n.kind=$kind, n.payload=$payload",
+                vec![("id", s(id)), ("kind", s(kind)), ("payload", s(data))],
+            )?;
+        }
+        // Links one statement each: both endpoints resolve through the primary-key index.
+        for (a, b, k) in new_links {
+            self.run(
+                "MATCH (a:Entity {id:$a}), (b:Entity {id:$b}) CREATE (a)-[r:Link {kind:$kind}]->(b)",
+                vec![("a", s(a)), ("b", s(b)), ("kind", s(k))],
+            )?;
+        }
+        Ok(())
+    }
+
+    /// Applies up to `batch` followed events in one transaction; returns how many. Runs of
+    /// batchable events go through `apply_run`; the others through the per-event path, in
+    /// journal order.
     fn step(&self, follower: &mut JournalFollower, batch: usize) -> Result<usize, Error> {
-        let mut applied = 0;
-        while applied < batch {
+        let mut pending = Vec::new();
+        while pending.len() < batch {
             let Some(stored) = follower.next_event()? else {
                 break;
             };
-            if applied == 0 {
-                kammi_store::fault::hit("projection.before");
-                self.conn.query("BEGIN TRANSACTION")?;
-            }
-            let event = strict_json(&stored.event)?;
-            let payload = strict_json(&stored.payload)?;
-            if let Err(e) = self.apply(&event, &stored.event_id.to_string(), &payload) {
-                self.conn.query("ROLLBACK")?;
-                return Err(format!("projection of seq {} failed: {e}", stored.seq).into());
-            }
-            applied += 1;
+            pending.push((
+                strict_json(&stored.event)?,
+                stored.event_id.to_string(),
+                strict_json(&stored.payload)?,
+                stored.seq,
+            ));
         }
+        let applied = pending.len();
         if applied > 0 {
+            kammi_store::fault::hit("projection.before");
+            self.conn.query("BEGIN TRANSACTION")?;
+            let mut run: Vec<(Json, String, Json)> = Vec::new();
+            let result = (|| -> Result<(), Error> {
+                for (event, id, payload, seq) in pending {
+                    if batchable(field(&event, "type")?) {
+                        run.push((event, id, payload));
+                        continue;
+                    }
+                    if !run.is_empty() {
+                        self.apply_run(&std::mem::take(&mut run))?;
+                    }
+                    self.apply(&event, &id, &payload)
+                        .map_err(|e| format!("projection of seq {seq} failed: {e}"))?;
+                }
+                if !run.is_empty() {
+                    self.apply_run(&run)?;
+                }
+                Ok(())
+            })();
+            if let Err(e) = result {
+                self.rollback()?;
+                return Err(e);
+            }
             self.run(
                 "MATCH (m:LedgerMeta {id:'primary'}) SET m.seq = $seq, m.head = $head",
                 vec![
@@ -414,7 +744,7 @@ impl<'db> Graph<'db> {
                     ("head", s(&follower.head().to_string())),
                 ],
             )?;
-            self.conn.query("COMMIT")?;
+            self.commit()?;
         }
         Ok(applied)
     }
@@ -596,12 +926,48 @@ impl<'db> Graph<'db> {
     }
 }
 
-/// Python's projection settings (`projection_runtime.py`: 256 MiB pool, 2 threads). The
-/// thread count is part of search parity: BM25 aggregation order follows it, and a 4-thread
-/// pool changed FTS scores in the last bit, which changes search receipts and the chain.
+/// Buffer pool bytes, fixed once per process by [`size_pool`].
+static POOL: std::sync::OnceLock<u64> = std::sync::OnceLock::new();
+
+/// Sizes the buffer pool from the store: 4x the main journal bytes, at least Python's
+/// 256 MiB and at most 16 GiB; `KAMMI_PROJECTOR_BUFFER_MB` overrides. Python's fixed 256 MiB
+/// fills up at around a million events (the post-commit checkpoint then fails and the
+/// projector crash-loops). The pool is claimed lazily, and its size does not change results.
+fn size_pool(store: Option<&Path>) -> u64 {
+    const FLOOR: u64 = 256 << 20;
+    const CEILING: u64 = 16 << 30;
+    let bytes = match std::env::var("KAMMI_PROJECTOR_BUFFER_MB")
+        .ok()
+        .and_then(|v| v.parse::<u64>().ok())
+    {
+        Some(mb) => mb << 20,
+        None => {
+            let journal: u64 = store
+                .and_then(|s| std::fs::read_dir(s.join("journal").join("main")).ok())
+                .map(|dir| {
+                    dir.flatten()
+                        .filter_map(|e| e.metadata().ok())
+                        .map(|m| m.len())
+                        .sum()
+                })
+                .unwrap_or(0);
+            journal.saturating_mul(4).clamp(FLOOR, CEILING)
+        }
+    };
+    *POOL.get_or_init(|| bytes)
+}
+
+fn pool() -> u64 {
+    *POOL.get_or_init(|| 256 << 20)
+}
+
+/// Python's projection settings (`projection_runtime.py`: 2 threads; its 256 MiB pool is the
+/// floor of [`size_pool`]). The thread count is part of search parity: BM25 aggregation order
+/// follows it, and a 4-thread pool changed FTS scores in the last bit, which changes search
+/// receipts and the chain.
 fn config() -> SystemConfig {
     SystemConfig::default()
-        .buffer_pool_size(256 << 20)
+        .buffer_pool_size(pool())
         .max_num_threads(2)
         .throw_on_wal_replay_failure(true)
         .enable_checksums(true)
@@ -650,6 +1016,18 @@ fn mark_healthy(db_path: &Path) -> Result<(), Error> {
 }
 
 /// A private scratch directory for bulk CSV files (never inside authority directories).
+/// Removes `bulk-*` scratch directories a crashed bulk load left beside the database.
+fn remove_stale_scratch(db_path: &Path) {
+    let Some(Ok(dir)) = db_path.parent().map(std::fs::read_dir) else {
+        return;
+    };
+    for entry in dir.flatten() {
+        if entry.file_name().to_string_lossy().starts_with("bulk-") && entry.path().is_dir() {
+            let _ = std::fs::remove_dir_all(entry.path());
+        }
+    }
+}
+
 fn scratch_dir(store: &Path) -> PathBuf {
     store
         .join("projection")
@@ -685,7 +1063,7 @@ fn deep_verify(graph: &Graph, store: &Path) -> Result<usize, Error> {
     let memory_target = graph.memory_position()?.0;
     let fresh = Database::in_memory(
         SystemConfig::default()
-            .buffer_pool_size(256 << 20)
+            .buffer_pool_size(pool())
             .max_num_threads(2),
     )?;
     let expected = Graph::new(&fresh, graph.memory.borrow().dims)?;
@@ -789,8 +1167,37 @@ fn quarantine(db_path: &Path, reason: &str) -> Result<(), Error> {
             std::fs::rename(&from, quarantine.join(name))?;
         }
     }
+    prune_quarantine(&quarantine);
     eprintln!("kammi-projector: quarantined projection ({reason}); rebuilding from genesis");
     Ok(())
+}
+
+/// Quarantined databases kept for diagnosis; older ones are deleted (the projection is
+/// derived, and a crash loop would otherwise fill the disk with full copies).
+const QUARANTINE_KEEP: usize = 3;
+
+fn prune_quarantine(quarantine: &Path) {
+    let Ok(dir) = std::fs::read_dir(quarantine) else {
+        return;
+    };
+    // Every file of one quarantine shares its millisecond stamp suffix.
+    let mut stamps: std::collections::BTreeMap<u128, Vec<PathBuf>> = Default::default();
+    for entry in dir.flatten() {
+        let name = entry.file_name().to_string_lossy().into_owned();
+        if let Some(stamp) = name.rsplit('.').next().and_then(|s| s.parse::<u128>().ok()) {
+            stamps.entry(stamp).or_default().push(entry.path());
+        }
+    }
+    let excess = stamps.len().saturating_sub(QUARANTINE_KEEP);
+    for (_, paths) in stamps.into_iter().take(excess) {
+        for path in paths {
+            let _ = if path.is_dir() {
+                std::fs::remove_dir_all(&path)
+            } else {
+                std::fs::remove_file(&path)
+            };
+        }
+    }
 }
 
 fn flag(args: &[String], name: &str) -> Option<String> {
@@ -866,6 +1273,9 @@ fn main() -> Result<(), Error> {
     // One projector per database: a restarted daemon's new projector waits for the previous
     // one (which exits when its stdin closes) instead of racing it on the same files.
     let _owner = lock_projection(&db_path, Duration::from_secs(120))?;
+    size_pool(store.as_deref());
+    // Holding the lock, no other projector is bulk-loading: scratch left by a crashed one goes.
+    remove_stale_scratch(&db_path);
     if command == "serve" {
         // The supervisor passes --reset after repeated fast crashes of a started projector.
         if args.iter().any(|a| a == "--reset") && db_path.exists() {

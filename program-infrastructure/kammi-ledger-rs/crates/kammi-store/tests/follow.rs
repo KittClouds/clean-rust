@@ -162,3 +162,22 @@ fn object_reader_sees_packed_and_loose_objects_beside_a_live_writer() {
         Err(StoreError::ObjectCorrupt(_))
     ));
 }
+
+#[test]
+fn an_empty_open_segment_is_caught_up_not_a_rollover() {
+    // Regression: a follower positioned in a segment whose first seq is the next seq (created,
+    // no complete frame yet) mistook it for a rollover and recursed until the stack overflowed.
+    let root = tempfile::tempdir().unwrap();
+    let dir = root.path().join("journal").join("memory");
+    fs::create_dir_all(&dir).unwrap();
+    let journal = Journal::open(&dir, "memory", small_segments()).unwrap();
+    let mut follower = JournalFollower::new(root.path(), "memory");
+    for _ in 0..3 {
+        assert!(follower.next_event().unwrap().is_none());
+    }
+    drop(journal);
+    let mut journal = Journal::open(&dir, "memory", small_segments()).unwrap();
+    fill(&mut journal, 3, 1);
+    assert_eq!(drain(&mut follower), vec![1, 2, 3]);
+    assert!(follower.next_event().unwrap().is_none());
+}
