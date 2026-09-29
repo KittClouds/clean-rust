@@ -1,0 +1,34 @@
+# Frozen Fabrique E4-0: the first Vault workspace (Vault Phase 1, W7).
+#
+# Owner and controller: Chief Kammi (decision 4). Run by tools/run_seed.py against a sandbox
+# copy, and at activation against the live Library. Every line is an ordinary `kammi` verb;
+# directives start with @:
+#   @actor <id> <kind> <lab>    register an actor (the runner keeps its credential file)
+#   @admin <actor>              following lines use the admin credential, recorded as <actor>
+#   @as <actor>                 following lines use <actor>'s own credential
+#   @register <var> <path> <kind>   register a file's bytes; $var is its artifact ID afterwards
+#
+# References are to records already in the Library (from Chief's E4-0 Ledger receipts in
+# governance/inbox). Protected material is named by classification and location only.
+
+@actor chief-kammi service kammi-ops
+@actor engineering-reviewer agent frozen-fabrique
+@admin chief-kammi
+
+create frozen-fabrique.e4-0 --title "Frozen Fabrique E4-0: supervised execution" --lab frozen-fabrique --owners chief-kammi
+
+objective "Reach a single scoped E4-0 scoring decision, so E4-01 can proceed as soon as its existing entry gate permits" --refs artifact:sha256:f864fbf0058ab0c2406420c25082f31d683384e6985b6be15bb5ddc3496f1b66 --refs seal:sha256:f1bb23871dc97718fd4de45cc91f2041604b6a6ceb5db3f355f465f729493594
+
+scope --authorized "Chief Kammi: custody bookkeeping on the E4-0 record (ingest, identities, lineage, seals, heads)" --authorized "Engineering reviewer: readiness review of the bound scoring handoff; a positive review is a recommendation, not a grant" --forbidden "Opening protected E4 material (classification: protected population members and primary labels; location: the sealed v16-v09 contract bundle)" --forbidden "Entering E4-01 before the sealed E4-0 terminal disposition and its entry gate" --forbidden "Model contact, GPU leases or a scoring run without a scoped grant issued by Chief" --forbidden "Re-hashing sealed ancestors, flattening seal closures or renaming historical receipt fields" --refs seal:sha256:1de42e2961152c478ee42fb19e64e937a789dbfe7ce1802d7373586434c48206
+
+pin run:frozen-fabrique.e4-0.supervised.v1 --note "The supervised E4-0 run"
+pin artifact:sha256:d807cbdc2cc53fcb83804690cfb281f4ae4b67c37f07b6e3a48e4c7ff58ef851 --note "E4-0 scoring stage prepared (no scoring authority)"
+pin artifact:sha256:f864fbf0058ab0c2406420c25082f31d683384e6985b6be15bb5ddc3496f1b66 --note "E4-0 scoring live preflight (no scoring authority)"
+
+note "Supervised parity and feature extraction are complete; Chief's custody audits report the expected worker and output custody with released fences, and no protected primary labels were opened. Scope is custody and output identity, not a scientific recomputation." --refs event:sha256:c42ad73ab06bd569462b2812caf8fbb9d1633bbe402462b089c9054d18032713
+
+@register packet ../../../governance/inbox/20260928/E4-0-ENGINEERING-REVIEWER-PACKET-v1.md review-packet
+
+handoff --to engineering-reviewer --summary "Readiness review of the frozen E4-0 contract binding, the Fabrique v02 scoring adapter and Chief's preparation receipt" --next-step "Return READY FOR SCOPED E4-0 SCORING AUTHORIZATION, or BLOCKED with the exact artifact, field or protocol mismatch" --refs artifact:$packet --refs artifact:sha256:d807cbdc2cc53fcb83804690cfb281f4ae4b67c37f07b6e3a48e4c7ff58ef851 --handoff-id h-review
+
+next "Engineering reviewer returns READY or BLOCKED; then Chief issues or withholds the single scoped E4-0 scoring grant"

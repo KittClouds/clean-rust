@@ -88,7 +88,11 @@ const SCOPE: Arg = arg(
     "Memory scope: your lab, or workspace:<id> (default: the workspace)",
 );
 
-pub const SPECS: [VerbSpec; 19] = [
+pub const SPECS: [VerbSpec; 20] = [
+    VerbSpec { verb: "create", event: Some("WorkspaceCreated"), about: "Create a workspace (Library admin only; Chief Kammi)", args: &[
+        arg("workspace", Text, true, Some(0), "New workspace ID"), arg("title", Text, true, None, "Title"),
+        arg("lab", Text, true, None, "Owning lab"), arg("owners", Texts, true, None, "Owner actors (registered)"),
+    ]},
     VerbSpec { verb: "open", event: Some("WorkspaceAgentAttached"), about: "Attach this agent to a workspace and read its work packet", args: &[
         arg("workspace", Text, true, Some(0), "Workspace ID"),
         arg("tool", Text, false, None, "The client tool (default kammi-cli)"),
@@ -232,6 +236,13 @@ pub fn execute(
         .map(|a| format!("?actor_id={}", quote(a, "")))
         .unwrap_or_default();
     let base = format!("/v2/workspaces/{}", quote(&ws, ""));
+    if verb == "create" {
+        let mut body = json!({"workspace_id": args["workspace"], "title": args["title"], "lab": args["lab"], "owners": args["owners"], "request_id": crate::request_id()});
+        if let Some(a) = actor {
+            body["actor"] = a.into();
+        }
+        return Ok(client.v2("POST", "/v2/workspaces", Some(&body))?);
+    }
     let memory_scope = || -> Result<String, VerbError> {
         match (text(args, "scope"), text(args, "workspace")) {
             (Some(scope), _) => Ok(scope.to_string()),

@@ -410,8 +410,69 @@ fn workspace_verb(
     Ok((value, if json_out { String::new() } else { human }))
 }
 
+/// `kammi help`, `kammi --help`, `kammi <verb> --help`: usage from the same spec tables.
+fn help(verb: Option<&str>) -> String {
+    match verb.and_then(kammi_shell::verbs::spec) {
+        Some(spec) => {
+            let mut out = format!("kammi {} - {}\n\n", spec.verb, spec.about);
+            let positional: Vec<_> = spec
+                .args
+                .iter()
+                .filter(|a| a.position.is_some())
+                .map(|a| format!("<{}>", a.name))
+                .collect();
+            out.push_str(&format!(
+                "usage: kammi {} {} [options] [--json]\n\noptions:\n",
+                spec.verb,
+                positional.join(" ")
+            ));
+            for a in spec.args.iter().filter(|a| a.position.is_none()) {
+                let many = matches!(a.kind, kammi_shell::verbs::Kind::Texts);
+                out.push_str(&format!(
+                    "  --{}{}  {}{}{}\n",
+                    a.name.replace('_', "-"),
+                    if matches!(a.kind, kammi_shell::verbs::Kind::Bool) {
+                        ""
+                    } else {
+                        " <value>"
+                    },
+                    a.about,
+                    if many { " (repeatable)" } else { "" },
+                    if !a.required {
+                        ""
+                    } else if matches!(a.name, "workspace" | "expected_head" | "session_id") {
+                        " [from the session]"
+                    } else {
+                        " [required]"
+                    }
+                ));
+            }
+            out
+        }
+        None => {
+            let mut out = String::from(
+                "kammi <verb> [arguments] [--json]; `kammi <verb> --help` for one verb\n\n",
+            );
+            for v in verbs::VERBS.iter() {
+                out.push_str(&format!("  {:<10} {}\n", v.name, v.summary));
+            }
+            out.push_str("\nEnvironment: KAMMI_URL, KAMMI_TOKEN, KAMMI_ACTOR, KAMMI_SESSION (default .kammi/session.json)\n");
+            out
+        }
+    }
+}
+
 fn main() {
     let argv: Vec<String> = std::env::args().skip(1).collect();
+    let asks_help = |a: &String| a == "--help" || a == "-h";
+    if argv.first().is_none_or(|a| asks_help(a) || a == "help") {
+        print!("{}", help(argv.get(1).map(String::as_str)));
+        return;
+    }
+    if argv.iter().skip(1).any(asks_help) {
+        print!("{}", help(Some(argv[0].as_str())));
+        return;
+    }
     let Some(command) = argv.first() else {
         eprintln!("usage: kammi <verb> [args]; `kammi verbs` lists the ABI");
         std::process::exit(exit::USAGE);

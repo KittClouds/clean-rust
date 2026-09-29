@@ -612,7 +612,19 @@ impl Ledger {
     /// substring over workspace IDs and titles and run IDs; prefix over artifact identities and
     /// seal roots; an exact event ID resolves to its envelope. At most 20 per kind.
     pub fn find(&self, query: &str, who: Principal<'_>) -> Result<Value> {
-        let q = query.trim().to_lowercase();
+        // Accept identities in the form the packet prints them (`seal:sha256:...`, `run:...`).
+        let bare = [
+            "artifact:",
+            "event:",
+            "memory:",
+            "run:",
+            "seal:",
+            "workspace:",
+        ]
+        .iter()
+        .find_map(|p| query.trim().strip_prefix(p))
+        .unwrap_or(query.trim());
+        let q = bare.to_lowercase();
         if q.len() < 3 {
             return value_error("find needs at least 3 characters");
         }
@@ -645,9 +657,9 @@ impl Ledger {
             .collect();
         seals.sort_by(|a, b| a["root"].as_str().cmp(&b["root"].as_str()));
         seals.truncate(20);
-        let event = match self.envelope(query.trim()) {
+        let event = match self.envelope(bare) {
             Ok((seq, envelope, _)) => {
-                crate::obj! {"event_id" => query.trim(), "seq" => seq, "type" => envelope["type"].clone(), "actor" => envelope["actor"].clone(), "utc" => envelope["utc"].clone()}
+                crate::obj! {"event_id" => bare, "seq" => seq, "type" => envelope["type"].clone(), "actor" => envelope["actor"].clone(), "utc" => envelope["utc"].clone()}
             }
             Err(_) => Value::Null,
         };

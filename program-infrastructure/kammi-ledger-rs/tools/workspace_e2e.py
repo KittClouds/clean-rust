@@ -116,8 +116,11 @@ def main():
         checks["activation_needs_admin"] = status == 401
         status, body = daemon.call("POST", "/v2/vocabulary/activate", {**payload, "request_id": "activate"})
         checks["activation"] = status == 200 and body.get("vocabulary_v4") is True
-        status, body = daemon.call("POST", "/v2/workspaces", {"workspace_id": WS, "title": "Frozen Fabrique E4-0", "lab": "frozen-fabrique", "owners": ["chief-kammi"], "request_id": "create"})
-        checks["admin_creates_workspace"] = status == 200 and body["head"] == body["event_id"]
+        r = shell("chief-kammi", "chief", "create", WS, "--title", "Frozen Fabrique E4-0", "--lab", "frozen-fabrique", "--owners", "chief-kammi")
+        checks["chief_cannot_create_without_admin"] = r.returncode == 1 and "401" in r.stderr
+        env = {**os.environ, "KAMMI_URL": daemon.url, "KAMMI_TOKEN": ADMIN, "KAMMI_ACTOR": "chief-kammi", "KAMMI_SESSION": str(root / "chief.session.json")}
+        r = subprocess.run([str(TARGET / "kammi.exe"), "create", WS, "--title", "Frozen Fabrique E4-0", "--lab", "frozen-fabrique", "--owners", "chief-kammi"], env=env, capture_output=True, text=True, timeout=60)
+        checks["admin_creates_workspace"] = r.returncode == 0 and "WorkspaceCreated" in r.stdout
 
         # --- the owner sets the frame through the CLI
         r = shell("chief-kammi", "chief", "work", "--workspace", WS)
@@ -159,7 +162,7 @@ def main():
 
         # --- MCP and the provider-neutral function list
         functions = json.loads(shell("reviewer", "reviewer", "verbs", "--functions").stdout)
-        checks["function_list"] = len(functions) == 19 and all(f["name"].startswith("kammi_") and f["parameters"]["type"] == "object" for f in functions)
+        checks["function_list"] = len(functions) == 20 and all(f["name"].startswith("kammi_") and f["parameters"]["type"] == "object" for f in functions)
         env = {**os.environ, "KAMMI_URL": daemon.url, "KAMMI_TOKEN": tokens["reviewer"], "KAMMI_ACTOR": "reviewer"}
         messages = [{"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {}},
                     {"jsonrpc": "2.0", "id": 2, "method": "tools/list"},
@@ -168,7 +171,7 @@ def main():
         replies = [json.loads(line) for line in mcp.stdout.splitlines()]
         tools = [t["name"] for t in replies[1]["result"]["tools"]] if len(replies) == 3 else []
         head_now = replies[2]["result"]["structuredContent"]["workspace"]["head"] if len(replies) == 3 else None
-        checks["mcp_lists_v1_then_verbs"] = len(tools) == 43 and tools[23] == "memory_neighbors" and tools[24] == "kammi_open"
+        checks["mcp_lists_v1_then_verbs"] = len(tools) == 44 and tools[23] == "memory_neighbors" and tools[24] == "kammi_create"
         messages = [messages[0], {"jsonrpc": "2.0", "id": 4, "method": "tools/call", "params": {"name": "kammi_note", "arguments": {"workspace": WS, "expected_head": head_now, "text": "Written through MCP"}}},
                     {"jsonrpc": "2.0", "id": 5, "method": "tools/call", "params": {"name": "kammi_note", "arguments": {"workspace": WS, "expected_head": head_now, "text": "Stale through MCP"}}}]
         mcp = subprocess.run([str(TARGET / "kammi-mcp.exe")], env=env, input="".join(json.dumps(m) + "\n" for m in messages), capture_output=True, text=True, timeout=60)

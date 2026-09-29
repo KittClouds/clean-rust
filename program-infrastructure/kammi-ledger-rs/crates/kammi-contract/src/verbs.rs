@@ -19,7 +19,7 @@ const fn verb(name: &'static str, phase: u8, writes: bool, summary: &'static str
     }
 }
 
-pub const VERBS: [Verb; 27] = [
+pub const VERBS: [Verb; 28] = [
     verb("status", 0, false, "Library status and flight gate"),
     verb(
         "call",
@@ -81,6 +81,12 @@ pub const VERBS: [Verb; 27] = [
     verb("trace", 1, false, "Evidence trace of a memory"),
     verb("find", 1, false, "Custody lookup by name or identity"),
     verb("log", 1, false, "Workspace events after an event ID"),
+    verb(
+        "create",
+        1,
+        true,
+        "Create a workspace (Library admin: Chief Kammi)",
+    ),
     verb("verbs", 0, false, "List this ABI"),
 ];
 
