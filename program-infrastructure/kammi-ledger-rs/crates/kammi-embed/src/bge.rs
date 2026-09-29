@@ -23,8 +23,14 @@ pub const MODEL_FILE: &str = "model_optimized.onnx";
 
 /// The snapshot directory inside a fastembed cache (`models--Qdrant--bge-small-en-v1.5-onnx-Q`).
 pub fn snapshot_dir(cache_or_snapshot: &Path) -> Result<PathBuf, String> {
+    // ONNX Runtime's Windows loader can reject a long path containing lexical `..` segments,
+    // even when the normalized target exists (notably for worktrees that junction the Python
+    // Library). Give it the resolved snapshot path instead.
+    let cache_or_snapshot = cache_or_snapshot
+        .canonicalize()
+        .map_err(|e| format!("{}: {e}", cache_or_snapshot.display()))?;
     if cache_or_snapshot.join(MODEL_FILE).is_file() {
-        return Ok(cache_or_snapshot.to_path_buf());
+        return Ok(cache_or_snapshot);
     }
     let snapshots = cache_or_snapshot
         .join("models--Qdrant--bge-small-en-v1.5-onnx-Q")
@@ -35,12 +41,15 @@ pub fn snapshot_dir(cache_or_snapshot: &Path) -> Result<PathBuf, String> {
         .filter(|p| p.join(MODEL_FILE).is_file())
         .collect();
     found.sort();
-    found.pop().ok_or_else(|| {
+    let snapshot = found.pop().ok_or_else(|| {
         format!(
             "no bge snapshot with {MODEL_FILE} under {}",
             snapshots.display()
         )
-    })
+    })?;
+    snapshot
+        .canonicalize()
+        .map_err(|e| format!("{}: {e}", snapshot.display()))
 }
 
 /// numpy `pairwise_sum` for float32 (`loops_utils.h`), block size 128.
@@ -231,5 +240,31 @@ mod tests {
         let normalized = numpy_normalize(&values);
         let norm: f32 = normalized.iter().map(|v| v * v).sum::<f32>().sqrt();
         assert!((norm - 1.0).abs() < 1e-5);
+    }
+
+    #[test]
+    fn snapshot_dir_resolves_lexical_parent_segments() {
+        use std::time::{SystemTime, UNIX_EPOCH};
+
+        let unique = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let temp = std::env::temp_dir().join(format!("kammi-bge-path-{unique}"));
+        let cache = temp.join("cache");
+        let staging = temp.join("staging");
+        let snapshot = cache
+            .join("models--Qdrant--bge-small-en-v1.5-onnx-Q")
+            .join("snapshots")
+            .join("fixture");
+        std::fs::create_dir_all(&snapshot).unwrap();
+        std::fs::create_dir_all(&staging).unwrap();
+        std::fs::write(snapshot.join(MODEL_FILE), b"fixture").unwrap();
+
+        let lexical = staging.join("..").join("cache");
+        let resolved = snapshot_dir(&lexical).unwrap();
+        assert_eq!(resolved, snapshot.canonicalize().unwrap());
+
+        std::fs::remove_dir_all(temp).unwrap();
     }
 }
