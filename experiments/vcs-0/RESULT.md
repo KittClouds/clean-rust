@@ -1,6 +1,13 @@
 # VCS-0c — Operational Reconstruction (sealed)
 
-**Outcome B. VCS-1b NOT earned on BANK-v1.**
+> **CORRECTED — see `CORRECTION-2026-09-30.md`.** The headline in this document was computed
+> correctly for the preregistered primary cell (causal / observer_correctness) and was
+> overgeneralized to all cells. `13c22b57` is preserved as the original interpretation; the
+> four-cell result is authoritative. Specifically, on **encoder / observer_correctness** the
+> neural arms beat the cheap estimator by 1.6 pp with supported intervals, which this document
+> does not reflect. The gate ledger, the VCS-1b decision, and every number here are unchanged.
+
+**Outcome B on the preregistered primary cell. VCS-1b NOT earned on BANK-v1.**
 
 Population: the exact 2,000-row R2a DEV export population, 1,668 canonical world groups
 (332 paired-surface rows retained as separate observations, bootstrap grouped by
