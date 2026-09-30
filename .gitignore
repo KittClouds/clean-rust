@@ -136,3 +136,6 @@ manifest.prev
 rust-native/phoenix/.tmp-gliclass/
 rust/phoenix/phase4_reweighted_ledger.jsonl
 *.wal
+
+__pycache__/
+*.pyc
