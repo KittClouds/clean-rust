@@ -1,0 +1,47 @@
+{
+  "schema": "phoenix.lexi-head-masking/protocol-v1",
+  "run_id": "LEXI-HEAD-MASKING-2026-09-30",
+  "purpose": "Measure operational sensitivity of the locked readouts to bounded attention-head group ablations across Base, NER-specialized, and NLI-specialized LFM2.5-230M backbones.",
+  "scope": {
+    "backbones": ["base", "ner_lora_step500", "nli_lora_step500"],
+    "whole_row_surfaces": [
+      "middle_plus_final",
+      "final_plus_mean",
+      "layer_m4_final",
+      "full_mean"
+    ],
+    "negative_control": "first_token",
+    "graph_sentinel": "edge_existence / middle_plus_final / existing Rung-1 tiny_mlp",
+    "readouts": ["decision", "action_type", "abstain_reason", "nli"],
+    "truth_join": false,
+    "training_or_fitting": false,
+    "surface_search": false
+  },
+  "input_sample": {
+    "release": "BANK-v1",
+    "population": "all existing TEST input partitions only",
+    "global_rows_per_split_renderer_stratum": 32,
+    "global_selection": "smallest SHA256(seed|world_id) values within each (split,surface_family) stratum",
+    "graph_pairs_per_split_renderer_stratum": 16,
+    "graph_pair_selection": "reservoir chosen by smallest SHA256(seed|split|family|row_idx|a_idx|b_idx), never by target label",
+    "seed": "LEXI-HEAD-MASKING-2026-09-30",
+    "candidate_truth_fields_used": false
+  },
+  "interventions": {
+    "attention_layers": "last four modules whose config layer_types entry is full_attention",
+    "first_level": "zero every query-head output entering the selected layer out_proj, one selected layer at a time",
+    "group_level": "zero one contiguous query-head group sharing a single KV head, at a time, within each selected layer",
+    "query_heads": 16,
+    "key_value_heads": 8,
+    "query_heads_per_kv_group": 2,
+    "individual_head_masks": false,
+    "other_layers_or_weights_changed": false
+  },
+  "analysis": {
+    "primary": "prediction flips and logit/margin movement relative to each model/readout's existing unmasked cached baseline",
+    "renderer_reporting": ["all", "S7_S8_S9", "other_renderers", "per_test_split"],
+    "graph_reporting": "frozen edge head score delta, sign-flip rate, and score-rank correlation; no accuracy or label join",
+    "claim_boundary": "operational ablation sensitivity only; no causal mechanism claim"
+  },
+  "stop_rule": "Finish layer and KV-group masks only. Individual-head masking is a separately named follow-up limited to members of a group with a clear selective effect."
+}

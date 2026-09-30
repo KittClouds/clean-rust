@@ -1,0 +1,87 @@
+{
+  "schema": "phoenix.lexi-specialization-survival/l-s0-lock-v1",
+  "run_id": "LEXI-SPECIALIZATION-SURVIVAL-2026-09-29",
+  "status": "LOCKED",
+  "purpose": "Freeze the 230M pre-specialization capability ruler for separate NER and NLI arms.",
+  "backbone": {
+    "name": "LFM2.5-230M-Base",
+    "revision_path": "D:/phoenix-models/lfm2.5-230m-base-9d2be55",
+    "config_sha256": "f7d0bcc454b7a30fa471b1e7b9e359e11fb25b56f5b4ffd59bb18248e3c2ea3d",
+    "tokenizer_sha256": "df1d8d5ec5d091b460562ffd545e4a5e91d17d4a0db7ebe733be34ed374377bd",
+    "weights_sha256": "e91eb22c0aeae0bcbea8ade56f5cfe3cf91bca0c34e859adacae8f4445416fe6",
+    "backbone_tuning_before_rung_1": false
+  },
+  "rung0": {
+    "lock_path": "experiments/bank-v1-rung0-atlas-20260929/rung0-lock.json",
+    "lock_sha256": "daa0406aa3f7caccfd84e09712b9448580eb6959faa0e7fba827557f7751c405",
+    "surfaces": [
+      "middle_plus_final",
+      "final_plus_mean",
+      "layer_m4_final",
+      "full_mean"
+    ],
+    "dead_control": "first_token",
+    "surface_search_allowed": false
+  },
+  "graph_rung1_sentinel": {
+    "task": "edge_existence",
+    "surface": "middle_plus_final",
+    "head": "tiny_mlp",
+    "selection": "DEV-only selection from the frozen Rung-1 readout roster",
+    "test_auc": 0.9819199244493652,
+    "held_renderer_s7_s8_s9_auc": 0.9552788745463127,
+    "held_control_auc": 0.8942703150093521,
+    "held_advantage": 0.061008559536960605,
+    "in_family_auc": 0.9875098005860029,
+    "renderer_drop": 0.032230926039690244,
+    "source_scope": "Synthetic BANK-v1 worlds; sentinel only, not a GNN or serving claim."
+  },
+  "artifacts": [
+    {
+      "role": "Rung-1 graph readout spec",
+      "path": "experiments/bank-v1-graph-surface-v2-20260929/spec.json",
+      "sha256": "61981c8a03145c534fd87c961bfc998d963a7ba6e33775ec989693bda8a82b7b"
+    },
+    {
+      "role": "Rung-1 graph-task derivation code",
+      "path": "experiments/bank-v1-graph-surface-v2-20260929/derive_graph_data.py",
+      "sha256": "086f357507881d92330f842bbfb935bf93dbfe7ed9a0e19da1c4e28b85c8ea31"
+    },
+    {
+      "role": "Rung-1 readout fitting code",
+      "path": "experiments/bank-v1-graph-surface-v2-20260929/fit_graph.py",
+      "sha256": "b54e5ef45a41e53732a912d3f953e87cebada4e10addaa3ce4c3806a2ecadbb5"
+    },
+    {
+      "role": "Rung-1 graph-task data receipt",
+      "path": "D:/phoenix-target-overgraph/bank-v1-graph-surface-v2-20260929/graph-task-data-report.json",
+      "sha256": "4d5f491d2fc64c421f77a84615a1841f60e6421985b1eb29c652057bc013b5ae"
+    },
+    {
+      "role": "Rung-1 scored results receipt",
+      "path": "D:/phoenix-target-overgraph/bank-v1-graph-surface-v2-20260929/graph-readout-results.json",
+      "sha256": "3924112ce1e42d90a6ee1e21b64a72d9a93c1bda7eabc036602403c9dd722766"
+    },
+    {
+      "role": "Rung-1 selected edge-existence head weights",
+      "path": "D:/phoenix-target-overgraph/bank-v1-graph-surface-v2-20260929/models/edge_existence-middle_plus_final-tiny_mlp.pt",
+      "sha256": "5cfb62bcc1e8f7cc6a71e4534fe78b36d4563c6424ea4aee739acf607db952c2"
+    },
+    {
+      "role": "Pinned base model weights",
+      "path": "D:/phoenix-models/lfm2.5-230m-base-9d2be55/model.safetensors",
+      "sha256": "e91eb22c0aeae0bcbea8ade56f5cfe3cf91bca0c34e859adacae8f4445416fe6"
+    }
+  ],
+  "specialization_contract": {
+    "arms": ["NER", "NLI"],
+    "base_model_for_each_arm": "the pinned LFM2.5-230M-Base weights above",
+    "training_sets_are_separate": true,
+    "bank_v1_is_evaluation_only": true,
+    "first_control": "frozen backbone plus task-specific head",
+    "first_backbone_change": "bounded late-layer LoRA",
+    "full_fine_tuning_before_gate": false,
+    "checkpoint_measurement": ["old Rung-0 observers", "same-architecture refit observers", "four locked surfaces", "edge_existence sentinel"],
+    "no_retrieval_or_authority_changes": true
+  }
+}

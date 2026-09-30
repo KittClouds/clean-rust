@@ -1,0 +1,80 @@
+{
+  "schema": "phoenix.bank-v1.graph-surface-v2/spec-1",
+  "run_id": "BANK-v1-GRAPH-SURFACE-V2-2026-09-29",
+  "purpose": "Engineering readout of graph-local information in frozen LFM2.5-230M representations",
+  "backbone": {
+    "name": "LFM2.5-230M-Base",
+    "revision_path": "D:/phoenix-models/lfm2.5-230m-base-9d2be55",
+    "fine_tuning": false,
+    "generation": false,
+    "dtype": "float32"
+  },
+  "source": {
+    "release": "BANK-v1",
+    "root": "C:/code land/clean-rust/experiments/ff-s15-bank-01/releases/BANK-v1",
+    "row_input": "input_text only enters the backbone; bindings and goal are span coordinates only",
+    "truth": "canonical worlds are joined only after extraction"
+  },
+  "splits": {
+    "fit": "canonical TRAIN worlds only",
+    "development": "canonical DEV worlds only; fixed training schedule, diagnostic scores",
+    "test": "canonical test worlds; no model/epoch selection",
+    "renderer_robustness": "report by S0-S11 and same-world paired renderer rows; S7/S8/S9 are renderer-held-out families"
+  },
+  "frozen_surfaces": [
+    "middle_plus_final",
+    "final_plus_mean",
+    "layer_m4_final",
+    "full_mean"
+  ],
+  "dead_control": "first_token",
+  "local_pooling": {
+    "all_entity_mentions": "prefer exact binding mention matches in the pre-Goal context; when absent, align the rendered entity ID token as a symbolic argument reference; mean token pool per occurrence, then mean over occurrences for that entity",
+    "goal_arguments": "exact binding mention matches restricted to the final Goal: field, with exact entity-ID reference fallback; each goal argument gets its own vector",
+    "middle_plus_final": "concatenate midpoint-layer mention-span mean and final-layer mention-span mean",
+    "final_plus_mean": "concatenate final-layer last-subtoken-of-mention and final-layer mention-span mean",
+    "layer_m4_final": "layer four transformer blocks before final, mention-span mean",
+    "full_mean": "final-layer mention-span mean",
+    "missing_span": "zero vector with matched=false; omitted from task examples"
+  },
+  "tasks": {
+    "node_type": "predict canonical type of each entity from its masked-in-text mention vector; report goal-argument subset separately",
+    "edge_existence": "predict whether an ordered pair has any binary initial_state fact",
+    "edge_label": "predict one binary fact predicate, with NONE negatives",
+    "one_hop_membership": "predict undirected CONNECTED shortest-path distance exactly one",
+    "two_hop_membership": "predict undirected CONNECTED shortest-path distance exactly two; direct edges excluded from negative candidates",
+    "link_completion": "for each binary (subject,predicate,object) fact, rank all other entities in the same world as candidate objects using the predicate score"
+  },
+  "readouts": {
+    "linear": "affine classifier over one node vector or ordered concatenated endpoint vectors",
+    "bilinear": "quadratic node readout or rank-128 factorized endpoint bilinear readout",
+    "tiny_mlp": "one 128-unit GELU hidden layer with dropout 0.1"
+  },
+  "controls": [
+    "majority/frequency prior",
+    "mention-string lexical type heuristic and type-pair-conditioned frequency baseline",
+    "cached Rung-0 whole-row surfaces with linear readout",
+    "cached Rung-0 first-token control"
+  ],
+  "engineering_gate": {
+    "pass": "at least one graph-local task exceeds its strongest applicable lexical/frequency control by >=0.05 absolute on its primary metric, retains a positive advantage on held-out renderer families S7/S8/S9, and loses no more than 0.10 absolute versus in-family test",
+    "otherwise": "stop the graph-local lane at Rung 1; do not search additional surfaces"
+  },
+  "seed": 20260929,
+  "training": {
+    "epochs": 5,
+    "batch_size": 2048,
+    "learning_rate": 0.001,
+    "weight_decay": 0.0001,
+    "mlp_width": 128,
+    "bilinear_rank": 128,
+    "maximum_train_examples_per_task": 200000,
+    "negative_ratio": 1,
+    "train_only_normalization": true
+  },
+  "limits": [
+    "Synthetic BANK-v1 engineering evidence only",
+    "No GNN claim, natural-language graph claim, authority change, retrieval, or serving promotion",
+    "Whole-row caches are reused read-only from the locked Rung-0 atlas"
+  ]
+}
