@@ -1,9 +1,8 @@
 """Vault Phase 1, M5: the journaled v4 activation (amendment v4 section 6), scripted.
 
   python tools/activate.py check                                   closure conditions (read-only)
-  python tools/activate.py rehearse <work> --live-copy            M5: the whole procedure on a current copy (real clock)
   python tools/activate.py rehearse <work> --live-copy            real-clock rehearsal on a current live copy
-  python tools/activate.py live --decision-file <closure.json>     the one-way step on the live Library
+  python tools/activate.py live --rehearsal-report <report.json>   one-way step; report must match tool and live head
 
 Procedure (the same in rehearsal and live):
  1. stop the daemon; back up the store (a byte copy); export-v1 and Python's independent_verify
@@ -48,6 +47,8 @@ from http_differential import free_port  # noqa: E402
 NATIVE = str(PY / "vendor/runtime-v1/native")
 MONITOR_PERIOD = timedelta(minutes=30)
 MONITOR_STALE_AFTER = timedelta(minutes=45)
+LIVE_HEALTH_TIMEOUT_SECONDS = 300
+LIVE_HEALTH_POLL_SECONDS = 1
 AMENDMENT_SCHEMA = "KAMMI_V4_EARLY_ACTIVATION_AMENDMENT_V1"
 CLOSURE_SCHEMA = "KAMMI_ROLLBACK_WINDOW_CLOSURE_V2"
 
@@ -70,12 +71,58 @@ def digest_bytes(raw: bytes) -> str:
     return hashlib.sha256(raw).hexdigest()
 
 
+def wait_for_stable_live_health(timeout_seconds=LIVE_HEALTH_TIMEOUT_SECONDS,
+                                poll_seconds=LIVE_HEALTH_POLL_SECONDS, status_reader=None):
+    """Wait for two consecutive healthy snapshots; never turn a missing lag into zero."""
+    read_status = status_reader or svc.status
+    deadline = time.monotonic() + timeout_seconds
+    consecutive = 0
+    last = None
+    last_error = None
+    while True:
+        try:
+            last = read_status()
+            last_error = None
+            if last.get("flight_gate") == "OPEN" and last.get("projection_lag") == 0:
+                consecutive += 1
+                if consecutive == 2:
+                    return last
+            else:
+                consecutive = 0
+        except Exception as error:  # transient startup/API failures remain fail-closed at timeout
+            last_error = f"{type(error).__name__}: {error}"
+            consecutive = 0
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            raise RuntimeError("live Library did not report two consecutive OPEN/lag-zero health snapshots "
+                               f"within {timeout_seconds}s; last_status={last!r}; last_error={last_error!r}")
+        time.sleep(min(poll_seconds, remaining))
+
+
+def validate_rehearsal_report(path: Path, activation_tool_sha256: str, source_head: str):
+    """Require the exact passing rehearsal and unchanged journal head before irreversible activation."""
+    try:
+        report = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as error:
+        raise RuntimeError(f"cannot read activation rehearsal report {path}: {error}") from error
+    if report.get("schema") != "KAMMI_ACTIVATION_REHEARSAL_V1" or report.get("status") != "PASS":
+        raise RuntimeError(f"activation requires a PASS live-copy rehearsal report: {path}")
+    if report.get("activation_tool_sha256") != activation_tool_sha256:
+        raise RuntimeError("activation tool changed after rehearsal; run a fresh live-copy rehearsal")
+    if report.get("source_head") != source_head:
+        raise RuntimeError("live journal head changed after rehearsal; run a fresh live-copy rehearsal")
+    return report
+
+
 def hash_tree(root: Path):
     """Hash every file by content and derive a path/size/hash inventory root."""
     entries = []
     total = 0
-    for path in sorted(p for p in root.rglob("*") if p.is_file()):
-        rel = path.relative_to(root).as_posix()
+    # Sort the serialized, case-sensitive POSIX paths, not Windows Path objects (whose ordering
+    # can differ from the bytewise order enforced by the Rust verifier).
+    files = sorted(((path.relative_to(root).as_posix(), path)
+                    for path in root.rglob("*") if path.is_file()), key=lambda pair: pair[0])
+    for rel, path in files:
         h = hashlib.sha256()
         size = 0
         with path.open("rb") as stream:
@@ -425,7 +472,8 @@ class Daemon:
         time.sleep(1.5)
 
 
-def procedure(daemon: Daemon, work: Path, decision: dict, report: dict, rollback: dict):
+def procedure(daemon: Daemon, work: Path, decision: dict, report: dict, rollback: dict,
+              expected_source_head: str | None = None):
     def step(name, **fields):
         report["steps"].append({"step": name, "utc": now().isoformat(), **fields})
         print(f"-- {name} {json.dumps(fields)[:320]}", flush=True)
@@ -440,6 +488,9 @@ def procedure(daemon: Daemon, work: Path, decision: dict, report: dict, rollback
     backup_check = subprocess.run([str(daemon.bin / "kammi-verify.exe"), str(backup_root)], capture_output=True, text=True)
     backup_verified = json.loads(backup_check.stdout) if backup_check.returncode == 0 else {"status": "FAIL", "error": backup_check.stderr[-800:]}
     assert backup_verified.get("status") == "PASS", backup_verified
+    if expected_source_head is not None and backup_verified.get("journal_head") != expected_source_head:
+        raise RuntimeError("live journal head changed after successful rehearsal; no v4 event was written: "
+                           f"expected={expected_source_head} actual={backup_verified.get('journal_head')}")
 
     export = work / "final-export-v1"
     exported = subprocess.run([str(daemon.bin / "kammi-migrate.exe"), "export-v1", "--v2", str(backup_root), "--out", str(export)], capture_output=True, text=True, env=env)
@@ -468,12 +519,9 @@ def procedure(daemon: Daemon, work: Path, decision: dict, report: dict, rollback
 
     stamp = now().strftime("%Y%m%dT%H%M%SZ")
     effective_at = decision["effective_at"]
-    amendment = register_json({"schema": AMENDMENT_SCHEMA, "decision_authority": "PROGRAM_OWNER",
-                               "effective_at": effective_at, "removes_fixed_floor": True,
-                               "amendment": "v4.1 immediate activation under recorded owner instruction",
-                               "supersedes": "2026-10-06T00:00:00Z"}, "protocol-amendment", f"v4-amendment-{stamp}")
-    # Take a content-addressed copy of the exact monitor history used by the decision.
+    # Audit the fresh, truthful sample before writing any activation evidence into the journal.
     if daemon.live:
+        wait_for_stable_live_health()
         svc.monitor()
     monitor_raw = (svc.OPS / "monitor.jsonl").read_bytes()
     monitor = monitoring_audit(monitor_raw, at=now())
@@ -481,6 +529,21 @@ def procedure(daemon: Daemon, work: Path, decision: dict, report: dict, rollback
     if not monitor_gate["ok"]:
         raise RuntimeError("monitoring preflight changed or current health failed before evidence registration: "
                            + json.dumps({"audit": monitor, "activation_gate": monitor_gate}))
+
+    activation_source = Path(__file__).read_bytes()
+    activation_tool_sha256 = digest_bytes(activation_source)
+    activation_source_path = work / "activation-tool.py"
+    activation_source_path.write_bytes(activation_source)
+    activation_tool_artifact = register_raw(activation_source, "activation-procedure-source",
+                                            f"v4-activation-tool-{stamp}")
+    amendment = register_json({"schema": AMENDMENT_SCHEMA, "decision_authority": "PROGRAM_OWNER",
+                               "effective_at": effective_at, "removes_fixed_floor": True,
+                               "amendment": "v4.1 immediate activation under recorded owner instruction",
+                               "supersedes": "2026-10-06T00:00:00Z",
+                               "activation_tool_artifact": activation_tool_artifact,
+                               "activation_tool_sha256": activation_tool_sha256},
+                              "protocol-amendment", f"v4-amendment-{stamp}")
+    # Register the exact monitor history audited above.
     monitoring_artifact = register_raw(monitor_raw, "activation-monitor-history", f"v4-monitor-{stamp}")
     rollback_id = register_json(rollback, "rollback-evidence-audit", f"v4-rollback-audit-{stamp}")
     inventory_id = register_raw((work / "backup-inventory.json").read_bytes(),
@@ -527,7 +590,8 @@ def procedure(daemon: Daemon, work: Path, decision: dict, report: dict, rollback
     (work / "program-owner-closure-decision.json").write_text(json.dumps(owner_decision, indent=1), encoding="utf-8")
     (work / "monitoring-audit.json").write_text(json.dumps(monitor, indent=1), encoding="utf-8")
     (work / "rollback-evidence-audit.json").write_text(json.dumps(rollback, indent=1), encoding="utf-8")
-    step("registered owner amendment, closure, monitoring snapshot, rollback audit, and backup manifest",
+    step("registered activation source, owner amendment, closure, monitoring snapshot, rollback audit, and backup manifest",
+         activation_tool=activation_tool_artifact, activation_tool_sha256=activation_tool_sha256,
          amendment=amendment, closure_decision=closure, monitoring_snapshot=monitoring_artifact,
          rollback_evidence=rollback_id, backup=backup_id, actual_monitor_gaps=monitor["gap_count"])
 
@@ -593,16 +657,21 @@ def rehearse(work: Path, live_copy: bool):
                                     "source_publicity_reviewed": True}}
     # Refresh only the monitor file before auditing. The operation appends a truthful live sample;
     # it does not mutate the Library journal.
+    wait_for_stable_live_health()
     svc.monitor()
     preflight = check(decision)
     if not preflight["ok"]:
         raise SystemExit("live preflight not ready for current-copy rehearsal: " + json.dumps(preflight, indent=1))
-    report = {"schema": "KAMMI_ACTIVATION_REHEARSAL_V1", "copy_of": "current live store",
-              "source_release": info["commit"], "clock": "real", "steps": []}
     daemon.start()
     try:
+        live_copy_status = call(daemon.url, "GET", "/v1/status", daemon.admin)[1]
+        source_head = live_copy_status["journal_head"]
+        activation_tool_sha256 = digest_bytes(Path(__file__).read_bytes())
+        report = {"schema": "KAMMI_ACTIVATION_REHEARSAL_V1", "copy_of": "current live store",
+                  "source_release": info["commit"], "source_head": source_head,
+                  "activation_tool_sha256": activation_tool_sha256, "clock": "real", "steps": []}
         # The rehearsal also proves the copy's actors can seed Frozen Fabrique afterwards.
-        procedure(daemon, work, decision, report, preflight["2_rollback_evidence"])
+        procedure(daemon, work, decision, report, preflight["2_rollback_evidence"], source_head)
         with tempfile.TemporaryDirectory(prefix="kammi-v4-rehearsal-") as secret_dir:
             secret_root = Path(secret_dir)
             admin_file = secret_root / "admin.secret"
@@ -619,7 +688,7 @@ def rehearse(work: Path, live_copy: bool):
     print(json.dumps({"status": report["status"], "gates": report.get("gates")}, indent=1))
 
 
-def live(decision_file: Path | None):
+def live(decision_file: Path | None, rehearsal_report: Path | None):
     effective_at = now().isoformat(timespec="milliseconds").replace("+00:00", "Z")
     decision = {
         "schema": CLOSURE_SCHEMA, "decision": "CLOSE", "decision_authority": "PROGRAM_OWNER",
@@ -637,6 +706,11 @@ def live(decision_file: Path | None):
             raise SystemExit("decision file must record the program owner's CLOSE decision")
         decision.update(supplied)
         decision["effective_at"] = effective_at
+    if rehearsal_report is None:
+        raise SystemExit("live activation requires --rehearsal-report from a passing current live-copy rehearsal")
+    activation_tool_sha256 = digest_bytes(Path(__file__).read_bytes())
+    live_health = wait_for_stable_live_health()
+    validate_rehearsal_report(rehearsal_report, activation_tool_sha256, live_health["journal_head"])
     # This is a real, truthful sample; historic gaps remain visible in the subsequent audit.
     svc.monitor()
     conditions = check(decision)
@@ -646,10 +720,13 @@ def live(decision_file: Path | None):
     work = svc.OPS / "activation" / now().strftime("%Y%m%dT%H%M%SZ")
     work.mkdir(parents=True, exist_ok=False)
     daemon = Daemon(svc.STORE, True, None, svc.admin_token(), svc.OPS / info["bin_dir"])
-    report = {"schema": "KAMMI_ACTIVATION_V2", "conditions": conditions, "steps": []}
+    report = {"schema": "KAMMI_ACTIVATION_V2", "conditions": conditions, "steps": [],
+              "source_head": live_health["journal_head"], "activation_tool_sha256": activation_tool_sha256,
+              "rehearsal_report": str(rehearsal_report.resolve())}
     (work / "program-owner-closure-decision-input.json").write_text(json.dumps(decision, indent=1), encoding="utf-8")
     try:
-        procedure(daemon, work, decision, report, conditions["2_rollback_evidence"])
+        procedure(daemon, work, decision, report, conditions["2_rollback_evidence"],
+                  live_health["journal_head"])
     except BaseException:
         # A failed pre-activation check must not leave the live Library stopped.
         daemon.start()
@@ -679,10 +756,12 @@ if __name__ == "__main__":
     parser.add_argument("work", nargs="?", type=Path)
     parser.add_argument("--live-copy", action="store_true", help="copy the current live store (brief stop); required for a real-clock rehearsal")
     parser.add_argument("--decision-file", type=Path, help="optional owner decision document; the direct instruction in the current task is otherwise recorded")
+    parser.add_argument("--rehearsal-report", type=Path,
+                        help="required for live: PASS report from a rehearsal of this tool and the unchanged current journal head")
     args = parser.parse_args()
     if args.operation == "check":
         print(json.dumps(check(), indent=1))
     elif args.operation == "rehearse":
         rehearse(args.work.resolve(), args.live_copy)
     else:
-        live(args.decision_file)
+        live(args.decision_file, args.rehearsal_report)

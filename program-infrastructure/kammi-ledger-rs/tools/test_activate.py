@@ -5,7 +5,9 @@ import unittest
 import csv
 import io
 import subprocess
+import tempfile
 from datetime import datetime, timezone
+from pathlib import Path
 from unittest.mock import patch
 
 import activate
@@ -153,6 +155,52 @@ class MonitoringAuditTests(unittest.TestCase):
         with patch.object(activate.subprocess, "run", side_effect=responses):
             audit = activate.windows_task_audit()
         self.assertTrue(audit["daemon_autostart_configured"])
+
+
+class ActivationReadinessTests(unittest.TestCase):
+    def test_backup_inventory_uses_case_sensitive_canonical_path_order(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "objects").mkdir()
+            (root / "objects" / "a.bin").write_bytes(b"object")
+            (root / "STORE.json").write_bytes(b"store")
+            inventory = activate.hash_tree(root)
+            paths = [row["path"] for row in inventory["files"]]
+            self.assertEqual(paths, ["STORE.json", "objects/a.bin"])
+            self.assertEqual(paths, sorted(paths))
+
+    def test_health_wait_requires_two_consecutive_open_lag_zero_snapshots(self):
+        responses = iter((
+            {"flight_gate": "OPEN", "projection_lag": None},
+            {"flight_gate": "OPEN", "projection_lag": 1},
+            {"flight_gate": "OPEN", "projection_lag": 0},
+            {"flight_gate": "OPEN", "projection_lag": 0, "journal_head": "sha256:head"},
+        ))
+        result = activate.wait_for_stable_live_health(
+            timeout_seconds=1, poll_seconds=0, status_reader=lambda: next(responses))
+        self.assertEqual(result["journal_head"], "sha256:head")
+
+    def test_health_wait_fails_closed_when_projection_lag_is_missing(self):
+        status = {"flight_gate": "OPEN", "projection_lag": None}
+        with self.assertRaisesRegex(RuntimeError, "two consecutive OPEN/lag-zero"):
+            activate.wait_for_stable_live_health(timeout_seconds=0, poll_seconds=0,
+                                                 status_reader=lambda: status)
+
+    def test_live_requires_matching_successful_rehearsal(self):
+        report = {"schema": "KAMMI_ACTIVATION_REHEARSAL_V1", "status": "PASS",
+                  "activation_tool_sha256": "tool-hash", "source_head": "head"}
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "rehearsal.json"
+            path.write_text(json.dumps(report), encoding="utf-8")
+            self.assertEqual(activate.validate_rehearsal_report(path, "tool-hash", "head"), report)
+            for tool_hash, source_head in (("changed-tool", "head"), ("tool-hash", "changed-head")):
+                with self.subTest(tool_hash=tool_hash, source_head=source_head):
+                    with self.assertRaises(RuntimeError):
+                        activate.validate_rehearsal_report(path, tool_hash, source_head)
+            report["status"] = "FAIL"
+            path.write_text(json.dumps(report), encoding="utf-8")
+            with self.assertRaisesRegex(RuntimeError, "PASS live-copy rehearsal"):
+                activate.validate_rehearsal_report(path, "tool-hash", "head")
 
 
 if __name__ == "__main__":
