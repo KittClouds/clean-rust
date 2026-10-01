@@ -141,6 +141,26 @@ SUPERVISED = [t for t in ALL_TARGETS if t.availability != "UNAVAILABLE"]
 UNAVAILABLE = [t for t in ALL_TARGETS if t.availability == "UNAVAILABLE"]
 PARTIAL = [t for t in ALL_TARGETS if t.availability == "PARTIAL"]
 
+# The action endpoint a* is NOT a member of the 13-target ontology. It is the CE term L_A and
+# is declared separately so the ontology stays exactly as the charter specified it.
+ACTION_ENDPOINT = Target(
+    name="action_endpoint", kind="endpoint", d_out=1,
+    ontology="the canonical action a* for the world, as a cross-entropy endpoint",
+    canonical_source="index of world.selected_action within world.available_actions",
+    availability="PARTIAL", head="W_action",
+    notes="DEFINED ONLY where world.selected_action is not None. Worlds whose canonical answer "
+          "is abstention have no action endpoint and contribute nothing to L_A. L_A is an "
+          "endpoint, explicitly NOT the definition of the epistemic state e_j.",
+    degrade="masked CE; undefined worlds excluded rather than assigned a default",
+    availability_evidence="measured in audit: action-endpoint coverage over canonical worlds")
+
+UNSUPERVISED_NOTE = (
+    "Every target is either mapped to an existing canonical source or marked UNAVAILABLE. "
+    "Unavailable targets emit no label array and receive no head. No label is manufactured to "
+    "complete the ontology, and no unavailable target is approximated from a related field."
+)
+
+
 
 # --------------------------------------------------------------------------- audit
 def audit_availability(n_rows: int = 2000) -> dict:
@@ -164,6 +184,7 @@ def audit_availability(n_rows: int = 2000) -> dict:
     per_cand_evidence = all(
         isinstance(e, dict) and "candidates" in e
         for w in worlds for e in (w.get("evidence_facts") or []))
+    n_endpoint = sum(1 for w in worlds if w.get("selected_action") is not None)
     dist = lambda xs: {str(v): xs.count(v) for v in sorted(set(xs))}
     return {
         "n_worlds": len(worlds),
@@ -176,6 +197,12 @@ def audit_availability(n_rows: int = 2000) -> dict:
         "legal_action_count_distribution": dist(n_legal),
         "per_candidate_evidence_field_present": per_cand_evidence,
         "requestability_field_present": any("request" in f or "askable" in f for f in fields),
+        "action_endpoint": {
+            "defined_worlds": n_endpoint,
+            "total_worlds": len(worlds),
+            "coverage": round(n_endpoint / max(len(worlds), 1), 4),
+            "note": "L_A is masked to these worlds; abstention worlds have no action endpoint",
+        },
         "availability": {
             "AVAILABLE": [t.name for t in ALL_TARGETS if t.availability == "AVAILABLE"],
             "PARTIAL": [t.name for t in ALL_TARGETS if t.availability == "PARTIAL"],

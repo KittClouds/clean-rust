@@ -162,8 +162,28 @@ def build(split: str, substrate: str, limit: int | None = None, seed: int = 0) -
                              dtype=torch.float32)
     LC = {n: torch.tensor([[(rows[j][n] if rows[j] else float("nan")) for j in range(pad)]
                            for rows in labels_cand], dtype=torch.float32) for n in cnames}
+    # action endpoint a*: index of canonical selected_action within available_actions, -1 = none
+    action_index = torch.full((len(world_ids),), -1, dtype=torch.long)
+    for i, (cand, wid) in enumerate(zip(cact, world_ids)):
+        w0 = worlds[wid]
+        sel = w0.get("selected_action")
+        if sel is None:
+            continue
+        for j, a in enumerate(cand):
+            if a is None:
+                continue
+            if json.dumps({"a": a.get("type"), "g": a.get("args", {})}, sort_keys=True) == \
+               json.dumps({"a": sel.get("type"), "g": sel.get("args", {})}, sort_keys=True):
+                action_index[i] = j
+                break
+
+    ent_runs = {}
+    for wid, (run, eids) in row_ent.items():
+        ent_runs[wid] = (run, len(eids))
+    keep_ent_runs = {w: ent_runs[w] for w in world_ids if w in ent_runs}
     return {"H": H, "global_labels": LG, "cand_labels": LC, "world_ids": world_ids,
-            "cand_actions": cact, "n_rows": len(world_ids),
+            "cand_actions": cact, "n_rows": len(world_ids), "action_index": action_index,
+            "ent_runs": keep_ent_runs,
             "global_names": gnames, "cand_names": cnames,
             "surfaces": SURFACES, "m_cap": M_CAP, "max_args": MAX_ARGS,
             "substrate": substrate, "split": split}

@@ -73,24 +73,81 @@ class SemanticInterfaceGraft(nn.Module):
         return s, e
 
 
+class BidirectionalGraft(nn.Module):
+    """Lepori's fabric: full-context + entity-local state -> candidate-conditioned encoder graft.
+
+    Same contract as the causal graft, different nervous system. NO alignment between the two
+    is imposed; see src/objective.py.
+    """
+
+    def __init__(self, d_h: int = 1024, n_surface: int = 6, n_types: int = len(ACTION_TYPES),
+                 d_s: int = 64, d_e: int = 32, hidden: int = 256, dropout: float = 0.1,
+                 n_layers: int = 2):
+        super().__init__()
+        self.fabric = "bidirectional"
+        self.d_s, self.d_e = d_s, d_e
+        self.row_proj = nn.Sequential(
+            nn.Linear(n_surface * d_h, hidden), nn.GELU(), nn.LayerNorm(hidden))
+        # a small attention-style mixer over surfaces: full-context aggregation
+        self.surf_proj = nn.Linear(d_h, hidden)
+        self.mixer = nn.ModuleList([
+            nn.MultiheadAttention(hidden, num_heads=4, batch_first=True) for _ in range(n_layers)])
+        self.mix_norm = nn.ModuleList([nn.LayerNorm(hidden) for _ in range(n_layers)])
+        self.type_emb = nn.Embedding(n_types, 32)
+        self.arg_proj = nn.Linear(3 * d_h + 32, hidden)
+        self.cand_proj = nn.Sequential(nn.GELU(), nn.LayerNorm(hidden))
+        self.to_s = nn.Sequential(nn.Linear(hidden, d_s), nn.GELU(), nn.Dropout(dropout))
+        self.to_e = nn.Sequential(nn.Linear(hidden + d_s, d_e), nn.GELU(), nn.Dropout(dropout))
+
+    def forward(self, H):
+        B, S, d = H["row"].shape
+        r = self.row_proj(H["row"].reshape(B, -1)).unsqueeze(1)      # [B,1,hidden]
+        # each surface is projected into the shared width so it can act as context tokens
+        ctx = self.surf_proj(H["row"])                               # [B,S,hidden]
+        ctx = ctx + ctx.mean(1, keepdim=True)
+        for attn, nrm in zip(self.mixer, self.mix_norm):
+            a, _ = attn(ctx, r, r)
+            r = nrm(r + a)
+        r = r.reshape(B, -1, r.shape[-1]).mean(1)                    # [B, hidden]
+        s = self.to_s(r)
+        E = H["ent"]
+        cand_ent = H["cand_ent"]
+        gathered = []
+        for slot in range(cand_ent.shape[-1]):
+            idx = cand_ent[:, :, slot].clamp(min=0)
+            v = E[idx]
+            v = v * (cand_ent[:, :, slot] >= 0).unsqueeze(-1).float()
+            gathered.append(v)
+        a = torch.cat(gathered + [self.type_emb(H["cand_type"])], dim=-1)
+        c = self.cand_proj(self.arg_proj(a))
+        e = self.to_e(torch.cat([c, s.unsqueeze(1).expand(-1, c.shape[1], -1)], dim=-1))
+        m = H["cand_mask"]
+        return s, e * m.unsqueeze(-1).float()
+
+
 class ReadoutHeads(nn.Module):
     """Per-target linear readouts. Global targets read from s; candidate targets read
     y_hat_j = W e_j. Targets marked unavailable in the ontology get NO head."""
 
-    def __init__(self, d_s: int, d_e: int, global_names, candidate_names):
+    def __init__(self, d_s: int, d_e: int, global_names, candidate_names,
+                 m_cap: int = 24, action_endpoint: bool = True):
         super().__init__()
         self.global_names = [n for n, _ in global_names]
         self.candidate_names = [n for n, _ in candidate_names]
         self.g_heads = nn.ModuleDict({n: nn.Linear(d_s, d) for n, d in global_names})
         self.c_heads = nn.ModuleDict({n: nn.Linear(d_e, d) for n, d in candidate_names})
+        # L_A: CE over the enumerated candidate set, read off the candidate slot only.
+        self.action_head = nn.Linear(d_e, m_cap) if action_endpoint else None
+        self.m_cap = m_cap
 
     def forward(self, s, e, cand_mask):
         g = {n: self.g_heads[n](s) for n in self.global_names}
         c = {}
         for n, head in self.c_heads.items():
-            o = head(e)                                                   # [B, m, d]
+            o = head(e)
             c[n] = o * cand_mask.unsqueeze(-1).float()
-        return g, c
+        a = self.action_head(e) * cand_mask.unsqueeze(-1).float() if self.action_head else None
+        return g, c, a
 
 
 def arch_descriptor(d_h: int = 1024, d_s: int = 64, d_e: int = 32) -> dict:

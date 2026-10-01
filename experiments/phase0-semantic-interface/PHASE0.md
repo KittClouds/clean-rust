@@ -149,12 +149,126 @@ Frozen as `phase0-semantic-interface/eval-contract-v0.1`. Requirements:
 | evaluation contract | frozen |
 | **frozen enough to begin training** | **YES** |
 
+## Shared supervision mathematics
+
+Both fabrics use the identical loss. Only `H` and the graft geometry differ.
+
+```
+L = λ_S·L_S + λ_E·L_E + λ_A·L_A + λ_CF·L_CF + λ_R·L_R
+
+L_S   = Σ_k ℓ(ŝ_k, s*_k)                                    semantic, on s
+L_E   = Σ_j Σ_k ℓ(ê_jk, e*_jk)                             candidate epistemic, on e_j
+L_A   = CE(â, a*)                                           action ENDPOINT, not the definition of e
+L_CF  = max(0, m − y[r(x⁺,a_j) − r(x⁻,a_j)])               truth-changing contrast, hinge
+L_R   = ‖s(x) − s(x̃)‖² + (1/m) Σ_j ‖e_j(x) − e_j(x̃)‖²      renderer invariance
+
+λ = (S 1.0, E 1.0, A 0.5, CF 0.5, R 0.25),  margin m = 0.2
+```
+
+The intended asymmetry: **semantic change → state changes** (L_S, L_E, L_CF);
+**renderer change → state approximately stable** (L_R).
+
+## Phase 0 discipline — enforced in code
+
+`assert_no_alignment_term()` raises if a term whose name contains `align`, `distill`,
+`s_c`, `s_b`, `e_c`, `e_b`, `cross_agent` is ever added to the loss. There is **no**
+`s_c ≈ s_b` and **no** `e_j^c ≈ e_j^b`. The two fabrics share loss semantics and the typed
+output contract `D(·) → Y`. Their internal coordinates may differ arbitrarily.
+
+## Pair construction — orthogonal by construction
+
+| | count (1.5k worlds) | used by | guarantee |
+|---|---|---|---|
+| renderer pairs `(x, x̃)` | BANK paired rows, S0/S1/S2 | `L_R` | same latent world, different surface family |
+| truth-changing pairs `(x⁺, x⁻)` | 1,497 verified | `L_CF` | same world **and same renderer**, legality genuinely flips |
+
+Truth-changing pairs are built by canonical-state mutation and **every one is verified
+against the executable simulator**: the candidate's legality must actually differ between
+`x⁺` and `x⁻`. Of 3,111 attempted mutations, **1,614 were discarded for flipping nothing**.
+
+```
+mutation histogram   flip_switch 895   block_edge 378   remove_edge 224
+```
+
+Orthogonality is the point: `L_CF` cannot be satisfied by a renderer shortcut because both
+members render identically; `L_R` cannot be satisfied by a truth shortcut because the world
+is bit-identical.
+
+## Action endpoint `a*` — partial provenance
+
+`a*` is the index of `world.selected_action` within `available_actions`, defined **only** where
+`selected_action is not None`. Measured coverage: **0.509** of canonical worlds. Abstention
+worlds contribute nothing to `L_A`; they are masked out, not assigned a default.
+
+## Honest limitation: `L_CF` is DORMANT in this harness
+
+`L_CF` is implemented and unit-tested, but contributes **0.0** in the recorded run. The
+mutated renderings of a truth-changing pair are not in the released primitive cache, so
+`H(x⁺)` and `H(x⁻)` do not exist. Activating the term requires a substrate pass to extract
+features for the mutated texts.
+
+This is recorded rather than hidden. It is **not** faked with a zero that pretends to be
+supervision, and it is the one named engineering item outstanding before `L_CF` carries
+gradient.
+
+`L_R` is live: both members of a renderer pair are real BANK rows, so their frozen `H` is
+already in the cache. Its value falls across the recorded run:
+
+```
+epoch        1        2        3        4
+L_R      1.1370   0.6077   0.2264   0.2606
+L_S      0.6415   0.6200   0.6021   0.5919
+L_E      0.6058   0.5859   0.5756   0.5746
+L_A      5.9116   5.3158   5.0014   4.9041
+```
+
+Renderer invariance is being learned (1.137 → 0.261, a 77% reduction) while the semantic
+terms decline slowly. That is the intended direction, but it is a 4-epoch harness trace on
+6k rows and is **not** a Phase 0 result — there is no accuracy gate here.
+
+## Exit gate — 9/9, no accuracy gate
+
+```
+SUBSTRATE_IDENTITY_FROZEN          True
+SURFACE_IDENTITY_FROZEN            True
+STATE_ABI_FROZEN                   True
+TARGET_PROVENANCE_COMPLETE         True
+PAIR_CONSTRUCTION_REPLAYABLE       True
+TRAINING_OBJECTIVE_IMPLEMENTED     True
+UNTRAINED_FORWARD_TESTS_PASS       True
+NO_PROTECTED_TRUTH_CONTACT         True
+PHASE1_CONFIG_READY                True
+
+PHASE 0 EXIT: True     accuracy gate present: False
+```
+
+Untrained forward test confirms the interface is candidate-conditioned rather than a
+broadcast world vector: `e` varies across candidates, `s` varies across rows,
+`s: [346, 64]`, `e: [346, 24, 32]`, action logits `[346, 24, 24]`.
+
+## Division of labour
+
+| | fabric | graft | substrate |
+|---|---|---|---|
+| **Lexi** | causal | late/prefix-integrated | `LFM2.5-230M-Base` |
+| **Lepori** | bidirectional | full-context + entity-local (this lane) | `LFM2.5-Encoder-230M` |
+
+Same question, different nervous systems. Same loss code, same ontology, same target
+provenance. **No unified latent space and no horse race is imposed.**
+
+Both fabrics are one config switch in `src/train_v2.py` (`--fabric`).
+
 ## Files
 
-- `src/ontology.py` — target ABI + empirical availability audit
-- `src/graft.py` — `SemanticInterfaceGraft`, `ReadoutHeads`, arch descriptor
-- `src/data.py` — H, candidate sets A, canonical supervision
-- `src/train.py` — training harness + evaluation contract
-- Results: `D:\codex-runs\encoder-contrast-01\phase0\phase0-harness-{causal,encoder}.json`
+- `src/ontology.py` — 13-target ABI, action endpoint, empirical availability audit
+- `src/objective.py` — the five-term loss + alignment-forbidden assertion
+- `src/pairs.py` — renderer and truth-changing pair construction with verification
+- `src/graft.py` — `BidirectionalGraft`, `SemanticInterfaceGraft`, `ReadoutHeads`
+- `src/data.py` — H, candidate sets A, canonical supervision, action endpoint
+- `src/gate.py` — the 9-boolean exit gate
+- `src/train_v2.py` — shared training harness, both fabrics
+- `src/train.py` — v1 per-target BCE harness (superseded by `train_v2.py`)
 
-No protected/test-truth was opened. BANK-v2 was not used. VCS was not reopened.
+Results: `D:\codex-runs\encoder-contrast-01\phase0\{exit-gate,phase0-bidirectional}.json`
+
+No protected/test-truth opened. BANK-v2 unused. VCS not reopened. No System 1.5 changes.
