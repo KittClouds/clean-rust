@@ -43,6 +43,14 @@ M_CAP = 24
 
 # ------------------------------------------------------------------ metrics
 def binary_metrics(y_true: torch.Tensor, y_pred: torch.Tensor, positive: float) -> dict:
+    """Binary metrics.
+
+    PROVENANCE CORRECTION: the frozen Phase 1 receipt used the key `macro_f1` for the
+    POSITIVE-CLASS F1. That is a misnomer -- true macro-F1 averages both classes' F1, so a
+    single-class predictor scores 0.000 on positive F1 but 0.500 on true macro-F1. The Phase 1
+    artifact is left untouched; the definition here is corrected for Phase 2 and both numbers
+    are now reported so nothing is ambiguous.
+    """
     y_true = y_true.float()
     y_pred = y_pred.float()
     tp = float(((y_pred == 1) & (y_true == 1)).sum())
@@ -53,12 +61,18 @@ def binary_metrics(y_true: torch.Tensor, y_pred: torch.Tensor, positive: float) 
     rec = tp / max(tp + fn, 1e-9)
     prec = tp / max(tp + fp, 1e-9)
     spec = tn / max(tn + fp, 1e-9)
-    f1 = 2 * prec * rec / max(prec + rec, 1e-9)
+    f1_pos = 2 * prec * rec / max(prec + rec, 1e-9)
+    # negative class
+    nprec = tn / max(tn + fn, 1e-9)
+    nrec = tn / max(tn + fp, 1e-9)
+    f1_neg = 2 * nprec * nrec / max(nprec + nrec, 1e-9)
     bal = (rec + spec) / 2
     pos_rate = (tp + fn) / max(len(y_true), 1)
     return {
         "accuracy": round(acc, 4), "balanced_accuracy": round(bal, 4),
-        "macro_f1": round(f1, 4), "precision": round(prec, 4), "recall": round(rec, 4),
+        "macro_f1": round((f1_pos + f1_neg) / 2, 4),
+        "positive_f1": round(f1_pos, 4), "negative_f1": round(f1_neg, 4),
+        "precision": round(prec, 4), "recall": round(rec, 4),
         "base_rate": round(pos_rate, 4),
         "support_pos": int(tp + fn), "support_neg": int(tn + fp), "n": int(len(y_true)),
         "beats_base_rate": bool(bal > max(pos_rate, 1 - pos_rate) + 0.01),

@@ -163,3 +163,175 @@ def objective_descriptor(w: LossWeights) -> dict:
             "enforcement": "assert_no_alignment_term() raises if an alignment term is added",
         },
     }
+
+# =====================================================================================
+# Phase 2 additive objective terms.
+#
+# Nothing above this line is modified. Phase 0 and Phase 1 losses stay frozen; these are
+# new functions. The Phase 2 contract changes the TRAINING OBJECTIVE ONLY.
+# =====================================================================================
+
+
+def js_divergence_bernoulli(p: torch.Tensor, q: torch.Tensor, eps: float = 1e-7) -> torch.Tensor:
+    """Jensen-Shannon divergence between two Bernoulli distributions.
+
+    Used instead of latent distance so that agreement is enforced on PREDICTIONS, which have
+    no incentive to shrink. Returns a per-element tensor.
+    """
+    p = p.clamp(eps, 1.0 - eps)
+    q = q.clamp(eps, 1.0 - eps)
+    m = 0.5 * (p + q)
+    kl_pm = 0.5 * (p * (p / m).log() + (1.0 - p) * ((1.0 - p) / (1.0 - m)).log())
+    kl_qm = 0.5 * (q * (q / m).log() + (1.0 - q) * ((1.0 - q) / (1.0 - m)).log())
+    return kl_pm + kl_qm
+
+
+def js_divergence_categorical(p: torch.Tensor, q: torch.Tensor, eps: float = 1e-7) -> torch.Tensor:
+    """Row-wise Jensen-Shannon divergence between two categorical distributions [..., C]."""
+    p = p.clamp_min(eps)
+    q = q.clamp_min(eps)
+    p = p / p.sum(-1, keepdim=True)
+    q = q / q.sum(-1, keepdim=True)
+    m = 0.5 * (p + q)
+    kl_pm = 0.5 * (p * (p / m).log()).sum(-1)
+    kl_qm = 0.5 * (q * (q / m).log()).sum(-1)
+    return kl_pm + kl_qm
+
+
+def prediction_consistency_loss(go_x, go_xt, co_x, co_xt, al_x, al_xt,
+                                cand_mask, action_valid, align_ok) -> dict:
+    """L_pair = L_pair,S + L_pair,E + L_pair,A on renderer pairs.
+
+    Consistency is enforced on the predicted distributions of the SUPERVISED heads, never on
+    latent distance. This is the replacement for Phase 1's raw ||s(x) - s(x-tilde)||^2.
+
+    `align_ok` is False when exact canonical candidate identity cannot be established for the
+    pair; in that case candidate and action consistency are OMITTED rather than guessed, per
+    the Phase 2 contract. Global-state consistency is still well defined there because it does
+    not depend on candidate correspondence.
+    """
+    # ---- L_pair,S : global semantic targets, single supervised channel
+    js = []
+    for k, lx in go_x.items():
+        lt = go_xt.get(k)
+        if lt is None:
+            continue
+        if lx.dim() == 1:
+            lx = lx.unsqueeze(-1)
+            lt = lt.unsqueeze(-1)
+        js.append(js_divergence_bernoulli(torch.sigmoid(lx[:, 0]),
+                                          torch.sigmoid(lt[:, 0])).mean())
+    lps = torch.stack(js).mean() if js else torch.tensor(0.0)
+
+    if not align_ok:
+        z = torch.tensor(0.0)
+        return {"S": lps, "E": z, "A": z, "omitted_E": True, "omitted_A": True}
+
+    # ---- L_pair,E : candidate targets, over valid aligned candidates only
+    per = []
+    m = (cand_mask > 0)
+    for k, lx in co_x.items():
+        lt = co_xt.get(k)
+        if lt is None or lx.dim() < 3:
+            continue
+        if lx.shape[-1] == 1:
+            lx = lx.squeeze(-1)
+            lt = lt.squeeze(-1)
+        per.append(js_divergence_bernoulli(torch.sigmoid(lx[m]), torch.sigmoid(lt[m])).mean())
+    lpe = torch.stack(per).mean() if per else torch.tensor(0.0)
+
+    # ---- L_pair,A : endpoint consistency, only where the action contract is preserved
+    if al_x is not None and al_xt is not None and bool(action_valid):
+        p = torch.softmax(al_x, dim=-1)
+        q = torch.softmax(al_xt, dim=-1)
+        lpa = js_divergence_categorical(p, q).mean()
+    else:
+        lpa = torch.tensor(0.0)
+
+    return {"S": lps, "E": lpe, "A": lpa, "omitted_E": False, "omitted_A": False}
+
+
+def variance_floor_loss(s: torch.Tensor, sigma0: torch.Tensor) -> torch.Tensor:
+    """L_var : VICReg-style explicit variance floor on the global state.
+
+        L_var = (1/d_s) * sum_k [ max(0, 0.5*sigma_k^(0) - sigma_k^(batch)) ]^2
+
+    sigma_k^(0) is the per-coordinate standard deviation of s from the UNTRAINED Phase 0
+    graft over TRAIN. It is a lane-relative reference: it never compares this lane's scale to
+    the sibling lane's, and it does not require any coordinate to encode a named concept.
+
+    Only a floor is applied. There is deliberately no covariance penalty in this phase.
+    """
+    sigma = s.std(dim=0, unbiased=False)
+    short = torch.clamp(0.5 * sigma0 - sigma, min=0.0)
+    return (short ** 2).mean()
+
+
+@dataclass
+class Phase2Weights:
+    """Frozen Phase 2 weights. L_R is REMOVED; the raw latent invariance term is gone."""
+    lambda_S: float = 1.0
+    lambda_E: float = 1.0
+    lambda_A: float = 0.5
+    lambda_CF: float = 0.5
+    lambda_pair: float = 0.25
+    lambda_var: float = 0.05
+    var_floor_ratio: float = 0.5
+
+    def terms(self) -> dict:
+        return {"S": self.lambda_S, "E": self.lambda_E, "A": self.lambda_A,
+                "CF": self.lambda_CF, "pair": self.lambda_pair, "var": self.lambda_var}
+
+    def validate(self) -> None:
+        forbidden = {"R", "L_R", "latent_invariance", "align", "distill", "s_c", "s_b",
+                     "e_c", "e_b", "cross_agent"}
+        leaked = forbidden & set(self.terms())
+        if leaked:
+            raise AssertionError(f"Phase 2 objective must not contain {sorted(leaked)}")
+
+
+def phase2_total_loss(parts: dict, w: Phase2Weights) -> tuple[torch.Tensor, dict]:
+    """L^(2) = L_S + L_E + 0.5 L_A + 0.5 L_CF + 0.25 L_pair + 0.05 L_var.
+
+    `parts` keys: S, E, A, CF, pair_S, pair_E, pair_A, var. L_CF stays masked when canonical
+    support-changing supervision is unavailable. No label is ever invented to wake it.
+    """
+    w.validate()
+    lam = w.terms()
+    weighted = {"S": lam["S"] * parts["S"], "E": lam["E"] * parts["E"],
+                "A": lam["A"] * parts["A"], "CF": lam["CF"] * parts["CF"],
+                "pair": lam["pair"] * (parts["pair_S"] + parts["pair_E"] + parts["pair_A"]),
+                "var": lam["var"] * parts["var"]}
+    total = None
+    detail = {}
+    for k, v in weighted.items():
+        if v is None:
+            continue
+        term = v if torch.is_tensor(v) else torch.tensor(float(v))
+        total = term if total is None else total + term
+        detail[k] = float(term.detach())
+    if total is None:
+        total = torch.tensor(0.0)
+    return total, detail
+
+
+def phase2_objective_descriptor(w: Phase2Weights) -> dict:
+    return {
+        "abi": "phase2-semantic-interface/objective-v0.1",
+        "L": "L_S + L_E + 0.5*L_A + 0.5*L_CF + 0.25*L_pair + 0.05*L_var",
+        "weights": w.terms(),
+        "var_floor_ratio": w.var_floor_ratio,
+        "invariance_enforced_on": "predicted distributions (Jensen-Shannon), not latent distance",
+        "raw_latent_L_R": "REMOVED in Phase 2",
+        "covariance_penalty": "deliberately absent in this phase",
+        "anti_collapse_design": "VICReg-inspired explicit variance floor only; the full "
+                                "method is not imported",
+        "sigma0_reference": "per-coordinate std of s from the UNTRAINED Phase 0 graft over TRAIN",
+        "candidate_alignment": "exact canonical alignment required; on failure E and A "
+                               "consistency are omitted, never guessed",
+        "cf_state": "dormant if canonical support-changing supervision is unavailable",
+        "changed_vs_phase1": ["objective only"],
+        "unchanged_vs_phase1": ["substrate", "extraction surfaces", "graft architecture",
+                                "latent dimensions", "target ontology", "canonical splits",
+                                "availability masks"],
+    }

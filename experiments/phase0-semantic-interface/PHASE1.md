@@ -15,7 +15,7 @@ semantic state collapsed to a constant and did not learn; the action endpoint di
 | substrate | `LFM2.5-Encoder-230M` @ `0b649ad0`, 229.7M, **frozen** |
 | graft | Phase 0 `BidirectionalGraft`, **unchanged** |
 | latent dims | `d_s=64`, `d_e=32`, `m_cap=24` — **this lane's Phase 0 choice, preserved** |
-| trainable | 3,187,526 parameters (0.0014% of the substrate) |
+| trainable | 3,187,526 parameters — **1.39%** of the substrate (corrected; an earlier draft of this file said 0.0014%, which was wrong by 1000×) |
 | training | 8 epochs, 312 steps/epoch = 2,496 steps, AdamW 3e-4 cosine, bs 64 |
 | objective | frozen five-term `L = L_S + L_E + 0.5·L_A + 0.5·L_CF + 0.25·L_R` |
 
@@ -48,6 +48,13 @@ Scored at the frozen checkpoint. Base rate is the trivial predictor; `beats` is 
 Every global target sits at *exactly* 0.500 balanced accuracy at **every one of the 8 epochs**.
 That is the signature of a single-class predictor: recall 0, specificity 1. The count channel
 matches its trivial baseline exactly, so it is reported as no margin rather than as a success.
+
+> **Provenance correction (Phase 2 pass).** The `macro_f1` column in the frozen
+> `phase1-bidirectional-receipt.json` is **positive-class F1**, not macro-F1. A single-class
+> predictor scores 0.000 on positive F1; true macro-F1 averages both classes and is **0.500**.
+> The scorer in `src/phase1.py` is now corrected and reports `macro_f1`, `positive_f1` and
+> `negative_f1` separately. The frozen receipt is left untouched. Balanced accuracy 0.500 and
+> every substantive conclusion above are unaffected.
 
 ### Candidate epistemic state — learned
 

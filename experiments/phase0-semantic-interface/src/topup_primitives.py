@@ -35,7 +35,7 @@ def load_extractor():
     return m
 
 
-def usable(world: dict, row: dict) -> bool:
+def usable(world: dict, row: dict, m_cap: int = 24) -> bool:
     """Exactly the filters src/data.py applies, so every row we add is actually joinable.
 
     Mirrors build(): world must be in the cache and the inputs file, must have a non-empty
@@ -44,12 +44,12 @@ def usable(world: dict, row: dict) -> bool:
     pad to -1), so neither do we.
     """
     cand = world.get("available_actions") or []
-    if not cand or len(cand) > 24:
+    if not cand or len(cand) > m_cap:
         return False
     return bool(row.get("bindings"))
 
 
-def joinable(split: str, prim_path: Path, cap: int) -> tuple[int, list[str]]:
+def joinable(split: str, prim_path: Path, cap: int, m_cap: int = 24) -> tuple[int, list[str]]:
     """Mirror src.data.build exactly: take the first `cap` CANONICAL cache rows and count
     how many of those survive build()'s filters. Returns (kept, that ordered id list)."""
     prim = torch.load(prim_path, map_location="cpu", weights_only=False)
@@ -75,14 +75,14 @@ def joinable(split: str, prim_path: Path, cap: int) -> tuple[int, list[str]]:
         if w is None:
             continue
         cand = w.get("available_actions") or []
-        if not cand or len(cand) > 24 or not binds.get(wid):
+        if not cand or len(cand) > m_cap or not binds.get(wid):
             continue
         kept += 1
     return kept, order
 
 
 
-def reorder(payload: dict, split: str, cap: int) -> dict:
+def reorder(payload: dict, split: str, cap: int, m_cap: int = 24) -> dict:
     """Deterministically order the cache so that build()'s canonical window is fully usable.
 
     build() reads the first `cap` CANONICAL row_ids and then applies its own join filters, so
@@ -113,7 +113,7 @@ def reorder(payload: dict, split: str, cap: int) -> dict:
         if w is None:
             return False
         cand = w.get("available_actions") or []
-        return bool(cand) and len(cand) <= 24 and bool(binds.get(wid))
+        return bool(cand) and len(cand) <= m_cap and bool(binds.get(wid))
 
     a, b, p = [], [], []
     for wid in ids:
@@ -159,13 +159,17 @@ def main() -> int:
     ap.add_argument("--batch", type=int, default=16)
     ap.add_argument("--max-len", type=int, default=512)
     ap.add_argument("--out-suffix", default="-full")
+    ap.add_argument("--m-cap", type=int, default=24,
+                    help="candidate cap used for the join filter; Phase 2 passes 28, the "
+                         "measured canonical maximum")
     args = ap.parse_args()
 
     ex = load_extractor()
     base = PRIM / args.substrate / f"{args.split}.pt"
     full = PRIM / args.substrate / f"{args.split}{args.out_suffix}.pt"
     # the population contract is measured in JOINABLE rows inside build()'s canonical window
-    already, _ = joinable(args.split, full if full.is_file() else base, args.target_canonical)
+    already, _ = joinable(args.split, full if full.is_file() else base, args.target_canonical,
+              args.m_cap)
     print(f"joinable canonical rows in build() window: {already}; "
           f"target {args.target_canonical}", flush=True)
     need = args.target_canonical - already
@@ -175,9 +179,9 @@ def main() -> int:
             print("target met by the frozen Phase 0 cache; nothing to write")
             return 0
         payload = reorder(torch.load(full, map_location="cpu", weights_only=False),
-                          args.split, args.target_canonical)
+                          args.split, args.target_canonical, args.m_cap)
         torch.save(payload, full)
-        final, _ = joinable(args.split, full, args.target_canonical)
+        final, _ = joinable(args.split, full, args.target_canonical, args.m_cap)
         print(json.dumps({"written": str(full), "reorder_only": True,
                           "joinable_in_window": final, "target": args.target_canonical,
                           "target_met": final >= args.target_canonical}, indent=2))
@@ -226,7 +230,7 @@ def main() -> int:
             if wid in have or "@" in wid:
                 continue
             w = worlds.get(wid)
-            if w is None or not usable(w, r):
+            if w is None or not usable(w, r, args.m_cap):
                 continue
             picked.append(r)
             if len(picked) >= need:
@@ -284,11 +288,11 @@ def main() -> int:
                         "substrate": args.substrate, "source": "BANK-v1 canonical rows only",
                         "elapsed_seconds": round(time.perf_counter() - started, 2),
                         "frozen_phase0_file_untouched": True}
-    payload = reorder(payload, args.split, args.target_canonical)
+    payload = reorder(payload, args.split, args.target_canonical, args.m_cap)
 
     outp = full
     torch.save(payload, outp)
-    final, _ = joinable(args.split, outp, args.target_canonical)
+    final, _ = joinable(args.split, outp, args.target_canonical, args.m_cap)
     canon = len([i for i in payload["row_ids"] if "@" not in i])
     print(json.dumps({"written": str(outp), "cache_rows": payload["n_rows"],
                       "canonical_in_cache": canon, "joinable_in_window": final,

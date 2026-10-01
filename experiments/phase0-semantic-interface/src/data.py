@@ -39,14 +39,20 @@ def _arg_entities(a: dict, ents: set[str]) -> list[str]:
 
 
 def build(split: str, substrate: str, limit: int | None = None, seed: int = 0,
-          prim_suffix: str = "") -> dict:
+          prim_suffix: str = "", m_cap: int | None = None) -> dict:
     """Return frozen features H, candidate set A, and canonical supervision for one split.
 
     `prim_suffix` selects a topped-up primitive cache (e.g. "-full"). With a suffix the
     population is defined by the cache's own canonical row order rather than by the first
     `limit` lines of the world file, which is what makes the 20k/2k canonical contract
     reachable. The default path is unchanged.
+
+    `m_cap` defaults to the frozen Phase 1 value of 24. The Phase 2 candidate preflight
+    measured the true canonical maximum as 28, so Phase 2 passes 28. NOTE: build() DROPS a
+    whole row when len(available_actions) > m_cap, so raising the cap changes which rows exist
+    at all -- it is not partial truncation of a retained row.
     """
+    M_CAP_EFF = m_cap if m_cap is not None else M_CAP
     prim = torch.load(PRIM / substrate / f"{split}{prim_suffix}.pt", map_location="cpu", weights_only=False)
     row_of = {w: i for i, w in enumerate(prim["row_ids"])}
     surf = torch.stack([prim["surfaces"][s] for s in SURFACES], 1).float()  # [N,6,d_h]
@@ -89,7 +95,7 @@ def build(split: str, substrate: str, limit: int | None = None, seed: int = 0,
         if w is None or wid not in row_of or wid not in input_rows:
             continue
         cand = w.get("available_actions") or []
-        if not cand or len(cand) > M_CAP:
+        if not cand or len(cand) > M_CAP_EFF:
             continue
         ents = {e["id"] for e in w["entities"]}
         base, eids = row_ent[wid]
@@ -110,13 +116,13 @@ def build(split: str, substrate: str, limit: int | None = None, seed: int = 0,
             cm.append((ids, ACTION_TYPES.index(a["type"]) if a["type"] in ACTION_TYPES else 0))
         cand_recs.append(cm)
         m = len(cm)
-        ctype.append([c[1] for c in cm] + [0] * (M_CAP - m))
-        cmask.append([1.0] * m + [0.0] * (M_CAP - m))
+        ctype.append([c[1] for c in cm] + [0] * (M_CAP_EFF - m))
+        cmask.append([1.0] * m + [0.0] * (M_CAP_EFF - m))
         cent.append([[e - off if e - off >= 0 else -1 for e in c[0]] + [-1] * (MAX_ARGS - len(c[0]))
-                     for c in cm] + [[-1] * MAX_ARGS] * (M_CAP - m))
+                     for c in cm] + [[-1] * MAX_ARGS] * (M_CAP_EFF - m))
         eptr[-1] = [off + j for j in range(len(eidx))]
         off += len(eidx)
-        cact.append(cand + [None] * (M_CAP - m))
+        cact.append(cand + [None] * (M_CAP_EFF - m))
 
         # ---------------- canonical supervision ----------------
         st, av, goal = w["initial_state"], w["available_actions"], w["goal"]
@@ -147,10 +153,10 @@ def build(split: str, substrate: str, limit: int | None = None, seed: int = 0,
                 "candidate_has_unmet_requirements": float(not is_legal),
                 # supported / counterevidence / requires_missing_information: UNAVAILABLE
             })
-        rows_c = rows_c + [None] * (M_CAP - len(rows_c))
+        rows_c = rows_c + [None] * (M_CAP_EFF - len(rows_c))
         labels_cand.append(rows_c)
 
-    pad = M_CAP
+    pad = M_CAP_EFF
     H = {
         "row": torch.stack(Hrow),
         "ent": torch.stack(ent_list) if ent_list else torch.zeros(0, surf.shape[-1]),
@@ -196,5 +202,5 @@ def build(split: str, substrate: str, limit: int | None = None, seed: int = 0,
             "cand_actions": cact, "n_rows": len(world_ids), "action_index": action_index,
             "ent_runs": keep_ent_runs,
             "global_names": gnames, "cand_names": cnames,
-            "surfaces": SURFACES, "m_cap": M_CAP, "max_args": MAX_ARGS,
+            "surfaces": SURFACES, "m_cap": M_CAP_EFF, "max_args": MAX_ARGS,
             "substrate": substrate, "split": split}
