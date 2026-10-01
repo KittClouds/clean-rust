@@ -38,9 +38,16 @@ def _arg_entities(a: dict, ents: set[str]) -> list[str]:
     return out[:MAX_ARGS]
 
 
-def build(split: str, substrate: str, limit: int | None = None, seed: int = 0) -> dict:
-    """Return frozen features H, candidate set A, and canonical supervision for one split."""
-    prim = torch.load(PRIM / substrate / f"{split}.pt", map_location="cpu", weights_only=False)
+def build(split: str, substrate: str, limit: int | None = None, seed: int = 0,
+          prim_suffix: str = "") -> dict:
+    """Return frozen features H, candidate set A, and canonical supervision for one split.
+
+    `prim_suffix` selects a topped-up primitive cache (e.g. "-full"). With a suffix the
+    population is defined by the cache's own canonical row order rather than by the first
+    `limit` lines of the world file, which is what makes the 20k/2k canonical contract
+    reachable. The default path is unchanged.
+    """
+    prim = torch.load(PRIM / substrate / f"{split}{prim_suffix}.pt", map_location="cpu", weights_only=False)
     row_of = {w: i for i, w in enumerate(prim["row_ids"])}
     surf = torch.stack([prim["surfaces"][s] for s in SURFACES], 1).float()  # [N,6,d_h]
     ent_all = prim["entity_vectors"].float()
@@ -53,9 +60,10 @@ def build(split: str, substrate: str, limit: int | None = None, seed: int = 0) -
         run += len(eids)
 
     worlds = {}
+    wlimit = None if prim_suffix else limit
     with (BANK / "worlds" / f"{split}.jsonl").open(encoding="utf-8") as f:
         for i, line in enumerate(f):
-            if limit and i >= limit:
+            if wlimit and i >= wlimit:
                 break
             if line.strip():
                 w = json.loads(line)
@@ -74,8 +82,11 @@ def build(split: str, substrate: str, limit: int | None = None, seed: int = 0) -
     cand_recs = []
     labels_global, labels_cand = [], []
 
-    for wid, w in worlds.items():
-        if wid not in row_of or wid not in input_rows:
+    order = ([x for x in prim["row_ids"] if "@" not in x][:limit] if prim_suffix
+             else list(worlds.keys()))
+    for wid in order:
+        w = worlds.get(wid)
+        if w is None or wid not in row_of or wid not in input_rows:
             continue
         cand = w.get("available_actions") or []
         if not cand or len(cand) > M_CAP:
