@@ -335,3 +335,145 @@ def phase2_objective_descriptor(w: Phase2Weights) -> dict:
                                 "latent dimensions", "target ontology", "canonical splits",
                                 "availability masks"],
     }
+
+# =====================================================================================
+# Phase 3 additive objective terms: supervision geometry.
+#
+# Nothing above this line is modified. Phase 0/1/2 losses stay frozen.
+#
+# Two changes, both to supervision geometry rather than to architecture:
+#   (1) unique-SOURCE weighting, so aliases and proxies cannot buy extra weight by having
+#       their own ontology head;
+#   (2) prospectively fixed balanced BCE using TRAIN prevalence only.
+# =====================================================================================
+
+
+def balanced_bce(logits: torch.Tensor, y: torch.Tensor, pi: float,
+                 mask: torch.Tensor | None = None) -> torch.Tensor:
+    """L^bal = -1/2 [ (y/pi) log p + ((1-y)/(1-pi)) log(1-p) ], pi from TRAIN only.
+
+    Written in the numerically stable softplus form. No DEV-derived weights, no focal
+    tuning, no threshold optimisation, no prevalence clipping: pi is bounded away from 0 by
+    the TRAIN panel itself (smallest observed prevalence is 0.079).
+    """
+    pi = float(min(max(pi, 1e-6), 1.0 - 1e-6))
+    z = logits
+    t = y
+    if mask is None:
+        l = 0.5 * ((t / pi) * torch.nn.functional.softplus(-z)
+                   + ((1.0 - t) / (1.0 - pi)) * torch.nn.functional.softplus(z))
+        return l.mean()
+    m = mask.float()
+    l = 0.5 * ((t / pi) * torch.nn.functional.softplus(-z)
+               + ((1.0 - t) / (1.0 - pi)) * torch.nn.functional.softplus(z))
+    return (l * m).sum() / m.sum().clamp(min=1.0)
+
+
+def source_group_loss(head_terms: list, pi: float) -> torch.Tensor:
+    """One source unit: L_g = (1/|H_g|) sum_h L_h.
+
+    `head_terms` are the already-computed per-head balanced losses for the heads that read this
+    single canonical source. Averaging over H_g is what stops an alias from counting twice.
+    """
+    if not head_terms:
+        return torch.tensor(0.0)
+    return torch.stack([t for t in head_terms]).mean()
+
+
+def family_balanced_loss(group_losses: list) -> torch.Tensor:
+    """L_S^(3) or L_E^(3) = (1/|G|) sum_g L_g. Each family is one conceptual block."""
+    if not group_losses:
+        return torch.tensor(0.0)
+    return torch.stack(list(group_losses)).mean()
+
+
+@dataclass
+class Phase3Weights:
+    lambda_S: float = 1.0
+    lambda_E: float = 1.0
+    lambda_A: float = 0.5
+    lambda_CF: float = 0.5
+    lambda_pair: float = 0.25
+    lambda_var: float = 0.05
+
+    def terms(self) -> dict:
+        return {"S": self.lambda_S, "E": self.lambda_E, "A": self.lambda_A,
+                "CF": self.lambda_CF, "pair": self.lambda_pair, "var": self.lambda_var}
+
+    def validate(self) -> None:
+        forbidden = {"R", "L_R", "latent_invariance", "align", "distill", "s_c", "s_b",
+                     "e_c", "e_b", "cross_agent"}
+        leaked = forbidden & set(self.terms())
+        if leaked:
+            raise AssertionError(f"raw latent L_R is RETIRED; found {sorted(leaked)}")
+
+
+def phase3_total_loss(parts: dict, w: Phase3Weights) -> tuple[torch.Tensor, dict]:
+    """L^(3) = L_S^(3) + L_E^(3) + 0.5 L_A + 0.5 L_CF + 0.25 L_pair + 0.05 L_var.
+
+    `parts`: S, E, A, CF, pair_S, pair_E, pair_A, var. L_var is UNCHANGED from Phase 2 even
+    though its measured contribution is small: removing it would be a second intervention.
+    """
+    w.validate()
+    lam = w.terms()
+    weighted = {
+        "S": lam["S"] * parts["S"],
+        "E": lam["E"] * parts["E"],
+        "A": lam["A"] * parts["A"],
+        "CF": lam["CF"] * parts["CF"],
+        "pair": lam["pair"] * (parts["pair_S"] + parts["pair_E"] + parts["pair_A"]),
+        "var": lam["var"] * parts["var"],
+    }
+    total, detail = None, {}
+    for k, v in weighted.items():
+        if v is None:
+            continue
+        term = v if torch.is_tensor(v) else torch.tensor(float(v))
+        total = term if total is None else total + term
+        detail[k] = float(term.detach())
+    if total is None:
+        total = torch.tensor(0.0)
+    return total, detail
+
+
+def j_select(J_S: torch.Tensor | float, J_E: torch.Tensor | float):
+    """J_select = 0.5 J_S + 0.5 J_E over UNIQUE source groups.
+
+    Replaces the Phase 1/2 prior-dominated BCE rule. Action accuracy and renderer agreement are
+    deliberately NOT part of this criterion.
+    """
+    return 0.5 * J_S + 0.5 * J_E
+
+
+def phase3_objective_descriptor(w: Phase3Weights, groups: dict,
+                                prevalence: dict) -> dict:
+    return {
+        "abi": "phase3-semantic-interface/objective-v0.1",
+        "L": "L_S^(3) + L_E^(3) + 0.5 L_A + 0.5 L_CF + 0.25 L_pair + 0.05 L_var",
+        "weights": w.terms(),
+        "raw_latent_L_R": "RETIRED for this lineage",
+        "unique_source_weighting": {
+            "rule": "L_g = (1/|H_g|) sum_h L_h, so a source contributes one unit regardless of "
+                    "how many alias heads read it",
+            "groups": groups,
+        },
+        "balanced_bce": {
+            "formula": "-0.5 * [ (y/pi) log p + ((1-y)/(1-pi)) log(1-p) ]",
+            "pi_source": "TRAIN ONLY",
+            "train_prevalence": prevalence,
+            "dev_derived_weights": False, "focal_tuning": False,
+            "threshold_tuning": False, "prevalence_clipping": False,
+        },
+        "family_balanced_aggregation": "L_S^(3) = mean over independent global source groups; "
+                                       "L_E^(3) = mean over independent candidate source groups",
+        "selection": "J_select = 0.5 J_S + 0.5 J_E balanced DEV BCE over unique source groups; "
+                     "lowest wins; action accuracy and renderer agreement excluded",
+        "L_var": "unchanged from Phase 2 despite small measured contribution, to avoid a "
+                 "second intervention",
+        "cf_state": "dormant unless an already-authorised canonical source exists",
+        "changed_vs_phase2": ["unique-source weighting", "balanced BCE", "selection rule"],
+        "unchanged_vs_phase2": ["substrate", "extraction surfaces", "graft architecture",
+                                "latent dimensions", "target ontology", "canonical splits",
+                                "availability masks", "candidate universe m_cap=28",
+                                "L_pair", "L_var", "L_CF dormancy"],
+    }
