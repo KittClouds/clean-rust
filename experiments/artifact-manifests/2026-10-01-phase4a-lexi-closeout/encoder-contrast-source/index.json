@@ -1,0 +1,22 @@
+{
+  "artifact_kind": "frozen-fabrique-encoder-contrast-source",
+  "created_utc": "2026-10-01T22:29:02Z",
+  "imported_file_count": 12,
+  "inventory_shards": [
+    {
+      "bytes": 6917,
+      "path": "files-000.ndjson",
+      "rows": 12,
+      "sha256": "a1910287d0550197b20ddf5807f16a9d7143429ff8915b3f71bcd4a5ecc812e8"
+    }
+  ],
+  "purpose": "source files and report",
+  "root_id": "encoder-contrast-source",
+  "schema": "KAMMI_CAS_IMPORT_INVENTORY_V1",
+  "source_agent": "source agent not recorded",
+  "source_lab": "Frozen Fabrique",
+  "source_root": "C:\\code land\\clean-rust\\experiments\\encoder-contrast-01",
+  "status": "IMPORTED_TO_LIBRARY_CAS",
+  "total_bytes": 116766,
+  "unique_content_objects": 12
+}

@@ -1,0 +1,55 @@
+{
+  "created_utc": "2026-10-01T22:29:02Z",
+  "excluded": {
+    "bytecode_cache_files": 602,
+    "bytecode_cache_imported": false,
+    "minicpm_imported": false,
+    "minicpm_paths": 1
+  },
+  "roots": [
+    {
+      "imported_file_count": 23,
+      "index": "lepori-phase4a-source/index.json",
+      "root_id": "lepori-phase4a-source",
+      "shards": 1,
+      "source_agent": "Lepori",
+      "source_lab": "Frozen Fabrique",
+      "total_bytes": 307618,
+      "unique_content_objects": 23
+    },
+    {
+      "imported_file_count": 12,
+      "index": "encoder-contrast-source/index.json",
+      "root_id": "encoder-contrast-source",
+      "shards": 1,
+      "source_agent": "source agent not recorded",
+      "source_lab": "Frozen Fabrique",
+      "total_bytes": 116766,
+      "unique_content_objects": 12
+    },
+    {
+      "imported_file_count": 140,
+      "index": "lepori-phase4a/index.json",
+      "root_id": "lepori-phase4a-output",
+      "shards": 1,
+      "source_agent": "Lepori",
+      "source_lab": "Frozen Fabrique",
+      "total_bytes": 5605091914,
+      "unique_content_objects": 140
+    },
+    {
+      "imported_file_count": 1814,
+      "index": "lexi-h2/index.json",
+      "root_id": "lexi-h2-rebuild",
+      "shards": 4,
+      "source_agent": "Lexi",
+      "source_lab": "source lab not identified in source-lock",
+      "total_bytes": 73512636383,
+      "unique_content_objects": 1692
+    }
+  ],
+  "schema": "KAMMI_LANE_CLOSEOUT_INDEX_V1",
+  "total_bytes": 79118152681,
+  "total_imported_files": 1989,
+  "total_unique_content_objects": 1865
+}
