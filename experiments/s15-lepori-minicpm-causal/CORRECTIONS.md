@@ -6,6 +6,64 @@ is restated unchanged.
 
 ---
 
+## C11. "MOVE is provably capped at ~0.37" — **withdrawn; the 0.37 was an estimator, not a bound**
+
+**Was:** legality-only state caps MOVE at ~0.37, so a recurrent action workspace over legality
+state was never going to fix MOVE.
+
+**Why that was wrong.** The 0.3699 was the **1-NN result**, not a MOVE-specific determinism
+ceiling. Review was right that only a within-MOVE grouping supports the claim. Computed
+properly, by grouping worlds whose true action is MOVE and taking the largest agreeing subset
+inside each gold-state group:
+
+| gold state | MOVE ceiling | MOVE 1-NN | ACTIVATE ceiling | NOOP ceiling |
+|---|---|---|---|---|
+| L1 legality only | **0.9335** (n=346) | 0.3699 | 0.9733 | 1.0000 |
+| L2 + `candidate_satisfies_goal` | **0.9942** | 0.9306 | 0.9867 | 1.0000 |
+| L4 + `optimal_next_actions` | 1.0000 | 0.9855 | 1.0000 | 1.0000 |
+
+So **MOVE is not information-capped at 0.37.** Legality-only state contains enough information to
+identify the logged MOVE choice in 93.35% of cases, and the 0.37 figure is the weakness of a
+crude 1-NN extractor, not an information bound. There is a large **estimation** gap, not an
+information gap, and those call for different responses.
+
+**What survives.** The practically decisive point is unchanged in force but restated honestly:
+legality-only is **not crudely learnable** (1-NN 0.3699 on MOVE), whereas legality + the
+goal-relative channel is (1-NN 0.9306). Adding the goal channel is what makes the endpoint
+*learnable by a simple estimator*, and that is why a workspace built only over legality state
+remains a poor bet — not because it is provably impossible, but because it starts from a
+representation where the distinction is 0.37-achievable at best under simple extraction.
+
+Also recorded: these ceilings are **in-sample DEV statistics** (grouping DEV worlds with identical
+gold state), so they bound what a memorising extractor could achieve, not what a generalising
+learner achieves. Stated that way in the receipt.
+
+Receipt: `gold-sufficiency-addendum.json`.
+
+---
+
+## C12. Recoverability readout arms all returned exactly 0.5000 — my probe was broken, not the representation
+
+The first run of the recoverability ladder returned **exactly 0.5000 balanced accuracy on every
+arm, including the capability control** that the production head solves at 0.7495. A uniform
+0.5000 is the signature of weights that have gone NaN, not of a representation lacking
+information, so I debugged before reporting anything.
+
+**Cause:** padded candidate slots carry `NaN` labels, and the loss computed
+`(l * mask).sum() / mask.sum()`. `NaN * 0` is still `NaN`, so a single padded slot poisoned the
+whole sum, the gradient became NaN, and every readout collapsed to a constant predictor. This is
+the same class of bug the Phase 0 `semantic_loss` guards against with `torch.nan_to_num`, and I
+dropped that guard when writing the probe.
+
+**Verification before trusting the rerun:** a closed-form ridge solve on the same frozen `e_j`
+recovered legality at TRAIN 0.7785 / DEV 0.7509, confirming the representation and the metric
+were fine and the fault was in the training loop only.
+
+Recorded because a clean 0.5000 across every arm would have read as a strong negative result —
+that is, as a substantive finding — when it was an arithmetic bug in my own probe.
+
+---
+
 ## C4. "Candidate legality is a property of the interface, not the backbone" — **over-claimed**
 
 **Was:** candidate legality at 0.7495 (MiniCPM) and 0.7509 (encoder) means the capability belongs
