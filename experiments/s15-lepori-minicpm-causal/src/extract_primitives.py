@@ -87,11 +87,16 @@ def pooled(h: torch.Tensor, mask: torch.Tensor, how: str) -> torch.Tensor:
 
 
 def surface_vectors(hs, mask) -> dict[str, torch.Tensor]:
+    """RAW pooled surfaces. No normalisation happens here, on purpose.
+
+    Normalisation statistics must be fitted on TRAIN only and then frozen for every other
+    split. Doing it per batch (the earlier version of this function) leaks DEV information into
+    the DEV representation and makes the cache depend on batch composition, which destroys
+    replayability. See src/fit_surface_stats.py; src/data.py applies the frozen statistics.
+    """
     out = {}
     for name, (layer, how) in SURFACES.items():
-        v = pooled(hs[layer], mask, how)
-        # per-surface standardisation: MiniCPM hidden scale varies ~6x with depth
-        out[name] = ((v - v.mean(0)) / v.std(0).clamp(min=1e-6)).cpu()
+        out[name] = pooled(hs[layer], mask, how).cpu()
     return out
 
 
@@ -181,7 +186,7 @@ def main() -> int:
         "row_ids": row_ids, "labels": labels,
         "hidden": int(model.config.hidden_size), "n_layers": n_layers,
         "surface_defs": {k: {"layer": v[0], "pooling": v[1]} for k, v in SURFACES.items()},
-        "per_surface_normalised": True,
+        "normalisation": "RAW; statistics fitted on TRAIN only by src/fit_surface_stats.py and applied in src/data.py",
         "max_len": args.max_len,
     }
     name = args.out_name or args.split
@@ -195,7 +200,8 @@ def main() -> int:
         "entity_vectors": list(ents.shape), "file": str(outp), "sha256": sha_file(outp),
         "elapsed_seconds": round(time.perf_counter() - started, 2),
         "cuda_peak_bytes": int(torch.cuda.max_memory_allocated()) if device == "cuda" else 0,
-        "device": device, "per_surface_normalised": True,
+        "device": device,
+        "normalisation": "RAW; TRAIN-only frozen statistics applied downstream",
     }
     (OUT / f"{name}-receipt.json").write_text(json.dumps(receipt, indent=2) + "\n")
     print(json.dumps(receipt, indent=2))
