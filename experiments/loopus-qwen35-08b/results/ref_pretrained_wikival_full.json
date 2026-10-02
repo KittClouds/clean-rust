@@ -1,0 +1,90 @@
+{
+  "batches": 127,
+  "depths": {
+    "1": {
+      "nll": 2.894278327289075,
+      "ppl": 18.07045555114746,
+      "top1": 0.44418077877251644,
+      "p1_minus_p2": 0.3345424463942284,
+      "logit_margin": 1.6223486832981493,
+      "entropy": 2.91036604289026,
+      "tokens": 259588,
+      "rel_drift_vs_h1": 0.0,
+      "cos_vs_h1": 1.0,
+      "state_norm": 10.454767722783126,
+      "seconds_cumulative": 11.89356310016592
+    }
+  },
+  "meta": {
+    "model": "D:\\phoenix-models\\qwen3.5-0.8b-base",
+    "corpus": "corpus/wiki_val.jsonl",
+    "seq_len": 512,
+    "windows": 510,
+    "checkpoint": null,
+    "train_meta": {
+      "gate": "none",
+      "scope": "none",
+      "N": null,
+      "n_sup": null,
+      "steps": null
+    },
+    "split": {
+      "encoder": [
+        0,
+        1
+      ],
+      "reasoning": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22
+      ],
+      "decoder": [
+        23
+      ],
+      "reasoning_layer_types": [
+        "linear_attention",
+        "full_attention",
+        "linear_attention",
+        "linear_attention",
+        "linear_attention",
+        "full_attention",
+        "linear_attention",
+        "linear_attention",
+        "linear_attention",
+        "full_attention",
+        "linear_attention",
+        "linear_attention",
+        "linear_attention",
+        "full_attention",
+        "linear_attention",
+        "linear_attention",
+        "linear_attention",
+        "full_attention",
+        "linear_attention",
+        "linear_attention",
+        "linear_attention"
+      ],
+      "n_linear_in_block": 16,
+      "n_full_in_block": 5,
+      "gate": null
+    }
+  }
+}
