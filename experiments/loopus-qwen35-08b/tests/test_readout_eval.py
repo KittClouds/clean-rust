@@ -73,3 +73,24 @@ def test_data_pack_and_split_are_deterministic(tmp_path):
     a, b = D.split_windows(w, 0.2, seed=0)
     a2, b2 = D.split_windows(w, 0.2, seed=0)
     assert torch.equal(a, a2) and torch.equal(b, b2) and a.shape[0] + b.shape[0] == 5
+
+
+def test_evaluate_adaptive_extremes_match_fixed_depths(tiny):
+    from src.eval_depth import evaluate_adaptive
+    from src.train_loopus import ConfidenceHead
+    g = torch.Generator().manual_seed(5)
+    windows = torch.randint(1, 256, (4, 32), generator=g)
+    m = LoopedQwen35(tiny, gate="sigmoid", **SPLIT)
+    conf = ConfidenceHead(tiny.config.hidden_size)
+    fixed = evaluate_depths(m, windows, depths=(1, 4), batch_size=2)
+    ad = evaluate_adaptive(m, conf, windows, max_R=4, thresholds=(0.0, 1.01), batch_size=2)
+    assert abs(ad[0.0]["nll"] - fixed["depths"][1]["nll"]) < 1e-4 and ad[0.0]["mean_exit_depth"] == 1.0
+    assert abs(ad[1.01]["nll"] - fixed["depths"][4]["nll"]) < 1e-4 and ad[1.01]["mean_exit_depth"] == 4.0
+
+
+def test_split_docs_is_disjoint_deterministic_and_stable():
+    docs = [f"doc {i} " * 5 for i in range(20)]
+    tr, ho = D.split_docs(docs, 0.2, seed=0)
+    assert len(ho) == 4 and len(tr) == 16 and not (set(tr) & set(ho))
+    assert (tr, ho) == D.split_docs(docs, 0.2, seed=0)
+    assert ho != D.split_docs(docs, 0.2, seed=1)[1]

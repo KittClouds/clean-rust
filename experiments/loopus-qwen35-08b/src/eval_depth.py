@@ -123,16 +123,46 @@ def evaluate_depths(model: LoopedQwen35, windows: torch.Tensor, depths=(1, 2, 4,
     return res
 
 
+@torch.no_grad()
+def evaluate_adaptive(model: LoopedQwen35, conf_head, windows: torch.Tensor, max_R: int, thresholds,
+                      batch_size: int = 2, device="cpu", chunk: int = 2048, max_batches: int | None = None) -> dict:
+    """Quality vs compute for confidence early exit: one entry per threshold.
+
+    ``mean_exit_depth`` is the compute proxy (reasoning-block applications per sequence).
+    """
+    from .train_loopus import adaptive_exit
+    model.eval()
+    w = model.lm_head.weight
+    out = {}
+    for thr in thresholds:
+        stats, depth_sum, n_seq, nb = None, 0.0, 0, 0
+        for x, m, y in D.batches(windows, batch_size, seed=0, epochs=1, device=device):
+            if max_batches and nb >= max_batches:
+                break
+            nb += 1
+            normed, depth, _ = adaptive_exit(model, conf_head, x, m, max_R, thr)
+            hh, yy = shift(normed, y, m)
+            stats = merge_stats(stats, token_stats(hh, w, yy, chunk))
+            depth_sum += float(depth.sum())
+            n_seq += x.shape[0]
+        r = finalize_stats(stats)
+        r["mean_exit_depth"] = depth_sum / max(n_seq, 1)
+        out[float(thr)] = r
+    return out
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--model", required=True, help="local HF directory of Qwen3.5-0.8B-Base")
     ap.add_argument("--corpus", required=True, help=".jsonl (input_text) / .txt / .md / directory")
     ap.add_argument("--depths", type=int, nargs="+", default=[1, 2, 4, 8])
     ap.add_argument("--seq-len", type=int, default=256)
-    ap.add_argument("--max-docs", type=int, default=400)
+    ap.add_argument("--max-docs", type=int, default=2000, help="keep identical to train_loopus.py")
     ap.add_argument("--max-batches", type=int, default=64)
     ap.add_argument("--batch-size", type=int, default=2)
     ap.add_argument("--loopcd", action="store_true")
+    ap.add_argument("--adaptive", action="store_true", help="confidence early-exit curve (needs --checkpoint)")
+    ap.add_argument("--max-R", type=int, default=8)
     ap.add_argument("--checkpoint", help="trained LoopUS state (from train_loopus.py)")
     ap.add_argument("--gate", default="none", choices=["none", "loopus", "sigmoid"])
     ap.add_argument("--dtype", default="bfloat16")
@@ -145,13 +175,17 @@ def main():
     hf = AutoModelForCausalLM.from_pretrained(a.model, dtype=dt).to(dev)
     tok = AutoTokenizer.from_pretrained(a.model)
     model = LoopedQwen35(hf, gate=a.gate).to(dev)
+    from .train_loopus import ConfidenceHead, load_trainable
+    conf = ConfidenceHead(hf.config.hidden_size).to(dev, dtype=dt)
     if a.checkpoint:
-        from .train_loopus import load_trainable
-        load_trainable(model, None, a.checkpoint, map_location=dev)
+        load_trainable(model, conf, a.checkpoint, map_location=dev)
     texts = D.read_texts(a.corpus, limit=a.max_docs)
-    windows = D.pack(texts, lambda t: tok(t, add_special_tokens=False)["input_ids"], a.seq_len)
-    _, held = D.split_windows(windows, val_frac=0.2, seed=0)
+    _, held_docs = D.split_docs(texts, val_frac=0.2, seed=0)       # same split as train_loopus.py
+    held = D.pack(held_docs, lambda t: tok(t, add_special_tokens=False)["input_ids"], a.seq_len)
     res = evaluate_depths(model, held, a.depths, a.batch_size, dev, loopcd=a.loopcd, max_batches=a.max_batches)
+    if a.adaptive:
+        res["adaptive"] = evaluate_adaptive(model, conf, held, a.max_R, (0.3, 0.5, 0.7, 0.8, 0.9, 1.01),
+                                            a.batch_size, dev, max_batches=a.max_batches)
     res["meta"] = {"model": a.model, "corpus": a.corpus, "seq_len": a.seq_len, "windows": int(held.shape[0]),
                    "gate": a.gate, "split": model.split_summary()}
     Path(a.out).parent.mkdir(parents=True, exist_ok=True)

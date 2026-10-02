@@ -57,6 +57,16 @@ def pack(texts: list[str], tokenize: Callable[[str], list[int]], seq_len: int,
     return torch.tensor(ids[: n * seq_len], dtype=torch.long).view(n, seq_len)
 
 
+def split_docs(texts: list[str], val_frac: float = 0.2, seed: int = 0) -> tuple[list[str], list[str]]:
+    """Deterministic DOCUMENT-level split (no window of a held-out document is ever trained on)."""
+    rng = random.Random(seed)
+    order = list(range(len(texts)))
+    rng.shuffle(order)
+    n_val = max(1, int(round(val_frac * len(texts))))
+    val = set(order[:n_val])
+    return [t for i, t in enumerate(texts) if i not in val], [texts[i] for i in sorted(val)]
+
+
 def split_windows(windows: torch.Tensor, val_frac: float = 0.1, seed: int = 0):
     """Deterministic window-level train/held-out split."""
     g = torch.Generator().manual_seed(seed)

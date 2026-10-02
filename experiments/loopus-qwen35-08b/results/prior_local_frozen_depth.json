@@ -1,0 +1,17 @@
+{
+  "provenance": "REPORTED by the user from an earlier local session (Windows, real Qwen/Qwen3.5-0.8B-Base, flash-linear-attention installed, BANK-v1 TRAIN input_text). NOT reproduced in the cloud build container, which cannot reach huggingface.co. The drift column's exact definition was not recorded; it is not the same quantity as rel_drift_vs_h1 in src/eval_depth.py.",
+  "model": "Qwen/Qwen3.5-0.8B-Base",
+  "split": {"encoder": [0, 1], "reasoning": [2, 22], "decoder": [23, 23]},
+  "gates_reported_green": {
+    "weights_vs_safetensors_worst_abs_diff": 0.0,
+    "manual_stack_vs_hf_max_logit_diff": 0.0,
+    "argmax_agreement": 1.0
+  },
+  "frozen_loop_depth_table": [
+    {"R": 1, "nll": 2.630, "top1": 0.582, "drift_vs_h1": 0.000, "cos_vs_h1": 1.000, "state_norm": 119},
+    {"R": 2, "nll": 3.035, "top1": 0.523, "drift_vs_h1": 0.221, "cos_vs_h1": 0.825, "state_norm": 169},
+    {"R": 4, "nll": 4.480, "top1": 0.349, "drift_vs_h1": 0.593, "cos_vs_h1": 0.546, "state_norm": 308},
+    {"R": 8, "nll": 7.652, "top1": 0.100, "drift_vs_h1": 1.528, "cos_vs_h1": 0.316, "state_norm": 703}
+  ],
+  "reported_conclusion": "Frozen looping is monotonically worse with depth, so h_R is never stronger than h_1: LoopCD has no weak->strong pair to extrapolate along, training-free. LoopUS-style post-training (decay gate + deep supervision) is the live route."
+}

@@ -209,7 +209,7 @@ def main():
     ap.add_argument("--steps", type=int, default=300)
     ap.add_argument("--batch-size", type=int, default=2)
     ap.add_argument("--seq-len", type=int, default=256)
-    ap.add_argument("--max-docs", type=int, default=2000)
+    ap.add_argument("--max-docs", type=int, default=2000, help="keep identical to eval_depth.py")
     ap.add_argument("--N", type=int, default=8)
     ap.add_argument("--n-sup", type=int, default=3)
     ap.add_argument("--lr", type=float, default=5e-5)
@@ -226,8 +226,9 @@ def main():
     model = LoopedQwen35(hf, gate=a.gate, grad_checkpoint=a.grad_checkpoint).to(dev)
     conf = ConfidenceHead(hf.config.hidden_size).to(dev, dtype=dt)
     texts = D.read_texts(a.corpus, limit=a.max_docs)
-    windows = D.pack(texts, lambda t: tok(t, add_special_tokens=False)["input_ids"], a.seq_len)
-    train_w, held = D.split_windows(windows, val_frac=0.2, seed=0)
+    train_docs, held_docs = D.split_docs(texts, val_frac=0.2, seed=0)
+    enc = lambda t: tok(t, add_special_tokens=False)["input_ids"]      # noqa: E731
+    train_w, held = D.pack(train_docs, enc, a.seq_len), D.pack(held_docs, enc, a.seq_len)
     cfg = TrainCfg(n_reasoning_steps=a.N, n_supervision=a.n_sup, lr=a.lr, scope=a.scope)
     hist = train(model, conf, D.batches(train_w, a.batch_size, seed=cfg.seed, epochs=None, device=dev),
                  a.steps, cfg)
