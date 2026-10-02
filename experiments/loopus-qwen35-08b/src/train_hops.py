@@ -53,9 +53,13 @@ def main():
     ap.add_argument("--lr-min-frac", type=float, default=0.1)
     ap.add_argument("--beta", type=float, default=1.0)
     ap.add_argument("--conf-weight", type=float, default=0.1)
+    ap.add_argument("--depth-matched", type=int, default=0,
+                    help="c>0: at depth t supervise only examples with k <= c*t (latent-CoT-style curriculum)")
     ap.add_argument("--grad-checkpoint", action="store_true")
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--checkpoint", help="eval-only: load a trained arm (use with --steps 0)")
+    ap.add_argument("--loopcd-depths", type=int, nargs="*", default=[],
+                    help="eval-only: also run the LoopCD sweep at these recursion depths")
     ap.add_argument("--out", required=True)
     a = ap.parse_args()
 
@@ -97,6 +101,13 @@ def main():
 
     if a.steps == 0:
         run_eval(0)
+        for R in a.loopcd_depths:
+            cd = H.evaluate_hops_loopcd(model, tok, eval_ex, R, device=dev)
+            (out / f"loopcd_R{R}.json").write_text(json.dumps(cd, indent=2))
+            print(f"[loopcd] R={R} (reference h_1); accuracy % by variant, then by k", flush=True)
+            for name, per in cd.items():
+                cells = " ".join(f"{per[k]['acc']*100:5.1f}" if k in per else "   - " for k in ks)
+                print(f"    {name:<16s} all={per['all']['acc']*100:5.1f} nll={per['all']['nll']:.3f} | k: {cells}", flush=True)
         return
 
     def on_step(step: int, rec: dict) -> None:
@@ -104,8 +115,10 @@ def main():
             run_eval(step, rec["loss"])
             save_trainable(model, conf, str(out / "trainable.pt"), meta)
 
-    batches = H.train_batches(tok, list(range(1, a.k_train + 1)), a.batch_size, a.seed, dev, a.n_nodes)
-    hist = train(model, conf, batches, a.steps, cfg, on_step=on_step)
+    batches = H.train_batches(tok, list(range(1, a.k_train + 1)), a.batch_size, a.seed, dev, a.n_nodes,
+                              with_ks=a.depth_matched > 0)
+    hist = train(model, conf, batches, a.steps, cfg, on_step=on_step,
+                 label_fn=H.depth_matched(a.depth_matched) if a.depth_matched > 0 else None)
     save_trainable(model, conf, str(out / "trainable.pt"), meta)
     (out / "history.json").write_text(json.dumps({"cfg": asdict(cfg), "history": hist}))
     print("done ->", out, flush=True)

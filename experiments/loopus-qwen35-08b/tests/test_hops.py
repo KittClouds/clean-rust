@@ -84,3 +84,42 @@ def test_evaluate_hops_readout_position_matches_full_forward():
                 assert abs(res[R][k]["acc"] - sum(cor[k]) / len(cor[k])) < 1e-9
                 assert res[R][k]["n"] == len(nll[k])
     assert res[1]["all"]["n"] == 10
+
+
+def test_depth_matched_label_fn_masks_by_hops_and_depth():
+    ks = torch.tensor([1, 3, 4, 7, 12])
+    y = torch.arange(1, 6)[:, None].expand(5, 4).clone()          # every position labelled
+    fn = H.depth_matched(3)
+    for t, expect in [(1, [1, 1, 0, 0, 0]), (2, [1, 1, 1, 0, 0]), (3, [1, 1, 1, 1, 0]), (4, [1, 1, 1, 1, 1])]:
+        out = fn(t, y, ks)
+        assert [int((r != -100).all()) for r in out] == expect, t
+        assert [int((r == -100).all()) for r in out] == [1 - e for e in expect]
+
+
+def test_train_supports_aux_and_skips_depths_with_no_labels(tiny):
+    from src.train_loopus import ConfidenceHead, TrainCfg, train
+    m = LoopedQwen35(tiny, gate="sigmoid", **SPLIT)
+    conf = ConfidenceHead(tiny.config.hidden_size)
+    tok = CharTok()
+    it = H.train_batches(tok, [1, 6], 4, seed=0, with_ks=True)
+    # c=1: depth t supervises k<=t. Depth 1 only sees k=1 examples; a batch with none must not crash.
+    hist = train(m, conf, it, steps=12, cfg=TrainCfg(n_reasoning_steps=3, n_supervision=2, lr=1e-3,
+                                                     log_every=0, seed=0),
+                 label_fn=H.depth_matched(1))
+    assert len(hist) == 12 and all(torch.isfinite(torch.tensor(h["loss"])) for h in hist)
+
+
+def test_loopcd_hops_base_matches_evaluate_and_zero_omega_is_identity():
+    tiny = build_tiny()
+    m = LoopedQwen35(tiny, gate="sigmoid", gate_kwargs=dict(g0=0.4), **SPLIT)
+    tok = CharTok()
+    ex = H.build_set(tok, 12, [1, 2, 3], seed=7)
+    ref = H.evaluate_hops(m, tok, ex, [3], batch_size=5, device="cpu")[3]
+    cd = H.evaluate_hops_loopcd(m, tok, ex, R=3, omegas=(0.0, 0.5), batch_size=5, device="cpu")
+    for k in (1, 2, 3):
+        if k in ref:
+            assert abs(cd["base"][k]["nll"] - ref[k]["nll"]) < 1e-4
+            for v in ("logits_w0.0", "hidden_w0.0"):               # omega = 0 must reproduce z_R exactly
+                assert abs(cd[v][k]["nll"] - ref[k]["nll"]) < 1e-3, v
+    assert set(cd) >= {"base", "logits_w0.5", "hidden_w0.5", "logits_adaptive", "hidden_adaptive"}
+    assert cd["base"]["all"]["n"] == 12

@@ -132,7 +132,11 @@ def supervision_loss(model: LoopedQwen35, conf_head: ConfidenceHead, ctx, h_old:
 
 
 def train(model: LoopedQwen35, conf_head: ConfidenceHead, batch_iter, steps: int, cfg: TrainCfg,
-          log=print, on_step=None) -> list[dict]:
+          log=print, on_step=None, label_fn=None) -> list[dict]:
+    """``batch_iter`` yields ``(x, mask, labels[, aux])``. If ``label_fn`` is given, the labels
+    supervised at recursion depth ``t`` are ``label_fn(t, labels, aux)`` (e.g. depth-matched
+    curricula that only ask depth ``t`` to solve examples needing <= c*t serial steps). A depth
+    whose filtered labels are all ignored is run without a loss."""
     rng = random.Random(cfg.seed)
     params = set_trainable(model, cfg.scope)
     gate_params = list(model.gate.parameters()) if model.gate is not None else []
@@ -151,7 +155,9 @@ def train(model: LoopedQwen35, conf_head: ConfidenceHead, batch_iter, steps: int
     model.train()
     conf_head.train()
     lo = max(1, cfg.min_supervised_depth)
-    for step, (x, m, y) in zip(range(steps), batch_iter):
+    for step, batch in zip(range(steps), batch_iter):
+        x, m, y, *rest = batch
+        aux = rest[0] if rest else None
         with torch.no_grad():
             ctx = model.prepare(x, m)
             h = model.encode(ctx)
@@ -159,8 +165,9 @@ def train(model: LoopedQwen35, conf_head: ConfidenceHead, batch_iter, steps: int
         opt.zero_grad(set_to_none=True)
         per_depth = []
         for t in range(1, cfg.n_reasoning_steps + 1):
-            if t in sup:
-                loss, h_next, met = supervision_loss(model, conf_head, ctx, h.detach(), t, y, m, cfg)
+            y_t = label_fn(t, y, aux) if label_fn is not None else y
+            if t in sup and int(((y_t[:, 1:] != -100) & (m[:, 1:] == 1)).sum()) > 0:
+                loss, h_next, met = supervision_loss(model, conf_head, ctx, h.detach(), t, y_t, m, cfg)
                 (loss / cfg.n_supervision).backward()
                 met["loss"] = float(loss.detach())
                 per_depth.append(met)
@@ -172,7 +179,7 @@ def train(model: LoopedQwen35, conf_head: ConfidenceHead, batch_iter, steps: int
         opt.step()
         sched.step()
         rec = {"step": step, "grad_norm": float(gn), "supervised": sorted(sup), "per_depth": per_depth,
-               "loss": sum(d["loss"] for d in per_depth) / len(per_depth)}
+               "loss": sum(d["loss"] for d in per_depth) / max(len(per_depth), 1)}
         history.append(rec)
         if on_step is not None:
             on_step(step, rec)
