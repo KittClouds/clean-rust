@@ -58,6 +58,8 @@ def main():
     ap.add_argument("--grad-checkpoint", action="store_true")
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--checkpoint", help="eval-only: load a trained arm (use with --steps 0)")
+    ap.add_argument("--init-from", help="warm-start LoRA + confidence head from a checkpoint, then train "
+                                        "(new modules such as a gate keep their fresh init)")
     ap.add_argument("--loopcd-depths", type=int, nargs="*", default=[],
                     help="eval-only: also run the LoopCD sweep at these recursion depths")
     ap.add_argument("--out", required=True)
@@ -74,6 +76,9 @@ def main():
     else:
         model = build_model(hf, a.gate, a.scope, a.lora_rank, None, a.grad_checkpoint, gate_kwargs)
         conf = ConfidenceHead(hf.config.hidden_size).to(dev)
+    if a.init_from:
+        from .train_loopus import load_trainable
+        load_trainable(model, conf, a.init_from, map_location=dev)
     out = Path(a.out)
     out.mkdir(parents=True, exist_ok=True)
     cfg = TrainCfg(n_reasoning_steps=a.N, n_supervision=min(a.n_sup, a.N), lr=a.lr, gate_lr_mult=a.gate_lr_mult,
