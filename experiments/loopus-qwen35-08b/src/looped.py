@@ -65,6 +65,8 @@ class LoopedQwen35(nn.Module):
             raise ValueError("config.layer_types does not cover num_hidden_layers")
         self.gate = build_gate(gate, self.cfg.hidden_size, **(gate_kwargs or {}))
         self.grad_checkpoint = grad_checkpoint
+        self._pass = 0                   # index of the recursion pass in flight (per-pass LoRA adapters)
+        self._lora_by_layer: dict[int, list] = {}
 
     # ------------------------------------------------------------------ setup
     def prepare(self, input_ids: torch.Tensor, attention_mask: torch.Tensor | None = None) -> Ctx:
@@ -82,13 +84,30 @@ class LoopedQwen35(nn.Module):
         return Ctx(embeds, self.text.rotary_emb(embeds, rope_pos), text_pos, masks, attention_mask)
 
     # ----------------------------------------------------------------- blocks
+    def _set_pass(self, i: int, p: int) -> None:
+        """Select pass ``p``'s adapters in layer ``i`` (no-op unless the layer has per-pass LoRA)."""
+        mods = self._lora_by_layer.get(i)
+        if mods is None:
+            from .lora import LoRALinear
+            mods = [m for m in self.text.layers[i].modules() if isinstance(m, LoRALinear) and m.n_passes > 1]
+            self._lora_by_layer[i] = mods
+        for m in mods:
+            m.cur = p
+
     def _layer(self, i: int, h: torch.Tensor, ctx: Ctx) -> torch.Tensor:
         layer = self.text.layers[i]
+        p = self._pass
         mask = ctx.masks[self.cfg.layer_types[i]]    # dispatch on ABSOLUTE index
         kw = dict(position_embeddings=ctx.position_embeddings, attention_mask=mask,
                   position_ids=ctx.text_position_ids, past_key_values=None, use_cache=False)
         if self.grad_checkpoint and self.training and torch.is_grad_enabled():
-            return checkpoint(lambda x: layer(x, **kw), h, use_reentrant=False)
+            # the pass index is re-applied inside the recomputed function: backward recomputes
+            # after the whole forward, when module state would otherwise point at the LAST pass
+            def fn(x):
+                self._set_pass(i, p)
+                return layer(x, **kw)
+            return checkpoint(fn, h, use_reentrant=False)
+        self._set_pass(i, p)
         return layer(h, **kw)
 
     def _run(self, idx: Sequence[int], h: torch.Tensor, ctx: Ctx) -> torch.Tensor:
@@ -105,7 +124,10 @@ class LoopedQwen35(nn.Module):
 
     def step(self, h: torch.Tensor, ctx: Ctx, first: bool) -> torch.Tensor:
         """One recursion step; the first pass is never gated (keeps R=1 exact)."""
+        if first:
+            self._pass = 0
         h_new = self.block(h, ctx)
+        self._pass += 1
         if first or self.gate is None:
             return h_new
         return self.gate(h_new, h)

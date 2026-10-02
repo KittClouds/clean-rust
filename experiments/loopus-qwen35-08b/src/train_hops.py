@@ -53,6 +53,8 @@ def main():
     ap.add_argument("--lr-min-frac", type=float, default=0.1)
     ap.add_argument("--beta", type=float, default=1.0)
     ap.add_argument("--conf-weight", type=float, default=0.1)
+    ap.add_argument("--lora-passes", type=int, default=1, help=">1: separate LoRA adapter per recursion pass")
+    ap.add_argument("--bptt", action="store_true", help="full backprop through all N passes, loss at depth N only")
     ap.add_argument("--depth-matched", type=int, default=0,
                     help="c>0: at depth t supervise only examples with k <= c*t (latent-CoT-style curriculum)")
     ap.add_argument("--grad-checkpoint", action="store_true")
@@ -74,7 +76,7 @@ def main():
         from .train_loopus import load_checkpoint
         model, conf, _ = load_checkpoint(hf, a.checkpoint, dev)
     else:
-        model = build_model(hf, a.gate, a.scope, a.lora_rank, None, a.grad_checkpoint, gate_kwargs)
+        model = build_model(hf, a.gate, a.scope, a.lora_rank, None, a.grad_checkpoint, gate_kwargs, lora_passes=a.lora_passes)
         conf = ConfidenceHead(hf.config.hidden_size).to(dev)
     if a.init_from:
         from .train_loopus import load_trainable
@@ -122,8 +124,12 @@ def main():
 
     batches = H.train_batches(tok, list(range(1, a.k_train + 1)), a.batch_size, a.seed, dev, a.n_nodes,
                               with_ks=a.depth_matched > 0)
-    hist = train(model, conf, batches, a.steps, cfg, on_step=on_step,
-                 label_fn=H.depth_matched(a.depth_matched) if a.depth_matched > 0 else None)
+    if a.bptt:
+        from .bptt import train_bptt
+        hist = train_bptt(model, batches, a.steps, cfg, on_step=on_step)
+    else:
+        hist = train(model, conf, batches, a.steps, cfg, on_step=on_step,
+                     label_fn=H.depth_matched(a.depth_matched) if a.depth_matched > 0 else None)
     save_trainable(model, conf, str(out / "trainable.pt"), meta)
     (out / "history.json").write_text(json.dumps({"cfg": asdict(cfg), "history": hist}))
     print("done ->", out, flush=True)

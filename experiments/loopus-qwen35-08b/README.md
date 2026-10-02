@@ -6,15 +6,15 @@ Model: `D:\phoenix-models\qwen3.5-0.8b-base` (text backbone, 24 layers = 18 gate
 
 ## One-paragraph result
 
-A frozen pretrained block cannot be looped, so LoopCD has no weak→strong trajectory to extrapolate. LoopUS-style
-post-training (decay gate + LoRA + random deep supervision + monotonicity/confidence losses) **does not make depth
-useful**: the objective is satisfied by making iterations ≥ 2 idempotent, on natural-language NLL *and* on a serial
-multi-hop task. Supervising depth *t* only on examples that need ≤ c·*t* serial steps ("depth-matched") does produce real
-depth use (R=2 beats R=1 by +4 pts overall and +9…17 pts on k=5–9, the hop counts assigned to depth 2–3) and therefore a genuine
-weak→strong trajectory. LoopCD on that trajectory is at best marginal (≤ +0.8 pt overall, NLL ≤ −0.02, with per-k effects of both
-signs). But **in no regime tested did the loop beat a one-pass control fine-tuned on the same stream**: 62.3 % vs 49.4 % (10 nodes,
-k ≤ 12) and, in the pre-registered warm-start test on a task where one pass genuinely runs out (26 nodes), −14.9 pts on k=5–8
-against a +5 criterion. Everything is LoRA r=32, ≤ 2,000 steps, one seed — see "What this does and does not establish".
+A frozen pretrained block cannot be looped, so LoopCD has no weak→strong trajectory to extrapolate. **LoopUS-style training
+(one-step detached gradients, same target at every depth) does not make depth useful** — it settles on "iterations ≥ 2 do
+nothing" on WikiText NLL and on a serial multi-hop task — and depth-matched variants of it still lose to a one-pass control.
+**But depth itself does help when it is trained with full backprop through the passes** (exp 6, pre-registered on a 26-node task
+where one pass runs out at k≈4): at R=2 a model with **shared weights (a true loop) beats the continued one-pass control by +17.9 pts
+on k=5–8, and a per-pass-adapter model by +23.5** (criterion was +5). So the earlier negatives were caused by the training signal
+(detached gradients), not by weight sharing or capacity. LoopCD stays marginal-to-harmful even on these genuine weak→strong
+trajectories (≤ +0.2 pt overall, NLL slightly worse). Scope: LoRA r=32, ≤ 2,000 steps, one seed, synthetic task, N=2 passes, k=5–7 gains only
+(k≥8 stays at the floor) — see "What this does and does not establish".
 
 ## Provenance (read this before trusting any commit)
 
@@ -34,11 +34,12 @@ locally verified frozen construction and is the only place with real-checkpoint 
 | `src/lora.py` | LoRA on the shared block + decoder (full FT of ~436 M block params needs ~7 GB of fp32 state; does not fit 12 GB) |
 | `src/train_loopus.py` | LoopUS-style trainer (random supervised depths, one-step detached gradients, mono + confidence losses, warmup/cosine, per-sequence early exit, optional `label_fn` for depth-matched supervision) |
 | `src/eval_depth.py`, `src/train_loopus.py` CLI | WikiText/BANK depth sweeps (+LoopCD) |
+| `src/bptt.py` | full-backprop looped trainer (loss at final depth, no detach) used by exp 6; `--lora-passes` gives per-pass adapters (selected checkpoint-safely in `looped.py`) |
 | `src/hops.py`, `src/train_hops.py` | serial k-hop pointer-following task, evaluator, LoopCD evaluator, CLI for every arm |
 | `src/validate_real.py`, `validate_real.json` | real-checkpoint gates |
 | `results/` | per-run eval logs, args, histories; `final_*` = large-n final evals |
 | `run_*.sh` | exact commands for each experiment |
-| `tests/` | 46 tests (toy hybrid Qwen3.5 config; CPU routes to the reference gated-delta kernel) |
+| `tests/` | 51 tests (toy hybrid Qwen3.5 config; CPU routes to the reference gated-delta kernel) |
 
 ## Gates (real checkpoint, `validate_real.json`)
 
@@ -108,18 +109,41 @@ depth-matching also *removes* the one-pass handling of k=5–6 (loop R=1 fell fr
 LoopCD at R=2 (`loopcd_R2.json`): base 35.9 / NLL 2.196; logits ω=0.25 **36.7** / 2.179 (best); hidden ω=0.5 36.5; adaptive 36.0–36.2. It is consistently positive on the band where
 h₂ > h₁ (k=5/6/7, logits ω=0.25: 39.6→45.2, 20.7→25.2, 10.8→17.1; SE ≈ 2.8 each) and negative on k=4 (87.9→85.3 at ω=0.25, 76.5 at ω=0.5), netting +0.3…+0.8 overall.
 
+### 6. The depth test: full backprop, with and without weight sharing — pre-registered
+Question: is there *any* benefit from 2× depth on the 26-node task, and does it survive weight sharing? Both arms warm-start from the exp-4 control, same
+stream/lr/steps as exp 5, **loss at the final depth only, full backprop through both passes (no detach), no gate**, 2 passes. A: separate LoRA adapter per pass
+(= a 2× deeper network, upper bound). B: shared adapters (= a true loop). Comparator: the exp-5 continued control, same eval set. Criterion fixed beforehand: R=2 beats control R=1 by ≥ 5 pts averaged over k=5…8.
+Final, n=300/k (`results/final_h6_*`):
+
+| k | 4 | 5 | 6 | 7 | 8 | all |
+|---|---|---|---|---|---|---|
+| control continued, R=1 | 99.6 | 68.7 | 42.0 | 17.4 | 14.7 | 40.3 |
+| A per-pass, R=1 | 97.4 | 67.5 | 36.1 | 14.9 | 15.4 | 40.2 |
+| **A per-pass, R=2** | 97.1 | **92.9** | **78.7** | **50.6** | 14.7 | 46.8 |
+| A per-pass, R=3 / R=4 | 97.4 / 92.6 | 91.6 / 87.6 | 70.8 / 68.2 | 42.1 / 34.8 | 14.0 / 12.2 | 45.3 / 42.4 |
+| B shared, R=1 | 97.8 | 69.3 | 37.4 | 16.1 | 12.6 | 40.0 |
+| **B shared, R=2** | 97.8 | **92.0** | **71.5** | **38.3** | 12.6 | 45.2 |
+| B shared, R=3 / R=4 | 97.4 / 96.3 | 92.3 / 88.2 | 67.5 / 62.3 | 28.5 / 24.4 | 11.9 / 12.6 | 44.0 / 42.1 |
+
+Mean over k=5…8: control 35.7; A 59.2 (**+23.5**); B 53.6 (**+17.9**). **Criterion met by both.** Reading:
+* Depth helps once the first pass is trained *for* the second (R=1 stays at the control's level, R=2 moves the ceiling from k≈4 to k≈7). The earlier negatives
+  (exps 1–5) used detached one-step gradients; this is the only thing that changed besides the loss target.
+* Weight sharing costs ~6 pts relative to per-pass adapters but still wins clearly. Shared B was flat at step 500 and only separated late (R=2 k=6: 44→73 by step 1000), so it is slower to train, not weaker in principle.
+* Gains stop at k=7: k≥8 is at the floor for every arm; passes beyond the trained N=2 degrade (R=3/4 < R=2).
+* LoopCD at R=2 (reference h₁): A base 46.8 / NLL 1.816 vs best logits ω=0.25 47.0 / 1.840; B base 45.2 / 1.874 vs hidden ω=0.25 45.4 / 1.893; adaptive variants lower. Never worth it.
+* Caveat on cost: R=2 is ~2× the inference compute of the control, and arm A has 2× the adapter parameters. B (same parameters, 2× compute) is the fair "loop vs one pass" row.
+
 ## What this does and does not establish
 
-* **Established (measured, gated):** the construction is correct; frozen looping diverges on this backbone; the LoopUS-style objective
-  collapses to idempotent iterations at this budget on both tasks; depth-matched supervision yields real depth use; LoopCD gains are marginal
-  (positive only on the band where the reference is weak, negative elsewhere); a one-pass control matches or beats the looped model in every
-  comparison made, including the pre-registered one.
-* **Not established:** anything at LoopUS's actual scale (they post-train far longer, full-parameter). Everything here is LoRA r=32, ≤ 2,000
-  steps of ~1–3 k tokens, **one seed**, and the hop task is synthetic. The depth-matched loop was run once per setting (no seed variance). The
-  failure of the from-scratch 26-node loop arm (exp 4) is an optimisation failure and says nothing about capacity.
+* **Established (measured, gated):** the construction is correct; frozen looping diverges on this backbone; the LoopUS-style objective with detached gradients
+  collapses to idempotent iterations at this budget on both tasks, and depth-matched supervision of it still loses to a one-pass control; **trained with full backprop, a
+  2-pass loop (shared or per-pass adapters) beats a one-pass control by +18…+24 pts on 5–8 hops** (pre-registered criterion +5); LoopCD does not help on any of these trajectories.
+* **Not established:** anything at LoopUS's scale (they post-train far longer, full-parameter). Everything here is LoRA r=32, ≤ 2,000 steps of ~1–3 k tokens, **one seed**, a synthetic
+  task, N=2. The k≥8 floor means the benefit is one extra pass worth of hops, not unbounded depth. Natural-language NLL was never retested with full backprop (exps 2: detached only) —
+  whether depth helps WikiText loss is open. Exp 4's failed from-scratch arm is an optimisation failure, not a capacity result.
 * The k=9…12 rows of the 10-node task carry cycle shortcuts (composite k lets "answer = start" score ~50 %); they inflate every arm equally and are not evidence of multi-hop composition.
-* Pilots 1 and 2, exp 2's loop arm and exp 4's loop arm were **stopped early by decision** (reasons above); they are reported at the step reached, not as completed runs.
-* Where a loop could still win (untested): much longer / full-parameter post-training; a loop that is *initialised from* depth-aware weights; supervising depth 1 on the full distribution while letting later depths refine; larger models where one pass genuinely cannot reach the answer.
+* Pilots 1 and 2, exp 2's and exp 4's loop arms were **stopped early by decision** (reasons above); reported at the step reached.
+* Next if continued: (1) full-backprop looping on WikiText NLL (does depth help real text?); (2) N=3–4 passes with full backprop and curriculum on k to push past k=7; (3) seeds on exp 6 (gaps are ≫ seed noise, but one seed is one seed); (4) whether detached training can be fixed (e.g. supervise depth 1 on the full distribution) — now known not to be a capacity limit.
 
 ## Reproduce
 ```
@@ -127,6 +151,6 @@ pip install triton-windows<3.8 pyarrow pytest        # fla kernels need Triton; 
 python src/validate_real.py                            # real-checkpoint gates
 python src/prep_corpus.py                              # corpus/ from the downloaded WikiText-103 shards + BANK-v1 TRAIN
 python -m pytest tests -q
-bash run_pilot1.sh | run_pilot2.sh | run_hops1.sh | run_hops2.sh | run_hops3.sh | run_hops4.sh | run_hops5.sh   # hops* need --n-nodes/--init-from as in the scripts
+bash run_pilot1.sh | run_pilot2.sh | run_hops1.sh | run_hops2.sh | run_hops3.sh | run_hops4.sh | run_hops5.sh | run_hops6.sh   # hops* need --n-nodes/--init-from as in the scripts
 ```
 Always train with `--grad-checkpoint` on LM runs (≈ 11 GB without it → shared-memory thrash on Windows; 5 GB with).

@@ -222,12 +222,15 @@ def adaptive_exit(model: LoopedQwen35, conf_head: ConfidenceHead, input_ids: tor
 
 def build_model(hf, gate: str = "sigmoid", scope: str = "lora", lora_rank: int = 32,
                 lora_alpha: float | None = None, grad_checkpoint: bool = False,
-                gate_kwargs: dict | None = None, split: dict | None = None) -> LoopedQwen35:
+                gate_kwargs: dict | None = None, split: dict | None = None,
+                lora_passes: int = 1) -> LoopedQwen35:
     """Wrap an HF Qwen3.5 in the looped stack; ``scope='lora'`` also adapts the block + decoder.
     ``split`` = dict(enc=, reasoning=, dec=) inclusive ranges; default is the measured 0-1/2-22/23."""
     m = LoopedQwen35(hf, gate=gate, gate_kwargs=gate_kwargs, grad_checkpoint=grad_checkpoint, **(split or {}))
     if scope == "lora":
-        apply_lora(m, m.rea_idx + m.dec_idx, lora_rank, lora_alpha)
+        # per-pass adapters only inside the looped block; the decoder runs once, so it keeps one adapter
+        apply_lora(m, m.rea_idx, lora_rank, lora_alpha, n_passes=lora_passes)
+        apply_lora(m, m.dec_idx, lora_rank, lora_alpha)
     dev = next(hf.parameters()).device
     return m.to(dev)
 
@@ -247,7 +250,15 @@ def load_trainable(model: LoopedQwen35, conf_head: ConfidenceHead | None, path: 
     own = dict(model.named_parameters())
     for k, v in sd.items():
         if k.startswith("model."):
-            own[k[len("model."):]].data.copy_(v)
+            name = k[len("model."):]
+            if name in own:
+                own[name].data.copy_(v)
+            else:                                # warm-start a per-pass model from a single-adapter checkpoint
+                targets = [own[f"{name}.{i}"] for i in range(64) if f"{name}.{i}" in own]
+                if not targets:
+                    raise KeyError(name)
+                for t in targets:
+                    t.data.copy_(v)
     if conf_head is not None:
         conf_head.load_state_dict({k[len("conf."):]: v for k, v in sd.items() if k.startswith("conf.")})
 
@@ -258,7 +269,7 @@ def load_checkpoint(hf, path: str, device: str = "cuda"):
     meta = sd["__meta__"]
     model = build_model(hf, gate=meta["gate"], scope=meta["scope"], lora_rank=meta.get("lora_rank", 32),
                         lora_alpha=meta.get("lora_alpha"), gate_kwargs=meta.get("gate_kwargs"),
-                        split=meta.get("split"))
+                        split=meta.get("split"), lora_passes=meta.get("lora_passes", 1))
     conf = ConfidenceHead(hf.config.hidden_size).to(device)
     load_trainable(model, conf, path, map_location=device)
     return model.eval(), conf.eval(), meta
