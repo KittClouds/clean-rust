@@ -9,14 +9,27 @@ Lepori  = MiniCPM5-1B-Base causal      <- this lane
 Encoder = PARKED / preserved lineage
 ```
 
-## Status: substrate qualified, primitives frozen, lane ready to train
+## Status
 
 | step | state | receipt |
 |---|---|---|
 | substrate qualification | **SUBSTRATE_QUALIFIED** | `substrate-qualification.json` |
 | frozen contract | written | `substrate-contract.json` |
 | BANK-v1 primitives | **20,000 TRAIN / 2,000 DEV canonical**, joinable at `m_cap=28` | `primitives/*-receipt.json` |
-| graft / training | not built yet | — |
+| Phase 0 gate | **9/9, engineering only, no accuracy threshold** | `phase0-gate.json` |
+| Phase 1 baseline | complete; candidate legality 0.7495, global dead, endpoint degenerate | `phase1-receipt.json` |
+| integrity / sufficiency audit | complete | `joint-surface-ablation.json`, `gold-action-sufficiency.json` |
+
+Read `CORRECTIONS.md` before quoting anything from this lane. It records ten corrections to my own
+earlier claims, three of which withdrew a conclusion outright.
+
+## Headline
+
+**Candidate legality is accessible; the candidate state is not yet action-sufficient.** A
+parameter-free gold-state ladder shows legality alone has a determinism ceiling of **0.7605**, while
+adding the *already-existing* `candidate_satisfies_goal` head — which this model has dead at
+0.5216 — takes it to **0.9925**. So a recurrent action workspace over legality state was never
+going to solve MOVE. Full tables in `PHASE1.md`.
 
 ## Why MiniCPM and not K2-Horizon
 
@@ -24,7 +37,7 @@ MiniCPM is a plain `LlamaForCausalLM` and exposes a **full internal hidden-state
 custom `K2HorizonModel.forward` absorbs `output_hidden_states` into `**kwargs`, never appends to
 `all_hidden_states`, and returns only `last_hidden_state` — so it is final-layer-only. For a
 program doing grafts over latent states, that is an integration risk rather than an interesting
-scientific question, so K2 is not the choice today. K2 remains available later.
+scientific question. K2 remains available later.
 
 ## Qualification results
 
@@ -44,17 +57,23 @@ The weight-identity check exists because of the LFM2.5-Encoder-230M incident, wh
 wrapper with bare `AutoModel` silently random-initialized every weight. A load is not trusted
 here until it is compared against the checkpoint on disk.
 
-### One substrate property worth knowing before designing anything
+### Scale varies with depth — and the number is smaller than I first said
 
-Hidden scale varies sharply with depth:
+Row-level pooled standard deviation, measured on real BANK data:
 
 ```
-std   layer 6 = 22.21    layer 12 = 22.91    layer 18 = 23.59    layer 24 = 3.73
+lt@24 3.85   mf@24 2.84   ms@24 2.95   mf@18 4.50   mf@12 2.03   mf@6 1.38
 ```
 
-The final layer is ~6× smaller than mid-depth. So the six surfaces are stored **already
-per-surface standardised**; otherwise shallow surfaces would dominate any cross-surface mixing,
-and a variance floor is only comparable *within* a surface, never across depths.
+A spread of **1.58×** relative to the final surface, 3.3× between shallowest and `mf@18`. Earlier
+I justified per-surface standardisation with a "6× smaller final layer" figure; that was a
+**token-level** standard deviation across sequence positions, which is the wrong statistic for a
+pooled per-row surface. Standardisation is still correct and still applied — the honest
+justification is a 1.6–3.3× spread. See `CORRECTIONS.md` C10.
+
+Standardisation statistics are fitted on **TRAIN canonical rows only** and frozen; `data.py`
+applies that one file to every split. Post-normalisation per-surface std is exactly 1.0 on TRAIN and
+0.9928–1.0047 on DEV, which is only possible if DEV never contributed.
 
 ## The six surfaces
 
@@ -71,6 +90,30 @@ All six verified mutually distinct (`lt@24` vs `mf@24` max-abs 5.13), no NaN, no
 Entity mentions are mean-pooled at final depth, where a causal mention representation is
 context-complete.
 
+**Caveat worth carrying:** the trained graft does **not** rely on this depth diversity. Removing
+all six surfaces at once changes candidate legality by −0.0004, and zeroing `s` inside the
+candidate path changes it by −0.0004. The earned capability lives entirely in the candidate-local
+branch. Do not design a depth-diversity mechanism on the assumption that this lane uses one.
+
+## Architecture
+
+```
+MiniCPM hidden stack
+   -> 6 typed surface projections   u_i = P_i(x_i)     one per surface, NOT shared
+   -> global semantic state         s   = rho_s([u_1..u_6])
+   -> candidate-conditioned states  e_j = rho_e([c_j ; s])
+   -> typed heads + action endpoint
+```
+
+The six `u_i` are returned as an explicit **surface memory bank** so a later intervention can
+reread them without reworking the base interface. No recurrence, no IHA, no LoRA, no stochasticity,
+no cross-surface attention, no backbone adaptation.
+
+**Action endpoint semantics:** one logit per candidate, `[B, m]`, masked CE over the candidates a
+world actually has, padded slots masked so they can never be selected. Chance is
+`1/15.69 = 0.0637`, not `1/28`. An earlier version of this lane inherited the encoder's mis-shaped
+`m × m_cap` head; see `CORRECTIONS.md` C9 for the three-lane lineage audit.
+
 ## Inherited constraints — the contract, not the graft
 
 The encoder's architecture is **not** being ported. These are program-level lessons, banked:
@@ -80,31 +123,43 @@ The encoder's architecture is **not** being ported. These are program-level less
 2. **No raw latent-matching loss.** `||s(x) - s(x̃)||²` is minimised at constant `s`; it drove
    `D_s` to 0.0007 while looking like success. Enforce consistency on *predictions* (JS).
 3. **Diversity is not competence.** `D_s > 0` did not imply discrimination — the encoder reached
-   `D_s` 1.84 with every global target still at 0.500.
+   `D_s` 1.84 with every global target still at 0.500, and this lane sits at 0.496 with the same
+   result.
 4. **Paired correctness, not naked renderer agreement.** A constant predictor is perfectly
-   renderer-stable for the wrong reason. Always report the 2×2 decomposition.
+   renderer-stable for the wrong reason. Always report the 2×2 decomposition. On this lane it
+   dissociates cleanly: global sources are *unstable* (70–89 disagreements of 188) and below
+   trivial, while `candidate_legal` has **zero** disagreements at 0.7553.
 5. **No duplicate-source weighting.** 13 BANK heads resolve to **6 independent canonical
    sources**; weight over sources, `L_g = (1/|H_g|) Σ_h L_h`.
 6. **Balanced objective, correct selection, pre-registered margins.** Class-imbalanced BCE is
    minimised by the prior; select on `J_select` over unique source groups.
-7. **No generic global-token/candidate-token recurrent mixer.** Phase 4A moved state enormously
-   while destroying candidate conditioning (6.53 → 1.53). Any future recurrent organ needs a
-   different job, not more depth.
-8. **Port the contract, not the graft.**
-
-This lane joins at the current constructive frontier and does not replay those rungs.
+7. **No generic global-token/candidate-token recurrent mixer.** Encoder Phase 4A moved state
+   enormously while destroying candidate conditioning (6.53 → 1.53).
+8. **Aggregate metrics can be majority-class artifacts.** This lane's endpoint is 0.4672, which is
+   *exactly* the NOOP share. Action-type breakdowns are mandatory, not optional.
+9. **Port the contract, not the graft.**
 
 ## Layout
 
 ```
-src/substrate_contract.py    frozen identity + inherited lessons (the thing not to change)
-src/qualify_substrate.py    Phase 0 substrate qualification, writes the receipt
-src/extract_primitives.py   BANK-v1 -> six surfaces + entity spans
-src/topup_primitives.py     reach the exhaustive joinable contract; never overwrite the base
+src/substrate_contract.py   frozen identity + inherited lessons (the thing not to change)
+src/qualify_substrate.py   Phase 0 substrate qualification
+src/fit_surface_stats.py   TRAIN-only frozen surface statistics
+src/extract_primitives.py  BANK-v1 -> six RAW surfaces + entity spans
+src/topup_primitives.py    reach the exhaustive joinable contract; never overwrite the base
+src/data.py                population, candidates, canonical supervision
+src/ontology.py            13 targets, 6 independent sources, alias map
+src/objective.py           inherited five-term contract; raw latent L_R absent and forbidden
+src/graft.py               six projections, surface memory bank, typed heads
+src/pairs.py               renderer pairs + simulator-verified truth-changing pairs
+src/gate.py                Phase 0 engineering exit gate
+src/phase1.py              Phase 1 baseline + surface-contribution diagnostic
+src/joint_ablation.py      joint all-u-zero / s-zero ablations
+src/gold_sufficiency.py    parameter-free gold action-sufficiency ladder
 ```
 
 Artifacts: `D:\codex-runs\encoder-contrast-01\lepori-causal-minicpm\`
+Docs: `PHASE1.md` (results), `CORRECTIONS.md` (ten corrections, read first).
 
-Next: build a **causal-appropriate** Phase 0/1 interface over these surfaces under the inherited
-constraints. The parked encoder's artifacts stay where they are, for a future encoder-specific
-program.
+Protected/test truth unopened, BANK-v2 unused, canonical splits unchanged, backbone frozen,
+cross-agent alignment forbidden and asserted.
