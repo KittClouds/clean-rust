@@ -1,0 +1,29 @@
+{
+  "weight_identity": "EXACT",
+  "R1_vs_hf_max_abs_logit_diff": 0.0,
+  "state_max_abs_diff_vs_frozen_reference": {
+    "1": 0.0,
+    "2": 0.0,
+    "4": 0.0,
+    "8": 0.0
+  },
+  "nll_by_depth_16rows_new_evaluator": {
+    "1": 2.8154,
+    "2": 3.1973,
+    "4": 4.6275,
+    "8": 7.7144
+  },
+  "top1_by_depth_16rows_new_evaluator": {
+    "1": 0.5711,
+    "2": 0.5097,
+    "4": 0.3518,
+    "8": 0.0966
+  },
+  "premise_json_nll_128rows": {
+    "1": 2.62973,
+    "2": 3.03473,
+    "4": 4.48025,
+    "8": 7.65229
+  },
+  "note": "16 rows here vs 128 in premise.json, so NLL agrees in trend not to the digit; the state diffs are the exact-equality check"
+}

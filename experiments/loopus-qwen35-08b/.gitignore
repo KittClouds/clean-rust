@@ -1,0 +1,8 @@
+__pycache__/
+.pytest_cache/
+*.pt
+
+# local run outputs (large)
+runs/
+corpus/
+*.safetensors

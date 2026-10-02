@@ -1,0 +1,111 @@
+{
+  "abi": "loopus-qwen35/premise-v0.1",
+  "question": "does a frozen reasoning block, looped, give a usable weak->strong trajectory? (the precondition for LoopCD)",
+  "split": {
+    "encoder": [
+      0,
+      1
+    ],
+    "reasoning": [
+      2,
+      22
+    ],
+    "decoder": [
+      23,
+      23
+    ]
+  },
+  "params": 752393024,
+  "weight_identity": "EXACT",
+  "correctness_gate": {
+    "max_abs_diff": 0.0,
+    "mean_abs_diff": 0.0,
+    "argmax_agreement": 1.0,
+    "atol": 0.02,
+    "logits_match": true
+  },
+  "data": {
+    "source": "BANK-v1 TRAIN inputs only",
+    "rows": 128,
+    "seq_len": 192,
+    "split_untouched": [
+      "DEV",
+      "protected"
+    ]
+  },
+  "depths": [
+    1,
+    2,
+    4,
+    8
+  ],
+  "results": {
+    "1": {
+      "nll": 2.62973,
+      "top1": 0.58152,
+      "top5": 0.75082,
+      "drift_rms_vs_h1": 0.0,
+      "cos_vs_h1": 1.0,
+      "hidden_norm": 118.981,
+      "js_to_final": 0.292546,
+      "argmax_flip_rate_vs_final": 0.91807
+    },
+    "2": {
+      "nll": 3.03473,
+      "top1": 0.52301,
+      "top5": 0.71275,
+      "drift_rms_vs_h1": 0.22078,
+      "cos_vs_h1": 0.82451,
+      "hidden_norm": 169.278,
+      "js_to_final": 0.280713,
+      "argmax_flip_rate_vs_final": 0.9018
+    },
+    "4": {
+      "nll": 4.48025,
+      "top1": 0.3488,
+      "top5": 0.54395,
+      "drift_rms_vs_h1": 0.59343,
+      "cos_vs_h1": 0.54563,
+      "hidden_norm": 307.7,
+      "js_to_final": 0.182501,
+      "argmax_flip_rate_vs_final": 0.78638
+    },
+    "8": {
+      "nll": 7.65229,
+      "top1": 0.09997,
+      "top5": 0.21523,
+      "drift_rms_vs_h1": 1.52791,
+      "cos_vs_h1": 0.31583,
+      "hidden_norm": 702.567,
+      "js_to_final": 0.0,
+      "argmax_flip_rate_vs_final": 0.0
+    }
+  },
+  "timing": {
+    "batches": 16,
+    "rows": 128,
+    "seq_len": 192,
+    "seconds": 1969.1,
+    "ms_per_batch": 123070.3,
+    "js_positions": 256,
+    "note": "cost grows as (1 + max_depth) reasoning passes plus one readout per visited depth"
+  },
+  "verdict": {
+    "best_depth": 1,
+    "nll_at_depth_1": 2.62973,
+    "nll_at_depth_max": 7.65229,
+    "nll_best_over_all_depths": 2.62973,
+    "looping_hurts_vs_single_pass": true,
+    "any_depth_improves_on_depth_1": false,
+    "trajectory_is_monotone_improving": false,
+    "hidden_state_norm_growth": 5.905,
+    "cos_to_h1_at_max_depth": 0.31583,
+    "depth1_disagrees_with_final": false,
+    "LoopCD_viable": false,
+    "LoopCD_why": "LoopCD contrasts a WEAK reference against a STRONGER final state. That requires h_R to be the better predictor. It is not: NLL 2.62973 at depth 1 vs 7.65229 at depth 8, and top-1 0.58152 vs 0.09997. The final iterate is not a refined model, it is a drifted one, so there is no strong end to extrapolate toward. The premise FAILS on this backbone, which is the opposite of the four model families LoopCD reports.",
+    "LoopUS_post_training_required": true,
+    "LoopUS_why": "this is precisely the failure the selective decay gate was built for: LoopUS section 1(ii) states that naively re-running a pretrained block induces hidden-state drift because the layers were optimised for single-pass use, and the gate exists to make every iteration a damped refinement step. Our drift measurement is the evidence that the gate is load-bearing here rather than decorative, and that a frozen loop cannot be used as-is.",
+    "hypothesis_for_the_drift": "the reasoning block is the plateau of a network whose final layer performs a large-magnitude projection toward the vocabulary (std 0.23 -> 2.90 on that transition). Feeding plateau activations back in without that projection pushes the representation along an unbounded direction, which is what the growing ||h|| and falling cos(h,h1) show."
+  },
+  "no_training_performed": true
+}
