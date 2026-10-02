@@ -102,12 +102,18 @@ class ReadoutHeads(nn.Module):
         self.cand_names = list(cand_names)
         self.g = nn.ModuleDict({n: nn.Linear(d_s, _dout(n)) for n in self.global_names})
         self.c = nn.ModuleDict({n: nn.Linear(d_e, 1) for n in self.cand_names})
-        self.a = nn.Linear(d_e, m_cap)
+        # ONE LOGIT PER CANDIDATE. The action endpoint is a choice among the candidate set, so
+        # it must be a [B, m] scorer with masked CE over m classes. Emitting m*m_cap logits and
+        # comparing an argmax over the flattened tensor against a single candidate index is the
+        # wrong shape: it silently turns the endpoint into an m*m_cap-way classifier in which
+        # only m_cap classes are ever correct, and it makes the chance rate 1/(m*m_cap) instead
+        # of 1/m. Corrected here at the source.
+        self.a = nn.Linear(d_e, 1)
 
     def forward(self, s, e, cand_mask):
         g = {n: self.g[n](s) for n in self.global_names}
         c = {n: self.c[n](e).squeeze(-1) for n in self.cand_names}
-        return g, c, self.a(e)
+        return g, c, self.a(e).squeeze(-1) * cand_mask
 
 
 def _dout(name: str) -> int:

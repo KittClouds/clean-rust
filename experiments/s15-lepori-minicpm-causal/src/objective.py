@@ -109,7 +109,14 @@ def prediction_consistency_loss(go_x, go_xt, co_x, co_xt, al_x, al_xt, cand_mask
 
 
 def action_loss(logits: torch.Tensor, a_star: torch.Tensor) -> torch.Tensor:
-    """Masked CE over the candidate universe. Abstention worlds contribute nothing."""
+    """Masked CE over the CANDIDATE SET.
+
+    `logits` is [B, m], one score per candidate, and `a_star` is the index of the canonical
+    selected action within the candidate set (-1 for abstention). Abstention worlds contribute
+    nothing and padded candidates are excluded by masking their logit to zero before the
+    softmax, so they can never be selected. Chance for this endpoint is 1/mean_valid_candidates,
+    not 1/m_cap.
+    """
     if logits is None:
         return torch.tensor(0.0)
     valid = a_star >= 0
