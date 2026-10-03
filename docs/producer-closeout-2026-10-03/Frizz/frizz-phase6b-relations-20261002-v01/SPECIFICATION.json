@@ -1,0 +1,32 @@
+{
+  "status": "FROZEN_BEFORE_GOLD_AUDIT",
+  "sources": {
+    "common.py": "2472cbda21aab6014832172291ce4391405893cd30f49e453a26a5bc8b3869a8",
+    "gold.py": "1d8b075b0ef457790008b40e9c546096bdaa6e89e790f0e3e027fe23fe83bb63",
+    "prepare.py": "ba442418658b085b371e48d101ab38985f19157d79eb2f106349781911fbc26f",
+    "SPECIFICATION.md": "fa5accf03f94311085b965e27a1788992888c2e9c4eb92b0b5358b7197337ec6",
+    "test_gold.py": "f8bdf30931cd662964ad6ace8a19d5b87841809bf695cd07cc9dd1a39a9a0b4c"
+  },
+  "inputs": {
+    "C:\\phoenix-target-overgraph\\frizz-phase6a-comparison-20261002-v01\\PHASE6A-SEALED-v02.json": "84b91d45a4f46da122a5b2dae22384b7d2fb07d0fd39cf3c07fba556172db0a8",
+    "C:\\phoenix-target-overgraph\\frizz-phase5-access-20261002-v01\\LANE-SEALED.json": "aecf00e1bdcb71a000d825702349d2b0f886a439f3cd7d2b23955e61e76953a4",
+    "C:\\phoenix-target-overgraph\\bank-v3-core-20261002-v04\\PHASE5-HANDOFF-v02.json": "08cab38d366d6a30d32af4b0391cafddb243a8ea9e6a7435ad53290462d41a4b",
+    "C:\\phoenix-target-overgraph\\frizz-phase6a-comparison-20261002-v01\\bridge-init-TRAIN.pt": "a69eaf952e68d9c3a083d06e77dd834e57185232ca17149a58e4bd0d95dd3c5a",
+    "C:\\phoenix-target-overgraph\\frizz-phase6a-comparison-20261002-v01\\bridge-init-DEV.pt": "b0f3849c03ca19f0fb4c8da4eb4b77d8d30ffe9c2cfe4af00a71a672c5ba8d78",
+    "C:\\phoenix-target-overgraph\\frizz-phase6a-comparison-20261002-v01\\bridge-trained-TRAIN.pt": "e3f6f5e0f1a1d8474b6ebfb5f74aff281b987b62f55f874fdb1d5b6d1348b34c",
+    "C:\\phoenix-target-overgraph\\frizz-phase6a-comparison-20261002-v01\\bridge-trained-DEV.pt": "87393a02c9e49c5a5c7a0ac27b78d1fe86e55202b680a651fac41e452c939ec7",
+    "C:\\phoenix-target-overgraph\\frizz-phase6a-comparison-20261002-v01\\E-init-TRAIN.pt": "aa13b82a8f6c1cbaad876386bcf37a4b82356e4c28a74f8e32b3b0b2f333f29e",
+    "C:\\phoenix-target-overgraph\\frizz-phase6a-comparison-20261002-v01\\E-init-DEV.pt": "485589083c9a10a36cf22ad50d1824b3f02a6cac8c2745814918ed7022b5e466",
+    "C:\\phoenix-target-overgraph\\frizz-phase6a-comparison-20261002-v01\\E-trained-TRAIN.pt": "d3aea5fa5cda64270f9a54d339a385f50a77221483390d54747a94539b63e1e9",
+    "C:\\phoenix-target-overgraph\\frizz-phase6a-comparison-20261002-v01\\E-trained-DEV.pt": "acecf9b2250cb7140e6628534273f222cab37ab209d3b4af0672e61724f596b3",
+    "C:\\code land\\clean-rust\\experiments\\ff-s15-bank-02\\src\\bank2\\algebra.py": "08384a17dafd2748dd3052a537240c873037ed47dd1fb74fb8d0c9a13d192875",
+    "C:\\code land\\clean-rust\\experiments\\ff-s15-bank-02\\src\\bank2\\facts.py": "f1230a01125dd491b97e768352bc08e28fce74a4a872e0062858432f18176f14",
+    "C:\\code land\\clean-rust\\experiments\\ff-s15-bank-02\\src\\bank2\\refsim.py": "d812238c32b74d2dad419c6a41a72482145ebe87739454ac0fedec924e318b82",
+    "C:\\code land\\clean-rust\\experiments\\ff-s15-bank-02\\src\\bank2\\requirements.py": "c753efa6378e5f0ba77af05ba73296856c1b48bc846c3e41e9c48aa3b094500e",
+    "C:\\code land\\clean-rust\\experiments\\ff-s15-bank-02\\src\\bank2\\sim.py": "bdf7270b2706d426b17e426abdf89abcd1c41043fda4f2ed9774980a4d3d6a1d"
+  },
+  "semantic_definitions": "SPECIFICATION.md",
+  "evaluation_opened": false,
+  "LFM_lane": "out of Frizz scope; left frozen",
+  "F": "parked"
+}

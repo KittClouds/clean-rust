@@ -1,0 +1,7 @@
+{
+  "frozen_consequence": "exact all outputs",
+  "gate_logits": "exact init and epoch8",
+  "metrics_and_disposition": "exact",
+  "protected_evaluation_opened": false,
+  "status": "PASS"
+}

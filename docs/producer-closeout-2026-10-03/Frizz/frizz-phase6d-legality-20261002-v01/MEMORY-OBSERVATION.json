@@ -1,0 +1,10 @@
+{
+  "method": "Windows Get-Process sample during TRAIN fit; not end-of-run lifetime maximum",
+  "training_process_id": 38028,
+  "working_set_bytes": 2014396416,
+  "peak_working_set_bytes_at_sample": 2127589376,
+  "private_memory_bytes_at_sample": 4427718656,
+  "CPU_seconds_at_sample": 20.46875,
+  "new_GPU_use": false,
+  "artifact_and_entity_access": "hash-verified Torch mmap caches; batch-local argument gathers"
+}

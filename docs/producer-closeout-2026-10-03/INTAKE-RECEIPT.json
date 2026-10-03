@@ -1,0 +1,18 @@
+{
+  "inventory": {
+    "source_path": "C:\\phoenix-recovery\\blackrootWorks-2026-10-03\\producer-closeout\\inventory.json",
+    "sha256": "2808af6ab26c8598c5dd35ce03ffa70c38b66cc2b5e34ffbe8f1ba4ffc9551c7",
+    "bytes": 3947711,
+    "mtime_ns": 1791018602446384000,
+    "artifact_id": "sha256:2808af6ab26c8598c5dd35ce03ffa70c38b66cc2b5e34ffbe8f1ba4ffc9551c7",
+    "byte_count": 3947711,
+    "event_id": "sha256:f19a2fd960b6ac7f908f86f29f0da84c4499011d482d7731ae373adce603eaf5"
+  },
+  "seal": {
+    "event_id": "sha256:6812363476475881f1a3768869ab02dc773937a0a2b09f34ed67912691989977",
+    "root": "sha256:af97d5555f2843fc939f8956b381b5a3130d4ae68663e1d85d76c016af933434"
+  },
+  "note_count": 80,
+  "artifact_locations": 4534,
+  "unique_artifacts": 3537
+}

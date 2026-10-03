@@ -1,0 +1,69 @@
+{
+  "both_renderer_public_reconstruction": "exact",
+  "examples": [
+    {
+      "alternate_fact": [
+        "AT",
+        "e5",
+        "e6"
+      ],
+      "changed_candidate_indices": [
+        47
+      ],
+      "exact_input_sha256": "f699c28030dfeb1916bd3513eb44954e8494e07fada45868a556281a91a7cffc",
+      "original_fact": [
+        "AT",
+        "e5",
+        "e1"
+      ],
+      "root": "V3:f54c248431a2988b5ea5430655483dcd",
+      "split": "TRAIN"
+    },
+    {
+      "alternate_fact": [
+        "AT",
+        "e8",
+        "e10"
+      ],
+      "changed_candidate_indices": [
+        8
+      ],
+      "exact_input_sha256": "dc8f6e96c84000e7e115a73f66dd0184061b38870150217806b7ca424ef32e7d",
+      "original_fact": [
+        "AT",
+        "e8",
+        "e6"
+      ],
+      "root": "V3:084b72ed2867de3a9d7480d1156ee24c",
+      "split": "TRAIN"
+    },
+    {
+      "alternate_fact": [
+        "AT",
+        "e3",
+        "e10"
+      ],
+      "changed_candidate_indices": [
+        15
+      ],
+      "exact_input_sha256": "869dc0beb8284749e79dd1e11128c29fdb73b94a8ede86c60b382369daa8f56e",
+      "original_fact": [
+        "AT",
+        "e3",
+        "e8"
+      ],
+      "root": "V3:d627ea432c3952aa12ece2d954cdc31d",
+      "split": "TRAIN"
+    }
+  ],
+  "one_hidden_unreported_fact_changed": true,
+  "protected_evaluation_opened": false,
+  "seconds": 5.577084699994884,
+  "status": "PASS",
+  "truth_test": "Act primitive clauses checked by independent fact-set subset/disjointness; no Sim.legal",
+  "verifier_sha256": "8328cf6c3be3fd471e6d9741fa80ccc86b996afa0de7adef0271d3a76c7912d0",
+  "witnesses": {
+    "DEV": 140,
+    "TRAIN": 598
+  }
+}

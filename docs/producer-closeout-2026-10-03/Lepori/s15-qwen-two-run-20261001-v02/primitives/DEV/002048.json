@@ -1,0 +1,66 @@
+{
+  "sha256": "a4230ae7da824153d3ebed30a8551c99ca3b9ecb724b47301cac620ac5535149",
+  "rows": 256,
+  "absent_mentions_zeroed": [
+    {
+      "row_id": "DEV:000499:0:2@S0",
+      "entity_id": "obj_0",
+      "mention": "ivory_object"
+    },
+    {
+      "row_id": "DEV:000499:0:2@S1",
+      "entity_id": "obj_0",
+      "mention": "ivory_object"
+    },
+    {
+      "row_id": "DEV:000529:0:0@S0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "DEV:000529:0:0@S1",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "DEV:000759:0:0@S0",
+      "entity_id": "loc_0",
+      "mention": "hall_south"
+    },
+    {
+      "row_id": "DEV:000759:0:0@S1",
+      "entity_id": "loc_0",
+      "mention": "hall_south"
+    },
+    {
+      "row_id": "DEV:000919:0:0@S0",
+      "entity_id": "obj_2",
+      "mention": "ember_object"
+    },
+    {
+      "row_id": "DEV:000919:0:0@S1",
+      "entity_id": "obj_2",
+      "mention": "ember_object"
+    },
+    {
+      "row_id": "DEV:001079:0:0@S0",
+      "entity_id": "sw_0",
+      "mention": "switch_q"
+    },
+    {
+      "row_id": "DEV:001079:0:0@S1",
+      "entity_id": "sw_0",
+      "mention": "switch_q"
+    },
+    {
+      "row_id": "DEV:001229:0:0@S1",
+      "entity_id": "obj_1",
+      "mention": "ember_object"
+    },
+    {
+      "row_id": "DEV:001229:0:0@S2",
+      "entity_id": "obj_1",
+      "mention": "ember_object"
+    }
+  ]
+}

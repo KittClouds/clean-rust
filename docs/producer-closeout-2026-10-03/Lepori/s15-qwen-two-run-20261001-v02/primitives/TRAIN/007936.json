@@ -1,0 +1,86 @@
+{
+  "sha256": "5ac7f8089b8d6720430287a6649823da3b32e9460c4cb506b4f31b847d367dac",
+  "rows": 256,
+  "absent_mentions_zeroed": [
+    {
+      "row_id": "TRAIN:007937:0:1",
+      "entity_id": "sw_2",
+      "mention": "switch_q"
+    },
+    {
+      "row_id": "TRAIN:007938:0:0",
+      "entity_id": "ag_0",
+      "mention": "the aforementioned agent"
+    },
+    {
+      "row_id": "TRAIN:007954:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:007959:0:0",
+      "entity_id": "obj_2",
+      "mention": "onyx_object"
+    },
+    {
+      "row_id": "TRAIN:007969:0:0",
+      "entity_id": "sw_2",
+      "mention": "switch_r"
+    },
+    {
+      "row_id": "TRAIN:007970:0:1",
+      "entity_id": "loc_0",
+      "mention": "hall_south"
+    },
+    {
+      "row_id": "TRAIN:008002:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:008005:0:0",
+      "entity_id": "obj_1",
+      "mention": "coral"
+    },
+    {
+      "row_id": "TRAIN:008045:0:1",
+      "entity_id": "sw_0",
+      "mention": "SWITCH_P"
+    },
+    {
+      "row_id": "TRAIN:008058:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:008059:0:0",
+      "entity_id": "obj_1",
+      "mention": "the aforementioned ivory_object"
+    },
+    {
+      "row_id": "TRAIN:008070:0:0",
+      "entity_id": "loc_3",
+      "mention": "chamber_c"
+    },
+    {
+      "row_id": "TRAIN:008108:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:008151:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:008155:0:0",
+      "entity_id": "obj_2",
+      "mention": "topaz_object"
+    },
+    {
+      "row_id": "TRAIN:008171:0:1",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    }
+  ]
+}

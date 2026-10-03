@@ -1,0 +1,62 @@
+{
+  "target": "first_action_type",
+  "surface": "s",
+  "family": "linear",
+  "epochs": 4,
+  "steps": 750,
+  "batch_unit": "64 canonical worlds",
+  "metric": {
+    "n": 333,
+    "accuracy": 0.7357357144355774,
+    "macro_f1": 0.10652173913043478,
+    "class_support": {
+      "0": {
+        "n": 10,
+        "f1": 0.0,
+        "reliable": false
+      },
+      "1": {
+        "n": 4,
+        "f1": 0.0,
+        "reliable": false
+      },
+      "2": {
+        "n": 5,
+        "f1": 0.0,
+        "reliable": false
+      },
+      "3": {
+        "n": 14,
+        "f1": 0.0,
+        "reliable": false
+      },
+      "4": {
+        "n": 249,
+        "f1": 0.8521739130434782,
+        "reliable": true
+      },
+      "5": {
+        "n": 11,
+        "f1": 0.0,
+        "reliable": false
+      },
+      "6": {
+        "n": 39,
+        "f1": 0.0,
+        "reliable": false
+      },
+      "7": {
+        "n": 0,
+        "f1": 0.0,
+        "reliable": false
+      },
+      "8": {
+        "n": 1,
+        "f1": 0.0,
+        "reliable": false
+      }
+    },
+    "macro_f1_scope": "DEV-present classes; underpowered classes descriptive only"
+  },
+  "restricted_or_underpowered": "respect source contract; pooled metrics descriptive only"
+}

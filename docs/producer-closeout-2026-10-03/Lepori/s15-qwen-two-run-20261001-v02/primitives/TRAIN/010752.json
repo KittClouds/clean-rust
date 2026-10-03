@@ -1,0 +1,21 @@
+{
+  "sha256": "001f58f569304c06c7fe6c4f8be6e0dbe31c6d4763434c000b0eccbcffd19f92",
+  "rows": 256,
+  "absent_mentions_zeroed": [
+    {
+      "row_id": "TRAIN:010772:0:0",
+      "entity_id": "obj_0",
+      "mention": "basalt_object"
+    },
+    {
+      "row_id": "TRAIN:010840:0:1",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:010908:0:0",
+      "entity_id": "obj_1",
+      "mention": "basalt_object"
+    }
+  ]
+}

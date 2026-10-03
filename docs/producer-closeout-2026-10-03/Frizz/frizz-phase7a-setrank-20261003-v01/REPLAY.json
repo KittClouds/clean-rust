@@ -1,0 +1,13 @@
+{
+  "checks": {
+    "frozen_source_files_unchanged": 16,
+    "consumed_inputs_rehashed": 6,
+    "checkpoints_rehashed": 26,
+    "max_abs_score_difference_vs_saved": 0.0,
+    "metric_differences": 0,
+    "comparison_differences": 0,
+    "equivariance_receipt_passed": true
+  },
+  "status": "PASS",
+  "first_differences": []
+}

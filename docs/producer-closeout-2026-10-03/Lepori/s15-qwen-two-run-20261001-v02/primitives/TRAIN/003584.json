@@ -1,0 +1,46 @@
+{
+  "sha256": "1dc8ed5a672bcb9baa596aa21d4f3db2bdca2d62be7c044c81baa5ded7d3bf17",
+  "rows": 256,
+  "absent_mentions_zeroed": [
+    {
+      "row_id": "TRAIN:003675:0:0",
+      "entity_id": "obj_1",
+      "mention": "coral_object"
+    },
+    {
+      "row_id": "TRAIN:003715:0:1",
+      "entity_id": "sw_1",
+      "mention": "switch_p"
+    },
+    {
+      "row_id": "TRAIN:003722:0:0",
+      "entity_id": "sw_2",
+      "mention": "the aforementioned switch_r"
+    },
+    {
+      "row_id": "TRAIN:003755:0:0",
+      "entity_id": "sw_0",
+      "mention": "switch_r"
+    },
+    {
+      "row_id": "TRAIN:003766:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:003775:0:0",
+      "entity_id": "loc_4",
+      "mention": "hall_south"
+    },
+    {
+      "row_id": "TRAIN:003778:0:0",
+      "entity_id": "loc_2",
+      "mention": "chamber_b"
+    },
+    {
+      "row_id": "TRAIN:003797:0:0",
+      "entity_id": "obj_1",
+      "mention": "ember_object"
+    }
+  ]
+}

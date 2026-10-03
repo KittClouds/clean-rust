@@ -1,0 +1,6 @@
+{
+  "status": "STOPPED",
+  "error": "CalledProcessError(1, ['C:\\\\Users\\\\shuga\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python313\\\\python.exe', '-u', 'C:\\\\phoenix-target-overgraph\\\\frizz-qwen-v3-bridge-20261002-v02\\\\frozen-source-v01\\\\dataset.py'])",
+  "evaluation_opened": false,
+  "E_started": false
+}

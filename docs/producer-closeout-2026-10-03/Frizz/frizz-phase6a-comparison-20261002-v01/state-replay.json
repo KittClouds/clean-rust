@@ -1,0 +1,9 @@
+{
+  "status": "PASS",
+  "state_caches": 8,
+  "positive_controls": 4,
+  "pair_and_target_reconstruction": "exact",
+  "source_identity": "frozen Phase5 checkpoints and Phase6A source",
+  "evaluation_opened": false,
+  "scope": "fresh process using declared authored code; not an independent semantic oracle"
+}

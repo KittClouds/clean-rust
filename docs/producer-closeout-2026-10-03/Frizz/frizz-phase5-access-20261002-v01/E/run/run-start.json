@@ -1,0 +1,19 @@
+{
+  "arm": "E",
+  "specification_sha256": "db4afee3b42756fa4c8960f2f7460e3485c6798158d0145ae1af4ad7f9788bc0",
+  "bridge_freeze_sha256": "65297ab4b4f84cf6e34a7af6eb64aa8e549007de9ad321af43ff61717e79c8e5",
+  "parameters": 2344052,
+  "fixed_buffer_elements": 0,
+  "epochs": 8,
+  "seed": 0,
+  "root_batch": 32,
+  "train_prevalences": {
+    "candidate_legal": 0.05593887344002724,
+    "candidate_satisfies_goal": 0.005886512342840433,
+    "goal_satisfied": 0.05558333173394203,
+    "solvable": 0.7941365242004395
+  },
+  "shared_initialization": "bridge initialization, never trained bridge",
+  "initial_residual_equivalence": "exact e equality on eight DEV roots",
+  "evaluation_opened": false
+}

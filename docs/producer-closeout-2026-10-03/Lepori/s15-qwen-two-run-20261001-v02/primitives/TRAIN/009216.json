@@ -1,0 +1,36 @@
+{
+  "sha256": "679eff388a747823edda8a834b63955a094399bf1bbfc434ff81aff84aacab18",
+  "rows": 256,
+  "absent_mentions_zeroed": [
+    {
+      "row_id": "TRAIN:009216:0:0",
+      "entity_id": "sw_0",
+      "mention": "the aforementioned switch_q"
+    },
+    {
+      "row_id": "TRAIN:009267:0:0",
+      "entity_id": "obj_1",
+      "mention": "jade_object"
+    },
+    {
+      "row_id": "TRAIN:009345:0:0",
+      "entity_id": "obj_1",
+      "mention": "ivory_object"
+    },
+    {
+      "row_id": "TRAIN:009357:0:1",
+      "entity_id": "obj_1",
+      "mention": "topaz_object"
+    },
+    {
+      "row_id": "TRAIN:009358:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:009385:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    }
+  ]
+}

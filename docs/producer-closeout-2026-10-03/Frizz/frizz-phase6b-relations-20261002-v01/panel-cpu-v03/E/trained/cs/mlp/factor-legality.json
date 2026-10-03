@@ -1,0 +1,60 @@
+{
+  "metric": {
+    "components": [
+      {
+        "component": 0,
+        "candidate_count": 3513,
+        "unknown_DEV_values": 0,
+        "accuracy_including_unknown_as_failure": 0.8519783616065979,
+        "macro_recall": 0.49966612458229065,
+        "classes": {
+          "0": {
+            "candidate_support": 2995,
+            "root_support": 332,
+            "recall": 0.9993322491645813,
+            "root_supported": true
+          },
+          "1": {
+            "candidate_support": 518,
+            "root_support": 333,
+            "recall": 0.0,
+            "root_supported": true
+          }
+        }
+      },
+      {
+        "component": 1,
+        "candidate_count": 3513,
+        "unknown_DEV_values": 0,
+        "accuracy_including_unknown_as_failure": 0.8508397340774536,
+        "macro_recall": 0.4997966422815807,
+        "classes": {
+          "0": {
+            "candidate_support": 2995,
+            "root_support": 332,
+            "recall": 0.9976627826690674,
+            "root_supported": true
+          },
+          "1": {
+            "candidate_support": 518,
+            "root_support": 333,
+            "recall": 0.00193050189409405,
+            "root_supported": true
+          }
+        }
+      }
+    ],
+    "mean_component_accuracy": 0.8514090478420258,
+    "mean_component_macro_recall": 0.4997313834319357,
+    "eligible_roots": 333,
+    "scope": "separate factor components, not a composite capability score"
+  },
+  "sha256": "0c47d17946bfffa968721df8602355a03f3c9e8720e7fef831f3f969e823a594",
+  "parameters": 20804,
+  "training_seconds": 2.2514276999863796,
+  "DEV_seconds": 0.3215306999918539,
+  "steps": 751,
+  "epochs": 4,
+  "device": "cpu",
+  "evaluation_opened": false
+}

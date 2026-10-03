@@ -1,0 +1,47 @@
+{
+  "disposition": [
+    "\"ASK\"",
+    "\"DECLINE_UNAVAILABLE\"",
+    "\"ESCALATE\"",
+    "\"EXECUTE\"",
+    "\"NOOP\""
+  ],
+  "reason": [
+    "\"AMBIGUOUS_REFERENCE\"",
+    "\"CONFLICTING_EVIDENCE\"",
+    "\"ESCALATION_REQUIRED\"",
+    "\"IMPOSSIBLE_GOAL\"",
+    "\"MULTIPLE_REQUIRED_MISSING\"",
+    "\"MULTIPLE_REQUIRED_MISSING_UNAVAILABLE\"",
+    "\"MULTIPLE_UNRESOLVED_ACTIONS\"",
+    "\"NECESSARY_MISSING_REQUESTABLE\"",
+    "\"NECESSARY_MISSING_UNAVAILABLE\"",
+    "\"NO_VALID_ACTION\"",
+    "\"OUT_OF_SCOPE\"",
+    "\"POLICY_DENIED\"",
+    "\"UNKNOWN_ENTITY\"",
+    "\"UNKNOWN_TARGET\"",
+    "null"
+  ],
+  "missing_cardinality": [
+    "\"0\"",
+    "\"1\"",
+    "\"2+\""
+  ],
+  "requestability": [
+    "\"ALL_REQUESTABLE\"",
+    "\"NA\"",
+    "\"SOME_UNAVAILABLE\""
+  ],
+  "first_action_type": [
+    "\"ACTIVATE\"",
+    "\"CLOSE\"",
+    "\"DEACTIVATE\"",
+    "\"DROP\"",
+    "\"MOVE\"",
+    "\"OPEN\"",
+    "\"TAKE\"",
+    "\"TRANSFER\"",
+    "\"WAIT\""
+  ]
+}

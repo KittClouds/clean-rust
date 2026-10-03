@@ -1,0 +1,17 @@
+{
+  "sha256": "8eb550f2a84502be58b3293404571239e54729eca09afdeda8333f426b273bfd",
+  "cost": {
+    "training_seconds": 4.665775100002065,
+    "steps": 750,
+    "eligible_train_roots": 1333,
+    "TRAIN_prevalence": 0.5,
+    "parameters": 32897,
+    "epochs": 4,
+    "DEV_seconds": 0.09467699998640455,
+    "peak_cuda_bytes": 97110016
+  },
+  "task": "selected_pair",
+  "mode": "c",
+  "family": "mlp",
+  "evaluation_opened": false
+}

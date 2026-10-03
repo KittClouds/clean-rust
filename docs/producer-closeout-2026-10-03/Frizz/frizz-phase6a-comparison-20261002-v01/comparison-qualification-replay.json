@@ -1,0 +1,6 @@
+{
+  "status": "PASS",
+  "qualification_sha256": "f1279cf48cceae922a79145ab6d8576cbe43a77453f8d9de63bea060bfe2bf8d",
+  "scope": "derived frozen-score metrics; full probe parameters/logits already replayed",
+  "evaluation_opened": false
+}

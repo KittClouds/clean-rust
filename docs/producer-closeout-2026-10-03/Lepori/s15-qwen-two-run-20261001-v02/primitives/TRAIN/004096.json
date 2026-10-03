@@ -1,0 +1,56 @@
+{
+  "sha256": "226eb9ca9ecde126ba723d16a3332e2e2f13978ebf7d1123b0f37888d0ba0086",
+  "rows": 256,
+  "absent_mentions_zeroed": [
+    {
+      "row_id": "TRAIN:004136:0:0",
+      "entity_id": "obj_2",
+      "mention": "copper_object"
+    },
+    {
+      "row_id": "TRAIN:004168:0:1",
+      "entity_id": "obj_2",
+      "mention": "the aforementioned topaz_object"
+    },
+    {
+      "row_id": "TRAIN:004189:0:0",
+      "entity_id": "obj_1",
+      "mention": "jade_object"
+    },
+    {
+      "row_id": "TRAIN:004201:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:004204:0:1",
+      "entity_id": "obj_0",
+      "mention": "ember_object"
+    },
+    {
+      "row_id": "TRAIN:004208:0:0",
+      "entity_id": "sw_0",
+      "mention": "switch_p"
+    },
+    {
+      "row_id": "TRAIN:004218:0:0",
+      "entity_id": "sw_0",
+      "mention": "switch_p"
+    },
+    {
+      "row_id": "TRAIN:004220:0:0",
+      "entity_id": "sw_0",
+      "mention": "SWITCH_P"
+    },
+    {
+      "row_id": "TRAIN:004290:0:0",
+      "entity_id": "ag_0",
+      "mention": "the aforementioned agent"
+    },
+    {
+      "row_id": "TRAIN:004338:0:0",
+      "entity_id": "loc_0",
+      "mention": "chamber a"
+    }
+  ]
+}

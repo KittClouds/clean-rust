@@ -1,0 +1,26 @@
+{
+  "sha256": "0504b19cb8eb2745deffec1902bfd5295937d703040ea8cb6d9a0294744415a7",
+  "rows": 256,
+  "absent_mentions_zeroed": [
+    {
+      "row_id": "TRAIN:010585:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:010623:0:0",
+      "entity_id": "sw_0",
+      "mention": "switch_r"
+    },
+    {
+      "row_id": "TRAIN:010657:0:0",
+      "entity_id": "obj_1",
+      "mention": "topaz_object"
+    },
+    {
+      "row_id": "TRAIN:010676:0:0",
+      "entity_id": "obj_1",
+      "mention": "basalt_object"
+    }
+  ]
+}

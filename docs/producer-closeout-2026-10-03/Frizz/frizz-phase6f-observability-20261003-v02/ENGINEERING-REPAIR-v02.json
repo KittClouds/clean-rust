@@ -1,0 +1,10 @@
+{
+  "corpus_modified": false,
+  "criteria_unchanged": true,
+  "instrument_exceptions": "KeyError/ValueError now abort, only declared A.Regenerate rejection censored",
+  "prior_pass": "C:\\phoenix-target-overgraph\\frizz-phase6f-observability-20261003-v01",
+  "regression": "acquisition_cost and fact_table keys remapped, original preserved",
+  "repair": "remap fact-ID dictionary keys and values in private counterfactual copies",
+  "semantic_normalization": "observable relation synonym pools only; inverse wording distinct",
+  "training": false
+}

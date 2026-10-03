@@ -1,0 +1,41 @@
+{
+  "heads": {
+    "candidate_legal": {
+      "balanced_accuracy": 0.42768222838640213,
+      "accuracy": 0.3662663698196411,
+      "support_positive": 10807,
+      "support_negative": 20337,
+      "train_prevalence": 0.34856510162353516,
+      "beats_declared_base_rate_margin": false
+    },
+    "candidate_satisfies_goal": {
+      "balanced_accuracy": 0.5082134529948235,
+      "accuracy": 0.6038723587989807,
+      "support_positive": 10083,
+      "support_negative": 21061,
+      "train_prevalence": 0.33605125546455383,
+      "beats_declared_base_rate_margin": false
+    }
+  },
+  "endpoint": null,
+  "renderer_paired_correctness": {
+    "candidate_legal": {
+      "both_correct": 1274,
+      "first_only": 560,
+      "second_only": 755,
+      "both_wrong": 2591,
+      "disagreement": 1315
+    },
+    "candidate_satisfies_goal": {
+      "both_correct": 3034,
+      "first_only": 301,
+      "second_only": 337,
+      "both_wrong": 1508,
+      "disagreement": 638
+    }
+  },
+  "D_s": 0.5803080797195435,
+  "J_S": 0.0,
+  "J_E": 0.7038994431495667,
+  "criterion": 0.7038994431495667
+}

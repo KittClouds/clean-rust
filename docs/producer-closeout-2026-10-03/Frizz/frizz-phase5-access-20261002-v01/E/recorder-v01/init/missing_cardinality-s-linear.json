@@ -1,0 +1,34 @@
+{
+  "target": "missing_cardinality",
+  "surface": "s",
+  "family": "linear",
+  "epochs": 4,
+  "steps": 752,
+  "batch_unit": "64 canonical worlds",
+  "metric": {
+    "n": 3000,
+    "accuracy": 0.7540000081062317,
+    "macro_f1": 0.3902091805835479,
+    "class_support": {
+      "0": {
+        "n": 2332,
+        "f1": 0.8559718969555035,
+        "reliable": true
+      },
+      "1": {
+        "n": 334,
+        "f1": 0.16335540838852097,
+        "reliable": true
+      },
+      "2": {
+        "n": 334,
+        "f1": 0.15130023640661938,
+        "reliable": true
+      }
+    },
+    "macro_f1_scope": "DEV-present classes; underpowered classes descriptive only"
+  },
+  "restricted_or_underpowered": "respect source contract; pooled metrics descriptive only",
+  "probe_sha256": "a4f4980324eb2176421eba5e5bc7afc36369ad44322d57a78e228bd5094581ca",
+  "parameters": 195
+}

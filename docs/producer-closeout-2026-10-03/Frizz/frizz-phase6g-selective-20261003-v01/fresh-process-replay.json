@@ -1,0 +1,8 @@
+{
+  "all_binary_baselines": "exact",
+  "candidate_permutation": "exact",
+  "init_epoch12_logits": "exact",
+  "metrics_and_disposition": "exact",
+  "protected_evaluation_opened": false,
+  "status": "PASS"
+}

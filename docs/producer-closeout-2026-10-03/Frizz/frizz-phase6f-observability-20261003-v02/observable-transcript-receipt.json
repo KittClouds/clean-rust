@@ -1,0 +1,12 @@
+{
+  "no_new_scoring_or_training": true,
+  "protected_evaluation_opened": false,
+  "renderer_public_reconstruction": "exact",
+  "rows": {
+    "DEV": 666,
+    "TRAIN": 2666
+  },
+  "semantic_content_sha256": "bdf381b907e21e06dde227f9c4a3a0a658f80011f55ddc23626962d03755b547",
+  "source_sha256": "5fda795fd14621860e5652ba4c0dfdc9790eeff8297a81bfe7c8155189fa3a3c",
+  "status": "PASS"
+}

@@ -1,0 +1,13 @@
+{
+  "TRAIN_loss_terms": {
+    "MAE": 0.01757508508550624,
+    "ordering": 0.28401352110363187,
+    "ordinal": 0.32986349665692877,
+    "renderer": 8.356638530434186e-05,
+    "status": 0.022661119721652495
+  },
+  "checkpoint_sha256": "1df8bbbea4c2eb2019f1ae9eaf451cdaebab46079094ddd307f12575a086eee4",
+  "elapsed_seconds": 31.663492699997732,
+  "epoch": 2,
+  "steps": 168
+}

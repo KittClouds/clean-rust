@@ -1,0 +1,91 @@
+{
+  "sha256": "2d918714c7cdee2c6015be4bb290415aa9f94cffc0e3e0158ae21fff414b8315",
+  "rows": 256,
+  "absent_mentions_zeroed": [
+    {
+      "row_id": "TRAIN:000020:0:0",
+      "entity_id": "sw_0",
+      "mention": "the aforementioned switch_r"
+    },
+    {
+      "row_id": "TRAIN:000023:0:0",
+      "entity_id": "obj_0",
+      "mention": "the aforementioned copper_object"
+    },
+    {
+      "row_id": "TRAIN:000056:0:0",
+      "entity_id": "sw_1",
+      "mention": "the aforementioned switch_p"
+    },
+    {
+      "row_id": "TRAIN:000060:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:000067:0:0",
+      "entity_id": "ag_0",
+      "mention": "they"
+    },
+    {
+      "row_id": "TRAIN:000072:0:0",
+      "entity_id": "obj_2",
+      "mention": "basalt_object"
+    },
+    {
+      "row_id": "TRAIN:000112:0:1",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:000121:0:0",
+      "entity_id": "sw_0",
+      "mention": "SWITCH_R"
+    },
+    {
+      "row_id": "TRAIN:000130:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:000153:0:0",
+      "entity_id": "sw_1",
+      "mention": "SWITCH_R"
+    },
+    {
+      "row_id": "TRAIN:000155:0:0",
+      "entity_id": "obj_1",
+      "mention": "sapphire_object"
+    },
+    {
+      "row_id": "TRAIN:000181:0:0",
+      "entity_id": "obj_1",
+      "mention": "ivory_object"
+    },
+    {
+      "row_id": "TRAIN:000183:0:0",
+      "entity_id": "sw_0",
+      "mention": "switch_p"
+    },
+    {
+      "row_id": "TRAIN:000187:0:0",
+      "entity_id": "obj_1",
+      "mention": "basalt_object"
+    },
+    {
+      "row_id": "TRAIN:000218:0:0",
+      "entity_id": "sw_1",
+      "mention": "switch_p"
+    },
+    {
+      "row_id": "TRAIN:000227:0:0",
+      "entity_id": "loc_0",
+      "mention": "the aforementioned vault_1"
+    },
+    {
+      "row_id": "TRAIN:000233:0:0",
+      "entity_id": "obj_1",
+      "mention": "coral_object"
+    }
+  ]
+}

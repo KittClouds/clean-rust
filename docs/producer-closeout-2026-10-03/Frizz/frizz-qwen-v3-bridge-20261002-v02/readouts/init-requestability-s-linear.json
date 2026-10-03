@@ -1,0 +1,32 @@
+{
+  "target": "requestability",
+  "surface": "s",
+  "family": "linear",
+  "epochs": 4,
+  "steps": 752,
+  "batch_unit": "64 canonical worlds",
+  "metric": {
+    "n": 3000,
+    "accuracy": 0.7723333239555359,
+    "macro_f1": 0.2983430568172425,
+    "class_support": {
+      "0": {
+        "n": 334,
+        "f1": 0.011494252873563218,
+        "reliable": true
+      },
+      "1": {
+        "n": 2332,
+        "f1": 0.8720075400565505,
+        "reliable": true
+      },
+      "2": {
+        "n": 334,
+        "f1": 0.011527377521613832,
+        "reliable": true
+      }
+    },
+    "macro_f1_scope": "DEV-present classes; underpowered classes descriptive only"
+  },
+  "restricted_or_underpowered": "respect source contract; pooled metrics descriptive only"
+}

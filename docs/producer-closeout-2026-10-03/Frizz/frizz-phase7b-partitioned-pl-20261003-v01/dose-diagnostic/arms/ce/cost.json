@@ -1,0 +1,15 @@
+{
+  "arm": "ce",
+  "seed": 0,
+  "parameters": 55169,
+  "epochs": 60,
+  "steps": 2520,
+  "initial_weights_sha256": "f609d0aedf094ccaa97adeb461aa9dcf5200a501d57cea8762a5c5ba93e19ae0",
+  "train_seconds_including_monitoring": 69.13253289996646,
+  "monitoring_seconds": 46.58752780035138,
+  "pure_training_seconds": 22.545005099615082,
+  "peak_cuda_memory_bytes": 292883968,
+  "device": "NVIDIA GeForce RTX 3080",
+  "batch_roots": 32,
+  "steps_per_epoch": 42
+}

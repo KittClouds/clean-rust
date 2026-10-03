@@ -1,0 +1,8 @@
+{
+  "reason": "unbound observable argument slots",
+  "predecessor": "pipeline-failure.json",
+  "training_started_before_repair": false,
+  "extractor_changed": false,
+  "corpus_changed": false,
+  "evaluation_opened": false
+}

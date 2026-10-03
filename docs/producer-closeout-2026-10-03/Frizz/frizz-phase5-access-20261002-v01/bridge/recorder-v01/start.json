@@ -1,0 +1,11 @@
+{
+  "bridge_untouched": true,
+  "arm": "bridge",
+  "source_sha256": "6fafc7bee12fa03696c053cbae3e27462ca62d0c4d2fb5c286e482b8720f3e28",
+  "panel_source_sha256": "68506dba21903b05b826bb1d97e6ac0d6fb25ad34d765a4ce9be76dcde4e1740",
+  "evaluation_opened": false,
+  "checkpoints": {
+    "init": "2f8e426bae499d4644a420468690a3fd3b31712f3ee306a710bd3416f9a10134",
+    "trained": "6d84a5e36a4fa9e6162aba95167513c0594a5c5ceccd5757843363482a3d7cc4"
+  }
+}

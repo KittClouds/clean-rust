@@ -1,0 +1,34 @@
+{
+  "target": "requestability",
+  "surface": "s",
+  "family": "mlp",
+  "epochs": 4,
+  "steps": 752,
+  "batch_unit": "64 canonical worlds",
+  "metric": {
+    "n": 3000,
+    "accuracy": 0.7786666750907898,
+    "macro_f1": 0.3160669888868178,
+    "class_support": {
+      "0": {
+        "n": 334,
+        "f1": 0.07242339832869081,
+        "reliable": true
+      },
+      "1": {
+        "n": 2332,
+        "f1": 0.8757775683317625,
+        "reliable": true
+      },
+      "2": {
+        "n": 334,
+        "f1": 0.0,
+        "reliable": true
+      }
+    },
+    "macro_f1_scope": "DEV-present classes; underpowered classes descriptive only"
+  },
+  "restricted_or_underpowered": "respect source contract; pooled metrics descriptive only",
+  "probe_sha256": "5c943694b4cf478e6f34ef751933d3329f87cce25f4e19c540e40ef4179722df",
+  "parameters": 4355
+}

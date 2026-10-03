@@ -1,0 +1,17 @@
+{
+  "status": "PASS",
+  "arm": "bridge",
+  "panels": {
+    "init": {
+      "status": "PASS",
+      "arms": 30,
+      "exact_logit_replay": true
+    },
+    "trained": {
+      "status": "PASS",
+      "arms": 30,
+      "exact_logit_replay": true
+    }
+  },
+  "evaluation_opened": false
+}

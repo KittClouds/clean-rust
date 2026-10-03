@@ -1,0 +1,31 @@
+{
+  "status": "NO_EXPOSED_SURFACE_CLEARS_FIXED_USEFUL_RANKING_THRESHOLD",
+  "F_earned": false,
+  "well_ranked_by_declared_arm": {
+    "bridge:c:linear": false,
+    "bridge:c:mlp": false,
+    "bridge:cs:linear": false,
+    "bridge:cs:mlp": false,
+    "bridge:e:linear": false,
+    "bridge:e:mlp": false,
+    "E:c:linear": false,
+    "E:c:mlp": false,
+    "E:cs:linear": false,
+    "E:cs:mlp": false,
+    "E:e:linear": false,
+    "E:e:mlp": false
+  },
+  "E_e_MLP_minus_linear_top1": {
+    "delta": -0.0030030030030030047,
+    "ci95": [
+      -0.018018018018018014,
+      0.009009009009009014
+    ],
+    "bootstrap_roots": 333,
+    "repetitions": 2000,
+    "seed": 20261002
+  },
+  "absence_scope": "failure to recover at this fixed linear/64-MLP dose, not proof of information-theoretic absence",
+  "pairwise_scope": "label-constructed contrast accuracy is not full-universe ranking sufficiency",
+  "evaluation_opened": false
+}

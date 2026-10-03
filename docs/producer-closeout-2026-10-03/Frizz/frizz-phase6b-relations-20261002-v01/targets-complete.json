@@ -1,0 +1,30 @@
+{
+  "status": "FIXED_BEFORE_RELATION_PROBE_DEV_SCORING",
+  "vocab": {
+    "legality": [
+      [
+        0,
+        1
+      ],
+      [
+        0,
+        1
+      ]
+    ],
+    "transition_distance": [
+      [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        9,
+        10,
+        11
+      ]
+    ]
+  }
+}

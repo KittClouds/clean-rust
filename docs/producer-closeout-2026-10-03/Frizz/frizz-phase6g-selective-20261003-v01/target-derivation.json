@@ -1,0 +1,32 @@
+{
+  "census": {
+    "DEV": {
+      "canonical_candidates": 20789,
+      "canonical_truth_loss": false,
+      "class_counts_primary": {
+        "CERTAIN_ILLEGAL": 17596,
+        "CERTAIN_LEGAL": 472,
+        "UNRESOLVED": 2721
+      },
+      "renderings": 666,
+      "roots": 333,
+      "strict_only": true
+    },
+    "TRAIN": {
+      "canonical_candidates": 84636,
+      "canonical_truth_loss": false,
+      "class_counts_primary": {
+        "CERTAIN_ILLEGAL": 72110,
+        "CERTAIN_LEGAL": 1931,
+        "UNRESOLVED": 10595
+      },
+      "renderings": 2666,
+      "roots": 1333,
+      "strict_only": true
+    }
+  },
+  "joins": "canonical root, renderer, candidate index; exhaustive mask and canonical truth checked",
+  "observation_contract_sha256": "e72239053cf9bedfecc5c1115524b1017deb68d4317c0cb5ac8008bf8423583d",
+  "paired_statuses_exact": true,
+  "source_sha256": "b4fc4f708714ea0862b84cdefc8e947bac0cf7cf83db6546108de4a9abfdfdce"
+}

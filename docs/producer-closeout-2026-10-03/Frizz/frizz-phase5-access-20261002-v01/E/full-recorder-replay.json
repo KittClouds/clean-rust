@@ -1,0 +1,8 @@
+{
+  "status": "PASS",
+  "arm": "E",
+  "checkpoint_sha256": "5aa48f12f3bbba57628d192ea3c189245a13fd5f9d9ca19c0378299618c1fedf",
+  "all_axes_and_ablations_replayed": true,
+  "scope": "fresh process, frozen authored implementation; not an independent semantic oracle",
+  "evaluation_opened": false
+}

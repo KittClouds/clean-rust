@@ -1,0 +1,10 @@
+{
+  "gold_decoder_accuracy": 1.0,
+  "ordinal_gradient_recovery": [
+    0,
+    4,
+    8
+  ],
+  "status": "PASS",
+  "unit_tests": 5
+}

@@ -1,0 +1,10 @@
+{
+  "status": "PASS",
+  "tests": 3,
+  "known_solvable_linear_and_tiny_MLP_exact_sets": 1.0,
+  "zero_rank4_delta_equals_original_projection": true,
+  "original_projection_has_no_gradient": true,
+  "LoRA_gradient_reaches_trainable_B": true,
+  "gate_rejection_kept_in_eligibility_denominator": true,
+  "source": "pilot-source-v01/test_access.py"
+}

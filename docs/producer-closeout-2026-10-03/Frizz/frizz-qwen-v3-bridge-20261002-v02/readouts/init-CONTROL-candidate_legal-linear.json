@@ -1,0 +1,18 @@
+{
+  "target": "candidate_legal",
+  "surface": "GOLD_CHANNEL_CONTROL",
+  "family": "linear",
+  "epochs": 4,
+  "batch_unit": "64 canonical worlds, not candidates",
+  "steps": 752,
+  "training_worlds": 12000,
+  "seconds": 2.483436399983475,
+  "metric": {
+    "n": 176168,
+    "positive": 9817,
+    "negative": 166351,
+    "balanced_accuracy": 1.0,
+    "accuracy": 1.0
+  },
+  "control": true
+}

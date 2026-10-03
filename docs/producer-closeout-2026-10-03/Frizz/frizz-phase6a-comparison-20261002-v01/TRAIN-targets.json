@@ -1,0 +1,8 @@
+{
+  "sha256": "63aeafdcb554e4e928279331eee7668efbba2f64742dfb9c39cefa96d5980ad2",
+  "roots": 12000,
+  "pair_construction": "pairs.py frozen before DEV scores",
+  "selected_roots": 1333,
+  "optimal_roots": 1333,
+  "evaluation_opened": false
+}

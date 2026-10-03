@@ -1,0 +1,91 @@
+{
+  "sha256": "95d6017b7419285438bcc7fd907b245e83793f9386130bed12aba640adb91611",
+  "rows": 256,
+  "absent_mentions_zeroed": [
+    {
+      "row_id": "TRAIN:013069:0:1",
+      "entity_id": "sw_1",
+      "mention": "switch_q"
+    },
+    {
+      "row_id": "TRAIN:013076:0:0",
+      "entity_id": "sw_0",
+      "mention": "switch_q"
+    },
+    {
+      "row_id": "TRAIN:013083:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:013092:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:013096:0:1",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:013102:0:0",
+      "entity_id": "obj_2",
+      "mention": "coral_object"
+    },
+    {
+      "row_id": "TRAIN:013108:0:0",
+      "entity_id": "ag_0",
+      "mention": "they"
+    },
+    {
+      "row_id": "TRAIN:013119:0:1",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:013149:0:0",
+      "entity_id": "obj_1",
+      "mention": "topaz_object"
+    },
+    {
+      "row_id": "TRAIN:013150:0:1",
+      "entity_id": "sw_1",
+      "mention": "switch_r"
+    },
+    {
+      "row_id": "TRAIN:013151:0:0",
+      "entity_id": "loc_0",
+      "mention": "atrium"
+    },
+    {
+      "row_id": "TRAIN:013206:0:0",
+      "entity_id": "ag_0",
+      "mention": "the aforementioned agent"
+    },
+    {
+      "row_id": "TRAIN:013214:0:0",
+      "entity_id": "obj_1",
+      "mention": "sapphire_object"
+    },
+    {
+      "row_id": "TRAIN:013233:0:0",
+      "entity_id": "sw_0",
+      "mention": "switch_r"
+    },
+    {
+      "row_id": "TRAIN:013257:0:0",
+      "entity_id": "sw_1",
+      "mention": "switch_p"
+    },
+    {
+      "row_id": "TRAIN:013269:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:013307:0:0",
+      "entity_id": "sw_1",
+      "mention": "switch_r"
+    }
+  ]
+}

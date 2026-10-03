@@ -1,0 +1,16 @@
+{
+  "sha256": "65de00e6a0dd4f48fe6a2fdd1f530acd58ba71d451fb37baf8830b58e6bd7f55",
+  "rows": 256,
+  "absent_mentions_zeroed": [
+    {
+      "row_id": "TRAIN:008859:0:1@S0",
+      "entity_id": "loc_0",
+      "mention": "hall_north"
+    },
+    {
+      "row_id": "TRAIN:008859:0:1@S1",
+      "entity_id": "loc_0",
+      "mention": "hall_north"
+    }
+  ]
+}

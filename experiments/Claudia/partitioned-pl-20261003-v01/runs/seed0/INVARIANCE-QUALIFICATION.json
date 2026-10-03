@@ -1,0 +1,233 @@
+{
+  "tolerances": {
+    "fp32": 1e-05,
+    "fp64": 1e-10
+  },
+  "results": {
+    "ce:epoch00:TRAIN:float32": {
+      "roots": 120,
+      "candidate_permutation_max_diff": 0.0,
+      "alone_vs_padded_batch_max_diff": 2.9802322387695312e-08,
+      "padded_slot_garbage_max_diff": 0.0,
+      "pass": true
+    },
+    "ce:epoch00:TRAIN:float64": {
+      "roots": 120,
+      "candidate_permutation_max_diff": 1.3877787807814457e-16,
+      "alone_vs_padded_batch_max_diff": 1.6653345369377348e-16,
+      "padded_slot_garbage_max_diff": 0.0,
+      "pass": true
+    },
+    "ce:epoch00:DEV:float32": {
+      "roots": 120,
+      "candidate_permutation_max_diff": 0.0,
+      "alone_vs_padded_batch_max_diff": 2.9802322387695312e-08,
+      "padded_slot_garbage_max_diff": 0.0,
+      "pass": true
+    },
+    "ce:epoch00:DEV:float64": {
+      "roots": 120,
+      "candidate_permutation_max_diff": 1.1102230246251565e-16,
+      "alone_vs_padded_batch_max_diff": 2.220446049250313e-16,
+      "padded_slot_garbage_max_diff": 0.0,
+      "pass": true
+    },
+    "ce:epoch12:TRAIN:float32": {
+      "roots": 120,
+      "candidate_permutation_max_diff": 0.0,
+      "alone_vs_padded_batch_max_diff": 3.814697265625e-06,
+      "padded_slot_garbage_max_diff": 0.0,
+      "pass": true
+    },
+    "ce:epoch12:TRAIN:float64": {
+      "roots": 120,
+      "candidate_permutation_max_diff": 7.105427357601002e-15,
+      "alone_vs_padded_batch_max_diff": 7.105427357601002e-15,
+      "padded_slot_garbage_max_diff": 0.0,
+      "pass": true
+    },
+    "ce:epoch12:DEV:float32": {
+      "roots": 120,
+      "candidate_permutation_max_diff": 0.0,
+      "alone_vs_padded_batch_max_diff": 1.9073486328125e-06,
+      "padded_slot_garbage_max_diff": 0.0,
+      "pass": true
+    },
+    "ce:epoch12:DEV:float64": {
+      "roots": 120,
+      "candidate_permutation_max_diff": 3.552713678800501e-15,
+      "alone_vs_padded_batch_max_diff": 5.329070518200751e-15,
+      "padded_slot_garbage_max_diff": 0.0,
+      "pass": true
+    },
+    "vanilla_pl:epoch00:TRAIN:float32": {
+      "roots": 120,
+      "candidate_permutation_max_diff": 0.0,
+      "alone_vs_padded_batch_max_diff": 2.9802322387695312e-08,
+      "padded_slot_garbage_max_diff": 0.0,
+      "pass": true
+    },
+    "vanilla_pl:epoch00:TRAIN:float64": {
+      "roots": 120,
+      "candidate_permutation_max_diff": 1.3877787807814457e-16,
+      "alone_vs_padded_batch_max_diff": 1.6653345369377348e-16,
+      "padded_slot_garbage_max_diff": 0.0,
+      "pass": true
+    },
+    "vanilla_pl:epoch00:DEV:float32": {
+      "roots": 120,
+      "candidate_permutation_max_diff": 0.0,
+      "alone_vs_padded_batch_max_diff": 2.9802322387695312e-08,
+      "padded_slot_garbage_max_diff": 0.0,
+      "pass": true
+    },
+    "vanilla_pl:epoch00:DEV:float64": {
+      "roots": 120,
+      "candidate_permutation_max_diff": 1.1102230246251565e-16,
+      "alone_vs_padded_batch_max_diff": 2.220446049250313e-16,
+      "padded_slot_garbage_max_diff": 0.0,
+      "pass": true
+    },
+    "vanilla_pl:epoch12:TRAIN:float32": {
+      "roots": 120,
+      "candidate_permutation_max_diff": 0.0,
+      "alone_vs_padded_batch_max_diff": 2.384185791015625e-07,
+      "padded_slot_garbage_max_diff": 0.0,
+      "pass": true
+    },
+    "vanilla_pl:epoch12:TRAIN:float64": {
+      "roots": 120,
+      "candidate_permutation_max_diff": 8.881784197001252e-16,
+      "alone_vs_padded_batch_max_diff": 8.881784197001252e-16,
+      "padded_slot_garbage_max_diff": 0.0,
+      "pass": true
+    },
+    "vanilla_pl:epoch12:DEV:float32": {
+      "roots": 120,
+      "candidate_permutation_max_diff": 0.0,
+      "alone_vs_padded_batch_max_diff": 2.9802322387695312e-08,
+      "padded_slot_garbage_max_diff": 0.0,
+      "pass": true
+    },
+    "vanilla_pl:epoch12:DEV:float64": {
+      "roots": 120,
+      "candidate_permutation_max_diff": 8.881784197001252e-16,
+      "alone_vs_padded_batch_max_diff": 8.881784197001252e-16,
+      "padded_slot_garbage_max_diff": 0.0,
+      "pass": true
+    },
+    "partitioned_pl:epoch00:TRAIN:float32": {
+      "roots": 120,
+      "candidate_permutation_max_diff": 0.0,
+      "alone_vs_padded_batch_max_diff": 2.9802322387695312e-08,
+      "padded_slot_garbage_max_diff": 0.0,
+      "pass": true
+    },
+    "partitioned_pl:epoch00:TRAIN:float64": {
+      "roots": 120,
+      "candidate_permutation_max_diff": 1.3877787807814457e-16,
+      "alone_vs_padded_batch_max_diff": 1.6653345369377348e-16,
+      "padded_slot_garbage_max_diff": 0.0,
+      "pass": true
+    },
+    "partitioned_pl:epoch00:DEV:float32": {
+      "roots": 120,
+      "candidate_permutation_max_diff": 0.0,
+      "alone_vs_padded_batch_max_diff": 2.9802322387695312e-08,
+      "padded_slot_garbage_max_diff": 0.0,
+      "pass": true
+    },
+    "partitioned_pl:epoch00:DEV:float64": {
+      "roots": 120,
+      "candidate_permutation_max_diff": 1.1102230246251565e-16,
+      "alone_vs_padded_batch_max_diff": 2.220446049250313e-16,
+      "padded_slot_garbage_max_diff": 0.0,
+      "pass": true
+    },
+    "partitioned_pl:epoch12:TRAIN:float32": {
+      "roots": 120,
+      "candidate_permutation_max_diff": 0.0,
+      "alone_vs_padded_batch_max_diff": 4.76837158203125e-07,
+      "padded_slot_garbage_max_diff": 0.0,
+      "pass": true
+    },
+    "partitioned_pl:epoch12:TRAIN:float64": {
+      "roots": 120,
+      "candidate_permutation_max_diff": 1.7763568394002505e-15,
+      "alone_vs_padded_batch_max_diff": 1.7763568394002505e-15,
+      "padded_slot_garbage_max_diff": 0.0,
+      "pass": true
+    },
+    "partitioned_pl:epoch12:DEV:float32": {
+      "roots": 120,
+      "candidate_permutation_max_diff": 0.0,
+      "alone_vs_padded_batch_max_diff": 4.76837158203125e-07,
+      "padded_slot_garbage_max_diff": 0.0,
+      "pass": true
+    },
+    "partitioned_pl:epoch12:DEV:float64": {
+      "roots": 120,
+      "candidate_permutation_max_diff": 8.881784197001252e-16,
+      "alone_vs_padded_batch_max_diff": 1.7763568394002505e-15,
+      "padded_slot_garbage_max_diff": 0.0,
+      "pass": true
+    },
+    "vanilla_pl_truncated:epoch00:TRAIN:float32": {
+      "roots": 120,
+      "candidate_permutation_max_diff": 0.0,
+      "alone_vs_padded_batch_max_diff": 2.9802322387695312e-08,
+      "padded_slot_garbage_max_diff": 0.0,
+      "pass": true
+    },
+    "vanilla_pl_truncated:epoch00:TRAIN:float64": {
+      "roots": 120,
+      "candidate_permutation_max_diff": 1.3877787807814457e-16,
+      "alone_vs_padded_batch_max_diff": 1.6653345369377348e-16,
+      "padded_slot_garbage_max_diff": 0.0,
+      "pass": true
+    },
+    "vanilla_pl_truncated:epoch00:DEV:float32": {
+      "roots": 120,
+      "candidate_permutation_max_diff": 0.0,
+      "alone_vs_padded_batch_max_diff": 2.9802322387695312e-08,
+      "padded_slot_garbage_max_diff": 0.0,
+      "pass": true
+    },
+    "vanilla_pl_truncated:epoch00:DEV:float64": {
+      "roots": 120,
+      "candidate_permutation_max_diff": 1.1102230246251565e-16,
+      "alone_vs_padded_batch_max_diff": 2.220446049250313e-16,
+      "padded_slot_garbage_max_diff": 0.0,
+      "pass": true
+    },
+    "vanilla_pl_truncated:epoch12:TRAIN:float32": {
+      "roots": 120,
+      "candidate_permutation_max_diff": 0.0,
+      "alone_vs_padded_batch_max_diff": 7.152557373046875e-07,
+      "padded_slot_garbage_max_diff": 0.0,
+      "pass": true
+    },
+    "vanilla_pl_truncated:epoch12:TRAIN:float64": {
+      "roots": 120,
+      "candidate_permutation_max_diff": 1.7763568394002505e-15,
+      "alone_vs_padded_batch_max_diff": 1.7763568394002505e-15,
+      "padded_slot_garbage_max_diff": 0.0,
+      "pass": true
+    },
+    "vanilla_pl_truncated:epoch12:DEV:float32": {
+      "roots": 120,
+      "candidate_permutation_max_diff": 0.0,
+      "alone_vs_padded_batch_max_diff": 7.152557373046875e-07,
+      "padded_slot_garbage_max_diff": 0.0,
+      "pass": true
+    },
+    "vanilla_pl_truncated:epoch12:DEV:float64": {
+      "roots": 120,
+      "candidate_permutation_max_diff": 1.7763568394002505e-15,
+      "alone_vs_padded_batch_max_diff": 1.7763568394002505e-15,
+      "padded_slot_garbage_max_diff": 0.0,
+      "pass": true
+    }
+  },
+  "pass": true
+}

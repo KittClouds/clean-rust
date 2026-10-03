@@ -1,0 +1,16 @@
+{
+  "sources": {
+    "common.py": "22a2ff97ef2f7e6ec58bc10860545897b7b3208e806b3716086c04c5a2b1e73e",
+    "targets.py": "4f8d9940bcfb099619a084a580b2b86c3f207e476166d6d74ee62caad5998d0c",
+    "probes.py": "b2d67b4666505d912352455aec308c38059c008ac94ac7adfeeef33109465885",
+    "raw_probe.py": "0a04f24444773886b968dfdf2289effefd574edc1153640a9d209e16bcfb4188",
+    "qualification.py": "c93ccd2b6e4411cb2d140d779e56723412446121ca2a8e0cca86ca5405f40838",
+    "controls.py": "5c394d9bbcf65ccdcc92e74171c90692983779b2271ed3c7e01d7eb1f4549181",
+    "verify_gold.py": "99121a8dff30369f9adddf52a58d1f75671e17c532e46b47f6684decc6038681",
+    "closeout.py": "7150c7b653e5be5350c0ace0a7cce7765bf9305a7a578d4e299b1c627a1c3d57",
+    "analysis_runner.py": "53cd55e236e60bd166eba616937d1235b6f8636457986a4c2ab319b0f667b9a9",
+    "freeze_analysis.py": "15a5bbae89500e97467ab2f0dfb71fd0e3cb92351cf337bd17fb8bdacec4e671"
+  },
+  "scope": "prospective conditional raw diagnostics and deterministic closeout; exposed panel source unchanged",
+  "evaluation_opened": false
+}

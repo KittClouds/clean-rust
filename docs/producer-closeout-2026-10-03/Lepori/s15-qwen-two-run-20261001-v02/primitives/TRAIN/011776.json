@@ -1,0 +1,56 @@
+{
+  "sha256": "bf4a747d0c26b14773e30320a7a9a10c19d8fbd3ab390a6e81181dc4b5962081",
+  "rows": 256,
+  "absent_mentions_zeroed": [
+    {
+      "row_id": "TRAIN:011788:0:0",
+      "entity_id": "sw_1",
+      "mention": "switch_q"
+    },
+    {
+      "row_id": "TRAIN:011799:0:0",
+      "entity_id": "sw_1",
+      "mention": "SWITCH_Q"
+    },
+    {
+      "row_id": "TRAIN:011809:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:011830:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:011868:0:0",
+      "entity_id": "obj_1",
+      "mention": "the aforementioned amber_object"
+    },
+    {
+      "row_id": "TRAIN:011881:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:011889:0:0",
+      "entity_id": "sw_2",
+      "mention": "switch_q"
+    },
+    {
+      "row_id": "TRAIN:011890:0:0",
+      "entity_id": "sw_0",
+      "mention": "switch_q"
+    },
+    {
+      "row_id": "TRAIN:011913:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:011947:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    }
+  ]
+}

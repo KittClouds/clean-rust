@@ -1,0 +1,9 @@
+{
+  "finding": "SETRANK_SEED0_BELOW_SURVIVAL_RULE_NO_CONFIRMATION_NO_WIDENING",
+  "rule_output": "FLAT_OR_NEGATIVE",
+  "one_sentence_answer": "On these frozen trained-E candidate states, full candidate self-attention bought at most a small, sub-threshold within-type gain over a matched independent scorer (gold-type top1 +3.6 pp, 95% CI [+0.3, +6.9]; all other primary metrics inside noise) and did not solve within-type comparison (same-type pair accuracy 0.544 vs 0.536) or legality sets (exact-set recovery on roots with a legal candidate: 0).",
+  "seed": 0,
+  "confirmation_seeds_run": 0,
+  "reason_no_confirmation": "frozen survival rule not met (STRONG needs gold-type top1 delta >= +0.05; PRESERVE needs gold-type MRR delta >= +0.03 with lower bound > 0)",
+  "evaluation_opened": false
+}

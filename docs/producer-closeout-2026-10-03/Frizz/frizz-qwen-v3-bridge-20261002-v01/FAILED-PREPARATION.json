@@ -1,0 +1,12 @@
+{
+  "status": "PRESERVED_PRE_TRAIN_FAILURE",
+  "exception": "NameError: Path is not defined",
+  "primitive_chunks_written": 0,
+  "graft_training_runs_consumed": 0,
+  "failed_source_hashes": {
+    "extract.py": "93a860b382adf4b3f9ca99c9ace17715dcbd7bba082f0b1d62310af55c2f507c",
+    "runtime.py": "bdbe37efa4b5513601aebb426e8bca943281bea88760a9f12fc56b6e13e15cf5"
+  },
+  "restoration": "reconstructed from corrected files, exact original locked byte hashes verified",
+  "successor": "frizz-qwen-v3-bridge-20261002-v02"
+}

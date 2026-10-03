@@ -1,0 +1,352 @@
+{
+  "arm": "set",
+  "trajectory": [
+    {
+      "epoch": 0,
+      "train_loss": null,
+      "DEV_monitor": {
+        "selected_top1": 0.0030030030757188797,
+        "selected_MRR": 0.039344966411590576,
+        "gold_type_top1": 0.10810811072587967,
+        "gold_type_MRR": 0.2986733913421631,
+        "pair_acc_pooled": 0.4644654095172882,
+        "legality_BA_all": 0.5793476533053143,
+        "legality_exact_all": 0.00033333332976326346
+      },
+      "TRAIN_monitor": {
+        "selected_top1": 0.0015003751032054424,
+        "selected_MRR": 0.030376678332686424,
+        "gold_type_top1": 0.08177044242620468,
+        "gold_type_MRR": 0.2834913730621338,
+        "pair_acc_pooled": 0.4376840889453888,
+        "legality_BA_all": 0.5827468352322398,
+        "legality_exact_all": 0.00041666667675599456
+      }
+    },
+    {
+      "epoch": 1,
+      "train_loss": {
+        "total": 2.1454429998199145,
+        "select": 1.3904425483345986,
+        "same_type": 1.2987945895294348,
+        "legality": 0.4224126463929812
+      },
+      "DEV_monitor": {
+        "selected_top1": 0.08408408612012863,
+        "selected_MRR": 0.23536203801631927,
+        "gold_type_top1": 0.1411411464214325,
+        "gold_type_MRR": 0.3344790041446686,
+        "pair_acc_pooled": 0.553459107875824,
+        "legality_BA_all": 0.7978507951899341,
+        "legality_exact_all": 0.056333333253860474
+      },
+      "TRAIN_monitor": {
+        "selected_top1": 0.5461365580558777,
+        "selected_MRR": 0.7018496990203857,
+        "gold_type_top1": 0.5603901147842407,
+        "gold_type_MRR": 0.71346116065979,
+        "pair_acc_pooled": 0.8747791051864624,
+        "legality_BA_all": 0.7987814431387035,
+        "legality_exact_all": 0.05716666579246521
+      }
+    },
+    {
+      "epoch": 2,
+      "train_loss": {
+        "total": 1.9023068775435288,
+        "select": 1.2128765480120978,
+        "same_type": 1.1738293592035771,
+        "legality": 0.41006260657310484
+      },
+      "DEV_monitor": {
+        "selected_top1": 0.06906907260417938,
+        "selected_MRR": 0.22868654131889343,
+        "gold_type_top1": 0.12012012302875519,
+        "gold_type_MRR": 0.3216644525527954,
+        "pair_acc_pooled": 0.5349056720733643,
+        "legality_BA_all": 0.7995155399451345,
+        "legality_exact_all": 0.056333333253860474
+      },
+      "TRAIN_monitor": {
+        "selected_top1": 0.5731433033943176,
+        "selected_MRR": 0.7225894927978516,
+        "gold_type_top1": 0.5821455121040344,
+        "gold_type_MRR": 0.73065584897995,
+        "pair_acc_pooled": 0.8855507969856262,
+        "legality_BA_all": 0.7990923546029711,
+        "legality_exact_all": 0.05741666629910469
+      }
+    },
+    {
+      "epoch": 3,
+      "train_loss": {
+        "total": 1.8089822783172131,
+        "select": 1.1490987267891566,
+        "same_type": 1.1170658851976818,
+        "legality": 0.40540244392553965
+      },
+      "DEV_monitor": {
+        "selected_top1": 0.0810810774564743,
+        "selected_MRR": 0.23557494580745697,
+        "gold_type_top1": 0.12612612545490265,
+        "gold_type_MRR": 0.3274974524974823,
+        "pair_acc_pooled": 0.5336477756500244,
+        "legality_BA_all": 0.8022120961377104,
+        "legality_exact_all": 0.05533333495259285
+      },
+      "TRAIN_monitor": {
+        "selected_top1": 0.5821455121040344,
+        "selected_MRR": 0.7302859425544739,
+        "gold_type_top1": 0.5918979644775391,
+        "gold_type_MRR": 0.7377336025238037,
+        "pair_acc_pooled": 0.8900951147079468,
+        "legality_BA_all": 0.8026831384185016,
+        "legality_exact_all": 0.05666666850447655
+      }
+    },
+    {
+      "epoch": 4,
+      "train_loss": {
+        "total": 1.8108976200620333,
+        "select": 1.1552135535875956,
+        "same_type": 1.1104613307317097,
+        "legality": 0.4018136239449183
+      },
+      "DEV_monitor": {
+        "selected_top1": 0.10210210084915161,
+        "selected_MRR": 0.2514949440956116,
+        "gold_type_top1": 0.15615615248680115,
+        "gold_type_MRR": 0.34208109974861145,
+        "pair_acc_pooled": 0.5424528121948242,
+        "legality_BA_all": 0.802111220348396,
+        "legality_exact_all": 0.054666668176651
+      },
+      "TRAIN_monitor": {
+        "selected_top1": 0.5933983325958252,
+        "selected_MRR": 0.7376435995101929,
+        "gold_type_top1": 0.5978994965553284,
+        "gold_type_MRR": 0.742379367351532,
+        "pair_acc_pooled": 0.8908524513244629,
+        "legality_BA_all": 0.8025916906872705,
+        "legality_exact_all": 0.05608333274722099
+      }
+    },
+    {
+      "epoch": 5,
+      "train_loss": {
+        "total": 1.7409098868171373,
+        "select": 1.1021972890954155,
+        "same_type": 1.0773466949594828,
+        "legality": 0.4001569854815801
+      },
+      "DEV_monitor": {
+        "selected_top1": 0.08708708733320236,
+        "selected_MRR": 0.23903365433216095,
+        "gold_type_top1": 0.14414414763450623,
+        "gold_type_MRR": 0.333124577999115,
+        "pair_acc_pooled": 0.5339622497558594,
+        "legality_BA_all": 0.8004517059334011,
+        "legality_exact_all": 0.05533333495259285
+      },
+      "TRAIN_monitor": {
+        "selected_top1": 0.6256564259529114,
+        "selected_MRR": 0.756709635257721,
+        "gold_type_top1": 0.6294073462486267,
+        "gold_type_MRR": 0.7611837983131409,
+        "pair_acc_pooled": 0.8980055451393127,
+        "legality_BA_all": 0.8019202618154173,
+        "legality_exact_all": 0.05624999850988388
+      }
+    },
+    {
+      "epoch": 6,
+      "train_loss": {
+        "total": 1.693235367357731,
+        "select": 1.0731633089731136,
+        "same_type": 1.0408885604720564,
+        "legality": 0.39851109766960147
+      },
+      "DEV_monitor": {
+        "selected_top1": 0.09009008854627609,
+        "selected_MRR": 0.23743344843387604,
+        "gold_type_top1": 0.1411411464214325,
+        "gold_type_MRR": 0.3327632546424866,
+        "pair_acc_pooled": 0.5311321020126343,
+        "legality_BA_all": 0.8020081624695983,
+        "legality_exact_all": 0.054999999701976776
+      },
+      "TRAIN_monitor": {
+        "selected_top1": 0.6699174642562866,
+        "selected_MRR": 0.7850755453109741,
+        "gold_type_top1": 0.6736684441566467,
+        "gold_type_MRR": 0.7888088226318359,
+        "pair_acc_pooled": 0.9107969403266907,
+        "legality_BA_all": 0.8029170156451446,
+        "legality_exact_all": 0.056333333253860474
+      }
+    },
+    {
+      "epoch": 7,
+      "train_loss": {
+        "total": 1.6144798064430554,
+        "select": 1.0200181626592142,
+        "same_type": 0.9904538535545581,
+        "legality": 0.3969388791322708
+      },
+      "DEV_monitor": {
+        "selected_top1": 0.09309308975934982,
+        "selected_MRR": 0.24169516563415527,
+        "gold_type_top1": 0.1501501500606537,
+        "gold_type_MRR": 0.33746621012687683,
+        "pair_acc_pooled": 0.5264151096343994,
+        "legality_BA_all": 0.8016504035867116,
+        "legality_exact_all": 0.05533333495259285
+      },
+      "TRAIN_monitor": {
+        "selected_top1": 0.690172553062439,
+        "selected_MRR": 0.7998543381690979,
+        "gold_type_top1": 0.6939234733581543,
+        "gold_type_MRR": 0.8037575483322144,
+        "pair_acc_pooled": 0.9186232686042786,
+        "legality_BA_all": 0.8033370214866604,
+        "legality_exact_all": 0.05649999901652336
+      }
+    },
+    {
+      "epoch": 8,
+      "train_loss": {
+        "total": 1.5692348990738392,
+        "select": 0.9910496747313688,
+        "same_type": 0.9588306597514699,
+        "legality": 0.3950795787970225
+      },
+      "DEV_monitor": {
+        "selected_top1": 0.0810810774564743,
+        "selected_MRR": 0.22899900376796722,
+        "gold_type_top1": 0.13813814520835876,
+        "gold_type_MRR": 0.330077201128006,
+        "pair_acc_pooled": 0.5248427391052246,
+        "legality_BA_all": 0.8009581873646766,
+        "legality_exact_all": 0.054999999701976776
+      },
+      "TRAIN_monitor": {
+        "selected_top1": 0.7299324870109558,
+        "selected_MRR": 0.8266226053237915,
+        "gold_type_top1": 0.7329332232475281,
+        "gold_type_MRR": 0.8296928405761719,
+        "pair_acc_pooled": 0.9303206205368042,
+        "legality_BA_all": 0.8032847437161093,
+        "legality_exact_all": 0.05666666850447655
+      }
+    },
+    {
+      "epoch": 9,
+      "train_loss": {
+        "total": 1.2926092804372311,
+        "select": 0.8046983720978667,
+        "same_type": 0.7789001477686167,
+        "legality": 0.39384334433078766
+      },
+      "DEV_monitor": {
+        "selected_top1": 0.09009008854627609,
+        "selected_MRR": 0.24020585417747498,
+        "gold_type_top1": 0.14714714884757996,
+        "gold_type_MRR": 0.3360047936439514,
+        "pair_acc_pooled": 0.5367924571037292,
+        "legality_BA_all": 0.8016132636705211,
+        "legality_exact_all": 0.054999999701976776
+      },
+      "TRAIN_monitor": {
+        "selected_top1": 0.7621905207633972,
+        "selected_MRR": 0.8473110198974609,
+        "gold_type_top1": 0.7659415006637573,
+        "gold_type_MRR": 0.8511163592338562,
+        "pair_acc_pooled": 0.9394092559814453,
+        "legality_BA_all": 0.8047732768650293,
+        "legality_exact_all": 0.056333333253860474
+      }
+    },
+    {
+      "epoch": 10,
+      "train_loss": {
+        "total": 1.1622197248438995,
+        "select": 0.7155810750933597,
+        "same_type": 0.6965959313163633,
+        "legality": 0.39336275776227314
+      },
+      "DEV_monitor": {
+        "selected_top1": 0.10210210084915161,
+        "selected_MRR": 0.2464226633310318,
+        "gold_type_top1": 0.15915915369987488,
+        "gold_type_MRR": 0.34348955750465393,
+        "pair_acc_pooled": 0.5446540713310242,
+        "legality_BA_all": 0.8017580310860425,
+        "legality_exact_all": 0.054999999701976776
+      },
+      "TRAIN_monitor": {
+        "selected_top1": 0.789947509765625,
+        "selected_MRR": 0.8651862144470215,
+        "gold_type_top1": 0.7944486141204834,
+        "gold_type_MRR": 0.8689297437667847,
+        "pair_acc_pooled": 0.9463940262794495,
+        "legality_BA_all": 0.8051915008736521,
+        "legality_exact_all": 0.05608333274722099
+      }
+    },
+    {
+      "epoch": 11,
+      "train_loss": {
+        "total": 1.0186574045618375,
+        "select": 0.6185048724348453,
+        "same_type": 0.6038355417482428,
+        "legality": 0.39293904427687326
+      },
+      "DEV_monitor": {
+        "selected_top1": 0.10810811072587967,
+        "selected_MRR": 0.25150784850120544,
+        "gold_type_top1": 0.1621621549129486,
+        "gold_type_MRR": 0.34540891647338867,
+        "pair_acc_pooled": 0.5449685454368591,
+        "legality_BA_all": 0.8013721086444051,
+        "legality_exact_all": 0.05533333495259285
+      },
+      "TRAIN_monitor": {
+        "selected_top1": 0.7996999025344849,
+        "selected_MRR": 0.8713663816452026,
+        "gold_type_top1": 0.804201066493988,
+        "gold_type_MRR": 0.875,
+        "pair_acc_pooled": 0.9488344788551331,
+        "legality_BA_all": 0.8045519894145525,
+        "legality_exact_all": 0.056333333253860474
+      }
+    },
+    {
+      "epoch": 12,
+      "train_loss": {
+        "total": 0.9900665024022262,
+        "select": 0.6000815387116885,
+        "same_type": 0.5836273598482591,
+        "legality": 0.39268513866265614
+      },
+      "DEV_monitor": {
+        "selected_top1": 0.10510510206222534,
+        "selected_MRR": 0.248953714966774,
+        "gold_type_top1": 0.15915915369987488,
+        "gold_type_MRR": 0.3431328237056732,
+        "pair_acc_pooled": 0.5443395972251892,
+        "legality_BA_all": 0.8014347340308505,
+        "legality_exact_all": 0.05533333495259285
+      },
+      "TRAIN_monitor": {
+        "selected_top1": 0.8019505143165588,
+        "selected_MRR": 0.8729783892631531,
+        "gold_type_top1": 0.8064516186714172,
+        "gold_type_MRR": 0.876449465751648,
+        "pair_acc_pooled": 0.949591875076294,
+        "legality_BA_all": 0.8046149503493107,
+        "legality_exact_all": 0.056333333253860474
+      }
+    }
+  ],
+  "selection_used": false
+}

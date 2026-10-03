@@ -1,0 +1,94 @@
+{
+  "target": "reason",
+  "surface": "s",
+  "family": "linear",
+  "epochs": 4,
+  "steps": 752,
+  "batch_unit": "64 canonical worlds",
+  "metric": {
+    "n": 3000,
+    "accuracy": 0.7670000195503235,
+    "macro_f1": 0.7745069841028411,
+    "class_support": {
+      "0": {
+        "n": 166,
+        "f1": 0.9788519637462235,
+        "reliable": false
+      },
+      "1": {
+        "n": 167,
+        "f1": 0.9695121951219512,
+        "reliable": false
+      },
+      "2": {
+        "n": 334,
+        "f1": 0.8854961832061069,
+        "reliable": true
+      },
+      "3": {
+        "n": 167,
+        "f1": 0.9425287356321839,
+        "reliable": false
+      },
+      "4": {
+        "n": 167,
+        "f1": 0.6361185983827493,
+        "reliable": false
+      },
+      "5": {
+        "n": 167,
+        "f1": 0.35514018691588783,
+        "reliable": false
+      },
+      "6": {
+        "n": 166,
+        "f1": 0.967930029154519,
+        "reliable": false
+      },
+      "7": {
+        "n": 167,
+        "f1": 0.4853801169590643,
+        "reliable": false
+      },
+      "8": {
+        "n": 167,
+        "f1": 0.503030303030303,
+        "reliable": false
+      },
+      "9": {
+        "n": 167,
+        "f1": 0.996996996996997,
+        "reliable": false
+      },
+      "10": {
+        "n": 166,
+        "f1": 0.9726443768996961,
+        "reliable": false
+      },
+      "11": {
+        "n": 167,
+        "f1": 0.9309309309309309,
+        "reliable": false
+      },
+      "12": {
+        "n": 166,
+        "f1": 0.676923076923077,
+        "reliable": false
+      },
+      "13": {
+        "n": 166,
+        "f1": 0.6686390532544378,
+        "reliable": false
+      },
+      "14": {
+        "n": 500,
+        "f1": 0.6474820143884892,
+        "reliable": true
+      }
+    },
+    "macro_f1_scope": "DEV-present classes; underpowered classes descriptive only"
+  },
+  "restricted_or_underpowered": "respect source contract; pooled metrics descriptive only",
+  "probe_sha256": "b3aaaaf2b62083bdbb99d7b875ae426b3d06e626dd21392e72c19b51d2c12dd9",
+  "parameters": 975
+}

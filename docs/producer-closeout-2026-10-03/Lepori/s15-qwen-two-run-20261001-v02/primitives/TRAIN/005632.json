@@ -1,0 +1,61 @@
+{
+  "sha256": "baa5a1140d1430fbebc8e8f0b5a28e49366512f8dc94e5b8c0527ec430d0c210",
+  "rows": 256,
+  "absent_mentions_zeroed": [
+    {
+      "row_id": "TRAIN:005647:0:0",
+      "entity_id": "sw_1",
+      "mention": "switch_p"
+    },
+    {
+      "row_id": "TRAIN:005687:0:2",
+      "entity_id": "sw_1",
+      "mention": "switch_p"
+    },
+    {
+      "row_id": "TRAIN:005688:0:0",
+      "entity_id": "obj_2",
+      "mention": "copper_object"
+    },
+    {
+      "row_id": "TRAIN:005712:0:0",
+      "entity_id": "obj_1",
+      "mention": "coral"
+    },
+    {
+      "row_id": "TRAIN:005740:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:005758:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:005766:0:0",
+      "entity_id": "obj_0",
+      "mention": "jade_object"
+    },
+    {
+      "row_id": "TRAIN:005778:0:0",
+      "entity_id": "sw_0",
+      "mention": "switch_p"
+    },
+    {
+      "row_id": "TRAIN:005785:0:0",
+      "entity_id": "obj_1",
+      "mention": "copper_object"
+    },
+    {
+      "row_id": "TRAIN:005841:0:2",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:005886:0:1",
+      "entity_id": "obj_2",
+      "mention": "topaz_object"
+    }
+  ]
+}

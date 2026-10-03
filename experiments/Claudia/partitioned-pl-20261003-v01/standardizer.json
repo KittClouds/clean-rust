@@ -1,0 +1,12 @@
+{
+  "sha256": "a0b5426078c0520243c227fdb9d6c7bfff65271069ea87e43df443b95acf2810",
+  "fit": "TRAIN valid candidates only (12,000 roots)",
+  "dims": {
+    "c_mu": 256,
+    "c_sd": 256,
+    "s_mu": 64,
+    "s_sd": 64,
+    "e_mu": 32,
+    "e_sd": 32
+  }
+}

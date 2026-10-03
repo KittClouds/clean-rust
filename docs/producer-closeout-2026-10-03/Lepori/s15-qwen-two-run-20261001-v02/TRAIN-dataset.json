@@ -1,0 +1,8 @@
+{
+  "sha256": "a36f9ed6f1734d40c91124851097cf5092bd3e324081728e5de7250a99bd42e6",
+  "canonical_rows": 20000,
+  "renderer_rows": 3332,
+  "pairs": 3332,
+  "source": "TRAIN",
+  "canonical_ids_sha256": "f41ffb36b269358c0ff21d9ec8806abe79af83d645d9fe2e10c744fe5dc6e8a0"
+}

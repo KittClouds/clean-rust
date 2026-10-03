@@ -1,0 +1,8 @@
+{
+  "sha256": "0cf9fd34df4a72a2da363e24a27dec8e329838de1005db22dca62921edac8f44",
+  "canonical_rows": 2000,
+  "renderer_rows": 332,
+  "pairs": 332,
+  "source": "DEV",
+  "canonical_ids_sha256": "36aa162e8d283fe61db039d2cd256ab4794e1e4d045ff70aede3925d6304f3b8"
+}

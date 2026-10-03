@@ -1,0 +1,24 @@
+{
+  "request": "user four checks before Run 1 seal",
+  "registration": "after Run 1, descriptive; no outcome-dependent readout selection",
+  "targets": [
+    "solvable",
+    "goal_satisfied",
+    "missing_information_present",
+    "contradiction_present"
+  ],
+  "readouts": [
+    "linear",
+    "MLP width64"
+  ],
+  "batch_unit": "worlds",
+  "batch_size": 64,
+  "epochs": 4,
+  "selection_on_dev": false,
+  "source_files": {
+    "C:\\code land\\clean-rust\\experiments\\s15-lepori-qwen-two-run\\global_probes.py": "1d22d36560851a95a12b67e78ec1cef9da4dbb168f84179468ec431b912d46fd",
+    "C:\\code land\\clean-rust\\experiments\\s15-lepori-qwen-two-run\\diagnostics_world.py": "7b84a47818e92e9c967865c8b4d458210108224b73726996b00341e4660b5672"
+  },
+  "graft_optimized": false,
+  "backbone_optimized": false
+}

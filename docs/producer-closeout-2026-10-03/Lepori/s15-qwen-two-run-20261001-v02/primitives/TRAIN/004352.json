@@ -1,0 +1,56 @@
+{
+  "sha256": "4a4c8ef317151c6698693fc2c3d5a08b7264ca028a230901b41bb91d17f00732",
+  "rows": 256,
+  "absent_mentions_zeroed": [
+    {
+      "row_id": "TRAIN:004362:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:004394:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:004423:0:0",
+      "entity_id": "sw_1",
+      "mention": "the aforementioned switch_p"
+    },
+    {
+      "row_id": "TRAIN:004429:0:1",
+      "entity_id": "obj_2",
+      "mention": "amber_object"
+    },
+    {
+      "row_id": "TRAIN:004438:0:0",
+      "entity_id": "sw_0",
+      "mention": "switch_r"
+    },
+    {
+      "row_id": "TRAIN:004441:0:0",
+      "entity_id": "loc_0",
+      "mention": "atrium"
+    },
+    {
+      "row_id": "TRAIN:004477:0:0",
+      "entity_id": "obj_2",
+      "mention": "basalt_object"
+    },
+    {
+      "row_id": "TRAIN:004500:0:0",
+      "entity_id": "sw_0",
+      "mention": "switch_p"
+    },
+    {
+      "row_id": "TRAIN:004502:0:0",
+      "entity_id": "sw_1",
+      "mention": "switch_q"
+    },
+    {
+      "row_id": "TRAIN:004514:0:0",
+      "entity_id": "sw_1",
+      "mention": "switch_r"
+    }
+  ]
+}

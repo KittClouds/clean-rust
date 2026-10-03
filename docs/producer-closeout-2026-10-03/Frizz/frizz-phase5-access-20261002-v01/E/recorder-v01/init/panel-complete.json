@@ -1,0 +1,950 @@
+{
+  "status": "MATCHED_PANEL_COMPLETE",
+  "seconds": 91.12096679999377,
+  "arms": {
+    "CONTROL-solvable-s-linear": {
+      "target": "solvable",
+      "surface": "GOLD_CHANNEL_CONTROL",
+      "family": "linear",
+      "epochs": 4,
+      "batch_unit": "64 canonical worlds, not candidates",
+      "steps": 752,
+      "training_worlds": 12000,
+      "seconds": 2.123830500000622,
+      "metric": {
+        "n": 2730,
+        "positive": 2168,
+        "negative": 562,
+        "balanced_accuracy": 1.0,
+        "accuracy": 1.0
+      },
+      "control": true,
+      "probe_sha256": "903d15260a9c65c8f4db0bfdabc3b31febf633743db60420746db743dc5ef10b",
+      "parameters": 2
+    },
+    "CONTROL-solvable-s-mlp": {
+      "target": "solvable",
+      "surface": "GOLD_CHANNEL_CONTROL",
+      "family": "mlp",
+      "epochs": 4,
+      "batch_unit": "64 canonical worlds, not candidates",
+      "steps": 752,
+      "training_worlds": 12000,
+      "seconds": 2.5104078000003938,
+      "metric": {
+        "n": 2730,
+        "positive": 2168,
+        "negative": 562,
+        "balanced_accuracy": 1.0,
+        "accuracy": 1.0
+      },
+      "control": true,
+      "probe_sha256": "04c0daf74356cb2bfc3ad6d28d11aea65eec66d1b64d53ae3ff6a39be2df784e",
+      "parameters": 193
+    },
+    "CONTROL-candidate_legal-e-linear": {
+      "target": "candidate_legal",
+      "surface": "GOLD_CHANNEL_CONTROL",
+      "family": "linear",
+      "epochs": 4,
+      "batch_unit": "64 canonical worlds, not candidates",
+      "steps": 752,
+      "training_worlds": 12000,
+      "seconds": 2.5193177000037394,
+      "metric": {
+        "n": 176168,
+        "positive": 9817,
+        "negative": 166351,
+        "balanced_accuracy": 1.0,
+        "accuracy": 1.0
+      },
+      "control": true,
+      "probe_sha256": "96696f835b74e3f3735114dfcdc2b4a7e5f4c8f9054ad2eb3b272091bdb442b6",
+      "parameters": 2
+    },
+    "CONTROL-candidate_legal-e-mlp": {
+      "target": "candidate_legal",
+      "surface": "GOLD_CHANNEL_CONTROL",
+      "family": "mlp",
+      "epochs": 4,
+      "batch_unit": "64 canonical worlds, not candidates",
+      "steps": 752,
+      "training_worlds": 12000,
+      "seconds": 3.0619197000050917,
+      "metric": {
+        "n": 176168,
+        "positive": 9817,
+        "negative": 166351,
+        "balanced_accuracy": 1.0,
+        "accuracy": 1.0
+      },
+      "control": true,
+      "probe_sha256": "1d038170efad78d0e394ffcbaa7f50cce149b01c678c0e21003083cb2e1590a1",
+      "parameters": 193
+    },
+    "candidate_legal-e-linear": {
+      "target": "candidate_legal",
+      "surface": "e",
+      "family": "linear",
+      "epochs": 4,
+      "batch_unit": "64 canonical worlds, not candidates",
+      "steps": 752,
+      "training_worlds": 12000,
+      "seconds": 2.8359066999983042,
+      "metric": {
+        "n": 176168,
+        "positive": 9817,
+        "negative": 166351,
+        "balanced_accuracy": 0.7252258956432343,
+        "accuracy": 0.7554152607917786
+      },
+      "control": false,
+      "probe_sha256": "af8f5b97cf6d457255b6ea0d7d5974083d897a04dc3324337e814ff9b39eeaa7",
+      "parameters": 33
+    },
+    "candidate_legal-e-mlp": {
+      "target": "candidate_legal",
+      "surface": "e",
+      "family": "mlp",
+      "epochs": 4,
+      "batch_unit": "64 canonical worlds, not candidates",
+      "steps": 752,
+      "training_worlds": 12000,
+      "seconds": 3.2317418000020552,
+      "metric": {
+        "n": 176168,
+        "positive": 9817,
+        "negative": 166351,
+        "balanced_accuracy": 0.7548989951610565,
+        "accuracy": 0.7954338788986206
+      },
+      "control": false,
+      "probe_sha256": "c7196ea5afb070444bb4e4a5b979264f596fea06a233d134a53a098b38defeb7",
+      "parameters": 2177
+    },
+    "candidate_legal-c-linear": {
+      "target": "candidate_legal",
+      "surface": "c",
+      "family": "linear",
+      "epochs": 4,
+      "batch_unit": "64 canonical worlds, not candidates",
+      "steps": 752,
+      "training_worlds": 12000,
+      "seconds": 4.292158399999607,
+      "metric": {
+        "n": 176168,
+        "positive": 9817,
+        "negative": 166351,
+        "balanced_accuracy": 0.7968901693820953,
+        "accuracy": 0.835997462272644
+      },
+      "control": false,
+      "probe_sha256": "7fb2b36f526aef138c8e2b7d315dcc24bebabd78229c96097bce973c15202d7f",
+      "parameters": 257
+    },
+    "candidate_legal-c-mlp": {
+      "target": "candidate_legal",
+      "surface": "c",
+      "family": "mlp",
+      "epochs": 4,
+      "batch_unit": "64 canonical worlds, not candidates",
+      "steps": 752,
+      "training_worlds": 12000,
+      "seconds": 4.813337200001115,
+      "metric": {
+        "n": 176168,
+        "positive": 9817,
+        "negative": 166351,
+        "balanced_accuracy": 0.8042452931404114,
+        "accuracy": 0.8549566268920898
+      },
+      "control": false,
+      "probe_sha256": "de99d9baf85c01016133ff7e716f439aa157ce9dadfc38d4eaffafffc80948cd",
+      "parameters": 16513
+    },
+    "candidate_legal-cs-linear": {
+      "target": "candidate_legal",
+      "surface": "cs",
+      "family": "linear",
+      "epochs": 4,
+      "batch_unit": "64 canonical worlds, not candidates",
+      "steps": 752,
+      "training_worlds": 12000,
+      "seconds": 4.4381413999944925,
+      "metric": {
+        "n": 176168,
+        "positive": 9817,
+        "negative": 166351,
+        "balanced_accuracy": 0.7960165441036224,
+        "accuracy": 0.8332614302635193
+      },
+      "control": false,
+      "probe_sha256": "00974c5ff532ac500278057cc46d39b65d8e4ee61fb2d67ec17263f4ad436719",
+      "parameters": 321
+    },
+    "candidate_legal-cs-mlp": {
+      "target": "candidate_legal",
+      "surface": "cs",
+      "family": "mlp",
+      "epochs": 4,
+      "batch_unit": "64 canonical worlds, not candidates",
+      "steps": 752,
+      "training_worlds": 12000,
+      "seconds": 4.942388299998129,
+      "metric": {
+        "n": 176168,
+        "positive": 9817,
+        "negative": 166351,
+        "balanced_accuracy": 0.804390549659729,
+        "accuracy": 0.8557740449905396
+      },
+      "control": false,
+      "probe_sha256": "1ff7efa94c1df132971428003a37c42612be80e6b48b99214820c961bc7f8580",
+      "parameters": 20609
+    },
+    "candidate_satisfies_goal-e-linear": {
+      "target": "candidate_satisfies_goal",
+      "surface": "e",
+      "family": "linear",
+      "epochs": 4,
+      "batch_unit": "64 canonical worlds, not candidates",
+      "steps": 752,
+      "training_worlds": 12000,
+      "seconds": 2.7253155000216793,
+      "metric": {
+        "n": 176168,
+        "positive": 1053,
+        "negative": 175115,
+        "balanced_accuracy": 0.6750233471393585,
+        "accuracy": 0.6954782009124756
+      },
+      "control": false,
+      "probe_sha256": "8ace9321d917af1896dafaf89fc950297570f1dfb743ec503ddaa13676148411",
+      "parameters": 33
+    },
+    "candidate_satisfies_goal-e-mlp": {
+      "target": "candidate_satisfies_goal",
+      "surface": "e",
+      "family": "mlp",
+      "epochs": 4,
+      "batch_unit": "64 canonical worlds, not candidates",
+      "steps": 752,
+      "training_worlds": 12000,
+      "seconds": 3.306570799992187,
+      "metric": {
+        "n": 176168,
+        "positive": 1053,
+        "negative": 175115,
+        "balanced_accuracy": 0.6748187839984894,
+        "accuracy": 0.6378343105316162
+      },
+      "control": false,
+      "probe_sha256": "173aedaf69ba424c04d3288a5a4c655e6e7fa7ac8dc310c55f89ce0feb51d97c",
+      "parameters": 2177
+    },
+    "candidate_satisfies_goal-c-linear": {
+      "target": "candidate_satisfies_goal",
+      "surface": "c",
+      "family": "linear",
+      "epochs": 4,
+      "batch_unit": "64 canonical worlds, not candidates",
+      "steps": 752,
+      "training_worlds": 12000,
+      "seconds": 4.476529900013702,
+      "metric": {
+        "n": 176168,
+        "positive": 1053,
+        "negative": 175115,
+        "balanced_accuracy": 0.7039872705936432,
+        "accuracy": 0.7061441540718079
+      },
+      "control": false,
+      "probe_sha256": "3e68db5b8cd129361842976c59bf70630369f8391fc3ad6a5cd763d42b2fa008",
+      "parameters": 257
+    },
+    "candidate_satisfies_goal-c-mlp": {
+      "target": "candidate_satisfies_goal",
+      "surface": "c",
+      "family": "mlp",
+      "epochs": 4,
+      "batch_unit": "64 canonical worlds, not candidates",
+      "steps": 752,
+      "training_worlds": 12000,
+      "seconds": 4.955521500000032,
+      "metric": {
+        "n": 176168,
+        "positive": 1053,
+        "negative": 175115,
+        "balanced_accuracy": 0.7076942026615143,
+        "accuracy": 0.6534614562988281
+      },
+      "control": false,
+      "probe_sha256": "45985327cab5d74c8812ad31502c4054059c5ae7d1f87c3756faa9477a30a3e9",
+      "parameters": 16513
+    },
+    "candidate_satisfies_goal-cs-linear": {
+      "target": "candidate_satisfies_goal",
+      "surface": "cs",
+      "family": "linear",
+      "epochs": 4,
+      "batch_unit": "64 canonical worlds, not candidates",
+      "steps": 752,
+      "training_worlds": 12000,
+      "seconds": 4.36444139998639,
+      "metric": {
+        "n": 176168,
+        "positive": 1053,
+        "negative": 175115,
+        "balanced_accuracy": 0.7015887498855591,
+        "accuracy": 0.6516450047492981
+      },
+      "control": false,
+      "probe_sha256": "369ad3a51510eb7e5c493e9ed40f2af6c0558821432f1456628dcac84f7c071a",
+      "parameters": 321
+    },
+    "candidate_satisfies_goal-cs-mlp": {
+      "target": "candidate_satisfies_goal",
+      "surface": "cs",
+      "family": "mlp",
+      "epochs": 4,
+      "batch_unit": "64 canonical worlds, not candidates",
+      "steps": 752,
+      "training_worlds": 12000,
+      "seconds": 4.939432299986947,
+      "metric": {
+        "n": 176168,
+        "positive": 1053,
+        "negative": 175115,
+        "balanced_accuracy": 0.7289857864379883,
+        "accuracy": 0.7333227396011353
+      },
+      "control": false,
+      "probe_sha256": "2f5e9664ffeff5f25670ee8fd8dc00a588fa9bfd06f7270f951c4d5b920c3fea",
+      "parameters": 20609
+    },
+    "goal_satisfied-s-linear": {
+      "target": "goal_satisfied",
+      "surface": "s",
+      "family": "linear",
+      "epochs": 4,
+      "batch_unit": "64 canonical worlds, not candidates",
+      "steps": 752,
+      "training_worlds": 12000,
+      "seconds": 2.198861200013198,
+      "metric": {
+        "n": 3000,
+        "positive": 167,
+        "negative": 2833,
+        "balanced_accuracy": 0.7447121143341064,
+        "accuracy": 0.5976666808128357
+      },
+      "control": false,
+      "probe_sha256": "2c0f84b8a66d7c9b23958a5ffc58f90379beaf12e71702ce62a8cb6375a787f7",
+      "parameters": 65
+    },
+    "goal_satisfied-s-mlp": {
+      "target": "goal_satisfied",
+      "surface": "s",
+      "family": "mlp",
+      "epochs": 4,
+      "batch_unit": "64 canonical worlds, not candidates",
+      "steps": 752,
+      "training_worlds": 12000,
+      "seconds": 2.3226338000094984,
+      "metric": {
+        "n": 3000,
+        "positive": 167,
+        "negative": 2833,
+        "balanced_accuracy": 0.7649896144866943,
+        "accuracy": 0.6200000047683716
+      },
+      "control": false,
+      "probe_sha256": "219b680cac7851d1fd6f4f8ba8d33cb3c494519ce3feee11f8cfd4f65f2b97cd",
+      "parameters": 4225
+    },
+    "solvable-s-linear": {
+      "target": "solvable",
+      "surface": "s",
+      "family": "linear",
+      "epochs": 4,
+      "batch_unit": "64 canonical worlds, not candidates",
+      "steps": 752,
+      "training_worlds": 12000,
+      "seconds": 2.1613046000129543,
+      "metric": {
+        "n": 2730,
+        "positive": 2168,
+        "negative": 562,
+        "balanced_accuracy": 0.7498514354228973,
+        "accuracy": 0.7523809671401978
+      },
+      "control": false,
+      "probe_sha256": "8e91abce434130d14fafc618208795774fef67e17f55b1875b3b2290a5f81d46",
+      "parameters": 65
+    },
+    "solvable-s-mlp": {
+      "target": "solvable",
+      "surface": "s",
+      "family": "mlp",
+      "epochs": 4,
+      "batch_unit": "64 canonical worlds, not candidates",
+      "steps": 752,
+      "training_worlds": 12000,
+      "seconds": 2.4379959999932908,
+      "metric": {
+        "n": 2730,
+        "positive": 2168,
+        "negative": 562,
+        "balanced_accuracy": 0.81380495429039,
+        "accuracy": 0.8194139003753662
+      },
+      "control": false,
+      "probe_sha256": "09340a2509106a10965fd2304c4c3275dc6708eeb03491ed119def7030ea887e",
+      "parameters": 4225
+    },
+    "disposition-s-linear": {
+      "target": "disposition",
+      "surface": "s",
+      "family": "linear",
+      "epochs": 4,
+      "steps": 752,
+      "batch_unit": "64 canonical worlds",
+      "metric": {
+        "n": 3000,
+        "accuracy": 0.6106666922569275,
+        "macro_f1": 0.2316003831743761,
+        "class_support": {
+          "0": {
+            "n": 167,
+            "f1": 0.05429864253393665,
+            "reliable": false
+          },
+          "1": {
+            "n": 1832,
+            "f1": 0.7545094588649363,
+            "reliable": true
+          },
+          "2": {
+            "n": 501,
+            "f1": 0.3024251069900143,
+            "reliable": true
+          },
+          "3": {
+            "n": 333,
+            "f1": 0.005952380952380952,
+            "reliable": true
+          },
+          "4": {
+            "n": 167,
+            "f1": 0.04081632653061224,
+            "reliable": false
+          }
+        },
+        "macro_f1_scope": "DEV-present classes; underpowered classes descriptive only"
+      },
+      "restricted_or_underpowered": "respect source contract; pooled metrics descriptive only",
+      "probe_sha256": "458a78103671415503406bfa33230bce05500c39e544708c4bb15b955bff2b6c",
+      "parameters": 325
+    },
+    "disposition-s-mlp": {
+      "target": "disposition",
+      "surface": "s",
+      "family": "mlp",
+      "epochs": 4,
+      "steps": 752,
+      "batch_unit": "64 canonical worlds",
+      "metric": {
+        "n": 3000,
+        "accuracy": 0.6356666684150696,
+        "macro_f1": 0.244644326161501,
+        "class_support": {
+          "0": {
+            "n": 167,
+            "f1": 0.05555555555555555,
+            "reliable": false
+          },
+          "1": {
+            "n": 1832,
+            "f1": 0.7727373312679796,
+            "reliable": true
+          },
+          "2": {
+            "n": 501,
+            "f1": 0.3889585947302384,
+            "reliable": true
+          },
+          "3": {
+            "n": 333,
+            "f1": 0.005970149253731343,
+            "reliable": true
+          },
+          "4": {
+            "n": 167,
+            "f1": 0.0,
+            "reliable": false
+          }
+        },
+        "macro_f1_scope": "DEV-present classes; underpowered classes descriptive only"
+      },
+      "restricted_or_underpowered": "respect source contract; pooled metrics descriptive only",
+      "probe_sha256": "9993a644f218ef1e920be72414ba9ea8320ce0d2ebcb159925a4e4a7e100efb7",
+      "parameters": 4485
+    },
+    "reason-s-linear": {
+      "target": "reason",
+      "surface": "s",
+      "family": "linear",
+      "epochs": 4,
+      "steps": 752,
+      "batch_unit": "64 canonical worlds",
+      "metric": {
+        "n": 3000,
+        "accuracy": 0.3596666753292084,
+        "macro_f1": 0.3137052331262832,
+        "class_support": {
+          "0": {
+            "n": 166,
+            "f1": 0.14225941422594143,
+            "reliable": false
+          },
+          "1": {
+            "n": 167,
+            "f1": 0.3225806451612903,
+            "reliable": false
+          },
+          "2": {
+            "n": 334,
+            "f1": 0.33229813664596275,
+            "reliable": true
+          },
+          "3": {
+            "n": 167,
+            "f1": 0.5707656612529002,
+            "reliable": false
+          },
+          "4": {
+            "n": 167,
+            "f1": 0.08928571428571429,
+            "reliable": false
+          },
+          "5": {
+            "n": 167,
+            "f1": 0.029850746268656716,
+            "reliable": false
+          },
+          "6": {
+            "n": 166,
+            "f1": 0.6284403669724771,
+            "reliable": false
+          },
+          "7": {
+            "n": 167,
+            "f1": 0.2049469964664311,
+            "reliable": false
+          },
+          "8": {
+            "n": 167,
+            "f1": 0.1095890410958904,
+            "reliable": false
+          },
+          "9": {
+            "n": 167,
+            "f1": 0.7637231503579952,
+            "reliable": false
+          },
+          "10": {
+            "n": 166,
+            "f1": 0.45272206303724927,
+            "reliable": false
+          },
+          "11": {
+            "n": 167,
+            "f1": 0.2792452830188679,
+            "reliable": false
+          },
+          "12": {
+            "n": 166,
+            "f1": 0.3560830860534125,
+            "reliable": false
+          },
+          "13": {
+            "n": 166,
+            "f1": 0.08333333333333333,
+            "reliable": false
+          },
+          "14": {
+            "n": 500,
+            "f1": 0.3404548587181254,
+            "reliable": true
+          }
+        },
+        "macro_f1_scope": "DEV-present classes; underpowered classes descriptive only"
+      },
+      "restricted_or_underpowered": "respect source contract; pooled metrics descriptive only",
+      "probe_sha256": "1a99d3309964cb1eeae03fb2801fffa91a0b8032845cc5c71384653319e84e3c",
+      "parameters": 975
+    },
+    "reason-s-mlp": {
+      "target": "reason",
+      "surface": "s",
+      "family": "mlp",
+      "epochs": 4,
+      "steps": 752,
+      "batch_unit": "64 canonical worlds",
+      "metric": {
+        "n": 3000,
+        "accuracy": 0.4183333218097687,
+        "macro_f1": 0.380719710590746,
+        "class_support": {
+          "0": {
+            "n": 166,
+            "f1": 0.27586206896551724,
+            "reliable": false
+          },
+          "1": {
+            "n": 167,
+            "f1": 0.3712574850299401,
+            "reliable": false
+          },
+          "2": {
+            "n": 334,
+            "f1": 0.47262247838616717,
+            "reliable": true
+          },
+          "3": {
+            "n": 167,
+            "f1": 0.6553398058252428,
+            "reliable": false
+          },
+          "4": {
+            "n": 167,
+            "f1": 0.07291666666666667,
+            "reliable": false
+          },
+          "5": {
+            "n": 167,
+            "f1": 0.0,
+            "reliable": false
+          },
+          "6": {
+            "n": 166,
+            "f1": 0.7956403269754768,
+            "reliable": false
+          },
+          "7": {
+            "n": 167,
+            "f1": 0.2271062271062271,
+            "reliable": false
+          },
+          "8": {
+            "n": 167,
+            "f1": 0.20689655172413793,
+            "reliable": false
+          },
+          "9": {
+            "n": 167,
+            "f1": 0.8617021276595744,
+            "reliable": false
+          },
+          "10": {
+            "n": 166,
+            "f1": 0.5128205128205128,
+            "reliable": false
+          },
+          "11": {
+            "n": 167,
+            "f1": 0.3772455089820359,
+            "reliable": false
+          },
+          "12": {
+            "n": 166,
+            "f1": 0.41055718475073316,
+            "reliable": false
+          },
+          "13": {
+            "n": 166,
+            "f1": 0.11458333333333333,
+            "reliable": false
+          },
+          "14": {
+            "n": 500,
+            "f1": 0.35624538063562455,
+            "reliable": true
+          }
+        },
+        "macro_f1_scope": "DEV-present classes; underpowered classes descriptive only"
+      },
+      "restricted_or_underpowered": "respect source contract; pooled metrics descriptive only",
+      "probe_sha256": "9f4ceea513a9eb56fb099c71b231296f3874a70b188c7fa4a821a577d9d6a423",
+      "parameters": 5135
+    },
+    "missing_cardinality-s-linear": {
+      "target": "missing_cardinality",
+      "surface": "s",
+      "family": "linear",
+      "epochs": 4,
+      "steps": 752,
+      "batch_unit": "64 canonical worlds",
+      "metric": {
+        "n": 3000,
+        "accuracy": 0.7540000081062317,
+        "macro_f1": 0.3902091805835479,
+        "class_support": {
+          "0": {
+            "n": 2332,
+            "f1": 0.8559718969555035,
+            "reliable": true
+          },
+          "1": {
+            "n": 334,
+            "f1": 0.16335540838852097,
+            "reliable": true
+          },
+          "2": {
+            "n": 334,
+            "f1": 0.15130023640661938,
+            "reliable": true
+          }
+        },
+        "macro_f1_scope": "DEV-present classes; underpowered classes descriptive only"
+      },
+      "restricted_or_underpowered": "respect source contract; pooled metrics descriptive only",
+      "probe_sha256": "a4f4980324eb2176421eba5e5bc7afc36369ad44322d57a78e228bd5094581ca",
+      "parameters": 195
+    },
+    "missing_cardinality-s-mlp": {
+      "target": "missing_cardinality",
+      "surface": "s",
+      "family": "mlp",
+      "epochs": 4,
+      "steps": 752,
+      "batch_unit": "64 canonical worlds",
+      "metric": {
+        "n": 3000,
+        "accuracy": 0.7836666703224182,
+        "macro_f1": 0.42925097540722507,
+        "class_support": {
+          "0": {
+            "n": 2332,
+            "f1": 0.8746378211319297,
+            "reliable": true
+          },
+          "1": {
+            "n": 334,
+            "f1": 0.14854111405835543,
+            "reliable": true
+          },
+          "2": {
+            "n": 334,
+            "f1": 0.2645739910313901,
+            "reliable": true
+          }
+        },
+        "macro_f1_scope": "DEV-present classes; underpowered classes descriptive only"
+      },
+      "restricted_or_underpowered": "respect source contract; pooled metrics descriptive only",
+      "probe_sha256": "258b82de0c984df310bbfe0930661737bd949e57e0f35462cd61f7c4fbac2d42",
+      "parameters": 4355
+    },
+    "requestability-s-linear": {
+      "target": "requestability",
+      "surface": "s",
+      "family": "linear",
+      "epochs": 4,
+      "steps": 752,
+      "batch_unit": "64 canonical worlds",
+      "metric": {
+        "n": 3000,
+        "accuracy": 0.7723333239555359,
+        "macro_f1": 0.2983430568172425,
+        "class_support": {
+          "0": {
+            "n": 334,
+            "f1": 0.011494252873563218,
+            "reliable": true
+          },
+          "1": {
+            "n": 2332,
+            "f1": 0.8720075400565505,
+            "reliable": true
+          },
+          "2": {
+            "n": 334,
+            "f1": 0.011527377521613832,
+            "reliable": true
+          }
+        },
+        "macro_f1_scope": "DEV-present classes; underpowered classes descriptive only"
+      },
+      "restricted_or_underpowered": "respect source contract; pooled metrics descriptive only",
+      "probe_sha256": "87f1481f6550c7a6bde7db93f0a8b392b0e277302b3e72911a0c9f9897fcc979",
+      "parameters": 195
+    },
+    "requestability-s-mlp": {
+      "target": "requestability",
+      "surface": "s",
+      "family": "mlp",
+      "epochs": 4,
+      "steps": 752,
+      "batch_unit": "64 canonical worlds",
+      "metric": {
+        "n": 3000,
+        "accuracy": 0.7786666750907898,
+        "macro_f1": 0.3160669888868178,
+        "class_support": {
+          "0": {
+            "n": 334,
+            "f1": 0.07242339832869081,
+            "reliable": true
+          },
+          "1": {
+            "n": 2332,
+            "f1": 0.8757775683317625,
+            "reliable": true
+          },
+          "2": {
+            "n": 334,
+            "f1": 0.0,
+            "reliable": true
+          }
+        },
+        "macro_f1_scope": "DEV-present classes; underpowered classes descriptive only"
+      },
+      "restricted_or_underpowered": "respect source contract; pooled metrics descriptive only",
+      "probe_sha256": "5c943694b4cf478e6f34ef751933d3329f87cce25f4e19c540e40ef4179722df",
+      "parameters": 4355
+    },
+    "first_action_type-s-linear": {
+      "target": "first_action_type",
+      "surface": "s",
+      "family": "linear",
+      "epochs": 4,
+      "steps": 750,
+      "batch_unit": "64 canonical worlds",
+      "metric": {
+        "n": 333,
+        "accuracy": 0.7357357144355774,
+        "macro_f1": 0.10652173913043478,
+        "class_support": {
+          "0": {
+            "n": 10,
+            "f1": 0.0,
+            "reliable": false
+          },
+          "1": {
+            "n": 4,
+            "f1": 0.0,
+            "reliable": false
+          },
+          "2": {
+            "n": 5,
+            "f1": 0.0,
+            "reliable": false
+          },
+          "3": {
+            "n": 14,
+            "f1": 0.0,
+            "reliable": false
+          },
+          "4": {
+            "n": 249,
+            "f1": 0.8521739130434782,
+            "reliable": true
+          },
+          "5": {
+            "n": 11,
+            "f1": 0.0,
+            "reliable": false
+          },
+          "6": {
+            "n": 39,
+            "f1": 0.0,
+            "reliable": false
+          },
+          "7": {
+            "n": 0,
+            "f1": 0.0,
+            "reliable": false
+          },
+          "8": {
+            "n": 1,
+            "f1": 0.0,
+            "reliable": false
+          }
+        },
+        "macro_f1_scope": "DEV-present classes; underpowered classes descriptive only"
+      },
+      "restricted_or_underpowered": "respect source contract; pooled metrics descriptive only",
+      "probe_sha256": "b54a022f8e2c18a57b575f28b81e7d02051750512fb6bc322413327b8edc537c",
+      "parameters": 585
+    },
+    "first_action_type-s-mlp": {
+      "target": "first_action_type",
+      "surface": "s",
+      "family": "mlp",
+      "epochs": 4,
+      "steps": 752,
+      "batch_unit": "64 canonical worlds",
+      "metric": {
+        "n": 333,
+        "accuracy": 0.7477477192878723,
+        "macro_f1": 0.10714285714285714,
+        "class_support": {
+          "0": {
+            "n": 10,
+            "f1": 0.0,
+            "reliable": false
+          },
+          "1": {
+            "n": 4,
+            "f1": 0.0,
+            "reliable": false
+          },
+          "2": {
+            "n": 5,
+            "f1": 0.0,
+            "reliable": false
+          },
+          "3": {
+            "n": 14,
+            "f1": 0.0,
+            "reliable": false
+          },
+          "4": {
+            "n": 249,
+            "f1": 0.8571428571428571,
+            "reliable": true
+          },
+          "5": {
+            "n": 11,
+            "f1": 0.0,
+            "reliable": false
+          },
+          "6": {
+            "n": 39,
+            "f1": 0.0,
+            "reliable": false
+          },
+          "7": {
+            "n": 0,
+            "f1": 0.0,
+            "reliable": false
+          },
+          "8": {
+            "n": 1,
+            "f1": 0.0,
+            "reliable": false
+          }
+        },
+        "macro_f1_scope": "DEV-present classes; underpowered classes descriptive only"
+      },
+      "restricted_or_underpowered": "respect source contract; pooled metrics descriptive only",
+      "probe_sha256": "c4c24a2ada14bbf76127b360b992d4c0e78010c4ce01e8c6e1c49de2f505f05a",
+      "parameters": 4745
+    }
+  },
+  "source_sha256": "68506dba21903b05b826bb1d97e6ac0d6fb25ad34d765a4ce9be76dcde4e1740",
+  "legacy_panel_reproduced": false,
+  "epoch_selection": "none; four fixed epochs",
+  "evaluation_opened": false
+}

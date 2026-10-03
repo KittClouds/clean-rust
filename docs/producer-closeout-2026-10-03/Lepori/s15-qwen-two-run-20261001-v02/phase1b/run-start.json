@@ -1,0 +1,15 @@
+{
+  "arm": "phase1b",
+  "initialization_sha256": "ec5a9e0037630a3ed87982e1857b35fd20641706ef13336d8d0d4fec9708932a",
+  "epochs": 8,
+  "seed": 0,
+  "optimizer": "AdamW",
+  "lr": 0.0003,
+  "weight_decay": 0.01,
+  "batch_size": 64,
+  "drop_last": true,
+  "clip": 1,
+  "renderer_pair_split": "TRAIN",
+  "global_action_losses": "OUT",
+  "active_parameters": 1907618
+}

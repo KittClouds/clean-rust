@@ -1,0 +1,66 @@
+{
+  "sha256": "0bc934eea6ba9e2914d878332e89743e352148bcd81338c4efbd18227a0a7e09",
+  "rows": 256,
+  "absent_mentions_zeroed": [
+    {
+      "row_id": "TRAIN:006928:0:0",
+      "entity_id": "obj_1",
+      "mention": "onyx_object"
+    },
+    {
+      "row_id": "TRAIN:006965:0:0",
+      "entity_id": "ag_0",
+      "mention": "the aforementioned agent"
+    },
+    {
+      "row_id": "TRAIN:006975:0:0",
+      "entity_id": "loc_0",
+      "mention": "vault_1"
+    },
+    {
+      "row_id": "TRAIN:007003:0:0",
+      "entity_id": "sw_0",
+      "mention": "switch_q"
+    },
+    {
+      "row_id": "TRAIN:007004:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:007021:0:0",
+      "entity_id": "obj_1",
+      "mention": "jade_object"
+    },
+    {
+      "row_id": "TRAIN:007023:0:0",
+      "entity_id": "sw_2",
+      "mention": "switch_q"
+    },
+    {
+      "row_id": "TRAIN:007068:0:1",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:007079:0:1",
+      "entity_id": "sw_0",
+      "mention": "SWITCH_P"
+    },
+    {
+      "row_id": "TRAIN:007084:0:0",
+      "entity_id": "obj_0",
+      "mention": "topaz_object"
+    },
+    {
+      "row_id": "TRAIN:007091:0:2",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:007139:0:0",
+      "entity_id": "obj_0",
+      "mention": "basalt_object"
+    }
+  ]
+}

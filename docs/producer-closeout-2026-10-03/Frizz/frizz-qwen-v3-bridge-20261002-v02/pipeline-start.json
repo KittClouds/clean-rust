@@ -1,0 +1,12 @@
+{
+  "status": "WAITING_FOR_EXTRACTION",
+  "extract_pid": 46764,
+  "evaluation_opened": false,
+  "steps": [
+    "dataset.py",
+    "train_bridge.py",
+    "readouts.py",
+    "verify_bridge.py"
+  ],
+  "automatic_E": false
+}

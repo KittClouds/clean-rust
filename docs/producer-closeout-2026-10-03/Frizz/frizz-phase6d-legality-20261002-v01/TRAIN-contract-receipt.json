@@ -1,0 +1,11 @@
+{
+  "canonical_roots": 1333,
+  "consequence_parameters_trainable": 0,
+  "epochs": 8,
+  "illegal_candidates_canonical": 79946,
+  "legal_candidates_canonical": 4690,
+  "paired_rows": 2666,
+  "selected_ID_supervision": false,
+  "threshold_logit": 0,
+  "weighting": "each root class-normalized legal/illegal BCE, equal class weights where both exist; TRAIN only"
+}

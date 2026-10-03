@@ -1,0 +1,56 @@
+{
+  "sha256": "8fbf0a486402087c0cdbdc7572b68058e2ab24d42dd71899f2d96f96f59a3e1f",
+  "rows": 256,
+  "absent_mentions_zeroed": [
+    {
+      "row_id": "DEV:001574:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "DEV:001595:0:0",
+      "entity_id": "sw_1",
+      "mention": "switch_r"
+    },
+    {
+      "row_id": "DEV:001602:0:1",
+      "entity_id": "sw_0",
+      "mention": "switch_q"
+    },
+    {
+      "row_id": "DEV:001607:0:0",
+      "entity_id": "obj_1",
+      "mention": "the aforementioned basalt_object"
+    },
+    {
+      "row_id": "DEV:001622:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "DEV:001660:0:0",
+      "entity_id": "sw_1",
+      "mention": "switch_q"
+    },
+    {
+      "row_id": "DEV:001711:0:0",
+      "entity_id": "sw_2",
+      "mention": "switch_q"
+    },
+    {
+      "row_id": "DEV:001714:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "DEV:001761:0:0",
+      "entity_id": "obj_1",
+      "mention": "topaz_object"
+    },
+    {
+      "row_id": "DEV:001765:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    }
+  ]
+}

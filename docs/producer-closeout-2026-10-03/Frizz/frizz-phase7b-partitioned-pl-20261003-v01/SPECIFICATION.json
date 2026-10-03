@@ -1,0 +1,82 @@
+{
+  "status": "FROZEN_BEFORE_DEV_SCORING",
+  "question": "Does training the scorer on the actual ordered partition structure recover more useful candidate ranking than ordinary selected-candidate CE?",
+  "release_identity": "84f0a7e13032e8cdfcecc862217bb33ca23568fade64fafeef410327eb996f12",
+  "input_identity_sha256": "01028a4e4a36345c3a7cef2e92241f553d15d60ec4379e60ed45469ff231a3c2",
+  "source_hashes": {
+    "common.py": "1b5f69476827ae597189bfa9409d76bca9aaa4cbb32473716cb9b54730064434",
+    "data.py": "14af294bc9d9097606a020f35507ebb55e8e77792beb2404b81015077439bb31",
+    "model.py": "93bf3857f0272cb711315b810b18f03d9b77eb7e24c1e2d2cb3246767d837ecb",
+    "pl.py": "fb8350ae2cd54c7970389ade34ec4a0c6034f6cf4cbe535adcfe7e1e557e2c04",
+    "losses.py": "d27807e057e4e49f7c83917569cfe97eb31f1f85f2f1aba9c49628367a9d3d7b",
+    "partition.py": "83cf4b46ee9a69cc6bc732357542051c404d183b04eb5cca36f987a3c70b7398",
+    "metrics.py": "5d3c44e6771053816d4bda13873b3756fe19de0aa6faff2ab7dc0beab384c0cb",
+    "train.py": "631dd408e4141cad69361f88f7ffa8ad2eaec0245857e429005fbc0c2ba62e56",
+    "score.py": "84be22d91796da7f90def6c2dfc4b589640da0d4f71f6aafa90bfa81faacc47f",
+    "compare.py": "83854a5678fec0f9972086d7fd4d6caa978aa0a7d301aca255ad5a060d329fc3",
+    "qualify.py": "7e1af17a874aec4a789b48844796361ee10b95abc6e05f9ff76047334e64ba25",
+    "replay.py": "ed15a7a8d03fc671858d92a93ca78df2501945dac216b0b045eed637ddf24bdb",
+    "seal.py": "185a6ede4dd734b899507b613358d647405af4accb289746411a28af88d8a908",
+    "verify_inputs.py": "cfc22a3b9786f25c2e437c14ef5f7089b3eaf55bce4753d7d5af447c13906dc2",
+    "freeze.py": "972ab6901dcfdf7083893d87dff3f22ecc23b3379ba880f7626af7d55bd85c41",
+    "test_pl.py": "8e89855873b438f6f9fae4cfbf158bd680f1347da2b02e4531f793618fb6823a",
+    "test_arms.py": "aad6b50f9840a2067d76b82c2e63c54f2217a9ac3a5bf0e479966ba1d62a03ea",
+    "test_partition.py": "e3f97b45ed8d0df623570f8297407fa7e93a59d7664b6c2a52445cd4e3f6350f",
+    "SPECIFICATION.md": "fc393e67b870e3d1cf5f6bf1c34ab6ea08d49df58d3c4ac13a7c4b43cc70c1d1"
+  },
+  "arms": {
+    "ce": "selected-candidate softmax CE + same-type CE (control)",
+    "vanilla_pl": "ListMLE on a fresh uniformly random linear extension of the partition order (selected > legal-other > illegal)",
+    "partitioned_pl": "exact grouped Plackett-Luce likelihood of P1 > P2 > P3, internal orders marginalised, + same-type",
+    "vanilla_pl_truncated (supplementary, outside the survival rule)": "ListMLE on a random linear extension kept through the legal candidates only"
+  },
+  "scorer": "365 -> 128 -> 64 -> 1, GELU, candidate-independent, 55,169 parameters, shared initial weights",
+  "population": "endpoint-eligible roots only: TRAIN 1,333, DEV 333",
+  "training": {
+    "seed": 0,
+    "epochs": 12,
+    "optimizer": "AdamW",
+    "lr": 0.0003,
+    "weight_decay": 0.01,
+    "grad_clip": 1.0,
+    "schedule": "cosine to 0, per step, no warmup",
+    "root_batch": 32,
+    "precision": "FP32",
+    "loss_weights": {
+      "full": 1.0,
+      "same_type": 0.5
+    },
+    "candidate_order": "canonical, shared",
+    "primary_endpoint": "epoch 12 (CPU/FP32)",
+    "checkpoint_selection": "none"
+  },
+  "expected_denominators": {
+    "TRAIN_eligible": 1333,
+    "DEV_eligible": 333,
+    "TRAIN_roots": 12000,
+    "DEV_roots": 3000,
+    "max_legal_other_group": 8
+  },
+  "survival_rule": {
+    "SURVIVES": "gold-type top1 delta >= +0.05 with paired 95% lower bound > 0, OR gold-type MRR delta >= +0.03 with lower bound > 0, AND selected top1 point-estimate delta >= -0.02",
+    "otherwise": "DOES_NOT_SURVIVE; seal without modifying partitions/weights/auxiliaries",
+    "confirmation": "seeds 1 and 2 under this frozen specification only if SURVIVES"
+  },
+  "bootstrap": {
+    "unit": "canonical root",
+    "repetitions": 2000,
+    "seed": 20261003
+  },
+  "not_included": [
+    "candidate self-attention",
+    "recurrence",
+    "comparator",
+    "LoRA",
+    "access organ",
+    "legality head / BCE",
+    "gold legality at inference",
+    "transition distance or simulator state as inputs"
+  ],
+  "evaluation_opened": false,
+  "protected_opened": false
+}

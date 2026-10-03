@@ -1,0 +1,441 @@
+{
+  "status": "DESCRIPTIVE_SUPPLEMENT",
+  "arms": {
+    "bridge:init:c:linear": {
+      "gold_type": {
+        "selected_roots": 333,
+        "selected_uniform_top1": 0.11401821672916412,
+        "optimal_roots": 333,
+        "optimal_uniform_top1": 0.11401821672916412,
+        "mean_allowed_candidates": 10.549549102783203,
+        "empty_allowed_eligible_roots": 0
+      },
+      "predicted_type": {
+        "selected_roots": 333,
+        "selected_uniform_top1": 0.08143562823534012,
+        "optimal_roots": 333,
+        "optimal_uniform_top1": 0.08143562823534012,
+        "mean_allowed_candidates": 9.54054069519043,
+        "empty_allowed_eligible_roots": 0
+      }
+    },
+    "bridge:init:c:mlp": {
+      "gold_type": {
+        "selected_roots": 333,
+        "selected_uniform_top1": 0.11401821672916412,
+        "optimal_roots": 333,
+        "optimal_uniform_top1": 0.11401821672916412,
+        "mean_allowed_candidates": 10.549549102783203,
+        "empty_allowed_eligible_roots": 0
+      },
+      "predicted_type": {
+        "selected_roots": 333,
+        "selected_uniform_top1": 0.08143562823534012,
+        "optimal_roots": 333,
+        "optimal_uniform_top1": 0.08143562823534012,
+        "mean_allowed_candidates": 9.54054069519043,
+        "empty_allowed_eligible_roots": 0
+      }
+    },
+    "bridge:init:cs:linear": {
+      "gold_type": {
+        "selected_roots": 333,
+        "selected_uniform_top1": 0.11401821672916412,
+        "optimal_roots": 333,
+        "optimal_uniform_top1": 0.11401821672916412,
+        "mean_allowed_candidates": 10.549549102783203,
+        "empty_allowed_eligible_roots": 0
+      },
+      "predicted_type": {
+        "selected_roots": 333,
+        "selected_uniform_top1": 0.08143562823534012,
+        "optimal_roots": 333,
+        "optimal_uniform_top1": 0.08143562823534012,
+        "mean_allowed_candidates": 9.54054069519043,
+        "empty_allowed_eligible_roots": 0
+      }
+    },
+    "bridge:init:cs:mlp": {
+      "gold_type": {
+        "selected_roots": 333,
+        "selected_uniform_top1": 0.11401821672916412,
+        "optimal_roots": 333,
+        "optimal_uniform_top1": 0.11401821672916412,
+        "mean_allowed_candidates": 10.549549102783203,
+        "empty_allowed_eligible_roots": 0
+      },
+      "predicted_type": {
+        "selected_roots": 333,
+        "selected_uniform_top1": 0.08143562823534012,
+        "optimal_roots": 333,
+        "optimal_uniform_top1": 0.08143562823534012,
+        "mean_allowed_candidates": 9.54054069519043,
+        "empty_allowed_eligible_roots": 0
+      }
+    },
+    "bridge:init:e:linear": {
+      "gold_type": {
+        "selected_roots": 333,
+        "selected_uniform_top1": 0.11401821672916412,
+        "optimal_roots": 333,
+        "optimal_uniform_top1": 0.11401821672916412,
+        "mean_allowed_candidates": 10.549549102783203,
+        "empty_allowed_eligible_roots": 0
+      },
+      "predicted_type": {
+        "selected_roots": 333,
+        "selected_uniform_top1": 0.08143562823534012,
+        "optimal_roots": 333,
+        "optimal_uniform_top1": 0.08143562823534012,
+        "mean_allowed_candidates": 9.54054069519043,
+        "empty_allowed_eligible_roots": 0
+      }
+    },
+    "bridge:init:e:mlp": {
+      "gold_type": {
+        "selected_roots": 333,
+        "selected_uniform_top1": 0.11401821672916412,
+        "optimal_roots": 333,
+        "optimal_uniform_top1": 0.11401821672916412,
+        "mean_allowed_candidates": 10.549549102783203,
+        "empty_allowed_eligible_roots": 0
+      },
+      "predicted_type": {
+        "selected_roots": 333,
+        "selected_uniform_top1": 0.08143562823534012,
+        "optimal_roots": 333,
+        "optimal_uniform_top1": 0.08143562823534012,
+        "mean_allowed_candidates": 9.54054069519043,
+        "empty_allowed_eligible_roots": 0
+      }
+    },
+    "bridge:trained:c:linear": {
+      "gold_type": {
+        "selected_roots": 333,
+        "selected_uniform_top1": 0.11401821672916412,
+        "optimal_roots": 333,
+        "optimal_uniform_top1": 0.11401821672916412,
+        "mean_allowed_candidates": 10.549549102783203,
+        "empty_allowed_eligible_roots": 0
+      },
+      "predicted_type": {
+        "selected_roots": 333,
+        "selected_uniform_top1": 0.08143562823534012,
+        "optimal_roots": 333,
+        "optimal_uniform_top1": 0.08143562823534012,
+        "mean_allowed_candidates": 9.54054069519043,
+        "empty_allowed_eligible_roots": 0
+      }
+    },
+    "bridge:trained:c:mlp": {
+      "gold_type": {
+        "selected_roots": 333,
+        "selected_uniform_top1": 0.11401821672916412,
+        "optimal_roots": 333,
+        "optimal_uniform_top1": 0.11401821672916412,
+        "mean_allowed_candidates": 10.549549102783203,
+        "empty_allowed_eligible_roots": 0
+      },
+      "predicted_type": {
+        "selected_roots": 333,
+        "selected_uniform_top1": 0.08143562823534012,
+        "optimal_roots": 333,
+        "optimal_uniform_top1": 0.08143562823534012,
+        "mean_allowed_candidates": 9.54054069519043,
+        "empty_allowed_eligible_roots": 0
+      }
+    },
+    "bridge:trained:cs:linear": {
+      "gold_type": {
+        "selected_roots": 333,
+        "selected_uniform_top1": 0.11401821672916412,
+        "optimal_roots": 333,
+        "optimal_uniform_top1": 0.11401821672916412,
+        "mean_allowed_candidates": 10.549549102783203,
+        "empty_allowed_eligible_roots": 0
+      },
+      "predicted_type": {
+        "selected_roots": 333,
+        "selected_uniform_top1": 0.07695016264915466,
+        "optimal_roots": 333,
+        "optimal_uniform_top1": 0.07695016264915466,
+        "mean_allowed_candidates": 10.207207679748535,
+        "empty_allowed_eligible_roots": 0
+      }
+    },
+    "bridge:trained:cs:mlp": {
+      "gold_type": {
+        "selected_roots": 333,
+        "selected_uniform_top1": 0.11401821672916412,
+        "optimal_roots": 333,
+        "optimal_uniform_top1": 0.11401821672916412,
+        "mean_allowed_candidates": 10.549549102783203,
+        "empty_allowed_eligible_roots": 0
+      },
+      "predicted_type": {
+        "selected_roots": 333,
+        "selected_uniform_top1": 0.07625202089548111,
+        "optimal_roots": 333,
+        "optimal_uniform_top1": 0.07625202089548111,
+        "mean_allowed_candidates": 10.441441535949707,
+        "empty_allowed_eligible_roots": 1
+      }
+    },
+    "bridge:trained:e:linear": {
+      "gold_type": {
+        "selected_roots": 333,
+        "selected_uniform_top1": 0.11401821672916412,
+        "optimal_roots": 333,
+        "optimal_uniform_top1": 0.11401821672916412,
+        "mean_allowed_candidates": 10.549549102783203,
+        "empty_allowed_eligible_roots": 0
+      },
+      "predicted_type": {
+        "selected_roots": 333,
+        "selected_uniform_top1": 0.07693834602832794,
+        "optimal_roots": 333,
+        "optimal_uniform_top1": 0.07693834602832794,
+        "mean_allowed_candidates": 9.753753662109375,
+        "empty_allowed_eligible_roots": 1
+      }
+    },
+    "bridge:trained:e:mlp": {
+      "gold_type": {
+        "selected_roots": 333,
+        "selected_uniform_top1": 0.11401821672916412,
+        "optimal_roots": 333,
+        "optimal_uniform_top1": 0.11401821672916412,
+        "mean_allowed_candidates": 10.549549102783203,
+        "empty_allowed_eligible_roots": 0
+      },
+      "predicted_type": {
+        "selected_roots": 333,
+        "selected_uniform_top1": 0.07465667277574539,
+        "optimal_roots": 333,
+        "optimal_uniform_top1": 0.07465667277574539,
+        "mean_allowed_candidates": 9.933934211730957,
+        "empty_allowed_eligible_roots": 5
+      }
+    },
+    "E:init:c:linear": {
+      "gold_type": {
+        "selected_roots": 333,
+        "selected_uniform_top1": 0.11401821672916412,
+        "optimal_roots": 333,
+        "optimal_uniform_top1": 0.11401821672916412,
+        "mean_allowed_candidates": 10.549549102783203,
+        "empty_allowed_eligible_roots": 0
+      },
+      "predicted_type": {
+        "selected_roots": 333,
+        "selected_uniform_top1": 0.08143562823534012,
+        "optimal_roots": 333,
+        "optimal_uniform_top1": 0.08143562823534012,
+        "mean_allowed_candidates": 9.54054069519043,
+        "empty_allowed_eligible_roots": 0
+      }
+    },
+    "E:init:c:mlp": {
+      "gold_type": {
+        "selected_roots": 333,
+        "selected_uniform_top1": 0.11401821672916412,
+        "optimal_roots": 333,
+        "optimal_uniform_top1": 0.11401821672916412,
+        "mean_allowed_candidates": 10.549549102783203,
+        "empty_allowed_eligible_roots": 0
+      },
+      "predicted_type": {
+        "selected_roots": 333,
+        "selected_uniform_top1": 0.08143562823534012,
+        "optimal_roots": 333,
+        "optimal_uniform_top1": 0.08143562823534012,
+        "mean_allowed_candidates": 9.54054069519043,
+        "empty_allowed_eligible_roots": 0
+      }
+    },
+    "E:init:cs:linear": {
+      "gold_type": {
+        "selected_roots": 333,
+        "selected_uniform_top1": 0.11401821672916412,
+        "optimal_roots": 333,
+        "optimal_uniform_top1": 0.11401821672916412,
+        "mean_allowed_candidates": 10.549549102783203,
+        "empty_allowed_eligible_roots": 0
+      },
+      "predicted_type": {
+        "selected_roots": 333,
+        "selected_uniform_top1": 0.08143562823534012,
+        "optimal_roots": 333,
+        "optimal_uniform_top1": 0.08143562823534012,
+        "mean_allowed_candidates": 9.54054069519043,
+        "empty_allowed_eligible_roots": 0
+      }
+    },
+    "E:init:cs:mlp": {
+      "gold_type": {
+        "selected_roots": 333,
+        "selected_uniform_top1": 0.11401821672916412,
+        "optimal_roots": 333,
+        "optimal_uniform_top1": 0.11401821672916412,
+        "mean_allowed_candidates": 10.549549102783203,
+        "empty_allowed_eligible_roots": 0
+      },
+      "predicted_type": {
+        "selected_roots": 333,
+        "selected_uniform_top1": 0.08143562823534012,
+        "optimal_roots": 333,
+        "optimal_uniform_top1": 0.08143562823534012,
+        "mean_allowed_candidates": 9.54054069519043,
+        "empty_allowed_eligible_roots": 0
+      }
+    },
+    "E:init:e:linear": {
+      "gold_type": {
+        "selected_roots": 333,
+        "selected_uniform_top1": 0.11401821672916412,
+        "optimal_roots": 333,
+        "optimal_uniform_top1": 0.11401821672916412,
+        "mean_allowed_candidates": 10.549549102783203,
+        "empty_allowed_eligible_roots": 0
+      },
+      "predicted_type": {
+        "selected_roots": 333,
+        "selected_uniform_top1": 0.08143562823534012,
+        "optimal_roots": 333,
+        "optimal_uniform_top1": 0.08143562823534012,
+        "mean_allowed_candidates": 9.54054069519043,
+        "empty_allowed_eligible_roots": 0
+      }
+    },
+    "E:init:e:mlp": {
+      "gold_type": {
+        "selected_roots": 333,
+        "selected_uniform_top1": 0.11401821672916412,
+        "optimal_roots": 333,
+        "optimal_uniform_top1": 0.11401821672916412,
+        "mean_allowed_candidates": 10.549549102783203,
+        "empty_allowed_eligible_roots": 0
+      },
+      "predicted_type": {
+        "selected_roots": 333,
+        "selected_uniform_top1": 0.08143562823534012,
+        "optimal_roots": 333,
+        "optimal_uniform_top1": 0.08143562823534012,
+        "mean_allowed_candidates": 9.54054069519043,
+        "empty_allowed_eligible_roots": 0
+      }
+    },
+    "E:trained:c:linear": {
+      "gold_type": {
+        "selected_roots": 333,
+        "selected_uniform_top1": 0.11401821672916412,
+        "optimal_roots": 333,
+        "optimal_uniform_top1": 0.11401821672916412,
+        "mean_allowed_candidates": 10.549549102783203,
+        "empty_allowed_eligible_roots": 0
+      },
+      "predicted_type": {
+        "selected_roots": 333,
+        "selected_uniform_top1": 0.08143562823534012,
+        "optimal_roots": 333,
+        "optimal_uniform_top1": 0.08143562823534012,
+        "mean_allowed_candidates": 9.54054069519043,
+        "empty_allowed_eligible_roots": 0
+      }
+    },
+    "E:trained:c:mlp": {
+      "gold_type": {
+        "selected_roots": 333,
+        "selected_uniform_top1": 0.11401821672916412,
+        "optimal_roots": 333,
+        "optimal_uniform_top1": 0.11401821672916412,
+        "mean_allowed_candidates": 10.549549102783203,
+        "empty_allowed_eligible_roots": 0
+      },
+      "predicted_type": {
+        "selected_roots": 333,
+        "selected_uniform_top1": 0.08143562823534012,
+        "optimal_roots": 333,
+        "optimal_uniform_top1": 0.08143562823534012,
+        "mean_allowed_candidates": 9.54054069519043,
+        "empty_allowed_eligible_roots": 0
+      }
+    },
+    "E:trained:cs:linear": {
+      "gold_type": {
+        "selected_roots": 333,
+        "selected_uniform_top1": 0.11401821672916412,
+        "optimal_roots": 333,
+        "optimal_uniform_top1": 0.11401821672916412,
+        "mean_allowed_candidates": 10.549549102783203,
+        "empty_allowed_eligible_roots": 0
+      },
+      "predicted_type": {
+        "selected_roots": 333,
+        "selected_uniform_top1": 0.07718741148710251,
+        "optimal_roots": 333,
+        "optimal_uniform_top1": 0.07718741148710251,
+        "mean_allowed_candidates": 10.054054260253906,
+        "empty_allowed_eligible_roots": 1
+      }
+    },
+    "E:trained:cs:mlp": {
+      "gold_type": {
+        "selected_roots": 333,
+        "selected_uniform_top1": 0.11401821672916412,
+        "optimal_roots": 333,
+        "optimal_uniform_top1": 0.11401821672916412,
+        "mean_allowed_candidates": 10.549549102783203,
+        "empty_allowed_eligible_roots": 0
+      },
+      "predicted_type": {
+        "selected_roots": 333,
+        "selected_uniform_top1": 0.07461026310920715,
+        "optimal_roots": 333,
+        "optimal_uniform_top1": 0.07461026310920715,
+        "mean_allowed_candidates": 10.654654502868652,
+        "empty_allowed_eligible_roots": 1
+      }
+    },
+    "E:trained:e:linear": {
+      "gold_type": {
+        "selected_roots": 333,
+        "selected_uniform_top1": 0.11401821672916412,
+        "optimal_roots": 333,
+        "optimal_uniform_top1": 0.11401821672916412,
+        "mean_allowed_candidates": 10.549549102783203,
+        "empty_allowed_eligible_roots": 0
+      },
+      "predicted_type": {
+        "selected_roots": 333,
+        "selected_uniform_top1": 0.07812156528234482,
+        "optimal_roots": 333,
+        "optimal_uniform_top1": 0.07812156528234482,
+        "mean_allowed_candidates": 9.792792320251465,
+        "empty_allowed_eligible_roots": 2
+      }
+    },
+    "E:trained:e:mlp": {
+      "gold_type": {
+        "selected_roots": 333,
+        "selected_uniform_top1": 0.11401821672916412,
+        "optimal_roots": 333,
+        "optimal_uniform_top1": 0.11401821672916412,
+        "mean_allowed_candidates": 10.549549102783203,
+        "empty_allowed_eligible_roots": 0
+      },
+      "predicted_type": {
+        "selected_roots": 333,
+        "selected_uniform_top1": 0.07154656201601028,
+        "optimal_roots": 333,
+        "optimal_uniform_top1": 0.07154656201601028,
+        "mean_allowed_candidates": 10.234233856201172,
+        "empty_allowed_eligible_roots": 4
+      }
+    }
+  },
+  "evaluation_opened": false,
+  "readout_refits": 0,
+  "note": "metrics.json uniform_top1_expectation uses full N, including restricted views. Use this supplement for conditional-universe chance baselines. Actual ranks/MRR/top-k/exclusions are unaffected.",
+  "branch_rule": "unchanged; uses unrestricted full-universe selected ranking only"
+}

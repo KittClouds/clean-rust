@@ -1,0 +1,14 @@
+{
+  "init": {
+    "forward_seconds": 2.7631888999894727,
+    "parameters": 164859,
+    "rows": 666,
+    "valid_candidate_evaluations": 41578
+  },
+  "trained": {
+    "forward_seconds": 2.6359252000111155,
+    "parameters": 164859,
+    "rows": 666,
+    "valid_candidate_evaluations": 41578
+  }
+}

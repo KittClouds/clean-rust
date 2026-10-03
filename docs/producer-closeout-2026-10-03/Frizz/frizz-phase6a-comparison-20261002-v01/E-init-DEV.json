@@ -1,0 +1,10 @@
+{
+  "sha256": "485589083c9a10a36cf22ad50d1824b3f02a6cac8c2745814918ed7022b5e466",
+  "checkpoint_sha256": "c6cc3ba1ff36fdd14647218e563ba52a0231ba1a95c5212065f8c2b25037926f",
+  "state_widths": {
+    "c": 256,
+    "cs": 320,
+    "e": 32
+  },
+  "evaluation_opened": false
+}

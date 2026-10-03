@@ -1,0 +1,36 @@
+{
+  "sha256": "fa2470517da6adcfe4cc32c8dcf109e18407ce9e62d05f9b11daf15cb136185c",
+  "rows": 256,
+  "absent_mentions_zeroed": [
+    {
+      "row_id": "TRAIN:016128:0:0",
+      "entity_id": "sw_0",
+      "mention": "switch_p"
+    },
+    {
+      "row_id": "TRAIN:016133:0:2",
+      "entity_id": "obj_0",
+      "mention": "onyx_object"
+    },
+    {
+      "row_id": "TRAIN:016233:0:1",
+      "entity_id": "ag_0",
+      "mention": "they"
+    },
+    {
+      "row_id": "TRAIN:016278:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:016290:0:3",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:016316:0:0",
+      "entity_id": "sw_0",
+      "mention": "switch_p"
+    }
+  ]
+}

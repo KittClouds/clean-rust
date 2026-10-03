@@ -1,0 +1,92 @@
+{
+  "target": "reason",
+  "surface": "s",
+  "family": "mlp",
+  "epochs": 4,
+  "steps": 752,
+  "batch_unit": "64 canonical worlds",
+  "metric": {
+    "n": 3000,
+    "accuracy": 0.7773333191871643,
+    "macro_f1": 0.7838324470236481,
+    "class_support": {
+      "0": {
+        "n": 166,
+        "f1": 0.972972972972973,
+        "reliable": false
+      },
+      "1": {
+        "n": 167,
+        "f1": 0.9663608562691132,
+        "reliable": false
+      },
+      "2": {
+        "n": 334,
+        "f1": 0.8861911987860395,
+        "reliable": true
+      },
+      "3": {
+        "n": 167,
+        "f1": 0.935672514619883,
+        "reliable": false
+      },
+      "4": {
+        "n": 167,
+        "f1": 0.6457142857142857,
+        "reliable": false
+      },
+      "5": {
+        "n": 167,
+        "f1": 0.34055727554179566,
+        "reliable": false
+      },
+      "6": {
+        "n": 166,
+        "f1": 0.9764705882352941,
+        "reliable": false
+      },
+      "7": {
+        "n": 167,
+        "f1": 0.4875,
+        "reliable": false
+      },
+      "8": {
+        "n": 167,
+        "f1": 0.5280898876404494,
+        "reliable": false
+      },
+      "9": {
+        "n": 167,
+        "f1": 0.996996996996997,
+        "reliable": false
+      },
+      "10": {
+        "n": 166,
+        "f1": 0.9818181818181818,
+        "reliable": false
+      },
+      "11": {
+        "n": 167,
+        "f1": 0.9208211143695014,
+        "reliable": false
+      },
+      "12": {
+        "n": 166,
+        "f1": 0.7537091988130564,
+        "reliable": false
+      },
+      "13": {
+        "n": 166,
+        "f1": 0.6959247648902821,
+        "reliable": false
+      },
+      "14": {
+        "n": 500,
+        "f1": 0.6686868686868687,
+        "reliable": true
+      }
+    },
+    "macro_f1_scope": "DEV-present classes; underpowered classes descriptive only"
+  },
+  "restricted_or_underpowered": "respect source contract; pooled metrics descriptive only"
+}

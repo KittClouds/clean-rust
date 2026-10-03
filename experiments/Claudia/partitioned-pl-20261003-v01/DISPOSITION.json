@@ -1,0 +1,16 @@
+{
+  "finding": "PARTITIONED_PL_SEED0_DOES_NOT_SURVIVE_LEARNS_COARSE_LEGALITY_ORDER_LOSES_SELECTED_VS_LEGAL_NO_CONFIRMATION",
+  "survival_rule_output": "DOES_NOT_SURVIVE",
+  "rule_detail": {
+    "gold_type_top1_criterion": false,
+    "gold_type_MRR_criterion": false,
+    "selected_top1_not_materially_degraded": false,
+    "output": "DOES_NOT_SURVIVE"
+  },
+  "seed": 0,
+  "confirmation_seeds_run": 0,
+  "one_sentence_answer": "No: on these frozen states, training on the ordered partition structure produced a strong, generalising legal-vs-illegal ordering but destroyed selected-vs-legal-other ordering, leaving gold-type ranking at the CE level and unrestricted top1 far below it.",
+  "reason_no_confirmation": "frozen survival rule not met",
+  "secondary_dose_diagnostic": "TRAIN partition ordering becomes strong (0.954), DEV stays at the floor",
+  "evaluation_opened": false
+}

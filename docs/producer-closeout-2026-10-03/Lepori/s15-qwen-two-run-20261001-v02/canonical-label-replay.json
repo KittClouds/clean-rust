@@ -1,0 +1,16 @@
+{
+  "TRAIN": {
+    "canonical_worlds": 20000,
+    "all_available_labels": "EXACT",
+    "selected_action_absent": 9625,
+    "selected_action_outside_candidate_set": 934,
+    "simulator_sha256": "37344067422e4aa6846ca01a7fb70a8a0f6647bf3bbaeffc7a0340e386d015a6"
+  },
+  "DEV": {
+    "canonical_worlds": 2000,
+    "all_available_labels": "EXACT",
+    "selected_action_absent": 960,
+    "selected_action_outside_candidate_set": 109,
+    "simulator_sha256": "37344067422e4aa6846ca01a7fb70a8a0f6647bf3bbaeffc7a0340e386d015a6"
+  }
+}

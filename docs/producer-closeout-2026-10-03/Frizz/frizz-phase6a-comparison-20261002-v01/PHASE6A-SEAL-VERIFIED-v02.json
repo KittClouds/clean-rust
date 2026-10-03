@@ -1,0 +1,7 @@
+{
+  "status": "PASS",
+  "seal_sha256": "84b91d45a4f46da122a5b2dae22384b7d2fb07d0fd39cf3c07fba556172db0a8",
+  "artifact_count": 372,
+  "evaluation_opened": false,
+  "prior_model_probe_state_replays": "preserved and hash bound"
+}

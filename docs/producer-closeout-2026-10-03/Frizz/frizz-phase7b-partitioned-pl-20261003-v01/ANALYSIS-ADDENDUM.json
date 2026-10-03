@@ -1,0 +1,9 @@
+{
+  "status": "POST_FREEZE_SCRIPTS",
+  "note": "Written after the freeze. dose_diagnostic.py: exploratory post-hoc single-dose diagnostic (plan receipt written before it ran; outside the survival rule). report.py: presentation only - reads receipts, re-derives the within-type chance baseline, writes CONTEXT/DISPOSITION/REPORT (revised once before sealing: one band sentence made precise). No frozen-contract number depends on either.",
+  "source_hashes": {
+    "dose_diagnostic.py": "ee2416bd727021e9746d07eba5dbb5bd74f817309c0fceae54b36a5e6edbac0c",
+    "report.py": "2214e5dfaf2f7baa75d09d5b4deac3fb08a37115d1128479d97a04410d583365"
+  },
+  "frozen_specification_sha256": "eac51444b53838273136dafff1fb038c05ba9146d85fb80d048063175b98c55f"
+}

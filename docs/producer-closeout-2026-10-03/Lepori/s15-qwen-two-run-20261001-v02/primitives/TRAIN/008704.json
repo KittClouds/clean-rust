@@ -1,0 +1,51 @@
+{
+  "sha256": "630a647bfec35d18207d2775ed8ee45fbad3cf57ee7ce4dedd86e21f53b8c4f4",
+  "rows": 256,
+  "absent_mentions_zeroed": [
+    {
+      "row_id": "TRAIN:008728:0:0",
+      "entity_id": "sw_0",
+      "mention": "switch_r"
+    },
+    {
+      "row_id": "TRAIN:008732:0:0",
+      "entity_id": "ag_0",
+      "mention": "they"
+    },
+    {
+      "row_id": "TRAIN:008744:0:0",
+      "entity_id": "ag_0",
+      "mention": "they"
+    },
+    {
+      "row_id": "TRAIN:008746:0:0",
+      "entity_id": "sw_1",
+      "mention": "switch_p"
+    },
+    {
+      "row_id": "TRAIN:008785:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:008818:0:1",
+      "entity_id": "sw_2",
+      "mention": "switch_q"
+    },
+    {
+      "row_id": "TRAIN:008821:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:008859:0:1",
+      "entity_id": "loc_0",
+      "mention": "hall_north"
+    },
+    {
+      "row_id": "TRAIN:008917:0:0",
+      "entity_id": "ag_0",
+      "mention": "they"
+    }
+  ]
+}

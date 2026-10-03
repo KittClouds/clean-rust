@@ -1,0 +1,20 @@
+{
+  "target": "candidate_legal",
+  "surface": "c",
+  "family": "linear",
+  "epochs": 4,
+  "batch_unit": "64 canonical worlds, not candidates",
+  "steps": 752,
+  "training_worlds": 12000,
+  "seconds": 4.2655873999756295,
+  "metric": {
+    "n": 176168,
+    "positive": 9817,
+    "negative": 166351,
+    "balanced_accuracy": 0.7968901693820953,
+    "accuracy": 0.835997462272644
+  },
+  "control": false,
+  "probe_sha256": "7fb2b36f526aef138c8e2b7d315dcc24bebabd78229c96097bce973c15202d7f",
+  "parameters": 257
+}

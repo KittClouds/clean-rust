@@ -1,0 +1,46 @@
+{
+  "sha256": "8031c321023cb756bd36855cc7e66dc9f8c9781b88c33dfdbaed8f1ea5269d7e",
+  "rows": 256,
+  "absent_mentions_zeroed": [
+    {
+      "row_id": "DEV:000087:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "DEV:000092:0:0",
+      "entity_id": "sw_1",
+      "mention": "switch_q"
+    },
+    {
+      "row_id": "DEV:000109:0:3",
+      "entity_id": "sw_1",
+      "mention": "switch_p"
+    },
+    {
+      "row_id": "DEV:000128:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "DEV:000146:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "DEV:000175:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "DEV:000229:0:0",
+      "entity_id": "obj_1",
+      "mention": "amber_object"
+    },
+    {
+      "row_id": "DEV:000243:0:0",
+      "entity_id": "sw_0",
+      "mention": "switch_q"
+    }
+  ]
+}

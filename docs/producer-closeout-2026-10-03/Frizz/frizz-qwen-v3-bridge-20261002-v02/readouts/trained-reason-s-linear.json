@@ -1,0 +1,92 @@
+{
+  "target": "reason",
+  "surface": "s",
+  "family": "linear",
+  "epochs": 4,
+  "steps": 752,
+  "batch_unit": "64 canonical worlds",
+  "metric": {
+    "n": 3000,
+    "accuracy": 0.768666684627533,
+    "macro_f1": 0.7750393148276128,
+    "class_support": {
+      "0": {
+        "n": 166,
+        "f1": 0.972972972972973,
+        "reliable": false
+      },
+      "1": {
+        "n": 167,
+        "f1": 0.9665653495440729,
+        "reliable": false
+      },
+      "2": {
+        "n": 334,
+        "f1": 0.8837920489296636,
+        "reliable": true
+      },
+      "3": {
+        "n": 167,
+        "f1": 0.9452449567723343,
+        "reliable": false
+      },
+      "4": {
+        "n": 167,
+        "f1": 0.643979057591623,
+        "reliable": false
+      },
+      "5": {
+        "n": 167,
+        "f1": 0.3280757097791798,
+        "reliable": false
+      },
+      "6": {
+        "n": 166,
+        "f1": 0.9764705882352941,
+        "reliable": false
+      },
+      "7": {
+        "n": 167,
+        "f1": 0.4896755162241888,
+        "reliable": false
+      },
+      "8": {
+        "n": 167,
+        "f1": 0.48502994011976047,
+        "reliable": false
+      },
+      "9": {
+        "n": 167,
+        "f1": 0.9940119760479041,
+        "reliable": false
+      },
+      "10": {
+        "n": 166,
+        "f1": 0.9818181818181818,
+        "reliable": false
+      },
+      "11": {
+        "n": 167,
+        "f1": 0.9369369369369369,
+        "reliable": false
+      },
+      "12": {
+        "n": 166,
+        "f1": 0.6750788643533123,
+        "reliable": false
+      },
+      "13": {
+        "n": 166,
+        "f1": 0.6896551724137931,
+        "reliable": false
+      },
+      "14": {
+        "n": 500,
+        "f1": 0.656282450674974,
+        "reliable": true
+      }
+    },
+    "macro_f1_scope": "DEV-present classes; underpowered classes descriptive only"
+  },
+  "restricted_or_underpowered": "respect source contract; pooled metrics descriptive only"
+}

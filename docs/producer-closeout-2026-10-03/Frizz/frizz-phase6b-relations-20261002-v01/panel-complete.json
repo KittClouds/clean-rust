@@ -1,0 +1,5 @@
+{
+  "status": "PASS",
+  "evaluation_opened": false,
+  "dose": "four fixed epochs; TRAIN only; no architecture selection"
+}

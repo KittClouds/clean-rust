@@ -1,0 +1,66 @@
+{
+  "sha256": "3a322c66328fa773b5cbf2b23cf84739e57d82326af1ea20a8e24502a64d05dc",
+  "rows": 256,
+  "absent_mentions_zeroed": [
+    {
+      "row_id": "TRAIN:003328:0:0",
+      "entity_id": "loc_0",
+      "mention": "atrium"
+    },
+    {
+      "row_id": "TRAIN:003349:0:0",
+      "entity_id": "sw_1",
+      "mention": "switch_r"
+    },
+    {
+      "row_id": "TRAIN:003350:0:2",
+      "entity_id": "loc_4",
+      "mention": "hall_south"
+    },
+    {
+      "row_id": "TRAIN:003360:0:0",
+      "entity_id": "sw_0",
+      "mention": "switch_p"
+    },
+    {
+      "row_id": "TRAIN:003380:0:1",
+      "entity_id": "obj_0",
+      "mention": "copper_object"
+    },
+    {
+      "row_id": "TRAIN:003388:0:2",
+      "entity_id": "sw_1",
+      "mention": "SWITCH_Q"
+    },
+    {
+      "row_id": "TRAIN:003420:0:0",
+      "entity_id": "obj_0",
+      "mention": "onyx_object"
+    },
+    {
+      "row_id": "TRAIN:003455:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:003459:0:0",
+      "entity_id": "obj_1",
+      "mention": "the aforementioned ember_object"
+    },
+    {
+      "row_id": "TRAIN:003499:0:0",
+      "entity_id": "ag_0",
+      "mention": "the aforementioned agent"
+    },
+    {
+      "row_id": "TRAIN:003544:0:0",
+      "entity_id": "sw_0",
+      "mention": "switch_p"
+    },
+    {
+      "row_id": "TRAIN:003571:0:0",
+      "entity_id": "obj_0",
+      "mention": "ember_object"
+    }
+  ]
+}

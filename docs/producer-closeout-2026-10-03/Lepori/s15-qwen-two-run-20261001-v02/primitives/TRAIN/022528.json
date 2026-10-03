@@ -1,0 +1,66 @@
+{
+  "sha256": "129b438cdd3eb99ac9c683d5aec4c845d2956736ac609dceb1db75335156abe2",
+  "rows": 256,
+  "absent_mentions_zeroed": [
+    {
+      "row_id": "TRAIN:013069:0:1@S0",
+      "entity_id": "sw_1",
+      "mention": "switch_q"
+    },
+    {
+      "row_id": "TRAIN:013069:0:1@S1",
+      "entity_id": "sw_1",
+      "mention": "switch_q"
+    },
+    {
+      "row_id": "TRAIN:013119:0:1@S0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:013119:0:1@S1",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:013149:0:0@S1",
+      "entity_id": "obj_1",
+      "mention": "topaz_object"
+    },
+    {
+      "row_id": "TRAIN:013149:0:0@S2",
+      "entity_id": "obj_1",
+      "mention": "topaz_object"
+    },
+    {
+      "row_id": "TRAIN:013269:0:0@S0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:013269:0:0@S1",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:013659:0:0@S0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:013659:0:0@S1",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:013689:0:0@S0",
+      "entity_id": "obj_1",
+      "mention": "ivory_object"
+    },
+    {
+      "row_id": "TRAIN:013689:0:0@S1",
+      "entity_id": "obj_1",
+      "mention": "ivory_object"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "artifacts": {
+    "ACTION-SUPPORTS-v02.json": "a385c7f247b49e43a65474398a50096c8a5765f2fcab12625c052a7afc5e2254",
+    "ENGINEERING-METADATA-v02.json": "84c97e9cfadf0a9e4e0f117c2000e79be8573089ad6e49b1be2769966a99fcfd",
+    "REPORT-ADDENDUM-v02.md": "ba3f80ecfe44148ad75867cb77513b0ff836341af5724009509e5e11858f4dcd"
+  },
+  "parent_seal_sha256": "97c6d62a5e86445e64e861b2674e00b5a85da574e1c97ecb10d64e8e19cb73f9",
+  "protected_evaluation_opened": false,
+  "source_sha256": "2ee55071c3d7208d916c9f4d69d87ce2a980ff22254235e429c70fbddf4ddf1e",
+  "status": "SEALED"
+}

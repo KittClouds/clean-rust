@@ -1,0 +1,16 @@
+{
+  "init": {
+    "checkpoint_bytes": 413077,
+    "forward_seconds": 2.2324112000060268,
+    "parameters": 101615,
+    "rows": 666,
+    "seconds_per_rendered_root": 0.003351968768777818
+  },
+  "trained": {
+    "checkpoint_bytes": 1245128,
+    "forward_seconds": 2.2006464000442065,
+    "parameters": 101615,
+    "rows": 666,
+    "seconds_per_rendered_root": 0.00330427387394025
+  }
+}

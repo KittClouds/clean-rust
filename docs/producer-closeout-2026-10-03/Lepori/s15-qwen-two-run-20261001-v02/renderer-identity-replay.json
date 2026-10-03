@@ -1,0 +1,12 @@
+{
+  "TRAIN": {
+    "canonical_worlds": 20000,
+    "renderer_truth_identity_mismatches": 0,
+    "input_sha256": "a7d17a8bf33960cad004774bec1a9d9aef10434dd16143f76da517382d7015d7"
+  },
+  "DEV": {
+    "canonical_worlds": 2000,
+    "renderer_truth_identity_mismatches": 0,
+    "input_sha256": "2e762e1806cffee85e45ece2305c435468b4147f2f3e53ef8b4d80afe2cc3cad"
+  }
+}

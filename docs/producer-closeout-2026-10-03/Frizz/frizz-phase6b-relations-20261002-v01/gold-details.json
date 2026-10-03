@@ -1,0 +1,271 @@
+{
+  "smallest_sufficient_sets_TRAIN_selected": [
+    {
+      "families": [
+        "transition_distance"
+      ],
+      "TRAIN": {
+        "roots": 1333,
+        "oracle_tie_top1": 1.0,
+        "unique_selected_roots": 1333,
+        "unique_fraction": 1.0,
+        "remaining_collision_candidates": 0,
+        "same_type_pairs": 11883,
+        "distinguished_pairs": 11883,
+        "distinguished_fraction": 1.0,
+        "scope": "root-conditional descriptor tie ceiling, NOT a learned accuracy or universal decision determinism ceiling"
+      },
+      "DEV": {
+        "roots": 333,
+        "oracle_tie_top1": 1.0,
+        "unique_selected_roots": 333,
+        "unique_fraction": 1.0,
+        "remaining_collision_candidates": 0,
+        "same_type_pairs": 3180,
+        "distinguished_pairs": 3180,
+        "distinguished_fraction": 1.0,
+        "scope": "root-conditional descriptor tie ceiling, NOT a learned accuracy or universal decision determinism ceiling"
+      }
+    }
+  ],
+  "rungs": {
+    "TRAIN": {
+      "type_only": {
+        "oracle_tie_top1": 0.11615234290590629,
+        "oracle_tie_MRR": 0.3167668953410439,
+        "collision_roots": 1332,
+        "collision_candidates": 11883,
+        "roots": 1333,
+        "interpretation": "selected descriptor class artificially placed first; oracle ambiguity bound, not learned or deployable ranking"
+      },
+      "legality": {
+        "oracle_tie_top1": 0.7726306576644162,
+        "oracle_tie_MRR": 0.8798084937901142,
+        "collision_roots": 556,
+        "collision_candidates": 714,
+        "roots": 1333,
+        "interpretation": "selected descriptor class artificially placed first; oracle ambiguity bound, not learned or deployable ranking"
+      },
+      "immediate_goal": {
+        "oracle_tie_top1": 0.815891472868217,
+        "oracle_tie_MRR": 0.9026996332416437,
+        "collision_roots": 450,
+        "collision_candidates": 577,
+        "roots": 1333,
+        "interpretation": "selected descriptor class artificially placed first; oracle ambiguity bound, not learned or deployable ranking"
+      },
+      "argument_goal": {
+        "oracle_tie_top1": 0.8350837709427358,
+        "oracle_tie_MRR": 0.9129886638326249,
+        "collision_roots": 404,
+        "collision_candidates": 514,
+        "roots": 1333,
+        "interpretation": "selected descriptor class artificially placed first; oracle ambiguity bound, not learned or deployable ranking"
+      },
+      "preconditions": {
+        "oracle_tie_top1": 0.8457114278569642,
+        "oracle_tie_MRR": 0.9188755522213886,
+        "collision_roots": 380,
+        "collision_candidates": 476,
+        "roots": 1333,
+        "interpretation": "selected descriptor class artificially placed first; oracle ambiguity bound, not learned or deployable ranking"
+      },
+      "effects_goal": {
+        "oracle_tie_top1": 0.8457114278569642,
+        "oracle_tie_MRR": 0.9188755522213886,
+        "collision_roots": 380,
+        "collision_candidates": 476,
+        "roots": 1333,
+        "interpretation": "selected descriptor class artificially placed first; oracle ambiguity bound, not learned or deployable ranking"
+      },
+      "obligations": {
+        "oracle_tie_top1": 0.8460865216304075,
+        "oracle_tie_MRR": 0.9190630991081103,
+        "collision_roots": 379,
+        "collision_candidates": 475,
+        "roots": 1333,
+        "interpretation": "selected descriptor class artificially placed first; oracle ambiguity bound, not learned or deployable ranking"
+      },
+      "transition_distance": {
+        "oracle_tie_top1": 1.0,
+        "oracle_tie_MRR": 1.0,
+        "collision_roots": 0,
+        "collision_candidates": 0,
+        "roots": 1333,
+        "interpretation": "selected descriptor class artificially placed first; oracle ambiguity bound, not learned or deployable ranking"
+      }
+    },
+    "DEV": {
+      "type_only": {
+        "oracle_tie_top1": 0.11401820568487234,
+        "oracle_tie_MRR": 0.3095524360092154,
+        "collision_roots": 332,
+        "collision_candidates": 3180,
+        "roots": 333,
+        "interpretation": "selected descriptor class artificially placed first; oracle ambiguity bound, not learned or deployable ranking"
+      },
+      "legality": {
+        "oracle_tie_top1": 0.7747747747747747,
+        "oracle_tie_MRR": 0.8790040040040039,
+        "collision_roots": 134,
+        "collision_candidates": 185,
+        "roots": 333,
+        "interpretation": "selected descriptor class artificially placed first; oracle ambiguity bound, not learned or deployable ranking"
+      },
+      "immediate_goal": {
+        "oracle_tie_top1": 0.8163163163163163,
+        "oracle_tie_MRR": 0.901735068401735,
+        "collision_roots": 110,
+        "collision_candidates": 149,
+        "roots": 333,
+        "interpretation": "selected descriptor class artificially placed first; oracle ambiguity bound, not learned or deployable ranking"
+      },
+      "argument_goal": {
+        "oracle_tie_top1": 0.8328328328328328,
+        "oracle_tie_MRR": 0.9104938271604939,
+        "collision_roots": 100,
+        "collision_candidates": 136,
+        "roots": 333,
+        "interpretation": "selected descriptor class artificially placed first; oracle ambiguity bound, not learned or deployable ranking"
+      },
+      "preconditions": {
+        "oracle_tie_top1": 0.8388388388388388,
+        "oracle_tie_MRR": 0.9139973306639972,
+        "collision_roots": 97,
+        "collision_candidates": 130,
+        "roots": 333,
+        "interpretation": "selected descriptor class artificially placed first; oracle ambiguity bound, not learned or deployable ranking"
+      },
+      "effects_goal": {
+        "oracle_tie_top1": 0.8388388388388388,
+        "oracle_tie_MRR": 0.9139973306639972,
+        "collision_roots": 97,
+        "collision_candidates": 130,
+        "roots": 333,
+        "interpretation": "selected descriptor class artificially placed first; oracle ambiguity bound, not learned or deployable ranking"
+      },
+      "obligations": {
+        "oracle_tie_top1": 0.8388388388388388,
+        "oracle_tie_MRR": 0.9139973306639972,
+        "collision_roots": 97,
+        "collision_candidates": 130,
+        "roots": 333,
+        "interpretation": "selected descriptor class artificially placed first; oracle ambiguity bound, not learned or deployable ranking"
+      },
+      "transition_distance": {
+        "oracle_tie_top1": 1.0,
+        "oracle_tie_MRR": 1.0,
+        "collision_roots": 0,
+        "collision_candidates": 0,
+        "roots": 333,
+        "interpretation": "selected descriptor class artificially placed first; oracle ambiguity bound, not learned or deployable ranking"
+      }
+    }
+  },
+  "distance_rank": {
+    "TRAIN": {
+      "all": {
+        "roots": 1333,
+        "mean_rank": 1.0,
+        "MRR": 1.0,
+        "top1": 1.0,
+        "top3": 1.0,
+        "top5": 1.0,
+        "unresolved_search_competitors": 7,
+        "class_supported": true
+      },
+      "1-28": {
+        "roots": 53,
+        "mean_rank": 1.0,
+        "MRR": 1.0,
+        "top1": 1.0,
+        "top3": 1.0,
+        "top5": 1.0,
+        "unresolved_search_competitors": 0,
+        "class_supported": false
+      },
+      "29-64": {
+        "roots": 694,
+        "mean_rank": 1.0,
+        "MRR": 1.0,
+        "top1": 1.0,
+        "top3": 1.0,
+        "top5": 1.0,
+        "unresolved_search_competitors": 2,
+        "class_supported": true
+      },
+      "65-128": {
+        "roots": 578,
+        "mean_rank": 1.0,
+        "MRR": 1.0,
+        "top1": 1.0,
+        "top3": 1.0,
+        "top5": 1.0,
+        "unresolved_search_competitors": 5,
+        "class_supported": true
+      },
+      "129-171": {
+        "roots": 8,
+        "mean_rank": 1.0,
+        "MRR": 1.0,
+        "top1": 1.0,
+        "top3": 1.0,
+        "top5": 1.0,
+        "unresolved_search_competitors": 0,
+        "class_supported": false
+      }
+    },
+    "DEV": {
+      "all": {
+        "roots": 333,
+        "mean_rank": 1.0,
+        "MRR": 1.0,
+        "top1": 1.0,
+        "top3": 1.0,
+        "top5": 1.0,
+        "unresolved_search_competitors": 0,
+        "class_supported": true
+      },
+      "1-28": {
+        "roots": 17,
+        "mean_rank": 1.0,
+        "MRR": 1.0,
+        "top1": 1.0,
+        "top3": 1.0,
+        "top5": 1.0,
+        "unresolved_search_competitors": 0,
+        "class_supported": false
+      },
+      "29-64": {
+        "roots": 187,
+        "mean_rank": 1.0,
+        "MRR": 1.0,
+        "top1": 1.0,
+        "top3": 1.0,
+        "top5": 1.0,
+        "unresolved_search_competitors": 0,
+        "class_supported": false
+      },
+      "65-128": {
+        "roots": 128,
+        "mean_rank": 1.0,
+        "MRR": 1.0,
+        "top1": 1.0,
+        "top3": 1.0,
+        "top5": 1.0,
+        "unresolved_search_competitors": 0,
+        "class_supported": false
+      },
+      "129-171": {
+        "roots": 1,
+        "mean_rank": 1.0,
+        "MRR": 1.0,
+        "top1": 1.0,
+        "top3": 1.0,
+        "top5": 1.0,
+        "unresolved_search_competitors": 0,
+        "class_supported": false
+      }
+    }
+  }
+}

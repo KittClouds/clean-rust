@@ -1,0 +1,18 @@
+{
+  "counts": {
+    "FN": 1023,
+    "FN_with_unmentioned_present_precondition": 279,
+    "FP": 12430,
+    "FP_missing_AT_without_mentioned_subject_location": 625,
+    "candidates": 84636,
+    "illegal_missing_AT_without_mentioned_subject_location": 13859,
+    "legal": 4690,
+    "legal_with_unmentioned_present_precondition": 319,
+    "legal_with_unsupported_present_precondition": 319
+  },
+  "interpretation": "exposure coverage diagnostic only, not a proof of observational nonidentifiability or an information ceiling",
+  "method": "visible fact ids plus report ids as mentioned; supported_facts separately; canonical simulator truth tick0",
+  "protected_evaluation_opened": false,
+  "roots": 1333,
+  "scientific_design_changed": false
+}

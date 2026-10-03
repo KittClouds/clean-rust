@@ -1,0 +1,13 @@
+{
+  "arm": "pointwise",
+  "parameters": 312066,
+  "epochs": 12,
+  "steps": 9000,
+  "train_seconds_including_monitoring": 161.34459910000442,
+  "monitoring_seconds": 16.68152919987915,
+  "pure_training_seconds": 144.66306990012527,
+  "peak_cuda_memory_bytes": 1667457024,
+  "device": "NVIDIA GeForce RTX 3080",
+  "batch_roots": 16,
+  "steps_per_epoch": 750
+}

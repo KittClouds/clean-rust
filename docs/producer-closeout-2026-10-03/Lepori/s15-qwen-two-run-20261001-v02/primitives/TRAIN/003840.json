@@ -1,0 +1,56 @@
+{
+  "sha256": "64ad14ee6c1847ac45a3d2ee86a052ace76befafca2e5db47e30804b070df452",
+  "rows": 256,
+  "absent_mentions_zeroed": [
+    {
+      "row_id": "TRAIN:003851:0:0",
+      "entity_id": "sw_0",
+      "mention": "switch_r"
+    },
+    {
+      "row_id": "TRAIN:003853:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:003874:0:0",
+      "entity_id": "obj_0",
+      "mention": "the aforementioned jade_object"
+    },
+    {
+      "row_id": "TRAIN:003909:0:0",
+      "entity_id": "sw_0",
+      "mention": "switch_r"
+    },
+    {
+      "row_id": "TRAIN:003929:0:0",
+      "entity_id": "sw_0",
+      "mention": "switch_p"
+    },
+    {
+      "row_id": "TRAIN:003961:0:0",
+      "entity_id": "sw_1",
+      "mention": "SWITCH_Q"
+    },
+    {
+      "row_id": "TRAIN:004030:0:0",
+      "entity_id": "obj_1",
+      "mention": "onyx_object"
+    },
+    {
+      "row_id": "TRAIN:004037:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:004048:0:0",
+      "entity_id": "obj_2",
+      "mention": "the aforementioned topaz_object"
+    },
+    {
+      "row_id": "TRAIN:004052:0:0",
+      "entity_id": "loc_2",
+      "mention": "hall_south"
+    }
+  ]
+}

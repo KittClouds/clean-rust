@@ -1,0 +1,620 @@
+{
+  "arm": "E",
+  "survives": true,
+  "status": "SURVIVES_AS_CONSTRUCTED",
+  "gates": {
+    "primary_cells": true,
+    "no_hard_loss_regression": true,
+    "fixed_linear_access": true,
+    "preservation_vector": true
+  },
+  "hard_primary_cells": {
+    "binding": {
+      "roots": 781,
+      "positive_roots": 209,
+      "negative_roots": 781,
+      "class_reliability": {
+        "positive": true,
+        "negative": true
+      },
+      "qualified_root_slice": true,
+      "bridge_balanced_loss": 0.48168302244183986,
+      "arm_balanced_loss": 0.36138304481046574,
+      "relative_loss_reduction": 0.24974925838474943,
+      "loss_improvement_interval": {
+        "delta": 0.12029997763137412,
+        "ci95": [
+          0.06787044921643003,
+          0.1750916871566602
+        ],
+        "bootstrap_roots": 781,
+        "repetitions": 2000,
+        "seed": 20261002
+      },
+      "improved": true,
+      "warning": "Single-class/underpowered positive support is not a positive-relation claim"
+    },
+    "candidate_comparison": {
+      "roots": 1262,
+      "positive_roots": 320,
+      "negative_roots": 1262,
+      "class_reliability": {
+        "positive": true,
+        "negative": true
+      },
+      "qualified_root_slice": true,
+      "bridge_balanced_loss": 0.8227552362017444,
+      "arm_balanced_loss": 0.7840887421483966,
+      "relative_loss_reduction": 0.0469963512257326,
+      "loss_improvement_interval": {
+        "delta": 0.038666494053347766,
+        "ci95": [
+          -0.04344578409964699,
+          0.1207236514843774
+        ],
+        "bootstrap_roots": 1262,
+        "repetitions": 2000,
+        "seed": 20261002
+      },
+      "improved": false,
+      "warning": "Single-class/underpowered positive support is not a positive-relation claim"
+    },
+    "globalization": {
+      "roots": 965,
+      "positive_roots": 250,
+      "negative_roots": 965,
+      "class_reliability": {
+        "positive": true,
+        "negative": true
+      },
+      "qualified_root_slice": true,
+      "bridge_balanced_loss": 0.5418048669138038,
+      "arm_balanced_loss": 0.32794676546557505,
+      "relative_loss_reduction": 0.39471424955333895,
+      "loss_improvement_interval": {
+        "delta": 0.21385810144822875,
+        "ci95": [
+          0.17932112110820994,
+          0.2536337068238838
+        ],
+        "bootstrap_roots": 965,
+        "repetitions": 2000,
+        "seed": 20261002
+      },
+      "improved": true,
+      "warning": "Single-class/underpowered positive support is not a positive-relation claim"
+    }
+  },
+  "fixed_e_linear_goal_access": {
+    "delta": 0.06468494899525934,
+    "ci95": [
+      0.050089842093870574,
+      0.07988030147959163
+    ],
+    "bootstrap_roots": 3000,
+    "repetitions": 2000,
+    "seed": 20261002,
+    "positive_roots": 702,
+    "negative_roots": 3000
+  },
+  "preservation_vector": {
+    "candidate_legal": {
+      "bridge": 0.804244875907898,
+      "arm": 0.8038869500160217,
+      "delta": -0.0003579258918762207,
+      "root_support": 3000,
+      "tolerance": 0.02,
+      "pass": true,
+      "scope": "undefined/underpowered values descriptive, not a reliability claim"
+    },
+    "candidate_satisfies_goal": {
+      "bridge": 0.7479196190834045,
+      "arm": 0.8089409470558167,
+      "delta": 0.06102132797241211,
+      "root_support": 3000,
+      "tolerance": 0.02,
+      "pass": true,
+      "scope": "undefined/underpowered values descriptive, not a reliability claim"
+    },
+    "goal_satisfied": {
+      "bridge": 0.7486287653446198,
+      "arm": 0.7516227662563324,
+      "delta": 0.0029940009117126465,
+      "root_support": 3000,
+      "tolerance": 0.02,
+      "pass": true,
+      "scope": "undefined/underpowered values descriptive, not a reliability claim"
+    },
+    "solvable": {
+      "bridge": 0.9733112454414368,
+      "arm": 0.9728499948978424,
+      "delta": -0.00046125054359436035,
+      "root_support": 2730,
+      "tolerance": 0.02,
+      "pass": true,
+      "scope": "undefined/underpowered values descriptive, not a reliability claim"
+    },
+    "linear_candidate_legal-e-linear": {
+      "bridge": 0.8037605881690979,
+      "arm": 0.8039734363555908,
+      "delta": 0.00021284818649291992,
+      "root_support": 3000,
+      "tolerance": 0.02,
+      "pass": true,
+      "scope": "undefined/underpowered values descriptive, not a reliability claim"
+    },
+    "linear_goal_satisfied-s-linear": {
+      "bridge": 0.7444056570529938,
+      "arm": 0.7473996579647064,
+      "delta": 0.0029940009117126465,
+      "root_support": 3000,
+      "tolerance": 0.02,
+      "pass": true,
+      "scope": "undefined/underpowered values descriptive, not a reliability claim"
+    },
+    "linear_solvable-s-linear": {
+      "bridge": 0.971169114112854,
+      "arm": 0.9676104187965393,
+      "delta": -0.0035586953163146973,
+      "root_support": 3000,
+      "tolerance": 0.02,
+      "pass": true,
+      "scope": "undefined/underpowered values descriptive, not a reliability claim"
+    },
+    "disposition": {
+      "bridge": 0.8090000152587891,
+      "arm": 0.8100000023841858,
+      "delta": 0.0009999871253967285,
+      "root_support": 3000,
+      "tolerance": 0.03,
+      "pass": true,
+      "scope": "undefined/underpowered values descriptive, not a reliability claim"
+    },
+    "reason": {
+      "bridge": 0.765666663646698,
+      "arm": 0.765666663646698,
+      "delta": 0.0,
+      "root_support": 3000,
+      "tolerance": 0.03,
+      "pass": true,
+      "scope": "undefined/underpowered values descriptive, not a reliability claim"
+    },
+    "missing_cardinality": {
+      "bridge": 0.8709999918937683,
+      "arm": 0.8696666955947876,
+      "delta": -0.0013332962989807129,
+      "root_support": 3000,
+      "tolerance": 0.03,
+      "pass": true,
+      "scope": "undefined/underpowered values descriptive, not a reliability claim"
+    },
+    "requestability": {
+      "bridge": 0.8820000290870667,
+      "arm": 0.8816666603088379,
+      "delta": -0.00033336877822875977,
+      "root_support": 3000,
+      "tolerance": 0.03,
+      "pass": true,
+      "scope": "undefined/underpowered values descriptive, not a reliability claim"
+    },
+    "first_action_type": {
+      "bridge": 0.7207207083702087,
+      "arm": 0.7057057023048401,
+      "delta": -0.015015006065368652,
+      "root_support": 333,
+      "tolerance": 0.03,
+      "pass": true,
+      "scope": "undefined/underpowered values descriptive, not a reliability claim"
+    },
+    "restricted:missing_cardinality:hidden_fact_count:2": {
+      "bridge": 0.8533145189285278,
+      "arm": 0.8476727604866028,
+      "delta": -0.005641758441925049,
+      "root_support": 709,
+      "tolerance": 0.05,
+      "pass": true,
+      "scope": "undefined/underpowered values descriptive, not a reliability claim"
+    },
+    "restricted:missing_cardinality:hidden_fact_count:1": {
+      "bridge": 0.9435600638389587,
+      "arm": 0.9421128630638123,
+      "delta": -0.0014472007751464844,
+      "root_support": 691,
+      "tolerance": 0.05,
+      "pass": true,
+      "scope": "undefined/underpowered values descriptive, not a reliability claim"
+    },
+    "restricted:missing_cardinality:hidden_fact_count:3": {
+      "bridge": 0.8184764981269836,
+      "arm": 0.8200972676277161,
+      "delta": 0.0016207695007324219,
+      "root_support": 617,
+      "tolerance": 0.05,
+      "pass": true,
+      "scope": "undefined/underpowered values descriptive, not a reliability claim"
+    },
+    "restricted:missing_cardinality:hidden_fact_count:6": {
+      "bridge": 0.9473684430122375,
+      "arm": 0.9473684430122375,
+      "delta": 0.0,
+      "root_support": 19,
+      "tolerance": 0.05,
+      "pass": true,
+      "scope": "undefined/underpowered values descriptive, not a reliability claim"
+    },
+    "restricted:missing_cardinality:hidden_fact_count:0": {
+      "bridge": 1.0,
+      "arm": 1.0,
+      "delta": 0.0,
+      "root_support": 533,
+      "tolerance": 0.05,
+      "pass": true,
+      "scope": "undefined/underpowered values descriptive, not a reliability claim"
+    },
+    "restricted:missing_cardinality:hidden_fact_count:4": {
+      "bridge": 0.7006579041481018,
+      "arm": 0.7006579041481018,
+      "delta": 0.0,
+      "root_support": 304,
+      "tolerance": 0.05,
+      "pass": true,
+      "scope": "undefined/underpowered values descriptive, not a reliability claim"
+    },
+    "restricted:missing_cardinality:hidden_fact_count:5": {
+      "bridge": 0.6850393414497375,
+      "arm": 0.6850393414497375,
+      "delta": 0.0,
+      "root_support": 127,
+      "tolerance": 0.05,
+      "pass": true,
+      "scope": "undefined/underpowered values descriptive, not a reliability claim"
+    },
+    "restricted:missing_cardinality:requirement_count:2": {
+      "bridge": 0.7962085604667664,
+      "arm": 0.7890995144844055,
+      "delta": -0.00710904598236084,
+      "root_support": 422,
+      "tolerance": 0.05,
+      "pass": true,
+      "scope": "undefined/underpowered values descriptive, not a reliability claim"
+    },
+    "restricted:missing_cardinality:requirement_count:1": {
+      "bridge": 0.8861314058303833,
+      "arm": 0.8868613243103027,
+      "delta": 0.0007299184799194336,
+      "root_support": 1370,
+      "tolerance": 0.05,
+      "pass": true,
+      "scope": "undefined/underpowered values descriptive, not a reliability claim"
+    },
+    "restricted:missing_cardinality:requirement_count:3": {
+      "bridge": 0.7344497442245483,
+      "arm": 0.7320573925971985,
+      "delta": -0.0023923516273498535,
+      "root_support": 418,
+      "tolerance": 0.05,
+      "pass": true,
+      "scope": "undefined/underpowered values descriptive, not a reliability claim"
+    },
+    "restricted:missing_cardinality:requirement_count:0": {
+      "bridge": 0.9939849376678467,
+      "arm": 0.9939849376678467,
+      "delta": 0.0,
+      "root_support": 665,
+      "tolerance": 0.05,
+      "pass": true,
+      "scope": "undefined/underpowered values descriptive, not a reliability claim"
+    },
+    "restricted:missing_cardinality:requirement_count:4": {
+      "bridge": 0.7735849022865295,
+      "arm": 0.7641509175300598,
+      "delta": -0.009433984756469727,
+      "root_support": 106,
+      "tolerance": 0.05,
+      "pass": true,
+      "scope": "undefined/underpowered values descriptive, not a reliability claim"
+    },
+    "restricted:missing_cardinality:requirement_count:5": {
+      "bridge": 0.7857142686843872,
+      "arm": 0.7857142686843872,
+      "delta": 0.0,
+      "root_support": 14,
+      "tolerance": 0.05,
+      "pass": true,
+      "scope": "undefined/underpowered values descriptive, not a reliability claim"
+    },
+    "restricted:missing_cardinality:requirement_count:7": {
+      "bridge": 0.0,
+      "arm": 0.0,
+      "delta": 0.0,
+      "root_support": 1,
+      "tolerance": 0.05,
+      "pass": true,
+      "scope": "undefined/underpowered values descriptive, not a reliability claim"
+    },
+    "restricted:missing_cardinality:requirement_count:6": {
+      "bridge": 0.5,
+      "arm": 0.5,
+      "delta": 0.0,
+      "root_support": 4,
+      "tolerance": 0.05,
+      "pass": true,
+      "scope": "undefined/underpowered values descriptive, not a reliability claim"
+    },
+    "restricted:missing_cardinality:bookkeeping_intervention:0": {
+      "bridge": 0.8845700621604919,
+      "arm": 0.8786808252334595,
+      "delta": -0.005889236927032471,
+      "root_support": 849,
+      "tolerance": 0.05,
+      "pass": true,
+      "scope": "undefined/underpowered values descriptive, not a reliability claim"
+    },
+    "restricted:missing_cardinality:bookkeeping_intervention:1": {
+      "bridge": 0.8809234499931335,
+      "arm": 0.8809234499931335,
+      "delta": 0.0,
+      "root_support": 823,
+      "tolerance": 0.05,
+      "pass": true,
+      "scope": "undefined/underpowered values descriptive, not a reliability claim"
+    },
+    "restricted:missing_cardinality:bookkeeping_intervention:2": {
+      "bridge": 0.8640776872634888,
+      "arm": 0.8668515682220459,
+      "delta": 0.002773880958557129,
+      "root_support": 721,
+      "tolerance": 0.05,
+      "pass": true,
+      "scope": "undefined/underpowered values descriptive, not a reliability claim"
+    },
+    "restricted:missing_cardinality:bookkeeping_intervention:3": {
+      "bridge": 0.8467874526977539,
+      "arm": 0.8451400399208069,
+      "delta": -0.0016474127769470215,
+      "root_support": 607,
+      "tolerance": 0.05,
+      "pass": true,
+      "scope": "undefined/underpowered values descriptive, not a reliability claim"
+    },
+    "restricted:requestability:renderer:\"V1\"": {
+      "bridge": 0.8533333539962769,
+      "arm": 0.8506666421890259,
+      "delta": -0.0026667118072509766,
+      "root_support": 375,
+      "tolerance": 0.05,
+      "pass": true,
+      "scope": "undefined/underpowered values descriptive, not a reliability claim"
+    },
+    "restricted:requestability:renderer:\"V2\"": {
+      "bridge": 0.8986666798591614,
+      "arm": 0.8960000276565552,
+      "delta": -0.002666652202606201,
+      "root_support": 375,
+      "tolerance": 0.05,
+      "pass": true,
+      "scope": "undefined/underpowered values descriptive, not a reliability claim"
+    },
+    "restricted:requestability:renderer:\"V3\"": {
+      "bridge": 0.8853333592414856,
+      "arm": 0.8826666474342346,
+      "delta": -0.0026667118072509766,
+      "root_support": 375,
+      "tolerance": 0.05,
+      "pass": true,
+      "scope": "undefined/underpowered values descriptive, not a reliability claim"
+    },
+    "restricted:requestability:renderer:\"V4\"": {
+      "bridge": 0.9039999842643738,
+      "arm": 0.9039999842643738,
+      "delta": 0.0,
+      "root_support": 375,
+      "tolerance": 0.05,
+      "pass": true,
+      "scope": "undefined/underpowered values descriptive, not a reliability claim"
+    },
+    "restricted:requestability:renderer:\"V5\"": {
+      "bridge": 0.8640000224113464,
+      "arm": 0.8640000224113464,
+      "delta": 0.0,
+      "root_support": 375,
+      "tolerance": 0.05,
+      "pass": true,
+      "scope": "undefined/underpowered values descriptive, not a reliability claim"
+    },
+    "restricted:requestability:renderer:\"V6\"": {
+      "bridge": 0.8826666474342346,
+      "arm": 0.8853333592414856,
+      "delta": 0.0026667118072509766,
+      "root_support": 375,
+      "tolerance": 0.05,
+      "pass": true,
+      "scope": "undefined/underpowered values descriptive, not a reliability claim"
+    },
+    "restricted:requestability:renderer:\"V7\"": {
+      "bridge": 0.871999979019165,
+      "arm": 0.874666690826416,
+      "delta": 0.0026667118072509766,
+      "root_support": 375,
+      "tolerance": 0.05,
+      "pass": true,
+      "scope": "undefined/underpowered values descriptive, not a reliability claim"
+    },
+    "restricted:requestability:renderer:\"V8\"": {
+      "bridge": 0.8960000276565552,
+      "arm": 0.8960000276565552,
+      "delta": 0.0,
+      "root_support": 375,
+      "tolerance": 0.05,
+      "pass": true,
+      "scope": "undefined/underpowered values descriptive, not a reliability claim"
+    },
+    "restricted:requestability:length_decile:1": {
+      "bridge": 0.9090909361839294,
+      "arm": 0.9057239294052124,
+      "delta": -0.003367006778717041,
+      "root_support": 297,
+      "tolerance": 0.05,
+      "pass": true,
+      "scope": "undefined/underpowered values descriptive, not a reliability claim"
+    },
+    "restricted:requestability:length_decile:4": {
+      "bridge": 0.800000011920929,
+      "arm": 0.800000011920929,
+      "delta": 0.0,
+      "root_support": 280,
+      "tolerance": 0.05,
+      "pass": true,
+      "scope": "undefined/underpowered values descriptive, not a reliability claim"
+    },
+    "restricted:requestability:length_decile:7": {
+      "bridge": 0.8850173950195312,
+      "arm": 0.891986072063446,
+      "delta": 0.006968677043914795,
+      "root_support": 287,
+      "tolerance": 0.05,
+      "pass": true,
+      "scope": "undefined/underpowered values descriptive, not a reliability claim"
+    },
+    "restricted:requestability:length_decile:9": {
+      "bridge": 0.8999999761581421,
+      "arm": 0.8935483694076538,
+      "delta": -0.006451606750488281,
+      "root_support": 310,
+      "tolerance": 0.05,
+      "pass": true,
+      "scope": "undefined/underpowered values descriptive, not a reliability claim"
+    },
+    "restricted:requestability:length_decile:3": {
+      "bridge": 0.8369565010070801,
+      "arm": 0.8333333134651184,
+      "delta": -0.00362318754196167,
+      "root_support": 276,
+      "tolerance": 0.05,
+      "pass": true,
+      "scope": "undefined/underpowered values descriptive, not a reliability claim"
+    },
+    "restricted:requestability:length_decile:6": {
+      "bridge": 0.8775510191917419,
+      "arm": 0.8775510191917419,
+      "delta": 0.0,
+      "root_support": 294,
+      "tolerance": 0.05,
+      "pass": true,
+      "scope": "undefined/underpowered values descriptive, not a reliability claim"
+    },
+    "restricted:requestability:length_decile:2": {
+      "bridge": 0.8950819969177246,
+      "arm": 0.8983606696128845,
+      "delta": 0.003278672695159912,
+      "root_support": 305,
+      "tolerance": 0.05,
+      "pass": true,
+      "scope": "undefined/underpowered values descriptive, not a reliability claim"
+    },
+    "restricted:requestability:length_decile:0": {
+      "bridge": 0.9833333492279053,
+      "arm": 0.9800000190734863,
+      "delta": -0.0033333301544189453,
+      "root_support": 300,
+      "tolerance": 0.05,
+      "pass": true,
+      "scope": "undefined/underpowered values descriptive, not a reliability claim"
+    },
+    "restricted:requestability:length_decile:8": {
+      "bridge": 0.8668730854988098,
+      "arm": 0.8668730854988098,
+      "delta": 0.0,
+      "root_support": 323,
+      "tolerance": 0.05,
+      "pass": true,
+      "scope": "undefined/underpowered values descriptive, not a reliability claim"
+    },
+    "restricted:requestability:length_decile:5": {
+      "bridge": 0.8597561120986938,
+      "arm": 0.8628048896789551,
+      "delta": 0.0030487775802612305,
+      "root_support": 328,
+      "tolerance": 0.05,
+      "pass": true,
+      "scope": "undefined/underpowered values descriptive, not a reliability claim"
+    },
+    "restricted:requestability:temporal_phrase_signature:[]": {
+      "bridge": 0.8820000290870667,
+      "arm": 0.8816666603088379,
+      "delta": -0.00033336877822875977,
+      "root_support": 3000,
+      "tolerance": 0.05,
+      "pass": true,
+      "scope": "undefined/underpowered values descriptive, not a reliability claim"
+    },
+    "exact_logged_action": {
+      "bridge": 0.09009008854627609,
+      "arm": 0.09609609842300415,
+      "delta": 0.006006009876728058,
+      "root_support": 333,
+      "tolerance": 0.03,
+      "pass": true,
+      "scope": "undefined/underpowered values descriptive, not a reliability claim"
+    },
+    "optimal_set_hit": {
+      "bridge": 0.09009008854627609,
+      "arm": 0.09609609842300415,
+      "delta": 0.006006009876728058,
+      "root_support": 333,
+      "tolerance": 0.03,
+      "pass": true,
+      "scope": "undefined/underpowered values descriptive, not a reliability claim"
+    },
+    "unsatisfied_goal": {
+      "bridge": 0.7536588609218597,
+      "arm": 0.8718035519123077,
+      "delta": 0.118144690990448,
+      "root_support": 2833,
+      "tolerance": 0.03,
+      "pass": true,
+      "scope": "undefined/underpowered values descriptive, not a reliability claim"
+    },
+    "legal_MOVE_unsatisfied_goal": {
+      "bridge": 0.7313137650489807,
+      "arm": 0.8808716833591461,
+      "delta": 0.1495579183101654,
+      "root_support": 2503,
+      "tolerance": 0.03,
+      "pass": true,
+      "scope": "undefined/underpowered values descriptive, not a reliability claim"
+    },
+    "renderer_candidate_legal": {
+      "bridge": -0.017017846927046776,
+      "arm": -0.017999863252043724,
+      "delta": -0.0009820163249969482,
+      "root_support": 3000,
+      "tolerance": 0.02,
+      "pass": true,
+      "scope": "undefined/underpowered values descriptive, not a reliability claim"
+    },
+    "renderer_candidate_satisfies_goal": {
+      "bridge": -0.11668407171964645,
+      "arm": -0.05442532151937485,
+      "delta": 0.062258750200271606,
+      "root_support": 3000,
+      "tolerance": 0.02,
+      "pass": true,
+      "scope": "undefined/underpowered values descriptive, not a reliability claim"
+    },
+    "renderer_eligible_action": {
+      "bridge": -0.6666666865348816,
+      "arm": -0.6276276111602783,
+      "delta": 0.03903907537460327,
+      "root_support": 333,
+      "tolerance": 0.02,
+      "pass": true,
+      "scope": "undefined/underpowered values descriptive, not a reliability claim"
+    }
+  },
+  "specification_sha256": "db4afee3b42756fa4c8960f2f7460e3485c6798158d0145ae1af4ad7f9788bc0",
+  "conflict": "diagnostic only",
+  "evaluation_opened": false,
+  "interpretation": "bounded single-family result, not a substrate ceiling; no composite score",
+  "underpowered_hard_positive_support": "proper-loss slice is reported separately from positive-class recoverability"
+}

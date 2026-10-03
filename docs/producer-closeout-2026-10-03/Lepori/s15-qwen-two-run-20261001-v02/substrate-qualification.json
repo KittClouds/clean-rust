@@ -1,0 +1,49 @@
+{
+  "status": "SUBSTRATE_QUALIFIED",
+  "model": "Qwen/Qwen3.5-0.8B-Base",
+  "revision": "dc7cdfe2ee4154fa7e30f5b51ca41bfa40174e68",
+  "weight_identity": {
+    "parameters_checked": 320,
+    "max_abs_diff": 0.0,
+    "text_parameters": 752393024
+  },
+  "padding": {
+    "0@6": {
+      "cosine": 0.9999459981918335,
+      "relative_rms": 0.010400420054793358
+    },
+    "0@12": {
+      "cosine": 0.9999176263809204,
+      "relative_rms": 0.012839561328291893
+    },
+    "0@18": {
+      "cosine": 0.9999036192893982,
+      "relative_rms": 0.01389006432145834
+    },
+    "0@24": {
+      "cosine": 0.9998906850814819,
+      "relative_rms": 0.014786766842007637
+    },
+    "1@6": {
+      "cosine": 0.9999407529830933,
+      "relative_rms": 0.01088651642203331
+    },
+    "1@12": {
+      "cosine": 0.9999006986618042,
+      "relative_rms": 0.014103119261562824
+    },
+    "1@18": {
+      "cosine": 0.9999117851257324,
+      "relative_rms": 0.013286576606333256
+    },
+    "1@24": {
+      "cosine": 0.9998918771743774,
+      "relative_rms": 0.014704566448926926
+    }
+  },
+  "hidden_stack_length": 25,
+  "hidden_width": 1024,
+  "frozen": true,
+  "vision_used": false,
+  "chat_template_used": false
+}

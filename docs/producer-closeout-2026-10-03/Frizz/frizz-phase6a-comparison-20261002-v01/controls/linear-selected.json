@@ -1,0 +1,13 @@
+{
+  "accuracy": 1.0,
+  "cost": {
+    "training_seconds": 2.0774700999900233,
+    "steps": 751,
+    "eligible_train_roots": 1333,
+    "TRAIN_prevalence": 0.5,
+    "parameters": 2,
+    "epochs": 4
+  },
+  "seconds": 0.029373900004429743,
+  "sha256": "c86b2a4d4ce6a7b79434ffdc677695bf83620a0c3005b50a66f378202af60f41"
+}

@@ -1,0 +1,26 @@
+{
+  "status": "FIXED_BEFORE_DIAGNOSTIC_DEV_SCORING",
+  "earned_factors": [
+    "legality",
+    "transition_distance"
+  ],
+  "sources": {
+    "common.py": "2472cbda21aab6014832172291ce4391405893cd30f49e453a26a5bc8b3869a8",
+    "freeze_panel.py": "4da04d28d4e890f48a5392ff2e720e66676a85e706e4fe6de01ee721a7b2378d",
+    "gold.py": "1d8b075b0ef457790008b40e9c546096bdaa6e89e790f0e3e027fe23fe83bb63",
+    "gold_details.py": "5d29ee252ac72c05917c2b554dcd1be406443d1fafe45d208bd85a9034dba9b4",
+    "panel.py": "a5cfb82fb60b3736655527bbfcc6bb5a14ba3e1e53592f57e350aab5e9e75ef3",
+    "prepare.py": "ba442418658b085b371e48d101ab38985f19157d79eb2f106349781911fbc26f",
+    "probes.py": "ada099c4923890234fbb5784ba423d7814bb0d2f0bda366230b02ef30ff60bfb",
+    "run_panel.py": "f153c5cae220b08473a0f7995a38b42b150938196dae481e9f2d8077b15efb60",
+    "SPECIFICATION.md": "fa5accf03f94311085b965e27a1788992888c2e9c4eb92b0b5358b7197337ec6",
+    "targets.py": "4f8d9940bcfb099619a084a580b2b86c3f207e476166d6d74ee62caad5998d0c",
+    "test_gold.py": "f8bdf30931cd662964ad6ace8a19d5b87841809bf695cd07cc9dd1a39a9a0b4c"
+  },
+  "gold_receipt_sha256": "f50cefd119d96c59dbc192871b9c6d9687dc5355d6d7ae78855142754707f0b7",
+  "epochs": 4,
+  "seed": 0,
+  "hidden": 64,
+  "batch_roots": 64,
+  "evaluation_opened": false
+}

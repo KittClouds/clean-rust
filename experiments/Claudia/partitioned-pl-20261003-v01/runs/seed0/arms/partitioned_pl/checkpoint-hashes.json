@@ -1,0 +1,15 @@
+{
+  "partitioned_pl-epoch00.pt": "f39a59ffa4f384473bc78b8533e11ed1b936523e7db959fbd4e4f898cc69990e",
+  "partitioned_pl-epoch01.pt": "1bbc054345597546a7d3f6337e267ebe785c431ae8e138adbab318acc2acb1da",
+  "partitioned_pl-epoch02.pt": "e63b83c50f6ff96dcd38c3340e2839fdf7a499e3a467f9a1b7fb0a79269a0c2b",
+  "partitioned_pl-epoch03.pt": "46b210b86c2d8dd8b378be3a123b4fdc3304c8d2efc9d44751fc9f752582bf99",
+  "partitioned_pl-epoch04.pt": "acfd5b16bd8185e5c58123003edf8ce3f0c8291cbd0237e4b98789e7d4d52610",
+  "partitioned_pl-epoch05.pt": "e9e7f2cd1503ab3135110856505055b2a70be78ed9e3df2dd957c584757f6ab4",
+  "partitioned_pl-epoch06.pt": "5ef4721f49a32662f640610e821c4e637def7cfd8be13123a30482bc5d162838",
+  "partitioned_pl-epoch07.pt": "fff37d7a5b51e800d57d8e22b6f2cb50a9559cf67b38a5da40c4709f9e0f9fc3",
+  "partitioned_pl-epoch08.pt": "bb374451d73d994b12e91a3c1a761e74b52c8159fce65bd1bff5a341bc5533df",
+  "partitioned_pl-epoch09.pt": "6b97debe96be6c982fa25c015969e75431f2ae0ba304a708408c70637b6b01e6",
+  "partitioned_pl-epoch10.pt": "70f7fef94ceee3dab431711d1811ffc59f18f29a36c29cc844fe8fa1b38f9edb",
+  "partitioned_pl-epoch11.pt": "a47cbbae24f79c8c1fc5567f68d8a0fd22ddb363a9be7d3eca3c393c2e995478",
+  "partitioned_pl-epoch12.pt": "70f8fbc5895a9a050cf87f041fabaf67199d08c1489da84fffc833481e59b499"
+}

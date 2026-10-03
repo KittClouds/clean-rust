@@ -1,0 +1,10 @@
+{
+  "checkpoint_sha256": "b27123339b70e0f27b27b9d053f86d5b6299079de839aedd77e7a8717a94af2a",
+  "elapsed_seconds": 11.151120800001081,
+  "epoch": 1,
+  "losses": {
+    "root_balanced_BCE": 0.4568185078955832,
+    "within_root_margin": 0.18695464357733727
+  },
+  "steps": 84
+}

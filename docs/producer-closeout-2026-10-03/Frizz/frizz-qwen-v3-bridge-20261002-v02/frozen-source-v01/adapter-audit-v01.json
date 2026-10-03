@@ -1,0 +1,54 @@
+{
+  "status": "ADAPTER_TRAIN_DEV_AUDIT_PASS",
+  "binding_receipt_sha256": "784efcd8d39e4f80192e1bb4b0afa2998ffe0efddaf628b85f498ca3f107e7e2",
+  "evaluation_files_opened": 0,
+  "model_inputs": [
+    "input_text",
+    "goal_mentions",
+    "bindings",
+    "actions",
+    "requests"
+  ],
+  "conflict_training_weight": 0,
+  "splits": {
+    "TRAIN": {
+      "rows": 24000,
+      "max_candidates": 171,
+      "candidate_slots": 1411362,
+      "selected_eligible_rows": 2666,
+      "optimal_eligible_rows": 2666,
+      "empty_optimal_rows": 21334,
+      "roots": 12000,
+      "eligible_action_type_root_support": {
+        "MOVE": 1046,
+        "DROP": 23,
+        "TAKE": 143,
+        "ACTIVATE": 49,
+        "OPEN": 39,
+        "DEACTIVATE": 20,
+        "WAIT": 1,
+        "CLOSE": 10,
+        "TRANSFER": 2
+      }
+    },
+    "DEV": {
+      "rows": 6000,
+      "max_candidates": 158,
+      "candidate_slots": 352336,
+      "selected_eligible_rows": 666,
+      "optimal_eligible_rows": 666,
+      "empty_optimal_rows": 5334,
+      "roots": 3000,
+      "eligible_action_type_root_support": {
+        "MOVE": 249,
+        "TAKE": 39,
+        "DEACTIVATE": 5,
+        "OPEN": 11,
+        "ACTIVATE": 10,
+        "DROP": 14,
+        "CLOSE": 4,
+        "WAIT": 1
+      }
+    }
+  }
+}

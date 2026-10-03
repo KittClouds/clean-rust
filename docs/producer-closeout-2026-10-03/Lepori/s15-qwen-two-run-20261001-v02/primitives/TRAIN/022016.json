@@ -1,0 +1,16 @@
+{
+  "sha256": "fd91fed5b4518a244d76ab43ae04317f966ffa3ae0f850e0a3e3895a65bb5381",
+  "rows": 256,
+  "absent_mentions_zeroed": [
+    {
+      "row_id": "TRAIN:010399:0:1@S0",
+      "entity_id": "sw_0",
+      "mention": "switch_q"
+    },
+    {
+      "row_id": "TRAIN:010399:0:1@S1",
+      "entity_id": "sw_0",
+      "mention": "switch_q"
+    }
+  ]
+}

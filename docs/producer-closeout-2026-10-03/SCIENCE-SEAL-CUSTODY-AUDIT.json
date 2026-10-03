@@ -1,0 +1,82 @@
+[
+  {
+    "manifest": "C:\\code land\\clean-rust\\experiments\\Claudia\\partitioned-pl-20261003-v01\\SEALED.json",
+    "source_lab": "Claudia",
+    "members": 402,
+    "hashes_checked": 402,
+    "discrepancies": [],
+    "external_references": []
+  },
+  {
+    "manifest": "C:\\phoenix-target-overgraph\\frizz-phase6b-relations-20261002-v01\\PHASE6B-SEALED.json",
+    "source_lab": "Frizz",
+    "members": 530,
+    "hashes_checked": 530,
+    "discrepancies": [],
+    "external_references": []
+  },
+  {
+    "manifest": "C:\\phoenix-target-overgraph\\frizz-phase6c-consequence-20261002-v01\\PHASE6C-SEALED.json",
+    "source_lab": "Frizz",
+    "members": 96,
+    "hashes_checked": 96,
+    "discrepancies": [],
+    "external_references": []
+  },
+  {
+    "manifest": "C:\\phoenix-target-overgraph\\frizz-phase6d-legality-20261002-v01\\PHASE6D-SEALED.json",
+    "source_lab": "Frizz",
+    "members": 63,
+    "hashes_checked": 63,
+    "discrepancies": [],
+    "external_references": []
+  },
+  {
+    "manifest": "C:\\phoenix-target-overgraph\\frizz-phase6e-raw-legality-20261002-v01\\METADATA-AMENDMENT-v02-SEALED.json",
+    "source_lab": "Frizz",
+    "members": 3,
+    "hashes_checked": 3,
+    "discrepancies": [],
+    "external_references": []
+  },
+  {
+    "manifest": "C:\\phoenix-target-overgraph\\frizz-phase6e-raw-legality-20261002-v01\\PHASE6E-SEALED.json",
+    "source_lab": "Frizz",
+    "members": 95,
+    "hashes_checked": 95,
+    "discrepancies": [],
+    "external_references": []
+  },
+  {
+    "manifest": "C:\\phoenix-target-overgraph\\frizz-phase6f-observability-20261003-v02\\PHASE6F-SEALED.json",
+    "source_lab": "Frizz",
+    "members": 30,
+    "hashes_checked": 30,
+    "discrepancies": [],
+    "external_references": []
+  },
+  {
+    "manifest": "C:\\phoenix-target-overgraph\\frizz-phase6g-selective-20261003-v01\\PHASE6G-SEALED.json",
+    "source_lab": "Frizz",
+    "members": 72,
+    "hashes_checked": 72,
+    "discrepancies": [],
+    "external_references": []
+  },
+  {
+    "manifest": "C:\\phoenix-target-overgraph\\frizz-phase7a-setrank-20261003-v01\\PHASE7A-SEALED.json",
+    "source_lab": "Frizz",
+    "members": 81,
+    "hashes_checked": 81,
+    "discrepancies": [],
+    "external_references": []
+  },
+  {
+    "manifest": "C:\\phoenix-target-overgraph\\frizz-phase7b-partitioned-pl-20261003-v01\\PHASE7B-SEALED.json",
+    "source_lab": "Frizz",
+    "members": 401,
+    "hashes_checked": 401,
+    "discrepancies": [],
+    "external_references": []
+  }
+]

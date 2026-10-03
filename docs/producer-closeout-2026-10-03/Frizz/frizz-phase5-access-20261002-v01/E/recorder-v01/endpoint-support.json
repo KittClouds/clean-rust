@@ -1,0 +1,81 @@
+{
+  "arm": "E",
+  "action_types": {
+    "MOVE": {
+      "exact_eligible_roots": 249,
+      "exact_correct": 28,
+      "optimal_eligible_roots": 249,
+      "optimal_hits": 28,
+      "class_supported": true,
+      "claim": "MOVE reliability eligible"
+    },
+    "TAKE": {
+      "exact_eligible_roots": 39,
+      "exact_correct": 4,
+      "optimal_eligible_roots": 39,
+      "optimal_hits": 4,
+      "class_supported": false,
+      "claim": "SUPPORT_ONLY_UNDERPOWERED"
+    },
+    "DROP": {
+      "exact_eligible_roots": 14,
+      "exact_correct": 0,
+      "optimal_eligible_roots": 14,
+      "optimal_hits": 0,
+      "class_supported": false,
+      "claim": "SUPPORT_ONLY_UNDERPOWERED"
+    },
+    "ACTIVATE": {
+      "exact_eligible_roots": 10,
+      "exact_correct": 0,
+      "optimal_eligible_roots": 10,
+      "optimal_hits": 0,
+      "class_supported": false,
+      "claim": "SUPPORT_ONLY_UNDERPOWERED"
+    },
+    "DEACTIVATE": {
+      "exact_eligible_roots": 5,
+      "exact_correct": 0,
+      "optimal_eligible_roots": 5,
+      "optimal_hits": 0,
+      "class_supported": false,
+      "claim": "SUPPORT_ONLY_UNDERPOWERED"
+    },
+    "OPEN": {
+      "exact_eligible_roots": 11,
+      "exact_correct": 0,
+      "optimal_eligible_roots": 11,
+      "optimal_hits": 0,
+      "class_supported": false,
+      "claim": "SUPPORT_ONLY_UNDERPOWERED"
+    },
+    "CLOSE": {
+      "exact_eligible_roots": 4,
+      "exact_correct": 0,
+      "optimal_eligible_roots": 4,
+      "optimal_hits": 0,
+      "class_supported": false,
+      "claim": "SUPPORT_ONLY_UNDERPOWERED"
+    },
+    "WAIT": {
+      "exact_eligible_roots": 1,
+      "exact_correct": 0,
+      "optimal_eligible_roots": 1,
+      "optimal_hits": 0,
+      "class_supported": false,
+      "claim": "SUPPORT_ONLY_UNDERPOWERED"
+    },
+    "TRANSFER": {
+      "exact_eligible_roots": 0,
+      "exact_correct": 0,
+      "optimal_eligible_roots": 0,
+      "optimal_hits": 0,
+      "class_supported": false,
+      "claim": "SUPPORT_ONLY_UNDERPOWERED"
+    }
+  },
+  "excluded_exact_roots": 2667,
+  "excluded_optimal_roots": 2667,
+  "pair_unit": "one primary rendering per canonical root",
+  "evaluation_opened": false
+}

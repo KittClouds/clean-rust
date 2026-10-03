@@ -1,0 +1,47 @@
+{
+  "status": "SUBSTRATE_QUALIFIED",
+  "revision": "dc7cdfe2ee4154fa7e30f5b51ca41bfa40174e68",
+  "weight_identity": {
+    "parameters_checked": 320,
+    "max_abs_difference": 0,
+    "text_parameters": 752393024
+  },
+  "padding": {
+    "0@6": {
+      "cosine": 0.9999526143074036,
+      "relative_rms": 0.009743948467075825
+    },
+    "0@12": {
+      "cosine": 0.999901533126831,
+      "relative_rms": 0.014031234197318554
+    },
+    "0@18": {
+      "cosine": 0.9999336004257202,
+      "relative_rms": 0.011529609560966492
+    },
+    "0@24": {
+      "cosine": 0.999894917011261,
+      "relative_rms": 0.01449893694370985
+    },
+    "1@6": {
+      "cosine": 0.9999502301216125,
+      "relative_rms": 0.009974466636776924
+    },
+    "1@12": {
+      "cosine": 0.9999009370803833,
+      "relative_rms": 0.01407984271645546
+    },
+    "1@18": {
+      "cosine": 0.9999321103096008,
+      "relative_rms": 0.011652437970042229
+    },
+    "1@24": {
+      "cosine": 0.9998951554298401,
+      "relative_rms": 0.014486652798950672
+    }
+  },
+  "maximum_context": 1415,
+  "frozen": true,
+  "vision_used": false,
+  "chat_template_used": false
+}

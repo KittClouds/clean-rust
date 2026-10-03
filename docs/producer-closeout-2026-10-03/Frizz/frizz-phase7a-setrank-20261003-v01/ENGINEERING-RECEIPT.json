@@ -1,0 +1,31 @@
+{
+  "status": "PASS",
+  "summary": "11 passed in 5.60s",
+  "tests": [
+    "test_setrank.py::test_permutation_equivariance_and_padding_invariance[set]",
+    "test_setrank.py::test_permutation_equivariance_and_padding_invariance[pointwise]",
+    "test_setrank.py::test_set_model_candidates_actually_interact_and_pointwise_do_not",
+    "test_setrank.py::test_order_detector_catches_a_positional_model",
+    "test_setrank.py::test_parameter_counts_are_matched_within_half_a_percent",
+    "test_setrank.py::test_make_perm_permutes_valid_prefix_only",
+    "test_setrank.py::test_losses_match_brute_force",
+    "test_setrank.py::test_loss_ignores_padding_and_ineligible_roots_and_handles_no_eligible",
+    "test_setrank.py::test_ranking_pairs_and_legality_metrics_on_a_hand_computed_case",
+    "test_setrank.py::test_bootstrap_is_paired_and_reproducible",
+    "test_setrank.py::test_one_training_step_runs_and_changes_weights"
+  ],
+  "torch": "2.11.0+cu128",
+  "test_file_sha256": "fd868f1768269b70624f67a1c78c93430d414a6cb6d91bbba1114089a11afd17",
+  "covers": [
+    "permutation equivariance + padding invariance (both arms, float64)",
+    "negative-control positional model fails the detector",
+    "set arm interacts / pointwise arm does not",
+    "parameter match < 0.5%",
+    "loss values vs brute force",
+    "padding/ineligible roots inert in loss; no-eligible batch safe",
+    "ranking, pair, legality metrics on a hand-computed case",
+    "paired bootstrap",
+    "training step"
+  ],
+  "rehearsal": "full train/score/compare/qualify/diagnostics/replay/seal chain rehearsed on TRAIN stand-ins with no DEV contact; two independent rehearsals gave identical numbers"
+}

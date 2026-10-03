@@ -1,0 +1,7 @@
+{
+  "sha256": "5276d629272eacb76c9bc4a11e927efd10adb45cec506e2d94df419b849219d7",
+  "purpose": "synthetic known-solvable sign relation",
+  "steps": 752,
+  "parameters": 193,
+  "device": "CPU"
+}

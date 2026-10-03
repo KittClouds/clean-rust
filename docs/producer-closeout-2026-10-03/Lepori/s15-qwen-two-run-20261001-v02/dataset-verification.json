@@ -1,0 +1,29 @@
+{
+  "status": "PASS",
+  "splits": {
+    "TRAIN": {
+      "rows": 23332,
+      "canonical": 20000,
+      "pairs": 3332,
+      "entity_vectors": 195854,
+      "candidate_support": 308938,
+      "max_candidates": 28,
+      "cross_world_references": 0,
+      "entity_identity_replay": "EXACT",
+      "dataset_sha256": "a36f9ed6f1734d40c91124851097cf5092bd3e324081728e5de7250a99bd42e6"
+    },
+    "DEV": {
+      "rows": 2332,
+      "canonical": 2000,
+      "pairs": 332,
+      "entity_vectors": 19719,
+      "candidate_support": 31144,
+      "max_candidates": 28,
+      "cross_world_references": 0,
+      "entity_identity_replay": "EXACT",
+      "dataset_sha256": "0cf9fd34df4a72a2da363e24a27dec8e329838de1005db22dca62921edac8f44"
+    }
+  },
+  "protected_test_opened": false,
+  "graft_training_started": false
+}

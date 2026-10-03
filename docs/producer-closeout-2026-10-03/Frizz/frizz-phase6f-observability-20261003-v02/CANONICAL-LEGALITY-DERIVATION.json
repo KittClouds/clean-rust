@@ -1,0 +1,15 @@
+{
+  "active_schedule": "valid_from <= 0 AND (valid_to is null OR 0 < valid_to)",
+  "candidate_literal_derivations": "clauses.jsonl.gz preserves each primitive fact/polarity/truth/observable support",
+  "negative_clauses": "Act.neg reconstructed by pinned simulator",
+  "not_clauses": [
+    "action permission",
+    "selected action",
+    "transition distance"
+  ],
+  "positive_clauses": "Act.pre reconstructed by pinned Sim.from_world; MOVE includes emitted gate conditions",
+  "rule": "all action.pre present at tick 0 AND all action.neg absent at tick 0",
+  "source": "C:\\code land\\clean-rust\\experiments\\ff-s15-bank-02\\src\\bank2\\sim.py",
+  "source_sha256": "bdf7270b2706d426b17e426abdf89abcd1c41043fda4f2ed9774980a4d3d6a1d",
+  "unknown": "no observable truth support; never substituted with canonical label"
+}

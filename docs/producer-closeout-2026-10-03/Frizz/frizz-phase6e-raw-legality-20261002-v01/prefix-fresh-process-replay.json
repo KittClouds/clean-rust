@@ -1,0 +1,21 @@
+{
+  "counts": {
+    "DEV": {
+      "all_cached_rows_hash_and_binding_verified": 666,
+      "fresh_model_prefix_rows_exact": 16
+    },
+    "TRAIN": {
+      "all_cached_rows_hash_and_binding_verified": 2666,
+      "fresh_model_prefix_rows_exact": 16
+    }
+  },
+  "original_model_identity": {
+    "max_abs_difference": 0,
+    "parameters_checked": 320,
+    "text_parameters": 752393024
+  },
+  "protected_evaluation_opened": false,
+  "scope": "all cache hashes/bindings; first16 rows per split recomputed exactly, not an exhaustive prefix recomputation",
+  "source_sha256": "54a072c03730ca9c478b3f151a4df9ae283e73c7ecb1a3bd8ae8c9249a407ec1",
+  "status": "PASS"
+}

@@ -1,0 +1,299 @@
+{
+  "attribution_unknown_clauses": {
+    "DEV:multiple_unknown_clauses": 2986,
+    "DEV:negative:BLOCKED": 2348,
+    "DEV:positive:AT": 4914,
+    "DEV:positive:CONTAINS": 90,
+    "DEV:positive:HOLDS": 840,
+    "DEV:positive:STATE": 554,
+    "TRAIN:multiple_unknown_clauses": 12134,
+    "TRAIN:negative:BLOCKED": 8900,
+    "TRAIN:positive:AT": 19556,
+    "TRAIN:positive:CONTAINS": 398,
+    "TRAIN:positive:HOLDS": 3376,
+    "TRAIN:positive:STATE": 2804
+  },
+  "decision": {
+    "bank_empirical_and_counterfactual_ceilings_separate": true,
+    "disposition": "OBSERVABILITY_GAP_LOCALIZED",
+    "no_collision_does_not_prove_identifiable": true,
+    "no_model_ceiling_claim": true,
+    "partial_nonidentifiability_proven": true,
+    "protected_evaluation_opened": false,
+    "training": false
+  },
+  "splits": {
+    "DEV": {
+      "augmented_counterfactual_exact_ceiling_NOT_original_bank": {
+        "ambiguous_roots": 280,
+        "classes": 333,
+        "empirical_exact_set_ceiling": 0.7040169133192389,
+        "roots": 473
+      },
+      "augmented_counterfactual_same_type_ceiling_NOT_original_bank": {
+        "ambiguous_roots": 12,
+        "classes": 333,
+        "empirical_exact_set_ceiling": 0.9873150105708245,
+        "roots": 473
+      },
+      "counterfactual_rejections": {
+        "actual_permitted_input_changed": 95,
+        "legality_unchanged": 705,
+        "replacement_fact_already_present": 6
+      },
+      "equal_root_balanced_pair_audit_ceiling_NOT_original_bank": 0.7897897897897898,
+      "exact_candidate_coordinate_collisions": {
+        "ambiguous_candidate_fraction": 0.0,
+        "ambiguous_candidates": 0,
+        "classes": 41578,
+        "empirical_candidate_scalar_accuracy_ceiling": 1.0,
+        "instances": 41578,
+        "root_fraction": 0.0,
+        "roots_with_ambiguous_candidate": 0,
+        "selected_fraction": 0.0,
+        "selected_in_ambiguous_classes": 0
+      },
+      "exact_input_root_ceiling": {
+        "ambiguous_roots": 0,
+        "classes": 333,
+        "empirical_exact_set_ceiling": 1.0,
+        "roots": 333
+      },
+      "exact_same_type_ceiling_gold_type_conditioned": {
+        "ambiguous_roots": 0,
+        "classes": 333,
+        "empirical_exact_set_ceiling": 1.0,
+        "roots": 333
+      },
+      "hidden_graph_rows": 0,
+      "oracle": {
+        "recipe_closed_graph": {
+          "CERTAIN_ILLEGAL": 35192,
+          "CERTAIN_LEGAL": 1708,
+          "UNRESOLVED": 4678,
+          "certain_illegal_precision": 1.0,
+          "certain_legal_precision": 1.0,
+          "correct_certain_illegal": 35192,
+          "correct_certain_legal": 1708,
+          "coverage": 0.8874885756890664
+        },
+        "strict": {
+          "CERTAIN_ILLEGAL": 35192,
+          "CERTAIN_LEGAL": 944,
+          "UNRESOLVED": 5442,
+          "certain_illegal_precision": 1.0,
+          "certain_legal_precision": 1.0,
+          "correct_certain_illegal": 35192,
+          "correct_certain_legal": 944,
+          "coverage": 0.8691134734715474
+        }
+      },
+      "paired_witness_failures": 0,
+      "recipe_certified_roots": 49,
+      "recipe_closed_graph_assumption_valid_on_population": true,
+      "renderer": {
+        "changed_observable_sections": {
+          "direct": 26
+        },
+        "hidden_fact_policy_ordering_source": "fact-ID sorting; exact witness test rejects any changed text",
+        "no_legality_clause_truth_inferred_from_renderer_metadata": true,
+        "non_REL_semantic_changes": 0,
+        "oracle_status_changes": 0,
+        "raw_input_changes": 333,
+        "relation_phrase_source_private_id_and_family": true,
+        "semantic_class_changes": 26
+      },
+      "selected_candidates_flipped_by_witness": 0,
+      "semantic_candidate_collisions": {
+        "ambiguous_candidate_fraction": 0.0,
+        "ambiguous_candidates": 0,
+        "classes": 22262,
+        "empirical_candidate_scalar_accuracy_ceiling": 1.0,
+        "instances": 41578,
+        "root_fraction": 0.0,
+        "roots_with_ambiguous_candidate": 0,
+        "selected_fraction": 0.0,
+        "selected_in_ambiguous_classes": 0
+      },
+      "semantic_root_ceiling": {
+        "ambiguous_roots": 0,
+        "classes": 333,
+        "empirical_exact_set_ceiling": 1.0,
+        "roots": 333
+      },
+      "semantic_same_type_ceiling_gold_type_conditioned": {
+        "ambiguous_roots": 0,
+        "classes": 333,
+        "empirical_exact_set_ceiling": 1.0,
+        "roots": 333
+      },
+      "strict_certified_roots": 1,
+      "supports": {
+        "canonical_candidates": 20789,
+        "canonical_roots": 333,
+        "counterfactual_attempts": 946,
+        "legal_candidates": 1166,
+        "rendered_candidates": 41578,
+        "rendered_rows": 666
+      },
+      "unbound_argument_occurrences": 0,
+      "unrendered_slot_marker_rows": 0,
+      "verified_ambiguous_fraction": 0.42042042042042044,
+      "verified_ambiguous_roots": 140,
+      "witness_changed_candidate_fraction": 0.007263456635720814,
+      "witness_changed_candidates": 151,
+      "witness_changed_same_type_roots": 6,
+      "witness_hidden_predicates": {
+        "AT": 128,
+        "HOLDS": 6,
+        "STATE": 6
+      }
+    },
+    "TRAIN": {
+      "augmented_counterfactual_exact_ceiling_NOT_original_bank": {
+        "ambiguous_roots": 1196,
+        "classes": 1333,
+        "empirical_exact_set_ceiling": 0.6903158984981874,
+        "roots": 1931
+      },
+      "augmented_counterfactual_same_type_ceiling_NOT_original_bank": {
+        "ambiguous_roots": 74,
+        "classes": 1333,
+        "empirical_exact_set_ceiling": 0.9808389435525634,
+        "roots": 1931
+      },
+      "counterfactual_rejections": {
+        "Regenerate:an ASK requires a generated request object naming the requirement": 1,
+        "actual_permitted_input_changed": 315,
+        "conditional_EXECUTE_not_preserved": 6,
+        "legality_unchanged": 2511,
+        "replacement_fact_already_present": 15
+      },
+      "equal_root_balanced_pair_audit_ceiling_NOT_original_bank": 0.7756939234808702,
+      "exact_candidate_coordinate_collisions": {
+        "ambiguous_candidate_fraction": 0.0,
+        "ambiguous_candidates": 0,
+        "classes": 169272,
+        "empirical_candidate_scalar_accuracy_ceiling": 1.0,
+        "instances": 169272,
+        "root_fraction": 0.0,
+        "roots_with_ambiguous_candidate": 0,
+        "selected_fraction": 0.0,
+        "selected_in_ambiguous_classes": 0
+      },
+      "exact_input_root_ceiling": {
+        "ambiguous_roots": 0,
+        "classes": 1333,
+        "empirical_exact_set_ceiling": 1.0,
+        "roots": 1333
+      },
+      "exact_same_type_ceiling_gold_type_conditioned": {
+        "ambiguous_roots": 0,
+        "classes": 1333,
+        "empirical_exact_set_ceiling": 1.0,
+        "roots": 1333
+      },
+      "hidden_graph_rows": 0,
+      "oracle": {
+        "recipe_closed_graph": {
+          "CERTAIN_ILLEGAL": 144220,
+          "CERTAIN_LEGAL": 6916,
+          "UNRESOLVED": 18136,
+          "certain_illegal_precision": 1.0,
+          "certain_legal_precision": 1.0,
+          "correct_certain_illegal": 144220,
+          "correct_certain_legal": 6916,
+          "coverage": 0.8928588307575972
+        },
+        "strict": {
+          "CERTAIN_ILLEGAL": 144220,
+          "CERTAIN_LEGAL": 3862,
+          "UNRESOLVED": 21190,
+          "certain_illegal_precision": 1.0,
+          "certain_legal_precision": 1.0,
+          "correct_certain_illegal": 144220,
+          "correct_certain_legal": 3862,
+          "coverage": 0.8748168628006995
+        }
+      },
+      "paired_witness_failures": 0,
+      "recipe_certified_roots": 213,
+      "recipe_closed_graph_assumption_valid_on_population": true,
+      "renderer": {
+        "changed_observable_sections": {
+          "direct": 118
+        },
+        "hidden_fact_policy_ordering_source": "fact-ID sorting; exact witness test rejects any changed text",
+        "no_legality_clause_truth_inferred_from_renderer_metadata": true,
+        "non_REL_semantic_changes": 0,
+        "oracle_status_changes": 0,
+        "raw_input_changes": 1333,
+        "relation_phrase_source_private_id_and_family": true,
+        "semantic_class_changes": 118
+      },
+      "selected_candidates_flipped_by_witness": 0,
+      "semantic_candidate_collisions": {
+        "ambiguous_candidate_fraction": 0.0,
+        "ambiguous_candidates": 0,
+        "classes": 92108,
+        "empirical_candidate_scalar_accuracy_ceiling": 1.0,
+        "instances": 169272,
+        "root_fraction": 0.0,
+        "roots_with_ambiguous_candidate": 0,
+        "selected_fraction": 0.0,
+        "selected_in_ambiguous_classes": 0
+      },
+      "semantic_root_ceiling": {
+        "ambiguous_roots": 0,
+        "classes": 1333,
+        "empirical_exact_set_ceiling": 1.0,
+        "roots": 1333
+      },
+      "semantic_same_type_ceiling_gold_type_conditioned": {
+        "ambiguous_roots": 0,
+        "classes": 1333,
+        "empirical_exact_set_ceiling": 1.0,
+        "roots": 1333
+      },
+      "strict_certified_roots": 3,
+      "supports": {
+        "canonical_candidates": 84636,
+        "canonical_roots": 1333,
+        "counterfactual_attempts": 3446,
+        "legal_candidates": 4690,
+        "rendered_candidates": 169272,
+        "rendered_rows": 2666
+      },
+      "unbound_argument_occurrences": 0,
+      "unrendered_slot_marker_rows": 0,
+      "verified_ambiguous_fraction": 0.4486121530382596,
+      "verified_ambiguous_roots": 598,
+      "witness_changed_candidate_fraction": 0.008117113285126897,
+      "witness_changed_candidates": 687,
+      "witness_changed_same_type_roots": 37,
+      "witness_hidden_predicates": {
+        "AT": 533,
+        "HOLDS": 13,
+        "STATE": 52
+      }
+    }
+  },
+  "streams": {
+    "clauses": {
+      "rows": 210850,
+      "semantic_content_sha256": "4e42dbc5dfa1ae3b63c1dbff5295ff539b1d72d5e75389bdbf96188f74e76a6d"
+    },
+    "collision-classes": {
+      "rows": 325220,
+      "semantic_content_sha256": "f0acc53cf007d7675c47b8b3db30438abdf87dfa000032a92cde4910794d69aa"
+    },
+    "root-partition": {
+      "rows": 1666,
+      "semantic_content_sha256": "1f045984450f0c0005e5c3ea393180a5490d7b1bc908650ffa6a9856f7a4f1bd"
+    },
+    "witnesses": {
+      "rows": 738,
+      "semantic_content_sha256": "11a01d21dffca186f1e19678afb29a4012dc5d3725740c13868ea2541e97f485"
+    }
+  }
+}

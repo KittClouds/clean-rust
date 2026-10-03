@@ -1,0 +1,46 @@
+{
+  "sha256": "1756b3f4362a858bbb1260f39e1178ba13f2d7cf91a19a47b52fe5840f08409c",
+  "rows": 256,
+  "absent_mentions_zeroed": [
+    {
+      "row_id": "DEV:001346:0:0",
+      "entity_id": "sw_2",
+      "mention": "switch_r"
+    },
+    {
+      "row_id": "DEV:001382:0:0",
+      "entity_id": "sw_1",
+      "mention": "switch_p"
+    },
+    {
+      "row_id": "DEV:001401:0:1",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "DEV:001438:0:0",
+      "entity_id": "sw_0",
+      "mention": "switch_q"
+    },
+    {
+      "row_id": "DEV:001476:0:0",
+      "entity_id": "ag_0",
+      "mention": "they"
+    },
+    {
+      "row_id": "DEV:001488:0:0",
+      "entity_id": "obj_0",
+      "mention": "ember_object"
+    },
+    {
+      "row_id": "DEV:001508:0:0",
+      "entity_id": "sw_1",
+      "mention": "the aforementioned switch_q"
+    },
+    {
+      "row_id": "DEV:001518:0:0",
+      "entity_id": "obj_2",
+      "mention": "onyx"
+    }
+  ]
+}

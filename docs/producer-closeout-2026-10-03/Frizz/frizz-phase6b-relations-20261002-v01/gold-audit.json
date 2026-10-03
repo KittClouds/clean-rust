@@ -1,0 +1,421 @@
+{
+  "status": "GOLD_SAME_TYPE_AUDIT_COMPLETE",
+  "ladder": {
+    "TRAIN": {
+      "type_only": {
+        "roots": 1333,
+        "oracle_tie_top1": 0.11615234290590629,
+        "unique_selected_roots": 1,
+        "unique_fraction": 0.0007501875468867217,
+        "remaining_collision_candidates": 11883,
+        "same_type_pairs": 11883,
+        "distinguished_pairs": 0,
+        "distinguished_fraction": 0.0,
+        "scope": "root-conditional descriptor tie ceiling, NOT a learned accuracy or universal decision determinism ceiling"
+      },
+      "legality": {
+        "roots": 1333,
+        "oracle_tie_top1": 0.7726306576644162,
+        "unique_selected_roots": 777,
+        "unique_fraction": 0.5828957239309828,
+        "remaining_collision_candidates": 714,
+        "same_type_pairs": 11883,
+        "distinguished_pairs": 11169,
+        "distinguished_fraction": 0.9399141630901288,
+        "scope": "root-conditional descriptor tie ceiling, NOT a learned accuracy or universal decision determinism ceiling"
+      },
+      "immediate_goal": {
+        "roots": 1333,
+        "oracle_tie_top1": 0.815891472868217,
+        "unique_selected_roots": 883,
+        "unique_fraction": 0.6624156039009752,
+        "remaining_collision_candidates": 577,
+        "same_type_pairs": 11883,
+        "distinguished_pairs": 11306,
+        "distinguished_fraction": 0.9514432382395018,
+        "scope": "root-conditional descriptor tie ceiling, NOT a learned accuracy or universal decision determinism ceiling"
+      },
+      "argument_goal": {
+        "roots": 1333,
+        "oracle_tie_top1": 0.8350837709427358,
+        "unique_selected_roots": 929,
+        "unique_fraction": 0.6969242310577645,
+        "remaining_collision_candidates": 514,
+        "same_type_pairs": 11883,
+        "distinguished_pairs": 11369,
+        "distinguished_fraction": 0.9567449297315492,
+        "scope": "root-conditional descriptor tie ceiling, NOT a learned accuracy or universal decision determinism ceiling"
+      },
+      "preconditions": {
+        "roots": 1333,
+        "oracle_tie_top1": 0.8457114278569642,
+        "unique_selected_roots": 953,
+        "unique_fraction": 0.7149287321830458,
+        "remaining_collision_candidates": 476,
+        "same_type_pairs": 11883,
+        "distinguished_pairs": 11407,
+        "distinguished_fraction": 0.9599427753934192,
+        "scope": "root-conditional descriptor tie ceiling, NOT a learned accuracy or universal decision determinism ceiling"
+      },
+      "effects_goal": {
+        "roots": 1333,
+        "oracle_tie_top1": 0.8457114278569642,
+        "unique_selected_roots": 953,
+        "unique_fraction": 0.7149287321830458,
+        "remaining_collision_candidates": 476,
+        "same_type_pairs": 11883,
+        "distinguished_pairs": 11407,
+        "distinguished_fraction": 0.9599427753934192,
+        "scope": "root-conditional descriptor tie ceiling, NOT a learned accuracy or universal decision determinism ceiling"
+      },
+      "obligations": {
+        "roots": 1333,
+        "oracle_tie_top1": 0.8460865216304075,
+        "unique_selected_roots": 954,
+        "unique_fraction": 0.7156789197299325,
+        "remaining_collision_candidates": 475,
+        "same_type_pairs": 11883,
+        "distinguished_pairs": 11408,
+        "distinguished_fraction": 0.9600269292266262,
+        "scope": "root-conditional descriptor tie ceiling, NOT a learned accuracy or universal decision determinism ceiling"
+      },
+      "transition_distance": {
+        "roots": 1333,
+        "oracle_tie_top1": 1.0,
+        "unique_selected_roots": 1333,
+        "unique_fraction": 1.0,
+        "remaining_collision_candidates": 0,
+        "same_type_pairs": 11883,
+        "distinguished_pairs": 11883,
+        "distinguished_fraction": 1.0,
+        "scope": "root-conditional descriptor tie ceiling, NOT a learned accuracy or universal decision determinism ceiling"
+      }
+    },
+    "DEV": {
+      "type_only": {
+        "roots": 333,
+        "oracle_tie_top1": 0.11401820568487234,
+        "unique_selected_roots": 1,
+        "unique_fraction": 0.003003003003003003,
+        "remaining_collision_candidates": 3180,
+        "same_type_pairs": 3180,
+        "distinguished_pairs": 0,
+        "distinguished_fraction": 0.0,
+        "scope": "root-conditional descriptor tie ceiling, NOT a learned accuracy or universal decision determinism ceiling"
+      },
+      "legality": {
+        "roots": 333,
+        "oracle_tie_top1": 0.7747747747747747,
+        "unique_selected_roots": 199,
+        "unique_fraction": 0.5975975975975976,
+        "remaining_collision_candidates": 185,
+        "same_type_pairs": 3180,
+        "distinguished_pairs": 2995,
+        "distinguished_fraction": 0.9418238993710691,
+        "scope": "root-conditional descriptor tie ceiling, NOT a learned accuracy or universal decision determinism ceiling"
+      },
+      "immediate_goal": {
+        "roots": 333,
+        "oracle_tie_top1": 0.8163163163163163,
+        "unique_selected_roots": 223,
+        "unique_fraction": 0.6696696696696697,
+        "remaining_collision_candidates": 149,
+        "same_type_pairs": 3180,
+        "distinguished_pairs": 3031,
+        "distinguished_fraction": 0.9531446540880503,
+        "scope": "root-conditional descriptor tie ceiling, NOT a learned accuracy or universal decision determinism ceiling"
+      },
+      "argument_goal": {
+        "roots": 333,
+        "oracle_tie_top1": 0.8328328328328328,
+        "unique_selected_roots": 233,
+        "unique_fraction": 0.6996996996996997,
+        "remaining_collision_candidates": 136,
+        "same_type_pairs": 3180,
+        "distinguished_pairs": 3044,
+        "distinguished_fraction": 0.9572327044025157,
+        "scope": "root-conditional descriptor tie ceiling, NOT a learned accuracy or universal decision determinism ceiling"
+      },
+      "preconditions": {
+        "roots": 333,
+        "oracle_tie_top1": 0.8388388388388388,
+        "unique_selected_roots": 236,
+        "unique_fraction": 0.7087087087087087,
+        "remaining_collision_candidates": 130,
+        "same_type_pairs": 3180,
+        "distinguished_pairs": 3050,
+        "distinguished_fraction": 0.9591194968553459,
+        "scope": "root-conditional descriptor tie ceiling, NOT a learned accuracy or universal decision determinism ceiling"
+      },
+      "effects_goal": {
+        "roots": 333,
+        "oracle_tie_top1": 0.8388388388388388,
+        "unique_selected_roots": 236,
+        "unique_fraction": 0.7087087087087087,
+        "remaining_collision_candidates": 130,
+        "same_type_pairs": 3180,
+        "distinguished_pairs": 3050,
+        "distinguished_fraction": 0.9591194968553459,
+        "scope": "root-conditional descriptor tie ceiling, NOT a learned accuracy or universal decision determinism ceiling"
+      },
+      "obligations": {
+        "roots": 333,
+        "oracle_tie_top1": 0.8388388388388388,
+        "unique_selected_roots": 236,
+        "unique_fraction": 0.7087087087087087,
+        "remaining_collision_candidates": 130,
+        "same_type_pairs": 3180,
+        "distinguished_pairs": 3050,
+        "distinguished_fraction": 0.9591194968553459,
+        "scope": "root-conditional descriptor tie ceiling, NOT a learned accuracy or universal decision determinism ceiling"
+      },
+      "transition_distance": {
+        "roots": 333,
+        "oracle_tie_top1": 1.0,
+        "unique_selected_roots": 333,
+        "unique_fraction": 1.0,
+        "remaining_collision_candidates": 0,
+        "same_type_pairs": 3180,
+        "distinguished_pairs": 3180,
+        "distinguished_fraction": 1.0,
+        "scope": "root-conditional descriptor tie ceiling, NOT a learned accuracy or universal decision determinism ceiling"
+      }
+    }
+  },
+  "inventory": {
+    "TRAIN": {
+      "families": {
+        "legality": {
+          "roots": 1333,
+          "oracle_tie_top1": 0.7726306576644162,
+          "unique_selected_roots": 777,
+          "unique_fraction": 0.5828957239309828,
+          "remaining_collision_candidates": 714,
+          "same_type_pairs": 11883,
+          "distinguished_pairs": 11169,
+          "distinguished_fraction": 0.9399141630901288,
+          "scope": "root-conditional descriptor tie ceiling, NOT a learned accuracy or universal decision determinism ceiling"
+        },
+        "immediate_goal": {
+          "roots": 1333,
+          "oracle_tie_top1": 0.3394148299812216,
+          "unique_selected_roots": 340,
+          "unique_fraction": 0.2550637659414854,
+          "remaining_collision_candidates": 8747,
+          "same_type_pairs": 11883,
+          "distinguished_pairs": 3136,
+          "distinguished_fraction": 0.2639064209374737,
+          "scope": "root-conditional descriptor tie ceiling, NOT a learned accuracy or universal decision determinism ceiling"
+        },
+        "argument_goal": {
+          "roots": 1333,
+          "oracle_tie_top1": 0.2542547329306519,
+          "unique_selected_roots": 90,
+          "unique_fraction": 0.06751687921980495,
+          "remaining_collision_candidates": 7094,
+          "same_type_pairs": 11883,
+          "distinguished_pairs": 4789,
+          "distinguished_fraction": 0.40301270722881427,
+          "scope": "root-conditional descriptor tie ceiling, NOT a learned accuracy or universal decision determinism ceiling"
+        },
+        "preconditions": {
+          "roots": 1333,
+          "oracle_tie_top1": 0.7878219554888722,
+          "unique_selected_roots": 812,
+          "unique_fraction": 0.609152288072018,
+          "remaining_collision_candidates": 661,
+          "same_type_pairs": 11883,
+          "distinguished_pairs": 11222,
+          "distinguished_fraction": 0.9443743162501052,
+          "scope": "root-conditional descriptor tie ceiling, NOT a learned accuracy or universal decision determinism ceiling"
+        },
+        "effects_goal": {
+          "roots": 1333,
+          "oracle_tie_top1": 0.24659957238726932,
+          "unique_selected_roots": 79,
+          "unique_fraction": 0.05926481620405101,
+          "remaining_collision_candidates": 7207,
+          "same_type_pairs": 11883,
+          "distinguished_pairs": 4676,
+          "distinguished_fraction": 0.3935033240764117,
+          "scope": "root-conditional descriptor tie ceiling, NOT a learned accuracy or universal decision determinism ceiling"
+        },
+        "obligations": {
+          "roots": 1333,
+          "oracle_tie_top1": 0.7042109105781273,
+          "unique_selected_roots": 716,
+          "unique_fraction": 0.5371342835708928,
+          "remaining_collision_candidates": 1976,
+          "same_type_pairs": 11883,
+          "distinguished_pairs": 9907,
+          "distinguished_fraction": 0.8337120255827652,
+          "scope": "root-conditional descriptor tie ceiling, NOT a learned accuracy or universal decision determinism ceiling"
+        },
+        "transition_distance": {
+          "roots": 1333,
+          "oracle_tie_top1": 1.0,
+          "unique_selected_roots": 1333,
+          "unique_fraction": 1.0,
+          "remaining_collision_candidates": 0,
+          "same_type_pairs": 11883,
+          "distinguished_pairs": 11883,
+          "distinguished_fraction": 1.0,
+          "scope": "root-conditional descriptor tie ceiling, NOT a learned accuracy or universal decision determinism ceiling"
+        }
+      },
+      "co_occurrence_pair_counts": {
+        "legality & immediate_goal": 2999,
+        "legality & argument_goal": 4589,
+        "legality & preconditions": 11169,
+        "legality & effects_goal": 4476,
+        "legality & transition_distance": 11169,
+        "immediate_goal & argument_goal": 2245,
+        "immediate_goal & preconditions": 3009,
+        "immediate_goal & effects_goal": 2245,
+        "immediate_goal & transition_distance": 3136,
+        "argument_goal & preconditions": 4604,
+        "argument_goal & effects_goal": 4676,
+        "argument_goal & transition_distance": 4789,
+        "preconditions & effects_goal": 4491,
+        "preconditions & transition_distance": 11222,
+        "effects_goal & transition_distance": 4676,
+        "legality & obligations": 9874,
+        "immediate_goal & obligations": 2781,
+        "argument_goal & obligations": 4213,
+        "preconditions & obligations": 9877,
+        "effects_goal & obligations": 4112,
+        "obligations & transition_distance": 9907
+      },
+      "unavailable": [
+        "candidate-specific evidence support/counterevidence labels"
+      ],
+      "obligation_definition": "canonical initial support_alternatives truth after candidate tick1, not a new normative policy target"
+    },
+    "DEV": {
+      "families": {
+        "legality": {
+          "roots": 333,
+          "oracle_tie_top1": 0.7747747747747747,
+          "unique_selected_roots": 199,
+          "unique_fraction": 0.5975975975975976,
+          "remaining_collision_candidates": 185,
+          "same_type_pairs": 3180,
+          "distinguished_pairs": 2995,
+          "distinguished_fraction": 0.9418238993710691,
+          "scope": "root-conditional descriptor tie ceiling, NOT a learned accuracy or universal decision determinism ceiling"
+        },
+        "immediate_goal": {
+          "roots": 333,
+          "oracle_tie_top1": 0.36301277134610466,
+          "unique_selected_roots": 94,
+          "unique_fraction": 0.2822822822822823,
+          "remaining_collision_candidates": 2148,
+          "same_type_pairs": 3180,
+          "distinguished_pairs": 1032,
+          "distinguished_fraction": 0.32452830188679244,
+          "scope": "root-conditional descriptor tie ceiling, NOT a learned accuracy or universal decision determinism ceiling"
+        },
+        "argument_goal": {
+          "roots": 333,
+          "oracle_tie_top1": 0.2672201255534589,
+          "unique_selected_roots": 29,
+          "unique_fraction": 0.08708708708708708,
+          "remaining_collision_candidates": 1793,
+          "same_type_pairs": 3180,
+          "distinguished_pairs": 1387,
+          "distinguished_fraction": 0.43616352201257863,
+          "scope": "root-conditional descriptor tie ceiling, NOT a learned accuracy or universal decision determinism ceiling"
+        },
+        "preconditions": {
+          "roots": 333,
+          "oracle_tie_top1": 0.7820320320320321,
+          "unique_selected_roots": 202,
+          "unique_fraction": 0.6066066066066066,
+          "remaining_collision_candidates": 176,
+          "same_type_pairs": 3180,
+          "distinguished_pairs": 3004,
+          "distinguished_fraction": 0.9446540880503145,
+          "scope": "root-conditional descriptor tie ceiling, NOT a learned accuracy or universal decision determinism ceiling"
+        },
+        "effects_goal": {
+          "roots": 333,
+          "oracle_tie_top1": 0.2591194924528258,
+          "unique_selected_roots": 26,
+          "unique_fraction": 0.07807807807807808,
+          "remaining_collision_candidates": 1817,
+          "same_type_pairs": 3180,
+          "distinguished_pairs": 1363,
+          "distinguished_fraction": 0.4286163522012579,
+          "scope": "root-conditional descriptor tie ceiling, NOT a learned accuracy or universal decision determinism ceiling"
+        },
+        "obligations": {
+          "roots": 333,
+          "oracle_tie_top1": 0.7074982991649659,
+          "unique_selected_roots": 180,
+          "unique_fraction": 0.5405405405405406,
+          "remaining_collision_candidates": 501,
+          "same_type_pairs": 3180,
+          "distinguished_pairs": 2679,
+          "distinguished_fraction": 0.8424528301886792,
+          "scope": "root-conditional descriptor tie ceiling, NOT a learned accuracy or universal decision determinism ceiling"
+        },
+        "transition_distance": {
+          "roots": 333,
+          "oracle_tie_top1": 1.0,
+          "unique_selected_roots": 333,
+          "unique_fraction": 1.0,
+          "remaining_collision_candidates": 0,
+          "same_type_pairs": 3180,
+          "distinguished_pairs": 3180,
+          "distinguished_fraction": 1.0,
+          "scope": "root-conditional descriptor tie ceiling, NOT a learned accuracy or universal decision determinism ceiling"
+        }
+      },
+      "co_occurrence_pair_counts": {
+        "argument_goal & effects_goal": 1363,
+        "argument_goal & transition_distance": 1387,
+        "effects_goal & transition_distance": 1363,
+        "legality & preconditions": 2995,
+        "legality & obligations": 2674,
+        "legality & transition_distance": 2995,
+        "preconditions & obligations": 2675,
+        "preconditions & transition_distance": 3004,
+        "obligations & transition_distance": 2679,
+        "legality & argument_goal": 1338,
+        "legality & effects_goal": 1314,
+        "argument_goal & preconditions": 1341,
+        "argument_goal & obligations": 1203,
+        "preconditions & effects_goal": 1317,
+        "effects_goal & obligations": 1179,
+        "legality & immediate_goal": 996,
+        "immediate_goal & preconditions": 999,
+        "immediate_goal & obligations": 884,
+        "immediate_goal & transition_distance": 1032,
+        "immediate_goal & argument_goal": 781,
+        "immediate_goal & effects_goal": 781
+      },
+      "unavailable": [
+        "candidate-specific evidence support/counterevidence labels"
+      ],
+      "obligation_definition": "canonical initial support_alternatives truth after candidate tick1, not a new normative policy target"
+    }
+  },
+  "earned_families_TRAIN_only": [
+    "legality",
+    "transition_distance"
+  ],
+  "first_sufficient_prefix_family_TRAIN": "transition_distance",
+  "rung_order": [
+    "legality",
+    "immediate_goal",
+    "argument_goal",
+    "preconditions",
+    "effects_goal",
+    "obligations",
+    "transition_distance"
+  ],
+  "seconds": 26.115574900002684,
+  "identity_control": "opaque argument tuples distinguish candidates by construction; excluded from semantic sufficiency claims",
+  "critical_caveat": "Unique descriptors are not a choice rule. Counterfactual remaining-distance computation is expensive gold planning, not observable cheap supervision.",
+  "evaluation_opened": false
+}

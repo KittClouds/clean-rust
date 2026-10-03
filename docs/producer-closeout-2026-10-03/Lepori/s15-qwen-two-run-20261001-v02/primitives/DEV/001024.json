@@ -1,0 +1,51 @@
+{
+  "sha256": "d4b67931c46a04cb69c29b3a68fa44303c12717c0318dcf47226dfe5461b1b91",
+  "rows": 256,
+  "absent_mentions_zeroed": [
+    {
+      "row_id": "DEV:001055:0:0",
+      "entity_id": "sw_0",
+      "mention": "the aforementioned switch_q"
+    },
+    {
+      "row_id": "DEV:001078:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "DEV:001079:0:0",
+      "entity_id": "sw_0",
+      "mention": "switch_q"
+    },
+    {
+      "row_id": "DEV:001092:0:0",
+      "entity_id": "obj_1",
+      "mention": "sapphire_object"
+    },
+    {
+      "row_id": "DEV:001141:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "DEV:001153:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "DEV:001229:0:0",
+      "entity_id": "obj_1",
+      "mention": "ember_object"
+    },
+    {
+      "row_id": "DEV:001248:0:0",
+      "entity_id": "sw_2",
+      "mention": "switch_r"
+    },
+    {
+      "row_id": "DEV:001278:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    }
+  ]
+}

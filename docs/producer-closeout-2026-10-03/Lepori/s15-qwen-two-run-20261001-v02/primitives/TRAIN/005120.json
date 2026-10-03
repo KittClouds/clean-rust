@@ -1,0 +1,41 @@
+{
+  "sha256": "42b6a74c80e8ed71f0f569585ad7be127fb8457a0a93a778805f792d52729f30",
+  "rows": 256,
+  "absent_mentions_zeroed": [
+    {
+      "row_id": "TRAIN:005124:0:0",
+      "entity_id": "loc_0",
+      "mention": "chamber_a"
+    },
+    {
+      "row_id": "TRAIN:005129:0:0",
+      "entity_id": "sw_1",
+      "mention": "SWITCH_Q"
+    },
+    {
+      "row_id": "TRAIN:005179:0:1",
+      "entity_id": "loc_0",
+      "mention": "hall_south"
+    },
+    {
+      "row_id": "TRAIN:005244:0:0",
+      "entity_id": "sw_1",
+      "mention": "switch_q"
+    },
+    {
+      "row_id": "TRAIN:005274:0:0",
+      "entity_id": "obj_2",
+      "mention": "ivory_object"
+    },
+    {
+      "row_id": "TRAIN:005285:0:0",
+      "entity_id": "sw_1",
+      "mention": "the aforementioned switch_p"
+    },
+    {
+      "row_id": "TRAIN:005318:0:0",
+      "entity_id": "obj_0",
+      "mention": "the aforementioned jade_object"
+    }
+  ]
+}

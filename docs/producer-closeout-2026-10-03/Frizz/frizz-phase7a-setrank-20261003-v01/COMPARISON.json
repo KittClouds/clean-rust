@@ -1,0 +1,231 @@
+{
+  "estimand": "SetRank minus matched pointwise control, seed 0, epoch 12, DEV, canonical roots",
+  "bootstrap": {
+    "selected_top1": {
+      "roots": 333,
+      "a_mean": 0.10510510510510511,
+      "b_mean": 0.08408408408408409,
+      "delta": 0.02102102102102102,
+      "ci95": [
+        -0.006006006006006009,
+        0.04804804804804805
+      ],
+      "fraction_resamples_positive": 0.9285,
+      "repetitions": 2000,
+      "seed": 20261003
+    },
+    "selected_MRR": {
+      "roots": 333,
+      "a_mean": 0.24895371692171236,
+      "b_mean": 0.23846672786338194,
+      "delta": 0.010486989058330426,
+      "ci95": [
+        -0.009531250770704389,
+        0.030515249404082973
+      ],
+      "fraction_resamples_positive": 0.8485,
+      "repetitions": 2000,
+      "seed": 20261003
+    },
+    "gold_type_top1": {
+      "roots": 333,
+      "a_mean": 0.15915915915915915,
+      "b_mean": 0.12312312312312312,
+      "delta": 0.03603603603603603,
+      "ci95": [
+        0.003003003003002991,
+        0.06906906906906908
+      ],
+      "fraction_resamples_positive": 0.976,
+      "repetitions": 2000,
+      "seed": 20261003
+    },
+    "gold_type_MRR": {
+      "roots": 333,
+      "a_mean": 0.34313279072063285,
+      "b_mean": 0.3235197441020348,
+      "delta": 0.01961304661859803,
+      "ci95": [
+        -0.00403919757718599,
+        0.042541260326242024
+      ],
+      "fraction_resamples_positive": 0.951,
+      "repetitions": 2000,
+      "seed": 20261003
+    },
+    "optimal_top1": {
+      "roots": 333,
+      "a_mean": 0.10510510510510511,
+      "b_mean": 0.08408408408408409,
+      "delta": 0.02102102102102102,
+      "ci95": [
+        -0.006006006006006009,
+        0.04804804804804805
+      ],
+      "fraction_resamples_positive": 0.9285,
+      "repetitions": 2000,
+      "seed": 20261003
+    },
+    "optimal_top1_gold_type": {
+      "roots": 333,
+      "a_mean": 0.15915915915915915,
+      "b_mean": 0.12312312312312312,
+      "delta": 0.03603603603603603,
+      "ci95": [
+        0.003003003003002991,
+        0.06906906906906908
+      ],
+      "fraction_resamples_positive": 0.976,
+      "repetitions": 2000,
+      "seed": 20261003
+    },
+    "same_type_pair_accuracy_root_mean": {
+      "roots": 332,
+      "a_mean": 0.5275854093123631,
+      "b_mean": 0.5222444013883192,
+      "delta": 0.005341007924043906,
+      "ci95": [
+        -0.01931169123097083,
+        0.030742491883820368
+      ],
+      "fraction_resamples_positive": 0.661,
+      "repetitions": 2000,
+      "seed": 20261003
+    },
+    "legality_exact_set_all_3000_roots": {
+      "roots": 3000,
+      "a_mean": 0.05533333333333333,
+      "b_mean": 0.05633333333333333,
+      "delta": -0.0010000000000000009,
+      "ci95": [
+        -0.002333333333333333,
+        0.0
+      ],
+      "fraction_resamples_positive": 0.0,
+      "repetitions": 2000,
+      "seed": 20261003
+    },
+    "legality_exact_set_eligible_333_roots": {
+      "roots": 333,
+      "a_mean": 0.0,
+      "b_mean": 0.0,
+      "delta": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ],
+      "fraction_resamples_positive": 0.0,
+      "repetitions": 2000,
+      "seed": 20261003
+    }
+  },
+  "candidate_count_bands": {
+    "1-28": {
+      "eligible_roots": 17,
+      "root_supported": false,
+      "unrestricted_top1": {
+        "set": 0.1764705926179886,
+        "pointwise": 0.05882352963089943,
+        "delta": 0.11764706671237946
+      },
+      "unrestricted_mrr": {
+        "set": 0.28472772240638733,
+        "pointwise": 0.2278377264738083,
+        "delta": 0.05688999593257904
+      },
+      "gold_type_top1": {
+        "set": 0.23529411852359772,
+        "pointwise": 0.05882352963089943,
+        "delta": 0.1764705926179886
+      },
+      "gold_type_mrr": {
+        "set": 0.36654993891716003,
+        "pointwise": 0.28296199440956116,
+        "delta": 0.08358794450759888
+      }
+    },
+    "29-64": {
+      "eligible_roots": 187,
+      "root_supported": false,
+      "unrestricted_top1": {
+        "set": 0.12299465388059616,
+        "pointwise": 0.09090909361839294,
+        "delta": 0.03208556026220322
+      },
+      "unrestricted_mrr": {
+        "set": 0.2748541533946991,
+        "pointwise": 0.25603610277175903,
+        "delta": 0.018818050622940063
+      },
+      "gold_type_top1": {
+        "set": 0.16042780876159668,
+        "pointwise": 0.12299465388059616,
+        "delta": 0.03743315488100052
+      },
+      "gold_type_mrr": {
+        "set": 0.3554566204547882,
+        "pointwise": 0.33346694707870483,
+        "delta": 0.021989673376083374
+      }
+    },
+    "65-128": {
+      "eligible_roots": 128,
+      "root_supported": false,
+      "unrestricted_top1": {
+        "set": 0.0703125,
+        "pointwise": 0.078125,
+        "delta": -0.0078125
+      },
+      "unrestricted_mrr": {
+        "set": 0.20813870429992676,
+        "pointwise": 0.21577316522598267,
+        "delta": -0.007634460926055908
+      },
+      "gold_type_top1": {
+        "set": 0.1484375,
+        "pointwise": 0.1328125,
+        "delta": 0.015625
+      },
+      "gold_type_mrr": {
+        "set": 0.3235829770565033,
+        "pointwise": 0.3142973780632019,
+        "delta": 0.009285598993301392
+      }
+    },
+    "129-171": {
+      "eligible_roots": 1,
+      "root_supported": false,
+      "unrestricted_top1": {
+        "set": 0.0,
+        "pointwise": 0.0,
+        "delta": 0.0
+      },
+      "unrestricted_mrr": {
+        "set": 0.021739130839705467,
+        "pointwise": 0.03846153989434242,
+        "delta": -0.016722409054636955
+      },
+      "gold_type_top1": {
+        "set": 0.0,
+        "pointwise": 0.0,
+        "delta": 0.0
+      },
+      "gold_type_mrr": {
+        "set": 0.1428571492433548,
+        "pointwise": 0.3333333432674408,
+        "delta": -0.190476194024086
+      }
+    }
+  },
+  "denominators": {
+    "DEV_roots": 3000,
+    "DEV_eligible_roots": 333,
+    "same_type_pairs": 3180,
+    "roots_with_same_type_alternative": 332
+  },
+  "context": {
+    "uniform_top1_unrestricted": 0.018880337476730347,
+    "uniform_top1_gold_type_full_N_convention": 0.018880337476730347
+  },
+  "disposition_rule_output": "FLAT_OR_NEGATIVE"
+}

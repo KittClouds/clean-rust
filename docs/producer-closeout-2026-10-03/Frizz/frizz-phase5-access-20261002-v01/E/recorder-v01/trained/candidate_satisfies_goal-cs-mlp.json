@@ -1,0 +1,20 @@
+{
+  "target": "candidate_satisfies_goal",
+  "surface": "cs",
+  "family": "mlp",
+  "epochs": 4,
+  "batch_unit": "64 canonical worlds, not candidates",
+  "steps": 752,
+  "training_worlds": 12000,
+  "seconds": 5.198956100008218,
+  "metric": {
+    "n": 176168,
+    "positive": 1053,
+    "negative": 175115,
+    "balanced_accuracy": 0.7320775985717773,
+    "accuracy": 0.7929533123970032
+  },
+  "control": false,
+  "probe_sha256": "49aa8f35d5e74169f32b5305ee0f986c5d9f1920d56612027e3a76dcf32ccee5",
+  "parameters": 20609
+}

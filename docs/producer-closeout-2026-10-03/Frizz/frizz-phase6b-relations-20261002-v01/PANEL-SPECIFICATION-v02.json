@@ -1,0 +1,21 @@
+{
+  "status": "FIXED_BEFORE_DIAGNOSTIC_DEV_SCORING",
+  "earned_factors": [
+    "legality",
+    "transition_distance"
+  ],
+  "sources": {
+    "common.py": "2472cbda21aab6014832172291ce4391405893cd30f49e453a26a5bc8b3869a8",
+    "targets.py": "4f8d9940bcfb099619a084a580b2b86c3f207e476166d6d74ee62caad5998d0c",
+    "probes.py": "ada099c4923890234fbb5784ba423d7814bb0d2f0bda366230b02ef30ff60bfb",
+    "panel.py": "68c5d5dffe51c1a16a91252cd6242f47b4fd296c6697768c217bba1def8f913c",
+    "resume_panel.py": "68dcf77ec23eafaca08d2c5d77cf01caf56bbdd6df296e96b014d4fdb6b6b89b"
+  },
+  "gold_receipt_sha256": "f50cefd119d96c59dbc192871b9c6d9687dc5355d6d7ae78855142754707f0b7",
+  "epochs": 4,
+  "seed": 0,
+  "hidden": 64,
+  "batch_roots": 64,
+  "evaluation_opened": false,
+  "engineering_repair": "hash-preserve completed fits; resume missing fits after CUDA illegal access; no dose/labels/features/endpoint change"
+}

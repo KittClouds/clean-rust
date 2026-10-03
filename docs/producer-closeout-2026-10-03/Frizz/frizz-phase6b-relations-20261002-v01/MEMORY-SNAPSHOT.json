@@ -1,0 +1,9 @@
+{
+  "process_id": 32304,
+  "stage": "matched CPU panel through bridge trained arms",
+  "working_set_bytes": 1203306496,
+  "observed_process_peak_working_set_bytes": 1262247936,
+  "private_memory_bytes": 3308670976,
+  "scope": "Windows process counters at an intermediate observation; not a final whole-flight maximum or allocation profile",
+  "evaluation_opened": false
+}

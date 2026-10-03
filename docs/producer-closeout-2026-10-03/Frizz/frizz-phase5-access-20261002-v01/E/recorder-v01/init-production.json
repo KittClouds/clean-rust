@@ -1,0 +1,27 @@
+{
+  "checkpoint_sha256": "c6cc3ba1ff36fdd14647218e563ba52a0231ba1a95c5212065f8c2b25037926f",
+  "output_sha256": "b6da14b089fdff76cc49e1c5e0de2787d4489a32aebaaabba3edc7eac3596f77",
+  "candidate_identity": {
+    "status": "PASS",
+    "root_count": 8,
+    "operation": "candidate permutation and inverse",
+    "candidate_ids": "join-only, never learned ID embedding"
+  },
+  "renderer_robustness": {
+    "candidate_legal": {
+      "candidate_slots": 176168,
+      "root_count": 3000,
+      "fraction": 0.09086780995130539
+    },
+    "candidate_satisfies_goal": {
+      "candidate_slots": 176168,
+      "root_count": 3000,
+      "fraction": 0.24891580641269684
+    },
+    "eligible_action": {
+      "root_count": 333,
+      "fraction": 0.5345345139503479
+    }
+  },
+  "common_adapter_plus_graft_seconds_per_root": 0.00042468413333214506
+}

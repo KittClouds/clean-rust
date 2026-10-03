@@ -1,0 +1,51 @@
+{
+  "sha256": "9a3faed80e16d7f396fa9f617e1d3e32f712341bfd4e9ec9ab87fd91061a40c8",
+  "rows": 256,
+  "absent_mentions_zeroed": [
+    {
+      "row_id": "TRAIN:014849:0:1",
+      "entity_id": "obj_2",
+      "mention": "ember_object"
+    },
+    {
+      "row_id": "TRAIN:014851:0:1",
+      "entity_id": "sw_2",
+      "mention": "switch_p"
+    },
+    {
+      "row_id": "TRAIN:014873:0:1",
+      "entity_id": "sw_0",
+      "mention": "switch_r"
+    },
+    {
+      "row_id": "TRAIN:014942:0:0",
+      "entity_id": "obj_0",
+      "mention": "sapphire_object"
+    },
+    {
+      "row_id": "TRAIN:014966:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:014968:0:0",
+      "entity_id": "loc_2",
+      "mention": "the aforementioned vault_2"
+    },
+    {
+      "row_id": "TRAIN:014983:0:0",
+      "entity_id": "obj_2",
+      "mention": "sapphire_object"
+    },
+    {
+      "row_id": "TRAIN:015018:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:015047:0:0",
+      "entity_id": "obj_0",
+      "mention": "sapphire_object"
+    }
+  ]
+}

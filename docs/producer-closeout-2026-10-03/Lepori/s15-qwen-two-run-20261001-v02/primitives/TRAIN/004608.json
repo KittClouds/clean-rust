@@ -1,0 +1,36 @@
+{
+  "sha256": "687c17737807419a111414dbafc81d17e7e979c83036f7461730ff69ba249e4c",
+  "rows": 256,
+  "absent_mentions_zeroed": [
+    {
+      "row_id": "TRAIN:004618:0:0",
+      "entity_id": "sw_0",
+      "mention": "switch_r"
+    },
+    {
+      "row_id": "TRAIN:004636:0:0",
+      "entity_id": "obj_2",
+      "mention": "ember_object"
+    },
+    {
+      "row_id": "TRAIN:004686:0:0",
+      "entity_id": "loc_4",
+      "mention": "hall south"
+    },
+    {
+      "row_id": "TRAIN:004712:0:0",
+      "entity_id": "sw_0",
+      "mention": "switch_q"
+    },
+    {
+      "row_id": "TRAIN:004715:0:0",
+      "entity_id": "obj_1",
+      "mention": "ember_object"
+    },
+    {
+      "row_id": "TRAIN:004745:0:0",
+      "entity_id": "obj_1",
+      "mention": "jade_object"
+    }
+  ]
+}

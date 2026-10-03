@@ -1,0 +1,48 @@
+{
+  "chance": {
+    "within_type_uniform_top1": 0.11401821672916412,
+    "within_type_uniform_MRR": 0.3095524311065674,
+    "unrestricted_uniform_top1": 0.018880337476730347,
+    "trivial_all_illegal_root_fraction": 0.055666666477918625,
+    "mean_same_type_candidates_per_eligible_root": 10.549549102783203
+  },
+  "sealed_independent_scorer_reference_phase6a": {
+    "E:trained:c:linear": {
+      "top1": 0.08708708733320236,
+      "MRR": 0.24142737686634064,
+      "gold_type_top1": 0.12012012302875519,
+      "gold_type_MRR": 0.31612101197242737
+    },
+    "E:trained:c:mlp": {
+      "top1": 0.07207207381725311,
+      "MRR": 0.22634470462799072,
+      "gold_type_top1": 0.10510510206222534,
+      "gold_type_MRR": 0.30259403586387634
+    },
+    "E:trained:cs:linear": {
+      "top1": 0.08708708733320236,
+      "MRR": 0.24300971627235413,
+      "gold_type_top1": 0.12012012302875519,
+      "gold_type_MRR": 0.31816500425338745
+    },
+    "E:trained:cs:mlp": {
+      "top1": 0.06606606394052505,
+      "MRR": 0.20895041525363922,
+      "gold_type_top1": 0.10510510206222534,
+      "gold_type_MRR": 0.2944898307323456
+    },
+    "E:trained:e:linear": {
+      "top1": 0.09009008854627609,
+      "MRR": 0.24069558084011078,
+      "gold_type_top1": 0.15315315127372742,
+      "gold_type_MRR": 0.3391304612159729
+    },
+    "E:trained:e:mlp": {
+      "top1": 0.08708708733320236,
+      "MRR": 0.2399253249168396,
+      "gold_type_top1": 0.1501501500606537,
+      "gold_type_MRR": 0.3381003439426422
+    }
+  },
+  "reference_note": "Phase 6A TinyMLP/linear independent scalar scorers on the same frozen trained-E states, same 333 DEV roots"
+}

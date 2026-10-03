@@ -1,0 +1,41 @@
+{
+  "sha256": "edb292b77e555df3c23962c0236497e571b68c723bd5ee588d4e8e699636fd07",
+  "rows": 256,
+  "absent_mentions_zeroed": [
+    {
+      "row_id": "TRAIN:009744:0:0",
+      "entity_id": "sw_1",
+      "mention": "switch_q"
+    },
+    {
+      "row_id": "TRAIN:009823:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:009876:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:009930:0:0",
+      "entity_id": "sw_2",
+      "mention": "switch_q"
+    },
+    {
+      "row_id": "TRAIN:009947:0:0",
+      "entity_id": "obj_1",
+      "mention": "the aforementioned coral_object"
+    },
+    {
+      "row_id": "TRAIN:009950:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:009957:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    }
+  ]
+}

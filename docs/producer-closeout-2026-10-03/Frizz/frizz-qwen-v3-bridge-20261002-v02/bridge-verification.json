@@ -1,0 +1,191 @@
+{
+  "status": "PASS",
+  "fixed_epoch": 8,
+  "checkpoint_sha256": "6d84a5e36a4fa9e6162aba95167513c0594a5c5ceccd5757843363482a3d7cc4",
+  "replay": "fresh process; same authored evaluation code, not independent semantic engine",
+  "positive_controls": 8,
+  "readout_deltas": {
+    "trained-candidate_legal-c-linear": {
+      "metric": "balanced_accuracy",
+      "init": 0.7968901693820953,
+      "trained": 0.8046554327011108,
+      "delta": 0.007765263319015503
+    },
+    "trained-candidate_legal-c-mlp": {
+      "metric": "balanced_accuracy",
+      "init": 0.8042452931404114,
+      "trained": 0.8048210740089417,
+      "delta": 0.0005757808685302734
+    },
+    "trained-candidate_legal-cs-linear": {
+      "metric": "balanced_accuracy",
+      "init": 0.7960165441036224,
+      "trained": 0.8047179281711578,
+      "delta": 0.0087013840675354
+    },
+    "trained-candidate_legal-cs-mlp": {
+      "metric": "balanced_accuracy",
+      "init": 0.804390549659729,
+      "trained": 0.8064868152141571,
+      "delta": 0.0020962655544281006
+    },
+    "trained-candidate_legal-e-linear": {
+      "metric": "balanced_accuracy",
+      "init": 0.7252258956432343,
+      "trained": 0.8037605881690979,
+      "delta": 0.07853469252586365
+    },
+    "trained-candidate_legal-e-mlp": {
+      "metric": "balanced_accuracy",
+      "init": 0.7548989951610565,
+      "trained": 0.80356764793396,
+      "delta": 0.04866865277290344
+    },
+    "trained-candidate_satisfies_goal-c-linear": {
+      "metric": "balanced_accuracy",
+      "init": 0.7039872705936432,
+      "trained": 0.7195338904857635,
+      "delta": 0.015546619892120361
+    },
+    "trained-candidate_satisfies_goal-c-mlp": {
+      "metric": "balanced_accuracy",
+      "init": 0.7076942026615143,
+      "trained": 0.721941739320755,
+      "delta": 0.014247536659240723
+    },
+    "trained-candidate_satisfies_goal-cs-linear": {
+      "metric": "balanced_accuracy",
+      "init": 0.7015887498855591,
+      "trained": 0.7530212104320526,
+      "delta": 0.05143246054649353
+    },
+    "trained-candidate_satisfies_goal-cs-mlp": {
+      "metric": "balanced_accuracy",
+      "init": 0.7289857864379883,
+      "trained": 0.746757984161377,
+      "delta": 0.017772197723388672
+    },
+    "trained-candidate_satisfies_goal-e-linear": {
+      "metric": "balanced_accuracy",
+      "init": 0.6750233471393585,
+      "trained": 0.748686283826828,
+      "delta": 0.07366293668746948
+    },
+    "trained-candidate_satisfies_goal-e-mlp": {
+      "metric": "balanced_accuracy",
+      "init": 0.6748187839984894,
+      "trained": 0.7481466829776764,
+      "delta": 0.07332789897918701
+    },
+    "trained-CONTROL-candidate_legal-linear": {
+      "metric": "balanced_accuracy",
+      "init": 1.0,
+      "trained": 1.0,
+      "delta": 0.0
+    },
+    "trained-CONTROL-candidate_legal-mlp": {
+      "metric": "balanced_accuracy",
+      "init": 1.0,
+      "trained": 1.0,
+      "delta": 0.0
+    },
+    "trained-CONTROL-solvable-linear": {
+      "metric": "balanced_accuracy",
+      "init": 1.0,
+      "trained": 1.0,
+      "delta": 0.0
+    },
+    "trained-CONTROL-solvable-mlp": {
+      "metric": "balanced_accuracy",
+      "init": 1.0,
+      "trained": 1.0,
+      "delta": 0.0
+    },
+    "trained-disposition-s-linear": {
+      "metric": "accuracy",
+      "init": 0.6106666922569275,
+      "trained": 0.8116666674613953,
+      "delta": 0.20099997520446777
+    },
+    "trained-disposition-s-mlp": {
+      "metric": "accuracy",
+      "init": 0.6356666684150696,
+      "trained": 0.8100000023841858,
+      "delta": 0.1743333339691162
+    },
+    "trained-first_action_type-s-linear": {
+      "metric": "accuracy",
+      "init": 0.7357357144355774,
+      "trained": 0.7147147059440613,
+      "delta": -0.021021008491516113
+    },
+    "trained-first_action_type-s-mlp": {
+      "metric": "accuracy",
+      "init": 0.7477477192878723,
+      "trained": 0.7147147059440613,
+      "delta": -0.033033013343811035
+    },
+    "trained-goal_satisfied-s-linear": {
+      "metric": "balanced_accuracy",
+      "init": 0.7447121143341064,
+      "trained": 0.7444056570529938,
+      "delta": -0.0003064572811126709
+    },
+    "trained-goal_satisfied-s-mlp": {
+      "metric": "balanced_accuracy",
+      "init": 0.7649896144866943,
+      "trained": 0.7299777418375015,
+      "delta": -0.03501187264919281
+    },
+    "trained-missing_cardinality-s-linear": {
+      "metric": "accuracy",
+      "init": 0.7540000081062317,
+      "trained": 0.8726666569709778,
+      "delta": 0.1186666488647461
+    },
+    "trained-missing_cardinality-s-mlp": {
+      "metric": "accuracy",
+      "init": 0.7836666703224182,
+      "trained": 0.8759999871253967,
+      "delta": 0.09233331680297852
+    },
+    "trained-reason-s-linear": {
+      "metric": "accuracy",
+      "init": 0.3596666753292084,
+      "trained": 0.768666684627533,
+      "delta": 0.4090000092983246
+    },
+    "trained-reason-s-mlp": {
+      "metric": "accuracy",
+      "init": 0.4183333218097687,
+      "trained": 0.7773333191871643,
+      "delta": 0.35899999737739563
+    },
+    "trained-requestability-s-linear": {
+      "metric": "accuracy",
+      "init": 0.7723333239555359,
+      "trained": 0.8816666603088379,
+      "delta": 0.109333336353302
+    },
+    "trained-requestability-s-mlp": {
+      "metric": "accuracy",
+      "init": 0.7786666750907898,
+      "trained": 0.8830000162124634,
+      "delta": 0.10433334112167358
+    },
+    "trained-solvable-s-linear": {
+      "metric": "balanced_accuracy",
+      "init": 0.7498514354228973,
+      "trained": 0.971169114112854,
+      "delta": 0.22131767868995667
+    },
+    "trained-solvable-s-mlp": {
+      "metric": "balanced_accuracy",
+      "init": 0.81380495429039,
+      "trained": 0.9687635600566864,
+      "delta": 0.1549586057662964
+    }
+  },
+  "evaluation_opened": false,
+  "E_started": false
+}

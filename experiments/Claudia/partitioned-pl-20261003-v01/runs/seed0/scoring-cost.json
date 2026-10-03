@@ -1,0 +1,21 @@
+{
+  "cpu_scoring_seconds": {
+    "ce-epoch00-TRAIN": 0.2502251999685541,
+    "ce-epoch00-DEV": 0.06279860000358894,
+    "ce-epoch12-TRAIN": 0.2225514999590814,
+    "ce-epoch12-DEV": 0.05734279996249825,
+    "vanilla_pl-epoch00-TRAIN": 0.2303152999957092,
+    "vanilla_pl-epoch00-DEV": 0.06475209997734055,
+    "vanilla_pl-epoch12-TRAIN": 0.23507120000431314,
+    "vanilla_pl-epoch12-DEV": 0.059745099977590144,
+    "partitioned_pl-epoch00-TRAIN": 0.2474750999826938,
+    "partitioned_pl-epoch00-DEV": 0.06198280001990497,
+    "partitioned_pl-epoch12-TRAIN": 0.25291129999095574,
+    "partitioned_pl-epoch12-DEV": 0.06333979999180883,
+    "vanilla_pl_truncated-epoch00-TRAIN": 0.22578050004085526,
+    "vanilla_pl_truncated-epoch00-DEV": 0.06223599996883422,
+    "vanilla_pl_truncated-epoch12-TRAIN": 0.23573740001302212,
+    "vanilla_pl_truncated-epoch12-DEV": 0.061528899997938424
+  },
+  "threads": 4
+}

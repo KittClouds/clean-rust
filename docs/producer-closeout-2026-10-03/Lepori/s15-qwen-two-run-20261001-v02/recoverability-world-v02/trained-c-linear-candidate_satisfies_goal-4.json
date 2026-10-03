@@ -1,0 +1,46 @@
+{
+  "final_epoch": {
+    "balanced_accuracy": 0.5703450441360474,
+    "accuracy": 0.5756164789199829,
+    "support_positive": 10083,
+    "support_negative": 21061,
+    "train_prevalence": 0.33605125546455383,
+    "beats_declared_base_rate_margin": false
+  },
+  "best_train_loss_secondary": {
+    "balanced_accuracy": 0.5714363306760788,
+    "accuracy": 0.5987670421600342,
+    "support_positive": 10083,
+    "support_negative": 21061,
+    "train_prevalence": 0.33605125546455383,
+    "beats_declared_base_rate_margin": false
+  },
+  "history": [
+    {
+      "epoch": 1,
+      "fixed_train_subsample_loss": 0.6710639571565465
+    },
+    {
+      "epoch": 2,
+      "fixed_train_subsample_loss": 0.6708635080683353
+    },
+    {
+      "epoch": 3,
+      "fixed_train_subsample_loss": 0.6681634151539507
+    },
+    {
+      "epoch": 4,
+      "fixed_train_subsample_loss": 0.6684967940374401
+    }
+  ],
+  "best_train_epoch": 3,
+  "epochs": 4,
+  "optimizer_steps": 1248,
+  "batch_size": 64,
+  "batch_unit": "WORLDS",
+  "drop_last": true,
+  "cached_dtype": "FP16",
+  "selection_on_dev": false,
+  "final_readout_sha256": "8c87f26f2cd72f03ba46b9da01f4960bd0fab00f3aeb1805c5974d53d77b262e",
+  "best_train_readout_sha256": "86d4091293d584bda52637d7885f5b34bb5024024562672c2810578d55438dcc"
+}

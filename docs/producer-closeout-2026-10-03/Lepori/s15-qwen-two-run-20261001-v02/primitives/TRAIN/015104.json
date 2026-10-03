@@ -1,0 +1,51 @@
+{
+  "sha256": "7e986b3b3bc8dfff0d6a2e7db340ac78fb59d79486b2f090b1bb1cce408b43d1",
+  "rows": 256,
+  "absent_mentions_zeroed": [
+    {
+      "row_id": "TRAIN:015112:0:1",
+      "entity_id": "obj_1",
+      "mention": "sapphire_object"
+    },
+    {
+      "row_id": "TRAIN:015135:0:1",
+      "entity_id": "obj_2",
+      "mention": "ivory_object"
+    },
+    {
+      "row_id": "TRAIN:015142:0:0",
+      "entity_id": "obj_2",
+      "mention": "jade_object"
+    },
+    {
+      "row_id": "TRAIN:015178:0:0",
+      "entity_id": "sw_0",
+      "mention": "the aforementioned switch_r"
+    },
+    {
+      "row_id": "TRAIN:015180:0:0",
+      "entity_id": "sw_2",
+      "mention": "switch_q"
+    },
+    {
+      "row_id": "TRAIN:015271:0:0",
+      "entity_id": "ag_0",
+      "mention": "the aforementioned agent"
+    },
+    {
+      "row_id": "TRAIN:015286:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:015306:0:0",
+      "entity_id": "obj_0",
+      "mention": "ivory_object"
+    },
+    {
+      "row_id": "TRAIN:015340:0:0",
+      "entity_id": "obj_1",
+      "mention": "jade_object"
+    }
+  ]
+}

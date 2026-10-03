@@ -1,0 +1,46 @@
+{
+  "sha256": "ad1a00fca76b70e3df660e5371889753891da696d9789761fda14c75f7cb9df6",
+  "rows": 256,
+  "absent_mentions_zeroed": [
+    {
+      "row_id": "TRAIN:001555:0:0",
+      "entity_id": "sw_0",
+      "mention": "switch_r"
+    },
+    {
+      "row_id": "TRAIN:001592:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:001646:0:0",
+      "entity_id": "obj_1",
+      "mention": "coral_object"
+    },
+    {
+      "row_id": "TRAIN:001652:0:0",
+      "entity_id": "obj_1",
+      "mention": "ember_object"
+    },
+    {
+      "row_id": "TRAIN:001653:0:0",
+      "entity_id": "obj_1",
+      "mention": "ivory_object"
+    },
+    {
+      "row_id": "TRAIN:001679:0:0",
+      "entity_id": "obj_1",
+      "mention": "basalt_object"
+    },
+    {
+      "row_id": "TRAIN:001707:0:0",
+      "entity_id": "obj_1",
+      "mention": "topaz_object"
+    },
+    {
+      "row_id": "TRAIN:001785:0:0",
+      "entity_id": "sw_2",
+      "mention": "switch_r"
+    }
+  ]
+}

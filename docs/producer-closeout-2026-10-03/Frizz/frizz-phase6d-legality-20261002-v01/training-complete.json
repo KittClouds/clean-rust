@@ -1,0 +1,11 @@
+{
+  "device": "CPU FP32 four threads",
+  "evaluation_opened": false,
+  "fit_seconds": 96.22165570000652,
+  "fixed_epoch": 8,
+  "frozen_consequence_sha256": "b1a45cc95b22bf619ce4bdb2b585935ea633e17ff36ef38ff9a1d0f160fd2341",
+  "only_trainable_scientific_target": "candidate_legal",
+  "optimizer_steps": 672,
+  "parameters": 101615,
+  "status": "PASS"
+}

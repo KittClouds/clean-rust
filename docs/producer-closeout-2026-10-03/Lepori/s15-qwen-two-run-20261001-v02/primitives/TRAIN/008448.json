@@ -1,0 +1,71 @@
+{
+  "sha256": "0e14c931e146ebcb4e6985a5c7e2e33b46ced3af67afd31fab79b097f2d48595",
+  "rows": 256,
+  "absent_mentions_zeroed": [
+    {
+      "row_id": "TRAIN:008452:0:1",
+      "entity_id": "sw_2",
+      "mention": "switch_q"
+    },
+    {
+      "row_id": "TRAIN:008458:0:1",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:008466:0:0",
+      "entity_id": "sw_0",
+      "mention": "switch_q"
+    },
+    {
+      "row_id": "TRAIN:008472:0:0",
+      "entity_id": "obj_1",
+      "mention": "onyx_object"
+    },
+    {
+      "row_id": "TRAIN:008507:0:0",
+      "entity_id": "obj_1",
+      "mention": "ivory_object"
+    },
+    {
+      "row_id": "TRAIN:008543:0:0",
+      "entity_id": "obj_1",
+      "mention": "sapphire_object"
+    },
+    {
+      "row_id": "TRAIN:008557:0:0",
+      "entity_id": "sw_2",
+      "mention": "switch_r"
+    },
+    {
+      "row_id": "TRAIN:008603:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:008614:0:0",
+      "entity_id": "obj_1",
+      "mention": "basalt_object"
+    },
+    {
+      "row_id": "TRAIN:008618:0:0",
+      "entity_id": "ag_0",
+      "mention": "the aforementioned agent"
+    },
+    {
+      "row_id": "TRAIN:008634:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:008650:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:008698:0:0",
+      "entity_id": "sw_1",
+      "mention": "switch_r"
+    }
+  ]
+}

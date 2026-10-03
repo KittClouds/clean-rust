@@ -1,0 +1,32 @@
+{
+  "source_files": {
+    "C:\\code land\\clean-rust\\experiments\\s15-lepori-qwen-two-run\\common.py": "00cb19d260d76d6edf905a5d58c5e245b1857f108ef1787263b165e9e0e68b89",
+    "C:\\code land\\clean-rust\\experiments\\s15-lepori-qwen-two-run\\dataset.py": "cb55f244dfc6e52e338adb55f207d19b8c6362f246a9f390bbf785ff138b1e77",
+    "C:\\code land\\clean-rust\\experiments\\s15-lepori-qwen-two-run\\diagnostics.py": "0270b4ea30b9ebd27d62469042922c025356465c461f0f1a575be0bb272822e0",
+    "C:\\code land\\clean-rust\\experiments\\s15-lepori-qwen-two-run\\prepare.py": "1fa0677cd38a900a65fc47ce0d0d876b271fe74c375f8cdd624e50e9bb10deb4",
+    "C:\\code land\\clean-rust\\experiments\\s15-lepori-qwen-two-run\\test_trial.py": "8e2c9e3d9cda385f6fc7ec60c430b01eec5b066d60b84c16cdd7d5fe688ed15f",
+    "C:\\code land\\clean-rust\\experiments\\s15-lepori-qwen-two-run\\train.py": "86942ad2c5b0b58180219d10b49a7cf238ca11653218fa895c36239ec347df36",
+    "C:\\code land\\clean-rust\\experiments\\s15-lepori-qwen-two-run\\verify_dataset.py": "1e0331b25cc0565ef89ea7c24e66963699a225c93feacd38c8a9f61ed37a408c",
+    "C:\\code land\\clean-rust\\experiments\\s15-lepori-minicpm-causal\\src\\graft.py": "d681a36e7703de94742a3e1bacb3c85f22dac063c2893eba4fc769027b36bf93",
+    "C:\\code land\\clean-rust\\experiments\\s15-lepori-minicpm-causal\\src\\ontology.py": "e3fcbadd5ec948c1d17bdc51913b92eac75e240b4b6632651de7eb9df0607552",
+    "C:\\code land\\clean-rust\\experiments\\s15-lepori-minicpm-causal\\src\\objective.py": "679f5cdf0d5ec3362038677e41d2f4b18d972c771e60caec54d41987dc69f23b",
+    "C:\\code land\\clean-rust\\experiments\\s15-lepori-minicpm-causal\\src\\data.py": "ee132ccb7374ca39f32bb41c71f9bccae80a3ef43237e226e57c0b9769f7892c"
+  },
+  "datasets": {
+    "TRAIN": "a36f9ed6f1734d40c91124851097cf5092bd3e324081728e5de7250a99bd42e6",
+    "DEV": "0cf9fd34df4a72a2da363e24a27dec8e329838de1005db22dca62921edac8f44"
+  },
+  "revision": "dc7cdfe2ee4154fa7e30f5b51ca41bfa40174e68",
+  "prevalences": {
+    "solvable": 0.43309998512268066,
+    "goal_satisfied": 0.36294999718666077,
+    "missing_information_present": 0.15964999794960022,
+    "contradiction_present": 0.07909999787807465,
+    "number_or_structure_of_missing_requirements": 0.15964999794960022,
+    "candidate_legal": 0.34856510162353516,
+    "candidate_applicable": 0.34856510162353516,
+    "candidate_has_unmet_requirements": 0.6514349579811096,
+    "candidate_satisfies_goal": 0.33605125546455383
+  },
+  "graft_training_budget": 2
+}

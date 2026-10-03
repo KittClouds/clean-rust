@@ -1,0 +1,92 @@
+{
+  "status": "PASS",
+  "protected_or_eval_files_opened": false,
+  "phase6b": {
+    "seal_sha256": "7f274c53b7cb5ab6edeaedcae20044c8380d61bcbea28a3157dd272de914ff01",
+    "artifacts_verified": 530,
+    "disposition": "BOUNDED_FROZEN_SURFACE_ACCESSIBILITY_LIMIT_NO_NEW_ORGAN",
+    "evaluation_opened": false
+  },
+  "consumed": {
+    "E-trained-TRAIN.pt": {
+      "path": "C:\\phoenix-target-overgraph\\frizz-phase6a-comparison-20261002-v01\\E-trained-TRAIN.pt",
+      "sha256": "d3aea5fa5cda64270f9a54d339a385f50a77221483390d54747a94539b63e1e9",
+      "bytes": 1202080069,
+      "verified_against": {
+        "phase6a_seal_v02": true,
+        "phase6b_specification_inputs": true,
+        "sidecar_receipt": true
+      }
+    },
+    "E-trained-DEV.pt": {
+      "path": "C:\\phoenix-target-overgraph\\frizz-phase6a-comparison-20261002-v01\\E-trained-DEV.pt",
+      "sha256": "acecf9b2250cb7140e6628534273f222cab37ab209d3b4af0672e61724f596b3",
+      "bytes": 300522853,
+      "verified_against": {
+        "phase6a_seal_v02": true,
+        "phase6b_specification_inputs": true,
+        "sidecar_receipt": true
+      }
+    },
+    "TRAIN-targets.pt": {
+      "path": "C:\\phoenix-target-overgraph\\frizz-phase6a-comparison-20261002-v01\\TRAIN-targets.pt",
+      "sha256": "63aeafdcb554e4e928279331eee7668efbba2f64742dfb9c39cefa96d5980ad2",
+      "bytes": 31396657,
+      "verified_against": {
+        "phase6a_seal_v02": true,
+        "sidecar_receipt": true
+      }
+    },
+    "DEV-targets.pt": {
+      "path": "C:\\phoenix-target-overgraph\\frizz-phase6a-comparison-20261002-v01\\DEV-targets.pt",
+      "sha256": "cb1f474e4e21c4cbaa5085afeb8d6c60141bccf6a577f54dbe20fce8f2cefb83",
+      "bytes": 7852489,
+      "verified_against": {
+        "phase6a_seal_v02": true,
+        "sidecar_receipt": true
+      }
+    },
+    "TRAIN-dataset.pt": {
+      "path": "C:\\phoenix-target-overgraph\\frizz-qwen-v3-bridge-20261002-v02\\TRAIN-dataset.pt",
+      "sha256": "336a550c1c8ae9576036f5f36a04408f4ff373c73cf65fc0863e33dbeeeaab6e",
+      "bytes": 1172013827,
+      "verified_against": {
+        "sidecar_receipt": true,
+        "phase6a_specification_frozen_inputs": true
+      }
+    },
+    "DEV-dataset.pt": {
+      "path": "C:\\phoenix-target-overgraph\\frizz-qwen-v3-bridge-20261002-v02\\DEV-dataset.pt",
+      "sha256": "a56d90e18f4932e570d4c87703ae940ea1033d13be6875518eb978f9ddb4ced3",
+      "bytes": 292735631,
+      "verified_against": {
+        "sidecar_receipt": true,
+        "phase6a_specification_frozen_inputs": true
+      }
+    }
+  },
+  "bank_v3_core": {
+    "release_identity": "84f0a7e13032e8cdfcecc862217bb33ca23568fade64fafeef410327eb996f12",
+    "corrected_handoff_sha256": "08cab38d366d6a30d32af4b0391cafddb243a8ea9e6a7435ad53290462d41a4b",
+    "release_manifest_sha256": "2033aabd67bce5a018a32ee7417cf2b282c8bb269419ba2458a320b59002524d",
+    "provenance_class": "SYNTHETIC_ONLY",
+    "candidate_contract": {
+      "exhaustive": true,
+      "max_count": 171,
+      "order": "lexicographic content-derived action id; exhaustive; no fixed bank cap",
+      "padding": "downstream deterministic padding; masked slots have no loss or metric"
+    },
+    "candidate_vocabulary": [
+      "MOVE",
+      "TAKE",
+      "DROP",
+      "ACTIVATE",
+      "DEACTIVATE",
+      "OPEN",
+      "CLOSE",
+      "WAIT",
+      "TRANSFER"
+    ],
+    "protected_files_opened": false
+  }
+}

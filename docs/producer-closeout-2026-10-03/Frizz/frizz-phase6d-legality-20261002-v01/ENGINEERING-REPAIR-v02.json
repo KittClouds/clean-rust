@@ -1,0 +1,11 @@
+{
+  "completed_epoch8_sha256": "4999d1b184cb32e222493718ed48977ba9aa77bd5cf4409b2c00fea6f77ded6f",
+  "failure": "ValueError: exact gate composition mismatch",
+  "model_retrained": false,
+  "original_sources_preserved": "source-v01 and workspace original",
+  "results_written_before_repair": false,
+  "root_cause": "empty_accepted_sets counted outside declared exact-set subset",
+  "scientific_changes": false,
+  "scope": "reporting counter only; new subset regression test",
+  "threshold_changed": false
+}

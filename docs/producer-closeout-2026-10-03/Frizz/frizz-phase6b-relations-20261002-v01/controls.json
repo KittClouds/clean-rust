@@ -1,0 +1,159 @@
+{
+  "status": "PASS",
+  "checks": {
+    "oracle-legality": {
+      "components": [
+        {
+          "component": 0,
+          "candidate_count": 3513,
+          "unknown_DEV_values": 0,
+          "accuracy_including_unknown_as_failure": 1.0,
+          "macro_recall": 1.0,
+          "classes": {
+            "0": {
+              "candidate_support": 2995,
+              "root_support": 332,
+              "recall": 1.0,
+              "root_supported": true
+            },
+            "1": {
+              "candidate_support": 518,
+              "root_support": 333,
+              "recall": 1.0,
+              "root_supported": true
+            }
+          }
+        },
+        {
+          "component": 1,
+          "candidate_count": 3513,
+          "unknown_DEV_values": 0,
+          "accuracy_including_unknown_as_failure": 1.0,
+          "macro_recall": 1.0,
+          "classes": {
+            "0": {
+              "candidate_support": 2995,
+              "root_support": 332,
+              "recall": 1.0,
+              "root_supported": true
+            },
+            "1": {
+              "candidate_support": 518,
+              "root_support": 333,
+              "recall": 1.0,
+              "root_supported": true
+            }
+          }
+        }
+      ],
+      "mean_component_accuracy": 1.0,
+      "mean_component_macro_recall": 1.0,
+      "eligible_roots": 333,
+      "scope": "separate factor components, not a composite capability score",
+      "unknown_candidates_excluded_from_control_only": 0
+    },
+    "oracle-transition_distance": {
+      "components": [
+        {
+          "component": 0,
+          "candidate_count": 3512,
+          "unknown_DEV_values": 0,
+          "accuracy_including_unknown_as_failure": 1.0,
+          "macro_recall": 1.0,
+          "classes": {
+            "0": {
+              "candidate_support": 93,
+              "root_support": 93,
+              "recall": 1.0,
+              "root_supported": false
+            },
+            "1": {
+              "candidate_support": 156,
+              "root_support": 155,
+              "recall": 1.0,
+              "root_supported": false
+            },
+            "2": {
+              "candidate_support": 103,
+              "root_support": 95,
+              "recall": 1.0,
+              "root_supported": false
+            },
+            "3": {
+              "candidate_support": 106,
+              "root_support": 98,
+              "recall": 1.0,
+              "root_supported": false
+            },
+            "4": {
+              "candidate_support": 27,
+              "root_support": 23,
+              "recall": 1.0,
+              "root_supported": false
+            },
+            "5": {
+              "candidate_support": 14,
+              "root_support": 11,
+              "recall": 1.0,
+              "root_supported": false
+            },
+            "6": {
+              "candidate_support": 3,
+              "root_support": 3,
+              "recall": 1.0,
+              "root_supported": false
+            },
+            "7": {
+              "candidate_support": 2,
+              "root_support": 2,
+              "recall": 1.0,
+              "root_supported": false
+            },
+            "9": {
+              "candidate_support": 13,
+              "root_support": 13,
+              "recall": 1.0,
+              "root_supported": false
+            },
+            "10": {
+              "candidate_support": 0,
+              "root_support": 0,
+              "recall": null,
+              "root_supported": false
+            },
+            "11": {
+              "candidate_support": 2995,
+              "root_support": 332,
+              "recall": 1.0,
+              "root_supported": true
+            }
+          }
+        }
+      ],
+      "mean_component_accuracy": 1.0,
+      "mean_component_macro_recall": 1.0,
+      "eligible_roots": 333,
+      "scope": "separate factor components, not a composite capability score",
+      "unknown_candidates_excluded_from_control_only": 1
+    },
+    "linear": {
+      "accuracy": 1.0,
+      "logits": [
+        -1.355404019355774,
+        -0.33885103464126587,
+        0.33885103464126587,
+        1.355404019355774
+      ]
+    },
+    "mlp": {
+      "accuracy": 1.0,
+      "logits": [
+        -11.165964126586914,
+        -3.061706781387329,
+        3.061706781387329,
+        11.165964126586914
+      ]
+    }
+  },
+  "evaluation_opened": false
+}

@@ -1,0 +1,39 @@
+{
+  "final_epoch": {
+    "balanced_accuracy": 0.5762001276016235,
+    "accuracy": 0.5848638415336609,
+    "support_positive": 10083,
+    "support_negative": 21061,
+    "train_prevalence": 0.33605125546455383,
+    "beats_declared_base_rate_margin": false
+  },
+  "best_train_loss_secondary": {
+    "balanced_accuracy": 0.5762001276016235,
+    "accuracy": 0.5848638415336609,
+    "support_positive": 10083,
+    "support_negative": 21061,
+    "train_prevalence": 0.33605125546455383,
+    "beats_declared_base_rate_margin": false
+  },
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 0.6775575736926036
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.6728613160608523
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.6708016038100728
+    },
+    {
+      "epoch": 4,
+      "train_loss": 0.6697520806855165
+    }
+  ],
+  "epochs": 4,
+  "positive_control": false,
+  "selection_on_dev": false
+}

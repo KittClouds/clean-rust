@@ -1,0 +1,26 @@
+{
+  "sha256": "d1f9b4eb9da3a4555246f5bf0ed13195e46914a9b23ad0b12127b660668ac212",
+  "rows": 256,
+  "absent_mentions_zeroed": [
+    {
+      "row_id": "TRAIN:011555:0:0",
+      "entity_id": "sw_1",
+      "mention": "switch_r"
+    },
+    {
+      "row_id": "TRAIN:011560:0:0",
+      "entity_id": "obj_2",
+      "mention": "the aforementioned coral_object"
+    },
+    {
+      "row_id": "TRAIN:011567:0:0",
+      "entity_id": "sw_1",
+      "mention": "switch_q"
+    },
+    {
+      "row_id": "TRAIN:011683:0:1",
+      "entity_id": "obj_1",
+      "mention": "amber_object"
+    }
+  ]
+}

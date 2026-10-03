@@ -1,0 +1,21 @@
+{
+  "sha256": "7f7bcb39e9a4830960775a9a2251237971f6f80c6cc88846041231598c28fde5",
+  "rows": 256,
+  "absent_mentions_zeroed": [
+    {
+      "row_id": "TRAIN:013825:0:0",
+      "entity_id": "ag_0",
+      "mention": "they"
+    },
+    {
+      "row_id": "TRAIN:013848:0:0",
+      "entity_id": "obj_1",
+      "mention": "amber_object"
+    },
+    {
+      "row_id": "TRAIN:014018:0:0",
+      "entity_id": "sw_2",
+      "mention": "switch_r"
+    }
+  ]
+}

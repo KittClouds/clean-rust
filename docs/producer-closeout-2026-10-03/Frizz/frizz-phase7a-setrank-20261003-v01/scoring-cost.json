@@ -1,0 +1,13 @@
+{
+  "cpu_scoring_seconds": {
+    "set-epoch00-TRAIN": 14.600457400025334,
+    "set-epoch00-DEV": 3.6058722999878228,
+    "set-epoch12-TRAIN": 14.383161699981429,
+    "set-epoch12-DEV": 3.5966575000202283,
+    "pointwise-epoch00-TRAIN": 9.595375899982173,
+    "pointwise-epoch00-DEV": 2.487374699965585,
+    "pointwise-epoch12-TRAIN": 9.717943899973761,
+    "pointwise-epoch12-DEV": 2.4127497999579646
+  },
+  "threads": 4
+}

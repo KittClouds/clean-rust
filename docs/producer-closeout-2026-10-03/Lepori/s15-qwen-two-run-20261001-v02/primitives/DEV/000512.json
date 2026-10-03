@@ -1,0 +1,71 @@
+{
+  "sha256": "8bcf1bfa73b8a1b339d2daa526eb7feab363a6be71cb8449e1304cb4464e8e90",
+  "rows": 256,
+  "absent_mentions_zeroed": [
+    {
+      "row_id": "DEV:000529:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "DEV:000536:0:0",
+      "entity_id": "sw_2",
+      "mention": "switch_p"
+    },
+    {
+      "row_id": "DEV:000557:0:2",
+      "entity_id": "sw_0",
+      "mention": "it"
+    },
+    {
+      "row_id": "DEV:000561:0:0",
+      "entity_id": "obj_1",
+      "mention": "sapphire_object"
+    },
+    {
+      "row_id": "DEV:000604:0:0",
+      "entity_id": "sw_0",
+      "mention": "switch_r"
+    },
+    {
+      "row_id": "DEV:000637:0:0",
+      "entity_id": "obj_1",
+      "mention": "the aforementioned coral_object"
+    },
+    {
+      "row_id": "DEV:000652:0:0",
+      "entity_id": "obj_0",
+      "mention": "amber_object"
+    },
+    {
+      "row_id": "DEV:000682:0:0",
+      "entity_id": "sw_2",
+      "mention": "the aforementioned switch_r"
+    },
+    {
+      "row_id": "DEV:000685:0:0",
+      "entity_id": "sw_0",
+      "mention": "switch_p"
+    },
+    {
+      "row_id": "DEV:000696:0:0",
+      "entity_id": "loc_2",
+      "mention": "hall_south"
+    },
+    {
+      "row_id": "DEV:000738:0:2",
+      "entity_id": "sw_2",
+      "mention": "switch_r"
+    },
+    {
+      "row_id": "DEV:000753:0:0",
+      "entity_id": "loc_0",
+      "mention": "vault_2"
+    },
+    {
+      "row_id": "DEV:000759:0:0",
+      "entity_id": "loc_0",
+      "mention": "hall south"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "target": "solvable",
+  "surface": "s",
+  "family": "mlp",
+  "epochs": 4,
+  "batch_unit": "64 canonical worlds, not candidates",
+  "steps": 752,
+  "training_worlds": 12000,
+  "seconds": 2.7407831999880727,
+  "metric": {
+    "n": 2730,
+    "positive": 2168,
+    "negative": 562,
+    "balanced_accuracy": 0.81380495429039,
+    "accuracy": 0.8194139003753662
+  },
+  "control": false,
+  "probe_sha256": "09340a2509106a10965fd2304c4c3275dc6708eeb03491ed119def7030ea887e",
+  "parameters": 4225
+}

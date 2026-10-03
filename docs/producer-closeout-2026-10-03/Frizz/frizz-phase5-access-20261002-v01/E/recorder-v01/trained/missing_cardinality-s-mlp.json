@@ -1,0 +1,34 @@
+{
+  "target": "missing_cardinality",
+  "surface": "s",
+  "family": "mlp",
+  "epochs": 4,
+  "steps": 752,
+  "batch_unit": "64 canonical worlds",
+  "metric": {
+    "n": 3000,
+    "accuracy": 0.8736666440963745,
+    "macro_f1": 0.7218510856279267,
+    "class_support": {
+      "0": {
+        "n": 2332,
+        "f1": 0.9509613307409808,
+        "reliable": true
+      },
+      "1": {
+        "n": 334,
+        "f1": 0.5241809672386896,
+        "reliable": true
+      },
+      "2": {
+        "n": 334,
+        "f1": 0.6904109589041096,
+        "reliable": true
+      }
+    },
+    "macro_f1_scope": "DEV-present classes; underpowered classes descriptive only"
+  },
+  "restricted_or_underpowered": "respect source contract; pooled metrics descriptive only",
+  "probe_sha256": "6ce3180ac87964876cfb11dfd9718b41953c92c0f8f2fe96229097f0f3cc80fb",
+  "parameters": 4355
+}

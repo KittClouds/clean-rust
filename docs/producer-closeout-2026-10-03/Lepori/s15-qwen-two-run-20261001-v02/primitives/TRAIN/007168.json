@@ -1,0 +1,51 @@
+{
+  "sha256": "dfd049ce1bc9a584fb95905d9da5eaf370ccfcee24f70afc30aebe35c20f3243",
+  "rows": 256,
+  "absent_mentions_zeroed": [
+    {
+      "row_id": "TRAIN:007174:0:0",
+      "entity_id": "loc_0",
+      "mention": "vault_1"
+    },
+    {
+      "row_id": "TRAIN:007201:0:0",
+      "entity_id": "sw_1",
+      "mention": "switch_p"
+    },
+    {
+      "row_id": "TRAIN:007226:0:0",
+      "entity_id": "obj_0",
+      "mention": "ember_object"
+    },
+    {
+      "row_id": "TRAIN:007259:0:0",
+      "entity_id": "sw_1",
+      "mention": "switch_q"
+    },
+    {
+      "row_id": "TRAIN:007293:0:4",
+      "entity_id": "obj_1",
+      "mention": "amber_object"
+    },
+    {
+      "row_id": "TRAIN:007320:0:0",
+      "entity_id": "obj_2",
+      "mention": "amber_object"
+    },
+    {
+      "row_id": "TRAIN:007409:0:1",
+      "entity_id": "obj_2",
+      "mention": "sapphire_object"
+    },
+    {
+      "row_id": "TRAIN:007413:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:007420:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    }
+  ]
+}

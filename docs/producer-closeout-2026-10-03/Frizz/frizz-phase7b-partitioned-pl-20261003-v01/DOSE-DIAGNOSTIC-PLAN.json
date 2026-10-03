@@ -1,0 +1,20 @@
+{
+  "status": "DECLARED_BEFORE_RUN",
+  "kind": "EXPLORATORY_POST_HOC_OUTSIDE_SURVIVAL_RULE",
+  "trigger": "frozen-dose PL arms under-fitted on TRAIN; selected-vs-legal collapse may be a dose artefact",
+  "dose": {
+    "lr": 0.003,
+    "epochs": 60,
+    "everything_else": "identical to the frozen primary run"
+  },
+  "no_tuning": "a single pre-declared dose; no search, no DEV-based selection; epoch 60 is the only scored endpoint",
+  "does_not_change": [
+    "survival-rule disposition",
+    "partitions",
+    "loss weights",
+    "objectives",
+    "the primary seed-0 numbers"
+  ],
+  "script_sha256": "ee2416bd727021e9746d07eba5dbb5bd74f817309c0fceae54b36a5e6edbac0c",
+  "frozen_specification_sha256": "eac51444b53838273136dafff1fb038c05ba9146d85fb80d048063175b98c55f"
+}

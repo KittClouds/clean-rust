@@ -1,0 +1,8 @@
+{
+  "status": "POST_FREEZE_SCRIPTS",
+  "note": "report.py is presentation only: it reads receipts, re-derives the within-type chance baseline, writes CONTEXT/DISPOSITION/REPORT. Its narrative numbers were first written from an earlier bit-identical run (REPRODUCTION-CHECK.json). No frozen-contract number depends on it.",
+  "source_hashes": {
+    "report.py": "1dad3f5bd594c9af1613aabfa9ae88d52d7fb7302cd599308a6bd331b555fdd7"
+  },
+  "frozen_specification_sha256": "a3fae92bbaa768812bdb795445bbf2e22d0fbb4b5f6f0568b023a879053ae9d0"
+}

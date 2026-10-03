@@ -1,0 +1,13 @@
+{
+  "closure_repair": "exclude live finish logs; preserve original attempts and all completed scientific bytes",
+  "evaluation_opened": false,
+  "failed_logs": {
+    "run.stderr.log": "ce6743df4fae41606b808e50f348457e89bd7bdb25e4355fde7e1bd29b060de4",
+    "run.stdout.log": "b2298505812e2505debe55d58c8d2d95bfd10f0226b11c0c21cf552b48e31a62"
+  },
+  "failed_source_preserved": "source-v01",
+  "finish_source": "source-v03",
+  "fit_source": "source-v02",
+  "preparation_failure": "unused padded candidate c-vectors compared to cropped historical zeros; real-candidate .02 tolerance unchanged",
+  "refit": false
+}

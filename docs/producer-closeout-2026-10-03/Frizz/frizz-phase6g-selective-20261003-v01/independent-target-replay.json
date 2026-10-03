@@ -1,0 +1,16 @@
+{
+  "derivation": "sealed strict oracle on actual BANK TRAIN/DEV, not copied labels",
+  "model_supervision": "status only",
+  "protected_evaluation_opened": false,
+  "status": "PASS",
+  "supports": {
+    "DEV": {
+      "candidate_instances": 41578,
+      "rendered_rows": 666
+    },
+    "TRAIN": {
+      "candidate_instances": 169272,
+      "rendered_rows": 2666
+    }
+  }
+}

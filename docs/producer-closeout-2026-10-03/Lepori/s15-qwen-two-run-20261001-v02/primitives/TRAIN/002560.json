@@ -1,0 +1,61 @@
+{
+  "sha256": "6e16041c157c0052d5ab0875338d05f19aed7905831f87e148f8c452ab219682",
+  "rows": 256,
+  "absent_mentions_zeroed": [
+    {
+      "row_id": "TRAIN:002632:0:1",
+      "entity_id": "obj_0",
+      "mention": "jade_object"
+    },
+    {
+      "row_id": "TRAIN:002633:0:0",
+      "entity_id": "obj_0",
+      "mention": "basalt_object"
+    },
+    {
+      "row_id": "TRAIN:002666:0:1",
+      "entity_id": "obj_1",
+      "mention": "amber_object"
+    },
+    {
+      "row_id": "TRAIN:002725:0:1",
+      "entity_id": "sw_0",
+      "mention": "switch_q"
+    },
+    {
+      "row_id": "TRAIN:002735:0:0",
+      "entity_id": "obj_1",
+      "mention": "amber_object"
+    },
+    {
+      "row_id": "TRAIN:002750:0:0",
+      "entity_id": "obj_1",
+      "mention": "the aforementioned ember_object"
+    },
+    {
+      "row_id": "TRAIN:002752:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:002770:0:0",
+      "entity_id": "obj_1",
+      "mention": "jade_object"
+    },
+    {
+      "row_id": "TRAIN:002789:0:0",
+      "entity_id": "sw_2",
+      "mention": "switch_p"
+    },
+    {
+      "row_id": "TRAIN:002792:0:0",
+      "entity_id": "sw_1",
+      "mention": "switch_p"
+    },
+    {
+      "row_id": "TRAIN:002802:0:2",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    }
+  ]
+}

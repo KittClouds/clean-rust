@@ -1,0 +1,24 @@
+{
+  "backbone_parameters_trainable": 0,
+  "canonical_binary_loss": false,
+  "class_prevalence": [
+    0.025989890098571777,
+    0.8326584696769714,
+    0.1413516253232956
+  ],
+  "class_weights": [
+    2.468973159790039,
+    0.0770644098520279,
+    0.4539624750614166
+  ],
+  "consequence_loss": false,
+  "device": "CPU FP32 four threads",
+  "endpoint": 12,
+  "epochs": 12,
+  "normalization_split": "TRAIN",
+  "only_supervision": "strict observable status",
+  "paired_rows": 2666,
+  "root_count": 1333,
+  "seed": 0,
+  "selection_loss": false
+}

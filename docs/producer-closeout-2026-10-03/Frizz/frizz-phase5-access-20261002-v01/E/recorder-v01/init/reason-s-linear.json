@@ -1,0 +1,94 @@
+{
+  "target": "reason",
+  "surface": "s",
+  "family": "linear",
+  "epochs": 4,
+  "steps": 752,
+  "batch_unit": "64 canonical worlds",
+  "metric": {
+    "n": 3000,
+    "accuracy": 0.3596666753292084,
+    "macro_f1": 0.3137052331262832,
+    "class_support": {
+      "0": {
+        "n": 166,
+        "f1": 0.14225941422594143,
+        "reliable": false
+      },
+      "1": {
+        "n": 167,
+        "f1": 0.3225806451612903,
+        "reliable": false
+      },
+      "2": {
+        "n": 334,
+        "f1": 0.33229813664596275,
+        "reliable": true
+      },
+      "3": {
+        "n": 167,
+        "f1": 0.5707656612529002,
+        "reliable": false
+      },
+      "4": {
+        "n": 167,
+        "f1": 0.08928571428571429,
+        "reliable": false
+      },
+      "5": {
+        "n": 167,
+        "f1": 0.029850746268656716,
+        "reliable": false
+      },
+      "6": {
+        "n": 166,
+        "f1": 0.6284403669724771,
+        "reliable": false
+      },
+      "7": {
+        "n": 167,
+        "f1": 0.2049469964664311,
+        "reliable": false
+      },
+      "8": {
+        "n": 167,
+        "f1": 0.1095890410958904,
+        "reliable": false
+      },
+      "9": {
+        "n": 167,
+        "f1": 0.7637231503579952,
+        "reliable": false
+      },
+      "10": {
+        "n": 166,
+        "f1": 0.45272206303724927,
+        "reliable": false
+      },
+      "11": {
+        "n": 167,
+        "f1": 0.2792452830188679,
+        "reliable": false
+      },
+      "12": {
+        "n": 166,
+        "f1": 0.3560830860534125,
+        "reliable": false
+      },
+      "13": {
+        "n": 166,
+        "f1": 0.08333333333333333,
+        "reliable": false
+      },
+      "14": {
+        "n": 500,
+        "f1": 0.3404548587181254,
+        "reliable": true
+      }
+    },
+    "macro_f1_scope": "DEV-present classes; underpowered classes descriptive only"
+  },
+  "restricted_or_underpowered": "respect source contract; pooled metrics descriptive only",
+  "probe_sha256": "1a99d3309964cb1eeae03fb2801fffa91a0b8032845cc5c71384653319e84e3c",
+  "parameters": 975
+}

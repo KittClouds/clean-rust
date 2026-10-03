@@ -1,0 +1,16 @@
+{
+  "arms": [
+    "local-linear",
+    "local-mlp",
+    "local_mf24-linear",
+    "local_mf24-mlp",
+    "local_ms24-linear",
+    "local_ms24-mlp",
+    "local_mf18-linear",
+    "local_mf18-mlp",
+    "E_e-linear",
+    "E_e-mlp"
+  ],
+  "exact_init_and_trained_logits": true,
+  "status": "PASS"
+}

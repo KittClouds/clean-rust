@@ -1,0 +1,20 @@
+{
+  "metric": {
+    "components": [
+      {
+        "accuracy": 0.4974842667579651,
+        "macro_recall": 0.49746131896972656
+      }
+    ],
+    "pairs": 3180,
+    "roots": 332
+  },
+  "sha256": "e9103b589ac17abe6480cdf28f937100818fa5b3e47bcf73c85fd7ac6ffb0e08",
+  "parameters": 20739,
+  "training_seconds": 2.4177857999748085,
+  "DEV_seconds": 0.6852247999922838,
+  "steps": 751,
+  "epochs": 4,
+  "device": "cpu",
+  "evaluation_opened": false
+}

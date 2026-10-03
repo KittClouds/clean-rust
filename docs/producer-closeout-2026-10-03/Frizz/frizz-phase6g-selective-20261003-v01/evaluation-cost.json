@@ -1,0 +1,16 @@
+{
+  "init": {
+    "checkpoint_bytes": 224361,
+    "device": "CPU FP32 four threads",
+    "forward_seconds": 0.23182919999817386,
+    "parameters": 55299,
+    "seconds_per_rendered_root": 0.00034809189188914996
+  },
+  "trained": {
+    "checkpoint_bytes": 676727,
+    "device": "CPU FP32 four threads",
+    "forward_seconds": 0.1803836000035517,
+    "parameters": 55299,
+    "seconds_per_rendered_root": 0.0002708462462515791
+  }
+}

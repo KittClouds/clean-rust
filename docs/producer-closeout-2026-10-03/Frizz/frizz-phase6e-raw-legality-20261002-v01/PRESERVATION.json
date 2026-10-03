@@ -1,0 +1,480 @@
+{
+  "Qwen_original_parameters": "PASS",
+  "evaluation_opened": false,
+  "independent_new_goal_fit": false,
+  "method": "immutable original identities and frozen production-head panel",
+  "production_goal_binding_globalization_renderer": {
+    "checkpoint_sha256": "5aa48f12f3bbba57628d192ea3c189245a13fd5f9d9ca19c0378299618c1fedf",
+    "independent_new_accessibility_fit": false,
+    "method": "frozen-head byte identity and unchanged production logits; full 3000-root existing goal panel, not a new goal fit",
+    "paired": {
+      "all": {
+        "after": {
+          "BA": 0.8051045835018158,
+          "candidates": 176168,
+          "negative": 175115,
+          "negative_roots": 3000,
+          "positive": 1053,
+          "positive_roots": 702
+        },
+        "before": {
+          "BA": 0.8051045835018158,
+          "candidates": 176168,
+          "negative": 175115,
+          "negative_roots": 3000,
+          "positive": 1053,
+          "positive_roots": 702
+        },
+        "exact_unchanged": true,
+        "roots": 3000
+      },
+      "binding": {
+        "after": {
+          "BA": 0.8029150664806366,
+          "candidates": 70723,
+          "negative": 70416,
+          "negative_roots": 781,
+          "positive": 307,
+          "positive_roots": 209
+        },
+        "before": {
+          "BA": 0.8029150664806366,
+          "candidates": 70723,
+          "negative": 70416,
+          "negative_roots": 781,
+          "positive": 307,
+          "positive_roots": 209
+        },
+        "exact_unchanged": true,
+        "roots": 781
+      },
+      "candidate_comparison": {
+        "after": {
+          "BA": 0.7730540633201599,
+          "candidates": 82382,
+          "negative": 81814,
+          "negative_roots": 1262,
+          "positive": 568,
+          "positive_roots": 320
+        },
+        "before": {
+          "BA": 0.7730540633201599,
+          "candidates": 82382,
+          "negative": 81814,
+          "negative_roots": 1262,
+          "positive": 568,
+          "positive_roots": 320
+        },
+        "exact_unchanged": true,
+        "roots": 1262
+      },
+      "globalization": {
+        "after": {
+          "BA": 0.8320682346820831,
+          "candidates": 62722,
+          "negative": 62472,
+          "negative_roots": 965,
+          "positive": 250,
+          "positive_roots": 250
+        },
+        "before": {
+          "BA": 0.8320682346820831,
+          "candidates": 62722,
+          "negative": 62472,
+          "negative_roots": 965,
+          "positive": 250,
+          "positive_roots": 250
+        },
+        "exact_unchanged": true,
+        "roots": 965
+      },
+      "renderer:V1": {
+        "after": {
+          "BA": 0.7736552059650421,
+          "candidates": 22577,
+          "negative": 22370,
+          "negative_roots": 375,
+          "positive": 207,
+          "positive_roots": 123
+        },
+        "before": {
+          "BA": 0.7736552059650421,
+          "candidates": 22577,
+          "negative": 22370,
+          "negative_roots": 375,
+          "positive": 207,
+          "positive_roots": 123
+        },
+        "exact_unchanged": true
+      },
+      "renderer:V2": {
+        "after": {
+          "BA": 0.8786310851573944,
+          "candidates": 22086,
+          "negative": 22032,
+          "negative_roots": 375,
+          "positive": 54,
+          "positive_roots": 54
+        },
+        "before": {
+          "BA": 0.8786310851573944,
+          "candidates": 22086,
+          "negative": 22032,
+          "negative_roots": 375,
+          "positive": 54,
+          "positive_roots": 54
+        },
+        "exact_unchanged": true
+      },
+      "renderer:V3": {
+        "after": {
+          "BA": 0.7468675076961517,
+          "candidates": 22475,
+          "negative": 22291,
+          "negative_roots": 375,
+          "positive": 184,
+          "positive_roots": 104
+        },
+        "before": {
+          "BA": 0.7468675076961517,
+          "candidates": 22475,
+          "negative": 22291,
+          "negative_roots": 375,
+          "positive": 184,
+          "positive_roots": 104
+        },
+        "exact_unchanged": true
+      },
+      "renderer:V4": {
+        "after": {
+          "BA": 0.8732737898826599,
+          "candidates": 20931,
+          "negative": 20876,
+          "negative_roots": 375,
+          "positive": 55,
+          "positive_roots": 55
+        },
+        "before": {
+          "BA": 0.8732737898826599,
+          "candidates": 20931,
+          "negative": 20876,
+          "negative_roots": 375,
+          "positive": 55,
+          "positive_roots": 55
+        },
+        "exact_unchanged": true
+      },
+      "renderer:V5": {
+        "after": {
+          "BA": 0.7841920554637909,
+          "candidates": 23261,
+          "negative": 23043,
+          "negative_roots": 375,
+          "positive": 218,
+          "positive_roots": 119
+        },
+        "before": {
+          "BA": 0.7841920554637909,
+          "candidates": 23261,
+          "negative": 23043,
+          "negative_roots": 375,
+          "positive": 218,
+          "positive_roots": 119
+        },
+        "exact_unchanged": true
+      },
+      "renderer:V6": {
+        "after": {
+          "BA": 0.907390296459198,
+          "candidates": 21123,
+          "negative": 21055,
+          "negative_roots": 375,
+          "positive": 68,
+          "positive_roots": 68
+        },
+        "before": {
+          "BA": 0.907390296459198,
+          "candidates": 21123,
+          "negative": 21055,
+          "negative_roots": 375,
+          "positive": 68,
+          "positive_roots": 68
+        },
+        "exact_unchanged": true
+      },
+      "renderer:V7": {
+        "after": {
+          "BA": 0.797384113073349,
+          "candidates": 22311,
+          "negative": 22111,
+          "negative_roots": 375,
+          "positive": 200,
+          "positive_roots": 112
+        },
+        "before": {
+          "BA": 0.797384113073349,
+          "candidates": 22311,
+          "negative": 22111,
+          "negative_roots": 375,
+          "positive": 200,
+          "positive_roots": 112
+        },
+        "exact_unchanged": true
+      },
+      "renderer:V8": {
+        "after": {
+          "BA": 0.8784827589988708,
+          "candidates": 21404,
+          "negative": 21337,
+          "negative_roots": 375,
+          "positive": 67,
+          "positive_roots": 67
+        },
+        "before": {
+          "BA": 0.8784827589988708,
+          "candidates": 21404,
+          "negative": 21337,
+          "negative_roots": 375,
+          "positive": 67,
+          "positive_roots": 67
+        },
+        "exact_unchanged": true
+      }
+    },
+    "primary": {
+      "all": {
+        "after": {
+          "BA": 0.8089409470558167,
+          "candidates": 176168,
+          "negative": 175115,
+          "negative_roots": 3000,
+          "positive": 1053,
+          "positive_roots": 702
+        },
+        "before": {
+          "BA": 0.8089409470558167,
+          "candidates": 176168,
+          "negative": 175115,
+          "negative_roots": 3000,
+          "positive": 1053,
+          "positive_roots": 702
+        },
+        "exact_unchanged": true,
+        "roots": 3000
+      },
+      "binding": {
+        "after": {
+          "BA": 0.8241852521896362,
+          "candidates": 70723,
+          "negative": 70416,
+          "negative_roots": 781,
+          "positive": 307,
+          "positive_roots": 209
+        },
+        "before": {
+          "BA": 0.8241852521896362,
+          "candidates": 70723,
+          "negative": 70416,
+          "negative_roots": 781,
+          "positive": 307,
+          "positive_roots": 209
+        },
+        "exact_unchanged": true,
+        "roots": 781
+      },
+      "candidate_comparison": {
+        "after": {
+          "BA": 0.777168482542038,
+          "candidates": 82382,
+          "negative": 81814,
+          "negative_roots": 1262,
+          "positive": 568,
+          "positive_roots": 320
+        },
+        "before": {
+          "BA": 0.777168482542038,
+          "candidates": 82382,
+          "negative": 81814,
+          "negative_roots": 1262,
+          "positive": 568,
+          "positive_roots": 320
+        },
+        "exact_unchanged": true,
+        "roots": 1262
+      },
+      "globalization": {
+        "after": {
+          "BA": 0.8366036117076874,
+          "candidates": 62722,
+          "negative": 62472,
+          "negative_roots": 965,
+          "positive": 250,
+          "positive_roots": 250
+        },
+        "before": {
+          "BA": 0.8366036117076874,
+          "candidates": 62722,
+          "negative": 62472,
+          "negative_roots": 965,
+          "positive": 250,
+          "positive_roots": 250
+        },
+        "exact_unchanged": true,
+        "roots": 965
+      },
+      "renderer:V1": {
+        "after": {
+          "BA": 0.8736156523227692,
+          "candidates": 22086,
+          "negative": 22032,
+          "negative_roots": 375,
+          "positive": 54,
+          "positive_roots": 54
+        },
+        "before": {
+          "BA": 0.8736156523227692,
+          "candidates": 22086,
+          "negative": 22032,
+          "negative_roots": 375,
+          "positive": 54,
+          "positive_roots": 54
+        },
+        "exact_unchanged": true
+      },
+      "renderer:V2": {
+        "after": {
+          "BA": 0.8052408993244171,
+          "candidates": 22475,
+          "negative": 22291,
+          "negative_roots": 375,
+          "positive": 184,
+          "positive_roots": 104
+        },
+        "before": {
+          "BA": 0.8052408993244171,
+          "candidates": 22475,
+          "negative": 22291,
+          "negative_roots": 375,
+          "positive": 184,
+          "positive_roots": 104
+        },
+        "exact_unchanged": true
+      },
+      "renderer:V3": {
+        "after": {
+          "BA": 0.9075641334056854,
+          "candidates": 20931,
+          "negative": 20876,
+          "negative_roots": 375,
+          "positive": 55,
+          "positive_roots": 55
+        },
+        "before": {
+          "BA": 0.9075641334056854,
+          "candidates": 20931,
+          "negative": 20876,
+          "negative_roots": 375,
+          "positive": 55,
+          "positive_roots": 55
+        },
+        "exact_unchanged": true
+      },
+      "renderer:V4": {
+        "after": {
+          "BA": 0.7806833684444427,
+          "candidates": 23261,
+          "negative": 23043,
+          "negative_roots": 375,
+          "positive": 218,
+          "positive_roots": 119
+        },
+        "before": {
+          "BA": 0.7806833684444427,
+          "candidates": 23261,
+          "negative": 23043,
+          "negative_roots": 375,
+          "positive": 218,
+          "positive_roots": 119
+        },
+        "exact_unchanged": true
+      },
+      "renderer:V5": {
+        "after": {
+          "BA": 0.8516539335250854,
+          "candidates": 21123,
+          "negative": 21055,
+          "negative_roots": 375,
+          "positive": 68,
+          "positive_roots": 68
+        },
+        "before": {
+          "BA": 0.8516539335250854,
+          "candidates": 21123,
+          "negative": 21055,
+          "negative_roots": 375,
+          "positive": 68,
+          "positive_roots": 68
+        },
+        "exact_unchanged": true
+      },
+      "renderer:V6": {
+        "after": {
+          "BA": 0.7427685260772705,
+          "candidates": 22311,
+          "negative": 22111,
+          "negative_roots": 375,
+          "positive": 200,
+          "positive_roots": 112
+        },
+        "before": {
+          "BA": 0.7427685260772705,
+          "candidates": 22311,
+          "negative": 22111,
+          "negative_roots": 375,
+          "positive": 200,
+          "positive_roots": 112
+        },
+        "exact_unchanged": true
+      },
+      "renderer:V7": {
+        "after": {
+          "BA": 0.826139360666275,
+          "candidates": 21404,
+          "negative": 21337,
+          "negative_roots": 375,
+          "positive": 67,
+          "positive_roots": 67
+        },
+        "before": {
+          "BA": 0.826139360666275,
+          "candidates": 21404,
+          "negative": 21337,
+          "negative_roots": 375,
+          "positive": 67,
+          "positive_roots": 67
+        },
+        "exact_unchanged": true
+      },
+      "renderer:V8": {
+        "after": {
+          "BA": 0.8149653673171997,
+          "candidates": 22577,
+          "negative": 22370,
+          "negative_roots": 375,
+          "positive": 207,
+          "positive_roots": 123
+        },
+        "before": {
+          "BA": 0.8149653673171997,
+          "candidates": 22577,
+          "negative": 22370,
+          "negative_roots": 375,
+          "positive": 207,
+          "positive_roots": 123
+        },
+        "exact_unchanged": true
+      }
+    },
+    "source_sha256": "c3291af80afc326177e27490bbed4a361e37821852d642968b9c053c8ebbed5a"
+  }
+}

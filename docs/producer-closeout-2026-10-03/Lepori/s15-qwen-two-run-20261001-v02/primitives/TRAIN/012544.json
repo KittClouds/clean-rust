@@ -1,0 +1,31 @@
+{
+  "sha256": "2d4f21f9d0eae2f1a26ca2475ee17235af422f6828d6b8ba15f04bfca1f80830",
+  "rows": 256,
+  "absent_mentions_zeroed": [
+    {
+      "row_id": "TRAIN:012603:0:0",
+      "entity_id": "sw_0",
+      "mention": "switch_p"
+    },
+    {
+      "row_id": "TRAIN:012715:0:0",
+      "entity_id": "obj_1",
+      "mention": "topaz_object"
+    },
+    {
+      "row_id": "TRAIN:012737:0:0",
+      "entity_id": "obj_1",
+      "mention": "basalt_object"
+    },
+    {
+      "row_id": "TRAIN:012750:0:0",
+      "entity_id": "loc_4",
+      "mention": "atrium"
+    },
+    {
+      "row_id": "TRAIN:012758:0:0",
+      "entity_id": "sw_0",
+      "mention": "SWITCH_P"
+    }
+  ]
+}

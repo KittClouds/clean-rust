@@ -1,0 +1,9 @@
+{
+  "sha256": "a56d90e18f4932e570d4c87703ae940ea1033d13be6875518eb978f9ddb4ced3",
+  "rows": 6000,
+  "roots": 3000,
+  "entities": 60514,
+  "max_candidates": 158,
+  "unbound_argument_slots_zeroed": 10664,
+  "rows_with_unbound_arguments": 664
+}

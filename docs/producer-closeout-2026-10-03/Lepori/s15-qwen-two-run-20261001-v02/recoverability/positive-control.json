@@ -1,0 +1,89 @@
+{
+  "result": {
+    "balanced_accuracy": 1.0
+  },
+  "readout_controls": {
+    "linear": {
+      "final_epoch": {
+        "balanced_accuracy": 1.0,
+        "accuracy": 1.0,
+        "support_positive": 265,
+        "support_negative": 247,
+        "train_prevalence": 0.51513671875,
+        "beats_declared_base_rate_margin": true
+      },
+      "best_train_loss_secondary": {
+        "balanced_accuracy": 1.0,
+        "accuracy": 1.0,
+        "support_positive": 265,
+        "support_negative": 247,
+        "train_prevalence": 0.51513671875,
+        "beats_declared_base_rate_margin": true
+      },
+      "history": [
+        {
+          "epoch": 1,
+          "train_loss": 0.6687409915030003
+        },
+        {
+          "epoch": 2,
+          "train_loss": 0.6174234934151173
+        },
+        {
+          "epoch": 3,
+          "train_loss": 0.587709242478013
+        },
+        {
+          "epoch": 4,
+          "train_loss": 0.5779317300766706
+        }
+      ],
+      "epochs": 4,
+      "positive_control": true,
+      "selection_on_dev": false
+    },
+    "mlp": {
+      "final_epoch": {
+        "balanced_accuracy": 1.0,
+        "accuracy": 1.0,
+        "support_positive": 265,
+        "support_negative": 247,
+        "train_prevalence": 0.51513671875,
+        "beats_declared_base_rate_margin": true
+      },
+      "best_train_loss_secondary": {
+        "balanced_accuracy": 1.0,
+        "accuracy": 1.0,
+        "support_positive": 265,
+        "support_negative": 247,
+        "train_prevalence": 0.51513671875,
+        "beats_declared_base_rate_margin": true
+      },
+      "history": [
+        {
+          "epoch": 1,
+          "train_loss": 0.4591245213523507
+        },
+        {
+          "epoch": 2,
+          "train_loss": 0.21811330085620284
+        },
+        {
+          "epoch": 3,
+          "train_loss": 0.13687097537331283
+        },
+        {
+          "epoch": 4,
+          "train_loss": 0.11836808384396136
+        }
+      ],
+      "epochs": 4,
+      "positive_control": true,
+      "selection_on_dev": false
+    }
+  },
+  "minimum_balanced_accuracy": 0.95,
+  "fixture": "label = first feature > 0; margin 4",
+  "optimizer_schedule": "identical fit_probe procedure to target arms",
+  "protected_data_used": false
+}

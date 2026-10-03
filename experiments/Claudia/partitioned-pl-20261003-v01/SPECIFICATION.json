@@ -1,0 +1,93 @@
+{
+  "status": "FROZEN_BEFORE_DEV_SCORING",
+  "question": "Does training the scorer on the actual ordered partition structure recover more useful candidate ranking than ordinary selected-candidate CE?",
+  "release_identity": "84f0a7e13032e8cdfcecc862217bb33ca23568fade64fafeef410327eb996f12",
+  "input_identity_sha256": "01028a4e4a36345c3a7cef2e92241f553d15d60ec4379e60ed45469ff231a3c2",
+  "source_hashes": {
+    "common.py": "e6a1bbf23018f13e6aacce04b1006a01e13e78160c19dc031515f4105bd924d4",
+    "data.py": "aa471c291a7f99d4d7447e0a9252689bb0f54e9e2abfadce1785c800a93f251b",
+    "model.py": "93bf3857f0272cb711315b810b18f03d9b77eb7e24c1e2d2cb3246767d837ecb",
+    "pl.py": "051df021d03e00c343be002c9792cedc0fc78da383dad647468d49c4489440bd",
+    "losses.py": "d27807e057e4e49f7c83917569cfe97eb31f1f85f2f1aba9c49628367a9d3d7b",
+    "partition.py": "83cf4b46ee9a69cc6bc732357542051c404d183b04eb5cca36f987a3c70b7398",
+    "metrics.py": "5c5512cb018911f662a224e03fd9f18d2932a601657929080fc792926426c3fb",
+    "train.py": "52f870921742279c64d773cff034d2a0d61876f5fa2c8e028550be02ecaabbc7",
+    "score.py": "84be22d91796da7f90def6c2dfc4b589640da0d4f71f6aafa90bfa81faacc47f",
+    "compare.py": "83854a5678fec0f9972086d7fd4d6caa978aa0a7d301aca255ad5a060d329fc3",
+    "qualify.py": "7e1af17a874aec4a789b48844796361ee10b95abc6e05f9ff76047334e64ba25",
+    "replay.py": "ed15a7a8d03fc671858d92a93ca78df2501945dac216b0b045eed637ddf24bdb",
+    "seal.py": "e747c61f986623613d183ccb9885b5c9e66c8a0132e4ebd97ef786c0441a3f69",
+    "verify_inputs.py": "cfc22a3b9786f25c2e437c14ef5f7089b3eaf55bce4753d7d5af447c13906dc2",
+    "freeze.py": "90321cfb4796e9f6cedd538c49a0a41b04d0840c8dda1e4ffc4d3e6c5b97c176",
+    "dose_diagnostic.py": "4849f0cd429cd063c78bd4d7ef40339f2c10989bc2780319e93cada18a0adf2e",
+    "test_pl.py": "8e89855873b438f6f9fae4cfbf158bd680f1347da2b02e4531f793618fb6823a",
+    "test_arms.py": "aad6b50f9840a2067d76b82c2e63c54f2217a9ac3a5bf0e479966ba1d62a03ea",
+    "test_partition.py": "e3f97b45ed8d0df623570f8297407fa7e93a59d7664b6c2a52445cd4e3f6350f",
+    "SPECIFICATION.md": "b5cdcb78f6556f27c5e89fe8df9ade954f8bb857b81c130d2fae4567ce8fc99a"
+  },
+  "arms": {
+    "ce": "selected-candidate softmax CE + same-type CE (control)",
+    "vanilla_pl": "ListMLE on a fresh uniformly random linear extension of the partition order (selected > legal-other > illegal)",
+    "partitioned_pl": "exact grouped Plackett-Luce likelihood of P1 > P2 > P3, internal orders marginalised, + same-type",
+    "vanilla_pl_truncated (supplementary, outside the survival rule)": "ListMLE on a random linear extension kept through the legal candidates only"
+  },
+  "scorer": "365 -> 128 -> 64 -> 1, GELU, candidate-independent, 55,169 parameters, shared initial weights",
+  "population": "endpoint-eligible roots only: TRAIN 1,333, DEV 333",
+  "training": {
+    "seed": 0,
+    "epochs": 12,
+    "optimizer": "AdamW",
+    "lr": 0.0003,
+    "weight_decay": 0.01,
+    "grad_clip": 1.0,
+    "schedule": "cosine to 0, per step, no warmup",
+    "root_batch": 32,
+    "precision": "FP32",
+    "loss_weights": {
+      "full": 1.0,
+      "same_type": 0.5
+    },
+    "candidate_order": "canonical, shared",
+    "primary_endpoint": "epoch 12 (CPU/FP32)",
+    "checkpoint_selection": "none"
+  },
+  "expected_denominators": {
+    "TRAIN_eligible": 1333,
+    "DEV_eligible": 333,
+    "TRAIN_roots": 12000,
+    "DEV_roots": 3000,
+    "max_legal_other_group": 8
+  },
+  "survival_rule": {
+    "SURVIVES": "gold-type top1 delta >= +0.05 with paired 95% lower bound > 0, OR gold-type MRR delta >= +0.03 with lower bound > 0, AND selected top1 point-estimate delta >= -0.02",
+    "otherwise": "DOES_NOT_SURVIVE; seal without modifying partitions/weights/auxiliaries",
+    "confirmation": "seeds 1 and 2 under this frozen specification only if SURVIVES"
+  },
+  "bootstrap": {
+    "unit": "canonical root",
+    "repetitions": 2000,
+    "seed": 20261003
+  },
+  "secondary_diagnostic": {
+    "script": "dose_diagnostic.py",
+    "dose": {
+      "lr": 0.003,
+      "epochs": 60,
+      "everything_else": "identical to primary"
+    },
+    "status": "pre-declared before any training; run regardless of the primary result; outside the survival rule; single dose, no tuning"
+  },
+  "provenance": "Fresh re-run in experiments/Claudia of an earlier run built under the Frizz namespace. The earlier results are NOT used as inputs; they motivated only the secondary diagnostic. Primary design, partitions, weights and survival rule are unchanged.",
+  "not_included": [
+    "candidate self-attention",
+    "recurrence",
+    "comparator",
+    "LoRA",
+    "access organ",
+    "legality head / BCE",
+    "gold legality at inference",
+    "transition distance or simulator state as inputs"
+  ],
+  "evaluation_opened": false,
+  "protected_opened": false
+}

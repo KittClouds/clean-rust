@@ -1,0 +1,49 @@
+{
+  "observable_fields": [
+    "bindings",
+    "actions",
+    "goal_mentions"
+  ],
+  "handoff_v02_sha256": "08cab38d366d6a30d32af4b0391cafddb243a8ea9e6a7435ad53290462d41a4b",
+  "bridge_changed": false,
+  "evaluation_opened": false,
+  "roles": [
+    "agent",
+    "at",
+    "dst",
+    "from",
+    "obj",
+    "source",
+    "src",
+    "target",
+    "to"
+  ],
+  "goal_roles": [
+    "SUBJECT",
+    "TARGET"
+  ],
+  "splits": {
+    "TRAIN": {
+      "sha256": "1e6640088a3f2fe1a0ecbf8cca8c59c3fa00c2bc17995c9f6fb059a207810a3b",
+      "rows": 24000,
+      "entities": 242366,
+      "goal_match_width": 2,
+      "goal_slots": {
+        "empty": 7116,
+        "unique": 39552,
+        "multiple": 1332
+      }
+    },
+    "DEV": {
+      "sha256": "81dac47588ecba9411914c8750b56d31979ff6f6b19202d60e5fa9681d188cb1",
+      "rows": 6000,
+      "entities": 60514,
+      "goal_match_width": 2,
+      "goal_slots": {
+        "empty": 1760,
+        "unique": 9908,
+        "multiple": 332
+      }
+    }
+  }
+}

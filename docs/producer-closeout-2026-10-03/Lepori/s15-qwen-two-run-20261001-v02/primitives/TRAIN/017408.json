@@ -1,0 +1,56 @@
+{
+  "sha256": "faa921297d4f2d3eba5206248adb9c2994ba8dc310cdc8460e4555ffe43ba3db",
+  "rows": 256,
+  "absent_mentions_zeroed": [
+    {
+      "row_id": "TRAIN:017480:0:1",
+      "entity_id": "obj_1",
+      "mention": "jade"
+    },
+    {
+      "row_id": "TRAIN:017536:0:0",
+      "entity_id": "loc_0",
+      "mention": "chamber_b"
+    },
+    {
+      "row_id": "TRAIN:017556:0:1",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:017565:0:0",
+      "entity_id": "loc_0",
+      "mention": "chamber_c"
+    },
+    {
+      "row_id": "TRAIN:017569:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:017571:0:2",
+      "entity_id": "sw_2",
+      "mention": "switch_q"
+    },
+    {
+      "row_id": "TRAIN:017586:0:0",
+      "entity_id": "sw_2",
+      "mention": "the aforementioned switch_p"
+    },
+    {
+      "row_id": "TRAIN:017616:0:1",
+      "entity_id": "obj_2",
+      "mention": "onyx_object"
+    },
+    {
+      "row_id": "TRAIN:017627:0:0",
+      "entity_id": "sw_1",
+      "mention": "switch_p"
+    },
+    {
+      "row_id": "TRAIN:017657:0:0",
+      "entity_id": "obj_1",
+      "mention": "amber_object"
+    }
+  ]
+}

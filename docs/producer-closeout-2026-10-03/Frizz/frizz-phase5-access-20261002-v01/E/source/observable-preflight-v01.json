@@ -1,0 +1,52 @@
+{
+  "status": "OBSERVABLE_PREFLIGHT_PASS",
+  "splits": {
+    "TRAIN": {
+      "rows": 24000,
+      "min_tokens": 195,
+      "median_tokens": 693,
+      "p99_tokens": 1112,
+      "max_tokens": 1415,
+      "rows_over_512": 20400,
+      "max_arguments": 4,
+      "argument_roles": [
+        "agent",
+        "at",
+        "dst",
+        "from",
+        "obj",
+        "source",
+        "src",
+        "target",
+        "to"
+      ],
+      "bindings": 242366,
+      "absent_names": 0
+    },
+    "DEV": {
+      "rows": 6000,
+      "min_tokens": 199,
+      "median_tokens": 694,
+      "p99_tokens": 1111,
+      "max_tokens": 1338,
+      "rows_over_512": 5090,
+      "max_arguments": 4,
+      "argument_roles": [
+        "agent",
+        "at",
+        "dst",
+        "from",
+        "obj",
+        "source",
+        "src",
+        "target",
+        "to"
+      ],
+      "bindings": 60514,
+      "absent_names": 0
+    }
+  },
+  "model_tokenizer_sha256": "fe000e3ed39ed12b8d2481d527d44f93c65d37e87645d2dcc80d1bf9d50d2927",
+  "evaluation_opened": false,
+  "seconds": 40.83198660000926
+}

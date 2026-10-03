@@ -1,0 +1,8 @@
+{
+  "status": "PASS",
+  "weak_factors": [
+    "legality",
+    "transition_distance"
+  ],
+  "evaluation_opened": false
+}

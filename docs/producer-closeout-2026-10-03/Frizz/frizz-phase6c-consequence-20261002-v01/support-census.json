@@ -1,0 +1,176 @@
+{
+  "DEV": {
+    "CPU_vs_frozen_FP16_primary_max_abs_error": {
+      "c": 0.00390625,
+      "e": 0.00390625,
+      "s": 0.001953125
+    },
+    "comparison_tolerance": 0.02,
+    "ordering_pairs": 207,
+    "ordering_roots": 136,
+    "paired_rows": 666,
+    "roots": 333,
+    "scope": "Phase6B EXECUTE-eligible canonical population; all candidate types retained, not just selected type",
+    "support": {
+      "0": {
+        "canonical_candidates": 93,
+        "rendered_candidates": 186,
+        "root_supported": false,
+        "roots": 93
+      },
+      "1": {
+        "canonical_candidates": 298,
+        "rendered_candidates": 596,
+        "root_supported": true,
+        "roots": 240
+      },
+      "10": {
+        "canonical_candidates": 1,
+        "rendered_candidates": 2,
+        "root_supported": false,
+        "roots": 1
+      },
+      "11": {
+        "canonical_candidates": 19623,
+        "rendered_candidates": 39246,
+        "root_supported": true,
+        "roots": 333
+      },
+      "2": {
+        "canonical_candidates": 375,
+        "rendered_candidates": 750,
+        "root_supported": true,
+        "roots": 252
+      },
+      "3": {
+        "canonical_candidates": 228,
+        "rendered_candidates": 456,
+        "root_supported": false,
+        "roots": 170
+      },
+      "4": {
+        "canonical_candidates": 104,
+        "rendered_candidates": 208,
+        "root_supported": false,
+        "roots": 73
+      },
+      "5": {
+        "canonical_candidates": 33,
+        "rendered_candidates": 66,
+        "root_supported": false,
+        "roots": 27
+      },
+      "6": {
+        "canonical_candidates": 5,
+        "rendered_candidates": 10,
+        "root_supported": false,
+        "roots": 5
+      },
+      "7": {
+        "canonical_candidates": 3,
+        "rendered_candidates": 6,
+        "root_supported": false,
+        "roots": 3
+      },
+      "8": {
+        "canonical_candidates": 3,
+        "rendered_candidates": 6,
+        "root_supported": false,
+        "roots": 3
+      },
+      "9": {
+        "canonical_candidates": 23,
+        "rendered_candidates": 46,
+        "root_supported": false,
+        "roots": 23
+      }
+    }
+  },
+  "TRAIN": {
+    "CPU_vs_frozen_FP16_primary_max_abs_error": {
+      "c": 0.00390625,
+      "e": 0.00390625,
+      "s": 0.001953125
+    },
+    "comparison_tolerance": 0.02,
+    "ordering_pairs": 776,
+    "ordering_roots": 541,
+    "paired_rows": 2666,
+    "roots": 1333,
+    "scope": "Phase6B EXECUTE-eligible canonical population; all candidate types retained, not just selected type",
+    "support": {
+      "0": {
+        "canonical_candidates": 339,
+        "rendered_candidates": 678,
+        "root_supported": true,
+        "roots": 339
+      },
+      "1": {
+        "canonical_candidates": 1198,
+        "rendered_candidates": 2396,
+        "root_supported": true,
+        "roots": 967
+      },
+      "10": {
+        "canonical_candidates": 18,
+        "rendered_candidates": 36,
+        "root_supported": false,
+        "roots": 18
+      },
+      "11": {
+        "canonical_candidates": 79946,
+        "rendered_candidates": 159892,
+        "root_supported": true,
+        "roots": 1333
+      },
+      "2": {
+        "canonical_candidates": 1615,
+        "rendered_candidates": 3230,
+        "root_supported": true,
+        "roots": 1008
+      },
+      "3": {
+        "canonical_candidates": 907,
+        "rendered_candidates": 1814,
+        "root_supported": true,
+        "roots": 662
+      },
+      "4": {
+        "canonical_candidates": 411,
+        "rendered_candidates": 822,
+        "root_supported": true,
+        "roots": 266
+      },
+      "5": {
+        "canonical_candidates": 106,
+        "rendered_candidates": 212,
+        "root_supported": false,
+        "roots": 92
+      },
+      "6": {
+        "canonical_candidates": 11,
+        "rendered_candidates": 22,
+        "root_supported": false,
+        "roots": 11
+      },
+      "7": {
+        "canonical_candidates": 6,
+        "rendered_candidates": 12,
+        "root_supported": false,
+        "roots": 6
+      },
+      "8": {
+        "canonical_candidates": 1,
+        "rendered_candidates": 2,
+        "root_supported": false,
+        "roots": 1
+      },
+      "9": {
+        "canonical_candidates": 78,
+        "rendered_candidates": 156,
+        "root_supported": false,
+        "roots": 76
+      }
+    }
+  }
+}

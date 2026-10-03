@@ -1,0 +1,17 @@
+{
+  "sha256": "a24f420d80b85ee2a1edf55f9a3968226db1ed4194114bb7227ba93d8f24549f",
+  "cost": {
+    "training_seconds": 3.0672004999942146,
+    "steps": 752,
+    "eligible_train_roots": 1333,
+    "TRAIN_prevalence": 0.015749799087643623,
+    "parameters": 321,
+    "epochs": 4,
+    "DEV_seconds": 0.13569100000313483,
+    "peak_cuda_bytes": 97110016
+  },
+  "task": "optimal",
+  "mode": "cs",
+  "family": "linear",
+  "evaluation_opened": false
+}

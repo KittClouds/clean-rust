@@ -1,0 +1,7 @@
+{
+  "status": "PASS",
+  "seal_sha256": "aecf00e1bdcb71a000d825702349d2b0f886a439f3cd7d2b23955e61e76953a4",
+  "artifact_count": 1522,
+  "evaluation_opened": false,
+  "scope": "fresh-process hash closure; model/probe replay receipts bound by seal"
+}

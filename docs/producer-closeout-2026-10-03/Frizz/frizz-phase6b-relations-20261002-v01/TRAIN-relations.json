@@ -1,0 +1,8 @@
+{
+  "sha256": "4a18b98a16e57230c064124a742694233a023e479872a1fcde33a61310ab711a",
+  "eligible_roots": 1333,
+  "pair_roots": 1332,
+  "same_type_pairs": 11883,
+  "factors_earned_from": "TRAIN descriptor audit only",
+  "evaluation_opened": false
+}

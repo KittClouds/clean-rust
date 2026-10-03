@@ -1,0 +1,41 @@
+{
+  "sha256": "7b18509a8cf46e02f5411e20556111bc29b6689c07ca6fbd438b6873065c329d",
+  "rows": 256,
+  "absent_mentions_zeroed": [
+    {
+      "row_id": "TRAIN:019482:0:0",
+      "entity_id": "sw_1",
+      "mention": "switch_q"
+    },
+    {
+      "row_id": "TRAIN:019496:0:0",
+      "entity_id": "obj_2",
+      "mention": "the aforementioned basalt_object"
+    },
+    {
+      "row_id": "TRAIN:019519:0:0",
+      "entity_id": "sw_0",
+      "mention": "switch_q"
+    },
+    {
+      "row_id": "TRAIN:019554:0:1",
+      "entity_id": "sw_0",
+      "mention": "switch_r"
+    },
+    {
+      "row_id": "TRAIN:019594:0:0",
+      "entity_id": "obj_2",
+      "mention": "ivory_object"
+    },
+    {
+      "row_id": "TRAIN:019609:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:019672:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    }
+  ]
+}

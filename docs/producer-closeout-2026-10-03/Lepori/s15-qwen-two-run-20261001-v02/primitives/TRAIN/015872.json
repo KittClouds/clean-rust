@@ -1,0 +1,61 @@
+{
+  "sha256": "46f4932f1da49cf2cc9fa73c4c66d12bfc28c42959db2c3373245df908968cd3",
+  "rows": 256,
+  "absent_mentions_zeroed": [
+    {
+      "row_id": "TRAIN:015900:0:0",
+      "entity_id": "obj_1",
+      "mention": "the aforementioned basalt_object"
+    },
+    {
+      "row_id": "TRAIN:015914:0:1",
+      "entity_id": "obj_0",
+      "mention": "coral_object"
+    },
+    {
+      "row_id": "TRAIN:015954:0:1",
+      "entity_id": "sw_0",
+      "mention": "switch_q"
+    },
+    {
+      "row_id": "TRAIN:016010:0:0",
+      "entity_id": "obj_1",
+      "mention": "the aforementioned jade_object"
+    },
+    {
+      "row_id": "TRAIN:016022:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:016062:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:016063:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:016075:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:016084:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:016086:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:016121:0:0",
+      "entity_id": "obj_1",
+      "mention": "jade_object"
+    }
+  ]
+}

@@ -1,0 +1,78 @@
+{
+  "final_epoch": {
+    "balanced_accuracy": 0.5900750756263733,
+    "accuracy": 0.6211790442466736,
+    "support_positive": 10083,
+    "support_negative": 21061,
+    "train_prevalence": 0.33605125546455383,
+    "beats_declared_base_rate_margin": false
+  },
+  "best_train_loss_secondary": {
+    "balanced_accuracy": 0.5900750756263733,
+    "accuracy": 0.6211790442466736,
+    "support_positive": 10083,
+    "support_negative": 21061,
+    "train_prevalence": 0.33605125546455383,
+    "beats_declared_base_rate_margin": false
+  },
+  "history": [
+    {
+      "epoch": 1,
+      "fixed_train_subsample_loss": 0.6672188310367212
+    },
+    {
+      "epoch": 2,
+      "fixed_train_subsample_loss": 0.6657158342618372
+    },
+    {
+      "epoch": 3,
+      "fixed_train_subsample_loss": 0.6610337998636175
+    },
+    {
+      "epoch": 4,
+      "fixed_train_subsample_loss": 0.6544272928437948
+    },
+    {
+      "epoch": 5,
+      "fixed_train_subsample_loss": 0.653798494243872
+    },
+    {
+      "epoch": 6,
+      "fixed_train_subsample_loss": 0.6522858401297227
+    },
+    {
+      "epoch": 7,
+      "fixed_train_subsample_loss": 0.6519830793945953
+    },
+    {
+      "epoch": 8,
+      "fixed_train_subsample_loss": 0.6510100686120154
+    },
+    {
+      "epoch": 9,
+      "fixed_train_subsample_loss": 0.6512246932856174
+    },
+    {
+      "epoch": 10,
+      "fixed_train_subsample_loss": 0.6500483889733226
+    },
+    {
+      "epoch": 11,
+      "fixed_train_subsample_loss": 0.649761272722992
+    },
+    {
+      "epoch": 12,
+      "fixed_train_subsample_loss": 0.6497456986829603
+    }
+  ],
+  "best_train_epoch": 12,
+  "epochs": 12,
+  "optimizer_steps": 3744,
+  "batch_size": 64,
+  "batch_unit": "WORLDS",
+  "drop_last": true,
+  "cached_dtype": "FP16",
+  "selection_on_dev": false,
+  "final_readout_sha256": "9941caa206295a6d461bffa5239749695d3c00e41596b8525a687695fdb09c2f",
+  "best_train_readout_sha256": "23be857981d8b22c0cdd5fad41440fa9834fc3cbbc681fb0d95c008daf97a608"
+}

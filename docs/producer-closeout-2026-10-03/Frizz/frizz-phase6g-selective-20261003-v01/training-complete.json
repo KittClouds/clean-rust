@@ -1,0 +1,9 @@
+{
+  "endpoint": 12,
+  "epochs": 12,
+  "fit_seconds": 22.194068900018465,
+  "parameters": 55299,
+  "protected_evaluation_opened": false,
+  "status": "PASS",
+  "steps": 1008
+}

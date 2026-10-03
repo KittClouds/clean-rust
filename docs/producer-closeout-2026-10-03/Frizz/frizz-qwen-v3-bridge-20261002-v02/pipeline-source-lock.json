@@ -1,0 +1,28 @@
+{
+  "files": {
+    "adapter-audit-v01.json": "cbc08402393a1e0ef82c48167b60ac6a57a07992a85ef626def65b1c71d5b218",
+    "adapter.py": "c3eaf5b91b1b8f0df8ee87e434a98cfeb71faf4cb6009cda7beb1eafcb3c7722",
+    "audit_release.py": "85719e0f17217020ba0348b7a4961a0a444ada7982bb607448ff7cea1a3e9ab2",
+    "BRIDGE.md": "5654c81ce0d37d4bfe28e8e8917f90f648b3c6710c02aba7b4d7643d8aee3988",
+    "bridge_model.py": "e5f7282c349aa7ce135be7a36021c72d48031f764c23ddbd1c2817298352b1c4",
+    "dataset.py": "f469fae69fa5ae6fde3f4bc7fac5b0cde168613d474f6661b0df22be1d21aea0",
+    "evaluate.py": "7863da20295185612ddaade5c9b77aaa03037d75a822ad8982df142facc53140",
+    "extract.py": "0646838151a992e366353b9e18edf8417fe216a2ed4ce6b9b67bca248ad248b5",
+    "objective.py": "c3f168e34415ce7f276f17ae5d87a491df38994a0c5040fd0fe16b46bd6d3d85",
+    "observable-preflight-v01.json": "16a988dfdd682b57a09fbe6c6a8c7590f0ca48c832e16b5245d64c15c90d79f1",
+    "pipeline.py": "bdf62a05b30febcf7a235f80c8a08ded4c07e1edfad3c42062132b9769dd00c8",
+    "PLAN.md": "38a075d7facc3446f3deabc0b1e99f2c9875d84ea9bc68b8face4cc658d7964b",
+    "preflight.py": "a13af5572513d2414af418cb460735ae654353f9e9f53adc395222e36d375d36",
+    "readouts.py": "799fa1fb25ebe19d6ebc6c3f800311fecc6a20974f49dc16626f118053bd1ca9",
+    "release-binding-v01.json": "784efcd8d39e4f80192e1bb4b0afa2998ffe0efddaf628b85f498ca3f107e7e2",
+    "runtime.py": "eee414da7520e7c574d3967e19536087afbf70de2606cb311ba8806bc7ec7bef",
+    "test_adapter.py": "f67002212319cdbccb763169b62021c011137c39cf40dfbed01d5e856cdb870d",
+    "test_bridge.py": "3c70840f285e819ebecc3fef5679750597bb0efe501776f0d0826ad3c691ba48",
+    "test_release.py": "0213193370a2c1451fb8ea46a5a7edd4399c8d266c3599dae2c691bd83edb7f3",
+    "train_bridge.py": "cf86d85253edf63e1962db8fd9176364a116e7ec8da57abbc2ac3cbf45f2f78f",
+    "verify_bridge.py": "452a94fb92908881dd671bb1995471fc88c5b58afd01f1149725a8e1f8b6407e"
+  },
+  "tests_passed": 16,
+  "cuda_backward_smoke": "PASS",
+  "evaluation_opened": false
+}

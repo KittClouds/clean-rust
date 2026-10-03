@@ -1,0 +1,7 @@
+{
+  "evaluation_opened": false,
+  "init_and_trained_logits": "exact",
+  "original_parameters_and_readout_unchanged": true,
+  "parameter_tensors_verified": 324,
+  "status": "PASS"
+}

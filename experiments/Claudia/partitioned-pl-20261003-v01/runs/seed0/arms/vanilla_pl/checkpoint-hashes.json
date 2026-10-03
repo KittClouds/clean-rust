@@ -1,0 +1,15 @@
+{
+  "vanilla_pl-epoch00.pt": "cc79bfb87abdef1ef79c276d88b37f56167d59c69b4fb4540e87cdad4cf83222",
+  "vanilla_pl-epoch01.pt": "c8b1ed3238c1845491598af89b87bab7a2b6eaad441ce1755c8bfb0567bacb8c",
+  "vanilla_pl-epoch02.pt": "e089063ce977e67f1ab17739bcabcfa37a3307a1c706dc05267680f8b6e89e03",
+  "vanilla_pl-epoch03.pt": "1f0e572afef76513f3eae42a19785f1273eaf1a11785df017a0e801e6904def9",
+  "vanilla_pl-epoch04.pt": "b193b96f419073b40ce7dcf9b7ec1aff0aa1ea2c659a85be58fbcfbeb46b1da5",
+  "vanilla_pl-epoch05.pt": "d165ce3507d47c9a4889ccddf8946f969c27f776da394bbbefe50bb4187c625c",
+  "vanilla_pl-epoch06.pt": "8168b35f282940b48eedf2d36f1cd16fa0636133e6c9ed9c787f3ea84f6adafe",
+  "vanilla_pl-epoch07.pt": "97bb2b2ab7f6868cc6e654577c82bcba8ecd554d029f11a83556b1673244144d",
+  "vanilla_pl-epoch08.pt": "9338a1bd1026cd1c50478fd286c8bafd2b30885ccad9027906b5c5ee728ec725",
+  "vanilla_pl-epoch09.pt": "e2fcdc40ad3f835356fe2a421bce267ac0c208e60f00b94f9baa9b0fcf181aca",
+  "vanilla_pl-epoch10.pt": "b0d617ed690b76bd05693428d0d577aff93cb276e142551a285af40e67f5f107",
+  "vanilla_pl-epoch11.pt": "73457740190ed80c93f418b4cde39d1722512392ee624f1b31664469c5e832bd",
+  "vanilla_pl-epoch12.pt": "39d30a0e463d822888222d930f6de6f1415423a32f349d80ebb511022eefa7df"
+}

@@ -1,0 +1,14 @@
+{
+  "preparation_failure": "str passed to Path-only hash adapter; failed before gold scientific scoring",
+  "control_repair": "one unseen DEV distance category made a known-label oracle control fail; only control denominator changed, unknown-as-failure probes unchanged",
+  "panel_failure": "CUDA illegal memory access during incomplete readout; source/logs preserved; GPU not reset; other user jobs untouched",
+  "panel_resume": "panel-source-v02 uses completed pt/json hashes and skips retraining finished identities; fresh-process full replay still mandatory",
+  "analysis_source_v02": "excludes actively written orchestration logs from immutable seal closure; no readout/endpoint change",
+  "final_panel_v03": "complete CPU FP32 panel at same family/dose; no mixed GPU/CPU phenotype comparisons; CUDA attempts preserved outside final panel",
+  "unit_tests": 5,
+  "test_sources": {
+    "test_gold.py": "f8bdf30931cd662964ad6ace8a19d5b87841809bf695cd07cc9dd1a39a9a0b4c",
+    "test_probes.py": "bdf46de56e07b8afcd7f8a753286a88e0bf72b39eac99a3ea6e8fbb877b811c0"
+  },
+  "evaluation_opened": false
+}

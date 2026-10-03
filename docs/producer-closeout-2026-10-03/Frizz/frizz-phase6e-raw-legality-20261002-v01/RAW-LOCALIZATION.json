@@ -1,0 +1,139 @@
+{
+  "adapter_arm": null,
+  "adapter_earned": false,
+  "interpretation": "bounded qualified frozen panel fails precise grounding at fixed dose",
+  "micro_LoRA_earned": true,
+  "protected_evaluation_opened": false,
+  "rules": {
+    "E_e-linear": {
+      "exact_gain_vs_gate": {
+        "bootstrap_roots": 333,
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "delta": 0.0,
+        "repetitions": 2000,
+        "seed": 20261002
+      },
+      "precise_grounding_qualified": false
+    },
+    "E_e-mlp": {
+      "exact_gain_vs_gate": {
+        "bootstrap_roots": 333,
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "delta": 0.0,
+        "repetitions": 2000,
+        "seed": 20261002
+      },
+      "precise_grounding_qualified": false
+    },
+    "local-linear": {
+      "exact_gain_vs_gate": {
+        "bootstrap_roots": 333,
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "delta": 0.0,
+        "repetitions": 2000,
+        "seed": 20261002
+      },
+      "precise_grounding_qualified": false
+    },
+    "local-mlp": {
+      "exact_gain_vs_gate": {
+        "bootstrap_roots": 333,
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "delta": 0.0,
+        "repetitions": 2000,
+        "seed": 20261002
+      },
+      "precise_grounding_qualified": false
+    },
+    "local_mf18-linear": {
+      "exact_gain_vs_gate": {
+        "bootstrap_roots": 333,
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "delta": 0.0,
+        "repetitions": 2000,
+        "seed": 20261002
+      },
+      "precise_grounding_qualified": false
+    },
+    "local_mf18-mlp": {
+      "exact_gain_vs_gate": {
+        "bootstrap_roots": 333,
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "delta": 0.0,
+        "repetitions": 2000,
+        "seed": 20261002
+      },
+      "precise_grounding_qualified": false
+    },
+    "local_mf24-linear": {
+      "exact_gain_vs_gate": {
+        "bootstrap_roots": 333,
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "delta": 0.0,
+        "repetitions": 2000,
+        "seed": 20261002
+      },
+      "precise_grounding_qualified": false
+    },
+    "local_mf24-mlp": {
+      "exact_gain_vs_gate": {
+        "bootstrap_roots": 333,
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "delta": 0.0,
+        "repetitions": 2000,
+        "seed": 20261002
+      },
+      "precise_grounding_qualified": false
+    },
+    "local_ms24-linear": {
+      "exact_gain_vs_gate": {
+        "bootstrap_roots": 333,
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "delta": 0.0,
+        "repetitions": 2000,
+        "seed": 20261002
+      },
+      "precise_grounding_qualified": false
+    },
+    "local_ms24-mlp": {
+      "exact_gain_vs_gate": {
+        "bootstrap_roots": 333,
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "delta": 0.0,
+        "repetitions": 2000,
+        "seed": 20261002
+      },
+      "precise_grounding_qualified": false
+    }
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "binding_source": "public.bindings name/aliases; first text mention; unmatched arguments zero, no canonical repair",
+  "canonical_legal_not_permission": true,
+  "counterfactuals_not_corpus_changes": true,
+  "exact_signature": "raw full text plus binding/goal/candidate-coordinate ABI, no renderer normalization",
+  "excluded": [
+    "hidden facts",
+    "simulator state",
+    "truth-only locations",
+    "unsupported predicates",
+    "selected ID",
+    "gold legality",
+    "distance",
+    "support labels",
+    "unrendered slot markers"
+  ],
+  "goal_source": "public.goal_mentions surface/role matching public.bindings; empty/multiple retained",
+  "public_superset_not_encoded_directly": [
+    "action text",
+    "action IDs",
+    "request IDs",
+    "world/canonical IDs",
+    "renderer metadata"
+  ],
+  "semantic_signature": "full source-traced observation plus ordered candidate menu, wording/order removed only at semantic level",
+  "text_source": "public.input_text -> untruncated frozen Qwen -> six aggregates/final mention means",
+  "typed_source": "public.actions type and sorted argument keys -> nine types/four roles/four binding vectors"
+}

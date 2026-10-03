@@ -1,0 +1,8 @@
+{
+  "status": "POST_HOC_PRESENTATION_ONLY",
+  "note": "report.py was written after DEV scoring. It reads receipts, re-derives the within-type chance baseline from frozen targets, and writes CONTEXT.json / DISPOSITION.json / REPORT.md. No scored number, checkpoint or comparison depends on it. Its disposition string applies the frozen rule output mechanically. Revised once before sealing, wording only: units on a CI, an added note that SetRank top3 / mean rank are slightly worse than the control, and a softened causal sentence.",
+  "source_hashes": {
+    "report.py": "1964106d5d61d5a1d3725d8d10a23affbd6e43d2727961a6458ec31bf09ade0c"
+  },
+  "frozen_specification_sha256": "0c2aa3acf4a46c5b8ba01caa5b5322554edec13eb352b414c845303274946fc9"
+}

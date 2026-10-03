@@ -1,0 +1,26 @@
+{
+  "sha256": "d854a7a7226391f50fd9bbdd23d882cb0badd085daa86b290843e8475332b4bb",
+  "rows": 256,
+  "absent_mentions_zeroed": [
+    {
+      "row_id": "TRAIN:006680:0:0",
+      "entity_id": "sw_1",
+      "mention": "switch_r"
+    },
+    {
+      "row_id": "TRAIN:006731:0:0",
+      "entity_id": "sw_0",
+      "mention": "switch_q"
+    },
+    {
+      "row_id": "TRAIN:006770:0:0",
+      "entity_id": "obj_0",
+      "mention": "basalt_object"
+    },
+    {
+      "row_id": "TRAIN:006785:0:0",
+      "entity_id": "loc_3",
+      "mention": "chamber_a"
+    }
+  ]
+}

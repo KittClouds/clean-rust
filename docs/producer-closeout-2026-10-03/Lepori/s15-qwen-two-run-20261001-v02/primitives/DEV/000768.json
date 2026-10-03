@@ -1,0 +1,66 @@
+{
+  "sha256": "342227fd9fbfc65f10545b38e52a77fd8d415956438e35589fec8194dd20dc59",
+  "rows": 256,
+  "absent_mentions_zeroed": [
+    {
+      "row_id": "DEV:000786:0:0",
+      "entity_id": "sw_0",
+      "mention": "the aforementioned switch_q"
+    },
+    {
+      "row_id": "DEV:000798:0:0",
+      "entity_id": "sw_0",
+      "mention": "switch_q"
+    },
+    {
+      "row_id": "DEV:000815:0:0",
+      "entity_id": "obj_0",
+      "mention": "jade_object"
+    },
+    {
+      "row_id": "DEV:000820:0:0",
+      "entity_id": "sw_0",
+      "mention": "switch_r"
+    },
+    {
+      "row_id": "DEV:000821:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "DEV:000825:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "DEV:000848:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "DEV:000870:0:0",
+      "entity_id": "sw_0",
+      "mention": "switch_r"
+    },
+    {
+      "row_id": "DEV:000952:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "DEV:000960:0:0",
+      "entity_id": "sw_2",
+      "mention": "switch_p"
+    },
+    {
+      "row_id": "DEV:000966:0:0",
+      "entity_id": "obj_1",
+      "mention": "onyx"
+    },
+    {
+      "row_id": "DEV:000990:0:0",
+      "entity_id": "loc_0",
+      "mention": "chamber_a"
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "process_id": 33692,
+  "stage": "consequence fit around epoch6",
+  "working_set_bytes": 2534326272,
+  "observed_process_peak_working_set_bytes": 2553856000,
+  "private_memory_bytes": 4625227776,
+  "device": "CPU FP32, four threads; no CUDA allocation",
+  "scope": "Windows process counters at a mid-flight observation, not an end-to-end allocation profile",
+  "evaluation_opened": false
+}

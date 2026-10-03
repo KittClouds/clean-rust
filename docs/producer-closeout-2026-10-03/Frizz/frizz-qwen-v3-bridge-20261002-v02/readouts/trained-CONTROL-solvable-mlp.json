@@ -1,0 +1,18 @@
+{
+  "target": "solvable",
+  "surface": "GOLD_CHANNEL_CONTROL",
+  "family": "mlp",
+  "epochs": 4,
+  "batch_unit": "64 canonical worlds, not candidates",
+  "steps": 752,
+  "training_worlds": 12000,
+  "seconds": 2.458182999980636,
+  "metric": {
+    "n": 2730,
+    "positive": 2168,
+    "negative": 562,
+    "balanced_accuracy": 1.0,
+    "accuracy": 1.0
+  },
+  "control": true
+}

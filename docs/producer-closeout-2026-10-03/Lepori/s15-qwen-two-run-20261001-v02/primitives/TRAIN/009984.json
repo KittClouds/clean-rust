@@ -1,0 +1,26 @@
+{
+  "sha256": "4351477a375a9772599be31e1bbaa200d6b5e7d049f97a4c0c2554c306231eb8",
+  "rows": 256,
+  "absent_mentions_zeroed": [
+    {
+      "row_id": "TRAIN:010032:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:010057:0:0",
+      "entity_id": "sw_0",
+      "mention": "switch_r"
+    },
+    {
+      "row_id": "TRAIN:010137:0:0",
+      "entity_id": "ag_0",
+      "mention": "they"
+    },
+    {
+      "row_id": "TRAIN:010233:0:0",
+      "entity_id": "obj_2",
+      "mention": "jade_object"
+    }
+  ]
+}

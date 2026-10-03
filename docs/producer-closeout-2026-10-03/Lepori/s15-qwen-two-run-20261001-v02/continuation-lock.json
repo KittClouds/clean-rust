@@ -1,0 +1,15 @@
+{
+  "reason": "correct diagnostic batch unit, preserve completed baseline",
+  "training_lock_sha256": "a2b5b5fa4a6270a29e1c5ee2d25217d003a7ba4d460da161282234979c01d3af",
+  "source_files": {
+    "C:\\code land\\clean-rust\\experiments\\s15-lepori-qwen-two-run\\finish_trial.py": "5bba1fa32bb70e83de923b5f6258fa5a5560f2d300669be1c5711425e6c8705d",
+    "C:\\code land\\clean-rust\\experiments\\s15-lepori-qwen-two-run\\diagnostics_world.py": "7b84a47818e92e9c967865c8b4d458210108224b73726996b00341e4660b5672"
+  },
+  "completed_graft_runs_preserved": [
+    "phase1"
+  ],
+  "remaining_graft_runs": [
+    "phase1b"
+  ],
+  "candidate_batched_analysis": "unmatched exploratory, preserved; no outcome-based arm selection"
+}

@@ -1,0 +1,117 @@
+{
+  "Qwen_or_E_trainable_parameters": 0,
+  "device": "CPU FP32 four threads",
+  "epochs": [
+    {
+      "TRAIN_loss_terms": {
+        "MAE": 0.019906854689387337,
+        "ordering": 0.3047478858913694,
+        "ordinal": 0.4174048611450763,
+        "renderer": 6.103690688248553e-05,
+        "status": 0.028730804100632668
+      },
+      "checkpoint_sha256": "68c034f6fa3c7e1e5b54355ea621b74745527a68b073fa825c86f36b64bfe66b",
+      "elapsed_seconds": 15.990083199983928,
+      "epoch": 1,
+      "steps": 84
+    },
+    {
+      "TRAIN_loss_terms": {
+        "MAE": 0.01757508508550624,
+        "ordering": 0.28401352110363187,
+        "ordinal": 0.32986349665692877,
+        "renderer": 8.356638530434186e-05,
+        "status": 0.022661119721652495
+      },
+      "checkpoint_sha256": "1df8bbbea4c2eb2019f1ae9eaf451cdaebab46079094ddd307f12575a086eee4",
+      "elapsed_seconds": 31.663492699997732,
+      "epoch": 2,
+      "steps": 168
+    },
+    {
+      "TRAIN_loss_terms": {
+        "MAE": 0.017284146388105694,
+        "ordering": 0.2673097165922324,
+        "ordinal": 0.30171907338358106,
+        "renderer": 9.800210829693934e-05,
+        "status": 0.02141224137241287
+      },
+      "checkpoint_sha256": "0ce3979f7722d445cee8ec4ec9d7ea76d0b624c1920032100d4116851a3dbe29",
+      "elapsed_seconds": 47.25269110000227,
+      "epoch": 3,
+      "steps": 252
+    },
+    {
+      "TRAIN_loss_terms": {
+        "MAE": 0.016355014594626568,
+        "ordering": 0.24902249996860823,
+        "ordinal": 0.2897961496242455,
+        "renderer": 0.00010258096976724032,
+        "status": 0.021203466070195038
+      },
+      "checkpoint_sha256": "bab654c015d7d982869b8d86b2276d44b88711f0d37e2dd2ce002e4c61412119",
+      "elapsed_seconds": 62.997742099978495,
+      "epoch": 4,
+      "steps": 336
+    },
+    {
+      "TRAIN_loss_terms": {
+        "MAE": 0.01562625146470964,
+        "ordering": 0.22492446271436556,
+        "ordinal": 0.2638556503114246,
+        "renderer": 0.00012634874682199943,
+        "status": 0.020695930513154184
+      },
+      "checkpoint_sha256": "f3b1331d0465f38cd5886ecc5dc789d774649e2de4f46fb1980f27d1495e5a41",
+      "elapsed_seconds": 78.8840222999861,
+      "epoch": 5,
+      "steps": 420
+    },
+    {
+      "TRAIN_loss_terms": {
+        "MAE": 0.015403087650026594,
+        "ordering": 0.1923831133615403,
+        "ordinal": 0.25000959918612525,
+        "renderer": 0.00012055399076329887,
+        "status": 0.020717145342911993
+      },
+      "checkpoint_sha256": "5610134f24b0fb45a4a7f17056bd1d4cb18537d8998234bd4ee9d9658effbe12",
+      "elapsed_seconds": 94.65720009998768,
+      "epoch": 6,
+      "steps": 504
+    },
+    {
+      "TRAIN_loss_terms": {
+        "MAE": 0.014428285915138466,
+        "ordering": 0.1542624690170799,
+        "ordinal": 0.2358875306589263,
+        "renderer": 0.000123837887908199,
+        "status": 0.020330624233576514
+      },
+      "checkpoint_sha256": "8c5f522a6b29f62c0f1e92f1bbedb61a28ac5055affbd0971f21bd9b33cdf823",
+      "elapsed_seconds": 111.14370649997727,
+      "epoch": 7,
+      "steps": 588
+    },
+    {
+      "TRAIN_loss_terms": {
+        "MAE": 0.014032055008491235,
+        "ordering": 0.1365862206245462,
+        "ordinal": 0.22897723228448913,
+        "renderer": 0.00011831571512067014,
+        "status": 0.02012764030535306
+      },
+      "checkpoint_sha256": "b1a45cc95b22bf619ce4bdb2b585935ea633e17ff36ef38ff9a1d0f160fd2341",
+      "elapsed_seconds": 126.84263249998912,
+      "epoch": 8,
+      "steps": 672
+    }
+  ],
+  "evaluation_opened": false,
+  "fixed_epoch": 8,
+  "parameters": 164859,
+  "selected_ID_supervision": false,
+  "status": "PASS",
+  "steps": 672,
+  "training_seconds": 126.84876939997775
+}

@@ -1,0 +1,181 @@
+{
+  "cache_root": "D:\\phoenix-target-overgraph\\frizz-phase6e-raw-legality-20261002-v01\\prefix23",
+  "evaluation_opened": false,
+  "full_text": true,
+  "layer": 23,
+  "max_tokens": 1415,
+  "prefix_frozen": true,
+  "rows": {
+    "DEV": 666,
+    "TRAIN": 2666
+  },
+  "seconds": 282.03691779996734,
+  "status": "PASS",
+  "weight_identity": {
+    "max_abs_difference": 0,
+    "parameters_checked": 320,
+    "text_parameters": 752393024
+  },
+  "zero_delta_boundary_parity": [
+    {
+      "relative_RMS": 0.004919636528939009,
+      "row": 0,
+      "split": "TRAIN"
+    },
+    {
+      "relative_RMS": 0.004079213831573725,
+      "row": 1,
+      "split": "TRAIN"
+    },
+    {
+      "relative_RMS": 0.0048913671635091305,
+      "row": 2,
+      "split": "TRAIN"
+    },
+    {
+      "relative_RMS": 0.004978276323527098,
+      "row": 3,
+      "split": "TRAIN"
+    },
+    {
+      "relative_RMS": 0.00471173832193017,
+      "row": 4,
+      "split": "TRAIN"
+    },
+    {
+      "relative_RMS": 0.0048112692311406136,
+      "row": 5,
+      "split": "TRAIN"
+    },
+    {
+      "relative_RMS": 0.0047456384636461735,
+      "row": 6,
+      "split": "TRAIN"
+    },
+    {
+      "relative_RMS": 0.004385544452816248,
+      "row": 7,
+      "split": "TRAIN"
+    },
+    {
+      "relative_RMS": 0.004027783405035734,
+      "row": 8,
+      "split": "TRAIN"
+    },
+    {
+      "relative_RMS": 0.0033228029496967793,
+      "row": 9,
+      "split": "TRAIN"
+    },
+    {
+      "relative_RMS": 0.0033133691176772118,
+      "row": 10,
+      "split": "TRAIN"
+    },
+    {
+      "relative_RMS": 0.0033571491949260235,
+      "row": 11,
+      "split": "TRAIN"
+    },
+    {
+      "relative_RMS": 0.0,
+      "row": 12,
+      "split": "TRAIN"
+    },
+    {
+      "relative_RMS": 0.003632650477811694,
+      "row": 13,
+      "split": "TRAIN"
+    },
+    {
+      "relative_RMS": 0.004945300053805113,
+      "row": 14,
+      "split": "TRAIN"
+    },
+    {
+      "relative_RMS": 0.004904291592538357,
+      "row": 15,
+      "split": "TRAIN"
+    },
+    {
+      "relative_RMS": 0.003280147910118103,
+      "row": 0,
+      "split": "DEV"
+    },
+    {
+      "relative_RMS": 0.004015085753053427,
+      "row": 1,
+      "split": "DEV"
+    },
+    {
+      "relative_RMS": 0.00471333647146821,
+      "row": 2,
+      "split": "DEV"
+    },
+    {
+      "relative_RMS": 0.004622065462172031,
+      "row": 3,
+      "split": "DEV"
+    },
+    {
+      "relative_RMS": 0.0045483787544071674,
+      "row": 4,
+      "split": "DEV"
+    },
+    {
+      "relative_RMS": 0.004561341367661953,
+      "row": 5,
+      "split": "DEV"
+    },
+    {
+      "relative_RMS": 0.0032843423541635275,
+      "row": 6,
+      "split": "DEV"
+    },
+    {
+      "relative_RMS": 0.00401668157428503,
+      "row": 7,
+      "split": "DEV"
+    },
+    {
+      "relative_RMS": 0.004317282699048519,
+      "row": 8,
+      "split": "DEV"
+    },
+    {
+      "relative_RMS": 0.003996443934738636,
+      "row": 9,
+      "split": "DEV"
+    },
+    {
+      "relative_RMS": 0.0,
+      "row": 10,
+      "split": "DEV"
+    },
+    {
+      "relative_RMS": 0.00027799486997537315,
+      "row": 11,
+      "split": "DEV"
+    },
+    {
+      "relative_RMS": 0.0,
+      "row": 12,
+      "split": "DEV"
+    },
+    {
+      "relative_RMS": 0.0040931375697255135,
+      "row": 13,
+      "split": "DEV"
+    },
+    {
+      "relative_RMS": 0.004386518150568008,
+      "row": 14,
+      "split": "DEV"
+    },
+    {
+      "relative_RMS": 0.004326940048485994,
+      "row": 15,
+      "split": "DEV"
+    }
+  ]
+}

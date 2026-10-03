@@ -1,0 +1,107 @@
+{
+  "status": "PASS",
+  "sources_and_inputs_unchanged": true,
+  "label_replay": {
+    "TRAIN": {
+      "canonical_worlds": 20000,
+      "all_available_labels": "EXACT",
+      "selected_action_absent": 9625,
+      "selected_action_outside_candidate_set": 934,
+      "simulator_sha256": "37344067422e4aa6846ca01a7fb70a8a0f6647bf3bbaeffc7a0340e386d015a6"
+    },
+    "DEV": {
+      "canonical_worlds": 2000,
+      "all_available_labels": "EXACT",
+      "selected_action_absent": 960,
+      "selected_action_outside_candidate_set": 109,
+      "simulator_sha256": "37344067422e4aa6846ca01a7fb70a8a0f6647bf3bbaeffc7a0340e386d015a6"
+    }
+  },
+  "label_replay_receipt_sha256": "516858f9af4e142e3a7df78a60053b7d422d3a66885c737507eed118305b8417",
+  "arms": {
+    "phase1": {
+      "selected_epoch": 8,
+      "evaluation_replay": "EXACT",
+      "goal_relative_strata": {
+        "all_valid": {
+          "balanced_accuracy": 0.9467529654502869,
+          "accuracy": 0.9448689818382263,
+          "support_positive": 10083,
+          "support_negative": 21061,
+          "train_prevalence": 0.33605125546455383,
+          "beats_declared_base_rate_margin": true
+        },
+        "initial_goal_not_satisfied": {
+          "balanced_accuracy": 0.7919549643993378,
+          "accuracy": 0.9615015983581543,
+          "support_positive": 678,
+          "support_negative": 20180,
+          "train_prevalence": 0.33605125546455383,
+          "beats_declared_base_rate_margin": true
+        },
+        "legal_MOVE_initial_goal_not_satisfied": {
+          "balanced_accuracy": 0.704940676689148,
+          "accuracy": 0.8234295845031738,
+          "support_positive": 468,
+          "support_negative": 1299,
+          "train_prevalence": 0.33605125546455383,
+          "beats_declared_base_rate_margin": true
+        }
+      },
+      "endpoint_denominator_audit": {
+        "optimal_set_hit_when_gold_set_nonempty": 0.6733870506286621,
+        "optimal_set_hit_count": 334,
+        "exact_logged_action_accuracy_same_nonempty_gold_subset": 0.6088709235191345,
+        "exact_logged_action_hit_count_same_nonempty_gold_subset": 302,
+        "exact_logged_action_hit_count_all_eligible": 732,
+        "exact_logged_action_eligible_rows": 931,
+        "defined_optimal_set_endpoint_rows": 496,
+        "empty_gold_optimal_set_endpoint_rows": 435,
+        "uniform_random_candidate_expected_accuracy": 0.08014145493507385,
+        "historical_inverse_mean_cardinality": 0.06372347474098206,
+        "these_descriptive_strata_used_for_selection": false
+      },
+      "forbidden_heads_unchanged": null
+    },
+    "phase1b": {
+      "selected_epoch": 8,
+      "evaluation_replay": "EXACT",
+      "goal_relative_strata": {
+        "all_valid": {
+          "balanced_accuracy": 0.9454227685928345,
+          "accuracy": 0.9470202922821045,
+          "support_positive": 10083,
+          "support_negative": 21061,
+          "train_prevalence": 0.33605125546455383,
+          "beats_declared_base_rate_margin": true
+        },
+        "initial_goal_not_satisfied": {
+          "balanced_accuracy": 0.727285623550415,
+          "accuracy": 0.964617908000946,
+          "support_positive": 678,
+          "support_negative": 20180,
+          "train_prevalence": 0.33605125546455383,
+          "beats_declared_base_rate_margin": true
+        },
+        "legal_MOVE_initial_goal_not_satisfied": {
+          "balanced_accuracy": 0.6154635697603226,
+          "accuracy": 0.7883418202400208,
+          "support_positive": 468,
+          "support_negative": 1299,
+          "train_prevalence": 0.33605125546455383,
+          "beats_declared_base_rate_margin": false
+        }
+      },
+      "endpoint_denominator_audit": null,
+      "forbidden_heads_unchanged": true
+    }
+  },
+  "shared_initialization": "EXACT",
+  "candidate_readout_replays": 13,
+  "global_readout_replays": 16,
+  "final_and_best_train_readout_scores": "EXACT",
+  "graft_training_runs": 2,
+  "protected_test_opened": false,
+  "analysis_source_sha256": "e482480cdb586f971602a1d3fd322eb355e4a9cdb42e32bc452446f47e008bed",
+  "claim_scope": "repaired Qwen acquisition; NOT substrate-only superiority over historical MiniCPM"
+}

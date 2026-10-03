@@ -1,0 +1,5 @@
+# heavy artifacts: sealed manifests record their hashes; the bytes stay out of git
+*.pt
+*.safetensors
+__pycache__/
+.pytest_cache/

@@ -1,0 +1,76 @@
+{
+  "sha256": "c848c11db73d807e3fb41623fdd3f49a8df6f72e8864766a89e8ee9f6085dd29",
+  "rows": 256,
+  "absent_mentions_zeroed": [
+    {
+      "row_id": "TRAIN:006319:0:0@S0",
+      "entity_id": "sw_0",
+      "mention": "switch_q"
+    },
+    {
+      "row_id": "TRAIN:006319:0:0@S1",
+      "entity_id": "sw_0",
+      "mention": "switch_q"
+    },
+    {
+      "row_id": "TRAIN:006329:0:0@S0",
+      "entity_id": "obj_1",
+      "mention": "sapphire_object"
+    },
+    {
+      "row_id": "TRAIN:006329:0:0@S1",
+      "entity_id": "obj_1",
+      "mention": "sapphire_object"
+    },
+    {
+      "row_id": "TRAIN:006599:0:0@S1",
+      "entity_id": "sw_1",
+      "mention": "switch_q"
+    },
+    {
+      "row_id": "TRAIN:006599:0:0@S2",
+      "entity_id": "sw_1",
+      "mention": "switch_q"
+    },
+    {
+      "row_id": "TRAIN:007079:0:1@S0",
+      "entity_id": "sw_0",
+      "mention": "switch_p"
+    },
+    {
+      "row_id": "TRAIN:007079:0:1@S1",
+      "entity_id": "sw_0",
+      "mention": "switch_p"
+    },
+    {
+      "row_id": "TRAIN:007139:0:0@S0",
+      "entity_id": "obj_0",
+      "mention": "basalt_object"
+    },
+    {
+      "row_id": "TRAIN:007139:0:0@S1",
+      "entity_id": "obj_0",
+      "mention": "basalt_object"
+    },
+    {
+      "row_id": "TRAIN:007259:0:0@S0",
+      "entity_id": "sw_1",
+      "mention": "switch_q"
+    },
+    {
+      "row_id": "TRAIN:007259:0:0@S1",
+      "entity_id": "sw_1",
+      "mention": "switch_q"
+    },
+    {
+      "row_id": "TRAIN:007409:0:1@S0",
+      "entity_id": "obj_2",
+      "mention": "sapphire_object"
+    },
+    {
+      "row_id": "TRAIN:007409:0:1@S1",
+      "entity_id": "obj_2",
+      "mention": "sapphire_object"
+    }
+  ]
+}

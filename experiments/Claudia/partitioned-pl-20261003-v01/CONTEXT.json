@@ -1,0 +1,14 @@
+{
+  "chance": {
+    "unrestricted_uniform_top1": 0.018880337476730347,
+    "within_type_uniform_top1": 0.11401821672916412,
+    "within_type_uniform_MRR": 0.3095524311065674,
+    "mean_same_type_candidates": 10.549549102783203
+  },
+  "phase6a_best_independent_scorer": {
+    "top1": 0.09009008854627609,
+    "MRR": 0.24069558084011078,
+    "gold_type_top1": 0.15315315127372742,
+    "gold_type_MRR": 0.3391304612159729
+  }
+}

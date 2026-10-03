@@ -1,0 +1,44 @@
+{
+  "target": "disposition",
+  "surface": "s",
+  "family": "mlp",
+  "epochs": 4,
+  "steps": 752,
+  "batch_unit": "64 canonical worlds",
+  "metric": {
+    "n": 3000,
+    "accuracy": 0.8100000023841858,
+    "macro_f1": 0.6502912596817799,
+    "class_support": {
+      "0": {
+        "n": 167,
+        "f1": 0.4489795918367347,
+        "reliable": false
+      },
+      "1": {
+        "n": 1832,
+        "f1": 0.9092373791621912,
+        "reliable": true
+      },
+      "2": {
+        "n": 501,
+        "f1": 0.77466251298027,
+        "reliable": true
+      },
+      "3": {
+        "n": 333,
+        "f1": 0.6656151419558359,
+        "reliable": true
+      },
+      "4": {
+        "n": 167,
+        "f1": 0.4529616724738676,
+        "reliable": false
+      }
+    },
+    "macro_f1_scope": "DEV-present classes; underpowered classes descriptive only"
+  },
+  "restricted_or_underpowered": "respect source contract; pooled metrics descriptive only",
+  "probe_sha256": "3a5d22807ef7101018b1ee1b21eba3c210610a050a0329152a45f54c7d1952d9",
+  "parameters": 4485
+}

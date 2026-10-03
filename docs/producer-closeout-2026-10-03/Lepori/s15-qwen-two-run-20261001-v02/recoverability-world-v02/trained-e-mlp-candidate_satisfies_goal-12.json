@@ -1,0 +1,78 @@
+{
+  "final_epoch": {
+    "balanced_accuracy": 0.9478455781936646,
+    "accuracy": 0.9467313289642334,
+    "support_positive": 10083,
+    "support_negative": 21061,
+    "train_prevalence": 0.33605125546455383,
+    "beats_declared_base_rate_margin": true
+  },
+  "best_train_loss_secondary": {
+    "balanced_accuracy": 0.9479901492595673,
+    "accuracy": 0.9468918442726135,
+    "support_positive": 10083,
+    "support_negative": 21061,
+    "train_prevalence": 0.33605125546455383,
+    "beats_declared_base_rate_margin": true
+  },
+  "history": [
+    {
+      "epoch": 1,
+      "fixed_train_subsample_loss": 0.09404617335492012
+    },
+    {
+      "epoch": 2,
+      "fixed_train_subsample_loss": 0.09305300286305684
+    },
+    {
+      "epoch": 3,
+      "fixed_train_subsample_loss": 0.09250411997352478
+    },
+    {
+      "epoch": 4,
+      "fixed_train_subsample_loss": 0.09194150496418732
+    },
+    {
+      "epoch": 5,
+      "fixed_train_subsample_loss": 0.09198374279855955
+    },
+    {
+      "epoch": 6,
+      "fixed_train_subsample_loss": 0.0915876489549652
+    },
+    {
+      "epoch": 7,
+      "fixed_train_subsample_loss": 0.09119882798621104
+    },
+    {
+      "epoch": 8,
+      "fixed_train_subsample_loss": 0.09108144105125159
+    },
+    {
+      "epoch": 9,
+      "fixed_train_subsample_loss": 0.09094180979659697
+    },
+    {
+      "epoch": 10,
+      "fixed_train_subsample_loss": 0.09088132109131358
+    },
+    {
+      "epoch": 11,
+      "fixed_train_subsample_loss": 0.09084182777780468
+    },
+    {
+      "epoch": 12,
+      "fixed_train_subsample_loss": 0.0908466244949443
+    }
+  ],
+  "best_train_epoch": 11,
+  "epochs": 12,
+  "optimizer_steps": 3744,
+  "batch_size": 64,
+  "batch_unit": "WORLDS",
+  "drop_last": true,
+  "cached_dtype": "FP16",
+  "selection_on_dev": false,
+  "final_readout_sha256": "93150ac1969a413bff8bd3d0099cdbb3594fd6b8668532d9f327518de5d70c03",
+  "best_train_readout_sha256": "bd9f581af4fe063b4725b3cfecf357cb8ffd23c3fa36d98c7652b6f1046a28f9"
+}

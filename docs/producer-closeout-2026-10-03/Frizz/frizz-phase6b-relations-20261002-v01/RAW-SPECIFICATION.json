@@ -1,0 +1,20 @@
+{
+  "weak_factors": [
+    "legality",
+    "transition_distance"
+  ],
+  "view": "observable nine-type one-hot + four qualified positional argument vectors + six TRAIN-normalized global Qwen surfaces",
+  "width": 10249,
+  "families": [
+    "linear",
+    "64-hidden GELU MLP"
+  ],
+  "epochs": 4,
+  "seed": 0,
+  "lr": 0.001,
+  "wd": 0.01,
+  "mask": "same-type candidate population; TRAIN only",
+  "source_sha256": "0a04f24444773886b968dfdf2289effefd574edc1153640a9d209e16bcfb4188",
+  "normalization": "parameter-free per argument LayerNorm; no DEV fits",
+  "evaluation_opened": false
+}

@@ -1,0 +1,11 @@
+{
+  "cap_depth": 8,
+  "evaluation_opened": false,
+  "max_states": 40000,
+  "roots": {
+    "DEV": 333,
+    "TRAIN": 1333
+  },
+  "semantics": "0..8 SOLVED distance,9 UNSAT_EXHAUSTED,10 CAP/STATE_LIMIT,11 ILLEGAL",
+  "status": "PASS"
+}

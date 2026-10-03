@@ -1,0 +1,36 @@
+{
+  "sha256": "64c7f92ee2469b63ae9e614242dff9a49d20435390ddb34bfa006d5eeb602c63",
+  "rows": 256,
+  "absent_mentions_zeroed": [
+    {
+      "row_id": "TRAIN:015388:0:0",
+      "entity_id": "sw_1",
+      "mention": "switch_q"
+    },
+    {
+      "row_id": "TRAIN:015409:0:1",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:015503:0:0",
+      "entity_id": "obj_1",
+      "mention": "coral_object"
+    },
+    {
+      "row_id": "TRAIN:015522:0:0",
+      "entity_id": "ag_0",
+      "mention": "the aforementioned agent"
+    },
+    {
+      "row_id": "TRAIN:015557:0:0",
+      "entity_id": "obj_1",
+      "mention": "copper_object"
+    },
+    {
+      "row_id": "TRAIN:015560:0:2",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    }
+  ]
+}

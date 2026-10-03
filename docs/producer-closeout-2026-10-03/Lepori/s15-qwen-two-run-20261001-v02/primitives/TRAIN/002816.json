@@ -1,0 +1,46 @@
+{
+  "sha256": "371a254fe7cd6d5ccecad2d8280a2cd82deaf76eb1e93c874f5595c0be5df023",
+  "rows": 256,
+  "absent_mentions_zeroed": [
+    {
+      "row_id": "TRAIN:002851:0:0",
+      "entity_id": "obj_0",
+      "mention": "topaz_object"
+    },
+    {
+      "row_id": "TRAIN:002912:0:0",
+      "entity_id": "obj_1",
+      "mention": "coral_object"
+    },
+    {
+      "row_id": "TRAIN:002924:0:0",
+      "entity_id": "obj_0",
+      "mention": "the aforementioned onyx_object"
+    },
+    {
+      "row_id": "TRAIN:002932:0:0",
+      "entity_id": "obj_1",
+      "mention": "sapphire_object"
+    },
+    {
+      "row_id": "TRAIN:002971:0:0",
+      "entity_id": "loc_0",
+      "mention": "chamber_c"
+    },
+    {
+      "row_id": "TRAIN:002998:0:0",
+      "entity_id": "obj_2",
+      "mention": "onyx"
+    },
+    {
+      "row_id": "TRAIN:003046:0:0",
+      "entity_id": "sw_0",
+      "mention": "switch_p"
+    },
+    {
+      "row_id": "TRAIN:003068:0:0",
+      "entity_id": "obj_1",
+      "mention": "ivory_object"
+    }
+  ]
+}

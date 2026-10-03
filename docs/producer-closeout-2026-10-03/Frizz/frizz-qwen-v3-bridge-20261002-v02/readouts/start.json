@@ -1,0 +1,9 @@
+{
+  "epochs": 4,
+  "batch_worlds": 64,
+  "seed": 0,
+  "lr": 0.001,
+  "selection": "none, fixed endpoint",
+  "evaluation_opened": false,
+  "source_sha256": "799fa1fb25ebe19d6ebc6c3f800311fecc6a20974f49dc16626f118053bd1ca9"
+}

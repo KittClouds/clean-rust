@@ -1,0 +1,52 @@
+{
+  "status": "RUN_STARTED",
+  "seed": 0,
+  "epochs": 8,
+  "root_batch": 32,
+  "rendered_batch": 64,
+  "optimizer": "AdamW",
+  "learning_rate": 0.0003,
+  "weight_decay": 0.01,
+  "checkpoint_selection": "fixed final epoch eight; DEV reporting only",
+  "handoff_v02_sha256": "08cab38d366d6a30d32af4b0391cafddb243a8ea9e6a7435ad53290462d41a4b",
+  "sources": {
+    "adapter.py": "c3eaf5b91b1b8f0df8ee87e434a98cfeb71faf4cb6009cda7beb1eafcb3c7722",
+    "audit_release.py": "85719e0f17217020ba0348b7a4961a0a444ada7982bb607448ff7cea1a3e9ab2",
+    "bridge_model.py": "e5f7282c349aa7ce135be7a36021c72d48031f764c23ddbd1c2817298352b1c4",
+    "context_inputs.py": "815d35a8c9414dc97b9e01f742a00754802db842c480f66e224b13f6725a7e12",
+    "continue_bridge.py": "6c049c874ce0521feb23c27a39bf8a8c6c9c41eb4a6952ad994e2df72f81a905",
+    "dataset.py": "84950bc65ad4f7fe03a30ab753cb60af7da827cba9a55ac3019c0a731f6ce02c",
+    "evaluate.py": "7863da20295185612ddaade5c9b77aaa03037d75a822ad8982df142facc53140",
+    "extract.py": "0646838151a992e366353b9e18edf8417fe216a2ed4ce6b9b67bca248ad248b5",
+    "flight_panel.py": "68506dba21903b05b826bb1d97e6ac0d6fb25ad34d765a4ce9be76dcde4e1740",
+    "objective.py": "c3f168e34415ce7f276f17ae5d87a491df38994a0c5040fd0fe16b46bd6d3d85",
+    "pipeline.py": "bdf62a05b30febcf7a235f80c8a08ded4c07e1edfad3c42062132b9769dd00c8",
+    "preflight.py": "a13af5572513d2414af418cb460735ae654353f9e9f53adc395222e36d375d36",
+    "readouts.py": "799fa1fb25ebe19d6ebc6c3f800311fecc6a20974f49dc16626f118053bd1ca9",
+    "recorder_runner.py": "6fafc7bee12fa03696c053cbae3e27462ca62d0c4d2fb5c286e482b8720f3e28",
+    "response_tools.py": "0cf2a2072bcccd7f92e167f2d7d87dbadd1059ce9daa825f9de83144e8b027d5",
+    "runtime.py": "eee414da7520e7c574d3967e19536087afbf70de2606cb311ba8806bc7ec7bef",
+    "test_adapter.py": "f67002212319cdbccb763169b62021c011137c39cf40dfbed01d5e856cdb870d",
+    "test_bridge.py": "eb9a2b2205377209cbea0b3bdbf2a806e23b791dfd29186f5485b29645f51a64",
+    "test_context_inputs.py": "99333ec82d426a8d6c11707a1ff720903dc93ba3c12a617f633969ed5a97d61c",
+    "test_release.py": "0213193370a2c1451fb8ea46a5a7edd4399c8d266c3599dae2c691bd83edb7f3",
+    "test_response.py": "d706a10b8093f18b522f0c0337b55ed0d3b5e1378ad906cb2f56b1d5346ed7ab",
+    "train_bridge.py": "cf86d85253edf63e1962db8fd9176364a116e7ec8da57abbc2ac3cbf45f2f78f",
+    "verify_bridge.py": "452a94fb92908881dd671bb1995471fc88c5b58afd01f1149725a8e1f8b6407e"
+  },
+  "spec_sha256": "5654c81ce0d37d4bfe28e8e8917f90f648b3c6710c02aba7b4d7643d8aee3988",
+  "dataset_hashes": {
+    "TRAIN": "336a550c1c8ae9576036f5f36a04408f4ff373c73cf65fc0863e33dbeeeaab6e",
+    "DEV": "a56d90e18f4932e570d4c87703ae940ea1033d13be6875518eb978f9ddb4ced3"
+  },
+  "train_prevalences": {
+    "candidate_legal": 0.05593887344002724,
+    "candidate_satisfies_goal": 0.005886512342840433,
+    "goal_satisfied": 0.05558333173394203,
+    "solvable": 0.7941365242004395
+  },
+  "parameters": 2174344,
+  "frozen_text_parameters": 752393024,
+  "evaluation_opened": false,
+  "mechanism": "dense baseline only; no E/F/recurrence/LoRA/IHA"
+}

@@ -1,0 +1,9 @@
+{
+  "status": "PASS",
+  "splits": [
+    "TRAIN",
+    "DEV"
+  ],
+  "scope": "fresh process pinned canonical simulator, full derived factors and same-type population",
+  "evaluation_opened": false
+}

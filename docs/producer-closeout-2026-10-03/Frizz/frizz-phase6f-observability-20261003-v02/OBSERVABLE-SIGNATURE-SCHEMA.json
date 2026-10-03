@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Phase6F v02 source-traced observable semantic transcript",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["bindings", "actor", "direct", "reports", "gates", "action_costs", "denied_permissions", "escalation_rules", "queries", "goal_prose", "goal_mentions", "menu", "requests_text"],
+  "properties": {
+    "bindings": {"type": "array", "description": "Exact public introduced bindings, names, aliases and types; IDs only join observable coordinates", "items": {"type": "object"}},
+    "actor": {"type": "string", "description": "Actor name actually emitted in the setting"},
+    "direct": {"type": "array", "items": {"type": "object", "required": ["fact", "validity"], "properties": {"fact": {"type": "array"}, "validity": {"type": ["array", "null"]}}}},
+    "reports": {"type": "array", "items": {"type": "object", "required": ["fact", "source", "confidence_pct"]}, "description": "Observed claims, never automatically certain truth"},
+    "gates": {"type": "array", "items": {"type": "object", "required": ["edge", "condition"]}},
+    "action_costs": {"type": "object"},
+    "denied_permissions": {"type": "object", "description": "Emitted denied type and authority only; not a simulator legality clause"},
+    "escalation_rules": {"type": "array", "items": {"type": "object"}},
+    "queries": {"type": "array", "description": "Emitted availability and question meaning; hidden location/state value excluded"},
+    "goal_prose": {"type": "array", "items": {"type": "string"}, "description": "Actual emitted goal clause, not private goal required-fact IDs"},
+    "goal_mentions": {"type": "array", "items": {"type": "object"}},
+    "menu": {"type": "array", "items": {"type": "object", "required": ["type", "arguments"], "properties": {"type": {"type": "string"}, "arguments": {"type": "array"}}}, "description": "Ordered exhaustive menu; deterministic sorted argument keys and public bound names, otherwise UNBOUND"},
+    "requests_text": {"type": "array", "items": {"type": "string"}}
+  },
+  "$comment": "Fact predicate arguments are observable names. REL uses observable synonym pools, not private registry ID. No hidden truth, selected ID, gold legality, transition distance or slot-marker metadata. Semantic collisions are not absolute raw-interface impossibility proofs. Exact-interface signature separately retains raw full text and ABI coordinates."
+}

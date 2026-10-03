@@ -1,0 +1,22 @@
+{
+  "status": "FIXED_BEFORE_DIAGNOSTIC_DEV_SCORING",
+  "earned_factors": [
+    "legality",
+    "transition_distance"
+  ],
+  "sources": {
+    "common.py": "22a2ff97ef2f7e6ec58bc10860545897b7b3208e806b3716086c04c5a2b1e73e",
+    "targets.py": "4f8d9940bcfb099619a084a580b2b86c3f207e476166d6d74ee62caad5998d0c",
+    "probes.py": "b2d67b4666505d912352455aec308c38059c008ac94ac7adfeeef33109465885",
+    "panel.py": "8eee08ae5689073e0523018c715ee76a6b0b1b757a23f11740f7443507783518",
+    "cpu_panel.py": "e92359e0b5566db20c616663f343e25a7002f4e68f0d602f56fc3e4a0890a275"
+  },
+  "gold_receipt_sha256": "f50cefd119d96c59dbc192871b9c6d9687dc5355d6d7ae78855142754707f0b7",
+  "epochs": 4,
+  "seed": 0,
+  "hidden": 64,
+  "batch_roots": 64,
+  "evaluation_opened": false,
+  "backend": "CPU FP32, four threads, deterministic algorithms, all 168 arms",
+  "repair": "complete matched CPU panel after contended CUDA failure; prior CUDA fits preserved and not used in final panel"
+}

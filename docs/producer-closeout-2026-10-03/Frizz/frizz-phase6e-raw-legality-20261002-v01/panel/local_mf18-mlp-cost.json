@@ -1,0 +1,9 @@
+{
+  "DEV_seconds": 0.8818194000050426,
+  "device": "CUDA FP32 TF32 disabled",
+  "fit_seconds": 31.77147940004943,
+  "fixed_epoch": 8,
+  "parameters": 330945,
+  "peak_allocated_bytes_process": 367533056,
+  "steps": 672
+}

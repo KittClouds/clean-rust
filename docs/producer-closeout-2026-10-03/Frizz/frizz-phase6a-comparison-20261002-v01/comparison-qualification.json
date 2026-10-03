@@ -1,0 +1,468 @@
+{
+  "pair_type_strata": {
+    "bridge:c:linear": {
+      "selected_pair": {
+        "same_action_type": {
+          "pairs": 223,
+          "roots": 164,
+          "positive_pairs": 107,
+          "negative_pairs": 116,
+          "accuracy": 0.5291479825973511,
+          "balanced_accuracy": 0.5292861759662628
+        },
+        "different_action_type": {
+          "pairs": 1109,
+          "roots": 333,
+          "positive_pairs": 559,
+          "negative_pairs": 550,
+          "accuracy": 0.886384129524231,
+          "balanced_accuracy": 0.8864498138427734
+        }
+      },
+      "optimal_pair": {
+        "same_action_type": {
+          "pairs": 223,
+          "roots": 164,
+          "positive_pairs": 107,
+          "negative_pairs": 116,
+          "accuracy": 0.5291479825973511,
+          "balanced_accuracy": 0.5292861759662628
+        },
+        "different_action_type": {
+          "pairs": 1109,
+          "roots": 333,
+          "positive_pairs": 559,
+          "negative_pairs": 550,
+          "accuracy": 0.886384129524231,
+          "balanced_accuracy": 0.8864498138427734
+        }
+      }
+    },
+    "bridge:c:mlp": {
+      "selected_pair": {
+        "same_action_type": {
+          "pairs": 223,
+          "roots": 164,
+          "positive_pairs": 107,
+          "negative_pairs": 116,
+          "accuracy": 0.5201793909072876,
+          "balanced_accuracy": 0.5188527256250381
+        },
+        "different_action_type": {
+          "pairs": 1109,
+          "roots": 333,
+          "positive_pairs": 559,
+          "negative_pairs": 550,
+          "accuracy": 0.8701533079147339,
+          "balanced_accuracy": 0.8702325522899628
+        }
+      },
+      "optimal_pair": {
+        "same_action_type": {
+          "pairs": 223,
+          "roots": 164,
+          "positive_pairs": 107,
+          "negative_pairs": 116,
+          "accuracy": 0.5201793909072876,
+          "balanced_accuracy": 0.5188527256250381
+        },
+        "different_action_type": {
+          "pairs": 1109,
+          "roots": 333,
+          "positive_pairs": 559,
+          "negative_pairs": 550,
+          "accuracy": 0.8701533079147339,
+          "balanced_accuracy": 0.8702325522899628
+        }
+      }
+    },
+    "bridge:cs:linear": {
+      "selected_pair": {
+        "same_action_type": {
+          "pairs": 223,
+          "roots": 164,
+          "positive_pairs": 107,
+          "negative_pairs": 116,
+          "accuracy": 0.5381165742874146,
+          "balanced_accuracy": 0.538269430398941
+        },
+        "different_action_type": {
+          "pairs": 1109,
+          "roots": 333,
+          "positive_pairs": 559,
+          "negative_pairs": 550,
+          "accuracy": 0.8827772736549377,
+          "balanced_accuracy": 0.8828427195549011
+        }
+      },
+      "optimal_pair": {
+        "same_action_type": {
+          "pairs": 223,
+          "roots": 164,
+          "positive_pairs": 107,
+          "negative_pairs": 116,
+          "accuracy": 0.5381165742874146,
+          "balanced_accuracy": 0.538269430398941
+        },
+        "different_action_type": {
+          "pairs": 1109,
+          "roots": 333,
+          "positive_pairs": 559,
+          "negative_pairs": 550,
+          "accuracy": 0.8827772736549377,
+          "balanced_accuracy": 0.8828427195549011
+        }
+      }
+    },
+    "bridge:cs:mlp": {
+      "selected_pair": {
+        "same_action_type": {
+          "pairs": 223,
+          "roots": 164,
+          "positive_pairs": 107,
+          "negative_pairs": 116,
+          "accuracy": 0.5156950950622559,
+          "balanced_accuracy": 0.5145423859357834
+        },
+        "different_action_type": {
+          "pairs": 1109,
+          "roots": 333,
+          "positive_pairs": 559,
+          "negative_pairs": 550,
+          "accuracy": 0.8512173295021057,
+          "balanced_accuracy": 0.851273387670517
+        }
+      },
+      "optimal_pair": {
+        "same_action_type": {
+          "pairs": 223,
+          "roots": 164,
+          "positive_pairs": 107,
+          "negative_pairs": 116,
+          "accuracy": 0.5156950950622559,
+          "balanced_accuracy": 0.5145423859357834
+        },
+        "different_action_type": {
+          "pairs": 1109,
+          "roots": 333,
+          "positive_pairs": 559,
+          "negative_pairs": 550,
+          "accuracy": 0.8512173295021057,
+          "balanced_accuracy": 0.851273387670517
+        }
+      }
+    },
+    "bridge:e:linear": {
+      "selected_pair": {
+        "same_action_type": {
+          "pairs": 223,
+          "roots": 164,
+          "positive_pairs": 107,
+          "negative_pairs": 116,
+          "accuracy": 0.5201793909072876,
+          "balanced_accuracy": 0.5192152857780457
+        },
+        "different_action_type": {
+          "pairs": 1109,
+          "roots": 333,
+          "positive_pairs": 559,
+          "negative_pairs": 550,
+          "accuracy": 0.8782687187194824,
+          "balanced_accuracy": 0.8783265650272369
+        }
+      },
+      "optimal_pair": {
+        "same_action_type": {
+          "pairs": 223,
+          "roots": 164,
+          "positive_pairs": 107,
+          "negative_pairs": 116,
+          "accuracy": 0.5201793909072876,
+          "balanced_accuracy": 0.5192152857780457
+        },
+        "different_action_type": {
+          "pairs": 1109,
+          "roots": 333,
+          "positive_pairs": 559,
+          "negative_pairs": 550,
+          "accuracy": 0.8782687187194824,
+          "balanced_accuracy": 0.8783265650272369
+        }
+      }
+    },
+    "bridge:e:mlp": {
+      "selected_pair": {
+        "same_action_type": {
+          "pairs": 223,
+          "roots": 164,
+          "positive_pairs": 107,
+          "negative_pairs": 116,
+          "accuracy": 0.5156950950622559,
+          "balanced_accuracy": 0.5149049460887909
+        },
+        "different_action_type": {
+          "pairs": 1109,
+          "roots": 333,
+          "positive_pairs": 559,
+          "negative_pairs": 550,
+          "accuracy": 0.8836789727210999,
+          "balanced_accuracy": 0.8837518095970154
+        }
+      },
+      "optimal_pair": {
+        "same_action_type": {
+          "pairs": 223,
+          "roots": 164,
+          "positive_pairs": 107,
+          "negative_pairs": 116,
+          "accuracy": 0.5156950950622559,
+          "balanced_accuracy": 0.5149049460887909
+        },
+        "different_action_type": {
+          "pairs": 1109,
+          "roots": 333,
+          "positive_pairs": 559,
+          "negative_pairs": 550,
+          "accuracy": 0.8836789727210999,
+          "balanced_accuracy": 0.8837518095970154
+        }
+      }
+    },
+    "E:c:linear": {
+      "selected_pair": {
+        "same_action_type": {
+          "pairs": 223,
+          "roots": 164,
+          "positive_pairs": 107,
+          "negative_pairs": 116,
+          "accuracy": 0.48430493474006653,
+          "balanced_accuracy": 0.4821946620941162
+        },
+        "different_action_type": {
+          "pairs": 1109,
+          "roots": 333,
+          "positive_pairs": 559,
+          "negative_pairs": 550,
+          "accuracy": 0.8683498501777649,
+          "balanced_accuracy": 0.8683997392654419
+        }
+      },
+      "optimal_pair": {
+        "same_action_type": {
+          "pairs": 223,
+          "roots": 164,
+          "positive_pairs": 107,
+          "negative_pairs": 116,
+          "accuracy": 0.48430493474006653,
+          "balanced_accuracy": 0.4821946620941162
+        },
+        "different_action_type": {
+          "pairs": 1109,
+          "roots": 333,
+          "positive_pairs": 559,
+          "negative_pairs": 550,
+          "accuracy": 0.8683498501777649,
+          "balanced_accuracy": 0.8683997392654419
+        }
+      }
+    },
+    "E:c:mlp": {
+      "selected_pair": {
+        "same_action_type": {
+          "pairs": 223,
+          "roots": 164,
+          "positive_pairs": 107,
+          "negative_pairs": 116,
+          "accuracy": 0.5022421479225159,
+          "balanced_accuracy": 0.49979858100414276
+        },
+        "different_action_type": {
+          "pairs": 1109,
+          "roots": 333,
+          "positive_pairs": 559,
+          "negative_pairs": 550,
+          "accuracy": 0.8521190285682678,
+          "balanced_accuracy": 0.852109283208847
+        }
+      },
+      "optimal_pair": {
+        "same_action_type": {
+          "pairs": 223,
+          "roots": 164,
+          "positive_pairs": 107,
+          "negative_pairs": 116,
+          "accuracy": 0.5022421479225159,
+          "balanced_accuracy": 0.49979858100414276
+        },
+        "different_action_type": {
+          "pairs": 1109,
+          "roots": 333,
+          "positive_pairs": 559,
+          "negative_pairs": 550,
+          "accuracy": 0.8521190285682678,
+          "balanced_accuracy": 0.852109283208847
+        }
+      }
+    },
+    "E:cs:linear": {
+      "selected_pair": {
+        "same_action_type": {
+          "pairs": 223,
+          "roots": 164,
+          "positive_pairs": 107,
+          "negative_pairs": 116,
+          "accuracy": 0.4798206388950348,
+          "balanced_accuracy": 0.47715920209884644
+        },
+        "different_action_type": {
+          "pairs": 1109,
+          "roots": 333,
+          "positive_pairs": 559,
+          "negative_pairs": 550,
+          "accuracy": 0.8647429943084717,
+          "balanced_accuracy": 0.8647487461566925
+        }
+      },
+      "optimal_pair": {
+        "same_action_type": {
+          "pairs": 223,
+          "roots": 164,
+          "positive_pairs": 107,
+          "negative_pairs": 116,
+          "accuracy": 0.4798206388950348,
+          "balanced_accuracy": 0.47715920209884644
+        },
+        "different_action_type": {
+          "pairs": 1109,
+          "roots": 333,
+          "positive_pairs": 559,
+          "negative_pairs": 550,
+          "accuracy": 0.8647429943084717,
+          "balanced_accuracy": 0.8647487461566925
+        }
+      }
+    },
+    "E:cs:mlp": {
+      "selected_pair": {
+        "same_action_type": {
+          "pairs": 223,
+          "roots": 164,
+          "positive_pairs": 107,
+          "negative_pairs": 116,
+          "accuracy": 0.4932735562324524,
+          "balanced_accuracy": 0.4922655373811722
+        },
+        "different_action_type": {
+          "pairs": 1109,
+          "roots": 333,
+          "positive_pairs": 559,
+          "negative_pairs": 550,
+          "accuracy": 0.8133453726768494,
+          "balanced_accuracy": 0.8132964670658112
+        }
+      },
+      "optimal_pair": {
+        "same_action_type": {
+          "pairs": 223,
+          "roots": 164,
+          "positive_pairs": 107,
+          "negative_pairs": 116,
+          "accuracy": 0.4932735562324524,
+          "balanced_accuracy": 0.4922655373811722
+        },
+        "different_action_type": {
+          "pairs": 1109,
+          "roots": 333,
+          "positive_pairs": 559,
+          "negative_pairs": 550,
+          "accuracy": 0.8133453726768494,
+          "balanced_accuracy": 0.8132964670658112
+        }
+      }
+    },
+    "E:e:linear": {
+      "selected_pair": {
+        "same_action_type": {
+          "pairs": 223,
+          "roots": 164,
+          "positive_pairs": 107,
+          "negative_pairs": 116,
+          "accuracy": 0.560538113117218,
+          "balanced_accuracy": 0.5601836740970612
+        },
+        "different_action_type": {
+          "pairs": 1109,
+          "roots": 333,
+          "positive_pairs": 559,
+          "negative_pairs": 550,
+          "accuracy": 0.902614951133728,
+          "balanced_accuracy": 0.9026524722576141
+        }
+      },
+      "optimal_pair": {
+        "same_action_type": {
+          "pairs": 223,
+          "roots": 164,
+          "positive_pairs": 107,
+          "negative_pairs": 116,
+          "accuracy": 0.560538113117218,
+          "balanced_accuracy": 0.5601836740970612
+        },
+        "different_action_type": {
+          "pairs": 1109,
+          "roots": 333,
+          "positive_pairs": 559,
+          "negative_pairs": 550,
+          "accuracy": 0.902614951133728,
+          "balanced_accuracy": 0.9026524722576141
+        }
+      }
+    },
+    "E:e:mlp": {
+      "selected_pair": {
+        "same_action_type": {
+          "pairs": 223,
+          "roots": 164,
+          "positive_pairs": 107,
+          "negative_pairs": 116,
+          "accuracy": 0.5695067048072815,
+          "balanced_accuracy": 0.5688043832778931
+        },
+        "different_action_type": {
+          "pairs": 1109,
+          "roots": 333,
+          "positive_pairs": 559,
+          "negative_pairs": 550,
+          "accuracy": 0.904418408870697,
+          "balanced_accuracy": 0.9044413864612579
+        }
+      },
+      "optimal_pair": {
+        "same_action_type": {
+          "pairs": 223,
+          "roots": 164,
+          "positive_pairs": 107,
+          "negative_pairs": 116,
+          "accuracy": 0.5695067048072815,
+          "balanced_accuracy": 0.5688043832778931
+        },
+        "different_action_type": {
+          "pairs": 1109,
+          "roots": 333,
+          "positive_pairs": 559,
+          "negative_pairs": 550,
+          "accuracy": 0.904418408870697,
+          "balanced_accuracy": 0.9044413864612579
+        }
+      }
+    }
+  },
+  "endpoint_population_audit": {
+    "selected_eligible_roots": 333,
+    "optimal_eligible_roots": 333,
+    "selected_and_optimal_eligible_masks_equal": true,
+    "optimal_set_equals_logged_singleton_on_eligible_roots": true
+  },
+  "purpose": "descriptive post-fit qualification, not a branch criterion or probe selection",
+  "evaluation_opened": false
+}

@@ -1,0 +1,51 @@
+{
+  "sha256": "26c3f87a7c09fecd9c4a4545a0bdb46333e81af99b743bfb4ba6d95e10ea5368",
+  "rows": 256,
+  "absent_mentions_zeroed": [
+    {
+      "row_id": "TRAIN:003097:0:0",
+      "entity_id": "obj_1",
+      "mention": "topaz_object"
+    },
+    {
+      "row_id": "TRAIN:003139:0:0",
+      "entity_id": "ag_0",
+      "mention": "they"
+    },
+    {
+      "row_id": "TRAIN:003176:0:0",
+      "entity_id": "obj_1",
+      "mention": "topaz_object"
+    },
+    {
+      "row_id": "TRAIN:003193:0:0",
+      "entity_id": "sw_1",
+      "mention": "switch_q"
+    },
+    {
+      "row_id": "TRAIN:003197:0:0",
+      "entity_id": "obj_1",
+      "mention": "topaz_object"
+    },
+    {
+      "row_id": "TRAIN:003235:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:003278:0:0",
+      "entity_id": "sw_2",
+      "mention": "the aforementioned switch_q"
+    },
+    {
+      "row_id": "TRAIN:003308:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:003311:0:0",
+      "entity_id": "sw_0",
+      "mention": "switch_p"
+    }
+  ]
+}

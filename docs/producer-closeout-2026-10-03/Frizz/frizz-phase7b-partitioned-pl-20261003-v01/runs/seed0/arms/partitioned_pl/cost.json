@@ -1,0 +1,15 @@
+{
+  "arm": "partitioned_pl",
+  "seed": 0,
+  "parameters": 55169,
+  "epochs": 12,
+  "steps": 504,
+  "initial_weights_sha256": "f609d0aedf094ccaa97adeb461aa9dcf5200a501d57cea8762a5c5ba93e19ae0",
+  "train_seconds_including_monitoring": 96.75847120000981,
+  "monitoring_seconds": 16.831557599944063,
+  "pure_training_seconds": 79.92691360006575,
+  "peak_cuda_memory_bytes": 292728832,
+  "device": "NVIDIA GeForce RTX 3080",
+  "batch_roots": 32,
+  "steps_per_epoch": 42
+}

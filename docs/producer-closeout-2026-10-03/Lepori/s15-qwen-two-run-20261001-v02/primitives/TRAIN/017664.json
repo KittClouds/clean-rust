@@ -1,0 +1,36 @@
+{
+  "sha256": "de5a2b40986112fb5023ab519d8f0db66dd4286adaf407e04aac8c36ec243bda",
+  "rows": 256,
+  "absent_mentions_zeroed": [
+    {
+      "row_id": "TRAIN:017680:0:0",
+      "entity_id": "obj_1",
+      "mention": "the aforementioned ivory_object"
+    },
+    {
+      "row_id": "TRAIN:017691:0:0",
+      "entity_id": "obj_2",
+      "mention": "sapphire_object"
+    },
+    {
+      "row_id": "TRAIN:017695:0:0",
+      "entity_id": "ag_0",
+      "mention": "agent"
+    },
+    {
+      "row_id": "TRAIN:017805:0:0",
+      "entity_id": "sw_0",
+      "mention": "switch_q"
+    },
+    {
+      "row_id": "TRAIN:017859:0:0",
+      "entity_id": "obj_2",
+      "mention": "ivory_object"
+    },
+    {
+      "row_id": "TRAIN:017902:0:0",
+      "entity_id": "obj_1",
+      "mention": "basalt_object"
+    }
+  ]
+}
