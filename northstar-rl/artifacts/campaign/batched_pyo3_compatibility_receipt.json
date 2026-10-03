@@ -1,0 +1,20 @@
+{
+  "schema_version": "BATCHED_PYO3_COMPATIBILITY_RECEIPT_V1",
+  "status": "QUALIFIED",
+  "learner_execution": "NOT_RUN",
+  "checks": [
+    "reset_many_shape_dtype",
+    "step_many_shape_dtype",
+    "32_lane_deterministic_replay",
+    "128_lane_boundary_smoke"
+  ],
+  "implementation": {
+    "abi_contract": "NORTHSTAR_PYO3_ABI_V2",
+    "batch_py_sha256": "450339b60e3ac1b525a69658dbe3a09bda797cc7b5b69e35b389febdeed659b2"
+  },
+  "performance": {
+    "reset_many_128_ns_per_call": 575231.2,
+    "reset_then_step_many_128_ns_per_call": 1572211.1,
+    "calls": 1000
+  }
+}

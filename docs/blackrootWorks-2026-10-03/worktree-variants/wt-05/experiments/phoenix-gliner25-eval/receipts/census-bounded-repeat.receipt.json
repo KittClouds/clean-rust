@@ -1,0 +1,28 @@
+{
+  "contract": "phoenix-gliner25-shadow-census-v1",
+  "model_dir": "D:\\phoenix-models\\gliner2.5-base-v1-onnx-a639bad",
+  "model_manifest_sha256": "51da4d7492257862566a77c3d39ef4b68052b4c06aebe58fd257992631e6528a",
+  "schema_id": "phoenix-story-boundary-shadow-v1",
+  "schema_sha256": "9b768cce2c46c3acb65e27d8916914a54b973a76c4930bce17880d8404633f3f",
+  "precision": "fp32",
+  "chunk_words": 384,
+  "overlap_words": 64,
+  "documents": [
+    {
+      "path": ".\\docs\\shortrun.md",
+      "sha256": "21470d2874e061b29baeb1cd2f41a989c598170e025ee063362d8b815a3ea977",
+      "bytes": 161490,
+      "words": 26182,
+      "chapters": 10
+    }
+  ],
+  "chunks": 5,
+  "mentions": 120,
+  "duplicate_mentions": 14,
+  "invalid_ranges": 0,
+  "elapsed_ms": 3054.7954,
+  "warm_words_per_second": 628.5199984260811,
+  "peak_working_set_bytes": 1070325760,
+  "output_blake3": "912e30586472e7064a31f6b7756a5b1fda3970f030ca1b8017b789a6bb9b877d",
+  "graph_publications": 0
+}

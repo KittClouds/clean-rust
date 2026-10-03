@@ -1,0 +1,79 @@
+{
+  "representation_abi_id": "FAS_FROZEN_OBSERVER_BUNDLE_REPRESENTATION_ABI_V07",
+  "model_id": "LiquidAI/LFM2.5-1.2B-Base",
+  "model_revision": "7453bca97ca1e67754c4035a4b4c584e1c9dd725",
+  "model_config_sha256": "15d6157fb6df3f8272e2fe90e18f57727ccf02a125c94469198b0f3281510185",
+  "model_config_sha256_source": "historical FAS/S01 pinned model asset receipt; actual local file must be rehashed before E2 model loading",
+  "model_weights_file": "model.safetensors",
+  "model_weights_sha256": "7678ab9546a0c51c1fca161876b1efc4f0906277f170b5822045f40fdaf9eeff",
+  "model_asset_manifest_sha256": "a76c55c90e6beaaf6acf145abcfbfa6bd5cbb7a1ff4788cbb80856f62adaa56e",
+  "tokenizer_id": "LiquidAI/LFM2.5-1.2B-Base",
+  "tokenizer_revision": "7453bca97ca1e67754c4035a4b4c584e1c9dd725",
+  "tokenizer_assets_manifest_sha256": "c5e9a5b08ec5658ef2a8760d8230bbe9367bea124451488e164baf0eeca95afc",
+  "runtime_versions": {
+    "python": "3.13.15",
+    "torch": "2.11.0+cu128",
+    "transformers": "5.17.0",
+    "tokenizers": "0.23.2",
+    "huggingface_hub": "1.32.0",
+    "safetensors": "0.8.0",
+    "numpy": "2.5.3",
+    "cuda_runtime": "12.8",
+    "expected_device_0": "NVIDIA GeForce RTX 3080"
+  },
+  "loader": {
+    "model_class": "transformers.AutoModel",
+    "tokenizer_class": "transformers.AutoTokenizer",
+    "tokenizer_fast": true,
+    "local_files_only": true,
+    "trust_remote_code": false,
+    "model_dtype": "float32",
+    "device": "cuda:0",
+    "model_eval_mode": true,
+    "gradients_enabled": false,
+    "optimizer_created": false
+  },
+  "tokenization": {
+    "input": "panel input_text, verbatim",
+    "add_special_tokens": true,
+    "chat_template": false,
+    "padding": false,
+    "truncation": false,
+    "batch_size": 1,
+    "attention_mask": "all ones with exact unpadded sequence length"
+  },
+  "forward_call": {
+    "arguments": [
+      "input_ids",
+      "attention_mask",
+      "use_cache=false",
+      "return_dict=true"
+    ],
+    "output_type": "transformers BaseModelOutput",
+    "tensor_identity": "output.last_hidden_state[0, sequence_length - 1, :]",
+    "hook_identity": "structured forward output field last_hidden_state; no registered module hook",
+    "layer": "final transformer block output before any language-model head",
+    "surface_id": "V1_FINAL_POSITION",
+    "position": "sequence_length - 1",
+    "hidden_shape": [
+      1,
+      "sequence_length",
+      2048
+    ],
+    "feature_shape": [
+      2048
+    ],
+    "hidden_dtype": "float32",
+    "serialization_dtype": "little-endian float32",
+    "serialization_order": "C-contiguous"
+  },
+  "extractor_source_path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/extract_features_v07.py",
+  "extractor_source_sha256": "2b210d4f65c37d823b7060278c8a29db3a5c5f7fb535e6bb28d5147bc56b7b24",
+  "e2_authorization_required": true,
+  "model_contact_authorized_by_this_receipt": false,
+  "predecessor_representation_abi_sha256": "be2bc19341fdfcd39b89be4b145c9214b933b5764e8bab913e69a82da6693982",
+  "representation_surface_semantics_unchanged_from_v01": true,
+  "resource_receipt_extension": "E2 v07 preserves the frozen V1_FINAL_POSITION representation and PyTorch process-allocator gate. It preserves the bound wait receipt and normalized root/hash identity, and corrects live-process matching to require both the frozen executable path and exact script path.",
+  "execution_identity_verifier_path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e2_execution_identity_v07.py",
+  "execution_identity_verifier_sha256": "ef077ddd6edaff7594088dddec1911527281dfdbbf04e53f7a71cb6d3f2abf82"
+}

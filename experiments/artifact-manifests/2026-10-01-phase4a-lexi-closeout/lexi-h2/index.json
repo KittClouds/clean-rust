@@ -1,0 +1,40 @@
+{
+  "artifact_kind": "lexi-h2-rebuild-output",
+  "created_utc": "2026-10-01T22:29:02Z",
+  "imported_file_count": 1814,
+  "inventory_shards": [
+    {
+      "bytes": 318565,
+      "path": "files-000.ndjson",
+      "rows": 500,
+      "sha256": "0fe17866cf45252538e3b6b19ebb8ddd751cc0a8d34061b054f13f1e2b9c54a5"
+    },
+    {
+      "bytes": 305550,
+      "path": "files-001.ndjson",
+      "rows": 500,
+      "sha256": "0593c8ccc6549cd75d10c31964857a17c8b1c7e11cb14dbd76b32c74562e5e35"
+    },
+    {
+      "bytes": 305257,
+      "path": "files-002.ndjson",
+      "rows": 500,
+      "sha256": "15216262e62f78b34c3ce2cd9f57d3e870e61a8dbc5094dcf4cf23fde8d118a9"
+    },
+    {
+      "bytes": 194808,
+      "path": "files-003.ndjson",
+      "rows": 314,
+      "sha256": "f9e0382ef985cbe9828e59efc3766432349303b6cf6c5ec10644e759003da1f1"
+    }
+  ],
+  "purpose": "Lexi H2 rebuild and survival output tree",
+  "root_id": "lexi-h2-rebuild",
+  "schema": "KAMMI_CAS_IMPORT_INVENTORY_V1",
+  "source_agent": "Lexi",
+  "source_lab": "source lab not identified in source-lock",
+  "source_root": "C:\\phoenix-target-overgraph\\lexi-h2-rebuild-20260930",
+  "status": "IMPORTED_TO_LIBRARY_CAS",
+  "total_bytes": 73512636383,
+  "unique_content_objects": 1692
+}

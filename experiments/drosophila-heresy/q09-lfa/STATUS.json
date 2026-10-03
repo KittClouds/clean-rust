@@ -1,0 +1,20 @@
+{
+  "protocol": "Q09-LFA",
+  "status": "LINEAR_AUDIT_VALID__FREEDOM_PRESENT",
+  "stage": "COMPLETE",
+  "scientific_seed_bundles_used": 0,
+  "behavioral_inference": false,
+  "q08_mutation_detected": false,
+  "contract_frozen": true,
+  "stage_a_output": "qualification/stage-a-9201-qr",
+  "stage_a_audited_states": 1024,
+  "stage_a_reviewer": "VERIFIED_BY_NUMPY",
+  "stage_b_output": "qualification/stage-b-9202-9205-qr",
+  "stage_b_new_audited_states": 4096,
+  "cumulative_audited_states": 5120,
+  "stage_b_reviewer": "VERIFIED_BY_NUMPY",
+  "box_feasibility": "NOT_TESTED",
+  "alternative_seq32_equality": "NOT_TESTED",
+  "q10_authorized": false,
+  "quarantined_pre_repair_output": "qualification/stage-a-9201-compact"
+}

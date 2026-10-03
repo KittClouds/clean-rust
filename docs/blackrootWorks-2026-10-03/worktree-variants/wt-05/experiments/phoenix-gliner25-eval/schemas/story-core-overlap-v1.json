@@ -1,0 +1,12 @@
+{
+  "schema_id": "phoenix-story-core-overlap-v1",
+  "labels": [
+    "Person",
+    "Location",
+    "Organization",
+    "Creature",
+    "Item",
+    "Concept",
+    "Event"
+  ]
+}

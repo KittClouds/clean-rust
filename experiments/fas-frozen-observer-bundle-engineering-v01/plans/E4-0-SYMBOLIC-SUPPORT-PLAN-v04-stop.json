@@ -1,0 +1,14 @@
+{
+  "receipt_id": "FAS_E4_0_SYMBOLIC_SUPPORT_PLAN_V04_STOP",
+  "status": "PREMODEL_PLANNING_STOP_TEST_IMPORT_DEFECT",
+  "source_path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/e4-support-plan-v04/src/main.rs",
+  "source_sha256": "72c7e010767e9ed217a9588d166a099887634a1d6f99f0c591c637938463cf57",
+  "failure": "The v04 planner unit-test module referred to row_id without importing it.",
+  "classification": "PLANNING_TOOL_TEST_COMPILE_DEFECT",
+  "e1_artifact_modified": false,
+  "e4_population_rows_written": false,
+  "tokenizer_contacted": false,
+  "model_contacted": false,
+  "labels_opened": false,
+  "repair_policy": "Preserve v04; add the missing test import in v05. No schedule or identity rule changes."
+}

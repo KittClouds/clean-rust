@@ -1,0 +1,10 @@
+{
+  "provider": "TRADELOCKER",
+  "credential_provider": "WINDOWS_GENERIC_CREDENTIAL",
+  "credential_alias": "Northstar/TradeLocker/live",
+  "credential_resolved": true,
+  "authenticated_account_id_hash": "6db47f4400ffd711dbf498345eee27a88f20acee8b54180f73e6535deddb7536",
+  "connection_environment": "LIVE",
+  "connection_state": "CONNECTED",
+  "detail_code": "AUTHENTICATED_READ_ONLY_CAPTURE_PASS"
+}

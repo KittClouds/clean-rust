@@ -1,0 +1,36 @@
+{
+  "available": {
+    "cue_linear_error_magnitude_per_state": true,
+    "interaction_norm_summaries": true,
+    "signed_axis_and_norm_scalars_per_state": true
+  },
+  "behavioral_probe": false,
+  "counts": {
+    "axis_signed": 19996,
+    "cue_linear_abs_only": 19996,
+    "full_constraint_vector": 0,
+    "full_linear_drive_vector": 0,
+    "norm_signed": 19996,
+    "readout_value_vector": 0,
+    "weight_state_vector": 0
+  },
+  "identity": "q10-gc1-lr1-requal1-csc1-coverage-v1",
+  "interpretation": "Full CSC1 vector routing/alignment is not identifiable from current receipts. Scalar gate morphology is available; no signed linear-drive direction is available. Missing is not zero.",
+  "missing": {
+    "committed_weight_vectors": true,
+    "full_constraint_vectors": true,
+    "readout_value_vectors": true,
+    "signed_linear_drive_vectors": true
+  },
+  "pair_interaction_records": 4999,
+  "pair_records": 4999,
+  "parent_hashes": {
+    "interaction_execution": "5016A2331F7336A1684413B5D91E9957ECC2B56622C3B4BD3FB643585A95C6F6",
+    "morphology_report": "8C58E33BAFB3A0B23417EDF88C08AF1249EA8274731225BB7F8EB952DDE93D29",
+    "pair_execution": "F160638BF6009ED4050A1427D3A3D8C8F56DE777CBBE2AFEEAB1704FE28B6B0E"
+  },
+  "protocol": "REQUAL1-CSC1-COVERAGE",
+  "replay_performed": false,
+  "scientific_promotion": false,
+  "status": "CSC1_BLOCKED_RECEIPT_COVERAGE"
+}

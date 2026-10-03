@@ -1,0 +1,507 @@
+{
+  "schema_version": "TRADELOCKER_LIVE_READ_RECEIPT_V1",
+  "diagnostic": {
+    "provider": "TRADELOCKER",
+    "credential_provider": "WINDOWS_GENERIC_CREDENTIAL",
+    "credential_alias": "Northstar/TradeLocker/live",
+    "credential_resolved": true,
+    "authenticated_account_id_hash": "6db47f4400ffd711dbf498345eee27a88f20acee8b54180f73e6535deddb7536",
+    "connection_environment": "LIVE",
+    "connection_state": "CONNECTED",
+    "detail_code": "AUTHENTICATED_READ_ONLY_CAPTURE_PASS"
+  },
+  "registry": {
+    "schema_version": "BROKER_INSTRUMENT_REGISTRY_V1",
+    "instruments": [
+      {
+        "broker": "TRADELOCKER",
+        "venue": "HEROFX",
+        "broker_instrument_id": "3884",
+        "broker_symbol": "NAS100",
+        "northstar_instrument_id": 1,
+        "asset_class": "BROKER_DECLARED_OR_UNRESOLVED",
+        "quote_currency": "UNRESOLVED",
+        "price_precision": 2,
+        "tick_size": 0.01,
+        "quantity_precision": 2,
+        "quantity_step": 0.01,
+        "min_quantity": 0.01,
+        "max_quantity": 500.0,
+        "contract_size": 1.0,
+        "trading_status": "OBSERVED_AVAILABLE",
+        "raw_metadata": {
+          "payload_hash": "ede53d9363ea9881f657a7647a3b096e2e6e123a72fb93a99963f5acadaae371",
+          "retention": "HASH_ONLY",
+          "retained_relative_path": null
+        },
+        "observed_at_ns": 1786749000219867200
+      },
+      {
+        "broker": "TRADELOCKER",
+        "venue": "HEROFX",
+        "broker_instrument_id": "3888",
+        "broker_symbol": "SPX500",
+        "northstar_instrument_id": 2,
+        "asset_class": "BROKER_DECLARED_OR_UNRESOLVED",
+        "quote_currency": "UNRESOLVED",
+        "price_precision": 2,
+        "tick_size": 0.01,
+        "quantity_precision": 2,
+        "quantity_step": 0.01,
+        "min_quantity": 0.01,
+        "max_quantity": 500.0,
+        "contract_size": 1.0,
+        "trading_status": "OBSERVED_AVAILABLE",
+        "raw_metadata": {
+          "payload_hash": "8f9b01dcb353d930229f7c18bbdd21f736d16972f6cc1a0b78700690e32f06c0",
+          "retention": "HASH_ONLY",
+          "retained_relative_path": null
+        },
+        "observed_at_ns": 1786749000219867200
+      },
+      {
+        "broker": "TRADELOCKER",
+        "venue": "HEROFX",
+        "broker_instrument_id": "3883",
+        "broker_symbol": "US30",
+        "northstar_instrument_id": 3,
+        "asset_class": "BROKER_DECLARED_OR_UNRESOLVED",
+        "quote_currency": "UNRESOLVED",
+        "price_precision": 2,
+        "tick_size": 0.01,
+        "quantity_precision": 2,
+        "quantity_step": 0.01,
+        "min_quantity": 0.01,
+        "max_quantity": 500.0,
+        "contract_size": 1.0,
+        "trading_status": "OBSERVED_AVAILABLE",
+        "raw_metadata": {
+          "payload_hash": "682dbbf26501bcf865b8d8bde5c08c181f92b8264fc111017b5947662b974193",
+          "retention": "HASH_ONLY",
+          "retained_relative_path": null
+        },
+        "observed_at_ns": 1786749000219867200
+      },
+      {
+        "broker": "TRADELOCKER",
+        "venue": "HEROFX",
+        "broker_instrument_id": "3890",
+        "broker_symbol": "DE40",
+        "northstar_instrument_id": 4,
+        "asset_class": "BROKER_DECLARED_OR_UNRESOLVED",
+        "quote_currency": "UNRESOLVED",
+        "price_precision": 2,
+        "tick_size": 0.01,
+        "quantity_precision": 2,
+        "quantity_step": 0.01,
+        "min_quantity": 0.01,
+        "max_quantity": 500.0,
+        "contract_size": 1.0,
+        "trading_status": "OBSERVED_AVAILABLE",
+        "raw_metadata": {
+          "payload_hash": "419ff957d878c8beab5221e070daf8e272b4041d9a6471bf22ba71343afa6ad0",
+          "retention": "HASH_ONLY",
+          "retained_relative_path": null
+        },
+        "observed_at_ns": 1786749000219867200
+      },
+      {
+        "broker": "TRADELOCKER",
+        "venue": "HEROFX",
+        "broker_instrument_id": "3889",
+        "broker_symbol": "UK100",
+        "northstar_instrument_id": 5,
+        "asset_class": "BROKER_DECLARED_OR_UNRESOLVED",
+        "quote_currency": "UNRESOLVED",
+        "price_precision": 2,
+        "tick_size": 0.01,
+        "quantity_precision": 2,
+        "quantity_step": 0.01,
+        "min_quantity": 0.01,
+        "max_quantity": 500.0,
+        "contract_size": 1.0,
+        "trading_status": "OBSERVED_AVAILABLE",
+        "raw_metadata": {
+          "payload_hash": "2983a6f81e70be2cc57a5b3c7076c7af839a1bd9542659e3904e1fc52dd4a84b",
+          "retention": "HASH_ONLY",
+          "retained_relative_path": null
+        },
+        "observed_at_ns": 1786749000219867200
+      },
+      {
+        "broker": "TRADELOCKER",
+        "venue": "HEROFX",
+        "broker_instrument_id": "3887",
+        "broker_symbol": "JP225",
+        "northstar_instrument_id": 6,
+        "asset_class": "BROKER_DECLARED_OR_UNRESOLVED",
+        "quote_currency": "UNRESOLVED",
+        "price_precision": 2,
+        "tick_size": 0.01,
+        "quantity_precision": 2,
+        "quantity_step": 0.01,
+        "min_quantity": 0.01,
+        "max_quantity": 500.0,
+        "contract_size": 1.0,
+        "trading_status": "OBSERVED_AVAILABLE",
+        "raw_metadata": {
+          "payload_hash": "acba74cdc0057f392a0ed835a949a3bab35acea945dfb5b5c738bc09be14f08e",
+          "retention": "HASH_ONLY",
+          "retained_relative_path": null
+        },
+        "observed_at_ns": 1786749000219867200
+      }
+    ],
+    "content_hash": "55475189d380a961989ee3ae68840039a5672b103ef92d306ec6c330a2ee5fd6"
+  },
+  "quote_tape": {
+    "schema_version": "BROKER_OBSERVATION_TAPE_V1",
+    "source_authority": "LIVE_TRADELOCKER_NORMALIZED_CAPTURE",
+    "account_id_hash": "6db47f4400ffd711dbf498345eee27a88f20acee8b54180f73e6535deddb7536",
+    "rows": [
+      {
+        "observation_id": "2ddb6adb86b9ccaaed3edd3e6645fabe18e994e06a6f1d5206ddf43c0db17f68",
+        "broker": "TRADELOCKER",
+        "account_environment": "LIVE",
+        "instrument_id": 1,
+        "event_time_ns": 1786749000219867200,
+        "received_time_ns": 1786749000219867200,
+        "recorded_time_ns": 1786749000454584300,
+        "bid": 30049.11,
+        "ask": 30050.81,
+        "last": null,
+        "spread": 1.7000000000007276,
+        "raw_payload_hash": "f234eea14601daabcc5f1cb402f4137063145958c456d34fbe405ac15acb1e8d",
+        "normalized_payload_hash": "735d225ef99e688d04881c4a962e33d7c6bf79a5af758de439dc474e8727f706",
+        "connection_state": "CONNECTED"
+      },
+      {
+        "observation_id": "66fef54bf02a99bf2bcf22cca8ac2ec3fcfcff78013e73fab2a9f56e717f2aac",
+        "broker": "TRADELOCKER",
+        "account_environment": "LIVE",
+        "instrument_id": 2,
+        "event_time_ns": 1786749000219867200,
+        "received_time_ns": 1786749000219867200,
+        "recorded_time_ns": 1786749000976545200,
+        "bid": 7779.05,
+        "ask": 7780.19,
+        "last": null,
+        "spread": 1.139999999999418,
+        "raw_payload_hash": "f06b967f817682c594f5b19fbb7c29935ae92faca6edc9d35a6a6624335a318a",
+        "normalized_payload_hash": "c7c0e049546b263017342b97d1190f9068c8ceead7d442ff6a6143700b3d41b2",
+        "connection_state": "CONNECTED"
+      },
+      {
+        "observation_id": "2163bb2f899d491d2c4106fd30bd96738c2dc6fdfd40d053c67aee50e268a865",
+        "broker": "TRADELOCKER",
+        "account_environment": "LIVE",
+        "instrument_id": 3,
+        "event_time_ns": 1786749000219867200,
+        "received_time_ns": 1786749000219867200,
+        "recorded_time_ns": 1786749001536113100,
+        "bid": 53685.36,
+        "ask": 53688.24,
+        "last": null,
+        "spread": 2.8799999999973807,
+        "raw_payload_hash": "8392576968342b52ec8599edf0bcc5486c9ca7fe2f2193a10e60011ba9095f7f",
+        "normalized_payload_hash": "a322782b187dd1d0d2e3868196401463cc8dbcad20d3909a349314a88a3d3aa3",
+        "connection_state": "CONNECTED"
+      },
+      {
+        "observation_id": "3c955caab72eed39e0189f4bff156d405a93803cbc513600c9f63e2ed5e23c2d",
+        "broker": "TRADELOCKER",
+        "account_environment": "LIVE",
+        "instrument_id": 4,
+        "event_time_ns": 1786749000219867200,
+        "received_time_ns": 1786749000219867200,
+        "recorded_time_ns": 1786749002613842400,
+        "bid": 26450.16,
+        "ask": 26451.36,
+        "last": null,
+        "spread": 1.2000000000007276,
+        "raw_payload_hash": "b1ee4ddab5c5afe8f6cdb8af3bf58875b450d2b016accfbf62b62f0d400f9d7a",
+        "normalized_payload_hash": "0afced765223774390c0bc91c7162704c90840eee435b74f9839e67120a086cb",
+        "connection_state": "CONNECTED"
+      },
+      {
+        "observation_id": "bd5661bf2d6993d0f54ddeac3ce186de04631d2ae47e90b57be8bca471ae32fe",
+        "broker": "TRADELOCKER",
+        "account_environment": "LIVE",
+        "instrument_id": 5,
+        "event_time_ns": 1786749000219867200,
+        "received_time_ns": 1786749000219867200,
+        "recorded_time_ns": 1786749010511476300,
+        "bid": 10753.72,
+        "ask": 10754.92,
+        "last": null,
+        "spread": 1.2000000000007276,
+        "raw_payload_hash": "d112e28f99607d6ade762b813f37f09f5a8868b1c1e01f7625c2112b77146caf",
+        "normalized_payload_hash": "2ddd685222547004df021c4c8e83eb4ee77afec13282a0aaeb3f10c8078bbd54",
+        "connection_state": "CONNECTED"
+      },
+      {
+        "observation_id": "7da3b6c7240dd84dded5da8bd6c56cdc1473ed9d655e4e8a0f76bc28ecbfa62b",
+        "broker": "TRADELOCKER",
+        "account_environment": "LIVE",
+        "instrument_id": 6,
+        "event_time_ns": 1786749000219867200,
+        "received_time_ns": 1786749000219867200,
+        "recorded_time_ns": 1786749012840052200,
+        "bid": 68624.48,
+        "ask": 68753.98,
+        "last": null,
+        "spread": 129.5,
+        "raw_payload_hash": "6bb2878536a5c85c40abb621fe15a3caaddbb4c34e337ab038d33543b99bc6be",
+        "normalized_payload_hash": "60098dc3654714399e4dd8b246a204ca702fe162d5053c1ae59b4765e4cf5c2d",
+        "connection_state": "CONNECTED"
+      }
+    ],
+    "content_hash": "22f7645291714103b1b9079794b4a3466f1d2d7c3bc87e72230427ede713d71a"
+  },
+  "account": {
+    "schema_version": "BROKER_ACCOUNT_SNAPSHOT_V1",
+    "account_id_hash": "6db47f4400ffd711dbf498345eee27a88f20acee8b54180f73e6535deddb7536",
+    "environment": "LIVE",
+    "broker_raw_terms": [
+      [
+        "balance",
+        0.0
+      ],
+      [
+        "projectedBalance",
+        0.0
+      ],
+      [
+        "availableFunds",
+        0.0
+      ],
+      [
+        "todayNet",
+        0.0
+      ],
+      [
+        "todayFees",
+        0.0
+      ],
+      [
+        "openNetPnL",
+        0.0
+      ]
+    ],
+    "cash_equivalent": 0.0,
+    "equity": 0.0,
+    "unrealized_pnl": 0.0,
+    "realized_pnl": 0.0,
+    "available_funds": 0.0,
+    "margin_terms": [],
+    "broker_time_ns": null,
+    "received_time_ns": 1786749014407695300,
+    "raw_payload_hash": "b7e3f1fb84f2eb297a5f3f34bce69a90343d866d9e8dcab0b5fa6bed75c58c6e",
+    "field_provenance": [
+      [
+        "cash_equivalent",
+        "BROKER_RAW.balance"
+      ],
+      [
+        "equity",
+        "BROKER_RAW.projectedBalance"
+      ],
+      [
+        "currency",
+        "AUTH_ACCOUNT.USD"
+      ]
+    ],
+    "content_hash": "566a94b0f1eb1e3b7812fcaeb2eaffbfd01a617ef58e3adc8f697b1572216257"
+  },
+  "positions": [],
+  "endpoint_payload_hashes": [
+    [
+      "config",
+      "1aa4153494f89d010fb068f8a3d1a4f4b30e737053d9d2b45bf09584c5c305fa"
+    ],
+    [
+      "instruments",
+      "fa5af2be5b5a9354a338afc0666424653bbf78ff7295b07b38325db44d0fb8b8"
+    ],
+    [
+      "account_state",
+      "b7e3f1fb84f2eb297a5f3f34bce69a90343d866d9e8dcab0b5fa6bed75c58c6e"
+    ],
+    [
+      "positions",
+      "a3a19a51a369ae9f8ac5b8636c7c298f166833e5535a0bfe96969f012d025c07"
+    ]
+  ],
+  "timings": [
+    {
+      "name": "authentication",
+      "value": 199.9334,
+      "unit": "milliseconds",
+      "component": "NETWORK_LATENCY_PLUS_API_PROCESSING",
+      "workload": "single_authenticated_live_read"
+    },
+    {
+      "name": "read_endpoint",
+      "value": 114.81779999999999,
+      "unit": "milliseconds",
+      "component": "NETWORK_LATENCY_PLUS_API_PROCESSING",
+      "workload": "single_authenticated_live_read"
+    },
+    {
+      "name": "config",
+      "value": 99.25739999999999,
+      "unit": "milliseconds",
+      "component": "NETWORK_LATENCY_PLUS_API_PROCESSING",
+      "workload": "single_authenticated_live_read"
+    },
+    {
+      "name": "instruments",
+      "value": 125.65419999999999,
+      "unit": "milliseconds",
+      "component": "NETWORK_LATENCY_PLUS_API_PROCESSING",
+      "workload": "single_authenticated_live_read"
+    },
+    {
+      "name": "instrument_details",
+      "value": 133.55710000000002,
+      "unit": "milliseconds",
+      "component": "NETWORK_LATENCY_PLUS_API_PROCESSING",
+      "workload": "single_authenticated_live_read"
+    },
+    {
+      "name": "quote",
+      "value": 100.30799999999999,
+      "unit": "milliseconds",
+      "component": "NETWORK_LATENCY_PLUS_API_PROCESSING",
+      "workload": "single_authenticated_live_read"
+    },
+    {
+      "name": "instrument_details",
+      "value": 101.77709999999999,
+      "unit": "milliseconds",
+      "component": "NETWORK_LATENCY_PLUS_API_PROCESSING",
+      "workload": "single_authenticated_live_read"
+    },
+    {
+      "name": "quote",
+      "value": 103.6556,
+      "unit": "milliseconds",
+      "component": "NETWORK_LATENCY_PLUS_API_PROCESSING",
+      "workload": "single_authenticated_live_read"
+    },
+    {
+      "name": "instrument_details",
+      "value": 106.048,
+      "unit": "milliseconds",
+      "component": "NETWORK_LATENCY_PLUS_API_PROCESSING",
+      "workload": "single_authenticated_live_read"
+    },
+    {
+      "name": "quote",
+      "value": 108.6025,
+      "unit": "milliseconds",
+      "component": "NETWORK_LATENCY_PLUS_API_PROCESSING",
+      "workload": "single_authenticated_live_read"
+    },
+    {
+      "name": "instrument_details",
+      "value": 111.1562,
+      "unit": "milliseconds",
+      "component": "NETWORK_LATENCY_PLUS_API_PROCESSING",
+      "workload": "single_authenticated_live_read"
+    },
+    {
+      "name": "quote",
+      "value": 631.0719,
+      "unit": "milliseconds",
+      "component": "NETWORK_LATENCY_PLUS_API_PROCESSING",
+      "workload": "single_authenticated_live_read"
+    },
+    {
+      "name": "instrument_details",
+      "value": 122.5684,
+      "unit": "milliseconds",
+      "component": "NETWORK_LATENCY_PLUS_API_PROCESSING",
+      "workload": "single_authenticated_live_read"
+    },
+    {
+      "name": "quote",
+      "value": 18.4011,
+      "unit": "milliseconds",
+      "component": "NETWORK_LATENCY_PLUS_API_PROCESSING",
+      "workload": "single_authenticated_live_read"
+    },
+    {
+      "name": "quote",
+      "value": 57.1886,
+      "unit": "milliseconds",
+      "component": "NETWORK_LATENCY_PLUS_API_PROCESSING",
+      "workload": "single_authenticated_live_read"
+    },
+    {
+      "name": "quote",
+      "value": 57.174099999999996,
+      "unit": "milliseconds",
+      "component": "NETWORK_LATENCY_PLUS_API_PROCESSING",
+      "workload": "single_authenticated_live_read"
+    },
+    {
+      "name": "quote",
+      "value": 639.7570000000001,
+      "unit": "milliseconds",
+      "component": "NETWORK_LATENCY_PLUS_API_PROCESSING",
+      "workload": "single_authenticated_live_read"
+    },
+    {
+      "name": "instrument_details",
+      "value": 17.1855,
+      "unit": "milliseconds",
+      "component": "NETWORK_LATENCY_PLUS_API_PROCESSING",
+      "workload": "single_authenticated_live_read"
+    },
+    {
+      "name": "instrument_details",
+      "value": 147.7158,
+      "unit": "milliseconds",
+      "component": "NETWORK_LATENCY_PLUS_API_PROCESSING",
+      "workload": "single_authenticated_live_read"
+    },
+    {
+      "name": "quote",
+      "value": 22.6615,
+      "unit": "milliseconds",
+      "component": "NETWORK_LATENCY_PLUS_API_PROCESSING",
+      "workload": "single_authenticated_live_read"
+    },
+    {
+      "name": "quote",
+      "value": 138.98360000000002,
+      "unit": "milliseconds",
+      "component": "NETWORK_LATENCY_PLUS_API_PROCESSING",
+      "workload": "single_authenticated_live_read"
+    },
+    {
+      "name": "account_state",
+      "value": 16.8213,
+      "unit": "milliseconds",
+      "component": "NETWORK_LATENCY_PLUS_API_PROCESSING",
+      "workload": "single_authenticated_live_read"
+    },
+    {
+      "name": "account_state",
+      "value": 440.4201,
+      "unit": "milliseconds",
+      "component": "NETWORK_LATENCY_PLUS_API_PROCESSING",
+      "workload": "single_authenticated_live_read"
+    },
+    {
+      "name": "positions",
+      "value": 108.59679999999999,
+      "unit": "milliseconds",
+      "component": "NETWORK_LATENCY_PLUS_API_PROCESSING",
+      "workload": "single_authenticated_live_read"
+    }
+  ],
+  "raw_payload_retention": "HASH_ONLY_PENDING_EXPLICIT_RETENTION_AUTHORITY",
+  "receipt_id": "7f12d1ec7373b387ac6bcd198f4c87a13df722fecb4170695609b8056294a420"
+}

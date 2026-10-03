@@ -1,0 +1,70 @@
+{
+  "algorithm": "SHA-256 over ordinal-sorted UTF-8 lines: relative_path<TAB>byte_length<TAB>file_sha256<LF>; seal excluded",
+  "entries": [
+    {
+      "bytes": 659,
+      "path": "README.md",
+      "sha256": "621e1966c858844c6324d0ff39bd2503994f1bab26a6aadf07b78eb55d816288"
+    },
+    {
+      "bytes": 3534,
+      "path": "S01-3-PROTOCOL.md",
+      "sha256": "5c37c5f2933a2e80e7b06047a6c257bf7b36a7d234649c4947697d3fb7b379cf"
+    },
+    {
+      "bytes": 1059,
+      "path": "contracts/authorization-packet-v01.json",
+      "sha256": "916c88c6a42a0159397b7827f4f8b131413087c1e0a1f027cf27b58464b5c052"
+    },
+    {
+      "bytes": 2713,
+      "path": "contracts/input-binding-v01.json",
+      "sha256": "e00504818bcd1635bfbb8ae0834b8cb06d60e000f1ab94868dc1dae9dfa58c58"
+    },
+    {
+      "bytes": 7829,
+      "path": "contracts/linear-accessibility-contract-v01.json",
+      "sha256": "6613a92b1a7464f659656fbfe001ae779ffc921d0f81b39200e9713915cf48f0"
+    },
+    {
+      "bytes": 14256,
+      "path": "source/common.py",
+      "sha256": "edf7263b2538c8cfc898fb974ac66edfbef58d925fc4617f65ce9c3306093609"
+    },
+    {
+      "bytes": 10030,
+      "path": "source/linear_core.py",
+      "sha256": "771bf4a235639cbd8ed5a0f0078339da65ad6fb10e46406646473bfc8df5ffbe"
+    },
+    {
+      "bytes": 16004,
+      "path": "source/preflight_s01_3.py",
+      "sha256": "8f87f60436a72f4c752d0c37c92ef4174b60f214f42a7ec9afc630c2ab489c7b"
+    },
+    {
+      "bytes": 15890,
+      "path": "source/run_probes.py",
+      "sha256": "59089dff1e32b14aafc326d5c2e0d56b9e641fb70a19ea7cbe8049259c936115"
+    },
+    {
+      "bytes": 1335,
+      "path": "source/seal_contract.py",
+      "sha256": "330caf09b09014f81678b37484ffcdcd905144fdef55f4651fba73af1c65a177"
+    },
+    {
+      "bytes": 5682,
+      "path": "source/seal_result.py",
+      "sha256": "4943744ff9365968bf8c96ba6022b4025cf2793363204170ad969c16f39f68e7"
+    },
+    {
+      "bytes": 183,
+      "path": "source/test_probe.py",
+      "sha256": "94131b005f28908d4dad2803a47a719f561aef973424b4e61091d184f65301b8"
+    }
+  ],
+  "feature_fitting_performed": false,
+  "phase_id": "s01-3-linear-accessibility-v01",
+  "project_id": "fas-s01-frozen-sensor-transfer-cartography",
+  "root_sha256": "44f62d775592ce794f978f238ddd3db485683eb798b651d70a6e2dd5703641a7",
+  "seal_id": "FASS01_S01_3_CONTRACT_FREEZE_V01"
+}

@@ -1,0 +1,17 @@
+{
+  "protocol": "Q10-PF6-S1A",
+  "status": "Q10_PF6_S1A_VALID__RECEIPT_SEMANTICS_RECONSTRUCTED",
+  "receipt_semantics_coverage": "COMPLETE",
+  "numerical_replay_coverage": "PARTIAL",
+  "historical_replay_scope": "ONE_RETAINED_CANDIDATE_PER_GROUP",
+  "result_sha256": "17F59DCD79312D101AA3952A2DC8641E73B017DCAF79FD12B8F0E3C4C9D2F64B",
+  "counts": {
+    "groups": 84,
+    "corrected_valid_late_groups": 15,
+    "corrected_valid_post8_groups": 28,
+    "exact_groups": 0
+  },
+  "scientific_bundle_authorized": false,
+  "behavioral_probe": false,
+  "dh08b_authorized": false
+}

@@ -1,0 +1,169 @@
+{
+  "project": "FORGE-RL-01",
+  "surface": "NORTHSTAR_JOINT_WIND_TUNNEL_V1",
+  "learner_execution": "PROHIBITED_UNTIL_LATER_GATE",
+  "items": [
+    {
+      "name": "ACCOUNT_PROJECTION",
+      "status": "QUALIFIED",
+      "reason_code": "AUTHENTICATED_NORMALIZED_LIVE_RECEIPT_PASS",
+      "receipts": [
+        "joint_replay_fixture.json",
+        "topology_report.json"
+      ]
+    },
+    {
+      "name": "BROKER_CONTRACT_TAPE",
+      "status": "QUALIFIED",
+      "reason_code": "AUTHENTICATED_TIME_BOUND_LIVE_CONTRACT_TAPE_PASS",
+      "receipts": [
+        "joint_replay_fixture.json",
+        "topology_report.json"
+      ]
+    },
+    {
+      "name": "CLOCK_COMPARISON",
+      "status": "PARTIAL",
+      "reason_code": "SYNTHETIC_CROSS_SOURCE_FIXTURE_PASS_LIVE_MT5_CAPTURE_ABSENT",
+      "receipts": [
+        "joint_replay_fixture.json",
+        "topology_report.json"
+      ]
+    },
+    {
+      "name": "CREDENTIAL_PROVIDER",
+      "status": "QUALIFIED",
+      "reason_code": "AUTHENTICATED_READ_ONLY_CAPTURE_PASS",
+      "receipts": [
+        "joint_replay_fixture.json",
+        "topology_report.json"
+      ]
+    },
+    {
+      "name": "DETERMINISTIC_REBUILD",
+      "status": "QUALIFIED",
+      "reason_code": "BYTE_IDENTICAL_DOUBLE_REBUILD",
+      "receipts": [
+        "joint_replay_fixture.json",
+        "topology_report.json"
+      ]
+    },
+    {
+      "name": "EXECUTION_CALIBRATION_INTERFACE",
+      "status": "QUALIFIED",
+      "reason_code": "SYNTHETIC_CONTRACT_FIXTURE_AND_OFFLINE_REPLAY_PASS",
+      "receipts": [
+        "joint_replay_fixture.json",
+        "topology_report.json"
+      ]
+    },
+    {
+      "name": "EXECUTION_REALITY_SCHEMA",
+      "status": "QUALIFIED",
+      "reason_code": "SYNTHETIC_CONTRACT_FIXTURE_AND_OFFLINE_REPLAY_PASS",
+      "receipts": [
+        "joint_replay_fixture.json",
+        "topology_report.json"
+      ]
+    },
+    {
+      "name": "INSTRUMENT_BINDING",
+      "status": "PARTIAL",
+      "reason_code": "SYNTHETIC_CROSS_SOURCE_FIXTURE_PASS_LIVE_MT5_CAPTURE_ABSENT",
+      "receipts": [
+        "joint_replay_fixture.json",
+        "topology_report.json"
+      ]
+    },
+    {
+      "name": "INSTRUMENT_DISCOVERY",
+      "status": "QUALIFIED",
+      "reason_code": "AUTHENTICATED_READ_RECEIPT_PASS",
+      "receipts": [
+        "joint_replay_fixture.json",
+        "topology_report.json"
+      ]
+    },
+    {
+      "name": "JOINT_REPLAY_FIXTURE",
+      "status": "QUALIFIED",
+      "reason_code": "SYNTHETIC_CONTRACT_FIXTURE_AND_OFFLINE_REPLAY_PASS",
+      "receipts": [
+        "joint_replay_fixture.json",
+        "topology_report.json"
+      ]
+    },
+    {
+      "name": "MT5_TL_PRICE_COMPARISON",
+      "status": "PARTIAL",
+      "reason_code": "SYNTHETIC_CROSS_SOURCE_FIXTURE_PASS_LIVE_MT5_CAPTURE_ABSENT",
+      "receipts": [
+        "joint_replay_fixture.json",
+        "topology_report.json"
+      ]
+    },
+    {
+      "name": "PERFORMANCE_BASELINE",
+      "status": "QUALIFIED",
+      "reason_code": "SYNTHETIC_CONTRACT_FIXTURE_AND_OFFLINE_REPLAY_PASS",
+      "receipts": [
+        "joint_replay_fixture.json",
+        "topology_report.json"
+      ]
+    },
+    {
+      "name": "POSITION_PROJECTION",
+      "status": "QUALIFIED",
+      "reason_code": "AUTHENTICATED_NORMALIZED_LIVE_RECEIPT_PASS",
+      "receipts": [
+        "joint_replay_fixture.json",
+        "topology_report.json"
+      ]
+    },
+    {
+      "name": "PRICE_OBSERVATION_TAPE",
+      "status": "QUALIFIED",
+      "reason_code": "AUTHENTICATED_NORMALIZED_LIVE_RECEIPT_PASS",
+      "receipts": [
+        "joint_replay_fixture.json",
+        "topology_report.json"
+      ]
+    },
+    {
+      "name": "RL_ENV_PROVENANCE_EXTENSION",
+      "status": "QUALIFIED",
+      "reason_code": "SYNTHETIC_CONTRACT_FIXTURE_AND_OFFLINE_REPLAY_PASS",
+      "receipts": [
+        "joint_replay_fixture.json",
+        "topology_report.json"
+      ]
+    },
+    {
+      "name": "STUDIO_BACKTRADER_ADAPTER",
+      "status": "QUALIFIED",
+      "reason_code": "SYNTHETIC_CONTRACT_FIXTURE_AND_OFFLINE_REPLAY_PASS",
+      "receipts": [
+        "joint_replay_fixture.json",
+        "topology_report.json"
+      ]
+    },
+    {
+      "name": "TRADELOCKER_CAPTURE_REPLAY",
+      "status": "QUALIFIED",
+      "reason_code": "LIVE_NORMALIZED_CAPTURE_MMAP_REOPEN_PASS",
+      "receipts": [
+        "joint_replay_fixture.json",
+        "topology_report.json"
+      ]
+    },
+    {
+      "name": "TRADELOCKER_CONNECTION",
+      "status": "QUALIFIED",
+      "reason_code": "AUTHENTICATED_READ_RECEIPT_PASS",
+      "receipts": [
+        "joint_replay_fixture.json",
+        "topology_report.json"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+gate_id	claim	status	evidence	blocks_substantive_results
+Q01	Exact observer source archived	PASS	d2c1f0614ba27289a87172dc9fa79f3b018cace73ebd5829afaf100aed406034	true
+Q02	Pre-existing compiled candidate archived	PASS	5505e033d487037a9cc5863788b067123fbf5bc3e48d4c40ddfa0fbe721ac290	true
+Q03	Semantic source audit complete	PASS	protocol/OBS_OPEN_01_PREREGISTRATION_V1.md sections 3-8	true
+Q04	Source compiles with pinned MetaEditor	PASS	MetaEditor 5.0.0.6106; two passes; zero errors; zero warnings	true
+Q05	Compiled binary byte reconstruction	NOT_SUPPORTED	pass1 6876295d...; pass2 7f9dfa5d...; outputs differ and neither equals archived candidate	false
+Q06	Current live source clock receipt	PASS	clock/OBS_OPEN_01_clock_probe_live.tsv sha256=f8186f3948521a4653c84ebc0979a50fb6a0085b5edf3aa8b191af1c97dc941e; source UTC+03:00; New York UTC-04:00 at observed instant	true
+Q07	Historical session clock mapping authority	PASS_BOUNDED_SESSION	2026-08-13 inferred UTC+03:00; corr=0.9978007786; sign=0.9894829097; margin=0.9012364674; winter/DST transport NOT_EVALUABLE_SOURCE_COVERAGE	true
+Q08	US30 symbol/session metadata qualified	PASS	clock/OBS_OPEN_01_clock_probe_live.tsv records digits=2 tick_size=0.01 point=0.01 plus weekly quote/trade sessions	true
+Q09	US30 M1 and M5 coverage qualified	PASS_BOUNDED_SESSION	2026-08-13 has 1379 M1 and 276 M5 bars; 11 older anchors returned MT5 4401 and remain NOT_EVALUABLE_SOURCE_COVERAGE	true
+Q10	R01-R30 construction golden suite	PASS_BOUNDED_SESSION	frozen observer vs independent oracle: 8280 rows; 140760 cells; zero missing/unexpected keys; zero mismatches; parity receipt logical sha256=71bee2f6ceaa96de16c26dcbda94cc6c5bf87ceecac64388d0b969250fbbf3ea	true
+Q11	Interaction grammar golden suite	PASS_BOUNDED_SESSION	all 17 frozen observer buffers matched the independent oracle over R01-R30; 6 deterministic path fixtures also pass; zero mismatches	true
+Q12	Bounded replay determinism	PASS_BOUNDED_SESSION_BYTE_IDENTICAL	two headless MT5 runs emitted byte-identical buffer ledger, run receipt, mismatch ledger, and comparison receipt	true
+Q13	Session universe and confirmation blocks frozen	NOT_EVALUABLE_SOURCE_COVERAGE	only one broker session is admitted; a multi-session discovery universe and untouched confirmation blocks cannot yet be frozen	true
+Q14	Substantive results opened	FROZEN_UNOPENED	preregistration boundary	false
+Q15	Black-box R01-R30 parity collector compiles	PASS	OBS_OPEN_ParityCollector_v1; MetaEditor AVX2+FMA3; 0 errors; 0 warnings; source sha256=c972ac4483da1e02d3fbf99795f636f8a84afd1b0da41a7bccb802ca1f4d6493; ex5 sha256=c55254edf27e613ba4a7ff277b8517b1924a3119d85cd6b752f44afb389ee1d3	false

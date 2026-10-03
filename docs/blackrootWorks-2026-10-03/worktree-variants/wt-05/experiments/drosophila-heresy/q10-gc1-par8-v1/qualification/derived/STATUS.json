@@ -1,0 +1,12 @@
+{
+  "behavioral_probe": false,
+  "engineering_only": true,
+  "execution_sha256": "A4304E70F7D32436109CD6F3367C298CD1227FBD5C4AA2578C28D14272721D6B",
+  "gc1_authorized": false,
+  "identity": "q10-gc1-par8-v1",
+  "protocol": "Q10-GC1-PAR8",
+  "result_sha256": "4C8E01EACBFAAB461870F7EDECE98815EB9CD7E0A3D57AE2B0A022F0FD052C8B",
+  "scientific_promotion": false,
+  "status": "GC1_ENGINEERING_ASSEMBLY_COMPLETE",
+  "summary_sha256": "8011479AC773C8BEDCAAD517E2C2AE5FDC8B78767076BC14C80D26E3FE63031A"
+}

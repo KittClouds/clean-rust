@@ -1,0 +1,42 @@
+{
+  "schema": "CHIEF_E4_0_SUPERVISED_ADAPTER_REVIEW_V1",
+  "status": "HOLD_VERSIONED_REPAIR_REQUIRED",
+  "candidate_plan_sha256": "278d72a59ef6abedb2366fa2869d4c551bb7d26a98870bf418c5158a48cb32c2",
+  "fabrique_qualification_sha256": "13643d19ac457a75713e26918f2b548b53e576089abfa23a8667afa6e7dd33a0",
+  "independent_checks": {
+    "six_declared_runtime_source_hashes_and_lengths_match": true,
+    "ten_synthetic_unit_tests_passed_on_independent_rerun": true,
+    "stage_output_roots_absent_at_review": true,
+    "protected_label_bytes_opened": false,
+    "model_tokenizer_cuda_contact_performed": false
+  },
+  "defects": [
+    {
+      "id": "LIBRARY_ACCEPTANCE_ID_DRIFT",
+      "candidate_acceptance_id": "sha256:daae9a9496b6dc15f5a256d966323fcb8848387f3ce3c7d926db7039d7fe7c8c",
+      "current_live_acceptance_id": "sha256:f98dcd6743c5e8b7ff091cef2d69aa361e53c252711c7b001f3a71d322744602",
+      "effect": "The adapter and candidate plan bind an obsolete Library release. The current flight gate is OPEN under a different accepted identity."
+    },
+    {
+      "id": "INHERITED_CONTRACT_VERIFIER_WRONG_VERSION",
+      "candidate_verifier": "e4_runner_common_v05.py:verify_contract_binding",
+      "hardcoded_contract_id": "FAS_FROZEN_CAPABILITY_FABRIC_E4_0_V09",
+      "current_contract_id": "FAS_FROZEN_CAPABILITY_FABRIC_E4_0_V16",
+      "hardcoded_seal_id": "FAS_E4_0_CONTRACT_V09_SEAL",
+      "current_seal_id": "FAS_E4_0_CONTRACT_V16_V09_SEAL",
+      "hardcoded_postseal_status": "E4_0_TRACK_E_POSTSEAL_PASS_V09_SEAL_ROOT_AND_MEMBERS_RECOMPUTED",
+      "current_postseal_status": "E4_0_TRACK_E_POSTSEAL_PASS_V16_V11_SEAL_ROOT_AND_MEMBERS_RECOMPUTED",
+      "effect": "The candidate fails before model contact when given the current sealed v16-v09 contract, even if the Library acceptance ID is corrected."
+    }
+  ],
+  "required_next_evidence": [
+    "Versioned adapter and candidate-spec repair preserving v01 bytes and failed review",
+    "No-model-contact preflight against the exact current contract, seal, and postseal audit",
+    "Current Library acceptance identity in the static binding and candidate plan",
+    "Chief-generated static input bindings with exact path, SHA-256, and size for every named visible artifact",
+    "Separately sealed execution spec and scoped live authorization only after corrected qualification"
+  ],
+  "e4_0_authorization_issued": false,
+  "gpu_lease_issued": false,
+  "e4_01_entry_open": false
+}

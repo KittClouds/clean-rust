@@ -1,0 +1,42 @@
+receipt_schema	OBS_OPEN_CLOCK_PROBE_V1
+probe_scope	CURRENT_LIVE_INSTANT_ONLY
+historical_offset_authority	NOT_ESTABLISHED
+source_symbol	US30
+terminal_company	MetaQuotes Ltd.
+terminal_name	MetaTrader 5
+terminal_build	6106
+account_server_source_id	MetaQuotes-Demo
+terminal_connected	true
+mql_tester	false
+mql_visual_mode	false
+time_current_epoch	1786716287
+time_current_text	2026.08.14 14:04:47
+time_trade_server_epoch	1786716287
+time_trade_server_text	2026.08.14 14:04:47
+time_gmt_epoch	1786705487
+time_gmt_text	2026.08.14 11:04:47
+time_local_epoch	1786691087
+time_local_text	2026.08.14 07:04:47
+source_minus_gmt_seconds	10800
+trade_server_minus_gmt_seconds	10800
+time_gmt_offset_raw_seconds	14400
+time_daylight_savings_raw_seconds	-3600
+symbol_description	US Wall Street 30 Index
+symbol_path	Indexes\US30
+symbol_currency_base	USD
+symbol_currency_profit	USD
+symbol_digits	2
+symbol_tick_size	0.010000000000
+symbol_point	0.010000000000
+symbol_last_quote_epoch	1786716285
+trade_session.MONDAY.0	0|82740|1970.01.01 00:00:00|1970.01.01 22:59:00
+trade_session.TUESDAY.0	0|82740|1970.01.01 00:00:00|1970.01.01 22:59:00
+trade_session.WEDNESDAY.0	0|82740|1970.01.01 00:00:00|1970.01.01 22:59:00
+trade_session.THURSDAY.0	0|82740|1970.01.01 00:00:00|1970.01.01 22:59:00
+trade_session.FRIDAY.0	0|82500|1970.01.01 00:00:00|1970.01.01 22:55:00
+quote_session.SUNDAY.0	82800|86400|1970.01.01 23:00:00|1970.01.02 00:00:00
+quote_session.MONDAY.0	0|86400|1970.01.01 00:00:00|1970.01.02 00:00:00
+quote_session.TUESDAY.0	0|86400|1970.01.01 00:00:00|1970.01.02 00:00:00
+quote_session.WEDNESDAY.0	0|86400|1970.01.01 00:00:00|1970.01.02 00:00:00
+quote_session.THURSDAY.0	0|86400|1970.01.01 00:00:00|1970.01.02 00:00:00
+quote_session.FRIDAY.0	0|82800|1970.01.01 00:00:00|1970.01.01 23:00:00

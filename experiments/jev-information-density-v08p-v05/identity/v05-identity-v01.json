@@ -1,0 +1,24 @@
+{
+  "protocol": "jev-information-density/v0.8p-v05-identity-v01",
+  "identity": "v0.8P-v05-direct-panel-identity-extraction-v01",
+  "status": "EXTRACTION_ONLY_AUTHORIZED",
+  "v03": "finished failed-closed; not an input and not retried",
+  "v04_stage_a_trace_sha256": "050a24e85f45eaf8b70d382871b4aaa50f973b25c8494ad116531f0b152ed02e",
+  "extraction_contract": {
+    "path": "experiments/jev-information-density-v08p-v05/identity/v05-extraction-contract-v01.json",
+    "sha256": "b2a1446635451e2f4a442f658458f3606767d2566bb31e8395c386acab5e38cb"
+  },
+  "source_allowlist": {
+    "path": "experiments/jev-information-density-v08p-v05/identity/source-allowlist-v01.json",
+    "sha256": "3470df15dd74b5e406816e3af5b4fad5760b37dbf0c455456452c4f0dc8e20cb",
+    "seal_path": "experiments/jev-information-density-v08p-v05/provenance/source-allowlist-seal-v01.json",
+    "seal_sha256": "4deb9d6ef80b47f053b12e13a20a6656aa09025dd3e6d8b211603bdf79162880"
+  },
+  "extractor_sha256": "436c980977ca5a3bc1878e5c165d13e6733b835e87a31ff70ba2e0d2eb131e89",
+  "synthetic_tests": "4_OF_4_PASS",
+  "panel_contract_created": false,
+  "panel_generation_authorized": false,
+  "model_contact": false,
+  "training": false,
+  "evaluation": false
+}

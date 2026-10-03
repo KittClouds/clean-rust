@@ -1,0 +1,15 @@
+{
+  "audited_states": 1024,
+  "behavioral_inference": false,
+  "box_feasibility": "TESTED_CONTINUOUS_ONLY",
+  "complete": true,
+  "cumulative_audited_states": 1024,
+  "freedom_events": 1001,
+  "protocol": "Q10-BG",
+  "schema_version": 1,
+  "scientific_seed_bundles": 0,
+  "sequential_f32_endpoint_equality": "NOT_TESTED",
+  "stage": "stage1-a",
+  "stage2_authorized_by_this_receipt": false,
+  "status": "Q10_STAGE1_VALID__BOUNDED_FREEDOM_PRESENT"
+}

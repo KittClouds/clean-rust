@@ -1,0 +1,18 @@
+{
+  "protocol": "Q10-RMT",
+  "parent_protocol": "Q10-DA2",
+  "engineering_only": true,
+  "primary_input": "all 28 Q10-DA2 geometry-valid endpoints",
+  "excluded_input": "four Q10-DA2 geometry-failed endpoints, retained separately",
+  "candidate_steps": [1, -1, 2, -2, 4, -4, 8, -8, 16, -16],
+  "minimum_final_reserve_ulps": 16,
+  "coordinate_movement_ceiling": 16,
+  "stage_two_rule": "escalate only one-step orphan or one-step fragile rows",
+  "zero_authority_rule": "legal coordinates with no support overlap with any mismatched row are counted structurally and not replayed",
+  "authority_column_cap": 256,
+  "readout": "exact sequential binary32 replay with negative-zero identity",
+  "repair_applied": false,
+  "behavioral_inference": false,
+  "scientific_seed_bundles": 0,
+  "dh08b_authorized": false
+}

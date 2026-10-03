@@ -1,0 +1,17 @@
+{
+  "stage": "DH05_scientific_run_complete",
+  "run": "artifacts/runs/20260915T184423Z",
+  "run_seal_sha256": "69af690908a9d30d95c485280b666794470aca6270fa9671dcbef10f2ff17f2c",
+  "rust_tests_passed": 32,
+  "rust_tests_ignored": 5,
+  "python_analysis_tests_passed": 2,
+  "clippy_release_all_targets_warnings_as_errors": "passed",
+  "release_locked_offline_build": "passed",
+  "trajectory_benchmark": {"status": "passed", "median_seconds": 0.0012452, "p95_seconds": 0.0012916, "hot_allocations": 0},
+  "observer_on_off_verification": "passed",
+  "parents_unchanged": true,
+  "parent_dh04_seal_sha256": "f7659de540c0fe536d0a7991e1d634c5bc0a42d064e47a5b8a4800e780ff762d",
+  "target": "D:/drosophila-heresy/dh05-target",
+  "junction": "C:/code land/clean-rust/experiments/drosophila-heresy/dh05/target",
+  "scientific_scope": "synthetic trajectory assay; one MaleCNS v1.0 specimen; no biological or generalization claim"
+}

@@ -1,0 +1,50 @@
+{
+  "receipt_id": "FAS_E4_0_ONLINE_PARITY_PRECONTACT_STOP_V01",
+  "status": "STOPPED_PRESERVED_PREMODEL_LEASE_CONSTRUCTION",
+  "execution_stage": "ONLINE_CACHE_PARITY",
+  "contract_root_sha256": "7344badf07476d19d9c6228f80d026a112c339e93daa75593e61031f68456e64",
+  "failed_authorization": {
+    "path": "C:\\Users\\shuga\\.codex\\worktrees\\e4-0-contract-work\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\audits\\e4-0-auth-issuer-v02\\online-parity-authorization-v01.json",
+    "bytes": 9884,
+    "sha256": "59d6ed54ca401ce6606cd2f3053a19ded24252c1a725aa53508cb0625a8197aa"
+  },
+  "process_output": "E4-0 parity stopped: NameError: name 'stage_output_root' is not defined",
+  "reproduction_traceback": "e4_gpu_lease_v01.py line 419, make_gpu_lease: receipt_path=stage_output_root(authorization, mode) / \"gpu-lease-release-receipt-v01.json\"",
+  "source_identities_at_stop": {
+    "e4_gpu_lease_v01.py": {
+      "path": "C:\\Users\\shuga\\.codex\\worktrees\\e4-0-contract-work\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\source\\scripts\\e4_gpu_lease_v01.py",
+      "bytes": 23022,
+      "sha256": "e95a6e40f4e9128d8c15cc758e91254e51936cb6b1e8942bbd1e76f635d82c21"
+    },
+    "e4_runner_modes_v02.py": {
+      "path": "C:\\Users\\shuga\\.codex\\worktrees\\e4-0-contract-work\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\source\\scripts\\e4_runner_modes_v02.py",
+      "bytes": 32754,
+      "sha256": "654974ee5c32c6482e868d9885ba9d92e4928ef25bc0713400cece253390f5af"
+    },
+    "e4_runner_artifacts_v02.py": {
+      "path": "C:\\Users\\shuga\\.codex\\worktrees\\e4-0-contract-work\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\source\\scripts\\e4_runner_artifacts_v02.py",
+      "bytes": 15794,
+      "sha256": "9976bb9ece709631ab33dcecaf3caa59b99268fdd39d413ad38b28a8d959a4a3"
+    },
+    "e4_online_parity_v02.py": {
+      "path": "C:\\Users\\shuga\\.codex\\worktrees\\e4-0-contract-work\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\source\\scripts\\e4_online_parity_v02.py",
+      "bytes": 1375,
+      "sha256": "02a26b5f3b2b2327a2e21bdaadec5e250ecf9ba0381a6b7707882ab9302ecb16"
+    }
+  },
+  "observed_state": {
+    "authorization_preflight_completed": true,
+    "verified_frozen_assets_and_inputs_read_only": true,
+    "lease_object_constructed": false,
+    "gpu_lease_lock_acquired": false,
+    "parity_output_directory_created": false,
+    "tokenizer_loaded": false,
+    "model_loaded": false,
+    "cuda_initialized": false,
+    "e4_features_extracted": false,
+    "labels_opened": false,
+    "predictions_emitted": false
+  },
+  "classification": "execution plumbing defect; no scientific result and no resource-gate result",
+  "repair_boundary": "preserve this authorization and all E0 v06 source bytes; bind any corrected runner/lease sources under a new audited contract/seal and issue a fresh stage authorization"
+}

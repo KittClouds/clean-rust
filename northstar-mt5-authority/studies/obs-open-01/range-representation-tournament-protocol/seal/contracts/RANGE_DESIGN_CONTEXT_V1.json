@@ -1,0 +1,1 @@
+{"evaluation_clock":"k+60 minutes after 09:30","excluded":["market_geometry","future_values","candidate_history","redundant_clock_coordinates"],"fields":["k_categorical_reference_k01","source_clock_offset_regime_reference_plus120"],"k_semantics":"COMPOSITE_DESIGN_AND_FREEZE_CLOCK_COORDINATE","schema":"RANGE_DESIGN_CONTEXT_V1"}

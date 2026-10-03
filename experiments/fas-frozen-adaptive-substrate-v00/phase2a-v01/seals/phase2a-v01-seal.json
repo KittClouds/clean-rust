@@ -1,0 +1,35 @@
+{
+  "seal_id": "FAS00_PHASE2A_SENSOR_CONTACT_PAPERWORK_V01",
+  "paperwork_bundle_id": "FAS00_SENSOR_CONTACT_PAPERWORK_V01",
+  "project_id": "fas-frozen-adaptive-substrate-v00",
+  "phase0_pre_model_root_sha256": "c7227d2a10da05f902ed5d16e94a8e12866d2e0ae6b2b2a357ed2da93431b3e6",
+  "phase1_v03_root_sha256": "d3ca9f8ef988a6f0ae93318fc0ea7c504b23b3be801dbf133d66f67746a69274",
+  "phase1_event_corpus_sha256": "9fdd7ce9e49b86ac9acb3da035429c616865f527123bd0ac7c312b1b912439ca",
+  "root_sha256": "e1ce39935e566f7dad53fae69c18a091dfc05526c3c5a3cdc8fae52b27357189",
+  "files": [
+    {
+      "path": "contracts/phase2a-feature-extraction-packet-v01.json",
+      "sha256": "f8fe9a7f859ca065a39ae215723583813d78977ba84bf234de82a8b64a76bc80"
+    },
+    {
+      "path": "contracts/sensor-qualification-contract-v01.json",
+      "sha256": "7b031e9aa7dfe92174a2ad8e5764b3b7a66505167dd8e32f35c542903a411a4b"
+    },
+    {
+      "path": "README.md",
+      "sha256": "966c391bd2094070f7592501b3ae0a27f8c6e19c6320aa1e2c6d86f596e048db"
+    },
+    {
+      "path": "scripts/seal-phase2a.ps1",
+      "sha256": "2ceff8d8650672ac70fa185f1c08e3e4eb1cab2f61c3077d8a48d550ee514efd"
+    }
+  ],
+  "phase2a_packet_sealed": true,
+  "phase3_contract_sealed": true,
+  "model_contact_authorized": false,
+  "model_contact_performed": false,
+  "feature_extraction_authorized": false,
+  "sensor_probe_authorized": false,
+  "online_mechanisms_authorized": false,
+  "phase5_corpus_generation_authorized": false
+}

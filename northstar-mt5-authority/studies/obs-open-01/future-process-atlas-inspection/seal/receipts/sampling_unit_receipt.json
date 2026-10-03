@@ -1,0 +1,1 @@
+{"candidate_count_per_session":{"max":98,"min":2},"law":"EVERY_DESCRIPTIVE_DISTRIBUTION_DECLARES_ITS_SAMPLING_UNIT","schema":"NORTHSTAR_DESCRIPTIVE_SAMPLING_UNIT_RECEIPT_V1","status":"PASS","views":{"ANCHOR_WEIGHTED":"equal mass per eligible causal anchor","SESSION_WEIGHTED":"equal mass per contributing session then equal mass per eligible anchor within session"}}

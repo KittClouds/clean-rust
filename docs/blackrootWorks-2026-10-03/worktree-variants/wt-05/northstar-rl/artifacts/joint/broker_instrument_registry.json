@@ -1,0 +1,29 @@
+{
+  "schema_version": "BROKER_INSTRUMENT_REGISTRY_V1",
+  "instruments": [
+    {
+      "broker": "TRADELOCKER",
+      "venue": "SYNTHETIC_HEROFX",
+      "broker_instrument_id": "3",
+      "broker_symbol": "US30",
+      "northstar_instrument_id": 3,
+      "asset_class": "INDEX_CFD",
+      "quote_currency": "USD",
+      "price_precision": 2,
+      "tick_size": 0.01,
+      "quantity_precision": 2,
+      "quantity_step": 0.01,
+      "min_quantity": 0.01,
+      "max_quantity": 100.0,
+      "contract_size": 1.0,
+      "trading_status": "SESSION_OPEN",
+      "raw_metadata": {
+        "payload_hash": "145285483efedefc8cd39fde31bb5145ccad8cdfb2c1fb771ee7e949cec777cc",
+        "retention": "SYNTHETIC_FIXTURE",
+        "retained_relative_path": "fixtures/synthetic_tradelocker_instrument.json"
+      },
+      "observed_at_ns": 1800000000000000000
+    }
+  ],
+  "content_hash": "966683a6d7a5686f36e94a2b1e62e9a8af756fb84e11fcd1da28955a769a7437"
+}

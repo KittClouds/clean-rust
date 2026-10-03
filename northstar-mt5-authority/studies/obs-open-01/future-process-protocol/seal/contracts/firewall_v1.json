@@ -1,0 +1,37 @@
+{
+  "schema": "OBS_OPEN_03AP_DERIVED_OUTCOME_FIREWALL_V1",
+  "source_population": {
+    "sessions": 257,
+    "prior_status": "MARKET_PATHS_PREVIOUSLY_READ_BY_DISC02E",
+    "correction": "NO CLAIM THAT D_B UNDERLYING_PATHS_ARE_UNOPENED"
+  },
+  "assignment": {
+    "algorithm": "SHA256_RANK",
+    "salt": "OBS_OPEN_03A_FIREWALL_V1",
+    "sort": "SHA256(salt + '|' + session_id), then session_id",
+    "atlas_DA_first_n": 154,
+    "representation_DB_remaining_n": 103,
+    "information_used": ["session_id", "civil_date", "server_offset_minutes"],
+    "substantive_outcomes_used": false
+  },
+  "roles": {
+    "D_A": "03A_DESCRIPTIVE_ATLAS_AND_QUESTION_GENERATION_ONLY",
+    "D_B": "03B_REPRESENTATION_GATE_EVALUATION_ONLY_AFTER_SEPARATE_PROTOCOL_FREEZE",
+    "D_C": "69_SESSION_FINAL_PROSPECTIVE_CONFIRMATION_CANDIDATE_REQUIRING_SEPARATE_AUTHORIZATION"
+  },
+  "D_B_current_state": {
+    "underlying_market_paths": "PREVIOUSLY_READ_AND_SEALED_BY_DISC02E",
+    "OUTCOME_REGISTRY_V1_values": "NOT_COMPUTED_UNOPENED",
+    "03B_target_selection": "UNOPENED",
+    "03B_formal_scores": "UNOPENED"
+  },
+  "D_C_current_state": "FROZEN_UNOPENED",
+  "D_C_session_count": 69,
+  "forbidden": [
+    "RUN_03A_OUTCOMES_ON_D_B",
+    "SELECT_03B_TARGET_FROM_D_B",
+    "DECODE_D_C_MEMBERSHIP",
+    "READ_D_C_OBSERVATIONS",
+    "PROMOTE_03A_DESCRIPTION_TO_CONFIRMATION"
+  ]
+}

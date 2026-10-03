@@ -1,0 +1,95 @@
+{
+  "contract_id": "FASS01_S01_2B_TOKENIZER_BOUNDARY_AUDIT_V01",
+  "project_id": "fas-s01-frozen-sensor-transfer-cartography",
+  "phase_id": "S01-2B-v01",
+  "mode": "READ_ONLY_TOKENIZER_BOUNDARY_AUDIT",
+  "parent_identity": {
+    "S01_2_corpus_sha256": "51a55212ba89d55bd6df532673ad4546c95def1f5d75622661f7c17b3e4a7ad1",
+    "S01_2_protocol_bundle_root_sha256": "67644d4a99b9c84f312caac591e00e2a12903cea0433832868aa35dce2b5d6f9",
+    "S01_2_result_tree_root_sha256": "f6065b8163799239e0d7b1200b5dda4aad169772ead14b999130a473ff9d9049",
+    "S01_2A_result_tree_root_sha256": "aad22fe9487928a016d70c3c91bee8095c2fe8db1a8f4b19df30d9fae4f0a2a0",
+    "S01_2A_preflight_root_sha256": "6ade0544c58471c8f162b4ce9b85786158d10c0e3d1a688689ac6c7e6b67715a",
+    "S01_2A_alignment_records_sha256": "c8589ed5325f4bbd6a3965b598044d97c3d74704ef9c6f63d428414c68132f46",
+    "S01_2A_report_sha256": "843217f7ce448d3361da048d9a3d5fcc8e4e7aaabb2b94d86de7d077bdbcb61a",
+    "S01_2A_disposition_sha256": "81d7fe88b52fc8275fa4f15ef69ac2b78343875e7c9feb06d611daf1e82569be",
+    "S01_2A_tokenizer_assets_sha256": "c5e9a5b08ec5658ef2a8760d8230bbe9367bea124451488e164baf0eeca95afc",
+    "S01_2_feature_extraction_contract_sha256": "08ddd42795d71d9b598da5015d5541316c6cf1f2c0761ce3c0890229cda4d5b0"
+  },
+  "input_paths": {
+    "sealed_corpus": "D:/codex-runs/fas-s01-frozen-sensor-transfer-cartography/s01-2-v01-sealed/corpus/counterfactual-quartets-v01.jsonl",
+    "sealed_s01_2_result_root": "D:/codex-runs/fas-s01-frozen-sensor-transfer-cartography/s01-2-v01-sealed",
+    "sealed_s01_2a_result_root": "D:/codex-runs/fas-s01-frozen-sensor-transfer-cartography/s01-2a-tokenizer-alignment-v02"
+  },
+  "input_contract": {
+    "event_count": 106496,
+    "quartet_count": 26624,
+    "span_types": ["context", "entity", "relation"],
+    "expected_span_occurrences": 638976,
+    "source_offset_unit": "ASCII character offset; equal to UTF-8 byte offset",
+    "tokenizer_identity_for_provenance_only": {
+      "repo_id": "LiquidAI/LFM2.5-1.2B-Base",
+      "resolved_commit": "7453bca97ca1e67754c4035a4b4c584e1c9dd725"
+    },
+    "source_alignment_disposition_must_remain": "TOKENIZER_ALIGNMENT_FAIL_CLOSED"
+  },
+  "spill_classification": {
+    "scope": "Every boundary-crossing token for every context/entity/relation span; preserve exact left and right spill strings and widths.",
+    "priority": [
+      "special-token / offset anomaly if a special token overlaps a required span or a malformed offset could affect it",
+      "no spill if the selected minimal token cover adds no characters outside the semantic span",
+      "adjacent semantic characters if any spill character is Unicode letter, number, or mark",
+      "other if any spill character is neither Unicode whitespace, punctuation, nor semantic character",
+      "whitespace + punctuation if both occur and no semantic or other characters occur",
+      "whitespace only if every spill character is Unicode whitespace",
+      "punctuation only if every spill character is Unicode punctuation"
+    ],
+    "per_token_fields": [
+      "token_position", "token_id", "token_offsets", "token_text",
+      "left_spill_text", "right_spill_text", "left_spill_width",
+      "right_spill_width", "combined_spill_category"
+    ],
+    "semantic_character_classes": ["Unicode L*", "Unicode N*", "Unicode M*"],
+    "punctuation_class": "Unicode general category P*",
+    "whitespace_class": "str.isspace()",
+    "special_token_handling": "Use the sealed special_tokens_mask. Model-visible special positions do not count as source text; any special position with a nonempty source offset intersecting a required span is an anomaly."
+  },
+  "minimal_cover_diagnostic": {
+    "selection": "All nonspecial token positions whose valid nonempty source offsets intersect the full character span.",
+    "cover": "The character interval from the minimum selected token start to the maximum selected token end, with exact left/right spill retained.",
+    "coverage_test": "Clip selected token offsets to the semantic span and determine whether every span character is covered exactly once; separately report gaps and overlaps.",
+    "nonsemantic_only_diagnostic": "A span is diagnostically recoverable when coverage is exact, there is no special/offset anomaly, and all cover spill consists only of Unicode whitespace and/or punctuation. This is a measurement only; it does not authorize or adopt an alignment rule.",
+    "strict_whitespace_diagnostic": "Separately count exact-coverage spans whose entire cover spill consists only of Unicode whitespace.",
+    "adoption": "No alignment rule, punctuation allowlist, tokenizer, corpus rendering, or feature extraction is authorized or adopted by this audit."
+  },
+  "grouping": {
+    "required": ["span_type", "combined_spill_category", "left_spill_category", "right_spill_category", "observation_template_id", "query_template_id", "term_identity"],
+    "position": ["character_span_start", "character_span_end", "input_character_length", "occurrence_index"],
+    "distribution_metrics": ["crossing_tokens_per_span", "left_spill_width", "right_spill_width", "total_cover_spill_width"],
+    "quantiles": [0.5, 0.95],
+    "quantile_method": "nearest rank: sorted one-based rank ceil(q*N); histogram implementation must reproduce that rank exactly"
+  },
+  "forbidden": [
+    "modify any S01-2 or S01-2A artifact",
+    "load or call a tokenizer",
+    "load LFM weights or instantiate a model",
+    "extract hidden features or create feature views",
+    "fit probes or calculate representation geometry",
+    "change corpus strings, span definitions, or tokenizer outputs",
+    "adopt a minimal-cover rule or punctuation allowlist",
+    "authorize feature extraction or S01-3"
+  ],
+  "outputs": [
+    "one audit record per declared span occurrence, including each crossing token and exact spill",
+    "aggregate spill report by span type, category, template, term identity, position, and spill width",
+    "candidate minimal-cover recoverability diagnostics, explicitly non-authoritative",
+    "read-only provenance and input-hash receipt",
+    "machine-readable disposition and result-tree seal"
+  ],
+  "terminal_disposition": {
+    "S01_2A_TOKENIZER_ALIGNMENT_FAIL_CLOSED": true,
+    "S01_2B_BOUNDARY_AUDIT_COMPLETE": "true only after 106496 event rows and 638976 span occurrences reconcile to the sealed inputs and the audit tree seal verifies",
+    "S01_2_FEATURE_EXTRACTION_ELIGIBLE": false,
+    "S01_2_MODEL_CONTACT_AUTHORIZED": false,
+    "S01_3_AUTHORIZED": false
+  }
+}

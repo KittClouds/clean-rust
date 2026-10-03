@@ -1,0 +1,23 @@
+[build-system]
+requires = ["maturin>=1.9,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "northstar-rl"
+version = "0.1.0"
+description = "Thin Gymnasium shell over Northstar's deterministic Rust learning world"
+requires-python = ">=3.9"
+dependencies = [
+    "gymnasium>=1.1,<2",
+    "numpy>=1.26",
+]
+
+[project.optional-dependencies]
+qualification = ["stable-baselines3>=2.7,<3"]
+
+[tool.maturin]
+manifest-path = "crates/northstar-rl-py/Cargo.toml"
+python-source = "python"
+module-name = "northstar_rl._northstar_rl"
+features = ["pyo3/extension-module"]
+

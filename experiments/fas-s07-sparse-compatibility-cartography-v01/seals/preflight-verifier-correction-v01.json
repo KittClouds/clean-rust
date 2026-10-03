@@ -1,0 +1,21 @@
+{
+  "correction_id": "FAS_S07_PREFLIGHT_VERIFIER_CORRECTION_V01",
+  "scope": "verification only; no scientific or training contract changed",
+  "historical_protocol_root_sha256": "9c8212fc5177a5cfabda57d05412e2e85e01fd261da850eebef774ab44eb88c9",
+  "original_verifier": {
+    "path": "scripts/s07_common.py",
+    "sha256": "ed3831f4e72e2bb2ccb4b3545afa42e70a42cee953b53399d899cc38401dfba0"
+  },
+  "corrected_verifier": {
+    "path": "scripts/s07_common.py",
+    "sha256": "829d2560cce12c573f581d0e2048e997e4c5b067b162aec025be988bd8410cfe"
+  },
+  "exact_mismatch": "S01 parent seal declares ordinal-sorted UTF-8 inventory lines; verifier sorted paths with casefold().",
+  "expected_s01_parent_root_sha256": "1fc3aeb432ecdbef21a35aea8fed5b0d59671681eb8eb8032533c9ce751a4384",
+  "previous_verifier_computed_root_sha256": "4e265bf075df7049d15ea0028f8322e967f71a57550f033cf8543a9e34ef4e1f",
+  "corrected_ordinal_reconstruction": "PASS",
+  "first_preflight": "FAIL_CLOSED before any run artifact was written",
+  "feature_or_model_access": false,
+  "training_started": false,
+  "scientific_contract_changed": false
+}

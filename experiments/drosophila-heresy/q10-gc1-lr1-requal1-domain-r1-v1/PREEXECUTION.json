@@ -1,0 +1,14 @@
+{
+  "contract_sha256": "59CA600D280C34CE72CCFDE246E72DB1448091F2C54294552A348CEEA4753E9B",
+  "execution_started": false,
+  "identity": "q10-gc1-lr1-requal1-domain-r1-v1",
+  "pair_replay_allowed": false,
+  "parent_bindings_sealed": true,
+  "plan_sha256": "7AED051B7E319B8C7F7A979E9953DFB565A13456705E552445AA0C2E6A6956C1",
+  "protocol": "REQUAL1-DOMAIN",
+  "result_exposure": false,
+  "root_manifest_sha256": "BAA2FA81A714E43CBAF9FB6B06EC7AE8C16C828CB7162CC5CBCDA97EE55EC8D0",
+  "runner_sha256": "61C15884825F7102B249378D8FBF840BCFE6219156FFA14E272432D6BB029629",
+  "singleton_replay_allowed": false,
+  "status": "PREEXECUTION_SEALED_NO_REPLAY"
+}

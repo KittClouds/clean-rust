@@ -1,0 +1,14 @@
+{
+  "status": "VERIFIED",
+  "frozen_files_checked": 25,
+  "output_files_checked": 19,
+  "seal_sha256": "ad0d7def1d846ff8d8d8acde61d836002c64c94ba9740eb8560a70d547ada9e9",
+  "real_slice_replayed_arms": 6,
+  "bit_identical_non_timing_results": true,
+  "scientific_sample_size_increased": false,
+  "output_hashes": {
+    "execution.json": "1459df8b1bbea18c225213d6f1cecd968b8c9c125901986f49fbbe578e444236",
+    "primary-tau4_glut_inhibitory.jsonl": "2c189affff5da3563be87c0908a4abc90c65e2a12fe392b295a1d33a6936bad0",
+    "replay-config.json": "24257260a6f74274a5df9a818166073add0137c122e0ddc7c817b6fa2d5709b0"
+  }
+}

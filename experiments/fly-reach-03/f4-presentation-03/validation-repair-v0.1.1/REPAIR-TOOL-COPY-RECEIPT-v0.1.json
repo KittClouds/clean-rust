@@ -1,0 +1,20 @@
+{
+  "analyzer_change_scope": [
+    "continuation root resolution",
+    "support-only target access gate",
+    "truth-access provenance and continuation source hash"
+  ],
+  "continuation_analyzer_sha256": "777c2bc7d6f2f817dd40d2654932b9f4bc503335bf5c0ffb15d6e6667409181f",
+  "continuation_verifier_sha256": "7c7a756b9bb5e577fe1683d2e4829f1d4e8b2fc9d0347157238b1fc77babcd57",
+  "original_analyzer_sha256": "be2c5198713ccbc47bc0ee83870c318460f75f0530e0db56d459345798c6e7a9",
+  "original_verifier_sha256": "7f602ac210f1ef4c2fba45a18687faf84240e55102baeeea097ece0359e74eae",
+  "schema": "F4-PRESENTATION-03-tool-copy-repair-receipt-v0.1",
+  "scoring_formula_changes": false,
+  "status": "PASS_NARROW_COPIES_CREATED",
+  "task_model_optimizer_or_fit_changes": false,
+  "verifier_change_scope": [
+    "continuation root resolution",
+    "truth-access context check and truthful receipt fields",
+    "continuation source hash"
+  ]
+}

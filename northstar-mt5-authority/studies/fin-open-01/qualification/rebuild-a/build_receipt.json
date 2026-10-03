@@ -1,0 +1,14 @@
+{
+  "financial_development_outcomes": "FROZEN_UNOPENED",
+  "financial_validation": "FROZEN_UNOPENED",
+  "outcome_inspection": "FORBIDDEN",
+  "output_file_count": 6,
+  "protocol_id": "FIN-OPEN-01",
+  "protocol_root_sha256": "0ab2ad4bfdcbf4b2c6229ba98ea8232de3a9a0620743ce7258f4b1d8a049368f",
+  "real_outcome_files_read": false,
+  "rebuild_identity": "DETERMINISTIC_OUTPUT_EXPECTED",
+  "schema": "FIN_OPEN_01_BUILD_RECEIPT_V1",
+  "science_confirmation": "FROZEN_UNOPENED",
+  "status": "PROTOCOL_QUALIFIED",
+  "substantive_obs_open_03_files_read": false
+}

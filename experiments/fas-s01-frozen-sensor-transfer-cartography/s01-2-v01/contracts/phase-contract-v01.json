@@ -1,0 +1,54 @@
+{
+  "contract_id": "FASS01_PHASE_S01_2_V01",
+  "project_id": "fas-s01-frozen-sensor-transfer-cartography",
+  "phase_id": "S01-2-v01",
+  "mode": "CONSTRUCTION_ONLY",
+  "parent_roots": {
+    "s01_construction": "894b4a0c6db98a5d84fe75589168715a00660d48917e47b0c21bb794a2fc3777",
+    "fas00_terminal_closure": "870e1d29d7db3dd458f16fcb56315f6976e4a5f35ba5731d642b3330a8d7d652",
+    "s01_1_cartography": "847c0a35e7c0aa6ad7c7120ea1d4fb5b07754add0df861530cd2df5e2631d8ef",
+    "s01_1_observation_increment_addendum": "e56733793ba4824851b079152c72097b0c615e481bed0185b9e0a470fae665e6"
+  },
+  "backbone_reserved_only": {
+    "model_id": "LiquidAI/LFM2.5-1.2B-Base",
+    "revision": "7453bca97ca1e67754c4035a4b4c584e1c9dd725",
+    "parameter_delta": 0
+  },
+  "allowed": [
+    "generate the new synthetic counterfactual corpus",
+    "independently reconstruct targets and validate factor isolation",
+    "compile and run synthetic-only tests",
+    "seal corpus, source, contracts, validation receipt, and disposition"
+  ],
+  "forbidden": [
+    "load tokenizer or LFM",
+    "feature extraction or cache creation",
+    "probe fitting or training",
+    "representation geometry execution",
+    "online adaptation",
+    "S01-3 execution or authorization",
+    "FAS-00 writes or revision",
+    "other-project reads or writes"
+  ],
+  "expected_counts": {
+    "context_terms": 32,
+    "entity_terms": 32,
+    "train_side_style_terms_per_role": 16,
+    "novel_heldout_terms_per_role": 16,
+    "observation_templates": 8,
+    "query_templates": 8,
+    "world_families": 8,
+    "relations": 2,
+    "states": 3,
+    "factorial_quartets": 24576,
+    "binding_context_quartets": 1024,
+    "binding_entity_quartets": 1024,
+    "total_quartets": 26624,
+    "rendered_inputs": 106496,
+    "variants_per_quartet": 4
+  },
+  "S01_2_CORPUS_READY": false,
+  "S01_2_EXTRACTION_READY": false,
+  "S01_2_MODEL_CONTACT_AUTHORIZED": false,
+  "S01_3_AUTHORIZED": false
+}

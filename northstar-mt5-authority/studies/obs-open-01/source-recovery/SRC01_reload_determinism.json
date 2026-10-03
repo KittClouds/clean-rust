@@ -1,0 +1,24 @@
+{
+  "rows": [
+    {
+      "byte_identical": true,
+      "run1_bytes": 2828216,
+      "run1_sha256": "3f8a896fd71dc33b45b9f7c4cdb4709d33e0398da3d5bbf412b38012c99855a2",
+      "run2_bytes": 2828216,
+      "run2_sha256": "3f8a896fd71dc33b45b9f7c4cdb4709d33e0398da3d5bbf412b38012c99855a2",
+      "status": "PASS",
+      "timeframe": "M1"
+    },
+    {
+      "byte_identical": true,
+      "run1_bytes": 2746306,
+      "run1_sha256": "7d782affb383d7c7809630e66ad5b09af94d3e62a3e6caf7b567887d1583f90c",
+      "run2_bytes": 2746306,
+      "run2_sha256": "7d782affb383d7c7809630e66ad5b09af94d3e62a3e6caf7b567887d1583f90c",
+      "status": "PASS",
+      "timeframe": "M5"
+    }
+  ],
+  "schema": "OBS_OPEN_SRC01_RELOAD_DETERMINISM_V1",
+  "status": "PASS"
+}

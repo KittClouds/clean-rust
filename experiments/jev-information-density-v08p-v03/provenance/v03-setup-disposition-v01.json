@@ -1,0 +1,33 @@
+{
+  "protocol": "jev-information-density/v0.8p-v03-setup-disposition-v01",
+  "identity": "v0.8P-v03-setup-disposition-v01",
+  "status": "BLOCKED_BEFORE_DENYLIST_SEAL",
+  "prior_attempts": {
+    "v01": "QUARANTINED_CONSTRUCTION_BOUNDARY_VIOLATION_E1_JOIN_READ",
+    "v02": "QUARANTINED_SOURCE_SCOPE_BOUNDARY_VIOLATION"
+  },
+  "v02_quarantine_receipt": {
+    "path": "experiments/jev-information-density-v08p-v03/provenance/v02-quarantine-receipt.json",
+    "inventory_entries": 16,
+    "v02_bytes_modified": false,
+    "v02_artifacts_used_as_v03_inputs": false
+  },
+  "clean_parent_contracts": {
+    "panel_design_sha256": "ce3b7b97caecb27f3ad99439c0e67dca6e40af5da3db9ca2e356ea5e9f06f823",
+    "run_contract_sha256": "e345225b4a17fc18eb35fcab24cbe1d72bd0e34bed9de272f927a7be461853e6",
+    "analysis_contract_sha256": "84111122033fda65c84344317cfe3b50639b23be4c71f480ba665c67a23cc939",
+    "bundle_seal_sha256": "67cd6b7902111000dc93a0f81f9f20bc05a9c084732705ed8f9ad82fe965fa85",
+    "all_recomputed_hashes_match": true
+  },
+  "v03": {
+    "construction_identity": "v0.8P-fresh-trajectory-instrumented-rerun-v03",
+    "source_allowlist_sha256": "43bdf7408ef2b0e6fbcdd75b4848fd7631870d4312624e39b917ef554d62f854",
+    "denylist": "NOT_SEALED",
+    "fresh_panel_contract": "NOT_CREATED",
+    "fresh_panel": "NOT_GENERATED",
+    "model_contact": false,
+    "training": false,
+    "evaluation": false
+  },
+  "blocking_event": "One allowlisted E1 seal-manifest source hash differed from its frozen expected SHA-256. The extractor failed closed before opening the firewall lock and before writing outputs. The observed hash was not persisted; no source re-read is authorized by the current boundary."
+}

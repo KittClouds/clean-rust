@@ -1,0 +1,55 @@
+{
+  "schema_version": "BROKER_ACCOUNT_SNAPSHOT_V1",
+  "account_id_hash": "6db47f4400ffd711dbf498345eee27a88f20acee8b54180f73e6535deddb7536",
+  "environment": "LIVE",
+  "broker_raw_terms": [
+    [
+      "balance",
+      0.0
+    ],
+    [
+      "projectedBalance",
+      0.0
+    ],
+    [
+      "availableFunds",
+      0.0
+    ],
+    [
+      "todayNet",
+      0.0
+    ],
+    [
+      "todayFees",
+      0.0
+    ],
+    [
+      "openNetPnL",
+      0.0
+    ]
+  ],
+  "cash_equivalent": 0.0,
+  "equity": 0.0,
+  "unrealized_pnl": 0.0,
+  "realized_pnl": 0.0,
+  "available_funds": 0.0,
+  "margin_terms": [],
+  "broker_time_ns": null,
+  "received_time_ns": 1786749014407695300,
+  "raw_payload_hash": "b7e3f1fb84f2eb297a5f3f34bce69a90343d866d9e8dcab0b5fa6bed75c58c6e",
+  "field_provenance": [
+    [
+      "cash_equivalent",
+      "BROKER_RAW.balance"
+    ],
+    [
+      "equity",
+      "BROKER_RAW.projectedBalance"
+    ],
+    [
+      "currency",
+      "AUTH_ACCOUNT.USD"
+    ]
+  ],
+  "content_hash": "566a94b0f1eb1e3b7812fcaeb2eaffbfd01a617ef58e3adc8f697b1572216257"
+}

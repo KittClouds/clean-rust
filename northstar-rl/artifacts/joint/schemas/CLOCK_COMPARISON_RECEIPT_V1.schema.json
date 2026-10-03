@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ClockComparisonReceipt",
+  "type": "object",
+  "properties": {
+    "bar_boundary_delta_ns": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "left_arrival_offset_ns": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "left_source": {
+      "type": "string"
+    },
+    "left_source_time_ns": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "northstar_instrument_id": {
+      "type": "integer",
+      "format": "uint32",
+      "minimum": 0
+    },
+    "receipt_id": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "right_arrival_offset_ns": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "right_source": {
+      "type": "string"
+    },
+    "right_source_time_ns": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "schema_version": {
+      "type": "string"
+    },
+    "session_boundary_relationship": {
+      "type": "string"
+    },
+    "source_time_delta_ns": {
+      "type": "integer",
+      "format": "int64"
+    }
+  },
+  "required": [
+    "schema_version",
+    "northstar_instrument_id",
+    "left_source",
+    "right_source",
+    "left_source_time_ns",
+    "right_source_time_ns",
+    "left_arrival_offset_ns",
+    "right_arrival_offset_ns",
+    "source_time_delta_ns",
+    "bar_boundary_delta_ns",
+    "session_boundary_relationship",
+    "receipt_id"
+  ],
+  "$defs": {
+    "Digest256": {
+      "description": "Domain-separated BLAKE3 digest",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

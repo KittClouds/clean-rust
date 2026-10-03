@@ -1,0 +1,47 @@
+{
+  "schema": "OBS_OPEN_DISC02P_CANDIDATE_SCHEMA_V1",
+  "promotion": "FORMAL_ELIGIBLE_AND_SUPPORT_PASS_AND_OMNIBUS_PASS_AND_HOLM_PASS_AND_MC_RESOLVED_AND_TEMPORALLY_SUPPORTED",
+  "fields": [
+    "candidate_id",
+    "formal_estimand_id",
+    "family_id",
+    "representation_id",
+    "discovery_population_hash",
+    "eligible_session_count",
+    "surface_domain",
+    "omnibus_statistic",
+    "raw_monte_carlo_p",
+    "monte_carlo_interval",
+    "holm_decision",
+    "anchor_cell",
+    "simultaneously_qualified_cells",
+    "frozen_cell_signs",
+    "temporal_support_receipt",
+    "insufficiencies",
+    "future_confirmation_contract"
+  ],
+  "rejection_precedence": [
+    "CONFIRMATION_NOT_AUTHORIZED",
+    "NOT_EVALUABLE_COVERAGE",
+    "DEGENERATE_RANGE_WIDTH",
+    "REPRESENTATION_NOT_COMPARABLE",
+    "SESSION_SUPPORT_INSUFFICIENT",
+    "SURFACE_SUPPORT_INSUFFICIENT",
+    "NUMERICAL_RESOLUTION_INSUFFICIENT",
+    "NUMERICAL_DECISION_UNRESOLVED",
+    "FAILS_OMNIBUS_EVIDENCE",
+    "FAILS_FAMILYWISE_CORRECTION",
+    "TEMPORAL_SUPPORT_INSUFFICIENT",
+    "TEMPORALLY_UNSTABLE",
+    "PROMOTED_DISCOVERY_ONLY"
+  ],
+  "typed_nonclaim_states": [
+    "NO_NATURAL_NULL",
+    "NEAR_NULL_NOT_EVALUABLE",
+    "SESSION_END_CENSORED",
+    "SOURCE_PATH_INCOMPLETE",
+    "GRAMMAR_EXCLUDED_BY_PROTOCOL"
+  ],
+  "discretionary_override": false
+}
+

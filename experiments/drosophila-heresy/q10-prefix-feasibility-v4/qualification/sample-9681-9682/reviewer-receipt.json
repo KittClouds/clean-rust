@@ -1,0 +1,13 @@
+{
+  "audited_events": 8,
+  "behavioral_inference": false,
+  "bundle_count": 48,
+  "bundles_per_event": 6,
+  "contract_sha256": "1c6753ddf2c16c55069e5bc34c5a7fe2418546d083b1c833291346e893835a8d",
+  "dh08b_authorized": false,
+  "plan_sha256": "b806e40a4107908cfe9e17979bd4e21e5538744d22658b5772418bc15b9c4514",
+  "prefix_grid_per_bundle": 125,
+  "protocol": "Q10-PF4",
+  "scientific_seed_bundles": 0,
+  "status": "VERIFIED"
+}

@@ -1,0 +1,54 @@
+{
+  "schema": "OBS_OPEN_DISC02P_INFERENCE_V1",
+  "independent_unit": "SESSION",
+  "resampling_payload": "ENTIRE_SESSION_WITH_BOTH_SIDES_ALL_CANDIDATES_ALL_RANGES_ALL_TIMES",
+  "formal_tests": 3,
+  "surface_test": "STUDENTIZED_MAX_ABSOLUTE_STATISTIC",
+  "null_generator": "DETERMINISTIC_SESSION_SIGN_REFLECTION",
+  "null_scope": "DECLARED_JOINT_REFLECTION_EXCHANGEABILITY_ONLY",
+  "randomizations": 9999,
+  "seed": 20260814,
+  "plus_one_correction": true,
+  "minimum_attainable_p": 0.0001,
+  "multiplicity": {
+    "procedure": "HOLM_BONFERRONI",
+    "alpha": 0.05,
+    "family_count": 3,
+    "within_surface": "MAX_STATISTIC_SIMULTANEOUS_LOCALIZATION",
+    "temporal_views_create_new_tests": false
+  },
+  "resolution": {
+    "required_headroom_factor": 10,
+    "strictest_first_step_threshold": 0.016666666666666666,
+    "required_maximum_p_min": 0.0016666666666666668,
+    "status": "PASS"
+  },
+  "monte_carlo_decision": {
+    "interval": "WILSON_99_PERCENT",
+    "pass": "upper_bound<=applicable_threshold",
+    "fail": "lower_bound>applicable_threshold",
+    "otherwise": "NUMERICAL_DECISION_UNRESOLVED"
+  },
+  "support": {
+    "aggregate_eligible_sessions": 129,
+    "supported_months": 4,
+    "sessions_per_supported_month": 10,
+    "required_offset_regimes": [120, 180],
+    "sessions_per_offset_regime": 20,
+    "chronological_blocks": 4,
+    "sessions_per_chronological_block": 20,
+    "leave_one_month_remaining_sessions": 103,
+    "leave_one_month_remaining_supported_months": 3,
+    "leave_one_month_sessions_per_offset_regime": 15
+  },
+  "localization": {
+    "anchor": "CANONICALLY_FIRST_CELL_TIED_FOR_MAX_ABSOLUTE_STUDENTIZED_MAGNITUDE",
+    "claim": "LOCALIZATION_RECEIPT_NOT_PRIVILEGED_RANGE",
+    "promotion_requires_same_nonzero_sign_in_all_supported_predeclared_views": true
+  },
+  "near_null": {
+    "equivalence_margin": null,
+    "failure_to_reject_is_supported_null": false,
+    "status": "NEAR_NULL_NOT_EVALUABLE"
+  }
+}

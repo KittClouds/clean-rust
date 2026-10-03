@@ -1,0 +1,105 @@
+{
+  "contract_id": "FASS01_S01_2C_MINIMAL_COVER_ALIGNMENT_V01",
+  "project_id": "fas-s01-frozen-sensor-transfer-cartography",
+  "phase_id": "S01-2C-v01",
+  "status": "SEALED_PRE_MODEL_CONTACT",
+  "objective": "Qualify a new tokenizer-span alignment rule against already-sealed S01-2 tokenizer offsets without loading a tokenizer or model.",
+  "parent_identity": {
+    "S01_2_corpus_sha256": "51a55212ba89d55bd6df532673ad4546c95def1f5d75622661f7c17b3e4a7ad1",
+    "S01_2_protocol_bundle_root_sha256": "67644d4a99b9c84f312caac591e00e2a12903cea0433832868aa35dce2b5d6f9",
+    "S01_2_result_tree_root_sha256": "f6065b8163799239e0d7b1200b5dda4aad169772ead14b999130a473ff9d9049",
+    "S01_2A_result_tree_root_sha256": "aad22fe9487928a016d70c3c91bee8095c2fe8db1a8f4b19df30d9fae4f0a2a0",
+    "S01_2A_alignment_records_sha256": "c8589ed5325f4bbd6a3965b598044d97c3d74704ef9c6f63d428414c68132f46",
+    "S01_2A_report_sha256": "843217f7ce448d3361da048d9a3d5fcc8e4e7aaabb2b94d86de7d077bdbcb61a",
+    "S01_2A_disposition_sha256": "81d7fe88b52fc8275fa4f15ef69ac2b78343875e7c9feb06d611daf1e82569be",
+    "S01_2A_tokenizer_assets_sha256": "c5e9a5b08ec5658ef2a8760d8230bbe9367bea124451488e164baf0eeca95afc",
+    "S01_2B_result_tree_root_sha256": "ea9f873fe69d323adbfc3a20b4ce65c0860730a8b51b25061af373d00da5a755",
+    "S01_2B_boundary_report_sha256": "00dda71b96e154a5dfc9ed78321a9e7a13752ebfa41815365f1d118d5214538c",
+    "S01_2B_boundary_audit_sha256": "c1ef852be4b7e0bde62d3efda2d28d64cf96e35cbf6d3c2bd2a547a148bd0c1e",
+    "S01_2B_disposition_sha256": "f5c7d366586fba19a9bcc0565ca357cc165ef1df579795d5bd9b86c78150ff2e",
+    "feature_extraction_contract_sha256": "08ddd42795d71d9b598da5015d5541316c6cf1f2c0761ce3c0890229cda4d5b0",
+    "geometry_analysis_contract_sha256": "4f6df89b02d0b991e09ab5d8f2658627c48799a10b1dd0557795c433d61099ab",
+    "boundary_audit_contract_sha256": "326c0ed05d279e1a5d54f4f296d59afb8340a7ff5e3189545de61f6bdd41bfe1"
+  },
+  "alignment_rule": {
+    "name": "MINIMAL_CONTIGUOUS_TOKEN_COVER_V01",
+    "selection": "Select every nonspecial tokenizer position i whose valid nonempty source offset [s_i,e_i) intersects the declared semantic character span S=[a,b): s_i < b and e_i > a.",
+    "cover": "The selected token positions must be a nonempty contiguous integer interval. The cover character interval is [minimum selected token start, maximum selected token end).",
+    "semantic_coverage": "Clip each selected token offset to S. Every semantic character in S must be covered exactly once, with no gaps and no overlaps.",
+    "spill": {
+      "side": "left only",
+      "maximum_characters": 1,
+      "allowed_exact_characters": ["U+0020 SPACE", "U+0028 LEFT PARENTHESIS"],
+      "right_spill": "forbidden",
+      "semantic_character_spill": "forbidden",
+      "other_punctuation_or_whitespace": "forbidden"
+    },
+    "special_and_offset_integrity": "Special positions may not overlap source characters or be selected. Nonspecial positions must have valid nonempty offsets. Any malformed offset, special-token overlap, or tokenizer anomaly affecting a required span fails that span.",
+    "quartet_eligibility": "Every context, entity, and relation occurrence in all four A/C/E/P events must pass. A quartet is eligible only when all four events pass all required spans."
+  },
+  "fixed_inputs": {
+    "events": 106496,
+    "quartets": 26624,
+    "variants_per_quartet_in_order": ["A", "C", "E", "P"],
+    "sealed_variant_change_labels": {"A": "NONE", "C": "CONTEXT", "E": "ENTITY", "P": "OBSERVATION_TEMPLATE"},
+    "P_interpretation": "The sealed generator labels its paraphrase-only surface realization as OBSERVATION_TEMPLATE.",
+    "span_types": ["context", "entity", "relation"],
+    "expected_span_occurrences": 638976,
+    "tokenizer": {
+      "identity": "LiquidAI/LFM2.5-1.2B-Base tokenizer at pinned revision 7453bca97ca1e67754c4035a4b4c584e1c9dd725",
+      "loaded_in_S01_2C": false,
+      "token_ids_sha256": "SHA-256 of consecutive little-endian unsigned 32-bit token IDs, without header or separators"
+    }
+  },
+  "support_gates": {
+    "support_unit": "complete A/C/E/P quartet",
+    "expected_complete_quartets": 26624,
+    "factorial_balanced": {
+      "key": ["track_id", "context_term_split", "entity_term_split", "world_family_id", "relation_id", "state_id", "observation_template_id", "query_template_id"],
+      "expected_cells": 1536,
+      "required_per_cell": 16
+    },
+    "binding_context": {
+      "key": ["track_id", "context_term_split", "context_pair_id", "entity_term_split"],
+      "expected_cells": 64,
+      "required_per_cell": 16
+    },
+    "binding_entity": {
+      "key": ["track_id", "entity_term_split", "entity_pair_id", "context_term_split"],
+      "expected_cells": 64,
+      "required_per_cell": 16
+    },
+    "on_shortage": "FAIL_CLOSED; do not merge cells or lower a threshold"
+  },
+  "representation_views": [
+    {"id": "V0_MEAN_FULL", "assignment": "All model-visible positions [0, sequence_length), including special-token positions."},
+    {"id": "V1_FINAL_POSITION", "assignment": "The single model-visible position sequence_length-1."},
+    {"id": "V2_FIRST_POSITION", "assignment": "The single model-visible position 0."},
+    {"id": "V3_CONTEXT_SPAN_MEAN", "assignment": "Sorted deduplicated union of valid token positions across every context occurrence."},
+    {"id": "V4_ENTITY_SPAN_MEAN", "assignment": "Sorted deduplicated union of valid token positions across every entity occurrence."},
+    {"id": "V5_RELATION_SPAN_MEAN", "assignment": "Sorted deduplicated union of valid token positions across every relation occurrence."},
+    {"id": "V6_FIXED_SPAN_CONCAT", "assignment": "Ordered references to V3, V4, V5 positions; no projection, normalization, or cross-span deduplication."}
+  ],
+  "permitted_operations": [
+    "Verify the sealed parent trees and read their allowlisted corpus, tokenizer offsets, boundary audit, reports, dispositions, and contracts.",
+    "Apply the frozen minimal-cover rule to every declared context, entity, and relation span.",
+    "Materialize token-index assignments and reconcile them with the sealed S01-2B audit.",
+    "Recompute quartet eligibility and all declared support cells.",
+    "Write and seal the S01-2C alignment manifest, report, and disposition."
+  ],
+  "forbidden_operations": [
+    "Load or call a tokenizer.",
+    "Load or instantiate LFM weights, extract hidden states, or create features.",
+    "Alter corpus strings, spans, tokenizer outputs, or any S01-2A/S01-2B artifact.",
+    "Expand the spill allowlist or change the seven frozen representation views.",
+    "Calculate representation geometry, fit probes, train any mechanism, or execute S01-3."
+  ],
+  "terminal_state": {
+    "S01_2A_TOKEN_ALIGNMENT": "TOKENIZER_ALIGNMENT_FAIL_CLOSED",
+    "S01_2B_BOUNDARY_AUDIT_COMPLETE": true,
+    "S01_2C_MINIMAL_COVER_ALIGNMENT": "PASS only if every required span and every support gate passes",
+    "S01_2_FEATURE_EXTRACTION_ELIGIBLE": "true only on S01-2C PASS",
+    "S01_2_MODEL_CONTACT_AUTHORIZED": false,
+    "S01_3_AUTHORIZED": false
+  }
+}

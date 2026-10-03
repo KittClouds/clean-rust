@@ -1,0 +1,11 @@
+{
+  "receipt_id": "FAS_FROZEN_OBSERVER_BUNDLE_E0_SEAL_AUDIT_DEFECT_V02",
+  "status": "SUPERSEDED_BEFORE_E1",
+  "seal_id": "FAS_FROZEN_OBSERVER_BUNDLE_E0_SEAL_V02",
+  "root_sha256": "752418ef5de3eb4aa3019b899adb2ec9bbbd1d345d8e4d2784d47505559b5a16",
+  "defect": "Seal entry set contains contracts/e0-freeze-v01.json and omits contracts/e0-freeze-v02.json",
+  "discovered_before_e1": true,
+  "model_contact_occurred": false,
+  "panel_rows_materialized": 0,
+  "replacement": "E0/E1 v03 corrects manifest membership and preserves this receipt"
+}

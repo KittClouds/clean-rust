@@ -1,0 +1,23 @@
+{
+  "protocol": "Q10-DA1",
+  "plan_sha256": "BEC2915FB84EBB81EC5DEF5ADE1F3077163CDB59216C9D1C4476F120D6F16B23",
+  "engineering_only": true,
+  "declared_events": 8,
+  "seeds": [9731, 9732],
+  "sides": ["R", "L"],
+  "taus": [4.0, 16.0],
+  "trial": 128,
+  "selector_count": 4,
+  "coalition_policy": "all eligible nonempty-support coordinates; greedy maximal under fixed stable order; no size cap",
+  "candidate_steps": [0, -1, 1, -2, 2, -4, 4, -8, 8, -16, 16],
+  "minimum_final_reserve_ulps": 16,
+  "prefixes": ["1", "3", "8", "16", "32", "all"],
+  "readout": "ordered f32 sequential replay; empty sum starts -0",
+  "nonlinear_interaction_search": false,
+  "legacy_path_length_64": "diagnostic_only",
+  "direction_cosine": "diagnostic_only_no_threshold",
+  "scientific_seed_bundles": 0,
+  "behavioral_inference": false,
+  "dh08b_authorized": false,
+  "sample_status": "PENDING_SUPERVISOR_REVIEW"
+}

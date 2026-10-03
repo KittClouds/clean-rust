@@ -1,0 +1,24 @@
+{
+  "authorization_id":"FASS01_S01_3_EXECUTION_AUTHORIZATION_V01",
+  "source":"explicit user instruction in the current task turn",
+  "authorized_phase":"FAS-S01 Phase S01-3 Frozen Linear Accessibility Cartography",
+  "permitted": [
+    "read the sealed S01-2 seven-view cache and frozen corpus metadata",
+    "fit only the prospectively frozen linear probe family after the contract and split are sealed",
+    "evaluate only the five declared factor labels across all seven views and fixed held-out slices",
+    "seal probe states, predictions, metrics, and execution receipts"
+  ],
+  "prohibited": [
+    "load LFM or tokenizer",
+    "extract or re-extract features",
+    "modify S01-2 or FAS-00 artifacts",
+    "change probe family, split, regularization, metrics, or thresholds after fitting",
+    "fit nonlinear or adaptive mechanisms",
+    "select or promote a view"
+  ],
+  "S01_3_AUTHORIZED":true,
+  "LFM_LOADING_AUTHORIZED":false,
+  "FEATURE_REEXTRACTION_AUTHORIZED":false,
+  "ADAPTIVE_MECHANISMS_AUTHORIZED":false,
+  "FAS00_PHASE4_AUTHORIZED":false
+}

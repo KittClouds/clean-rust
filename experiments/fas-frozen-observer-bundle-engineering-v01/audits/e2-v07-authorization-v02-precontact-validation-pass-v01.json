@@ -1,0 +1,33 @@
+{
+  "receipt_id": "FAS_FROZEN_OBSERVER_BUNDLE_E2_V07_AUTHORIZATION_V02_PRECONTACT_VALIDATION_PASS_V01",
+  "status": "AUTHORIZATION_AND_PREMODEL_BINDINGS_PASS_MODEL_CONTACT_NOT_YET_PERFORMED",
+  "recorded_utc": "2026-09-26T10:51:20.998497+00:00",
+  "e0_v10_root_sha256": "899a131c09298fdafdcc6771ad01e8982857a1cd47900259800f97dd7bea7ccd",
+  "authorization_sha256": "1c9e14314076752c3637f8f83f2da0063f273f907f99f8f39344b3d4061eb435",
+  "preserved_rejected_authorization_sha256": "0827f54d9845c8af3076f7bf77a0a54857d4b93688d7812ed3bca61fc6a7f27e",
+  "preserved_stop_receipt_sha256": "1193000b22dc54b2b8960ac70d715c84ac0423aa59fb77b5a4a87693708586f9",
+  "checks": {
+    "actual_e0_seal_root_and_members_recomputed": true,
+    "e0_v09_predecessor_root_and_members_recomputed": true,
+    "freeze_contract_derived_from_manifest_membership": true,
+    "manifest_metadata_spelling_not_used_as_identity_gate": true,
+    "e0_v09_direct_predecessor_verified": true,
+    "e1_v04_root_and_panel_row_order_verified": true,
+    "e2_v07_protocol_hash_and_authority_verified": true,
+    "representation_abi_and_extractor_hashes_verified": true,
+    "model_and_tokenizer_asset_hashes_verified": true,
+    "runtime_distribution_versions_verified_without_importing_model_libraries": true,
+    "concurrent_wait_receipt_and_live_absence_verified": true,
+    "comparator_hash_and_length_verified_read_only": true,
+    "storage_host_and_device_resource_preflight_passed": true,
+    "feature_output_root_is_new": true,
+    "labels_not_opened": true,
+    "cuda_allocator_not_initialized": true
+  },
+  "model_contact_performed": false,
+  "tokenizer_loaded": false,
+  "model_loaded": false,
+  "model_runtime_imported": false,
+  "cuda_allocator_initialized": false,
+  "e3_authorized": false
+}

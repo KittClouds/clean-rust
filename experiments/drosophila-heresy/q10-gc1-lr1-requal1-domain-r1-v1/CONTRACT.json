@@ -1,0 +1,50 @@
+{
+  "behavioral_probe": false,
+  "candidate_inventory_policy": "current GP1 mappings are byte-revalidated; scores and readouts are not imported as measurements",
+  "closure_count": 2,
+  "historical_inputs_are_measurements": false,
+  "identity": "q10-gc1-lr1-requal1-domain-r1-v1",
+  "pair_replay_allowed": false,
+  "plan_sha256": "7AED051B7E319B8C7F7A979E9953DFB565A13456705E552445AA0C2E6A6956C1",
+  "protocol": "REQUAL1-DOMAIN",
+  "root_manifest_sha256": "BAA2FA81A714E43CBAF9FB6B06EC7AE8C16C828CB7162CC5CBCDA97EE55EC8D0",
+  "runner_sha256": "61C15884825F7102B249378D8FBF840BCFE6219156FFA14E272432D6BB029629",
+  "scientific_promotion": false,
+  "scientific_seed_bundles": 0,
+  "selected_contexts": [
+    [
+      "seed9731-L-tau16.json",
+      2
+    ],
+    [
+      "seed9731-L-tau4.json",
+      3
+    ],
+    [
+      "seed9731-R-tau16.json",
+      1
+    ],
+    [
+      "seed9731-R-tau16.json",
+      3
+    ],
+    [
+      "seed9731-R-tau4.json",
+      0
+    ],
+    [
+      "seed9731-R-tau4.json",
+      1
+    ],
+    [
+      "seed9731-R-tau4.json",
+      2
+    ],
+    [
+      "seed9731-R-tau4.json",
+      3
+    ]
+  ],
+  "singleton_replay_allowed": false,
+  "status": "PREMEASUREMENT_SEALED"
+}

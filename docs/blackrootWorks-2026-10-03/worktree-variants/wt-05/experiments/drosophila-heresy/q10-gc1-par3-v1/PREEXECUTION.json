@@ -1,0 +1,12 @@
+{
+  "contract_sha256": "DA5D3485BE2BF3EF8245BA526C456D794D3749F1189B02F616F6E28445C06D68",
+  "created_at_utc": "2026-09-18T00:00:00Z",
+  "execution_started": false,
+  "identity": "q10-gc1-par3-v1",
+  "parent_bindings_sealed": true,
+  "plan_sha256": "36BACDE950637AB7358C8E0DF640D449A8A64DE07355F381C57D9A3F2B1C0254",
+  "protocol": "Q10-GC1-PAR3",
+  "result_exposure": false,
+  "runner_sha256": "C6934BADB75DC62173B437994BF85329440AEBF30E8C1E026C6BD4B6B8303EFA",
+  "status": "PREEXECUTION_SEALED_NO_EXECUTION"
+}

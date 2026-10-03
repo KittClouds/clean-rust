@@ -1,0 +1,14 @@
+{
+  "status": "SEALED_POST_HOC",
+  "created_utc": "20260916T051439Z",
+  "fresh_seed_bundles_added": 0,
+  "simulator_rerun": false,
+  "files": {
+    "posthoc_trajectory.py": "874226ba1626f855956fe5a3f8b120df7a8f65da14d138bf300c0882fedf668b",
+    "REPORT.md": "34beffb67475e91b2d3ee6e244c4ea9e11f73e01e046cc5ed2f471d622912778",
+    "seed_trajectory_contrasts.csv": "4fe1399b16866df899b1480bba9cec5cad597701d63e9a187dced890fff1c3e9",
+    "summary.json": "f2815222e8aecb42f8d90d6b672a3a1a1122f763b589fb0fb98f475eaeee4d82",
+    "trajectory.svg": "eb32f620eaffbe8b5d52d04e49ff2b5158b08aee9a8d9e56e97645449f2340d4",
+    "trajectory_summary.csv": "dc59f0c671e0455cf4c783895c9142a9a05a862c36c56d78cd78b859ca7e942f"
+  }
+}

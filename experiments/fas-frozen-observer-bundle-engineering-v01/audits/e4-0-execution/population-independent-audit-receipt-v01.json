@@ -1,0 +1,21 @@
+{
+  "schema": "FAS_E4_0_INDEPENDENT_AUDIT_RECEIPT_V01",
+  "audit_type": "population",
+  "issued_utc": "2026-09-26T23:09:54.927011+00:00",
+  "status": "PASS_POPULATION_FRESHNESS_SUPPORT",
+  "population_root_sha256": "27731b483b8242aaef15ca22b97796b7b305a79db9bbb235765e13dcd9d08967",
+  "rows": 149336,
+  "quartets": 18667,
+  "e1_quartets_checked": 26624,
+  "e1_rows_checked": 106496,
+  "e1_rendered_input_hashes_checked": 103206,
+  "population_truth_files_opened": false,
+  "primary_support": {
+    "construction_minimum_rows_per_class": 252,
+    "scoring_minimum_rows_per_class": 200,
+    "primary_support_cells": 81,
+    "heldout_or_joint_support_read": false,
+    "method": "compare the declared primary-only support matrix with the hash-pinned deterministic symbolic support plan; never read either terminal-label file"
+  },
+  "all_checks_passed": true
+}

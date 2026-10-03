@@ -1,0 +1,124 @@
+{
+  "identity": "JEV-V08Q-R2-PAIRED-LATE-SHAM-WEIGHT-ANALYSIS-V01",
+  "status": "SEALED_WITH_PHASE_PACKET_V01",
+  "primary_question": "What is the paired effect of changing only the late-stage auxiliary SHAM multiplier from 1.0 to 0.5 after a common SHAM-1.0 history through step 80?",
+  "estimand": {
+    "pairing": "within seed, same exact step80 state, same held-out neighborhoods, same candidate identities",
+    "contrast_orientation": "LATE_SHAM_HALF minus LATE_SHAM_1X",
+    "primary_endpoint": 120,
+    "intermediate_endpoint": 100,
+    "shared_prebranch_reference": 80,
+    "unit_of_training_pairing": "seed-level shared optimizer/head state",
+    "unit_of_panel_resampling": "neighborhood, stratified by fixed family"
+  },
+  "response_vector": {
+    "no_composite_score": true,
+    "no_single_coordinate_may_mask_another": true,
+    "coordinates": {
+      "direction": "correct-direction rate for fact-view movement under inherited Q metric semantics",
+      "gain": "mean signed P_F(new_id)-P_A(new_id), plus neighborhood distribution and exact-delta MAE",
+      "boundary_crossing": [
+        "F_new: frozen argmax on fact view equals intended new candidate",
+        "Strict: frozen argmax on anchor equals old candidate AND frozen argmax on fact view equals new candidate",
+        "A_old: frozen argmax on anchor equals old candidate"
+      ],
+      "locality": [
+        "sham posterior L1 and sham MAP-flip rate",
+        "matched-neutral posterior L1 and matched-neutral MAP-flip rate"
+      ],
+      "multiclass_geometry": [
+        "fact new-winner gap = P_F(new_id)-max(P_F(c), c != new_id)",
+        "anchor old-winner gap = P_A(old_id)-max(P_A(c), c != old_id)",
+        "fact and anchor old/new pairwise margins",
+        "strongest competitor identity"
+      ],
+      "calibration_and_anchor": ["anchor NLL", "anchor Brier", "anchor gold accuracy"]
+    },
+    "actual_frozen_argmax_and_numeric_gap_reported_separately": true,
+    "tie_convention": "inherited frozen candidate-order argmax convention; competitor ties use earliest frozen candidate order"
+  },
+  "primary_reporting": {
+    "per_seed_paired_effect_vector": true,
+    "all_24_seed_vectors_shown": true,
+    "family_breakouts": ["exposure_control", "respiratory_monitoring", "salinity_control", "vibration_monitoring"],
+    "step100": "intermediate trajectory snapshot; descriptive, no checkpoint selection",
+    "step80": "common pre-branch state and baseline; not a treatment arm",
+    "cohort_summary": "report finite 24-seed mean, median, sign count, and range descriptively; do not claim a universal seed-population law",
+    "registered_Q_full_course_labels": "not reused; they target a different estimand",
+    "no_posthoc_phenotype_thresholds": true
+  },
+  "uncertainty": {
+    "neighborhood_bootstrap": {
+      "replicates": 10000,
+      "family_order": ["exposure_control", "respiratory_monitoring", "salinity_control", "vibration_monitoring"],
+      "resamples_per_family": 500,
+      "rng": "NumPy PCG64",
+      "seed_derivation": {
+        "label": "jev-information-density-v08q-r2-late-branch-v01/bootstrap-plan",
+        "sha256": "2db4c5d4b3c59233fe8d1070b8c5d1943e062dc6a63be63e88c60f5241e2189f",
+        "value": 3569726509,
+        "operation": "first four SHA-256 digest bytes, unsigned little-endian"
+      },
+      "quantile_method": "linear",
+      "paired_resampling": "one shared neighborhood resample plan per replicate reused across both branches, checkpoints, and all coordinates within seed",
+      "interpretation": "intervals condition on the seed and fixed fresh panel; they do not quantify seed-to-seed uncertainty"
+    },
+    "seed_variation": "show all 24 paired effects; the independent training-trajectory count is 24 paired seeds, not 48 branch runs; no neighborhood pooling may be used to inflate the number of training trajectories"
+  },
+  "state_moderation": {
+    "purpose": "secondary test of whether state measured before the late branch is associated with the paired branch effect",
+    "prebranch_step80_coordinates": [
+      "fact new-winner gap",
+      "anchor old-winner gap",
+      "fact old/new pairwise margin",
+      "anchor old/new pairwise margin",
+      "new-candidate probability movement",
+      "sham L1",
+      "matched-neutral L1",
+      "A_old",
+      "F_new",
+      "actual frozen argmax IDs and strongest competitors"
+    ],
+    "two_preregistered_secondary_moderator_relationships": [
+      {
+        "moderator": "step80 fact new-winner gap",
+        "paired_outcome": "step120 HALF-minus-1X new-candidate probability movement"
+      },
+      {
+        "moderator": "step80 anchor old-winner gap",
+        "paired_outcome": "step120 HALF-minus-1X A_old indicator"
+      }
+    ],
+    "observational_unit": "seed; for each family and seed, reduce the step80 moderator and step120 paired outcome to the arithmetic mean across that family's 500 neighborhoods, yielding 24 paired seed-level observations per family",
+    "slope": "for each family and moderator relationship, fit an unweighted ordinary least-squares slope across the 24 seed-level pairs; report the slope per 0.1 increase in the raw probability-gap moderator, with all 24 points shown",
+    "uncertainty": {
+      "method": "paired-seed cluster bootstrap; resample the 24 seed IDs with replacement and carry each sampled seed's four-family observations together",
+      "replicates": 10000,
+      "shared_resample_plan": "reuse the same seed-index resample for every family and both moderator relationships within a replicate",
+      "rng": "NumPy PCG64",
+      "seed_derivation": {
+        "label": "jev-information-density-v08q-r2-late-branch-v01/moderator-seed-cluster-bootstrap",
+        "sha256": "565747f88d8a4655326dfb5e859e962ee3fcf4636d648b992cbf9481e414aeb3",
+        "value": 4165424982,
+        "operation": "first four SHA-256 digest bytes, unsigned little-endian"
+      },
+      "interval": "95% percentile interval using NumPy quantile(method='linear')",
+      "invalid_replicates": "if a resample has zero moderator variance for a family, mark that replicate invalid for that slope; report CI_NOT_ESTIMABLE if fewer than 9500 valid replicates remain",
+      "no_p_value_or_threshold": true
+    },
+    "inference_boundary": "descriptive seed-level effect-modification evidence; no flexible prediction model, threshold selection, policy fitting, or treating family-by-seed records as independent",
+    "other_state_coordinates": "report descriptive stratified summaries only; no quartile cuts chosen using outcomes"
+  },
+  "interpretation": {
+    "consistent_paired_effect": "supports a relatively consistent late-weight effect under this common history; does not prove prior full-course heterogeneity was caused only by early divergence",
+    "heterogeneous_paired_effect": "shows the late contrast varies across these seed-conditioned states; state moderation requires the predeclared relationships to be directionally coherent, not just a visually selected subgroup",
+    "moderation_replicates": "motivates a later prospective policy test; does not validate a controller",
+    "no_effect": "suggests changing weight only after step80 has little effect under this history; does not negate full-course weight effects"
+  },
+  "claim_limits": [
+    "step80 was selected after Q-R1 and is not a universally special branch point",
+    "the estimand is late-only weight change after common SHAM history, not full-course SHAM-LOW",
+    "same four families/templates only; no novel-family or novel-template generalization",
+    "state moderation does not establish mechanism or an operational control policy"
+  ]
+}

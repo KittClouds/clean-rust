@@ -1,0 +1,18 @@
+{
+  "autodiff": false,
+  "backprop": false,
+  "canonical_policy": "parallel-off true-perpendicular",
+  "complete": true,
+  "configured_seeds": [
+    9100
+  ],
+  "fresh_seed_bundles": 0,
+  "mode": "qualify",
+  "outcome_rows": 8,
+  "protocol": "DH-08A",
+  "qualification_seed_bundles": 1,
+  "reward_rule": "action_contingent",
+  "shadow": "event-local Q07 feasible-null endpoint; never committed",
+  "specimens": 1,
+  "wall_seconds": 3.0854361
+}

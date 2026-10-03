@@ -1,0 +1,454 @@
+{
+  "protocol": "Q10-RMT",
+  "status": "Q10_RMT_VALID__TOPOLOGY_MAPPED",
+  "declared_da2_endpoints": 32,
+  "primary_valid_endpoints": 28,
+  "excluded_noncontract_endpoints": 4,
+  "mismatch_rows_mapped": 7003,
+  "component_records": 2738,
+  "repair_applied": false,
+  "behavioral_inference": false,
+  "scientific_seed_bundles_used": 0,
+  "dh08b_authorized": false,
+  "local_replay_checks": 1792,
+  "local_replay_passes": 1792,
+  "shards": [
+    "qualification/final14_00",
+    "qualification/final14_01",
+    "qualification/final14_02",
+    "qualification/final14_03",
+    "qualification/final14_04",
+    "qualification/final14_05",
+    "qualification/final14_06",
+    "qualification/final14_07",
+    "qualification/final14_08",
+    "qualification/final14_09",
+    "qualification/final14_10",
+    "qualification/final14_11",
+    "qualification/final14_12",
+    "qualification/final14_13"
+  ],
+  "shard_receipts": [
+    {
+      "path": "qualification/final14_00",
+      "sha256": {
+        "endpoints.json": "A4A139EB69F389D38B66B1275CCDA783CDF6A9AB21AEC812BA5DC4F4018A7307",
+        "rows.json": "4D69F1AADCF717C8BBA92EDF5B203533C9612E8AF1975BC795D03D2CF00AEAD0",
+        "components.json": "4651351A73ED359884851A3F7337F007BBA0F24522938A79DC1958DFE992974C",
+        "excluded-noncontract.json": "02A7CDA89BFC68F6AEA8C556546BAEA77559386C2F78C239C6A849A1F846033E",
+        "execution.json": "1A6B04E9B885D5B84D1F6427915D6907CE897F3122D22208D933BED51C676779",
+        "authority-summary.json": "E73E053F3054B4E32AA2E33F4750E35BF676ED9CD0125BFB73756734FAB1E35A",
+        "moves.jsonl": "181FB26C3DB3994F47F7957634B5B4992C81B6823F05F5C321777C8B1E2684D3"
+      },
+      "slice": [
+        0,
+        2
+      ],
+      "endpoint_keys": [
+        [
+          "seed9731-L-tau16.json",
+          0
+        ],
+        [
+          "seed9731-L-tau16.json",
+          1
+        ]
+      ],
+      "endpoint_count": 2,
+      "row_count": 487,
+      "component_count": 204,
+      "move_count": 10932
+    },
+    {
+      "path": "qualification/final14_01",
+      "sha256": {
+        "endpoints.json": "2B9C177752F79CAC3E639BFEFEFEA93EFECA3BE139C4288963F2232940D91D7C",
+        "rows.json": "636E9063C92FEA107EF6D5DC2ABCEE93D79EE0261E27684F2F9907B5C58F1EF8",
+        "components.json": "3BC2217E77BD4F5A58C30F89E8ACC158D388432BCD50C4F8A06C4282CC51C838",
+        "excluded-noncontract.json": "02A7CDA89BFC68F6AEA8C556546BAEA77559386C2F78C239C6A849A1F846033E",
+        "execution.json": "BAA7DC1482B283885BD9FCEE8928B1CAB755468189A95FA25DEACA20698DA18C",
+        "authority-summary.json": "696171DCED1902279779C524434E4D9F395F4E5AF35BE6105609DEFB45BF426D",
+        "moves.jsonl": "B89D01C3ED613587573E123D5E550EF65988D0BD44F49D6D0836E2FC11587967"
+      },
+      "slice": [
+        2,
+        4
+      ],
+      "endpoint_keys": [
+        [
+          "seed9731-L-tau16.json",
+          2
+        ],
+        [
+          "seed9731-L-tau16.json",
+          3
+        ]
+      ],
+      "endpoint_count": 2,
+      "row_count": 500,
+      "component_count": 193,
+      "move_count": 11415
+    },
+    {
+      "path": "qualification/final14_02",
+      "sha256": {
+        "endpoints.json": "8A3AD03E8C8DE2D02C3772C2C43B85DB8D55229DE4371D07ED6575CB32F0F988",
+        "rows.json": "41E747F5FD832E95028E100BD14678FADEB7BBDA4375D21EB1D69F4A552FB7FC",
+        "components.json": "E75C523F75B863E7079CF3CC6F253E8EC168B3D5233017D647A379AAF92B9D43",
+        "excluded-noncontract.json": "02A7CDA89BFC68F6AEA8C556546BAEA77559386C2F78C239C6A849A1F846033E",
+        "execution.json": "57E87065CAD8F75BAB9DE4478507A82DA9C256102B3B537E716225BA8C1E0F21",
+        "authority-summary.json": "389B33DCA9B984E530EAF54E1ABCD2CDB8F01830CFD0A7252DC4DFAD76FC3CFF",
+        "moves.jsonl": "F11B81799CBE1278B120E04A1DE82C465ABB7B1FDDABFE3C5EB5964976312DB0"
+      },
+      "slice": [
+        4,
+        6
+      ],
+      "endpoint_keys": [
+        [
+          "seed9731-L-tau4.json",
+          0
+        ],
+        [
+          "seed9731-L-tau4.json",
+          1
+        ]
+      ],
+      "endpoint_count": 2,
+      "row_count": 510,
+      "component_count": 180,
+      "move_count": 11627
+    },
+    {
+      "path": "qualification/final14_03",
+      "sha256": {
+        "endpoints.json": "CD86F0B728BCC9F6979C3E19905B9FED55B61D65F3041CE990B810D125A111EB",
+        "rows.json": "B49C5C72F26F2EDCC5F4C9AB87DB782C294A545D236ABB48B88B40BFD4556884",
+        "components.json": "F54BB6B068563B04F78D14C82A2799351671261DEF80D46B008C801519E0D3B9",
+        "excluded-noncontract.json": "02A7CDA89BFC68F6AEA8C556546BAEA77559386C2F78C239C6A849A1F846033E",
+        "execution.json": "B89E8C53F27E455E4FC20BF193CBBF907017FA3D0CBC2B903402AE93D5100CDB",
+        "authority-summary.json": "C272638CEADFC752B8E0099CB4A254E4BD493EDB7593E894BB8DDABA3FC1C444",
+        "moves.jsonl": "E756112247D80CD32B0CF8C1DB52867538C0FD1A630836BFD693FA2378B32E00"
+      },
+      "slice": [
+        6,
+        8
+      ],
+      "endpoint_keys": [
+        [
+          "seed9731-L-tau4.json",
+          2
+        ],
+        [
+          "seed9731-L-tau4.json",
+          3
+        ]
+      ],
+      "endpoint_count": 2,
+      "row_count": 492,
+      "component_count": 192,
+      "move_count": 11341
+    },
+    {
+      "path": "qualification/final14_04",
+      "sha256": {
+        "endpoints.json": "F54436FE945F485BB9EDE377F1B50017CE4B637E3ED901CF85F519F5F45E80C8",
+        "rows.json": "B4B8C13CCC78916E5B09A67F8FAFC3992E303C582B76DA4224E772137B5A495D",
+        "components.json": "DF46B8AE4898E40A2AE48998162513E17F3B29300AA790840E73BE16A2647CCC",
+        "excluded-noncontract.json": "02A7CDA89BFC68F6AEA8C556546BAEA77559386C2F78C239C6A849A1F846033E",
+        "execution.json": "B6A1D02D321F5ADDEB128252477FA90321A02BF28EA9D3056B3A921472F8A598",
+        "authority-summary.json": "5C89AD932F45DCA0BC56FE29E1F759DF5D75590FC8A75E575C68B21A0C19A696",
+        "moves.jsonl": "28F9D5F281946F85E181AF759405C06339B75DB5A17F0C48FDE2D8803CF53BDF"
+      },
+      "slice": [
+        8,
+        10
+      ],
+      "endpoint_keys": [
+        [
+          "seed9731-R-tau16.json",
+          1
+        ],
+        [
+          "seed9731-R-tau16.json",
+          3
+        ]
+      ],
+      "endpoint_count": 2,
+      "row_count": 481,
+      "component_count": 174,
+      "move_count": 11019
+    },
+    {
+      "path": "qualification/final14_05",
+      "sha256": {
+        "endpoints.json": "E7A42EFA42A007703E222AF54DDED9DD84E1805F6DFD0E233E92A470B697578C",
+        "rows.json": "4D194710082C3C6AC49C647398482FCE9D3EA990FF29D5CC5F6ED10AEC731420",
+        "components.json": "7CF4B279EC793C2C8FCA3750E3CE5EB2386988DCD465E175E718C85CBD1C04A5",
+        "excluded-noncontract.json": "02A7CDA89BFC68F6AEA8C556546BAEA77559386C2F78C239C6A849A1F846033E",
+        "execution.json": "539AD81F3FC2816606F9D5765368A9AD610DE7FA025FEC240060E166D2816AA6",
+        "authority-summary.json": "20CDD398F429A0046F539EF5BAC05DE9BE799849032AFD72A051832FA7634C3A",
+        "moves.jsonl": "A6330D8F53C2A767196F3A9A441479BC4E111BA7CB7B0FA66955ED1A81623541"
+      },
+      "slice": [
+        10,
+        12
+      ],
+      "endpoint_keys": [
+        [
+          "seed9731-R-tau4.json",
+          0
+        ],
+        [
+          "seed9731-R-tau4.json",
+          1
+        ]
+      ],
+      "endpoint_count": 2,
+      "row_count": 463,
+      "component_count": 175,
+      "move_count": 11947
+    },
+    {
+      "path": "qualification/final14_06",
+      "sha256": {
+        "endpoints.json": "98FF69ECC682C243E6F32DF7DC42114A8DA9648DFC4A84AD2C2D52E1DAC8E686",
+        "rows.json": "A0226E7FA15FAB083334C85F160554AC79769DCB57A6EBF62B4564AEA6047B6E",
+        "components.json": "791C02F131FD0359F9D200FC6FCE1BC11965A77ACBCCABDEF0BD7CB65BC2374B",
+        "excluded-noncontract.json": "02A7CDA89BFC68F6AEA8C556546BAEA77559386C2F78C239C6A849A1F846033E",
+        "execution.json": "F266659ACF82A77386284B899790DE874B92F2934522ADA7F0164C40C793B541",
+        "authority-summary.json": "32D75A3DCACC80B9E89F37935E4F88FF8F5503E6AE55329B19A5AB1481B88E9C",
+        "moves.jsonl": "6898673449A59BE8C479286F0494173B206F87B7856203ABF397FAAAB71F994B"
+      },
+      "slice": [
+        12,
+        14
+      ],
+      "endpoint_keys": [
+        [
+          "seed9731-R-tau4.json",
+          2
+        ],
+        [
+          "seed9731-R-tau4.json",
+          3
+        ]
+      ],
+      "endpoint_count": 2,
+      "row_count": 453,
+      "component_count": 182,
+      "move_count": 11546
+    },
+    {
+      "path": "qualification/final14_07",
+      "sha256": {
+        "endpoints.json": "27967481E2F10044C420295EA06203D522CD9C970A394A58DE561DDAA9E976E3",
+        "rows.json": "C646E68691D62AB2B51A6812E6CF693868DEFFA26C6A6E3E5A33F168E31A8B5C",
+        "components.json": "D5D0030E520E930F10879520A504710851144F0F6498FAC980603A5C4E983E43",
+        "excluded-noncontract.json": "02A7CDA89BFC68F6AEA8C556546BAEA77559386C2F78C239C6A849A1F846033E",
+        "execution.json": "1AEC5D772C3B6EA1BBDF870FD1E0B5686EBE220160E2A7E2958A6F95BAC1D57C",
+        "authority-summary.json": "3A467DE0ABBEA82C5205B7C8B227FF4C76998E63B02A56D42219F6329D1C958A",
+        "moves.jsonl": "70337E7BC7FDB59112A96AD21092711A612E95DFCC5944465F26E8AD2183F7D1"
+      },
+      "slice": [
+        14,
+        16
+      ],
+      "endpoint_keys": [
+        [
+          "seed9732-L-tau16.json",
+          0
+        ],
+        [
+          "seed9732-L-tau16.json",
+          2
+        ]
+      ],
+      "endpoint_count": 2,
+      "row_count": 484,
+      "component_count": 203,
+      "move_count": 11336
+    },
+    {
+      "path": "qualification/final14_08",
+      "sha256": {
+        "endpoints.json": "DCB95DB018B4DA7D748370A5F788CDF183F954AD340BEB3162087CA34518A0AE",
+        "rows.json": "DCBA7EAD5522120E400B6CD136106FD1936C67BCF51B8C9A46A859A54C5FBAA7",
+        "components.json": "C5BEB37E32525D41749FB6B32E43B5AC8264459FF6270ACA24DEBAF439D75C5E",
+        "excluded-noncontract.json": "02A7CDA89BFC68F6AEA8C556546BAEA77559386C2F78C239C6A849A1F846033E",
+        "execution.json": "F89B8FFD08D341A339895DD3C7686DAA9A78B7C0B58484878793897D3A1A14C7",
+        "authority-summary.json": "83F08A48EE785EA9435467080E0DBCD16327E764CA36F14073C93E547A8C2292",
+        "moves.jsonl": "32BE2A8AA4E636D2D0D3B76E3CCBB41628106311DAEBAF96C0BEC722F3122F94"
+      },
+      "slice": [
+        16,
+        18
+      ],
+      "endpoint_keys": [
+        [
+          "seed9732-L-tau4.json",
+          0
+        ],
+        [
+          "seed9732-L-tau4.json",
+          1
+        ]
+      ],
+      "endpoint_count": 2,
+      "row_count": 502,
+      "component_count": 226,
+      "move_count": 11526
+    },
+    {
+      "path": "qualification/final14_09",
+      "sha256": {
+        "endpoints.json": "B25A780EB7F0A902ADCDA8F3DF81E709A1E08DDDFE8451C120B73BF49149171C",
+        "rows.json": "0E57A42359F9571C2D2AF65FA2E65CD772798B3E729E70EA507E9CA5945FBE3B",
+        "components.json": "4C01F41C5B0F058D170A102F2DAE43A34955CFD1C752EF7C5D0D82EAB2603724",
+        "excluded-noncontract.json": "02A7CDA89BFC68F6AEA8C556546BAEA77559386C2F78C239C6A849A1F846033E",
+        "execution.json": "FC1921801BEE8BF968C9EAFD44C08742B3D4B3A8CF34961122C631120C36198A",
+        "authority-summary.json": "1EBB9D47E6C52C8AF84EE948D7C76D7255ADA5FD66AB1EB8EF5977A13D0EF962",
+        "moves.jsonl": "1DB8D54CA594C3A864C73D2B8FFF902A83310C14E7C058BC9B1FAA8811C69933"
+      },
+      "slice": [
+        18,
+        20
+      ],
+      "endpoint_keys": [
+        [
+          "seed9732-L-tau4.json",
+          2
+        ],
+        [
+          "seed9732-L-tau4.json",
+          3
+        ]
+      ],
+      "endpoint_count": 2,
+      "row_count": 504,
+      "component_count": 237,
+      "move_count": 11371
+    },
+    {
+      "path": "qualification/final14_10",
+      "sha256": {
+        "endpoints.json": "FF9EB45A12DD0355DC307DE6F5E8BCE4682980D99F006FEA8FCEB9F4A011DD58",
+        "rows.json": "2B612C6570F27166F4AD5602A370BE871827A16571B9FD5FD6D3269E5CC825F8",
+        "components.json": "42D97C1DC454BD8CA0A380DC957A44AD8E7FE66C18A7DC6247CA685DE30C08C9",
+        "excluded-noncontract.json": "02A7CDA89BFC68F6AEA8C556546BAEA77559386C2F78C239C6A849A1F846033E",
+        "execution.json": "8A05D4C9EE58DFFF34BAF9F44114BA61BD34FDCFE549FBF7F90A92370B38E322",
+        "authority-summary.json": "999CFF3EC4AB7A4A5D338AE48CD90A12A966D43D91951B9831B1C72124F05D50",
+        "moves.jsonl": "F577E6E8508074F469EAEAAF6045A77810AD98E453F9D899653F97865A2989EB"
+      },
+      "slice": [
+        20,
+        22
+      ],
+      "endpoint_keys": [
+        [
+          "seed9732-R-tau16.json",
+          0
+        ],
+        [
+          "seed9732-R-tau16.json",
+          1
+        ]
+      ],
+      "endpoint_count": 2,
+      "row_count": 526,
+      "component_count": 189,
+      "move_count": 13338
+    },
+    {
+      "path": "qualification/final14_11",
+      "sha256": {
+        "endpoints.json": "5C3A3121E8BFA267404BF8A189766FCF5756E96571BEB6A2FF577F8225B3F265",
+        "rows.json": "D9F383CB5E75B39E196C06DA1E0404FB5BA3BFEFD6D457E1DAD1C4E8684C4DBF",
+        "components.json": "C0F04A2635C2DB8CDEBBA9BB5114EB75B999BDAD4DD1C419DB2CCB81E61C31C5",
+        "excluded-noncontract.json": "02A7CDA89BFC68F6AEA8C556546BAEA77559386C2F78C239C6A849A1F846033E",
+        "execution.json": "9DA716A6BB459DCC9FE831C3C42B4EFE3E90CAD061B0CDCD44572AAD9DF1398B",
+        "authority-summary.json": "F0FE57CF05983B56B8559E016D80EA2B9FAE0C5544CE6788C8D8368A6DBD11E0",
+        "moves.jsonl": "05545EEE8D219B78A5D02E7246989E0A484A47EEAB511AE5B94CB18ABF9B5EFB"
+      },
+      "slice": [
+        22,
+        24
+      ],
+      "endpoint_keys": [
+        [
+          "seed9732-R-tau16.json",
+          2
+        ],
+        [
+          "seed9732-R-tau16.json",
+          3
+        ]
+      ],
+      "endpoint_count": 2,
+      "row_count": 531,
+      "component_count": 190,
+      "move_count": 13526
+    },
+    {
+      "path": "qualification/final14_12",
+      "sha256": {
+        "endpoints.json": "D52A530282E32114E79DC8235A4BD5BE29D7E4B8BE9F50EED9813A518F1C1247",
+        "rows.json": "472673BED11981CCEFCA2142416B767E12D58E61788A0D50E92E26E4D76E4CB8",
+        "components.json": "27B4D3F8AFFC75A27587FC8AA8781DE811B1FF1DA179CD60D94B750316A05FFA",
+        "excluded-noncontract.json": "02A7CDA89BFC68F6AEA8C556546BAEA77559386C2F78C239C6A849A1F846033E",
+        "execution.json": "6CF4C467136AE0721FFDFF49B27582669706C9E9473D2B2755CDFF6C6F81EE62",
+        "authority-summary.json": "20500C46061D5B919C82CC4B9840B80F675D3D6DC163985406D8233BA5B26E75",
+        "moves.jsonl": "3D995B9E87B52725D686510AAD486B7025EB72367E994E8024F438737941AB35"
+      },
+      "slice": [
+        24,
+        26
+      ],
+      "endpoint_keys": [
+        [
+          "seed9732-R-tau4.json",
+          0
+        ],
+        [
+          "seed9732-R-tau4.json",
+          1
+        ]
+      ],
+      "endpoint_count": 2,
+      "row_count": 539,
+      "component_count": 186,
+      "move_count": 13701
+    },
+    {
+      "path": "qualification/final14_13",
+      "sha256": {
+        "endpoints.json": "27AB0B03D2B1631F10711844B8194D2C29411F0BE70C42010C407A60ECE210DE",
+        "rows.json": "08B55CFA30D9A720C3B931980C0A3C5CFBDF459E9067283446CC9B507C88D022",
+        "components.json": "A49806A2B2B5AE12938337C63D305100396DA1F1E6C946A56ABC7BC9C2708943",
+        "excluded-noncontract.json": "02A7CDA89BFC68F6AEA8C556546BAEA77559386C2F78C239C6A849A1F846033E",
+        "execution.json": "214CD6E30B9388EB74EA8D4922EDAEE0EE073FF113B67BAB3A40E6E87B9E77AA",
+        "authority-summary.json": "AD26CB9BA970ED223A74D9EF883C064B3098D58A93BCF320FE55C3CA2C078BB6",
+        "moves.jsonl": "412B603712EE833C6BA93922EB6179681381E7D8E79F80121B1072462A4616BC"
+      },
+      "slice": [
+        26,
+        28
+      ],
+      "endpoint_keys": [
+        [
+          "seed9732-R-tau4.json",
+          2
+        ],
+        [
+          "seed9732-R-tau4.json",
+          3
+        ]
+      ],
+      "endpoint_count": 2,
+      "row_count": 531,
+      "component_count": 207,
+      "move_count": 13446
+    }
+  ],
+  "next_decision": "Choose the next correction architecture from the sealed residual topology; do not open DH08B."
+}

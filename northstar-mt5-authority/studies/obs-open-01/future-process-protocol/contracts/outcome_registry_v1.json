@@ -1,0 +1,49 @@
+{
+  "schema": "OUTCOME_REGISTRY_V1",
+  "authority": "DESCRIPTIVE_RETROSPECTIVE_SIDECARS_ONLY",
+  "common_receipt_fields": [
+    "outcome_id",
+    "anchor_id",
+    "anchor_kind",
+    "anchor_known_at",
+    "outcome_window_start",
+    "requested_window_end",
+    "observed_until",
+    "outcome_known_at",
+    "outcome_state",
+    "censor_reason",
+    "support_bars",
+    "source_path_hash"
+  ],
+  "candidate_outcomes": [
+    {"id": "CANDIDATE_TERMINAL_ORIENTED_DISPLACEMENT_RAW", "index": "horizon_minutes"},
+    {"id": "CANDIDATE_MAX_PARALLEL_DISPLACEMENT_RAW", "index": "horizon_minutes"},
+    {"id": "CANDIDATE_MAX_ANTIPARALLEL_DISPLACEMENT_RAW", "index": "horizon_minutes"},
+    {"id": "CANDIDATE_REALIZED_CLOSE_VARIATION_RAW", "index": "horizon_minutes"},
+    {"id": "CANDIDATE_PATH_EFFICIENCY", "index": "horizon_minutes"},
+    {"id": "CANDIDATE_FIRST_PASSAGE_PARALLEL_RAW", "index": "raw_price_threshold"},
+    {"id": "CANDIDATE_FIRST_PASSAGE_ANTIPARALLEL_RAW", "index": "raw_price_threshold"},
+    {"id": "CANDIDATE_TIME_TO_SUPERSESSION", "index": "none"},
+    {"id": "CANDIDATE_SURVIVAL_AT_HORIZON", "index": "horizon_minutes"},
+    {"id": "CANDIDATE_TERMINAL_STATUS", "index": "none", "availability": "SESSION_TERMINATION_ONLY"}
+  ],
+  "range_outcomes": [
+    {"id": "RANGE_Z_TERMINAL_CLOSE", "index": ["k", "horizon_minutes"]},
+    {"id": "RANGE_Z_MAX_UPPER_DISPLACEMENT", "index": ["k", "horizon_minutes"]},
+    {"id": "RANGE_Z_MAX_LOWER_DISPLACEMENT", "index": ["k", "horizon_minutes"]},
+    {"id": "RANGE_Z_REALIZED_CLOSE_VARIATION", "index": ["k", "horizon_minutes"]},
+    {"id": "RANGE_Z_PATH_EFFICIENCY", "index": ["k", "horizon_minutes"]},
+    {"id": "RANGE_FIRST_PASSAGE_UPPER_Z", "index": ["k", "z_threshold"]},
+    {"id": "RANGE_FIRST_PASSAGE_LOWER_Z", "index": ["k", "z_threshold"]},
+    {"id": "RANGE_LOCATION_OCCUPANCY", "index": ["k", "horizon_minutes", "IN_ZONE_ABOVE_BELOW"]},
+    {"id": "RANGE_MIDPOINT_CROSSING_COUNT", "index": ["k", "horizon_minutes"]},
+    {"id": "RANGE_RAIL_CROSSING_COUNT", "index": ["k", "horizon_minutes"]}
+  ],
+  "raw_price_thresholds": [1, 2, 4, 8, 16, 32, 64, 128, 256],
+  "raw_price_threshold_unit": "SOURCE_PRICE_UNIT",
+  "range_z_thresholds": [1, 2, 4, 8],
+  "threshold_rationale": "PRE_DATA_DYADIC_MEASUREMENT_LATTICE_NOT_DISTRIBUTION_DERIVED",
+  "forbidden_terms": ["FAVORABLE", "ADVERSE", "PROFIT", "LOSS", "TARGET", "STOP"],
+  "formal_tests": 0,
+  "candidate_promotion": "FORBIDDEN"
+}

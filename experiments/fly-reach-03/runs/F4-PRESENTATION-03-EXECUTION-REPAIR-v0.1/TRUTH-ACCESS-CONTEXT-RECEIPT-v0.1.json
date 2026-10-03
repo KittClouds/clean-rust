@@ -1,0 +1,15 @@
+{
+  "comparative_predictions_or_scores_emitted": false,
+  "inclusion_probability_p_opened": true,
+  "native_delta_opened": false,
+  "no_replacement_reweighting_or_row_filtering": true,
+  "preweight_opened": false,
+  "purpose": "assignment-level evaluability and training-support counts only",
+  "reference_value_opened": false,
+  "schema": "F4-PRESENTATION-03-truth-access-context-v0.1",
+  "status": "PASS_SUPPORT_ONLY_TARGET_OPEN",
+  "support_receipt_sha256": "966e69845091e6aa6c2c52ccc760723a49d15eb573749066c867699e3b38303a",
+  "support_status": "all_six_assignments_evaluable; all_twelve_training_folds_two_class_valid",
+  "target_polarity_Y_opened_before_fitting": true,
+  "validation_receipt_sha256": "9df970a7c9065d9f7058eb3d5af3c189f5dec64c6097b2d78e8c0c26bb75cb3b"
+}

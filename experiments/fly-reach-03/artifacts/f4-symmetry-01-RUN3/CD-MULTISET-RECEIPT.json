@@ -1,0 +1,45 @@
+{
+  "folds": [
+    {
+      "c_values_sha256": "d730ba93e07e3e527c4f4dc0d402a150a0cfc9202b4ac15a42e832aaf49276a0",
+      "d_values_sha256": "17e072c6b41ee7d1c06a305a33ff093f5695af9b4c23ae42cd539f48ecb0b2a4",
+      "holdout_block": 303000,
+      "normalized_row_multiset_equal": true,
+      "raw_row_multiset_equal": true,
+      "shared_relation_mean_sha256": "526d038f1544e4f4ddb2215c5a47938248d7735bbba16915b128ea75268b75d5",
+      "shared_relation_scale_sha256": "0723602e4ef4f4faa1545a888f3bf7ff416e552699a796a9e213e632134030ae"
+    },
+    {
+      "c_values_sha256": "93d90bfcb7e977d18e12ec778312fbe814b45d46b8a5df988fc3cd94eb888073",
+      "d_values_sha256": "b7c28c00ee3ec0dfc8ec72aa33e43f9e97308362278c8207e246f953239a8343",
+      "holdout_block": 303001,
+      "normalized_row_multiset_equal": true,
+      "raw_row_multiset_equal": true,
+      "shared_relation_mean_sha256": "b0d634f86a3e761d04ecc762ae136addf98183ccb7236f75cc3d85db573e05c6",
+      "shared_relation_scale_sha256": "43a682d4ea42039024bbbe08b7260d09adb89d61aa68c76c05ccad962fb0552e"
+    },
+    {
+      "c_values_sha256": "6a484e97c09beaf13985f72e7c743b4095b43cdc70ecd59c7c25aed308c96e9d",
+      "d_values_sha256": "d7ae66aa31c88261dbafbc67ce37b4fc5d9bdd5e176b2ac58108f491a9acbe3d",
+      "holdout_block": 303002,
+      "normalized_row_multiset_equal": true,
+      "raw_row_multiset_equal": true,
+      "shared_relation_mean_sha256": "61734badad630a61c01d951ee2feb72dcb90a02edf982c0958e439c5c524ba26",
+      "shared_relation_scale_sha256": "fa9b9cf7bf1695ff0a0209909b7b09cdb7f6cbf889446dfb2942bc261591961f"
+    },
+    {
+      "c_values_sha256": "852e9f37cfaa261e83a86abeb7173840df03bcf6464de0f56508a3ca3b733832",
+      "d_values_sha256": "b4537e37d85dcf2cd617d467bad7a2ff405527f70c5cd81e87160ed192e71790",
+      "holdout_block": 303003,
+      "normalized_row_multiset_equal": true,
+      "raw_row_multiset_equal": true,
+      "shared_relation_mean_sha256": "15791adaf4a1e5e89c83b66660c6f4e87a26fc1d0f0ee112836844b612812c59",
+      "shared_relation_scale_sha256": "353f4d62d778968dc1d5802c1b43c75ddac8a8262db14e95808100e04df7ae42"
+    }
+  ],
+  "gate_id": "CD_VALUE_IDENTITY",
+  "normalized_C_D_row_multisets_equal": true,
+  "raw_C_D_row_multisets_equal": true,
+  "schema": "F4-SYMMETRY-01-CD-multiset-v1",
+  "status": "PASS"
+}

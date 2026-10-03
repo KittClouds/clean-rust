@@ -1,0 +1,28 @@
+{
+  "schema_version": "LEARNER_SPEC_V1",
+  "learner_spec_id": "6ca41cd3e6bd9e664bcd55bdc41a7f681a1b714d14c49645c50851b4ae94e893",
+  "algorithm": "FUTURE_SB3_PPO",
+  "policy_architecture": {
+    "policy_class": "MlpPolicy",
+    "hidden_layers": [
+      64,
+      64
+    ],
+    "activation": "tanh",
+    "shared_backbone": true
+  },
+  "optimizer": "Adam",
+  "learning_rate": 0.0003,
+  "rollout_length": 2048,
+  "batch_size": 64,
+  "gamma": 0.99,
+  "gae_lambda": 0.95,
+  "entropy_coefficient": 0.0,
+  "value_coefficient": 0.5,
+  "max_gradient_norm": 0.5,
+  "seed": 42,
+  "executor_name": "stable_baselines3",
+  "executor_version": "2.9.0",
+  "implementation_identity": "f6fbffd6ed6759e21ce25ffdaeb883a3e0b6e751f057c00396e69f27307cd862",
+  "execution_permission": "PROHIBITED_UNTIL_DEGEN_RL_01"
+}

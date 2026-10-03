@@ -1,0 +1,1 @@
+{"derived_claims_recomputed":["state_traces","protected_traces","first_mismatch_ordinal","mismatch_observable_id"],"epsilon_supported":true,"primitive_evidence":["authority_binding","frozen_comparison","fiber_certificate","neutral_token_sequence"],"schema":"FINITE_SEPARATOR_CERTIFICATE_V1","version":1}

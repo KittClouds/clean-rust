@@ -1,0 +1,14 @@
+﻿{
+    "contract":  "MST_FURNACE_BATCH_V1",
+    "batch_id":  "BATCH_20260812T090602007Z",
+    "started_at_utc":  "2026-08-12T09:06:02.0070468Z",
+    "manifest_sha256":  "1a7836062c7d202bb1a8d7bcdbf7b67b16747b8f13383128f34e47ea3f1541e6",
+    "requested_windows":  [
+                              "JPN225_20260316_SHARP_REVERSAL",
+                              "US30_20260427_ORDINARY"
+                          ],
+    "visual":  false,
+    "fixed_preset":  "RG2_M5_SIX_INDEX_V1",
+    "single_writer":  true,
+    "dry_run":  true
+}

@@ -1,0 +1,48 @@
+{
+  "audit": {
+    "checks": {
+      "COMMITTED_IDENTITY_INTRABAR_IMMUTABLE": {
+        "examined": 34,
+        "failures": 0,
+        "first_failure": null,
+        "status": "PASS"
+      },
+      "PROVISIONAL_SENTINEL_MOVEMENT": {
+        "examined": 34,
+        "failures": 0,
+        "first_failure": null,
+        "status": "PASS"
+      },
+      "PROVISIONAL_TO_COMPLETED_HANDOFF": {
+        "examined": 9,
+        "failures": 0,
+        "first_failure": null,
+        "status": "PASS"
+      },
+      "V2_00_REGRESSION_PARITY": {
+        "examined": 50940,
+        "failures": 0,
+        "first_failure": null,
+        "status": "PASS"
+      }
+    },
+    "input": {
+      "bytes": 1327125,
+      "path": "OBS_OPEN_INST01_US30_M1_ONLINE.tsv",
+      "rows": 1415,
+      "sha256": "3de4402f0e440bb29957e8db09a9072d5764a9057e810c86ec9f796d98103a89"
+    },
+    "market_findings": "FORBIDDEN_NOT_COMPUTED",
+    "overall": "PASS",
+    "runtime_evidence": {
+      "bars_with_tick_changes": 9,
+      "completed_handoffs": 9,
+      "lower_intrabar_changes": 21,
+      "tick_sentinel_change_rows": 34,
+      "upper_intrabar_changes": 4
+    },
+    "schema": "OBS_OPEN_INST01_ONLINE_AUDIT_V1",
+    "scope": "INSTRUMENT_METROLOGY_ONLY"
+  },
+  "logical_sha256": "1c866fdfb84c848f1fca5f1cccfe1c333eeafde1fb27be3f126c47a62028eff4"
+}

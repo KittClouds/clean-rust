@@ -1,0 +1,42 @@
+{
+  "recorded_utc": "2026-09-27T01:11:53.119391+00:00",
+  "schema": "FAS_E4_0_CONTRACT_TOOLING_SOURCE_TESTS_V08",
+  "receipt_id": "E4_0_CONTRACT_TOOLING_V08_SOURCE_TESTS",
+  "status": "PASS_SYNTHETIC_CONTRACT_AND_SOURCE_MAP_TESTS",
+  "commands": [
+    "python -m unittest source.scripts.test_e4_0_contract_v08 -v",
+    "python -m py_compile v08 builder/finalizer/sealer/tests"
+  ],
+  "unit_test_count": 13,
+  "py_compile": "PASS",
+  "source_bindings": [
+    {
+      "path": "source/scripts/build_e4_0_source_map_v07.py",
+      "bytes": 31400,
+      "sha256": "4975a2a03c169c36cca03ee47794ebf5d2ee2e215d99f2fbe2605d3d064e1177"
+    },
+    {
+      "path": "source/scripts/finalize_e4_0_contract_v08.py",
+      "bytes": 23997,
+      "sha256": "476cd7f64ff263d768b16cf7f98d6bd36ed3b72d5b93e8848865fc71bcc428dd"
+    },
+    {
+      "path": "source/scripts/seal_e4_0_contract_v08.py",
+      "bytes": 12682,
+      "sha256": "280145f01619225455fcc9923076c7a481745fcbbe276f87d25b00b97e41b090"
+    },
+    {
+      "path": "source/scripts/test_e4_0_contract_v08.py",
+      "bytes": 9817,
+      "sha256": "a2c054cec5821b95387179b45b68400b9c6da71336122a6816550b567a5ca7f6"
+    }
+  ],
+  "inherited_v06_binding_preflight": "PASS",
+  "runtime_access": {
+    "model_contact": false,
+    "tokenizer_contact": false,
+    "cuda_initialized": false,
+    "truth_opened": false
+  },
+  "execution_authorization_conferred": false
+}

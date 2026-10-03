@@ -1,0 +1,31 @@
+{
+  "protocol": "jev-information-density/v0.8p-r1-replay-attempt-disposition-v01",
+  "identity": "v0.8P-R1-fresh-trajectory-instrumented-rerun-v01",
+  "attempt_output": "D:/codex-runs/jev-information-density-v08p-r1/v0.8P-R1/replay-attempt-02",
+  "disposition": "FAILED_IMPLEMENTATION_PARITY_ARGUMENT_ORDER; NONPROMOTABLE",
+  "failure": {
+    "reported_error": "raw replay byte length mismatch: canonical",
+    "cause_found_by_source_audit": "replay_training accumulated exact, canonical, certificate streams in that order but passed them to a verifier whose expected order is canonical, exact, certificate",
+    "source_corpus_mismatch_established": false,
+    "generated_byte_counts_emitted": false,
+    "selected_scope_comparison": "passed in process before the parity-order failure; its success receipt was not emitted"
+  },
+  "preserved_outputs": {
+    "train_all_occurrence_identities": {
+      "rows": 132000,
+      "bytes": 81809480,
+      "sha256": "6aced3e6b7ded5befb348974e55adbcb40566bae85677fc7197c8600c608ef75"
+    },
+    "selected_training_scope_identities": {
+      "rows": 55000,
+      "bytes": 34087100,
+      "sha256": "0f5cd945f965c291b13375b16367085a8c4f3dced4e5996b0e1ffbadf279d191"
+    }
+  },
+  "mutation": "none; attempt output remains byte-preserved",
+  "model_contact": false,
+  "panel_generation": false,
+  "training": false,
+  "evaluation": false,
+  "phoenix_access": false
+}

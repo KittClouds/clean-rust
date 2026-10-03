@@ -1,0 +1,14 @@
+{
+  "schema_version": "STUDIO_BACKTRADER_ADAPTER_V1",
+  "northstar_episode_spec_id": "049907b465fee983bdca02e0c0878de1393ee9c74171d4fc70a22b838eca565f",
+  "northstar_feature_spec_id": "996edc8e87ea2f513d6721972f055b8a2aa31f04cf9fe4f792c1d1626498f37a",
+  "northstar_action_spec_id": "ff42128c28e9250f22e97751d5bf496fde5974e236de390adb8bd81dd1871d65",
+  "broker_contract_id": "451bf7eb3bb3a70649f429732e181a126625759fc099766cdba7def8e5baab53",
+  "studio_adapter_version": "northstar-origin-v1",
+  "restrictions": [
+    "RESEARCH_CONSUMER_ONLY",
+    "NO_COMMAND_AUTHORITY",
+    "NO_LEARNER_EXECUTION"
+  ],
+  "adapter_id": "6d40006e54831527aabe808d563fae56c2affa51bfb99232b82a409e043da407"
+}

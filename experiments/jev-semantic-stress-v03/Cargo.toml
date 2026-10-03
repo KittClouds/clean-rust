@@ -1,0 +1,22 @@
+[package]
+name = "jev-semantic-stress-v03"
+version = "0.3.0"
+edition = "2024"
+rust-version = "1.88"
+publish = false
+
+[workspace]
+
+[dependencies]
+anyhow = "1.0"
+blake3 = "1.8"
+jev-decision-world-v01 = { path = "../jev-decision-world-v01" }
+jev-decision-world-v02 = { path = "../jev-decision-world-v02" }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = { version = "1.0", features = ["preserve_order"] }
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+panic = "abort"

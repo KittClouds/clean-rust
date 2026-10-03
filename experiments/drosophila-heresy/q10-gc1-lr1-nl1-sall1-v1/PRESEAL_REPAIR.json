@@ -1,0 +1,9 @@
+{
+  "action": "sealed the existing verified manifests and wrote contract/preexecution explicitly; no source or output manifest was overwritten",
+  "cause": "prepare writer encountered pre-existing human PLAN.md after deterministic manifests were created",
+  "created_at_utc": "2026-09-18T15:36:49.658593+00:00",
+  "identity": "q10-gc1-lr1-nl1-sall1-v1",
+  "parents_modified": false,
+  "replay_started": false,
+  "status": "PRESEAL_SETUP_REPAIRED"
+}

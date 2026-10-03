@@ -1,0 +1,15 @@
+{
+  "stage": "before_first_DH06_scientific_execution",
+  "rust_tests_passed": 38,
+  "rust_tests_ignored": 6,
+  "python_analysis_tests_passed": 3,
+  "python": "3.13.15",
+  "numpy": "2.3.3",
+  "clippy_release_all_targets_warnings_as_errors": "passed",
+  "explicit_dh06_benchmark": {"status": "passed", "median_seconds": 0.0021107, "p95_seconds": 0.0043858, "hot_allocations": 0},
+  "release_locked_offline_build": "passed",
+  "parent_dh05_seal_sha256": "69af690908a9d30d95c485280b666794470aca6270fa9671dcbef10f2ff17f2c",
+  "target": "D:/drosophila-heresy/dh06-target",
+  "junction": "C:/code land/clean-rust/experiments/drosophila-heresy/dh06/target",
+  "validation_scope": "synthetic intervention, geometry, lineage, and analysis tests only; no DH06 anatomy-task outcome inspected"
+}

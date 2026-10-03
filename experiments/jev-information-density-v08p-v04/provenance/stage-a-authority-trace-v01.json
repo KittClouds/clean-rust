@@ -1,0 +1,50 @@
+{
+  "protocol": "jev-information-density/v0.8p-v04-stage-a-authority-trace-v01",
+  "identity": "v0.8P-v04-source-identity-adjudication-v01-stage-a",
+  "status": "STOP_NO_UNAMBIGUOUS_AUTHORITY_BINDING_FOR_SEAL_MANIFEST",
+  "v03_candidate": {
+    "expected_source_path": "D:\\codex-runs\\jev-information-density-v08n\\v0.8N-eval-panel-v01\\seal\\seal-manifest.json",
+    "expected_source_sha256": "425cef320df94e2b47b448203f8a916ebbcbb2019539b2d09e51f5b4ced92f614",
+    "assertion_location": "experiments/jev-information-density-v08p-v03/identity/source-allowlist-v01.json#/authorized_sources/1",
+    "source_allowlist_sha256": "43bdf7408ef2b0e6fbcdd75b4848fd7631870d4312624e39b917ef554d62f854"
+  },
+  "authority_artifacts": [
+    {
+      "path": "experiments/jev-information-density-v08n/eval-panel-v01-contract.json",
+      "sha256": "3fa547c0a2490c4cfb5d578a32dffeb8414c35daa5e59ef339ab1e148e2e9cd6",
+      "role": "sealed panel protocol contract",
+      "finding": "describes panel scope and firewall but contains no exact output seal-manifest path/hash binding"
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08n\\v0.8N-eval-panel-v01\\seal\\evaluation-firewall-lock.json",
+      "sha256": "79d25ac82fba1bc6332e16d8bc5f877fadd11cccaed5ef3f07eacfe5e1877da2",
+      "json_pointer": "/panel_manifest_sha256",
+      "bound_value": "80e09c0f203b8a6505e062a2091a594273dca808258ff2f4539ab8414db9eabe",
+      "bound_object": "D:/codex-runs/jev-information-density-v08n/v0.8N-eval-panel-v01/matched-panel-v02/heldout-matched-panel-manifest.jsonl",
+      "finding": "binds the held-out panel manifest, not seal/seal-manifest.json"
+    },
+    {
+      "path": "experiments/jev-information-density-v08p-v03/provenance/extraction-attempt-1-failure-v01.json",
+      "sha256": "06932c8100f36218f9ee392f44c17cfa75bfab4756e1c399a3e0bed22a9ab5ce",
+      "role": "failure record",
+      "finding": "repeats the v03 expected-hash assertion; it is not an independent authority binding"
+    }
+  ],
+  "derivation_of_v03_expected_hash": "The value 425cef...f614 was copied into v03 source-allowlist-v01.json at /authorized_sources/1/expected_sha256. The permitted sealed panel contract has no such binding, and the firewall lock binds a different object hash. No unambiguous authoritative derivation was found within the exact authorized records.",
+  "v03_mismatch_classification": "UNRESOLVED; cannot distinguish v03 binding error from source drift under available sealed authority",
+  "stage_a_source_access": {
+    "e1_source_opened": "evaluation-firewall-lock.json only",
+    "firewall_lock_hash_verified": true,
+    "seal_manifest_opened": false,
+    "panel_manifest_opened": false,
+    "candidate_join_or_features_opened": false,
+    "targets_predictions_metrics_geometry_or_heads_opened": false,
+    "directory_discovery": false
+  },
+  "stage_b": {
+    "authorized": false,
+    "reason": "Stage A did not identify one exact authoritative path/hash pair",
+    "hash_only_read_performed": false
+  },
+  "next_action": "Stop. Do not re-open E1 sources or search for a replacement authority. Further work requires an explicit exact-path authority designation or a new protocol decision."
+}

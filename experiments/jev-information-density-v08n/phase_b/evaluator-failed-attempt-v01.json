@@ -1,0 +1,35 @@
+{
+  "protocol": "jev-information-density/v0.8n-road-b-evaluator-failed-attempt-v01",
+  "status": "PANEL_OPENED_EVALUATOR_ABORTED_BEFORE_HEAD_LOAD",
+  "panel_identity": "v0.8N-eval-panel-v01/matched-panel-v02",
+  "panel_unlock_receipt_sha256": "e8ff5e4548ab5e0b2b96433d844c64836aa03ff878034381c1933db913cb3ec0",
+  "opening_count": 1,
+  "frozen_evaluator": {
+    "path": "experiments/jev-information-density-v08n/phase_b/evaluate_phase_b_v01.py",
+    "sha256": "fa22bc8febff89d2b635091c6cb40be6f3beba4549c4a135d16e213f6fd3dda4"
+  },
+  "runtime_adapter": {
+    "path": "experiments/jev-information-density-v08n/phase_b/evaluate_phase_b_runtime_corrected_v01.py",
+    "sha256": "3ff0f993c80a09923fe589964932e57496c5e574cd43ab1bdb7c94116922eb43",
+    "receipt_path": "experiments/jev-information-density-v08n/phase_b/phase-b-evaluator-runtime-correction-v01.json",
+    "receipt_sha256": "cbd4e209ce3a174fc46d61150c5b795c7bc2e0af05c22d4eb2eec75e695acefe"
+  },
+  "failure": {
+    "initial_schema": "salinity_control",
+    "exception": "RuntimeError: held-out schema has no training candidate-order binding: salinity_control",
+    "traceback_source": "Codex execution record exec-1e326185-396b-400c-bae1-662539c993af",
+    "traceback": "Traceback (most recent call last):\n  File \"C:\\code land\\clean-rust\\experiments\\jev-information-density-v08n\\phase_b\\evaluate_phase_b_runtime_corrected_v01.py\", line 240, in <module>\n    raise SystemExit(main())\n                     ~~~~^^\n  File \"C:\\code land\\clean-rust\\experiments\\jev-information-density-v08n\\phase_b\\evaluate_phase_b_runtime_corrected_v01.py\", line 203, in main\n    status = evaluator.main()\n  File \"C:\\code land\\clean-rust\\experiments\\jev-information-density-v08n\\phase_b\\evaluate_phase_b_v01.py\", line 322, in main\n    raise RuntimeError(f\"held-out schema has no training candidate-order binding: {slug}\")\nRuntimeError: held-out schema has no training candidate-order binding: salinity_control",
+    "head_implementation_imported": false,
+    "terminal_head_loaded": false,
+    "inference_executed": false,
+    "predictions_created": false,
+    "metrics_created": false
+  },
+  "preservation": {
+    "traceback_recovered_from_execution_record": true,
+    "frozen_evaluator_modified": false,
+    "first_attempt_overwritten": false,
+    "evaluation_output_directory_absent": true
+  },
+  "note": "The evaluator had already read the authorized held-out feature scope, neighborhood records, selected-panel records, and frozen feature tensor before this exception. The traceback proves it stopped at the schema join before loading any head or producing predictions."
+}

@@ -1,0 +1,39 @@
+{
+  "receipt_id": "FAS_FROZEN_OBSERVER_BUNDLE_E2_V03_AUTHORIZED_ATTEMPT_STOP_V01",
+  "status": "STOPPED_PRE_MODEL_CONTACT_PRESERVE_AND_STOP",
+  "recorded_utc": "2026-09-26T09:36:25.601724+00:00",
+  "authorization_path": "C:\\code land\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\audits\\e2-v03-model-contact-authorization-v01.json",
+  "authorization_sha256": "6f881c13ab1a8d334431650904cc3eae6983947b38e6da1c078e98108ceee719",
+  "e0_v06_root_sha256": "968e7da8d44e36e31de81e87bdf140e7d766100891cecb7bbf9b4be80e99b3ea",
+  "e1_v04_root_sha256": "6ba77a899363651e3ba119b005f59a22e86f011f83c86b873857cd3f9ab64b03",
+  "e2_v01_preservation_root_sha256": "0ff309d833cd87017f7384247e4420a508f582ad9f375c5637f586d73b703f4c",
+  "e2_protocol_sha256": "d88bbf9342918f5a1db4e42190128e2adf9d0c726bcddd568ddb9498ab25181d",
+  "extractor_source_sha256": "f677d0927bde71f146ce8e7f6f4df83b70864a464a1f009888f52bcd2c59787b",
+  "stage": "sealed E2 v03 pre-model binding verifier",
+  "failure_classification": "sealed contract identity metadata mismatch; pre-model verification failure",
+  "failure": "RuntimeError: authorization does not bind a sealed E0 v06 freeze",
+  "expected_manifest_field": {
+    "field": "freeze_id",
+    "value": "FAS_FROZEN_OBSERVER_BUNDLE_E0_FREEZE_V06"
+  },
+  "observed_manifest_fields": {
+    "freeze_id": null,
+    "seal_id": "FAS_FROZEN_OBSERVER_BUNDLE_E0_SEAL_V06",
+    "freeze_contract_path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/e0-freeze-v06-sealed-v03.json"
+  },
+  "model_contact_performed": false,
+  "tokenizer_contact_performed": false,
+  "model_asset_hashing_performed": false,
+  "torch_imported_by_verifier": false,
+  "transformers_imported_by_verifier": false,
+  "tokenizers_imported_by_verifier": false,
+  "cuda_allocator_initialized": false,
+  "feature_extraction_performed": false,
+  "feature_output_root_created": false,
+  "e2_v01_comparator_sha256": "8eb80df5f73e761fe6c025fc1c66abef2027d639b6c14f56d4177d6e6a7a45a4",
+  "e2_v01_comparator_bytes": 872415232,
+  "comparator_modified": false,
+  "e3_fitting_authorized": false,
+  "e3_scoring_authorized": false,
+  "disposition": "Preserve E2 v03 pre-contact stop. Do not alter E0 v06 or retry extraction under E2 v03. A corrected sealed execution identity and fresh authorization are required."
+}

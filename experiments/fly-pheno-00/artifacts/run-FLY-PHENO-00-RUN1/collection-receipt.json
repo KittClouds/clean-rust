@@ -1,0 +1,16 @@
+{
+  "comparative_summaries_printed": false,
+  "competent_base_blocks": 0,
+  "completed_base_blocks": 216,
+  "declared_fit_rows": 11232,
+  "fit_manifest_sha256": "b1718c980f9bbeedb34f5fa6c540dc7a63483a924cebd753f022853bc9e51261",
+  "fit_receipts_path": "fit-receipts.jsonl",
+  "integrity_gate_pending": true,
+  "outcome_path": "final-outcomes.jsonl",
+  "preexecution_seal_sha256": "8bfacdbe6548956c26939f7f2ed4f92309cafa3442e4c91a290b498a1bb571d1",
+  "run_id": "FLY-PHENO-00-RUN1",
+  "schema": "FLY-PHENO-00-collection-receipt-v1",
+  "status": "COLLECTION_COMPLETE",
+  "threads": 4,
+  "wall_seconds": 1692.7246364
+}

@@ -1,0 +1,8 @@
+{
+  "schema": "FAS_E4_0_SOURCE_PRESERVATION_ATTEMPT_V01",
+  "status": "PARTIAL_SNAPSHOT_STOPPED_BEFORE_SOURCE_MODIFICATION",
+  "reason": "The first snapshot command created its directory and copied integrity.py, then failed because it assumed a nested tests directory existed. No source file was changed. The partial snapshot is retained in track-d-v05-source-snapshot-v01/ and the complete retry is track-d-v05-source-snapshot-v02/.",
+  "partial_snapshot_path": "audits/e4-0-track-d/history/track-d-v05-source-snapshot-v01/integrity-track-d-v05.py",
+  "partial_snapshot_sha256": "a1bc8feaa9426853e7ec5eb41503f072997418dfeafc522be7175a65e8153d8d",
+  "source_modified": false
+}

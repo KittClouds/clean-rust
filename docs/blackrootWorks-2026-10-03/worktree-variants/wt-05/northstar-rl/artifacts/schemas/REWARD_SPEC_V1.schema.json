@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RewardSpec",
+  "type": "object",
+  "properties": {
+    "formula": {
+      "type": "string"
+    },
+    "reward_spec_id": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "schema_version": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "reward_spec_id",
+    "formula"
+  ],
+  "$defs": {
+    "Digest256": {
+      "description": "Domain-separated BLAKE3 digest",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

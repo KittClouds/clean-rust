@@ -1,0 +1,154 @@
+{
+  "contract_id": "FASS01_S01_3_LINEAR_ACCESSIBILITY_V01",
+  "status": "FROZEN_PRE_FIT",
+  "purpose": "Diagnostic linear accessibility cartography over the immutable S01-2 cache; exploratory, not confirmatory.",
+  "parent_binding": {
+    "project_id": "fas-s01-frozen-sensor-transfer-cartography",
+    "phase_id": "s01-3-linear-accessibility-v01",
+    "s01_2_result_root_sha256": "1fc3aeb432ecdbef21a35aea8fed5b0d59671681eb8eb8032533c9ce751a4384",
+    "s01_2_feature_cache_root_sha256": "4964f35fb87a45a9447cd0f5f028668027ca3ad3a8f0d0c3f9eb7b9cbe7ccaaa",
+    "s01_2_corpus_sha256": "51a55212ba89d55bd6df532673ad4546c95def1f5d75622661f7c17b3e4a7ad1",
+    "feature_rows_sha256": "a8ea72310c0926962a0783d90eb3ceda19ca0b334bd2c00aafdd226e8aaaa40b",
+    "s01_2_contract_preserved": true,
+    "fas00_modified": false
+  },
+  "input_boundary": {
+    "allowed": [
+      "sealed S01-2 seven-view float32 feature cache",
+      "sealed S01-2 feature-row identity manifest",
+      "sealed S01-2 counterfactual corpus metadata and labels",
+      "S01-2 cache and result seals as provenance"
+    ],
+    "forbidden": [
+      "LFM weight loading",
+      "tokenizer loading",
+      "feature extraction or re-extraction",
+      "new representation views",
+      "FAS-00 artifact modification",
+      "nonlinear probes",
+      "online or adaptive mechanisms",
+      "view selection or promotion",
+      "threshold or regularization search"
+    ],
+    "expected_events": 106496,
+    "expected_quartets": 26624,
+    "expected_test_quartets": 5318,
+    "expected_test_events": 21272
+  },
+  "views": [
+    {"id":"V0_MEAN_FULL","dimension":2048,"cache_file":"V0_MEAN_FULL.f32le"},
+    {"id":"V1_FINAL_POSITION","dimension":2048,"cache_file":"V1_FINAL_POSITION.f32le"},
+    {"id":"V2_FIRST_POSITION","dimension":2048,"cache_file":"V2_FIRST_POSITION.f32le"},
+    {"id":"V3_CONTEXT_SPAN_MEAN","dimension":2048,"cache_file":"V3_CONTEXT_SPAN_MEAN.f32le"},
+    {"id":"V4_ENTITY_SPAN_MEAN","dimension":2048,"cache_file":"V4_ENTITY_SPAN_MEAN.f32le"},
+    {"id":"V5_RELATION_SPAN_MEAN","dimension":2048,"cache_file":"V5_RELATION_SPAN_MEAN.f32le"},
+    {"id":"V6_FIXED_SPAN_CONCAT","dimension":6144,"cache_file":"V6_FIXED_SPAN_CONCAT.f32le"}
+  ],
+  "tasks": {
+    "CONTEXT_IDENTITY": {"label":"context_term_id","classes":32,"fit_term_scope":"all 32 context term IDs"},
+    "ENTITY_IDENTITY": {"label":"entity_term_id","classes":32,"fit_term_scope":"all 32 entity term IDs"},
+    "RELATION_IDENTITY": {"label":"relation_id","classes":2,"fit_term_scope":"TRAIN_SIDE_STYLE context and entity terms only"},
+    "OBSERVED_STATE": {"label":"state_id","classes":3,"fit_term_scope":"TRAIN_SIDE_STYLE context and entity terms only"},
+    "EXACT_TARGET": {"label":"exact_target","classes":3,"fit_term_scope":"TRAIN_SIDE_STYLE context and entity terms only"}
+  },
+  "group_split": {
+    "algorithm":"bucket = int.from_bytes(SHA256(UTF8('FASS01-S01-3-GROUPSPLIT-V01|' + quartet_id))[0:4], 'big') % 5",
+    "train_buckets":[1,2,3,4],
+    "test_bucket":0,
+    "unit":"quartet; all A/C/E/P variants remain on one side",
+    "templates_excluded_from_all_fits":[6,7],
+    "training_template_condition":"observation_template_id < 6 and query_template_id < 6",
+    "generator_seed_used_for_split":false
+  },
+  "fit_protocol": {
+    "family":"multinomial linear logistic regression",
+    "feature_standardization":"per feature, fit rows only; population mean and standard deviation in float64; zero standard deviation maps to scale 1; transformed matrix float32",
+    "standardization_chunk_rows":2048,
+    "prediction_batch_rows":16384,
+    "weight_initialization":"all zeros",
+    "intercept":"enabled and unregularized",
+    "loss":"mean multiclass cross entropy plus 0.5 * 1e-4 * sum(weight^2)",
+    "regularization":"L2, coefficient 1e-4, fixed for all views and tasks",
+    "regularization_l2_coefficient":0.0001,
+    "optimizer":"torch.optim.LBFGS",
+    "optimizer_parameters":{"lr":1.0,"max_iter":300,"max_eval":375,"tolerance_grad":1e-7,"tolerance_change":1e-9,"history_size":10,"line_search_fn":"strong_wolfe"},
+    "execution":"one NVIDIA GeForce RTX 3080 CUDA device; float32 probe optimization; deterministic algorithms required; TF32 disabled; CUBLAS_WORKSPACE_CONFIG=:4096:8; OMP_NUM_THREADS=1; MKL_NUM_THREADS=1; OPENBLAS_NUM_THREADS=1",
+    "randomness":"none; zero initialization and deterministic optimizer",
+    "class_weight":null,
+    "validation_or_tuning":false
+  },
+  "fit_row_rules": {
+    "identity_tasks":"training quartet bucket in {1,2,3,4}; both template IDs below 6; all term split groups; all four variants",
+    "relation_state_target_tasks":"training quartet bucket in {1,2,3,4}; both template IDs below 6; context and entity term splits both TRAIN_SIDE_STYLE; all four variants"
+  },
+  "test_conditions": {
+    "identity_tasks": [
+      "SEEN_TEMPLATES_ALL_TERMS",
+      "SEEN_TEMPLATES_TRAIN_SIDE_CONTEXT_TERMS",
+      "SEEN_TEMPLATES_NOVEL_CONTEXT_TERMS",
+      "SEEN_TEMPLATES_TRAIN_SIDE_ENTITY_TERMS",
+      "SEEN_TEMPLATES_NOVEL_ENTITY_TERMS",
+      "OBSERVATION_TEMPLATE_HELDOUT_ONLY",
+      "QUERY_TEMPLATE_HELDOUT_ONLY",
+      "BOTH_TEMPLATES_HELDOUT",
+      "ANY_TEMPLATE_HELDOUT"
+    ],
+    "relation_state_target_tasks": [
+      "IN_DOMAIN_TRAIN_SIDE_TERMS_SEEN_TEMPLATES",
+      "CONTEXT_NOVEL_ONLY_SEEN_TEMPLATES",
+      "ENTITY_NOVEL_ONLY_SEEN_TEMPLATES",
+      "BOTH_TERMS_NOVEL_SEEN_TEMPLATES",
+      "OBSERVATION_TEMPLATE_NOVEL_ONLY_TRAIN_SIDE_TERMS",
+      "QUERY_TEMPLATE_NOVEL_ONLY_TRAIN_SIDE_TERMS",
+      "BOTH_TEMPLATES_NOVEL_TRAIN_SIDE_TERMS",
+      "ANY_TEMPLATE_NOVEL_TRAIN_SIDE_TERMS",
+      "CONTEXT_NOVEL_X_ANY_TEMPLATE_NOVEL",
+      "ENTITY_NOVEL_X_ANY_TEMPLATE_NOVEL",
+      "BOTH_TERMS_NOVEL_X_ANY_TEMPLATE_NOVEL"
+    ],
+    "test_quartet_bucket":0,
+    "all_four_variants_retained":true
+  },
+  "prospective_support": {
+    "identity_train_minimum_per_class":100,
+    "other_train_minimum_per_class":50,
+    "identity_test_minimum_per_class":5,
+    "other_test_minimum_per_class":20,
+    "each_test_condition_minimum_total":300,
+    "shortage_action":"FAIL_CLOSED before feature fitting; do not merge slices, drop rows, or lower support thresholds",
+    "expected_test_rows": {
+      "IN_DOMAIN_TRAIN_SIDE_TERMS_SEEN_TEMPLATES":3103,
+      "CONTEXT_NOVEL_ONLY_SEEN_TEMPLATES":3051,
+      "ENTITY_NOVEL_ONLY_SEEN_TEMPLATES":3194,
+      "BOTH_TERMS_NOVEL_SEEN_TEMPLATES":3281,
+      "OBSERVATION_TEMPLATE_NOVEL_ONLY_TRAIN_SIDE_TERMS":829,
+      "QUERY_TEMPLATE_NOVEL_ONLY_TRAIN_SIDE_TERMS":894,
+      "BOTH_TEMPLATES_NOVEL_TRAIN_SIDE_TERMS":338,
+      "ANY_TEMPLATE_NOVEL_TRAIN_SIDE_TERMS":2061,
+      "CONTEXT_NOVEL_X_ANY_TEMPLATE_NOVEL":2245,
+      "ENTITY_NOVEL_X_ANY_TEMPLATE_NOVEL":2126,
+      "BOTH_TERMS_NOVEL_X_ANY_TEMPLATE_NOVEL":2211
+    }
+  },
+  "metrics": {
+    "required":["support","accuracy","balanced_accuracy","multiclass_log_loss","multiclass_brier_score","confusion_matrix","per_class_recall"],
+    "probability_floor":1e-7,
+    "view_selection":false,
+    "composite_score":false,
+    "decision_thresholds":false
+  },
+  "interpretation_limits": [
+    "Identity tasks use all 32 class labels in fitting; they measure closed-set identity decoding on held-out quartets, not unseen-class classification.",
+    "Factor-transfer probes exclude novel context/entity term IDs from fitting.",
+    "This is one grouped split on an exploratory corpus; it is not an independent confirmatory evaluation.",
+    "Linear failure does not establish information absence from the backbone or nonlinear inaccessibility."
+  ],
+  "terminal_authority": {
+    "probe_training_authorized_by_latest_user_instruction":true,
+    "LFM_loading_authorized":false,
+    "feature_reextraction_authorized":false,
+    "S01_adaptive_mechanisms_authorized":false,
+    "FAS00_PHASE4_AUTHORIZED":false,
+    "S01_3_AUTHORIZED":true
+  }
+}

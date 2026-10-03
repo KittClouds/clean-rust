@@ -1,0 +1,72 @@
+{
+  "audit": {
+    "checks": {
+      "AGE_SEMANTICS": {
+        "examined": 31,
+        "failures": 0,
+        "first_failure": null,
+        "status": "PASS"
+      },
+      "BIRTH_TIME_CAUSALITY": {
+        "examined": 31,
+        "failures": 0,
+        "first_failure": null,
+        "status": "PASS"
+      },
+      "CANDIDATE_IDENTITY": {
+        "examined": 31,
+        "failures": 0,
+        "first_failure": null,
+        "status": "PASS"
+      },
+      "COMMITTED_EXTREME_MONOTONICITY": {
+        "examined": 61,
+        "failures": 0,
+        "first_failure": null,
+        "status": "PASS"
+      },
+      "GIVEBACK_IDENTITY": {
+        "examined": 31,
+        "failures": 0,
+        "first_failure": null,
+        "status": "PASS"
+      },
+      "RANGE_EXTENSION_IDENTITY": {
+        "examined": 31,
+        "failures": 0,
+        "first_failure": null,
+        "status": "PASS"
+      },
+      "SENTINEL_WINDOW_SEMANTICS": {
+        "examined": 31,
+        "failures": 0,
+        "first_failure": null,
+        "status": "PASS"
+      },
+      "V2_00_REGRESSION_PARITY": {
+        "examined": 50940,
+        "failures": 0,
+        "first_failure": null,
+        "status": "PASS"
+      }
+    },
+    "input": {
+      "bytes": 1327125,
+      "path": "OBS_OPEN_INST01_US30_M1_ONLINE.tsv",
+      "rows": 1415,
+      "sha256": "3de4402f0e440bb29957e8db09a9072d5764a9057e810c86ec9f796d98103a89",
+      "symbols": [
+        "US30"
+      ],
+      "timeframes": [
+        "PERIOD_M1"
+      ]
+    },
+    "market_findings": "FORBIDDEN_NOT_COMPUTED",
+    "overall": "PASS",
+    "qualified_session_paths": 1,
+    "schema": "OBS_OPEN_INST01_CAPTURE_AUDIT_V1",
+    "scope": "INSTRUMENT_METROLOGY_ONLY"
+  },
+  "logical_sha256": "1365b2fb16f5a0de810943a4f6ebdfc1934e33cc2afb03b81903f154321ddf1d"
+}

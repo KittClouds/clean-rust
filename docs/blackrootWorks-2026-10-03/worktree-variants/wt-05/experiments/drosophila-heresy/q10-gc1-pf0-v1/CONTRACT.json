@@ -1,0 +1,59 @@
+{
+  "firewall": {
+    "behavioral_probe": false,
+    "engineering_only": true,
+    "gc1_authorized": false,
+    "global_assembly_executed": false,
+    "parent_writes": false,
+    "scientific_promotion": false,
+    "write_root": "experiments/drosophila-heresy/q10-gc1-pf0-v1"
+  },
+  "identity": "q10-gc1-pf0-v1",
+  "parent_bindings": [
+    {
+      "label": "par2_plan",
+      "path": "experiments/drosophila-heresy/q10-gc0-gp1-par2-v1/PLAN.md",
+      "sha256": "93BE4404182D90E0B3742233AD89D844D649F5300229DE8456E0844258416F03"
+    },
+    {
+      "label": "par2_contract",
+      "path": "experiments/drosophila-heresy/q10-gc0-gp1-par2-v1/CONTRACT.json",
+      "sha256": "13EF3F6D7EF2C1C548F5E36B6FF98E48D3BBFBCEA1917E318078A8068E6C57D7"
+    },
+    {
+      "label": "par2_execution",
+      "path": "experiments/drosophila-heresy/q10-gc0-gp1-par2-v1/qualification/execution.json",
+      "sha256": "C74E310443C15C58E9EC897DCAEFFB1C0E86ED23B350E830D4308953751F34D2"
+    },
+    {
+      "label": "par2_summary",
+      "path": "experiments/drosophila-heresy/q10-gc0-gp1-par2-v1/qualification/derived/SUMMARY.json",
+      "sha256": "8243D02538C5AF103D2D9D60486C6781A5057F59671B37760969C795ECCBCF2C"
+    },
+    {
+      "label": "par2_status",
+      "path": "experiments/drosophila-heresy/q10-gc0-gp1-par2-v1/qualification/derived/STATUS.json",
+      "sha256": "97C277DBCF3238561E783A545D46D8142C564400FBF04DC3CC20022C87B41019"
+    },
+    {
+      "label": "par2_palettes",
+      "path": "experiments/drosophila-heresy/q10-gc0-gp1-par2-v1/qualification/palettes.jsonl",
+      "sha256": "56A8BCFD950C2C796279556B03C4905622B1207023C1142076AE7147203477FA"
+    },
+    {
+      "label": "ra1_execution",
+      "path": "experiments/drosophila-heresy/q10-gc0-ra1-v1/qualification/execution.json",
+      "sha256": "CED3F7CF5CA76D91A1DCD95739A77831501A5B5C8BA53C035B72748CD5E97020"
+    }
+  ],
+  "plan_sha256": "06BB42E896317BB93431913A037AC2572027D6B9DBC307C3067FFF4A823F4469",
+  "protocol": "Q10-GC1-PF0",
+  "sample": {
+    "expected_endpoint_set_count": 14,
+    "expected_palette_count": 7207,
+    "expected_raw_group_count": 801,
+    "selection_is_not_post_outcome": true,
+    "selection_is_sealed": true
+  },
+  "status": "PREEXECUTION_SEALED_NO_EXECUTION"
+}

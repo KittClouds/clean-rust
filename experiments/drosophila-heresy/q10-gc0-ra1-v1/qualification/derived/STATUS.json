@@ -1,0 +1,14 @@
+{
+  "authority_complete": false,
+  "behavioral_probe": false,
+  "engineering_only": true,
+  "execution_sha256": "CED3F7CF5CA76D91A1DCD95739A77831501A5B5C8BA53C035B72748CD5E97020",
+  "gc1_authorized": false,
+  "identity": "q10-gc0-ra1-v1",
+  "protocol": "Q10-GC0-RA1",
+  "raw_support_complete": true,
+  "result_sha256": "0EC9FAEEC21CA214843AF23619164DAEC1614EE903AEB96DF0C0AF77872C0CB7",
+  "scientific_promotion": false,
+  "status": "RA1_ENGINEERING_COMPLETE_AUTHORITY_INCOMPLETE",
+  "summary_sha256": "E072A18346861BBC9B91ACA3454E4314E9E62ECB7EA4DA98C2CBE7F56165D2C3"
+}

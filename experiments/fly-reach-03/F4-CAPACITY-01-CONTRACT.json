@@ -1,0 +1,51 @@
+{
+  "schema": "FLY-REACH-03-F4-CAPACITY-01-contract-v1",
+  "study_id": "FLY-REACH-03",
+  "identity": "F4-CAPACITY-01",
+  "status": "QUALIFICATION_ONLY_FROZEN",
+  "parent_disposition": "QUALIFICATION_STOP_F4_ENCODER_CAPACITY",
+  "parent_encoder_spec_sha256": "3325e1b6ce91956162fa3022c9e2c3bdf3396b269e975da9c108f45d9129d43b",
+  "scientific_interpretation_opened": false,
+  "measured_namespace_created": false,
+  "probes": {
+    "within_block_temporal": {
+      "question": "Can the frozen 80D representation and frozen MLP generalize within each qualification task block?",
+      "train_rule": "trial < 6144",
+      "validation_rule": "trial >= 6144",
+      "estimator": "F4-ENCODER-SPEC-v1 exact settings",
+      "four_blocks": [303000, 303001, 303002, 303003]
+    },
+    "memorization": {
+      "question": "Can the frozen MLP memorize a small deterministic qualification subset?",
+      "rows": 256,
+      "class_balance": "128 positive and 128 negative rows selected by stable global row order",
+      "epochs": 1000,
+      "batch_size": 64,
+      "learning_rate": 0.001,
+      "seed": 305000,
+      "training_and_scoring": "same frozen 80D encoder, no measured rows"
+    },
+    "cross_block_signed_margin": {
+      "question": "Do held-out blocks show systematic polarity inversion despite weak balanced extraction?",
+      "estimator": "F4-ENCODER-SPEC-v1 exact settings",
+      "quantity": "IPW weighted E[Y * logit(Z)] on each held-out block"
+    },
+    "representation_ladder": {
+      "status": "deferred_until_probes_1_to_3",
+      "rule": "No new representation or estimator is authored from observed outcomes in this identity"
+    }
+  },
+  "scoring": {
+    "target": "Y in {-1,+1} only",
+    "weight": "q = 1 / p_inclusion",
+    "balanced_error": "one-half IPW error within each target class",
+    "omega_hat": "max(0, 1 - 2 * balanced_error)",
+    "signed_margin": "sum(q * Y * logit) / sum(q)"
+  },
+  "lineage": {
+    "input_run": "qualification-v2",
+    "feature_identity": "f4-features-v1",
+    "feature_spec_sha256": "3325e1b6ce91956162fa3022c9e2c3bdf3396b269e975da9c108f45d9129d43b",
+    "measured_namespace_created": false
+  }
+}

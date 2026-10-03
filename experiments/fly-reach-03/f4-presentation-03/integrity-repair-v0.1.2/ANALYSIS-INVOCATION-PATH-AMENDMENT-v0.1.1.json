@@ -1,0 +1,20 @@
+{
+  "identity": "F4-PRESENTATION-03-ANALYSIS-INVOCATION-PATH-REPAIR-v0.1.1",
+  "analysis_source_sha256": "777c2bc7d6f2f817dd40d2654932b9f4bc503335bf5c0ffb15d6e6667409181f",
+  "comparative_truth_access_permitted_only_now_after_integrity_pass": true,
+  "allowed_change": "Add the existing frozen f4-presentation-03 directory to sys.path before invoking the unchanged analyzer.",
+  "truth_fields_parsed_by_failed_startup": [],
+  "raw_truth_file_sha256": "ff9d000145fc503e83710ca99d65b0304d52c1f94533d92c78e28b9730214d50",
+  "status": "INVOCATION_RETRY_FROZEN",
+  "prediction_lock_sha256": "dd387bcc52510eac947774cb6d9303d8cdd8142cee07a60b0e39cddd4dcb54ce",
+  "schema": "F4-PRESENTATION-03-analysis-invocation-path-amendment-v1",
+  "integrity_receipt_sha256": "cf52cc787b3bf501b3f80944d452af3247e569f82f110c06c597e499bfca2591",
+  "analysis_invocation_stop_receipt_sha256": "ad8a3b096025e903607329640adf35e803c5c6460a05ab8c97bfdb4f09e267a2",
+  "fit_manifest_sha256": "f71d344c5bc58e86a68e7bd9163aed1ab5d945468bfe84f06a8981e6a1c2ce66",
+  "prohibited": [
+    "modify analyzer source",
+    "modify scoring or weights",
+    "rerun fits",
+    "modify prediction lock or integrity receipt"
+  ]
+}

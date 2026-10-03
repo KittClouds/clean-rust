@@ -1,0 +1,22 @@
+{
+  "protocol": "Q10-RMT",
+  "status": "Q10_RMT_VALID__TOPOLOGY_MAPPED",
+  "primary_endpoints": 28,
+  "excluded_da2_geometry_failures": 4,
+  "mismatch_rows": 7003,
+  "serialized_moves": 168071,
+  "helpful_components": 2738,
+  "local_replay_checks": 1792,
+  "local_replay_passes": 1792,
+  "repair_applied": false,
+  "behavioral_inference": false,
+  "scientific_seed_bundles_used": 0,
+  "dh08b_authorized": false,
+  "next_protocol": "Q10-PF5+Q10-NA",
+  "next_gate": "prefix-constrained feasibility with exact sequential-f32 replay; parallel hidden-authority audit for the 326 no-helpful rows",
+  "receipts": {
+    "execution": "qualification/sample-9731-9732/execution.json",
+    "authority_summary": "qualification/sample-9731-9732/authority-summary.json",
+    "independent_audit": "scripts/audit_q10_rmt.py"
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "core_artifacts": [
+    {
+      "bytes": 4218,
+      "path": "Q-V08Q-PROTOCOL-V02.md",
+      "sha256": "5cf9f3a9e56b724c2f440267e268b01a3db99973001eda9ec0140796612a69f2"
+    },
+    {
+      "bytes": 1366,
+      "path": "contracts/q-correction-record-v02.json",
+      "sha256": "23e29fc6cd2f95a5ebf11fd0c71d9c8a9a72a922f4eac9a52356ccea34b6a109"
+    },
+    {
+      "bytes": 3681,
+      "path": "contracts/q-run-contract-v02.json",
+      "sha256": "5f6cd42b6de058a4fcdcbeb70b1939dbe944a6c973ee704a93148f9bea71d1ae"
+    },
+    {
+      "bytes": 3226,
+      "path": "contracts/q-panel-contract-v02.json",
+      "sha256": "a48bcce6389cab974aeed56d0358c3cff0d6e71324bbc1dd70954ba9be201811"
+    },
+    {
+      "bytes": 3678,
+      "path": "contracts/q-analysis-contract-v02.json",
+      "sha256": "b5c3c02b56405c0a471f82907bbb400dc4655c5fa8e82a32463dce77675e16cc"
+    },
+    {
+      "bytes": 17428,
+      "path": "contracts/q-source-lock-v02.json",
+      "sha256": "d6d70768242ac12801069e2bdb27cb976679c907206e81ae8c0921867bea2363"
+    },
+    {
+      "bytes": 3398,
+      "path": "source/q_weighted_objective_v02.py",
+      "sha256": "fc412072592857be36b02312d852d08ce3df2bf6fa7b28f8c1d59575c28e1ea4"
+    },
+    {
+      "bytes": 3307,
+      "path": "source/q_analysis_rules_v02.py",
+      "sha256": "4ba7a48438a35f00154e5eefcc76906122080944ff32575a4a26a5b1d29f91b3"
+    },
+    {
+      "bytes": 5302,
+      "path": "tests/test_q_rules_v02.py",
+      "sha256": "6353e74ce9c498de6c56111cfa67771a76a2e51e4f6ad15ff8525c5573293ebd"
+    }
+  ],
+  "evaluation": false,
+  "feature_extracted": false,
+  "identity": "JEV_V08Q_BUNDLE_PROVENANCE_V02",
+  "locally_reverified_source_lock_entries": [
+    "experiments/jev-information-density-v08q/contracts/q-contrast-proposal-v01.md",
+    "experiments/jev-information-density-v08q/source/q_analysis_rules_v02.py",
+    "experiments/jev-information-density-v08q/source/q_weighted_objective_v02.py",
+    "experiments/jev-information-density-v08q/tests/test_q_rules_v02.py"
+  ],
+  "model_loaded": false,
+  "panel_materialized": false,
+  "source_lock_file_sha256": "d6d70768242ac12801069e2bdb27cb976679c907206e81ae8c0921867bea2363",
+  "source_lock_root_sha256": "5e973916fb62747cde2de51f7deb2e29616ea1ead13ce384dcdb254901d936d3",
+  "training": false
+}

@@ -1,0 +1,15 @@
+{
+  "audited_events": 8,
+  "availability_denominator": "all declared seed/side/tau events; no resampling",
+  "available_events": 8,
+  "behavioral_inference": false,
+  "coalition_policy": "all eligible nonempty-support coordinates; greedy maximal under fixed stable order; no size cap",
+  "complete": true,
+  "declared_events": 8,
+  "dh08b_authorized": false,
+  "geometry_endpoint_claim": "ONLY_IF_ALL_GEOMETRY_GATES_PASS",
+  "protocol": "Q10-DA1",
+  "readout_authority": "FULL_SEQUENTIAL_F32_ORACLE_REQUIRED",
+  "scientific_seed_bundles": 0,
+  "unavailable_events": 0
+}

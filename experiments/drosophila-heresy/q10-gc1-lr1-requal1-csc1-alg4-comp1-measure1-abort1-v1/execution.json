@@ -1,0 +1,9 @@
+{
+  "contract_sha256": "D5FDAF5A6A1397C78E8EF2068EBD554A56C26F05D277F88F39483086A256C830",
+  "engineering_only": true,
+  "identity": "q10-gc1-lr1-requal1-csc1-alg4-comp1-measure1-abort1-v1",
+  "preexecution_sha256": "EBB19609C5BD0762E8CA38C683C6E3D720D39A1C6013D00CA98DBCF2E3CBB3B3",
+  "protocol": "Q10-ALG4-COMP1-MEASURE-ABORT1",
+  "scientific_promotion": false,
+  "status": "ABORT_RECORDED"
+}

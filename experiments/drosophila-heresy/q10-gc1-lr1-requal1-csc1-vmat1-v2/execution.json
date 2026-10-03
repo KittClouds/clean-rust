@@ -1,0 +1,9 @@
+{
+  "engineering_only": true,
+  "error": "'a_mapping'",
+  "error_type": "KeyError",
+  "identity": "q10-gc1-lr1-requal1-csc1-vmat1-v2",
+  "protocol": "Q10-CSC1-VMAT1",
+  "scientific_promotion": false,
+  "status": "BLOCKED_CSC1_VMAT1"
+}

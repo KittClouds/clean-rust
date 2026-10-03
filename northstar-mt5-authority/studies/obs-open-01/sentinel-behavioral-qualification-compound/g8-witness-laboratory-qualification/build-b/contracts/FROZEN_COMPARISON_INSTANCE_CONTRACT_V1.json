@@ -1,0 +1,1 @@
+{"M_evolution_recomputed":true,"fixed":["pi_a","pi_b","gamma","ThetaStar","Lambda_ab","M0_ab","C_a","C_b","fiber"],"forbidden_mutations":["STARTS","FIBER","CONTEXT","THETA","LAMBDA","INITIAL_M","G4_MATCH","G5_PRESENTABILITY"],"mutable_only":"WITNESS_TOKEN_SEQUENCE","schema":"G8_FROZEN_COMPARISON_INSTANCE_CONTRACT_V1","side_realizations_recomputed":true}

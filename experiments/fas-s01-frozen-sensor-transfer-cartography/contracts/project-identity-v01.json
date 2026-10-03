@@ -1,0 +1,31 @@
+{
+  "contract_id": "FASS01_PROJECT_IDENTITY_V01",
+  "project_id": "fas-s01-frozen-sensor-transfer-cartography",
+  "status": "CONSTRUCTION_ONLY",
+  "workspace_root": "C:/code land/clean-rust/experiments/fas-s01-frozen-sensor-transfer-cartography",
+  "run_root_reserved": "D:/codex-runs/fas-s01-frozen-sensor-transfer-cartography",
+  "backbone": {
+    "model_id": "LiquidAI/LFM2.5-1.2B-Base",
+    "revision": "7453bca97ca1e67754c4035a4b4c584e1c9dd725",
+    "parameter_delta_required": 0
+  },
+  "immutable_parent_roots": {
+    "fas00_terminal_closure": "870e1d29d7db3dd458f16fcb56315f6976e5a4f35ba5731d642b3330a8d7d652",
+    "fas00_phase3_result": "09fd072754e3b149ac2a9564928209a792eba091064033ca0d7f455333dda0c5",
+    "fas00_phase2a_cache": "9af2c6c73a2f21608e8a2dc912d8838968eaebffb32b4b1ea0a18364e488d217",
+    "fas00_phase2a_verifier_correction": "d2c84b22e141845392e6ad51ba9ca9584778cc283953bd137518b577e857360b",
+    "fas00_phase1_v03": "d3ca9f8ef988a6f0ae93318fc0ea7c504b23b3be801dbf133d66f67746a69274"
+  },
+  "cross_project_reads_after_separate_analysis_authorization": [
+    "FAS-00 Phase 1 v03 qualification corpus and manifest",
+    "FAS-00 Phase 2A FULL and QUERY_ONLY cache, row receipts, and seal",
+    "FAS-00 Phase 3 sealed report, row scores, fixed probe artifacts, receipt, and disposition",
+    "FAS-00 terminal closure"
+  ],
+  "cross_project_writes_authorized": false,
+  "other_project_access_authorized": false,
+  "S01_READONLY_ANALYSIS_AUTHORIZED": false,
+  "S01_MODEL_CONTACT_AUTHORIZED": false,
+  "S01_PROBE_TRAINING_AUTHORIZED": false,
+  "FAS00_PHASE4_AUTHORIZED": false
+}

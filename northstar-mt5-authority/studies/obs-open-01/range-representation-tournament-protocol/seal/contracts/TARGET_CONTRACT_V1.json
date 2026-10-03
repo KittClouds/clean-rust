@@ -1,0 +1,1 @@
+{"anchor":"RANGE_FREEZE","availability":"OBSERVED_COMPLETE with support_bars=60 and outcome_known_at=freeze_commit_time+3600","economic_semantics":false,"new_outcome_family":false,"registry_binding":{"equality":false,"horizon_minutes":60,"outcome_code":101,"predicate":"value > 0","representation":"RAW_PRICE"},"schema":"STRICT_ABOVE_FROZEN_MIDPOINT_AT_60M_V1"}

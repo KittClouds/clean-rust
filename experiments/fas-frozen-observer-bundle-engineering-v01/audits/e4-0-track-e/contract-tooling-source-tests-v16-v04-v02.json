@@ -1,0 +1,44 @@
+{
+  "schema": "FAS_E4_0_CONTRACT_TOOLING_SOURCE_TESTS_V16_V04_V02",
+  "receipt_id": "E4_0_CONTRACT_TOOLING_V16_V04_SOURCE_TESTS_V02",
+  "status": "PASS_SYNTHETIC_CONTRACT_AND_SOURCE_MAP_TESTS_V04",
+  "commands": [
+    "python -m py_compile experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/build_e4_0_source_map_v16_v04.py experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/finalize_e4_0_contract_v16_v04.py experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/seal_e4_0_contract_v16_v03.py experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/test_e4_0_contract_v16_v04.py",
+    "python experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/test_e4_0_contract_v16_v04.py (34 synthetic tests)"
+  ],
+  "unit_test_count": 34,
+  "py_compile": "PASS",
+  "source_bindings": [
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/build_e4_0_source_map_v16_v04.py",
+      "bytes": 72881,
+      "sha256": "0babb46a2a0dd02fddf94bac1813bef1482cb3af6f98172ce54f0d4fa46ff5ee"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/finalize_e4_0_contract_v16_v04.py",
+      "bytes": 74341,
+      "sha256": "4a13849d03857308301b78d9fe039132d2dc1db0a6cfcbb6779fbf91433fd25e"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/seal_e4_0_contract_v16_v03.py",
+      "bytes": 17757,
+      "sha256": "5b6f57cb83ef6c30dbdaa4914220d62df1aa54b0db3377ba49485ca3ae720a41"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/test_e4_0_contract_v16_v04.py",
+      "bytes": 38393,
+      "sha256": "c73970bc8abf181b8c044a91f629f83c6768e4f1c4fc1b4db3e7a43dedbda76c"
+    }
+  ],
+  "runtime_access": {
+    "model_contact": false,
+    "tokenizer_contact": false,
+    "cuda_initialized": false,
+    "gpu_lease_acquired": false,
+    "cache_created": false,
+    "labels_opened": false
+  },
+  "scope": "Synthetic-only contract finalizer, source-map receipt registration/source closure, role projection, and sealer tests. The v01 receipt draft is retained as malformed schema history; this v02 receipt uses the registered source_bindings field. No final contract candidate, seal, authorization, E4 population, terminal truth, tokenizer, model, CUDA, GPU lease, or cache contact.",
+  "execution_authorization_conferred": false,
+  "recorded_utc": "2026-09-27T06:37:17.679814+00:00"
+}

@@ -1,0 +1,1 @@
+{"authority":["CANONICAL_INTEGER_M1_BRIDGE_V1","SYNTHETIC_SEQUENCE_FIXTURE"],"invalid_class":"SOURCE_GRAMMAR_INVALID","required":["completed bar","integer ticks","low <= open,close <= high","knowledge-event equals declared cadence"],"schema":"G5_SOURCE_STIMULUS_GRAMMAR_V1","source_row_locator":"NOT_IN_G4_AUTHORITY"}

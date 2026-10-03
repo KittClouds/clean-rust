@@ -1,0 +1,32 @@
+{
+  "schema": "OBS_OPEN_DISC02P_CONFIRMATION_V1",
+  "population": "FROZEN_CONFIRMATION_69",
+  "current_state": "FROZEN_UNOPENED",
+  "role": "PROSPECTIVE_ONE_SHOT_CONFIRMATION_CANDIDATE",
+  "eligibility": "ONLY_MECHANICALLY_PROMOTED_DISC02E_CANDIDATES_WITH_COMPLETE_PRE_DISCOVERY_CONTRACT",
+  "minimum_eligible_sessions": 35,
+  "minimum_supported_months": 2,
+  "minimum_sessions_per_supported_month": 10,
+  "required_offset_regimes": [120, 180],
+  "minimum_sessions_per_offset_regime": 10,
+  "resampling_unit": "SESSION",
+  "randomizations": 9999,
+  "seed": 20260814,
+  "familywise_rule": "HOLM_BONFERRONI_ALPHA_0_05_ACROSS_FROZEN_PROMOTED_REGISTRY",
+  "one_shot": true,
+  "discovery_reselection": false,
+  "required_frozen_fields": [
+    "family_id",
+    "formal_estimand_id",
+    "representation_id",
+    "surface_domain",
+    "localized_cell_set",
+    "cell_signs",
+    "natural_null",
+    "support_contract",
+    "resampling_contract",
+    "multiplicity_contract",
+    "decision_rule"
+  ],
+  "confirmation_access_authorized_by_disc02p": false
+}

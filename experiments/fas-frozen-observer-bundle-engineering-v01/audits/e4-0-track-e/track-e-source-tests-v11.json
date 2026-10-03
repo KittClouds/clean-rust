@@ -1,0 +1,51 @@
+{
+  "actual_v07_contract_and_map_audited": false,
+  "command": "python -m unittest audits.e4-0-track-e.test_audit_e4_0_track_e_v07 -v; python -m py_compile audits/e4-0-track-e/audit_e4_0_track_e_v07.py audits/e4-0-track-e/test_audit_e4_0_track_e_v07.py",
+  "created_utc": "2026-09-27T00:07:24.647817+00:00",
+  "model_tokenizer_cuda_contact": false,
+  "python_compile": "PASS",
+  "schema": "FAS_E4_0_TRACK_E_SOURCE_TESTS_V03",
+  "scope": "Synthetic-only v07 contract/source/seal audit plus corrected exact source-role closure. Verifies unchanged sealed-v06 science projection, v07 supersession and inherited roots, source-map/source/receipt identity, v07 authorization issuer entrypoint and tests, exact Track B v03 online/parity integration paths consumed by the scorer, inherited population and parity-panel identities, exact seal members/root, preseal/postseal dispositions, and tamper rejection. Truth fixture absent. No actual v07 contract/map, E4 labels/population, tokenizer, model, or CUDA accessed.",
+  "source_role_paths_verified": {
+    "e4_online_feature_and_parity_runner": [
+      "source/scripts/e4_online_parity_v03.py",
+      "source/scripts/e4_runner_common_v03.py",
+      "source/scripts/e4_runner_artifacts_v03.py",
+      "source/scripts/e4_runner_modes_v03.py",
+      "source/scripts/e4_gpu_lease_v03.py",
+      "source/tests/test_e4_runner_v03.py"
+    ],
+    "e4_stage_authorization_issuer": [
+      "source/scripts/issue_e4_stage_authorization_v07.py",
+      "source/tests/test_e4_stage_authorization_v07.py"
+    ]
+  },
+  "sources": [
+    {
+      "bytes": 41993,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/audit_e4_0_track_e_v07.py",
+      "sha256": "9b114422341d1c7b783eeb1e961787bea9c4fe3ac9df0ea363ce8e6265ba58e0"
+    },
+    {
+      "bytes": 21885,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/test_audit_e4_0_track_e_v07.py",
+      "sha256": "022f3c97efbbf9d79be48e332d0100848f7c0d8b2d537698990b0438b01f14f4"
+    }
+  ],
+  "status": "TRACK_E_SOURCE_TESTS_PASS_V07_PREMAP_SYNTHETIC_AUDITOR",
+  "supersedes": [
+    {
+      "bytes": 2046,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-source-tests-v10.json",
+      "reason": "Superseded after correcting v07 issuer source filenames and binding the exact Track B integration source paths used by the scorer review; v10 remains unchanged history.",
+      "sha256": "f8e2f26695a1b2ab442c8e52ed15709fbab5a8e7ef799b19c571390d6e2dcee0"
+    }
+  ],
+  "tests": {
+    "discovered": 10,
+    "failed": 0,
+    "passed": 10,
+    "skipped": 0
+  },
+  "truth_payloads_opened": false
+}

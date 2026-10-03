@@ -1,0 +1,26 @@
+{
+  "schema_version": "RL_ENV_SPEC_V1",
+  "environment_id": "804b59bad205db0c337c4e6c564a365dda1e3949b4a08ffa286df06e34c25fc7",
+  "runraw_tape_id": "de5b69487f00c0bcc84d87bea1b0c6880b6110099b225370791b3977e21d7cd0",
+  "feature_tape_id": "996edc8e87ea2f513d6721972f055b8a2aa31f04cf9fe4f792c1d1626498f37a",
+  "observation_spec_id": "ed829485c839f0419f040ad05de15cb44d680c191b622d763626e815dddbd654",
+  "episode_spec_id": "049907b465fee983bdca02e0c0878de1393ee9c74171d4fc70a22b838eca565f",
+  "action_spec_id": "ff42128c28e9250f22e97751d5bf496fde5974e236de390adb8bd81dd1871d65",
+  "instrument_contract_id": "ba9f8fe2c625cc4c431267e7fee785dade2cb056641cf5bd212ea0b138409275",
+  "execution_spec_id": "ddfa6715e7a1835ec1e2cb98743a15ea2524b2981ea2d939839a32488937ab07",
+  "reward_spec_id": "5ef542088ac1acc0871d8dc00aa15d5787a15d96618a33f676b71a5758560bc9",
+  "termination_spec_id": "a2dc7172867c1e8c520fc6460897ee3e7c168f7a06267bafedad0f5e5357cb1b",
+  "numeric_contract_id": "cbdc71040758788ff485414eb323e6cfa82fe49a22ffd00ef6ac60f688427291",
+  "seed_contract_id": "ff75747d0789e831a0a1a8d6f550067cf03e1f41994db87f15bcdb0a4b473289",
+  "wind_tunnel_mode": "RUN_RAW_REPLAY",
+  "implementation_hashes": [
+    "b851edd41227980a5b529e781fe6019dd75df183fe08654f3998de1e7ecff215",
+    "575780fb5df88972419dc62b79c98eef2b2fb3e55abeae0eb7439915e987413c",
+    "a5145adaf2ea8a6aec3021d4f6aa4ec7fcf513732d088b3d1a46054069017195",
+    "afcd7842d80203a0f4cefeb07d0f26a4159662f3458bb8ac3ff95bf7e7ed2af1",
+    "039ebb8ea01d21fbd330e24d6f168ab40045188c9c9d1da8df3962fd173c0fa0",
+    "987493faa23ac2a4942a92c66183178fded166971102e34826b3c515fbeb0d69",
+    "f22b0541c30c9596830ac1d5e5f76818fc946c426e2820357556fad89d5a35cc",
+    "9ea4f392cec3056c05e1d6d65be6d9f704adaf289a7ca54319db7e3f0ff5d44e"
+  ]
+}

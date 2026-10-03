@@ -1,0 +1,28 @@
+{
+  "analysis_sha256": "bdfd01c45f8fc8e95116ab6534b62b3bfe4bb5463c186475b4ef81ff0cd4fed8",
+  "biological_promotion": false,
+  "evaluable_assignment_count": 6,
+  "identity": "F4-BINDING-01-STAGE-B-PROSP-v0.1",
+  "measured_reach03_authorized": false,
+  "model_count": 36,
+  "output_hashes": {
+    "ANALYSIS.json": "bdfd01c45f8fc8e95116ab6534b62b3bfe4bb5463c186475b4ef81ff0cd4fed8",
+    "ASSIGNMENT-METRICS.csv": "547683b4d74951ce6653055bdafa22dec8e250a18a9fee43d4e495d27c1e9b3d",
+    "BLOCK-METRICS.csv": "273915bdd08478c3ac5e355b5e1d06a6327bc7d0c8bab6b27671eb43dce2c6ce",
+    "MODEL-ASSIGNMENT-METRICS.csv": "1eed1284b3944da6cc72e4671448853d9e9078bc89a2e44d84384c10f64bb2bb",
+    "MODEL-CELL-METRICS.csv": "189554e232c33ce42f112f4680c6563680075f2dc2a4dea965c3d05586bd03cc",
+    "RESULTS.md": "5a108f59fc46de8d2f24f7a5eb5e287a486c4ca4ee4e1d3b3cb5ea0596dfecec",
+    "STAGE-B-SUPPORT-TABLE.csv": "3154309960f126e7fcf2ed0d487d8f13667b78ab675530935b0ad4c10a4486e3"
+  },
+  "pheno_status": "unchanged",
+  "pre_truth_integrity_receipt_sha256": "abf24df9b387be6739f1ee26d90261bca0415b18d4b0c02709094d861bd963dc",
+  "prediction_lock_sha256": "3dc0e1a68b33d02c45b86c2a948e8fa35fcbc08628e0f30468ea270a975a126c",
+  "primary_pair_swap_interval": null,
+  "primary_pair_swap_mean_delta_error": 0.12766283131199493,
+  "qualification_only": true,
+  "row_count": 46602,
+  "schema": "F4-BINDING-01-stage-b-terminal-receipt-v0.1",
+  "scientific_disposition": "INCONCLUSIVE_BOOTSTRAP_SUPPORT",
+  "status": "ANALYSIS_COMPLETE",
+  "truth_access_provenance": "Fresh Stage B scoring truth opened after prediction lock and independent pre-truth integrity PASS."
+}

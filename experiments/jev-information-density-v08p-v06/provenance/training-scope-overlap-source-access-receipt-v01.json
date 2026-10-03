@@ -1,0 +1,52 @@
+{
+  "protocol": "jev-information-density/v0.8p-v06-training-scope-overlap-source-access-v01",
+  "identity": "v0.8P-v06-training-scope-overlap-preflight-v01",
+  "status": "SOURCE_SCOPE_PASS_OVERLAP_NOT_EVALUABLE",
+  "authorized_content_sources_read": [
+    {
+      "path": "experiments/jev-information-density-v08p/contracts/contract-bundle-seal-v01.json",
+      "sha256": "67cd6b7902111000dc93a0f81f9f20bc05a9c084732705ed8f9ad82fe965fa85",
+      "purpose": "confirm original P contract bundle bindings"
+    },
+    {
+      "path": "experiments/jev-information-density-v08p/phase_b/phase-b-p-run-contract-v01.json",
+      "sha256": "e345225b4a17fc18eb35fcab24cbe1d72bd0e34bed9de272f927a7be461853e6",
+      "purpose": "identify available training-scope hashes/counts; no identity rows present"
+    },
+    {
+      "path": "experiments/jev-information-density-v08p/phase_a/fresh-panel-contract-v01.json",
+      "sha256": "ce3b7b97caecb27f3ad99439c0e67dca6e40af5da3db9ca2e356ea5e9f06f823",
+      "purpose": "read the exact pre-existing training-scope overlap dimensions"
+    },
+    {
+      "path": "experiments/jev-information-density-v08p-v06/phase_a/fresh-panel-contract-v01.json",
+      "sha256": "28b7878c9d68026254b8db734959387857b7eafb7b083d658d30d4cca6636a00",
+      "purpose": "verify sealed v06 boundary and inherited training-overlap prerequisite"
+    },
+    {
+      "path": "experiments/jev-information-density-v08p-v06/provenance/v06-input-binding-root-v01.json",
+      "sha256": "447176e523947eab718721c953db16a51102f91a812d0d73c99712f110c21c32",
+      "purpose": "verify v06 parent/input bindings and stop state"
+    }
+  ],
+  "not_accessed": {
+    "training_identity_values_or_manifests": true,
+    "fresh_panel_candidates_or_collision_stream": true,
+    "v01_v02_v03_quarantined_or_failed_contents": true,
+    "e1_content_beyond_v05_opaque_denylist_binding": true,
+    "analysis_contract_content": true,
+    "generator_or_lfm_source": true,
+    "model_or_head": true
+  },
+  "path_metadata_checks_only": [
+    {
+      "path": "D:/codex-runs/jev-information-density-v08p-v06/fresh-panel",
+      "check": "exact-path existence check",
+      "result": "absent"
+    }
+  ],
+  "source_access_method": "Explicit literal paths only; no directory enumeration, glob, recursive search, or additional source acquisition during this overlap preflight.",
+  "comparison_performed": false,
+  "reason_not_performed": "The sealed inputs contain scope digests/counts but not the identity rows needed for the required exact intersections, and P candidate generation is prohibited in this step.",
+  "next_action_authorized": false
+}

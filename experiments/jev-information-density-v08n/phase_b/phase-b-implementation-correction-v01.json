@@ -1,0 +1,75 @@
+{
+  "protocol": "jev-information-density/v0.8n-road-b-phase-b-implementation-correction-v01",
+  "identity": "v0.8N-phase-b-implementation-correction-v01",
+  "status": "IMPLEMENTATION_ONLY_CORRECTION_SEALED",
+  "parent_authorization_event_sha256": "0cad8d2e45fe8e7e5eed7f9bcdeab406926f24605ad9f62396d83f9512bb0a09",
+  "corrected_entrypoint_sha256": "a51e0e4ad27efb0b4df5d1466bcf6ea9c297a19bb26c08eca58d07d2e895fd00",
+  "frozen_trainer_sha256": "e539bac2d67b47ba2b660b8579c5818e5fffc0cf94fa26cfd3e9dd905ef795ba",
+  "correction_verifier_sha256": "23a45671f069695a29e92b75ec831f707cfbfddde396baee89990febb6899eee",
+  "correction_test_sha256": "efacd9bb7119e606a2a3f332a7c076295d34abc2d32579bd7999e3fbedc721e9",
+  "correction_class": "runtime cache-container view; semantic impact none",
+  "observed_failure": {
+    "stage": "training input verification, before head template initialization",
+    "exception": "IndexError: the frozen runner indexed the state tensor with an extra mean_full@16 dictionary layer",
+    "actual_sealed_cache_layout": "torch.load(cache)['features'] is the contiguous float32 [55000,2048] state tensor; feature_key is stored at the cache top level",
+    "frozen_runner_expected_view": "cache['features']['state']['mean_full@16']",
+    "outputs_at_failure": {
+      "candidate_extraction_complete": true,
+      "head_templates_created": false,
+      "run_directories_created": false,
+      "optimizer_steps": 0,
+      "head_training": false,
+      "heldout_panel_opened": false
+    }
+  },
+  "correction": {
+    "entrypoint": "experiments/jev-information-density-v08n/phase_b/train_phase_b_corrected_v01.py",
+    "corrected_entrypoint_sha256": "a51e0e4ad27efb0b4df5d1466bcf6ea9c297a19bb26c08eca58d07d2e895fd00",
+    "frozen_trainer_path": "experiments/jev-information-density-v08n/phase_b/train_phase_b_v01.py",
+    "frozen_trainer_sha256": "e539bac2d67b47ba2b660b8579c5818e5fffc0cf94fa26cfd3e9dd905ef795ba",
+    "correction_verifier_path": "experiments/jev-information-density-v08n/phase_b/verify_phase_b_correction_v01.py",
+    "correction_verifier_sha256": "23a45671f069695a29e92b75ec831f707cfbfddde396baee89990febb6899eee",
+    "correction_test_path": "experiments/jev-information-density-v08n/phase_b/tests/test_v08n_phase_b_correction.py",
+    "correction_test_sha256": "efacd9bb7119e606a2a3f332a7c076295d34abc2d32579bd7999e3fbedc721e9",
+    "adapter": "in-memory dictionary view around the identical tensor object; no tensor copy, reorder, cast, transform, or serialization change",
+    "effective_feature_key": "mean_full@16",
+    "required_tensor": {
+      "shape": [55000, 2048],
+      "dtype": "float32",
+      "contiguous": true,
+      "source_file_sha256": "da946af90353c91c3b1298d2951eebc42b9f515708b628d3a053e700a960c4d6"
+    }
+  },
+  "candidate_features_carried_forward_unchanged": {
+    "candidate_feature_receipt_sha256": "29f8d67b24fd2a554500e1cfe2e0fe0b4311d32fad7052ad8ffb3464b7835f44",
+    "candidate_tensor_file_sha256": "3bb3036f455a83409361eb3e4150833bd8b255a2a783ec1218b00b12315c0590",
+    "candidate_tensor_content_sha256": "f76e573779152fd3966845a39e29206c333eef388e0511c5f3e07f8f1b46d593",
+    "candidate_receipt_remains_bound_to_parent_authorization": true,
+    "candidate_reextraction": false
+  },
+  "correction_tests": {
+    "test_count": 3,
+    "passed": true,
+    "same_tensor_object_and_data_pointer": true,
+    "wrong_key_fails_closed": true,
+    "wrong_container_fails_closed": true,
+    "preexisting_metric_tests": 5,
+    "all_smoke_tests_pass": true,
+    "static_parse_pass": true
+  },
+  "recording": {
+    "run_config_and_run_integrity_bind_this_receipt": true,
+    "training_hash_tree_includes_this_receipt": true,
+    "training_seal_binds_corrected_entrypoint": true,
+    "separate_read_only_correction_verification_before_panel_unlock": true
+  },
+  "semantic_contract_changed": false,
+  "training_inputs_changed": false,
+  "model_revision_changed": false,
+  "objective_or_loss_changed": false,
+  "seed_or_schedule_changed": false,
+  "evaluation_contract_changed": false,
+  "protected_panel_access": false,
+  "newtight_access": false,
+  "phoenix_access": false
+}

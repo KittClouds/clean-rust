@@ -1,0 +1,112 @@
+{
+  "schema": "OBS_OPEN_UNIVERSE_QUALIFICATION_CONTRACT_V1",
+  "study_id": "OBS-OPEN-01",
+  "qualification_parent_root": "b5a55b74770cbdb9364cdb3087570c33c4b3b41af7004c9ee4b73b5e8078a040",
+  "parent_commit": "eb746c123ae653d8cc9962ac9586038d83137601",
+  "substantive_status": "FROZEN_UNOPENED",
+  "candidate_civil_dates": {
+    "first": "2024-01-02",
+    "last": "2025-12-31",
+    "timezone": "America/New_York"
+  },
+  "source": {
+    "provider": "MetaQuotes-Demo",
+    "canonical_instrument": "US30",
+    "broker_symbol": "US30",
+    "bar_authority_sha256": "125b768ad87ba578c5498deffe50462909a6a1be422953a0f7488f036aac9d5b",
+    "bar_authority_bytes": 93138485,
+    "collector_source_sha256": "d3c67e8f15d0b0f3880588b540a1b52bfc076aad532e24f4ee8b41729e70dee8",
+    "collector_ex5_sha256": "cb698c780034198cd7cf87f02ef39456599822184bddde86dfd74f9d13d7607b",
+    "terminal_build": 6106,
+    "tester_model": "ONE_MINUTE_OHLC",
+    "raw_storage": "D_DRIVE_LOCAL_ONLY",
+    "online_publication": false
+  },
+  "observer": {
+    "source_sha256": "d2c1f0614ba27289a87172dc9fa79f3b018cace73ebd5829afaf100aed406034",
+    "compiled_sha256": "5505e033d487037a9cc5863788b067123fbf5bc3e48d4c40ddfa0fbe721ac290",
+    "interaction_timeframe": "M5",
+    "range_timeframe": "M1",
+    "range_minutes": [1, 30],
+    "range_start_new_york": "09:30:00",
+    "area_end_new_york": "16:00:00",
+    "require_every_m1_bar": true,
+    "require_chart_continuity": true
+  },
+  "clock": {
+    "scientific_timezone": "America/New_York",
+    "server_offset_model": "EUROPE_HELSINKI_OFFSET_PROXY_V1",
+    "server_offset_proxy_timezone": "Europe/Helsinki",
+    "external_alignment_provider": "Dukascopy",
+    "external_alignment_symbol": "USA30IDXUSD",
+    "alignment_thresholds": {
+      "minimum_aligned_returns": 300,
+      "minimum_pearson_correlation": 0.8,
+      "minimum_nonzero_sign_agreement": 0.7,
+      "minimum_best_runner_up_correlation_margin": 0.3
+    },
+    "required_anchor_dates": [
+      "2024-01-17",
+      "2024-03-08",
+      "2024-03-11",
+      "2024-03-28",
+      "2024-04-01",
+      "2024-08-14",
+      "2025-01-15",
+      "2025-03-07",
+      "2025-03-10",
+      "2025-03-28",
+      "2025-03-31",
+      "2025-10-24",
+      "2025-10-27",
+      "2025-10-31",
+      "2025-11-03"
+    ],
+    "excluded_unresolved_intervals": [
+      {
+        "first": "2024-10-27",
+        "last": "2024-12-31",
+        "reason": "NOT_EVALUABLE_CLOCK_TRANSPORT"
+      }
+    ]
+  },
+  "coverage": {
+    "required_m1_range_opens": 30,
+    "required_m5_opens_including_finalization_trigger": 79,
+    "m1_range_first_new_york": "09:30:00",
+    "m1_range_last_new_york": "09:59:00",
+    "m5_first_new_york": "09:30:00",
+    "m5_last_new_york": "16:00:00",
+    "duplicate_tolerance": 0,
+    "missing_tolerance": 0,
+    "normal_session_only": true,
+    "early_close_policy": "EXCLUDE_STRUCTURALLY"
+  },
+  "calendar": {
+    "authority_2024": "https://www.nyse.com/publicdocs/ICE_NYSE_2024_Yearly_Trading_Calendar.pdf",
+    "authority_2025": "https://www.nyse.com/publicdocs/ICE_NYSE_2025_Yearly_Trading_Calendar.pdf",
+    "core_session_authority": "https://www.nyse.com/trade/hours-calendars",
+    "full_closures": {
+      "2024": ["2024-01-15", "2024-02-19", "2024-03-29", "2024-05-27", "2024-06-19", "2024-07-04", "2024-09-02", "2024-11-28", "2024-12-25"],
+      "2025": ["2025-01-01", "2025-01-09", "2025-01-20", "2025-02-17", "2025-04-18", "2025-05-26", "2025-06-19", "2025-07-04", "2025-09-01", "2025-11-27", "2025-12-25"]
+    },
+    "early_closes": {
+      "2024": ["2024-07-03", "2024-11-29", "2024-12-24"],
+      "2025": ["2025-07-03", "2025-11-28", "2025-12-24"]
+    }
+  },
+  "partition": {
+    "algorithm": "CONTIGUOUS_TEMPORAL_BLOCK_V1",
+    "discovery_first": "2024-01-02",
+    "discovery_last": "2025-06-30",
+    "confirmation_first": "2025-07-01",
+    "confirmation_last": "2025-12-31",
+    "minimum_admitted_discovery_sessions": 200,
+    "minimum_admitted_confirmation_sessions": 60,
+    "minimum_supported_calendar_months_per_partition": 4,
+    "minimum_sessions_per_supported_month": 10,
+    "require_both_server_offset_regimes_per_partition": true,
+    "seed": null,
+    "outcome_dependent": false
+  }
+}

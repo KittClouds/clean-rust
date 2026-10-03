@@ -1,0 +1,36 @@
+{
+  "intended_deltas": [
+    "D1 context-safe cache (legacy collides across contexts; adapter isolates)",
+    "D2 duplicate-list rejection (legacy dict collapse silent)",
+    "D3 full reconstruction receipts",
+    "D4 exclusive chunks, no --force"
+  ],
+  "labels": {
+    "advantage": true,
+    "exact": true,
+    "invalid": true,
+    "signed_zero": true
+  },
+  "memory": {
+    "per_case_cache_bound": 8,
+    "probe_peak_bytes": 4493756
+  },
+  "mini_domain": {
+    "bytes_scores_geometry_gates_match_legacy": true,
+    "case": "seed9731-L-tau16.json|2",
+    "deterministic": true,
+    "groups": [
+      0,
+      1,
+      2
+    ],
+    "seconds_per_candidate": 1.0842403250001855,
+    "singles_checked": 24
+  },
+  "shortlist": {
+    "max_32": true,
+    "no_same_group_pairs": true,
+    "note": "legacy as-coded collateral order preserved; prose discrepancy documented, not corrected",
+    "tie_stable": true
+  }
+}

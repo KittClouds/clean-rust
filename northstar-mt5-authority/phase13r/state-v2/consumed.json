@@ -1,0 +1,7 @@
+{
+  "authorization_token_sha256": "f45a6fdc2c822498eeba0685b93abf7c50b6d51ad4f9058fd361fb6028985120",
+  "bundle_semantic_sha256": "98d5550e327eef9b167d3cfd7ec1e3a7bae9262304d2bf1caff4dc98660c6ce8",
+  "contract": "NORTHSTAR_RG2_HOLDOUT_CONSUMPTION_V1",
+  "protocol_sha256": "6be4368c07fe912c6e35df0e9c76e96d5c2a60e3c6f40db33c67370125acdebc",
+  "status": "CONSUMED_BEFORE_SCORING"
+}

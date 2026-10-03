@@ -1,0 +1,10 @@
+{
+  "cache_isolation": true,
+  "chunk_round_trip": true,
+  "duplicate_rejected": true,
+  "missing_group_rejected": true,
+  "orphan_tmp_refused": true,
+  "overwrite_refused": true,
+  "parent_drift_checked": true,
+  "resume_identity": true
+}

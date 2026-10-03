@@ -1,0 +1,122 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "BrokerObservationTape",
+  "type": "object",
+  "properties": {
+    "account_id_hash": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "content_hash": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "rows": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/BrokerQuoteObservation"
+      }
+    },
+    "schema_version": {
+      "type": "string"
+    },
+    "source_authority": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "source_authority",
+    "account_id_hash",
+    "rows",
+    "content_hash"
+  ],
+  "$defs": {
+    "BrokerQuoteObservation": {
+      "type": "object",
+      "properties": {
+        "account_environment": {
+          "type": "string"
+        },
+        "ask": {
+          "type": "number",
+          "format": "double"
+        },
+        "bid": {
+          "type": "number",
+          "format": "double"
+        },
+        "broker": {
+          "type": "string"
+        },
+        "connection_state": {
+          "$ref": "#/$defs/ConnectionState"
+        },
+        "event_time_ns": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "instrument_id": {
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0
+        },
+        "last": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "double"
+        },
+        "normalized_payload_hash": {
+          "$ref": "#/$defs/Digest256"
+        },
+        "observation_id": {
+          "$ref": "#/$defs/Digest256"
+        },
+        "raw_payload_hash": {
+          "$ref": "#/$defs/Digest256"
+        },
+        "received_time_ns": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "recorded_time_ns": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "spread": {
+          "type": "number",
+          "format": "double"
+        }
+      },
+      "required": [
+        "observation_id",
+        "broker",
+        "account_environment",
+        "instrument_id",
+        "event_time_ns",
+        "received_time_ns",
+        "recorded_time_ns",
+        "bid",
+        "ask",
+        "spread",
+        "raw_payload_hash",
+        "normalized_payload_hash",
+        "connection_state"
+      ]
+    },
+    "ConnectionState": {
+      "type": "string",
+      "enum": [
+        "CONNECTED",
+        "REAUTHENTICATED",
+        "CAPTURED_REPLAY",
+        "UNAVAILABLE"
+      ]
+    },
+    "Digest256": {
+      "description": "Domain-separated BLAKE3 digest",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

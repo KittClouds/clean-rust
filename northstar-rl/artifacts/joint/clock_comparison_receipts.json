@@ -1,0 +1,58 @@
+[
+  {
+    "schema_version": "CLOCK_COMPARISON_RECEIPT_V1",
+    "northstar_instrument_id": 3,
+    "left_source": "MT5",
+    "right_source": "TRADELOCKER",
+    "left_source_time_ns": 1800000000000000000,
+    "right_source_time_ns": 1800000000001000000,
+    "left_arrival_offset_ns": 2000000,
+    "right_arrival_offset_ns": 5000000,
+    "source_time_delta_ns": 1000000,
+    "bar_boundary_delta_ns": 1000000,
+    "session_boundary_relationship": "SAME_SYNTHETIC_SESSION",
+    "receipt_id": "7c1a69896e519977d922750218045340fee7fc8717da60a8f08138cde32790be"
+  },
+  {
+    "schema_version": "CLOCK_COMPARISON_RECEIPT_V1",
+    "northstar_instrument_id": 3,
+    "left_source": "MT5",
+    "right_source": "TRADELOCKER",
+    "left_source_time_ns": 1800000060000000000,
+    "right_source_time_ns": 1800000060001000000,
+    "left_arrival_offset_ns": 2000000,
+    "right_arrival_offset_ns": 5000000,
+    "source_time_delta_ns": 1000000,
+    "bar_boundary_delta_ns": 1000000,
+    "session_boundary_relationship": "SAME_SYNTHETIC_SESSION",
+    "receipt_id": "d890cc2d415b4a2c5d896588ace62d650428eb96039f3556f8b9cd9c830bfb9a"
+  },
+  {
+    "schema_version": "CLOCK_COMPARISON_RECEIPT_V1",
+    "northstar_instrument_id": 3,
+    "left_source": "MT5",
+    "right_source": "TRADELOCKER",
+    "left_source_time_ns": 1800000120000000000,
+    "right_source_time_ns": 1800000120001000000,
+    "left_arrival_offset_ns": 2000000,
+    "right_arrival_offset_ns": 5000000,
+    "source_time_delta_ns": 1000000,
+    "bar_boundary_delta_ns": 1000000,
+    "session_boundary_relationship": "SAME_SYNTHETIC_SESSION",
+    "receipt_id": "7bcffca6545f1bf08d96a4fabce0e076aa2ed4a7212a9924848c06f618adce9d"
+  },
+  {
+    "schema_version": "CLOCK_COMPARISON_RECEIPT_V1",
+    "northstar_instrument_id": 3,
+    "left_source": "MT5",
+    "right_source": "TRADELOCKER",
+    "left_source_time_ns": 1800000180000000000,
+    "right_source_time_ns": 1800000180001000000,
+    "left_arrival_offset_ns": 2000000,
+    "right_arrival_offset_ns": 5000000,
+    "source_time_delta_ns": 1000000,
+    "bar_boundary_delta_ns": 1000000,
+    "session_boundary_relationship": "SAME_SYNTHETIC_SESSION",
+    "receipt_id": "647582f448eb962b5753081d1114d019bcfb1040aa3ef7144dc8145c63c36915"
+  }
+]

@@ -1,0 +1,10 @@
+﻿{
+    "contract":  "MST_FURNACE_BATCH_V1",
+    "batch_id":  "BATCH_20260812T091913630Z",
+    "status":  "COMPLETE_WITH_QUARANTINE",
+    "completed_at_utc":  "2026-08-12T09:20:52.2612844Z",
+    "admitted":  0,
+    "skipped":  0,
+    "quarantined":  3,
+    "terminal_processes_remaining":  0
+}

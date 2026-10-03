@@ -2944,8 +2944,11 @@ dependencies = [
  "phoenix-analysis-contract",
  "phoenix-chunker",
  "phoenix-dynamic-ner",
+ "phoenix-gliner25-contract",
  "phoenix-rel-post",
  "phoenix-types",
+ "serde_json",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -3243,6 +3246,17 @@ dependencies = [
  "serde",
  "smallvec",
  "thiserror 1.0.69",
+]
+
+[[package]]
+name = "phoenix-gliner25-contract"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "blake3",
+ "memmap2",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]

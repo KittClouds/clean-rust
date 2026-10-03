@@ -1,0 +1,13 @@
+{
+  "supplement_id": "FAS_S03_OVERLAP_ANALYSIS_SUPPLEMENT_V01",
+  "status": "SEALED_BEFORE_COMPLETION_OR_INTERPRETATION",
+  "authorization_source": "The S03 user directive explicitly requests whether entity-harmed cases are the same events whose context margins improve.",
+  "scope": "Descriptive event-set overlap only, computed from the already-authorized paired event ledger fields; no new model, feature, event, margin, threshold, or significance test.",
+  "definitions": {
+    "context_margin_improved": "event is in the context-primary slice and final_position target margin minus mean_full target margin is strictly positive",
+    "entity_harmed_correctness": "event is in the entity-comparator slice, mean_full is correct, and final_position is incorrect",
+    "overlap": "event_id intersection of the two sets above",
+    "shared_event_cross_table": "within events belonging to both slices, cross-tab target-margin delta sign against the paired correctness transition"
+  },
+  "interpretation_limit": "This is an event-identity overlap description. Since target margin and prediction are shared event-level quantities, it is not a causal effect or an independent context-versus-entity intervention."
+}

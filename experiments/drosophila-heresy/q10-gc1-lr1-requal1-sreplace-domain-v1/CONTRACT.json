@@ -1,0 +1,38 @@
+{
+  "protocol": "REQUAL1-SREPLACE-DOMAIN",
+  "identity": "q10-gc1-lr1-requal1-sreplace-domain-v1",
+  "status": "FROZEN_PRE_EXECUTION__NOT_EXECUTED",
+  "plan_sha256": "0AFBF5977479750AF673E3CD4001E6928231A749AA78E418D6A3098A4D11B3C2",
+  "runner_sha256": "EAE3668A53479D618B7106D742BC05B9B28ABD69A9FC80E80BECCE6C886B3770",
+  "parent_bindings": [
+    {"label": "sreplace_execution", "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-sreplace-singles-v1/execution.json", "sha256": "EA8E07387F2E0A82DF65AC0F548644290CC200E14D289CBFBD4E19269B82B108"},
+    {"label": "sreplace_root_manifest", "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-sreplace-singles-v1/ROOT_MANIFEST.json", "sha256": "5133FAC48529E3E39BCACA3EA09367F5AFAEDAFBBE84B5488634630F2085833F"},
+    {"label": "sreplace_plan", "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-sreplace-singles-v1/PLAN.md", "sha256": "C57EF2ABA1F2CDA09A958884741E2064437DCB8DB168CDB0C7DE85E0F5771AF9"},
+    {"label": "sreplace_contract", "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-sreplace-singles-v1/CONTRACT.json", "sha256": "456F959F217896556ED5F2AA70E300940F03A4D6D66E21220F4D22040B5E2DAF"},
+    {"label": "sreplace_runner", "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-sreplace-singles-v1/scripts/run_sreplace_singles.py", "sha256": "839D885F193D5ED967EDE0EFA1457D245E23DDD86EC30FC00EDF1953732E6C0C"}
+  ],
+  "scope": {
+    "contexts": 8,
+    "input_singletons": 3696,
+    "shortlist_size_per_context": 32,
+    "pair_replay": false,
+    "scientific_promotion": false,
+    "behavioral_probe": false
+  },
+  "selector": {
+    "exclude_exact_noop_replacements": true,
+    "geometry_slots": 16,
+    "collateral_slots": 8,
+    "bucket_fill_slots": 8,
+    "score": ["mismatch_count", "total_ulp_distance", "residual_l2", "maximum_absolute_residual"],
+    "pair_domain": "all unordered selected pairs with distinct group IDs",
+    "historical_lr1_selector_imported": false
+  },
+  "firewall": {
+    "new_replay": false,
+    "pair_replay": false,
+    "historical_result_import": false,
+    "scientific_promotion": false,
+    "behavioral_probe": false
+  }
+}

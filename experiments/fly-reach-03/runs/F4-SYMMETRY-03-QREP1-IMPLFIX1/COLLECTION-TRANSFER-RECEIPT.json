@@ -1,0 +1,30 @@
+{
+  "files": [
+    {
+      "destination_bytes": 5588996,
+      "destination_sha256": "41bb93ca9a20036aaff513f220b7511442b83eb22d12cac9709adc1fc839e525",
+      "name": "RAW-PREDICTORS.bin",
+      "source_bytes": 5588996,
+      "source_sha256": "41bb93ca9a20036aaff513f220b7511442b83eb22d12cac9709adc1fc839e525"
+    },
+    {
+      "destination_bytes": 637370,
+      "destination_sha256": "4f0609d5f80f43c7f3d5eefefb496c0329e21c50430f08b7b74b826bd307a218",
+      "name": "RAW-SCORING-TRUTH.bin",
+      "source_bytes": 637370,
+      "source_sha256": "4f0609d5f80f43c7f3d5eefefb496c0329e21c50430f08b7b74b826bd307a218"
+    },
+    {
+      "destination_bytes": 32607,
+      "destination_sha256": "950d770e09da362464237af7cb245d937548e0a2b0b5b6b3e233c3550f4ac187",
+      "name": "NATIVE-COLLECTION-RECEIPT.json",
+      "source_bytes": 32607,
+      "source_sha256": "950d770e09da362464237af7cb245d937548e0a2b0b5b6b3e233c3550f4ac187"
+    }
+  ],
+  "method": "byte-identical copy of immutable native-only files from the stopped implementation identity",
+  "schema": "F4-SYMMETRY-03-collection-transfer-v1",
+  "source_prefit_stop_sha256": "5f898b25186bff69e004d046531e1a6fede58c54efff7971b44f18f6b1d15379",
+  "source_run_id": "F4-SYMMETRY-03-QREP1",
+  "status": "PASS"
+}

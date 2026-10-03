@@ -19,17 +19,26 @@ Encoder = PARKED / preserved lineage
 | Phase 0 gate | **9/9, engineering only, no accuracy threshold** | `phase0-gate.json` |
 | Phase 1 baseline | complete; candidate legality 0.7495, global dead, endpoint degenerate | `phase1-receipt.json` |
 | integrity / sufficiency audit | complete | `joint-surface-ablation.json`, `gold-action-sufficiency.json` |
+| Phase 1B acquisition test | complete; goal-relative target not acquired by shallow readout or isolated supervision; legality held | `PHASE1B.md` |
 
-Read `CORRECTIONS.md` before quoting anything from this lane. It records ten corrections to my own
-earlier claims, three of which withdrew a conclusion outright.
+Read `CORRECTIONS.md` before quoting anything from this lane. It records corrections to earlier
+claims; later entries supersede stale interpretations retained for historical context.
+
+**Historical-reference status:** the Qwen preparation audit found harness defects
+documented in C13. The user chose to repair Qwen only and retain MiniCPM's existing
+results. Numerical receipts are preserved; isolation/representation causal claims
+are qualified. The new trial is in `../s15-lepori-qwen-two-run/README.md`.
 
 ## Headline
 
 **Candidate legality is accessible; the candidate state is not yet action-sufficient.** A
-parameter-free gold-state ladder shows legality alone has a determinism ceiling of **0.7605**, while
-adding the *already-existing* `candidate_satisfies_goal` head — which this model has dead at
-0.5216 — takes it to **0.9925**. So a recurrent action workspace over legality state was never
-going to solve MOVE. Full tables in `PHASE1.md`.
+parameter-free gold-state ladder gives legality-only state an overall determinism ceiling of
+**0.7605** and a MOVE-conditional ceiling of **0.9335**. Its MOVE 1-NN accuracy is **0.3699**;
+that is an estimator result, not an information ceiling. Adding the *already-existing*
+`candidate_satisfies_goal` channel raises the overall ceiling to **0.9925** and the MOVE ceiling to
+**0.9942**, while MOVE 1-NN reaches **0.9306**. The ladder shows a large learnability gap from
+legality-only state, not that MOVE is impossible from it. Full tables in `PHASE1.md` and the C11
+correction in `CORRECTIONS.md`.
 
 ## Why MiniCPM and not K2-Horizon
 
@@ -159,7 +168,7 @@ src/gold_sufficiency.py    parameter-free gold action-sufficiency ladder
 ```
 
 Artifacts: `D:\codex-runs\encoder-contrast-01\lepori-causal-minicpm\`
-Docs: `PHASE1.md` (results), `CORRECTIONS.md` (ten corrections, read first).
+Docs: `PHASE1.md` (results), `CORRECTIONS.md` (corrections, read first).
 
 Protected/test truth unopened, BANK-v2 unused, canonical splits unchanged, backbone frozen,
 cross-agent alignment forbidden and asserted.

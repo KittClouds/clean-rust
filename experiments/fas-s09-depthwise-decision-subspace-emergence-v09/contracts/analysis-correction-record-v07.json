@@ -1,0 +1,74 @@
+{
+  "correction": {
+    "all_probe_fit_and_metric_semantics_changed": false,
+    "feature_or_label_semantics_changed": false,
+    "model_contact_or_feature_extraction_added": false,
+    "principal_angle_reporting": "unchanged and descriptive; not used for the terminal equality gate",
+    "terminal_pair_normal_gate": "max_abs_residual <= 1e-12",
+    "terminal_plane_gate": "projector Frobenius distance <= 1e-12"
+  },
+  "exact_mismatch": {
+    "independent_identity_evidence": "M pair-normal max residual 0.0 and projector Frobenius residual 0.0 against S08; F pair-normal and projector residuals also independently recompute to 0.0 from the exact same terminal state",
+    "interpretation": "near-one cosine rounding creates a nonzero arccos floor that exceeds the 1e-6-degree gate despite exact equality of the decision plane",
+    "observed_M_arccos_angles_degrees": [
+      1.2074182697257333e-06,
+      1.7075472925031877e-06
+    ],
+    "observed_M_principal_cosines": [
+      0.9999999999999998,
+      0.9999999999999996
+    ],
+    "v06_gate_operation": "convert principal cosines to angles with arccos, then require each angle <= 1e-6 degrees"
+  },
+  "failure_artifacts": {
+    "F_terminal_probe_state_v04_sha256": "2cbbd450468ae7ebbe073ca9badaf229dcf9d3b55ff80ed102ccf9eb7e942641",
+    "F_terminal_probe_state_v06_sha256": "2cbbd450468ae7ebbe073ca9badaf229dcf9d3b55ff80ed102ccf9eb7e942641",
+    "M_terminal_probe_state_v04_sha256": "1b3db11aa1fe691a98b40b0b9001c3f0125d1acd47f7c069ef53fd487a2d46e4",
+    "M_terminal_probe_state_v06_sha256": "1b3db11aa1fe691a98b40b0b9001c3f0125d1acd47f7c069ef53fd487a2d46e4",
+    "analysis_failure_v04_sha256": "2b10293430730f694dabf9dff2a17794f81b7f0ef91f65a2fe78802280dd54b3",
+    "analysis_failure_v06_sha256": "685ebde3eb306b7d897b2b9a894f553e12771fb93a66a37f31cc276958bfcb68",
+    "metric_schema_audit_v04_sha256": "e7e12a40bfa7831475bc0c27a39daa21fd93ca06f1ee7c5e4245b9b5d9977b51",
+    "v06_geometry_semantics_audit_sha256": "d13bf9a0a7ac73080e88036902ea4b22ae2a2cd3bc45f56073ec67f442ca45d4"
+  },
+  "prior_attempt_failure": {
+    "actual_archived_value": "2cbbd450468ae7ebbe073ca9badaf229dcf9d3b55ff80ed102ccf9eb7e942641",
+    "exact_field": "failure_artifacts.F_terminal_probe_state_v04_sha256",
+    "failure_receipt_sha256": "76b55adc0c6879a8f8f573b5073ab32692bd7b0be395b29b09a832b65f00bd10",
+    "incorrect_contracted_value": "2cbbd450468ae7ebbe073ca9badfaf229dcf9d3b55ff80ed102ccf9eb7e942641",
+    "stop_boundary": "read-only audit before S09 preflight, cache read, or probe fitting",
+    "v05_protocol_root_sha256": "37199be683afa00ea19b2e844938d4dc4f9a9b6a45e104664d9159fccbde1727",
+    "v05_protocol_seal_file_sha256": "8d73cdde9adfba1757bc7e2edf234e3364e16a656e713a9075810b1b975f86fb"
+  },
+  "record_id": "FAS_S09_V07_STABLE_TERMINAL_PLANE_GATE_CORRECTION",
+  "superseded_feature_cache_root_sha256": "82f9eb6ba0b9c37e58c415b03ec1bc4be00032f73cc43e70b3987ac4108f7653",
+  "superseded_preflight_root_sha256": "67b85bf3bf22bdaa059541ce70a311523cbe2397dee6a21a504f3a0c38912136",
+  "superseded_protocol_root_sha256": "9cb1cee3db9f3838fc8d05f6d2858138c7c82109d89d8b8fce37c6506d86d2f0",
+  "superseded_protocol_seal_file_sha256": "26054171d5ebba7bd8e1403bc5bd275991871e51ff8af55bcb00c1d542064ff2",
+  "supersedes_run_id": "fas-s09-depthwise-decision-subspace-emergence-v06",
+  "v04_execution_boundary": {
+    "FAS00_access": false,
+    "feature_cache_hash_verification_reached": true,
+    "layer16_F_probe_exactly_reproduced_S01": true,
+    "layer16_M_S08_geometry_gate_failed": true,
+    "layer16_M_probe_exactly_reproduced_S01": true,
+    "layers_1_to_15_fit": false,
+    "model_contact_during_v04_analysis": false,
+    "result_sealed": false
+  },
+  "v04_formula_parent": {
+    "preflight_root_sha256": "4b2c98e5fa69b4ac3d6cbf297afab9e152e85a1508062ebf0bd6ff00390bbaa3",
+    "protocol_root_sha256": "0cb82fce63e4f390e63116d8ac94117bd0d3e52e037a1c89fd861b2e6998ab69",
+    "protocol_seal_file_sha256": "f377ca19cac0a6bceb729df015a9a50e717395519e2ef0b58414268a16911431"
+  },
+  "v06_execution_boundary": {
+    "FAS00_access": false,
+    "feature_cache_hash_verification_passed": true,
+    "layer16_M_and_F_probe_states_exact_to_S01": true,
+    "layer16_M_arccos_gate_failed_only": true,
+    "layer16_M_pair_normal_residual": 0.0,
+    "layer16_M_projector_residual": 0.0,
+    "layers_1_to_15_fit": false,
+    "model_loaded": false,
+    "result_sealed": false
+  }
+}

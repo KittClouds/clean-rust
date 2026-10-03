@@ -1,0 +1,1 @@
+"Q10-ALG4-COMP1 preflight PASS. No long measurement was launched. COMP1A and COMP1B are separately sealed and share the same compatible domain identity: 31,596,544 order-4 tuples, 15,798,272 per anchor, domain stream SHA-256 BA9AF9234D5FF129ED584DBAE6B4133C8572E042735E84FFF7C747F8E1971CD4.\n"

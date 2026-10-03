@@ -1,0 +1,119 @@
+{
+  "schema": "ff-s15-bank3-reconstruction-v1",
+  "status": "SCAFFOLD_PRE_CODE",
+  "version": "0.1",
+  "experiment": "FF-S15-BANK-03",
+  "date": "2026-09-30",
+  "purpose": "the record that makes a root auditable: what was read, what was reconstructed, what was preserved, what was lost, and what the human annotation is allowed to influence.",
+
+  "pipeline": [
+    {"stage": 1, "name": "external item read", "produces": "raw item bytes + content_hash + license record"},
+    {"stage": 2, "name": "canonical reconstruction", "produces": "W_canonical in the v2 fact language", "constraint": "only AT, CONNECTED, BLOCKED, HOLDS, CONTAINS, STATE, REL plus temporal qualifiers"},
+    {"stage": 3, "name": "reconstruction witness", "produces": "the witness object below", "constraint": "must re-derive without consulting the source item"},
+    {"stage": 4, "name": "deterministic derivation", "produces": "y_derived = f(W_canonical) via the pinned v2 algebra", "constraint": "no randomness; no human input"},
+    {"stage": 5, "name": "BANK label", "produces": "the canonical target, with y_human carried alongside as a check"}
+  ],
+
+  "reconstruction_witness": {
+    "required_fields": {
+      "root_id": "stable identifier, unique across the bank",
+      "source_dataset": "must match the ledger record",
+      "source_item_id": "must match the ledger record",
+      "source_version": "must match the ledger record",
+      "content_hash": "sha256 of the exact bytes read",
+      "license_record_ref": "pointer into the source ledger; a root without this is a G14-V3 failure",
+      "reconstruction_disposition": "EXACT_RECONSTRUCTION | PARTIAL_RECONSTRUCTION | REJECTED_RECONSTRUCTION",
+      "fact_language_conformance": "list of predicates used, each of which must be one of the seven permitted",
+      "preserved_semantics": "explicit list of what the reconstruction retains",
+      "changed_semantics": "explicit list of what it alters, drops, or approximates",
+      "unreconstructable_elements": "explicit list of source structure that could NOT be represented, with a reason for each",
+      "reconstruction_confidence": "EXACT | HIGH | MEDIUM | LOW, with the basis stated",
+      "label_origin": "DERIVED_FROM_CANONICAL_WORLD",
+      "human_annotation_role": "CHECK | DISAGREEMENT_SIGNAL | METADATA",
+      "human_annotation_present": "bool",
+      "verifier_receipt": "pointer to the receipt produced by re-deriving the witness"
+    },
+    "hard_prohibitions": [
+      "label_origin must never be HUMAN_INHERITED",
+      "human_annotation_role must never be LABEL or TRUTH",
+      "a PARTIAL_RECONSTRUCTION may not claim a witness for facts it could not reconstruct",
+      "unreconstructable_elements may not be left empty merely to look complete"
+    ]
+  },
+
+  "dispositions": {
+    "EXACT_RECONSTRUCTION": {
+      "definition": "every semantically load-bearing element of the source item is representable in the v2 fact language and was reconstructed, with no approximation",
+      "provides_canonical_target_supervision": true,
+      "may_produce_descendants": true,
+      "recorded_in_agreement_statistic": true
+    },
+    "PARTIAL_RECONSTRUCTION": {
+      "definition": "some load-bearing elements are representable and were reconstructed; others are recorded in unreconstructable_elements",
+      "provides_canonical_target_supervision": false,
+      "may_contribute": "renderer and natural-language material, only where preserved semantics are explicitly bounded",
+      "must_not": "supply canonical targets, or present an approximate fact as a witnessed one",
+      "rationale": "a partial reconstruction is honest about its boundary, which is strictly better than a confident reconstruction that quietly invented structure"
+    },
+    "REJECTED_RECONSTRUCTION": {
+      "definition": "the item's structure does not fit the v2 fact language, or the reconstruction cannot be witnessed at all",
+      "provides_canonical_target_supervision": false,
+      "may_contribute": "nothing to the corpus",
+      "still_recorded": true,
+      "why_record_it": "rejection rates per source are themselves a source-selection signal; a source rejected at 90% is a different fact about that source than one never tried"
+    }
+  },
+
+  "descendant_record": {
+    "note": "one per generated child, per the lineage invariant",
+    "required_fields": {
+      "descendant_id": "stable identifier",
+      "root_id": "exactly one; a descendant with zero or many roots is a G-LINEAGE failure",
+      "source_dataset": "inherited from the root",
+      "source_item_id": "inherited from the root",
+      "transformation": "the declared named transformation, e.g. P5 or support-minus",
+      "preserved_semantics": "declared",
+      "changed_semantics": "declared",
+      "canonical_world": "the descendant's canonical world",
+      "verifier_receipt": "pointer to the receipt that re-derives this descendant's targets",
+      "capability_axes": "structural annotation over the 10 frozen axes",
+      "root_disposition_inherited": "the root's reconstruction_disposition, carried so a partial root's descendants cannot silently claim target supervision"
+    },
+    "invariant": "a descendant of a PARTIAL or REJECTED root may not supply canonical target supervision"
+  },
+
+  "capability_axes": {
+    "axes": ["binding", "evidence_support", "counterevidence", "missing_requirements", "conflict", "composition_depth", "transition_depth", "candidate_comparison", "globalization", "nuisance_invariance"],
+    "count": 10,
+    "annotation": "every root and every descendant carries a structural annotation, not a free-text description",
+    "purpose": "enables constructed curricula such as support -> support+conflict -> support+conflict+transition, instead of shuffling a large row count and hoping"
+  },
+
+  "agreement_reporting": {
+    "statistic": "Pr(y_human == y_derived)",
+    "reported_per": ["source_dataset", "target_family", "reconstruction_confidence_class", "reconstruction_disposition"],
+    "also_reported": ["EXACT rate per source", "PARTIAL rate per source", "REJECT rate per source", "mean |M| per source", "the specific target families each source can and cannot support"],
+    "unresolved_cases": "where a human annotation is itself ambiguous, the case is recorded as ANNOTATION_AMBIGUOUS rather than counted as a derivation failure",
+    "why": "separating a bad reconstruction from an ambiguous annotation is what makes the agreement rate actionable as a source-selection signal"
+  },
+
+  "gates_enforced_by_this_schema": {
+    "G14-V3": ["license_record_ref present", "content_hash present", "external_roots_imported > 0"],
+    "G-EXT-TRUTH": ["canonical_world present", "reconstruction_witness present", "label_origin == DERIVED_FROM_CANONICAL_WORLD", "human_annotation_role in {CHECK, DISAGREEMENT_SIGNAL, METADATA}"],
+    "G-LINEAGE": ["exactly one root per descendant", "declared transformation", "declared preserved semantics", "declared changed semantics", "verifier receipt present"],
+    "G-V1-EXCLUSION": ["no root carries a v1 world_id or v1 world_hash"],
+    "scope": "100% of roots and 100% of descendants",
+    "sampled": false
+  },
+
+  "open_items": [
+    {"id": "O1", "item": "reconstruction-yield probe has not been run", "state": "OPEN", "severity": "high", "note": "until it reports, every yield claim in the program is an assumption. It is cheap: reconstruct a bounded sample per candidate source and report the disposition mix."}
+  ],
+
+  "not_authorized_by_this_schema": [
+    "ingesting any external row",
+    "reconstructing roots at scale",
+    "building the corpus",
+    "allocating curriculum or target-family weights"
+  ]
+}

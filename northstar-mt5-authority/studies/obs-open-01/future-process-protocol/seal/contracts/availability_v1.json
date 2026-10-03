@@ -1,0 +1,27 @@
+{
+  "schema": "OBS_OPEN_03AP_OUTCOME_AVAILABILITY_V1",
+  "states": {
+    "OBSERVED_COMPLETE": "required fixed window is observed completely or a first-passage event is observed before censoring",
+    "RIGHT_CENSORED": "event-time outcome is not observed before a valid censor boundary",
+    "SESSION_TERMINATED": "fixed-horizon path outcome requests time beyond the admitted session boundary",
+    "SOURCE_PATH_INCOMPLETE": "an unseen interval prevents authoritative evaluation",
+    "NOT_EVALUABLE": "anchor or required geometry is invalid or unavailable"
+  },
+  "precedence": [
+    "SOURCE_PATH_INCOMPLETE",
+    "NOT_EVALUABLE",
+    "OBSERVED_COMPLETE",
+    "RIGHT_CENSORED",
+    "SESSION_TERMINATED"
+  ],
+  "censor_reasons": [
+    "NONE",
+    "SESSION_TERMINATION",
+    "CANDIDATE_SUPERSESSION",
+    "SOURCE_PATH_GAP",
+    "INVALID_ANCHOR",
+    "DEGENERATE_RANGE"
+  ],
+  "coercions_forbidden": ["NULL", "EMPTY_STRING", "ZERO", "FALSE", "NAN", "ROW_DELETION"],
+  "source_gap_rule": "NO_INTERPOLATION_NO_NEGATIVE_EVENT_INFERENCE_ACROSS_GAP"
+}

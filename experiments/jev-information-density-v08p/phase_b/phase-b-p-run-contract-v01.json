@@ -1,0 +1,268 @@
+{
+  "protocol": "jev-information-density/v0.8p-late-transition-localization-run-v01",
+  "identity": "v0.8P-fresh-trajectory-instrumented-rerun-v01",
+  "status": "SEALED_FOR_REVIEW_NOT_AUTHORIZED",
+  "purpose": "Run a new three-arm, three-seed trajectory under the unchanged v0.8N training treatment and recipe, with dense checkpoints in optimizer steps 81-120.",
+  "authorization_state": {
+    "contract_sealed": true,
+    "panel_construction_authorized": false,
+    "training_authorized": false,
+    "evaluation_authorized": false,
+    "model_contact_in_this_contract_drafting": false,
+    "output_root_created": false
+  },
+  "parents": {
+    "v08n_construction_receipt": {
+      "path": "D:/codex-runs/jev-information-density-v08n/v0.8N-base-v01/synthesis/v08n-synthesis-receipt-final-v09.json",
+      "sha256": "e86f3cd925841c4e68f8558696e68cb729b9b9ba49a644b9bc35e7e2bcde68a6",
+      "role": "training-data and sealed arm lineage"
+    },
+    "v08n_execution_contract_sha256": "efb2bbe59293d7899083927cc187a292b5dfd1dc2948a0b752b3d9cbae2fd18d",
+    "v08n_execution_input_receipt": {
+      "path": "D:/codex-runs/jev-information-density-v08n/v0.8N-base-v01/phase-b-v03-inputs/execution-inputs-receipt.json",
+      "sha256": "c022befafd49a1e317f692ff3b6f7efcccd11aee98285ca5f0071f6edbaf817c"
+    },
+    "v08n_training_seal": {
+      "path": "D:/codex-runs/jev-information-density-v08n/v0.8N-base-v01/phase-b-run-v01/training-seal-manifest.json",
+      "sha256": "43932fc963b150167972e81b1c1bb93f6989e9b93faa65ab1eee3ecf55c7b727",
+      "checkpoint_hash_tree_sha256": "add6dfd013c936b100e7cbdb205018bf91b95e91ed11ca854b26aed998c66923",
+      "role": "lineage reference only; no old head is a P initialization"
+    },
+    "v08o_result_seal": {
+      "path": "D:/codex-runs/jev-information-density-v08o/v0.8O-capability-trajectory-cartography-v01/v08o-result-seal-v01.json",
+      "sha256": "6327e2c3e83bbff7d511c5ba4bfd09792d5adad6aa95ae4d2abfce351e224ff7",
+      "role": "prospective question rationale only; no checkpoint or evaluation row is reused"
+    },
+    "original_v08n_phase_b_disposition": "EVALUATION_INPUT_CONTRACT_INCOMPLETE",
+    "v08n_e1_primary_panel_reuse": false,
+    "v08o_panel_reuse": false
+  },
+  "treatments": {
+    "arms": ["B-DUP", "B-MATCHED", "B-SHAM"],
+    "primary_question": "On a fresh held-out panel, how do sham locality, matched-neutral locality, and fact-response coordinates evolve over optimizer steps 81-120, and how do the three training treatments differ in timing or form?",
+    "arm_difference_only": "auxiliary_source_role and its already-sealed source feature pointer",
+    "B-DUP": "each anchor receives its exact anchor target again",
+    "B-MATCHED": "the prospectively radius-matched neutral training view receives the anchor target",
+    "B-SHAM": "the certified sham training view receives the anchor target",
+    "explicit_relation_loss": false,
+    "bank_or_objective_changes": false,
+    "same_training_inputs_as_v08n": true
+  },
+  "training_inputs": {
+    "common_primary_occurrence_manifest": {
+      "sha256": "773119294a51aa46487de26f9f253355187a7bfd1e75cb2f258c307c86f10b06",
+      "rows": 10000,
+      "anchors": 5000,
+      "fact_flips": 5000
+    },
+    "candidate_catalog": {
+      "sha256": "1698ea2078951837b3cb780a3f873c3c099e5e3d001c714e1d58a41e2951487e",
+      "rows": 48,
+      "dimension": 2048
+    },
+    "arm_head_input_manifests": {
+      "B-DUP": "f6f4ec519a04efeac02962c68c2d2d8ec92cf43d25bb9fd974f168e67c4d3b2b",
+      "B-MATCHED": "bd38446c0328f8092dc3293090fd3041d7be5d53945df6f80fb3770244d87b0d",
+      "B-SHAM": "9dd346766856f56006be326c171e664dcbab23983cdd7501f480b6fabb6ff895"
+    },
+    "training_only_state_features": {
+      "scope_receipt_sha256": "d98ae657e28b976f187d4d67e58119ce80496e76c061c90362ac2e50ff7f720e",
+      "scope_manifest_sha256": "aa8cba58f4a8ec46ed6ec8eaf0bfbe992b03b9fa58f815b4259d9fdfe2b009f3",
+      "scope_content_sha256": "40648e3bbf50e25f31e84d7656221171425cb6e71e07d4c07d4dc72650bb228e",
+      "feature_file_sha256": "da946af90353c91c3b1298d2951eebc42b9f515708b628d3a053e700a960c4d6",
+      "feature_tensor_sha256": "d8f0f12296758f68c55b5e5660572dd48e4e90d1a3a1683844e59765826bafaa",
+      "scope_rows": 55000,
+      "dimensions": 2048
+    },
+    "training_candidate_features": {
+      "feature_receipt_sha256": "29f8d67b24fd2a554500e1cfe2e0fe0b4311d32fad7052ad8ffb3464b7835f44",
+      "feature_file_sha256": "3bb3036f455a83409361eb3e4150833bd8b255a2a783ec1218b00b12315c0590",
+      "tensor_sha256": "f76e573779152fd3966845a39e29206c333eef388e0511c5f3e07f8f1b46d593",
+      "shape": [48, 2048],
+      "dtype": "float32"
+    },
+    "reuse_rule": "Reuse only these exact sealed training-side inputs after recomputing and matching their hashes. Do not load the E1 panel, E1 candidate vectors, E1 joins, E1 targets, or E1 predictions as P inputs.",
+    "new_schedule": "Materialize a P-specific common schedule from the frozen occurrence manifest and the seeds below. The schedule must be hashed and independently checked before any P head initialization; the old v0.8N schedule hash is not reused."
+  },
+  "model_and_head": {
+    "backbone": "LiquidAI/LFM2.5-1.2B-Base",
+    "revision": "7453bca97ca1e67754c4035a4b4c584e1c9dd725",
+    "backbone_frozen": true,
+    "head": "CompatibilityHead(2048, mlp, 128)",
+    "head_implementation": {
+      "path": "experiments/jev-frozen-readout-v01/probe.py",
+      "sha256": "a3049d52e1183c806c84522a617a05646eb86fbcb69af72b5bb26f4808852cb1"
+    },
+    "trainable_parameters": 590081,
+    "head_inputs": "raw float32 frozen state and candidate features; no normalization, centering, scaling, or covariance transform",
+    "head_input_dim": 2048,
+    "candidate_count_per_event": 4,
+    "candidate_masks": "all four true; no padding candidates",
+    "candidate_order_transform": "reverse candidate indices and target values together, exactly as the frozen fast_tensor_batch path"
+  },
+  "training": {
+    "primary_occurrences_per_epoch": 10000,
+    "auxiliary_events_per_epoch_per_run": 5000,
+    "auxiliary_exposures_per_complete_run": 15000,
+    "primary_batch_capacity": 256,
+    "batches_per_epoch": 40,
+    "final_primary_batch_rows": 16,
+    "optimizer_steps_per_epoch": 40,
+    "epochs": 3,
+    "steps_per_run": 120,
+    "total_runs": 9,
+    "total_optimizer_steps": 1080,
+    "loss": {
+      "implementation": "experiments/jev-frozen-scaling-v05/train_v05.py::v05_loss",
+      "sha256": "52033950dab23835c13f4aa74a2f0d5867aec754f8a139a63a739a36b0cb62b9",
+      "per_event": "categorical cross-entropy plus 0.25 times multiclass Brier score",
+      "brier_weight": 0.25,
+      "auxiliary_event_weight": 1.0,
+      "reduction": "arithmetic mean over all active primary and auxiliary events in the optimizer step",
+      "relation_or_invariance_loss": false
+    },
+    "optimizer": {
+      "name": "torch.optim.AdamW",
+      "learning_rate": 0.002,
+      "weight_decay": 0.01,
+      "betas": [0.9, 0.999],
+      "epsilon": 1e-8,
+      "amsgrad": false,
+      "scheduler": "none",
+      "gradient_clipping": "none",
+      "zero_grad_set_to_none": true,
+      "gradient_accumulation_steps": 1
+    },
+    "precision": {
+      "head_parameters": "float32",
+      "head_inputs": "float32",
+      "logits_and_loss": "float32",
+      "autocast": false,
+      "gradient_scaler": false,
+      "cuda_matmul_tf32": false
+    },
+    "schedule": {
+      "source_order": "sorted group_id order from the common primary occurrence manifest",
+      "per_epoch_shuffle": "random.Random(seed + zero_based_epoch).shuffle(group_ids)",
+      "batching": "consume the frozen P schedule directly; no runtime shuffle, sampler, or drop_last",
+      "auxiliary_placement": "append one auxiliary event for each scheduled anchor to that same optimizer batch in the frozen slot order",
+      "forward_order": "primary rows first, followed by auxiliary events in scheduled anchor-slot order",
+      "schedule_rows": 360,
+      "schedule_hash_required_before_initialization": true
+    },
+    "seed_set": {
+      "derivation": "SHA-256(UTF-8('jev-information-density-v08p-run-v01/optimizer-seed/{index}')); interpret the first four digest bytes as unsigned little-endian u32; indices 0, 1, 2",
+      "seeds": [3243871208, 669993655, 3076094663],
+      "seed_derivation_sha256": [
+        "e88b59c132631db0073844272eab63fef3d01469bdee32e703efecaa7df21b4f",
+        "b74aef2759eef9a7cc6d5da2f9fc7001c3a3c781d8a0598274c67de7739374a8",
+        "c77a59b76e5b3fd561b8c1393152d21db790f8568e22a9920065fe444e2c61fc"
+      ],
+      "prior_v08n_seeds_reused": false,
+      "pairing": "one seed-initialized head template per seed, byte-identical across the three arms; reset Python, Torch CPU, and CUDA RNG streams to the seed for each run"
+    },
+    "execution_order": {
+      "3243871208": ["B-DUP", "B-MATCHED", "B-SHAM"],
+      "669993655": ["B-MATCHED", "B-SHAM", "B-DUP"],
+      "3076094663": ["B-SHAM", "B-DUP", "B-MATCHED"],
+      "parallel_runs": false
+    },
+    "checkpoint_policy": {
+      "save_epoch_1_terminal": true,
+      "save_epoch_2_terminal": true,
+      "save_after_every_optimizer_step_in_epoch_3": true,
+      "epoch_3_global_steps": [81, 120],
+      "trained_checkpoints_per_run": 42,
+      "trained_checkpoint_total": 378,
+      "epoch_3_step_40_is_terminal": true,
+      "save_initial_head_template_per_seed": true,
+      "selection_or_promotion": false,
+      "checkpoint_payload": [
+        "head state_dict",
+        "optimizer state_dict",
+        "Python RNG state",
+        "Torch CPU RNG state",
+        "all CUDA RNG states",
+        "seed, arm, epoch, global_step, schedule hash, last committed occurrence index"
+      ],
+      "write_rule": "atomic checkpoint write; hash only after durable completion; no evaluation process may read before the complete tree is sealed"
+    },
+    "restart_policy": {
+      "infrastructure_failure": "preserve failed-attempt artifacts; resume only from the last fully validated per-step checkpoint for that same seed and arm, including optimizer and RNG state",
+      "no_checkpoint_or_invalid_checkpoint": "restart that seed-arm from its paired initial template at step zero only if the run has no committed optimizer step; otherwise stop for review",
+      "no_seed_replacement": true,
+      "contract_hash_mismatch_or_nonfinite_state": "halt the whole experiment; not an infrastructure retry",
+      "bitwise_replay_claim": false,
+      "runtime_basis": "Torch deterministic algorithms remain disabled as in the sealed v0.8N runtime; record that CUDA execution may not be bitwise reproducible across a resumed boundary"
+    }
+  },
+  "runtime_environment": {
+    "python": "3.13.15",
+    "torch": "2.11.0+cu128",
+    "transformers": "5.17.0",
+    "tokenizers": "0.23.2",
+    "numpy": "2.5.3",
+    "cuda_runtime": "12.8",
+    "cudnn": 91900,
+    "device": "NVIDIA GeForce RTX 3080",
+    "compute_capability": [8, 6],
+    "torch_matmul_tf32": false,
+    "torch_cudnn_tf32": true,
+    "torch_cudnn_benchmark": false,
+    "torch_deterministic_algorithms": false,
+    "mismatch_disposition": "ABORT_BEFORE_HEAD_INITIALIZATION; no software, hardware, precision, or deterministic-mode substitution"
+  },
+  "implementation_gate": {
+    "frozen_reference_entrypoint": {
+      "path": "experiments/jev-information-density-v08n/phase_b/train_phase_b_corrected_v07.py",
+      "sha256": "94de26895656cd42cd26016030ab38baa4732e3b7980e58d3b082b6cd6430e9f"
+    },
+    "frozen_reference_trainer": {
+      "path": "experiments/jev-information-density-v08n/phase_b/train_phase_b_v01.py",
+      "sha256": "e539bac2d67b47ba2b660b8579c5818e5fffc0cf94fa26cfd3e9dd905ef795ba"
+    },
+    "checkpoint_cadence_delta": "instrumentation-only: persist every epoch-3 optimizer step and its optimizer/RNG continuation state; no change to event order, loss, optimizer, or update arithmetic",
+    "p_specific_runner": "not yet materialized; before separate training authorization, bind its exact source hash and tests proving event/update parity against the frozen reference semantics",
+    "required_pretraining_tests": [
+      "three arm manifests share the exact common primary occurrence stream",
+      "per-seed initial head hashes are identical across all three arms",
+      "per-epoch primary and auxiliary event schedules are identical across arms",
+      "the same treatment payload is the only arm-specific event field",
+      "every step-81..120 checkpoint round-trips model, optimizer, and RNG state",
+      "resume from a synthetic committed checkpoint matches uninterrupted deterministic fixture updates",
+      "checkpoint instrumentation does not change loss/update arithmetic",
+      "trainer filesystem scope denies every P-panel and E1 path"
+    ]
+  },
+  "output": {
+    "root": "D:/codex-runs/jev-information-density-v08p/v0.8P-late-transition-localization-v01",
+    "must_not_exist_at_authorization": true,
+    "create_during_contract_drafting": false,
+    "run_count": 9,
+    "trained_checkpoint_count": 378,
+    "initial_template_count": 3,
+    "required_seals": [
+      "fixed-schedule-manifest.json",
+      "execution-order.json",
+      "checkpoint-hash-tree.json",
+      "training-telemetry-hash-tree.json",
+      "training-seal-manifest.json"
+    ]
+  },
+  "boundaries": {
+    "training_without_separate_explicit_authorization": false,
+    "panel_construction_without_separate_explicit_authorization": false,
+    "evaluation_without_separate_explicit_authorization": false,
+    "heldout_panel_readable_to_trainer": false,
+    "heldout_panel_open_before_checkpoint_seal": false,
+    "E1_rows_targets_joins_predictions_as_primary_inputs": false,
+    "early_stopping": false,
+    "checkpoint_selection_or_promotion": false,
+    "extra_epochs_or_steps": false,
+    "seed_replacement": false,
+    "rescue_learning_rate_or_optimizer_change": false,
+    "newtight": false,
+    "legacy_evaluation": false,
+    "phoenix": false
+  }
+}

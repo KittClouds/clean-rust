@@ -1,0 +1,29 @@
+{
+  "protocol": "Q10-SR",
+  "status": "Q10_SR_STAGE2A_INVALID",
+  "stage": "STAGE_1A_ABORTED__PERFORMANCE_QUALIFICATION",
+  "fresh_engineering_seed_opened": 9501,
+  "configured_stage_1a_events": 1024,
+  "completed_side_tau_blocks": 0,
+  "completed_event_receipts": 0,
+  "stage_valid": false,
+  "scientific_seed_bundles": 0,
+  "behavioral_inference": false,
+  "repairs_established": 0,
+  "capacity_claim_established": false,
+  "failure": {
+    "kind": "FROZEN_SEARCH_PERFORMANCE_BUDGET_EXCEEDED",
+    "location": "seed 9501 before the first 256-event side/tau bundle committed",
+    "observed_wall_minutes_at_stop": 40.3,
+    "observed_process_cpu_seconds": 17428.921875,
+    "observed_peak_working_set_bytes": 3568324608,
+    "committed_qualification_files": [
+      "pre-execution.json"
+    ]
+  },
+  "interpretation": "The sealed full-vector beam implementation did not commit its first 256-event bundle within the declared 40-minute observation window. This is an engineering performance abort, not a numeric, capacity, repairability, or scientific result.",
+  "partial_directory_preserved": true,
+  "same_identity_resume_authorized": false,
+  "stage_1b_authorized": false,
+  "dh08b_authorized": false
+}

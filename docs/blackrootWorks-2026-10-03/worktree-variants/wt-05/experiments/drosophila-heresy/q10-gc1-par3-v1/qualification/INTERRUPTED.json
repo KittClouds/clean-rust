@@ -1,0 +1,8 @@
+{
+  "protocol": "Q10-GC1-PAR3",
+  "identity": "q10-gc1-par3-v1",
+  "status": "INTERRUPTED_BEFORE_RECEIPT",
+  "authoritative": false,
+  "reason": "Runner was stopped after read-only review found endpoint/task identity and result-header provenance gaps. No execution or derived result receipt was emitted.",
+  "replacement_identity": "q10-gc1-par4-v1"
+}

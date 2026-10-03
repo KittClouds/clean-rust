@@ -1,0 +1,14 @@
+{
+  "schema": "FLY-REACH-03-F4-PRECISION-01-analysis-attempt-v1",
+  "identity": "F4-PRECISION-01-ANALYSIS-01",
+  "contract_version": "0.1.6",
+  "status": "ANCHOR_SOURCE_PATH_MISMATCH",
+  "failure": "All four frozen Arm A folds completed, but the analyzer tried to read anchor rows from the nonterminal receipt using the terminal receipt's nested schema. It stopped before comparing anchors or training B/C.",
+  "arm_a_fold_metrics_compared": false,
+  "arm_b_fits_started": false,
+  "arm_c_fits_started": false,
+  "model_metrics_persisted": false,
+  "analysis_output_created": false,
+  "measured_namespace_created": false,
+  "disposition": "Preserved as nonpromotable analysis attempt. v0.1.7 reads cross_block_80d from the hash-pinned terminal receipt."
+}

@@ -1,0 +1,53 @@
+{
+  "schema": "FAS_E4_0_TRACK_E_SOURCE_TESTS_V01",
+  "status": "TRACK_E_SOURCE_TESTS_PASS_PREMAP_UNIT_TESTS",
+  "created_utc": "2026-09-26T21:49:16.486640+00:00",
+  "command": "python -B -m unittest discover -s audits/e4-0-track-e -p 'test_*.py' -v",
+  "scope": "Track E independent source, parser, seal-root, final sealer symlink/junction ordering, and duplicate-member tests before final v04 map creation. The actual-map integration test was skipped because the final map was absent. No E4 rows, labels, tokenizer/model, or CUDA were accessed.",
+  "sources": [
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/audit_e4_0_track_e.py",
+      "bytes": 42870,
+      "sha256": "130ecb1de4d26cd5496e470f8f320661f7fba310af8dadfdca113e43a6b7459b"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/audit_e4_0_track_e_seal.py",
+      "bytes": 10558,
+      "sha256": "c7ffac775b97ed7ccfda21fcd74757379d8785d4699d9b9064766017cf7fd326"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/test_audit_e4_0_track_e.py",
+      "bytes": 4672,
+      "sha256": "908598d68901ebeb1e0425aebac0a7975c82bbab7ade653e9db1a3b05b523bf1"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/seal_e4_0_contract_v05.py",
+      "bytes": 8603,
+      "sha256": "993c94e17e0b657da1536fd623c82f5eee45e0304f2e11b99a0bdf042991eb58"
+    }
+  ],
+  "tests": {
+    "discovered": 5,
+    "passed": 4,
+    "skipped": 1,
+    "failed": 0
+  },
+  "supersedes": [
+    {
+      "path": "audits/e4-0-track-e/track-e-source-tests-v01.json",
+      "reason": "Preserved empty file from failed create-once serialization; excluded from receipt table."
+    },
+    {
+      "path": "audits/e4-0-track-e/track-e-source-tests-v02.json",
+      "reason": "Superseded after map-row parser/source binding verification changes."
+    },
+    {
+      "path": "audits/e4-0-track-e/track-e-source-tests-v03.json",
+      "reason": "Superseded after independent seal-root helper consolidation."
+    },
+    {
+      "path": "audits/e4-0-track-e/track-e-source-tests-v04.json",
+      "reason": "Superseded after adding pre-resolve symlink and duplicate seal-member tests; updated final sealer guard and corrected exact Auth issuer receipt hash."
+    }
+  ]
+}

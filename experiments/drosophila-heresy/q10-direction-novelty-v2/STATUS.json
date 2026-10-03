@@ -1,0 +1,49 @@
+{
+  "protocol": "Q10-DN2",
+  "status": "Q10_DN2_INVALID__NUMERICAL_SPAN_AUDIT_FAILED",
+  "stage": "EXECUTION_COMPLETE__POSTEXECUTION_NUMERICAL_AUDIT_FAILED",
+  "sample": {
+    "seeds": [9611, 9612],
+    "sides": ["R", "L"],
+    "taus": [4.0, 16.0],
+    "trials": [1, 64, 128, 256],
+    "events": 32,
+    "steps": 16,
+    "step_curve": [1, 2, 4, 8, 16]
+  },
+  "aggregate": {
+    "bundles": 8,
+    "events": 32,
+    "median_residual_ratio": {
+      "1": 0.45323309362967756,
+      "2": 0.2912104147101721,
+      "4": 0.14880435617578164,
+      "8": 0.05899688915821963,
+      "16": 5.957193656699604e-15
+    },
+    "events_residual_ratio_16_le_1e-6": 26,
+    "median_one_step_authority_rows": 432.5,
+    "median_sixteen_step_authority_rows": 685.0,
+    "median_newly_authorized_rows": 253.0,
+    "coordinate_rank_max_observed": 9
+  },
+  "firewall": {
+    "scientific_seed_bundles": 0,
+    "behavioral_inference": false,
+    "dh08b_authorized": false,
+    "independent_review": "VERIFIED"
+  },
+  "postexecution_audit": {
+    "status": "FAILED",
+    "rank_bound_violations": 32,
+    "nested_curve_violations": 46,
+    "failure": "Gram eigensolver threshold admitted numerical modes: one-step rank exceeded one-step authority in every event and nested cumulative spans were nonmonotone",
+    "surviving_diagnostic": "multi-step moves newly authorized 209 to 300 readout rows per event; residual coverage is invalidated",
+    "same_identity_resume_authorized": false
+  },
+  "promotion": {
+    "scientific": false,
+    "repair_search": false,
+    "reason": "numerical span audit failed independent rank and nesting invariants; no repair or behavioral conclusion is permitted"
+  }
+}

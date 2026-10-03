@@ -1,0 +1,53 @@
+{
+  "protocol": "jev-information-density/v0.8p-v03-setup-seal-v01",
+  "identity": "v0.8P-v03-setup-seal-v01",
+  "status": "PARTIAL_SETUP_SEALED_BLOCKED_BEFORE_DENYLIST",
+  "clean_parent_contracts": {
+    "panel_design_sha256": "ce3b7b97caecb27f3ad99439c0e67dca6e40af5da3db9ca2e356ea5e9f06f823",
+    "run_contract_sha256": "e345225b4a17fc18eb35fcab24cbe1d72bd0e34bed9de272f927a7be461853e6",
+    "analysis_contract_sha256": "84111122033fda65c84344317cfe3b50639b23be4c71f480ba665c67a23cc939",
+    "bundle_seal_sha256": "67cd6b7902111000dc93a0f81f9f20bc05a9c084732705ed8f9ad82fe965fa85",
+    "recomputed_exactly": true
+  },
+  "quarantine": {
+    "v01": "QUARANTINED_CONSTRUCTION_BOUNDARY_VIOLATION_E1_JOIN_READ",
+    "v02": "QUARANTINED_SOURCE_SCOPE_BOUNDARY_VIOLATION",
+    "v02_inventory_count": 16,
+    "v02_inventory_receipt_path": "experiments/jev-information-density-v08p-v03/provenance/v02-quarantine-receipt.json",
+    "v02_inventory_receipt_sha256": "44503e89294cf6b23db057d2027e36fc12310e6ec14a122658617fd2f50f4375",
+    "v02_artifact_reuse": false
+  },
+  "v03_identity_and_source_allowlist": {
+    "construction_identity_path": "experiments/jev-information-density-v08p-v03/identity/v03-construction-identity-v01.json",
+    "construction_identity_sha256": "04006e81887a7944ac35057695196eb282918c11d71d90db20d05af7ab738b4b",
+    "allowlist_path": "experiments/jev-information-density-v08p-v03/identity/source-allowlist-v01.json",
+    "allowlist_sha256": "43bdf7408ef2b0e6fbcdd75b4848fd7631870d4312624e39b917ef554d62f854",
+    "allowlist_seal_path": "experiments/jev-information-density-v08p-v03/provenance/source-allowlist-seal-v01.json",
+    "allowlist_seal_sha256": "e5b2692d1ab0ba72ba15dd181a56e0b8b07198f2bc4b092e203dd34fded21182",
+    "authorized_exact_source_count": 3
+  },
+  "extractor": {
+    "source_path": "experiments/jev-information-density-v08p-v03/identity/extract_e1_neighborhood_denylist_v03.py",
+    "source_sha256": "e93cc70387c1acd526ad4245b35bec2dfc6ac1f5a68fb104e18010a1c33a6450",
+    "synthetic_test_path": "experiments/jev-information-density-v08p-v03/identity/tests/test_extract_e1_denylist_v03.py",
+    "synthetic_test_sha256": "35aec2b3c5ffb302a43a5ee577be517539dd82d75ee90da8c6fd09d7e6416a84",
+    "synthetic_test_status": "3_OF_3_PASS"
+  },
+  "extraction_attempt": {
+    "receipt_path": "experiments/jev-information-density-v08p-v03/provenance/extraction-attempt-1-failure-v01.json",
+    "receipt_sha256": "06932c8100f36218f9ee392f44c17cfa75bfab4756e1c399a3e0bed22a9ab5ce",
+    "status": "FAIL_CLOSED_AUTHORIZED_SOURCE_HASH_MISMATCH",
+    "second_process_started": false,
+    "denylist_output": false,
+    "machine_successful_open_receipt": false
+  },
+  "fresh_panel_contract": "NOT_CREATED; denylist prerequisite did not seal",
+  "fresh_panel": "NOT_GENERATED",
+  "model_contact": false,
+  "training": false,
+  "checkpoint_inference": false,
+  "evaluation_metrics": false,
+  "newtight": false,
+  "phoenix": false,
+  "stop_reason": "The exact allowlisted E1 seal-manifest source did not match its frozen expected SHA-256. The observed hash was not persisted. No retry or expected-hash amendment is authorized by the current instruction."
+}

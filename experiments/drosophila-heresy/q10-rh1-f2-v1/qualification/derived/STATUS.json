@@ -1,0 +1,9 @@
+{
+  "authority_factor_gated": false,
+  "derived_summary_sha256": "C56E6B3DCB351867BA2BE9EB2394810B94284F2534AC3F7252502B2956BD8B62",
+  "protocol": "Q10-PF6-RH1-F2",
+  "raw_execution_sha256": "D900B374F076AEC352381D878D31AEA8D7129D8BB5A3E53DB5B7D5B05E3FAFF9",
+  "scientific_promotion": false,
+  "status": "ENGINEERING_FACTORIAL_COMPLETE_NO_SCIENTIFIC_PROMOTION",
+  "structural_issue_count": 0
+}

@@ -1,0 +1,130 @@
+{
+  "protocol": "jev-information-density/v0.8n-road-b-phase-b-authorization-v01",
+  "identity": "v0.8N-road-b-phase-b-authorization-event-v01",
+  "status": "PHASE_B_AUTHORIZED",
+  "phase_b_ready": true,
+  "phase_b_authorized": true,
+  "authorization_source": "Direct user authorization in this task; user selected the per-seed strict-transition floor.",
+  "authorized_at_utc": "2026-09-23T05:12:49Z",
+  "authorization_scope": {
+    "arms": ["B-DUP", "B-MATCHED", "B-SHAM"],
+    "seeds": [20260927, 20260928, 20260929],
+    "run_count": 9,
+    "terminal_checkpoints": 9,
+    "all_epoch_checkpoints": 27,
+    "epochs_per_run": 3,
+    "optimizer_steps_per_run": 120,
+    "first_model_contact": "Extract and validate the 48-entry x 2048-dimensional candidate tensor from the sealed candidate manifest using the pinned frozen LFM revision and extraction path.",
+    "training": "Frozen decision-head training only; no backbone parameter updates.",
+    "evaluation": "One opening of the sealed matched held-out contrast panel after independent validation of the complete training seal.",
+    "excluded_surfaces": ["NewTight", "legacy evaluations", "Phoenix"]
+  },
+  "bindings": {
+    "candidate_packet_receipt_sha256": "7089c9fe9103ac68735e9c9dbb7fab424948a925204232651974abf9f5bdfd54",
+    "candidate_packet_tree_sha256": "eca19115ba4f9c3674281edb2643ac6e6729347023d8d04eb6288e7b4239f600",
+    "run_contract": {
+      "path": "experiments/jev-information-density-v08n/phase_b/phase-b-run-contract-v01.json",
+      "sha256": "da538aa03355732a2ba362da45d947e169b87aa644d0efd6ba7ef7a546306c1f"
+    },
+    "analysis_contract": {
+      "path": "experiments/jev-information-density-v08n/phase_b/phase-b-analysis-contract-v01.json",
+      "sha256": "0072c44903ea253cd8ad288cda8c100270f19d909ddced098af32d388ac29e1f"
+    },
+    "execution_contract": {
+      "path": "experiments/jev-information-density-v08n/phase_b/phase_b-contract-v02.json",
+      "sha256": "efb2bbe59293d7899083927cc187a292b5dfd1dc2948a0b752b3d9cbae2fd18d"
+    },
+    "construction_receipt": {
+      "path": "D:/codex-runs/jev-information-density-v08n/v0.8N-base-v01/synthesis/v08n-synthesis-receipt-final-v09.json",
+      "sha256": "e86f3cd925841c4e68f8558696e68cb729b9b9ba49a644b9bc35e7e2bcde68a6"
+    },
+    "execution_input_receipt": {
+      "path": "D:/codex-runs/jev-information-density-v08n/v0.8N-base-v01/phase-b-v03-inputs/execution-inputs-receipt.json",
+      "sha256": "c022befafd49a1e317f692ff3b6f7efcccd11aee98285ca5f0071f6edbaf817c"
+    },
+    "execution_input_hash_tree": {
+      "path": "D:/codex-runs/jev-information-density-v08n/v0.8N-base-v01/phase-b-v03-inputs/execution-inputs-hash-tree.json",
+      "sha256": "f0fbae87a5e30902634108b0829d5da9a76bc691eb6a7551b0eebe4764cbbc77"
+    },
+    "preflight": {
+      "path": "D:/codex-runs/jev-information-density-v08n/v0.8N-base-v01/phase-b-preflight-v02/preflight-report.json",
+      "sha256": "b3101ce2c89df575628d5413f289a94f9fdee5a6e178ee77020143adaf15881c",
+      "status": "V08N_PHASE_B_PREFLIGHT_PASS_READY_NOT_AUTHORIZED"
+    },
+    "heldout_panel": {
+      "identity": "v0.8N-eval-panel-v01/matched-panel-v02",
+      "seal_manifest_sha256": "425cef320df94e2b47b448203f8a916ebcbb2019539b2d09e51f5b4ced92f614",
+      "panel_manifest_sha256": "80e09c0f203b8a6505e062a2091a594273dca808258ff2f4539ab8414db9eabe",
+      "panel_hash_tree_sha256": "fc0adf7f8d1b9a10914dd9aa85282a42b0cd4bbe185f8b09710498b556d0f08f",
+      "firewall_lock_sha256": "79d25ac82fba1bc6332e16d8bc5f877fadd11cccaed5ef3f07eacfe5e1877da2",
+      "neighborhoods": 2000,
+      "family_counts": {
+        "exposure_control": 500,
+        "respiratory_monitoring": 500,
+        "salinity_control": 500,
+        "vibration_monitoring": 500
+      },
+      "opening_rule": "Unlock once only after all nine terminal checkpoints and the full 27-checkpoint training hash tree pass independent validation."
+    },
+    "historical_sensitivity_basis": {
+      "path": "D:/codex-runs/jev-information-density-v08k/phase-b-v01/reports/k-attribution-summary.json",
+      "sha256": "acd86b65aaf3e349e24079a46b9aad865d4df0fd4b867b70b14d600029b45463"
+    },
+    "sensitivity_floor": {
+      "metric": "strict_old_to_new_transition_rate",
+      "minimum_per_seed": 0.37,
+      "applies_to": ["B-MATCHED", "B-SHAM"],
+      "user_selected": true
+    }
+  },
+  "implementation_bindings": {
+    "experiments/jev-information-density-v08n/phase_b/extract_candidate_features_v01.py": "66f39a4d758fdd2f13f50a32295a728fbb4b5cd6bf16ae398c22492a755f86b0",
+    "experiments/jev-information-density-v08n/phase_b/train_phase_b_v01.py": "e539bac2d67b47ba2b660b8579c5818e5fffc0cf94fa26cfd3e9dd905ef795ba",
+    "experiments/jev-information-density-v08n/phase_b/verify_training_seal_v01.py": "89d75bac074d7bb0cab0b452fbe47aa4b0cf455f4c016a5390c95b467c13671d",
+    "experiments/jev-information-density-v08n/phase_b/evaluate_phase_b_v01.py": "fa22bc8febff89d2b635091c6cb40be6f3beba4549c4a135d16e213f6fd3dda4",
+    "experiments/jev-information-density-v08n/phase_b/analyze_phase_b_v01.py": "dbde07fe1ec009f2bca7f1f22ad913a2a79f4f8dfb8120a1f31ebf37d5f59b70",
+    "experiments/jev-information-density-v08n/phase_b/tests/test_v08n_analysis_metrics.py": "5f39463eb045017cb9467ab012a12d2270ae460881f5a5992922f4ded7483af5",
+    "experiments/jev-information-density-v08n/phase_b/audit_phase_b_authorization_packet.py": "c3e96c66f2f60da71d9f02d754744921c3988badb355cc3ebb18b83f95da04c4",
+    "experiments/jev-lfm-variable-v07/extract_lfm.py": "b8cd79a9a3265eca0fde5f509ba7c058bc2065d7747efe17ff7c7c1f6335b2d0",
+    "experiments/jev-frozen-readout-v01/probe.py": "a3049d52e1183c806c84522a617a05646eb86fbcb69af72b5bb26f4808852cb1",
+    "experiments/jev-frozen-scaling-v05/train_v05.py": "52033950dab23835c13f4aa74a2f0d5867aec754f8a139a63a739a36b0cb62b9"
+  },
+  "preauthorization_verification": {
+    "packet_audit_status": "PASS",
+    "packet_audit_failures": 0,
+    "contract_checks": 107,
+    "training_input_structural_audit": "PASS",
+    "implementation_smoke_tests": 5,
+    "implementation_static_parse": "PASS",
+    "run_output_identity_absent_before_authorization": true,
+    "candidate_tensor_absent_before_authorization": true,
+    "heldout_bodies_opened": false,
+    "model_loaded": false,
+    "head_initialized": false,
+    "head_training": false,
+    "evaluation_inference": false,
+    "newtight_access": false,
+    "phoenix_access": false,
+    "luna_disposition": "LUNA_NO_ARTIFACT; existing local independent fallback seal remains authoritative"
+  },
+  "execution_guards": {
+    "paired_seed_initialization": "one frozen head template per seed, loaded identically into all three arms; seed RNG reset per arm",
+    "restart_policy": "retain infrastructure-failure attempts and restart only the affected seed-arm from epoch zero; no resume or seed replacement; contract/hash/semantic errors stop the full experiment",
+    "evaluation_order": [
+      "candidate tensor extraction and validation",
+      "all nine paired head runs",
+      "seal all 27 epoch checkpoints and training telemetry",
+      "independent validation of the complete training hash tree",
+      "one-time unlock and inference on the held-out matched contrast panel",
+      "frozen analysis contract"
+    ],
+    "no_intermediate_or_result_guided_evaluation": true,
+    "newtight_and_legacy_evaluation": false,
+    "phoenix": false,
+    "follow_on_experiment_authorized": false
+  },
+  "treatment_boundary": "B-DUP/B-MATCHED/B-SHAM use the same primary occurrence stream, candidate catalog, exact target multiset, fixed schedule, loss and optimizer. Only the auxiliary input source pointer differs.",
+  "interpretation_ceiling": "The primary estimand is whether the SHAM training effect survives control for local frozen-representation displacement magnitude using the prospectively radius-matched neutral_4/neutral_5 basis. A residual does not isolate semantic identity from representation direction, higher-order geometry, or edited field/position.",
+  "scientific_semantics_changed": false,
+  "no_luna_pass_inferred": true
+}

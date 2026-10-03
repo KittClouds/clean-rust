@@ -1,0 +1,50 @@
+﻿{
+    "contract":  "MST_CORPUS_ADMISSION_V2",
+    "status":  "ADMITTED",
+    "admitted_at_utc":  "2026-08-12T12:47:06.5043280Z",
+    "campaign_id":  "RG2_SIX_INDEX_ENVIRONMENT_FRAME_V3",
+    "manifest_sha256":  "5bf12767746b8499ad0edde2597df67b1928cc5941705a8391ae2585a0574092",
+    "window_id":  "US30_20260413_DIRECTIONAL_EXPANSION_UP",
+    "run_key":  "RG2_US30_PERIOD_M5_1776038400_1776466500_16278752941905126714",
+    "invocation_id":  "RG2_US30_PERIOD_M5_1776038400_1776466500_16278752941905126714_I1776038400_2149680765334816370",
+    "auction_stem":  "MasterAuction_US30_PERIOD_M5_F2_US30_20260413_XUP_A01_RG2_v7",
+    "structure_stem":  "MasterStructure_US30_PERIOD_M5_F2_US30_20260413_XUP_A01_v6",
+    "canonical_dataset_hash":  "24a70356dc084f506966cbd17c3fdf5169ca684234c9dde71a9eca1d6d010a28",
+    "dataset_hashes":  {
+                           "events":  "3b767ab5f6e6fdf39e036f1bf8cbf15d6cc33a29e3ef4bdf8a4ea8e0dcb5dddc",
+                           "attempts":  "b2149aad8abe1553c434489893c8513d18abbde1f32d39760c0e6ae53d5f7025",
+                           "episodes":  "4d47eee8d7ee1134fe7a78e07735764ed0a4d6803b327d911dd4dc33abdabd4c",
+                           "context":  "f07c522f0cd8ab5bfb3aaaf5e3d57016bce9de3f285ced1d7b6d19348aab4816",
+                           "features":  "888382289151e72f38d7c7ce55d015a3db1998838e90f54c17b559da6e798a06",
+                           "transits":  "ffbd6a5b40c5c4e52cb2e06b6ad91eb1d4ec2f7bce7c73f1674e407d82d938e6"
+                       },
+    "row_counts":  {
+                       "events":  1314,
+                       "attempts":  280,
+                       "episodes":  62,
+                       "context":  2443,
+                       "features":  280,
+                       "transits":  6
+                   },
+    "structure_row_counts":  {
+                                 "inputs":  422574,
+                                 "nodes":  36321,
+                                 "events":  485
+                             },
+    "terminal_hash":  "9175773579541948694",
+    "receipt_hash":  "16148162274723910466",
+    "contract_receipt_hash":  "10902417938092119014",
+    "isolation":  "unique_instance_tag_plus_single_writer_lock",
+    "warmup_policy":  "native_history_fixed_producer_lookbacks",
+    "finalization_time":  1776466500,
+    "visual_rendering":  false,
+    "research_logging":  true,
+    "schema_identity_valid":  true,
+    "source_frame_valid":  true,
+    "unexpected_data_gaps":  0,
+    "daily_profile_sha256":  "fc93ca7b4dd65a5f971c407c12d702d441b60fc085d315edc13e72a78450a556",
+    "expected_profile_bars":  1368,
+    "observed_profile_bars":  1368,
+    "observed_profile_cutoff":  1776466500,
+    "replay_duplicate":  false
+}

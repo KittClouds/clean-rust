@@ -1,0 +1,12 @@
+{
+  "contract_sha256": "60A5317355D07DC849BE35666587636A17E71821DA9E1CC0F209C77F278790A4",
+  "created_at_utc": "2026-09-18T00:00:00Z",
+  "execution_started": false,
+  "identity": "q10-gc0-ac3-v1",
+  "parent_bindings_sealed": true,
+  "parent_drift_policy": "fail closed before loading RA1, AC2 observations, or PF5 runtime",
+  "plan_sha256": "ED4D3715184D1168E222A78EA186377FDF2103E046BC1C915942C9892200F450",
+  "protocol": "Q10-GC0-AC3",
+  "result_exposure": false,
+  "status": "PREEXECUTION_SEALED_NO_EXECUTION"
+}

@@ -1,0 +1,37 @@
+{
+  "schema": "FAS_E4_0_CONTRACT_AUDIT_BRIDGE_V01",
+  "status": "PASS_CONTRACT_SEAL",
+  "contract_root_sha256": "7344badf07476d19d9c6228f80d026a112c339e93daa75593e61031f68456e64",
+  "contract": {
+    "path": "contracts/e4-0-contract-v06-final.json",
+    "bytes": 43208,
+    "sha256": "ea4f11cec5d65a3be7716c77febf5d448d8ebf1a5a4049aee5d25d51c0c50958"
+  },
+  "seal_manifest": {
+    "path": "seals/e4-0-contract-v06-seal.json",
+    "bytes": 35340,
+    "sha256": "799d1535a16ea6fbf2269206443addf96736ef8a70ca5ab3373cdd5e6a44605c",
+    "entry_count": 93
+  },
+  "source_map": {
+    "path": "plans/E4-0-IMPLEMENTATION-SOURCE-MAP-v05.md",
+    "bytes": 24331,
+    "sha256": "f9b5ea66486546de9534c9ed39524659baaeb69947842e985213ab3ac1d303c6"
+  },
+  "independent_audit_receipt": {
+    "path": "audits/e4-0-track-e/track-e-postseal-receipt-v02.json",
+    "bytes": 18469,
+    "sha256": "d4bcffcd9fcec0b11ded889fc91c41299dbf385b1971ac71c35b31a75a9c5bce",
+    "status": "E4_0_TRACK_E_POSTSEAL_PASS_ROOT_AND_MEMBERS_RECOMPUTED",
+    "pass": true,
+    "auditor_source_sha256": "86049aa4041922972690f4c7edc95411d095cab1266a04e95b493416f0c327f9"
+  },
+  "normalization": "Expose the verified nested Track E final_seal.seal_root_sha256 at the root-level contract_root_sha256 field expected by the stage authorizer. Track D contract-mode mismatch is separately preserved; no Track D PASS is claimed.",
+  "checks_reperformed": [
+    "Track E receipt clean PASS and POSTSEAL mode",
+    "contract/source-map hashes and lengths equal receipt",
+    "seal manifest hash, root, and entry count equal receipt",
+    "all 93 current v06 seal member hashes and lengths rechecked"
+  ],
+  "scope": "Contract/source-map seal audit only; no population, label, tokenizer, model, CUDA, or score access."
+}

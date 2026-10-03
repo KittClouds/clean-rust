@@ -1,0 +1,13 @@
+{
+  "builder": "tools/build_qualification_seal.py",
+  "builder_sha256": "ef2bb36b55c2cdde77b77152332ac232cb324e0877614e8adb9bbaaed1bec0ad",
+  "determinism_requirement": "TWO_INDEPENDENT_OUTPUT_DIRECTORIES_BYTE_IDENTICAL",
+  "emitted_files": [
+    "qualification_content_manifest.tsv",
+    "qualification_root_receipt.json",
+    "qualification_build_receipt.json"
+  ],
+  "manifest_sha256": "b5a55b74770cbdb9364cdb3087570c33c4b3b41af7004c9ee4b73b5e8078a040",
+  "receipt_schema": "OBS_OPEN_01_QUALIFICATION_BUILD_V1",
+  "validation": "PASS"
+}

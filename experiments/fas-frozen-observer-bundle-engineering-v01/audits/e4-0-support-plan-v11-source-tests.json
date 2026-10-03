@@ -1,0 +1,49 @@
+{
+  "receipt_id": "FAS_E4_0_SUPPORT_PLAN_V11_SOURCE_VALIDATION",
+  "status": "PASS_MODEL_FREE_SOURCE_AND_PLAN_VALIDATION",
+  "source": {
+    "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/e4-support-plan-v11/src/main.rs",
+    "sha256": "d3cc9b9c36bbcde3bfdaac07f571e53a88374c26d076fb808b273bae4d3155ae",
+    "bytes": 33181
+  },
+  "cargo_manifest": {
+    "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/e4-support-plan-v11/Cargo.toml",
+    "sha256": "5634d636df04da59a64d5e1ed890641ebc3823ec9971b94673ffd123f3591379",
+    "bytes": 324
+  },
+  "cargo_lock": {
+    "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/e4-support-plan-v11/Cargo.lock",
+    "sha256": "8a84004756324303676bae7acc1bd041d54530a93e9e85b074d65b162e9e3a8c",
+    "bytes": 6002
+  },
+  "checks": {
+    "cargo_fmt_check": "PASS",
+    "cargo_test_release": {
+      "status": "PASS",
+      "passed": 5,
+      "failed": 0
+    },
+    "cargo_clippy_release_deny_warnings": "PASS",
+    "v11_semantics_equal_v10_after_excluding_receipt_and_source_identity": true,
+    "selected_prefix": 18667,
+    "selected_minimum_class_support": 252,
+    "previous_prefix_minimum_support": 248
+  },
+  "support_plan": {
+    "path": "experiments/fas-frozen-observer-bundle-engineering-v01/plans/E4-0-SYMBOLIC-SUPPORT-PLAN-v11.json",
+    "sha256": "a15bca5d78867ea32905299fabd21f85cf6846a5a02a0c55dd32337e0396847f",
+    "bytes": 7785
+  },
+  "model_free": true,
+  "population_rows_written": false,
+  "tokenizer_contacted": false,
+  "model_contacted": false,
+  "cuda_initialized": false,
+  "labels_opened": false,
+  "read_inputs": [
+    "sealed E1 model-input JSONL for rendered-input hashes",
+    "sealed E1 row manifest for quartet/row identity hashes",
+    "sealed E1 term inventory",
+    "frozen held-out template manifest"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "status": "PASSED",
+  "seed": 9100,
+  "fresh_measured_seeds_used": 0,
+  "result_cells": 8,
+  "shadow_events": 1024,
+  "observed_maxima": {
+    "axial_error_over_total_norm": 1.9784089141689937e-08,
+    "norm_relative_error": 1.4499982700809832e-08,
+    "residual_norm_relative_error": 1.4500330524323943e-08,
+    "residual_abs_cosine": 1.58515429822845e-08
+  },
+  "output_hashes": {
+    "R-tau4.jsonl": "0b0c65aedb0ea7253d997e0ef3ead6d3c6971aca8f2fbe64e0e4a999d22c8806",
+    "R-tau16.jsonl": "fc6840e1210ca7dcbcd27d69872abad4147efca1049d236d7b5be73f8cc24c7a",
+    "L-tau4.jsonl": "c6751df04a83e9bebc0b25b4ef6d8c9ad2288a7c79b2fd2983606c33500a0711",
+    "L-tau16.jsonl": "b3e060b50b0c7ac4d2c11bb114cbe3290f04cd74cb5a050293d53a44c4d7d397"
+  },
+  "binary_sha256": "b1e12a27bc25163f54b1a5911c17b56ce58c54f7ed4908ad41cdc3f4c010d90d"
+}

@@ -1,0 +1,75 @@
+{
+  "contract": "jev-decision-data-information-density/v0.8c-exact-feasibility",
+  "status": "frozen_pre_solver",
+  "v08b_immutable": {
+    "contract_sha256": "16e8a36542ab80c9164ffe21794affd1662df8cd34dcff71858eae237c4d2c8d",
+    "failed_constructor_report_sha256": "c38c980aed9b231e1bea15cc3ce5d42d67eff767f9b5b3286046fee7f97a778e"
+  },
+  "inputs": {
+    "group_records_sha256": "9e3546fbe88741666cc5be5ae28907d7a223f74c8578609adfc3036ba7f4e7f2",
+    "r100_manifest_sha256": "0b9998d94e895e5f540c066bdc618d0d6378b9e9ce632380838b7a14beac008b",
+    "c100_manifest_sha256": "860fbfef8283e707d41639ab970ef7257d116e3001a18a0b180feea9d72579c3",
+    "eval_manifest_sha256": "3e72cd7596fbf0b302501b88dd9dc645a5749de10884b57eceb5552bfc5ef8ae",
+    "eligible_group_count": 416672,
+    "evaluation_group_count": 83328
+  },
+  "solver": {
+    "name": "ortools-cp-sat",
+    "version": "9.15.6755",
+    "source_sha256": "c91f2f553af1270e259e7b90fff41a754524ee41aa3eb9bab98437ab1020adc4",
+    "phase1_method": "direct_identity_witness_from_existing_reference_bank",
+    "workers": 1,
+    "random_seed": 20260920,
+    "wall_time_limit_seconds_per_profile": 1800,
+    "phase1_has_objective": false
+  },
+  "profiles": {
+    "R100": {
+      "composition_target": "R100",
+      "group_count": 100000,
+      "joint_cell_counts_from_pinned_manifest": true
+    },
+    "C100": {
+      "composition_target": "C100",
+      "group_count": 100000,
+      "joint_cell_counts_from_pinned_manifest": true
+    }
+  },
+  "constraints": {
+    "joint_cell_counts": "exact",
+    "unique_model_inputs_relative_error": 0.02,
+    "input_occurrence_histogram_tv": 0.02,
+    "unique_roots_relative_error": 0.02,
+    "root_occurrence_histogram_tv": 0.02,
+    "topology_marginal_tv": 0.02,
+    "intervention_marginal_tv": 0.02,
+    "unique_count_rounding": "outward_floor_lower_ceil_upper",
+    "occurrence_histogram_tv_integer_form": "25*sum_abs(N_ref*H_sel[k]-N_sel*H_ref[k]) <= N_sel*N_ref",
+    "v08b_json_policy_precedence": "use v08b declared bank-acceptance bounds; constructor-only exact per-cell input and exact-root profiles are not additional v08c acceptance constraints",
+    "group_ids_may_be_aggregated_only_by_constraint_equivalence": [
+      "model_input_id",
+      "root_id",
+      "joint_cell",
+      "topology_feature_multiset",
+      "intervention_class"
+    ],
+    "forbid_unstated_exact_root_histogram": true,
+    "forbid_unstated_exact_per_cell_input_histogram": true
+  },
+  "phase_gates": {
+    "phase1_feasibility_only": true,
+    "phase2_objective_only_after_feasibility": true,
+    "model_contact_authorized": false,
+    "phoenix_in_scope": false,
+    "existing_v08_banks_mutable": false,
+    "strict_novel93_mutable": false
+  },
+  "fallback": {
+    "invoke_only_if_original_target_proven_infeasible": true,
+    "joint_cell_quotas": "proportional_to_eligible_pool_support_by_largest_remainder",
+    "minimum_per_query_view": 10000,
+    "minimum_source_support_ratio_per_selected_cell": 2.5,
+    "profile_is_hashed_before_bank_construction": true,
+    "criteria_may_be_relaxed": false
+  }
+}

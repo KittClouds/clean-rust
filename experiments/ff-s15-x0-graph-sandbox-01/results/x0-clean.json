@@ -1,0 +1,485 @@
+{
+ "abstain_reason_names": {
+  "CONFLICTING_EVIDENCE|CONFLICTING_EVIDENCE": 1671,
+  "IMPOSSIBLE_GOAL|NO_VALID_ACTION": 21,
+  "INSUFFICIENT_EVIDENCE|AMBIGUOUS_REFERENCE": 1623,
+  "INSUFFICIENT_EVIDENCE|UNKNOWN_ENTITY": 1660,
+  "NO_VALID_ACTION|NO_VALID_ACTION": 23,
+  "UNKNOWN_ENTITY|UNKNOWN_ENTITY": 786,
+  "UNKNOWN_TARGET|UNKNOWN_ENTITY": 868
+ },
+ "act_actions": {
+  "graph_path": {
+   "noop_ok": 4529,
+   "ok": 4791
+  },
+  "graph_path_slots": {
+   "noop_ok": 4529,
+   "ok": 4791
+  },
+  "graph_path_slots_alias": {
+   "noop_ok": 4529,
+   "ok": 4791
+  }
+ },
+ "ask_identifiability": {
+  "by_missing_kind": {
+   "AT": {
+    "hit": 390,
+    "mean_candidates": 1.0,
+    "n": 390
+   },
+   "CONNECTED": {
+    "hit": 230,
+    "mean_candidates": 3.961038961038961,
+    "n": 231
+   },
+   "STATE": {
+    "hit": 255,
+    "mean_candidates": 1.0,
+    "n": 255
+   }
+  },
+  "hit": 875,
+  "mean_candidates": 1.7808219178082192,
+  "n": 876
+ },
+ "ask_label_relevance": {
+  "removed fact not needed for the goal": 737,
+  "removed fact on the goal path": 241
+ },
+ "blocked_count_by_label_(0,1,2+)": {
+  "ABSTAIN/CONFLICTING_EVIDENCE": {
+   "0": 1536,
+   "1": 135
+  },
+  "ABSTAIN/IMPOSSIBLE_GOAL": {
+   "2": 346
+  },
+  "ABSTAIN/INSUFFICIENT_EVIDENCE": {
+   "0": 5003,
+   "1": 518
+  },
+  "ABSTAIN/NO_VALID_ACTION": {
+   "1": 135,
+   "2": 375
+  },
+  "ABSTAIN/UNKNOWN_ENTITY": {
+   "0": 719,
+   "1": 67
+  },
+  "ABSTAIN/UNKNOWN_TARGET": {
+   "0": 781,
+   "1": 87
+  },
+  "ACT/goal_already": {
+   "0": 4158,
+   "1": 371
+  },
+  "ACT/plan": {
+   "0": 4416,
+   "1": 375
+  },
+  "ASK": {
+   "0": 892,
+   "1": 86
+  }
+ },
+ "by_label_class": {
+  "flat": {
+   "ABSTAIN/CONFLICTING_EVIDENCE": {
+    "ABSTAIN": 1119,
+    "ACT": 552
+   },
+   "ABSTAIN/IMPOSSIBLE_GOAL": {
+    "ABSTAIN": 346
+   },
+   "ABSTAIN/INSUFFICIENT_EVIDENCE": {
+    "ABSTAIN": 1815,
+    "ACT": 3505,
+    "ASK": 201
+   },
+   "ABSTAIN/NO_VALID_ACTION": {
+    "ABSTAIN": 439,
+    "ACT": 71
+   },
+   "ABSTAIN/UNKNOWN_ENTITY": {
+    "ABSTAIN": 35,
+    "ACT": 751
+   },
+   "ABSTAIN/UNKNOWN_TARGET": {
+    "ABSTAIN": 36,
+    "ACT": 832
+   },
+   "ACT/goal_already": {
+    "ABSTAIN": 115,
+    "ACT": 4414
+   },
+   "ACT/plan": {
+    "ABSTAIN": 104,
+    "ACT": 4687
+   },
+   "ASK": {
+    "ABSTAIN": 75,
+    "ACT": 636,
+    "ASK": 267
+   }
+  },
+  "flat+": {
+   "ABSTAIN/CONFLICTING_EVIDENCE": {
+    "ABSTAIN": 1671
+   },
+   "ABSTAIN/IMPOSSIBLE_GOAL": {
+    "ABSTAIN": 346
+   },
+   "ABSTAIN/INSUFFICIENT_EVIDENCE": {
+    "ABSTAIN": 1877,
+    "ACT": 3431,
+    "ASK": 213
+   },
+   "ABSTAIN/NO_VALID_ACTION": {
+    "ABSTAIN": 503,
+    "ACT": 7
+   },
+   "ABSTAIN/UNKNOWN_ENTITY": {
+    "ABSTAIN": 786
+   },
+   "ABSTAIN/UNKNOWN_TARGET": {
+    "ABSTAIN": 868
+   },
+   "ACT/goal_already": {
+    "ACT": 4529
+   },
+   "ACT/plan": {
+    "ABSTAIN": 260,
+    "ACT": 4531
+   },
+   "ASK": {
+    "ABSTAIN": 76,
+    "ACT": 605,
+    "ASK": 297
+   }
+  },
+  "graph_path": {
+   "ABSTAIN/CONFLICTING_EVIDENCE": {
+    "ABSTAIN": 1671
+   },
+   "ABSTAIN/IMPOSSIBLE_GOAL": {
+    "ABSTAIN": 21,
+    "ACT": 299,
+    "ASK": 26
+   },
+   "ABSTAIN/INSUFFICIENT_EVIDENCE": {
+    "ABSTAIN": 1660,
+    "ACT": 3635,
+    "ASK": 226
+   },
+   "ABSTAIN/NO_VALID_ACTION": {
+    "ABSTAIN": 23,
+    "ACT": 329,
+    "ASK": 158
+   },
+   "ABSTAIN/UNKNOWN_ENTITY": {
+    "ABSTAIN": 786
+   },
+   "ABSTAIN/UNKNOWN_TARGET": {
+    "ABSTAIN": 868
+   },
+   "ACT/goal_already": {
+    "ACT": 4529
+   },
+   "ACT/plan": {
+    "ACT": 4791
+   },
+   "ASK": {
+    "ACT": 739,
+    "ASK": 239
+   }
+  },
+  "graph_path_slots": {
+   "ABSTAIN/CONFLICTING_EVIDENCE": {
+    "ABSTAIN": 1671
+   },
+   "ABSTAIN/IMPOSSIBLE_GOAL": {
+    "ABSTAIN": 21,
+    "ACT": 299,
+    "ASK": 26
+   },
+   "ABSTAIN/INSUFFICIENT_EVIDENCE": {
+    "ABSTAIN": 1660,
+    "ACT": 3213,
+    "ASK": 648
+   },
+   "ABSTAIN/NO_VALID_ACTION": {
+    "ABSTAIN": 23,
+    "ACT": 329,
+    "ASK": 158
+   },
+   "ABSTAIN/UNKNOWN_ENTITY": {
+    "ABSTAIN": 786
+   },
+   "ABSTAIN/UNKNOWN_TARGET": {
+    "ABSTAIN": 868
+   },
+   "ACT/goal_already": {
+    "ACT": 4529
+   },
+   "ACT/plan": {
+    "ACT": 4791
+   },
+   "ASK": {
+    "ACT": 102,
+    "ASK": 876
+   }
+  },
+  "graph_path_slots_alias": {
+   "ABSTAIN/CONFLICTING_EVIDENCE": {
+    "ABSTAIN": 1671
+   },
+   "ABSTAIN/IMPOSSIBLE_GOAL": {
+    "ABSTAIN": 21,
+    "ACT": 299,
+    "ASK": 26
+   },
+   "ABSTAIN/INSUFFICIENT_EVIDENCE": {
+    "ABSTAIN": 3283,
+    "ACT": 1623,
+    "ASK": 615
+   },
+   "ABSTAIN/NO_VALID_ACTION": {
+    "ABSTAIN": 23,
+    "ACT": 329,
+    "ASK": 158
+   },
+   "ABSTAIN/UNKNOWN_ENTITY": {
+    "ABSTAIN": 786
+   },
+   "ABSTAIN/UNKNOWN_TARGET": {
+    "ABSTAIN": 868
+   },
+   "ACT/goal_already": {
+    "ACT": 4529
+   },
+   "ACT/plan": {
+    "ACT": 4791
+   },
+   "ASK": {
+    "ACT": 102,
+    "ASK": 876
+   }
+  }
+ },
+ "duplicated_alias_by_label": {
+  "ABSTAIN/CONFLICTING_EVIDENCE": {
+   "False": 1671
+  },
+  "ABSTAIN/IMPOSSIBLE_GOAL": {
+   "False": 346
+  },
+  "ABSTAIN/INSUFFICIENT_EVIDENCE": {
+   "False": 3898,
+   "True": 1623
+  },
+  "ABSTAIN/NO_VALID_ACTION": {
+   "False": 510
+  },
+  "ABSTAIN/UNKNOWN_ENTITY": {
+   "False": 786
+  },
+  "ABSTAIN/UNKNOWN_TARGET": {
+   "False": 868
+  },
+  "ACT/goal_already": {
+   "False": 4529
+  },
+  "ACT/plan": {
+   "False": 4791
+  },
+  "ASK": {
+   "False": 978
+  }
+ },
+ "graph_by_signature": {
+  "graph_path": {
+   "ABSTAIN/CONFLICTING_EVIDENCE": {
+    "ABSTAIN": 1671
+   },
+   "ABSTAIN/IMPOSSIBLE_GOAL": {
+    "ABSTAIN": 21,
+    "ACT": 299,
+    "ASK": 26
+   },
+   "ABSTAIN/NO_VALID_ACTION": {
+    "ABSTAIN": 23,
+    "ACT": 329,
+    "ASK": 158
+   },
+   "ABSTAIN/UNKNOWN_ENTITY": {
+    "ABSTAIN": 786
+   },
+   "ABSTAIN/UNKNOWN_TARGET": {
+    "ABSTAIN": 868
+   },
+   "ACT/goal_already": {
+    "ACT": 4529
+   },
+   "ACT/plan": {
+    "ACT": 4791
+   },
+   "duplicated alias": {
+    "ACT": 1590,
+    "ASK": 33
+   },
+   "goal outside action closure": {
+    "ABSTAIN": 1660
+   },
+   "missing fact removed": {
+    "ACT": 1220,
+    "ASK": 399
+   },
+   "no signature": {
+    "ACT": 1564,
+    "ASK": 33
+   }
+  },
+  "graph_path_slots": {
+   "ABSTAIN/CONFLICTING_EVIDENCE": {
+    "ABSTAIN": 1671
+   },
+   "ABSTAIN/IMPOSSIBLE_GOAL": {
+    "ABSTAIN": 21,
+    "ACT": 299,
+    "ASK": 26
+   },
+   "ABSTAIN/NO_VALID_ACTION": {
+    "ABSTAIN": 23,
+    "ACT": 329,
+    "ASK": 158
+   },
+   "ABSTAIN/UNKNOWN_ENTITY": {
+    "ABSTAIN": 786
+   },
+   "ABSTAIN/UNKNOWN_TARGET": {
+    "ABSTAIN": 868
+   },
+   "ACT/goal_already": {
+    "ACT": 4529
+   },
+   "ACT/plan": {
+    "ACT": 4791
+   },
+   "duplicated alias": {
+    "ACT": 1590,
+    "ASK": 33
+   },
+   "goal outside action closure": {
+    "ABSTAIN": 1660
+   },
+   "missing fact removed": {
+    "ACT": 161,
+    "ASK": 1458
+   },
+   "no signature": {
+    "ACT": 1564,
+    "ASK": 33
+   }
+  },
+  "graph_path_slots_alias": {
+   "ABSTAIN/CONFLICTING_EVIDENCE": {
+    "ABSTAIN": 1671
+   },
+   "ABSTAIN/IMPOSSIBLE_GOAL": {
+    "ABSTAIN": 21,
+    "ACT": 299,
+    "ASK": 26
+   },
+   "ABSTAIN/NO_VALID_ACTION": {
+    "ABSTAIN": 23,
+    "ACT": 329,
+    "ASK": 158
+   },
+   "ABSTAIN/UNKNOWN_ENTITY": {
+    "ABSTAIN": 786
+   },
+   "ABSTAIN/UNKNOWN_TARGET": {
+    "ABSTAIN": 868
+   },
+   "ACT/goal_already": {
+    "ACT": 4529
+   },
+   "ACT/plan": {
+    "ACT": 4791
+   },
+   "duplicated alias": {
+    "ABSTAIN": 1623
+   },
+   "goal outside action closure": {
+    "ABSTAIN": 1660
+   },
+   "missing fact removed": {
+    "ACT": 161,
+    "ASK": 1458
+   },
+   "no signature": {
+    "ACT": 1564,
+    "ASK": 33
+   }
+  }
+ },
+ "graph_digest_sample": "9c2ae368e1aab88d686eac7ca019e5bdb7aa23c0948e01b3a553e5ca22978786",
+ "n_dev": 20000,
+ "physics_agreement": {
+  "graph_path": {
+   "oracle_ABSTAIN|controller_ACT": 3,
+   "oracle_ABSTAIN|controller_not_ACT": 693,
+   "oracle_ACT|controller_ACT": 14319
+  },
+  "graph_path_slots": {
+   "oracle_ABSTAIN|controller_ACT": 2,
+   "oracle_ABSTAIN|controller_not_ACT": 295,
+   "oracle_ACT|controller_ACT": 13261
+  },
+  "graph_path_slots_alias": {
+   "oracle_ABSTAIN|controller_ACT": 2,
+   "oracle_ABSTAIN|controller_not_ACT": 262,
+   "oracle_ACT|controller_ACT": 11671
+  }
+ },
+ "summary": {
+  "flat": {
+   "act_labelled_acted": 0.9765021459227468,
+   "ask_precision": 0.5705128205128205,
+   "ask_recall": 0.27300613496932513,
+   "decision_accuracy": 0.6579,
+   "nonact_labelled_not_acted": 0.40571161048689136
+  },
+  "flat+": {
+   "act_labelled_acted": 0.9721030042918455,
+   "ask_precision": 0.5823529411764706,
+   "ask_recall": 0.30368098159509205,
+   "decision_accuracy": 0.7704,
+   "nonact_labelled_not_acted": 0.621441947565543
+  },
+  "graph_path": {
+   "act_labelled_acted": 1.0,
+   "ask_precision": 0.3682588597842835,
+   "ask_recall": 0.2443762781186094,
+   "decision_accuracy": 0.7294,
+   "nonact_labelled_not_acted": 0.5316479400749063
+  },
+  "graph_path_slots": {
+   "act_labelled_acted": 1.0,
+   "ask_precision": 0.5128805620608899,
+   "ask_recall": 0.8957055214723927,
+   "decision_accuracy": 0.76125,
+   "nonact_labelled_not_acted": 0.6308052434456929
+  },
+  "graph_path_slots_alias": {
+   "act_labelled_acted": 1.0,
+   "ask_precision": 0.5229850746268657,
+   "ask_recall": 0.8957055214723927,
+   "decision_accuracy": 0.8424,
+   "nonact_labelled_not_acted": 0.7796816479400749
+  }
+ }
+}

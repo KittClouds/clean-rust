@@ -1,0 +1,72 @@
+{
+  "receipt_id": "FAS_FROZEN_OBSERVER_BUNDLE_E0_E2_DRAFT_INTEGRITY_RECEIPT_V04",
+  "status": "DRAFT_CONTRACTS_HASHED_NOT_SEALED",
+  "created_utc": "2026-09-26T03:40:53.986659+00:00",
+  "draft_tree_sha256": "74fdf82400280410e946b5916e4b5b021ab280b578c99a15374c366473276123",
+  "entries": [
+    {
+      "path": "audits/e0-e2-process-gpu-update-v05-draft.md",
+      "bytes": 4216,
+      "sha256": "2e8172923dc31f40b60529c3c9b56b3a730d246334672c01807b8e624ee32056"
+    },
+    {
+      "path": "contracts/e0-freeze-v05-draft.json",
+      "bytes": 17251,
+      "sha256": "43a0b7fb4e14a1447c36c03d293f9700a874dbabb48e7182e45f9ede598445b0"
+    },
+    {
+      "path": "contracts/e2-run-v02-draft.json",
+      "bytes": 7464,
+      "sha256": "3fa2fa062190bf0cc9aeb9e5d2abe7cdcfbca54f16fc664879159f1bbaab8927"
+    },
+    {
+      "path": "contracts/representation-abi-v02.json",
+      "bytes": 3231,
+      "sha256": "ab3d342d465cc67c8f35a6beccc629b6517b021089c1642a1daa5f305a9c8414"
+    },
+    {
+      "path": "source/scripts/extract_features_v02.py",
+      "bytes": 23753,
+      "sha256": "262f4b02bf68617f8b4f8bae1dd5b5c7ac52b7d8e3bb7504659a2f290429f740"
+    },
+    {
+      "path": "source/scripts/sample_e2_resources_v02.ps1",
+      "bytes": 3706,
+      "sha256": "dda73c48afd804b2d3253bf38b498141a75e4123c2d357526f336a78b2d20754"
+    },
+    {
+      "path": "source/scripts/wait_for_concurrent_gpu_job_v01.ps1",
+      "bytes": 4916,
+      "sha256": "9a41e083b638e09411ad2143375d180730a25d1b42937e330eb0373788acd216"
+    },
+    {
+      "path": "source/tests/test_e2_resource_v02.py",
+      "bytes": 4521,
+      "sha256": "5c67f443ed1c0a88490701050363f4b49df17cf180533cdd497cec030b79897c"
+    }
+  ],
+  "predecessor_roots": {
+    "e0_v04": "fef50e3d7efe6ff35adf671940ee73112caf8ba6192596094aa6bb3e69ae9ab2",
+    "e1_v04": "6ba77a899363651e3ba119b005f59a22e86f011f83c86b873857cd3f9ab64b03",
+    "e2_v01_preservation": "0ff309d833cd87017f7384247e4420a508f582ad9f375c5637f586d73b703f4c"
+  },
+  "concurrent_run_observation": {
+    "status": "ACTIVE_WAITING",
+    "pid": 34332,
+    "executable": "C:\\Users\\shuga\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+    "script": "D:\\codex-runs\\fas-s12-observer-plane-causal-dependence-v01\\run-v02\\source\\run_s12_v02.py",
+    "creation_time_local": "2026-09-25T20:08:43",
+    "last_monitor_event_utc": "2026-09-26T03:40:16.0690742Z"
+  },
+  "validation": {
+    "extractor_and_unit_test_py_compile": "PASS",
+    "focused_unit_tests": "PASS_5_TESTS",
+    "waiter_and_resource_sampler_parsers": "PASS",
+    "contract_and_source_hash_bindings": "PASS",
+    "model_or_tokenizer_contact_performed": false,
+    "e2_v02_extraction_performed": false,
+    "e0_sealed": false,
+    "e2_v02_authorized": false
+  },
+  "not_a_seal": true
+}

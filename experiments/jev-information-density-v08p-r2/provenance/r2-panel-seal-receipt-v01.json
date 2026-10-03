@@ -1,0 +1,11 @@
+{
+  "schema": "jev-v08p-r2-panel-seal-receipt-v01",
+  "panel_manifest_path": "experiments/jev-information-density-v08p-r2/provenance/r2-panel-materialization-manifest-v01.json",
+  "panel_manifest_sha256": "565d5e2650db375230fed15eb94471c92a25810c1644d629e7bb9d1490bf4822",
+  "status": "SEMANTIC_AND_IDENTITY_PANEL_SEALED_RADIUS_MATCH_PENDING",
+  "evaluation_firewall": "locked; no head or behavioral access",
+  "model_contact": false,
+  "training": false,
+  "inference": false,
+  "evaluation": false
+}

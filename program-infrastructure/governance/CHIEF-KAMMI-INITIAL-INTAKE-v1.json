@@ -1,0 +1,132 @@
+{
+  "schema": "CHIEF_KAMMI_INITIAL_INTAKE_V1",
+  "status": "RECORDED",
+  "records": [
+    {
+      "source_thread_id": "01a06ed5-a0d4-7ad2-98a7-1fe26a15e96c",
+      "source_title": "Audit Breeze TTS integration",
+      "path": "C:\\code land\\clean-rust\\program-infrastructure\\governance\\inbox\\20260927\\01a06ed5-a0d4-7ad2-98a7-1fe26a15e96c.json",
+      "status": "RECEIVED_NOT_INDEPENDENTLY_VERIFIED",
+      "receipt": {
+        "artifact_id": "sha256:c8842fcd8bb04bc2bf08e6c926308817bb528ac895ea6ca5527c82a0a98cb837",
+        "event_id": "sha256:939933cdfde7584c68387b6fce67243d1b5c43ec14aa30bb468cf2dd325e94c6"
+      }
+    },
+    {
+      "source_thread_id": "01a09283-4813-7fc0-93e1-e6db6b0d75b4",
+      "source_title": "Fly Chief",
+      "path": "C:\\code land\\clean-rust\\program-infrastructure\\governance\\inbox\\20260927\\01a09283-4813-7fc0-93e1-e6db6b0d75b4.json",
+      "status": "RECEIVED_NOT_INDEPENDENTLY_VERIFIED",
+      "receipt": {
+        "artifact_id": "sha256:48d9df752fe363fd7e30f5565f5cb30c7685f0dea35698b69d9ef87e333aab99",
+        "event_id": "sha256:6f4b0cdc81b86dcd7df1e3c8f21a7d4e19105996db0d289c8203be25dbd31cdd"
+      }
+    },
+    {
+      "source_thread_id": "01a0b9cd-0bbf-71a0-87ca-2f2773e36e9c",
+      "source_title": "Drosophila Heresy \u00e2\u20ac\u201d Deputy Scientific\u00e2\u20ac\u00a6",
+      "path": "C:\\code land\\clean-rust\\program-infrastructure\\governance\\inbox\\20260927\\01a0b9cd-0bbf-71a0-87ca-2f2773e36e9c.json",
+      "status": "RECEIVED_NOT_INDEPENDENTLY_VERIFIED",
+      "receipt": {
+        "artifact_id": "sha256:e5f50c8062372e1a8d3525a14dfa8f7d6a800ef2bc9f9fb2729e498ab401d0a2",
+        "event_id": "sha256:3d1bd81a56496927ea31af89a08d23236a52085b74abe642460811cafcc9708f"
+      }
+    },
+    {
+      "source_thread_id": "01a0baf4-677a-7a41-a42c-be4b10bd2dda",
+      "source_title": "JEV",
+      "path": "C:\\code land\\clean-rust\\program-infrastructure\\governance\\inbox\\20260927\\01a0baf4-677a-7a41-a42c-be4b10bd2dda.json",
+      "status": "RECEIVED_NOT_INDEPENDENTLY_VERIFIED",
+      "receipt": {
+        "artifact_id": "sha256:4b8d4580697d88203ec4186d8f980c610dc65e29a6968d003fb7504e3ff69905",
+        "event_id": "sha256:e81ff2499cf63b43cf47fc3281e3224510177c0b1c4d2969b2dd2c4a96fe4abf"
+      }
+    },
+    {
+      "source_thread_id": "01a0bba0-2621-7ad1-addc-b27100855117",
+      "source_title": "AR04",
+      "path": "C:\\code land\\clean-rust\\program-infrastructure\\governance\\inbox\\20260927\\01a0bba0-2621-7ad1-addc-b27100855117.json",
+      "status": "RECEIVED_NOT_INDEPENDENTLY_VERIFIED",
+      "receipt": {
+        "artifact_id": "sha256:946b491e857dbb8bbdb03342988ac5cd7e5074e9a1f45cd47bfe80112b8762e0",
+        "event_id": "sha256:0b9723d91a874db6e9dd432ce88ef7c97f80b208ec104eb2a4e7b327cf9dd9be"
+      }
+    },
+    {
+      "source_thread_id": "01a0bf69-d1fd-72f3-ab25-8809d21b40de",
+      "source_title": "Curate non-overlapping Jev data",
+      "path": "C:\\code land\\clean-rust\\program-infrastructure\\governance\\inbox\\20260927\\01a0bf69-d1fd-72f3-ab25-8809d21b40de.json",
+      "status": "RECEIVED_NOT_INDEPENDENTLY_VERIFIED",
+      "receipt": {
+        "artifact_id": "sha256:d0468605e059554adf2128a6bbac683c19d9323f5eed9e147be8158e92b3479d",
+        "event_id": "sha256:728a3f400c31c9ef67b469009945caa59c2219025e328dfd9ef640fd3cea8dcc"
+      }
+    },
+    {
+      "source_thread_id": "01a0c502-4556-7051-8865-faa2d7289164",
+      "source_title": "Design FLY-DROP experiment",
+      "path": "C:\\code land\\clean-rust\\program-infrastructure\\governance\\inbox\\20260927\\01a0c502-4556-7051-8865-faa2d7289164.json",
+      "status": "RECEIVED_NOT_INDEPENDENTLY_VERIFIED",
+      "receipt": {
+        "artifact_id": "sha256:0b8472d7b39d95f53725607d669704cf34a52f00ce189fab7cfced329cca92a8",
+        "event_id": "sha256:c0645ef4ea48787913e81ff473c14a2a2f984cd2fca6d76184874485d7055f21"
+      }
+    },
+    {
+      "source_thread_id": "01a0cc60-31a9-7222-88b6-8529ea56162b",
+      "source_title": "FAS paused",
+      "path": "C:\\code land\\clean-rust\\program-infrastructure\\governance\\inbox\\20260927\\01a0cc60-31a9-7222-88b6-8529ea56162b.json",
+      "status": "RECEIVED_NOT_INDEPENDENTLY_VERIFIED",
+      "receipt": {
+        "artifact_id": "sha256:2867a37f4ef018a475afff247ac95736c265601dee29b8960fb327fd8e46a4d6",
+        "event_id": "sha256:a804be7ff206bd0085a61a52d78ec5375e506eca8121274abc86d81cc313f40a"
+      }
+    },
+    {
+      "source_thread_id": "01a0cf53-2df4-7123-9237-82bcdf8f9148",
+      "source_title": "Golden Path Close Out",
+      "path": "C:\\code land\\clean-rust\\program-infrastructure\\governance\\inbox\\20260927\\01a0cf53-2df4-7123-9237-82bcdf8f9148.json",
+      "status": "RECEIVED_NOT_INDEPENDENTLY_VERIFIED",
+      "receipt": {
+        "artifact_id": "sha256:f9e381bc695d0844f61212c668837426700dbf8479f09fb61cfec0c80372e68a",
+        "event_id": "sha256:a6e8f37aebc47a11d11b73d8a15c38e8a1b9ee8eaaca29250f992239bec57bc7"
+      }
+    },
+    {
+      "source_thread_id": "01a0d426-04dc-7941-b0b0-30b1e5a09442",
+      "source_title": "Kinetic Kammi",
+      "path": "C:\\code land\\clean-rust\\program-infrastructure\\governance\\inbox\\20260927\\01a0d426-04dc-7941-b0b0-30b1e5a09442.json",
+      "status": "RECEIVED_NOT_INDEPENDENTLY_VERIFIED",
+      "receipt": {
+        "artifact_id": "sha256:3744e93b61ed288d2a450fe6fa576b98ca4ff19ce5400f7cb15417aa67102134",
+        "event_id": "sha256:846530aeec142fdb9ce5845385bacca4337e2aa2304ae680510a9ca31d6ab88a"
+      }
+    },
+    {
+      "source_thread_id": "01a0d986-610d-78e1-bb7b-7590d41a3f1c",
+      "source_title": "FAS-R1",
+      "path": "C:\\code land\\clean-rust\\program-infrastructure\\governance\\inbox\\20260927\\01a0d986-610d-78e1-bb7b-7590d41a3f1c.json",
+      "status": "RECEIVED_NOT_INDEPENDENTLY_VERIFIED",
+      "receipt": {
+        "artifact_id": "sha256:b0e04c90609346ef181370d15bf7fda52dc389061b5c3048371d50290b885a4d",
+        "event_id": "sha256:7e04f532dec4bcc562a5245899839ddc9139b90471d499e12bac7e66cfa6a208"
+      }
+    },
+    {
+      "source_thread_id": "01a0da51-f0a8-7dd0-94f7-a7e424e77021",
+      "source_title": "Frozen Fabrique",
+      "path": "C:\\code land\\clean-rust\\program-infrastructure\\governance\\inbox\\20260927\\01a0da51-f0a8-7dd0-94f7-a7e424e77021.json",
+      "status": "RECEIVED_NOT_INDEPENDENTLY_VERIFIED",
+      "receipt": {
+        "artifact_id": "sha256:bdbbcccc5c98d2deaf8d00f202257f016912ada47e3fb829da04fd9bdb6b8678",
+        "event_id": "sha256:25b93dc8b51901f2ee6013b878df683d0b58c0d03967ea30a531a232c73548d0"
+      }
+    }
+  ],
+  "seal": {
+    "root": "sha256:3704aef57add1addeaa02456323f531ec9bab0dafe826344523edf74f65ebefd",
+    "event_id": "sha256:97260083ac9e36840b063f7036db2e58e1fefa5c6de59c4a3d144389779837b2"
+  },
+  "scientific_authority_conferred": false,
+  "scope": "Immutable snapshots of agent messages only; experiment artifacts not independently audited."
+}

@@ -1,0 +1,21 @@
+{
+  "record_id": "FAS_S09_V03_PREFLIGHT_CORRECTION_RECORD",
+  "failed_attempt_protocol_root_sha256": "edd84c62df98d3f59443b8765bdee84224b5069a1a285a994d259391d2b183ae",
+  "failed_attempt_protocol_seal_file_sha256": "9a4d5cab7a8e09b5290723ed5e2ca91ba3f7656c3193f090dd0d7d795ed1297e",
+  "failed_contract_file_sha256": "305ffba88dc4076cd06d7c554315e8278538725ab70894a8327d4ed19c81f9db",
+  "exact_failure": {
+    "stage": "source identity preflight",
+    "field": "recovery_inputs.v02_extractor_source_sha256",
+    "contracted_value": "2c4c586bab5d5f027d07683df1699da9cc666b2edeeb5708f5d72ec047b2989a",
+    "observed_value": "2c4c586bab5d5f027d07683df1699da9cc666b2edebb5708f5d72ec047b2989a",
+    "error": "contracted extraction or linear-core source identity differs"
+  },
+  "disposition": {
+    "model_loaded": false,
+    "feature_matrices_read": false,
+    "probe_fitting_started": false,
+    "scientific_outputs_changed": false,
+    "source_v02_changed": false
+  },
+  "correction": "Correct the single source SHA-256 transcription in the v03 recovery contract; preserve the failed protocol seal and exact failed run snapshot under history-preflight-v03-attempt. Reseal the corrected packet before recovery qualification."
+}

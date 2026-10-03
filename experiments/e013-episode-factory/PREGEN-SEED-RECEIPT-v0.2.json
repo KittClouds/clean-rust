@@ -1,0 +1,23 @@
+{
+  "schema": "e013-pregen-seed-receipt/v0.2",
+  "created_date": "2026-09-26",
+  "stage": "before_episode_generation_and_adjudication",
+  "governing_protocol": "E013-TRUST-SIGNAL-DEVELOPMENT-v0.2",
+  "governing_protocol_sha256": "840be748b8aed6b9b642c3c622f079a61c847c61d0e5c9842b04a2a229aa6bdc",
+  "seeds": [
+    {
+      "bank": "E013-C",
+      "private_path": "D:\\codex-runs\\e013-episode-factory-v0.2\\seeds\\C.bin",
+      "bytes": 32,
+      "sha256": "eb21563cb05fd2b396eca1df9a7e81577f2d0f1d5a50e5ddb4d609ee97d9c3ee"
+    },
+    {
+      "bank": "E013-D",
+      "private_path": "D:\\codex-runs\\e013-episode-factory-v0.2\\seeds\\D.bin",
+      "bytes": 32,
+      "sha256": "f20fb209a13c5e8759de0af3d3e4888d354568390650270e99afd52e11f3303d"
+    }
+  ],
+  "seed_bytes_in_public_projection": false,
+  "e013_observer_contact": false
+}

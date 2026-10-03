@@ -1,0 +1,70 @@
+{
+  "f2_runtime_bindings": {
+    "pf5_contract": "20995E1826A9C62E0E8689017A2F3E624CC9E63B76B210FBD4AB11D7E9E7D34F",
+    "pf5_runner": "A00078787DB732906416B3C7158DC777CD41C2E71C3AAE660D1AE525446FB82A",
+    "rh1_ac2_effects": "4D45D48375385AE8886A744BF9CE8E926140F9181C30966316D7350608327EE5",
+    "rh1_ac2_features": "7EC54C783A97078243D4AA5B1AEDC65AC5FBE0475C8F11561D84FF4D8120C2F2",
+    "rh1_ac2_summary": "C0D93364B17D0739DB47519EA458833DA15E9DF59E28C85E6BD1A7D9B757EB04",
+    "rh1_cq1_contract": "E28592C95AFCA90FC83817A98CB2558E5C6157F6CE0050D260F3420F324F24E4",
+    "rh1_q1_summary": "848BE1D1A72A7B5C50863539AA7E4838299FC12C21E5BBCEF46EDB879B1096B7",
+    "rh1_runner": "B42644BA0E2C4C8A0CC0F9997135CE18A9F9E6C0836810926300C4D84F198103",
+    "s1_execution": "E561D7392D471CC0B47E98E66EC5AD9FC772476F2F61103FBF5994A051BC0E17",
+    "s1_sample": "0DE70DA72627D834C7D877F667469DA848F04312F072036245DFE312AD863BB9"
+  },
+  "full_selected_group_count": 16,
+  "geometry_policy": {
+    "actual_endpoints_hard_gate": [
+      "W0",
+      "historical_authority_h16",
+      "authority_h32_full"
+    ],
+    "counterfactual_endpoints_diagnostic_only": [
+      "authority_h32_early_ranks_1_16",
+      "authority_h32_late_only_ranks_17_32"
+    ],
+    "counterfactual_geometry_failure_policy": "record_metrics_and_diagnostic_pass_flag_without_abort",
+    "independent_replay_required": true,
+    "source": "sealed PF5 contract inherited by the F2 runtime"
+  },
+  "group_receipts": [
+    {
+      "actual_endpoint_geometry_hard_gate_pass": true,
+      "counterfactual_diagnostic_pass": {
+        "authority_h32_early_ranks_1_16": false,
+        "authority_h32_late_only_ranks_17_32": false
+      },
+      "identity": [
+        "seed9731-L-tau16.json",
+        0,
+        45
+      ],
+      "morphology_label": "zero_support+zero_sign",
+      "path": "qualification/smoke/groups/seed9731-L-tau16__set0__group45.json",
+      "row_interaction_sha256": "551CA1144AAF788BD8FCF29AF5B24DA703269266779849D0BF569B6A96FD61E2",
+      "sha256": "A4AC9E6D894E56670B8CC2B12EFCEE7479FA5DE9C950A3B1F82CED64A368BCB0"
+    }
+  ],
+  "la1_contract_sha256": "106841BC2260A76057B79E574B83F82796FC84A92D92DF6FB764D7AB42FEB650",
+  "la1_plan_sha256": "08CFA676B94EF6D8969D2D4C1DE479225A6E06D705DB7ACB52B559FC7A2F42CA",
+  "la1_preexecution_sha256": "9EF47B23DBAAFCE0E1E3ECE845A8BC57A14FF7237C561BEF6B8233924DB10F97",
+  "protocol": "Q10-PF6-RH1-LA1",
+  "run_scope": "smoke",
+  "scope": {
+    "behavioral_probe": false,
+    "engineering_only": true,
+    "model_mutation": false,
+    "parent_writes": false,
+    "scientific_promotion": false,
+    "scientific_seed_bundles": 0
+  },
+  "selected_group_count": 1,
+  "selection_complete": false,
+  "source_hashes": {
+    "f2_contract": "7CBDD2607D55A010D339B796196F7408A70B4664065075F3C3D7A5F64773723C",
+    "f2_execution": "D900B374F076AEC352381D878D31AEA8D7129D8BB5A3E53DB5B7D5B05E3FAFF9",
+    "f2_interpretation": "E00B21C55495A76C98A6F35E47F869F7C13F9CA50ADA44DD57B7879357EE86B9",
+    "f2_runner": "B42644BA0E2C4C8A0CC0F9997135CE18A9F9E6C0836810926300C4D84F198103",
+    "f2_summary": "C56E6B3DCB351867BA2BE9EB2394810B94284F2534AC3F7252502B2956BD8B62"
+  },
+  "status": "LA1_SMOKE_COMPLETE"
+}

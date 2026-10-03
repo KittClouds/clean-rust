@@ -1,0 +1,18 @@
+{
+  "identity": "q10-gc1-lr1-requal1-csc1-pair-alg3-exh1-audit-v1",
+  "parent": {
+    "contract_sha256": "1BE8E1C73B1FD26ED0900328C399866E57CBD688C4EB3198CFBD8A6C70B99712",
+    "execution_sha256": "A9A7DB62AEC66956C0CF047A02FB3644F51EA83B386FD67795620E43DBF0CC4E",
+    "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-pair-alg3-exh1-v1"
+  },
+  "protocol": "Q10-ALG3-EXH1-AUDIT1",
+  "read_only": true,
+  "scientific_promotion": false,
+  "status": "SEALED_PREMEASUREMENT",
+  "write_allowlist": [
+    "CONTRACT.json",
+    "PREEXECUTION.json",
+    "execution.json",
+    "STATUS.json"
+  ]
+}

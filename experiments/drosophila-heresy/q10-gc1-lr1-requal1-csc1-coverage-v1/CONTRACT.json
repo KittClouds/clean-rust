@@ -1,0 +1,30 @@
+{
+  "identity": "q10-gc1-lr1-requal1-csc1-coverage-v1",
+  "parent_bindings": [
+    {
+      "label": "pair_execution",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-sreplace-pairs-rerun1-v1/execution.json",
+      "sha256": "F160638BF6009ED4050A1427D3A3D8C8F56DE777CBBE2AFEEAB1704FE28B6B0E"
+    },
+    {
+      "label": "interaction_execution",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-sreplace-pairs-rerun1-interaction-v1/execution.json",
+      "sha256": "5016A2331F7336A1684413B5D91E9957ECC2B56622C3B4BD3FB643585A95C6F6"
+    },
+    {
+      "label": "morphology_report",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-sreplace-pairs-rerun1-morphology-v1/REPORT.json",
+      "sha256": "8C58E33BAFB3A0B23417EDF88C08AF1249EA8274731225BB7F8EB952DDE93D29"
+    }
+  ],
+  "plan_sha256": "E51159D51DE7B48379BD9541F01D01B75819D28B3C1FA6EA40D2D1C1E093A0C0",
+  "protocol": "REQUAL1-CSC1-COVERAGE",
+  "runner_sha256": "61AFE43EA7798092FFBD0B634B9ABEE0EA7C2F7E484A1BB36B987FD49C22AB27",
+  "scope": {
+    "behavioral_probe": false,
+    "read_only": true,
+    "replay_performed": false,
+    "scientific_promotion": false
+  },
+  "status": "FROZEN_PRE_EXECUTION__NOT_EXECUTED"
+}

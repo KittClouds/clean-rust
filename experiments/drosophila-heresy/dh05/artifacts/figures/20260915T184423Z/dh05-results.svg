@@ -1,0 +1,131 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="760" viewBox="0 0 1120 760">
+<style>text{font-family:Arial,sans-serif;fill:#252525}.title{font-size:22px;font-weight:600}.subtitle{font-size:14px;fill:#555}.panel-title{font-size:15px;font-weight:600}.axis{font-size:12px}.tick{font-size:11px;fill:#555}.legend{font-size:13px}</style>
+<text x="75" y="42" class="title">DH-05: interval eligibility accelerates old-map destabilization</text>
+<text x="75" y="70" class="subtitle">Right soma slice | 24 fresh seed bundles | state restored in both causal cells | means across taus and seeds</text>
+<rect x="75" y="145" width="465" height="270" fill="none" stroke="#b7b7b7"/>
+<line x1="75" y1="373.46" x2="540" y2="373.46" stroke="#dddddd"/>
+<text x="65" y="377.46" text-anchor="end" class="tick">-0.00</text>
+<line x1="75" y1="290.38" x2="540" y2="290.38" stroke="#dddddd"/>
+<text x="65" y="294.38" text-anchor="end" class="tick">0.02</text>
+<line x1="75" y1="207.31" x2="540" y2="207.31" stroke="#dddddd"/>
+<text x="65" y="211.31" text-anchor="end" class="tick">0.04</text>
+<line x1="75" y1="165.77" x2="540" y2="165.77" stroke="#dddddd"/>
+<text x="65" y="169.77" text-anchor="end" class="tick">0.05</text>
+<polyline points="75.00,161.23 104.06,177.99 133.12,191.33 191.25,213.42 307.50,244.68 540.00,289.14" fill="none" stroke="#c65f32" stroke-width="3"/>
+<circle cx="75.00" cy="161.23" r="4" fill="#c65f32"/>
+<circle cx="104.06" cy="177.99" r="4" fill="#c65f32"/>
+<circle cx="133.12" cy="191.33" r="4" fill="#c65f32"/>
+<circle cx="191.25" cy="213.42" r="4" fill="#c65f32"/>
+<circle cx="307.50" cy="244.68" r="4" fill="#c65f32"/>
+<circle cx="540.00" cy="289.14" r="4" fill="#c65f32"/>
+<polyline points="75.00,161.23 104.06,166.24 133.12,171.38 191.25,180.35 307.50,199.02 540.00,234.65" fill="none" stroke="#19766f" stroke-width="3"/>
+<circle cx="75.00" cy="161.23" r="4" fill="#19766f"/>
+<circle cx="104.06" cy="166.24" r="4" fill="#19766f"/>
+<circle cx="133.12" cy="171.38" r="4" fill="#19766f"/>
+<circle cx="191.25" cy="180.35" r="4" fill="#19766f"/>
+<circle cx="307.50" cy="199.02" r="4" fill="#19766f"/>
+<circle cx="540.00" cy="234.65" r="4" fill="#19766f"/>
+<text x="75.00" y="437" text-anchor="middle" class="tick">0</text>
+<text x="104.06" y="437" text-anchor="middle" class="tick">16</text>
+<text x="133.12" y="437" text-anchor="middle" class="tick">32</text>
+<text x="191.25" y="437" text-anchor="middle" class="tick">64</text>
+<text x="307.50" y="437" text-anchor="middle" class="tick">128</text>
+<text x="540.00" y="437" text-anchor="middle" class="tick">256</text>
+<text x="75" y="127" class="panel-title">Old-map expression</text>
+<text x="21" y="280.00" transform="rotate(-90 21 280.00)" text-anchor="middle" class="axis">Old-map margin</text>
+<rect x="585" y="145" width="465" height="270" fill="none" stroke="#b7b7b7"/>
+<line x1="585" y1="386.28" x2="1050" y2="386.28" stroke="#dddddd"/>
+<text x="575" y="390.28" text-anchor="end" class="tick">0.60</text>
+<line x1="585" y1="271.38" x2="1050" y2="271.38" stroke="#dddddd"/>
+<text x="575" y="275.38" text-anchor="end" class="tick">0.80</text>
+<line x1="585" y1="156.49" x2="1050" y2="156.49" stroke="#dddddd"/>
+<text x="575" y="160.49" text-anchor="end" class="tick">1.00</text>
+<polyline points="585.00,156.49 614.06,200.11 643.12,233.01 701.25,271.03 817.50,316.58 1050.00,351.83" fill="none" stroke="#c65f32" stroke-width="3"/>
+<circle cx="585.00" cy="156.49" r="4" fill="#c65f32"/>
+<circle cx="614.06" cy="200.11" r="4" fill="#c65f32"/>
+<circle cx="643.12" cy="233.01" r="4" fill="#c65f32"/>
+<circle cx="701.25" cy="271.03" r="4" fill="#c65f32"/>
+<circle cx="817.50" cy="316.58" r="4" fill="#c65f32"/>
+<circle cx="1050.00" cy="351.83" r="4" fill="#c65f32"/>
+<polyline points="585.00,156.49 614.06,165.52 643.12,173.63 701.25,188.50 817.50,216.00 1050.00,255.34" fill="none" stroke="#19766f" stroke-width="3"/>
+<circle cx="585.00" cy="156.49" r="4" fill="#19766f"/>
+<circle cx="614.06" cy="165.52" r="4" fill="#19766f"/>
+<circle cx="643.12" cy="173.63" r="4" fill="#19766f"/>
+<circle cx="701.25" cy="188.50" r="4" fill="#19766f"/>
+<circle cx="817.50" cy="216.00" r="4" fill="#19766f"/>
+<circle cx="1050.00" cy="255.34" r="4" fill="#19766f"/>
+<text x="585.00" y="437" text-anchor="middle" class="tick">0</text>
+<text x="614.06" y="437" text-anchor="middle" class="tick">16</text>
+<text x="643.12" y="437" text-anchor="middle" class="tick">32</text>
+<text x="701.25" y="437" text-anchor="middle" class="tick">64</text>
+<text x="817.50" y="437" text-anchor="middle" class="tick">128</text>
+<text x="1050.00" y="437" text-anchor="middle" class="tick">256</text>
+<text x="585" y="127" class="panel-title">Acquired structure retained</text>
+<text x="531" y="280.00" transform="rotate(-90 531 280.00)" text-anchor="middle" class="axis">Acquisition-axis coordinate</text>
+<rect x="75" y="480" width="465" height="210" fill="none" stroke="#b7b7b7"/>
+<line x1="75" y1="660.83" x2="540" y2="660.83" stroke="#dddddd"/>
+<text x="65" y="664.83" text-anchor="end" class="tick">-6.00</text>
+<line x1="75" y1="602.50" x2="540" y2="602.50" stroke="#dddddd"/>
+<text x="65" y="606.50" text-anchor="end" class="tick">-4.00</text>
+<line x1="75" y1="544.17" x2="540" y2="544.17" stroke="#dddddd"/>
+<text x="65" y="548.17" text-anchor="end" class="tick">-2.00</text>
+<line x1="75" y1="485.83" x2="540" y2="485.83" stroke="#dddddd"/>
+<text x="65" y="489.83" text-anchor="end" class="tick">0.00</text>
+<line x1="75" y1="485.83" x2="540" y2="485.83" stroke="#777" stroke-dasharray="5 4"/>
+<polyline points="75.00,485.83 104.06,527.24 133.12,558.29 191.25,594.76 307.50,638.37 540.00,672.63" fill="none" stroke="#c65f32" stroke-width="3"/>
+<circle cx="75.00" cy="485.83" r="4" fill="#c65f32"/>
+<circle cx="104.06" cy="527.24" r="4" fill="#c65f32"/>
+<circle cx="133.12" cy="558.29" r="4" fill="#c65f32"/>
+<circle cx="191.25" cy="594.76" r="4" fill="#c65f32"/>
+<circle cx="307.50" cy="638.37" r="4" fill="#c65f32"/>
+<circle cx="540.00" cy="672.63" r="4" fill="#c65f32"/>
+<polyline points="75.00,485.83 104.06,494.41 133.12,502.06 191.25,516.17 307.50,542.28 540.00,579.86" fill="none" stroke="#19766f" stroke-width="3"/>
+<circle cx="75.00" cy="485.83" r="4" fill="#19766f"/>
+<circle cx="104.06" cy="494.41" r="4" fill="#19766f"/>
+<circle cx="133.12" cy="502.06" r="4" fill="#19766f"/>
+<circle cx="191.25" cy="516.17" r="4" fill="#19766f"/>
+<circle cx="307.50" cy="542.28" r="4" fill="#19766f"/>
+<circle cx="540.00" cy="579.86" r="4" fill="#19766f"/>
+<text x="75.00" y="712" text-anchor="middle" class="tick">0</text>
+<text x="104.06" y="712" text-anchor="middle" class="tick">16</text>
+<text x="133.12" y="712" text-anchor="middle" class="tick">32</text>
+<text x="191.25" y="712" text-anchor="middle" class="tick">64</text>
+<text x="307.50" y="712" text-anchor="middle" class="tick">128</text>
+<text x="540.00" y="712" text-anchor="middle" class="tick">256</text>
+<text x="75" y="462" class="panel-title">Movement along anti-acquisition axis</text>
+<text x="21" y="585.00" transform="rotate(-90 21 585.00)" text-anchor="middle" class="axis">Parallel projection</text>
+<rect x="585" y="480" width="465" height="210" fill="none" stroke="#b7b7b7"/>
+<line x1="585" y1="690.00" x2="1050" y2="690.00" stroke="#dddddd"/>
+<text x="575" y="694.00" text-anchor="end" class="tick">0.00</text>
+<line x1="585" y1="630.00" x2="1050" y2="630.00" stroke="#dddddd"/>
+<text x="575" y="634.00" text-anchor="end" class="tick">0.30</text>
+<line x1="585" y1="570.00" x2="1050" y2="570.00" stroke="#dddddd"/>
+<text x="575" y="574.00" text-anchor="end" class="tick">0.60</text>
+<line x1="585" y1="510.00" x2="1050" y2="510.00" stroke="#dddddd"/>
+<text x="575" y="514.00" text-anchor="end" class="tick">0.90</text>
+<polyline points="585.00,690.00 614.06,622.43 643.12,600.68 701.25,573.06 817.50,542.81 1050.00,498.48" fill="none" stroke="#c65f32" stroke-width="3"/>
+<circle cx="585.00" cy="690.00" r="4" fill="#c65f32"/>
+<circle cx="614.06" cy="622.43" r="4" fill="#c65f32"/>
+<circle cx="643.12" cy="600.68" r="4" fill="#c65f32"/>
+<circle cx="701.25" cy="573.06" r="4" fill="#c65f32"/>
+<circle cx="817.50" cy="542.81" r="4" fill="#c65f32"/>
+<circle cx="1050.00" cy="498.48" r="4" fill="#c65f32"/>
+<polyline points="585.00,690.00 614.06,681.07 643.12,677.31 701.25,671.71 817.50,663.35 1050.00,649.54" fill="none" stroke="#19766f" stroke-width="3"/>
+<circle cx="585.00" cy="690.00" r="4" fill="#19766f"/>
+<circle cx="614.06" cy="681.07" r="4" fill="#19766f"/>
+<circle cx="643.12" cy="677.31" r="4" fill="#19766f"/>
+<circle cx="701.25" cy="671.71" r="4" fill="#19766f"/>
+<circle cx="817.50" cy="663.35" r="4" fill="#19766f"/>
+<circle cx="1050.00" cy="649.54" r="4" fill="#19766f"/>
+<text x="585.00" y="712" text-anchor="middle" class="tick">0</text>
+<text x="614.06" y="712" text-anchor="middle" class="tick">16</text>
+<text x="643.12" y="712" text-anchor="middle" class="tick">32</text>
+<text x="701.25" y="712" text-anchor="middle" class="tick">64</text>
+<text x="817.50" y="712" text-anchor="middle" class="tick">128</text>
+<text x="1050.00" y="712" text-anchor="middle" class="tick">256</text>
+<text x="585" y="462" class="panel-title">Movement outside acquisition axis</text>
+<text x="531" y="585.00" transform="rotate(-90 531 585.00)" text-anchor="middle" class="axis">Perpendicular norm</text>
+<line x1="760" y1="95" x2="780" y2="95" stroke="#c65f32" stroke-width="3"/><circle cx="770" cy="95" r="4" fill="#c65f32"/><text x="790" y="100" class="legend">Eligibility retained</text>
+<line x1="940" y1="95" x2="960" y2="95" stroke="#19766f" stroke-width="3"/><circle cx="950" cy="95" r="4" fill="#19766f"/><text x="970" y="100" class="legend">Eligibility suppressed</text>
+<text x="75" y="730" class="subtitle">Final old-map probe: -7.84 pp; acquisition-axis projection: -3.180</text>
+</svg>

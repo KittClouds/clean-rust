@@ -1,0 +1,1 @@
+{"schema":"G6_SOURCE_CLOSURE_RECEIPT_V1","source_closure_sha256":"505baeef527bf837ce396aeeed485206f9280e06f26108295689f23bf635736c","source_files":["Cargo.toml","Cargo.lock","OBS_OPEN_G6_PROTOCOL_V1.md","src/lib.rs","src/model.rs","src/contract.rs","src/fixtures.rs","src/seal.rs","src/main.rs","tests/g6_contract.rs"],"status":"PASS"}

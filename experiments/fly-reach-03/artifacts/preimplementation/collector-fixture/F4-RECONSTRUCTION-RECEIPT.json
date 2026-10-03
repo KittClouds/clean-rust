@@ -1,0 +1,9 @@
+{
+  "schema": "FLY-REACH-03-f4-reconstruction-receipt-v1",
+  "status": "PASS",
+  "rows_checked": 12,
+  "target_matches": 12,
+  "value_mismatches": 0,
+  "max_abs_error": 0.0,
+  "tolerance": 0.000001
+}

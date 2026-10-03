@@ -1,0 +1,35 @@
+{
+  "output_root": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e4-0-v01",
+  "artifacts": {
+    "e4_contract": "C:\\Users\\shuga\\.codex\\worktrees\\e4-0-contract-work\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\contracts\\e4-0-contract-v06-final.json",
+    "e4_contract_seal_manifest": "C:\\Users\\shuga\\.codex\\worktrees\\e4-0-contract-work\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\seals\\e4-0-contract-v06-seal.json",
+    "e4_contract_audit": "C:\\Users\\shuga\\.codex\\worktrees\\e4-0-contract-work\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\audits\\e4-0-track-e\\e4-0-contract-audit-bridge-v01.json",
+    "e0_seal": "C:\\code land\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\seals\\e0-seal-v10.json",
+    "e0_audit": "C:\\code land\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\audits\\e0-v10-independent-audit-v01.json",
+    "e1_seal": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e1-panel-v04\\e1-seal-v01.json",
+    "e1_audit": "C:\\code land\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\audits\\e1-independent-audit-v04.json",
+    "e2_seal": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e2-v07\\e2-v07-seal.json",
+    "e2_audit": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e2-v07\\e2-v07-independent-audit-v01.json",
+    "e3_seal": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e3-v02\\e3-v02-seal.json",
+    "e3_audit": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e3-v02\\e3-v02-independent-audit-v01.json",
+    "representation_abi": "C:\\Users\\shuga\\.codex\\worktrees\\e4-0-contract-work\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\contracts\\representation-abi-v07.json",
+    "model_manifest": "D:\\codex-runs\\fas-s01-frozen-sensor-transfer-cartography\\s01-2-feature-geometry-v01\\model-asset-manifest-v01.json",
+    "tokenizer_manifest": "D:\\codex-runs\\fas-s01-frozen-sensor-transfer-cartography\\s01-2a-tokenizer-alignment-v02\\tokenizer-assets-manifest-v01.json",
+    "e1_inputs": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e1-panel-v04\\panel\\panel-inputs-v01.jsonl",
+    "e1_rows": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e1-panel-v04\\panel\\row-manifest-v01.jsonl",
+    "e1_terms": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e1-panel-v04\\corpus\\term-inventory-v01.json",
+    "e1_splits": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e1-panel-v04\\panel\\split-manifest-v01.jsonl",
+    "population_seal": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e4-0-v01\\stage-seal-v01.json",
+    "population_audit": "C:\\Users\\shuga\\.codex\\worktrees\\e4-0-contract-work\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\audits\\e4-0-execution\\population-independent-audit-receipt-v01.json"
+  },
+  "paths": {
+    "model_snapshot": "D:\\codex-runs\\fas-s01-frozen-sensor-transfer-cartography\\s01-2-feature-geometry-v01\\model-assets\\hub-cache\\models--LiquidAI--LFM2.5-1.2B-Base\\snapshots\\7453bca97ca1e67754c4035a4b4c584e1c9dd725",
+    "tokenizer_snapshot": "D:\\codex-runs\\fas-s01-frozen-sensor-transfer-cartography\\s01-2a-tokenizer-alignment-v02\\tokenizer-cache\\hub\\models--LiquidAI--LFM2.5-1.2B-Base\\snapshots\\7453bca97ca1e67754c4035a4b4c584e1c9dd725",
+    "model_asset_manifest": "D:\\codex-runs\\fas-s01-frozen-sensor-transfer-cartography\\s01-2-feature-geometry-v01\\model-asset-manifest-v01.json",
+    "tokenizer_asset_manifest": "D:\\codex-runs\\fas-s01-frozen-sensor-transfer-cartography\\s01-2a-tokenizer-alignment-v02\\tokenizer-assets-manifest-v01.json"
+  },
+  "gpu_lease": {
+    "lock_path": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\gpu\\cuda0.lock"
+  },
+  "valid_for_seconds": 28800
+}

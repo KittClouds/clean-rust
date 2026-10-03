@@ -1,0 +1,132 @@
+{
+  "conclusion": "Complete order-3 structural domain counted from the canonical UVD0 compatibility graph.",
+  "contexts": [
+    {
+      "actions": 440,
+      "context": [
+        "seed9731-L-tau16.json",
+        2
+      ],
+      "isolated_actions": 0,
+      "max_degree": 432,
+      "mean_degree": 432.0,
+      "min_degree": 432,
+      "structural_pairs": 95040,
+      "structural_triples": 13432320,
+      "unique_edges": 95040
+    },
+    {
+      "actions": 496,
+      "context": [
+        "seed9731-L-tau4.json",
+        3
+      ],
+      "isolated_actions": 0,
+      "max_degree": 488,
+      "mean_degree": 488.0,
+      "min_degree": 488,
+      "structural_pairs": 121024,
+      "structural_triples": 19363840,
+      "unique_edges": 121024
+    },
+    {
+      "actions": 472,
+      "context": [
+        "seed9731-R-tau16.json",
+        1
+      ],
+      "isolated_actions": 0,
+      "max_degree": 464,
+      "mean_degree": 464.0,
+      "min_degree": 464,
+      "structural_pairs": 109504,
+      "structural_triples": 16644608,
+      "unique_edges": 109504
+    },
+    {
+      "actions": 432,
+      "context": [
+        "seed9731-R-tau16.json",
+        3
+      ],
+      "isolated_actions": 0,
+      "max_degree": 424,
+      "mean_degree": 424.0,
+      "min_degree": 424,
+      "structural_pairs": 91584,
+      "structural_triples": 12699648,
+      "unique_edges": 91584
+    },
+    {
+      "actions": 472,
+      "context": [
+        "seed9731-R-tau4.json",
+        0
+      ],
+      "isolated_actions": 0,
+      "max_degree": 464,
+      "mean_degree": 464.0,
+      "min_degree": 464,
+      "structural_pairs": 109504,
+      "structural_triples": 16644608,
+      "unique_edges": 109504
+    },
+    {
+      "actions": 440,
+      "context": [
+        "seed9731-R-tau4.json",
+        1
+      ],
+      "isolated_actions": 0,
+      "max_degree": 432,
+      "mean_degree": 432.0,
+      "min_degree": 432,
+      "structural_pairs": 95040,
+      "structural_triples": 13432320,
+      "unique_edges": 95040
+    },
+    {
+      "actions": 472,
+      "context": [
+        "seed9731-R-tau4.json",
+        2
+      ],
+      "isolated_actions": 0,
+      "max_degree": 464,
+      "mean_degree": 464.0,
+      "min_degree": 464,
+      "structural_pairs": 109504,
+      "structural_triples": 16644608,
+      "unique_edges": 109504
+    },
+    {
+      "actions": 472,
+      "context": [
+        "seed9731-R-tau4.json",
+        3
+      ],
+      "isolated_actions": 0,
+      "max_degree": 464,
+      "mean_degree": 464.0,
+      "min_degree": 464,
+      "structural_pairs": 109504,
+      "structural_triples": 16644608,
+      "unique_edges": 109504
+    }
+  ],
+  "contract_sha256": "F22CEFE540F558D04C32E10600ACD4EBE10107BC1CADED293E77BA4D01C9369D",
+  "counts": {
+    "actions": 3696,
+    "contexts": 8,
+    "structural_pairs": 840704,
+    "structural_triples": 125506560
+  },
+  "engineering_only": true,
+  "geometry_executed": false,
+  "identity": "q10-gc1-lr1-requal1-csc1-pair-alg3-cens0-v1",
+  "outcomes_consulted": false,
+  "protocol": "Q10-ALG3-CENS0",
+  "readout_executed": false,
+  "scientific_promotion": false,
+  "status": "ALG3_CENS0_COMPLETE"
+}

@@ -1,0 +1,11 @@
+{
+  "preflight_receipt_file_sha256": "ebefb419cfc2c1acbd32eb6b40610181904b7843af33c0e8fd357b4005174d0c",
+  "runtime_numpy": "2.5.3",
+  "runtime_python": "3.13.15",
+  "schema": "F4-INVARIANT-01-RUN2-source-freeze-receipt-v1",
+  "source_manifest_canonical_sha256": "2345918fafae91c2a56b2cdf596a343369f0faf51ace18ed7ffde2bbe6060a27",
+  "source_manifest_file_sha256": "6dfc960f3e7654b7c569995dd99ef91964f8646cc9aaa50a8a6e291c7268187e",
+  "status": "PASS",
+  "task_namespace_created": false,
+  "task_payload_created": false
+}

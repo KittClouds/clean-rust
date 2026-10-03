@@ -1,0 +1,18 @@
+{
+  "cue_relabeling": {
+    "coordinate_pairs": 42085440,
+    "max_abs_reference_difference": 0.0,
+    "three_way_sign_changes": 0,
+    "threshold_channel_changes": 0
+  },
+  "joint_label_action_inversion": {
+    "coordinate_pairs": 1753560,
+    "max_abs_reference_difference": 0.0,
+    "three_way_sign_changes": 0,
+    "threshold_channel_changes": 0
+  },
+  "rows_removed_due_to_target_changes": 0,
+  "schema": "F4-SYMMETRY-01-target-symmetry-diagnostic-v1",
+  "status": "RECORDED",
+  "target_invariance_required": false
+}

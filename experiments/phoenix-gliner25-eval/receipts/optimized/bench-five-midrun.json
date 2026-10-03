@@ -1,0 +1,83 @@
+{
+  "contract": "phoenix-gliner25-five-surface-novel-benchmark-v1",
+  "document": "C:\\code land\\clean-rust\\docs\\midrun.md",
+  "document_bytes": 522922,
+  "engine_load_ms": 2345.3302,
+  "features": [
+    {
+      "feature": "long_context",
+      "p50_ms": 248.9401,
+      "p95_ms": 277.6937,
+      "p99_ms": 277.6937,
+      "peak_working_set_bytes": 995831808,
+      "runs": 3,
+      "stable_output_count": 18,
+      "warmup": 1,
+      "working_set_after_bytes": 995831808,
+      "working_set_before_bytes": 969166848
+    },
+    {
+      "feature": "wide_span_entities",
+      "p50_ms": 259.84069999999997,
+      "p95_ms": 277.642,
+      "p99_ms": 277.642,
+      "peak_working_set_bytes": 995835904,
+      "runs": 3,
+      "stable_output_count": 18,
+      "warmup": 1,
+      "working_set_after_bytes": 995835904,
+      "working_set_before_bytes": 995835904
+    },
+    {
+      "feature": "span_attributes",
+      "p50_ms": 258.7652,
+      "p95_ms": 300.87760000000003,
+      "p99_ms": 300.87760000000003,
+      "peak_working_set_bytes": 1020514304,
+      "runs": 3,
+      "stable_output_count": 5,
+      "warmup": 1,
+      "working_set_after_bytes": 1020514304,
+      "working_set_before_bytes": 1015062528
+    },
+    {
+      "feature": "constrained_classification",
+      "p50_ms": 217.8697,
+      "p95_ms": 219.46009999999998,
+      "p99_ms": 219.46009999999998,
+      "peak_working_set_bytes": 1021554688,
+      "runs": 3,
+      "stable_output_count": 2,
+      "warmup": 1,
+      "working_set_after_bytes": 1021554688,
+      "working_set_before_bytes": 1021542400
+    },
+    {
+      "feature": "joint_information_extraction",
+      "p50_ms": 341.4893,
+      "p95_ms": 363.1798,
+      "p99_ms": 363.1798,
+      "peak_working_set_bytes": 1053532160,
+      "runs": 3,
+      "stable_output_count": 4,
+      "warmup": 1,
+      "working_set_after_bytes": 1053532160,
+      "working_set_before_bytes": 1050243072
+    }
+  ],
+  "graph_publications": 0,
+  "long_window": {
+    "bytes": 749,
+    "chunk_words": 384,
+    "model_words": 141,
+    "overlap_words": 64,
+    "whitespace_words": 116
+  },
+  "model": "D:\\phoenix-models\\gliner2.5-base-v1-onnx-a639bad",
+  "short_window": {
+    "bytes": 749,
+    "model_words": 141,
+    "whitespace_words": 116
+  },
+  "tiered_explicit": true
+}

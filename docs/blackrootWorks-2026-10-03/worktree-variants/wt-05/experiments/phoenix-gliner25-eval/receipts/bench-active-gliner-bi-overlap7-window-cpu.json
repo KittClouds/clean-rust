@@ -1,0 +1,24 @@
+{
+  "contract": "phoenix-active-gliner-bi-benchmark-v1",
+  "model_path": "D:\\hf-models\\gliner-bi-base-v2.0-onnx\\model_label_embeds_quantized.onnx",
+  "labels": [
+    "Person",
+    "Location",
+    "Organization",
+    "Creature",
+    "Item",
+    "Concept",
+    "Event"
+  ],
+  "workload": "first 270 whitespace words of docs/shortrun.md",
+  "warmups": 3,
+  "runs": 30,
+  "engine_load_ms": 1123,
+  "prediction_count": 10,
+  "prepared_min_ms": 233.9979,
+  "prepared_mean_ms": 250.69936,
+  "prepared_median_ms": 247.6727,
+  "prepared_p95_ms": 278.2641,
+  "prepared_max_ms": 282.9981,
+  "graph_publications": 0
+}

@@ -1,0 +1,1 @@
+{"accepted":true,"code":"MINIMAL_WITHIN_DECLARED_FINITE_BOX","verdict":"MINIMAL_WITHIN_DECLARED_FINITE_BOX","recomputed":{"left_state_trace":[0,1],"right_state_trace":[0,0],"protected_trace_left":[0,1],"protected_trace_right":[0,0],"first_mismatch_experiment_ordinal":1,"mismatch_observable_id":"SYNTHETIC_PROTECTED_VALUE"}}

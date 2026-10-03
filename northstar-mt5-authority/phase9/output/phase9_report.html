@@ -1,0 +1,86 @@
+<!doctype html><html><head><meta charset='utf-8'><title>RG2 Phase 9</title>
+<style>
+body{background:#0b1110;color:#dce9e4;font:14px system-ui;margin:0}main{max-width:1450px;margin:auto;padding:28px}
+h1{font-size:28px}h2{font-size:17px;color:#72e2c2}.decision{color:#ffc767}.cards{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+.card,section{background:#121b19;border:1px solid #263a35;border-radius:8px;padding:14px}.card b{display:block;font-size:22px;color:#fff}.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+.barrow{display:grid;grid-template-columns:180px 1fr 65px 150px;gap:8px;align-items:center;margin:7px 0}.track{height:9px;background:#26332f;border-radius:8px;overflow:hidden}.track i{display:block;height:100%;background:#4bd5ae}em{color:#82928d;font-style:normal;font-size:12px}
+table{border-collapse:collapse;width:100%;font-size:12px}th,td{border-bottom:1px solid #25332f;padding:7px;text-align:left}th{color:#72e2c2}pre{white-space:pre-wrap;color:#91a29d}@media(max-width:900px){.cards,.grid{grid-template-columns:1fr}}
+</style></head><body><main><h1>RG2 Phase 9 — dataset geometry</h1><p class='decision'><b>HOLD_RG2_FOR_LIFECYCLE_COVERAGE_REVIEW</b></p>
+<p>No strategy labels · no win rate · no feature selection · no model</p><div class='cards'>
+<div class='card'><b>20</b>runs</div><div class='card'><b>2,294</b>nodes</div>
+<div class='card'><b>38,957</b>events</div><div class='card'><b>7,764</b>attempts</div>
+<div class='card'><b>1,462</b>episodes</div><div class='card'><b>628</b>transits</div></div>
+<div class='grid'><section><h2>Instrument</h2><div class='barrow'><span>US500</span><div class='track'><i style='width:100.00%'></i></div><b>311</b><em>21.27% · cens 1.93%</em></div><div class='barrow'><span>JPN225</span><div class='track'><i style='width:94.86%'></i></div><b>295</b><em>20.18% · cens 1.36%</em></div><div class='barrow'><span>US30</span><div class='track'><i style='width:75.24%'></i></div><b>234</b><em>16.01% · cens 2.14%</em></div><div class='barrow'><span>FRA40</span><div class='track'><i style='width:71.06%'></i></div><b>221</b><em>15.12% · cens 2.71%</em></div><div class='barrow'><span>DE40</span><div class='track'><i style='width:69.13%'></i></div><b>215</b><em>14.71% · cens 1.86%</em></div><div class='barrow'><span>USTEC</span><div class='track'><i style='width:59.81%'></i></div><b>186</b><em>12.72% · cens 1.61%</em></div></section><section><h2>Region</h2><div class='barrow'><span>MEDIAN_CORE</span><div class='track'><i style='width:100.00%'></i></div><b>848</b><em>58.00% · cens 1.42%</em></div><div class='barrow'><span>BELOW</span><div class='track'><i style='width:34.67%'></i></div><b>294</b><em>20.11% · cens 2.04%</em></div><div class='barrow'><span>ABOVE</span><div class='track'><i style='width:28.66%'></i></div><b>243</b><em>16.62% · cens 2.06%</em></div><div class='barrow'><span>FAR_BELOW</span><div class='track'><i style='width:5.54%'></i></div><b>47</b><em>3.21% · cens 6.38%</em></div><div class='barrow'><span>FAR_ABOVE</span><div class='track'><i style='width:3.42%'></i></div><b>29</b><em>1.98% · cens 6.90%</em></div><div class='barrow'><span>EXTREME_BELOW</span><div class='track'><i style='width:0.12%'></i></div><b>1</b><em>0.07% · cens 0.00%</em></div></section><section><h2>Resolution</h2><div class='barrow'><span>NODE_RETIRED</span><div class='track'><i style='width:100.00%'></i></div><b>856</b><em>58.55% · cens 0.35%</em></div><div class='barrow'><span>TIMEOUT</span><div class='track'><i style='width:46.73%'></i></div><b>400</b><em>27.36% · cens 1.25%</em></div><div class='barrow'><span>TRANSIT_TO_NEXT_NODE</span><div class='track'><i style='width:10.63%'></i></div><b>91</b><em>6.22% · cens 4.40%</em></div><div class='barrow'><span>RECLAIM_AFTER_BREAK</span><div class='track'><i style='width:5.49%'></i></div><b>47</b><em>3.21% · cens 0.00%</em></div><div class='barrow'><span>RETURN_TO_SOURCE_NODE</span><div class='track'><i style='width:2.57%'></i></div><b>22</b><em>1.50% · cens 0.00%</em></div><div class='barrow'><span>ACCEPT_AND_HOLD_RETEST</span><div class='track'><i style='width:1.87%'></i></div><b>16</b><em>1.09% · cens 0.00%</em></div><div class='barrow'><span>REJECT_TO_ORIGIN</span><div class='track'><i style='width:1.52%'></i></div><b>13</b><em>0.89% · cens 76.92%</em></div><div class='barrow'><span>ACCEPT_AND_FAIL_RETEST</span><div class='track'><i style='width:0.93%'></i></div><b>8</b><em>0.55% · cens 50.00%</em></div><div class='barrow'><span>ACCEPT_THROUGH_NODE</span><div class='track'><i style='width:0.82%'></i></div><b>7</b><em>0.48% · cens 0.00%</em></div><div class='barrow'><span>NONE</span><div class='track'><i style='width:0.23%'></i></div><b>2</b><em>0.14% · cens 100.00%</em></div></section><section><h2>Producer combination</h2><div class='barrow'><span>VOLKITT+WAYNE</span><div class='track'><i style='width:100.00%'></i></div><b>3,378</b><em>43.51% · cens 0.41%</em></div><div class='barrow'><span>DAY_SWINGS+VOLKITT+WAYNE</span><div class='track'><i style='width:41.30%'></i></div><b>1,395</b><em>17.97% · cens 0.00%</em></div><div class='barrow'><span>DAY_SWINGS+WAYNE</span><div class='track'><i style='width:32.27%'></i></div><b>1,090</b><em>14.04% · cens 0.09%</em></div><div class='barrow'><span>WAYNE</span><div class='track'><i style='width:26.88%'></i></div><b>908</b><em>11.70% · cens 0.44%</em></div><div class='barrow'><span>VOLKITT</span><div class='track'><i style='width:16.67%'></i></div><b>563</b><em>7.25% · cens 0.18%</em></div><div class='barrow'><span>DAY_SWINGS+VOLKITT</span><div class='track'><i style='width:10.09%'></i></div><b>341</b><em>4.39% · cens 0.00%</em></div><div class='barrow'><span>DAY_SWINGS</span><div class='track'><i style='width:2.63%'></i></div><b>89</b><em>1.15% · cens 0.00%</em></div></section></div><section><h2>Continuous distributions</h2><table><thead><tr><th>unit</th><th>metric</th><th>count</th><th>missing_count</th><th>censoring_rate</th><th>p05</th><th>median</th><th>p95</th></tr></thead><tbody><tr><td>episode</td><td>duration_seconds</td><td>1462</td><td>0</td><td>0.0192</td><td>9.05</td><td>3600.0</td><td>30690.4</td></tr><tr><td>episode</td><td>node_width_atr</td><td>1462</td><td>0</td><td>0.0192</td><td>0.0004</td><td>0.1088</td><td>11.4353</td></tr><tr><td>episode</td><td>node_age_seconds</td><td>1462</td><td>0</td><td>0.0192</td><td>0.0</td><td>155.0</td><td>142256.15</td></tr><tr><td>episode</td><td>start_median_sigma</td><td>1462</td><td>0</td><td>0.0192</td><td>-1.2369</td><td>-0.0068</td><td>1.1513</td></tr><tr><td>attempt</td><td>duration_seconds</td><td>7764</td><td>0</td><td>0.0026</td><td>34.0</td><td>421.0</td><td>7348.85</td></tr><tr><td>attempt</td><td>penetration_atr</td><td>7764</td><td>0</td><td>0.0026</td><td>0.0</td><td>0.2183</td><td>2.8701</td></tr><tr><td>attempt</td><td>inside_seconds</td><td>7764</td><td>0</td><td>0.0026</td><td>0.0</td><td>24.0</td><td>1437.7</td></tr><tr><td>attempt</td><td>approach_efficiency</td><td>7764</td><td>0</td><td>0.0026</td><td>0.0</td><td>0.1228</td><td>1.0</td></tr><tr><td>attempt</td><td>node_width_atr</td><td>7764</td><td>0</td><td>0.0026</td><td>0.0169</td><td>1.0873</td><td>11.8417</td></tr><tr><td>attempt</td><td>node_age_seconds</td><td>7764</td><td>0</td><td>0.0026</td><td>3.0</td><td>15531.0</td><td>180538.6</td></tr><tr><td>attempt</td><td>start_median_sigma</td><td>7764</td><td>0</td><td>0.0026</td><td>-1.3808</td><td>-0.0079</td><td>1.0912</td></tr><tr><td>transit</td><td>distance_atr</td><td>628</td><td>0</td><td>0.0</td><td>0.5848</td><td>3.3795</td><td>13.8372</td></tr><tr><td>transit</td><td>duration_seconds</td><td>628</td><td>0</td><td>0.0</td><td>0.0</td><td>206.0</td><td>6451.7</td></tr></tbody></table></section>
+<section><h2>Question readiness</h2><table><thead><tr><th>question</th><th>evidence_count</th><th>readiness</th><th>reason</th></tr></thead><tbody><tr><td>Why do resolved episodes terminate through node retirement?</td><td>853</td><td>READY_DESCRIPTIVE</td><td>semantic lifecycle audit; no expectancy</td></tr><tr><td>Is node retirement concentrated by instrument?</td><td>186</td><td>READY_DESCRIPTIVE</td><td>all six instruments populated</td></tr><tr><td>What contexts accompany node-to-node transit?</td><td>628</td><td>READY_DESCRIPTIVE</td><td>descriptive geometry only</td></tr><tr><td>What contexts accompany reclaim after break?</td><td>47</td><td>READY_DESCRIPTIVE</td><td>cross-cells may remain sparse</td></tr><tr><td>What contexts accompany accepted retest failure?</td><td>4</td><td>INSUFFICIENT</td><td>too few for conditional inference</td></tr><tr><td>How do EXTREME_ABOVE episodes behave?</td><td>0</td><td>EMPTY</td><td>empty regional cell</td></tr><tr><td>How do EXTREME_BELOW episodes behave?</td><td>1</td><td>INSUFFICIENT</td><td>near-empty regional cell</td></tr><tr><td>Does repeated testing differ by attempt ordinal?</td><td>886</td><td>READY_DESCRIPTIVE</td><td>episodes with repeated attempts; within-episode attempts remain dependent</td></tr><tr><td>Do exact producer combinations differ?</td><td>89</td><td>PRELIMINARY_ONLY</td><td>7 combinations have at least 30 attempts</td></tr><tr><td>Are both approach directions represented?</td><td>701</td><td>READY_DESCRIPTIVE</td><td>from-above and from-below mirrors are both populated</td></tr><tr><td>Can behavior be compared across data sources?</td><td>1</td><td>EMPTY_COMPARISON</td><td>RG2 contains one data source</td></tr><tr><td>Can behavior be compared across core sigma bands?</td><td>177</td><td>READY_DESCRIPTIVE</td><td>minimum cell across negative core, median core, and positive core</td></tr><tr><td>Can behavior be compared at absolute sigma above two?</td><td>17</td><td>PRELIMINARY_ONLY</td><td>both extreme sigma tails combined</td></tr><tr><td>Can node age and width be audited against retirement/timeout?</td><td>1462</td><td>READY_DESCRIPTIVE</td><td>stratified continuous and categorical geometry available</td></tr><tr><td>How does corridor geometry differ across resolutions?</td><td>7764</td><td>READY_DESCRIPTIVE</td><td>continuous distributions and cross-coverage available</td></tr><tr><td>Can RG2 support a predictive model?</td><td>1462</td><td>BLOCKED_BY_DESIGN</td><td>Phase 9 forbids modeling; outcome imbalance requires review</td></tr></tbody></table></section><section><h2>Machine summary</h2><pre>{
+  &quot;contract&quot;: &quot;MST_RG2_PHASE9_DATASET_GEOMETRY_V1&quot;,
+  &quot;generated_at_utc&quot;: &quot;2026-08-12T12:51:21.447745+00:00&quot;,
+  &quot;research_generation&quot;: 2,
+  &quot;corpus_fingerprint&quot;: &quot;3de4a043f52ff997e3e8de9428a4bbfcb17d94b41935a2ce9b64ebc0dce80a34&quot;,
+  &quot;runs&quot;: 20,
+  &quot;instruments&quot;: 6,
+  &quot;data_sources&quot;: 1,
+  &quot;scheduled_span_hours&quot;: 2356.25,
+  &quot;observed_bar_hours&quot;: 1769.5833333333335,
+  &quot;observed_bars&quot;: 21235,
+  &quot;nodes_created&quot;: 2294,
+  &quot;nodes_retired&quot;: 2077,
+  &quot;nodes_persisted_at_cutoff&quot;: 217,
+  &quot;events&quot;: 38957,
+  &quot;attempts&quot;: 7764,
+  &quot;episodes&quot;: 1462,
+  &quot;transits&quot;: 628,
+  &quot;episodes_resolved&quot;: 1434,
+  &quot;episodes_right_censored&quot;: 28,
+  &quot;episode_censoring_rate&quot;: 0.019151846785225718,
+  &quot;behavioral_resolutions&quot;: 186,
+  &quot;behavioral_resolution_share&quot;: 0.12722298221614228,
+  &quot;unexpected_data_gaps&quot;: 0,
+  &quot;profile_bar_gap&quot;: 0,
+  &quot;replay_count&quot;: 1,
+  &quot;replay_status&quot;: &quot;PASS&quot;,
+  &quot;replay_hash_agreement&quot;: true,
+  &quot;replays&quot;: [
+    {
+      &quot;run_key&quot;: &quot;RG2_USTEC_PERIOD_M5_1776038400_1776466500_3632165528533734308&quot;,
+      &quot;baseline_invocation_id&quot;: &quot;RG2_USTEC_PERIOD_M5_1776038400_1776466500_3632165528533734308_I1776038400_10924319290598477948&quot;,
+      &quot;replay_invocation_id&quot;: &quot;RG2_USTEC_PERIOD_M5_1776038400_1776466500_3632165528533734308_I1776038400_17891714471850596647&quot;,
+      &quot;canonical_dataset_hash&quot;: &quot;e9353d2aa8ebcbb2d4ce80100b58dc59b52cbc2a81a6220a02e918f47000e26f&quot;
+    }
+  ],
+  &quot;primary_key_duplicates&quot;: {
+    &quot;events&quot;: 0,
+    &quot;attempts&quot;: 0,
+    &quot;episodes&quot;: 0,
+    &quot;features&quot;: 0,
+    &quot;transits&quot;: 0
+  },
+  &quot;qc_failures&quot;: [],
+  &quot;relational_invariant_failures&quot;: [],
+  &quot;diagnostics&quot;: {
+    &quot;node_retired_episode_rows&quot;: 856,
+    &quot;node_retired_resolved&quot;: 853,
+    &quot;node_retired_censored&quot;: 3,
+    &quot;node_retired_share_of_resolved&quot;: 0.594839609483961,
+    &quot;node_retired_node_age_median_seconds&quot;: 5.0,
+    &quot;node_retired_width_median_atr&quot;: 0.09133952,
+    &quot;node_retired_duration_median_seconds&quot;: 946.0,
+    &quot;node_retired_under_1h_count&quot;: 692,
+    &quot;timeout_episode_rows&quot;: 400,
+    &quot;timeout_resolved&quot;: 395,
+    &quot;timeout_censored&quot;: 5,
+    &quot;timeout_share_of_resolved&quot;: 0.2754532775453278,
+    &quot;timeout_node_age_median_seconds&quot;: 16045.0,
+    &quot;timeout_width_median_atr&quot;: 2.48595174,
+    &quot;timeout_duration_median_seconds&quot;: 12747.0,
+    &quot;timeout_over_1atr_count&quot;: 240,
+    &quot;retired_node_lifetime_median_seconds&quot;: 7200.0,
+    &quot;persisted_node_observed_age_median_seconds&quot;: 75180.0,
+    &quot;repeated_attempt_episodes&quot;: 886,
+    &quot;producer_combinations&quot;: 7,
+    &quot;minimum_producer_combo_attempts&quot;: 89
+  },
+  &quot;status&quot;: &quot;PASS&quot;,
+  &quot;phase9_decision&quot;: &quot;HOLD_RG2_FOR_LIFECYCLE_COVERAGE_REVIEW&quot;,
+  &quot;semantic_result_sha256&quot;: &quot;119d87d2be6d9b4337e6af0d7752596c61873c05598f4438514a016ec81574ae&quot;
+}</pre></section>
+</main></body></html>

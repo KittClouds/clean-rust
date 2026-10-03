@@ -1,0 +1,33 @@
+{
+  "schema": "FAS_E4_0_V13_FINALIZATION_STOP_V01",
+  "receipt_id": "E4_0_V13_FINALIZATION_STOP_RECEIPT_STATUS_MISMATCH",
+  "status": "E4_0_V13_FINALIZATION_STOP_RECEIPT_STATUS_MISMATCH",
+  "mode": "PRE_FINALIZATION",
+  "source_map": {
+    "path": "experiments/fas-frozen-observer-bundle-engineering-v01/plans/E4-0-IMPLEMENTATION-SOURCE-MAP-v13.md",
+    "bytes": 86052,
+    "sha256": "a06d436c5cee8305ab65a7cb77f34165f48ccdeee932b788a511a70663c47fc6"
+  },
+  "finalizer_source": {
+    "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/finalize_e4_0_contract_v13.py",
+    "bytes": 52511,
+    "sha256": "03025d1e0e5ed52e7ef3920db0ef780139944fd209fa9d221ca071b42f16ed11"
+  },
+  "diagnostic": {
+    "exception_class": "RuntimeError",
+    "message": "receipt status mismatch or failure: experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-source-tests-v20.json"
+  },
+  "contract_candidate": null,
+  "pass": false,
+  "final_seal": null,
+  "authorization_written": false,
+  "model_contact": false,
+  "tokenizer_contact": false,
+  "cuda_initialized": false,
+  "gpu_lease_acquired": false,
+  "feature_cache_created": false,
+  "labels_opened": false,
+  "population_truth_files_opened": false,
+  "template_or_joint_truth_opened": false,
+  "scope": "Preserved pre-finalization tooling stop: v13 map and finalizer are bound exactly; the finalizer rejected the actual predecessor Track E v12 PASS receipt status because its accepted status registry omitted that registered status. No contract candidate, seal, authorization, model/tokenizer/CUDA/GPU contact, feature cache, or labels were produced or opened."
+}

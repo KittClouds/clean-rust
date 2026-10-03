@@ -1,0 +1,252 @@
+{
+  "block_counts": [
+    {
+      "block": 306000,
+      "negative": 1999,
+      "positive": 0,
+      "rows": 1999
+    },
+    {
+      "block": 306001,
+      "negative": 0,
+      "positive": 1321,
+      "rows": 1321
+    },
+    {
+      "block": 306002,
+      "negative": 1134,
+      "positive": 116,
+      "rows": 1250
+    },
+    {
+      "block": 306003,
+      "negative": 522,
+      "positive": 208,
+      "rows": 730
+    },
+    {
+      "block": 306004,
+      "negative": 0,
+      "positive": 504,
+      "rows": 504
+    },
+    {
+      "block": 306005,
+      "negative": 4127,
+      "positive": 1342,
+      "rows": 5469
+    },
+    {
+      "block": 306006,
+      "negative": 3426,
+      "positive": 0,
+      "rows": 3426
+    },
+    {
+      "block": 306007,
+      "negative": 0,
+      "positive": 1416,
+      "rows": 1416
+    },
+    {
+      "block": 306008,
+      "negative": 381,
+      "positive": 1545,
+      "rows": 1926
+    },
+    {
+      "block": 306009,
+      "negative": 97,
+      "positive": 3998,
+      "rows": 4095
+    },
+    {
+      "block": 306010,
+      "negative": 3463,
+      "positive": 612,
+      "rows": 4075
+    },
+    {
+      "block": 306011,
+      "negative": 2475,
+      "positive": 190,
+      "rows": 2665
+    }
+  ],
+  "fit_manifest_created": false,
+  "fits_executed": false,
+  "folds": [
+    {
+      "fold_index": 0,
+      "heldout_block": 306000,
+      "heldout_class_complete": false,
+      "heldout_negative": 1999,
+      "heldout_positive": 0,
+      "heldout_rows": 1999,
+      "training_negative": 15625,
+      "training_order_hash": "0b81d2dd53702deab251086f0a1c3c99226db508d1f375dcc8789087025e1f2d",
+      "training_positive": 11252,
+      "training_row_hash": "f46f7708b5be0c687636a2c7c22ce3e06f4bd777b39d289da257958142ebbb90",
+      "training_rows": 26877
+    },
+    {
+      "fold_index": 1,
+      "heldout_block": 306001,
+      "heldout_class_complete": false,
+      "heldout_negative": 0,
+      "heldout_positive": 1321,
+      "heldout_rows": 1321,
+      "training_negative": 17624,
+      "training_order_hash": "3894d08daa01cb05fe165c4b4affb6bdd997fc2b63f406130d61c24b539d2972",
+      "training_positive": 9931,
+      "training_row_hash": "59e14d7b8a243b433b120a7e5adeed9115a4583151c9c964cdc6286dc6318d2a",
+      "training_rows": 27555
+    },
+    {
+      "fold_index": 2,
+      "heldout_block": 306002,
+      "heldout_class_complete": true,
+      "heldout_negative": 1134,
+      "heldout_positive": 116,
+      "heldout_rows": 1250,
+      "training_negative": 16490,
+      "training_order_hash": "f186d68e3dad03d0bc9d34e72ede6db9613ab2882da1aafced7c92e6d534e88c",
+      "training_positive": 11136,
+      "training_row_hash": "3a51142b0e87a39181c060af8dd00f1f9e1fdb9fa8f28cef90e7156270ce3077",
+      "training_rows": 27626
+    },
+    {
+      "fold_index": 3,
+      "heldout_block": 306003,
+      "heldout_class_complete": true,
+      "heldout_negative": 522,
+      "heldout_positive": 208,
+      "heldout_rows": 730,
+      "training_negative": 17102,
+      "training_order_hash": "0e0048133be4d13d0e4dd3ef76b7eafb88e2e58a810d60fea41a283f16968416",
+      "training_positive": 11044,
+      "training_row_hash": "38984f78496fe2d7bbcd84e63e5a9de592e14e34e0b266ac7da7e4caaa6438af",
+      "training_rows": 28146
+    },
+    {
+      "fold_index": 4,
+      "heldout_block": 306004,
+      "heldout_class_complete": false,
+      "heldout_negative": 0,
+      "heldout_positive": 504,
+      "heldout_rows": 504,
+      "training_negative": 17624,
+      "training_order_hash": "9d197c09f3f0b30150bf18dbb5ea3918ba7bcd83fe9debb0adb0d994c09c24f0",
+      "training_positive": 10748,
+      "training_row_hash": "17de958cb029810add23204b8e7a1cb5294108d527bcba489c04828b6d2bb019",
+      "training_rows": 28372
+    },
+    {
+      "fold_index": 5,
+      "heldout_block": 306005,
+      "heldout_class_complete": true,
+      "heldout_negative": 4127,
+      "heldout_positive": 1342,
+      "heldout_rows": 5469,
+      "training_negative": 13497,
+      "training_order_hash": "f220ca9764e7b5ff94f29cf8aaea174fd95ff2f39737c65411972cbfa9c0cfb6",
+      "training_positive": 9910,
+      "training_row_hash": "3008ff2e439ed26abbe3c716168a0fdc351b0b3df5deac439de128c67e777f1f",
+      "training_rows": 23407
+    },
+    {
+      "fold_index": 6,
+      "heldout_block": 306006,
+      "heldout_class_complete": false,
+      "heldout_negative": 3426,
+      "heldout_positive": 0,
+      "heldout_rows": 3426,
+      "training_negative": 14198,
+      "training_order_hash": "025c8f8e3b7337553101f8d01c7a2122aae7ede74193680601af1524e4540de5",
+      "training_positive": 11252,
+      "training_row_hash": "1ec60a07ec266c16e9fc8f1a1d2194a21f246ba46c1332334cd3ea0f71af7299",
+      "training_rows": 25450
+    },
+    {
+      "fold_index": 7,
+      "heldout_block": 306007,
+      "heldout_class_complete": false,
+      "heldout_negative": 0,
+      "heldout_positive": 1416,
+      "heldout_rows": 1416,
+      "training_negative": 17624,
+      "training_order_hash": "5f9872698abf9d4de9ae43140c81bad95081e5c5fb778cb4c4df7628afe3f2f6",
+      "training_positive": 9836,
+      "training_row_hash": "c9c62d548817e9d869c384b2efff398d0755b5c6815fa737822662f24c3ac139",
+      "training_rows": 27460
+    },
+    {
+      "fold_index": 8,
+      "heldout_block": 306008,
+      "heldout_class_complete": true,
+      "heldout_negative": 381,
+      "heldout_positive": 1545,
+      "heldout_rows": 1926,
+      "training_negative": 17243,
+      "training_order_hash": "89d0dd47fcff2417b90d48ad745bcf557f2cfbe4fefe3f070090c94890a02bd3",
+      "training_positive": 9707,
+      "training_row_hash": "ba8e202c957bbe0d18b5e7497af7cdcf1f30abab706b510eea59272cbe81e791",
+      "training_rows": 26950
+    },
+    {
+      "fold_index": 9,
+      "heldout_block": 306009,
+      "heldout_class_complete": true,
+      "heldout_negative": 97,
+      "heldout_positive": 3998,
+      "heldout_rows": 4095,
+      "training_negative": 17527,
+      "training_order_hash": "613bcf4d2e69af79df9274fb2993392cc2bf2e9f90c5bd62237e49aeb88e14e8",
+      "training_positive": 7254,
+      "training_row_hash": "adc4f96c5c0594fd70ecfbd89031200512d55352b8cd86a5209cb8afc702eafa",
+      "training_rows": 24781
+    },
+    {
+      "fold_index": 10,
+      "heldout_block": 306010,
+      "heldout_class_complete": true,
+      "heldout_negative": 3463,
+      "heldout_positive": 612,
+      "heldout_rows": 4075,
+      "training_negative": 14161,
+      "training_order_hash": "f8735337011e8f024f11692bce1cd1fac6d1680a0bcb457428c7c418f1caff00",
+      "training_positive": 10640,
+      "training_row_hash": "aa22aaede0dc596fa5a651511cab3e7f982be842d60fb6468c52f98108539745",
+      "training_rows": 24801
+    },
+    {
+      "fold_index": 11,
+      "heldout_block": 306011,
+      "heldout_class_complete": true,
+      "heldout_negative": 2475,
+      "heldout_positive": 190,
+      "heldout_rows": 2665,
+      "training_negative": 15149,
+      "training_order_hash": "26e1ea0ee5c104fb9685fc71bce7714d6b63c269f2e0cd860e03a8205d1252ff",
+      "training_positive": 11062,
+      "training_row_hash": "5e228ba2ba4772eeb26c930930da1ba8ab8cd3bb56d798cde29579d898e08afe",
+      "training_rows": 26211
+    }
+  ],
+  "heldout_class_complete_blocks": 7,
+  "heldout_support_gate_applied": false,
+  "heldout_support_used_to_change_execution": false,
+  "model_construction_performed": false,
+  "predictions_or_arm_outcomes_inspected": false,
+  "predictor_file_sha256": "e764b0ed8d910f0817f291f8081d08d42767461ce319f3fb80ce2236d2b9644a",
+  "qualification_only": true,
+  "run_id": "F4-INVARIANT-01-COLLECT2",
+  "schema": "F4-INVARIANT-01-training-support-receipt-v1",
+  "scoring_truth_file_sha256": "5691561ec69800f7e067e3b03de2f917d68cfee8412b1f85a0e6fa55b7daad24",
+  "source_collection_receipt_sha256": "80b2b6021ffc3bae261bd921184b9f9aecd394c5dba66310d874a8849e3d171d",
+  "status": "PASS",
+  "support_gate": "all 12 leave-one-block-out training partitions are nonempty and contain both target classes",
+  "support_gate_script_sha256": "fb8b0b0451320bc3a8bba48e70877896a2bf5f1162208e976d086a0898139b57",
+  "total_rows": 28876,
+  "training_support_failures": []
+}

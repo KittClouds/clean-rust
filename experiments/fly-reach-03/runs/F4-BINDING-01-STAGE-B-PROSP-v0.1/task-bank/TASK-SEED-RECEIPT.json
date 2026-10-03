@@ -1,0 +1,17 @@
+{
+  "assignment_counts": {
+    "0": 4,
+    "1": 4,
+    "2": 4,
+    "3": 4,
+    "4": 4,
+    "5": 4
+  },
+  "block_count": 24,
+  "native_collection_started": false,
+  "schema": "F4-BINDING-01-stage-b-seed-receipt-v0.1",
+  "status": "PASS",
+  "task_payload_created": false,
+  "task_seed_manifest_sha256": "42469f7872f8362456e6988e4f07453e211adae609f1bc393eadd5fe1ebe8ec3",
+  "unique_seed_count": 72
+}

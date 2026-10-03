@@ -1,0 +1,64 @@
+{
+  "behavior": false,
+  "case_summaries": [
+    {
+      "case": "seed9731-L-tau16__set2",
+      "complete": true,
+      "expected": 440,
+      "materialized": 440
+    },
+    {
+      "case": "seed9731-L-tau4__set3",
+      "complete": true,
+      "expected": 496,
+      "materialized": 496
+    },
+    {
+      "case": "seed9731-R-tau16__set1",
+      "complete": true,
+      "expected": 472,
+      "materialized": 472
+    },
+    {
+      "case": "seed9731-R-tau16__set3",
+      "complete": true,
+      "expected": 432,
+      "materialized": 432
+    },
+    {
+      "case": "seed9731-R-tau4__set0",
+      "complete": true,
+      "expected": 472,
+      "materialized": 472
+    },
+    {
+      "case": "seed9731-R-tau4__set1",
+      "complete": true,
+      "expected": 440,
+      "materialized": 440
+    },
+    {
+      "case": "seed9731-R-tau4__set2",
+      "complete": true,
+      "expected": 472,
+      "materialized": 472
+    },
+    {
+      "case": "seed9731-R-tau4__set3",
+      "complete": true,
+      "expected": 472,
+      "materialized": 472
+    }
+  ],
+  "checks_passed": true,
+  "expected_records": 3696,
+  "global_assembly": false,
+  "identity": "q10-gc0-lr1-sall1-r2-v1",
+  "library_sha256": "2ED5E8EC7168E3677FBB3F6976F26AD46B66F11AFEB80E150B1F523D91EB1580",
+  "materialized_records": 3696,
+  "protocol": "SALL1_COMPLETE_SINGLETON_MATERIALIZATION",
+  "scientific_promotion": false,
+  "scope": "engineering_only_exact_singleton_materialization",
+  "source_verified_records": 3696,
+  "status": "COMPLETE"
+}

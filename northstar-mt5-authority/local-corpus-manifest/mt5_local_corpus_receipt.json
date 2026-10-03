@@ -1,0 +1,14 @@
+{
+    "schema":  "MT5_LOCAL_CORPUS_RECEIPT_V1",
+    "status":  "SEALED_LOCAL_ONLY",
+    "storage_policy":  "D_DRIVE_ONLY_NOT_REMOTE",
+    "local_root":  "D:/northstar-mt5-corpus/osv1-mt5-freeze-v1",
+    "file_count":  590,
+    "total_bytes":  11986996702,
+    "total_gib":  11.163761,
+    "manifest_path":  "local-corpus-manifest/mt5_local_corpus_manifest.tsv",
+    "manifest_sha256":  "58d13f99985a3256c00a0b2a4ed895cd8dc778db969dae6f20da8e54f18cf768",
+    "source_payloads_remaining":  0,
+    "remote_storage":  false,
+    "authoritative_note":  "Payload bytes remain local. Repository publishes only source, control artifacts, and this content-addressed receipt."
+}

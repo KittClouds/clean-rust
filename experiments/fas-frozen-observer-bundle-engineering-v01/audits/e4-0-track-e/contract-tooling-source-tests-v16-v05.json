@@ -1,0 +1,44 @@
+{
+  "commands": [
+    "python -m py_compile source/scripts/build_e4_0_source_map_v16_v05.py source/scripts/finalize_e4_0_contract_v16_v05.py source/scripts/seal_e4_0_contract_v16_v04.py source/scripts/test_e4_0_contract_v16_v05.py",
+    "python -m unittest discover -s experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts -p test_e4_0_contract_v16_v05.py -v"
+  ],
+  "execution_authorization_conferred": false,
+  "py_compile": "PASS",
+  "receipt_id": "E4_0_CONTRACT_TOOLING_V16_V05_SOURCE_TESTS",
+  "recorded_utc": "2026-09-27T07:00:53.305291+00:00",
+  "runtime_access": {
+    "cache_created": false,
+    "cuda_initialized": false,
+    "gpu_lease_acquired": false,
+    "labels_opened": false,
+    "model_contact": false,
+    "tokenizer_contact": false
+  },
+  "schema": "FAS_E4_0_CONTRACT_TOOLING_SOURCE_TESTS_V16_V05",
+  "scope": "Synthetic-only v16-v04 contract tooling tests: failed-attempt lineage, exact scope serialization, receipt registry/source closure, scientific-field invariance, source-role projection, path safety, and sealer member validation. No candidate contract, seal, stage authorization, E4 truth, tokenizer, model, CUDA, GPU lease, or cache was accessed.",
+  "source_bindings": [
+    {
+      "bytes": 77129,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/build_e4_0_source_map_v16_v05.py",
+      "sha256": "910587e002feba128ad2282f890270ed741b6ba37acbc0038aaf8101e30d8af2"
+    },
+    {
+      "bytes": 79158,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/finalize_e4_0_contract_v16_v05.py",
+      "sha256": "4b0510eec61339dba28b6e2e16120dbea964c5d61c4cbbbaa264df874e7c5e6b"
+    },
+    {
+      "bytes": 17761,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/seal_e4_0_contract_v16_v04.py",
+      "sha256": "87cd4e9aa33ca450d5be4dfe771ae0c21a8acb52344b35efafa206e444eee013"
+    },
+    {
+      "bytes": 38739,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/test_e4_0_contract_v16_v05.py",
+      "sha256": "fa93dc7cbfeb3ebf24fc9c615922bf661a4589f55bcc278fddc08a5018795901"
+    }
+  ],
+  "status": "PASS_SYNTHETIC_CONTRACT_AND_SOURCE_MAP_TESTS_V05",
+  "unit_test_count": 34
+}

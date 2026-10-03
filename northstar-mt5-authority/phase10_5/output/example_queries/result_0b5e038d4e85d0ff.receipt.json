@@ -1,0 +1,26 @@
+{
+  "contract": "MST_RG2_RESEARCH_RESULT_RECEIPT_V1",
+  "interface_version": "MST_RG2_RESEARCH_INTERFACE_V1_1",
+  "created_at_utc": "2026-08-12T13:38:07.028803+00:00",
+  "corpus_sha256": "9cbad8545db23cba7ccea2bd062aeba700597deb4be19cecbb74647f65ef8413",
+  "analysis_code_sha256": "7000d52d9b4234de19df4ba0b7ddb225ccf9556d095e3589e4018ed57bac60e6",
+  "query_spec": {
+    "target": "reclaim_given_break",
+    "group_by": [
+      "canonical_instrument"
+    ],
+    "filters": [],
+    "partition": "RG2_EXPLORATORY",
+    "censoring_treatment": "exclude_censored_from_estimate_retain_counts"
+  },
+  "query_spec_sha256": "0b5e038d4e85d0ff8494c45626fa1cc4af809e518125251936d23645cc815775",
+  "eligibility_rule": "attempt has a recorded break; reclaim is observed behavioral outcome",
+  "censoring_treatment": "exclude_censored_from_estimate_retain_counts",
+  "eligible_rows": 2073,
+  "observed_rows": 880,
+  "censored_rows": 526,
+  "analyzable_rows": 1547,
+  "result_rows": 6,
+  "result_file": "result_0b5e038d4e85d0ff.tsv",
+  "result_sha256": "37e82d48bb315229ab9c815a42e675a591592bbbd7d079d7cb20732f8709abeb"
+}

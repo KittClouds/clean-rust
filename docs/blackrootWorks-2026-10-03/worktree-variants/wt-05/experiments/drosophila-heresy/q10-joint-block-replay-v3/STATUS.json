@@ -1,0 +1,23 @@
+{
+  "protocol": "Q10-JBR3",
+  "status": "Q10_JBR3_INVALID__THRESHOLD_SELECTOR_DEGENERATE",
+  "review": "STRUCTURAL_RECEIPT_VERIFIED_SELECTOR_INVALID",
+  "audited_events": 8,
+  "blocks": 48,
+  "joint_candidates": 6000,
+  "threshold_score_unique_values": 1,
+  "threshold_score_value": 0.0,
+  "scientific_seed_bundles_used": 0,
+  "behavioral_inference": false,
+  "future_dh08b_authorized": false,
+  "promotion": {
+    "exact_joint_block_replay": false,
+    "selector_qualification": false,
+    "global_repair": false,
+    "scientific": false
+  },
+  "parent": {
+    "protocol": "Q10-JBR2",
+    "status": "Q10_JBR2_STAGE1_VALID__JOINT_REPLAY_COMPLETE"
+  }
+}

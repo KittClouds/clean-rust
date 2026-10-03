@@ -1,0 +1,132 @@
+{
+  "protocol": "jev-information-density/v0.8p-v02-fresh-heldout-panel-v01",
+  "identity": "v0.8P-fresh-eval-panel-v02",
+  "status": "CONTRACT_READY_PANEL_GENERATION_NOT_AUTHORIZED",
+  "purpose": "Construct a fresh held-out neighborhood draw for the instrumented v0.8P trajectory rerun, under the unchanged sealed run and analysis contracts.",
+  "authorization_state": {
+    "v02_setup_authorized": true,
+    "e1_identity_denylist_sealed": true,
+    "panel_generation_authorized": false,
+    "lfm_load": false,
+    "feature_extraction": false,
+    "head_training": false,
+    "checkpoint_evaluation": false,
+    "firewall_open": false
+  },
+  "frozen_contract_bindings": {
+    "run_contract": {
+      "path": "experiments/jev-information-density-v08p/phase_b/phase-b-p-run-contract-v01.json",
+      "sha256": "e345225b4a17fc18eb35fcab24cbe1d72bd0e34bed9de272f927a7be461853e6"
+    },
+    "analysis_contract": {
+      "path": "experiments/jev-information-density-v08p/phase_b/phase-b-p-analysis-contract-v01.json",
+      "sha256": "84111122033fda65c84344317cfe3b50639b23be4c71f480ba665c67a23cc939"
+    },
+    "original_panel_design_reference_only": {
+      "path": "experiments/jev-information-density-v08p/phase_a/fresh-panel-contract-v01.json",
+      "sha256": "ce3b7b97caecb27f3ad99439c0e67dca6e40af5da3db9ca2e356ea5e9f06f823",
+      "failed_panel_data_parentage": false
+    },
+    "identity_denylist_contract": {
+      "path": "experiments/jev-information-density-v08p-v02/identity/e1-identity-denylist-extraction-contract-v03.json",
+      "sha256": "1c890e9c38bb16ca839adb83c903a1d8deff75845d20d8ff1a0ee35195be3f89"
+    },
+    "identity_denylist_audit": {
+      "path": "experiments/jev-information-density-v08p-v02/identity/denylist-audit-v01.json",
+      "denylist_sha256": "11cac12e40bd13dfbd615c0045ed8ea7c87b81ad85d7f0f61ffbc4d7e2819846",
+      "seal_sha256": "0501a7f2f4c6c71ce6bf31abf26e94311e60117df47d045eb8b36f5643ceec5c"
+    }
+  },
+  "freshness_and_scope": {
+    "partition_namespace": "eval_v08p_v02",
+    "generator_seed_derivation": {
+      "label": "jev-information-density-v08p-v02-panel/generator-seed",
+      "algorithm": "SHA-256(UTF-8(label)); interpret first four digest bytes as unsigned little-endian u32",
+      "sha256": "404b7e33e38b636e1ad49f29ef30a58862cc7177dace3d57c433184b742e04d7",
+      "seed": 863914816
+    },
+    "instance_rule": "Generate a new draw under the v02 partition/seed. Do not read, copy, validate, or reuse any v01 raw panel artifact.",
+    "family_basis": [
+      {"slug": "exposure_control", "neighborhoods": 500},
+      {"slug": "respiratory_monitoring", "neighborhoods": 500},
+      {"slug": "salinity_control", "neighborhoods": 500},
+      {"slug": "vibration_monitoring", "neighborhoods": 500}
+    ],
+    "family_total": 2000,
+    "template_surfaces": ["p0", "p1", "p2", "p3"],
+    "claim_boundary": "Fresh-world/neighborhood confirmation under fixed semantic families and templates; not novel-template or novel-family generalization."
+  },
+  "panel_shape": {
+    "neighborhoods": 2000,
+    "episodes_per_neighborhood": 11,
+    "roles": [
+      "anchor", "fact_flip", "sham", "neutral_1", "neutral_2", "neutral_3",
+      "neutral_4", "neutral_5", "neutral_6", "neutral_7", "neutral_8"
+    ],
+    "selected_views": ["anchor", "fact_flip", "sham", "matched_neutral"],
+    "candidate_count_per_view": 4,
+    "candidate_feature_shape": [16, 2048],
+    "evaluated_view_rows": 8000
+  },
+  "semantic_validation_contract": {
+    "same_latent_world_within_neighborhood": true,
+    "same_query_schema_candidate_set_and_order": true,
+    "sham_and_each_neutral_target_component_abs_error_max": 1e-12,
+    "fact_flip_exact_map_winner_changes": true,
+    "independent_solver_receipt_per_episode": true,
+    "one_declared_intervention_per_sibling": true,
+    "sham_neutral_surface_edit_magnitude_equal": true,
+    "exact_world_validation_must_precede_feature_extraction": true
+  },
+  "feature_and_matching_contract": {
+    "backbone": "LiquidAI/LFM2.5-1.2B-Base",
+    "revision": "7453bca97ca1e67754c4035a4b4c584e1c9dd725",
+    "backbone_frozen": true,
+    "pooling": "final-layer mean_full@16 over valid positions",
+    "input_mode": "exact-length, single-row, no padding",
+    "batch_size": 1,
+    "backbone_dtype": "bfloat16",
+    "output_dtype": "float32",
+    "feature_dimension": 2048,
+    "candidate_basis": "Fresh 16-row candidate semantic basis from authoritative family definitions; exact schema identity plus candidate semantic ID join; no row-slot crosswalk.",
+    "matching_rule": "For each anchor choose argmin_j abs(||h_Nj-h_A||_2 - ||h_S-h_A||_2), with the already frozen deterministic SHA-256 tie-break.",
+    "direction_or_cosine_for_selection": false,
+    "radius_gates": {
+      "mean_relative_error_max": 0.10,
+      "p95_absolute_error_max": 0.25,
+      "per_family_mean_relative_error_max": 0.15,
+      "all_required": true,
+      "failure": "Fail the v02 panel identity; no replacement selection or threshold relaxation."
+    }
+  },
+  "disjointness": {
+    "training_overlap_checks_unchanged": [
+      "world/root identities",
+      "episode identities",
+      "rendered-input hashes",
+      "selector-input hashes"
+    ],
+    "e1_source_used_for_collision_check": "Only the sealed hashed canonical-neighborhood denylist bound above.",
+    "e1_identity_scope": "Canonical neighborhood_id values from the sealed E1 matched-panel manifest; no world_id/root_id values are present in that manifest.",
+    "identity_hash_contract_ref": "Use the exact canonicalization, domain prefix, and SHA-256 formula bound by identity_denylist_contract above.",
+    "collision_rule": "A P-v02 neighborhood identity hash matching the denylist is a hard construction failure; do not emit the matched E1 hash or any E1 metadata. Report only P-side collision identity/count.",
+    "no_e1_manifest_or_join_access_by_panel_builder": true,
+    "no_candidate_join_candidate_features_targets_predictions_metrics_geometry_or_head_access": true,
+    "no_replacement_after_collision_or_radius_gate_failure": true
+  },
+  "firewall": {
+    "panel_readable_to_training_process": false,
+    "panel_opening_count": 0,
+    "body_access_granted": false,
+    "head_load": false,
+    "head_training": false,
+    "checkpoint_evaluation": false,
+    "newtight_legacy_phoenix": false,
+    "separate_panel_generation_authorization_required": true
+  },
+  "output": {
+    "root": "D:/codex-runs/jev-information-density-v08p-v02/fresh-eval-panel-v02",
+    "must_not_exist_before_separate_generation_authorization": true,
+    "fail_if_identity_root_exists": true
+  }
+}

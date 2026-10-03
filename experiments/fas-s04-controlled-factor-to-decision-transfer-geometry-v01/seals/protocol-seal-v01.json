@@ -1,0 +1,52 @@
+{
+  "FAS00_PHASE4_AUTHORIZED": false,
+  "S04_MODEL_CONTACT": false,
+  "S04_PROBE_FITTING": false,
+  "S04_PROTOCOL_SEALED": true,
+  "SAE_ANALYSIS_AUTHORIZED": false,
+  "experiment_id": "fas-s04-controlled-factor-to-decision-transfer-geometry-v01",
+  "files": [
+    {
+      "path": "S04-PROTOCOL.md",
+      "sha256": "fbb685215873b98fb3dacbaf61e10c0f92314a313170eef8b9c19b9bef1c6235"
+    },
+    {
+      "path": "contracts/analysis-contract-v01.json",
+      "sha256": "1c9c0e39b17eb12b363fcfb5ec07aa2f12bceda4e9ef78e8b85af7bab00de952"
+    },
+    {
+      "path": "contracts/parent-binding-v01.json",
+      "sha256": "1499ea118c85a14ac007d7a790d6d87641236e0a50c4fb13b5acf35c078b8719"
+    },
+    {
+      "path": "contracts/authorization-packet-v01.json",
+      "sha256": "ba3f4fb29a360f41637b6e01a629a0be72cc8bef68b0d938243029bc9ba0db40"
+    },
+    {
+      "path": "scripts/s04_common.py",
+      "sha256": "e9f4253e5db518f2705ea709872e456bd38e9412c0f2e3a81e888371034d5cb6"
+    },
+    {
+      "path": "scripts/s04_preflight.py",
+      "sha256": "a572b0887ca071195a567d832cf004d19d074340a229e0b786d58399aca6f858"
+    },
+    {
+      "path": "scripts/s04_analyze.py",
+      "sha256": "55ef70bb622797cd8932a8c2e38dffa71e22f3e6227e2c52f2925f0126e786e4"
+    },
+    {
+      "path": "scripts/s04_seal_results.py",
+      "sha256": "a426809b0c9552faa2cb546505c1a5d70e285a07b43a5251929d891749719f21"
+    },
+    {
+      "path": "scripts/test_s04_math.py",
+      "sha256": "1e1913ff6dfaece8fd293dcd096935d4fc98d2597944d7fcba711d98fa1cb38d"
+    },
+    {
+      "path": "scripts/seal_protocol.py",
+      "sha256": "0532abbc44acf7050b51c4cb21d9c05b3d6220a30c4ed92ffff999ad18f1a719"
+    }
+  ],
+  "root_sha256": "3806a541b09351760f168643d2a46747f26e11ff72c852f04f6c8e91ed88880f",
+  "seal_id": "FAS_S04_PROTOCOL_SEAL_V01"
+}

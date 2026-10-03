@@ -1,0 +1,33 @@
+{
+  "protocol": "Q10-GC0-RA1",
+  "identity": "q10-gc0-ra1-v1",
+  "status": "PREEXECUTION_SEALED_NO_EXECUTION",
+  "created_at_utc": "2026-09-18T00:00:00Z",
+  "plan_sha256": "D47A94E78404659BAA0829A55BD8CF4E43B41F2F0B60B183EC966EA085A57B70",
+  "contract_sha256": "C08EFD38EEC6EFD54DEF82DAF2F69D1E5BF09B837A2189DA68179AB9B974B945",
+  "parent_bindings_sealed": true,
+  "parent_drift_policy": "fail_closed_before_loading RH1-F2/PF5 runtime or AC2 observations",
+  "selection_is_sealed": true,
+  "selection_is_not_post_outcome": true,
+  "endpoint_keys": [
+    ["seed9731-L-tau16.json", 0], ["seed9731-L-tau16.json", 1], ["seed9731-L-tau16.json", 2], ["seed9731-L-tau16.json", 3],
+    ["seed9731-L-tau4.json", 0], ["seed9731-L-tau4.json", 1], ["seed9731-L-tau4.json", 2], ["seed9731-L-tau4.json", 3],
+    ["seed9731-R-tau16.json", 1], ["seed9731-R-tau16.json", 3],
+    ["seed9731-R-tau4.json", 0], ["seed9731-R-tau4.json", 1], ["seed9731-R-tau4.json", 2], ["seed9731-R-tau4.json", 3]
+  ],
+  "authority_source": {
+    "features": "experiments/drosophila-heresy/q10-rh1-ac2-v1/qualification/features.jsonl",
+    "effects": "experiments/drosophila-heresy/q10-rh1-ac2-v1/qualification/effects.jsonl",
+    "legal_prefix_vocabulary": [0, -1, 1, -2, 2, -4, 4, -8, 8, -16, 16]
+  },
+  "firewall": {
+    "scientific_promotion": false,
+    "behavioral_probe": false,
+    "gc1_authorized": false,
+    "candidate_generation": false,
+    "constructor_run": false,
+    "parent_writes": false
+  },
+  "execution_started": false,
+  "result_exposure": false
+}

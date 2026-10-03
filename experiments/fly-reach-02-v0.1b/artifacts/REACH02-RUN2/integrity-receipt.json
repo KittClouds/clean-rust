@@ -1,0 +1,10 @@
+{
+  "diagnostic_rows": 1080,
+  "duplicate_cells": 0,
+  "missing_cells": 0,
+  "outcome_rows": 5616,
+  "qualification_rows": 72,
+  "schema": "FLY-REACH-02-integrity-v1",
+  "status": "INTEGRITY_PASS",
+  "trajectory_rows": 1080
+}

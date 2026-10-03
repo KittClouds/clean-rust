@@ -1,0 +1,20 @@
+{
+  "audit_scope": "classification_only__no_replay",
+  "behavioral_probe": false,
+  "canonical_state_updated": false,
+  "future_protocol_opened": false,
+  "groups": 1596,
+  "primary_endpoints": 28,
+  "protocol": "Q10-PF5",
+  "reclassified_exact_guard_pruned_groups": 23,
+  "scientific_bundle_count": 0,
+  "source_execution_sha256": "8C4CFC547DA471781D353EE767D0122FFF57A1AB6BD4EDDDF2F0117B0C943439",
+  "source_results_sha256": "1B368EAA9B81B323935713CB92951662394B9D5A945A19FCF5D05136F82D7FCB",
+  "source_run_scope": "full_streaming",
+  "status": "Q10_PF5_FULL_RECEIPT_AUDIT_COMPLETE",
+  "status_counts": {
+    "BLOCKED_WITHIN_DECLARED_DOMAIN": 37,
+    "OVERSIZE_UNTESTED": 1457,
+    "PARTIAL_FEASIBILITY_FOUND": 102
+  }
+}

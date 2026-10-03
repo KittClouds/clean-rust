@@ -1,0 +1,14 @@
+{
+  "fixture_base_sha256": "cd3bb7356f3502f63717c57c6ad70942633866c81beaeecdf0137b1243a7e6ea",
+  "fixture_has_target_or_reference_data": false,
+  "fixture_tensor_sha256": "b5ef438cf142c30cd2729fc83bf816602fe2417a07e26a9e49748456a835363a",
+  "fixture_tuple_sha256": "d3f026cdd50d4aaad608e12dfcb56f49d53855afead9d39bd559d8db6ccba046",
+  "phi_pre_bit_identical": true,
+  "pool_bit_identical": true,
+  "production_phi_pre_sha256": "61347d2cc4f9cac2b0007e0871f9e2c07063d78699a2d071b4c2d081474feead",
+  "production_pool_sha256": "d95f41adc89c609f3aae3362f0828654647ae98a386d735b27bdc70a8b2a5caf",
+  "scalar_reference_phi_pre_sha256": "61347d2cc4f9cac2b0007e0871f9e2c07063d78699a2d071b4c2d081474feead",
+  "scalar_reference_pool_sha256": "d95f41adc89c609f3aae3362f0828654647ae98a386d735b27bdc70a8b2a5caf",
+  "schema": "F4-INVARIANT-01-S-operation-order-fixture-v1",
+  "status": "PASS"
+}

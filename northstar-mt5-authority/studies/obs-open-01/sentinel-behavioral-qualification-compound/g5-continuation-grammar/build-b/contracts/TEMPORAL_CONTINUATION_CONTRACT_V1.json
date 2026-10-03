@@ -1,0 +1,1 @@
+{"absolute_timestamp_equality_default":false,"historical_precision_upgrade":"NONE","relative_alignment":"next source-authoritative causal slot under each side context","schema":"G5_TEMPORAL_CONTINUATION_CONTRACT_V1","source_semantic_resolution_ns":1000000000,"storage_resolution_ns":1,"subsecond_pairing_below_source_resolution":"FORBIDDEN"}

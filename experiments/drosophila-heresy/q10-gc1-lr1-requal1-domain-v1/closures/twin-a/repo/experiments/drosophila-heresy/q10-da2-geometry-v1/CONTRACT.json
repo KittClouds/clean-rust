@@ -1,0 +1,21 @@
+{
+  "protocol": "Q10-DA2",
+  "parent_protocol": "Q10-DA1",
+  "engineering_only": true,
+  "declared_events": 8,
+  "source_fixtures": "q10-distributed-additive-v1/qualification/sample-9731-9732",
+  "support_coalitions": "the four sealed DA1 stable support-disjoint sets per event",
+  "candidate_steps": [0, -1, 1, -2, 2, -4, 4, -8, 8, -16, 16],
+  "minimum_final_reserve_ulps": 16,
+  "selector": "DA1 local mismatch-first choices plus deterministic one/two-coordinate axis correction",
+  "pair_candidate_window": 250,
+  "axis_normalized_tolerance": 2e-6,
+  "norm_normalized_tolerance": 2e-7,
+  "cue_linear_normalized_tolerance": 2e-6,
+  "maximum_coordinate_steps": 16,
+  "legacy_path_length_64": "diagnostic_only",
+  "sequential_readout_parity": "reported separately; required for endpoint status",
+  "scientific_seed_bundles": 0,
+  "behavioral_inference": false,
+  "dh08b_authorized": false
+}

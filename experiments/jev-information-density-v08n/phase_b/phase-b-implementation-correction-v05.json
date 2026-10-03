@@ -1,0 +1,62 @@
+{
+  "protocol": "jev-information-density/v0.8n-road-b-phase-b-implementation-correction-v05",
+  "identity": "v0.8N-phase-b-implementation-correction-v05",
+  "status": "IMPLEMENTATION_ONLY_CORRECTION_SEALED",
+  "parent_authorization_event_sha256": "0cad8d2e45fe8e7e5eed7f9bcdeab406926f24605ad9f62396d83f9512bb0a09",
+  "parent_correction_receipt_sha256": "aee91c3f9e00440c344dde82c70425fc7bdd1cec1939f0468dcaa38658511aa1",
+  "parent_entrypoint_sha256": "1d5b971e45b67cf13fd1aacc15ae753fe05166343b979db831dd23759ade3939",
+  "corrected_entrypoint_sha256": "cc2a0f1706d88d37204abc6a2fb7666f577154519aa531ecfb4177fa423349c0",
+  "frozen_trainer_sha256": "e539bac2d67b47ba2b660b8579c5818e5fffc0cf94fa26cfd3e9dd905ef795ba",
+  "correction_verifier_sha256": "87c2780d0578ca3306e69a5deb3e9cf32abcf91376d6c3ac23c31dbc02c76eb2",
+  "correction_test_sha256": "b509de3daca3d2d7b36b680db5b68f41fbb6e511dc6e872f5ef3046dab646221",
+  "correction_class": "correction-chain composition omission; semantic impact none",
+  "observed_failure": {
+    "stage": "v04 no-head input preflight while loading state feature cache",
+    "exception": "IndexError: too many indices for tensor of dimension 2",
+    "root_cause": "v04 loaded the corrected trainer directly but did not install the already-sealed v01 no-copy cache-container adapter before verify_inputs",
+    "outputs_at_failure": {
+      "head_initialization_during_this_preflight": false,
+      "optimizer_steps": 0,
+      "run_artifacts_created_or_modified": false,
+      "retained_zero_step_attempt_modified": false,
+      "heldout_panel_opened": false
+    }
+  },
+  "retained_zero_step_attempt": {
+    "path": "D:\\codex-runs\\jev-information-density-v08n\\v0.8N-base-v01\\phase-b-run-v01\\attempts\\seed-20260927\\B-DUP\\attempt-95b914e81caf48b595bedb6f9a203176",
+    "seed": 20260927,
+    "arm": "B-DUP",
+    "failure_stage": "event materialization before optimizer step 1",
+    "optimizer_steps": 0,
+    "evaluation_access": false,
+    "files": {
+      "initial-head-template.sha256": {
+        "sha256": "da3f26cb1c1f343ab72156a9a717af76ba35220c2a5c05077c079368efd979b0",
+        "bytes": 66
+      },
+      "run-config.json": {
+        "sha256": "d059aadc58eaf1d076dc894c1d9aa1fe923bc45f29e1ab8e0d2659b557f082f1",
+        "bytes": 1561
+      }
+    },
+    "initial_head_sha256": "327d5e46f962b6e6a447c1f972537860fb5d6126a3e97219fce07315bddfdb2c"
+  },
+  "correction": {
+    "entrypoint": "experiments/jev-information-density-v08n/phase_b/train_phase_b_corrected_v05.py",
+    "inherited_cache_adapter_explicitly_installed": true,
+    "parent_chain_remains_immutable": true,
+    "frozen_trainer_on_disk_unchanged": true,
+    "correction_test_path": "experiments/jev-information-density-v08n/phase_b/tests/test_v08n_phase_b_correction_v05.py",
+    "correction_verifier_path": "experiments/jev-information-density-v08n/phase_b/verify_phase_b_correction_v05.py",
+    "run_and_training_seal_bind_all_five_correction_receipts": true
+  },
+  "semantic_contract_changed": false,
+  "training_inputs_changed": false,
+  "model_revision_changed": false,
+  "objective_or_loss_changed": false,
+  "seed_or_schedule_changed": false,
+  "evaluation_contract_changed": false,
+  "protected_panel_access": false,
+  "newtight_access": false,
+  "phoenix_access": false
+}

@@ -1,0 +1,28 @@
+{
+  "biological_promotion": false,
+  "contract_json_sha256": "aba7db3f96383259f677329a897dd2e4d8c6450b42f03214738f862ad1a4aa83",
+  "contract_markdown_sha256": "2c3f46214cbe9ec1271a2b9a72a2fac130d648f05f23f1e43685c1436c153a90",
+  "evaluable_block_gate": {
+    "each_omega_hat_min": 0.7,
+    "equivalent_epsilon_balanced_max": 0.15,
+    "minimum_evaluable": 10,
+    "total": 12
+  },
+  "fit_or_outcome_namespace_created": false,
+  "fresh_task_blocks_created": false,
+  "frozen_d_sources_verified": {
+    "d_feature_construction": "9da88d9a2e147cad551e8e4e2c8b11ba460b435f5743f57527fbf46d7eb09497",
+    "feature_helpers": "27024a001f2c89f520b5230bf3796ee8691e499f29ce73c71597ad7c303debf5",
+    "fit_recipe": "0c8a84f2418c8b2d7fa222675860771e7e4e64b871ad333ec0fb5e3e65af5026",
+    "model": "92e260bd0057115867bf69b343d8193bab141035f3338af4586c5e0af61c47f8"
+  },
+  "measured_reach03_authorized": false,
+  "native_collection_started": false,
+  "pooled_gate": {
+    "epsilon_balanced_max": 0.1,
+    "omega_hat_min": 0.8
+  },
+  "run_id": "F4-CALIBRATION-02-QPROMO1",
+  "schema": "F4-CALIBRATION-02-pre-task-freeze-receipt-v1",
+  "status": "CONTRACT_FROZEN_PRETASK"
+}

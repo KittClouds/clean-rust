@@ -1,0 +1,37 @@
+{
+  "counts": {
+    "endpoint_set_count": 14,
+    "expansion_contexts": 25794,
+    "new_effect_records": 25794,
+    "new_feature_records": 25794,
+    "new_legal_prefix_records": 283734,
+    "raw_coordinate_context_count": 27075,
+    "raw_group_count": 801,
+    "replayed_effect_records": 25794,
+    "reused_complete_ac2_contexts": 1281,
+    "reused_effect_records": 0
+  },
+  "engineering_only": true,
+  "gate": {
+    "complete_authority_support_equals_raw_support": true,
+    "expanded_records_complete": true,
+    "merged_authority_context_complete": true,
+    "raw_support_complete": true
+  },
+  "identity": "q10-gc0-ac3-v1",
+  "interpretation": "AC3 expands AC2 authority observations to the RA1 raw-group context set. This qualifies the authority instrument only; it does not construct a global endpoint or authorize GC1.",
+  "protocol": "Q10-GC0-AC3",
+  "scientific_promotion": false,
+  "status": "AC3_ENGINEERING_COMPLETE_AUTHORITY_COMPLETE",
+  "verified_parent_bindings": {
+    "ac2_effects": "4D45D48375385AE8886A744BF9CE8E926140F9181C30966316D7350608327EE5",
+    "ac2_features": "7EC54C783A97078243D4AA5B1AEDC65AC5FBE0475C8F11561D84FF4D8120C2F2",
+    "ra1_contract": "C08EFD38EEC6EFD54DEF82DAF2F69D1E5BF09B837A2189DA68179AB9B974B945",
+    "ra1_execution": "CED3F7CF5CA76D91A1DCD95739A77831501A5B5C8BA53C035B72748CD5E97020",
+    "ra1_plan": "D47A94E78404659BAA0829A55BD8CF4E43B41F2F0B60B183EC966EA085A57B70",
+    "ra1_preexecution": "D8DD1C63A4886701CA7D51E3797DF9B5B86F6806A7020CCD9AF34E9BA0CE4AE2",
+    "ra1_runner": "4588E2FAEC420222C105B5778BBB34A584CD22D96B382C846C4E92CD53F01A05",
+    "ra1_status": "65B1F1811C7C7F10FB8CC238DA34AE662BF3962C5008C214AD95565475B3B71C",
+    "ra1_summary": "E072A18346861BBC9B91ACA3454E4314E9E62ECB7EA4DA98C2CBE7F56165D2C3"
+  }
+}

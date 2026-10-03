@@ -1,0 +1,1 @@
+{"coordinates":["EXPERIMENT_TOKEN_COUNT","TOTAL_PRESENTATIONS_LEFT_PLUS_RIGHT","APPLIED_CAUSAL_PROGRESS_LEFT_PLUS_RIGHT","CANONICAL_TOKEN_ENCODING"],"experiment_token_and_causal_progress_distinct":true,"order":"LEXICOGRAPHIC","rejected_step":{"causal_progress":0,"experiment_tokens":1},"token_length_bounds_integer_magnitude":false,"well_founded":true}

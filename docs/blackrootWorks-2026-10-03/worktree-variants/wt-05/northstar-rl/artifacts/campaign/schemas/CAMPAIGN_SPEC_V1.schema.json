@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CampaignSpec",
+  "type": "object",
+  "properties": {
+    "campaign_id": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "experiment_id": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "partition_tape_id": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "run_budget_steps": {
+      "type": "integer",
+      "format": "uint64",
+      "minimum": 0
+    },
+    "run_seeds": {
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "format": "uint64",
+        "minimum": 0
+      }
+    },
+    "schema_version": {
+      "type": "string"
+    },
+    "state": {
+      "type": "string"
+    },
+    "variance_axes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "schema_version",
+    "campaign_id",
+    "experiment_id",
+    "partition_tape_id",
+    "run_seeds",
+    "run_budget_steps",
+    "variance_axes",
+    "state"
+  ],
+  "$defs": {
+    "Digest256": {
+      "description": "Domain-separated BLAKE3 digest",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

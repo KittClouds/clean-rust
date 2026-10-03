@@ -1,0 +1,8 @@
+{
+  "build_a_sha256": "6f1167bd912e74205f7e217d11dbedbda0e18258910805652d027940ccff0748",
+  "build_b_sha256": "6f1167bd912e74205f7e217d11dbedbda0e18258910805652d027940ccff0748",
+  "builds": 2,
+  "byte_identical": true,
+  "schema": "OBS_OPEN_SRC01_FINAL_SEAL_DETERMINISM_V1",
+  "status": "PASS"
+}

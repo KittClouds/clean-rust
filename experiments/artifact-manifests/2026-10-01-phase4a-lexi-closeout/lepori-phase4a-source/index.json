@@ -1,0 +1,22 @@
+{
+  "artifact_kind": "frozen-fabrique-phase4a-source",
+  "created_utc": "2026-10-01T22:29:02Z",
+  "imported_file_count": 23,
+  "inventory_shards": [
+    {
+      "bytes": 13066,
+      "path": "files-000.ndjson",
+      "rows": 23,
+      "sha256": "57856239e417c3b4fd35e559b26c6211ce1a7ed07d758400177685f5b0efa040"
+    }
+  ],
+  "purpose": "source files and reports",
+  "root_id": "lepori-phase4a-source",
+  "schema": "KAMMI_CAS_IMPORT_INVENTORY_V1",
+  "source_agent": "Lepori",
+  "source_lab": "Frozen Fabrique",
+  "source_root": "C:\\code land\\clean-rust\\experiments\\phase0-semantic-interface",
+  "status": "IMPORTED_TO_LIBRARY_CAS",
+  "total_bytes": 307618,
+  "unique_content_objects": 23
+}

@@ -1,0 +1,82 @@
+{
+  "schema": "FLY-REACH-03-math-objects-v0.3",
+  "status": "SEALED_PRE_CODE",
+  "version": "0.3",
+  "engineering_only": true,
+  "execution_authorized": false,
+  "implementation_authorized": false,
+  "biological_promotion": false,
+  "pheno_reseal_authorized": false,
+  "authoritative_contract": "MATH-CONTRACT-v0.3-AUTHORITATIVE.md",
+  "evidence": {
+    "authoritative_reach02": "FLY-REACH-02-v0.1b/RUN2",
+    "nonpromotable_history": "FLY-REACH-02/RUN1",
+    "run1_endpoint_numbers_are_evidence": false
+  },
+  "target": {
+    "symbol": "Y_{i,t}",
+    "source": "reference_delta_into g_{i,t} at w_t before native delivery",
+    "tau_primary": 1e-12,
+    "zero_channel": true,
+    "binary_channel": "Y != 0",
+    "on_policy": "native_trajectory_only"
+  },
+  "filtrations": {
+    "order": ["F0", "F1", "F2", "F3a", "F3b", "F4"],
+    "F0": "static coordinate/anatomical identity",
+    "F1": "F0 plus instantaneous local pre-update state",
+    "F2": "F1 plus frozen local temporal history",
+    "F3a": "signals actually entering the native update",
+    "F3b": "F3a plus native-state summaries computable without reference information",
+    "F4": "all deterministic inputs to reference_delta_into, excluding g and functions of g"
+  },
+  "scoring": {
+    "primary_population": "U*",
+    "same_rows_all_levels": true,
+    "requires_all_features_defined": true,
+    "requires_nonzero_target": true,
+    "requires_primary_native_support": true
+  },
+  "support": {
+    "stage": "native proposed delta before sim.apply_delta",
+    "epsilon": "EPS",
+    "definition": "S_N_signarm = {i: abs(native_proposed_delta_i) > EPS}",
+    "native_magnitude": "m_i = abs(native_proposed_delta_i)",
+    "delivered_support": "secondary diagnostic only",
+    "eta_S_L1": "sum_i abs(g_i) 1[i in S_N_signarm] / sum_i abs(g_i)"
+  },
+  "estimands": {
+    "omega_theoretical": "TV(P_F|+ , P_F|-)",
+    "omega_estimator": "max(0, 1 - 2 epsilon_bal_hat)",
+    "psi": "2 A_w - 1",
+    "A_w": "sum_j q_j m_j abs(g_j) 1[s_j = y_j] / sum_j q_j m_j abs(g_j)",
+    "eta_del": "cos(Pi_[0,2](w_t + m*s) - w_t, g)",
+    "psi_scope": "first-order local proposed alignment, not endpoint guarantee",
+    "f4": "Omega(F4) = 1 exact reconstruction invariant on nonzero channel"
+  },
+  "weighting": {
+    "inclusion_weight": "q_j = 1 / p_inclusion_j",
+    "balanced_error": "half classwise q-weighted error for Y=+1 plus half classwise q-weighted error for Y=-1",
+    "stratified_estimand": "must be named explicitly if q is not used"
+  },
+  "temporal": {
+    "sample_resolution": "every trial",
+    "lag_units": "trials",
+    "lag_set": [1, 2, 4, 8, 16, 32],
+    "volatility": "eligible adjacent nonzero pairs",
+    "sparse_lag_iact_claim": false
+  },
+  "uncertainty": {
+    "independent_axis": "task/learner block",
+    "resample_unit": "complete substrate-by-side panel",
+    "independent_216_cell_bootstrap": false,
+    "ipw_required_for_U_star": true
+  },
+  "out_of_scope": [
+    "runner and feature collector implementation",
+    "measured seed namespace",
+    "biological promotion",
+    "PHENO reseal",
+    "order-swap and continuous-mixture probes"
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "protocol": "Q10-GC0",
+  "identity": "q10-gc0-v1",
+  "status": "PREEXECUTION_SEALED_NO_EXECUTION",
+  "created_at_utc": "2026-09-18T01:12:34.4358752Z",
+  "plan_sha256": "D298AEE12140C9EE86411486339D16A66CE10D7EC86208FE6CD640C8A1C7C288",
+  "contract_sha256": "A1FBCC1B562A4521355F5F78D14C3F7F9034DD90F6DA15882BA4B299FC6AA65C",
+  "parent_bindings_sealed": true,
+  "parent_drift_policy": "fail_closed_before_loading_runtime_or_inputs",
+  "sample": {
+    "endpoint_keys": [
+      ["seed9731-L-tau16.json", 0],
+      ["seed9731-L-tau16.json", 1],
+      ["seed9731-L-tau16.json", 2],
+      ["seed9731-L-tau16.json", 3],
+      ["seed9731-L-tau4.json", 0],
+      ["seed9731-L-tau4.json", 1],
+      ["seed9731-L-tau4.json", 2],
+      ["seed9731-L-tau4.json", 3],
+      ["seed9731-R-tau16.json", 1],
+      ["seed9731-R-tau16.json", 3],
+      ["seed9731-R-tau4.json", 0],
+      ["seed9731-R-tau4.json", 1],
+      ["seed9731-R-tau4.json", 2],
+      ["seed9731-R-tau4.json", 3]
+    ],
+    "expected_endpoint_count": 4,
+    "expected_endpoint_set_count": 14,
+    "expected_group_count": 27,
+    "full_f2_group_count": 55,
+    "selection_is_sealed": true
+  },
+  "cutoffs": {
+    "horizon": "min(32, group_coordinate_count)",
+    "max_unique_replays_per_group": 512,
+    "frontier_width": 32,
+    "nonzero_palette_size": 8,
+    "cutoffs_are_sealed": true
+  },
+  "firewall": {
+    "engineering_only": true,
+    "scientific_seed_bundles": 0,
+    "behavioral_probe": false,
+    "scientific_promotion": false,
+    "gc1_authorized": false,
+    "parent_writes": false,
+    "write_root": "experiments/drosophila-heresy/q10-gc0-v1"
+  },
+  "sealed_parent_sha256": {
+    "rh1_f2_plan": "E1AE27783A3A95F638B69594B310C8237B736D0A0833A43F78DB17874D852225",
+    "rh1_f2_contract": "7CBDD2607D55A010D339B796196F7408A70B4664065075F3C3D7A5F64773723C",
+    "rh1_f2_preexecution": "7986F18A231A31BC98C18977905CE992CE87FBD9A797949B17FA7A18FB31C651",
+    "rh1_f2_status": "02CFF603390074A4FA31A3B2B11CA5AD58BE9BA391D4BFAAB396FAC60F32E239",
+    "rh1_f2_execution": "D900B374F076AEC352381D878D31AEA8D7129D8BB5A3E53DB5B7D5B05E3FAFF9",
+    "rh1_f2_derived_result": "DEC41A9DFDCE75EEDFC147494C7B1347A01868B283DC38FD396FDB5E83775F91",
+    "rh1_f2_derived_summary": "C56E6B3DCB351867BA2BE9EB2394810B94284F2534AC3F7252502B2956BD8B62",
+    "rh1_f2_derived_status": "6C826ECBA69509DA61DFB007D93B37EC70208298CBC223E517E0F2E6B4DD43F5",
+    "rh1_f2_runner": "B42644BA0E2C4C8A0CC0F9997135CE18A9F9E6C0836810926300C4D84F198103",
+    "rh1_common_runtime": "20BE4D05B2554109AEED10A41FFCE90A915F224A552B5762C3D574B4701F942C",
+    "pf5_runner": "A00078787DB732906416B3C7158DC777CD41C2E71C3AAE660D1AE525446FB82A",
+    "pf5_qualification_runtime": "6C4B857E7DB4A7F60B2F59AD0D3939AD8F4B07B2E1378681DDAD819F70CC58C9",
+    "pf5_contract": "20995E1826A9C62E0E8689017A2F3E624CC9E63B76B210FBD4AB11D7E9E7D34F",
+    "rh1_ac2_summary": "C0D93364B17D0739DB47519EA458833DA15E9DF59E28C85E6BD1A7D9B757EB04",
+    "rh1_ac2_features": "7EC54C783A97078243D4AA5B1AEDC65AC5FBE0475C8F11561D84FF4D8120C2F2",
+    "rh1_ac2_effects": "4D45D48375385AE8886A744BF9CE8E926140F9181C30966316D7350608327EE5"
+  },
+  "execution_started": false,
+  "result_exposure": false
+}

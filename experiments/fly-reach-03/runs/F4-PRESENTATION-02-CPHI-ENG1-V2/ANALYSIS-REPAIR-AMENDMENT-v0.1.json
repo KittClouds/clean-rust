@@ -1,0 +1,44 @@
+{
+  "schema": "F4-PRESENTATION-02-analysis-repair-amendment-v0.1",
+  "identity": "F4-PRESENTATION-02-CPHI-ENG1-V2",
+  "status": "ANALYSIS_ONLY_REPAIR",
+  "original_analysis_sha256": "f0e674cdb017539de59d685287bb29afe9e7e3b9cafcbc76dc4526d465ec2d64",
+  "analysis_stop_receipt_sha256": "cb442ea57a39aaa32dd94d4a07b9d976eb1d67191d6b3c189a1314c3e5cac0e2",
+  "repaired_analysis_sha256": "e90d0edbdf04666ba9cbc69b333829e6671569d46504e4facc570e56d4ffc19e",
+  "repair_test_sha256": "80e13eed18fa175f3ace8fd165359ca2ac3d7b95838651df0e1ddf701ed4edf7",
+  "exact_change": {
+    "before": "int(item[\"epoch\"])",
+    "after": "_epoch_number(item[\"epoch\"])",
+    "helper": "def _epoch_number(value: str) -> int: return int(float(value))",
+    "scope": "Parse integer-form and decimal-form CSV epoch values without changing score calculations or result ordering."
+  },
+  "outcome_access": {
+    "heldout_truth_previously_opened": true,
+    "failed_attempt_opened_truth_before_stopping": true,
+    "failed_attempt_computed_some_diagnostics_in_memory": true,
+    "failed_attempt_wrote_or_returned_comparative_result": false,
+    "no_comparative_metrics_were_printed_or_persisted_before_repair": true
+  },
+  "locked_inputs_at_repair": {
+    "integrity_receipt_sha256": "b67af01ff3732345d1a1332dcd070d74e258842a40ea756882a261d4e2e0027c",
+    "prediction_lock_sha256": "98c2c3e369d5ccbb9e3c0fa4878b3c100e9a6ede3ab296ce87ec1b69323eec5d",
+    "truth_file_sha256": "5691561ec69800f7e067e3b03de2f917d68cfee8412b1f85a0e6fa55b7daad24",
+    "prediction_count": 36,
+    "prediction_tree_sha256": "0acb385fc1136310b8841cf06ed20f29b22b9cc9e173caebc52303b4cf0ff9af",
+    "fit_receipt_count": 36,
+    "fit_receipt_tree_sha256": "a9ec95b5935824a3c910691cfae425b1dc2d7474c9cf3f64cc6683bdcb96dd62",
+    "heldout_state_tree_sha256": "474b1aad75afa46a939714f60b797f7306d4cb86fa98434b783559bb4bd2b9fa",
+    "training_trace_tree_sha256": "9396f034104280fe395681a665e5345c4ceb1a3ee2120e9de61cf68ab2f17a6f"
+  },
+  "unchanged": [
+    "all 36 fits, initial/final tensors, prediction streams, activation states, training traces, and fit receipts",
+    "Cphi prediction lock and Cphi integrity receipt",
+    "parent task bank, raw inputs/truth, normalizers, and D/S outputs",
+    "metrics, weighting, class handling, block/replicate aggregation, role-distance and pooling-collision diagnostics",
+    "parent scientific status NOT_EVALUABLE_SUPPORT and previous truth-access provenance"
+  ],
+  "qualification_only": true,
+  "measured_reach03_authorized": false,
+  "pheno_status": "unchanged",
+  "biological_promotion": false
+}

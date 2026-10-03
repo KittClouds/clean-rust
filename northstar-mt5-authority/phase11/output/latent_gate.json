@@ -1,0 +1,9 @@
+{
+  "status": "DEFERRED_PROTOCOL_NOT_FROZEN",
+  "transitions": 37495,
+  "event_states": 16,
+  "minimum_source_transitions": 198,
+  "median_run_jsd_bits": 0.007711307731808103,
+  "reason": "deterministic transition geometry is measured; latent state count and identification protocol must be pre-registered before fitting",
+  "hmm_fit_performed": false
+}

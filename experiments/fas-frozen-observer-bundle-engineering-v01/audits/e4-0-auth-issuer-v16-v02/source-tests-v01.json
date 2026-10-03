@@ -1,0 +1,34 @@
+{
+  "schema": "FAS_E4_0_AUTHORIZATION_ISSUER_SOURCE_TESTS_V16_V02",
+  "receipt_id": "E4_0_AUTHORIZATION_ISSUER_V16_V02_SOURCE_TESTS",
+  "status": "PASS_SYNTHETIC_TESTS_V16_V02",
+  "commands": [
+    "python -m py_compile experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/issue_e4_stage_authorization_v16_v02.py experiments/fas-frozen-observer-bundle-engineering-v01/source/tests/test_e4_stage_authorization_v16_v02.py",
+    "python experiments/fas-frozen-observer-bundle-engineering-v01/source/tests/test_e4_stage_authorization_v16_v02.py (17 synthetic tests)"
+  ],
+  "synthetic_test_count": 17,
+  "py_compile": "PASS",
+  "source_files": [
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/issue_e4_stage_authorization_v16_v02.py",
+      "bytes": 52480,
+      "sha256": "8ddd1e35e36a46939835cccb6bae8e2481ebfdb2b6fa07a4fb162a69f0b18a98"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/tests/test_e4_stage_authorization_v16_v02.py",
+      "bytes": 48372,
+      "sha256": "d1f3d0bec6f6fffbe9879b80bdb67f64648b971559257f288a5241b03fe8d43d"
+    }
+  ],
+  "runtime_access": {
+    "model_contact": false,
+    "tokenizer_contact": false,
+    "cuda_initialized": false,
+    "gpu_lease_acquired": false,
+    "cache_created": false,
+    "labels_opened": false
+  },
+  "scope": "Synthetic v16-v02 authorization issuer verification only. Preserves the exact v14/v15 and v16 failed-attempt lineage, validates the E4-0 v16-v02 seal identity and staged boundaries, and emits no authorization output. No model, tokenizer, CUDA, GPU lease, cache, or terminal-label access.",
+  "execution_authorization_conferred": false,
+  "recorded_utc": "2026-09-27T06:25:38.237156+00:00"
+}

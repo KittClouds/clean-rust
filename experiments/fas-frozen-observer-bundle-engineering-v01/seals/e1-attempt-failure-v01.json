@@ -1,0 +1,16 @@
+{
+  "receipt_id": "FAS_FROZEN_OBSERVER_BUNDLE_E1_ATTEMPT_FAILURE_V01",
+  "status": "E1_CONSTRUCTION_ABORTED_BEFORE_PANEL_OUTPUT",
+  "e0_root_sha256": "9d2aed30f5af52039634fadba1d7af87e64e88c8f607b3d522f5612427098dfa",
+  "preflight_sha256": "18eb3673a1336d2f9eb7cbe7736402e37a3141566df396e7b00817bc988435a1",
+  "failure": "panel world contract authority fields are nested under construction_authority while the v01 validator expected top-level fields",
+  "failure_phase": "world_contract_validation_before_output_directory_creation",
+  "model_loaded": false,
+  "tokenizer_loaded": false,
+  "feature_extraction_performed": false,
+  "observer_fitting_performed": false,
+  "quartets_materialized": 0,
+  "rows_materialized": 0,
+  "historical_s01_artifacts_reused": false,
+  "repair_identity": "E0/E1 v02 validator-path correction; v01 seal and run preserved"
+}

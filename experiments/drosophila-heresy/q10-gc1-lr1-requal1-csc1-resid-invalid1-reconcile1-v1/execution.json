@@ -1,0 +1,12 @@
+{
+  "conclusion": "Both RESID-INVALID1-RERUN1 valid-target classifications are false positives from row-local prefix reconstruction. Full replay reproduces the authoritative O2/O3 frontier states, which are geometry-valid but do not hit the target rows. Prior RESID1 classifications for rows 36 and 695 remain correct.",
+  "contract_sha256": "E3507C7626903F265ACFE171D1E9E87C8CE41BC40B610512087DD3BF22CA7969",
+  "engineering_only": true,
+  "identity": "q10-gc1-lr1-requal1-csc1-resid-invalid1-reconcile1-v1",
+  "protocol": "Q10-RESID-INVALID1-RECONCILE1",
+  "reconciliation_sha256": "F4B3367D532FE52DF8ED4B6E851FBC04D7444E31BFF47B20EDF5D134368F590E",
+  "replay_executed": true,
+  "scientific_promotion": false,
+  "status": "RESID_INVALID1_RECONCILE1_COMPLETE",
+  "witness_count": 2
+}

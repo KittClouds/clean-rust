@@ -1,0 +1,23 @@
+{
+  "completed_blocks": 216,
+  "contract_sha256": "7f0a580fecd737fd67be06878cd0fd0c4ab253ce92e1bc6d2a9acdddec81e6c0",
+  "expected_blocks": 216,
+  "expected_rows": 1080,
+  "frontier_path": "competence-frontier.jsonl",
+  "horizons": [
+    512,
+    1024,
+    2048,
+    4096,
+    8192
+  ],
+  "no_lesions": true,
+  "no_recovery_comparison": true,
+  "nonfinite_rows": 0,
+  "qualification_only": true,
+  "schema": "FLY-PHENO-00-v0.2-QCOMP-collection-receipt-v1",
+  "status": "QUALIFICATION_COMPLETE",
+  "study_id": "FLY-PHENO-00-v0.2-QCOMP",
+  "threshold": 0.25,
+  "wall_seconds": 278.5242692
+}

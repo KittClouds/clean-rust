@@ -1,0 +1,51 @@
+{
+  "rows": [
+    {
+      "claim": "HISTORICAL_BUFFER_PARITY",
+      "evidence": [
+        "SRC01_M1_reload_parity_grouped_abi.json",
+        "SRC01_M5_reload_parity_grouped_abi.json"
+      ],
+      "status": "PASS"
+    },
+    {
+      "claim": "ONLINE_BUFFER_PARITY",
+      "evidence": [
+        "SRC01_M1_online_parity.json",
+        "SRC01_M5_online_parity.json"
+      ],
+      "status": "PASS"
+    },
+    {
+      "claim": "RELOAD_BUFFER_PARITY",
+      "evidence": [
+        "SRC01_reload_determinism.json"
+      ],
+      "status": "PASS"
+    },
+    {
+      "claim": "BOUNDARY_SEMANTIC_PARITY",
+      "evidence": [
+        "SRC01_boundary_causal_receipt.json",
+        "SRC01_synthetic_fixture_receipt.json"
+      ],
+      "status": "PASS"
+    },
+    {
+      "claim": "CAUSAL_FREEZE_QUALIFIED",
+      "evidence": [
+        "SRC01_boundary_causal_receipt.json"
+      ],
+      "status": "PASS"
+    },
+    {
+      "claim": "GRAMMAR_HANDOFF_QUALIFIED",
+      "evidence": [
+        "SRC01_boundary_causal_receipt.json"
+      ],
+      "status": "PASS"
+    }
+  ],
+  "schema": "OBS_OPEN_SRC01_TYPED_PARITY_MATRIX_V1",
+  "status": "PASS"
+}

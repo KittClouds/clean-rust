@@ -1,0 +1,9 @@
+{
+  "contract_id": "FAS_RESET_V1",
+  "event_advance": {"transient_state": "preserve", "episodic_memory": "preserve", "adaptive_parameters": "preserve", "optimizer_state": "preserve", "regime_snapshots": "preserve"},
+  "episode_reset": {"transient_state": "clear", "episodic_memory": "preserve", "adaptive_parameters": "preserve", "optimizer_state": "preserve", "regime_snapshots": "preserve"},
+  "world_reset": {"transient_state": "clear", "episodic_memory": "clear", "adaptive_parameters": "restore sealed initialization readout", "optimizer_state": "clear", "regime_snapshots": "clear"},
+  "experiment_reset": {"transient_state": "clear", "episodic_memory": "clear", "adaptive_parameters": "restore sealed initialization readout", "optimizer_state": "clear", "regime_snapshots": "clear", "feature_cache_infrastructure": "retain immutable FAS-owned cache"},
+  "phase1_usage": "No adaptive arms run in Phase 1. WORLD_RESET is the only later FAS-00 arm boundary; EVENT_ADVANCE is not a reset.",
+  "scope": "FAS-00 only; no policy for future FAS branches."
+}

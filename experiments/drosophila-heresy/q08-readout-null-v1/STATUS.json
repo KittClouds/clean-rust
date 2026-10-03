@@ -1,0 +1,18 @@
+{
+  "protocol": "Q08-ReadoutNull-v1",
+  "status": "BLOCKED_PRESEAL_CONSTRUCTOR_QUALIFICATION",
+  "qualification_seeds_used": [
+    9200
+  ],
+  "qualification_seeds_unopened": [
+    9201,
+    9202,
+    9203,
+    9204,
+    9205
+  ],
+  "scientific_seed_bundles_used": 0,
+  "full_qualification_executed": false,
+  "archive": "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q08-readout-null-v1\\artifacts\\20260916T124240Z",
+  "archive_sha256": "f0e08a083de067d64e029f72d611d1341236af129324b360dd4280a1b2654a57"
+}

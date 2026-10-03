@@ -1,0 +1,98 @@
+{
+  "schema_version": "PARTITION_TAPE_V1",
+  "partition_tape_id": "ea30eec338e8c49b9157ad5586fd60cdf741f22120cc72a59c2583f3ba0f48e8",
+  "source_episode_tape_id": "01f330c76e0de255668e4969600db19ba18ee3094ff1eb379b58ab6d6aa30a6c",
+  "strategy": "chronological_group_aware_v1",
+  "group_key": "declared_group_id",
+  "chronology_key": "episode_start_time_ns_then_end_time_ns",
+  "embargo_ns": 2000000000,
+  "assignments": [
+    {
+      "episode_id": "1bf882bd3d85f70c2b7274fe932552bb418e4d59ada704a11c7e2d63f2dbae70",
+      "group_id": "session-00",
+      "chronological_ordinal": 0,
+      "role": "TRAIN",
+      "reason_code": "CHRONOLOGICAL_GROUP_ASSIGNMENT"
+    },
+    {
+      "episode_id": "b65178622fda5179d5da6e59ba5c91b387b7de7d16a2eaf37865663d99e8dd51",
+      "group_id": "session-01",
+      "chronological_ordinal": 1,
+      "role": "TRAIN",
+      "reason_code": "CHRONOLOGICAL_GROUP_ASSIGNMENT"
+    },
+    {
+      "episode_id": "4c9b43b5a0d40c4a23b2f64b6b24e9148384f79b3a372cb85b3d60808d8b0627",
+      "group_id": "session-02",
+      "chronological_ordinal": 2,
+      "role": "TRAIN",
+      "reason_code": "CHRONOLOGICAL_GROUP_ASSIGNMENT"
+    },
+    {
+      "episode_id": "7fd3ed1a7a403da9e85015a25b1583c5bb22bfd562d6e310d093eb9b39235adc",
+      "group_id": "session-03",
+      "chronological_ordinal": 3,
+      "role": "TRAIN",
+      "reason_code": "CHRONOLOGICAL_GROUP_ASSIGNMENT"
+    },
+    {
+      "episode_id": "962d7790d91b4c08ef8c4a1dedc2b5ff32b92c43ed0590dbaae397e4c34f8d5b",
+      "group_id": "session-04",
+      "chronological_ordinal": 4,
+      "role": "TRAIN",
+      "reason_code": "CHRONOLOGICAL_GROUP_ASSIGNMENT"
+    },
+    {
+      "episode_id": "caa48728fdcbc86bd3b7b0a385f876a7450ac964b14910d0aca3f996683723aa",
+      "group_id": "session-05",
+      "chronological_ordinal": 5,
+      "role": "TRAIN",
+      "reason_code": "CHRONOLOGICAL_GROUP_ASSIGNMENT"
+    },
+    {
+      "episode_id": "d39f0766731013a9aac46801663ae8996a7c524836ee90c97cc2df99a2caf790",
+      "group_id": "session-06",
+      "chronological_ordinal": 6,
+      "role": "EXCLUDED_EMBARGO",
+      "reason_code": "BOUNDARY_EMBARGO"
+    },
+    {
+      "episode_id": "194e40943ad333c248dcc6ca626c7179e703c1d04b1ad24c0dab39b0ccb012bd",
+      "group_id": "session-07",
+      "chronological_ordinal": 7,
+      "role": "DEVELOPMENT",
+      "reason_code": "CHRONOLOGICAL_GROUP_ASSIGNMENT"
+    },
+    {
+      "episode_id": "0e3c22a7096ecd3eec47a6147b2597f3437acd0d9e26fcdc26c8fd1c731d1ac8",
+      "group_id": "session-08",
+      "chronological_ordinal": 8,
+      "role": "DEVELOPMENT",
+      "reason_code": "CHRONOLOGICAL_GROUP_ASSIGNMENT"
+    },
+    {
+      "episode_id": "ef021a1aa54c1fe43789e87cd1a36ea13cb556c756a1be7b3a5a00e4bed31db3",
+      "group_id": "session-09",
+      "chronological_ordinal": 9,
+      "role": "EXCLUDED_EMBARGO",
+      "reason_code": "BOUNDARY_EMBARGO"
+    },
+    {
+      "episode_id": "59a35be2f207aabc8e1a20d3c7949dea85450c2a63df515ba57b1bfb19edbcef",
+      "group_id": "session-10",
+      "chronological_ordinal": 10,
+      "role": "EVALUATION",
+      "reason_code": "CHRONOLOGICAL_GROUP_ASSIGNMENT"
+    },
+    {
+      "episode_id": "6db00d65a0f592927f6c83fe39d4c468f3c34012a2e8349b5f1b1d437c6b4db9",
+      "group_id": "session-11",
+      "chronological_ordinal": 11,
+      "role": "EVALUATION",
+      "reason_code": "CHRONOLOGICAL_GROUP_ASSIGNMENT"
+    }
+  ],
+  "episode_population_hash": "ae87d2b32ce7c591eedac8086aec9640d925da73b902f79e0c48eec762917239",
+  "sealed": true,
+  "content_hash": "69ae60a73b47ea1bb98efd2b55ae4a925702b5b1b3256f594377969252094cee"
+}

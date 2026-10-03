@@ -1,0 +1,269 @@
+{
+  "captured_at_utc": "2026-09-18T15:43:55.804764+00:00",
+  "contract_audits": [
+    {
+      "contract": "experiments/drosophila-heresy/q10-rh1-f2-v1/CONTRACT.json",
+      "counts": {
+        "MATCH": 4,
+        "MISMATCH": 6,
+        "MISSING": 0
+      },
+      "identity": "q10-rh1-f2-v1",
+      "nonmatching": [
+        {
+          "actual_sha256": "B0ADD65611A38CD8121F65A348D06CEA3624B3F2A2EF1697AA188D5C7029F53D",
+          "expected_sha256": "E28592C95AFCA90FC83817A98CB2558E5C6157F6CE0050D260F3420F324F24E4",
+          "label": "rh1_cq1_contract",
+          "path": "experiments/drosophila-heresy/q10-rh1-cq1-v1/CONTRACT.json",
+          "status": "MISMATCH"
+        },
+        {
+          "actual_sha256": "FF1219038E73788B5376916F133B39CE39CCF2992FF3CC80B0C19E2223AC70E5",
+          "expected_sha256": "4D45D48375385AE8886A744BF9CE8E926140F9181C30966316D7350608327EE5",
+          "label": "rh1_ac2_effects",
+          "path": "experiments/drosophila-heresy/q10-rh1-ac2-v1/qualification/effects.jsonl",
+          "status": "MISMATCH"
+        },
+        {
+          "actual_sha256": "5E10F89937F51B21071787C874F5D6C6A5C832031990940ECA77A5D990BE26E3",
+          "expected_sha256": "7EC54C783A97078243D4AA5B1AEDC65AC5FBE0475C8F11561D84FF4D8120C2F2",
+          "label": "rh1_ac2_features",
+          "path": "experiments/drosophila-heresy/q10-rh1-ac2-v1/qualification/features.jsonl",
+          "status": "MISMATCH"
+        },
+        {
+          "actual_sha256": "4442B942F06E8BEC43129058B74C300472D143A82338EFB09E8D3CBE8AA89759",
+          "expected_sha256": "A00078787DB732906416B3C7158DC777CD41C2E71C3AAE660D1AE525446FB82A",
+          "label": "pf5_runner",
+          "path": "experiments/drosophila-heresy/q10-pf5-v1/scripts/run_q10_pf5.py",
+          "status": "MISMATCH"
+        },
+        {
+          "actual_sha256": "B1D04A1EA9144A29CEA6E2B997FEB0C26D9790BF7841A4FA61269E22E24FB1C9",
+          "expected_sha256": "B42644BA0E2C4C8A0CC0F9997135CE18A9F9E6C0836810926300C4D84F198103",
+          "label": "rh1_runner",
+          "path": "experiments/drosophila-heresy/q10-rh1-f2-v1/scripts/run_rh1.py",
+          "status": "MISMATCH"
+        },
+        {
+          "actual_sha256": "730D6B03CEE7CE58A9002320372E9F77EC2AB593EC25A71583F59D90D690BC26",
+          "expected_sha256": "20995E1826A9C62E0E8689017A2F3E624CC9E63B76B210FBD4AB11D7E9E7D34F",
+          "label": "pf5_contract",
+          "path": "experiments/drosophila-heresy/q10-pf5-v1/CONTRACT.json",
+          "status": "MISMATCH"
+        }
+      ],
+      "protocol": "Q10-PF6-RH1-F2"
+    },
+    {
+      "contract": "experiments/drosophila-heresy/q10-rh1-cq1-v1/CONTRACT.json",
+      "counts": {
+        "MATCH": 9,
+        "MISMATCH": 12,
+        "MISSING": 0
+      },
+      "identity": "q10-rh1-cq1-v1",
+      "nonmatching": [
+        {
+          "actual_sha256": "0844E38DC44A6C590DAEE4D8B1B1EAAD56B13EF9EC8425F5ECCFE1EC9D3CCB87",
+          "expected_sha256": "91286F84241D120395905E1569218B4D4BA5EE682AE5C82B75879305FC88A75C",
+          "label": "pf5_plan",
+          "path": "experiments/drosophila-heresy/q10-pf5-v1/PLAN.md",
+          "status": "MISMATCH"
+        },
+        {
+          "actual_sha256": "730D6B03CEE7CE58A9002320372E9F77EC2AB593EC25A71583F59D90D690BC26",
+          "expected_sha256": "20995E1826A9C62E0E8689017A2F3E624CC9E63B76B210FBD4AB11D7E9E7D34F",
+          "label": "pf5_contract",
+          "path": "experiments/drosophila-heresy/q10-pf5-v1/CONTRACT.json",
+          "status": "MISMATCH"
+        },
+        {
+          "actual_sha256": "4442B942F06E8BEC43129058B74C300472D143A82338EFB09E8D3CBE8AA89759",
+          "expected_sha256": "A00078787DB732906416B3C7158DC777CD41C2E71C3AAE660D1AE525446FB82A",
+          "label": "pf5_runtime_helper",
+          "path": "experiments/drosophila-heresy/q10-pf5-v1/scripts/run_q10_pf5.py",
+          "status": "MISMATCH"
+        },
+        {
+          "actual_sha256": "685B8885D588BCD88A5AE9D23098115996AFC25A28BA2BD89A915FAEEF6FF484",
+          "expected_sha256": "2B030F345FE7E9E8A2AF6DEEA1C8CFA8D225841CB3EC026E7648D7C4EB1043ED",
+          "label": "pf6_plan",
+          "path": "experiments/drosophila-heresy/q10-pf6-v1/PLAN.md",
+          "status": "MISMATCH"
+        },
+        {
+          "actual_sha256": "F15A9328B943FDD06371774CB6C98122209E66916041680B1059F7088A64056E",
+          "expected_sha256": "B572E4A99AF93F4B1DF44885787E5B5C739C603CF5DC3FD8A48B713513513782",
+          "label": "pf6_contract",
+          "path": "experiments/drosophila-heresy/q10-pf6-v1/CONTRACT.json",
+          "status": "MISMATCH"
+        },
+        {
+          "actual_sha256": "4C0B83A9668638EE3579D046F0DA58452C7CF7E9D5580004036753FF454C80D0",
+          "expected_sha256": "79B731A7D86FDA1D3FB45F3FA320C62BABD35933AE9ED5BCC25D0744B3F6EA46",
+          "label": "pf6_runtime_helper",
+          "path": "experiments/drosophila-heresy/q10-pf6-v1/scripts/run_q10_pf6.py",
+          "status": "MISMATCH"
+        },
+        {
+          "actual_sha256": "D91CE77BF7D0DD9EE1528CA8E383C30D5C541A04FB2859B9D0881AA47C06D763",
+          "expected_sha256": "651B77A4C9EC848EA17D05726E275A748DCA23EA4106D1A4CA7DEFD523173DCC",
+          "label": "s1_plan",
+          "path": "experiments/drosophila-heresy/q10-pf6-s1-v1/PLAN.md",
+          "status": "MISMATCH"
+        },
+        {
+          "actual_sha256": "5EA03D8499C49C4EA57340183ED569347A3F3B053F0012818EFBC276C0306FAF",
+          "expected_sha256": "C60C17E2C79A04136701ACDCC4F17E72F017DFEE6728DF0EA523BBA2217CEB7D",
+          "label": "s1_contract",
+          "path": "experiments/drosophila-heresy/q10-pf6-s1-v1/CONTRACT.json",
+          "status": "MISMATCH"
+        },
+        {
+          "actual_sha256": "DC0F15CDBDB86C5D2074AFF7432F7FEDCFFE4FDF13C3BBF28AB97A2E152A2B02",
+          "expected_sha256": "9C5036F7BF85278ADFA5154E0C312E82952B16A96BF96A518E78C1C70BBB7FB8",
+          "label": "s1_runner",
+          "path": "experiments/drosophila-heresy/q10-pf6-s1-v1/scripts/run_q10_pf6_s1.py",
+          "status": "MISMATCH"
+        },
+        {
+          "actual_sha256": "676236D985AE68E97F41D2C4ACF2627C9EC07E4C2F45026EB7BDD4C5649B9E9E",
+          "expected_sha256": "2EEA4F242C45ED40AE435C02699F41C3F8A0D92A0D2CDE470BFDB53ECC2BAE61",
+          "label": "s1_sampler",
+          "path": "experiments/drosophila-heresy/q10-pf6-s1-v1/scripts/select_q10_pf6_s1.py",
+          "status": "MISMATCH"
+        },
+        {
+          "actual_sha256": "AF87BCEF77668054B7C20C333F7F15E79ECF0E5FC3C51B0AE2DDFD75F69C4EA1",
+          "expected_sha256": "FFD057E2D2FB86CB8BBBE0F78EA66C10DF752ABB369448549430EDBF4595CC6E",
+          "label": "rmt_contract",
+          "path": "experiments/drosophila-heresy/q10-rmt-v1/CONTRACT.json",
+          "status": "MISMATCH"
+        },
+        {
+          "actual_sha256": "4FC8859C6A759039CE4FF7581C43EF2687E23147F535378AB9F3147CFAD9799F",
+          "expected_sha256": "9FC2FB529A8EDA40F9F6AC1EB43DE1E76C8E7EB1331C2FD66CEC69AE7C1BF83F",
+          "label": "rmt_moves",
+          "path": "experiments/drosophila-heresy/q10-rmt-v1/qualification/sample-9731-9732/moves.jsonl",
+          "status": "MISMATCH"
+        }
+      ],
+      "protocol": "Q10-RH1-CQ1"
+    }
+  ],
+  "decisions": [
+    "DO_NOT_RUN_RIS1",
+    "DO_NOT_RUN_NEW_SALL1_FROM_NL1",
+    "DO_NOT_REBIND_HISTORICAL_CONTRACTS_IN_PLACE",
+    "BUILD_FRESH_CURRENT_RUNTIME_CLOSURE_BEFORE_NEW_MATERIALIZATION"
+  ],
+  "historical_measurements_used": false,
+  "identity": "q10-gc1-lr1-chain-audit-v1",
+  "mutation_policy": "read_only",
+  "nested_audit": {
+    "checks": [
+      {
+        "actual_sha256": "2C4BC3875E57BC0E1843F202067E406F5AD28917DEEE6ADAB1031478C34AB018",
+        "expected_sha256": "A4304E70F7D32436109CD6F3367C298CD1227FBD5C4AA2578C28D14272721D6B",
+        "label": "par8_execution",
+        "path": "experiments/drosophila-heresy/q10-gc1-par8-v1/qualification/execution.json",
+        "status": "MISMATCH"
+      },
+      {
+        "actual_sha256": "54A2688080A65F5CFE31B11A12F5DA85B92D86BBDE2E42072FB0C0F32F3D3B1A",
+        "expected_sha256": "56A8BCFD950C2C796279556B03C4905622B1207023C1142076AE7147203477FA",
+        "label": "par2_palettes",
+        "path": "experiments/drosophila-heresy/q10-gc0-gp1-par2-v1/qualification/palettes.jsonl",
+        "status": "MISMATCH"
+      },
+      {
+        "actual_sha256": null,
+        "expected_sha256": "47DB038381C9ACB0C98E7D933AA40864F779584CC635178BDF775FDAB5598762",
+        "label": "pf0_execution",
+        "path": "experiments/drosophila-heresy/q10-gc1-pf0-v1/qualification/execution.json",
+        "status": "MISSING"
+      },
+      {
+        "actual_sha256": "730D6B03CEE7CE58A9002320372E9F77EC2AB593EC25A71583F59D90D690BC26",
+        "expected_sha256": "20995E1826A9C62E0E8689017A2F3E624CC9E63B76B210FBD4AB11D7E9E7D34F",
+        "label": "pf5_contract",
+        "path": "experiments/drosophila-heresy/q10-pf5-v1/CONTRACT.json",
+        "status": "MISMATCH"
+      },
+      {
+        "actual_sha256": null,
+        "expected_sha256": "2F4DC200F0D4A2CCBE54E8883F467E74AD8B1789A8F55787A70391EA3F2B6A4E",
+        "label": "cancel1_plan",
+        "path": "experiments/drosophila-heresy/q10-gc1-cancel1-v1/PLAN.md",
+        "status": "MISSING"
+      },
+      {
+        "actual_sha256": null,
+        "expected_sha256": "4AD04F0F3B6E1CB56A5C5C17F3984F370C4A9DF8DC6D47B786EB83541A625BF3",
+        "label": "cancel1_contract",
+        "path": "experiments/drosophila-heresy/q10-gc1-cancel1-v1/CONTRACT.json",
+        "status": "MISSING"
+      },
+      {
+        "actual_sha256": null,
+        "expected_sha256": "2DC8F504628FC29BDBBAD8DDE22225765B3A3EC7A0C9623EDE7412F27700CA9D",
+        "label": "cancel1_runner",
+        "path": "experiments/drosophila-heresy/q10-gc1-cancel1-v1/scripts/run_cancel1.py",
+        "status": "MISSING"
+      },
+      {
+        "actual_sha256": null,
+        "expected_sha256": "7820F43395EF6BFB82CC32838970CA7F404BC39BF7821B4B63DBE1AEB02585C7",
+        "label": "rq1_runner",
+        "path": "experiments/drosophila-heresy/q10-gc1-rq1-v1/scripts/run_rq1.py",
+        "status": "MISSING"
+      },
+      {
+        "actual_sha256": null,
+        "expected_sha256": "B976E87228BE823D029C119D67D1BE9593AF929381EEFEA9C4B36F9525348E03",
+        "label": "rq1_contract",
+        "path": "experiments/drosophila-heresy/q10-gc1-rq1-v1/CONTRACT.json",
+        "status": "MISSING"
+      },
+      {
+        "actual_sha256": null,
+        "expected_sha256": "251723BDA26FAA6005B75369E88444767784E82DB500D1EAEC5952446F9A67E5",
+        "label": "rq1_execution",
+        "path": "experiments/drosophila-heresy/q10-gc1-rq1-v1/qualification/execution.json",
+        "status": "MISSING"
+      }
+    ],
+    "decision": "DO_NOT_RUN_RIS1_OR_NEW_SALL1_FROM_THIS_TREE",
+    "identity": "q10-gc1-lr1-nl1-audit-v1",
+    "nested_lr1_contract": "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-lr1-nl1-v1\\parent-snapshot\\experiments\\drosophila-heresy\\q10-gc1-cancel1-lr1-v1\\CONTRACT.json",
+    "nested_lr1_parent_summary": {
+      "MATCH": 0,
+      "MISMATCH": 3,
+      "MISSING": 7
+    },
+    "parent_mutation": false,
+    "protocol": "Q10-GC1-LR1-NL1-INTERNAL-PARENT-CONSISTENCY-AUDIT",
+    "scientific_promotion": false,
+    "scope": "read_only_audit_of_fresh_snapshot_before_replay",
+    "smoke_test": {
+      "error": "LR1 parent drift: par8_execution",
+      "identity": "q10-gc1-lr1-nl1-sall1-v1",
+      "records_materialized": 0,
+      "status": "ABORTED_PRESEAL"
+    },
+    "snapshot_root": "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-lr1-nl1-v1\\parent-snapshot",
+    "status": "FAILED_NESTED_LR1_PARENT_CONTRACT"
+  },
+  "next_gate": "Q10-GC1-LR1-REQUAL1-CURRENT-CLOSURE",
+  "parent_mutation": false,
+  "protocol": "Q10-GC1-LR1-RECURSIVE-RUNTIME-CLOSURE-AUDIT",
+  "runtime_smoke": {
+    "error": "RH1-F2 parent drift: rh1_cq1_contract",
+    "operation": "current RH1-F2 load_runtime on eight current endpoint/set keys",
+    "status": "FAILED_BEFORE_REPLAY"
+  },
+  "scientific_promotion": false,
+  "scope": "read_only_recursive_parent_and_runtime_closure_audit",
+  "status": "FAILED_CURRENT_RUNTIME_CLOSURE"
+}

@@ -1,0 +1,1 @@
+{"affine":["price origin","semantic time origin"],"exact":["price scale","source resolution","storage resolution","cadence","session duration","range count","range shape"],"excluded":["context.session_id","input.source_row_id","emission.commit.source_row_id"],"mode":"COUPLED_CONTEXT_RELATION_WITH_TYPED_FIBERS","schema":"G6_CONTEXT_MATCHING_POLICY_V1"}

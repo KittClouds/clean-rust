@@ -1,0 +1,209 @@
+{
+  "protocol": "DH-08A",
+  "created_utc": "20260916T054825Z",
+  "before_task_execution": true,
+  "status_at_seal": "FROZEN_UNOPENED",
+  "fingerprints": {
+    "Cargo.toml": "dc05c404f9f37e02928af25d0689f0b6b64d6e1b9afe41c7b62595a513157375",
+    "Cargo.lock": "5958e4d49aab5df0e0389ee57643249a0f1f335d663072c945a0f947a0299cb9",
+    "config.json": "39561560628f98b532762df2d70b3536a772bca8870e677b9668962f7471e6c5",
+    "PROTOCOL.md": "7833ee37063dba0091b7410c9146de2056bb5c3cc9b6de7d208c99e2d370185d",
+    "QUALIFICATION.json": "a5ea19e3a30a08c68e8da6e30abb4f277c06c91669449203aceda9544c8f305b",
+    "requirements.lock": "93de842bade6b2631fe1efb076b0ed04f6c6639451358a4ed4ac1c55c82e7aeb",
+    "src\\allocation.rs": "4fff2a7f1bc7078795abde6916bf14c96d2334579d04e48d4194999a076f826e",
+    "src\\baseline.rs": "0ac5d54b053a26f97841bf8e4ac8acadeed6296056d466289f116420255212fa",
+    "src\\capture.rs": "96d116502a9cc76ec1204b335ebfba840e03f9380a35f54228e1893fd51bee51",
+    "src\\experiment_main.rs": "04f1a269a09aba89b6e17dfaaece4f8fe867812e6b1e11ee79f64ee390a842f6",
+    "src\\graph.rs": "a697285a9fe4560fce32afb5330358ede1c84e96365c23ac96c24d97fe667464",
+    "src\\main.rs": "cc78b74c56d736714867d3db80535ebfe226d0845f3cd2fd61b4354dd1cbfd71",
+    "src\\observer.rs": "08fc18ef45d376a9e58d7531231b110dad8a81cc86dc3c0d84e7333f445688ef",
+    "src\\plasticity.rs": "d08e4057234dfbd6c4c11da660031263aeaa0327a86b68f7cae04cdc4bf9438c",
+    "src\\policy.rs": "92780302bf6f30ad91c6bb57cece36f5881175aeaa8883181f8b0260fd2f6a34",
+    "src\\rng.rs": "794d04a94d011ece9f5758ad05a680b3acccbc82e94e33f4d9a9179c882dd950",
+    "src\\rotation.rs": "d50637747333bcc3463fffb4f986c721e8b397cb2f6b6da0bf63b55c6ed599ac",
+    "src\\simulation\\dh03.rs": "ddaebb5caa82a16fff7745d878babf0f09d204a5ca8dd6360d6e60fa6f4b34e4",
+    "src\\simulation\\dh04.rs": "1ea9f7df8e36b97f96298dc44fbbb2cb0c4e5eabda103db13c7c076bf71312e2",
+    "src\\simulation\\dh06.rs": "7eaa329ccd45ad4e5f7da46514a3d16fa2491a7b99269da6762a3330d22b7a76",
+    "src\\simulation\\dh06_tests.rs": "d249399012c3806c53213ec18b1d078c278b41ed1b42acd4d06c43034bfa63ee",
+    "src\\simulation\\dh07.rs": "7e4d457d6b24ba2e63ce7b73a47614b6f2378a69db97a1c72524c33e0423c25b",
+    "src\\simulation\\dh07_null.rs": "34e248533711c409de3b951384cee41ef3b92a28c0bf16a5d50ab91ddf0ad6bd",
+    "src\\simulation\\dh07_tests.rs": "f1e34ec8be6c1721260dc780fcacfe5639321f410c4146fb98a8bc790ba0a588",
+    "src\\simulation\\dh08a_tests.rs": "2372aae14491498fd621b53317e129ac3aac8ae384d04184a10d02d813880b35",
+    "src\\simulation\\experiment.rs": "4ef74dfe60ad9cc9ae4b440a995419c648dceb1a903204b0c53fc770c94ba477",
+    "src\\simulation.rs": "93698d2f1b9c470eed487a615b813eb25c7a5447c3b73d5225dee439a49a7976",
+    "src\\task.rs": "06b4ea25e3c8c4a0106337866c714c6d74e6d1c0377ac0a934c33e859a02dc61",
+    "scripts\\analyze.py": "5f052e9dd363ee1229c4d2d0763d009f38c5446663b4b586c5a470a72973fc12",
+    "scripts\\seal_run.py": "3ef309da1b9dbfd593b604ae77d7ba29435b0e7c31535246e52913cb53f6e3d4",
+    "scripts\\test_analysis.py": "554e177c0a847fe696e3a521b8e42626d10e876a348892d09c4d97d67fecf2b9",
+    "scripts\\verify_run.py": "1ccd9230670451982ef86305f71951cbf98d322548f578f3416e32eb1ba2af3e",
+    "qualification\\preseal-cargo-build.log": "c663462ee6e8bd687c13f4f43386d516f3f0bb8fc1cb3522d98b83bf3664d8fd",
+    "qualification\\preseal-cargo-clippy.log": "3e43b255d4b20a7b309afeb5012d5088aa471e53c75606d9df8a98bab335f40e",
+    "qualification\\preseal-cargo-test.log": "e12e35148a43053553288f1f531786c533fdb81e3f0701c36419d9f8aa7b0a0d",
+    "qualification\\preseal-python-analysis-tests.log": "caaa1d85582f0542bf2156e4943e3ca30eb08c6069eb61cb72af04cfc3df0ac1",
+    "qualification\\sealer-validator.log": "0f4b6a7b92732c91de10735cf19d030f0a1150727f4ad942b58ff3910bf671d1",
+    "qualification\\smoke.log": "733118be14568142a6aadb7d3da621e5bd9b39c98df59a6d891f68bd03711cfb",
+    "qualification\\config.json": "d5bdf24d54a50f55de96400b7e0bbc261e596dfe0a6bf6f7fcc1de69b3361056",
+    "anatomy\\census.json": "8a26ed6f448b02a881b1a9a285f8cd3b642f8e0e272b27f6e2c681409cdc2c9e",
+    "anatomy\\edges-L.tsv": "2bc460d2019f2ab71320f103597d3b4b5062320bd3c97e5239a76a7915d407e0",
+    "anatomy\\edges-R.tsv": "e7761386f2e60bfaaf9f2bd92923c2127442c35a3f108e3810e45a2297517b1f",
+    "anatomy\\nodes-L.json": "adf1b43cb3953dc090c2bb8b11b117796a9dd6ddd3701d5b346c7ca09eedbd80",
+    "anatomy\\nodes-L.tsv": "3cae35fd55e026e2009f6cc26e60096522911009b84593a5d1a3f3e4eb0a99c1",
+    "anatomy\\nodes-R.json": "7d69e54f4840fe1291faebb9432d098370045d0cf59b68f01d1a555171e38540",
+    "anatomy\\nodes-R.tsv": "420c28ee36ce37bba8c683704c36dfa60c90640962edb78f97fbf2321fdc0752",
+    "q07-evidence\\qualification-seal.json": "db08125d2041865f91d8d443fc8a2fad795c7e5b499cda352ffd29cc081de688",
+    "q07-evidence\\policy-summary.json": "c75c9af3b6d3470933e24bc3ff0746ebd8e1e741c53e236a8c9000c441c55334",
+    "q07-evidence\\policy-independent.json": "446095f51a652d707f8ba8785eec9873e2addf7f615856a6cc519cb03c1ddbf4",
+    "q07-evidence\\clamp-summary.json": "0210a11fd7feb98f555b7372a6cedd26e80f2daeeeda1fe362ac0f37d502c860",
+    "q07-evidence\\holdout-gates.json": "2d42c05926cf8b07a125c855df6d68094c7bada6c573dd099eb40c7dafbe03c2",
+    "drosophila-heresy-dh08a.exe": "b1e12a27bc25163f54b1a5911c17b56ce58c54f7ed4908ad41cdc3f4c010d90d",
+    "current-binary-smoke.json": "c42f035c57f526ab37b20bf96115fabd8ce557db3828930bc7043340fddaf4af"
+  },
+  "parent_dh07r": {
+    "seal_sha256": "18508e8fc6b3e86a7f8d56cde0413fd43b436c06de056f7f7a20a155225b060d",
+    "frozen_files": 58
+  },
+  "q07_qualification": {
+    "seal_sha256": "db08125d2041865f91d8d443fc8a2fad795c7e5b499cda352ffd29cc081de688",
+    "policy_summary_sha256": "c75c9af3b6d3470933e24bc3ff0746ebd8e1e741c53e236a8c9000c441c55334",
+    "independent_summary_sha256": "446095f51a652d707f8ba8785eec9873e2addf7f615856a6cc519cb03c1ddbf4",
+    "events": 12288,
+    "measured_seeds_used": 0
+  },
+  "dh08a_qualification": {
+    "protocol": "DH-08A",
+    "status": "QUALIFIED_FOR_SINGLE_MEASURED_EXECUTION",
+    "fresh_measured_seeds_used": 0,
+    "qualification_behavior_used_for_protocol_tuning": false,
+    "parent_dh07r": {
+      "run": "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\dh07r\\artifacts\\runs\\20260915T233614Z",
+      "seal_sha256": "18508e8fc6b3e86a7f8d56cde0413fd43b436c06de056f7f7a20a155225b060d"
+    },
+    "constructor_qualification": {
+      "protocol": "Q07-BoundedNull-v1",
+      "closed_loop_events": 12288,
+      "failures": 0,
+      "measured_seeds_used": 0,
+      "qualification_seal_sha256": "db08125d2041865f91d8d443fc8a2fad795c7e5b499cda352ffd29cc081de688",
+      "policy_summary_sha256": "c75c9af3b6d3470933e24bc3ff0746ebd8e1e741c53e236a8c9000c441c55334",
+      "independent_checks": 384
+    },
+    "exact_orchestration_smoke": {
+      "mode": "qualify",
+      "seed": 9100,
+      "sides": [
+        "R",
+        "L"
+      ],
+      "taus": [
+        4.0,
+        16.0
+      ],
+      "event_count": 1024,
+      "result_cells": 8,
+      "all_events_passed": true,
+      "fresh_measured_seeds_used": 0,
+      "observed_maxima": {
+        "axial_error_over_total_norm": 1.9784089141689937e-08,
+        "norm_relative_error": 1.4499982700809832e-08,
+        "residual_norm_relative_error": 1.4500330524323943e-08,
+        "residual_abs_cosine": 1.58515429822845e-08
+      },
+      "output_hashes": {
+        "L-tau16.jsonl": "8336c00fae7be28b025598ba2057d901756faf37006c57c6d3e5e4e60011db33",
+        "L-tau4.jsonl": "c6d2cfd7e4aa15d4a5af5fe9d568bb52e1f3ed0d556716ba474647cdd6d5524d",
+        "R-tau16.jsonl": "d2cab0dcf532fe1e2778d392c24bed6e30141f2b8aa8fb8463a97a18ca7acd68",
+        "R-tau4.jsonl": "756aefc82251ed7d2152030f51bcfd5fb3ee66745a93a84d8468bccf1033f9c3"
+      }
+    },
+    "rust": {
+      "release_tests_passed": 56,
+      "tests_failed": 0,
+      "tests_ignored": 9,
+      "clippy_warnings": 0,
+      "release_build": "PASSED"
+    },
+    "analysis": {
+      "tests_passed": 9,
+      "tests_failed": 0,
+      "bootstrap_resamples": 20000,
+      "bootstrap_seed": 2026091608,
+      "fail_closed_fixtures": "PASSED"
+    },
+    "runtime": {
+      "python": "3.13.15 (tags/v3.13.15:4061bc4, Aug  5 2026, 13:05:39) [MSC v.1944 64 bit (AMD64)]",
+      "interpreter": "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\dh06\\.dh06-venv\\Scripts\\python.exe",
+      "interpreter_sha256": "72b29481593c5da37c99248c82777fbfb56217ea7809b771bc760d0a9ecb179b",
+      "numpy": "2.3.3"
+    },
+    "scope": {
+      "specimens": 1,
+      "fresh_seed_bundles": 32,
+      "measured_seed_range": "8000..8031",
+      "estimand": "event-local true minus Q07-matched-null old-map margin on endogenous true-policy states"
+    }
+  },
+  "current_binary_smoke": {
+    "status": "PASSED",
+    "seed": 9100,
+    "fresh_measured_seeds_used": 0,
+    "result_cells": 8,
+    "shadow_events": 1024,
+    "observed_maxima": {
+      "axial_error_over_total_norm": 1.9784089141689937e-08,
+      "norm_relative_error": 1.4499982700809832e-08,
+      "residual_norm_relative_error": 1.4500330524323943e-08,
+      "residual_abs_cosine": 1.58515429822845e-08
+    },
+    "output_hashes": {
+      "R-tau4.jsonl": "0b0c65aedb0ea7253d997e0ef3ead6d3c6971aca8f2fbe64e0e4a999d22c8806",
+      "R-tau16.jsonl": "fc6840e1210ca7dcbcd27d69872abad4147efca1049d236d7b5be73f8cc24c7a",
+      "L-tau4.jsonl": "c6751df04a83e9bebc0b25b4ef6d8c9ad2288a7c79b2fd2983606c33500a0711",
+      "L-tau16.jsonl": "b3e060b50b0c7ac4d2c11bb114cbe3290f04cd74cb5a050293d53a44c4d7d397"
+    },
+    "binary_sha256": "b1e12a27bc25163f54b1a5911c17b56ce58c54f7ed4908ad41cdc3f4c010d90d"
+  },
+  "fresh_seed_bundles": [
+    8000,
+    8001,
+    8002,
+    8003,
+    8004,
+    8005,
+    8006,
+    8007,
+    8008,
+    8009,
+    8010,
+    8011,
+    8012,
+    8013,
+    8014,
+    8015,
+    8016,
+    8017,
+    8018,
+    8019,
+    8020,
+    8021,
+    8022,
+    8023,
+    8024,
+    8025,
+    8026,
+    8027,
+    8028,
+    8029,
+    8030,
+    8031
+  ],
+  "fresh_seed_outcomes_used_for_tuning": 0,
+  "primary_outcome": "seed mean of event-local true_minus_null old-map margins",
+  "primary_contrast": "mean(M_true - M_Q07_matched_null) over 2 sides x 2 taus x 256 events",
+  "python": "3.13.15 (tags/v3.13.15:4061bc4, Aug  5 2026, 13:05:39) [MSC v.1944 64 bit (AMD64)]",
+  "analysis_interpreter": "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\dh06\\.dh06-venv\\Scripts\\python.exe",
+  "analysis_interpreter_sha256": "72b29481593c5da37c99248c82777fbfb56217ea7809b771bc760d0a9ecb179b",
+  "analysis_numpy": "2.3.3",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "binary_executed": "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\dh08a\\artifacts\\runs\\20260916T054825Z\\sealed\\drosophila-heresy-dh08a.exe",
+  "compiler": "rustc 1.96.0 (ac68faa20 2026-05-25)"
+}

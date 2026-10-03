@@ -1,0 +1,11 @@
+{
+  "schema_version": "CAMPAIGN_RECEIPT_V1",
+  "campaign_id": "a2db4037e285d6964027bc91d6bad9bf79b422ad5e8c1197c2425e18576b11b3",
+  "run_receipt_ids": [
+    "dee2e70e945ba953a3e966d9edc736f1d28ec3dcf23c17121f1562e30a9c7258",
+    "5e4456031dbcb53813fb82688b5704ee087e982d12b4a4067f54d952bc5058b2",
+    "b29d153811af30a72e231702a08a581f37f0c1de4cafa0b89129f1bc45c5b38a"
+  ],
+  "learner_execution": "NOT_RUN",
+  "receipt_id": "99f93009c7f7e132774708be8874ecddff47d4550c4cfedb1ff829edbcf68684"
+}

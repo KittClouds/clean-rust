@@ -1,0 +1,69 @@
+{
+  "recorded_utc": "2026-09-27T01:17:06.809677+00:00",
+  "schema": "FAS_E4_0_TRACK_D_SOURCE_TEST_RECEIPT_V04",
+  "receipt_id": "E4_0_TRACK_D_V04_SOURCE_TESTS",
+  "status": "PASS_SYNTHETIC_SOURCE_AND_CLI_TESTS",
+  "command": "python -m unittest discover -s source/scripts/e4_independent_audit_v04/tests -p test_*.py -v; python -m compileall -q; independent auditor --help",
+  "synthetic_test_count": 18,
+  "compile_and_cli": "PASS",
+  "source_files": [
+    {
+      "path": "source/scripts/e4_independent_audit_v04/__init__.py",
+      "bytes": 71,
+      "sha256": "c5c6939552ed8fc92be9b0dd26f6732123dcccc44ef316eb3ab685f8bf291f12"
+    },
+    {
+      "path": "source/scripts/e4_independent_audit_v04/__main__.py",
+      "bytes": 48,
+      "sha256": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d"
+    },
+    {
+      "path": "source/scripts/e4_independent_audit_v04/cli.py",
+      "bytes": 30254,
+      "sha256": "d9ff5fc35eabeb1c9465fccdabfb41b463774a8588e652fdba099ea3227632e8"
+    },
+    {
+      "path": "source/scripts/e4_independent_audit_v04/constants.py",
+      "bytes": 6388,
+      "sha256": "2d2399f856119d144d4fd7ebfe38042c89a6a69176dd49ce05b60e5f8e7a416d"
+    },
+    {
+      "path": "source/scripts/e4_independent_audit_v04/integrity.py",
+      "bytes": 34207,
+      "sha256": "11377c12adc1c74df712434da2f402c26dbd24cecbb9fe0a863c648824036c63"
+    },
+    {
+      "path": "source/scripts/e4_independent_audit_v04/population.py",
+      "bytes": 16583,
+      "sha256": "721f7d965777e9c2cb1baee6d4459ef7dbffea8b84c58cb123dedc72e5bf3309"
+    },
+    {
+      "path": "source/scripts/e4_independent_audit_v04/features.py",
+      "bytes": 13065,
+      "sha256": "241f84f6874cf272b173acb52a1541c472445c109c270c230858210b8ab529b5"
+    },
+    {
+      "path": "source/scripts/e4_independent_audit_v04/replay.py",
+      "bytes": 24743,
+      "sha256": "fc2d49b6efe7b300b425d8a69858f4256da7218a400872d2560798456a44b421"
+    },
+    {
+      "path": "source/scripts/e4_independent_audit_v04/tests/test_audit.py",
+      "bytes": 50260,
+      "sha256": "00b1832743715342221d022ce99fa8c4f6c3e54d3d2ba50287a8cc91e79261fb"
+    },
+    {
+      "path": "source/scripts/e4_independent_audit_v04/README.md",
+      "bytes": 2186,
+      "sha256": "b6b9dae8f77187726a01a12a9bcbd97024d60febf49789979b34d48799758356"
+    }
+  ],
+  "runtime_access": {
+    "model_contact": false,
+    "tokenizer_contact": false,
+    "cuda_initialized": false,
+    "E4_rows_materialized": false,
+    "truth_opened": false
+  },
+  "scope": "Synthetic and source-level checks only. No E4 population, labels, tokenizer, model, CUDA, feature cache, or execution authorization was touched."
+}

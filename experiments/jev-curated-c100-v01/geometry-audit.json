@@ -1,0 +1,89 @@
+{
+  "source_training_side": {
+    "world_family_counts": {
+      "network_incident": 43747,
+      "support_routing": 43748,
+      "system_diagnosis": 43841
+    },
+    "operation_counts": {
+      "all_local_candidates": 6500,
+      "base": 6500,
+      "counterfactual_state_change": 45500,
+      "criterion_paraphrase": 13000,
+      "full_ontology_branch": 6500,
+      "local_plus_unrelated_distractor": 6500,
+      "representation_change": 13000,
+      "supporting_evidence_removal": 20836,
+      "target_plus_one_sibling": 6500,
+      "target_plus_two_siblings": 6500
+    },
+    "lexical_regime_counts": {
+      "held_out_lexical": 13109,
+      "in_distribution": 118227
+    },
+    "unique_semantic_fingerprints": 105336,
+    "unique_exact_text_hashes": 6828,
+    "unique_normalized_text_hashes": 6828,
+    "unique_structural_fingerprints": 27,
+    "posterior_entropy": {
+      "count": 788016,
+      "p25": 0.34003426609783605,
+      "p50": 0.7152126808384721,
+      "p75": 1.0714569010644366
+    }
+  },
+  "selected": {
+    "world_family_counts": {
+      "system_diagnosis": 1132
+    },
+    "coverage_status": "single_novel_world_family_after_current_firewall",
+    "root_count": 1132,
+    "groups": 93252,
+    "episodes": 23313,
+    "operation_counts": {
+      "all_local_candidates": 1132,
+      "base": 1132,
+      "counterfactual_state_change": 7924,
+      "criterion_paraphrase": 2264,
+      "full_ontology_branch": 1132,
+      "local_plus_unrelated_distractor": 1132,
+      "representation_change": 2264,
+      "supporting_evidence_removal": 4069,
+      "target_plus_one_sibling": 1132,
+      "target_plus_two_siblings": 1132
+    },
+    "lexical_regime_counts": {
+      "in_distribution": 20954,
+      "held_out_lexical": 2359
+    },
+    "candidate_profile_counts": {
+      "name": 23313,
+      "name_definition": 23313,
+      "opaque_definition": 23313,
+      "opaque_only": 23313
+    },
+    "candidate_set_size_counts": {
+      "1": 46626,
+      "2": 24445,
+      "3": 1132,
+      "4": 48890,
+      "5": 24445
+    },
+    "posterior_entropy": {
+      "count": 139878,
+      "p25": 0.3187638320329842,
+      "p50": 0.7074623185691532,
+      "p75": 0.9683286375745197
+    },
+    "semantic_family_count": 1132,
+    "semantic_fingerprint_count": 18785,
+    "structural_fingerprint_count": 9
+  },
+  "unavailable_or_proxy": {
+    "canonical_D1_D2_D4_competitor_balance": "unavailable; only generator candidate_distances exist, so D1_proxy/D2_proxy/D4_proxy are diagnostic",
+    "causal_topology": "unavailable in v06 stress metadata; v04 known_v03_topology is a training-side placeholder, not promoted here",
+    "intervention_magnitude": "unavailable as a numeric magnitude; intervention classes and gold posterior entropy are available",
+    "opaque_definition_schema_variation": "candidate_profiles are available; numeric schema variation beyond profile labels is unavailable",
+    "protected_evaluation_outcomes": "not read and not used"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "protocol": "jev-information-density/v0.8p-phase-a-authorization-v01",
+  "identity": "v0.8P-phase-a-fresh-panel-and-instrument-materialization-v01",
+  "authorization": "AUTHORIZED_BY_USER",
+  "authorized_scope": [
+    "construct exactly 2000 fresh held-out neighborhoods and sealed panel artifacts",
+    "run frozen exact-world validation, training/prior-panel identity overlap audits, fresh LFM feature extraction and radius-only matching",
+    "materialize and hash the nine-run schedule and prospective checkpoint manifest",
+    "implement and hash P-specific trainer, evaluator, checkpoint/prediction writers, and analysis reader",
+    "run only non-outcome synthetic/contract-fixture tests",
+    "seal the complete pre-run instrument package"
+  ],
+  "forbidden_scope": [
+    "P head training or extra optimizer steps",
+    "head loading or checkpoint inference",
+    "P predictions, treatment metrics, event-time analysis, or behavior inspection",
+    "E1 reuse as primary data or reading E1 panel bodies",
+    "NewTight, legacy evaluation, Phoenix",
+    "contract changes based on generated panel contents"
+  ],
+  "bindings": {
+    "contract_bundle_identity": "v0.8P-contract-bundle-v01",
+    "contract_bundle_seal_sha256": "67cd6b7902111000dc93a0f81f9f20bc05a9c084732705ed8f9ad82fe965fa85",
+    "run_contract_sha256": "e345225b4a17fc18eb35fcab24cbe1d72bd0e34bed9de272f927a7be461853e6",
+    "analysis_contract_sha256": "84111122033fda65c84344317cfe3b50639b23be4c71f480ba665c67a23cc939",
+    "fresh_panel_contract_sha256": "ce3b7b97caecb27f3ad99439c0e67dca6e40af5da3db9ca2e356ea5e9f06f823"
+  },
+  "resulting_state_required": {
+    "panel_materialized_and_sealed": true,
+    "panel_behavior_opened": false,
+    "schedule_and_checkpoint_manifest_sealed": true,
+    "pre_run_instrument_package_sealed": true,
+    "training_authorized": false,
+    "evaluation_authorized": false
+  },
+  "stop_rule": "Stop after Phase A seals. Any request to train, load a head, infer, calculate behavioral metrics, or open the panel for behavior requires separate explicit authorization."
+}

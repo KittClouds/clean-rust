@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "BrokerPositionProjection",
+  "type": "object",
+  "properties": {
+    "average_price": {
+      "type": "number",
+      "format": "double"
+    },
+    "broker_position_id_hash": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "broker_status": {
+      "type": "string"
+    },
+    "content_hash": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "current_price": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "format": "double"
+    },
+    "northstar_instrument_id": {
+      "type": "integer",
+      "format": "uint32",
+      "minimum": 0
+    },
+    "observation_time_ns": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "quantity": {
+      "type": "number",
+      "format": "double"
+    },
+    "raw_payload_hash": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "schema_version": {
+      "type": "string"
+    },
+    "side": {
+      "type": "string"
+    },
+    "unrealized_result": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "format": "double"
+    }
+  },
+  "required": [
+    "schema_version",
+    "broker_position_id_hash",
+    "northstar_instrument_id",
+    "side",
+    "quantity",
+    "average_price",
+    "broker_status",
+    "observation_time_ns",
+    "raw_payload_hash",
+    "content_hash"
+  ],
+  "$defs": {
+    "Digest256": {
+      "description": "Domain-separated BLAKE3 digest",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

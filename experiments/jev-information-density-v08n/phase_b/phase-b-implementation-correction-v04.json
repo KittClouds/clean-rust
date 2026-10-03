@@ -1,0 +1,64 @@
+{
+  "protocol": "jev-information-density/v0.8n-road-b-phase-b-implementation-correction-v04",
+  "identity": "v0.8N-phase-b-implementation-correction-v04",
+  "status": "IMPLEMENTATION_ONLY_CORRECTION_SEALED",
+  "parent_authorization_event_sha256": "0cad8d2e45fe8e7e5eed7f9bcdeab406926f24605ad9f62396d83f9512bb0a09",
+  "parent_correction_receipt_sha256": "bff01924842eb1f0f91d12dd0d143842076a660852f5d9fadc44c8dada428c32",
+  "parent_entrypoint_sha256": "787c654f5a9bba75a9031a0863ec4d17939e517e43451e639eaa6cb10c835e7e",
+  "corrected_entrypoint_sha256": "1d5b971e45b67cf13fd1aacc15ae753fe05166343b979db831dd23759ade3939",
+  "frozen_trainer_sha256": "e539bac2d67b47ba2b660b8579c5818e5fffc0cf94fa26cfd3e9dd905ef795ba",
+  "correction_verifier_sha256": "d08f46f76adbff8ee298cb5216d96434ff2a40960af082ff9b9cc6934f4a1972",
+  "correction_test_sha256": "53ec0015a1502b7a9606b5ed4ca6f6d256c67f7c47f445e0c1cb31bae6534eda",
+  "correction_class": "event identity resolution implementation bug; semantic impact none",
+  "observed_failure": {
+    "stage": "event materialization after deterministic seed template creation and before first optimizer step",
+    "exception": "KeyError: source_episode_id",
+    "root_cause": "dict.get evaluated row['source_episode_id'] eagerly even when primary row group_id was present",
+    "outputs_at_failure": {
+      "seed_template_created": true,
+      "seed_template_sha256": "327d5e46f962b6e6a447c1f972537860fb5d6126a3e97219fce07315bddfdb2c",
+      "attempt_run_config_sha256": "d059aadc58eaf1d076dc894c1d9aa1fe923bc45f29e1ab8e0d2659b557f082f1",
+      "attempt_initial_digest_file_sha256": "da3f26cb1c1f343ab72156a9a717af76ba35220c2a5c05077c079368efd979b0",
+      "optimizer_steps": 0,
+      "checkpoint_count": 0,
+      "heldout_panel_opened": false
+    }
+  },
+  "failed_attempt_forensic": {
+    "path": "D:\\codex-runs\\jev-information-density-v08n\\v0.8N-base-v01\\phase-b-run-v01\\attempts\\seed-20260927\\B-DUP\\attempt-95b914e81caf48b595bedb6f9a203176",
+    "seed": 20260927,
+    "arm": "B-DUP",
+    "failure_stage": "event materialization before optimizer step 1",
+    "optimizer_steps": 0,
+    "evaluation_access": false,
+    "files": {
+      "initial-head-template.sha256": {
+        "sha256": "da3f26cb1c1f343ab72156a9a717af76ba35220c2a5c05077c079368efd979b0",
+        "bytes": 66
+      },
+      "run-config.json": {
+        "sha256": "d059aadc58eaf1d076dc894c1d9aa1fe923bc45f29e1ab8e0d2659b557f082f1",
+        "bytes": 1561
+      }
+    },
+    "initial_head_sha256": "327d5e46f962b6e6a447c1f972537860fb5d6126a3e97219fce07315bddfdb2c"
+  },
+  "correction": {
+    "entrypoint": "experiments/jev-information-density-v08n/phase_b/train_phase_b_corrected_v04.py",
+    "replacement": "Select row['group_id'] when present; otherwise select row['source_episode_id']. This preserves the intended identity value for primary and auxiliary rows without eager evaluation of an absent field.",
+    "on_disk_authorized_trainer_modified": false,
+    "model_or_feature_computation_changed": false,
+    "loss_event_values_or_order_changed": false,
+    "failed_attempt_preserved_and_hash_bound": true,
+    "run_and_training_seal_bind_all_four_correction_receipts": true
+  },
+  "semantic_contract_changed": false,
+  "training_inputs_changed": false,
+  "model_revision_changed": false,
+  "objective_or_loss_changed": false,
+  "seed_or_schedule_changed": false,
+  "evaluation_contract_changed": false,
+  "protected_panel_access": false,
+  "newtight_access": false,
+  "phoenix_access": false
+}

@@ -1,0 +1,142 @@
+{
+  "candidate_slots": {
+    "dtype": "float32",
+    "name": "e",
+    "scope": "candidate-conditioned partially supervised epistemic state",
+    "shape": [
+      "B",
+      "M",
+      64
+    ]
+  },
+  "cross_fabric_coordinate_alignment": false,
+  "decoders": {
+    "action": {
+      "kind": "candidate_index",
+      "provenance": "CANONICAL_POLICY_ENDPOINT",
+      "source": "world.selected_action if world.decision==ACT and exact action belongs to A",
+      "unavailable": "ASK/ABSTAIN or out-of-schema actions; never substitute WAIT/NOOP"
+    },
+    "candidate": [
+      {
+        "available": true,
+        "kind": "binary",
+        "meaning": "Canonical simulator legality, not observation justification.",
+        "name": "candidate_legal",
+        "source": "simulator.legal_actions(initial_state, available_actions)",
+        "supervision_provenance": "SIMULATOR_TRUTH"
+      },
+      {
+        "available": true,
+        "kind": "binary",
+        "meaning": "Legal one-step goal achievement, including WAIT/NOOP when goal already holds.",
+        "name": "candidate_satisfies_goal",
+        "source": "legal(a) and simulator.goal_satisfied(simulator.apply_action(initial_state,a),goal)",
+        "supervision_provenance": "SIMULATOR_TRUTH"
+      },
+      {
+        "available": false,
+        "kind": "binary",
+        "meaning": "No canonical candidate support evaluator.",
+        "name": "candidate_supported",
+        "source": null,
+        "supervision_provenance": "UNAVAILABLE"
+      },
+      {
+        "available": false,
+        "kind": "binary",
+        "meaning": "Global contradictions have no canonical candidate attribution.",
+        "name": "candidate_has_counterevidence",
+        "source": null,
+        "supervision_provenance": "UNAVAILABLE"
+      },
+      {
+        "available": false,
+        "kind": "binary",
+        "meaning": "Global missing annotations have no candidate requirement mapping.",
+        "name": "candidate_has_unmet_requirements",
+        "source": null,
+        "supervision_provenance": "UNAVAILABLE"
+      },
+      {
+        "available": false,
+        "kind": "binary",
+        "meaning": "No independent applicability contract; do not alias legality.",
+        "name": "candidate_applicable",
+        "source": null,
+        "supervision_provenance": "UNAVAILABLE"
+      },
+      {
+        "available": false,
+        "kind": "binary",
+        "meaning": "No canonical candidate-to-missing-information dependency.",
+        "name": "candidate_requires_missing_information",
+        "source": null,
+        "supervision_provenance": "UNAVAILABLE"
+      }
+    ],
+    "global": [
+      {
+        "available": false,
+        "kind": "binary",
+        "meaning": "Unrestricted solvability is not certified by depth-four planning.",
+        "name": "solvable",
+        "source": null,
+        "supervision_provenance": "UNAVAILABLE"
+      },
+      {
+        "available": true,
+        "kind": "binary",
+        "meaning": "Goal holds in current canonical state.",
+        "name": "goal_satisfied",
+        "source": "simulator.goal_satisfied(initial_state, goal)",
+        "supervision_provenance": "SIMULATOR_TRUTH"
+      },
+      {
+        "available": true,
+        "kind": "binary",
+        "meaning": "Missing-information annotation exists; not inferred action relevance.",
+        "name": "missing_information_present",
+        "source": "bool(world.missing_information)",
+        "supervision_provenance": "GENERATOR_ANNOTATION"
+      },
+      {
+        "available": true,
+        "kind": "binary",
+        "meaning": "Canonical contradiction annotation exists.",
+        "name": "contradiction_present",
+        "source": "bool(world.contradictions)",
+        "supervision_provenance": "GENERATOR_ANNOTATION"
+      },
+      {
+        "available": false,
+        "kind": "binary",
+        "meaning": "Random ASK choice does not define requestability or negative labels.",
+        "name": "requestable_information_present",
+        "source": null,
+        "supervision_provenance": "UNAVAILABLE"
+      },
+      {
+        "available": true,
+        "kind": "count",
+        "meaning": "Scalar annotation-count proxy only: BANK-v1 0/1; includes unknown entity annotations; not full precondition structure.",
+        "name": "number_or_structure_of_missing_requirements",
+        "source": "len(world.missing_information)",
+        "supervision_provenance": "GENERATOR_ANNOTATION"
+      }
+    ]
+  },
+  "forward_inputs": "frozen H, observable A, availability/padding masks; encoder additionally uses already extracted masked entity-local vectors",
+  "latent_dimensions_have_named_semantics": false,
+  "runtime_provenance": "MODEL_ESTIMATE only with trained artifact; unavailable targets never emitted as false",
+  "schema": "frozen-fabrique.semantic-candidate-state/v2",
+  "semantic_slot": {
+    "dtype": "float32",
+    "name": "s",
+    "scope": "task/world state",
+    "shape": [
+      "B",
+      64
+    ]
+  }
+}

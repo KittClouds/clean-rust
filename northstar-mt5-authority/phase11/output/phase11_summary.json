@@ -1,0 +1,33 @@
+{
+  "contract": "MST_RG2_PHASE11_EMPIRICAL_STRUCTURE_V1",
+  "status": "PASS",
+  "corpus_sha256": "9cbad8545db23cba7ccea2bd062aeba700597deb4be19cecbb74647f65ef8413",
+  "interface_version": "MST_RG2_RESEARCH_INTERFACE_V1_1",
+  "targets": 5,
+  "runs": 20,
+  "holdout_windows_touched": 0,
+  "nonlinear_challengers_run": 4,
+  "frozen_research_candidates": 4,
+  "exit_gates": {
+    "phase10_5_interface_verified": true,
+    "holdout_access_failed_closed": true,
+    "all_targets_have_run_blocked_models": true,
+    "all_targets_have_forward_evaluation": true,
+    "all_targets_have_instrument_transfer_evaluation": true,
+    "no_target_uses_censored_label": true,
+    "no_holdout_candidate_authorized": true,
+    "latent_model_not_fit_without_protocol": true
+  },
+  "model_gate_contract": {
+    "minimum_analyzable": 200,
+    "minimum_positive": 50,
+    "minimum_negative": 50,
+    "minimum_runs": 10,
+    "maximum_missing_feature_share": 0.6,
+    "minimum_group_logloss_improvement": 0.0,
+    "minimum_forward_logloss_improvement": 0.0,
+    "minimum_instrument_transfer_logloss_improvement": 0.0
+  },
+  "semantic_result_sha256": "c572ebdf36b5c523301452f49ad788303598776486fe2d780c8ef22a7eb87c9c",
+  "generated_at_utc": "2026-08-12T13:47:28.222114+00:00"
+}

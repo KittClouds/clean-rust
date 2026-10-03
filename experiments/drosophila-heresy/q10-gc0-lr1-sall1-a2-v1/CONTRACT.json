@@ -1,0 +1,26 @@
+{
+  "identity": "q10-gc0-lr1-sall1-a2-v1",
+  "parent_bindings": [
+    {
+      "label": "SALL1 coverage",
+      "path": "experiments/drosophila-heresy/q10-gc0-lr1-sall1-a1-v1/execution.json",
+      "sha256": "392EF8F4AA49476F50DAD78359EB137197A241CD7C03FE0598FCB3E75DF30DA3"
+    },
+    {
+      "label": "MAT1 pairs",
+      "path": "experiments/drosophila-heresy/q10-gc1-cancel1-mat1-r1-v1/qualification/materialized-pairs.jsonl",
+      "sha256": "7DDDBACD03C25795667BC630263C0169389AC9A64D4192A0C33BFC494B16E55C"
+    },
+    {
+      "label": "PALL1 pairs",
+      "path": "experiments/drosophila-heresy/q10-gc0-lr1-pall1-v1/qualification/execution.json",
+      "sha256": "1023D5CF563EFC3B0E272D1EDBE83A3B35628AE7A8B6865A600BFDBF30397B47"
+    },
+    {
+      "label": "coverage report",
+      "path": "experiments/drosophila-heresy/q10-gc0-lr1-sall1-a2-v1/reports/all-materialized-pair-effect-coverage.json",
+      "sha256": "E41CF2A1F9D6EBB75A41A5FE7F6AE8A9E40FD8A7C0FA962F15F93BB24DD684E6"
+    }
+  ],
+  "protocol": "ALL_MATERIALIZED_PAIR_EFFECT_COVERAGE_AUDIT"
+}

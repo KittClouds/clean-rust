@@ -1,0 +1,86 @@
+[
+  {
+    "episode_id": "1bf882bd3d85f70c2b7274fe932552bb418e4d59ada704a11c7e2d63f2dbae70",
+    "instrument_id": 3,
+    "group_id": "session-00",
+    "start_time_ns": 1800000000000000000,
+    "end_time_ns": 1800000090000000000
+  },
+  {
+    "episode_id": "b65178622fda5179d5da6e59ba5c91b387b7de7d16a2eaf37865663d99e8dd51",
+    "instrument_id": 3,
+    "group_id": "session-01",
+    "start_time_ns": 1800000100000000000,
+    "end_time_ns": 1800000190000000000
+  },
+  {
+    "episode_id": "4c9b43b5a0d40c4a23b2f64b6b24e9148384f79b3a372cb85b3d60808d8b0627",
+    "instrument_id": 3,
+    "group_id": "session-02",
+    "start_time_ns": 1800000200000000000,
+    "end_time_ns": 1800000290000000000
+  },
+  {
+    "episode_id": "7fd3ed1a7a403da9e85015a25b1583c5bb22bfd562d6e310d093eb9b39235adc",
+    "instrument_id": 3,
+    "group_id": "session-03",
+    "start_time_ns": 1800000300000000000,
+    "end_time_ns": 1800000390000000000
+  },
+  {
+    "episode_id": "962d7790d91b4c08ef8c4a1dedc2b5ff32b92c43ed0590dbaae397e4c34f8d5b",
+    "instrument_id": 3,
+    "group_id": "session-04",
+    "start_time_ns": 1800000400000000000,
+    "end_time_ns": 1800000490000000000
+  },
+  {
+    "episode_id": "caa48728fdcbc86bd3b7b0a385f876a7450ac964b14910d0aca3f996683723aa",
+    "instrument_id": 3,
+    "group_id": "session-05",
+    "start_time_ns": 1800000500000000000,
+    "end_time_ns": 1800000590000000000
+  },
+  {
+    "episode_id": "d39f0766731013a9aac46801663ae8996a7c524836ee90c97cc2df99a2caf790",
+    "instrument_id": 3,
+    "group_id": "session-06",
+    "start_time_ns": 1800000600000000000,
+    "end_time_ns": 1800000690000000000
+  },
+  {
+    "episode_id": "194e40943ad333c248dcc6ca626c7179e703c1d04b1ad24c0dab39b0ccb012bd",
+    "instrument_id": 3,
+    "group_id": "session-07",
+    "start_time_ns": 1800000700000000000,
+    "end_time_ns": 1800000790000000000
+  },
+  {
+    "episode_id": "0e3c22a7096ecd3eec47a6147b2597f3437acd0d9e26fcdc26c8fd1c731d1ac8",
+    "instrument_id": 3,
+    "group_id": "session-08",
+    "start_time_ns": 1800000800000000000,
+    "end_time_ns": 1800000890000000000
+  },
+  {
+    "episode_id": "ef021a1aa54c1fe43789e87cd1a36ea13cb556c756a1be7b3a5a00e4bed31db3",
+    "instrument_id": 3,
+    "group_id": "session-09",
+    "start_time_ns": 1800000900000000000,
+    "end_time_ns": 1800000990000000000
+  },
+  {
+    "episode_id": "59a35be2f207aabc8e1a20d3c7949dea85450c2a63df515ba57b1bfb19edbcef",
+    "instrument_id": 3,
+    "group_id": "session-10",
+    "start_time_ns": 1800001000000000000,
+    "end_time_ns": 1800001090000000000
+  },
+  {
+    "episode_id": "6db00d65a0f592927f6c83fe39d4c468f3c34012a2e8349b5f1b1d437c6b4db9",
+    "instrument_id": 3,
+    "group_id": "session-11",
+    "start_time_ns": 1800001100000000000,
+    "end_time_ns": 1800001190000000000
+  }
+]

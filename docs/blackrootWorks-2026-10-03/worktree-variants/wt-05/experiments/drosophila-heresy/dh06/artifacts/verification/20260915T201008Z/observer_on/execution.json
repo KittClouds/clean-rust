@@ -1,0 +1,13 @@
+{
+  "autodiff": false,
+  "both_causal_cells_restore_interval_state": true,
+  "causal_factor": "distractor_generated_eligibility",
+  "complete": true,
+  "config": "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\dh06\\artifacts\\verification\\20260915T201008Z\\observer_on\\config.json",
+  "learning_rule_search": false,
+  "observer_feeds_learner": false,
+  "outcome_rows": 12,
+  "protocol": "DH-06",
+  "threads": 1,
+  "wall_seconds": 1.114295
+}

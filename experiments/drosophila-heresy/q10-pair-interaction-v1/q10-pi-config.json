@@ -1,0 +1,15 @@
+{
+  "protocol": "Q10-PI1",
+  "seeds": [9721, 9722],
+  "sides": ["R", "L"],
+  "taus": [4.0, 16.0],
+  "trials": [128],
+  "observe": true,
+  "cues": 16,
+  "delay_steps": 12,
+  "total_trials": 512,
+  "eta": 0.05,
+  "glut_sign": -1.0,
+  "input_salt": 858980352,
+  "threads": 1
+}

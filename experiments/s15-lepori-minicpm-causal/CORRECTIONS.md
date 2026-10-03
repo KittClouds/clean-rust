@@ -4,6 +4,49 @@ Every entry is a correction to something I previously wrote, with the evidence t
 Ordered newest first. Nothing here is a retcon of a measurement; where a measurement stands it
 is restated unchanged.
 
+## C14. Reciprocal mean candidate count is not expected row-wise random accuracy
+
+For a random policy choosing uniformly within each world's candidate set,
+expected exact accuracy is `mean(1 / m_i)`, not `1 / mean(m_i)`. They differ when
+cardinalities vary. Qwen's independently replayed 931-row eligible DEV subset
+gives 0.0801 versus 0.0637. C9's measured reciprocal-mean values remain historical
+descriptive statistics, but its labeling of them as exact "true chance" is too
+strong. No old score is overwritten and no new chance statistic enters selection.
+
+## C13. Qwen preparation exposes additional historical harness defects
+
+**Scope:** source audit on 2026-10-01, not a rerun or a reconstructed execution
+seal. Original receipts do not bind all inspected source bytes, so these findings
+qualify interpretation without inventing corrected historical scores.
+
+- `src/phase1.py`: training obtains `pair_context(dv, ...)` and
+  `renderer_pairs("DEV", ...)`; consistency gradients therefore use DEV features.
+- `src/phase1b.py`: the declared retained pair loss is absent from the training
+  total. Its `js_penalty` has `@torch.no_grad()`, detaching the variance penalty.
+- `src/data.py`: candidate argument indices use `raw_base + ordinal - off`, but
+  `CausalGraft.candidate_states` indexes the global packed entity tensor. With
+  equal raw/packed offsets, later rows address the first world's entities instead
+  of their own. Correct addressing is `packed_offset + local_ordinal`.
+- `src/graft.py`: padded action scores are multiplied by zero. Zero does not
+  exclude a class from softmax/argmax and can beat negative valid scores.
+- The inspected top-up `reorder` constructs positions from the new ordering and
+  uses them to index old arrays. Whether a particular historical order changed is
+  not established here. Qwen independently re-extracts features, using historical
+  caches only for row-ID population identity.
+
+**User decision:** repair Qwen only; retain MiniCPM as a historical reference.
+No old checkpoint, tensor cache, or numerical receipt is overwritten. The new
+trial has TRAIN-only consistency, correctly identity-aligned entity indices,
+differentiable variance loss and excluded padded action classes. It is therefore
+not a strictly substrate-only, fully matched MiniCPM/Qwen comparison.
+
+**Interpretation:** the old isolation result cannot cleanly rule out objective
+competition; source/graft/harness-level negatives do not convict the raw substrate.
+The initialization probe result supports `ACCESSIBLE_AT_INIT=yes`,
+`ACQUIRED_BY_TRAINING=no evidence`, and a slightly negative measured probe delta.
+It is not proof that training can never acquire legality. C12's positive-control
+stop rule is mandatory for the repaired recoverability instrument.
+
 ---
 
 ## C11. "MOVE is provably capped at ~0.37" — **withdrawn; the 0.37 was an estimator, not a bound**
@@ -131,10 +174,12 @@ content upstream.
 action-sufficient.**
 
 **And the gold ladder makes it specific** — see the table in `PHASE1.md`. Legality alone has a
-determinism ceiling of **0.7605**; adding the already-existing `candidate_satisfies_goal` channel
-takes it to **0.9925**. So a recurrent action workspace over legality state was **provably never
-going to solve MOVE**: the channel it would operate on caps at ~0.76 overall and ~0.37 on MOVE
-specifically.
+determinism ceiling of **0.7605 overall**. The earlier claim that this implied a **~0.37 MOVE
+information cap** is withdrawn by C11: 0.3699 was the L1 MOVE 1-NN estimate, while the L1
+conditional MOVE determinism ceiling is **0.9335**. Adding the existing
+`candidate_satisfies_goal` channel raises the L2 ceilings to **0.9925 overall** and **0.9942 on
+MOVE** (with MOVE 1-NN at **0.9306**). The gap identifies an estimator limitation, not an
+impossibility result for a recurrent action workspace.
 
 ---
 
@@ -149,9 +194,10 @@ passes.
 | Lepori (causal, MiniCPM5-1B), P1 | **correct** `[B, m]`, argmax over `m` | 0.4672 | **0.0000** (n=346) | **0.0000** (n=150) | 1.0000 (n=435) |
 
 Lexi's strongest *measured* trivial baseline is 0.1308, and MOVE's is 0.1870, so Lexi's MOVE at
-0.4770 is real learning. **The substrate difference is genuine, not an artifact.** Lexi also never
-reported an analytic "chance" at all — it reported measured trivial baselines, which is the more
-conservative choice.
+0.4770 is above the measured trivial baselines, so the endpoint is not explained by majority-class
+degeneracy. This establishes a measured lane difference, not a substrate-only effect: the graft
+and training configuration also differ. Lexi reported measured trivial baselines rather than an
+analytic "chance" rate.
 
 ---
 

@@ -1,0 +1,26 @@
+[package]
+name = "fas-frozen-capability-fabric-e4-population-v01"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+fas-frozen-observer-bundle-panel-v04 = { path = "../panel-generator-v04" }
+hashbrown = "0.15"
+memchr = "2.7"
+memmap2 = "0.9"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+sha2 = "0.10"
+
+[dev-dependencies]
+criterion = "0.5"
+
+[[bench]]
+name = "population_hot_path"
+harness = false
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+panic = "abort"

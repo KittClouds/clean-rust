@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="600" viewBox="0 0 1000 600">
+<rect width="100%" height="100%" fill="#fbfaf7"/>
+<style>text{font-family:Segoe UI,Arial,sans-serif;fill:#18212a}.title{font-size:24px;font-weight:700}.sub{font-size:14px;fill:#52606b}.label{font-size:14px}.tick{font-size:12px;fill:#52606b}.axis{stroke:#6b7680;stroke-width:1}.zero{stroke:#b42318;stroke-width:1.5;stroke-dasharray:6 5}.ci{stroke:#155eef;stroke-width:4}.point{fill:#0e7490;fill-opacity:.7}.mean{fill:#155eef}</style>
+<text x="55" y="42" class="title">DH-07R realized residual-direction effect</text>
+<text x="55" y="66" class="sub">True endogenous residual minus feasible matched null; negative values favor direction-specific suppression</text>
+<line x1="234.72" y1="92" x2="234.72" y2="538" class="zero"/>
+<text x="55" y="108" class="label" font-weight="700">A. Paired seed-bundle effects</text>
+<circle cx="184.84" cy="130.50" r="5" class="point"><title>-0.00069072</title></circle>
+<circle cx="246.69" cy="135.50" r="5" class="point"><title>+0.00016569</title></circle>
+<circle cx="278.81" cy="140.50" r="5" class="point"><title>+0.00061045</title></circle>
+<circle cx="279.56" cy="145.50" r="5" class="point"><title>+0.00062081</title></circle>
+<circle cx="328.32" cy="130.50" r="5" class="point"><title>+0.00129600</title></circle>
+<circle cx="344.04" cy="135.50" r="5" class="point"><title>+0.00151361</title></circle>
+<circle cx="417.24" cy="140.50" r="5" class="point"><title>+0.00252713</title></circle>
+<circle cx="425.04" cy="145.50" r="5" class="point"><title>+0.00263506</title></circle>
+<circle cx="426.96" cy="130.50" r="5" class="point"><title>+0.00266176</title></circle>
+<circle cx="469.89" cy="135.50" r="5" class="point"><title>+0.00325610</title></circle>
+<circle cx="477.01" cy="140.50" r="5" class="point"><title>+0.00335472</title></circle>
+<circle cx="494.62" cy="145.50" r="5" class="point"><title>+0.00359852</title></circle>
+<circle cx="510.48" cy="130.50" r="5" class="point"><title>+0.00381811</title></circle>
+<circle cx="525.04" cy="135.50" r="5" class="point"><title>+0.00401974</title></circle>
+<circle cx="555.66" cy="140.50" r="5" class="point"><title>+0.00444366</title></circle>
+<circle cx="557.29" cy="145.50" r="5" class="point"><title>+0.00446632</title></circle>
+<circle cx="558.64" cy="184.50" r="5" class="point"><title>+0.00448490</title></circle>
+<circle cx="566.21" cy="189.50" r="5" class="point"><title>+0.00458978</title></circle>
+<circle cx="568.05" cy="194.50" r="5" class="point"><title>+0.00461521</title></circle>
+<circle cx="569.39" cy="199.50" r="5" class="point"><title>+0.00463382</title></circle>
+<circle cx="599.53" cy="184.50" r="5" class="point"><title>+0.00505108</title></circle>
+<circle cx="607.72" cy="189.50" r="5" class="point"><title>+0.00516447</title></circle>
+<circle cx="610.14" cy="194.50" r="5" class="point"><title>+0.00519802</title></circle>
+<circle cx="614.16" cy="199.50" r="5" class="point"><title>+0.00525370</title></circle>
+<circle cx="625.36" cy="184.50" r="5" class="point"><title>+0.00540878</title></circle>
+<circle cx="626.82" cy="189.50" r="5" class="point"><title>+0.00542901</title></circle>
+<circle cx="628.20" cy="194.50" r="5" class="point"><title>+0.00544803</title></circle>
+<circle cx="635.58" cy="199.50" r="5" class="point"><title>+0.00555031</title></circle>
+<circle cx="651.37" cy="184.50" r="5" class="point"><title>+0.00576897</title></circle>
+<circle cx="741.98" cy="189.50" r="5" class="point"><title>+0.00702357</title></circle>
+<circle cx="759.19" cy="194.50" r="5" class="point"><title>+0.00726185</title></circle>
+<circle cx="850.16" cy="199.50" r="5" class="point"><title>+0.00852139</title></circle>
+<text x="55" y="270" class="label" font-weight="700">B. Mean effects and paired 95% t intervals</text>
+<text x="55" y="320" class="label">Parallel off</text>
+<line x1="431.32" y1="315" x2="539.90" y2="315" class="ci"/>
+<line x1="431.32" y1="307" x2="431.32" y2="323" class="ci"/>
+<line x1="539.90" y1="307" x2="539.90" y2="323" class="ci"/>
+<circle cx="485.61" cy="315" r="7" class="mean"><title>+0.00347376 [+0.00272203, +0.00422550]</title></circle>
+<text x="55" y="387" class="label">Parallel on</text>
+<line x1="495.35" y1="382" x2="625.18" y2="382" class="ci"/>
+<line x1="495.35" y1="374" x2="495.35" y2="390" class="ci"/>
+<line x1="625.18" y1="374" x2="625.18" y2="390" class="ci"/>
+<circle cx="560.27" cy="382" r="7" class="mean"><title>+0.00450748 [+0.00360868, +0.00540628]</title></circle>
+<text x="55" y="454" class="label">Averaged primary</text>
+<line x1="467.76" y1="449" x2="578.12" y2="449" class="ci"/>
+<line x1="467.76" y1="441" x2="467.76" y2="457" class="ci"/>
+<line x1="578.12" y1="441" x2="578.12" y2="457" class="ci"/>
+<circle cx="522.94" cy="449" r="7" class="mean"><title>+0.00399062 [+0.00322658, +0.00475466]</title></circle>
+<line x1="105" y1="538" x2="930" y2="538" class="axis"/>
+<line x1="105.00" y1="538" x2="105.00" y2="545" class="axis"/>
+<text x="105.00" y="562" text-anchor="middle" class="tick">-0.0018</text>
+<line x1="270.00" y1="538" x2="270.00" y2="545" class="axis"/>
+<text x="270.00" y="562" text-anchor="middle" class="tick">+0.0005</text>
+<line x1="435.00" y1="538" x2="435.00" y2="545" class="axis"/>
+<text x="435.00" y="562" text-anchor="middle" class="tick">+0.0028</text>
+<line x1="600.00" y1="538" x2="600.00" y2="545" class="axis"/>
+<text x="600.00" y="562" text-anchor="middle" class="tick">+0.0051</text>
+<line x1="765.00" y1="538" x2="765.00" y2="545" class="axis"/>
+<text x="765.00" y="562" text-anchor="middle" class="tick">+0.0073</text>
+<line x1="930.00" y1="538" x2="930.00" y2="545" class="axis"/>
+<text x="930.00" y="562" text-anchor="middle" class="tick">+0.0096</text>
+<text x="517" y="590" text-anchor="middle" class="label">Old-map margin difference at reversal trial 256</text>
+</svg>

@@ -1,0 +1,20 @@
+{
+  "all_regenerated_cells_match_frozen_manifest": true,
+  "cell_count": 72,
+  "fit_manifest_created": false,
+  "fits_executed": false,
+  "frozen_implementation_receipt_sha256": "16fd21aa430552385138cea93ae8a395a373f9386e0ce28d1cf77880b8f612cc",
+  "implementation_model_sha256": "2882482311355f5729fb3922d0b51fdef960f24a49d793a77ce855d903939f02",
+  "initializer_seed_manifest_sha256": "efb32a7c2ca2709407b65c32627dbd206b8b1bde304ce9b0b98b165aeea1da8e",
+  "model_training_or_prediction_performed": false,
+  "parameter_counts": {
+    "D": 19969,
+    "S": 19057
+  },
+  "qualification_only": true,
+  "regeneration_count": 2,
+  "run_id": "F4-INVARIANT-01-COLLECT2",
+  "schema": "F4-INVARIANT-01-initial-tensor-regeneration-receipt-v1",
+  "status": "PASS",
+  "task_or_target_data_used": false
+}

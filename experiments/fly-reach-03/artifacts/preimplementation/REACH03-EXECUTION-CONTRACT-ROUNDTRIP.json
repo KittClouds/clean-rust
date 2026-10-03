@@ -1,0 +1,16 @@
+{
+  "canonical_bytes": 6962,
+  "execution_authorized": false,
+  "execution_contract_sha256": "8413d064359563245cab0606e72dcb095744818622872c0cf4453380395c95f9",
+  "filtrations": [
+    "F0",
+    "F1",
+    "F2",
+    "F3a",
+    "F3b",
+    "F4"
+  ],
+  "roundtrip_equal": true,
+  "schema": "FLY-REACH-03-execution-contract-roundtrip-v1",
+  "status": "PASS"
+}

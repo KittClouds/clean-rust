@@ -1,0 +1,60 @@
+{
+  "schema": "F4-PRESENTATION-02-engineering-screen-v0.1",
+  "identity": "F4-PRESENTATION-02-CPHI-ENG1",
+  "status": "AUTHORIZED_ENGINEERING_SCREEN",
+  "purpose": "Compare shared tuple encoding with canonical concatenation against the existing frozen D and S-sum panel.",
+  "qualification_only": true,
+  "scientific_disposition_parent": "NOT_EVALUABLE_SUPPORT",
+  "truth_access_provenance": "Parent held-out truth was previously opened; this is a descriptive engineering screen.",
+  "parent_run_id": "F4-INVARIANT-01-COLLECT2-EXEC2",
+  "panel": {
+    "blocks": [306000, 306001, 306002, 306003, 306004, 306005, 306006, 306007, 306008, 306009, 306010, 306011],
+    "rows": 28876,
+    "fold_normalization": "Reuse the frozen leave-one-block-out normalization payloads and normalized tuple semantics.",
+    "training_order": "Reuse the parent raw row order and leave-one-block-out training partitions.",
+    "new_task_or_seed_bank": false,
+    "new_native_collection": false
+  },
+  "architecture": {
+    "name": "Cphi",
+    "tuple_input_width": 6,
+    "shared_phi_width": 16,
+    "tuple_order": "Sort normalized raw tuples with the exact D lexicographic key, then apply the shared phi in that order.",
+    "relational_presentation": "Concatenate four 16D phi outputs in D canonical tuple order; do not pool or sum.",
+    "base_width": 66,
+    "readout_widths": [130, 101, 64, 1],
+    "parameter_count": 19936,
+    "parameter_count_calculation": "(6*16+16)+(130*101+101)+(101*64+64)+(64*1+1)",
+    "activation": "Parent GELU approximation after phi affine and after each of the first two readout affine layers.",
+    "optimizer": "Parent SEncoder Adam update semantics, learning rate, batch size, and epoch count.",
+    "training_epochs": 200,
+    "batch_size": 2048,
+    "learning_rate": 0.001
+  },
+  "initialization": {
+    "replicates": [0, 1, 2],
+    "phi": "Copy the existing S initializer phi tensors bit-for-bit for the matching fold and replicate.",
+    "readout": "SHA-256 domain-separated per-layer seeds under F4-PRESENTATION-02-CPHI-INIT-v1, PCG64 normal draw scaled by sqrt(2/fan_in), float32 tensors; zero biases.",
+    "task_identity_used": false
+  },
+  "instrumentation": {
+    "training_trace": ["epoch BCE", "epoch unweighted balanced error", "per-layer gradient norm mean and maximum per epoch"],
+    "final_state": ["all final tensors", "tensor hash", "optimizer first/second moment norm summaries"],
+    "heldout_state": ["sorted tuple features", "four phi outputs", "64D concatenated relational state", "16D post-hoc sum state", "64D penultimate hidden state", "logits", "role-separation statistic"],
+    "inference_caveat": "Per-fit held-out activations are diagnostic data; they do not establish a mechanism or a causal trajectory effect."
+  },
+  "analysis": {
+    "anchors": "Use the existing locked D and S prediction streams without rerunning them.",
+    "primary_engineering_comparison": "Cphi against frozen D and S pooled and by block/replicate.",
+    "diagnostics": ["logit magnitude and errors", "role-separation bins", "post-hoc sum-state nearest opposite-target neighbors", "306005 named block diagnostic"],
+    "scientific_promotion": false,
+    "measured_reach03_authorized": false,
+    "pheno_status": "unchanged",
+    "biological_promotion": false
+  },
+  "immutability": {
+    "parent_task_bank_collection_normalizers_predictions_receipts_and_analysis": "read-only",
+    "new_fit_count": 36,
+    "fit_grid": "12 folds x 3 initialization replicates x Cphi"
+  }
+}

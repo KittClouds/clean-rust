@@ -1,0 +1,52 @@
+[
+  {
+    "array_index": 0,
+    "feature_id": "market.simple_return.v1",
+    "feature_implementation_hash": "ba9b9e7e803f0ba90e50b812ee4a96e23815673b263f4b0ccf583084326a1d5c",
+    "source_dependencies": [
+      "close"
+    ]
+  },
+  {
+    "array_index": 1,
+    "feature_id": "market.candle_range.v1",
+    "feature_implementation_hash": "2c61c63e4daba88d676521dc4c231d6e2def16592b4add40f39cf4308bb22d11",
+    "source_dependencies": [
+      "high",
+      "low"
+    ]
+  },
+  {
+    "array_index": 2,
+    "feature_id": "market.rolling_mean.v1",
+    "feature_implementation_hash": "bb7ce0bb6e4876a230278b431d8efe508391f3a8c5dd67dd5da6699bec543b46",
+    "source_dependencies": [
+      "close"
+    ]
+  },
+  {
+    "array_index": 3,
+    "feature_id": "clock.time_of_day_sin.v1",
+    "feature_implementation_hash": "33e3ae9f43f1a1db140809ddce9c6e9c15fdb27f3c124fe976a65e87d4a5fde4",
+    "source_dependencies": [
+      "event_time"
+    ]
+  },
+  {
+    "array_index": 4,
+    "feature_id": "clock.time_of_day_cos.v1",
+    "feature_implementation_hash": "e682eca563e93a448f2e673ed526331ea5b1b4115706ae3f86412038b62e0283",
+    "source_dependencies": [
+      "event_time"
+    ]
+  },
+  {
+    "array_index": 5,
+    "feature_id": "clock.session_progress.v1",
+    "feature_implementation_hash": "4abdcbd7bf0690737423c9db67c61a9caa8e3360d42b58c2ab24a468806535c1",
+    "source_dependencies": [
+      "session_id",
+      "event_time"
+    ]
+  }
+]

@@ -1,0 +1,174 @@
+{
+  "counts": {
+    "best_search_geometry_rejected_count": 8,
+    "endpoint_set_count": 14,
+    "reconstructed_valid_count": 14
+  },
+  "endpoint_set_results": [
+    {
+      "best_search_rejected_for_geometry": false,
+      "endpoint": "seed9731-L-tau16.json",
+      "final_geometry_pass": true,
+      "mismatch_count": 164,
+      "readout_sha256": "68EB994204413987601E0F0BBABF6434E0475EDC402E8B7EB7F58D3B04DB5BED",
+      "selected_group_count": 59,
+      "set_index": 0,
+      "total_ulp_distance": 229,
+      "weight_state_sha256": "33DDBD32C9D84F0D1736A401F75D4A5C99B110C2E14CE973682A3F02E24DC255"
+    },
+    {
+      "best_search_rejected_for_geometry": false,
+      "endpoint": "seed9731-L-tau16.json",
+      "final_geometry_pass": true,
+      "mismatch_count": 169,
+      "readout_sha256": "FDD3019898745C574861CC440DD6B200B8BBAD9AE19A6465430A2698F9F55333",
+      "selected_group_count": 57,
+      "set_index": 1,
+      "total_ulp_distance": 216,
+      "weight_state_sha256": "0EFBD0945946215FAA101E2982C8D6C5A3018D928FDA35A4E2D331CC610B5A9A"
+    },
+    {
+      "best_search_rejected_for_geometry": true,
+      "endpoint": "seed9731-L-tau16.json",
+      "final_geometry_pass": true,
+      "mismatch_count": 166,
+      "readout_sha256": "ADA7E736FC995C9279C2D2FB62E422CD88254C5E82B4480397973343A94936EC",
+      "selected_group_count": 55,
+      "set_index": 2,
+      "total_ulp_distance": 210,
+      "weight_state_sha256": "893DD4A740F050F4528C50F68C70EAE9095BFC7A69F547B661A17B1A4ED74901"
+    },
+    {
+      "best_search_rejected_for_geometry": false,
+      "endpoint": "seed9731-L-tau16.json",
+      "final_geometry_pass": true,
+      "mismatch_count": 159,
+      "readout_sha256": "0723308F6E3AE8008F9F9347702F35C536401D9CED8DDF5C82205EB169D4A70C",
+      "selected_group_count": 58,
+      "set_index": 3,
+      "total_ulp_distance": 200,
+      "weight_state_sha256": "AAA6803DE6CCB912C7AD0FC2D202DAE099101AF1C440C488866C1EA9DAF8BE1E"
+    },
+    {
+      "best_search_rejected_for_geometry": false,
+      "endpoint": "seed9731-L-tau4.json",
+      "final_geometry_pass": true,
+      "mismatch_count": 166,
+      "readout_sha256": "3DC319339779A8D576435DEA7790849E9E62A86D9F3C228D32BB5CFA346313D4",
+      "selected_group_count": 54,
+      "set_index": 0,
+      "total_ulp_distance": 212,
+      "weight_state_sha256": "7FCC31CBAC293E2C193E61FADA85CFEAD9D986B5614D59F8393E71795E8B5611"
+    },
+    {
+      "best_search_rejected_for_geometry": false,
+      "endpoint": "seed9731-L-tau4.json",
+      "final_geometry_pass": true,
+      "mismatch_count": 167,
+      "readout_sha256": "F7EC585C8C262E47676D94AC35884364A9950C0A37695FDC09EF0B5F94F8A791",
+      "selected_group_count": 56,
+      "set_index": 1,
+      "total_ulp_distance": 223,
+      "weight_state_sha256": "2FE1470DAA7EA487D2CCE75291CB559624F5E15169DA54F2F51566FFB1991229"
+    },
+    {
+      "best_search_rejected_for_geometry": false,
+      "endpoint": "seed9731-L-tau4.json",
+      "final_geometry_pass": true,
+      "mismatch_count": 162,
+      "readout_sha256": "CDC042C5F30D9664C0E3F55BA231F94C18B001B1ED2C69CC2279F88217238E1F",
+      "selected_group_count": 55,
+      "set_index": 2,
+      "total_ulp_distance": 203,
+      "weight_state_sha256": "C66DC0C4A6BBDEA2295FF99837F9CBFAFBE1595A8C15A29874F15DDFEB682B89"
+    },
+    {
+      "best_search_rejected_for_geometry": true,
+      "endpoint": "seed9731-L-tau4.json",
+      "final_geometry_pass": true,
+      "mismatch_count": 222,
+      "readout_sha256": "A8D5CC968BBB660B2CECF54942624EE42537DA5FA031342FC25E0CC2100AA702",
+      "selected_group_count": 62,
+      "set_index": 3,
+      "total_ulp_distance": 282,
+      "weight_state_sha256": "7D5A63B4FD34469DF26FAFDA3F36A5BA8FC53DF05C19EC0DF774FBB3AC146D15"
+    },
+    {
+      "best_search_rejected_for_geometry": true,
+      "endpoint": "seed9731-R-tau16.json",
+      "final_geometry_pass": true,
+      "mismatch_count": 185,
+      "readout_sha256": "D98C22255C964471F6A95F22F90F98BE36A768D2FDD5E2FCEB1FA79774C3BE60",
+      "selected_group_count": 59,
+      "set_index": 1,
+      "total_ulp_distance": 251,
+      "weight_state_sha256": "73807A1BC3D2E5A6E7FDF22F3C44244135B63938ACC37A38D86528B3AFDA3B98"
+    },
+    {
+      "best_search_rejected_for_geometry": true,
+      "endpoint": "seed9731-R-tau16.json",
+      "final_geometry_pass": true,
+      "mismatch_count": 181,
+      "readout_sha256": "BF6BE8F18F3B499952E65ED71A7D1F57D9DCB5E4329DAABD85D15DE417425669",
+      "selected_group_count": 54,
+      "set_index": 3,
+      "total_ulp_distance": 241,
+      "weight_state_sha256": "74AE38165C58781DEB8FB5640D35D9A4B44E6ED6F8E40CB75D3B80A3757DDFFB"
+    },
+    {
+      "best_search_rejected_for_geometry": true,
+      "endpoint": "seed9731-R-tau4.json",
+      "final_geometry_pass": true,
+      "mismatch_count": 211,
+      "readout_sha256": "9D70A363DA810C57C5B6FB0E1E83A88F7BFDBB55ED9CFAA71FE67AD60D646F49",
+      "selected_group_count": 59,
+      "set_index": 0,
+      "total_ulp_distance": 267,
+      "weight_state_sha256": "49D0EF001DC11E663C42DC715B60ED9368FC209D6F16E9586CE57A85F0DCF931"
+    },
+    {
+      "best_search_rejected_for_geometry": true,
+      "endpoint": "seed9731-R-tau4.json",
+      "final_geometry_pass": true,
+      "mismatch_count": 181,
+      "readout_sha256": "FC0519537DB2B7886A5C3876C728FE81C15873A71EB280B707C7AA8F7B00D562",
+      "selected_group_count": 55,
+      "set_index": 1,
+      "total_ulp_distance": 236,
+      "weight_state_sha256": "0DFF4025F96FEBDA829949CA338F970C44F5009CB7BDB6069DB9E491D7CB671D"
+    },
+    {
+      "best_search_rejected_for_geometry": true,
+      "endpoint": "seed9731-R-tau4.json",
+      "final_geometry_pass": true,
+      "mismatch_count": 197,
+      "readout_sha256": "B6B229181B8B3F17AAD66B4D2BE931D754C6A6BA5787D7C1E01630D0B099E91C",
+      "selected_group_count": 59,
+      "set_index": 2,
+      "total_ulp_distance": 261,
+      "weight_state_sha256": "933EB00FE88CA21D972075AD81926CBBC8116B83CE8A61C18CB91CD924C570F6"
+    },
+    {
+      "best_search_rejected_for_geometry": true,
+      "endpoint": "seed9731-R-tau4.json",
+      "final_geometry_pass": true,
+      "mismatch_count": 124,
+      "readout_sha256": "8BE367D8DFB6492157BEB7D27C271EC5F28FB3DB70530988812D00C8077E0E6B",
+      "selected_group_count": 59,
+      "set_index": 3,
+      "total_ulp_distance": 165,
+      "weight_state_sha256": "DF8E0968E0A55068A877FF0B4BEAF0FE2980A13716F018DB5216B172FE7E3C1C"
+    }
+  ],
+  "gate": {
+    "all_final_geometry_valid": true,
+    "behavioral_probe": false,
+    "independent_reconstruction_complete": true,
+    "receipt_semantics_complete": true,
+    "scientific_promotion": false,
+    "search_executed": false
+  },
+  "identity": "q10-gc1-par8-audit1-v1",
+  "parent_par8_execution_sha256": "A4304E70F7D32436109CD6F3367C298CD1227FBD5C4AA2578C28D14272721D6B",
+  "protocol": "Q10-GC1-PAR8-AUDIT1"
+}

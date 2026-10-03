@@ -1,0 +1,122 @@
+{
+  "conclusion": "Current dependency closures were compared with the current singleton action grammar without replay; no unsupported row had a mapped nonzero action coordinate inside its closure.",
+  "context": [
+    "seed9731-R-tau4.json",
+    3
+  ],
+  "contract_sha256": "B17E188566D63A2F729DCF1118ED2ED26563BF7CEB72ED730D73D6328412A469",
+  "counts": {
+    "classification_counts": {
+      "MUTABLE_COORDINATE_UNREPRESENTED_BY_ACTION_GRAMMAR": 33
+    },
+    "context": [
+      "seed9731-R-tau4.json",
+      3
+    ],
+    "coordinate_count": 24091,
+    "legal_nonzero_coordinate_count": 24091,
+    "mapped_nonzero_coordinate_count": 223,
+    "singleton_action_count": 472,
+    "unsupported_row_domain_sha256": "BFD49351FF1A3615A1DC2A9A7C12ABBACEB5AA41C75C77ADC670FF591250E8D2",
+    "unsupported_rows": [
+      55,
+      84,
+      155,
+      202,
+      206,
+      231,
+      234,
+      245,
+      255,
+      283,
+      300,
+      304,
+      305,
+      352,
+      452,
+      490,
+      498,
+      499,
+      519,
+      545,
+      549,
+      577,
+      590,
+      593,
+      600,
+      620,
+      635,
+      639,
+      647,
+      671,
+      672,
+      683,
+      735
+    ]
+  },
+  "engineering_only": true,
+  "gap_summary_sha256": "1FB05D9A1331472668957B9863CE80946610E41E3657E10D1D0B1EC5D085F8E6",
+  "identity": "q10-gc1-lr1-requal1-csc1-prim-gap1-v1",
+  "parent_bindings": [
+    {
+      "bytes": 16997,
+      "label": "front2_runner",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-pair-alg3-front2-v3/scripts/run_front2.py",
+      "sha256": "B208C709521EA0721D4C79FD9D736A9C6C492D2A198B872DDBA78FA654C6AA46"
+    },
+    {
+      "bytes": 18450,
+      "label": "alg1_runner",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-alg1-v2/scripts/run_alg1.py",
+      "sha256": "9559DF16F983BB12D36A21C38F50A84E17BF547EB80D6AF0234A6CC480262508"
+    },
+    {
+      "bytes": 245398591,
+      "label": "alg1_descriptor",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-alg1-v2/descriptors/seed9731-R-tau4__set3.json",
+      "sha256": "9ACA7A84D85B1098AC6A23C8DFC31F137B79C1770899FCE05F973FC6C3AC2112"
+    },
+    {
+      "bytes": 4202,
+      "label": "alg1_execution",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-alg1-v2/execution.json",
+      "sha256": "3E6BE728EBE220051637499227A7C8269D91B1BF68776743F19DB38657CAAA50"
+    },
+    {
+      "bytes": 9072,
+      "label": "pf5_contract",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-domain-r2-v1/closures/twin-a/repo/experiments/drosophila-heresy/q10-pf5-v1/CONTRACT.json",
+      "sha256": "730D6B03CEE7CE58A9002320372E9F77EC2AB593EC25A71583F59D90D690BC26"
+    },
+    {
+      "bytes": 2193378,
+      "label": "reference_execution",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-par8-ref1-v1/execution.json",
+      "sha256": "9C47DBA6BF576FC6696E70153F0CE80FB0163B538794BE82158710C1064A04E5"
+    },
+    {
+      "bytes": 2945,
+      "label": "support1_execution",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-resid-support1-v1/execution.json",
+      "sha256": "2837A6D52B1EFC4B687B47A18C8376CE5F27C6C1CF7E89DD9365A4CA94834DA9"
+    },
+    {
+      "bytes": 52365,
+      "label": "support1_rows",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-resid-support1-v1/row-stats.json",
+      "sha256": "49337871F05C96B9F5301FDB81989EAB7399C2BB9AC17A19AE3D2B9F6F055D08"
+    },
+    {
+      "bytes": 71200,
+      "label": "support1_summary",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-resid-support1-v1/support-summary.json",
+      "sha256": "DCDE7712563D892B9DEC2436CDA5355445F2340425A314687B1C87F74DDD67AC"
+    }
+  ],
+  "protocol": "Q10-PRIM-GAP1",
+  "readout_executed": false,
+  "replay_executed": false,
+  "row_stats_sha256": "0EB0DF4D92016B92C781CD2964EC813135A59B8BF82B5B270F3AB191CF663642",
+  "scientific_promotion": false,
+  "status": "PRIM_GAP1_COMPLETE"
+}

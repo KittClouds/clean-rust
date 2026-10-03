@@ -1,0 +1,29 @@
+{
+  "recorded_utc": "2026-09-27T01:11:53.116351+00:00",
+  "schema": "FAS_E4_0_STAGE_AUTHORIZATION_ISSUER_SOURCE_TESTS_V08",
+  "receipt_id": "E4_0_AUTH_ISSUER_V08_SOURCE_TESTS",
+  "status": "PASS_SYNTHETIC_TESTS",
+  "command": "python -m unittest source.tests.test_e4_stage_authorization_v08 -v; python -m py_compile issuer and tests",
+  "synthetic_test_count": 13,
+  "py_compile": "PASS",
+  "source_files": [
+    {
+      "path": "source/scripts/issue_e4_stage_authorization_v08.py",
+      "bytes": 36155,
+      "sha256": "b882252799e7120e4131da033cf11c2f8cfd1eb75dfeda298bb817f4eb6e1888"
+    },
+    {
+      "path": "source/tests/test_e4_stage_authorization_v08.py",
+      "bytes": 30709,
+      "sha256": "e3217260ae4a553d698cbe8b31d0386657c52d0a20471e11d1aa0e28aa967cff"
+    }
+  ],
+  "runtime_access": {
+    "model_contact": false,
+    "tokenizer_contact": false,
+    "cuda_initialized": false,
+    "E4_rows_materialized": false,
+    "truth_opened": false
+  },
+  "scope": "Model-free synthetic issuer tests, including v06/v07 lineage, exact v08 seal membership, finite stage interval, no truth artifacts, and nested final_seal postseal-root compatibility."
+}

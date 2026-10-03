@@ -1,0 +1,51 @@
+{
+  "analysis_sha256": "beb30c21df8761efbd0e9ed3fe3745cf57e9f6421cc4fe1750202ffbaa298e75",
+  "arm_fit_counts": {
+    "D": 36,
+    "S": 36
+  },
+  "design_contract_sha256": "52280190e160fafdbb973b4cda273bf9e24eca6ba96998a0393e90601fc88f40",
+  "executable_sha256": "2247a06ecb4866eeee077af42d78d888ce7a20a4084ced3e2a7e30e92ad7f748",
+  "fit_count": 72,
+  "fit_manifest_row_hashes_file_sha256": "e87e09b4804cd343f03e0cd8afb85d80e657d65f817ddcc147f65b3b76cbd226",
+  "fit_manifest_sha256": "47b440bb4f9f4d93c897b0835dfe4159e7579a92d2fa5e0e41d93b3084bf8048",
+  "fit_receipt_root": "fit-receipts",
+  "fits_executed": false,
+  "heldout_class_complete_blocks": 7,
+  "heldout_support_used_to_change_fit_grid": false,
+  "heldout_truth_opened": false,
+  "implementation_spec_sha256": "1e82459a516daddc375a3304860bbe45c5fda3880c7404abeaa3df214e7ce086",
+  "initial_tensor_bundle_manifest_sha256": "4d9ed75096c010d40ceff324f0f44daaec00dbbf4e6cc9a53da74909146a5bea",
+  "initial_tensor_root": "initial-tensors",
+  "initializer_seed_manifest_sha256": "efb32a7c2ca2709407b65c32627dbd206b8b1bde304ce9b0b98b165aeea1da8e",
+  "input_source_sha256": "32f5301842e9e5ec0463276dc507a69522e6bd08989d08cf625678296136d2a9",
+  "measured_reach03_authorized": false,
+  "model_source_sha256": "2882482311355f5729fb3922d0b51fdef960f24a49d793a77ce855d903939f02",
+  "prediction_root": "heldout-predictions",
+  "predictor_file_sha256": "e764b0ed8d910f0817f291f8081d08d42767461ce319f3fb80ce2236d2b9644a",
+  "qualification_only": true,
+  "row_count": 28876,
+  "run_id": "F4-INVARIANT-01-COLLECT2-EXEC2",
+  "runtime": {
+    "matches_parent_pinned_runtime": true,
+    "numpy_version": "2.5.3",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python_executable": "C:\\Users\\shuga\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+    "python_executable_sha256": "85b71d8c6ec1905935f74be0c9869aae198d00e98f39df699ec66f9c5a84cecd",
+    "python_version": "3.13.15 (tags/v3.13.15:4061bc4, Aug  5 2026, 13:05:39) [MSC v.1944 64 bit (AMD64)]",
+    "thread_environment": {
+      "BLIS_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "NUMEXPR_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1"
+    }
+  },
+  "schema": "F4-INVARIANT-01-fit-execution-preflight-v1",
+  "source_manifest_canonical_sha256": "1ffd0ecd452edd07546833a0d85977bed3b16d2b52c6f2c472579519c32323b3",
+  "source_manifest_file_sha256": "b6ad8dd810430f61f6c98ec2fbc4f13f7ff2edbfbf74135208700b49e6cc89e7",
+  "status": "PASS",
+  "task_bank_sha256": "8e49f61018255fa32d4328056d46a0b5a14b70306ccfa98733849dcac245c02c",
+  "truth_file_sha256": "5691561ec69800f7e067e3b03de2f917d68cfee8412b1f85a0e6fa55b7daad24"
+}

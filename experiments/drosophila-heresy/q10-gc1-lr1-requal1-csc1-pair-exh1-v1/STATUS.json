@@ -1,0 +1,10 @@
+{
+  "engineering_only": true,
+  "execution_sha256": "13303BA195672CEB8D7971D44753CF5DF9F30FF822BE538901CF8AA40ED4C707",
+  "identity": "q10-gc1-lr1-requal1-csc1-pair-exh1-v1",
+  "pair_replay_performed": false,
+  "protocol": "Q10-PAIR-EXH1",
+  "readout_executed": false,
+  "scientific_promotion": false,
+  "status": "PAIR_EXH1_COMPLETE"
+}

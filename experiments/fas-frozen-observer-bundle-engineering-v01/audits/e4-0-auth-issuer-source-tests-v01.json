@@ -1,0 +1,40 @@
+{
+  "schema": "FAS_E4_0_AUTH_ISSUER_SOURCE_TESTS_RECEIPT_V01",
+  "status": "PASS_SYNTHETIC_TESTS",
+  "date_utc": "2026-09-26",
+  "source_files": [
+    {
+      "path": "source/scripts/issue_e4_stage_authorization_v01.py",
+      "bytes": 20639,
+      "sha256": "fce139b12fc0885f2b7082019cecec7628654398858456900b7fc5bdeab7e2b9"
+    },
+    {
+      "path": "source/tests/test_e4_stage_authorization_v01.py",
+      "bytes": 14259,
+      "sha256": "4d4a9e89cd45b58262be09b6d5777dbcb6af823e29bc6516030a2454c4b179b1"
+    }
+  ],
+  "py_compile": "PASS",
+  "synthetic_test_count": 5,
+  "synthetic_tests": [
+    "all_runtime_stages_match_track_d_exact_fields_roots_and_scope",
+    "artifact_role_extra_and_truth_paths_are_rejected",
+    "contract_audit_and_stage_seal_identity_fail_closed",
+    "fresh_scoring_preserves_scorer_exact_fourteen_fields",
+    "interval_must_be_finite_integer_and_create_is_once"
+  ],
+  "integration_checks": {
+    "track_d_auth_parser": "PASS",
+    "track_b_stage_auth_validator_population_panel_parity_feature": "PASS",
+    "track_c_fresh_scoring_auth_validator": "PASS"
+  },
+  "scope": {
+    "real_authorization_issued": false,
+    "e4_population_materialized": false,
+    "tokenizer_contact": false,
+    "model_contact": false,
+    "cuda_contact": false,
+    "labels_opened": false
+  },
+  "synthetic_only": true
+}

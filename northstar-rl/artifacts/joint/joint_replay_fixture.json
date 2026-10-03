@@ -1,0 +1,436 @@
+{
+  "schema_version": "JOINT_REPLAY_FIXTURE_V1",
+  "source_class": "SYNTHETIC_CONTRACT_FIXTURE_NOT_LIVE_MARKET_EVIDENCE",
+  "northstar_instrument_id": 3,
+  "registry": {
+    "schema_version": "BROKER_INSTRUMENT_REGISTRY_V1",
+    "instruments": [
+      {
+        "broker": "TRADELOCKER",
+        "venue": "SYNTHETIC_HEROFX",
+        "broker_instrument_id": "3",
+        "broker_symbol": "US30",
+        "northstar_instrument_id": 3,
+        "asset_class": "INDEX_CFD",
+        "quote_currency": "USD",
+        "price_precision": 2,
+        "tick_size": 0.01,
+        "quantity_precision": 2,
+        "quantity_step": 0.01,
+        "min_quantity": 0.01,
+        "max_quantity": 100.0,
+        "contract_size": 1.0,
+        "trading_status": "SESSION_OPEN",
+        "raw_metadata": {
+          "payload_hash": "145285483efedefc8cd39fde31bb5145ccad8cdfb2c1fb771ee7e949cec777cc",
+          "retention": "SYNTHETIC_FIXTURE",
+          "retained_relative_path": "fixtures/synthetic_tradelocker_instrument.json"
+        },
+        "observed_at_ns": 1800000000000000000
+      }
+    ],
+    "content_hash": "966683a6d7a5686f36e94a2b1e62e9a8af756fb84e11fcd1da28955a769a7437"
+  },
+  "binding": {
+    "schema_version": "INSTRUMENT_BINDING_V1",
+    "binding_id": "9bdfd61aa3f76ec4408822447c9ddf0efc2546e682d17583964bd630daf1ee2d",
+    "northstar_instrument_id": 3,
+    "mt5_terminal_id": "SYNTHETIC_MT5_TERMINAL",
+    "mt5_symbol": "US30",
+    "tradelocker_account_environment": "SYNTHETIC_HEROFX",
+    "tradelocker_instrument_id": "3",
+    "tradelocker_symbol": "US30",
+    "binding_basis": "explicit qualification fixture with shared symbol and typed contract comparison",
+    "observed_contract_fields": [
+      {
+        "field": "price_precision",
+        "mt5_value": "2",
+        "tradelocker_value": "2",
+        "status": "EXACT",
+        "transform": null
+      },
+      {
+        "field": "tick_size",
+        "mt5_value": "0.01",
+        "tradelocker_value": "0.01",
+        "status": "EXACT",
+        "transform": null
+      },
+      {
+        "field": "quantity_step",
+        "mt5_value": "0.01",
+        "tradelocker_value": "0.01",
+        "status": "EXACT",
+        "transform": null
+      },
+      {
+        "field": "quote_currency",
+        "mt5_value": "USD",
+        "tradelocker_value": "USD",
+        "status": "EXACT",
+        "transform": null
+      },
+      {
+        "field": "session_availability",
+        "mt5_value": "fixture_open",
+        "tradelocker_value": "fixture_open",
+        "status": "COMPATIBLE",
+        "transform": null
+      }
+    ],
+    "binding_status": "COMPATIBLE",
+    "created_at_ns": 1800000000000000000,
+    "verified_at_ns": 1800000000000000000
+  },
+  "runraw_source_contract": "c40129d6b3235e89fdd135250aa82d690f2ee85c285508cdd15e22345462c6da",
+  "mt5": {
+    "schema_version": "BROKER_OBSERVATION_TAPE_V1",
+    "source_authority": "SYNTHETIC_MT5_CONTRACT_FIXTURE",
+    "account_id_hash": "9d3f222f818b5182957365c927a4019dd62cbf2e5e5592054baec06e54b94bc0",
+    "rows": [
+      {
+        "observation_id": "81851d3759bc8871d8ae319ce0a83b15638010290840dbc39195e61a5b848c11",
+        "broker": "MT5",
+        "account_environment": "SYNTHETIC_QUALIFICATION",
+        "instrument_id": 3,
+        "event_time_ns": 1800000000000000000,
+        "received_time_ns": 1800000000002000000,
+        "recorded_time_ns": 1800000000002200000,
+        "bid": 39999.5,
+        "ask": 40000.5,
+        "last": 40000.0,
+        "spread": 1.0,
+        "raw_payload_hash": "bd11264a3ef7c88daf92466743157fe570fba30d6fa3e03e59bf7c1a069553bb",
+        "normalized_payload_hash": "6f45613dd7002ebd704132a71fea538466e5827c4c8719a48ac76daacfb5fcaf",
+        "connection_state": "CAPTURED_REPLAY"
+      },
+      {
+        "observation_id": "9b4f4d4d1df624898e5d79104a521c9afcea9ae2b8a563f7dc3164a4dd030ce0",
+        "broker": "MT5",
+        "account_environment": "SYNTHETIC_QUALIFICATION",
+        "instrument_id": 3,
+        "event_time_ns": 1800000060000000000,
+        "received_time_ns": 1800000060002000000,
+        "recorded_time_ns": 1800000060002200000,
+        "bid": 40000.5,
+        "ask": 40001.5,
+        "last": 40001.0,
+        "spread": 1.0,
+        "raw_payload_hash": "b10426d35418bc8ec2f405cc917cdf48cec57e9cde7daada19c7f011c79faf12",
+        "normalized_payload_hash": "24a5781ff98a37068d9e90da36349fc4f2bb60eaab89fb11493a4c68dedb5723",
+        "connection_state": "CAPTURED_REPLAY"
+      },
+      {
+        "observation_id": "cdc9e1d15802227fa42d7af36eada9c744ea9cdfb27e48013e9e50cc8f7decc6",
+        "broker": "MT5",
+        "account_environment": "SYNTHETIC_QUALIFICATION",
+        "instrument_id": 3,
+        "event_time_ns": 1800000120000000000,
+        "received_time_ns": 1800000120002000000,
+        "recorded_time_ns": 1800000120002200000,
+        "bid": 40001.5,
+        "ask": 40002.5,
+        "last": 40002.0,
+        "spread": 1.0,
+        "raw_payload_hash": "a57525f02fe88e5dbb46bcc24c4cf44f70f978bd8c5ac1da7c42677218acd6a1",
+        "normalized_payload_hash": "9d99930d2051a573faf92a649e35670c3893b3940e7e9522aecded7e1407a76d",
+        "connection_state": "CAPTURED_REPLAY"
+      },
+      {
+        "observation_id": "0422d5cdde003b37cc84699e8af389d672d68baebc09e856d092a065e77ba87d",
+        "broker": "MT5",
+        "account_environment": "SYNTHETIC_QUALIFICATION",
+        "instrument_id": 3,
+        "event_time_ns": 1800000180000000000,
+        "received_time_ns": 1800000180002000000,
+        "recorded_time_ns": 1800000180002200000,
+        "bid": 40002.5,
+        "ask": 40003.5,
+        "last": 40003.0,
+        "spread": 1.0,
+        "raw_payload_hash": "5723a79534400adfa331cecec046552c3ca020d6069a39b7a8fd105438883681",
+        "normalized_payload_hash": "c9611c19d0a6d2958314bb16a71da97b327bf3d6c1dbdf93e446d50c7a407e0d",
+        "connection_state": "CAPTURED_REPLAY"
+      }
+    ],
+    "content_hash": "5e0db92bdf2a03f1be1bd6931d259820e51795cd025981a8f57e9e5920c4fa33"
+  },
+  "tradelocker": {
+    "schema_version": "BROKER_OBSERVATION_TAPE_V1",
+    "source_authority": "SYNTHETIC_TRADELOCKER_CONTRACT_FIXTURE",
+    "account_id_hash": "de521246fa5c54b0485e2273844519114b1ce434c8f47641ad87d77a459bc93e",
+    "rows": [
+      {
+        "observation_id": "45973dd6dbb82d58298a33edfd4688cb56c4b19321c5a4f24fa6b55457f24a8c",
+        "broker": "TRADELOCKER",
+        "account_environment": "SYNTHETIC_QUALIFICATION",
+        "instrument_id": 3,
+        "event_time_ns": 1800000000001000000,
+        "received_time_ns": 1800000000006000000,
+        "recorded_time_ns": 1800000000006200000,
+        "bid": 39999.5,
+        "ask": 40000.75,
+        "last": 40000.125,
+        "spread": 1.25,
+        "raw_payload_hash": "54fb0b358495513fbd983f1652e8cccb01ad6c3e0ceed3cc49c7a2d412b3d8d6",
+        "normalized_payload_hash": "8d22e526f51c7b95c79681e3c253c8f441603b0753bc42bdcc3bdb7ff5f6371a",
+        "connection_state": "CAPTURED_REPLAY"
+      },
+      {
+        "observation_id": "00a0b0aa67554952030db5c841051d40dcffc7f028b9cf471ca0573a2dbcb970",
+        "broker": "TRADELOCKER",
+        "account_environment": "SYNTHETIC_QUALIFICATION",
+        "instrument_id": 3,
+        "event_time_ns": 1800000060001000000,
+        "received_time_ns": 1800000060006000000,
+        "recorded_time_ns": 1800000060006200000,
+        "bid": 40000.5,
+        "ask": 40001.75,
+        "last": 40001.125,
+        "spread": 1.25,
+        "raw_payload_hash": "78e1a5429e735eebc37e53a7ddb74fbb696b04a1460dec8431c45522307d02b7",
+        "normalized_payload_hash": "9c2d8f4dcf62c0d9d6766988d7edea2a050a72b5bd15cc594a8646dcee09e3f0",
+        "connection_state": "CAPTURED_REPLAY"
+      },
+      {
+        "observation_id": "7fa2eb2595bca784b2d0dc2b8540b2449f42cb685cc7ae6ff816fb3e81e390ac",
+        "broker": "TRADELOCKER",
+        "account_environment": "SYNTHETIC_QUALIFICATION",
+        "instrument_id": 3,
+        "event_time_ns": 1800000120001000000,
+        "received_time_ns": 1800000120006000000,
+        "recorded_time_ns": 1800000120006200000,
+        "bid": 40001.5,
+        "ask": 40002.75,
+        "last": 40002.125,
+        "spread": 1.25,
+        "raw_payload_hash": "6046a3c296fc9be24b637233cfd4a0a9a9ae7593782af2c7965bf28dc70bb8be",
+        "normalized_payload_hash": "325face38575e7388dc3b3a7e79441cfd8ff4fa70a67123b8429a1b3d1f707f9",
+        "connection_state": "CAPTURED_REPLAY"
+      },
+      {
+        "observation_id": "d8bad0538bbcc4cfe00b67c60a039c0f58f968841bead3bad6de39fee02d4193",
+        "broker": "TRADELOCKER",
+        "account_environment": "SYNTHETIC_QUALIFICATION",
+        "instrument_id": 3,
+        "event_time_ns": 1800000180001000000,
+        "received_time_ns": 1800000180006000000,
+        "recorded_time_ns": 1800000180006200000,
+        "bid": 40002.5,
+        "ask": 40003.75,
+        "last": 40003.125,
+        "spread": 1.25,
+        "raw_payload_hash": "5194a300e6e21c1dbfc0852dbba09d92f77a4c302b03646e55415ca67879f943",
+        "normalized_payload_hash": "c7ce3d4316c530fe85856a8b58ed732ede78dd398d78d7241eb8e19b32b01151",
+        "connection_state": "CAPTURED_REPLAY"
+      }
+    ],
+    "content_hash": "b63b37140767a3353fb455a4c733c3621e679782a8be6a4b884c7774135c85b8"
+  },
+  "broker_contracts": {
+    "schema_version": "BROKER_CONTRACT_TAPE_V1",
+    "rows": [
+      {
+        "northstar_instrument_id": 3,
+        "valid_from_ns": 1800000000000000000,
+        "observed_at_ns": 1800000000000000000,
+        "tick_size": 0.01,
+        "quantity_step": 0.01,
+        "minimum_quantity": 0.01,
+        "contract_size": 1.0,
+        "margin_fields": [
+          [
+            "qualification_margin_rate",
+            0.01
+          ]
+        ],
+        "broker_precision": 2,
+        "quote_denomination": "USD",
+        "trading_availability": "SESSION_OPEN",
+        "source_authority": "SYNTHETIC_TRADELOCKER_CONTRACT_FIXTURE",
+        "source_payload_hash": "145285483efedefc8cd39fde31bb5145ccad8cdfb2c1fb771ee7e949cec777cc"
+      }
+    ],
+    "content_hash": "451bf7eb3bb3a70649f429732e181a126625759fc099766cdba7def8e5baab53"
+  },
+  "clock_comparisons": [
+    {
+      "schema_version": "CLOCK_COMPARISON_RECEIPT_V1",
+      "northstar_instrument_id": 3,
+      "left_source": "MT5",
+      "right_source": "TRADELOCKER",
+      "left_source_time_ns": 1800000000000000000,
+      "right_source_time_ns": 1800000000001000000,
+      "left_arrival_offset_ns": 2000000,
+      "right_arrival_offset_ns": 5000000,
+      "source_time_delta_ns": 1000000,
+      "bar_boundary_delta_ns": 1000000,
+      "session_boundary_relationship": "SAME_SYNTHETIC_SESSION",
+      "receipt_id": "7c1a69896e519977d922750218045340fee7fc8717da60a8f08138cde32790be"
+    },
+    {
+      "schema_version": "CLOCK_COMPARISON_RECEIPT_V1",
+      "northstar_instrument_id": 3,
+      "left_source": "MT5",
+      "right_source": "TRADELOCKER",
+      "left_source_time_ns": 1800000060000000000,
+      "right_source_time_ns": 1800000060001000000,
+      "left_arrival_offset_ns": 2000000,
+      "right_arrival_offset_ns": 5000000,
+      "source_time_delta_ns": 1000000,
+      "bar_boundary_delta_ns": 1000000,
+      "session_boundary_relationship": "SAME_SYNTHETIC_SESSION",
+      "receipt_id": "d890cc2d415b4a2c5d896588ace62d650428eb96039f3556f8b9cd9c830bfb9a"
+    },
+    {
+      "schema_version": "CLOCK_COMPARISON_RECEIPT_V1",
+      "northstar_instrument_id": 3,
+      "left_source": "MT5",
+      "right_source": "TRADELOCKER",
+      "left_source_time_ns": 1800000120000000000,
+      "right_source_time_ns": 1800000120001000000,
+      "left_arrival_offset_ns": 2000000,
+      "right_arrival_offset_ns": 5000000,
+      "source_time_delta_ns": 1000000,
+      "bar_boundary_delta_ns": 1000000,
+      "session_boundary_relationship": "SAME_SYNTHETIC_SESSION",
+      "receipt_id": "7bcffca6545f1bf08d96a4fabce0e076aa2ed4a7212a9924848c06f618adce9d"
+    },
+    {
+      "schema_version": "CLOCK_COMPARISON_RECEIPT_V1",
+      "northstar_instrument_id": 3,
+      "left_source": "MT5",
+      "right_source": "TRADELOCKER",
+      "left_source_time_ns": 1800000180000000000,
+      "right_source_time_ns": 1800000180001000000,
+      "left_arrival_offset_ns": 2000000,
+      "right_arrival_offset_ns": 5000000,
+      "source_time_delta_ns": 1000000,
+      "bar_boundary_delta_ns": 1000000,
+      "session_boundary_relationship": "SAME_SYNTHETIC_SESSION",
+      "receipt_id": "647582f448eb962b5753081d1114d019bcfb1040aa3ef7144dc8145c63c36915"
+    }
+  ],
+  "price_comparisons": [
+    {
+      "schema_version": "BROKER_PRICE_COMPARISON_V1",
+      "northstar_instrument_id": 3,
+      "mt5_time_ns": 1800000000000000000,
+      "tradelocker_time_ns": 1800000000001000000,
+      "bid_difference": 0.0,
+      "ask_difference": 0.25,
+      "midpoint_difference": 0.125,
+      "spread_difference": 0.25,
+      "bar_open_difference": null,
+      "bar_high_difference": null,
+      "bar_low_difference": null,
+      "bar_close_difference": 0.125,
+      "missing_observation_state": null,
+      "temporal_alignment": "NEAREST_WITHIN_1MS_FIXTURE",
+      "difference_class": "VENUE_OBSERVATION_DIFFERENCE",
+      "receipt_id": "003dc6daa7cd8b40f219b73653639bf46465f2ce7900192f1311341a7ea5deae"
+    },
+    {
+      "schema_version": "BROKER_PRICE_COMPARISON_V1",
+      "northstar_instrument_id": 3,
+      "mt5_time_ns": 1800000060000000000,
+      "tradelocker_time_ns": 1800000060001000000,
+      "bid_difference": 0.0,
+      "ask_difference": 0.25,
+      "midpoint_difference": 0.125,
+      "spread_difference": 0.25,
+      "bar_open_difference": null,
+      "bar_high_difference": null,
+      "bar_low_difference": null,
+      "bar_close_difference": 0.125,
+      "missing_observation_state": null,
+      "temporal_alignment": "NEAREST_WITHIN_1MS_FIXTURE",
+      "difference_class": "VENUE_OBSERVATION_DIFFERENCE",
+      "receipt_id": "fa5bf3398fe1987ae9fd2e677d874e806385238a6ae99525199bd3f6f02e7b56"
+    },
+    {
+      "schema_version": "BROKER_PRICE_COMPARISON_V1",
+      "northstar_instrument_id": 3,
+      "mt5_time_ns": 1800000120000000000,
+      "tradelocker_time_ns": 1800000120001000000,
+      "bid_difference": 0.0,
+      "ask_difference": 0.25,
+      "midpoint_difference": 0.125,
+      "spread_difference": 0.25,
+      "bar_open_difference": null,
+      "bar_high_difference": null,
+      "bar_low_difference": null,
+      "bar_close_difference": 0.125,
+      "missing_observation_state": null,
+      "temporal_alignment": "NEAREST_WITHIN_1MS_FIXTURE",
+      "difference_class": "VENUE_OBSERVATION_DIFFERENCE",
+      "receipt_id": "519c53d1af10a9c9d8282c7a204c7314fd1e62275cbf7bbe6f699cd9cd8dc0c1"
+    },
+    {
+      "schema_version": "BROKER_PRICE_COMPARISON_V1",
+      "northstar_instrument_id": 3,
+      "mt5_time_ns": 1800000180000000000,
+      "tradelocker_time_ns": 1800000180001000000,
+      "bid_difference": 0.0,
+      "ask_difference": 0.25,
+      "midpoint_difference": 0.125,
+      "spread_difference": 0.25,
+      "bar_open_difference": null,
+      "bar_high_difference": null,
+      "bar_low_difference": null,
+      "bar_close_difference": 0.125,
+      "missing_observation_state": null,
+      "temporal_alignment": "NEAREST_WITHIN_1MS_FIXTURE",
+      "difference_class": "VENUE_OBSERVATION_DIFFERENCE",
+      "receipt_id": "fd687459329d95795514276cc9b774a7fb5548e661065b2c569e933a62391a89"
+    }
+  ],
+  "calibration": {
+    "schema_version": "EXECUTION_CALIBRATION_V1",
+    "calibration_id": "54573a6dd64d67d4c68420d9e48c0a9cb306abf9bf0fd5fd97f6245f9dce12f3",
+    "instrument_id": 3,
+    "market_regime_partition": "SYNTHETIC_QUALIFICATION_ONLY",
+    "observed_spread_distribution": [
+      {
+        "value": 1.25,
+        "cumulative_probability": 1.0
+      }
+    ],
+    "observed_price_delta_distribution": [
+      {
+        "value": 0.125,
+        "cumulative_probability": 1.0
+      }
+    ],
+    "observed_latency_distribution_ns": [
+      {
+        "value": 5000000.0,
+        "cumulative_probability": 1.0
+      }
+    ],
+    "observed_fill_ratio_distribution": [
+      {
+        "value": 1.0,
+        "cumulative_probability": 1.0
+      }
+    ],
+    "sample_count": 4,
+    "effective_period_ns": [
+      1800000000000000000,
+      1800000180000000000
+    ],
+    "source_tape_id": "b63b37140767a3353fb455a4c733c3621e679782a8be6a4b884c7774135c85b8",
+    "calibration_method": "empirical_ecdf_fixture_no_interpolation",
+    "calibration_hash": "54573a6dd64d67d4c68420d9e48c0a9cb306abf9bf0fd5fd97f6245f9dce12f3"
+  },
+  "wind_tunnel": {
+    "schema_version": "WIND_TUNNEL_MODE_V1",
+    "mode": "CROSS_SOURCE_COMPARISON",
+    "runraw_tape_id": "c40129d6b3235e89fdd135250aa82d690f2ee85c285508cdd15e22345462c6da",
+    "mt5_capture_id": "5e0db92bdf2a03f1be1bd6931d259820e51795cd025981a8f57e9e5920c4fa33",
+    "tradelocker_capture_id": "b63b37140767a3353fb455a4c733c3621e679782a8be6a4b884c7774135c85b8",
+    "binding_id": "9bdfd61aa3f76ec4408822447c9ddf0efc2546e682d17583964bd630daf1ee2d",
+    "source_spec_id": "f3ff9e1bc8542ff5e9ce053564ebeedc29a966179fbd4addd61d083de4279547"
+  },
+  "content_hash": "9b6468ed676e4c9e79345f034346319dc5bbbc1d39b1d58926b7a5d77742f79d"
+}

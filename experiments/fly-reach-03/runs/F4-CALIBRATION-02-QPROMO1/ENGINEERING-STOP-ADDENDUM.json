@@ -1,0 +1,16 @@
+{
+  "comparative_outcomes_accessed": false,
+  "correction": [
+    "The frozen fit_d.py already adds both the SYMMETRY-03 helper directory and the study scripts directory to sys.path. Its model import was not the cause of the fit launch stop.",
+    "The actual fit launch stopped at its prefit assertion because it expected PRE-FIT-GATES.heldout_truth_opened=false while the prepared receipt used truth_values_opened=false. It stopped before read_predictors, model fitting, or held-out truth access.",
+    "A separate read-only import smoke showed integrity.py lacked the study scripts directory needed for f4_symmetry_01_model.py. Integrity had not been run on the collection; this is a future integrity-launch defect."
+  ],
+  "fit_count_started": 0,
+  "heldout_truth_values_opened": false,
+  "prediction_streams_written": 0,
+  "run_id": "F4-CALIBRATION-02-QPROMO1",
+  "run_status_remains": "NONPROMOTABLE_ENGINEERING_STOP_BEFORE_FITS",
+  "schema": "F4-CALIBRATION-02-engineering-stop-addendum-v1",
+  "status": "CORRECTS_IMPLEMENTATION_FINDING",
+  "supersedes_stop_receipt_sha256": "24c95d84e866e195493825ddc0a8cee458e089941f85afe3eae60b26570ff881"
+}

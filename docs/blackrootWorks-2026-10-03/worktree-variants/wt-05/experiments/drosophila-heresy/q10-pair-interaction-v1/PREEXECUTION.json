@@ -1,0 +1,177 @@
+{
+  "anatomy_manifest": [
+    {
+      "path": "census.json",
+      "sha256": "8a26ed6f448b02a881b1a9a285f8cd3b642f8e0e272b27f6e2c681409cdc2c9e"
+    },
+    {
+      "path": "edges-L.tsv",
+      "sha256": "2bc460d2019f2ab71320f103597d3b4b5062320bd3c97e5239a76a7915d407e0"
+    },
+    {
+      "path": "edges-R.tsv",
+      "sha256": "e7761386f2e60bfaaf9f2bd92923c2127442c35a3f108e3810e45a2297517b1f"
+    },
+    {
+      "path": "nodes-L.json",
+      "sha256": "adf1b43cb3953dc090c2bb8b11b117796a9dd6ddd3701d5b346c7ca09eedbd80"
+    },
+    {
+      "path": "nodes-L.tsv",
+      "sha256": "3cae35fd55e026e2009f6cc26e60096522911009b84593a5d1a3f3e4eb0a99c1"
+    },
+    {
+      "path": "nodes-R.json",
+      "sha256": "7d69e54f4840fe1291faebb9432d098370045d0cf59b68f01d1a555171e38540"
+    },
+    {
+      "path": "nodes-R.tsv",
+      "sha256": "420c28ee36ce37bba8c683704c36dfa60c90640962edb78f97fbf2321fdc0752"
+    }
+  ],
+  "behavioral_inference": false,
+  "canonical_anatomy_dir": "\\\\?\\C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\dh06\\artifacts\\runs\\20260915T201008Z\\sealed\\anatomy",
+  "contract_sha256": "f2202dc05be95429b3d513f3f96e8208f0a888bb4cd1bd03ce7fd781c8f8791c",
+  "dh08b_authorized": false,
+  "disjoint_pairs_per_event": 32,
+  "executable": "D:\\drosophila-heresy\\q10-pi-build\\release\\q10-pair-interaction-v1.exe",
+  "executable_sha256": "2824afe9d3e6d96f119ea487ade753c0ac6e073f9656badb48b4a2dbc5f0df67",
+  "parent_hashes": {
+    "contract": "5A7CD7E15724F6260C2D42296BED5FF3667CA32FA1D8D48E5408EFFA2A0F35BF",
+    "plan": "8A70CFADA7A833AA1110FDE5DBF0CFAFDDD4AFD4297A06AD846B1959439B8B9D",
+    "result": "68200D7F49B8A4B943150A1C3A5AB4B46DF4ED8EB1EBBE7A3DF45F8BEEBBD337",
+    "status": "D19D051DA550BCDED9C436F9A7164AF0C4322D8BB16C418D7C4CA9E04217A9C4"
+  },
+  "plan_sha256": "544d008d0f6afc36ed1786cbae461968ec31d2b3dca64b94caed15eeaa632f39",
+  "protocol": "Q10-PI1",
+  "scientific_seed_bundles": 0,
+  "shared_pairs_per_event": 64,
+  "signed_steps": [
+    -1,
+    1,
+    -2,
+    2,
+    -4,
+    4,
+    -8,
+    8,
+    -16,
+    16
+  ],
+  "source_manifest": [
+    {
+      "path": "CONTRACT.json",
+      "sha256": "f2202dc05be95429b3d513f3f96e8208f0a888bb4cd1bd03ce7fd781c8f8791c"
+    },
+    {
+      "path": "Cargo.lock",
+      "sha256": "c57bc9aa19c7b8160f7ea912807f244a5c1e03b965735bb6733a399832b2d45e"
+    },
+    {
+      "path": "Cargo.toml",
+      "sha256": "c033117ccda952f32e04666e4cccf6797ee074f7302029b6a4a8bae195c0a35d"
+    },
+    {
+      "path": "PLAN.md",
+      "sha256": "544d008d0f6afc36ed1786cbae461968ec31d2b3dca64b94caed15eeaa632f39"
+    },
+    {
+      "path": "q10-pi-config.json",
+      "sha256": "c00237f9c9b17228c71d821be7e194ef56c3b15b0a9c1ef89df7cd2c6b694747"
+    },
+    {
+      "path": "scripts/review_q10_pi.py",
+      "sha256": "6b185e8ce421bc83eaee8532d7c831d651df65daa73ac9f472e0066cf42c032a"
+    },
+    {
+      "path": "src\\allocation.rs",
+      "sha256": "4fff2a7f1bc7078795abde6916bf14c96d2334579d04e48d4194999a076f826e"
+    },
+    {
+      "path": "src\\capture.rs",
+      "sha256": "e0ed3fdc33cc1c0cd7236ddd6aba67e29d685fc10e0a6b6a416ec5da81b8c66f"
+    },
+    {
+      "path": "src\\graph.rs",
+      "sha256": "a697285a9fe4560fce32afb5330358ede1c84e96365c23ac96c24d97fe667464"
+    },
+    {
+      "path": "src\\linear.rs",
+      "sha256": "1523d127f8a36f27266ffc777614d8a5a1ef77729080923106a916364d59d404"
+    },
+    {
+      "path": "src\\main.rs",
+      "sha256": "bd77449ba56cc4f41a01cf164534d2d50f9e0a0cc8bcde968f8d65af43869096"
+    },
+    {
+      "path": "src\\observer.rs",
+      "sha256": "08fc18ef45d376a9e58d7531231b110dad8a81cc86dc3c0d84e7333f445688ef"
+    },
+    {
+      "path": "src\\pi_core.rs",
+      "sha256": "1a441e4318e52b2014ca598120447ebeea77091130370a34acce1a4a3fb5e810"
+    },
+    {
+      "path": "src\\pi_sampler.rs",
+      "sha256": "14e9b7f7fbf156bee66087d24eb55e75ca7c69848f5df2119d502fcb65f70788"
+    },
+    {
+      "path": "src\\pi_types.rs",
+      "sha256": "d5007ccc08b6b50b816a83ae7dd1597c4430b2ddb3e2a1e619a770f847a2bcb6"
+    },
+    {
+      "path": "src\\plasticity.rs",
+      "sha256": "d08e4057234dfbd6c4c11da660031263aeaa0327a86b68f7cae04cdc4bf9438c"
+    },
+    {
+      "path": "src\\policy.rs",
+      "sha256": "b01b4072d60bc2efc3ccaa121bbaf0763168f3154ef5ea32829c1c85193b08ed"
+    },
+    {
+      "path": "src\\q10.rs",
+      "sha256": "d2c5d3a632911501031f5113e2e5996db3e2d445a7a2dfde7464e1c2e1264f53"
+    },
+    {
+      "path": "src\\q10pi.rs",
+      "sha256": "706c64d8fd416947ad050288dcdc5e4d0bb90c6cbec6f9444d2b147df33eaa29"
+    },
+    {
+      "path": "src\\q10sr\\bank.rs",
+      "sha256": "0b4115b29ad0d281aa1a5deee6f4f747839f58345068e3455787b118d74d6450"
+    },
+    {
+      "path": "src\\q10sr\\mod.rs",
+      "sha256": "7217e22b37bf7db36bfca128d367f6f5e647c73ac5f88e564f1a3da8fffc3a52"
+    },
+    {
+      "path": "src\\q10sr\\readout.rs",
+      "sha256": "f69288094969ceb44eb92886aab57959a1a643beb3fde4981256a423d197ac4b"
+    },
+    {
+      "path": "src\\rng.rs",
+      "sha256": "794d04a94d011ece9f5758ad05a680b3acccbc82e94e33f4d9a9179c882dd950"
+    },
+    {
+      "path": "src\\rotation.rs",
+      "sha256": "d50637747333bcc3463fffb4f986c721e8b397cb2f6b6da0bf63b55c6ed599ac"
+    },
+    {
+      "path": "src\\simulation\\dh07.rs",
+      "sha256": "4a3d8df5f3e389d211e19fae96093f12ab6ebe3450be34169fab82010e05909a"
+    },
+    {
+      "path": "src\\simulation\\dh07_null.rs",
+      "sha256": "9a576bfbc0335ac9d2f169ce3fe98a393b6a884879a43257e2c5e218495f17ee"
+    },
+    {
+      "path": "src\\simulation.rs",
+      "sha256": "c5a7f88e51e1572c80b9b4848b890247e40b74106176730ad701e96a285b0cdd"
+    },
+    {
+      "path": "src\\task.rs",
+      "sha256": "06b4ea25e3c8c4a0106337866c714c6d74e6d1c0377ac0a934c33e859a02dc61"
+    }
+  ],
+  "status": "FROZEN_PRE_EXECUTION",
+  "target_blind_map_before_overlay": true
+}

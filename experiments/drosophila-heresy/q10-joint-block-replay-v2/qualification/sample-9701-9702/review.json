@@ -1,0 +1,13 @@
+{
+  "audited_events": 8,
+  "behavioral_inference": false,
+  "block_count": 48,
+  "blocks_per_event": 6,
+  "contract_sha256": "99a09e7fb24320cb8afaa6785f77642eafe19cdf9fd8fac04cdddd745ecf0f69",
+  "dh08b_authorized": false,
+  "joint_candidates_per_block": 125,
+  "plan_sha256": "868fc1a3f04ae9a538453f0be49459c6cffbf9d1c1cdc00ed6be53fa5dbc42ef",
+  "protocol": "Q10-JBR2",
+  "scientific_seed_bundles": 0,
+  "status": "VERIFIED"
+}

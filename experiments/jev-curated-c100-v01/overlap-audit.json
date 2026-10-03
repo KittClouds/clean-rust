@@ -1,0 +1,10 @@
+{
+  "exact_episode_id": 0,
+  "semantic_fingerprint": 0,
+  "exact_text_sha256": 0,
+  "normalized_text_sha256": 0,
+  "structural_fingerprint": 0,
+  "same_root_family": 0,
+  "selected_semantic_family_collisions_with_current": 0,
+  "note": "root-family exclusion is the semantic-family firewall; structural fingerprints are reported separately because they describe reusable task shape rather than world identity"
+}

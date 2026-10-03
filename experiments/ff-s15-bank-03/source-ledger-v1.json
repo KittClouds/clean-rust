@@ -1,0 +1,335 @@
+{
+  "schema": "ff-s15-bank3-source-ledger-v1",
+  "status": "SCAFFOLD_PRE_CODE",
+  "version": "0.2",
+  "experiment": "FF-S15-BANK-03",
+  "date": "2026-09-30",
+  "purpose": "the source ledger that makes 'no outside material entered anonymously' checkable. Nothing here authorizes ingestion; it defines the record and the rubric.",
+  "record_schema": {
+    "required_fields": {
+      "source_dataset": "string, the canonical dataset name",
+      "source_item_id": "string, the identifier of the specific item within that dataset",
+      "source_version": "string, release tag, commit hash, or archive checksum of the exact bytes read",
+      "license": "string, the declared license of THOSE BYTES",
+      "training_allowed": "bool",
+      "derivatives_allowed": "bool",
+      "synthetic_seeding_allowed": "bool",
+      "redistribution_allowed": "bool",
+      "attribution_required": "bool | string, the required attribution string if any",
+      "content_hash": "sha256 of the exact item bytes read"
+    },
+    "note": "license is a property of the BYTES, not of the dataset's reputation. A permissive dataset homepage does not license a specific mirror."
+  },
+  "four_permission_flags": {
+    "training_allowed": "may the item's content be used as model training input",
+    "derivatives_allowed": "may modified versions be distributed",
+    "synthetic_seeding_allowed": "may the item seed generation of synthetic data. This is the flag that open benchmarks most often restrict, and it is the one that matters most for v3, because v3's whole method is expansion around a root.",
+    "redistribution_allowed": "may the item's content itself be redistributed inside the bank"
+  },
+  "the_global_piqa_precedent": {
+    "why_recorded": "the reason a boolean ledger is not optional",
+    "case": "Global PIQA is CC BY-SA 4.0 but its card states it may not be used to train AI systems OR to generate synthetic training data seeded from it",
+    "lesson": "'open benchmark' does not mean 'legal seed material', and a permissive license can still forbid exactly the operation v3 performs most",
+    "consequence": "synthetic_seeding_allowed is a first-class field, defaults to FALSE on any ambiguity, and no root may be ingested with it false"
+  },
+  "defaults": {
+    "on_ambiguity": "all four permission flags default to FALSE and the source is held at HELD_PENDING_REVIEW",
+    "unresolved_license_is_not_a_yes": true,
+    "code_license_does_not_transfer_to_data": "a generator repo's license does not license a separately hosted dataset derived from it; this is the documented ProofWriter / RuleTaker wrinkle"
+  },
+  "admissibility_rubric": {
+    "note": "a source is admissible as a SEMANTIC ROOT only if it clears every criterion. A source can still be used as a challenge panel or as renderer inspiration while failing this rubric.",
+    "criteria": [
+      {
+        "id": "A1",
+        "criterion": "all four permission flags resolved to true, with the license recorded for the exact bytes read",
+        "blocking": true
+      },
+      {
+        "id": "A2",
+        "criterion": "synthetic_seeding_allowed is true",
+        "blocking": true,
+        "why": "v3 expands families around each root; a source that forbids synthetic seeding cannot be a root"
+      },
+      {
+        "id": "A3",
+        "criterion": "attribution is satisfiable and recorded",
+        "blocking": true
+      },
+      {
+        "id": "A4",
+        "criterion": "the source provides structure attached, not just text: evidence spans, supporting-fact sets, influence graphs, proof trees, or equivalent handles",
+        "blocking": true,
+        "why": "generic human-written QA without attached structure gives text, not capability supervision"
+      },
+      {
+        "id": "A5",
+        "criterion": "the item is reconstructible into the v2 fact language (AT, CONNECTED, BLOCKED, HOLDS, CONTAINS, STATE, REL)",
+        "blocking": false,
+        "measured_by": "O1 reconstruction-yield probe",
+        "note": "non-blocking as a criterion because it is a MEASUREMENT, not a property; it decides selection after probing, not before"
+      },
+      {
+        "id": "A6",
+        "criterion": "the source's original TEST partitions are excluded from root harvesting",
+        "blocking": true,
+        "why": "benchmark test partitions stay untouched as external transfer checks"
+      }
+    ]
+  },
+  "candidate_inventory": {
+    "status": "PERMISSIONS_VERIFIED_NOT_ADMITTED",
+    "disclaimer": "Permissions were resolved against primary sources on 2026-09-30 and recorded in o1-permission-verification.json. NO source cleared rubric A2 (synthetic_seeding_allowed), so none is admitted as a semantic root. See the receipt for per-source verdicts, blocking flags, and cross-cutting findings F1-F5.",
+    "verification_required_before_any_ingestion": true,
+    "entries": [
+      {
+        "source_dataset": "VitaminC",
+        "proposed_role": "top-tier seed for support, counterevidence, truth-changing twins, renderer-vs-semantic contrast",
+        "reported_license": "Wikipedia/FEVER-derived, generally CC BY-SA-style terms (UNVERIFIED)",
+        "structural_handle": "450k+ claim/evidence pairs around near-identical evidence, support flipping under small factual revisions",
+        "rubric_notes": "A4 clearly satisfied. The revision-aligned contrast structure is unusually well matched to v3's support+/support- descendants.",
+        "permission_flags": {
+          "training_allowed": "UNRESOLVED",
+          "derivatives_allowed": "UNRESOLVED",
+          "synthetic_seeding_allowed": "UNRESOLVED",
+          "redistribution_allowed": "UNRESOLVED"
+        },
+        "flags_held_at_false_default": true,
+        "research_reported_license_claim": "Wikipedia/FEVER-derived, generally CC BY-SA-style terms (UNVERIFIED)",
+        "permission_verification_ref": "o1-permission-verification.json",
+        "admissible_as_root": false,
+        "admissible_as_code": false
+      },
+      {
+        "source_dataset": "ContractNLI",
+        "proposed_role": "obligations, exceptions, missing evidence, long-document evidence selection",
+        "reported_license": "CC BY 4.0 (UNVERIFIED)",
+        "structural_handle": "607 real contracts, entailment/contradiction/not-mentioned labels plus evidence spans",
+        "rubric_notes": "A4 satisfied via evidence spans. The not-mentioned class is directly relevant to v2's DECLINE_UNAVAILABLE and ASK semantics.",
+        "permission_flags": {
+          "training_allowed": "UNRESOLVED",
+          "derivatives_allowed": "UNRESOLVED",
+          "synthetic_seeding_allowed": "UNRESOLVED",
+          "redistribution_allowed": "UNRESOLVED"
+        },
+        "flags_held_at_false_default": true,
+        "research_reported_license_claim": "CC BY 4.0 (UNVERIFIED)",
+        "permission_verification_ref": "o1-permission-verification.json",
+        "admissible_as_root": false,
+        "admissible_as_code": false
+      },
+      {
+        "source_dataset": "MuSiQue",
+        "proposed_role": "global composition, connected reasoning, solvable-vs-unanswerable",
+        "reported_license": "CC BY 4.0 (UNVERIFIED)",
+        "structural_handle": "25k 2-4 hop questions constructed so hops depend on one another, plus unanswerable contrasts",
+        "rubric_notes": "A4 satisfied. The solvable-vs-unanswerable contrast is the closest external analogue to v2's derivability discipline.",
+        "permission_flags": {
+          "training_allowed": "UNRESOLVED",
+          "derivatives_allowed": "UNRESOLVED",
+          "synthetic_seeding_allowed": "UNRESOLVED",
+          "redistribution_allowed": "UNRESOLVED"
+        },
+        "flags_held_at_false_default": true,
+        "research_reported_license_claim": "CC BY 4.0 (UNVERIFIED)",
+        "permission_verification_ref": "o1-permission-verification.json",
+        "admissible_as_root": false,
+        "admissible_as_code": false
+      },
+      {
+        "source_dataset": "HotpotQA",
+        "proposed_role": "human linguistic mess, evidence chaining, entity comparison",
+        "reported_license": "CC BY-SA 4.0 (UNVERIFIED)",
+        "structural_handle": "113k human-authored multihop QA with sentence-level supporting facts and comparison questions",
+        "rubric_notes": "A4 satisfied via supporting facts. 113k items is a large root pool, so O1 should sample this source early.",
+        "permission_flags": {
+          "training_allowed": "UNRESOLVED",
+          "derivatives_allowed": "UNRESOLVED",
+          "synthetic_seeding_allowed": "UNRESOLVED",
+          "redistribution_allowed": "UNRESOLVED"
+        },
+        "flags_held_at_false_default": true,
+        "research_reported_license_claim": "CC BY-SA 4.0 (UNVERIFIED)",
+        "permission_verification_ref": "o1-permission-verification.json",
+        "admissible_as_root": false,
+        "admissible_as_code": false
+      },
+      {
+        "source_dataset": "WIQA",
+        "proposed_role": "state transitions, perturbations, causal chains, action-consequence supervision",
+        "reported_license": "repo Apache-2.0 (UNVERIFIED)",
+        "structural_handle": "~40k what-if questions from human-authored influence graphs over procedural text",
+        "rubric_notes": "A4 satisfied via influence graphs. The closest external match to v2's transition_system and next_state targets.",
+        "permission_flags": {
+          "training_allowed": "UNRESOLVED",
+          "derivatives_allowed": "UNRESOLVED",
+          "synthetic_seeding_allowed": "UNRESOLVED",
+          "redistribution_allowed": "UNRESOLVED"
+        },
+        "flags_held_at_false_default": true,
+        "research_reported_license_claim": "repo Apache-2.0 (UNVERIFIED)",
+        "permission_verification_ref": "o1-permission-verification.json",
+        "admissible_as_root": false,
+        "admissible_as_code": false
+      },
+      {
+        "source_dataset": "RuleTaker",
+        "proposed_role": "exact deduction, unknowns, controllable proof depth, synthetic capability curriculum",
+        "reported_license": "Apache-2.0 code/generator (UNVERIFIED for the data bytes)",
+        "structural_handle": "configurable natural-language theory generator plus a theorem prover",
+        "rubric_notes": "A4 satisfied and uniquely so: this is a GENERATOR, so it can supply roots indefinitely rather than a fixed corpus. The proposal is to use the generator and write our own ProofWriter-like extensions, avoiding the ProofWriter data-license wrinkle entirely.",
+        "permission_flags": {
+          "training_allowed": "UNRESOLVED",
+          "derivatives_allowed": "UNRESOLVED",
+          "synthetic_seeding_allowed": "UNRESOLVED",
+          "redistribution_allowed": "UNRESOLVED"
+        },
+        "flags_held_at_false_default": true,
+        "research_reported_license_claim": "Apache-2.0 code/generator (UNVERIFIED for the data bytes)",
+        "permission_verification_ref": "o1-permission-verification.json",
+        "admissible_as_root": false,
+        "admissible_as_code": true
+      },
+      {
+        "source_dataset": "ALFWorld",
+        "proposed_role": "action legality, state transition, multi-step plans, MOVE-like capability",
+        "reported_license": "ALFWorld MIT; bundled components have their own licenses (UNVERIFIED per-component)",
+        "structural_handle": "textual interactive worlds aligned to embodied tasks, explicit initial states and action sequences",
+        "rubric_notes": "A4 satisfied. Per-component licensing must be checked individually; MIT on the wrapper does not settle bundled assets.",
+        "permission_flags": {
+          "training_allowed": "UNRESOLVED",
+          "derivatives_allowed": "UNRESOLVED",
+          "synthetic_seeding_allowed": "UNRESOLVED",
+          "redistribution_allowed": "UNRESOLVED"
+        },
+        "flags_held_at_false_default": true,
+        "research_reported_license_claim": "ALFWorld MIT; bundled components have their own licenses (UNVERIFIED per-component)",
+        "permission_verification_ref": "o1-permission-verification.json",
+        "admissible_as_root": false,
+        "admissible_as_code": false
+      },
+      {
+        "source_dataset": "ScienceWorld",
+        "proposed_role": "longer-horizon state/action reasoning, experiment-like transitions",
+        "reported_license": "Apache-style code distribution (UNVERIFIED)",
+        "structural_handle": "interactive text simulator with scientific tasks, state changes, generated task variations",
+        "rubric_notes": "A4 satisfied. A simulator like this can act as an external transfer panel rather than a root source.",
+        "permission_flags": {
+          "training_allowed": "UNRESOLVED",
+          "derivatives_allowed": "UNRESOLVED",
+          "synthetic_seeding_allowed": "UNRESOLVED",
+          "redistribution_allowed": "UNRESOLVED"
+        },
+        "flags_held_at_false_default": true,
+        "research_reported_license_claim": "Apache-style code distribution (UNVERIFIED)",
+        "permission_verification_ref": "o1-permission-verification.json",
+        "admissible_as_root": false,
+        "admissible_as_code": false
+      },
+      {
+        "source_dataset": "EntailmentBank",
+        "proposed_role": "small high-quality reasoning-tree seed, compositional supervision",
+        "reported_license": "UNRESOLVED - explicitly flagged in research as needing verification before redistribution or training packaging",
+        "structural_handle": "human-curated multi-premise entailment trees with explicit intermediate conclusions",
+        "rubric_notes": "A1 FAILS on current information. Held pending license resolution. A4 satisfied via proof trees.",
+        "permission_flags": {
+          "training_allowed": "UNRESOLVED",
+          "derivatives_allowed": "UNRESOLVED",
+          "synthetic_seeding_allowed": "UNRESOLVED",
+          "redistribution_allowed": "UNRESOLVED"
+        },
+        "flags_held_at_false_default": true,
+        "research_reported_license_claim": "UNRESOLVED - explicitly flagged in research as needing verification before redistribution or training packaging",
+        "permission_verification_ref": "o1-permission-verification.json",
+        "admissible_as_root": false,
+        "admissible_as_code": false
+      },
+      {
+        "source_dataset": "TRIP",
+        "proposed_role": "state tracking, contradiction localization, minimal semantic changes",
+        "reported_license": "UNDECLARED on the official card (UNVERIFIED)",
+        "structural_handle": "highly similar story pairs with plausibility, conflicting-sentence, and physical-state annotations",
+        "rubric_notes": "A1 FAILS. Research explicitly recommends keeping it out of the training pool until resolved. Structurally a strong fit for v2's CONTRADICTION and P6 intervention.",
+        "permission_flags": {
+          "training_allowed": "UNRESOLVED",
+          "derivatives_allowed": "UNRESOLVED",
+          "synthetic_seeding_allowed": "UNRESOLVED",
+          "redistribution_allowed": "UNRESOLVED"
+        },
+        "flags_held_at_false_default": true,
+        "research_reported_license_claim": "UNDECLARED on the official card (UNVERIFIED)",
+        "permission_verification_ref": "o1-permission-verification.json",
+        "admissible_as_root": false,
+        "admissible_as_code": false
+      },
+      {
+        "source_dataset": "FEVER",
+        "proposed_role": "DEMOTED - substrate material only, not a major v3 root source",
+        "reported_license": "UNVERIFIED",
+        "structural_handle": "185,445 support/refute/not-enough-info claims with evidence",
+        "rubric_notes": "A4 is nominally satisfied, but follow-up work found strong claim-only cues that let models predict labels without properly using evidence. That is precisely the accidental-cue failure V2-0 exists to detect, so raw FEVER would import a known shortcut. Demoted to substrate material; VitaminC is its intended replacement as the training geometry.",
+        "permission_flags": {
+          "training_allowed": "UNRESOLVED",
+          "derivatives_allowed": "UNRESOLVED",
+          "synthetic_seeding_allowed": "UNRESOLVED",
+          "redistribution_allowed": "UNRESOLVED"
+        },
+        "flags_held_at_false_default": true,
+        "research_reported_license_claim": "UNVERIFIED",
+        "permission_verification_ref": "o1-permission-verification.json",
+        "admissible_as_root": false,
+        "admissible_as_code": false
+      },
+      {
+        "source_dataset": "ProofWriter",
+        "proposed_role": "DO NOT INGEST - concept excellent, provenance unresolved",
+        "reported_license": "no equally clear upstream data license verified; a third-party audit warns against assuming the RuleTaker code license transfers to the ProofWriter ZIP",
+        "structural_handle": "proofs, abduction, open-world reasoning",
+        "rubric_notes": "A1 FAILS on the code-license-does-not-transfer-to-data principle. Resolution: use the RuleTaker generator and write our own ProofWriter-like extensions. Those extensions are then bank-owned with no inherited ontology.",
+        "permission_flags": {
+          "training_allowed": "UNRESOLVED",
+          "derivatives_allowed": "UNRESOLVED",
+          "synthetic_seeding_allowed": "UNRESOLVED",
+          "redistribution_allowed": "UNRESOLVED"
+        },
+        "flags_held_at_false_default": true,
+        "research_reported_license_claim": "no equally clear upstream data license verified; a third-party audit warns against assuming the RuleTaker code license transfers to the ProofWriter ZIP",
+        "permission_verification_ref": "o1-permission-verification.json",
+        "admissible_as_root": false,
+        "admissible_as_code": false
+      }
+    ]
+  },
+  "explicitly_excluded_from_the_main_training_stew": [
+    {
+      "source_dataset": "SNLI/MNLI",
+      "reason": "useful background NLI but too blunt for the capabilities v3 targets"
+    },
+    {
+      "source_dataset": "StrategyQA",
+      "reason": "implicit decomposition is interesting but only 2,780 examples and much less structurally anchored than MuSiQue or EntailmentBank"
+    },
+    {
+      "source_dataset": "ANLI",
+      "reason": "excellent adversarial material, but CC BY-NC and a model-specific collection process make it a bounded specialty ingredient rather than a foundation"
+    },
+    {
+      "source_dataset": "CLUTRR",
+      "reason": "conceptually excellent, but CC BY-NC; proposed resolution is to recreate its core relational curriculum with our own generator. NOTE: CLUTRR is already a v2 structure-only seed (relation_registry, aliases, TEST-RELATION) and remains NOT_IMPORTED in v2."
+    }
+  ],
+  "cross_generation_consistency": {
+    "note": "v2's seed-registry-v2.json recorded 7 structure-only challenge panels with rows_imported = 0 and licenses marked NOT_IMPORTED. v3's ledger is a different instrument with a different purpose: it records permissions for material that will actually be read.",
+    "v2_registry_unchanged": true,
+    "v2_registry_path": "experiments/ff-s15-bank-02/seed-registry-v2.json",
+    "no_v2_file_is_modified_by_v3": true
+  },
+  "permission_verification": {
+    "status": "COMPLETE",
+    "receipt": "experiments/ff-s15-bank-03/o1-permission-verification.json",
+    "result": "0 of 12 sources permission-cleared as semantic roots",
+    "binding_constraint": "synthetic_seeding_allowed is UNRESOLVED for 11 of 12; rubric A2 makes it blocking",
+    "only_affirmative": "RuleTaker GENERATOR (code, Apache-2.0) - yields zero external rows",
+    "per_item_hashes_published_by_any_source": false
+  }
+}

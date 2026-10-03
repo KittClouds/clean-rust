@@ -1,0 +1,157 @@
+{
+  "admitted_inputs": {
+    "area_end": "09:40_SOURCE_CLOCK",
+    "capture_modelling": "EVERY_TICK",
+    "clock_authority": "SOURCE_CLOCK_ONLY_NO_NEW_YORK_TRANSPORT_CLAIM",
+    "enable_extreme_sentinels": true,
+    "history_days": 20,
+    "range_end": "09:35_SOURCE_CLOCK",
+    "range_start": "09:30_SOURCE_CLOCK",
+    "require_chart_continuity": true,
+    "require_exact_start_alignment": true,
+    "require_range_continuity": true,
+    "symbol": "US30",
+    "timeframes": [
+      "M1",
+      "M5"
+    ]
+  },
+  "candidate": {
+    "name": "OpeningRangeGrammar_v2_10_ExtremeSentinels",
+    "parent_ex5": {
+      "bytes": 46494,
+      "path": "authority/OpeningRangeGrammar_v2_00_LegacyStateMachine.ex5",
+      "sha256": "6f221fdd9f536ffa64e23842a4d9f77bd218bafda1c350b45458c1232a1a23ed"
+    },
+    "parent_source": {
+      "bytes": 49535,
+      "path": "authority/OpeningRangeGrammar_v2_00_LegacyStateMachine.mq5",
+      "sha256": "9519323848f232ff4255f8d00896d2a78b91d16b7e1dc07ed7bac8451d0fd5c2"
+    },
+    "prior_physical_builds": [
+      {
+        "bytes": 108552,
+        "path": "authority/OpeningRangeGrammar_v2_10_ExtremeSentinels.precompile.ex5",
+        "sha256": "bf227d49d81b3fcec182e79a51dca9199723c4c01977f216a8678d8ac9bc9296"
+      },
+      {
+        "bytes": 60992,
+        "path": "authority/OpeningRangeGrammar_v2_10_ExtremeSentinels.compile1.ex5",
+        "sha256": "1e44d4d311452032ac8e138afc82c137154b495ced59a5f73208c258a66af981"
+      }
+    ],
+    "runtime_ex5": {
+      "bytes": 58736,
+      "path": "authority/OpeningRangeGrammar_v2_10_ExtremeSentinels.ex5",
+      "sha256": "a9e25979dc85a760b15499a13552216f19646e43274c93c4d032adc671f415dd"
+    },
+    "source": {
+      "bytes": 64606,
+      "path": "authority/OpeningRangeGrammar_v2_10_ExtremeSentinels.mq5",
+      "sha256": "a133ef773531a1599d1cef1e5124fcacc24b037f84cca777205c67ee0a785c61"
+    }
+  },
+  "capture_instrument": {
+    "bytes": 8911,
+    "path": "capture/OBS_OPEN_INST01_CaptureIndicator.mq5",
+    "sha256": "eecc387b450b6490ea493cf8b7784f1810ef41a2e7f612b335beb26ad876a944"
+  },
+  "captures": [
+    {
+      "bytes": 5646956,
+      "path": "captures/OBS_OPEN_INST01_US30_M1_HIST_run1.tsv",
+      "sha256": "4cd2ab87c44ad1dd4f9d13ee221e44c3d5709c08978c8548c5f3c0430c518f01"
+    },
+    {
+      "bytes": 5646956,
+      "path": "captures/OBS_OPEN_INST01_US30_M1_HIST_run2.tsv",
+      "sha256": "4cd2ab87c44ad1dd4f9d13ee221e44c3d5709c08978c8548c5f3c0430c518f01"
+    },
+    {
+      "bytes": 5036107,
+      "path": "captures/OBS_OPEN_INST01_US30_M5_HIST_run1.tsv",
+      "sha256": "3bf99462d0d3e8ee4af1073f7101ab8ada283e5605d859fe33a78b8419745b78"
+    },
+    {
+      "bytes": 5036107,
+      "path": "captures/OBS_OPEN_INST01_US30_M5_HIST_run2.tsv",
+      "sha256": "3bf99462d0d3e8ee4af1073f7101ab8ada283e5605d859fe33a78b8419745b78"
+    },
+    {
+      "bytes": 81767,
+      "path": "captures/OBS_OPEN_INST01_FIXTURE_FULL_M1.tsv",
+      "sha256": "b4fc4ec6ab8b34fb06d8e7e9e196b4ad410ff9b6d9d3df118cc113ae88eb6d70"
+    },
+    {
+      "bytes": 75511,
+      "path": "captures/OBS_OPEN_INST01_FIXTURE_GAP_M1.tsv",
+      "sha256": "0ae7a81ec6071b63f2e03e58a33f76a18ee839e765077f54dba8a4077b6128f9"
+    },
+    {
+      "bytes": 18180,
+      "path": "captures/OBS_OPEN_INST01_FIXTURE_FULL_M5.tsv",
+      "sha256": "ab816cb2c1f30d35a06ef28bba66675acb504e0c8a844ba438ebc93a215eb296"
+    },
+    {
+      "bytes": 18167,
+      "path": "captures/OBS_OPEN_INST01_FIXTURE_GAP_M5.tsv",
+      "sha256": "328961581d87d91d04d72269360bb416d9e29c96a2eed4cd258783ddf43496f5"
+    },
+    {
+      "bytes": 1327125,
+      "path": "captures/OBS_OPEN_INST01_US30_M1_ONLINE.tsv",
+      "sha256": "3de4402f0e440bb29957e8db09a9072d5764a9057e810c86ec9f796d98103a89"
+    },
+    {
+      "bytes": 702800,
+      "path": "captures/OBS_OPEN_INST01_US30_M5_ONLINE.tsv",
+      "sha256": "aeba69b1f11a0e32a5930df7d92c439c08ddd215c1b72b1e42e995f6cb7feb76"
+    }
+  ],
+  "compiler_runtime": {
+    "account": "5054311760",
+    "broker_server": "MetaQuotes-Demo",
+    "compile_receipts": [
+      {
+        "bytes": 3348,
+        "path": "compile-v210.log",
+        "sha256": "6aec7b76cd225a0f7dd3ce5b5f5711564bf2ba2d36d50b08c04b2b1cbc3287b4"
+      },
+      {
+        "bytes": 3350,
+        "path": "compile-v210-run2.log",
+        "sha256": "249f7080094fbe7f58007471f11a0e8953cdc399697bcc49d184a4a986bc3bbf"
+      }
+    ],
+    "compile_result": "0_ERRORS_0_WARNINGS_X64_REGULAR",
+    "metaeditor": {
+      "sha256": "9bee761959abb8d7de49af54caaf83d1dd05156dd9b10bd855d31da3ae9ad1b9",
+      "version": "5.0.0.6106"
+    },
+    "metatester": {
+      "sha256": "4e94a6cc182caaef8834b0f9be25106162d022b7e9dc867da2b7c8fb8dd08277",
+      "version": "5.0.0.6106"
+    },
+    "physical_ex5_recompile_identity": "NOT_STABLE_ACROSS_INVOCATIONS",
+    "physical_identity_rule": "CURRENT_RUNTIME_EX5_SEALED_EXACTLY",
+    "terminal": {
+      "sha256": "0ab0496b90977d4ef848f8d2591970c3a50721476b37fa60cfb6b1bda74b2983",
+      "version": "5.0.0.6106"
+    },
+    "terminal_data_id": "D0E8209F77C8CF37AD8BF550E51FF075"
+  },
+  "fixture_instrument": {
+    "bytes": 5865,
+    "path": "fixtures/OBS_OPEN_INST01_CreateFixtureSymbols.mq5",
+    "sha256": "6a54f2e33f232b5559a86cfab04d9d50362795002aaad13d4e2281e6d5622204"
+  },
+  "parent": {
+    "authority": "OBS-OPEN-SRC-01",
+    "authority_hash": "1f6657197ae1b6f9449ba9731cc3edf55d857275f50940fc46a6cc01ccc8ef28",
+    "observer_generation": "LEGACY_BREAKOUT_OBSERVER_V1",
+    "preserved_generation": "RECONSTRUCTED_OBSERVER_V1",
+    "root": "32e1207717afc29533e8a8fb0a7e0f329f9e092f58f3fb3c58d5661c5b7dd0fa"
+  },
+  "schema": "OBS_OPEN_INST01_AUTHORITY_MANIFEST_V1",
+  "scope": "INSTRUMENT_METROLOGY_ONLY"
+}

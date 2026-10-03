@@ -1,0 +1,13 @@
+{
+  "behavioral_probe": false,
+  "engineering_only": true,
+  "execution_sha256": "47DB038381C9ACB0C98E7D933AA40864F779584CC635178BDF775FDAB5598762",
+  "gc1_authorized": false,
+  "global_assembly_executed": false,
+  "identity": "q10-gc1-pf0-v1",
+  "protocol": "Q10-GC1-PF0",
+  "result_sha256": "3C05BAA36240E6E5D21007B169A4B168AA4DAB608646FAE324D506913BFFFB59",
+  "scientific_promotion": false,
+  "status": "GC1_PF0_ENGINEERING_COMPLETE",
+  "summary_sha256": "867B8A4609F71FE45FBA828EEB5A6D00D5CBB084F258701EB7EEFA68C27FC075"
+}

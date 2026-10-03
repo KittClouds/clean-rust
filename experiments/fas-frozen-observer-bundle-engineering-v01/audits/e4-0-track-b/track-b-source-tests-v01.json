@@ -1,0 +1,194 @@
+{
+  "schema": "FAS_E4_0_TRACK_B_SOURCE_TESTS_V01",
+  "status": "PASS_SYNTHETIC_SOURCE_AND_CLI_TESTS",
+  "recorded_utc": "2026-09-26T20:37:23Z",
+  "source_unit": "E4-0 parity and feature runner v01",
+  "commands": [
+    "python -m py_compile source/scripts/e4_online_parity_v01.py source/scripts/e4_runner_common_v01.py source/scripts/e4_runner_artifacts_v01.py source/scripts/e4_gpu_lease_v01.py source/scripts/e4_runner_modes_v01.py source/tests/test_e4_runner_v01.py",
+    "python -m unittest discover -s source\\tests -p test_e4_runner_v01.py -v",
+    "python source/scripts/e4_online_parity_v01.py --help",
+    "python --version"
+  ],
+  "results": {
+    "py_compile": "PASS",
+    "unittest": "PASS",
+    "tests_run": 13,
+    "tests_passed": 13,
+    "tests_failed": 0,
+    "test_names": [
+      "test_e4_stream_checks_schedule_and_custody_without_materializing_population",
+      "test_jsonl_stream_rejects_labels_and_identity_mismatch",
+      "test_active_lock_with_reused_pid_or_wrong_script_is_preserved",
+      "test_gpu_allocator_and_process_ram_limits_are_separate",
+      "test_lease_waits_for_attributed_process_and_writes_release_receipt",
+      "test_e1_fit_quartet_builder_validates_identity_and_keeps_only_fit_rows",
+      "test_parity_selector_is_deterministic_and_balanced",
+      "test_query_template_identity_is_recovered_from_label_free_text",
+      "test_query_template_rejects_unknown_term_or_ambiguous_shape",
+      "test_feature_extraction_function_has_no_prediction_or_label_join_call",
+      "test_generic_stage_seal_verifies_root_bytes_and_detects_tampering",
+      "test_invalid_stage_auth_fails_before_output_creation_or_cuda_import",
+      "test_stage_authorization_binds_contract_roots_scope_and_time"
+    ],
+    "cli_help_smoke": "PASS",
+    "python_version": "3.13.15"
+  },
+  "boundary": {
+    "actual_e4_population_materialized": false,
+    "actual_e4_terminal_or_escrow_labels_read": false,
+    "tokenizer_contact": false,
+    "backbone_model_contact": false,
+    "cuda_initialized": false,
+    "cuda_runtime_contact": false,
+    "cli_help_imported_torch": false,
+    "e4_predictions_emitted": false,
+    "e4_heads_scored": false,
+    "gpu_lease_live_process_scan": false,
+    "gpu_lease_tests_used_synthetic_process_records": true
+  },
+  "schemas": {
+    "stage_authorization": {
+      "path": "contracts/e4-0-stage-authorization-schema-v01.json",
+      "bytes": 3020,
+      "sha256": "73a7cb5e4bb23463bc73e0591f903644c46ad17129f1bc3c1b1f58bccb87aed3"
+    },
+    "artifact_seal": {
+      "path": "contracts/e4-0-artifact-seal-schema-v01.json",
+      "bytes": 2267,
+      "sha256": "8a43f3a945fefbf983b734f51b98093a4538e2ebceef6199f543cbd86b5ef6f9"
+    }
+  },
+  "source_files": {
+    "source/scripts/e4_online_parity_v01.py": {
+      "bytes": 1375,
+      "sha256": "febe1ef46f0e6529069a07c3a6a4bb4f372c5c3fab611afef4374770fa08a907"
+    },
+    "source/scripts/e4_runner_common_v01.py": {
+      "bytes": 20575,
+      "sha256": "ca4ca4941323568e8a5cff651bb8cfcbf6ac9c74098b60608b54cc762108eb75"
+    },
+    "source/scripts/e4_runner_artifacts_v01.py": {
+      "bytes": 15794,
+      "sha256": "d5b3fa29563877f34554d79b3a76524f488c6c7d4daaf3e4026d70b46e39a6c1"
+    },
+    "source/scripts/e4_gpu_lease_v01.py": {
+      "bytes": 23022,
+      "sha256": "e95a6e40f4e9128d8c15cc758e91254e51936cb6b1e8942bbd1e76f635d82c21"
+    },
+    "source/scripts/e4_runner_modes_v01.py": {
+      "bytes": 32467,
+      "sha256": "95c87f22d9278afe1035d9d0b4ef6e2b2abd12f20810c80872b0b2cf2acd099a"
+    },
+    "source/tests/test_e4_runner_v01.py": {
+      "bytes": 16796,
+      "sha256": "1b04c6d979acdc998fd09e6daf8e9dad9dd9122276c2f018d0cb1d34ab40bb15"
+    }
+  },
+  "input_schema": {
+    "panel_inputs_path": "population/panel-inputs-v01.jsonl",
+    "panel_input_fields_exact": [
+      "row_id",
+      "quartet_id",
+      "variant_id",
+      "input_text"
+    ],
+    "row_manifest_path": "population/row-manifest-v01.jsonl",
+    "row_manifest_fields_exact": [
+      "row_index",
+      "row_id",
+      "quartet_id",
+      "variant_id",
+      "surface_id",
+      "truth_partition"
+    ],
+    "custody_pairs": {
+      "PRIMARY_SEEN": "PRIMARY_TERMINAL",
+      "HELDOUT_TEMPLATE": "TEMPLATE_ESCROW"
+    },
+    "manifest_order": "global schedule order; per quartet PRIMARY_SEEN A,C,E,P then HELDOUT_TEMPLATE A,C,E,P",
+    "labels_and_lexical_strata_in_runner_input": false
+  },
+  "outputs": {
+    "parity_panel": {
+      "stage": "PARITY_PANEL_MATERIALIZATION",
+      "status": "PARITY_PANEL_SEALED",
+      "directory": "parity-panel/",
+      "files": [
+        "panel-inputs-v01.jsonl",
+        "row-manifest-v01.jsonl",
+        "selection-receipt-v01.json",
+        "stage-seal-v01.json"
+      ]
+    },
+    "online_cache_parity": {
+      "stage": "ONLINE_CACHE_PARITY",
+      "status": "ONLINE_CACHE_PARITY_PASS",
+      "directory": "parity/",
+      "files": [
+        "parity-online-features.f32le",
+        "parity-receipt-v01.json",
+        "gpu-lease-release-receipt-v01.json",
+        "stage-seal-v01.json"
+      ],
+      "receipt_fields": [
+        "feature_byte_identical",
+        "feature_max_abs_deviation",
+        "prediction_agreement_by_head",
+        "e2_reference_cache",
+        "row_identity"
+      ]
+    },
+    "fresh_feature_extraction": {
+      "stage": "FRESH_FEATURE_EXTRACTION",
+      "status": "FEATURE_CACHE_COMPLETE_GATE_PASS",
+      "directory": "features/",
+      "files": [
+        "V1_FINAL_POSITION.f32le",
+        "feature-extraction-receipt-v01.json",
+        "gpu-lease-release-receipt-v01.json",
+        "stage-seal-v01.json"
+      ],
+      "feature_cache": {
+        "rows": 149336,
+        "dimension": 2048,
+        "bytes": 1223360512,
+        "dtype": "<f4",
+        "layout": "C_ROW_MAJOR"
+      },
+      "receipt_fields": [
+        "feature_cache",
+        "row_identity",
+        "predictions_emitted",
+        "labels_opened",
+        "heldout_template_labels_opened",
+        "joint_template_labels_opened"
+      ]
+    },
+    "stage_seal_schema": "FAS_E4_0_ARTIFACT_SEAL_V01"
+  },
+  "runtime_prerequisites": {
+    "python": "3.13.15 validated in source test environment; exact runtime identity must be supplied/checked by sealed ABI at execution",
+    "packages": [
+      "numpy",
+      "torch",
+      "transformers",
+      "tokenizers",
+      "huggingface_hub",
+      "safetensors"
+    ],
+    "platform_tools": [
+      "PowerShell Get-Process for extractor-process PeakWorkingSet64",
+      "nvidia-smi diagnostic only"
+    ],
+    "inference_abi": "E2 v07 pinned CUDA:0 FP32, batch 1, no padding/truncation, final unpadded token; runtime code remains lazy until stage authorization and GPU lease pass",
+    "resource_gates": {
+      "extractor_process_pytorch_cuda_reserved_peak_max_bytes": 10737418240,
+      "extractor_process_peak_working_set_max_bytes": 26843545600,
+      "total_gpu_memory_claimed": false
+    }
+  },
+  "limitations": [
+    "No live tokenizer/model/CUDA or E4 population execution was exercised under the synthetic-only Track B boundary.",
+    "A synthetic suite verifies local schema/identity logic but does not substitute for the independent contract/source audit or runtime qualification."
+  ]
+}

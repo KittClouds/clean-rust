@@ -1,0 +1,82 @@
+{
+  "schema": "FLY-REACH-03-v0.3-precode-seal-v2",
+  "study_id": "FLY-REACH-03",
+  "version": "v0.3",
+  "status": "SEALED_PRE_CODE",
+  "execution_authorized": false,
+  "implementation_authorized": false,
+  "biological_promotion": false,
+  "pheno_reseal_authorized": false,
+  "controlling_artifacts": [
+    {
+      "path": "MATH-CONTRACT-v0.3-AUTHORITATIVE.md",
+      "bytes": 43057,
+      "sha256": "6beb47c4784a7d6e37a91e45688dd86e50b15291a8f0dbf07c56c71aefbe47a7"
+    },
+    {
+      "path": "math-objects-v0.3.json",
+      "bytes": 3116,
+      "sha256": "7dca0f687258531743014b7ac55681f7324566f40d9497c4a5e303771f6c7c2c"
+    }
+  ],
+  "incorporated_historical_artifacts": [
+    {
+      "path": "MATH-CONTRACT.md",
+      "bytes": 24667,
+      "sha256": "0908c55d1c349b722af95375f79bc3b4d892989a3942af2294e1f10e4d9e585a"
+    },
+    {
+      "path": "MATH-CONTRACT-v0.2-AMENDMENT.md",
+      "bytes": 12881,
+      "sha256": "9a083a2c7980e6a5b0135b1ecde952115cf9cde988c1d0b40ee1e9ae728b80bf"
+    },
+    {
+      "path": "MATH-CONTRACT-v0.3-TIGHTENING.md",
+      "bytes": 3820,
+      "sha256": "327a2e2ad585c71dd65274031b6272a15683c791b41469d1e0257c22ebdaf0ff"
+    },
+    {
+      "path": "math-objects.json",
+      "bytes": 6122,
+      "sha256": "2367e9130ac16d2ee71f97b4a78d471f807f5545520999d9359da75ca62954fd"
+    },
+    {
+      "path": "math-objects.sha256",
+      "bytes": 85,
+      "sha256": "a9d1b32e0ff8399e2fe5ec84e673f0289382c379c686cad07980f1797daf780c"
+    }
+  ],
+  "authoritative_reach02_receipts": [
+    {
+      "path": "experiments/fly-reach-02-v0.1b/artifacts/REACH02-RUN2/REACH02-V0.1B-TERMINAL-RECEIPT.json",
+      "bytes": 11294,
+      "sha256": "099b19cf57926981017d6eb708685b4252ff9e2b8674145fd7feae78963de990"
+    },
+    {
+      "path": "experiments/fly-reach-02/artifacts/REACH02-RUN1/REACH02-RUN1-NONPROMOTABLE-RECEIPT.json",
+      "bytes": 644,
+      "sha256": "eaef92b327607ce19b41e0fd64cf90d04dc8f7fc6be8a0b0349e688056731fda"
+    }
+  ],
+  "precedence": [
+    "MATH-CONTRACT.md",
+    "MATH-CONTRACT-v0.2-AMENDMENT.md",
+    "MATH-CONTRACT-v0.3-TIGHTENING.md",
+    "MATH-CONTRACT-v0.3-AUTHORITATIVE.md",
+    "math-objects-v0.3.json"
+  ],
+  "controls": [
+    "theoretical Omega distinct from estimator extractable Omega",
+    "capability-weighted proposed Psi plus delivery-aware eta_del sidecar",
+    "exact proposed native sign-arm support and magnitude",
+    "common U-star scoring population",
+    "F3a/F3b interface boundary",
+    "F4 exact reconstruction audit",
+    "IPW inside each balanced class",
+    "every-trial temporal accumulation",
+    "block-preserving paired bootstrap",
+    "Psi is local first-order alignment, not endpoint guarantee"
+  ],
+  "no_execution_note": "No runner, feature collector, classifier, seeds, or measured artifacts are covered by this seal.",
+  "sealed_at_utc": "2026-09-22T12:45:46.9392701Z"
+}

@@ -1,0 +1,7 @@
+{
+  "contract": "NORTHSTAR_RG2_HOLDOUT_AUTHORIZATION_V1",
+  "status": "AUTHORIZED_UNCONSUMED",
+  "holdout_authorized": true,
+  "protocol_sha256": "869402c193435f149120f1130ddefd817f87a39240c51bc5536292fd2b285d2d",
+  "authorization_token_sha256": "fb1cb67ef47ea922f4f3515843f9adac50d8ff62f4f13bb10d5311849be286b0"
+}

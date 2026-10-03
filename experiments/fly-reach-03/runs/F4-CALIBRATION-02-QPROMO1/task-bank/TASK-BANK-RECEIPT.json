@@ -1,0 +1,27 @@
+{
+  "block_count": 12,
+  "block_ids": [
+    305000,
+    305001,
+    305002,
+    305003,
+    305004,
+    305005,
+    305006,
+    305007,
+    305008,
+    305009,
+    305010,
+    305011
+  ],
+  "measured_namespace_created": false,
+  "native_trajectory_collection_started": false,
+  "outcome_selection": false,
+  "schema": "F4-CALIBRATION-02-task-bank-receipt-v1",
+  "status": "PASS",
+  "structural_pattern_selection": false,
+  "task_manifest_sha256": "381bca3f219078147935e57a3938d7beec927e476543a1daabad96370243aa79",
+  "task_schedule_parity": "PASS",
+  "training_sha256": "df0031f7d2b52e32a23a6572c43e32894cab62989dfa39faf6da92f36f32a31c",
+  "trials_per_block": 8192
+}

@@ -1,0 +1,12 @@
+{
+  "protocol": "Q10-CSC1-VMAT1",
+  "identity": "q10-gc1-lr1-requal1-csc1-vmat1-v1",
+  "status": "SETUP_BLOCKED_BEFORE_PREFLIGHT",
+  "error_type": "ModuleNotFoundError",
+  "error": "build_domain_closure was imported from the wrong path during premeasurement setup",
+  "measured_records_written": 0,
+  "contract_written": false,
+  "scientific_promotion": false,
+  "superseded_by": "q10-gc1-lr1-requal1-csc1-vmat1-v2",
+  "disposition": "historical_setup_artifact_preserved"
+}

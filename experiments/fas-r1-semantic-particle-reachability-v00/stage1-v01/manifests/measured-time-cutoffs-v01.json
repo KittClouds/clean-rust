@@ -1,0 +1,29 @@
+{
+  "manifest": "FAS-R1-MEASURED-TIME-CUTOFFS-v01",
+  "status": "FROZEN_BEFORE_FIRST_MATCHED_ARM_RUN",
+  "frozen_utc_date": "2026-09-26",
+  "unit": "seconds per task-arm trace",
+  "cutoffs": [
+    0.01,
+    0.025,
+    0.05,
+    0.1,
+    0.25,
+    0.5,
+    1.0,
+    2.5,
+    5.0,
+    10.0
+  ],
+  "apply_to": [
+    "C_active",
+    "C_wall"
+  ],
+  "definitions": {
+    "C_active": "post-hoc cumulative CPU-active nanoseconds plus GPU-active nanoseconds, converted to seconds; report CPU and GPU components separately",
+    "C_wall": "post-hoc monotonic elapsed time from task request dispatch",
+    "prefix_rule": "execute each arm to its full prescribed transition maximum, then truncate the closed timestamped trace at each cutoff; the scheduler receives no clock cutoff or stop signal",
+    "hit_rule": "an assignment counts only after its generating charged expansion completes by the cutoff; initial assignment is separately reported at time zero, with curves including and excluding it"
+  },
+  "engineering_note": "This log-spaced v01 grid is intentionally broad for the first local feasibility run. If nearly all completed traces fall outside the grid, preserve this version and issue v02 from a development-only runtime pilot before the next matched arm comparison."
+}

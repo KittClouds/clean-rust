@@ -1,0 +1,8 @@
+{
+  "audit_identity": "q10-gc1-lr1-nl1-audit-v1",
+  "identity": "q10-gc1-lr1-nl1-sall1-v1",
+  "parents_modified": false,
+  "reason": "snapshot-backed smoke failed nested LR1 parent contract consistency at par8_execution",
+  "records_materialized": 0,
+  "status": "ABORTED_PRESEAL"
+}

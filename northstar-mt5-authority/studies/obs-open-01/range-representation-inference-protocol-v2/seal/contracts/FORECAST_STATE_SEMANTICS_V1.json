@@ -1,0 +1,1 @@
+{"D_A_pseudo_DB":"RETRAINED_BY_BLOCK; fixed within each validation block","D_B_tournament":"FIXED_ACROSS_EVALUATION","cross_model_state_covariance_pairs":"FORBIDDEN","schema":"FORECAST_STATE_SEMANTICS_V1","source_kind":"ARTIFACT_DECLARED","states":["FIXED_ACROSS_EVALUATION","UPDATED_PREQUENTIALLY","RETRAINED_BY_BLOCK","OTHER"]}

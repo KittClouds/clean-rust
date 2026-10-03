@@ -1,0 +1,647 @@
+{
+  "captures": [
+    {
+      "boundary_matrix": [
+        {
+          "boundary": "09:29",
+          "snapshot": {
+            "bar_open": "09:29",
+            "event_kind": "CURRENT_OPEN",
+            "geometry_known": 0,
+            "grammar_event": null,
+            "interaction_eligible": 0,
+            "knowledge_time": "09:29",
+            "legacy": [
+              "NA",
+              "NA",
+              "NA",
+              "NA"
+            ],
+            "lifecycle": 0,
+            "location": null,
+            "shift": 0,
+            "source_day": "2024-01-02",
+            "tick_source_day": "2024-01-02"
+          },
+          "status": "OBSERVED"
+        },
+        {
+          "boundary": "09:30",
+          "snapshot": {
+            "bar_open": "09:30",
+            "event_kind": "CURRENT_OPEN",
+            "geometry_known": 0,
+            "grammar_event": null,
+            "interaction_eligible": 0,
+            "knowledge_time": "09:30",
+            "legacy": [
+              "37753.10",
+              "37753.10",
+              "NA",
+              "NA"
+            ],
+            "lifecycle": 1,
+            "location": null,
+            "shift": 0,
+            "source_day": "2024-01-02",
+            "tick_source_day": "2024-01-02"
+          },
+          "status": "OBSERVED"
+        },
+        {
+          "boundary": "09:34",
+          "snapshot": {
+            "bar_open": "09:34",
+            "event_kind": "CURRENT_OPEN",
+            "geometry_known": 0,
+            "grammar_event": null,
+            "interaction_eligible": 0,
+            "knowledge_time": "09:34",
+            "legacy": [
+              "37755.10",
+              "37751.10",
+              "NA",
+              "NA"
+            ],
+            "lifecycle": 1,
+            "location": null,
+            "shift": 0,
+            "source_day": "2024-01-02",
+            "tick_source_day": "2024-01-02"
+          },
+          "status": "OBSERVED"
+        },
+        {
+          "boundary": "09:35",
+          "snapshot": {
+            "bar_open": "09:35",
+            "event_kind": "CURRENT_OPEN",
+            "geometry_known": 0,
+            "grammar_event": null,
+            "interaction_eligible": 0,
+            "knowledge_time": "09:35",
+            "legacy": [
+              "37755.10",
+              "37751.10",
+              "37755.10",
+              "37751.10"
+            ],
+            "lifecycle": 1,
+            "location": null,
+            "shift": 0,
+            "source_day": "2024-01-02",
+            "tick_source_day": "2024-01-02"
+          },
+          "status": "OBSERVED"
+        },
+        {
+          "boundary": "09:39",
+          "snapshot": {
+            "bar_open": "09:39",
+            "event_kind": "CURRENT_OPEN",
+            "geometry_known": 1,
+            "grammar_event": null,
+            "interaction_eligible": 0,
+            "knowledge_time": "09:39",
+            "legacy": [
+              "NA",
+              "NA",
+              "37755.10",
+              "37751.10"
+            ],
+            "lifecycle": 2,
+            "location": null,
+            "shift": 0,
+            "source_day": "2024-01-02",
+            "tick_source_day": "2024-01-02"
+          },
+          "status": "OBSERVED"
+        },
+        {
+          "boundary": "09:40",
+          "snapshot": {
+            "bar_open": "09:40",
+            "event_kind": "CURRENT_OPEN",
+            "geometry_known": 1,
+            "grammar_event": null,
+            "interaction_eligible": 0,
+            "knowledge_time": "09:40",
+            "legacy": [
+              "NA",
+              "NA",
+              "37755.10",
+              "37751.10"
+            ],
+            "lifecycle": 2,
+            "location": null,
+            "shift": 0,
+            "source_day": "2024-01-02",
+            "tick_source_day": "2024-01-02"
+          },
+          "status": "OBSERVED"
+        }
+      ],
+      "causal_commit_bar_open": "09:36",
+      "checks": [
+        {
+          "check_id": "TIMEFRAME_IDENTITY",
+          "evidence": {
+            "actual": "PERIOD_M1",
+            "expected": "PERIOD_M1"
+          },
+          "status": "PASS"
+        },
+        {
+          "check_id": "SINGLE_SOURCE_DAY",
+          "evidence": {
+            "source_days": [
+              "2024-01-02"
+            ]
+          },
+          "status": "PASS"
+        },
+        {
+          "check_id": "BOUNDARY_0929_PRESENT",
+          "evidence": {
+            "bar_open": "09:29",
+            "event_kind": "CURRENT_OPEN",
+            "geometry_known": 0,
+            "grammar_event": null,
+            "interaction_eligible": 0,
+            "knowledge_time": "09:29",
+            "legacy": [
+              "NA",
+              "NA",
+              "NA",
+              "NA"
+            ],
+            "lifecycle": 0,
+            "location": null,
+            "shift": 0,
+            "source_day": "2024-01-02",
+            "tick_source_day": "2024-01-02"
+          },
+          "status": "PASS"
+        },
+        {
+          "check_id": "BOUNDARY_0930_PRESENT",
+          "evidence": {
+            "bar_open": "09:30",
+            "event_kind": "CURRENT_OPEN",
+            "geometry_known": 0,
+            "grammar_event": null,
+            "interaction_eligible": 0,
+            "knowledge_time": "09:30",
+            "legacy": [
+              "37753.10",
+              "37753.10",
+              "NA",
+              "NA"
+            ],
+            "lifecycle": 1,
+            "location": null,
+            "shift": 0,
+            "source_day": "2024-01-02",
+            "tick_source_day": "2024-01-02"
+          },
+          "status": "PASS"
+        },
+        {
+          "check_id": "BOUNDARY_0934_PRESENT",
+          "evidence": {
+            "bar_open": "09:34",
+            "event_kind": "CURRENT_OPEN",
+            "geometry_known": 0,
+            "grammar_event": null,
+            "interaction_eligible": 0,
+            "knowledge_time": "09:34",
+            "legacy": [
+              "37755.10",
+              "37751.10",
+              "NA",
+              "NA"
+            ],
+            "lifecycle": 1,
+            "location": null,
+            "shift": 0,
+            "source_day": "2024-01-02",
+            "tick_source_day": "2024-01-02"
+          },
+          "status": "PASS"
+        },
+        {
+          "check_id": "BOUNDARY_0935_PRESENT",
+          "evidence": {
+            "bar_open": "09:35",
+            "event_kind": "CURRENT_OPEN",
+            "geometry_known": 0,
+            "grammar_event": null,
+            "interaction_eligible": 0,
+            "knowledge_time": "09:35",
+            "legacy": [
+              "37755.10",
+              "37751.10",
+              "37755.10",
+              "37751.10"
+            ],
+            "lifecycle": 1,
+            "location": null,
+            "shift": 0,
+            "source_day": "2024-01-02",
+            "tick_source_day": "2024-01-02"
+          },
+          "status": "PASS"
+        },
+        {
+          "check_id": "BOUNDARY_0939_PRESENT",
+          "evidence": {
+            "bar_open": "09:39",
+            "event_kind": "CURRENT_OPEN",
+            "geometry_known": 1,
+            "grammar_event": null,
+            "interaction_eligible": 0,
+            "knowledge_time": "09:39",
+            "legacy": [
+              "NA",
+              "NA",
+              "37755.10",
+              "37751.10"
+            ],
+            "lifecycle": 2,
+            "location": null,
+            "shift": 0,
+            "source_day": "2024-01-02",
+            "tick_source_day": "2024-01-02"
+          },
+          "status": "PASS"
+        },
+        {
+          "check_id": "BOUNDARY_0940_PRESENT",
+          "evidence": {
+            "bar_open": "09:40",
+            "event_kind": "CURRENT_OPEN",
+            "geometry_known": 1,
+            "grammar_event": null,
+            "interaction_eligible": 0,
+            "knowledge_time": "09:40",
+            "legacy": [
+              "NA",
+              "NA",
+              "37755.10",
+              "37751.10"
+            ],
+            "lifecycle": 2,
+            "location": null,
+            "shift": 0,
+            "source_day": "2024-01-02",
+            "tick_source_day": "2024-01-02"
+          },
+          "status": "PASS"
+        },
+        {
+          "check_id": "CURRENT_OPEN_NEVER_GRAMMAR_ELIGIBLE",
+          "evidence": {
+            "rows": 1375
+          },
+          "status": "PASS"
+        },
+        {
+          "check_id": "GEOMETRY_UNKNOWN_BEFORE_CAUSAL_COMMIT",
+          "evidence": {
+            "commit": "09:36",
+            "rows": 7
+          },
+          "status": "PASS"
+        },
+        {
+          "check_id": "CAUSAL_FREEZE_COMMIT",
+          "evidence": {
+            "bar_open": "09:36",
+            "event_kind": "CURRENT_OPEN",
+            "geometry_known": 1,
+            "grammar_event": null,
+            "interaction_eligible": 0,
+            "knowledge_time": "09:36",
+            "legacy": [
+              "NA",
+              "NA",
+              "37755.10",
+              "37751.10"
+            ],
+            "lifecycle": 2,
+            "location": null,
+            "shift": 0,
+            "source_day": "2024-01-02",
+            "tick_source_day": "2024-01-02"
+          },
+          "status": "PASS"
+        },
+        {
+          "check_id": "FIRST_COMPLETED_GRAMMAR_HANDOFF",
+          "evidence": {
+            "bar_open": "09:36",
+            "event_kind": "COMPLETED_BAR",
+            "geometry_known": 1,
+            "grammar_event": 6,
+            "interaction_eligible": 1,
+            "knowledge_time": "09:37",
+            "legacy": [
+              "NA",
+              "NA",
+              "37755.10",
+              "37751.10"
+            ],
+            "lifecycle": 2,
+            "location": 3,
+            "shift": 1,
+            "source_day": "2024-01-02",
+            "tick_source_day": "2024-01-02"
+          },
+          "status": "PASS"
+        },
+        {
+          "check_id": "INCLUSIVE_ENDPOINT_VISIBLE_IN_LEGACY_ORACLE",
+          "evidence": {
+            "boundary": "09:35",
+            "legacy": [
+              "37755.10",
+              "37751.10",
+              "37755.10",
+              "37751.10"
+            ]
+          },
+          "status": "PASS"
+        }
+      ],
+      "failed_checks": [],
+      "path": "studies\\obs-open-01\\source-recovery\\OBS_OPEN_SRC01_US30_M1_ONLINE_run1.tsv",
+      "sha256": "3a1bed23249615b6bd463201963baeeeb02f7339a08d099684596a9b952daabc",
+      "source_clock_day": "2024-01-02",
+      "status": "PASS",
+      "timeframe": "PERIOD_M1"
+    },
+    {
+      "boundary_matrix": [
+        {
+          "boundary": "09:29",
+          "reason": "PERIOD_M5 has no completed-candle identity at this minute",
+          "status": "NOT_APPLICABLE_TIMEFRAME_BOUNDARY"
+        },
+        {
+          "boundary": "09:30",
+          "snapshot": {
+            "bar_open": "09:30",
+            "event_kind": "CURRENT_OPEN",
+            "geometry_known": 0,
+            "grammar_event": null,
+            "interaction_eligible": 0,
+            "knowledge_time": "09:30",
+            "legacy": [
+              "37753.10",
+              "37753.10",
+              "NA",
+              "NA"
+            ],
+            "lifecycle": 1,
+            "location": null,
+            "shift": 0,
+            "source_day": "2024-01-02",
+            "tick_source_day": "2024-01-02"
+          },
+          "status": "OBSERVED"
+        },
+        {
+          "boundary": "09:34",
+          "reason": "PERIOD_M5 has no completed-candle identity at this minute",
+          "status": "NOT_APPLICABLE_TIMEFRAME_BOUNDARY"
+        },
+        {
+          "boundary": "09:35",
+          "snapshot": {
+            "bar_open": "09:35",
+            "event_kind": "CURRENT_OPEN",
+            "geometry_known": 0,
+            "grammar_event": null,
+            "interaction_eligible": 0,
+            "knowledge_time": "09:35",
+            "legacy": [
+              "37755.10",
+              "37751.10",
+              "37755.10",
+              "37751.10"
+            ],
+            "lifecycle": 1,
+            "location": null,
+            "shift": 0,
+            "source_day": "2024-01-02",
+            "tick_source_day": "2024-01-02"
+          },
+          "status": "OBSERVED"
+        },
+        {
+          "boundary": "09:39",
+          "reason": "PERIOD_M5 has no completed-candle identity at this minute",
+          "status": "NOT_APPLICABLE_TIMEFRAME_BOUNDARY"
+        },
+        {
+          "boundary": "09:40",
+          "snapshot": {
+            "bar_open": "09:40",
+            "event_kind": "CURRENT_OPEN",
+            "geometry_known": 1,
+            "grammar_event": null,
+            "interaction_eligible": 0,
+            "knowledge_time": "09:40",
+            "legacy": [
+              "NA",
+              "NA",
+              "37755.10",
+              "37746.60"
+            ],
+            "lifecycle": 2,
+            "location": null,
+            "shift": 0,
+            "source_day": "2024-01-02",
+            "tick_source_day": "2024-01-02"
+          },
+          "status": "OBSERVED"
+        }
+      ],
+      "causal_commit_bar_open": "09:40",
+      "checks": [
+        {
+          "check_id": "TIMEFRAME_IDENTITY",
+          "evidence": {
+            "actual": "PERIOD_M5",
+            "expected": "PERIOD_M5"
+          },
+          "status": "PASS"
+        },
+        {
+          "check_id": "SINGLE_SOURCE_DAY",
+          "evidence": {
+            "source_days": [
+              "2024-01-02"
+            ]
+          },
+          "status": "PASS"
+        },
+        {
+          "check_id": "BOUNDARY_0930_PRESENT",
+          "evidence": {
+            "bar_open": "09:30",
+            "event_kind": "CURRENT_OPEN",
+            "geometry_known": 0,
+            "grammar_event": null,
+            "interaction_eligible": 0,
+            "knowledge_time": "09:30",
+            "legacy": [
+              "37753.10",
+              "37753.10",
+              "NA",
+              "NA"
+            ],
+            "lifecycle": 1,
+            "location": null,
+            "shift": 0,
+            "source_day": "2024-01-02",
+            "tick_source_day": "2024-01-02"
+          },
+          "status": "PASS"
+        },
+        {
+          "check_id": "BOUNDARY_0935_PRESENT",
+          "evidence": {
+            "bar_open": "09:35",
+            "event_kind": "CURRENT_OPEN",
+            "geometry_known": 0,
+            "grammar_event": null,
+            "interaction_eligible": 0,
+            "knowledge_time": "09:35",
+            "legacy": [
+              "37755.10",
+              "37751.10",
+              "37755.10",
+              "37751.10"
+            ],
+            "lifecycle": 1,
+            "location": null,
+            "shift": 0,
+            "source_day": "2024-01-02",
+            "tick_source_day": "2024-01-02"
+          },
+          "status": "PASS"
+        },
+        {
+          "check_id": "BOUNDARY_0940_PRESENT",
+          "evidence": {
+            "bar_open": "09:40",
+            "event_kind": "CURRENT_OPEN",
+            "geometry_known": 1,
+            "grammar_event": null,
+            "interaction_eligible": 0,
+            "knowledge_time": "09:40",
+            "legacy": [
+              "NA",
+              "NA",
+              "37755.10",
+              "37746.60"
+            ],
+            "lifecycle": 2,
+            "location": null,
+            "shift": 0,
+            "source_day": "2024-01-02",
+            "tick_source_day": "2024-01-02"
+          },
+          "status": "PASS"
+        },
+        {
+          "check_id": "CURRENT_OPEN_NEVER_GRAMMAR_ELIGIBLE",
+          "evidence": {
+            "rows": 276
+          },
+          "status": "PASS"
+        },
+        {
+          "check_id": "GEOMETRY_UNKNOWN_BEFORE_CAUSAL_COMMIT",
+          "evidence": {
+            "commit": "09:40",
+            "rows": 2
+          },
+          "status": "PASS"
+        },
+        {
+          "check_id": "CAUSAL_FREEZE_COMMIT",
+          "evidence": {
+            "bar_open": "09:40",
+            "event_kind": "CURRENT_OPEN",
+            "geometry_known": 1,
+            "grammar_event": null,
+            "interaction_eligible": 0,
+            "knowledge_time": "09:40",
+            "legacy": [
+              "NA",
+              "NA",
+              "37755.10",
+              "37746.60"
+            ],
+            "lifecycle": 2,
+            "location": null,
+            "shift": 0,
+            "source_day": "2024-01-02",
+            "tick_source_day": "2024-01-02"
+          },
+          "status": "PASS"
+        },
+        {
+          "check_id": "FIRST_COMPLETED_GRAMMAR_HANDOFF",
+          "evidence": {
+            "bar_open": "09:40",
+            "event_kind": "COMPLETED_BAR",
+            "geometry_known": 1,
+            "grammar_event": 6,
+            "interaction_eligible": 1,
+            "knowledge_time": "09:45",
+            "legacy": [
+              "NA",
+              "NA",
+              "37755.10",
+              "37746.60"
+            ],
+            "lifecycle": 2,
+            "location": 3,
+            "shift": 1,
+            "source_day": "2024-01-02",
+            "tick_source_day": "2024-01-02"
+          },
+          "status": "PASS"
+        },
+        {
+          "check_id": "INCLUSIVE_ENDPOINT_VISIBLE_IN_LEGACY_ORACLE",
+          "evidence": {
+            "boundary": "09:35",
+            "legacy": [
+              "37755.10",
+              "37751.10",
+              "37755.10",
+              "37751.10"
+            ]
+          },
+          "status": "PASS"
+        }
+      ],
+      "failed_checks": [],
+      "path": "studies\\obs-open-01\\source-recovery\\OBS_OPEN_SRC01_US30_M5_ONLINE_run1.tsv",
+      "sha256": "bddfb733731c5df34a46b672b27a6e021026e43ff7b78aaf07ba95461bf81210",
+      "source_clock_day": "2024-01-02",
+      "status": "PASS",
+      "timeframe": "PERIOD_M5"
+    }
+  ],
+  "causal_authority": "V2_CAUSAL_BUFFERS_ONLY",
+  "clock_authority": "SOURCE_CLOCK_WALL_TIME_ONLY",
+  "legacy_repaint_classification": "HISTORICAL_REPAINTING_COMPATIBILITY_OBSERVATION",
+  "new_york_clock_transport": "NOT_EVALUATED_BY_SRC01",
+  "schema": "OBS_OPEN_SRC01_BOUNDARY_AUDIT_V1",
+  "status": "PASS"
+}

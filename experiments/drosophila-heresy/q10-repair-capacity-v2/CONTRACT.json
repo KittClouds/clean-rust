@@ -1,0 +1,449 @@
+{
+  "protocol": "Q10-RC2",
+  "title": "Sequential-f32 ULP Repair-Capacity Audit",
+  "kind": "FROZEN_PRE_QUALIFICATION_CONTRACT",
+  "created_utc": "2026-09-16T21:11:35Z",
+  "status": "FROZEN_PRE_QUALIFICATION__NOT_EXECUTED",
+  "plan_sha256": "AF09914817ABC36A0ACD7D971B051B0E0872E57E6305B1823882300077185ACE",
+  "lineage": {
+    "parent_protocol": "Q10-SM",
+    "parent_directory": "experiments/drosophila-heresy/q10-safety-margin-v1",
+    "parent_plan_sha256": "8A70CFADA7A833AA1110FDE5DBF0CFAFDDD4AFD4297A06AD846B1959439B8B9D",
+    "parent_contract_sha256": "5A7CD7E15724F6260C2D42296BED5FF3667CA32FA1D8D48E5408EFFA2A0F35BF",
+    "parent_status_sha256": "D19D051DA550BCDED9C436F9A7164AF0C4322D8BB16C418D7C4CA9E04217A9C4",
+    "parent_result_sha256": "68200D7F49B8A4B943150A1C3A5AB4B46DF4ED8EB1EBBE7A3DF45F8BEEBBD337",
+    "parent_summary_sha256": "2B64FF590E226CD393EBCFF6A5147728BAC931F395D76970567EBD6061EDA113",
+    "required_parent_status": "Q10_SM_STAGE1_VALID__F32_SAFE_FREEDOM_PRESENT",
+    "required_parent_stage": "STAGE1_COMPLETE",
+    "required_parent_audited_states": 5120,
+    "required_parent_accepted_nonidentity_events": 5026,
+    "required_parent_safety_margin_dominated_events": 94,
+    "required_parent_sequential_f32_readout": "NOT_RUN",
+    "required_parent_ulp_repair": "NOT_RUN",
+    "q08_mutation_forbidden": true,
+    "q09_mutation_forbidden": true,
+    "q10_bg_mutation_forbidden": true,
+    "q10_sm_mutation_forbidden": true
+  },
+  "predecessor_failure": {
+    "protocol": "Q10-RC",
+    "status": "Q10_RC_INVALID",
+    "opened_engineering_seed": 9601,
+    "reason": "returned SVD-left-vector reconstruction exceeded the frozen integrity gate",
+    "same_seed_reuse_forbidden": true,
+    "correction": "retain the frozen SVD rank decision and compute projection plus minimum-norm coefficients by Householder QR of A times V_r"
+  },
+  "authorization": {
+    "files_authorized": [
+      "PLAN.md",
+      "CONTRACT.json"
+    ],
+    "source_creation_or_edit_authorized": true,
+    "build_authorized": true,
+    "qualification_execution_authorized": true,
+    "experiment_run_authorized": false,
+    "measured_cli_forbidden": false,
+    "scientific_seed_bundles_used": 0,
+    "behavioral_inference": false,
+    "repair_application_authorized": false,
+    "multi_move_evaluation_authorized": false,
+    "dh08b_authorized": false
+  },
+  "scope": {
+    "purpose": "characterize local sequential-f32 readout authority of all legal isolated one-ULP moves around fresh Q10-SM committed safe endpoints",
+    "capacity_only": true,
+    "causal_repair": false,
+    "repairs_applied": 0,
+    "behavior_recorded": false,
+    "scientific_seeds_allowed": [],
+    "forbidden_observables": [
+      "actions",
+      "rewards",
+      "accuracy",
+      "old-map margin",
+      "learning trajectory",
+      "future-plasticity outcome"
+    ],
+    "forbidden_operations": [
+      "committing a candidate move",
+      "combining moves",
+      "repeated-coordinate repair",
+      "greedy repair",
+      "beam repair",
+      "discrete repair search",
+      "post-repair evaluation",
+      "behavioral simulation"
+    ]
+  },
+  "engineering_scope": {
+    "qualification_seeds_allowed": [
+      9611,
+      9612,
+      9613,
+      9614,
+      9615
+    ],
+    "stage_a_seeds": [
+      9611
+    ],
+    "stage_b_seeds": [
+      9612,
+      9613,
+      9614,
+      9615
+    ],
+    "sides": [
+      "R",
+      "L"
+    ],
+    "taus": [
+      4.0,
+      16.0
+    ],
+    "reversal_states_per_side_tau": 256,
+    "expected_stage_a_states": 1024,
+    "expected_stage_b_new_states": 4096,
+    "expected_cumulative_states": 5120,
+    "top_up_forbidden": true,
+    "replacement_seed_forbidden": true,
+    "parent_seed_reuse_as_observations_forbidden": true,
+    "endpoint_generation": "rerun the frozen Q10-SM constructor and all continuous plus committed 32-ULP gates on each fresh event state",
+    "no_safe_endpoint_handling": "retain in coverage denominator as NOT_APPLICABLE__NO_SAFE_ENDPOINT",
+    "minimum_applicable_endpoint_gate": null
+  },
+  "stage_entry": {
+    "stage_a_requires": [
+      "later explicit source and execution authorization",
+      "source manifest frozen",
+      "executable hash frozen",
+      "compiler and target identity frozen",
+      "receipt schema frozen",
+      "independent scalar f32 reference frozen"
+    ],
+    "stage_b_entry_rule": "Stage A lineage, endpoint, move enumeration, sequential-f32, factorization, relaxed-budget, receipt, and independent-review gates pass without any contract change",
+    "change_after_stage_a": "requires a new protocol identity and fresh engineering seeds"
+  },
+  "event_state": {
+    "base_state": "committed f32 W_B_32",
+    "true_state": "committed endogenous f32 W_T_32",
+    "alternate_state": "committed Q10-SM-safe f32 W_N_32",
+    "permitted_support": "S_t inherited unchanged from Q10-SM",
+    "true_boundary_set": "B_t inherited unchanged from Q10-SM",
+    "outside_support_set": "O_t inherited unchanged from Q10-SM",
+    "frozen_set": "F_t = B_t union O_t",
+    "variable_set": "I_t = S_t minus B_t",
+    "alternate_admission": [
+      "all Q10-SM continuous integrity gates pass",
+      "all Q10-SM committed support and boundary gates pass",
+      "all Q10-SM 32-ULP safety gates pass",
+      "no clipping or nonfinite value occurred"
+    ],
+    "immutable_candidate_baseline": true
+  },
+  "sequential_f32_readout": {
+    "rows": "all q = 16 * post_len cue-by-MBON drives",
+    "order": "cue-major then MBON-minor",
+    "source_slice": "Task.patterns[cue].edges[offsets[j]..offsets[j + 1]]",
+    "accumulator_initial_bits": "positive 0.0f32",
+    "operation": "scalar binary32 addition in stored source-coordinate order with binary32 rounding after each addition",
+    "reassociation_forbidden": true,
+    "simd_reduction_forbidden": true,
+    "fma_forbidden": true,
+    "f64_accumulation_forbidden": true,
+    "parallel_row_reduction_forbidden": true,
+    "parallelism_allowed_across_events_or_moves": true,
+    "optimized_incidence_evaluation_allowed": true,
+    "optimized_rule": "only touched rows may be recomputed, but every touched row restarts at positive zero and follows the complete learner source order",
+    "stage_a_reference_gate": "optimized evaluator agrees bitwise with an independent full scalar reference",
+    "baseline_alternate": "g_N = g_seq32(W_N_32)",
+    "baseline_true": "g_T = g_seq32(W_T_32)",
+    "error": "e_k = f64(g_N[k]) - f64(g_T[k])",
+    "bitwise_equality_authoritative": true,
+    "signed_zero_reported_separately": true,
+    "aggregate_substitution_forbidden": true
+  },
+  "one_ulp_move_bank": {
+    "eligible_coordinates": "every coordinate in I_t",
+    "directions_in_order": [
+      "minus",
+      "plus"
+    ],
+    "coordinate_order": "ascending source-coordinate index",
+    "minus_candidate": "nextafter32(W_N_32[i], -infinity)",
+    "plus_candidate": "nextafter32(W_N_32[i], +infinity)",
+    "candidate_budget_per_event": "exactly 2 * |I_t|",
+    "complete_enumeration_required": true,
+    "sampling_forbidden": true,
+    "truncation_forbidden": true,
+    "top_k_forbidden": true,
+    "legality": [
+      "resulting bit pattern is distinct and exactly adjacent in the named direction",
+      "result is finite and strictly inside the frozen weight bounds",
+      "only one coordinate in I_t changes",
+      "outside-support and fixed coordinates remain bitwise unchanged",
+      "lower and upper boundary membership remain exact",
+      "no new boundary member is created",
+      "at least 31 legal nextafter32 steps remain before boundary contact in each direction",
+      "no clipping, saturation, stochastic rounding, or model RNG is used"
+    ],
+    "post_move_reserve_steps_each_direction": 31,
+    "candidate_evaluation": "temporary immutable counterfactual from W_N_32; discard after readout",
+    "effect": "v_j[k] = f64(g_seq32(W_N_32 with move j)[k]) - f64(g_N[k])",
+    "conceptual_matrix": "R = [v_1, ..., v_m] in R^(q x m)",
+    "zero_effect_definition": "candidate readout bitwise equals g_N in every row",
+    "zero_effect_receipted": true,
+    "zero_effect_excluded_from_active_factorization": true,
+    "sparse_storage_allowed": true,
+    "move_application_count": 0,
+    "multi_move_evaluation_count": 0,
+    "incomplete_enumeration_policy": "event or run is incomplete and cannot be summarized from a subset"
+  },
+  "rank_and_projection": {
+    "matrix": "active nonzero-effect conceptual R",
+    "arithmetic": "deterministic f64 thin SVD",
+    "rank_multiplier": 1000.0,
+    "rank_threshold": "tau_rank = sigma_max * max(q, m_active) * f64::EPSILON * 1000",
+    "zero_bank_rank": 0,
+    "svd_convergence_tolerance": 1e-14,
+    "svd_max_iterations": 100000,
+    "gram_implementation_allowed": true,
+    "gram_gate": "Stage A independent replay agrees on rank, singular values, and retained-subspace projection within integrity tolerance",
+    "reachable_error": "e_reachable = U_r U_r^T e",
+    "unreachable_error": "e_unreachable = e - e_reachable",
+    "rho_2": "norm2(e_unreachable) / norm2(e)",
+    "rho_inf": "norm_inf(e_unreachable) / norm_inf(e)",
+    "already_equal_rule": "if every g_N row is bitwise equal to g_T, set rho_2 and rho_inf to zero and do not estimate correction budget",
+    "integrity_tolerance_normalized": 2e-10,
+    "required_metrics": [
+      "q",
+      "candidate move count",
+      "legal move count",
+      "active move count",
+      "rank",
+      "rank fraction",
+      "rank threshold",
+      "singular-value diagnostics",
+      "norm2(e)",
+      "norm_inf(e)",
+      "reachable norm2 and norm_inf",
+      "unreachable norm2 and norm_inf",
+      "rho_2",
+      "rho_inf",
+      "maximum absolute bank-column inner product with e_unreachable"
+    ],
+    "capacity_success_rank_gate": null,
+    "capacity_success_projection_gate": null
+  },
+  "relaxed_correction_budget": {
+    "enabled_for_nonzero_error": true,
+    "definition": "x_dagger = -R^+ e using only singular values above tau_rank",
+    "property": "unique minimum-Euclidean-norm unconstrained real coefficient vector satisfying R x_dagger = -e_reachable",
+    "required_metrics": [
+      "norm1(x_dagger)",
+      "norm2(x_dagger)",
+      "norm_inf(x_dagger)",
+      "coefficient count with abs(x) greater than 1e-12",
+      "coefficient fraction with abs(x) greater than 1e-12",
+      "ceil(norm1(x_dagger)) labelled one-ULP-equivalent scale",
+      "norm2(R x_dagger + e)",
+      "norm_inf(R x_dagger + e)",
+      "condition diagnostics"
+    ],
+    "coefficient_reporting_floor": 1e-12,
+    "coefficients_may_be_fractional": true,
+    "coefficients_may_be_negative": true,
+    "coordinate_direction_exclusivity_enforced": false,
+    "integer_feasibility_claim": false,
+    "discrete_move_count_claim": false,
+    "repair_budget_gate": null
+  },
+  "bottleneck_rows": {
+    "coverage": "every cue-by-MBON row",
+    "required_metrics": [
+      "cue index and MBON index",
+      "row source-coordinate count",
+      "row permitted-coordinate count",
+      "legal minus and plus counts",
+      "nonzero-effect minus and plus counts",
+      "positive, negative, and bitwise-zero effect counts",
+      "locally helpful and harmful move counts relative to e_k",
+      "maximum absolute single-move effect",
+      "summed positive one-step authority",
+      "summed absolute negative one-step authority",
+      "zero_capacity flag",
+      "one_sided_capacity flag",
+      "no_helpful_move_for_error flag",
+      "best single-move reduction divided by abs(e_k)"
+    ],
+    "report_sort": [
+      "no_helpful_move_for_error descending",
+      "zero_capacity descending",
+      "best single-move fraction ascending",
+      "cue index ascending",
+      "MBON index ascending"
+    ],
+    "summed_authority_composable_claim": false,
+    "bottleneck_success_gate": null
+  },
+  "collateral_diagnostics": {
+    "per_legal_move": [
+      "committed acquisition-axis displacement delta",
+      "committed total displacement-norm delta"
+    ],
+    "included_in_repair_matrix": false,
+    "simultaneous_axis_norm_direction_capacity_claim": false
+  },
+  "numeric_integrity": {
+    "normalized_factorization_tolerance": 2e-10,
+    "normalized_projection_reconstruction_tolerance": 2e-10,
+    "normalized_projection_orthogonality_tolerance": 2e-10,
+    "rank_cutoff_multiplier": 1000.0,
+    "svd_convergence_tolerance": 1e-14,
+    "svd_max_iterations": 100000,
+    "coefficient_reporting_floor": 1e-12,
+    "zero_readout_effect_uses_threshold": false,
+    "zero_readout_effect_uses_bitwise_equality": true,
+    "tolerance_selection_from_outputs_forbidden": true
+  },
+  "required_event_receipt": [
+    "lineage hashes, seed, side, tau, trial, and endpoint status",
+    "base, true, alternate, support, and row-order hashes",
+    "Q10-SM continuous and committed safety receipts",
+    "baseline sequential-f32 values and bit patterns",
+    "error vector and per-row ULP distance",
+    "candidate, legal, illegal-by-reason, zero-effect, and active move counts",
+    "deterministic digest of every move coordinate, direction, resulting bits, touched rows, and effect bits",
+    "rank, threshold, singular-value, projection, relaxed-budget, and bottleneck metrics",
+    "no-mutation, no-RNG, no-repair, no-multi-move, no-scientific-seed, and no-behavior receipts"
+  ],
+  "aggregate_reporting": {
+    "preserve_groups": [
+      "stage",
+      "seed",
+      "side",
+      "tau",
+      "reversal window",
+      "endpoint status",
+      "cue-by-MBON row"
+    ],
+    "dominated_events_may_be_dropped": false,
+    "already_equal_events_may_be_dropped": false,
+    "full_distributions_required": true,
+    "post_hoc_groups": "descriptive only and may not alter frozen audit"
+  },
+  "required_pre_execution_freeze": {
+    "required": true,
+    "fields": [
+      "implementation source manifest and executable hash",
+      "compiler and target identity",
+      "Q10-SM compatibility fixture hashes",
+      "binary32 nextafter and signed-zero behavior",
+      "scalar reference and optimized incidence evaluator",
+      "complete move enumeration and legality implementation",
+      "matrix factorization backend and deterministic settings",
+      "pseudoinverse implementation",
+      "event and aggregate receipt schemas",
+      "independent replay implementation",
+      "observer invariance, no-mutation, no-RNG, no-repair, and fail-closed tests"
+    ],
+    "outcome_dependent_change_forbidden": true
+  },
+  "required_tests_before_future_execution": [
+    "Q10-SM constructor and endpoint compatibility on frozen fixtures",
+    "nextafter32 adjacency for signed zero, subnormal, exponent-transition, and near-bound values",
+    "support, boundary, no-clipping, and 31-step remaining-reserve gates",
+    "optimized g_seq32 bitwise equality with scalar reference",
+    "immutable W_N_32 baseline for every candidate",
+    "sparse conceptual R equality with dense fixture matrix",
+    "rank and projection agreement with independent factorization",
+    "pseudoinverse reconstruction and orthogonality within 2e-10 normalized tolerance",
+    "observer invariance",
+    "no simulation RNG, learner mutation, repair, behavior, scientific seeds, nonfinite output, or silent truncation"
+  ],
+  "fail_closed": {
+    "invalid_conditions": [
+      "lineage hash mismatch",
+      "incomplete event coverage",
+      "incomplete move enumeration",
+      "readout source-order mismatch",
+      "move-legality mismatch",
+      "factorization nonconvergence",
+      "integrity tolerance failure",
+      "receipt omission",
+      "learner mutation",
+      "simulation RNG consumption",
+      "repair or multi-move evaluation",
+      "scientific seed or behavioral observation"
+    ],
+    "rescue_seed_forbidden": true,
+    "top_up_forbidden": true,
+    "post_output_tolerance_relaxation_forbidden": true,
+    "post_output_backend_selection_forbidden": true
+  },
+  "status_vocabulary": [
+    "FROZEN_DRAFT_ONLY__NOT_EXECUTED",
+    "Q10_RC_VALID__CAPACITY_CHARACTERIZED",
+    "Q10_RC_VALID__NO_APPLICABLE_SAFE_ENDPOINTS",
+    "Q10_RC_VALID__NUMERICALLY_AMBIGUOUS",
+    "Q10_RC_INVALID"
+  ],
+  "status_semantics": {
+    "Q10_RC_VALID__CAPACITY_CHARACTERIZED": "measurement receipts are valid; it does not imply error span, small relaxed budget, or discrete repair existence",
+    "Q10_RC_VALID__NO_APPLICABLE_SAFE_ENDPOINTS": "integrity is valid but the frozen Q10-SM constructor yields no accepted endpoint on fresh states",
+    "Q10_RC_VALID__NUMERICALLY_AMBIGUOUS": "lineage is intact but a predeclared numerical degeneracy prevents reliable characterization",
+    "Q10_RC_INVALID": "one or more lineage, coverage, legality, arithmetic, numerical, mutation, seed, or firewall gates failed"
+  },
+  "capacity_repair_separation": {
+    "local_isolated_counterfactuals_only": true,
+    "column_space_uses_additive_real_combinations": true,
+    "sequential_f32_combination_interactions_tested": false,
+    "repeated_move_effects_tested": false,
+    "integer_or_direction_exclusive_solution_tested": false,
+    "exact_seq32_repair_tested": false,
+    "simultaneous_final_geometry_tested": false,
+    "causal_repair_tested": false,
+    "interpretation": "rank, projection, and relaxed budget characterize a local readout vocabulary and cannot establish a realizable repair"
+  },
+  "future_gates": {
+    "rank_fraction": null,
+    "projection_residual": null,
+    "relaxed_budget": null,
+    "bottleneck_fraction": null,
+    "discrete_move_budget": null,
+    "coordinate_reuse": null,
+    "exact_repair_success": null,
+    "axis_tolerance": null,
+    "norm_tolerance": null,
+    "direction_cosine": null,
+    "exchangeability": null,
+    "behavior": null,
+    "gate_selection_from_behavior_forbidden": true
+  },
+  "claims_explicitly_forbidden": [
+    "Q08 vindication",
+    "Q09, Q10-BG, or Q10-SM reinterpretation",
+    "repair existence from matrix rank",
+    "repair existence from projection residual",
+    "repair existence from relaxed coefficients",
+    "exact sequential-f32 equality reachability",
+    "simultaneous axis, norm, support, boundary, reserve, or direction control",
+    "scientific exchangeability",
+    "direction effect",
+    "behavior effect",
+    "future-learning-state claim",
+    "metaplasticity claim",
+    "DH-08B authorization"
+  ],
+  "assumptions": [
+    "All weights, bounds, and readouts are finite IEEE-754 binary32 values; NaN and infinity fail closed.",
+    "Q10-SM source-coordinate order, support, boundary, and 32-ULP semantics remain unchanged.",
+    "A legal move consumes at most one reserve step and must leave at least 31 legal steps toward each bound.",
+    "Every move effect is evaluated from the same immutable committed W_N_32 endpoint.",
+    "Sparse move effects may be represented compactly if they reproduce the complete conceptual matrix exactly.",
+    "The rank threshold and pseudoinverse share one retained singular subspace.",
+    "The relaxed minimum-L2 coefficient vector is a numerical authority diagnostic, not a legal move plan.",
+    "Per-row summed positive and negative authority are non-composable descriptive quantities.",
+    "Fresh engineering states may yield a different accepted-endpoint count from Q10-SM; no minimum count is inferred from the parent result.",
+    "No future qualification or scientific gate may be selected from Q10-RC2 behavioral evidence because Q10-RC2 observes no behavior."
+  ]
+}

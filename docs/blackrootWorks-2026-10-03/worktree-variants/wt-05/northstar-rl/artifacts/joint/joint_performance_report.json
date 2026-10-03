@@ -1,0 +1,201 @@
+{
+  "schema_version": "JOINT_PERFORMANCE_REPORT_V1",
+  "metrics": [
+    {
+      "name": "broker_tape_replay",
+      "value": 0.005434530326377512,
+      "unit": "GB_per_second_payload",
+      "component": "SERIALIZATION",
+      "workload": "mmap_open_hash_validate_and_scan"
+    },
+    {
+      "name": "broker_observation_serialization",
+      "value": 0.168976836285832,
+      "unit": "GB_per_second",
+      "component": "SERIALIZATION",
+      "workload": "normalized_json"
+    },
+    {
+      "name": "mt5_tradelocker_matching",
+      "value": 2105263157.8947368,
+      "unit": "pairs_per_second",
+      "component": "NORMALIZATION",
+      "workload": "aligned_fixture_pairs"
+    }
+  ],
+  "network_receipt": [
+    {
+      "name": "authentication",
+      "value": 199.9334,
+      "unit": "milliseconds",
+      "component": "NETWORK_LATENCY_PLUS_API_PROCESSING",
+      "workload": "single_authenticated_live_read"
+    },
+    {
+      "name": "read_endpoint",
+      "value": 114.8178,
+      "unit": "milliseconds",
+      "component": "NETWORK_LATENCY_PLUS_API_PROCESSING",
+      "workload": "single_authenticated_live_read"
+    },
+    {
+      "name": "config",
+      "value": 99.2574,
+      "unit": "milliseconds",
+      "component": "NETWORK_LATENCY_PLUS_API_PROCESSING",
+      "workload": "single_authenticated_live_read"
+    },
+    {
+      "name": "instruments",
+      "value": 125.6542,
+      "unit": "milliseconds",
+      "component": "NETWORK_LATENCY_PLUS_API_PROCESSING",
+      "workload": "single_authenticated_live_read"
+    },
+    {
+      "name": "instrument_details",
+      "value": 133.55710000000002,
+      "unit": "milliseconds",
+      "component": "NETWORK_LATENCY_PLUS_API_PROCESSING",
+      "workload": "single_authenticated_live_read"
+    },
+    {
+      "name": "quote",
+      "value": 100.308,
+      "unit": "milliseconds",
+      "component": "NETWORK_LATENCY_PLUS_API_PROCESSING",
+      "workload": "single_authenticated_live_read"
+    },
+    {
+      "name": "instrument_details",
+      "value": 101.7771,
+      "unit": "milliseconds",
+      "component": "NETWORK_LATENCY_PLUS_API_PROCESSING",
+      "workload": "single_authenticated_live_read"
+    },
+    {
+      "name": "quote",
+      "value": 103.6556,
+      "unit": "milliseconds",
+      "component": "NETWORK_LATENCY_PLUS_API_PROCESSING",
+      "workload": "single_authenticated_live_read"
+    },
+    {
+      "name": "instrument_details",
+      "value": 106.048,
+      "unit": "milliseconds",
+      "component": "NETWORK_LATENCY_PLUS_API_PROCESSING",
+      "workload": "single_authenticated_live_read"
+    },
+    {
+      "name": "quote",
+      "value": 108.6025,
+      "unit": "milliseconds",
+      "component": "NETWORK_LATENCY_PLUS_API_PROCESSING",
+      "workload": "single_authenticated_live_read"
+    },
+    {
+      "name": "instrument_details",
+      "value": 111.1562,
+      "unit": "milliseconds",
+      "component": "NETWORK_LATENCY_PLUS_API_PROCESSING",
+      "workload": "single_authenticated_live_read"
+    },
+    {
+      "name": "quote",
+      "value": 631.0719,
+      "unit": "milliseconds",
+      "component": "NETWORK_LATENCY_PLUS_API_PROCESSING",
+      "workload": "single_authenticated_live_read"
+    },
+    {
+      "name": "instrument_details",
+      "value": 122.5684,
+      "unit": "milliseconds",
+      "component": "NETWORK_LATENCY_PLUS_API_PROCESSING",
+      "workload": "single_authenticated_live_read"
+    },
+    {
+      "name": "quote",
+      "value": 18.4011,
+      "unit": "milliseconds",
+      "component": "NETWORK_LATENCY_PLUS_API_PROCESSING",
+      "workload": "single_authenticated_live_read"
+    },
+    {
+      "name": "quote",
+      "value": 57.1886,
+      "unit": "milliseconds",
+      "component": "NETWORK_LATENCY_PLUS_API_PROCESSING",
+      "workload": "single_authenticated_live_read"
+    },
+    {
+      "name": "quote",
+      "value": 57.1741,
+      "unit": "milliseconds",
+      "component": "NETWORK_LATENCY_PLUS_API_PROCESSING",
+      "workload": "single_authenticated_live_read"
+    },
+    {
+      "name": "quote",
+      "value": 639.7570000000001,
+      "unit": "milliseconds",
+      "component": "NETWORK_LATENCY_PLUS_API_PROCESSING",
+      "workload": "single_authenticated_live_read"
+    },
+    {
+      "name": "instrument_details",
+      "value": 17.1855,
+      "unit": "milliseconds",
+      "component": "NETWORK_LATENCY_PLUS_API_PROCESSING",
+      "workload": "single_authenticated_live_read"
+    },
+    {
+      "name": "instrument_details",
+      "value": 147.7158,
+      "unit": "milliseconds",
+      "component": "NETWORK_LATENCY_PLUS_API_PROCESSING",
+      "workload": "single_authenticated_live_read"
+    },
+    {
+      "name": "quote",
+      "value": 22.6615,
+      "unit": "milliseconds",
+      "component": "NETWORK_LATENCY_PLUS_API_PROCESSING",
+      "workload": "single_authenticated_live_read"
+    },
+    {
+      "name": "quote",
+      "value": 138.98360000000002,
+      "unit": "milliseconds",
+      "component": "NETWORK_LATENCY_PLUS_API_PROCESSING",
+      "workload": "single_authenticated_live_read"
+    },
+    {
+      "name": "account_state",
+      "value": 16.8213,
+      "unit": "milliseconds",
+      "component": "NETWORK_LATENCY_PLUS_API_PROCESSING",
+      "workload": "single_authenticated_live_read"
+    },
+    {
+      "name": "account_state",
+      "value": 440.4201,
+      "unit": "milliseconds",
+      "component": "NETWORK_LATENCY_PLUS_API_PROCESSING",
+      "workload": "single_authenticated_live_read"
+    },
+    {
+      "name": "positions",
+      "value": 108.5968,
+      "unit": "milliseconds",
+      "component": "NETWORK_LATENCY_PLUS_API_PROCESSING",
+      "workload": "single_authenticated_live_read"
+    }
+  ],
+  "limitations": [
+    "Live endpoint timings combine NETWORK_LATENCY and API_PROCESSING because the provider exposes no server processing timer",
+    "PyO3 replay throughput remains represented by the FORGE-RL-00 native compatibility receipt",
+    "Fixture measurements are architecture baselines, not production market throughput claims"
+  ]
+}

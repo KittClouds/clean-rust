@@ -1,0 +1,11 @@
+﻿{
+    "contract":  "NORTHSTAR_PHASE13_AUTHORIZATION_ABORT_V1",
+    "status":  "ABORTED_UNCONSUMED_INFRASTRUCTURE_ONLY",
+    "protocol_sha256":  "869402c193435f149120f1130ddefd817f87a39240c51bc5536292fd2b285d2d",
+    "authorization_sha256":  "a5584b1ae837d41f324db80702c0662cfc7b5461d67d8914b664848015cca8f6",
+    "holdout_evaluator_invocations":  0,
+    "sealed_holdout_runs":  0,
+    "candidate_scores_exposed":  0,
+    "cause":  "MT5 ToDate is exclusive; Monday ToDate supplied no first-post-boundary trigger bar",
+    "remediation":  "extend tester envelope through Tuesday while retaining the frozen Saturday cutoff"
+}

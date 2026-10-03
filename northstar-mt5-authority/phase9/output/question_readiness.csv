@@ -1,0 +1,17 @@
+question,unit,evidence_count,readiness,reason
+Why do resolved episodes terminate through node retirement?,episode,853,READY_DESCRIPTIVE,semantic lifecycle audit; no expectancy
+Is node retirement concentrated by instrument?,episode,186,READY_DESCRIPTIVE,all six instruments populated
+What contexts accompany node-to-node transit?,transit,628,READY_DESCRIPTIVE,descriptive geometry only
+What contexts accompany reclaim after break?,episode,47,READY_DESCRIPTIVE,cross-cells may remain sparse
+What contexts accompany accepted retest failure?,episode,4,INSUFFICIENT,too few for conditional inference
+How do EXTREME_ABOVE episodes behave?,episode,0,EMPTY,empty regional cell
+How do EXTREME_BELOW episodes behave?,episode,1,INSUFFICIENT,near-empty regional cell
+Does repeated testing differ by attempt ordinal?,episode,886,READY_DESCRIPTIVE,episodes with repeated attempts; within-episode attempts remain dependent
+Do exact producer combinations differ?,attempt,89,PRELIMINARY_ONLY,7 combinations have at least 30 attempts
+Are both approach directions represented?,episode,701,READY_DESCRIPTIVE,from-above and from-below mirrors are both populated
+Can behavior be compared across data sources?,run,1,EMPTY_COMPARISON,RG2 contains one data source
+Can behavior be compared across core sigma bands?,episode,177,READY_DESCRIPTIVE,"minimum cell across negative core, median core, and positive core"
+Can behavior be compared at absolute sigma above two?,episode,17,PRELIMINARY_ONLY,both extreme sigma tails combined
+Can node age and width be audited against retirement/timeout?,episode,1462,READY_DESCRIPTIVE,stratified continuous and categorical geometry available
+How does corridor geometry differ across resolutions?,attempt,7764,READY_DESCRIPTIVE,continuous distributions and cross-coverage available
+Can RG2 support a predictive model?,corpus,1462,BLOCKED_BY_DESIGN,Phase 9 forbids modeling; outcome imbalance requires review

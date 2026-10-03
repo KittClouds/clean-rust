@@ -1,0 +1,23 @@
+{
+  "protocol": "Q08-ReadoutNull-v1",
+  "kind": "PRE_SMOKE_CONTRACT_FREEZE",
+  "created_utc": "2026-09-16T12:32:32.763457+00:00",
+  "plan_sha256": "534d7c278c8c232e447d15c41ff95a128871e7b7c2be339c730614ee28a2a138",
+  "parent_dh08a_seal_sha256": "a21f2e19688181955d5d01180e218a6b66f19f0d560305919aa21c6f579d3a13",
+  "qualification_seeds_allowed": [
+    9200,
+    9201,
+    9202,
+    9203,
+    9204,
+    9205
+  ],
+  "tau": 4.0,
+  "sides": [
+    "R",
+    "L"
+  ],
+  "scientific_seed_bundles_used": 0,
+  "behavioral_hypothesis_testing_forbidden": true,
+  "gates_frozen_before_smoke": true
+}

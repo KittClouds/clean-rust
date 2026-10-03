@@ -1,0 +1,32 @@
+{
+  "schema": "FLY-REACH-03-F4-CAPACITY-01-post-prob-contract-v1",
+  "identity": "F4-CAPACITY-01-POST-PROBABILITY",
+  "status": "QUALIFICATION_ONLY_FROZEN",
+  "parent_identity": "F4-CAPACITY-01-ACTION-SIGN",
+  "representation": {
+    "base": "f4-features-v1, width 80",
+    "added_channels": ["sim.action_sign[coordinate.post]", "cue_post_probability for each of four cues"],
+    "width": 85,
+    "reference_blind": true,
+    "source": "deterministic replay state; no reference delta or target input",
+    "row_universe": "same qualification-v2 U* rows"
+  },
+  "estimator": {
+    "hidden_layers": [128, 64],
+    "activation": "GELU",
+    "optimizer": "Adam",
+    "learning_rate": 0.001,
+    "batch_size": 2048,
+    "epochs": 200,
+    "initialization_seed_base": 308000,
+    "training_order": "concatenated lexicographic feature-stream row order; no shuffle",
+    "hyperparameter_search": "none"
+  },
+  "evaluation": {
+    "folds": "four leave-one-Q-block-out folds",
+    "blocks": [303000, 303001, 303002, 303003],
+    "scoring": "IPW-balanced error and Omega_hat",
+    "measured_namespace_created": false,
+    "scientific_interpretation_opened": false
+  }
+}

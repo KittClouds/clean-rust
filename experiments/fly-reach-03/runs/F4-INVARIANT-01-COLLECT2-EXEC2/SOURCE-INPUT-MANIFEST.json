@@ -1,0 +1,396 @@
+{
+  "collection_retry": {
+    "collection_started": false,
+    "new_task_ids_or_seeds_created": false,
+    "parent_run_id": "F4-INVARIANT-01-RUN2",
+    "parent_stop_receipt_sha256": "90ce05ac4b55b04d34a605fe3bcc2078b317501e9b2e88f86a01c77f9dcc4015",
+    "previous_collection_attempt_id": "F4-INVARIANT-01-COLLECT1",
+    "previous_collection_stop_receipt_sha256": "0d77295560d60943fb5af8abf35f20078b03845b3bed5317d70472e023c73030",
+    "task_bytes_reused_without_regeneration": true
+  },
+  "entries": [
+    {
+      "byte_length": 5717837,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/anatomy/edges-L.tsv",
+      "sha256": "ed6044a5de43b2c6acd58aa034967ac80a595ab55456a04f505ecb764d36b0de"
+    },
+    {
+      "byte_length": 5725623,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/anatomy/edges-R.tsv",
+      "sha256": "42b602cd95cf169e86cee7fdc3b28f59e068677aa63e382b845af30c2bffa573"
+    },
+    {
+      "byte_length": 58761,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/anatomy/nodes-L.tsv",
+      "sha256": "3fc14bc6bf33e6a1fc2af7f377b7a23f6700ff916030b840bab4259d76e5232f"
+    },
+    {
+      "byte_length": 58949,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/anatomy/nodes-R.tsv",
+      "sha256": "871cf14a0daf569139b2a880f1927a0f3be7b4d11f5feb47bd435178b74d347f"
+    },
+    {
+      "byte_length": 5255578,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g001/edges-L.tsv",
+      "sha256": "eb92e858b4b07534abc8763e3b8f92bd139b02d95d4bb3cc6b2c9ae2807c28c9"
+    },
+    {
+      "byte_length": 5262051,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g001/edges-R.tsv",
+      "sha256": "7de3749f1a0fc8a03a5ed760650db2526ebaf391aa29a30c5b8ddeb461e3b223"
+    },
+    {
+      "byte_length": 5255578,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g002/edges-L.tsv",
+      "sha256": "655a2e71a0f1da4b82ee8560c2b1e20570a04a9e34eb018ebb4c5aebf0568c54"
+    },
+    {
+      "byte_length": 5262051,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g002/edges-R.tsv",
+      "sha256": "108ffd074903a08d801371027b6662503fc0e2a7814ec95e6fac7718e7ae601e"
+    },
+    {
+      "byte_length": 5255578,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g003/edges-L.tsv",
+      "sha256": "5d4b14cab55df828c61c0f13abc73a5d4ed9171ea5b743cb9623b34c084cfa19"
+    },
+    {
+      "byte_length": 5262051,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g003/edges-R.tsv",
+      "sha256": "1d5578e048b7ba567a909337988234c8dd3721e23905419826c664ee8e14f332"
+    },
+    {
+      "byte_length": 5255578,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g004/edges-L.tsv",
+      "sha256": "c2c0cfef2e4b5006e7d0bebc5a222ea0bb2d925ee79c4088566f1adf23bcc17e"
+    },
+    {
+      "byte_length": 5262051,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g004/edges-R.tsv",
+      "sha256": "c26d834b276648dfc9b529bd8ce6d1f2d3db61c22cdd3563a75b4801da4590ac"
+    },
+    {
+      "byte_length": 5255578,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g005/edges-L.tsv",
+      "sha256": "94cf106a1dd66c161a18bcba31d5e62c89dce378d4bf4fd8c70e604000fd3e74"
+    },
+    {
+      "byte_length": 5262051,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g005/edges-R.tsv",
+      "sha256": "ad73539b78bd22232dc73f9e6d94e4ebcea547a9d4109861e07c6da4f0d5c3d2"
+    },
+    {
+      "byte_length": 5255578,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g006/edges-L.tsv",
+      "sha256": "165ef118059d023b9a4db2346aa6ed044a0f80e601a5850dd42ea6e5634e5662"
+    },
+    {
+      "byte_length": 5262051,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g006/edges-R.tsv",
+      "sha256": "41f9bef7b72386177e02dd9979f2801970fd99176d48335a9a7f4c8eb86dc0c0"
+    },
+    {
+      "byte_length": 5255578,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g007/edges-L.tsv",
+      "sha256": "6c966396aef86b7280cbda592604c4e111a3c7a80792b861c6f486ddc3df93b1"
+    },
+    {
+      "byte_length": 5262051,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g007/edges-R.tsv",
+      "sha256": "2a4fcd636b3bb6a62ae56395e499631586e439b4808780275d48412abef0582e"
+    },
+    {
+      "byte_length": 5255578,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g008/edges-L.tsv",
+      "sha256": "bd0444ddc71c8fb02f59777190c9c2610ed79fa4b9572ddaeb367dda75213927"
+    },
+    {
+      "byte_length": 5262051,
+      "path": "experiments/fly-reach-02-v0.1b/inputs/null-graphs/g008/edges-R.tsv",
+      "sha256": "da63f56a22074bb72a1b6b7aaf75602470f4b92c98a6007ef86e7a8b3242a59d"
+    },
+    {
+      "byte_length": 14122,
+      "path": "experiments/fly-reach-03/F4-INVARIANT-01-DESIGN-CONTRACT-v0.1.md",
+      "sha256": "52280190e160fafdbb973b4cda273bf9e24eca6ba96998a0393e90601fc88f40"
+    },
+    {
+      "byte_length": 24040,
+      "path": "experiments/fly-reach-03/F4-INVARIANT-01-IMPLEMENTATION-SPEC-v0.1.md",
+      "sha256": "1e82459a516daddc375a3304860bbe45c5fda3880c7404abeaa3df214e7ce086"
+    },
+    {
+      "byte_length": 12703,
+      "path": "experiments/fly-reach-03/F4-SYMMETRY-01-CONTRACT-v0.1.md",
+      "sha256": "cfef638aaeac1dfc0b768d13cc95afe7724861f74e3d3111d91401925bed6379"
+    },
+    {
+      "byte_length": 2045,
+      "path": "experiments/fly-reach-03/F4-SYMMETRY-01-IMPLEMENTATION-AMENDMENT-v0.2.md",
+      "sha256": "cf4b1a83922a08ec45b7e812cd1c39e8681940ff18c479bc0856bc18a9fa35f3"
+    },
+    {
+      "byte_length": 29253,
+      "path": "experiments/fly-reach-03/F4-SYMMETRY-01-IMPLEMENTATION-SPEC-v0.1.md",
+      "sha256": "9ef769a80e4e5e91cd9af8b26bf22f8d1b49a940fe89c1f24f571333541ce0a4"
+    },
+    {
+      "byte_length": 43057,
+      "path": "experiments/fly-reach-03/MATH-CONTRACT-v0.3-AUTHORITATIVE.md",
+      "sha256": "6beb47c4784a7d6e37a91e45688dd86e50b15291a8f0dbf07c56c71aefbe47a7"
+    },
+    {
+      "byte_length": 17997,
+      "path": "experiments/fly-reach-03/executor/src/collector.rs",
+      "sha256": "f551c86875b6ec7f5d9fe7327adbfcfc4a66810640cf70c72aaa234822a4a258"
+    },
+    {
+      "byte_length": 5250,
+      "path": "experiments/fly-reach-03/executor/src/graph.rs",
+      "sha256": "8977281a6f5a3cceaf1783f8099b7d49db81fd51f9a83bec144327e02f56ebad"
+    },
+    {
+      "byte_length": 11933,
+      "path": "experiments/fly-reach-03/executor/src/reach_sim.rs",
+      "sha256": "b487e23da9ab85164b79bad40f2802a89f1d660a68c97d7728ea8af52d1f0790"
+    },
+    {
+      "byte_length": 976,
+      "path": "experiments/fly-reach-03/executor/src/rng.rs",
+      "sha256": "e18ae9832519a211983d401d111f6685c76988375e29d150f2a8355e504a07f4"
+    },
+    {
+      "byte_length": 2403,
+      "path": "experiments/fly-reach-03/executor/src/task.rs",
+      "sha256": "c19e955138cded658382216e947c1d381d11fab2e258b32f29176934a2e2c4be"
+    },
+    {
+      "byte_length": 11828,
+      "path": "experiments/fly-reach-03/f4-invariant-01-collection-v1/execute_collection.py",
+      "sha256": "83a21a1ef14f6f1e4c24f0a3f9ab7885275f8f78ff8a00ab561ca93be11937c8"
+    },
+    {
+      "byte_length": 8753,
+      "path": "experiments/fly-reach-03/f4-invariant-01-collection-v1/freeze_collection.py",
+      "sha256": "ecbf93cd7110a3150502e0498949e7c3c4bb1dedc546435a91d889499d687a3b"
+    },
+    {
+      "byte_length": 7999,
+      "path": "experiments/fly-reach-03/f4-invariant-01-collection-v1/reconcile_inputs.py",
+      "sha256": "4d353cba1954e0d24edef0d0a91bd86221b7a1bd8edf0e53369bae2dd446fe80"
+    },
+    {
+      "byte_length": 11824,
+      "path": "experiments/fly-reach-03/f4-invariant-01-collection-v2/execute_collection.py",
+      "sha256": "c0e2ce2a1295e9c1092a58266fa612b92e014a4ab3ed07e1fbec831320fbb858"
+    },
+    {
+      "byte_length": 10807,
+      "path": "experiments/fly-reach-03/f4-invariant-01-collection-v2/freeze_collection.py",
+      "sha256": "970b8aaaf67650f65d02f1c393a5bed6c4a622ee29b98cb75613311276a5f6b4"
+    },
+    {
+      "byte_length": 7999,
+      "path": "experiments/fly-reach-03/f4-invariant-01-collection-v2/reconcile_inputs.py",
+      "sha256": "0f83341e88e7f343e1257baed6063912eef8469798da4c043517bfb6a2d7db1c"
+    },
+    {
+      "byte_length": 11690,
+      "path": "experiments/fly-reach-03/f4-invariant-01-execution-v2/execute_collection.py",
+      "sha256": "5a265fe869ff3ec0e28f58b3e4e2ea8679e1f7dbb0d4404b04c65c113cd5dbd6"
+    },
+    {
+      "byte_length": 15149,
+      "path": "experiments/fly-reach-03/f4-invariant-01-execution-v2/freeze_run.py",
+      "sha256": "872c13801b203ddc8162c64317262c5264f1f92d3e3c73fa0f42cb4c6c40a3f2"
+    },
+    {
+      "byte_length": 6017,
+      "path": "experiments/fly-reach-03/f4-invariant-01-execution-v2/native-collector/Cargo.lock",
+      "sha256": "c34e2f1ea5f1b8102681b2bd2689e68f5ec3be13936fd42113cec22d102fd56b"
+    },
+    {
+      "byte_length": 389,
+      "path": "experiments/fly-reach-03/f4-invariant-01-execution-v2/native-collector/Cargo.toml",
+      "sha256": "66e443673d36daf8734d821d030754a5563a454dcfd38a07fce9c2413e60d9da"
+    },
+    {
+      "byte_length": 1058,
+      "path": "experiments/fly-reach-03/f4-invariant-01-execution-v2/native-collector/src/main.rs",
+      "sha256": "a9e210c23b49a98c9a8aef332f9f0daaf66e193faca535aaeb091949cb78d68c"
+    },
+    {
+      "byte_length": 17833,
+      "path": "experiments/fly-reach-03/f4-invariant-01-execution-v2/native-collector/src/native_collect.rs",
+      "sha256": "c587524753740c74dd444bc01d6dbc1a258a8c4ef8af67fea5b596dc3f0b934c"
+    },
+    {
+      "byte_length": 14296,
+      "path": "experiments/fly-reach-03/f4-invariant-01-execution-v2/prepare_tasks.py",
+      "sha256": "0cc17d892643cfebac0d9f76c768f4076e1f285aa1e1324507765660ea7a45a2"
+    },
+    {
+      "byte_length": 7983,
+      "path": "experiments/fly-reach-03/f4-invariant-01-execution-v2/reconcile_inputs.py",
+      "sha256": "db629d82e0d887a259a55d49349c6f1bcf19fc93ce2618ab60ba309d4a454a1e"
+    },
+    {
+      "byte_length": 5137,
+      "path": "experiments/fly-reach-03/f4-invariant-01-impl-v2/f4_invariant_01_inputs.py",
+      "sha256": "32f5301842e9e5ec0463276dc507a69522e6bd08989d08cf625678296136d2a9"
+    },
+    {
+      "byte_length": 15762,
+      "path": "experiments/fly-reach-03/f4-invariant-01-impl-v2/f4_invariant_01_model.py",
+      "sha256": "2882482311355f5729fb3922d0b51fdef960f24a49d793a77ce855d903939f02"
+    },
+    {
+      "byte_length": 4064,
+      "path": "experiments/fly-reach-03/f4-invariant-01-impl-v2/implementation-artifacts/IMPLEMENTATION-FREEZE.json",
+      "sha256": "16fd21aa430552385138cea93ae8a395a373f9386e0ce28d1cf77880b8f612cc"
+    },
+    {
+      "byte_length": 5641,
+      "path": "experiments/fly-reach-03/f4-invariant-01-impl-v2/implementation-artifacts/IMPLEMENTATION-PREFLIGHT-RECEIPT.json",
+      "sha256": "36a80e669e079dc28d61e3b37ebb19b209d5b352f507626d2c553152817a8320"
+    },
+    {
+      "byte_length": 142068,
+      "path": "experiments/fly-reach-03/f4-invariant-01-impl-v2/implementation-artifacts/INITIALIZER-SEED-MANIFEST.json",
+      "sha256": "efb32a7c2ca2709407b65c32627dbd206b8b1bde304ce9b0b98b165aeea1da8e"
+    },
+    {
+      "byte_length": 4234,
+      "path": "experiments/fly-reach-03/f4-invariant-01-impl-v2/implementation-artifacts/SOURCE-INPUT-MANIFEST.json",
+      "sha256": "41f31a90a8244c05e07570a54560ee6682e64ab6b891e938f3e5be767d938ee9"
+    },
+    {
+      "byte_length": 32126,
+      "path": "experiments/fly-reach-03/manifests/QUALIFICATION-MANIFEST.json",
+      "sha256": "9ea9048d424698212b5a14eecdadef56987a93c54ed28e3ef40a9508431014e5"
+    },
+    {
+      "byte_length": 3116,
+      "path": "experiments/fly-reach-03/math-objects-v0.3.json",
+      "sha256": "7dca0f687258531743014b7ac55681f7324566f40d9497c4a5e303771f6c7c2c"
+    },
+    {
+      "byte_length": 772,
+      "path": "experiments/fly-reach-03/runs/F4-INVARIANT-01-COLLECT1/COLLECTION-PREFLIGHT-RECEIPT.json",
+      "sha256": "47199d47e96e903375e328afbc3fb8ba2ea9f08f75b74d9758093b614127ea3b"
+    },
+    {
+      "byte_length": 662,
+      "path": "experiments/fly-reach-03/runs/F4-INVARIANT-01-COLLECT1/PRECOLLECTION-STOP-RECEIPT.json",
+      "sha256": "0d77295560d60943fb5af8abf35f20078b03845b3bed5317d70472e023c73030"
+    },
+    {
+      "byte_length": 17675,
+      "path": "experiments/fly-reach-03/runs/F4-INVARIANT-01-COLLECT1/SOURCE-INPUT-MANIFEST.json",
+      "sha256": "ea5abc4a1337dfd4844828bff0954af32c733b4d7d4a4287b82ed66a7c4f175f"
+    },
+    {
+      "byte_length": 714,
+      "path": "experiments/fly-reach-03/runs/F4-INVARIANT-01-RUN1/IMPLEMENTATION-PREFLIGHT-RECEIPT.json",
+      "sha256": "b59197c82a3c7194da6999d92404509e1555f1b074935a610b82ae06001ede98"
+    },
+    {
+      "byte_length": 715,
+      "path": "experiments/fly-reach-03/runs/F4-INVARIANT-01-RUN1/PRETASK-STOP-RECEIPT.json",
+      "sha256": "1a160454fced2a7f15d32b9fb03af63eeea9871ee8762404aa2485d5e444c32a"
+    },
+    {
+      "byte_length": 15012,
+      "path": "experiments/fly-reach-03/runs/F4-INVARIANT-01-RUN1/SOURCE-INPUT-MANIFEST.json",
+      "sha256": "34a1ad352ecb128718caf3244f68081fca427510daa4a6193fa69d4bfd3fc5f0"
+    },
+    {
+      "byte_length": 9939,
+      "path": "experiments/fly-reach-03/runs/F4-INVARIANT-01-RUN1/task-bank/TASK-SEED-MANIFEST.json",
+      "sha256": "26ed7e56fd4546265979c25ce4d06f04682c0c01170f1992baabda8b72594fd2"
+    },
+    {
+      "byte_length": 377,
+      "path": "experiments/fly-reach-03/runs/F4-INVARIANT-01-RUN1/task-bank/TASK-SEED-RECEIPT.json",
+      "sha256": "06624a69258a560b562989213462c665903e5091ddb938b65eb3de05d8321c35"
+    },
+    {
+      "byte_length": 714,
+      "path": "experiments/fly-reach-03/runs/F4-INVARIANT-01-RUN2/IMPLEMENTATION-PREFLIGHT-RECEIPT.json",
+      "sha256": "ebefb419cfc2c1acbd32eb6b40610181904b7843af33c0e8fd357b4005174d0c"
+    },
+    {
+      "byte_length": 796,
+      "path": "experiments/fly-reach-03/runs/F4-INVARIANT-01-RUN2/PRECOLLECTION-STOP-RECEIPT.json",
+      "sha256": "90ce05ac4b55b04d34a605fe3bcc2078b317501e9b2e88f86a01c77f9dcc4015"
+    },
+    {
+      "byte_length": 16147,
+      "path": "experiments/fly-reach-03/runs/F4-INVARIANT-01-RUN2/SOURCE-INPUT-MANIFEST.json",
+      "sha256": "6dfc960f3e7654b7c569995dd99ef91964f8646cc9aaa50a8a6e291c7268187e"
+    },
+    {
+      "byte_length": 434688,
+      "path": "experiments/fly-reach-03/runs/F4-INVARIANT-01-RUN2/bin/f4-invariant-01-native-collector.exe",
+      "sha256": "596938cd129db02e66cedb940e2cbdd6568509a57a8fc7849511b31048ff70fb"
+    },
+    {
+      "byte_length": 6891,
+      "path": "experiments/fly-reach-03/runs/F4-INVARIANT-01-RUN2/task-bank/TASK-BANK-MANIFEST.json",
+      "sha256": "29cfb77356f9ad0a637d1e7e1d5cbb935c4d6c7f28451ae184d9e44d1d9cb745"
+    },
+    {
+      "byte_length": 668,
+      "path": "experiments/fly-reach-03/runs/F4-INVARIANT-01-RUN2/task-bank/TASK-GENERATION-RECEIPT.json",
+      "sha256": "a480f185d888d7e745140fb6667778011228b20cec83e779a88a617cb2c6cc95"
+    },
+    {
+      "byte_length": 10430,
+      "path": "experiments/fly-reach-03/runs/F4-INVARIANT-01-RUN2/task-bank/TASK-SEED-MANIFEST.json",
+      "sha256": "e90a2556ce19bc586ca229556c2e7a8b6fdf8b1a7de26df0140604ecc0801200"
+    },
+    {
+      "byte_length": 377,
+      "path": "experiments/fly-reach-03/runs/F4-INVARIANT-01-RUN2/task-bank/TASK-SEED-RECEIPT.json",
+      "sha256": "6145047cdbc3aed52d74a2b2543e02b840941f6204743b078b1d85c5675601b1"
+    },
+    {
+      "byte_length": 19541561,
+      "path": "experiments/fly-reach-03/runs/F4-INVARIANT-01-RUN2/task-bank/training.json",
+      "sha256": "8e49f61018255fa32d4328056d46a0b5a14b70306ccfa98733849dcac245c02c"
+    },
+    {
+      "byte_length": 12239,
+      "path": "experiments/fly-reach-03/scripts/f4_symmetry_01_common.py",
+      "sha256": "47ddbeca65ee2b0a94f1712915c8df17fc5855fddfb160c1ac59b9bc48afbeca"
+    },
+    {
+      "byte_length": 10956,
+      "path": "experiments/fly-reach-03/scripts/prepare_qualification.py",
+      "sha256": "d1de1bb9f1d0a82e0bd9ca3a9520a6d38e696fa686d0dbcda46bced17561923a"
+    }
+  ],
+  "run_id": "F4-INVARIANT-01-COLLECT2",
+  "runtime": {
+    "numpy_config": "Build Dependencies:\n  blas:\n    detection method: pkgconfig\n    found: true\n    include directory: C:/Users/runneradmin/AppData/Local/Temp/cibw-run-hg727bee/cp313-win_amd64/build/venv/Lib/site-packages/scipy_openblas64/include\n    lib directory: C:/Users/runneradmin/AppData/Local/Temp/cibw-run-hg727bee/cp313-win_amd64/build/venv/Lib/site-packages/scipy_openblas64/lib\n    name: scipy-openblas\n    openblas configuration: OpenBLAS 0.3.34.106.0  USE64BITINT DYNAMIC_ARCH NO_AFFINITY\n      Haswell MAX_THREADS=24\n    pc file directory: D:/a/numpy-release/numpy-release/.openblas\n    version: 0.3.34.106.0\n  lapack:\n    detection method: pkgconfig\n    found: true\n    include directory: C:/Users/runneradmin/AppData/Local/Temp/cibw-run-hg727bee/cp313-win_amd64/build/venv/Lib/site-packages/scipy_openblas64/include\n    lib directory: C:/Users/runneradmin/AppData/Local/Temp/cibw-run-hg727bee/cp313-win_amd64/build/venv/Lib/site-packages/scipy_openblas64/lib\n    name: scipy-openblas\n    openblas configuration: OpenBLAS 0.3.34.106.0  USE64BITINT DYNAMIC_ARCH NO_AFFINITY\n      Haswell MAX_THREADS=24\n    pc file directory: D:/a/numpy-release/numpy-release/.openblas\n    version: 0.3.34.106.0\nCompilers:\n  c:\n    commands: cl\n    linker: link\n    name: msvc\n    version: 19.44.35228\n  c++:\n    commands: cl\n    linker: link\n    name: msvc\n    version: 19.44.35228\n  cython:\n    commands: cython\n    linker: cython\n    name: cython\n    version: 3.3.0\nMachine Information:\n  build:\n    cpu: x86_64\n    endian: little\n    family: x86_64\n    system: windows\n  host:\n    cpu: x86_64\n    endian: little\n    family: x86_64\n    system: windows\nPython Information:\n  path: C:\\Users\\runneradmin\\AppData\\Local\\Temp\\build-env-xf1j587o\\Scripts\\python.exe\n  version: '3.13'\nSIMD Extensions:\n  baseline:\n  - X86_V2\n  found:\n  - X86_V3\n\n",
+    "numpy_version": "2.5.3",
+    "parent_native_collector_sha256": "596938cd129db02e66cedb940e2cbdd6568509a57a8fc7849511b31048ff70fb",
+    "parent_rust_runtime": "rustc 1.96.0 (ac68faa20 2026-05-25)\nbinary: rustc\ncommit-hash: ac68faa20c58cbccd01ee7208bf3b6e93a7d7f96\ncommit-date: 2026-05-25\nhost: x86_64-pc-windows-msvc\nrelease: 1.96.0\nLLVM version: 22.1.2",
+    "python_executable": "C:\\Users\\shuga\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+    "python_executable_sha256": "85b71d8c6ec1905935f74be0c9869aae198d00e98f39df699ec66f9c5a84cecd",
+    "python_version": "3.13.15 (tags/v3.13.15:4061bc4, Aug  5 2026, 13:05:39) [MSC v.1944 64 bit (AMD64)]",
+    "thread_environment": {
+      "BLIS_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "NUMEXPR_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1"
+    }
+  },
+  "schema": "F4-INVARIANT-01-COLLECT2-source-input-manifest-v1",
+  "task_bank_manifest_sha256": "29cfb77356f9ad0a637d1e7e1d5cbb935c4d6c7f28451ae184d9e44d1d9cb745",
+  "task_bank_run_id": "F4-INVARIANT-01-RUN2",
+  "task_bank_sha256": "8e49f61018255fa32d4328056d46a0b5a14b70306ccfa98733849dcac245c02c",
+  "task_seed_manifest_sha256": "e90a2556ce19bc586ca229556c2e7a8b6fdf8b1a7de26df0140604ecc0801200"
+}

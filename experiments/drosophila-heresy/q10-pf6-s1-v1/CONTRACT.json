@@ -1,0 +1,74 @@
+{
+  "protocol": "Q10-PF6-S1",
+  "status": "FROZEN_PREEXECUTION",
+  "purpose": "engineering-only 84-group qualification of sealed Q10-PF6",
+  "plan_sha256": "651B77A4C9EC848EA17D05726E275A748DCA23EA4106D1A4CA7DEFD523173DCC",
+  "parent": {
+    "pf5_protocol": "Q10-PF5",
+    "pf5_plan_sha256": "91286F84241D120395905E1569218B4D4BA5EE682AE5C82B75879305FC88A75C",
+    "pf5_contract_sha256": "20995E1826A9C62E0E8689017A2F3E624CC9E63B76B210FBD4AB11D7E9E7D34F",
+    "pf5_audit_execution_sha256": "46991E50F2A0829BB08BE297B726F15A355032241CD212B09D915E4A2605F2CB",
+    "pf5_audit_results_sha256": "A2C90AB364BF5025A528A3E4E6A7192EBCF1F70939CD3EABAD0A22EE04ECDD92",
+    "pf6_protocol": "Q10-PF6",
+    "pf6_plan_sha256": "2B030F345FE7E9E8A2AF6DEEA1C8CFA8D225841CB3EC026E7648D7C4EB1043ED",
+    "pf6_contract_sha256": "B572E4A99AF93F4B1DF44885787E5B5C739C603CF5DC3FD8A48B713513513782",
+    "pf6_runner_sha256": "79B731A7D86FDA1D3FB45F3FA320C62BABD35933AE9ED5BCC25D0744B3F6EA46",
+    "pf6_runtime_helper_sha256": "A00078787DB732906416B3C7158DC777CD41C2E71C3AAE660D1AE525446FB82A"
+  },
+  "population": {
+    "primary_endpoints": 28,
+    "all_groups": 1596,
+    "eligible_status": "OVERSIZE_UNTESTED",
+    "eligible_groups": 1457,
+    "excluded_partial": 102,
+    "excluded_blocked": 37,
+    "sample_groups": 84,
+    "groups_per_endpoint": 3,
+    "excluded_pf6_slice": ["seed9731-L-tau16.json", 0, 6]
+  },
+  "sampling": {
+    "strata": ["low_coordinate_quartile", "median_coordinate_count", "high_coordinate_quartile"],
+    "coordinate_count_quantile_method": "nearest_rank_within_endpoint",
+    "tie_break_order": ["residual_mass_desc", "mismatched_rows_desc", "bridge_count_desc", "stable_group_hash_asc"],
+    "selection_before_replay": true,
+    "sample_manifest_immutable": true,
+    "stable_hash": "sha256(source_event|set_index|group_index)",
+    "random_seed": null
+  },
+  "pf6": {
+    "exploit_width": 24,
+    "explore_width": 8,
+    "beam_width": 32,
+    "maximum_rounds": 16,
+    "max_nodes_per_group": 32768,
+    "candidate_replay": "exact_learner_order_sequential_binary32",
+    "complete_endpoint_semantics": true,
+    "tested_zero_label": "tested_zero",
+    "unselected_zero_label": "unselected_zero_by_horizon",
+    "intermediate_geometry_guardrails": "inherited_pf5",
+    "final_geometry_gates": "inherited_da2",
+    "objective": ["mismatch_count", "total_ulp_distance", "residual_l2", "maximum_absolute_residual"],
+    "no_parameter_tuning_after_first_replay": true
+  },
+  "scope": {
+    "scientific_bundle_count": 0,
+    "behavioral_probe": false,
+    "canonical_state_updated": false,
+    "canonical_repair": false,
+    "dh08b_authorized": false,
+    "pf6_slice_in_sample": false
+  },
+  "forbidden_fields": [
+    "accuracy",
+    "reward",
+    "actions",
+    "old_map_margin",
+    "reversed_map_margin",
+    "behavior",
+    "behavioral_inference",
+    "scientific_seed_id",
+    "repair_applied",
+    "repair_applied_to_canonical_model",
+    "dh08b_authorized"
+  ]
+}

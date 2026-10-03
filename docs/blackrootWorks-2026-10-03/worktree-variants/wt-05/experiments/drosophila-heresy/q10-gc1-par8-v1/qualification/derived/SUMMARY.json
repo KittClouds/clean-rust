@@ -1,0 +1,26 @@
+{
+  "counts": {
+    "endpoint_set_count": 14,
+    "exact_evaluations": 323648,
+    "exact_global_target_count": 0,
+    "partial_global_count": 14
+  },
+  "engineering_only": true,
+  "gate": {
+    "all_endpoint_sets_completed": true,
+    "behavioral_probe": false,
+    "gc1_authorized": false,
+    "global_assembly_executed": true,
+    "scientific_promotion": false
+  },
+  "identity": "q10-gc1-par8-v1",
+  "interpretation": "Global palette assembly was executed with exact sequential-f32 replay, validated baseline-relative candidate bytes, complete ZERO-filled endpoint mappings, and a fixed group beam. Results are constructor evidence only; no behavior or science was run.",
+  "library_counts": {
+    "palette_count": 7207,
+    "raw_group_count": 801,
+    "zero_candidate_count": 801
+  },
+  "protocol": "Q10-GC1-PAR8",
+  "scientific_promotion": false,
+  "status": "GC1_ENGINEERING_ASSEMBLY_COMPLETE"
+}

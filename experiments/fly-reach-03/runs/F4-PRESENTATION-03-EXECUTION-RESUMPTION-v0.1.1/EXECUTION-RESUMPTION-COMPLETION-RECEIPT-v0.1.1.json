@@ -1,0 +1,15 @@
+{
+  "comparative_analysis_performed": false,
+  "fit_count": 144,
+  "fit_manifest_sha256": "f71d344c5bc58e86a68e7bd9163aed1ab5d945468bfe84f06a8981e6a1c2ce66",
+  "heldout_scoring_truth_read_during_fitting": false,
+  "identity": "F4-PRESENTATION-03-EXECUTION-RESUMPTION-v0.1.1",
+  "interruption_receipt_sha256": "1b32eb8d247cbc4bdf17fe00c83a286047e8aa206a9de4b0498f3be713f3b9bc",
+  "new_pending_fits_completed": 82,
+  "parent_run_id": "F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1",
+  "prediction_lock_sha256": "dd387bcc52510eac947774cb6d9303d8cdd8142cee07a60b0e39cddd4dcb54ce",
+  "resumption_amendment_sha256": "9199058b9beb4861da3e997e52ece028f1426be937787ad4fd2ae959ff2d36a3",
+  "schema": "F4-PRESENTATION-03-execution-resumption-completion-v1",
+  "status": "PREDICTIONS_LOCKED",
+  "unchanged_parent_fits_reused": 62
+}

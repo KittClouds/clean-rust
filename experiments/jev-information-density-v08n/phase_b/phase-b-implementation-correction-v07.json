@@ -1,0 +1,53 @@
+{
+  "protocol": "jev-information-density/v0.8n-road-b-phase-b-implementation-correction-v07",
+  "identity": "v0.8N-phase-b-implementation-correction-v07",
+  "status": "IMPLEMENTATION_ONLY_CORRECTION_SEALED",
+  "parent_authorization_event_sha256": "0cad8d2e45fe8e7e5eed7f9bcdeab406926f24605ad9f62396d83f9512bb0a09",
+  "parent_correction_receipt_sha256": "0f610fe31c538e87bcae9feead0532e3f3c8f1009df73344fd487a07d453c145",
+  "parent_entrypoint_sha256": "b0423384ec3e22052c70864ab32e010366325f798057b214411504871b7df333",
+  "corrected_entrypoint_sha256": "94de26895656cd42cd26016030ab38baa4732e3b7980e58d3b082b6cd6430e9f",
+  "frozen_trainer_sha256": "e539bac2d67b47ba2b660b8579c5818e5fffc0cf94fa26cfd3e9dd905ef795ba",
+  "correction_verifier_sha256": "d16b01cc26301f630cc59ce0d21a897cf003046f1bc0d1783acf5cc9197842e2",
+  "correction_test_sha256": "63ab420c50707f614e6f7b45a2319fb40dcaf5fa70228a469627ae7665533bf6",
+  "correction_class": "occurrence metadata join at event materialization; semantic impact none",
+  "observed_failure": {
+    "stage": "v06 no-head primary stream binding validation",
+    "exception": "RuntimeError: primary neighborhood_id mismatch at 0",
+    "root_cause": "the arm event manifest intentionally carries the source episode, target, feature and candidate payload but leaves role and neighborhood metadata in the common occurrence manifest",
+    "outputs_at_failure": {
+      "head_initialization_during_this_preflight": false,
+      "optimizer_steps": 0,
+      "run_artifacts_created_or_modified": false,
+      "heldout_panel_opened": false
+    }
+  },
+  "correction": {
+    "entrypoint": "experiments/jev-information-density-v08n/phase_b/train_phase_b_corrected_v07.py",
+    "operation": "join each arm's enriched primary occurrence row to the common stream's role and neighborhood fields by exact occurrence index",
+    "checked_common_fields": [
+      "occurrence_index",
+      "group_id",
+      "source_episode_id equals common episode_id",
+      "feature_scope_index",
+      "target_hash",
+      "candidate_order_hash",
+      "candidate_semantic_ids"
+    ],
+    "payload_source": "arm manifest target, candidate indices, mask and weights remain untouched",
+    "common_stream_order_and_multiplicity_changed": false,
+    "on_disk_authorized_trainer_modified": false,
+    "preflight_materializes_all_rows_without_training": true,
+    "correction_test_path": "experiments/jev-information-density-v08n/phase_b/tests/test_v08n_phase_b_correction_v07.py",
+    "correction_verifier_path": "experiments/jev-information-density-v08n/phase_b/verify_phase_b_correction_v07.py",
+    "run_and_training_seal_bind_all_seven_correction_receipts": true
+  },
+  "semantic_contract_changed": false,
+  "training_inputs_changed": false,
+  "model_revision_changed": false,
+  "objective_or_loss_changed": false,
+  "seed_or_schedule_changed": false,
+  "evaluation_contract_changed": false,
+  "protected_panel_access": false,
+  "newtight_access": false,
+  "phoenix_access": false
+}

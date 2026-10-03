@@ -1,0 +1,1 @@
+{"continuation":"same prefix and causal slot","fixture":"F_REJECTION_FOLLOWUP","observable_kernel_rejection":"ARITHMETIC_OVERFLOW","reason":"G1 step is a pure function over borrowed prior state and returns Err before next state","rejected_attempt_extends_prefix":false,"schema":"G5_REJECTION_STATE_EFFECT_CONTRACT_V1","state_effect":"STATE_UNCHANGED","termination_assumed":false}

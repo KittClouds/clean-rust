@@ -1,0 +1,44 @@
+﻿{
+    "contract":  "MST_HOLDOUT_ADMISSION_V1",
+    "status":  "SEALED",
+    "protocol_sha256":  "098844644e31878725ec4bb7859bb5db2f63f937adfc21bea3fb8ea91b287cf6",
+    "canonical_instrument":  "FRA40",
+    "broker_symbol":  "FRA40",
+    "data_source_id":  "METAQUOTES_DEMO",
+    "holdout_id":  "RECOVERY_B",
+    "window_start":  1785110400,
+    "window_end_exclusive":  1785542400,
+    "run_key":  "RG2_FRA40_PERIOD_M5_1785110400_1785542400_483794312679891613",
+    "invocation_id":  "RG2_FRA40_PERIOD_M5_1785110400_1785542400_483794312679891613_I1785110400_17622602441146247328",
+    "auction_stem":  "MasterAuction_FRA40_PERIOD_M5_P13R_FRA40_RECOVERY_B_RG2_v7",
+    "structure_stem":  "MasterStructure_FRA40_PERIOD_M5_P13R_FRA40_RECOVERY_B_v6",
+    "canonical_dataset_hash":  "fe7de7240af4c77de9e6b590721b57db9fce55bc6bdbd1cb691888eca9a18523",
+    "dataset_hashes":  {
+                           "events":  "5ee8821346ae5d3f1f0fe520d5034574070e8e352efe6239fb0e3f0064f31f3a",
+                           "attempts":  "07533afecb54df7e626c006ab60bcbcdaa42d6ca4335e23073818efe22081a4f",
+                           "episodes":  "3f485f73526bbf5e564d0136e7c595c6b74e4c065fb928e37d0f2ea31693e4be",
+                           "context":  "692fe96cfeba097bb9436db28b48956ffca7ae5fea290e2620665dc76078ba9d",
+                           "features":  "9dbb25ab149c4b13c1c8ecb828cebedb22a902d1442a4a8c7f6807e6e4847455",
+                           "transits":  "5317aa9cdaa2e795164346aebfc868ea9342c4688a4190b760c6887156dfbc62"
+                       },
+    "row_counts":  {
+                       "events":  1813,
+                       "attempts":  356,
+                       "episodes":  57,
+                       "context":  2994,
+                       "features":  356,
+                       "transits":  35
+                   },
+    "structure_row_counts":  {
+                                 "inputs":  185120,
+                                 "nodes":  15262,
+                                 "events":  396
+                             },
+    "terminal_hash":  "18416995938463997666",
+    "receipt_hash":  "13054875072170954694",
+    "contract_receipt_hash":  "798253437828919676",
+    "isolation":  "unique_instance_tag_plus_single_writer_lock",
+    "visual_rendering":  false,
+    "research_logging":  true,
+    "unexpected_data_gaps":  0
+}

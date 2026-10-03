@@ -1,0 +1,126 @@
+mod allocation;
+#[cfg(test)]
+mod baseline;
+mod graph;
+mod observer;
+mod plasticity;
+mod rng;
+mod simulation;
+mod task;
+pub use allocation::allocations;
+use anyhow::{Result, ensure};
+use graph::Graph;
+use rayon::prelude::*;
+use serde::Deserialize;
+use serde_json::json;
+use simulation::{Dh04Condition, Simulator, attach_immediate_reference};
+use std::{
+    fs::{File, OpenOptions},
+    io::{BufWriter, Write},
+    path::Path,
+    time::Instant,
+};
+
+#[derive(Deserialize)]
+struct Config {
+    observe: Option<bool>,
+    seeds: Vec<u64>,
+    taus: Vec<f32>,
+    sides: Vec<String>,
+    conditions: Vec<Dh04Condition>,
+    arms: Vec<String>,
+    cues: usize,
+    delay_steps: usize,
+    trials: usize,
+    eta: f32,
+    glut_sign: f32,
+    input_salt: u64,
+    threads: usize,
+}
+fn main() -> Result<()> {
+    let args: Vec<_> = std::env::args().collect();
+    ensure!(
+        args.len() == 5 && args[1] == "run",
+        "usage: drosophila-heresy-dh05 run CONFIG ANATOMY OUTPUT"
+    );
+    let c: Config = serde_json::from_reader(File::open(&args[2])?)?;
+    ensure!(
+        c.trials >= 32 && c.trials.is_multiple_of(8) && c.cues >= 2 && c.cues.is_multiple_of(2)
+    );
+    ensure!(c.delay_steps <= 32 && c.threads > 0 && c.threads <= 8 && c.glut_sign.abs() == 1.0);
+    ensure!(
+        c.arms == ["E", "Z"]
+            && c.conditions
+                == [
+                    Dh04Condition::Immediate,
+                    Dh04Condition::Quiet,
+                    Dh04Condition::EligibilityRetained,
+                    Dh04Condition::EligibilitySuppressed,
+                ]
+            && !c.seeds.is_empty()
+    );
+    let out = Path::new(&args[4]);
+    std::fs::create_dir_all(out)?;
+    let pool = rayon::ThreadPoolBuilder::new()
+        .num_threads(c.threads)
+        .build()?;
+    let start = Instant::now();
+    let mut count = 0;
+    for side in &c.sides {
+        for &tau in &c.taus {
+            ensure!(tau >= 1.0);
+            let graph = Graph::load(Path::new(&args[3]), side, c.glut_sign)?;
+            let file = OpenOptions::new()
+                .write(true)
+                .create_new(true)
+                .open(out.join(format!("{side}-tau{tau}.jsonl")))?;
+            let rows:Result<Vec<_>>=pool.install(||c.seeds.par_iter().map(|&seed|->Result<_>{
+            let setup=Instant::now();let (route,receipt)=graph.route.rewired(seed^0x887733);
+            ensure!(receipt.accepted>0 && receipt.retained_fraction<0.95 && receipt.degree_preserved);
+            let task=task::Task::new(&graph,seed^c.input_salt,c.cues,c.delay_steps,c.trials);
+            ensure!(task.unique_cue_codes()==c.cues);
+            let mut results=Vec::new();let mut geometry=serde_json::Map::new();
+            for arm in &c.arms {
+                let mut runs=Vec::new();
+                for &condition in &c.conditions {
+                    let mut sim=Simulator::new(&graph,&graph.route,seed,tau,c.eta,arm);
+                    let run=sim.run_dh04(&task,condition,&route,c.observe.unwrap_or(true));
+                    ensure!(run.result.outcome.hot_allocations==0);
+                    ensure!(arm!="Z"||run.result.outcome.changed_weights==0);
+                    runs.push(run);
+                }
+                let contrast=attach_immediate_reference(&mut runs);
+                geometry.insert(arm.clone(),serde_json::to_value(contrast)?);
+                for run in runs {
+                    results.push(json!({"seed":seed,"side":side,"tau":tau,
+                        "condition":run.condition,"arm":arm,"result":run.result}));
+                }
+            }
+            Ok(json!({"seed":seed,"null_routing":receipt,"motifs_anatomical":graph.routing_motifs(&graph.route),
+                "nt_uncertain_mbons":graph.nt_uncertain,"plastic_edges":graph.kc_mb.edges.len(),
+                "eligibility_contrast_geometry":geometry,
+                "setup_and_execution_seconds":setup.elapsed().as_secs_f64(),"results":results}))
+        }).collect());
+            let mut writer = BufWriter::new(file);
+            for row in rows? {
+                serde_json::to_writer(&mut writer, &row)?;
+                writer.write_all(b"\n")?;
+                count += c.conditions.len() * c.arms.len();
+            }
+            writer.flush()?;
+            println!("completed {side} tau={tau}: {} paired seeds", c.seeds.len());
+        }
+    }
+    let receipt = json!({"complete":true,"protocol":"DH-05","outcome_rows":count,"wall_seconds":start.elapsed().as_secs_f64(),"threads":c.threads,
+        "config":args[2],"observer_feeds_learner":false,"causal_factor":"distractor_generated_eligibility",
+        "both_causal_cells_restore_interval_state":true,"autodiff":false,"learning_rule_search":false});
+    serde_json::to_writer_pretty(
+        OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(out.join("execution.json"))?,
+        &receipt,
+    )?;
+    println!("{receipt}");
+    Ok(())
+}

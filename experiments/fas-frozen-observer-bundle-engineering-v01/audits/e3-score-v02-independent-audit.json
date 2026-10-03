@@ -1,0 +1,31 @@
+{
+  "audit_id": "FAS_FROZEN_OBSERVER_BUNDLE_E3_SCORE_V02_INDEPENDENT_AUDIT",
+  "status": "E3_SCORE_V02_INDEPENDENT_REPLAY_PASS_SCORING_DISPOSITION_SEALED",
+  "recorded_utc": "2026-09-26T13:47:16.067516+00:00",
+  "e0_root_sha256": "899a131c09298fdafdcc6771ad01e8982857a1cd47900259800f97dd7bea7ccd",
+  "e1_root_sha256": "6ba77a899363651e3ba119b005f59a22e86f011f83c86b873857cd3f9ab64b03",
+  "e2_v07_root_sha256": "a2e2aa76f77904665b9abfa2a22f609c05219d8bc64c537bed41f5c634d1da8a",
+  "e3_v02_root_sha256": "899ff6a61272b86fdf1cd51d8c14100e77185157c242f27fbffe452803a435e1",
+  "score_seal_root_sha256": "a104bffedbc3e31268c0f1c0103ad4326add5a9da93816007904b70cdf3c7d1f",
+  "score_seal_entry_count": 11,
+  "all_eight_endpoint_metrics_replayed": true,
+  "all_10000_bootstrap_replicates_replayed_per_endpoint": true,
+  "prediction_replay_passed": true,
+  "row_identity_replay_passed": true,
+  "support_replay_passed": true,
+  "evaluation_label_single_stream_receipt_passed": true,
+  "raw_evaluation_label_file_opened_by_auditor": false,
+  "terminal_disposition": "ALL_EIGHT_GATES_PASS_BUNDLE_QUALIFIED_FOR_ROUTING_DESIGN",
+  "passed_endpoints": [
+    "context_identity",
+    "entity_identity",
+    "relation",
+    "observed_state",
+    "exact_target_in_domain",
+    "exact_target_context_novel",
+    "exact_target_entity_novel",
+    "exact_target_both_novel"
+  ],
+  "failed_endpoints": [],
+  "E4_integration_authorized": false
+}

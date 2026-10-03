@@ -1,0 +1,9 @@
+Exception calling "Open" with "4" argument(s): "The process cannot access the file 
+'C:\Users\shuga\OneDrive\Documents\ChatGPT\eas\furnace\single_writer.lock' because it is being used by another 
+process."
+At C:\Users\shuga\OneDrive\Documents\ChatGPT\eas\Invoke-MasterStructureDataFurnace.ps1:179 char:5
++     $lockStream = [IO.File]::Open($lockPath, [IO.FileMode]::OpenOrCre ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : IOException
+ 

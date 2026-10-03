@@ -1,0 +1,210 @@
+{
+  "protocol": "Q10-PF5",
+  "status": "FROZEN_PRE_EXECUTION__NOT_EXECUTED",
+  "parent_protocol": "Q10-RMT",
+  "purpose": "engineering-only prefix-constrained feasibility qualification",
+  "plan_sha256": "91286F84241D120395905E1569218B4D4BA5EE682AE5C82B75879305FC88A75C",
+  "parent": {
+    "rmt_root": "experiments/drosophila-heresy/q10-rmt-v1",
+    "rmt_result_sha256": "938DC5384E8F64A3E2EB453256CADB188B4A35278330C758E175104FEE6989CD",
+    "rmt_status_sha256": "66EBF48C7AEEB2BBE414F6176E28291A4AAE83CE792876C3873D6AB734E62FFD",
+    "rmt_plan_sha256": "41DB8A90568A1BDA22DA1E7A3D8288967E24037FDCAD5C8B2518ED53D28511C5",
+    "rmt_contract_sha256": "FFD057E2D2FB86CB8BBBE0F78EA66C10DF752ABB369448549430EDBF4595CC6E",
+    "rmt_config_sha256": "F39F2494ACA53FC3434CB4E73940838B10E7BF4FB08B228AEEFD6A9C39E0EFE3",
+    "rmt_preexecution_sha256": "F1A102DB83448EF6B1D9903329CCF38E34E730014BF3D37B10904036C9B61982",
+    "source_input_root": "experiments/drosophila-heresy/q10-distributed-additive-v1/qualification/sample-9731-9732",
+    "source_input_sha256": {
+      "seed9731-L-tau16.json": "3114A3B31C59A79D540F32C30FE1C217971418655CD8B13E17A91D8157AA1707",
+      "seed9731-L-tau4.json": "2974BF3A4CB5C80569EE73B2E46C8800D12D142DDA9B67EA572880F4EE9C3B5E",
+      "seed9731-R-tau16.json": "185769A85B1EA2FE8E596804C1FC3CB4F27A3D8318010FB8D739E56CBF554F73",
+      "seed9731-R-tau4.json": "8BA8EF71BF255B53769A6E50EB65408E19BD59743F932F3DF741AF3EB97DCE99",
+      "seed9732-L-tau16.json": "461269AF2C4B89F9DD9B589E6CA322A29CA9357FAA29627911E7FB5B85E8E1A3",
+      "seed9732-L-tau4.json": "36F042052DF02EEA4371C3C76F8AFA727FECF5450158CBFAEA731E7E43A60D28",
+      "seed9732-R-tau16.json": "2E6AF0C80578CD61214099D166D692007B431FF557D678AFBBAF2FFD8DC8BFC9",
+      "seed9732-R-tau4.json": "A53A3567E84CB753805409A92B1C350C5F2AC6173557D221C000C975BF19A135"
+    },
+    "da2_results_sha256": "A76139A924D0D24EE5376378DBCDB12AAE539CE33182DE1050C741DC0475BB23",
+    "source_manifest": [
+      {
+        "path": "PLAN.md",
+        "sha256": "41DB8A90568A1BDA22DA1E7A3D8288967E24037FDCAD5C8B2518ED53D28511C5"
+      },
+      {
+        "path": "CONTRACT.json",
+        "sha256": "FFD057E2D2FB86CB8BBBE0F78EA66C10DF752ABB369448549430EDBF4595CC6E"
+      },
+      {
+        "path": "q10-rmt-config.json",
+        "sha256": "F39F2494ACA53FC3434CB4E73940838B10E7BF4FB08B228AEEFD6A9C39E0EFE3"
+      },
+      {
+        "path": "scripts/run_q10_rmt.py",
+        "sha256": "16EC3E13D8DB9C49934283FBC14B40470CCF32DBDA7F4213E57B223D12DC4C45"
+      },
+      {
+        "path": "scripts/audit_q10_rmt.py",
+        "sha256": "30FAA6E6F80AAA9A29FA602553739085DF43C9AE869D80057EC60AFA24DD4109"
+      },
+      {
+        "path": "scripts/seal_q10_rmt.py",
+        "sha256": "C66AA040EA7A6138E34B2A0F2C81C76D6B945FD10351DF9AA7121A37150BB372"
+      },
+      {
+        "path": "scripts/merge_q10_rmt.py",
+        "sha256": "9342400499943BCB9D693BC8E647192A28A9183A003EAF1B25DA34C7A45FA04D"
+      }
+    ],
+    "receipt_root": "qualification/sample-9731-9732",
+    "receipt_manifest": [
+      {
+        "path": "qualification/sample-9731-9732/execution.json",
+        "sha256": "B371FD8D3EFCB2354F78D1152AFC884FC4A6D6CA5D595B5295103DC68FCC7B86"
+      },
+      {
+        "path": "qualification/sample-9731-9732/authority-summary.json",
+        "sha256": "3389B671F8A4B61D0EA6484654418BF02E83A42C02424D3263FB69BFDBDC40C9"
+      },
+      {
+        "path": "qualification/sample-9731-9732/components.json",
+        "sha256": "E873F1FAAA1C1D2093F5D90D483AF621D1B371FA205A52EBD3E74D0E7B841977"
+      },
+      {
+        "path": "qualification/sample-9731-9732/endpoints.json",
+        "sha256": "1BE006961358B748CE0ECBCE635347274326494D546F82E6F32CA1FAAC0A7A8C"
+      },
+      {
+        "path": "qualification/sample-9731-9732/excluded-noncontract.json",
+        "sha256": "02A7CDA89BFC68F6AEA8C556546BAEA77559386C2F78C239C6A849A1F846033E"
+      },
+      {
+        "path": "qualification/sample-9731-9732/moves.jsonl",
+        "sha256": "9FC2FB529A8EDA40F9F6AC1EB43DE1E76C8E7EB1331C2FD66CEC69AE7C1BF83F"
+      },
+      {
+        "path": "qualification/sample-9731-9732/rows.json",
+        "sha256": "A9AE4E5209E7BB32C4815666A32EA9C66B9E60A79C0E1A739C486E68DDE041C3"
+      }
+    ],
+    "receipt_resolution": "one immutable merged receipt root; no archived, failed, or probe directory may substitute for it"
+  },
+  "scope": {
+    "primary_endpoints": 28,
+    "excluded_da2_geometry_failures": 4,
+    "candidate_state": "cloned f32 state only",
+    "canonical_repair_applied": false,
+    "scientific_seed_bundles": 0,
+    "behavioral_inference": false,
+    "dh08b_authorized": false
+  },
+  "topology_invariants": {
+    "mismatch_rows": 7003,
+    "one_step_orphan_rows": 3726,
+    "one_step_fragile_rows": 2274,
+    "one_step_broad_rows": 1003,
+    "k_star_counts": {
+      "1": 3277,
+      "2": 1128,
+      "4": 1172,
+      "8": 703,
+      "16": 397,
+      "none": 326
+    },
+    "helpful_components": 2738,
+    "largest_helpful_component_rows": 13,
+    "serialized_moves": 168071,
+    "local_replay_checks": 1792,
+    "local_replay_passes": 1792,
+    "no_helpful_rows_are_diagnostic": true,
+    "no_helpful_rows_are_entry_blockers": false
+  },
+  "prefix_domain": {
+    "choices": [0, -1, 1, -2, 2, -4, 4, -8, 8, -16, 16],
+    "positive_prefix_lengths": [1, 2, 4, 8, 16],
+    "negative_prefix_lengths": [1, 2, 4, 8, 16],
+    "max_coordinate_steps": 16,
+    "minimum_final_reserve_ulps": 16,
+    "one_final_choice_per_coordinate": true,
+    "unmeasured_prefix_policy": "replay from the frozen endpoint before use; never assume zero authority",
+    "readout": "exact learner-order sequential binary32 replay with bitwise comparison and signed-zero identity"
+  },
+  "geometry": {
+    "intermediate_debt_allowed": true,
+    "intermediate_guardrails": {
+      "axis_normalized_abs": 3.2e-5,
+      "norm_normalized_abs": 3.2e-6,
+      "cue_linear_normalized_abs": 3.2e-5
+    },
+    "final_da2_gates_are_hard": true,
+    "final_da2_gates": {
+      "axis_normalized_abs": 2e-6,
+      "norm_normalized_abs": 2e-7,
+      "cue_linear_normalized_abs": 2e-6,
+      "support_bounds_boundary_and_reserve": true
+    },
+    "final_state_reconstructed_from_f32_bytes": true
+  },
+  "relaxation": {
+    "object": "sum of per-coordinate convex hulls of exact committed prefix effects",
+    "purpose": "bounded screen and prioritization only",
+    "max_group_rows": 64,
+    "max_group_coordinates": 512,
+    "max_projected_iterations": 200,
+    "raw_disjoint_outside_result": "valid rejection only with complete coverage and at most one candidate coordinate per affected row",
+    "shared_component_outside_result": "prioritization only; exact replay remains required"
+  },
+  "exact_replay": {
+    "microgroup_cartesian_product_limit": 4096,
+    "large_group_strategy": "deterministic bounded beam",
+    "beam_width": 32,
+    "exploit_width": 24,
+    "explore_width": 8,
+    "maximum_rounds": 8,
+    "max_nodes_per_group": 8192,
+    "search_may_be_nonmonotonic": true,
+    "exploration_lane_is_retained": true,
+    "tie_break": "mismatch count, total ULP distance, residual L2, maximum absolute residual, stable prefix tuple",
+    "objective": ["mismatch_row_count", "total_ulp_distance", "residual_l2", "maximum_absolute_residual"],
+    "surrogate_effects_allowed": false,
+    "candidate_state_isolation": true
+  },
+  "coverage": {
+    "complete": "every declared legal choice affecting the group is measured or deterministically replayable within budget",
+    "partial": "an absent prefix can still be replayed within budget",
+    "incomplete": "a required prefix cannot be enumerated within budget",
+    "negative_feasibility_requires_complete_coverage": true,
+    "oversize_status": "OVERSIZE_UNTESTED",
+    "bounded_exhaustion_status": "INCONCLUSIVE_BOUNDED_SEARCH"
+  },
+  "classification": {
+    "exact": "EXACT_TARGET_REACHED",
+    "partial": "PARTIAL_FEASIBILITY_FOUND",
+    "domain_block": "BLOCKED_WITHIN_DECLARED_DOMAIN",
+    "additive_screen_reject": "RELAXATION_OUTSIDE_ADDITIVE_DOMAIN",
+    "bounded_search_failure": "INCONCLUSIVE_BOUNDED_SEARCH",
+    "budget_failure": "OVERSIZE_UNTESTED",
+    "row_diagnostic": "NO_INDIVIDUAL_HELPFUL_AUTHORITY"
+  },
+  "firewall": {
+    "repair_applied": false,
+    "behavioral_inference": false,
+    "scientific_seed_bundles": 0,
+    "dh08b_authorized": false,
+    "sealed_predecessor_writes": false
+  },
+  "forbidden_fields": [
+    "accuracy",
+    "reward",
+    "actions",
+    "old_map_margin",
+    "reversed_map_margin",
+    "behavior",
+    "scientific_seed_id",
+    "repair_applied_to_canonical_model"
+  ],
+  "allowed_outputs": [
+    "new Q10-PF5 engineering receipts under q10-pf5-v1 only",
+    "candidate prefix selections for cloned states",
+    "exact sequential-f32 mismatch and geometry diagnostics",
+    "coverage, relaxation, replay-budget, and feasibility-class receipts"
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "schema_version": "BROKER_ACCOUNT_SNAPSHOT_V1",
+  "account_id_hash": "de521246fa5c54b0485e2273844519114b1ce434c8f47641ad87d77a459bc93e",
+  "environment": "SYNTHETIC_QUALIFICATION",
+  "broker_raw_terms": [
+    [
+      "balance",
+      1000.0
+    ],
+    [
+      "projectedBalance",
+      1000.0
+    ],
+    [
+      "availableFunds",
+      1000.0
+    ]
+  ],
+  "cash_equivalent": 1000.0,
+  "equity": 1000.0,
+  "unrealized_pnl": 0.0,
+  "realized_pnl": null,
+  "available_funds": 1000.0,
+  "margin_terms": [],
+  "broker_time_ns": null,
+  "received_time_ns": 1800000000006000000,
+  "raw_payload_hash": "77d2784e3a2b69dd3200da91eff6599cb683b7c096acc6670256e707b084f561",
+  "field_provenance": [
+    [
+      "cash_equivalent",
+      "BROKER_RAW.balance"
+    ],
+    [
+      "equity",
+      "BROKER_RAW.projectedBalance"
+    ]
+  ],
+  "content_hash": "11cd7cd44da3c61bd3375fa3d06527d34b7a0fe78e1fe4265220f2dfe718b923"
+}

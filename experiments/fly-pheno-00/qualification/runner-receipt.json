@@ -1,0 +1,12 @@
+{
+  "contract_sha256": "c2c52cd4dcbb76cfb0a758bca3ea1deffd52296497269ee395da2c1e1e963ecb",
+  "fit_manifest_sha256": "b1718c980f9bbeedb34f5fa6c540dc7a63483a924cebd753f022853bc9e51261",
+  "fit_rows": 11232,
+  "lesion_outcome_comparisons_recorded": false,
+  "measured_execution_authorized": false,
+  "outcomes_opened": false,
+  "primary_rows": 1728,
+  "qualification_seed_namespace": "910000..910005",
+  "status": "QUALIFICATION_ONLY_PASS",
+  "summary_sha256": "cea0e1da1ac31a83a603fd808ba0e1eb1a83679ce6ff7d24c87bd113cb42b6c1"
+}

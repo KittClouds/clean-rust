@@ -1,0 +1,13 @@
+﻿{
+    "contract":  "MST_CAMPAIGN_MANIFEST_LOCK_V1",
+    "campaign_id":  "RG2_SIX_INDEX_ENVIRONMENT_FRAME_V1",
+    "status":  "FROZEN_BEFORE_EXECUTION",
+    "frozen_at_utc":  "2026-08-12T08:57:29.7287896Z",
+    "manifest_sha256":  "4012ebff1b744ff6121f43ef2184fdfa973a9aacb1a78f1712bf3c795ad2415e",
+    "research_generation":  2,
+    "configuration_hash":  "4284550518493202411",
+    "production_windows":  54,
+    "holdout_windows":  12,
+    "execution_started":  false,
+    "mutation_rule":  "new_campaign_id_and_new_lock_required"
+}

@@ -1,0 +1,30 @@
+{
+  "receipt_id": "FAS_FROZEN_OBSERVER_BUNDLE_E0_V05_SEAL_ATTEMPT_FAILURE_V01",
+  "status": "SEAL_ATTEMPT_STOPPED_BEFORE_SEAL_ROOT_CREATED",
+  "created_utc": "2026-09-26T07:32:15.827765+00:00",
+  "attempted_seal_script": {
+    "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/seal_e0_v05.py",
+    "sha256": "d4cae50fd007d61457043fb9dab750d9ff4e762dbbbeb5eea7ebc39721f09d52",
+    "bytes": 16864
+  },
+  "failure": "The seal script omitted the v08 draft integrity receipt manifest itself from the required seal entry set, so its pre-root membership assertion stopped the attempt.",
+  "preserved_unsealed_outputs": {
+    "e0_freeze_contract": {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/e0-freeze-v05.json",
+      "sha256": "590668bdf3ded4837d542e6c829f8dbe7defb93ab7e4e69ecab4e6c1f32a9d5a",
+      "bytes": 20904
+    },
+    "e2_protocol": {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/e2-run-v02.json",
+      "sha256": "36ec221031ee7438a53cf272ff9b92ceb2b4d0f66e3c741e24b75f9f8ea1c817",
+      "bytes": 11026
+    }
+  },
+  "seal_manifest_created": false,
+  "model_contact_authorized": false,
+  "tokenizer_contact_authorized": false,
+  "model_or_tokenizer_contact_performed": false,
+  "feature_extraction_performed": false,
+  "required_correction": "Use a versioned seal-script and final-contract path; include the full v08 entry set and the v08 receipt manifest itself; preserve this failed attempt in the successful seal membership.",
+  "not_a_seal": true
+}

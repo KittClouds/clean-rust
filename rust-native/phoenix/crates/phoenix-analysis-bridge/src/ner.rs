@@ -63,7 +63,8 @@ struct BiBackend {
 
 pub struct LoadedNer {
     engine: PhoenixNerEngine,
-    metadata: phoenix_rel_post::GlinerBiModelMetadata,
+    metadata: Option<phoenix_rel_post::GlinerBiModelMetadata>,
+    identity: Option<phoenix_analysis_contract::AnalysisModelIdentity>,
     pub load_micros: u64,
     pub cache_status: OrtCacheStatus,
 }
@@ -71,6 +72,23 @@ pub struct LoadedNer {
 impl LoadedNer {
     pub fn load(model_root: &Path) -> Result<Self> {
         let started = Instant::now();
+        if model_root.join("gliner25.json").is_file() {
+            let (backend, identity) = crate::gliner25::Backend::load(model_root)?;
+            let engine = PhoenixNerEngineBuilder::new()
+                .schema(DynamicSchemaBuilder {
+                    max_labels: 14,
+                    ..Default::default()
+                })
+                .model(Box::new(backend))
+                .build();
+            return Ok(Self {
+                engine,
+                metadata: None,
+                identity: Some(identity),
+                load_micros: elapsed_micros(started),
+                cache_status: OrtCacheStatus::Disabled,
+            });
+        }
         let (model, ort_info) = GlinerBiModel::load_with_ort_info(model_root)
             .with_context(|| format!("load GLiNER-BI from {}", model_root.display()))?;
         let load_micros = elapsed_micros(started);
@@ -87,14 +105,19 @@ impl LoadedNer {
             .build();
         Ok(Self {
             engine,
-            metadata,
+            metadata: Some(metadata),
+            identity: None,
             load_micros,
             cache_status: ort_info.cache_status,
         })
     }
 
-    pub fn metadata(&self) -> &phoenix_rel_post::GlinerBiModelMetadata {
-        &self.metadata
+    pub fn metadata(&self) -> Option<&phoenix_rel_post::GlinerBiModelMetadata> {
+        self.metadata.as_ref()
+    }
+
+    pub fn identity(&self) -> Option<&phoenix_analysis_contract::AnalysisModelIdentity> {
+        self.identity.as_ref()
     }
 
     pub fn run(
@@ -130,8 +153,8 @@ fn run_loaded(
     let chunk_elapsed = elapsed_micros(chunk_started);
     let scope = ScopeKey::default();
     let started = Instant::now();
-    let output = engine
-        .extract_mentions(&SurfaceNerInput {
+    let (output, metrics) = engine
+        .extract_mentions_with_metrics(&SurfaceNerInput {
             document_id,
             text,
             tokens: &tokens,
@@ -142,6 +165,17 @@ fn run_loaded(
             label_bank_context: None,
         })
         .context("dynamic NER extraction")?;
+    eprintln!("PHOENIX_NER_STAGES {metrics:?}");
+    if let Some(error) = output
+        .diagnostics
+        .iter()
+        .find(|d| d.code.as_str() == "NER_MODEL_FAIL")
+    {
+        anyhow::bail!(
+            "model extraction failed; refusing partial publication: {}",
+            error.message
+        );
+    }
     let dynamic_ner_micros = elapsed_micros(started);
     let aggregated = aggregate_entities(document_hash, &output.mentions)?;
     let (candidates, candidate_evidence) = build_nli_candidates(
@@ -506,7 +540,7 @@ fn packet_kind(packet: &MentionPacket) -> AnalysisEntityKind {
     }
 }
 
-fn model_labels(label_pack: &LabelPack) -> Vec<String> {
+pub(crate) fn model_labels(label_pack: &LabelPack) -> Vec<String> {
     let mut labels = Vec::new();
     for label in &label_pack.labels {
         push_model_label_aliases(&mut labels, label.as_str());
@@ -551,7 +585,7 @@ fn push_model_label_aliases(labels: &mut Vec<String>, label: &str) {
     }
 }
 
-fn insert_model_prediction(
+pub(crate) fn insert_model_prediction(
     by_key: &mut BTreeMap<(u32, u32, String), DiscoveredSpan>,
     prediction: GlinerBiPrediction,
 ) {

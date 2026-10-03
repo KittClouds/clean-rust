@@ -1,0 +1,465 @@
+{
+  "analysis_outputs_existed_before_failure": false,
+  "error_class": "KeyError: fold_index missing in prediction-lock model row",
+  "failure": "analysis expects fold_index, heldout_block, and replicate_index in prediction-lock entries; frozen lock rows contain the fit_id and prediction receipt linkage but omit these fields",
+  "files": [
+    {
+      "byte_length": 36345,
+      "path": "experiments/fly-reach-03/frozen-fabrique/F4-BINDING-01-STAGE-B-v0.1/IMPLEMENTATION-FREEZE.json",
+      "sha256": "9469ac8b9ef7e0db530ec2febae15cf17677bd58c476886593b12e5a8d0da37b"
+    },
+    {
+      "byte_length": 14928,
+      "path": "experiments/fly-reach-03/frozen-fabrique/F4-BINDING-01-STAGE-B-v0.1/SOURCE-INPUT-MANIFEST.json",
+      "sha256": "461a959b099ad7cb555d6cfa5dfdc66c191f3ffcdadc79f874801abe36079752"
+    },
+    {
+      "byte_length": 44290,
+      "path": "experiments/fly-reach-03/frozen-fabrique/F4-BINDING-01-STAGE-B-v0.1/MODEL-REGISTRY.json",
+      "sha256": "8d936560fdf442e69e724f5bdf2898fad3a3b624f116ac385aca8a5b7d637713"
+    },
+    {
+      "byte_length": 16851,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/task-bank/TASK-BANK-MANIFEST.json",
+      "sha256": "9ed34090f909292cb67cd2ea59c6d43d2bf53899511284e08977dda7111e3bdd"
+    },
+    {
+      "byte_length": 39084919,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/task-bank/training.json",
+      "sha256": "8cac76b0618caaecca501e308eb9ffffe26d30c3980037385562fb53ed7c8188"
+    },
+    {
+      "byte_length": 15937916,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/native-collection/RAW-PREDICTORS.bin",
+      "sha256": "e3084483f7438298abe14bc09a16d243f9aa68c2622fa62e59d94d048c5817e8"
+    },
+    {
+      "byte_length": 1817510,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/native-collection/RAW-SCORING-TRUTH.bin",
+      "sha256": "3e382caa8bfc5b993cc0c4ec10fdf2d54e40bb3b912c6c9f670f004c794c099a"
+    },
+    {
+      "byte_length": 96562,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/native-collection/NATIVE-COLLECTION-RECEIPT.json",
+      "sha256": "394b2a5bc662dc96e884113f52bba5891667d3743d643053c4809ec230b19a1b"
+    },
+    {
+      "byte_length": 57230,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/COLLECTION-INTEGRITY-RECEIPT.json",
+      "sha256": "62ca3409dbeb6adfd401bf8dfaf3564eeeeb469b10257413e9270b155aea5a34"
+    },
+    {
+      "byte_length": 16336,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/PREDICTION-LOCK.json",
+      "sha256": "3dc0e1a68b33d02c45b86c2a948e8fa35fcbc08628e0f30468ea270a975a126c"
+    },
+    {
+      "byte_length": 13119,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/PRE-TRUTH-INTEGRITY-RECEIPT.json",
+      "sha256": "abf24df9b387be6739f1ee26d90261bca0415b18d4b0c02709094d861bd963dc"
+    },
+    {
+      "byte_length": 13218,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/EMPTY-BLOCK-REPAIR-INFERENCE-RECEIPT.json",
+      "sha256": "6809816f4316e95454625c56b52d5733390335b1a40362248d8457e526dd561e"
+    },
+    {
+      "byte_length": 658,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/EMPTY-BLOCK-REPAIR-INTEGRITY-RECEIPT.json",
+      "sha256": "a3c885c65fdc67a3d185d132e95315d70ec7fcbaaf8380913889d07774ec1ec0"
+    },
+    {
+      "byte_length": 6134,
+      "path": "experiments/fly-reach-03/frozen-fabrique/F4-BINDING-01-STAGE-B-v0.1/repair-empty-block-loader-v0.1/REPAIR-MANIFEST.json",
+      "sha256": "09afd9bc9ed9793a0bb96283c4f6bffefeac3134f4b5a89b2ebcbe557284eab3"
+    },
+    {
+      "byte_length": 65,
+      "path": "experiments/fly-reach-03/frozen-fabrique/F4-BINDING-01-STAGE-B-v0.1/repair-empty-block-loader-v0.1/REPAIR-MANIFEST.sha256",
+      "sha256": "1c2af3cff55d0e1074a360a771c67e61cbecd710a79b2412f8d0614037fca63d"
+    }
+  ],
+  "fits_or_predictions_rerun": false,
+  "identity": "F4-BINDING-01-STAGE-B-PROSP-v0.1",
+  "locked_prediction_file_count": 72,
+  "locked_prediction_surface": [
+    {
+      "byte_length": 1398092,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/predictions/Cphi-H309000-I0.bin",
+      "sha256": "c6d0493ed389895f31e85181b8e0d7ba3174e5f3b154b8f1c8f3d1baa0d90f7b"
+    },
+    {
+      "byte_length": 1398092,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/predictions/Cphi-H309000-I1.bin",
+      "sha256": "83d3881408d39c980b8ebca99a41638c2b3087b10a15aa47713bfd13dba26570"
+    },
+    {
+      "byte_length": 1398092,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/predictions/Cphi-H309000-I2.bin",
+      "sha256": "3544996b64b21425d084e041712e711a7ad491b06239221b3722c6db7e4d5fdf"
+    },
+    {
+      "byte_length": 1398092,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/predictions/Cphi-H309001-I0.bin",
+      "sha256": "aa04b0b97ae725e4934924650ef7d537f5dfcddefadb686036ef7d5449939760"
+    },
+    {
+      "byte_length": 1398092,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/predictions/Cphi-H309001-I1.bin",
+      "sha256": "d96ea2da2b2d5430a6cdf4c683dcf1cb85fad9ab139a33da1ec5d4a5ac8c8a7a"
+    },
+    {
+      "byte_length": 1398092,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/predictions/Cphi-H309001-I2.bin",
+      "sha256": "5bba2a67f9ff39f88f1a3e8a2fb06ff1686928a45969a59c7ca3f3653c9f5e8b"
+    },
+    {
+      "byte_length": 1398092,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/predictions/Cphi-H309002-I0.bin",
+      "sha256": "a0986943f17fc883ed68ed50817249faedb4470436af812f68279ba7f40f3aff"
+    },
+    {
+      "byte_length": 1398092,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/predictions/Cphi-H309002-I1.bin",
+      "sha256": "64e4a07e2633dc364f0604ba90f48e6d3fc2a4ae294b8d9bbe571f6c4c2e9661"
+    },
+    {
+      "byte_length": 1398092,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/predictions/Cphi-H309002-I2.bin",
+      "sha256": "ae88e8841b7cb44f88e0c25b1976fb95f41264c6f84574a3ff2892e8c27cb503"
+    },
+    {
+      "byte_length": 1398092,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/predictions/Cphi-H309003-I0.bin",
+      "sha256": "fb9090f162c5ef8748682b88b2844d3f50f274b843b24700fc9b2febbe5aab55"
+    },
+    {
+      "byte_length": 1398092,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/predictions/Cphi-H309003-I1.bin",
+      "sha256": "9bda4bfbe6d21fe4f248e3297f911c4347d858b23bf8e12660d181c2e392dd78"
+    },
+    {
+      "byte_length": 1398092,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/predictions/Cphi-H309003-I2.bin",
+      "sha256": "9592c7bad5317873f75773f8c9989f208d141efc62369669955974e6da32f913"
+    },
+    {
+      "byte_length": 1398092,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/predictions/Cphi-H309004-I0.bin",
+      "sha256": "6ddfa91affdd7a5993c9d64e27130f0274afd21879e85e6eaa9d6ad73a712d9f"
+    },
+    {
+      "byte_length": 1398092,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/predictions/Cphi-H309004-I1.bin",
+      "sha256": "48eb6a64041ebdde5ad532fa6eaedd1ae72929472f7427c14c63385e5c7f6ae9"
+    },
+    {
+      "byte_length": 1398092,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/predictions/Cphi-H309004-I2.bin",
+      "sha256": "ec4c2cce3b78c18c8e2cfc645028c298ff00795e8d384e46bc7f6b3dbb7306b0"
+    },
+    {
+      "byte_length": 1398092,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/predictions/Cphi-H309005-I0.bin",
+      "sha256": "96a6d1d28e61806b3ae5d60781c2bf8efc0adf9019d2f6d520dde424a5cbfbc6"
+    },
+    {
+      "byte_length": 1398092,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/predictions/Cphi-H309005-I1.bin",
+      "sha256": "703eacd787baf4d6573bf5e6f0da7754d8f60f5930ec4374803a750081d5565f"
+    },
+    {
+      "byte_length": 1398092,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/predictions/Cphi-H309005-I2.bin",
+      "sha256": "6fe36e31564c6faa219636fff6999884240e250e3eb0ea18053664302ad3c5e1"
+    },
+    {
+      "byte_length": 1398092,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/predictions/Cphi-H309006-I0.bin",
+      "sha256": "e71b891fccba3ad7c39365ba94d0d94a15f256e42ac332387afacc825ca77a7e"
+    },
+    {
+      "byte_length": 1398092,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/predictions/Cphi-H309006-I1.bin",
+      "sha256": "7511d6826539a9fc6aeee43c14a6594bf8d3439d4103b03b5f45e1e98fc4f6d5"
+    },
+    {
+      "byte_length": 1398092,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/predictions/Cphi-H309006-I2.bin",
+      "sha256": "3a826a4cc04f106701b9c3b1aeaa1087f6922bee654ec091b8fba6b8e82395d4"
+    },
+    {
+      "byte_length": 1398092,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/predictions/Cphi-H309007-I0.bin",
+      "sha256": "4d7ade6fef4b83730ffa6295b5647f300fe02f08fb87c2c9cbac7e495646b502"
+    },
+    {
+      "byte_length": 1398092,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/predictions/Cphi-H309007-I1.bin",
+      "sha256": "62243eae16ea0da0f35015eb06e43c3cad5a8199bd1bc991422cc04af0020b41"
+    },
+    {
+      "byte_length": 1398092,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/predictions/Cphi-H309007-I2.bin",
+      "sha256": "a439c64cef47749d5433b7c485b7f6551adf4820510a04c94132eae83685ecbd"
+    },
+    {
+      "byte_length": 1398092,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/predictions/Cphi-H309008-I0.bin",
+      "sha256": "519a975294e39a5a25a50e5104986bd320a4474fa632aef3f18365ddbc449ee0"
+    },
+    {
+      "byte_length": 1398092,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/predictions/Cphi-H309008-I1.bin",
+      "sha256": "91738824c2f4dadce335215aeefdf908d82e564829abb34544c3e5d1af4a3ec0"
+    },
+    {
+      "byte_length": 1398092,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/predictions/Cphi-H309008-I2.bin",
+      "sha256": "813c2b9786339b41091def8a826c09b29be358726d59d406f877d03be1b42e2e"
+    },
+    {
+      "byte_length": 1398092,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/predictions/Cphi-H309009-I0.bin",
+      "sha256": "f571e2bd7e65416a0ca15b6c77eaff3739d831e0db3b19bcd377865b888f7307"
+    },
+    {
+      "byte_length": 1398092,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/predictions/Cphi-H309009-I1.bin",
+      "sha256": "18ed6102660ca9d4fd2fb024a49517daddf02985fc7004ed99230ba96c9e4c88"
+    },
+    {
+      "byte_length": 1398092,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/predictions/Cphi-H309009-I2.bin",
+      "sha256": "8f6dbafa609d695a6bd9566121ed2a21ce9726222acd75d3743b007c02ca5f0a"
+    },
+    {
+      "byte_length": 1398092,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/predictions/Cphi-H309010-I0.bin",
+      "sha256": "f6c6d7214332da6f7487e6b22d05ec6f7d4f1fc4aa6c316e80ed4b142a1d7f8f"
+    },
+    {
+      "byte_length": 1398092,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/predictions/Cphi-H309010-I1.bin",
+      "sha256": "909ad3ba36958d3812784091e425f7537dcd3372fa656b33ecff887512b10c4c"
+    },
+    {
+      "byte_length": 1398092,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/predictions/Cphi-H309010-I2.bin",
+      "sha256": "9ca48794d7f881bcc932f7d529638ef678a934e313cdad36bd99d3e85cdbd4b7"
+    },
+    {
+      "byte_length": 1398092,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/predictions/Cphi-H309011-I0.bin",
+      "sha256": "e9a3fefae7b160a32593b4aaeb519819295332bb33f652229a50fdecaf490790"
+    },
+    {
+      "byte_length": 1398092,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/predictions/Cphi-H309011-I1.bin",
+      "sha256": "2d75bdec501c944107c7748ee10bca7e69c14f8f542a8511ceb0a802db05e9aa"
+    },
+    {
+      "byte_length": 1398092,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/predictions/Cphi-H309011-I2.bin",
+      "sha256": "1a0835fe9dfb9cebc295ae0b0e7de86938faa28cfbfaaf5f147e0c8df920af20"
+    },
+    {
+      "byte_length": 12935,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/fit-receipts/Cphi-H309000-I0.json",
+      "sha256": "9464281f1edf92ee8d54e296685f38f9a87f038ea37bb17913c62eed3444d0dc"
+    },
+    {
+      "byte_length": 12935,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/fit-receipts/Cphi-H309000-I1.json",
+      "sha256": "6169a578d65f31fdbf6c961e6eaefea32b884af7fda7090726c31fbead1675ce"
+    },
+    {
+      "byte_length": 12935,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/fit-receipts/Cphi-H309000-I2.json",
+      "sha256": "2a071fac2a8f2b66eaeb6affe03305fed6fbdd66fe517f080c1d88df12d02218"
+    },
+    {
+      "byte_length": 12935,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/fit-receipts/Cphi-H309001-I0.json",
+      "sha256": "bc5923c2a606346e38285b9cb8cbba615fd815cb94a788d9c1cd8a4ffb8ad86c"
+    },
+    {
+      "byte_length": 12935,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/fit-receipts/Cphi-H309001-I1.json",
+      "sha256": "fc3e337b94ea6eba9ffcd008a005dfbe94b3e1f6b20132a26fd56d3c7e236bc4"
+    },
+    {
+      "byte_length": 12935,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/fit-receipts/Cphi-H309001-I2.json",
+      "sha256": "7055b46f1fdcbd9335960845e899ee391729ecfefa5a506ce3660c6cc8feb678"
+    },
+    {
+      "byte_length": 12935,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/fit-receipts/Cphi-H309002-I0.json",
+      "sha256": "871d096427999b5296c1ff4d81961f74f4759bdb4f288d88c393f4aee76a1617"
+    },
+    {
+      "byte_length": 12935,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/fit-receipts/Cphi-H309002-I1.json",
+      "sha256": "b4a330b7158fb053b8a4c5dc423ad32d9eece791794c9f1ab179744f50fccdfc"
+    },
+    {
+      "byte_length": 12935,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/fit-receipts/Cphi-H309002-I2.json",
+      "sha256": "c93a4f116b7fb1e9240893209479a0db0d913f16474469383e696251d3e3cfcf"
+    },
+    {
+      "byte_length": 12935,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/fit-receipts/Cphi-H309003-I0.json",
+      "sha256": "58870a0d41a94824c5a600a3b860912142667485069360d960d5f20fc86544de"
+    },
+    {
+      "byte_length": 12935,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/fit-receipts/Cphi-H309003-I1.json",
+      "sha256": "ee32f33421c8792ccec4a31bb6e4f3e783ac9eb53311fe7c3de97402bbdd77d2"
+    },
+    {
+      "byte_length": 12935,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/fit-receipts/Cphi-H309003-I2.json",
+      "sha256": "3fdfb034958142784c0f11eacd571e868f64404a08b22e09e017db70b5145612"
+    },
+    {
+      "byte_length": 12935,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/fit-receipts/Cphi-H309004-I0.json",
+      "sha256": "34d1b45afad3c36df6682ef78fa98edc4f304efaeaf88747b024abdf89bac6ef"
+    },
+    {
+      "byte_length": 12935,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/fit-receipts/Cphi-H309004-I1.json",
+      "sha256": "4a6c3f7570e8f818ef20eea0a879609d7a2507d0735c6f4419868747e55231b4"
+    },
+    {
+      "byte_length": 12935,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/fit-receipts/Cphi-H309004-I2.json",
+      "sha256": "b37fcfed22e5723c71a6bc74a52cf123d454ea91de9e505db97df269e0bf4c34"
+    },
+    {
+      "byte_length": 12935,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/fit-receipts/Cphi-H309005-I0.json",
+      "sha256": "275cdd33550f9aa0f3300b58082b4c4a32612540340a0f91c7a7c488064d5bf7"
+    },
+    {
+      "byte_length": 12935,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/fit-receipts/Cphi-H309005-I1.json",
+      "sha256": "d62898359d80b30a99656bb74b5e2c7516a5c458e27b7569985e45aaf2fd8f66"
+    },
+    {
+      "byte_length": 12935,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/fit-receipts/Cphi-H309005-I2.json",
+      "sha256": "3fd58271297455aa9ac93d7f0a2d84df3d378c2f83192ed6d6ab5c727653da1d"
+    },
+    {
+      "byte_length": 12935,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/fit-receipts/Cphi-H309006-I0.json",
+      "sha256": "6e03afa25b7a363b8c5e8a8fc16ac482b2a87e23726e4e69a2e014c435f18c4a"
+    },
+    {
+      "byte_length": 12935,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/fit-receipts/Cphi-H309006-I1.json",
+      "sha256": "50f1808fc62b81fa461e64e3a927e5dc707883468f01411bf627d9fcee9572d3"
+    },
+    {
+      "byte_length": 12935,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/fit-receipts/Cphi-H309006-I2.json",
+      "sha256": "b84e1cdd6bf72f7dce740d4b23d47043eee3ca04d23f695465f766cd27e970b1"
+    },
+    {
+      "byte_length": 12935,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/fit-receipts/Cphi-H309007-I0.json",
+      "sha256": "53c406ca551269057cca1381cdaf86fce65d128ff78f2e941267663f90b0c7f4"
+    },
+    {
+      "byte_length": 12935,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/fit-receipts/Cphi-H309007-I1.json",
+      "sha256": "67463311315b140164f98c0013a7b969d7a0e3b91856626982d8e9c3dd462a08"
+    },
+    {
+      "byte_length": 12935,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/fit-receipts/Cphi-H309007-I2.json",
+      "sha256": "f9708a20148e500a4b401e2fdd00b120b1bd789d364f79625e6b11d0de42a95c"
+    },
+    {
+      "byte_length": 12935,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/fit-receipts/Cphi-H309008-I0.json",
+      "sha256": "d3fdb089f834ecd3b646423321435feae6e0f7c66562add4d92ab934e63e0783"
+    },
+    {
+      "byte_length": 12935,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/fit-receipts/Cphi-H309008-I1.json",
+      "sha256": "5fb1f9784589a1bbab9ec4842c36dee1881e510cb0ecbfadb52baa16962ef3c9"
+    },
+    {
+      "byte_length": 12935,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/fit-receipts/Cphi-H309008-I2.json",
+      "sha256": "50d22b1565b4ba61727ecf0256d813b8f87b23c0b2b9a0f414eaa3f4e794e46c"
+    },
+    {
+      "byte_length": 12935,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/fit-receipts/Cphi-H309009-I0.json",
+      "sha256": "a138219fce4f000c9fc897d4cbddf1102f59fd37982931e83f46158e86e2b0e3"
+    },
+    {
+      "byte_length": 12935,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/fit-receipts/Cphi-H309009-I1.json",
+      "sha256": "e009dbcbad77eb400777f4535dfc5e7c2e903f4a62b4fa1755abe9139da18172"
+    },
+    {
+      "byte_length": 12935,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/fit-receipts/Cphi-H309009-I2.json",
+      "sha256": "a5e929840c936e28ffb082aeb57db2de70ca0530c6c042e24e9935e3f71609f7"
+    },
+    {
+      "byte_length": 12936,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/fit-receipts/Cphi-H309010-I0.json",
+      "sha256": "60620e939b57ac5268cda56582763e5d7200dc82351c31572149f0b4abcbacb2"
+    },
+    {
+      "byte_length": 12936,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/fit-receipts/Cphi-H309010-I1.json",
+      "sha256": "4419f462e2ab01de1a7bb991d377b5a42f66af17695fc5c92113a13bc218cac6"
+    },
+    {
+      "byte_length": 12936,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/fit-receipts/Cphi-H309010-I2.json",
+      "sha256": "35c7f0e539c731f3fd615e441ee5eed0b1b049e5294de42a18d3438f4b306a6f"
+    },
+    {
+      "byte_length": 12936,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/fit-receipts/Cphi-H309011-I0.json",
+      "sha256": "ef1c14aea2958ae05c841b845ccbd9643b4058d41cbd78d89eb0653f1d88291a"
+    },
+    {
+      "byte_length": 12936,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/fit-receipts/Cphi-H309011-I1.json",
+      "sha256": "36c128db1249819478008b5a05948d59ee8ec245b6ceec5f80bc62db5b03bc8c"
+    },
+    {
+      "byte_length": 12936,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/fit-receipts/Cphi-H309011-I2.json",
+      "sha256": "f8106efe3f49d2194a4f47a7a09863fe7a36665c0e6205775a7171ce5442bdaf"
+    }
+  ],
+  "partial_in_memory_scoring": {
+    "assignment": "1100",
+    "comparative_summary_produced": false,
+    "comparison_outputs_written": false,
+    "condition_score_calls_completed": 3,
+    "conditions_scored": [
+      "intact",
+      "pair_swap",
+      "cycle_4"
+    ],
+    "model_index": 0
+  },
+  "schema": "F4-BINDING-01-stage-b-analysis-start-stop-v0.1",
+  "stage": "frozen analysis metadata join",
+  "status": "STOP_AFTER_TRUTH_OPEN_BEFORE_COMPARATIVE_OUTPUT",
+  "target_values_loaded": true,
+  "truth_and_collection_unchanged": true,
+  "truth_values_opened": true
+}

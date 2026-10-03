@@ -1,0 +1,32 @@
+{
+  "protocol": "Q10-RMT",
+  "status": "Q10_RMT_VALID__TOPOLOGY_MAPPED",
+  "declared_da2_endpoints": 32,
+  "primary_valid_endpoints": 28,
+  "excluded_noncontract_endpoints": 4,
+  "mismatch_rows_mapped": 7003,
+  "component_records": 2738,
+  "repair_applied": false,
+  "behavioral_inference": false,
+  "scientific_seed_bundles_used": 0,
+  "dh08b_authorized": false,
+  "local_replay_checks": 1792,
+  "local_replay_passes": 1792,
+  "shards": [
+    "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-rmt-v1\\qualification\\shard14_00",
+    "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-rmt-v1\\qualification\\shard14_01",
+    "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-rmt-v1\\qualification\\shard14_02",
+    "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-rmt-v1\\qualification\\shard14_03",
+    "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-rmt-v1\\qualification\\shard14_04",
+    "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-rmt-v1\\qualification\\shard14_05",
+    "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-rmt-v1\\qualification\\shard14_06",
+    "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-rmt-v1\\qualification\\shard14_07",
+    "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-rmt-v1\\qualification\\shard14_08",
+    "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-rmt-v1\\qualification\\shard14_09",
+    "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-rmt-v1\\qualification\\shard14_10",
+    "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-rmt-v1\\qualification\\shard14_11",
+    "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-rmt-v1\\qualification\\shard14_12",
+    "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-rmt-v1\\qualification\\shard14_13"
+  ],
+  "next_decision": "Choose the next correction architecture from the sealed residual topology; do not open DH08B."
+}

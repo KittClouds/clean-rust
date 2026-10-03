@@ -1,0 +1,11 @@
+{
+  "autodiff": false,
+  "complete": true,
+  "config": "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\dh02\\artifacts\\runs\\20260912T040045Z\\sealed\\config.json",
+  "learning_rule_search": false,
+  "observer_feeds_learner": false,
+  "outcome_rows": 576,
+  "protocol": "DH-02",
+  "threads": 4,
+  "wall_seconds": 7.9525774
+}

@@ -1,0 +1,6 @@
+{
+  "exit_code": 0,
+  "wall_seconds_including_launch": 8.084171700000297,
+  "observed_peak_working_set_bytes": 16297984,
+  "method": "Windows GetProcessMemoryInfo peak working set sampled every 0.1 s; simulator only"
+}

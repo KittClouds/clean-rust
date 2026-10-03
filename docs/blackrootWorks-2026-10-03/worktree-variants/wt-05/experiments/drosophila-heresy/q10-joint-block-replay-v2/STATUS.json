@@ -1,0 +1,23 @@
+{
+  "protocol": "Q10-JBR2",
+  "status": "Q10_JBR2_STAGE1_VALID__JOINT_REPLAY_COMPLETE",
+  "review": "VERIFIED",
+  "audited_events": 8,
+  "blocks": 48,
+  "joint_candidates": 6000,
+  "shared_pair_blocks": 24,
+  "disjoint_control_blocks": 24,
+  "scientific_seed_bundles_used": 0,
+  "behavioral_inference": false,
+  "future_dh08b_authorized": false,
+  "promotion": {
+    "exact_joint_block_replay": true,
+    "local_block_diagnostics": true,
+    "global_repair": false,
+    "scientific": false
+  },
+  "parent": {
+    "protocol": "Q10-SM",
+    "status": "Q10_SM_STAGE1_VALID__F32_SAFE_FREEDOM_PRESENT"
+  }
+}

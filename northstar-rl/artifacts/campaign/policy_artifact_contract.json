@@ -1,0 +1,25 @@
+{
+  "schema_version": "POLICY_ARTIFACT_V1",
+  "policy_artifact_id": "f3eb080cbd556ce375664026ac8d555cda1ab4f52c580880adf61b9dc09e8373",
+  "materialization_state": "CONTRACT_ONLY_PRE_LEARNER",
+  "originating_experiment_id": "a8ecde3e6bd83e00e392480d353fe17eb9dfa304c78a45839596767b78a642b1",
+  "weights_hash": null,
+  "observation_dictionary_hash": "2962e05d4431ad00d5a4a7eea13b3ba8292f0b04377816a16d33c1ccc7fb457e",
+  "action_spec_id": "ff42128c28e9250f22e97751d5bf496fde5974e236de390adb8bd81dd1871d65",
+  "transform_state_id": "dec8e024669dc81256f389442bf4342608eb0b375b732d382014e23c40185199",
+  "environment_id": "804b59bad205db0c337c4e6c564a365dda1e3949b4a08ffa286df06e34c25fc7",
+  "executor_name": "stable_baselines3",
+  "executor_version": "2.9.0",
+  "inference_signature": {
+    "input_dtype": "float32",
+    "input_shape": [
+      6
+    ],
+    "output_dtype": "float32",
+    "output_shape": [
+      1
+    ],
+    "deterministic": true
+  },
+  "onnx_export_identity": null
+}

@@ -1,0 +1,17 @@
+{
+  "contract_id":"FAS_S07_SHARED_TOPK_SAE_TRAINING_V01",
+  "status":"FROZEN_PRE_FIT",
+  "input_dimension":2048,
+  "dictionary_width":16384,
+  "expansion_factor":8,
+  "activation":{"encoder":"affine_then_relu_then_topk","k":32,"topk_ties":"torch deterministic index ordering"},
+  "decoder":{"bias":true,"column_norm":"project each decoder column to unit L2 norm after every optimizer update"},
+  "initialization":{"decoder":"seeded standard-normal columns then unit normalize","encoder":"decoder transpose","encoder_bias":0,"decoder_bias":"streaming mean of both S01 training-side standardized surfaces"},
+  "objective":{"loss":"mean squared error over batch and 2048 input coordinates","auxiliary_loss":null,"sparsity_penalty":null},
+  "optimizer":{"name":"Adam","learning_rate":0.0003,"betas":[0.9,0.999],"epsilon":1e-8,"weight_decay":0,"gradient_clipping":null,"schedule":null},
+  "training":{"epochs":20,"paired_rows_per_batch":512,"vector_batch_size":1024,"order":"interleave M,F for each shuffled row","final_partial_batch":"retain","row_scope":"split_bucket in {1,2,3,4}","labels_visible_to_trainer":false,"heldout_visible_to_trainer":false,"fas00_visible_to_trainer":false},
+  "seeds":[1301,2027,31415],
+  "execution":{"device":"NVIDIA GeForce RTX 3080 CUDA","dtype":"float32","tf32":false,"deterministic_algorithms":true,"one_process_one_gpu":true},
+  "checkpoint":{"selection":"final epoch only","optimizer_state_saved":false,"encoder_decoder_and_biases_saved":true},
+  "failure":{"nonfinite_loss":"fail closed","out_of_memory":"fail closed, no batch-size change"}
+}

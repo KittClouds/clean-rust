@@ -1,0 +1,13 @@
+# Python/runtime transients
+**/__pycache__/
+*.py[cod]
+**/single_writer.lock
+*.pid
+
+# Large MT5 observation payloads are sealed on D: only.
+# Their hashes and relative paths are published in local-corpus-manifest/.
+/furnace/corpus/**/*.tsv
+/furnace/quarantine/**/*.tsv
+/furnace/replays/**/*.tsv
+/phase13/collection/**/*.tsv
+/phase13r/collection/**/*.tsv

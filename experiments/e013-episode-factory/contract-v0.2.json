@@ -1,0 +1,50 @@
+{
+  "schema": "e013-bank-construction-implementation/v0.2",
+  "status": "DRAFT_BEFORE_BANK_GENERATION",
+  "governing_protocol": {
+    "id": "E013-TRUST-SIGNAL-DEVELOPMENT-v0.2",
+    "path": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-013-trust-signal\\E013-TRUST-SIGNAL-DEVELOPMENT-PROTOCOL-v0.2.md",
+    "sha256": "840be748b8aed6b9b642c3c622f079a61c847c61d0e5c9842b04a2a229aa6bdc",
+    "lock_path": "C:\\rd-c\\selective-cognition-action-region-program\\experiment-013-trust-signal\\E013-PROTOCOL-LOCK-v0.2.json",
+    "lock_sha256": "9bd4cfeac86e613ddb7f46ef1b4f8ec92d2aedf702b260323822cb3c53e97ba2"
+  },
+  "user_selected_v0_2_after_v0_3_discovery": true,
+  "supersedes_unsealed_draft": "contract-v0.1.json",
+  "domain": "rust_local_commit_patch_selection",
+  "model_contact_authorized": false,
+  "banks": {
+    "D": {
+      "repository_count": 6,
+      "families_per_repository": 8,
+      "tasks_per_family": 12,
+      "task_count": 576,
+      "empty_valid_per_cell": 1,
+      "empty_valid_count": 48
+    },
+    "C": {
+      "repository_count": 4,
+      "families_per_repository": 8,
+      "tasks_per_family": 16,
+      "task_count": 512,
+      "empty_valid_per_cell": 1,
+      "empty_valid_count": 32
+    }
+  },
+  "candidate_count_on_empty_valid_task": 4,
+  "construction_extension": {
+    "truth_changing_pair_per_cell": 1,
+    "pair_members_nonempty": true,
+    "pair_candidate_patch_bytes_equal": true,
+    "pair_producer_order_equal": true,
+    "pair_valid_sets_different": true,
+    "note": "Prospective construction feature from the user mandate; not a gate stated in sealed protocol v0.2."
+  },
+  "candidate_must_apply": true,
+  "candidate_must_compile": true,
+  "candidate_replay_from_fresh_reset": true,
+  "visible_hidden_fixture_roots_disjoint": true,
+  "candidate_order_independent_of_validity": true,
+  "empty_slot_private": true,
+  "observer_outcome_dependent_curation": false,
+  "seal_confirmation_before_development_observer_outcomes": true
+}

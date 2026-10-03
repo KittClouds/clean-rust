@@ -1,0 +1,16 @@
+{
+  "receipt_id": "FAS00_PRE_MODEL_CHECKS_V01",
+  "project_id": "fas-frozen-adaptive-substrate-v00",
+  "checked_utc": "2026-09-23T04:01:38Z",
+  "model_contact_performed": false,
+  "model_contact_authorized": false,
+  "target_directory": "D:/codex-runs/fas-frozen-adaptive-substrate-v00/target",
+  "toolchain": {"cargo": "1.96.0", "rustc": "1.96.0"},
+  "checks": [
+    {"command": "cargo test --release", "result": "PASS", "tests_passed": 5, "tests_failed": 0, "tests_ignored": 1},
+    {"command": "cargo run --release -- smoke", "result": "PASS", "worlds": 96, "events_per_world": 32, "checks": ["target reconstruction", "transition schedule", "context binding", "feedback timing", "split/template integrity", "seed determinism", "query-only counterfactual balance"]},
+    {"command": "cargo clippy --release --all-targets -- -D warnings", "result": "PASS"},
+    {"command": "cargo test --release generator_throughput_smoke -- --ignored --nocapture", "result": "PASS", "worlds_generated_and_validated": 5000, "elapsed_ms": 213.7864, "note": "Local diagnostic, not a frozen performance claim"}
+  ],
+  "disposition": "PRE_MODEL_CONSTRUCTION_CHECKS_PASS"
+}

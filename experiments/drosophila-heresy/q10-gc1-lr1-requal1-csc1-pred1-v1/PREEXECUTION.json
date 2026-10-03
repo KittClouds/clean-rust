@@ -1,0 +1,11 @@
+{
+  "contract_sha256": "A5D782061255F1B338488F4773D2B27A79835E03A9A9C0F51DCD7FB31D27EEC2",
+  "domain_manifest_sha256": "DC0C9B4FC4910721757AA178053135CD21A14C087644C9CE57C1D936435D8527",
+  "expected_output": "REPORT.json",
+  "identity": "q10-gc1-lr1-requal1-csc1-pred1-v1",
+  "input_binding_count": 42,
+  "protocol": "Q10-CSC1-PRED1",
+  "replay_performed": false,
+  "scientific_promotion": false,
+  "status": "PREEXECUTION_SEALED"
+}

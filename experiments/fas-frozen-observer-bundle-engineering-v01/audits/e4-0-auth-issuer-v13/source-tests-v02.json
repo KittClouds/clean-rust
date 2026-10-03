@@ -1,0 +1,34 @@
+{
+  "schema": "FAS_E4_0_AUTHORIZATION_ISSUER_SOURCE_TESTS_V13",
+  "receipt_id": "E4_0_AUTHORIZATION_ISSUER_V13_SOURCE_TESTS_V02",
+  "status": "PASS_SYNTHETIC_TESTS",
+  "commands": [
+    "python -m py_compile experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/issue_e4_stage_authorization_v13.py experiments/fas-frozen-observer-bundle-engineering-v01/source/tests/test_e4_stage_authorization_v13.py",
+    "python experiments/fas-frozen-observer-bundle-engineering-v01/source/tests/test_e4_stage_authorization_v13.py (17 synthetic tests)"
+  ],
+  "synthetic_test_count": 17,
+  "py_compile": "PASS",
+  "source_files": [
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/issue_e4_stage_authorization_v13.py",
+      "bytes": 46077,
+      "sha256": "b400bd162be61cb2a40b9db75de2e79824856673f54e0918b639f8a1a9bb9a09"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/tests/test_e4_stage_authorization_v13.py",
+      "bytes": 49503,
+      "sha256": "320a5ac9fcae0e2b52f1ba942935b0f6fb9d1f67826e74998ec46e69799bd8d1"
+    }
+  ],
+  "runtime_access": {
+    "model_contact": false,
+    "tokenizer_contact": false,
+    "cuda_initialized": false,
+    "gpu_lease_acquired": false,
+    "cache_created": false,
+    "labels_opened": false
+  },
+  "scope": "Synthetic issuer verification only. Validates exact v13 contract identity, sealed v11 last-sealed predecessor, exact failed v12 contract/map/preseal lineage, failed map-build attempt, and preserved v11 final_seal diagnostics. No authorization output or runtime contact.",
+  "execution_authorization_conferred": false,
+  "recorded_utc": "2026-09-27T03:52:21.410781+00:00"
+}

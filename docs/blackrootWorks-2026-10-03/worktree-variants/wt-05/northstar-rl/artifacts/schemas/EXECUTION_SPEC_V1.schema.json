@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ExecutionSpec",
+  "type": "object",
+  "properties": {
+    "action_source": {
+      "type": "string"
+    },
+    "execution_spec_id": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "fill_timing": {
+      "type": "string"
+    },
+    "fixed_commission": {
+      "type": "number",
+      "format": "double"
+    },
+    "proportional_commission": {
+      "type": "number",
+      "format": "double"
+    },
+    "quantity_rounding": {
+      "$ref": "#/$defs/QuantityRounding"
+    },
+    "reference_fill_price": {
+      "type": "string"
+    },
+    "schema_version": {
+      "type": "string"
+    },
+    "slippage_ticks": {
+      "type": "number",
+      "format": "double"
+    },
+    "spread_ticks": {
+      "type": "number",
+      "format": "double"
+    }
+  },
+  "required": [
+    "schema_version",
+    "execution_spec_id",
+    "action_source",
+    "fill_timing",
+    "reference_fill_price",
+    "quantity_rounding",
+    "fixed_commission",
+    "proportional_commission",
+    "spread_ticks",
+    "slippage_ticks"
+  ],
+  "$defs": {
+    "Digest256": {
+      "description": "Domain-separated BLAKE3 digest",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "QuantityRounding": {
+      "type": "string",
+      "enum": [
+        "toward_zero",
+        "nearest"
+      ]
+    }
+  }
+}

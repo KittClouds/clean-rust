@@ -1,0 +1,188 @@
+{
+  "arms": [
+    "native",
+    "native_direction_reference_magnitude",
+    "reference_direction_native_support",
+    "reference_direction_full_support",
+    "weight_oracle"
+  ],
+  "bank_files": [
+    {
+      "bytes": 120030,
+      "path": "inputs/banks/competence.json",
+      "sha256": "8ce74b456c1965972796bf81aa0ee297baf0c58c7e0e60612a308ba80ca38932"
+    },
+    {
+      "bytes": 1918512,
+      "path": "inputs/banks/evaluator-large.json",
+      "sha256": "2939bf5a56c9b17070ca5c7ebc00266c183d95694407a7717825e4d5a12f8de0"
+    },
+    {
+      "bytes": 21014742,
+      "path": "inputs/banks/training.json",
+      "sha256": "dc58ff7241b4ae2eb18ee347742860c95928f35bca4fd5fa709c18fd37d9455e"
+    }
+  ],
+  "blocks": [
+    52000,
+    52001,
+    52002,
+    52003,
+    52004,
+    52005,
+    52006,
+    52007,
+    52008,
+    52009,
+    52010,
+    52011
+  ],
+  "checkpoints": [
+    0,
+    512,
+    1024,
+    2048,
+    4096,
+    8192
+  ],
+  "graph_seeds": [
+    53000,
+    53001,
+    53002,
+    53003,
+    53004,
+    53005,
+    53006,
+    53007
+  ],
+  "no_biological_promotion": true,
+  "no_lesions": true,
+  "null_files": [
+    {
+      "bytes": 5255578,
+      "path": "inputs/null-graphs/g001/edges-L.tsv",
+      "sha256": "255f593c850b078ea03af947cee2b4d5b215714da38082b909a5d204edffde07"
+    },
+    {
+      "bytes": 5262051,
+      "path": "inputs/null-graphs/g001/edges-R.tsv",
+      "sha256": "6759ce460c45b7d005b36a73d0ac73d6b0ee7faaf7a2930d7b6f4af966f03000"
+    },
+    {
+      "bytes": 5255578,
+      "path": "inputs/null-graphs/g002/edges-L.tsv",
+      "sha256": "8356026a5fd2e8e7fffc0736f7137bdd7fb5a66bba18108c408fede1f3f509b1"
+    },
+    {
+      "bytes": 5262051,
+      "path": "inputs/null-graphs/g002/edges-R.tsv",
+      "sha256": "3eb753f6d404d8c647205e24859464f54fe501408c5fc383c6deb81342975262"
+    },
+    {
+      "bytes": 5255578,
+      "path": "inputs/null-graphs/g003/edges-L.tsv",
+      "sha256": "f140e872f61e410f09bdd3ec5c391874917d09e79cb8f53d5c48448bd21e84c5"
+    },
+    {
+      "bytes": 5262051,
+      "path": "inputs/null-graphs/g003/edges-R.tsv",
+      "sha256": "72eb57e714ccce4cfbc40a974f0cbe8f3d034f5e0492691c74c581ed8609d58c"
+    },
+    {
+      "bytes": 5255578,
+      "path": "inputs/null-graphs/g004/edges-L.tsv",
+      "sha256": "2cac6fc02ece4be7141e64ec8ff7920875d10a1db4e3ab41ffb184a2d1cfbf09"
+    },
+    {
+      "bytes": 5262051,
+      "path": "inputs/null-graphs/g004/edges-R.tsv",
+      "sha256": "c3b325d8da48e95f7134a5d5f5be75469851de8e789df308cd5662ffae402b53"
+    },
+    {
+      "bytes": 5255578,
+      "path": "inputs/null-graphs/g005/edges-L.tsv",
+      "sha256": "c99f995e9c3532b1cec13be2276b3d55e9b91eaea1322137719e932987ed4fc3"
+    },
+    {
+      "bytes": 5262051,
+      "path": "inputs/null-graphs/g005/edges-R.tsv",
+      "sha256": "06bb311b1afa6fb5e240340f531ec55f864705741f30ef0b3774e51969d6f997"
+    },
+    {
+      "bytes": 5255578,
+      "path": "inputs/null-graphs/g006/edges-L.tsv",
+      "sha256": "49f2b9bc18aa5fb5210c08296311f964d6f024efcdbbde367bac9c79d22605c9"
+    },
+    {
+      "bytes": 5262051,
+      "path": "inputs/null-graphs/g006/edges-R.tsv",
+      "sha256": "3a4fd9aa8e3eee909d0dc9d75feecaadfd341fe50e82c7c01bdfc4d1f0e1aa4a"
+    },
+    {
+      "bytes": 5255578,
+      "path": "inputs/null-graphs/g007/edges-L.tsv",
+      "sha256": "06532e06fe3aefd6297dbd65aa827a9a4d7257da44d1a003defa6676e2f4386c"
+    },
+    {
+      "bytes": 5262051,
+      "path": "inputs/null-graphs/g007/edges-R.tsv",
+      "sha256": "8f8718d2ce008fdb88ead68291a822950ee995aaef1145fe178efc72e7a04cc7"
+    },
+    {
+      "bytes": 5255578,
+      "path": "inputs/null-graphs/g008/edges-L.tsv",
+      "sha256": "7bc59b322411db3e7da5ea9356cc332e39198beada6a7d7e5c6f121c6f4a9dc6"
+    },
+    {
+      "bytes": 5262051,
+      "path": "inputs/null-graphs/g008/edges-R.tsv",
+      "sha256": "6f1378f7a6512346fdbeaeca504fc407d2b64736438407b8e006348a11c055c7"
+    }
+  ],
+  "oracle_steps": 128,
+  "pretraining_trials": 8192,
+  "primary_task": "four_cue",
+  "purpose": "engineering-only decomposition of native adaptive authority",
+  "reference_lr": 0.05,
+  "schema": "FLY-REACH-00-manifest-v1",
+  "sides": [
+    "L",
+    "R"
+  ],
+  "source_files": [
+    {
+      "bytes": 5717837,
+      "path": "inputs/anatomy/edges-L.tsv",
+      "sha256": "ed6044a5de43b2c6acd58aa034967ac80a595ab55456a04f505ecb764d36b0de"
+    },
+    {
+      "bytes": 5725623,
+      "path": "inputs/anatomy/edges-R.tsv",
+      "sha256": "42b602cd95cf169e86cee7fdc3b28f59e068677aa63e382b845af30c2bffa573"
+    },
+    {
+      "bytes": 58761,
+      "path": "inputs/anatomy/nodes-L.tsv",
+      "sha256": "3fc14bc6bf33e6a1fc2af7f377b7a23f6700ff916030b840bab4259d76e5232f"
+    },
+    {
+      "bytes": 58949,
+      "path": "inputs/anatomy/nodes-R.tsv",
+      "sha256": "871cf14a0daf569139b2a880f1927a0f3be7b4d11f5feb47bd435178b74d347f"
+    }
+  ],
+  "study_id": "FLY-REACH-00",
+  "substrates": [
+    "fly",
+    "g001",
+    "g002",
+    "g003",
+    "g004",
+    "g005",
+    "g006",
+    "g007",
+    "g008"
+  ],
+  "support_requirement": 0.8,
+  "threshold": 0.25
+}

@@ -1,0 +1,46 @@
+{
+  "schema_version": "CAMPAIGN_PERFORMANCE_REPORT_V1",
+  "metrics": [
+    {
+      "name": "reset_many",
+      "value": 1375515.8184319118,
+      "unit": "lane_resets_per_second",
+      "workload": "1_lanes_one_native_call"
+    },
+    {
+      "name": "step_many",
+      "value": 196193.83951343928,
+      "unit": "lane_steps_per_second",
+      "workload": "1_lanes_reset_then_one_step"
+    },
+    {
+      "name": "reset_many",
+      "value": 1436136.7920294409,
+      "unit": "lane_resets_per_second",
+      "workload": "32_lanes_one_native_call"
+    },
+    {
+      "name": "step_many",
+      "value": 190335.70459898646,
+      "unit": "lane_steps_per_second",
+      "workload": "32_lanes_reset_then_one_step"
+    },
+    {
+      "name": "reset_many",
+      "value": 1305855.947765762,
+      "unit": "lane_resets_per_second",
+      "workload": "128_lanes_one_native_call"
+    },
+    {
+      "name": "step_many",
+      "value": 184730.30818210947,
+      "unit": "lane_steps_per_second",
+      "workload": "128_lanes_reset_then_one_step"
+    }
+  ],
+  "limitations": [
+    "Lane execution is currently contiguous single-owner sequential Rust; batching removes boundary crossings but is not a parallelism claim",
+    "Qualification corpus has one executable market episode; campaign partition episodes are sealed synthetic control-plane fixtures",
+    "No learner, optimizer, backward pass, or checkpoint operation was executed"
+  ]
+}

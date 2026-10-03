@@ -1,0 +1,220 @@
+{
+  "protocol": "Q10-NA",
+  "version": 2,
+  "status": "FROZEN_PRE_EXECUTION__NOT_EXECUTED",
+  "engineering_only": true,
+  "purpose": "Test whether the 326 Q10-RMT rows without individually helpful prefixes through 16 ULP have pairwise or triplewise joint authority under exact sequential-f32 replay.",
+  "plan_sha256": "FC58C1BCB293C9A4131342E32C055CE01276F5C9B7DFD548866CC8A0B0ED2DCB",
+  "scaffold_files": [
+    "PLAN.md",
+    "CONTRACT.json"
+  ],
+  "parent": {
+    "protocol": "Q10-RMT",
+    "root": "experiments/drosophila-heresy/q10-rmt-v1",
+    "receipt_root": "experiments/drosophila-heresy/q10-rmt-v1/qualification/sample-9731-9732",
+    "receipt_resolution": "Use exactly this canonical immutable receipt root; never mix archived, failed, shard, or probe directories.",
+    "protocol_file_sha256": {
+      "PLAN.md": "41DB8A90568A1BDA22DA1E7A3D8288967E24037FDCAD5C8B2518ED53D28511C5",
+      "CONTRACT.json": "FFD057E2D2FB86CB8BBBE0F78EA66C10DF752ABB369448549430EDBF4595CC6E",
+      "RESULT.md": "938DC5384E8F64A3E2EB453256CADB188B4A35278330C758E175104FEE6989CD",
+      "STATUS.json": "66EBF48C7AEEB2BBE414F6176E28291A4AAE83CE792876C3873D6AB734E62FFD",
+      "PREEXECUTION.json": "F1A102DB83448EF6B1D9903329CCF38E34E730014BF3D37B10904036C9B61982"
+    },
+    "receipt_file_sha256": {
+      "execution.json": "B371FD8D3EFCB2354F78D1152AFC884FC4A6D6CA5D595B5295103DC68FCC7B86",
+      "authority-summary.json": "3389B671F8A4B61D0EA6484654418BF02E83A42C02424D3263FB69BFDBDC40C9",
+      "endpoints.json": "1BE006961358B748CE0ECBCE635347274326494D546F82E6F32CA1FAAC0A7A8C",
+      "rows.json": "A9AE4E5209E7BB32C4815666A32EA9C66B9E60A79C0E1A739C486E68DDE041C3",
+      "components.json": "E873F1FAAA1C1D2093F5D90D483AF621D1B371FA205A52EBD3E74D0E7B841977",
+      "excluded-noncontract.json": "02A7CDA89BFC68F6AEA8C556546BAEA77559386C2F78C239C6A849A1F846033E",
+      "moves.jsonl": "9FC2FB529A8EDA40F9F6AC1EB43DE1E76C8E7EB1331C2FD66CEC69AE7C1BF83F"
+    },
+    "status_required": "Q10_RMT_VALID__TOPOLOGY_MAPPED",
+    "parent_next_decision_is_not_overridden": true,
+    "replay_inputs": {
+      "source_root": "experiments/drosophila-heresy/q10-distributed-additive-v1/qualification/sample-9731-9732",
+      "source_files_sha256": {
+        "seed9731-L-tau16.json": "3114A3B31C59A79D540F32C30FE1C217971418655CD8B13E17A91D8157AA1707",
+        "seed9731-L-tau4.json": "2974BF3A4CB5C80569EE73B2E46C8800D12D142DDA9B67EA572880F4EE9C3B5E",
+        "seed9731-R-tau16.json": "185769A85B1EA2FE8E596804C1FC3CB4F27A3D8318010FB8D739E56CBF554F73",
+        "seed9731-R-tau4.json": "8BA8EF71BF255B53769A6E50EB65408E19BD59743F932F3DF741AF3EB97DCE99",
+        "seed9732-L-tau16.json": "461269AF2C4B89F9DD9B589E6CA322A29CA9357FAA29627911E7FB5B85E8E1A3",
+        "seed9732-L-tau4.json": "36F042052DF02EEA4371C3C76F8AFA727FECF5450158CBFAEA731E7E43A60D28",
+        "seed9732-R-tau16.json": "2E6AF0C80578CD61214099D166D692007B431FF557D678AFBBAF2FFD8DC8BFC9",
+        "seed9732-R-tau4.json": "A53A3567E84CB753805409A92B1C350C5F2AC6173557D221C000C975BF19A135"
+      },
+      "da2_results_path": "experiments/drosophila-heresy/q10-da2-geometry-v1/qualification/sample-9731-9732/results.json",
+      "da2_results_sha256": "A76139A924D0D24EE5376378DBCDB12AAE539CE33182DE1050C741DC0475BB23",
+      "endpoint_reconstruction": "fixture initial_weight_bits plus hash-bound DA2 selected_steps",
+      "serialized_move_policy": "moves.jsonl contains only moves with raw/helpful/worse rows; absence is metadata, not illegal"
+    }
+  },
+  "scope": {
+    "declared_da2_endpoints": 32,
+    "primary_rmt_endpoints": 28,
+    "excluded_da2_geometry_failures": 4,
+    "rmt_mismatch_rows": 7003,
+    "target_rows": 326,
+    "target_definition": "rows.json records with k_star == null/none and class_final == no_local_authority",
+    "target_parent_invariant": "every target has zero one_step_helpful_coordinates and no helpful prefix through 16 ULP",
+    "scientific_seed_bundles": 0,
+    "behavioral_inference": false,
+    "canonical_repair_applied": false,
+    "dh08b_authorized": false
+  },
+  "parent_usage": {
+    "authoritative_target_sources": [
+      "qualification/sample-9731-9732/rows.json",
+      "qualification/sample-9731-9732/moves.jsonl",
+      "qualification/sample-9731-9732/endpoints.json",
+      "qualification/sample-9731-9732/execution.json"
+    ],
+    "topology_diagnostic_sources": [
+      "qualification/sample-9731-9732/components.json",
+      "qualification/sample-9731-9732/authority-summary.json"
+    ],
+    "row_persistence_is_not_used_for_target_resolution": true,
+    "excluded_receipt_is_bound_but_not_primary_input": "excluded-noncontract.json"
+  },
+  "readout": {
+    "arithmetic": "exact learner-order sequential IEEE-754 binary32 replay",
+    "comparison": "bitwise output comparison with signed-zero identity",
+    "ulp_order": "the monotonic binary32 ULP ordering sealed by Q10-RMT",
+    "helpful_definition": "candidate row ULP distance is strictly smaller than the parent baseline ULP distance",
+    "exact_target_definition": "candidate row bits equal parent target bits",
+    "surrogates_for_classification": false
+  },
+  "raw_support": {
+    "neighborhood_definition": "For each target endpoint-row, the union of coordinate IDs in all parent move records whose raw_rows contain that row.",
+    "receipt_cross_check": "The move-derived union must equal the row record all_raw_coordinates exactly.",
+    "support_may_be_trimmed": false,
+    "helpful_graph_may_define_domain": false,
+    "coverage_required": true,
+    "legal_prefix_choices": [
+      0,
+      -1,
+      1,
+      -2,
+      2,
+      -4,
+      4,
+      -8,
+      8,
+      -16,
+      16
+    ],
+    "prefix_meaning": "one final committed coordinate value relative to the immutable parent endpoint; no independently selectable increments",
+    "prefix_domain_source": "deterministic replay from hash-bound source fixture and DA2 selected_steps; serialized RMT moves are a cross-check",
+    "duplicate_prefix_records": "fail closed",
+    "missing_prefix_records": "replay deterministically; fail closed only when fixture replay is unavailable or contradictory",
+    "serialized_prefix_records": "report present serialized keys separately"
+  },
+  "replay": {
+    "baseline": "immutable committed Q10-RMT endpoint",
+    "candidate_state": "cloned f32 endpoint with one final prefix per selected coordinate",
+    "application": "selected coordinate values are applied simultaneously before a fresh sequential readout",
+    "individuals": "replay every legal nonzero prefix for every raw-support coordinate as an invariant check",
+    "pairs": "enumerate every legal prefix tuple for every unordered coordinate pair when the complete domain fits budget",
+    "triples": "after complete pair work finds no pair authority, enumerate every legal prefix tuple for every unordered coordinate triple when the complete domain fits budget",
+    "ordering": {
+      "endpoint": "stable endpoint identity",
+      "row": "ascending readout row",
+      "coordinates": "ascending coordinate tuple",
+      "prefix_tuple": "lexicographic order under [0, -1, 1, -2, 2, -4, 4, -8, 8, -16, 16]"
+    },
+    "stop_rule": "A lower-order class may stop higher-order work only after that entire lower-order declared domain is complete; no partial success is used to claim domain completeness.",
+    "candidate_mutation": "in-memory clones only; no canonical state, parent receipt, or predecessor is mutated"
+  },
+  "classification": {
+    "individual": "At least one legal single-coordinate prefix improves the row. Expected count is zero; any occurrence fails closed as a parent invariant violation.",
+    "pair": "No individual prefix helps and a complete legal pair domain contains a helpful candidate.",
+    "triple": "No individual or pair prefix helps and a complete legal triple domain contains a helpful candidate.",
+    "higher-order-or-untested": "A pair/triple domain is budget-incomplete, a neighborhood has more than three coordinates after pair/triple work, or bounded higher-order escalation ends without a complete domain.",
+    "no-effect-within-domain": "The complete domain for a neighborhood of one, two, or three coordinates is exhaustively replayed with no helpful candidate. This is not global impossibility.",
+    "mutual_exclusion": true,
+    "geometry_qualified_is_separate": true,
+    "no_effect_requires_complete_coverage": true
+  },
+  "escalation": {
+    "pair_incomplete_policy": "deterministic lexicographic prefix/coordinate replay up to the pair budget; classify higher-order-or-untested if the full pair domain is not covered",
+    "triple_incomplete_policy": "deterministic lexicographic replay up to the triple budget followed by bounded beam candidates; classify higher-order-or-untested if the full triple domain is not covered",
+    "higher_order_seed_order": "stable coordinate tuple order, then stable prefix tuple order",
+    "intermediate_states_may_worsen": true,
+    "intermediate_objective_pruning": "no final geometry or monotonic mismatch gate",
+    "beam_width": 32,
+    "maximum_rounds": 8,
+    "max_visited_states_per_row": 8192,
+    "max_seed_candidates_per_row": 4096,
+    "diversity_key": "stable prefix signature plus exact cloned endpoint bytes",
+    "budget_exhaustion_is_not_no_effect": true
+  },
+  "budgets": {
+    "max_target_rows": 326,
+    "max_pair_replays_per_row": 131072,
+    "max_pair_replays_total": 25000000,
+    "max_triple_replays_per_row": 1048576,
+    "max_triple_replays_total": 50000000,
+    "max_higher_order_seed_candidates_per_row": 4096,
+    "max_beam_states_per_row": 8192,
+    "max_output_bytes": 2147483648,
+    "budget_exhaustion_status": "FAIL_CLOSED__HIGHER_ORDER_OR_UNTESTED"
+  },
+  "geometry_gates": {
+    "evaluation_phase": "complete candidate endpoint only",
+    "axis_normalized_tolerance": 2e-06,
+    "norm_normalized_tolerance": 2e-07,
+    "cue_linear_normalized_tolerance": 2e-06,
+    "minimum_final_reserve_ulps": 16,
+    "support_bounds_and_boundary_membership": "required on complete candidate",
+    "intermediate_axis_norm_linear_debt": "record but do not use as a final-gate pruning rule",
+    "geometry_invalid_readout_authority": "retain as raw diagnostic; set geometry_qualified false"
+  },
+  "outputs": {
+    "allowed_root": "experiments/drosophila-heresy/q10-na-v1 only",
+    "required_receipts_per_target": [
+      "endpoint identity",
+      "row identity",
+      "raw-support coordinate list",
+      "prefix-domain coverage",
+      "individual/pair/triple replay counts",
+      "tested and untested domain counts",
+      "readout classification",
+      "geometry-qualified classification",
+      "baseline and candidate bits",
+      "ULP distances",
+      "geometry signatures",
+      "budget receipt"
+    ],
+    "forbidden_claims": [
+      "accuracy",
+      "reward",
+      "actions",
+      "behavior",
+      "old_map_margin",
+      "reversed_map_margin",
+      "scientific_seed_id",
+      "biological_mechanism",
+      "connectome_generalization",
+      "repair_applied_to_canonical_model",
+      "DH08B_authorization"
+    ]
+  },
+  "fail_closed": [
+    "any parent protocol, result, status, preexecution, or receipt-file hash mismatch",
+    "missing, extra, archived, failed, mixed, or ambiguous parent receipt root",
+    "parent status or Q10-RMT invariant mismatch",
+    "target count not exactly 326 or duplicate target endpoint-row identity",
+    "target row does not have k_star none, final no_local_authority, or zero one-step helpful coordinates",
+    "baseline or target sequential-f32 replay mismatch",
+    "individual helpful result in the parent target set",
+    "nonfinite arithmetic, invalid f32 state, bounds violation, or reserve violation",
+    "classifying budget exhaustion or incomplete coverage as no-effect-within-domain",
+    "treating a partial intermediate geometry state as a final geometry result",
+    "writing or mutating Q10-RMT or any other predecessor",
+    "canonical repair application, scientific bundle use, behavioral measurement, or DH08B field/process",
+    "source fixture or DA2 results hash mismatch",
+    "missing legal prefix cannot be deterministically replayed from the frozen endpoint fixture",
+    "duplicate or contradictory serialized prefix record"
+  ]
+}

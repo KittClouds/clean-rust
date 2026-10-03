@@ -1,0 +1,16 @@
+{
+  "receipt_id": "FAS_FROZEN_OBSERVER_BUNDLE_E1_ATTEMPT_FAILURE_V03",
+  "status": "E1_CONSTRUCTION_ABORTED_BEFORE_PANEL_OUTPUT",
+  "e0_root_sha256": "1e42c8aa5eba7cd8f3d49c5f9f37cfbd277f9899bab750fa3b17dc0aea414a09",
+  "preflight_sha256": "f2796b8f1a08bec5862537818d42abfe6ddb0511cda075d38d53d813668ed21c",
+  "failure": "validator looked for minimum_test_rows_per_class at contract top level; frozen contract nests it under support_gate",
+  "failure_phase": "world_contract_validation_before_output_directory_creation",
+  "model_loaded": false,
+  "tokenizer_loaded": false,
+  "feature_extraction_performed": false,
+  "observer_fitting_performed": false,
+  "quartets_materialized": 0,
+  "rows_materialized": 0,
+  "historical_s01_artifacts_reused": false,
+  "repair_identity": "E0/E1 v04 adds exact-contract validator unit check and reads support_gate path"
+}

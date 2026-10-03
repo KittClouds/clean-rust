@@ -1,0 +1,169 @@
+{
+  "project": "FORGE-RL-02",
+  "surface": "NORTHSTAR_STRATEGY_EXPERIMENT_RUNTIME_V1",
+  "learner_execution": "PROHIBITED_UNTIL_DEGEN_RL_01",
+  "items": [
+    {
+      "name": "BATCHED_PYO3_ABI",
+      "status": "QUALIFIED",
+      "reason_code": "PYTHON_BATCH_COMPATIBILITY_RECEIPT_PASS",
+      "receipts": [
+        "campaign_double_build_receipt.json",
+        "campaign_receipt.json"
+      ]
+    },
+    {
+      "name": "BATCHED_RUST_ABI",
+      "status": "QUALIFIED",
+      "reason_code": "INERT_CONTROL_PLANE_CONTRACT_AND_RECEIPT_PASS",
+      "receipts": [
+        "campaign_double_build_receipt.json",
+        "campaign_receipt.json"
+      ]
+    },
+    {
+      "name": "CAMPAIGN_RUN_RECEIPTS",
+      "status": "QUALIFIED",
+      "reason_code": "INERT_CONTROL_PLANE_CONTRACT_AND_RECEIPT_PASS",
+      "receipts": [
+        "campaign_double_build_receipt.json",
+        "campaign_receipt.json"
+      ]
+    },
+    {
+      "name": "DOUBLE_REBUILD",
+      "status": "QUALIFIED",
+      "reason_code": "BYTE_IDENTICAL_DOUBLE_REBUILD",
+      "receipts": [
+        "campaign_double_build_receipt.json",
+        "campaign_receipt.json"
+      ]
+    },
+    {
+      "name": "EVALUATION_SPEC_PRECOMMIT",
+      "status": "QUALIFIED",
+      "reason_code": "INERT_CONTROL_PLANE_CONTRACT_AND_RECEIPT_PASS",
+      "receipts": [
+        "campaign_double_build_receipt.json",
+        "campaign_receipt.json"
+      ]
+    },
+    {
+      "name": "EVALUATOR_DETERMINISM",
+      "status": "QUALIFIED",
+      "reason_code": "INERT_CONTROL_PLANE_CONTRACT_AND_RECEIPT_PASS",
+      "receipts": [
+        "campaign_double_build_receipt.json",
+        "campaign_receipt.json"
+      ]
+    },
+    {
+      "name": "EXPERIMENT_IDENTITY",
+      "status": "QUALIFIED",
+      "reason_code": "INERT_CONTROL_PLANE_CONTRACT_AND_RECEIPT_PASS",
+      "receipts": [
+        "campaign_double_build_receipt.json",
+        "campaign_receipt.json"
+      ]
+    },
+    {
+      "name": "GROUP_AWARE_CHRONOLOGY",
+      "status": "QUALIFIED",
+      "reason_code": "INERT_CONTROL_PLANE_CONTRACT_AND_RECEIPT_PASS",
+      "receipts": [
+        "campaign_double_build_receipt.json",
+        "campaign_receipt.json"
+      ]
+    },
+    {
+      "name": "HOLDOUT_FIREWALL",
+      "status": "QUALIFIED",
+      "reason_code": "INERT_CONTROL_PLANE_CONTRACT_AND_RECEIPT_PASS",
+      "receipts": [
+        "campaign_double_build_receipt.json",
+        "campaign_receipt.json"
+      ]
+    },
+    {
+      "name": "LEARNER_EXECUTION_PROHIBITION",
+      "status": "QUALIFIED",
+      "reason_code": "INERT_CONTROL_PLANE_CONTRACT_AND_RECEIPT_PASS",
+      "receipts": [
+        "campaign_double_build_receipt.json",
+        "campaign_receipt.json"
+      ]
+    },
+    {
+      "name": "LEARNER_SPEC",
+      "status": "QUALIFIED",
+      "reason_code": "INERT_CONTROL_PLANE_CONTRACT_AND_RECEIPT_PASS",
+      "receipts": [
+        "campaign_double_build_receipt.json",
+        "campaign_receipt.json"
+      ]
+    },
+    {
+      "name": "MULTI_SEED_PLAN",
+      "status": "QUALIFIED",
+      "reason_code": "INERT_CONTROL_PLANE_CONTRACT_AND_RECEIPT_PASS",
+      "receipts": [
+        "campaign_double_build_receipt.json",
+        "campaign_receipt.json"
+      ]
+    },
+    {
+      "name": "PARTITION_IMMUTABILITY",
+      "status": "QUALIFIED",
+      "reason_code": "INERT_CONTROL_PLANE_CONTRACT_AND_RECEIPT_PASS",
+      "receipts": [
+        "campaign_double_build_receipt.json",
+        "campaign_receipt.json"
+      ]
+    },
+    {
+      "name": "PARTITION_TAPE",
+      "status": "QUALIFIED",
+      "reason_code": "INERT_CONTROL_PLANE_CONTRACT_AND_RECEIPT_PASS",
+      "receipts": [
+        "campaign_double_build_receipt.json",
+        "campaign_receipt.json"
+      ]
+    },
+    {
+      "name": "PERFORMANCE_BASELINE",
+      "status": "QUALIFIED",
+      "reason_code": "INERT_CONTROL_PLANE_CONTRACT_AND_RECEIPT_PASS",
+      "receipts": [
+        "campaign_double_build_receipt.json",
+        "campaign_receipt.json"
+      ]
+    },
+    {
+      "name": "POLICY_ARTIFACT_CONTRACT",
+      "status": "QUALIFIED",
+      "reason_code": "INERT_CONTROL_PLANE_CONTRACT_AND_RECEIPT_PASS",
+      "receipts": [
+        "campaign_double_build_receipt.json",
+        "campaign_receipt.json"
+      ]
+    },
+    {
+      "name": "TRANSFORM_REBUILD",
+      "status": "QUALIFIED",
+      "reason_code": "INERT_CONTROL_PLANE_CONTRACT_AND_RECEIPT_PASS",
+      "receipts": [
+        "campaign_double_build_receipt.json",
+        "campaign_receipt.json"
+      ]
+    },
+    {
+      "name": "TRANSFORM_TRAIN_ONLY",
+      "status": "QUALIFIED",
+      "reason_code": "INERT_CONTROL_PLANE_CONTRACT_AND_RECEIPT_PASS",
+      "receipts": [
+        "campaign_double_build_receipt.json",
+        "campaign_receipt.json"
+      ]
+    }
+  ]
+}

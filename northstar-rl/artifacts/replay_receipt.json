@@ -1,0 +1,10 @@
+{
+  "episode_id": "f6ed719eff14c39684077e088cb406e83423e1f8d5fa058bf4d68b68df5b40ce",
+  "seed": 42,
+  "policy": {
+    "policy": "ALTERNATE_EXTREMES"
+  },
+  "action_count": 9,
+  "trajectory_root": "fad02d374effd35a14e1bd481fa3ccbf17829ba74ae750f2ebacdcca28ebca5c",
+  "terminal_receipt_hash": "4145d2aeeae7ff841d16bea98b0afcea4d87b2c3bd59f589fea79359ab59760a"
+}

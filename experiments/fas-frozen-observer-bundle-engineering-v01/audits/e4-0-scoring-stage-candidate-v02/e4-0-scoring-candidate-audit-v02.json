@@ -1,0 +1,39 @@
+{
+  "schema": "FAS_E4_0_SCORING_CANDIDATE_PACKET_AUDIT_V01",
+  "status": "PASS_CANDIDATE_PACKET_IDENTITY_AUDIT",
+  "created_utc": "2026-09-28T02:42:50.118005+00:00",
+  "wrapper_spec_sha256": "80e24afa298c8db0c8300e83715155d10e131762bbef0cf9ac51049e13c1acfa",
+  "native_execution_spec_sha256": "d3c38aabd7da770bc3d417d48e4aa03c8d784954cd7713725842cba40c7d2e1f",
+  "native_schema_exact": true,
+  "native_source_count": 35,
+  "present_source_paths_verified": 34,
+  "source_content_hashes_verified_during_audit": 12,
+  "sealed_data_identities_matched_to_bound_constants": 23,
+  "protected_sealed_data_content_hashes_read_during_audit": false,
+  "future_staged_panel_path": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e4-0-scoring-input-v01\\ledger-inputs\\primary-panel-e4-v01.jsonl",
+  "future_staged_panel_hash_and_length_bound": true,
+  "only_future_source_missing": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e4-0-scoring-input-v01\\ledger-inputs\\primary-panel-e4-v01.jsonl",
+  "dynamic_handoff_json_not_in_source_files": true,
+  "dynamic_handoff_paths_fixed_under_attempt_root": true,
+  "original_protected_label_path_delivered": false,
+  "panel_id_bound": "e4-0-primary-terminal-v01",
+  "output_root_fresh": true,
+  "grant_issued": false,
+  "panel_opened": false,
+  "real_labels_opened": false,
+  "real_scoring_performed": false,
+  "runtime_versions": {
+    "python": "3.13.15",
+    "numpy": "2.5.3",
+    "torch_metadata": "2.11.0+cu128"
+  },
+  "independent_packet_checks": [
+    "standalone native spec matches exact v1 schema and wrapper copy",
+    "wrapper/receipt/native hashes agree",
+    "all present native sources match declared SHA-256 and byte length",
+    "cache, manifest, E3 head and staged panel identities match sealed adapter constants without reading protected payload contents",
+    "only future source is the sealed staged panel path",
+    "native output paths and limits match the runner",
+    "no grant or real label operation is claimed"
+  ]
+}

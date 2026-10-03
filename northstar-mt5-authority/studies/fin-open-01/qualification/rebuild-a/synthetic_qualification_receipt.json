@@ -1,0 +1,85 @@
+{
+  "cases": {
+    "BLOCK_PROFILE_RANDOMIZATION": {
+      "status": "PASS",
+      "whole_profiles_preserved": true
+    },
+    "CONTIGUOUS_SCALE_HORIZON_REGION": {
+      "regions": [
+        [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            2,
+            2
+          ],
+          [
+            2,
+            3
+          ]
+        ]
+      ],
+      "status": "PASS"
+    },
+    "CORRELATED_HORIZON_PATHS": {
+      "independent_units": 48,
+      "status": "PASS"
+    },
+    "ISOLATED_FALSE_LOOKING_CELL": {
+      "familywise_p": 0.4085603112840467,
+      "status": "PASS"
+    },
+    "NESTED_CROSS_SCALE_DEPENDENCE": {
+      "independent_units": 48,
+      "status": "PASS"
+    },
+    "NO_ASSOCIATION": {
+      "familywise_p": 1.0,
+      "status": "PASS"
+    },
+    "OUTCOME_AND_SCIENCE_READ_GUARDS": {
+      "outcome_files_read": false,
+      "science_confirmation_files_read": false,
+      "status": "PASS"
+    },
+    "SPARSE_MIDPOINT_PROBES": {
+      "directional_probe_counts": [
+        38,
+        39,
+        39,
+        38
+      ],
+      "status": "PASS"
+    },
+    "STRONG_OPPOSITE_ORIENTATION_ASSOCIATION": {
+      "familywise_p": 0.0038910505836575876,
+      "status": "PASS"
+    },
+    "STRONG_SAME_ORIENTATION_ASSOCIATION": {
+      "familywise_p": 0.0038910505836575876,
+      "status": "PASS"
+    },
+    "TEMPORAL_SIGN_REVERSAL": {
+      "status": "PASS",
+      "temporal_status": "TEMPORALLY_UNSTABLE"
+    }
+  },
+  "real_outcomes_read": false,
+  "schema": "FIN_OPEN_01_SYNTHETIC_QUALIFICATION_RECEIPT_V1",
+  "science_confirmation_read": false,
+  "status": "PASS"
+}

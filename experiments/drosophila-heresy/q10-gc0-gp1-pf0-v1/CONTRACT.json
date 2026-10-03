@@ -1,0 +1,78 @@
+{
+  "candidate_generation": {
+    "benchmark_candidates_per_group": 2,
+    "benchmark_group_count": 12,
+    "horizon": "min(32, group_coordinate_count)",
+    "max_unique_replays_per_group": 512,
+    "nonzero_candidates_requested_per_group": 8
+  },
+  "firewall": {
+    "behavioral_probe": false,
+    "candidate_generation": false,
+    "constructor_run": false,
+    "engineering_only": true,
+    "gc1_authorized": false,
+    "parent_writes": false,
+    "scientific_promotion": false,
+    "write_root": "experiments/drosophila-heresy/q10-gc0-gp1-pf0-v1"
+  },
+  "identity": "q10-gc0-gp1-pf0-v1",
+  "parent_bindings": [
+    {
+      "label": "ac3_plan",
+      "path": "experiments/drosophila-heresy/q10-gc0-ac3-v1/PLAN.md",
+      "sha256": "ED4D3715184D1168E222A78EA186377FDF2103E046BC1C915942C9892200F450"
+    },
+    {
+      "label": "ac3_contract",
+      "path": "experiments/drosophila-heresy/q10-gc0-ac3-v1/CONTRACT.json",
+      "sha256": "60A5317355D07DC849BE35666587636A17E71821DA9E1CC0F209C77F278790A4"
+    },
+    {
+      "label": "ac3_preexecution",
+      "path": "experiments/drosophila-heresy/q10-gc0-ac3-v1/PREEXECUTION.json",
+      "sha256": "48EFF259732103FFD0CC71530AAFFC93E9CDDD4564C04A4D22F4FA1431C3CC36"
+    },
+    {
+      "label": "ac3_runner",
+      "path": "experiments/drosophila-heresy/q10-gc0-ac3-v1/scripts/run_ac3.py",
+      "sha256": "3493709BC1C8CB2C30A2701C738BDE5671637EF23C73F36B30586680676B7A1A"
+    },
+    {
+      "label": "ac3_execution",
+      "path": "experiments/drosophila-heresy/q10-gc0-ac3-v1/qualification/execution.json",
+      "sha256": "BDEEF9F136D9C1DF147FF32174195D65E17AF13788AD2BAF677F27892FDEFC9E"
+    },
+    {
+      "label": "ac3_summary",
+      "path": "experiments/drosophila-heresy/q10-gc0-ac3-v1/qualification/derived/SUMMARY.json",
+      "sha256": "13D8ADDDC4EAF22211133F680AAF7B6D0B3F15F87C55653CF799586A0A577DED"
+    },
+    {
+      "label": "ac3_status",
+      "path": "experiments/drosophila-heresy/q10-gc0-ac3-v1/qualification/derived/STATUS.json",
+      "sha256": "41D0A104E0EB66349EDE05FF2C63BC4B72B79A7714DCE676B0C30C8359284568"
+    },
+    {
+      "label": "ac3_features",
+      "path": "experiments/drosophila-heresy/q10-gc0-ac3-v1/qualification/expanded_features.jsonl",
+      "sha256": "75AB83ED1D832D80D74E4D136F272F11FA9E5F3905E12897A26A4994FCE02268"
+    },
+    {
+      "label": "ac3_effects",
+      "path": "experiments/drosophila-heresy/q10-gc0-ac3-v1/qualification/expanded_effects.jsonl",
+      "sha256": "6A0CFF57B00EFF8191F60F79B85A31E25C6138BD361346A93F4174243A7DCC97"
+    }
+  ],
+  "plan_sha256": "41ABC030B774CD63074CA711BB4B61F09553A4A0137B44555DD9ECA2C0E68854",
+  "protocol": "Q10-GC0-GP1-PF0",
+  "sample": {
+    "expected_endpoint_set_count": 14,
+    "expected_raw_coordinate_context_count": 27075,
+    "expected_raw_group_count": 801,
+    "selection_is_not_post_outcome": true,
+    "selection_is_sealed": true,
+    "source": "sealed RA1 sample"
+  },
+  "status": "PREEXECUTION_SEALED_NO_EXECUTION"
+}

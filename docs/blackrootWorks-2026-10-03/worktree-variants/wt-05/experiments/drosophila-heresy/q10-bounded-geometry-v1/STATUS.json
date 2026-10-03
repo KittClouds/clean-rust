@@ -1,0 +1,20 @@
+{
+  "protocol": "Q10-BG",
+  "status": "Q10_STAGE1_VALID__BOUNDED_FREEDOM_PRESENT",
+  "stage": "STAGE1_COMPLETE",
+  "scientific_seed_bundles_used": 0,
+  "behavioral_inference": false,
+  "q08_mutation_detected": false,
+  "q09_mutation_detected": false,
+  "contract_frozen": true,
+  "stage1a_output": "qualification/stage1-a-9301-repaired",
+  "stage1a_new_audited_states": 1024,
+  "stage1a_reviewer": "VERIFIED_BY_NUMPY",
+  "stage1b_output": "qualification/stage1-b-9302-9305",
+  "stage1b_new_audited_states": 4096,
+  "cumulative_stage1_audited_states": 5120,
+  "stage1b_reviewer": "VERIFIED_BY_NUMPY",
+  "stage2_status": "NOT_RUN",
+  "stage2_reason": "continuous endpoints are not f32-robust at the frozen max-rotation boundary",
+  "future_dh08b_authorized": false
+}

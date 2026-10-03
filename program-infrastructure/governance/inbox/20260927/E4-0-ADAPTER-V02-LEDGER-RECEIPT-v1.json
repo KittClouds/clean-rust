@@ -1,0 +1,54 @@
+{
+  "schema": "CHIEF_E4_0_ADAPTER_V02_LEDGER_RECEIPT_V1",
+  "status": "V02_CONSTRUCTION_IDENTITIES_REGISTERED_AUTHORITY_WITHHELD",
+  "artifacts": {
+    "candidate-plan": {
+      "artifact_id": "sha256:116b4c3c4445de61f55355cb1e6ef85ba795cd72567a194e1f030cc6987ee57a",
+      "event_id": "sha256:f449a3f3f0e29513bf9400ce331d6ac1ad53694a6488b907c48168fb4fadbc51"
+    },
+    "synthetic-qualification": {
+      "artifact_id": "sha256:2b5947d3c1b8e0a28bd7fc27147cec6f8ff786b2f7370c42e174b04dfc78d3ba",
+      "event_id": "sha256:1116f76a96fdf7437deb3a217e8cd33c47cc9aca4e8ab1d413ba1d78dba97c3b"
+    },
+    "chief-static-parity-binding": {
+      "artifact_id": "sha256:c2888a7cea6a3999e0f1b3b395fb26b99b56e120c75be261f0a6d1c1cd5e6bc4",
+      "event_id": "sha256:9ed5d33eaec3167952e8a7082f671403753fb83cbf1d7ffc1858b94d589caf8f"
+    },
+    "runtime-source-0": {
+      "artifact_id": "sha256:bf8c080e5375bae81d07a6ce5a2f7ebfdd9223fd59fe609072372a42475db198",
+      "event_id": "sha256:55007c0c2b781b04b1a4ee2c52585c8729751680b4ad8dca973aea9bc18605c4"
+    },
+    "runtime-source-1": {
+      "artifact_id": "sha256:a80be515dc4a2afd7f06cff875819aa690916756674ef557f7a985d0d6722d33",
+      "event_id": "sha256:190cbf70a4ac15bff1ad586f9b32da691df302b919cbd2d1d6560c6f5b07f2d1"
+    },
+    "runtime-source-2": {
+      "artifact_id": "sha256:5c745fd9d679726264275155b2340ef1883bf9802006953a4cba9d0579387738",
+      "event_id": "sha256:152432015740729b32e9cad30a12e6c13f29d6abe08550b65e0d69a77c95785d"
+    },
+    "runtime-source-3": {
+      "artifact_id": "sha256:4daf2f45560e44c3c3c6c7327b881519bc9c04543616b5c72e5d2a25afd146e5",
+      "event_id": "sha256:cc3f471986116dbb44896033ec7a32cedfb8d2119007e0af986217947780f504"
+    },
+    "runtime-source-4": {
+      "artifact_id": "sha256:0b508de5c61737ff2b7d4a1838d8277ac9fe5428874e7b9bec834ee1145ca8a4",
+      "event_id": "sha256:e8bb0cecef1236f3fa63f776dca1fe643649e3c6a6916bb7875d14048fc322a0"
+    },
+    "runtime-source-5": {
+      "artifact_id": "sha256:25c708eeeecd3c2a71beb03847446ff4301779e44114ada5399c93a437fe6d37",
+      "event_id": "sha256:929e838768efc6a19ce209f513aecc6990509a66a38841250352ee7860b45334"
+    },
+    "synthetic-test-source": {
+      "artifact_id": "sha256:e696ef9ac33e2ec98d697464a704dbd7cc52551f761afc1c9a96699624d26e05",
+      "event_id": "sha256:d7a4f42a88a49f576050b558eb4172f74fad02ab06ffdcdb012c2a28f9517695"
+    }
+  },
+  "seal": {
+    "root": "sha256:aa3effdd2fc602d7b2bd05ce87d71ce02ac28018bf262437a7fa50de7a439179",
+    "event_id": "sha256:c47d3268987ef036245421776b2d329695ce3714543abb35793617b7ea804b5a"
+  },
+  "binding_sha256": "sha256:c2888a7cea6a3999e0f1b3b395fb26b99b56e120c75be261f0a6d1c1cd5e6bc4",
+  "e4_0_stage_authorization_issued": false,
+  "gpu_lease_issued": false,
+  "e4_01_entry_open": false
+}

@@ -1,0 +1,22 @@
+[package]
+name = "obs-open-04a-g0"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[dependencies]
+memchr = "2.7.5"
+memmap2 = "0.9.8"
+obs-open-03a = { path = "../../future-process-atlas" }
+obs-open-04a = { path = "../../sentinel-memory-metrology" }
+obs-open-meas02 = { path = "../../measurement-surface" }
+serde = { version = "1.0.219", features = ["derive"] }
+serde_json = "1.0.143"
+sha2 = "0.10.9"
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+

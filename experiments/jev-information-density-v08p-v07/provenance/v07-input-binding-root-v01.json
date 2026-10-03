@@ -1,0 +1,101 @@
+{
+  "protocol": "jev-information-density/v0.8p-v07-input-binding-root-v01",
+  "identity": "v0.8P-v07-ordering-repair-input-root-v01",
+  "disposition": "ORDERING_REPAIR_CONTRACT_SEALED_ONLY",
+  "contract_output": {
+    "path": "experiments/jev-information-density-v08p-v07/protocol/v07-overlap-ordering-repair-contract-v01.json",
+    "sha256": "cf2fc2705ea40d86cc81ddc7e9bd77108c303071e12efe32486653db27c14e0d"
+  },
+  "authorized_parent_inputs": [
+    {
+      "path": "experiments/jev-information-density-v08p/contracts/contract-bundle-seal-v01.json",
+      "sha256": "67cd6b7902111000dc93a0f81f9f20bc05a9c084732705ed8f9ad82fe965fa85",
+      "purpose": "Verify original P run, analysis, and panel contract bindings."
+    },
+    {
+      "path": "experiments/jev-information-density-v08p/phase_b/phase-b-p-run-contract-v01.json",
+      "sha256": "e345225b4a17fc18eb35fcab24cbe1d72bd0e34bed9de272f927a7be461853e6",
+      "purpose": "Bind frozen training-scope source hashes and counts; no source identity rows were opened."
+    },
+    {
+      "path": "experiments/jev-information-density-v08p/phase_a/fresh-panel-contract-v01.json",
+      "sha256": "ce3b7b97caecb27f3ad99439c0e67dca6e40af5da3db9ca2e356ea5e9f06f823",
+      "purpose": "Verify the original exact training-overlap rule."
+    },
+    {
+      "path": "experiments/jev-information-density-v08p-v06/phase_a/fresh-panel-contract-v01.json",
+      "sha256": "28b7878c9d68026254b8db734959387857b7eafb7b083d658d30d4cca6636a00",
+      "purpose": "Bind the v06 candidate-stream construction identity and preserved panel requirements."
+    },
+    {
+      "path": "experiments/jev-information-density-v08p-v06/provenance/v06-input-binding-root-v01.json",
+      "sha256": "447176e523947eab718721c953db16a51102f91a812d0d73c99712f110c21c32",
+      "purpose": "Bind v06 source and construction provenance."
+    },
+    {
+      "path": "experiments/jev-information-density-v08p-v06/provenance/training-scope-overlap-preflight-v01.json",
+      "sha256": "3c8c262214896a0c8888f043caba604ac0e50e6b5b1eac4de2de776c7099d1f3",
+      "purpose": "Preserve the v06 NOT_EVALUABLE finding without reinterpretation."
+    },
+    {
+      "path": "experiments/jev-information-density-v08p-v06/provenance/training-scope-overlap-source-access-receipt-v01.json",
+      "sha256": "9fe3799bb9018aee5cef1b1bab7a34f07c0773c24fa0518d1f8b6027fd654f92",
+      "purpose": "Bind the source-access record for the v06 preflight."
+    },
+    {
+      "path": "experiments/jev-information-density-v08p-v06/provenance/training-scope-overlap-preflight-root-v01.json",
+      "sha256": "aeba02e49dcdf3987cae7c38d34d63e69e4a02aee0781dab8e4dfab2a17b9c29",
+      "purpose": "Bind the authoritative v06 NOT_EVALUABLE disposition."
+    }
+  ],
+  "sealed_bundle_binding_check": {
+    "bundle_sha256": "67cd6b7902111000dc93a0f81f9f20bc05a9c084732705ed8f9ad82fe965fa85",
+    "run_contract_sha256": "e345225b4a17fc18eb35fcab24cbe1d72bd0e34bed9de272f927a7be461853e6",
+    "analysis_contract_sha256": "84111122033fda65c84344317cfe3b50639b23be4c71f480ba665c67a23cc939",
+    "panel_design_contract_sha256": "ce3b7b97caecb27f3ad99439c0e67dca6e40af5da3db9ca2e356ea5e9f06f823",
+    "run_and_panel_bindings_match_bundle": true,
+    "analysis_contract_body_opened": false
+  },
+  "preserved_overlap_rule": {
+    "authoritative_original_contract_sha256": "ce3b7b97caecb27f3ad99439c0e67dca6e40af5da3db9ca2e356ea5e9f06f823",
+    "dimensions": [
+      "world_id",
+      "root_id",
+      "episode_id",
+      "full_rendered_input_hash",
+      "selector_input_hash"
+    ],
+    "semantics": "Exact same-field set intersections under the original frozen serialization/canonicalization; all five intersections must be empty. No field, equality rule, threshold, or exclusion class is added, relaxed, or changed.",
+    "v06_disposition": "NOT_EVALUABLE",
+    "v06_result_reinterpreted": false,
+    "overlap_computed_in_v07_contract_step": false
+  },
+  "source_boundary": {
+    "study_artifact_content_inputs_opened": 8,
+    "opened_artifacts_are_exactly_the_listed_parent_inputs": true,
+    "directory_enumeration": false,
+    "recursive_search_or_glob": false,
+    "training_identity_rows_opened": false,
+    "candidate_identity_values_opened_or_generated": false,
+    "v06_collision_stream_consumed": false,
+    "v01_v02_v03_artifacts_opened": false,
+    "model_or_feature_contact": false,
+    "training": false,
+    "head_loading_or_inference": false,
+    "panel_evaluation": false,
+    "phoenix": false,
+    "note": "This is an explicit-path contract/input-binding record, not an OS-level file-open telemetry claim."
+  },
+  "authorization_state_after_seal": {
+    "ordering_repair_contract": "SEALED",
+    "training_identity_source_allowlist": "NOT_AUTHORIZED",
+    "training_identity_acquisition": "NOT_AUTHORIZED",
+    "candidate_identity_staging": "NOT_AUTHORIZED",
+    "exact_overlap_audit": "NOT_AUTHORIZED",
+    "panel_promotion": "NOT_AUTHORIZED",
+    "lfm_contact": "NOT_AUTHORIZED",
+    "training": "NOT_AUTHORIZED",
+    "evaluation": "NOT_AUTHORIZED"
+  },
+  "root_hash_rule": "SHA-256 of the exact bytes of this receipt; no self-referential hash field."
+}

@@ -1,0 +1,45 @@
+{
+  "plan_id": "FAS00_PHASE3_SENSOR_EXECUTION_V02",
+  "supersedes": "FAS00_PHASE3_SENSOR_EXECUTION_V01; source-seal sort mismatch before corpus access or probe fitting",
+  "project_id": "fas-frozen-adaptive-substrate-v00",
+  "contract_sha256": "7b031e9aa7dfe92174a2ad8e5764b3b7a66505167dd8e32f35c542903a411a4b",
+  "phase2a_cache_root_sha256": "9af2c6c73a2f21608e8a2dc912d8838968eaebffb32b4b1ea0a18364e488d217",
+  "verifier_correction_root_sha256": "d2c84b22e141845392e6ad51ba9ca9584778cc283953bd137518b577e857360b",
+  "phase1_corpus_sha256": "9fdd7ce9e49b86ac9acb3da035429c616865f527123bd0ac7c312b1b912439ca",
+  "input_cache": "D:/codex-runs/fas-frozen-adaptive-substrate-v00/phase2a-v01/feature-cache-v01",
+  "output_results": "D:/codex-runs/fas-frozen-adaptive-substrate-v00/phase3-v02/results-v01",
+  "feature_selection": "FULL and QUERY_ONLY only, as named by the sealed contract",
+  "split": "world seeds 0..15 with templates 3/4 train; 16..23 with template 5 validation; 24..31 with template 5 test",
+  "probe_family": "multinomial linear softmax; mean cross-entropy plus 0.5 * ||W||_F^2; bias unregularized",
+  "optimizer": {
+    "implementation": "scipy.optimize.minimize(method=L-BFGS-B, jac=True, no bounds)",
+    "line_search": "SciPy L-BFGS-B fixed More-Thuente Wolfe implementation",
+    "maxiter": 1000,
+    "maxfun": 1000000,
+    "maxcor": 10,
+    "maxls": 20,
+    "gtol": 1e-8,
+    "ftol": 0.0,
+    "acceptance": "success and finite objective and gradient infinity norm <= 1e-8",
+    "initial_parameters": "all zeros",
+    "floating_point": "float64 throughout fitting and metrics",
+    "blas_threads": 4
+  },
+  "runtime": {
+    "python": "3.13.15",
+    "numpy": "2.5.3",
+    "scipy": "1.16.2",
+    "scipy_wheel_sha256": "fda714cf45ba43c9d3bae8f2585c777f64e3f89a2e073b668b32ede412d8f52c"
+  },
+  "gate_application": {
+    "positive": "validation and test",
+    "heldout_term_transfer": "declared test slices",
+    "negative_controls": "test; validation is reported as a diagnostic",
+    "query_only": "pooled test accuracy and unweighted per-seed point estimate <= 0.40, cluster-bootstrap upper endpoint <= 0.45",
+    "nonpass_precedence": ["SENSOR_FAIL_TARGET_LEAKAGE", "SENSOR_FAIL_SURFACE_SHORTCUT", "SENSOR_FAIL_NO_SIGNAL"],
+    "no_result_driven_repair": true
+  },
+  "phase4_authorized": false,
+  "online_mechanisms_authorized": false,
+  "phase5_corpus_generation_authorized": false
+}

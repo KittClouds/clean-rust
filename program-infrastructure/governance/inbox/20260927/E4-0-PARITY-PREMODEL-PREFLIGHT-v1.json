@@ -1,0 +1,22 @@
+{
+  "schema": "CHIEF_E4_0_PARITY_PREMODEL_PREFLIGHT_V1",
+  "status": "PASS_VISIBLE_PREMODEL_PREFLIGHT",
+  "binding_sha256": "c2888a7cea6a3999e0f1b3b395fb26b99b56e120c75be261f0a6d1c1cd5e6bc4",
+  "adapter_sha256": "bf8c080e5375bae81d07a6ce5a2f7ebfdd9223fd59fe609072372a42475db198",
+  "runner_sha256": "5c745fd9d679726264275155b2340ef1883bf9802006953a4cba9d0579387738",
+  "current_contract_sha256": "21fc77d5a288b9adef995d88f089890235f8dcb2fbc3c9e452725bb67892a22f",
+  "current_contract_root_sha256": "278ae16eeb6852d3efad44221556a87be6df54964471f0870931fe2e99b305d1",
+  "checks": {
+    "official_static_binding_loaded": true,
+    "actual_v16_v09_contract_seal_and_postseal_audit_verified": true,
+    "population_and_parity_stage_manifests_replayed": true,
+    "eleven_named_visible_predecessor_artifacts_verified": true,
+    "torch_transformers_tokenizers_imported": false,
+    "protected_label_bytes_opened": false,
+    "model_contact_performed": false,
+    "cuda_initialized": false
+  },
+  "execution_scope": "Read-only parity prerequisites using the exact Chief binding; no model or asset-loader call, stage grant, GPU lease, or E4 execution.",
+  "e4_0_stage_authorization_issued": false,
+  "e4_01_entry_open": false
+}

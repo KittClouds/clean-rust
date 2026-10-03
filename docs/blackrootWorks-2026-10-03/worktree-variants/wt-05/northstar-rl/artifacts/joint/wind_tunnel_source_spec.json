@@ -1,0 +1,9 @@
+{
+  "schema_version": "WIND_TUNNEL_MODE_V1",
+  "mode": "CROSS_SOURCE_COMPARISON",
+  "runraw_tape_id": "c40129d6b3235e89fdd135250aa82d690f2ee85c285508cdd15e22345462c6da",
+  "mt5_capture_id": "5e0db92bdf2a03f1be1bd6931d259820e51795cd025981a8f57e9e5920c4fa33",
+  "tradelocker_capture_id": "b63b37140767a3353fb455a4c733c3621e679782a8be6a4b884c7774135c85b8",
+  "binding_id": "9bdfd61aa3f76ec4408822447c9ddf0efc2546e682d17583964bd630daf1ee2d",
+  "source_spec_id": "f3ff9e1bc8542ff5e9ce053564ebeedc29a966179fbd4addd61d083de4279547"
+}

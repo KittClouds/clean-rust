@@ -1,0 +1,28 @@
+{
+  "analysis_prohibited_until_support_receipt": true,
+  "collection_validation_receipt_sha256": "9df970a7c9065d9f7058eb3d5af3c189f5dec64c6097b2d78e8c0c26bb75cb3b",
+  "eligible_count_rule": "the frozen collector did not persist exact pre-modulus eligible denominators; retain null exact counts and report sampled counts plus sum(q) estimate without replay",
+  "raw_collection_tree_seal_sha256": "5d98535f780d5b630b5136c07367791c4698f750013561ad8c243211c6d01b88",
+  "raw_predictor_sha256": "495c68070624e4b8eaeeba217aeb03bdac6636d75e6691292a59872c11a9455f",
+  "raw_truth_sha256": "ff9d000145fc503e83710ca99d65b0304d52c1f94533d92c78e28b9730214d50",
+  "schema": "F4-PRESENTATION-03-support-accounting-amendment-v0.1.1",
+  "scope": [
+    "emit all 216 substrate-side-block support cells, including zero-row cells",
+    "evaluate assignment polarity support across each assignment's two blocks",
+    "evaluate all 12 leave-one-block-out training partitions",
+    "report raw q=1/p diagnostics with no trim, cap, normalization, or winsorization"
+  ],
+  "status": "FROZEN_PRE_FIT_SUPPORT_AND_WEIGHT_DIAGNOSTICS",
+  "support_rule": "all six assignments must each contain both target polarities across their two blocks; otherwise the equal-weight assignment aggregate is null",
+  "support_script_sha256": "52b1420eb9a809200e41f02dc7feb593d725129e91c4d84c49e6a9c9e01100c4",
+  "task_bank_manifest_sha256": "ad339f4a710c9cb803e68a7076da923a68486f81b7552aa767c710f885deb0a1",
+  "training_payload_sha256": "d61a0390fb9ba413b8970ba3ae82b8b5ec9fb717d3fc2247a79d9f8e30431d61",
+  "validation_repair_identity": "F4-PRESENTATION-03-VALIDATION-REPAIR-v0.1.1",
+  "weight_diagnostic_fields": [
+    "min_q",
+    "max_q",
+    "mean_q",
+    "sum_q",
+    "ess=(sum_q)^2/sum(q^2)"
+  ]
+}

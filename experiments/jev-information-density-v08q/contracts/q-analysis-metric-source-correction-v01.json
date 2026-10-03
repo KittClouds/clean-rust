@@ -1,0 +1,25 @@
+{
+  "schema": "jev-v08q-analysis-metric-source-correction-v01",
+  "identity": "JEV-V08Q-ANALYSIS-METRIC-SOURCE-CORRECTION-V01",
+  "status": "FROZEN_SOURCE_IDENTITY_CORRECTION_BEFORE_METRIC_REPLAY",
+  "parent_analysis_attempt": "analyze_q_results_v06.py",
+  "failed_preflight_receipt": "D:/codex-runs/jev-information-density-v08q-run-v01/evaluation-v02/analysis-failure-receipt-v01.json",
+  "failed_preflight_receipt_sha256": "a818e245788050e5dfc9a5da590c31c60e18d505494900eb0543520dd0fd8a58",
+  "mismatch": {
+    "v06_declared_metric_source_sha256": "fa22bc8febff89d2b635091c6cb40be6f3beba4549c4a135d16e213f6fd3dda4",
+    "that_sha256_belongs_to": "experiments/jev-information-density-v08n/phase_b/evaluate_phase_b_v01.py",
+    "loaded_metric_source": "experiments/jev-information-density-v08n/phase_b/analyze_phase_b_v01.py",
+    "correct_metric_source_sha256": "dbde07fe1ec009f2bca7f1f22ad913a2a79f4f8dfb8120a1f31ebf37d5f59b70"
+  },
+  "repair": {
+    "metric_logic_changed": false,
+    "probe_or_training_changed": false,
+    "prediction_matrix_changed": false,
+    "raw_prediction_sha256": "d4bc4fce5fd1c51815ac214b794e3b5d5c51f549d80ad7e1362ec5c04abc976e",
+    "raw_prediction_hash_tree_sha256": "9a558752afd107487bf9f3b1dbf7bceebf927c51892a55b1289d447eabbc1d5b",
+    "failed_analysis_consumed_prediction_rows": false,
+    "failed_analysis_emitted_metrics": false,
+    "output_isolation": "Corrected analysis writes to evaluation-v03; sealed raw predictions and preserved v06 failure outputs in evaluation-v02 remain unchanged."
+  },
+  "historical_artifacts_preserved": true
+}

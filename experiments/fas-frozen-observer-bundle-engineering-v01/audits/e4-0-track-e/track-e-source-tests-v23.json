@@ -1,0 +1,34 @@
+{
+  "schema": "FAS_E4_0_TRACK_E_SOURCE_TESTS_V14",
+  "receipt_id": "E4_0_TRACK_E_V14_PREMAP_SYNTHETIC_AUDITOR_TESTS",
+  "status": "TRACK_E_SOURCE_TESTS_PASS_V14_PREMAP_SYNTHETIC_AUDITOR",
+  "commands": [
+    "python -m py_compile experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/audit_e4_0_track_e_v14.py experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/test_audit_e4_0_track_e_v14.py",
+    "python experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/test_audit_e4_0_track_e_v14.py (from repository root)"
+  ],
+  "tests": {
+    "discovered": 9,
+    "passed": 9,
+    "failed": 0,
+    "skipped": 0
+  },
+  "python_compile": "PASS",
+  "sources": [
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/audit_e4_0_track_e_v14.py",
+      "bytes": 112628,
+      "sha256": "627db699fe05eb354f9eba59b9a3c3cd4755cdb5cbdbe71b390fd62247cfa2bc"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/test_audit_e4_0_track_e_v14.py",
+      "bytes": 7365,
+      "sha256": "8514f38c42a762259a21d44d446b5d45c38fb49fc67c0644e5608e9dfa747ac1"
+    }
+  ],
+  "actual_v14_contract_and_map_audited": false,
+  "model_tokenizer_cuda_contact": false,
+  "truth_payloads_opened": false,
+  "execution_authorization_conferred": false,
+  "scope": "Synthetic-only independent Track E v14 auditor tests. Validates sealed v06-v11 ancestor closure, exact failed v12 candidate/map history, and failed v13 finalizer stop/source/map with no candidate, seal, contact, or truth access. No v14 contract/map audit, E4 labels/population, model, tokenizer, CUDA, or GPU accessed.",
+  "recorded_utc": "2026-09-27T04:04:12.373Z"
+}

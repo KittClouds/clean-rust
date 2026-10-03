@@ -1,0 +1,12 @@
+{
+  "schema": "FLY-REACH-03-F4-PRECISION-01-preflight-attempt-v1",
+  "identity": "F4-PRECISION-01",
+  "contract_version": "0.1",
+  "status": "CONTRACT_SCHEMA_MISMATCH",
+  "failure": "The preflight expected measured_execution_authorized at the contract top level; v0.1 stored the false value under decision_rules.",
+  "collection_started": false,
+  "precision_output_created": false,
+  "measured_namespace_created": false,
+  "scientific_interpretation_opened": false,
+  "disposition": "Superseded before collection by administrative contract v0.1.1; no scientific data were generated."
+}

@@ -1,0 +1,42 @@
+{
+  "protocol": "Q10-PF6-RH1-LA1",
+  "identity": "q10-rh1-la1-v1",
+  "status": "PREEXECUTION_SEALED_NO_BEHAVIOR",
+  "plan_sha256": "08CFA676B94EF6D8969D2D4C1DE479225A6E06D705DB7ACB52B559FC7A2F42CA",
+  "contract_sha256": "106841BC2260A76057B79E574B83F82796FC84A92D92DF6FB764D7AB42FEB650",
+  "f2_execution_sha256": "D900B374F076AEC352381D878D31AEA8D7129D8BB5A3E53DB5B7D5B05E3FAFF9",
+  "f2_summary_sha256": "C56E6B3DCB351867BA2BE9EB2394810B94284F2534AC3F7252502B2956BD8B62",
+  "f2_interpretation_sha256": "E00B21C55495A76C98A6F35E47F869F7C13F9CA50ADA44DD57B7879357EE86B9",
+  "f2_runner_sha256": "B42644BA0E2C4C8A0CC0F9997135CE18A9F9E6C0836810926300C4D84F198103",
+  "f2_contract_sha256": "7CBDD2607D55A010D339B796196F7408A70B4664065075F3C3D7A5F64773723C",
+  "selection": {
+    "source": "sealed_f2_execution_results",
+    "cohort": "primary",
+    "strict_score": [
+      "mismatch_count",
+      "total_ulp_distance",
+      "residual_l2",
+      "maximum_absolute_residual"
+    ],
+    "selected_group_count": null,
+    "selected_group_count_status": "PENDING_RECEIPT_DERIVATION"
+  },
+  "geometry_correction": {
+    "actual_endpoints_hard_gate": [
+      "W0",
+      "historical_authority_h16",
+      "authority_h32_full"
+    ],
+    "counterfactual_endpoints_diagnostic_only": [
+      "authority_h32_early_ranks_1_16",
+      "authority_h32_late_only_ranks_17_32"
+    ],
+    "counterfactual_geometry_failure_aborts": false
+  },
+  "measured_execution_started": false,
+  "scientific_seed_bundles": 0,
+  "behavioral_probe": false,
+  "scientific_promotion": false,
+  "model_mutation": false,
+  "parent_writes": false
+}

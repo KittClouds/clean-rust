@@ -1,0 +1,13 @@
+{
+  "behavioral_probe": false,
+  "candidate_generation_executed": false,
+  "engineering_only": true,
+  "execution_sha256": "45A4800D22E300FED98FF30A7384BFC31931A13C24556EE48D39F8B46226B410",
+  "gc1_authorized": false,
+  "identity": "q10-gc0-gp1-pf0-v1",
+  "protocol": "Q10-GC0-GP1-PF0",
+  "result_sha256": "4F018D91F9251ED90400A108B48221CC5E44007280EDA94F92EF3EF52FDD0EE6",
+  "scientific_promotion": false,
+  "status": "PF0_ENGINEERING_PREFLIGHT_COMPLETE",
+  "summary_sha256": "AD44877A9B9AC92B51354E4EED8D0781E10132E3F98C0ABCAFAC72F91C2F69B7"
+}

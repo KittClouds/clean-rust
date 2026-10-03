@@ -1,0 +1,31 @@
+{
+  "entries": [
+    {
+      "bytes": 9165,
+      "path": "FAS-S11-PROTOCOL-V01.md",
+      "sha256": "e6ace87b8e16eefda5d5d191bbf26c69a6bbf2f224cd07bd383b3f5fab64e6bd"
+    },
+    {
+      "bytes": 10074,
+      "path": "S11-PROPOSAL-V01.md",
+      "sha256": "64ec956c8a845114cbb92b7734ffc93c3ddbb897e0908c9e94fd5c76850dbd8e"
+    },
+    {
+      "bytes": 12477,
+      "path": "contracts/s11-confirmatory-contract-v01.json",
+      "sha256": "27e6f17b32e18c709023255498df529e2781a4422e12bec3614a1b1e97abf077"
+    },
+    {
+      "bytes": 6047,
+      "path": "source/seal_protocol_v01.py",
+      "sha256": "bd4b43f75057d77a76f627686fd5bee3ce21d039798e71a400948403fed95ea1"
+    }
+  ],
+  "features_extracted": false,
+  "model_loaded": false,
+  "panel_generated": false,
+  "probe_fits_performed": false,
+  "project_id": "fas-s11-cross-depth-observer-transport-replication-v01",
+  "root_sha256": "9f11fb59d0f01ed12ee9c9f1753ae990ce5bcb20cf4f799d35a11a39079a4598",
+  "seal_id": "FAS_S11_CONFIRMATORY_PROTOCOL_SEAL_V01"
+}

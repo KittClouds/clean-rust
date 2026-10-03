@@ -1,0 +1,461 @@
+{
+ "build_failures": [
+  [
+   "TEST-GRAPH-ISO",
+   57,
+   "TEST-GRAPH-ISO:57 not built in 120 attempts: hidden facts shared with another requirement"
+  ],
+  [
+   "TEST-GRAPH-ISO",
+   68,
+   "TEST-GRAPH-ISO:68 not built in 120 attempts: split predicate TEST-GRAPH-ISO: held axes []"
+  ],
+  [
+   "TEST-JOINT",
+   31,
+   "TEST-JOINT:31 not built in 120 attempts: no tie"
+  ],
+  [
+   "TEST-JOINT",
+   42,
+   "TEST-JOINT:42 not built in 120 attempts: split predicate TEST-JOINT: held axes ['TEMPLATE']"
+  ],
+  [
+   "TEST-JOINT",
+   242,
+   "-JOINT:242 not built in 120 attempts: intent IMPOSSIBLE derived ('DECLINE_UNAVAILABLE', 'NECESSARY_MISSING_UNAVAILABLE')"
+  ],
+  [
+   "TEST-JOINT",
+   280,
+   "TEST-JOINT:280 not built in 120 attempts: split predicate TEST-JOINT: held axes ['TEMPLATE']"
+  ]
+ ],
+ "canonical_world_counts": {
+  "DEV": 300,
+  "TEST-ACTION-COMPOSITION": 300,
+  "TEST-GRAPH-ISO": 300,
+  "TEST-HOP-DEPTH": 300,
+  "TEST-IID": 300,
+  "TEST-INFORMATION-POLICY": 300,
+  "TEST-JOINT": 300,
+  "TEST-RELATION": 300,
+  "TEST-TEMPLATE": 300,
+  "TEST-TEMPORAL-COMPOSITION": 300,
+  "TEST-VOCAB": 300,
+  "TRAIN": 1600
+ },
+ "coverage": {
+  "all_five_dispositions": true,
+  "all_five_required_facts_scopes_nonempty": true,
+  "all_five_slot_types_in_requirements": true,
+  "all_four_query_source_scopes_used": true,
+  "all_nine_actions_in_every_cell": true,
+  "all_sixteen_reasons": true,
+  "all_twelve_splits_present": true,
+  "ask_cardinality_branches": true,
+  "both_zero_missing_classifications": true,
+  "pilot_ok": true
+ },
+ "freeze_sha256": "923fb971e513b038f42be2446f32a40d03d1ecba9b86f1d20c72df1c9903417e",
+ "gates": {
+  "G01": {
+   "checked": 5794,
+   "examples": [],
+   "failures": 0,
+   "passed": true
+  },
+  "G02": {
+   "checked": 5794,
+   "examples": [],
+   "failures": 0,
+   "passed": true,
+   "regen_checked": 5794,
+   "rows": 5794
+  },
+  "G03": {
+   "checked": 5794,
+   "examples": [],
+   "failures": 0,
+   "passed": true
+  },
+  "G04": {
+   "checked": 5794,
+   "examples": [],
+   "failures": 0,
+   "passed": true
+  },
+  "G05": {
+   "checked": 5794,
+   "examples": [],
+   "failures": 0,
+   "passed": true
+  },
+  "G06": {
+   "checked": 54,
+   "examples": [],
+   "failures": 0,
+   "holes": [],
+   "passed": true,
+   "receipt": {
+    "ACTIVATE": {
+     "available": 26512,
+     "executed_in_shortest_plan_witness": 204,
+     "generated": 3936,
+     "illegal": 25715,
+     "legal": 797,
+     "truth_optimal": 228
+    },
+    "CLOSE": {
+     "available": 17846,
+     "executed_in_shortest_plan_witness": 91,
+     "generated": 3557,
+     "illegal": 17454,
+     "legal": 392,
+     "truth_optimal": 98
+    },
+    "DEACTIVATE": {
+     "available": 26512,
+     "executed_in_shortest_plan_witness": 84,
+     "generated": 3936,
+     "illegal": 26138,
+     "legal": 374,
+     "truth_optimal": 91
+    },
+    "DROP": {
+     "available": 93563,
+     "executed_in_shortest_plan_witness": 413,
+     "generated": 5794,
+     "illegal": 92142,
+     "legal": 1421,
+     "truth_optimal": 135
+    },
+    "MOVE": {
+     "available": 52869,
+     "executed_in_shortest_plan_witness": 2241,
+     "generated": 5761,
+     "illegal": 44152,
+     "legal": 8717,
+     "truth_optimal": 3607
+    },
+    "OPEN": {
+     "available": 17627,
+     "executed_in_shortest_plan_witness": 212,
+     "generated": 3508,
+     "illegal": 17267,
+     "legal": 360,
+     "truth_optimal": 141
+    },
+    "TAKE": {
+     "available": 93563,
+     "executed_in_shortest_plan_witness": 718,
+     "generated": 5794,
+     "illegal": 91813,
+     "legal": 1750,
+     "truth_optimal": 638
+    },
+    "TRANSFER": {
+     "available": 19575,
+     "executed_in_shortest_plan_witness": 67,
+     "generated": 1914,
+     "illegal": 19503,
+     "legal": 72,
+     "truth_optimal": 10
+    },
+    "WAIT": {
+     "available": 5619,
+     "executed_in_shortest_plan_witness": 11,
+     "generated": 5619,
+     "illegal": 0,
+     "legal": 5619,
+     "truth_optimal": 68
+    }
+   }
+  },
+  "G07": {
+   "checked": 17,
+   "examples": [],
+   "failures": 0,
+   "passed": true,
+   "undetected": []
+  },
+  "G08": {
+   "checked": 5794,
+   "passed": true,
+   "structural_duplicates": 0,
+   "textual_duplicates": 0
+  },
+  "G09": {
+   "checked": 5794,
+   "passed": true,
+   "violations": []
+  },
+  "G10": {
+   "axes_without_pairs": [],
+   "checked": 720,
+   "examples": [],
+   "failures": 0,
+   "passed": true,
+   "per_axis": {
+    "P1": {
+     "failures": 0,
+     "pairs": 60
+    },
+    "P10": {
+     "failures": 0,
+     "pairs": 60
+    },
+    "P11": {
+     "failures": 0,
+     "pairs": 60
+    },
+    "P12": {
+     "failures": 0,
+     "pairs": 60
+    },
+    "P2": {
+     "failures": 0,
+     "pairs": 60
+    },
+    "P3": {
+     "failures": 0,
+     "pairs": 60
+    },
+    "P4": {
+     "failures": 0,
+     "pairs": 60
+    },
+    "P5": {
+     "failures": 0,
+     "pairs": 60
+    },
+    "P6": {
+     "failures": 0,
+     "pairs": 60
+    },
+    "P7": {
+     "failures": 0,
+     "pairs": 60
+    },
+    "P8": {
+     "failures": 0,
+     "pairs": 60
+    },
+    "P9": {
+     "failures": 0,
+     "pairs": 60
+    }
+   }
+  },
+  "G11": {
+   "checked": 5794,
+   "examples": [],
+   "failures": 0,
+   "passed": true
+  },
+  "G12": {
+   "checked": 5794,
+   "examples": [],
+   "failures": 0,
+   "passed": true,
+   "reason_coverage": {
+    "unseen_reasons": []
+   }
+  },
+  "G13": {
+   "checked": 5794,
+   "examples": [],
+   "failures": 0,
+   "passed": true
+  },
+  "G14": {
+   "checked": 5794,
+   "external_rows_imported": 0,
+   "passed": true,
+   "tokens_outside_bank_vocabulary": {}
+  },
+  "G15": {
+   "checked": 14,
+   "incomplete_panels": [],
+   "incomplete_seeds": [],
+   "panels_without_seed_entry": [],
+   "passed": true
+  },
+  "G16": {
+   "checked": 5794,
+   "passed": true,
+   "rates": {
+    "G01": 1.0,
+    "G02": 1.0,
+    "G03": 1.0,
+    "G04": 1.0,
+    "G05": 1.0,
+    "G11": 1.0,
+    "G12": 1.0,
+    "G13": 1.0,
+    "G17": 1.0,
+    "G18": 1.0
+   },
+   "sampled_gates": []
+  },
+  "G17": {
+   "checked": 5794,
+   "examples": [],
+   "failures": 0,
+   "passed": true
+  },
+  "G18": {
+   "checked": 5794,
+   "examples": [],
+   "failures": 0,
+   "passed": true
+  },
+  "_summary": {
+   "dispositions": {
+    "ASK": 837,
+    "DECLINE_UNAVAILABLE": 1973,
+    "ESCALATE": 880,
+    "EXECUTE": 1781,
+    "NOOP": 323
+   },
+   "m_by_disposition": {
+    "ASK:1": 837,
+    "DECLINE_UNAVAILABLE:1": 324,
+    "DECLINE_UNAVAILABLE:2": 216,
+    "ESCALATE:2": 363
+   },
+   "query_slots": {
+    "entity_attribute": 1656,
+    "general_relation": 466,
+    "object_location": 7589,
+    "prohibited_edge": 33,
+    "traversable_edge": 287
+   },
+   "reasons": {
+    "AMBIGUOUS_REFERENCE": 128,
+    "CONFLICTING_EVIDENCE": 197,
+    "ESCALATION_REQUIRED": 517,
+    "EXECUTE": 1781,
+    "IMPOSSIBLE_GOAL": 213,
+    "MULTIPLE_REQUIRED_MISSING": 363,
+    "MULTIPLE_REQUIRED_MISSING_UNAVAILABLE": 216,
+    "MULTIPLE_UNRESOLVED_ACTIONS": 128,
+    "NECESSARY_MISSING_REQUESTABLE": 837,
+    "NECESSARY_MISSING_UNAVAILABLE": 324,
+    "NOOP": 323,
+    "NO_VALID_ACTION": 175,
+    "OUT_OF_SCOPE": 128,
+    "POLICY_DENIED": 258,
+    "UNKNOWN_ENTITY": 117,
+    "UNKNOWN_TARGET": 89
+   },
+   "rows": 5794,
+   "scopes": {
+    "ACTION": 768,
+    "GOAL": 728,
+    "PLAN": 3800,
+    "SCHEMA": 498
+   },
+   "split_rows": {
+    "DEV": 300,
+    "TEST-ACTION-COMPOSITION": 300,
+    "TEST-GRAPH-ISO": 298,
+    "TEST-HOP-DEPTH": 300,
+    "TEST-IID": 300,
+    "TEST-INFORMATION-POLICY": 300,
+    "TEST-JOINT": 296,
+    "TEST-RELATION": 300,
+    "TEST-TEMPLATE": 1200,
+    "TEST-TEMPORAL-COMPOSITION": 300,
+    "TEST-VOCAB": 300,
+    "TRAIN": 1600
+   }
+  }
+ },
+ "ms_per_row_all_gates": 395.9770444594131,
+ "n_build_failures": 6,
+ "pairs": {
+  "per_axis": {
+   "P1": {
+    "failures": 0,
+    "pairs": 60
+   },
+   "P10": {
+    "failures": 0,
+    "pairs": 60
+   },
+   "P11": {
+    "failures": 0,
+    "pairs": 60
+   },
+   "P12": {
+    "failures": 0,
+    "pairs": 60
+   },
+   "P2": {
+    "failures": 0,
+    "pairs": 60
+   },
+   "P3": {
+    "failures": 0,
+    "pairs": 60
+   },
+   "P4": {
+    "failures": 0,
+    "pairs": 60
+   },
+   "P5": {
+    "failures": 0,
+    "pairs": 60
+   },
+   "P6": {
+    "failures": 0,
+    "pairs": 60
+   },
+   "P7": {
+    "failures": 0,
+    "pairs": 60
+   },
+   "P8": {
+    "failures": 0,
+    "pairs": 60
+   },
+   "P9": {
+    "failures": 0,
+    "pairs": 60
+   }
+  }
+ },
+ "rows": 5794,
+ "scale": 1.0,
+ "seconds": {
+  "generate_and_gate": 152.95273303985596,
+  "total": 157.699768781662
+ },
+ "source_manifest": {
+  "BANK-V2-FREEZE.md": "cafe070bfb1b216697329b2b92ab5093facc1c4b19d5a60c5233781640a2a89b",
+  "__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "algebra.py": "08384a17dafd2748dd3052a537240c873037ed47dd1fb74fb8d0c9a13d192875",
+  "bank-v2-objects.json": "923fb971e513b038f42be2446f32a40d03d1ecba9b86f1d20c72df1c9903417e",
+  "build.py": "10fc6a9c2961f2d37755bbbd4a88a2a12a859c22af6d4c551250141eba6f60b0",
+  "canon.py": "8ed6687e40f1abd8080832769871c2a0e94f2308939c002855bf7747f9a7c214",
+  "facts.py": "f1230a01125dd491b97e768352bc08e28fce74a4a872e0062858432f18176f14",
+  "freeze.py": "0e4f0910cb86d1a572f78b49605002f066fea57f40932d42685c6a30cf459a49",
+  "gates.py": "f7e75619c703af73ab72d20f3cf37957faebe5071b3e30bd63ce40ed6f817b38",
+  "intents.py": "39ffc16dbc6931099c994c33246cb25f6cf8dd43dadf8b4a01320f3a03e46280",
+  "interventions.py": "98373a96bc336672d3f90f7f1736d8d14570854bbe1fd9432a5b2274aad2d413",
+  "lexicon.py": "be3d0b16eb04c6e3d2ad2870b116ee7218f53a01067724791fb2c677ff2e148c",
+  "pipeline.py": "70385abd72ec18bea774b6b3b01fd7ac89332f747e2ccb205353b37bd9c9ed9c",
+  "refsim.py": "d812238c32b74d2dad419c6a41a72482145ebe87739454ac0fedec924e318b82",
+  "registry.py": "8bd3ef26a531ba69dda54b661c485313392b09ecb16d9bb64d0a6208735a803c",
+  "render.py": "77fe09e9d789601cd41c1520f1af2dc3ca18b4f2d9bc375f898a5e4d2fc22edd",
+  "requirements.py": "c753efa6378e5f0ba77af05ba73296856c1b48bc846c3e41e9c48aa3b094500e",
+  "seed-registry-v2.json": "026132200210b97921b763ef80de79a648d8c98640cf04422e65208d9a9e8c8b",
+  "sim.py": "bdf7270b2706d426b17e426abdf89abcd1c41043fda4f2ed9774980a4d3d6a1d",
+  "splits.py": "a2be7cdcdcc7c1c34e4a3ee16e130f8db3c497a3b5b58f2afede82d604fa1fa7",
+  "targets.py": "72c1cfa0ed44e2793c5272b0b500e5728e6126471cb87f536315fdd9da49211b",
+  "worldgen.py": "0605cc3e0e14ceff198737a89b947fc1bae4dbcd75551551175afd92301aef90"
+ },
+ "stage": "pilot",
+ "version": "0.7"
+}

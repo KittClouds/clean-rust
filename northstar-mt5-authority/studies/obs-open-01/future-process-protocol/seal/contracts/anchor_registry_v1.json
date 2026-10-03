@@ -1,0 +1,33 @@
+{
+  "schema": "OBS_OPEN_03AP_ANCHOR_REGISTRY_V1",
+  "anchors": [
+    {
+      "anchor_kind": "EXTREME_CANDIDATE_BIRTH",
+      "source_schema": "EXTREME_CANDIDATE_SCHEMA_V1",
+      "identity": "candidate_id",
+      "anchor_known_at": "birth_knowledge_time",
+      "anchor_price": "extreme_price",
+      "orientation": "UPPER_OR_LOWER_FROM_CANDIDATE_SIDE",
+      "path_start": "FIRST_COMPLETED_M1_BAR_STRICTLY_AFTER_BIRTH_KNOWLEDGE_TIME",
+      "path_stop": "SUPERSESSION_COMMIT_INCLUSIVE_OR_SESSION_TERMINATION",
+      "terminal_status": "RETROSPECTIVE_LABEL_AVAILABLE_ONLY_AT_SESSION_TERMINATION"
+    },
+    {
+      "anchor_kind": "RANGE_FREEZE",
+      "source_schema": "RANGE_OBJECT_SCHEMA_V1",
+      "identity": "range_object_id",
+      "scale": "k=1..30_PEERS",
+      "anchor_known_at": "freeze_commit_time",
+      "anchor_geometry": ["high", "low", "midpoint", "width"],
+      "orientation": "NONE",
+      "path_start": "FIRST_COMPLETED_M1_BAR_STRICTLY_AFTER_FREEZE_COMMIT_TIME",
+      "path_stop": "SESSION_TERMINATION"
+    }
+  ],
+  "forbidden": [
+    "BACKDATE_OUTCOME_TO_ANCHOR",
+    "USE_TERMINAL_SURVIVOR_AT_CANDIDATE_BIRTH",
+    "ORIENT_RANGE_FREEZE_WITH_FUTURE_DIRECTION",
+    "USE_RANGE_GEOMETRY_BEFORE_FREEZE_COMMIT"
+  ]
+}

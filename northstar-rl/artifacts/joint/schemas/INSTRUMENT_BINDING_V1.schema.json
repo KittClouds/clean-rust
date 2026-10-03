@@ -1,0 +1,118 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "InstrumentBinding",
+  "type": "object",
+  "properties": {
+    "binding_basis": {
+      "type": "string"
+    },
+    "binding_id": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "binding_status": {
+      "$ref": "#/$defs/BindingStatus"
+    },
+    "created_at_ns": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "mt5_symbol": {
+      "type": "string"
+    },
+    "mt5_terminal_id": {
+      "type": "string"
+    },
+    "northstar_instrument_id": {
+      "type": "integer",
+      "format": "uint32",
+      "minimum": 0
+    },
+    "observed_contract_fields": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/FieldComparison"
+      }
+    },
+    "schema_version": {
+      "type": "string"
+    },
+    "tradelocker_account_environment": {
+      "type": "string"
+    },
+    "tradelocker_instrument_id": {
+      "type": "string"
+    },
+    "tradelocker_symbol": {
+      "type": "string"
+    },
+    "verified_at_ns": {
+      "type": "integer",
+      "format": "int64"
+    }
+  },
+  "required": [
+    "schema_version",
+    "binding_id",
+    "northstar_instrument_id",
+    "mt5_terminal_id",
+    "mt5_symbol",
+    "tradelocker_account_environment",
+    "tradelocker_instrument_id",
+    "tradelocker_symbol",
+    "binding_basis",
+    "observed_contract_fields",
+    "binding_status",
+    "created_at_ns",
+    "verified_at_ns"
+  ],
+  "$defs": {
+    "BindingStatus": {
+      "type": "string",
+      "enum": [
+        "EXACT",
+        "COMPATIBLE",
+        "TRANSFORM_REQUIRED",
+        "PARTIAL",
+        "UNRESOLVED"
+      ]
+    },
+    "Digest256": {
+      "description": "Domain-separated BLAKE3 digest",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "FieldComparison": {
+      "type": "object",
+      "properties": {
+        "field": {
+          "type": "string"
+        },
+        "mt5_value": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "status": {
+          "$ref": "#/$defs/BindingStatus"
+        },
+        "tradelocker_value": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "transform": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "field",
+        "status"
+      ]
+    }
+  }
+}

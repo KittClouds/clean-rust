@@ -1,0 +1,29 @@
+{
+  "recorded_utc": "2026-09-27T01:25:08.081416+00:00",
+  "schema": "FAS_E4_0_TRACK_E_SOURCE_TESTS_V08",
+  "receipt_id": "E4_0_TRACK_E_V08_PREMAP_SOURCE_TESTS_V16",
+  "status": "TRACK_E_SOURCE_TESTS_PASS_V08_PREMAP_SYNTHETIC_AUDITOR",
+  "command": "python -m unittest experiments.fas-frozen-observer-bundle-engineering-v01.audits.e4-0-track-e.test_audit_e4_0_track_e_v08 -v; python -m py_compile auditor and tests",
+  "synthetic_test_count": 16,
+  "py_compile": "PASS",
+  "sources": [
+    {
+      "path": "audits/e4-0-track-e/audit_e4_0_track_e_v08.py",
+      "bytes": 60552,
+      "sha256": "df13a5cd3e0301af2fcd835e89ff15bf62a93ed9ffddb45dda05565feb738e11"
+    },
+    {
+      "path": "audits/e4-0-track-e/test_audit_e4_0_track_e_v08.py",
+      "bytes": 33169,
+      "sha256": "ff3f6349ecea51c2f69a1a88ca70508d0ccac2cfd75634ed73d68931b4e200ce"
+    }
+  ],
+  "scope": {
+    "contract_version": "v08",
+    "mode": "synthetic_pre_map_only",
+    "truth_payloads_opened": false,
+    "model_tokenizer_cuda_contact": false,
+    "validated": "v06 exact science baseline, v07 immediate parent and preserved stopped attempt, v08 source/receipt closure, seal member/root logic"
+  },
+  "execution_authorization_conferred": false
+}

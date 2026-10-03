@@ -1,0 +1,18 @@
+﻿{
+    "contract":  "MST_REPLAY_DUPLICATE_V1",
+    "status":  "PASS",
+    "verified_at_utc":  "2026-08-12T09:48:06.0544787Z",
+    "window_id":  "USTEC_20260413_DIRECTIONAL_EXPANSION_UP",
+    "run_key":  "RG2_USTEC_PERIOD_M5_1776038400_1776466500_3632165528533734308",
+    "baseline_invocation_id":  "RG2_USTEC_PERIOD_M5_1776038400_1776466500_3632165528533734308_I1776038400_10924319290598477948",
+    "replay_invocation_id":  "RG2_USTEC_PERIOD_M5_1776038400_1776466500_3632165528533734308_I1776038400_18411853840738605151",
+    "comparisons":  {
+                        "run_key":  true,
+                        "canonical_dataset_hash":  true,
+                        "terminal_hash":  true,
+                        "receipt_hash":  true,
+                        "contract_receipt_hash":  true,
+                        "dataset_hashes":  true,
+                        "row_counts":  true
+                    }
+}

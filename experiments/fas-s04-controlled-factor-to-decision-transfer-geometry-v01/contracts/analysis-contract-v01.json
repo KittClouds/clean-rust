@@ -1,0 +1,68 @@
+{
+  "contract_id": "FAS_S04_CONTROLLED_FACTOR_TO_DECISION_TRANSFER_GEOMETRY_V01",
+  "experiment_id": "fas-s04-controlled-factor-to-decision-transfer-geometry-v01",
+  "question": "How do the S01-2 controlled A/C/E/P surface variants move fixed exact-target probe margins in semantic state order, and how do those within-quartet movements differ between mean_full and final_position?",
+  "parents": {
+    "s01_2_construction_root_sha256": "f6065b8163799239e0d7b1200b5dda4aad169772ead14b999130a473ff9d9049",
+    "s01_2c_alignment_root_sha256": "662fa64623e1970417564a9ae2c089d849b510465b70bcd376131eb02537890c",
+    "s01_2_corpus_sha256": "51a55212ba89d55bd6df532673ad4546c95def1f5d75622661f7c17b3e4a7ad1",
+    "s01_2_result_root_sha256": "1fc3aeb432ecdbef21a35aea8fed5b0d59671681eb8eb8032533c9ce751a4384",
+    "s01_2_feature_cache_root_sha256": "4964f35fb87a45a9447cd0f5f028668027ca3ad3a8f0d0c3f9eb7b9cbe7ccaaa",
+    "s01_3_result_root_sha256": "2581b50d75382c197793ea46400bf2b8a27508df22b2ff5bdbe82eb20a5238b7",
+    "s01_3_contract_sha256": "6613a92b1a7464f659656fbfe001ae779ffc921d0f81b39200e9713915cf48f0",
+    "s01_3_test_events_sha256": "b8a9e4dbeda07d98519cb3fe3508a839d17652494f5a3e0f7b0c82020fdc3498"
+  },
+  "scope": {
+    "tracks": ["FACTORIAL_BALANCED"],
+    "split": "Only quartet bucket 0 in the sealed S01-3 grouped split; all A/C/E/P siblings remain together.",
+    "views": ["V0_MEAN_FULL", "V1_FINAL_POSITION"],
+    "probe_task": "EXACT_TARGET",
+    "variants": ["A", "C", "E", "P"],
+    "causal_factor_edges": {
+      "C": "context alias substitution; canonical context and target fixed",
+      "E": "entity alias substitution; canonical entity and target fixed",
+      "P": "observation-template paraphrase; query and semantics fixed"
+    },
+    "semantic_state_mapping": "Map probe output slot through candidate_identity_order and candidate_semantics.state_id; report sealed IDs and invented surfaces, never relabel as safe/risky/idle."
+  },
+  "estimands": {
+    "pair_margin": "m_ab(v,x)=semantic_state_logit_a(v,x)-semantic_state_logit_b(v,x)",
+    "factor_delta": "Delta_f m(v,q)=m(v,q_variant_f)-m(v,q_A), within one quartet q, for f in C,E,P",
+    "surface_differential": "Gamma_f m(q)=Delta_f m(final_position,q)-Delta_f m(mean_full,q), for f in C,E,P",
+    "surface_shift": "SurfaceShift m(q,v)=m(final_position,q,v)-m(mean_full,q,v), paired by quartet and variant; descriptive of the complete separately fitted pipelines",
+    "target_margin": "semantic_state_logit_target - max(other semantic-state logits)",
+    "class_pair_order": [[0,1],[0,2],[1,2]],
+    "interaction": "CE not estimated: the sealed quartet has no jointly changed context-and-entity variant. No cross-quartet surrogate is allowed.",
+    "relation_state": "Relation and state are not within-quartet intervention edges in S01-2. Report them only as predeclared strata for C/E/P effects; do not report Delta_R or Delta_S."
+  },
+  "probe_replay": {
+    "feature_dtype": "FP32 little-endian",
+    "scaler_state_dtype": "FP64 serialized, cast to FP32 for replay",
+    "standardization": "(feature_fp32 - scaler_mean_fp32) / scaler_scale_fp32 in FP32",
+    "linear_state_dtype": "FP32 weights and bias",
+    "logits": "FP32 linear replay; report margins after FP64 conversion",
+    "required_check": "Every selected event argmax must match the sealed S01-3 exact-target probability row after mapping to candidate-position order. Any mismatch fails closed.",
+    "fit_or_update": false,
+    "optimizer_continuation": false
+  },
+  "summary": {
+    "statistics": ["n", "mean", "median", "nearest_rank_p10", "nearest_rank_p90", "min", "max", "positive", "zero", "negative"],
+    "group_axes": ["context_term_split", "entity_term_split", "context_term_id", "entity_term_id", "relation_id", "state_id", "world_family_id", "observation_template_id", "query_template_id", "context_term_split_x_entity_term_split", "relation_id_x_state_id"],
+    "term_id_grouping": "context_term_id and entity_term_id denote the A-variant anchor aliases. The corresponding C and E replacement IDs are retained explicitly in the quartet ledger.",
+    "unit": "one complete held-out A/C/E/P quartet",
+    "significance_tests": false,
+    "confidence_intervals": false,
+    "view_selection": false
+  },
+  "required_outputs": ["design-eligibility-v01.json", "design-audit-receipt-v01.json", "preflight-receipt-v01.json", "quartet-margin-ledger-v01.jsonl", "margin-summary-v01.json", "execution-receipt-v01.json", "S04-RESULTS.md"],
+  "forbidden": ["LFM load", "tokenizer load", "feature extraction", "new representation view", "probe fitting", "optimizer continuation", "adaptive mechanism", "SAE", "significance test", "confidence interval", "post-hoc subgroup", "cross-quartet causal surrogate", "S01 or FAS-00 modification"],
+  "limitations": ["S01-3 fixed exact-target probe states reached the sealed 300-iteration cap.", "The two views have separately fitted probes and standardizers; Gamma describes complete fixed pipelines, not representation-only causation.", "C and E are lexical aliases of unchanged canonical entities; P changes observation wording. These are not latent-world context/entity changes.", "S01-2 provides no CE sibling and no within-quartet relation/state intervention.", "The S01 controlled corpus is exploratory, not an independent confirmatory evaluation."],
+  "authority": {
+    "user_authorized_existing_cache_analysis": true,
+    "model_contact": false,
+    "probe_fitting": false,
+    "adaptive_mechanisms": false,
+    "FAS00_PHASE4_AUTHORIZED": false,
+    "SAE_ANALYSIS_AUTHORIZED": false
+  }
+}

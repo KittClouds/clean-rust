@@ -1,0 +1,45 @@
+{
+  "schema": "FAS_E4_0_TRACK_B_V02_ATTEMPT_NOTE_V01",
+  "receipt_id": "FAS_E4_0_TRACK_B_V02_ATTEMPT_NOTE_V01",
+  "status": "SYNTHETIC_IMPORT_COLLISION_REPAIRED",
+  "recorded_utc": "2026-09-26T22:22:00Z",
+  "attempt_identity": "E4-0 Track B v02 successor source/synthetic validation",
+  "initial_attempt": {
+    "suite": "test_e4_runner_v02.py",
+    "tests_run": 13,
+    "passed": 10,
+    "errored": 3,
+    "classification": "VERSIONED_MODULE_IMPORT_COLLISION",
+    "details": [
+      "A wildcard import from unchanged e4_gpu_lease_v01 re-exported e4_runner_common_v01 names into e4_runner_modes_v02. That caused its online preflight to call the V01 contract verifier, defeating V06 contract identity validation.",
+      "The same wildcard re-export caused synthetic GPU lease/resource errors to use the V01 E4RunnerError class while V02 tests expected the V02 class."
+    ],
+    "model_contact": false,
+    "tokenizer_contact": false,
+    "cuda_contact": false,
+    "e4_data_materialized": false
+  },
+  "repair": {
+    "path": "source/scripts/e4_runner_modes_v02.py",
+    "change": "Replace the GPU lease wildcard import with explicit imports of only its runtime, allocator, feature, process-memory, and lease APIs. V02 auth and artifact functions now remain sourced from V02 modules.",
+    "gate_or_schema_change": false,
+    "gpu_lease_v01_modified": false,
+    "test_assertion_adjustment": "GPU lease/resource failure tests assert the unchanged V01 lease module exception type; runner preflight tests continue to assert V02 common error type."
+  },
+  "retest": {
+    "track_b_suite": "PASS",
+    "track_b_tests": 13,
+    "issuer_suite": "PASS",
+    "issuer_tests": 5,
+    "py_compile": "PASS",
+    "cli_help_smokes": "PASS",
+    "real_authorization_issued": false,
+    "model_contact": false,
+    "tokenizer_contact": false,
+    "cuda_contact": false
+  },
+  "receipts": [
+    "audits/e4-0-track-b-v02/track-b-source-tests-v01.json",
+    "audits/e4-0-auth-issuer-v02/source-tests-v01.json"
+  ]
+}

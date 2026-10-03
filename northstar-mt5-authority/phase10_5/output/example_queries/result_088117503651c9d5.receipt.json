@@ -1,0 +1,26 @@
+{
+  "contract": "MST_RG2_RESEARCH_RESULT_RECEIPT_V1",
+  "interface_version": "MST_RG2_RESEARCH_INTERFACE_V1_1",
+  "created_at_utc": "2026-08-12T13:38:07.129658+00:00",
+  "corpus_sha256": "9cbad8545db23cba7ccea2bd062aeba700597deb4be19cecbb74647f65ef8413",
+  "analysis_code_sha256": "7000d52d9b4234de19df4ba0b7ddb225ccf9556d095e3589e4018ed57bac60e6",
+  "query_spec": {
+    "target": "rejection_given_initial_contact",
+    "group_by": [
+      "canonical_instrument"
+    ],
+    "filters": [],
+    "partition": "RG2_EXPLORATORY",
+    "censoring_treatment": "exclude_censored_from_estimate_retain_counts"
+  },
+  "query_spec_sha256": "088117503651c9d5d55e5d520a3367857329183e65dc46e645f03858bb7d706a",
+  "eligibility_rule": "non-retest attempt has contact; REJECT_TO_ORIGIN is observed",
+  "censoring_treatment": "exclude_censored_from_estimate_retain_counts",
+  "eligible_rows": 5737,
+  "observed_rows": 3504,
+  "censored_rows": 686,
+  "analyzable_rows": 5051,
+  "result_rows": 6,
+  "result_file": "result_088117503651c9d5.tsv",
+  "result_sha256": "fcfd60c11e6ffcc5a3174a7b731c76c03f6f9eef3aa7b96da6ab9cf31f8db33f"
+}

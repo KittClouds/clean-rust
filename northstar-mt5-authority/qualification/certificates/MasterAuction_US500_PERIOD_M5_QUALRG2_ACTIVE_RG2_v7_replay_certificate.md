@@ -1,0 +1,11 @@
+﻿# MasterStructure Replay Determinism Certificate
+
+- Status: **PASS**
+- Stem: `MasterAuction_US500_PERIOD_M5_QUALRG2_ACTIVE_RG2_v7`
+- Completed invocations: 2
+- Canonical dataset SHA-256: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`
+
+| Variant | Visual | Events | Attempts | Episodes | Transits | Terminal hash | Dataset hash |
+|---|---:|---:|---:|---:|---:|---|---|
+| RG2_US500_PERIOD_M5_1785715200_1785775800_13834566250209676751_I1785715200_7429266944575690891 | 0 | 0 | 0 | 0 | 0 | `1469598103934665603` | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` |
+| RG2_US500_PERIOD_M5_1785715200_1785775800_13834566250209676751_I1785715200_7421077781968775363 | 0 | 0 | 0 | 0 | 0 | `1469598103934665603` | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` |

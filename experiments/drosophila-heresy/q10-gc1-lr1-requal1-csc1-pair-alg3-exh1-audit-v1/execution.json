@@ -1,0 +1,160 @@
+{
+  "conclusion": "EXH1 range coverage, valid payloads, rescue labels, parent bindings, and write surface reconciled independently.",
+  "contexts": [
+    {
+      "context": [
+        "seed9731-L-tau16.json",
+        2
+      ],
+      "n1": {
+        "0": 402582,
+        "1": 273083,
+        "2": 89676,
+        "3": 6814
+      },
+      "n2": {
+        "0": 228483,
+        "1": 302777,
+        "2": 171686,
+        "3": 69209
+      },
+      "ranges": 14,
+      "structural_triples": 13432320,
+      "unique_valid_ranks": 772155,
+      "valid_triples": 772155
+    },
+    {
+      "context": [
+        "seed9731-L-tau4.json",
+        3
+      ],
+      "n1": {
+        "0": 4326
+      },
+      "n2": {
+        "0": 3054,
+        "1": 1272
+      },
+      "ranges": 20,
+      "structural_triples": 19363840,
+      "unique_valid_ranks": 4326,
+      "valid_triples": 4326
+    },
+    {
+      "context": [
+        "seed9731-R-tau16.json",
+        1
+      ],
+      "n1": {
+        "0": 23820
+      },
+      "n2": {
+        "0": 10081,
+        "1": 13739
+      },
+      "ranges": 17,
+      "structural_triples": 16644608,
+      "unique_valid_ranks": 23820,
+      "valid_triples": 23820
+    },
+    {
+      "context": [
+        "seed9731-R-tau16.json",
+        3
+      ],
+      "n1": {
+        "0": 3
+      },
+      "n2": {
+        "0": 3
+      },
+      "ranges": 13,
+      "structural_triples": 12699648,
+      "unique_valid_ranks": 3,
+      "valid_triples": 3
+    },
+    {
+      "context": [
+        "seed9731-R-tau4.json",
+        0
+      ],
+      "n1": {},
+      "n2": {},
+      "ranges": 17,
+      "structural_triples": 16644608,
+      "unique_valid_ranks": 0,
+      "valid_triples": 0
+    },
+    {
+      "context": [
+        "seed9731-R-tau4.json",
+        1
+      ],
+      "n1": {
+        "0": 22197,
+        "1": 11764
+      },
+      "n2": {
+        "0": 7605,
+        "1": 16985,
+        "2": 9369,
+        "3": 2
+      },
+      "ranges": 14,
+      "structural_triples": 13432320,
+      "unique_valid_ranks": 33961,
+      "valid_triples": 33961
+    },
+    {
+      "context": [
+        "seed9731-R-tau4.json",
+        2
+      ],
+      "n1": {
+        "0": 5347,
+        "1": 25539
+      },
+      "n2": {
+        "0": 3133,
+        "1": 5861,
+        "2": 21892
+      },
+      "ranges": 17,
+      "structural_triples": 16644608,
+      "unique_valid_ranks": 30886,
+      "valid_triples": 30886
+    },
+    {
+      "context": [
+        "seed9731-R-tau4.json",
+        3
+      ],
+      "n1": {
+        "0": 97995,
+        "1": 127209,
+        "2": 225
+      },
+      "n2": {
+        "0": 37790,
+        "1": 73310,
+        "2": 114329
+      },
+      "ranges": 17,
+      "structural_triples": 16644608,
+      "unique_valid_ranks": 225429,
+      "valid_triples": 225429
+    }
+  ],
+  "counts": {
+    "payload_records": 1090580,
+    "structural_triples": 125506560,
+    "valid_triples": 1090580
+  },
+  "engineering_only": true,
+  "identity": "q10-gc1-lr1-requal1-csc1-pair-alg3-exh1-audit-v1",
+  "parent_contract_sha256": "1BE8E1C73B1FD26ED0900328C399866E57CBD688C4EB3198CFBD8A6C70B99712",
+  "parent_execution_sha256": "A9A7DB62AEC66956C0CF047A02FB3644F51EA83B386FD67795620E43DBF0CC4E",
+  "protocol": "Q10-ALG3-EXH1-AUDIT1",
+  "scientific_promotion": false,
+  "status": "EXH1_AUDIT_COMPLETE"
+}

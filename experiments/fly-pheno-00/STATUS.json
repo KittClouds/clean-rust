@@ -1,0 +1,76 @@
+{
+  "schema": "FLY-PHENO-00-design-status-v1",
+  "study_id": "FLY-PHENO-00",
+  "version": "0.1-preexecution",
+  "status": "PREEXECUTION_SEALED_NOT_AUTHORIZED",
+  "study_class": "engineering_phenotype_mining",
+  "measured_execution_authorized": false,
+  "outcomes_opened": false,
+  "biological_promotion": false,
+  "jev_in_scope": false,
+  "fly_drop_00": {
+    "status": "CLOSED",
+    "disposition": "PRIMARY_TOPOLOGY_EFFECT_NOT_SUPPORTED",
+    "follow_up_is_rescue": false
+  },
+  "source_boundary": {
+    "candidate_lineage": "experiments/drosophila-heresy/dh08a",
+    "protocol_records_preexecution_status": "FROZEN_UNOPENED",
+    "candidate_tree_contains_run_artifacts": true,
+    "mutation_permitted": false,
+    "outcome_file_access_permitted": false,
+    "new_source_snapshot_required": true
+  },
+  "prospective_primary": {
+    "lesion_family": "uniform_random",
+    "severity": 0.10,
+    "recovery_endpoint_trials": 512,
+    "estimand": "damage-specific C benefit: fly minus mean degree-preserving-shuffle C benefit",
+    "B": "L_weight_frozen,p(512)-L_adaptive,p(512)",
+    "C": "B_p-B_0",
+    "bootstrap": "20000-replicate two-sided multiway percentile over learner block, lesion permutation, and null graph",
+    "direction": "two_sided"
+  },
+  "fixed_design": {
+    "lesion_target": "unique trainable KC-to-MB edge indices",
+    "lesion_persists_through_recovery": true,
+    "masked_edges_update": false,
+    "stored_weight_values_preserved": true,
+    "substrates": ["fly_derived", "degree_preserving_shuffled_graphs"],
+    "null_graph_realizations": 8,
+    "accepted_swaps_per_edge": 4,
+    "learner_task_blocks": 12,
+    "random_lesion_permutations": 4,
+    "severity_ladder": [0.0, 0.01, 0.05, 0.10, 0.20],
+    "lesion_samplers": ["uniform_random", "high_degree_targeted"],
+    "sham_condition": "p=0 on each substrate",
+    "recovery_checkpoints": [0, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512],
+    "pretraining_trials": 512,
+    "competence_criterion": "measurement error fraction <= 0.25 on 256 competence responses",
+    "minimum_global_complete_blocks": 8,
+    "epsilon_D": 0.015625,
+    "weight_frozen_control": "continued experience with weights frozen and other state dynamics on",
+    "heldout_evaluator": "fixed common-draw panel; read-only against training state"
+  },
+  "seal_time_fields": [
+    "source and executable hashes",
+    "anatomy and degree-preserving null realization hashes",
+    "task and held-out evaluation bank hashes",
+    "competence threshold and pretraining cap",
+    "learner/task seed count and seed list",
+    "null graph realization count and seed list",
+    "minimum damage denominator epsilon_D",
+    "interval and bootstrap method, count, and seed",
+    "complete fit manifest"
+  ],
+  "required_before_seal": [
+    "fresh source snapshot isolated from DH-08A result artifacts",
+    "stationary task implementation and frozen data banks",
+    "permanent lesion-mask implementation and qualification",
+    "weight-frozen/state-on implementation and qualification",
+    "pure evaluator and state-isolation qualification",
+    "frozen replication counts and analysis contract",
+    "source, executable, and dependency hashes"
+  ],
+  "scope_note": "Preparation and qualification inputs are sealed for review. This package does not authorize measured recovery outcome collection."
+}

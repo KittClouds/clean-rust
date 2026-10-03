@@ -1,0 +1,545 @@
+{
+  "schema_version": "FEATURE_REGISTRY_V1",
+  "features": [
+    {
+      "feature_id": "market.open.v1",
+      "feature_family": "raw",
+      "version": 1,
+      "dtype": "float64",
+      "shape": [
+        1
+      ],
+      "source_dependencies": [
+        "open"
+      ],
+      "lookback": 0,
+      "warmup": 0,
+      "event_time_semantics": "value is indexed by the completed source bar event_time",
+      "knowledge_time_semantics": "maximum source knowledge_time in the declared lookback; observable only when t_known <= t",
+      "missingness_semantics": "typed cell state; non-AVAILABLE values are not observations",
+      "units": "price",
+      "transform": {
+        "kind": "raw_open"
+      },
+      "parameters": [],
+      "implementation_hash": "84507ac8614024fe02967ccbc3c8cecf194365ef43d17a64804b1f9c17ced35c"
+    },
+    {
+      "feature_id": "market.high.v1",
+      "feature_family": "raw",
+      "version": 1,
+      "dtype": "float64",
+      "shape": [
+        1
+      ],
+      "source_dependencies": [
+        "high"
+      ],
+      "lookback": 0,
+      "warmup": 0,
+      "event_time_semantics": "value is indexed by the completed source bar event_time",
+      "knowledge_time_semantics": "maximum source knowledge_time in the declared lookback; observable only when t_known <= t",
+      "missingness_semantics": "typed cell state; non-AVAILABLE values are not observations",
+      "units": "price",
+      "transform": {
+        "kind": "raw_high"
+      },
+      "parameters": [],
+      "implementation_hash": "3afbdd1342124a6d70653fdb843e7b80815d861d4355b2ef6d59af2f4dcbfd25"
+    },
+    {
+      "feature_id": "market.low.v1",
+      "feature_family": "raw",
+      "version": 1,
+      "dtype": "float64",
+      "shape": [
+        1
+      ],
+      "source_dependencies": [
+        "low"
+      ],
+      "lookback": 0,
+      "warmup": 0,
+      "event_time_semantics": "value is indexed by the completed source bar event_time",
+      "knowledge_time_semantics": "maximum source knowledge_time in the declared lookback; observable only when t_known <= t",
+      "missingness_semantics": "typed cell state; non-AVAILABLE values are not observations",
+      "units": "price",
+      "transform": {
+        "kind": "raw_low"
+      },
+      "parameters": [],
+      "implementation_hash": "29cbd3423e184ad054d1d443244928f7cc2ca4360d8b40fd6558c8703e676cdb"
+    },
+    {
+      "feature_id": "market.close.v1",
+      "feature_family": "raw",
+      "version": 1,
+      "dtype": "float64",
+      "shape": [
+        1
+      ],
+      "source_dependencies": [
+        "close"
+      ],
+      "lookback": 0,
+      "warmup": 0,
+      "event_time_semantics": "value is indexed by the completed source bar event_time",
+      "knowledge_time_semantics": "maximum source knowledge_time in the declared lookback; observable only when t_known <= t",
+      "missingness_semantics": "typed cell state; non-AVAILABLE values are not observations",
+      "units": "price",
+      "transform": {
+        "kind": "raw_close"
+      },
+      "parameters": [],
+      "implementation_hash": "47f1ef1ecf667b0a467b676392a315c21897bfc3183d32a933848483ef3ddab8"
+    },
+    {
+      "feature_id": "market.log_return.v1",
+      "feature_family": "return",
+      "version": 1,
+      "dtype": "float64",
+      "shape": [
+        1
+      ],
+      "source_dependencies": [
+        "close"
+      ],
+      "lookback": 1,
+      "warmup": 1,
+      "event_time_semantics": "value is indexed by the completed source bar event_time",
+      "knowledge_time_semantics": "maximum source knowledge_time in the declared lookback; observable only when t_known <= t",
+      "missingness_semantics": "typed cell state; non-AVAILABLE values are not observations",
+      "units": "ratio",
+      "transform": {
+        "kind": "log_return"
+      },
+      "parameters": [],
+      "implementation_hash": "15b7cddfd711f253c873ed5aca9b6b31eb171476d2e3f99a7e87d2bc35e70d4d"
+    },
+    {
+      "feature_id": "market.simple_return.v1",
+      "feature_family": "return",
+      "version": 1,
+      "dtype": "float64",
+      "shape": [
+        1
+      ],
+      "source_dependencies": [
+        "close"
+      ],
+      "lookback": 1,
+      "warmup": 1,
+      "event_time_semantics": "value is indexed by the completed source bar event_time",
+      "knowledge_time_semantics": "maximum source knowledge_time in the declared lookback; observable only when t_known <= t",
+      "missingness_semantics": "typed cell state; non-AVAILABLE values are not observations",
+      "units": "ratio",
+      "transform": {
+        "kind": "simple_return"
+      },
+      "parameters": [],
+      "implementation_hash": "ba9b9e7e803f0ba90e50b812ee4a96e23815673b263f4b0ccf583084326a1d5c"
+    },
+    {
+      "feature_id": "market.candle_range.v1",
+      "feature_family": "candle",
+      "version": 1,
+      "dtype": "float64",
+      "shape": [
+        1
+      ],
+      "source_dependencies": [
+        "high",
+        "low"
+      ],
+      "lookback": 0,
+      "warmup": 0,
+      "event_time_semantics": "value is indexed by the completed source bar event_time",
+      "knowledge_time_semantics": "maximum source knowledge_time in the declared lookback; observable only when t_known <= t",
+      "missingness_semantics": "typed cell state; non-AVAILABLE values are not observations",
+      "units": "price",
+      "transform": {
+        "kind": "candle_range"
+      },
+      "parameters": [],
+      "implementation_hash": "2c61c63e4daba88d676521dc4c231d6e2def16592b4add40f39cf4308bb22d11"
+    },
+    {
+      "feature_id": "market.candle_body.v1",
+      "feature_family": "candle",
+      "version": 1,
+      "dtype": "float64",
+      "shape": [
+        1
+      ],
+      "source_dependencies": [
+        "open",
+        "high",
+        "low",
+        "close"
+      ],
+      "lookback": 0,
+      "warmup": 0,
+      "event_time_semantics": "value is indexed by the completed source bar event_time",
+      "knowledge_time_semantics": "maximum source knowledge_time in the declared lookback; observable only when t_known <= t",
+      "missingness_semantics": "typed cell state; non-AVAILABLE values are not observations",
+      "units": "price",
+      "transform": {
+        "kind": "candle_body"
+      },
+      "parameters": [],
+      "implementation_hash": "0b58016c10d301de50ad78e48d382eeb8de16048c349ef98ced2e03016b07bf1"
+    },
+    {
+      "feature_id": "market.upper_wick.v1",
+      "feature_family": "candle",
+      "version": 1,
+      "dtype": "float64",
+      "shape": [
+        1
+      ],
+      "source_dependencies": [
+        "open",
+        "high",
+        "low",
+        "close"
+      ],
+      "lookback": 0,
+      "warmup": 0,
+      "event_time_semantics": "value is indexed by the completed source bar event_time",
+      "knowledge_time_semantics": "maximum source knowledge_time in the declared lookback; observable only when t_known <= t",
+      "missingness_semantics": "typed cell state; non-AVAILABLE values are not observations",
+      "units": "price",
+      "transform": {
+        "kind": "upper_wick"
+      },
+      "parameters": [],
+      "implementation_hash": "14567402ca54e85ea818fb189cdf5a371a3d47dbbf702caf47fc756cc68f3686"
+    },
+    {
+      "feature_id": "market.lower_wick.v1",
+      "feature_family": "candle",
+      "version": 1,
+      "dtype": "float64",
+      "shape": [
+        1
+      ],
+      "source_dependencies": [
+        "open",
+        "high",
+        "low",
+        "close"
+      ],
+      "lookback": 0,
+      "warmup": 0,
+      "event_time_semantics": "value is indexed by the completed source bar event_time",
+      "knowledge_time_semantics": "maximum source knowledge_time in the declared lookback; observable only when t_known <= t",
+      "missingness_semantics": "typed cell state; non-AVAILABLE values are not observations",
+      "units": "price",
+      "transform": {
+        "kind": "lower_wick"
+      },
+      "parameters": [],
+      "implementation_hash": "c67e499479afe3675e66551fe81cce0f1f43d2414812944cac8361f8d25f2633"
+    },
+    {
+      "feature_id": "market.rolling_high.v1",
+      "feature_family": "rolling",
+      "version": 1,
+      "dtype": "float64",
+      "shape": [
+        1
+      ],
+      "source_dependencies": [
+        "high",
+        "low"
+      ],
+      "lookback": 2,
+      "warmup": 2,
+      "event_time_semantics": "value is indexed by the completed source bar event_time",
+      "knowledge_time_semantics": "maximum source knowledge_time in the declared lookback; observable only when t_known <= t",
+      "missingness_semantics": "typed cell state; non-AVAILABLE values are not observations",
+      "units": "price",
+      "transform": {
+        "kind": "rolling_high",
+        "window": 3
+      },
+      "parameters": [
+        [
+          "window",
+          "3"
+        ]
+      ],
+      "implementation_hash": "2f9f40908c77cf46eae20c348ff3f3b95adfdc3c7bef7a02856fe349508fb575"
+    },
+    {
+      "feature_id": "market.rolling_low.v1",
+      "feature_family": "rolling",
+      "version": 1,
+      "dtype": "float64",
+      "shape": [
+        1
+      ],
+      "source_dependencies": [
+        "high",
+        "low"
+      ],
+      "lookback": 2,
+      "warmup": 2,
+      "event_time_semantics": "value is indexed by the completed source bar event_time",
+      "knowledge_time_semantics": "maximum source knowledge_time in the declared lookback; observable only when t_known <= t",
+      "missingness_semantics": "typed cell state; non-AVAILABLE values are not observations",
+      "units": "price",
+      "transform": {
+        "kind": "rolling_low",
+        "window": 3
+      },
+      "parameters": [
+        [
+          "window",
+          "3"
+        ]
+      ],
+      "implementation_hash": "8e777656ec4a06bcf37bc7f101713af9ea284b927a6f0e437d336c372097d50f"
+    },
+    {
+      "feature_id": "market.rolling_range.v1",
+      "feature_family": "rolling",
+      "version": 1,
+      "dtype": "float64",
+      "shape": [
+        1
+      ],
+      "source_dependencies": [
+        "high",
+        "low"
+      ],
+      "lookback": 2,
+      "warmup": 2,
+      "event_time_semantics": "value is indexed by the completed source bar event_time",
+      "knowledge_time_semantics": "maximum source knowledge_time in the declared lookback; observable only when t_known <= t",
+      "missingness_semantics": "typed cell state; non-AVAILABLE values are not observations",
+      "units": "price",
+      "transform": {
+        "kind": "rolling_range",
+        "window": 3
+      },
+      "parameters": [
+        [
+          "window",
+          "3"
+        ]
+      ],
+      "implementation_hash": "5b4825118a7ffa2462af17a9a8788cea382bb72548d091379bbdf79a5621ed04"
+    },
+    {
+      "feature_id": "market.rolling_mean.v1",
+      "feature_family": "rolling",
+      "version": 1,
+      "dtype": "float64",
+      "shape": [
+        1
+      ],
+      "source_dependencies": [
+        "close"
+      ],
+      "lookback": 2,
+      "warmup": 2,
+      "event_time_semantics": "value is indexed by the completed source bar event_time",
+      "knowledge_time_semantics": "maximum source knowledge_time in the declared lookback; observable only when t_known <= t",
+      "missingness_semantics": "typed cell state; non-AVAILABLE values are not observations",
+      "units": "price",
+      "transform": {
+        "kind": "rolling_mean",
+        "window": 3
+      },
+      "parameters": [
+        [
+          "window",
+          "3"
+        ]
+      ],
+      "implementation_hash": "bb7ce0bb6e4876a230278b431d8efe508391f3a8c5dd67dd5da6699bec543b46"
+    },
+    {
+      "feature_id": "market.rolling_variance.v1",
+      "feature_family": "rolling",
+      "version": 1,
+      "dtype": "float64",
+      "shape": [
+        1
+      ],
+      "source_dependencies": [
+        "close"
+      ],
+      "lookback": 2,
+      "warmup": 2,
+      "event_time_semantics": "value is indexed by the completed source bar event_time",
+      "knowledge_time_semantics": "maximum source knowledge_time in the declared lookback; observable only when t_known <= t",
+      "missingness_semantics": "typed cell state; non-AVAILABLE values are not observations",
+      "units": "price_squared",
+      "transform": {
+        "kind": "rolling_variance",
+        "window": 3
+      },
+      "parameters": [
+        [
+          "window",
+          "3"
+        ]
+      ],
+      "implementation_hash": "cbf22766f680bba4fc37bd1dca1fd4949c07820dae10e8b4018fabd4a7672907"
+    },
+    {
+      "feature_id": "market.rolling_stddev.v1",
+      "feature_family": "rolling",
+      "version": 1,
+      "dtype": "float64",
+      "shape": [
+        1
+      ],
+      "source_dependencies": [
+        "close"
+      ],
+      "lookback": 2,
+      "warmup": 2,
+      "event_time_semantics": "value is indexed by the completed source bar event_time",
+      "knowledge_time_semantics": "maximum source knowledge_time in the declared lookback; observable only when t_known <= t",
+      "missingness_semantics": "typed cell state; non-AVAILABLE values are not observations",
+      "units": "price",
+      "transform": {
+        "kind": "rolling_std_dev",
+        "window": 3
+      },
+      "parameters": [
+        [
+          "window",
+          "3"
+        ]
+      ],
+      "implementation_hash": "159a0ffe36580d00bf881cf281f2c22b04b2d3a4bf2990bdb8f9f10d7d931686"
+    },
+    {
+      "feature_id": "market.realized_abs_movement.v1",
+      "feature_family": "movement",
+      "version": 1,
+      "dtype": "float64",
+      "shape": [
+        1
+      ],
+      "source_dependencies": [
+        "close"
+      ],
+      "lookback": 2,
+      "warmup": 2,
+      "event_time_semantics": "value is indexed by the completed source bar event_time",
+      "knowledge_time_semantics": "maximum source knowledge_time in the declared lookback; observable only when t_known <= t",
+      "missingness_semantics": "typed cell state; non-AVAILABLE values are not observations",
+      "units": "price",
+      "transform": {
+        "kind": "realized_absolute_movement",
+        "window": 3
+      },
+      "parameters": [
+        [
+          "window",
+          "3"
+        ]
+      ],
+      "implementation_hash": "d2543c6c0eb3727ee086b14450db42da6835dae30a4aad0c05c118c436378f73"
+    },
+    {
+      "feature_id": "market.volume_change.v1",
+      "feature_family": "volume",
+      "version": 1,
+      "dtype": "float64",
+      "shape": [
+        1
+      ],
+      "source_dependencies": [
+        "volume"
+      ],
+      "lookback": 1,
+      "warmup": 1,
+      "event_time_semantics": "value is indexed by the completed source bar event_time",
+      "knowledge_time_semantics": "maximum source knowledge_time in the declared lookback; observable only when t_known <= t",
+      "missingness_semantics": "typed cell state; non-AVAILABLE values are not observations",
+      "units": "ratio",
+      "transform": {
+        "kind": "volume_change"
+      },
+      "parameters": [],
+      "implementation_hash": "4c0b8c4f953ba57223549af281421ff4bc4f374aeb8439faa76cb6389a3e24fd"
+    },
+    {
+      "feature_id": "clock.time_of_day_sin.v1",
+      "feature_family": "clock",
+      "version": 1,
+      "dtype": "float64",
+      "shape": [
+        1
+      ],
+      "source_dependencies": [
+        "event_time"
+      ],
+      "lookback": 0,
+      "warmup": 0,
+      "event_time_semantics": "value is indexed by the completed source bar event_time",
+      "knowledge_time_semantics": "maximum source knowledge_time in the declared lookback; observable only when t_known <= t",
+      "missingness_semantics": "typed cell state; non-AVAILABLE values are not observations",
+      "units": "unitless",
+      "transform": {
+        "kind": "time_of_day_sin"
+      },
+      "parameters": [],
+      "implementation_hash": "33e3ae9f43f1a1db140809ddce9c6e9c15fdb27f3c124fe976a65e87d4a5fde4"
+    },
+    {
+      "feature_id": "clock.time_of_day_cos.v1",
+      "feature_family": "clock",
+      "version": 1,
+      "dtype": "float64",
+      "shape": [
+        1
+      ],
+      "source_dependencies": [
+        "event_time"
+      ],
+      "lookback": 0,
+      "warmup": 0,
+      "event_time_semantics": "value is indexed by the completed source bar event_time",
+      "knowledge_time_semantics": "maximum source knowledge_time in the declared lookback; observable only when t_known <= t",
+      "missingness_semantics": "typed cell state; non-AVAILABLE values are not observations",
+      "units": "unitless",
+      "transform": {
+        "kind": "time_of_day_cos"
+      },
+      "parameters": [],
+      "implementation_hash": "e682eca563e93a448f2e673ed526331ea5b1b4115706ae3f86412038b62e0283"
+    },
+    {
+      "feature_id": "clock.session_progress.v1",
+      "feature_family": "clock",
+      "version": 1,
+      "dtype": "float64",
+      "shape": [
+        1
+      ],
+      "source_dependencies": [
+        "session_id",
+        "event_time"
+      ],
+      "lookback": 0,
+      "warmup": 0,
+      "event_time_semantics": "value is indexed by the completed source bar event_time",
+      "knowledge_time_semantics": "maximum source knowledge_time in the declared lookback; observable only when t_known <= t",
+      "missingness_semantics": "typed cell state; non-AVAILABLE values are not observations",
+      "units": "ratio",
+      "transform": {
+        "kind": "session_progress"
+      },
+      "parameters": [],
+      "implementation_hash": "4abdcbd7bf0690737423c9db67c61a9caa8e3360d42b58c2ab24a468806535c1"
+    }
+  ],
+  "content_hash": "5a6766022adbe8826c39f6e2c7204401432173bf13cd915e9145722646a8813a"
+}

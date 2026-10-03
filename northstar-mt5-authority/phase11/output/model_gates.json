@@ -1,0 +1,97 @@
+{
+  "reclaim_given_break": {
+    "status": "PASS_NONLINEAR_CHALLENGER",
+    "analyzable": 1547,
+    "positive": 880,
+    "negative": 667,
+    "runs": 20,
+    "grouped_logloss_improvement": 0.028981399704228306,
+    "forward_logloss_improvement": 0.021524558321412424,
+    "gates": {
+      "minimum_analyzable": true,
+      "minimum_positive": true,
+      "minimum_negative": true,
+      "minimum_runs": true,
+      "grouped_logloss_beats_null": true,
+      "forward_logloss_beats_null": true,
+      "instrument_transfer_logloss_beats_null": true
+    },
+    "instrument_transfer_logloss_improvement": 0.01979058940007694
+  },
+  "initial_acceptance_given_initial_contact": {
+    "status": "PASS_NONLINEAR_CHALLENGER",
+    "analyzable": 5051,
+    "positive": 667,
+    "negative": 4384,
+    "runs": 20,
+    "grouped_logloss_improvement": 0.05572284602398314,
+    "forward_logloss_improvement": 0.05600623532274385,
+    "gates": {
+      "minimum_analyzable": true,
+      "minimum_positive": true,
+      "minimum_negative": true,
+      "minimum_runs": true,
+      "grouped_logloss_beats_null": true,
+      "forward_logloss_beats_null": true,
+      "instrument_transfer_logloss_beats_null": true
+    },
+    "instrument_transfer_logloss_improvement": 0.06281377607620586
+  },
+  "rejection_given_initial_contact": {
+    "status": "PASS_NONLINEAR_CHALLENGER",
+    "analyzable": 5051,
+    "positive": 3504,
+    "negative": 1547,
+    "runs": 20,
+    "grouped_logloss_improvement": 0.24409308324736928,
+    "forward_logloss_improvement": 0.2566805211932468,
+    "gates": {
+      "minimum_analyzable": true,
+      "minimum_positive": true,
+      "minimum_negative": true,
+      "minimum_runs": true,
+      "grouped_logloss_beats_null": true,
+      "forward_logloss_beats_null": true,
+      "instrument_transfer_logloss_beats_null": true
+    },
+    "instrument_transfer_logloss_improvement": 0.2562101247692627
+  },
+  "retest_hold_given_retest_contact": {
+    "status": "PASS_NONLINEAR_CHALLENGER",
+    "analyzable": 1251,
+    "positive": 763,
+    "negative": 488,
+    "runs": 20,
+    "grouped_logloss_improvement": 0.21964376398063568,
+    "forward_logloss_improvement": 0.23572360899678196,
+    "gates": {
+      "minimum_analyzable": true,
+      "minimum_positive": true,
+      "minimum_negative": true,
+      "minimum_runs": true,
+      "grouped_logloss_beats_null": true,
+      "forward_logloss_beats_null": true,
+      "instrument_transfer_logloss_beats_null": true
+    },
+    "instrument_transfer_logloss_improvement": 0.22368638591469986
+  },
+  "transit_given_episode_acceptance": {
+    "status": "HOLD_BASELINE_ONLY",
+    "analyzable": 263,
+    "positive": 227,
+    "negative": 36,
+    "runs": 19,
+    "grouped_logloss_improvement": 0.014223110944581618,
+    "forward_logloss_improvement": 0.022201175304461473,
+    "gates": {
+      "minimum_analyzable": true,
+      "minimum_positive": true,
+      "minimum_negative": false,
+      "minimum_runs": true,
+      "grouped_logloss_beats_null": true,
+      "forward_logloss_beats_null": true,
+      "instrument_transfer_logloss_beats_null": true
+    },
+    "instrument_transfer_logloss_improvement": 0.007192159987929214
+  }
+}

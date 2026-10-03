@@ -1,0 +1,16 @@
+{
+  "authorization_id": "FAS_S04_EXISTING_CACHE_DECISION_MARGIN_ANALYSIS_V01",
+  "status": "AUTHORIZED_BY_USER_IN_CURRENT_TASK",
+  "scope": "Read the sealed S01-2 mean_full and final_position caches, S01-2 corpus metadata, S01-3 held-out test-event manifest, two sealed exact-target probe states, and their saved predictions. Compute only the frozen C/E/P within-quartet semantic-state margins and surface differentials in analysis-contract-v01.json.",
+  "model_contact": false,
+  "LFM_load": false,
+  "feature_extraction": false,
+  "probe_fitting": false,
+  "optimizer_continuation": false,
+  "adaptive_mechanisms": false,
+  "SAE": false,
+  "FAS00_modified": false,
+  "S01_modified": false,
+  "FAS00_PHASE4_AUTHORIZED": false,
+  "SAE_ANALYSIS_AUTHORIZED": false
+}

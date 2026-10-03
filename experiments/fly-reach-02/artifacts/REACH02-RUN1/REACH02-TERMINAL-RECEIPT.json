@@ -1,0 +1,355 @@
+{
+  "arm_means": {
+    "native": {
+      "excess_large": {
+        "competence_rate": 0.9398148148148148,
+        "max": 0.32635498046875,
+        "mean": 0.07500599048755786,
+        "median": 0.060821533203125,
+        "min": -0.11932373046875
+      },
+      "loss_256": {
+        "competence_rate": 0.2222222222222222,
+        "max": 0.53515625,
+        "mean": 0.3083767361111111,
+        "median": 0.2890625,
+        "min": 0.1279296875
+      },
+      "loss_large": {
+        "competence_rate": 0.2361111111111111,
+        "max": 0.53753662109375,
+        "mean": 0.3077709056712963,
+        "median": 0.28839111328125,
+        "min": 0.13018798828125
+      }
+    },
+    "reference_direction_native_support": {
+      "excess_large": {
+        "competence_rate": 1.0,
+        "max": 0.1185302734375,
+        "mean": 0.015028776945891205,
+        "median": 0.013336181640625,
+        "min": -0.03765869140625
+      },
+      "loss_256": {
+        "competence_rate": 0.4444444444444444,
+        "max": 0.2939453125,
+        "mean": 0.25228316695601855,
+        "median": 0.2529296875,
+        "min": 0.212890625
+      },
+      "loss_large": {
+        "competence_rate": 0.6620370370370371,
+        "max": 0.2623291015625,
+        "mean": 0.24779369212962962,
+        "median": 0.24755859375,
+        "min": 0.23150634765625
+      }
+    },
+    "sign_ref_native_mag": {
+      "excess_large": {
+        "competence_rate": 1.0,
+        "max": -0.11920166015625,
+        "mean": -0.23276491518373843,
+        "median": -0.232574462890625,
+        "min": -0.2945556640625
+      },
+      "loss_256": {
+        "competence_rate": 1.0,
+        "max": 0.0,
+        "mean": 0.0,
+        "median": 0.0,
+        "min": 0.0
+      },
+      "loss_large": {
+        "competence_rate": 1.0,
+        "max": 0.0,
+        "mean": 0.0,
+        "median": 0.0,
+        "min": 0.0
+      }
+    },
+    "stable_inversion_flip": {
+      "excess_large": {
+        "competence_rate": 0.9444444444444444,
+        "max": 0.32635498046875,
+        "mean": 0.07583194308810765,
+        "median": 0.061279296875,
+        "min": -0.11932373046875
+      },
+      "loss_256": {
+        "competence_rate": 0.2222222222222222,
+        "max": 0.53515625,
+        "mean": 0.3089283130787037,
+        "median": 0.28955078125,
+        "min": 0.1279296875
+      },
+      "loss_large": {
+        "competence_rate": 0.22685185185185186,
+        "max": 0.53753662109375,
+        "mean": 0.3085968582718461,
+        "median": 0.289947509765625,
+        "min": 0.13018798828125
+      }
+    },
+    "weight_oracle": {
+      "excess_large": {
+        "competence_rate": 1.0,
+        "max": 0.0,
+        "mean": 0.0,
+        "median": 0.0,
+        "min": 0.0
+      },
+      "loss_256": {
+        "competence_rate": 0.6481481481481481,
+        "max": 0.3076171875,
+        "mean": 0.23683449074074073,
+        "median": 0.236328125,
+        "min": 0.1064453125
+      },
+      "loss_large": {
+        "competence_rate": 0.7037037037037037,
+        "max": 0.2945556640625,
+        "mean": 0.23276491518373843,
+        "median": 0.232574462890625,
+        "min": 0.11920166015625
+      }
+    }
+  },
+  "artifact_hashes": [
+    {
+      "bytes": 7665,
+      "path": "manifests/REACH02-CONTRACT.json",
+      "sha256": "c1adf4da8c04f3e02a3f484244d3d0a9982ff0f0e36e6567426cf438de38d0a1"
+    },
+    {
+      "bytes": 6391,
+      "path": "manifests/REACH02-MANIFEST.json",
+      "sha256": "bb5911de6192a3bd5aa8903dd1399f0c62994c7e01ec8143de9e6724749189ac"
+    },
+    {
+      "bytes": 120158,
+      "path": "inputs/banks/measured-competence.json",
+      "sha256": "f0a85738b76ad06c128e521e8209c4a737f33413bf1a32ed23cc96c87891f0bb"
+    },
+    {
+      "bytes": 1918538,
+      "path": "inputs/banks/measured-large.json",
+      "sha256": "e31909374ec874a25eb6503934e872bb4ed01bd009a03b9b250da4b37cda3bb5"
+    },
+    {
+      "bytes": 21014756,
+      "path": "inputs/banks/measured-training.json",
+      "sha256": "70848bf722a97fa3d87647915e29ff299ce3cd29808f44ebd6e29145691449bf"
+    },
+    {
+      "bytes": 120218,
+      "path": "inputs/banks/qualification-competence.json",
+      "sha256": "14fe646faf3a393a2886ffd6627144a3fb9230f786308e7103302aef8304bdce"
+    },
+    {
+      "bytes": 1918690,
+      "path": "inputs/banks/qualification-large.json",
+      "sha256": "607ba80bc842b5590e5394ddb665cc87e5facab32cfb9f74d6c326e2c7a9a07a"
+    },
+    {
+      "bytes": 7004869,
+      "path": "inputs/banks/qualification-training.json",
+      "sha256": "835e1def29becd329fbe1a30f2245c424545fcb7fc361a96b407285653fdff0c"
+    },
+    {
+      "bytes": 10989,
+      "path": "artifacts/REACH02-RUN1/qualification-diagnostics.jsonl",
+      "sha256": "825ca82881ca3089d75b9c061233e5626bae33ecbae980bfa3967714ca414f9d"
+    },
+    {
+      "bytes": 4072,
+      "path": "artifacts/REACH02-RUN1/stable-inversion-masks.json",
+      "sha256": "93c071e514f09604c4c95e562a7b06e4e76d5f0ca7c20b8768aa4fb99473f25f"
+    },
+    {
+      "bytes": 1770541,
+      "path": "artifacts/REACH02-RUN1/outcomes.jsonl",
+      "sha256": "b26e08d689f10ec01a9dc177247dfca55163f0b6d8b5d0931688f2810dcce9eb"
+    },
+    {
+      "bytes": 739429,
+      "path": "artifacts/REACH02-RUN1/diagnostics.jsonl",
+      "sha256": "fee26e62ec93bf4bf571eb39e5ed38521515deef801de69516813f7d1494cfd3"
+    },
+    {
+      "bytes": 533149,
+      "path": "artifacts/REACH02-RUN1/trajectories.jsonl",
+      "sha256": "1cf88ba607e86cd79c44437ceb654d678e276029dbfd89e0bf6af5526657b7a3"
+    },
+    {
+      "bytes": 736,
+      "path": "artifacts/REACH02-RUN1/collection-receipt.json",
+      "sha256": "9414592d9cc30a67b255d772f47b09e9c1b30a86f0c17cedbe192774a5c0bf29"
+    },
+    {
+      "bytes": 236,
+      "path": "artifacts/REACH02-RUN1/integrity-receipt.json",
+      "sha256": "00ddfac2c7b0f0acdcdb288cead58f37c026eb8e9de79fb594f3729cb8a2bdf7"
+    },
+    {
+      "bytes": 30977,
+      "path": "artifacts/REACH02-RUN1/reach02-analysis-initial.json",
+      "sha256": "2d727d3068b19533658a0085cbfb3ff028c44eb5cd28b1a0cc19734820c830a3"
+    },
+    {
+      "bytes": 1356,
+      "path": "artifacts/REACH02-RUN1/RESULTS-initial.md",
+      "sha256": "69a0b90dda78dc98dd113e8623e5623cf5f3f9d72f8ab34f486f3c4be851fc23"
+    },
+    {
+      "bytes": 31042,
+      "path": "artifacts/REACH02-RUN1/reach02-analysis.json",
+      "sha256": "fa9446d678733546aa5ff1afaa0b40c4e444e0acc52ea5065c42ce1c0c2c22d5"
+    },
+    {
+      "bytes": 418,
+      "path": "artifacts/REACH02-RUN1/reach02-summary.csv",
+      "sha256": "63db3f93c9558a65704eaf09d4c0ce440ed350af064ea217b10a14cbdbe46505"
+    },
+    {
+      "bytes": 1606,
+      "path": "artifacts/REACH02-RUN1/RESULTS.md",
+      "sha256": "f3d809d44eae943c4486a403df19705e4a93b5c8ccdbe8a1f2f9e9604669ba2b"
+    },
+    {
+      "bytes": 11927,
+      "path": "scripts/analyze_reach02.py",
+      "sha256": "336b70224582e5a2bdd6076980a7c0b72f974e201981c7f32de3050ca3869553"
+    },
+    {
+      "bytes": 701952,
+      "path": "sealed/fly-reach-02.exe",
+      "sha256": "7e52227796f44f8478b65f2036afd4764985714e35877cc317d4bd0750b59c9c"
+    },
+    {
+      "bytes": 1026,
+      "path": "provenance/PROTECTED-DH08A-TREE-RECEIPT.json",
+      "sha256": "5a8f4beb9a9a4d50c35bbb73455d14551a23ff79f58e4ebcb00e07faedce0466"
+    }
+  ],
+  "cancellation_interpretation": "The measured local cancellation telemetry does not show a dominant cancellation rescue relative to the aggregate sign failure.",
+  "closed_at_utc": "2026-09-22T11:32:26.220959+00:00",
+  "disposition": "SIGN_COUNTERFACTUAL_SUPPORTED_STABLE_MASK_NOT_EXPLANATORY",
+  "integrity_status": "INTEGRITY_PASS",
+  "inversion_interpretation": "The qualification-derived stable-inversion flip does not improve the endpoint; aggregate sign failure is not explained by the predeclared stable-inversion class alone.",
+  "native_stage_summary": {
+    "aggregate_sign_agreement_mean": {
+      "competence_rate": 0.0,
+      "max": 0.53205154636274,
+      "mean": 0.47783478186628187,
+      "median": 0.4816520477839741,
+      "min": 0.39311493481631776
+    },
+    "aggregation_cosine_mean": {
+      "competence_rate": 1.0,
+      "max": 0.011386704488542626,
+      "mean": 0.003014503911431332,
+      "median": 0.0029346649203422625,
+      "min": -0.004494041518869992
+    },
+    "bound_clip_fraction": {
+      "competence_rate": 0.3101851851851852,
+      "max": 0.5574754990893431,
+      "mean": 0.2890211792032772,
+      "median": 0.3161368552855015,
+      "min": 0.02553123547557748
+    },
+    "cumulative_delivered_l2": {
+      "competence_rate": 0.0,
+      "max": 89.60110538375899,
+      "mean": 79.22100677869592,
+      "median": 80.52662783358792,
+      "min": 59.09178142328588
+    },
+    "delivered_cosine_mean": {
+      "competence_rate": 1.0,
+      "max": 0.003144047989324709,
+      "mean": 0.00028328934438300566,
+      "median": 0.00029041252468546335,
+      "min": -0.002457639857154042
+    },
+    "eligibility_cosine_mean": {
+      "competence_rate": 1.0,
+      "max": 0.03580766512745186,
+      "mean": 0.005432654788428624,
+      "median": 0.0050448169059234835,
+      "min": -0.01995570880236738
+    },
+    "local_cancellation_mean": {
+      "competence_rate": 1.0,
+      "max": 0.01887802481832005,
+      "mean": 0.012498285361025631,
+      "median": 0.012799619963989987,
+      "min": 0.006940585844375507
+    },
+    "local_sign_agreement_mean": {
+      "competence_rate": 0.0,
+      "max": 0.53205154636274,
+      "mean": 0.47783478186628187,
+      "median": 0.4816520477839741,
+      "min": 0.39311493481631776
+    },
+    "modulation_cosine_mean": {
+      "competence_rate": 1.0,
+      "max": 0.011386704488542626,
+      "mean": 0.003014503911431332,
+      "median": 0.0029346649203422625,
+      "min": -0.004494041518869992
+    },
+    "native_support_fraction_mean": {
+      "competence_rate": 0.0,
+      "max": 0.3903892797455597,
+      "mean": 0.37186661753838246,
+      "median": 0.3710273744242072,
+      "min": 0.3581981479595422
+    },
+    "reference_mass_on_native_support_mean": {
+      "competence_rate": 0.0,
+      "max": 0.7744328306380897,
+      "mean": 0.6488907541677855,
+      "median": 0.6534771052071191,
+      "min": 0.4765081059472808
+    },
+    "stable_correct_fraction": {
+      "competence_rate": 1.0,
+      "max": 0.08293553609231663,
+      "mean": 0.0641473397444227,
+      "median": 0.06460919015399941,
+      "min": 0.04586327242865941
+    },
+    "stable_inverted_fraction": {
+      "competence_rate": 1.0,
+      "max": 0.08235440620978789,
+      "mean": 0.06379408012233341,
+      "median": 0.06423657728150979,
+      "min": 0.04574009443646069
+    },
+    "unstable_fraction": {
+      "competence_rate": 0.0,
+      "max": 0.90839663313488,
+      "mean": 0.8720585801332439,
+      "median": 0.8710121125025663,
+      "min": 0.8378232534971566
+    }
+  },
+  "no_biological_promotion": true,
+  "no_lesions": true,
+  "pheno_reseal_authorized": false,
+  "protected_dh08a_receipt_sha256": "5a8f4beb9a9a4d50c35bbb73455d14551a23ff79f58e4ebcb00e07faedce0466",
+  "run_id": "FLY-REACH-02-RUN1",
+  "schema": "FLY-REACH-02-terminal-receipt-v1",
+  "sign_counterfactual_supported": true,
+  "stable_mask_fraction": {
+    "max": 0.0027509751591049065,
+    "mean": 0.00018737302365422155,
+    "min": 0.0
+  },
+  "status": "CLOSED_ENGINEERING_ONLY",
+  "study_id": "FLY-REACH-02"
+}

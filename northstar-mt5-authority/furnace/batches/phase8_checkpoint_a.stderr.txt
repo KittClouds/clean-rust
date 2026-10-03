@@ -1,0 +1,7 @@
+Furnace failed for US500_20251222_LOW_VOLATILITY, exit=
+At C:\Users\shuga\OneDrive\Documents\ChatGPT\eas\Invoke-MasterStructureRG2Collection.ps1:56 char:32
++ ... DE -ne 0) { throw "Furnace failed for $($next.window_id), exit=$LASTE ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (Furnace failed ...LATILITY, exit=:String) [], RuntimeException
+    + FullyQualifiedErrorId : Furnace failed for US500_20251222_LOW_VOLATILITY, exit=
+ 

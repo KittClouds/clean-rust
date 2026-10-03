@@ -1,0 +1,32 @@
+{
+  "block_ids": [
+    309000,
+    309001,
+    309002,
+    309003,
+    309004,
+    309005,
+    309006,
+    309007,
+    309008,
+    309009,
+    309010,
+    309011
+  ],
+  "comparative_metrics_emitted": false,
+  "execution_continuation_identity": "F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1",
+  "native_collection_receipt_sha256": "534a8d817ed3d610d9f257c51392426f05cabc1f4fd157ddfa39d9a5243f34cf",
+  "predictor_sha256": "495c68070624e4b8eaeeba217aeb03bdac6636d75e6691292a59872c11a9455f",
+  "raw_collection_tree_seal_sha256": "5d98535f780d5b630b5136c07367791c4698f750013561ad8c243211c6d01b88",
+  "row_count": 29275,
+  "run_id": "F4-PRESENTATION-03-ENG1",
+  "schema": "F4-PRESENTATION-03-collection-receipt-execution-repair-v0.1",
+  "status": "PASS",
+  "stream_count": 216,
+  "support_accounting_receipt_sha256": "966e69845091e6aa6c2c52ccc760723a49d15eb573749066c867699e3b38303a",
+  "task_bank_manifest_sha256": "ad339f4a710c9cb803e68a7076da923a68486f81b7552aa767c710f885deb0a1",
+  "task_bank_payload_sha256": "d61a0390fb9ba413b8970ba3ae82b8b5ec9fb717d3fc2247a79d9f8e30431d61",
+  "truth_sha256": "ff9d000145fc503e83710ca99d65b0304d52c1f94533d92c78e28b9730214d50",
+  "validation_receipt_sha256": "9df970a7c9065d9f7058eb3d5af3c189f5dec64c6097b2d78e8c0c26bb75cb3b",
+  "validation_repair_identity": "F4-PRESENTATION-03-VALIDATION-REPAIR-v0.1.1"
+}

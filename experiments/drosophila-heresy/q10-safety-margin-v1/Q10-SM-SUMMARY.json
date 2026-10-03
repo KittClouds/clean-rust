@@ -1,0 +1,129 @@
+{
+  "protocol": "Q10-SM",
+  "status": "Q10_SM_STAGE1_VALID__F32_SAFE_FREEDOM_PRESENT",
+  "total_events": 5120,
+  "accepted_nonidentity_events": 5026,
+  "safety_margin_dominated_events": 94,
+  "accepted_fraction": 0.981640625,
+  "states_by_seed": {
+    "9401": 1024,
+    "9402": 1024,
+    "9403": 1024,
+    "9404": 1024,
+    "9405": 1024
+  },
+  "quantiles": {
+    "residual_cosine": {
+      "min": 0.9980241682880373,
+      "q25": 0.999975124168003,
+      "median": 0.9999926047460865,
+      "q75": 0.9999982380417944,
+      "max": 0.9999999899375216
+    },
+    "rotation_angle": {
+      "min": 0.0001418624574927804,
+      "q25": 0.0018772099876128597,
+      "median": 0.0038458446748762254,
+      "q75": 0.007053500480891313,
+      "max": 0.06287261258810821
+    },
+    "minimum_safety_slack": {
+      "min": 4.701100619897147e-16,
+      "q25": 1.046045493063516e-12,
+      "median": 2.4196625605932276e-12,
+      "q75": 4.466977975665573e-12,
+      "max": 1.592217460308354e-11
+    },
+    "continuous_minimum_down_surplus_ulps": {
+      "min": 3.3289194107055664e-05,
+      "q25": 0.20108211040496826,
+      "median": 0.48755520582199097,
+      "q75": 1.1996151506900787,
+      "max": 33.71742248535156
+    },
+    "continuous_minimum_up_surplus_ulps": {
+      "min": 2401.420336730778,
+      "q25": 3087384.6992229754,
+      "median": 3803258.898645318,
+      "q75": 5049367.289714569,
+      "max": 7845807.367017746
+    },
+    "f32_cue_drive_drift": {
+      "min": 8.940696719084151e-08,
+      "q25": 1.4901161193934392e-07,
+      "median": 1.713633537847592e-07,
+      "q75": 1.9744038582368562e-07,
+      "max": 4.172325134277344e-07
+    },
+    "f32_axis_drift": {
+      "min": 2.984347925033548e-11,
+      "q25": 5.926441966661684e-08,
+      "median": 1.215712822803328e-07,
+      "q75": 2.1477754469996675e-07,
+      "max": 7.802669992965083e-07
+    },
+    "f32_total_norm_drift": {
+      "min": 1.8207657603852567e-14,
+      "q25": 2.3070305665839896e-09,
+      "median": 4.772178874290489e-09,
+      "q75": 7.978214311421539e-09,
+      "max": 2.775021124001853e-08
+    },
+    "f32_storage_displacement_drift": {
+      "min": 2.966552573729908e-08,
+      "q25": 5.572081794417722e-08,
+      "median": 5.78508879622245e-08,
+      "q75": 5.8906265901020015e-08,
+      "max": 5.9604380507616295e-08
+    },
+    "f32_residual_cosine_drift": {
+      "min": 2.1094237467877974e-15,
+      "q25": 3.3131830612376234e-12,
+      "median": 1.0394629601506722e-11,
+      "q75": 2.5525914715274212e-11,
+      "max": 7.727889439479441e-10
+    },
+    "true_minimum_safety_slack": {
+      "min": 5.682050385757975e-10,
+      "q25": 1.7157891818442295e-06,
+      "median": 5.230248234511237e-06,
+      "q75": 1.3472974387696013e-05,
+      "max": 0.00017306931840721518
+    }
+  },
+  "accepted_f32_down_steps_capped": {
+    "min": 32.0,
+    "q25": 32.0,
+    "median": 32.0,
+    "q75": 32.0,
+    "max": 32.0
+  },
+  "accepted_f32_up_steps_capped": {
+    "min": 32.0,
+    "q25": 32.0,
+    "median": 32.0,
+    "q75": 32.0,
+    "max": 32.0
+  },
+  "accepted_candidate_count": [
+    16
+  ],
+  "accepted_reserve_ulps": [
+    32
+  ],
+  "all_integrity_maxima": {
+    "cue_drive_max_abs_error": 1.1102230246251565e-15,
+    "axis_displacement_error": 1.071365218763276e-14,
+    "null_annihilation_max_abs": 2.2822022049950874e-14,
+    "total_norm_error": 5.0182080713057076e-14,
+    "reconstruction_error": 0.0,
+    "f32_safety_violation_count": 0.0,
+    "f32_boundary_membership_symmetric_difference": 0.0,
+    "f32_lower_boundary_membership_difference": 0.0,
+    "f32_upper_boundary_membership_difference": 0.0
+  },
+  "scientific_seed_bundles": 0,
+  "behavioral_inference": false,
+  "sequential_f32_readout": "NOT_TESTED",
+  "ulp_repair": "NOT_TESTED"
+}

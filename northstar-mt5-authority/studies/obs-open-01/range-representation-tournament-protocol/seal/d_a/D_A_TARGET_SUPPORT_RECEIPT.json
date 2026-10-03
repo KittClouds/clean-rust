@@ -1,0 +1,1 @@
+{"target_id":"STRICT_ABOVE_FROZEN_MIDPOINT_AT_60M_V1","range_records_seen":4620,"observed_complete_records":4505,"unavailable_records":115,"complete_sessions":150,"incomplete_sessions":4,"values_decoded":0,"equality_rule":"raw terminal displacement > 0; equality is false","registry_binding":"OUTCOME_REGISTRY_V1 / RangeTerminalClose / RAW_PRICE / 60m"}

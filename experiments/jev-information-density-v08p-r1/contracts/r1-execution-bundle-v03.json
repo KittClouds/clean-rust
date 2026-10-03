@@ -1,0 +1,44 @@
+{
+  "protocol": "jev-information-density/v0.8p-r1-execution-bundle-v03",
+  "identity": "v0.8P-R1-fresh-trajectory-instrumented-rerun-v01",
+  "status": "INPUT_BINDING_CORRECTION_AFTER_SUCCESSFUL_TRAINING_REPLAY_AND_PANEL_STAGING",
+  "supersedes_implementation_only": "r1-execution-bundle-v02.json",
+  "scientific_contracts_unchanged": true,
+  "contract_bindings": {
+    "identity_schema_sha256": "a5d9bf108a1b14d05652b78021a55b74500ed55d6bdc759ff02c09560ea6f7ed",
+    "r1_execution_contract_sha256": "d692acbef984c98d7f3ac6c5861112d4fbdcf162c4906a93bf548a84dc5e82fa",
+    "original_p_run_sha256": "e345225b4a17fc18eb35fcab24cbe1d72bd0e34bed9de272f927a7be461853e6",
+    "original_p_analysis_sha256": "84111122033fda65c84344317cfe3b50639b23be4c71f480ba665c67a23cc939",
+    "original_p_panel_sha256": "ce3b7b97caecb27f3ad99439c0e67dca6e40af5da3db9ca2e356ea5e9f06f823",
+    "v05_e1_denylist_sha256": "50eebeb5790c29b4a75c6f8df849eb4c2865d3c864932bbd7f636b7a0e52a2cd"
+  },
+  "implementation": {
+    "generator_source_sha256": "4b2111dd2ce2c1ffcd12f492860133f03398a053eeb5812a4416f3a68386faca",
+    "release_binary_sha256": "d0bce091904b39868a670cdeaa3bd0994dfd325969ddcea9ae528d0d2fd62967",
+    "release_binary_bytes": 811520,
+    "tests_passed": 5,
+    "tests_failed": 0,
+    "overlap_audit_training_input_root": "D:/codex-runs/jev-information-density-v08p-r1/v0.8P-R1/replay-attempt-03"
+  },
+  "correction": {
+    "reason": "attempt-03 was the successful replay, but overlap audit source path still referred to the preserved empty first-launch directory",
+    "change": "bind overlap audit to immutable successful attempt-03 identity sidecars",
+    "failed_replay_directories_modified": false,
+    "scientific_contract_or_identity_rule_changed": false
+  },
+  "completed_inputs": {
+    "training_scope_manifest_sha256": "0f5cd945f965c291b13375b16367085a8c4f3dced4e5996b0e1ffbadf279d191",
+    "training_scope_rows": 55000,
+    "prior_identity_reconstruction": "PASS; 2000 neighborhoods / 22000 episodes; exact v05 denylist match",
+    "candidate_staging": "R1_PROVISIONAL_PANEL_GENERATED; 2000 neighborhoods / 22000 episodes; zero E1 ID collisions"
+  },
+  "boundaries": {
+    "lfm_contact": false,
+    "feature_extraction": false,
+    "training": false,
+    "head_loading": false,
+    "inference": false,
+    "evaluation": false,
+    "phoenix_access": false
+  }
+}

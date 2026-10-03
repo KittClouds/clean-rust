@@ -1,0 +1,80 @@
+{
+  "seal_id": "FAS_FROZEN_OBSERVER_BUNDLE_E3_SCORE_V02_SEAL",
+  "status": "E3_SCORE_V02_SEALED_AFTER_INDEPENDENT_REPLAY",
+  "root_sha256": "a104bffedbc3e31268c0f1c0103ad4326add5a9da93816007904b70cdf3c7d1f",
+  "entry_count": 11,
+  "entries": [
+    {
+      "artifact_id": "contract/e3-score-v02.json",
+      "path": "C:\\code land\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\contracts\\e3-score-v02.json",
+      "bytes": 11485,
+      "sha256": "6d1c7f35a7f3405313b9b67cbebebbb1b740c7e1c670b93d5579f280a7889704"
+    },
+    {
+      "artifact_id": "authorization/e3-score-authorization-v02.json",
+      "path": "C:\\code land\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\audits\\e3-score-authorization-v02.json",
+      "bytes": 1741,
+      "sha256": "d82ef561eb666e86ed48f8414d148a54af12a30f31f627faf520d5cd74768195"
+    },
+    {
+      "artifact_id": "source/score_e3_v02.py",
+      "path": "C:\\code land\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\source\\scripts\\score_e3_v02.py",
+      "bytes": 41104,
+      "sha256": "8075335328e6ad81b8df227fd117d8ab1d871cd70b033c362289ac901f6f2e85"
+    },
+    {
+      "artifact_id": "source/test_e3_score_v02.py",
+      "path": "C:\\code land\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\source\\tests\\test_e3_score_v02.py",
+      "bytes": 7856,
+      "sha256": "ddfee5b36acff20570e154fdcc6829d0898fad2cb7af7bdcf3d096ffd5179d44"
+    },
+    {
+      "artifact_id": "source/build_e3_score_contract_v02.py",
+      "path": "C:\\code land\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\source\\scripts\\build_e3_score_contract_v02.py",
+      "bytes": 12331,
+      "sha256": "1c37129dfa3e83dd46d35b4bdf12fac228e2eee68c40a293597aedc8a5e48e59"
+    },
+    {
+      "artifact_id": "source/audit_e3_score_v02.py",
+      "path": "C:\\code land\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\source\\scripts\\audit_e3_score_v02.py",
+      "bytes": 25850,
+      "sha256": "813c6b009799a65dfddceac6730bba28d95b89cae2cd9d5395052b41297e49ac"
+    },
+    {
+      "artifact_id": "output/e3-score-run-receipt-v02.json",
+      "path": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e3-score-v02\\e3-score-run-receipt-v02.json",
+      "bytes": 3473,
+      "sha256": "1455e217bf6bc674d5c7b279b32234e735e9a3bf82bdc4c5fa83bb3a98d74754"
+    },
+    {
+      "artifact_id": "output/metrics-and-gates-v02.json",
+      "path": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e3-score-v02\\metrics-and-gates-v02.json",
+      "bytes": 42219,
+      "sha256": "d482f5ea14d60d91a79cc609a420d60a62b2d4fad2b808700ea7886dff872f4a"
+    },
+    {
+      "artifact_id": "output/prelabel-preflight-v02.json",
+      "path": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e3-score-v02\\prelabel-preflight-v02.json",
+      "bytes": 4337,
+      "sha256": "c11817cf863b5f6da8fad9146c78f5e5af7ce20bc8acf199f36d751e0b069b50"
+    },
+    {
+      "artifact_id": "output/scored-test-rows-v02.jsonl",
+      "path": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e3-score-v02\\scored-test-rows-v02.jsonl",
+      "bytes": 9222310,
+      "sha256": "3e42ac8d621b8cd76caf08bf71d553f51c01cd2b0ca06f267c769a94cff82086"
+    },
+    {
+      "artifact_id": "output/whole-quartet-bootstrap-v02.npz",
+      "path": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e3-score-v02\\whole-quartet-bootstrap-v02.npz",
+      "bytes": 163680,
+      "sha256": "ca70219b70d90886fe12e1f878209429a3b9a0b21391c28b4ce5754cf6c6c2ca"
+    }
+  ],
+  "e0_root_sha256": "899a131c09298fdafdcc6771ad01e8982857a1cd47900259800f97dd7bea7ccd",
+  "e1_root_sha256": "6ba77a899363651e3ba119b005f59a22e86f011f83c86b873857cd3f9ab64b03",
+  "e2_v07_root_sha256": "a2e2aa76f77904665b9abfa2a22f609c05219d8bc64c537bed41f5c634d1da8a",
+  "e3_v02_root_sha256": "899ff6a61272b86fdf1cd51d8c14100e77185157c242f27fbffe452803a435e1",
+  "raw_e1_evaluation_labels_included": false,
+  "created_utc": "2026-09-26T13:47:16.066749+00:00"
+}

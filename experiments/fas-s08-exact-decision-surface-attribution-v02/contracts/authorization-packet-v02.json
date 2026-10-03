@@ -1,0 +1,16 @@
+{
+  "authorization_id": "FAS_S08_AUTHORIZATION_V02",
+  "status": "AUTHORIZED_BY_USER_IN_CURRENT_TASK",
+  "source": "User explicitly authorized a versioned S08 formula correction, a complete rerun from the top, preservation of the v01 failed attempt, and automatic continuation through the already-defined downstream stages after the corrected identities pass.",
+  "scope": "Reverify all parents, rerun S08 geometry and Walsh analysis, apply the corrected centered-bias identity, perform S01 training-only coordinate census/selection and held-out interventions, seal S01, then perform the already-authorized post-S01-seal FAS-00 descriptive transfer.",
+  "v01_failed_attempt_root_sha256": "db9319719bab147d3f755370455df0c11604fc6f85dfff72c9aa0380cef8c805",
+  "additional_authorization_required": false,
+  "model_contact": false,
+  "feature_extraction": false,
+  "probe_fitting": false,
+  "adaptive_mechanisms": false,
+  "sae": false,
+  "layerwise_analysis": false,
+  "fas00_coordinate_selection": false,
+  "parent_modification": false
+}

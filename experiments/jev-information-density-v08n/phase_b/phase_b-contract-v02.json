@@ -1,0 +1,94 @@
+{
+  "protocol": "jev-information-density/v0.8n-road-b-phase-b-v02",
+  "status": "PHASE_B_READY_NOT_AUTHORIZED",
+  "phase_b_ready": true,
+  "phase_b_authorized": false,
+  "parent_contract": "phase_b-contract-v01.json",
+  "parent_identity": "v0.8N-base-v01",
+  "scientific_meaning_unchanged": true,
+  "arms": ["B-DUP", "B-MATCHED", "B-SHAM"],
+  "model": {
+    "repo_id": "LiquidAI/LFM2.5-1.2B-Base",
+    "revision": "7453bca97ca1e67754c4035a4b4c584e1c9dd725",
+    "backbone_frozen": true,
+    "feature_path": "exact-length,single-row,no-padding,final-layer mean_full",
+    "head": "dynamic MLP width 128, 590081 trainable parameters",
+    "candidate_profile": "name_definition",
+    "state_feature_dimension": 2048,
+    "candidate_feature_dimension": 2048
+  },
+  "training": {
+    "primary_occurrence_count": 10000,
+    "primary_anchor_count": 5000,
+    "primary_fact_flip_count": 5000,
+    "auxiliary_event_count_per_arm": 5000,
+    "batch_size_groups": 256,
+    "epochs": 3,
+    "schedule_seed_rule": "random.Random(seed + zero_based_epoch).shuffle sorted group_id order",
+    "optimizer_steps_per_seed": 120,
+    "paired_seeds": [20260927, 20260928, 20260929],
+    "arm_order": {
+      "20260927": ["B-DUP", "B-MATCHED", "B-SHAM"],
+      "20260928": ["B-SHAM", "B-DUP", "B-MATCHED"],
+      "20260929": ["B-MATCHED", "B-SHAM", "B-DUP"]
+    },
+    "optimizer": "AdamW(head_only)",
+    "learning_rate": 0.002,
+    "weight_decay": 0.01,
+    "scheduler": "none",
+    "gradient_clipping": "none",
+    "terminal_epoch": 3,
+    "best_epoch_selection": false
+  },
+  "objective": {
+    "base_event_weight": 1.0,
+    "auxiliary_event_weight": 1.0,
+    "normalization": "(N_base*L_base + N_aux*L_aux)/(N_base + N_aux)",
+    "treatment_payload_only": "auxiliary_source_role",
+    "disabled_events_forwarded_then_zero_weighted": false
+  },
+  "execution_inputs": {
+    "root": "D:/codex-runs/jev-information-density-v08n/v0.8N-base-v01/phase-b-v03-inputs",
+    "common_primary_occurrence_manifest_sha256": "773119294a51aa46487de26f9f253355187a7bfd1e75cb2f258c307c86f10b06",
+    "candidate_catalog_sha256": "1698ea2078951837b3cb780a3f873c3c099e5e3d001c714e1d58a41e2951487e",
+    "fixed_training_schedule_sha256": "4acfdc057ead9f07c310cfed452a385e5637bae2d367eac5d62343ceec892df7",
+    "head_input_manifest_sha256": {
+      "B-DUP": "f6f4ec519a04efeac02962c68c2d2d8ec92cf43d25bb9fd974f168e67c4d3b2b",
+      "B-MATCHED": "bd38446c0328f8092dc3293090fd3041d7be5d53945df6f80fb3770244d87b0d",
+      "B-SHAM": "9dd346766856f56006be326c171e664dcbab23983cdd7501f480b6fabb6ff895"
+    },
+    "candidate_tensor": "deferred_until_explicit_phase_b_authorization; must use the frozen candidate catalog and pinned extractor"
+  },
+  "analysis": {
+    "primary_estimand": "paired SHAM minus MATCHED neighborhood-level locality difference",
+    "secondary_estimand": "paired MATCHED minus DUP locality difference",
+    "sensitivity_guard": "fact-flip performance and strict transition reported separately; locality is not interpreted without sensitivity review",
+    "effect_modifiers": ["per-anchor radius error", "cosine sham-neutral", "cosine sham-fact", "cosine matched-neutral-fact", "surface/edit diagnostics", "family"],
+    "effect_modifier_role": "diagnostic only; cannot replace candidates, alter selection, or change gates",
+    "inference": "paired neighborhood differences with seed-level reporting and family-stratified results",
+    "evaluation_unlock": "only after all terminal checkpoints and training telemetry are sealed"
+  },
+  "required_pretraining_assertions": {
+    "primary_stream_hash_verified": true,
+    "schedule_hash_verified": true,
+    "head_input_hashes_verified": true,
+    "arm_primary_manifests_equal": true,
+    "candidate_order_and_masks_frozen": true,
+    "heldout_panel_sealed": true,
+    "protected_evaluation_firewall_locked": true
+  },
+  "boundaries": {
+    "model_head_training": false,
+    "evaluation_inference": false,
+    "protected_evaluation_bodies_opened": false,
+    "newtight_access": false,
+    "phoenix_access": false,
+    "LoRA": false,
+    "QLoRA": false,
+    "lambda_search": false,
+    "architecture_search": false,
+    "candidate_replacement_after_geometry": false,
+    "radius_gate_relaxation": false,
+    "follow_on_experiment": false
+  }
+}

@@ -1,0 +1,157 @@
+{
+  "contexts": [
+    {
+      "context": [
+        "seed9731-L-tau16.json",
+        2
+      ],
+      "eligibility_reasons": {
+        "READOUT_BETTER_THAN_V": 265,
+        "VALID_AND_READOUT_BETTER_THAN_V": 44,
+        "VALID_ANY_SCORE": 6
+      },
+      "eligible_candidates": 315,
+      "identity_replacements_excluded": 55,
+      "input_singletons": 440,
+      "rejected_nonidentity": 70,
+      "shard_content_sha256": "16E506597C0E85274BF06D04021988E8484F51E46054FB43B24A74AF218F0B7C"
+    },
+    {
+      "context": [
+        "seed9731-L-tau4.json",
+        3
+      ],
+      "eligibility_reasons": {
+        "READOUT_BETTER_THAN_V": 434,
+        "VALID_AND_READOUT_BETTER_THAN_V": 0,
+        "VALID_ANY_SCORE": 0
+      },
+      "eligible_candidates": 434,
+      "identity_replacements_excluded": 62,
+      "input_singletons": 496,
+      "rejected_nonidentity": 0,
+      "shard_content_sha256": "1C7016CB696DAF6417CAB4602A53B0D35D85CB83F0343FB41E364369CB91EAB7"
+    },
+    {
+      "context": [
+        "seed9731-R-tau16.json",
+        1
+      ],
+      "eligibility_reasons": {
+        "READOUT_BETTER_THAN_V": 415,
+        "VALID_AND_READOUT_BETTER_THAN_V": 0,
+        "VALID_ANY_SCORE": 0
+      },
+      "eligible_candidates": 415,
+      "identity_replacements_excluded": 57,
+      "input_singletons": 472,
+      "rejected_nonidentity": 0,
+      "shard_content_sha256": "75EDB2AAE274D147AE3A0A88A168CBCF8271F3A874A277F73071FD3CDE5DC882"
+    },
+    {
+      "context": [
+        "seed9731-R-tau16.json",
+        3
+      ],
+      "eligibility_reasons": {
+        "READOUT_BETTER_THAN_V": 378,
+        "VALID_AND_READOUT_BETTER_THAN_V": 0,
+        "VALID_ANY_SCORE": 0
+      },
+      "eligible_candidates": 378,
+      "identity_replacements_excluded": 54,
+      "input_singletons": 432,
+      "rejected_nonidentity": 0,
+      "shard_content_sha256": "EF30132244F2EDE7C88E6DA33A2E870F689A9097EF0186A1BF40A3D2D24FE5E1"
+    },
+    {
+      "context": [
+        "seed9731-R-tau4.json",
+        0
+      ],
+      "eligibility_reasons": {
+        "READOUT_BETTER_THAN_V": 416,
+        "VALID_AND_READOUT_BETTER_THAN_V": 0,
+        "VALID_ANY_SCORE": 0
+      },
+      "eligible_candidates": 416,
+      "identity_replacements_excluded": 56,
+      "input_singletons": 472,
+      "rejected_nonidentity": 0,
+      "shard_content_sha256": "1B02E5C106772A49CC5A02AC77178F6B108FCBFECA54967D47A8A98E2CA774E0"
+    },
+    {
+      "context": [
+        "seed9731-R-tau4.json",
+        1
+      ],
+      "eligibility_reasons": {
+        "READOUT_BETTER_THAN_V": 384,
+        "VALID_AND_READOUT_BETTER_THAN_V": 1,
+        "VALID_ANY_SCORE": 0
+      },
+      "eligible_candidates": 385,
+      "identity_replacements_excluded": 55,
+      "input_singletons": 440,
+      "rejected_nonidentity": 0,
+      "shard_content_sha256": "6EB7B1BCDF72C9E6357BBE7551EF1F2DD8E559AD356E10C6C7F0742A7EC14CF5"
+    },
+    {
+      "context": [
+        "seed9731-R-tau4.json",
+        2
+      ],
+      "eligibility_reasons": {
+        "READOUT_BETTER_THAN_V": 413,
+        "VALID_AND_READOUT_BETTER_THAN_V": 1,
+        "VALID_ANY_SCORE": 0
+      },
+      "eligible_candidates": 414,
+      "identity_replacements_excluded": 58,
+      "input_singletons": 472,
+      "rejected_nonidentity": 0,
+      "shard_content_sha256": "21CDA8288C0B91691D1FCA3252E6CF7209D0DA6A97C7CD3C3A3646225B21076B"
+    },
+    {
+      "context": [
+        "seed9731-R-tau4.json",
+        3
+      ],
+      "eligibility_reasons": {
+        "READOUT_BETTER_THAN_V": 267,
+        "VALID_AND_READOUT_BETTER_THAN_V": 3,
+        "VALID_ANY_SCORE": 2
+      },
+      "eligible_candidates": 272,
+      "identity_replacements_excluded": 58,
+      "input_singletons": 472,
+      "rejected_nonidentity": 142,
+      "shard_content_sha256": "0594D1852A8BE4FC9E9CAE97CDBDFCEFBB38A037378E868E0E719CD86C6A1E26"
+    }
+  ],
+  "counts": {
+    "contexts": 8,
+    "eligible_candidates": 3029,
+    "input_singletons": 3696
+  },
+  "eligibility": "nonidentity and (final_geometry_pass or score_key strictly better than fresh V score key)",
+  "engineering_only": true,
+  "historical_lr1_results_used_as_evidence": false,
+  "identity": "q10-gc1-lr1-requal1-sreplace-candidates-v1",
+  "pair_replay_executed": false,
+  "parent_singletons_execution_sha256": "EA8E07387F2E0A82DF65AC0F548644290CC200E14D289CBFBD4E19269B82B108",
+  "protocol": "REQUAL1-SREPLACE-CANDIDATES",
+  "scientific_promotion": false,
+  "shard_hashes": {
+    "seed9731-L-tau16__set2": "82CD116CD7EF53EB8A69AD332972BC6F9492A040ED82E46509990C4E3511A65E",
+    "seed9731-L-tau4__set3": "66DABC20E0CD94ABF7751DD36E60CA18652871108D6D61064F16689952D2F82F",
+    "seed9731-R-tau16__set1": "1441571351DE1EADB13D1425E00C8E09D090BF6925FF0D281AD5223F72A54FF2",
+    "seed9731-R-tau16__set3": "0521CD30D2C61DBB03C6E57264308201D56C272F5E515F7981A1DED092142D19",
+    "seed9731-R-tau4__set0": "29A1A1521410F4A36748DF89BDBCEF539E768BE5775A159A53743280CEEACEFD",
+    "seed9731-R-tau4__set1": "ABE5849691D350D894344F4CABE1874F234AC08E7AD2D3DE9C900360C7BACA30",
+    "seed9731-R-tau4__set2": "7BCD300D80FE96365C7877F2C7D55738F9A012C909F641D0FBF13598C5E89DCC",
+    "seed9731-R-tau4__set3": "E103355E22C4F47F63DA034420306EC9124F3CF7DD04096D282F33041C57D4FC"
+  },
+  "source_manifest_sha256": "03DE810C83DA5870DC08F5FC77A9E9CAB72BD850ED15762F2EA956AC5A0271D4",
+  "status": "SREPLACE_CANDIDATES_COMPLETE"
+}

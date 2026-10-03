@@ -1,0 +1,29 @@
+{
+  "recorded_utc": "2026-09-27T01:57:39.801176+00:00",
+  "schema": "FAS_E4_0_TRACK_E_SOURCE_TESTS_V09",
+  "receipt_id": "E4_0_TRACK_E_V09_PREMAP_SOURCE_TESTS_V17",
+  "status": "TRACK_E_SOURCE_TESTS_PASS_V09_PREMAP_SYNTHETIC_AUDITOR",
+  "command": "python audits/e4-0-track-e/test_audit_e4_0_track_e_v09.py -v; python -m py_compile auditor and tests",
+  "synthetic_test_count": 19,
+  "py_compile": "PASS",
+  "sources": [
+    {
+      "path": "audits/e4-0-track-e/audit_e4_0_track_e_v09.py",
+      "bytes": 77792,
+      "sha256": "d370f38e6bcd5c8381db2d974ec79d05577161408fc334e5bbfb2dcb717bce25"
+    },
+    {
+      "path": "audits/e4-0-track-e/test_audit_e4_0_track_e_v09.py",
+      "bytes": 40675,
+      "sha256": "744dcbdaacfe6ed45756a8f872567a379373d495c1c5ef474cc612d08efb96ca"
+    }
+  ],
+  "scope": {
+    "contract_version": "v09",
+    "mode": "synthetic_pre_map_only",
+    "truth_payloads_opened": false,
+    "model_tokenizer_cuda_contact": false,
+    "validated": "v06 science baseline, direct v08 predecessor/seal, preserved v08 precontact issuer stop and failed preseal lineage, WDDM preflight, source map closure, v09 amendment and seal membership"
+  },
+  "execution_authorization_conferred": false
+}

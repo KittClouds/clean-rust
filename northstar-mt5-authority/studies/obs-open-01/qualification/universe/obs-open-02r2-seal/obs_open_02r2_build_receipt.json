@@ -1,0 +1,10 @@
+{
+  "builder_sha256": "124523331c0dbc9eed9d2aca39f1e3bd75f02d0adb22f94268fb5742bd5716f4",
+  "confirmation_rows_read": 0,
+  "gate": "OBS-OPEN-02R2",
+  "manifest_sha256": "a0a48d280cdb48f09ec510fe0c70dbdcd74c5821073b8c17b24d61338d415a34",
+  "observation_access": "OUTCOME_BLIND_DISCOVERY_SOURCE_QUALITY_ONLY",
+  "r2_root_sha256": "9f7a011d5f31b498f713b6a2459c36af19dc2e388736678919cf8344f937d234",
+  "rebuild_requirement": "TWO_CLEAN_BUILDS_BYTE_IDENTICAL",
+  "schema": "OBS_OPEN_EXECUTABLE_DISCOVERY_COMPLETION_BUILD_V1"
+}

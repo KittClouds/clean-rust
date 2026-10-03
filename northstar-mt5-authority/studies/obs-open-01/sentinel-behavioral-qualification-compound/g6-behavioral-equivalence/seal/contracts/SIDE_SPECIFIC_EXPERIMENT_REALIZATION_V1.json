@@ -1,0 +1,1 @@
+{"operator":"Lambda(z_j,pi_a^(j-1),pi_b^(j-1),C_a,C_b,M_(j-1),H_exp_<j) -> (x_j_a,x_j_b)","price":"common integer-tick OHLC deltas relative to each committed close","raw_diagonal":"QUALIFIED_SPECIAL_CASE_NOT_DEFAULT","schema":"G6_SIDE_SPECIFIC_EXPERIMENT_REALIZATION_V1","time":"each side next causal slot"}

@@ -1,0 +1,116 @@
+{
+  "schema": "FAS_E4_0_TRACK_C_V03_SOURCE_TESTS_V01",
+  "status": "PASS_SYNTHETIC_SOURCE_AND_CLI_TESTS",
+  "source_unit": "E4 fresh scorer v03; v07 contract successor with v06 inherited population and parity-panel stages",
+  "supersedes": {
+    "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-c-v02/track-c-source-tests-v01.json",
+    "bytes": 6584,
+    "sha256": "04514426de6e72ea0dcc63f2b5f1e72f37620da11ec01f297da1196fa11614a1"
+  },
+  "recorded_utc": "2026-09-26T23:50:11+00:00",
+  "commands": [
+    "python -m py_compile source/scripts/e4_fresh_scorer_v03/scorer.py source/scripts/e4_fresh_scorer_v03/runner.py source/scripts/e4_fresh_scorer_v03/output_artifacts.py source/scripts/e4_fresh_scorer_v03/test_scorer.py source/scripts/e4_fresh_scorer_v03/test_runner.py",
+    "python -m unittest discover -s source/scripts/e4_fresh_scorer_v03 -p 'test_*.py' -v",
+    "PowerShell here-string piped to Python: import sys, numpy, torch; print Python/NumPy/Torch versions and torch.cuda.is_initialized() (False)"
+  ],
+  "results": {
+    "py_compile": "PASS",
+    "unittest": "PASS",
+    "tests_run": 16,
+    "tests_passed": 16,
+    "tests_failed": 0,
+    "test_names": [
+      "test_authorized_reader_opens_synthetic_labels_once_and_verifies_identity",
+      "test_balanced_accuracy_and_support_match_expected_values",
+      "test_bootstrap_is_deterministic_and_uses_linear_tail_quantile",
+      "test_cli_rejects_broader_scope_before_creating_score_or_opening_labels",
+      "test_cli_rejects_tampered_feature_bytes_before_label_open",
+      "test_feature_inference_excludes_escrow_rows",
+      "test_frozen_bootstrap_and_endpoint_constants",
+      "test_invalid_auth_fails_before_synthetic_label_file_is_opened",
+      "test_perfect_synthetic_bundle_passes_all_eight_endpoints",
+      "test_preflight_only_cli_smoke_leaves_labels_unopened_and_score_absent",
+      "test_single_endpoint_failure_cannot_be_hidden_by_bundle_average",
+      "test_support_failure_is_recorded_and_fails_bundle",
+      "test_synthetic_seal_chain_opens_only_primary_once_and_seals_outputs",
+      "test_synthetic_stages_use_exact_track_b_member_ids",
+      "test_synthetic_suite_keeps_cuda_uninitialized",
+      "test_v07_contract_successor_and_v06_lineage_identities_are_frozen"
+    ],
+    "preflight_only_cli_smoke": "PASS_SYNTHETIC_SEAL_CHAIN_LABELS_UNOPENED_SCORE_ABSENT",
+    "lineage_fixture": "PASS_V07_CONTRACT_AND_SEAL_BIND_EXACT_V06_SUCCESSOR_MEMBERS",
+    "torch_cuda_is_initialized_after_tests": false
+  },
+  "runtime": {
+    "python": "3.13.15",
+    "numpy": "2.5.3",
+    "torch": "2.11.0+cu128",
+    "torch_cuda_initialized_after_probe": false
+  },
+  "identity": {
+    "contract_id": "FAS_FROZEN_CAPABILITY_FABRIC_E4_0_V07",
+    "contract_member_artifact_id": "E4_0_CONTRACT_V07_FINAL",
+    "contract_seal_id": "FAS_E4_0_CONTRACT_V07_SEAL",
+    "v06_inherited_stages": [
+      "POPULATION_GENERATION",
+      "PARITY_PANEL_MATERIALIZATION"
+    ],
+    "v07_new_stages": [
+      "ONLINE_CACHE_PARITY",
+      "FRESH_FEATURE_EXTRACTION",
+      "FRESH_SCORING"
+    ],
+    "scientific_predecessor_map": [
+      "e0_v10_root_sha256",
+      "e1_v04_root_sha256",
+      "e2_v07_root_sha256",
+      "e3_v02_bundle_root_sha256"
+    ]
+  },
+  "boundary": {
+    "actual_e4_population_or_feature_data_read": false,
+    "actual_e4_primary_terminal_labels_read": false,
+    "actual_e4_escrow_labels_read": false,
+    "actual_frozen_e3_head_files_read": false,
+    "synthetic_e3_head_values_used": true,
+    "synthetic_primary_labels_opened_by_authorized_cli_fixture": true,
+    "synthetic_escrow_sentinel_opened": false,
+    "immutable_v06_contract_and_seal_read_for_temporary_lineage_fixtures": true,
+    "tokenizer_contact": false,
+    "backbone_model_contact": false,
+    "torch_imported": true,
+    "cuda_initialization": false,
+    "real_e4_scoring_execution": false
+  },
+  "source_files": {
+    "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_fresh_scorer_v03/output_artifacts.py": {
+      "bytes": 5887,
+      "sha256": "73fbdd184d01df6de913676a0caa0be8f38f264bc9667e3985b52485425b33d4"
+    },
+    "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_fresh_scorer_v03/README.md": {
+      "bytes": 9180,
+      "sha256": "c40af702e4a98fe594ce5d0c1a9e521eaf88acd771c7115154d762497458957f"
+    },
+    "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_fresh_scorer_v03/runner.py": {
+      "bytes": 45271,
+      "sha256": "25bee0586fb240c554552ee90374b0ac8ae6844eff7bdb60600aa6cb56fdbefc"
+    },
+    "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_fresh_scorer_v03/scorer.py": {
+      "bytes": 33616,
+      "sha256": "58bc957de63d430933570430ee0760a5833bc9c6ef5a82dae6dba78115b8b866"
+    },
+    "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_fresh_scorer_v03/test_runner.py": {
+      "bytes": 27847,
+      "sha256": "d0c5f342fe13a556b0d9b4f850bd63e013e90c27f016ef3482a972b9b6f3cfc7"
+    },
+    "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_fresh_scorer_v03/test_scorer.py": {
+      "bytes": 11470,
+      "sha256": "49918704b151c9055432f4fb6199e3621a619b21acfb85d2a0427883283132c6"
+    }
+  },
+  "notes": [
+    "Scoring algorithms and frozen endpoint order, BA, support, whole-quartet stratified PCG64 bootstrap, seed, chunks, quantile, alpha, and threshold are unchanged from v02.",
+    "The v03 synthetic integration fixture copies immutable v06 contract/seal protocol bytes into a temporary workspace to exercise lineage binding; it does not read live E4 population/features/labels or E3 observer member files.",
+    "The authorized synthetic CLI test opens only its temporary synthetic primary label file once; the temporary escrow sentinel is never opened."
+  ]
+}

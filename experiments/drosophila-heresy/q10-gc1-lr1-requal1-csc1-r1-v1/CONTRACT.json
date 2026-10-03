@@ -1,0 +1,39 @@
+{
+  "admissibility_model": "axis and norm independent signed intervals plus signed linear-drive L2 ball",
+  "identity": "q10-gc1-lr1-requal1-csc1-r1-v1",
+  "output": "descriptive read-only routing audit",
+  "parent_bindings": [
+    {
+      "label": "vmat_contract",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-vmat1-v6/CONTRACT.json",
+      "sha256": "306327807FF2A8F6C5C630250F414AB680BE23886BBCDFCC4BA1CEE8A84CEB04"
+    },
+    {
+      "label": "vmat_execution",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-vmat1-v6/execution.json",
+      "sha256": "CFA417B937ACFCD9A3AD54A28F5305C93E48F67E45D9AA8966E61A3B03FA4D12"
+    },
+    {
+      "label": "vmat_finalizer",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-vmat1-finalizer-v1/REPORT.json",
+      "sha256": "726D0D55D4527264771837C0F958F538897C727E817E6887B26FD15679A0B50E"
+    },
+    {
+      "label": "vmat_domain_manifest",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-vmat1-v6/domain-manifest.json",
+      "sha256": "DC0C9B4FC4910721757AA178053135CD21A14C087644C9CE57C1D936435D8527"
+    },
+    {
+      "label": "vmat_tolerance_schema",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-vmat1-v6/tolerance-schema.json",
+      "sha256": "C3D0E66D269B775D1E82877A801BE690CF6BE1F175D667BB2FC482483A7424E3"
+    }
+  ],
+  "plan_sha256": "699A251F5EAEB0FFD41F33E299F1BC5F30EAA73A4693FB759AF8298116200570",
+  "protocol": "Q10-CSC1-R1",
+  "replay_performed": false,
+  "runner_sha256": "DF2086ADEB460AA0186922C620589D9ACE743409E53B419E67B7F19F867C07A4",
+  "scientific_promotion": false,
+  "search_performed": false,
+  "status": "PREMEASUREMENT_SEALED"
+}

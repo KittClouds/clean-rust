@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SeedContract",
+  "type": "object",
+  "properties": {
+    "derivation": {
+      "type": "string"
+    },
+    "schema_version": {
+      "type": "string"
+    },
+    "seed_contract_id": {
+      "$ref": "#/$defs/Digest256"
+    }
+  },
+  "required": [
+    "schema_version",
+    "seed_contract_id",
+    "derivation"
+  ],
+  "$defs": {
+    "Digest256": {
+      "description": "Domain-separated BLAKE3 digest",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

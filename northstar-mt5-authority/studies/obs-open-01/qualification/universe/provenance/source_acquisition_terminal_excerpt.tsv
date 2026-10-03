@@ -1,0 +1,13 @@
+sequence	terminal_log_line
+0	"NI	0	10:16:33.419	Tester	US30,M1 (MetaQuotes-Demo): testing of Experts\Research\OBS_OPEN_SourceCoverageCollectorEA_v1.ex5 from 2024.01.01 00:00 to 2026.01.02 00:00"
+1	"DS	0	10:16:36.906	Core 01	US30,M1 (MetaQuotes-Demo): 1 minutes OHLC ticks generating"
+2	"DS	0	10:16:36.906	Core 01	US30,M1: testing of Experts\Research\OBS_OPEN_SourceCoverageCollectorEA_v1.ex5 from 2024.01.01 00:00 to 2026.01.02 00:00 started with inputs:"
+3	"OD	0	10:16:36.906	Core 01	2024.01.01 00:00:00   OBS_OPEN_SOURCE_COVERAGE_EA_START schema=OBS_OPEN_SOURCE_COVERAGE_V1 symbol=US30 from=2024.01.01 through=2025.12.31"
+4	"HJ	0	10:16:36.906	Core 01	2025.12.31 23:59:59   OBS_OPEN_SOURCE_COVERAGE_EA_COMPLETE schema=OBS_OPEN_SOURCE_COVERAGE_V1 reason=1 m1_rows=650380 m5_rows=130206"
+5	"PJ	0	10:16:36.906	Core 01	US30,M1: 2592476 ticks, 650381 bars generated. Environment synchronized in 0:00:00.235. Test passed in 0:00:03.260 (including ticks preprocessing 0:00:00.156)."
+6	"FF	0	10:17:43.248	Tester	US30,M1 (MetaQuotes-Demo): testing of Experts\Research\OBS_OPEN_SourceCoverageCollectorEA_v1.ex5 from 2024.01.01 00:00 to 2026.01.02 00:00"
+7	"HG	0	10:17:46.601	Core 01	US30,M1 (MetaQuotes-Demo): 1 minutes OHLC ticks generating"
+8	"HN	0	10:17:46.601	Core 01	US30,M1: testing of Experts\Research\OBS_OPEN_SourceCoverageCollectorEA_v1.ex5 from 2024.01.01 00:00 to 2026.01.02 00:00 started with inputs:"
+9	"OP	0	10:17:46.601	Core 01	2024.01.01 00:00:00   OBS_OPEN_SOURCE_COVERAGE_EA_START schema=OBS_OPEN_SOURCE_COVERAGE_V1 symbol=US30 from=2024.01.01 through=2025.12.31"
+10	"HF	0	10:17:46.601	Core 01	2025.12.31 23:59:59   OBS_OPEN_SOURCE_COVERAGE_EA_COMPLETE schema=OBS_OPEN_SOURCE_COVERAGE_V1 reason=1 m1_rows=650380 m5_rows=130206"
+11	"MN	0	10:17:46.601	Core 01	US30,M1: 2592476 ticks, 650381 bars generated. Environment synchronized in 0:00:00.034. Test passed in 0:00:03.327 (including ticks preprocessing 0:00:00.172)."

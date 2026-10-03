@@ -1,0 +1,28 @@
+{
+  "contract": "MST_RG2_IMMUTABLE_CORPUS_SEAL_V1",
+  "status": "SEALED",
+  "sealed_at_utc": "2026-08-12T12:52:05.734649+00:00",
+  "research_generation": 2,
+  "run_count": 20,
+  "canonical_corpus_sha256": "9cbad8545db23cba7ccea2bd062aeba700597deb4be19cecbb74647f65ef8413",
+  "campaign_manifest_sha256": "5bf12767746b8499ad0edde2597df67b1928cc5941705a8391ae2585a0574092",
+  "configuration_hash": "4284550518493202411",
+  "dataset_contract": "MST_AUCTION_RELATIONAL_V1",
+  "dataset_schema": "7",
+  "phase9_semantic_hash": "119d87d2be6d9b4337e6af0d7752596c61873c05598f4438514a016ec81574ae",
+  "lifecycle_audit_semantic_hash": "752d3da65adc8b2a24e05d4525847ad7f700184e924b823040a94aa1dc8caf6e",
+  "immutability": "raw run directories remain immutable; additions or semantic changes require a new corpus generation",
+  "artifacts": {
+    "admitted_runs.tsv": "2a33ef581708e6fa08fa4ff68eae8b8e8b4963c122ee97e4bd4e75e35e70e3c4",
+    "configuration.json": "84275da2fe9df87162e3e74c58d9f095d38e4a10257080fc1b3a1af1986e1a88",
+    "corpus_manifest.tsv": "2a33ef581708e6fa08fa4ff68eae8b8e8b4963c122ee97e4bd4e75e35e70e3c4",
+    "coverage_report.html": "841ebcf3496d23dc74605568262cec0365843dba15fa7e92985a4940da9d19bc",
+    "coverage_report.md": "2871a17bb06cd44e3b7b0c0506d59d9351c86b217f17e932a41a4074adc42095",
+    "lifecycle_audit.md": "468cc4f9434b84bfa1db9ec7f71710d3baec15c0a7f313025c8e9c4e931faa5b",
+    "phase10_exit_gate.json": "2de978f40461e6af2072c44b450358f8942f0e5922de53f95bdcc8b3cc0f8f8b",
+    "quarantined_runs.tsv": "0623b4ee4ff973e602e4c4158c7d39a384473589acb4abe4b6ff6415e105b6fb",
+    "schema_dictionary.json": "d48977075cc3a07f779c04cb23f2700842a7f7ee4064e43b07f2647e4e453a6b",
+    "source_fingerprints.tsv": "0146a93749fcaafe6d84a1634cc3c0205bc649d71b405ac545d15e08101f3b4e",
+    "targeted_gap_collection.tsv": "44f1a9e234e60a6206794aedbe51d275a321ebbc346f3cb3f8e77bcacc037ae3"
+  }
+}

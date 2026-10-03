@@ -1,0 +1,17 @@
+[package]
+name = "northstar-rl-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "northstar-rl"
+path = "src/main.rs"
+
+[dependencies]
+northstar-rl-broker = { path = "../northstar-rl-broker" }
+northstar-rl-campaign = { path = "../northstar-rl-campaign" }
+northstar-rl-core = { path = "../northstar-rl-core" }
+serde.workspace = true
+serde_json.workspace = true

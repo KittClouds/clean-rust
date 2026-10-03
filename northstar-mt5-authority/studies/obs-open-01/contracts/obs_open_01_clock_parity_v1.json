@@ -1,0 +1,49 @@
+{
+  "contract_id": "OBS-OPEN-01-CLOCK-PARITY-V1",
+  "purpose": "BOUNDED_SOURCE_CLOCK_QUALIFICATION",
+  "substantive_market_results_permitted": false,
+  "broker": {
+    "server": "MetaQuotes-Demo",
+    "symbol": "US30",
+    "timeframe": "M1",
+    "timestamp_semantics": "SERVER_CLOCK_MINUTE"
+  },
+  "external": {
+    "provider": "Dukascopy",
+    "symbol": "USA30IDXUSD",
+    "artifact": "HOURLY_BI5_TICKS",
+    "timestamp_semantics": "UTC_FILE_HOUR_PLUS_TICK_MILLISECOND"
+  },
+  "admitted_sessions": ["2026-08-13"],
+  "candidate_offset_minutes": {
+    "minimum": -720,
+    "maximum": 840,
+    "step": 15
+  },
+  "aggregation": {
+    "external_price": "LAST_INTEGER_MID_PER_UTC_MINUTE",
+    "broker_price": "M1_CLOSE",
+    "comparison": "CONSECUTIVE_ONE_MINUTE_CHANGE",
+    "join": "EXACT_UTC_MINUTE"
+  },
+  "acceptance": {
+    "minimum_aligned_returns": 300,
+    "minimum_pearson_correlation": 0.80,
+    "minimum_nonzero_sign_agreement": 0.70,
+    "minimum_best_runner_up_correlation_margin": 0.30,
+    "require_manifest_reconciliation": true,
+    "require_byte_identical_rebuild": true
+  },
+  "typed_outcomes": [
+    "PASS_BOUNDED_SESSION",
+    "NOT_EVALUABLE_SOURCE_COVERAGE",
+    "NOT_EVALUABLE_EXTERNAL_SOURCE",
+    "NOT_EVALUABLE_INSUFFICIENT_OVERLAP",
+    "FAIL_ALIGNMENT_THRESHOLDS"
+  ],
+  "transport_limits": {
+    "winter_offset_proven": false,
+    "dst_transition_proven": false,
+    "other_sessions_proven": false
+  }
+}

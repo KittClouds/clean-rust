@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ActionSpec",
+  "type": "object",
+  "properties": {
+    "action_spec_id": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "dtype": {
+      "type": "string"
+    },
+    "high": {
+      "type": "number",
+      "format": "float"
+    },
+    "low": {
+      "type": "number",
+      "format": "float"
+    },
+    "schema_version": {
+      "type": "string"
+    },
+    "semantics": {
+      "type": "string"
+    },
+    "shape": {
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "format": "uint32",
+        "minimum": 0
+      }
+    }
+  },
+  "required": [
+    "schema_version",
+    "action_spec_id",
+    "low",
+    "high",
+    "shape",
+    "dtype",
+    "semantics"
+  ],
+  "$defs": {
+    "Digest256": {
+      "description": "Domain-separated BLAKE3 digest",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

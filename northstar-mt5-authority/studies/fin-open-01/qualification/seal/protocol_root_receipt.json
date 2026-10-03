@@ -1,0 +1,56 @@
+{
+  "authority": {
+    "authorized_discovery_sessions": 257,
+    "confirmation_sessions": 69,
+    "confirmation_status": "FROZEN_UNOPENED",
+    "parent_study_id": "OBS-OPEN-01",
+    "substantive_observer_outputs_read": false
+  },
+  "authority_manifest_sha256": "f75760041a8a9d049e31281f02bf5ddafe325bdc4b1e20d2d4c709cdd1dcf99b",
+  "content_manifest_sha256": "0ab2ad4bfdcbf4b2c6229ba98ea8232de3a9a0620743ce7258f4b1d8a049368f",
+  "financial_partition_sha256": "e90d759c9d5ae60c9e4fde202dbc6fdc303f213d060825634bfb29dc2d766d14",
+  "outcomes": {
+    "economic_findings_created": false,
+    "financial_development": "FROZEN_UNOPENED",
+    "financial_validation": "FROZEN_UNOPENED",
+    "science_confirmation": "FROZEN_UNOPENED"
+  },
+  "partition": {
+    "assignment": "METADATA_ONLY_CHRONOLOGICAL",
+    "development": {
+      "count": 180,
+      "last_civil_date": "2025-01-30",
+      "name": "D_F"
+    },
+    "offset_regimes_in_development": [
+      120,
+      180
+    ],
+    "offset_regimes_in_validation": [
+      120,
+      180
+    ],
+    "outcomes_read": false,
+    "population_count": 257,
+    "schema": "FIN_OPEN_01_FINANCIAL_PARTITION_V1",
+    "validation": {
+      "count": 77,
+      "first_civil_date": "2025-02-03",
+      "name": "V_F",
+      "state": "FROZEN_UNOPENED"
+    }
+  },
+  "protocol_id": "FIN-OPEN-01",
+  "protocol_root_sha256": "0ab2ad4bfdcbf4b2c6229ba98ea8232de3a9a0620743ce7258f4b1d8a049368f",
+  "resolution": {
+    "alpha_familywise": 0.05,
+    "approximate_alpha_monte_carlo_se": 0.002407827262281234,
+    "minimum_attainable_p": 0.00012205541315757354,
+    "permutations": 8192,
+    "resolution_qualified": true
+  },
+  "schema": "FIN_OPEN_01_PROTOCOL_ROOT_RECEIPT_V1",
+  "status": "PROTOCOL_QUALIFIED",
+  "synthetic_qualification_sha256": "0cfc7643f2651084636a2db54ab9d5b6e360816ef07e5df5f1fea2bda66f8f6d",
+  "trading_authority": false
+}

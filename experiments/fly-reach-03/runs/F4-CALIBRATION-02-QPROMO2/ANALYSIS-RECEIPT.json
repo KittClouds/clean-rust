@@ -1,0 +1,14 @@
+{
+  "analysis_script_sha256": "54a54276b4cd71fd6f0f794a9aa2aed31e5f69fb78953092572b458507a2a0a4",
+  "analysis_sha256": "c1464e869d75ea9cd3d2a8e6a5d32fe002fa382dc7a68747d4579ae12907c2d5",
+  "block_outcomes_sha256": "1480b76e16954e5b1abe802666d9154224c9cae7bad5bedc5576b1248f4442af",
+  "disposition": "NOT_EVALUABLE_SUPPORT",
+  "heldout_truth_opened_after_integrity_pass": true,
+  "integrity_receipt_sha256": "a2565e8593528de2d711dbfab0c8b1feb309ea17db8a0d573e74f01ed89f8d7f",
+  "measured_reach03_authorized": false,
+  "pooled_outcome_sha256": "523857daf29696235aa965d6b55a21faf9f8b79d320784c01812e2155248f53d",
+  "qualification_only": true,
+  "results_sha256": "a4089991cc697bd6b86a4cded595a94dc98049af452c42755d0470b4583591df",
+  "schema": "F4-CALIBRATION-02-v0.2-analysis-receipt-v1",
+  "status": "PASS"
+}

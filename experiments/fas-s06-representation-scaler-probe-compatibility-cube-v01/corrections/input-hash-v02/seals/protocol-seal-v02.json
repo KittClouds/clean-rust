@@ -1,0 +1,77 @@
+{
+  "analysis_execution": false,
+  "feature_extraction": false,
+  "files": [
+    {
+      "bytes": 3517,
+      "path": "contracts/analysis-contract-v01.json",
+      "sha256": "dc588a8ed57c67c5be968029fc953700c417c233e003b038b05d7bc228c087cd"
+    },
+    {
+      "bytes": 657,
+      "path": "contracts/authorization-packet-v01.json",
+      "sha256": "0667e098f36f2269e7aaafd13957818f7187e9e91fd440565403cc86d846959a"
+    },
+    {
+      "bytes": 3611,
+      "path": "contracts/parent-binding-v01.json",
+      "sha256": "5001be41c26b67211674ec51e6dd7792417e41a725648b7d8f82df1ba3785ab7"
+    },
+    {
+      "bytes": 3611,
+      "path": "corrections/input-hash-v02/contracts/parent-binding-v02.json",
+      "sha256": "0128af41fc07803161ad4f8a0ea63c9cf19c25c149f46b6ffab4a5e0d07df2c5"
+    },
+    {
+      "bytes": 823,
+      "path": "corrections/input-hash-v02/INPUT-HASH-CORRECTION.md",
+      "sha256": "dfc7bc5a28e3972058fbcff21290931ee208fe1a7f4df3649c81aece2b5e023c"
+    },
+    {
+      "bytes": 30109,
+      "path": "corrections/input-hash-v02/scripts/s06_analyze.py",
+      "sha256": "8742896dcbfdf9b6189f1ed0214b69a7cbb507a3f8cc9bc02847e5b23b3b27b7"
+    },
+    {
+      "bytes": 10810,
+      "path": "corrections/input-hash-v02/scripts/s06_common.py",
+      "sha256": "394c004b43e2847dae00b241309b89801d9836784c39b9cddc1f5c2f034bf8f1"
+    },
+    {
+      "bytes": 3725,
+      "path": "corrections/input-hash-v02/scripts/s06_preflight.py",
+      "sha256": "a733319331d0abfe9c1f126f8735e581f16a1914598c5d2717484917e93b33eb"
+    },
+    {
+      "bytes": 6073,
+      "path": "corrections/input-hash-v02/scripts/s06_seal_results.py",
+      "sha256": "f1b6caac9d6ff2fc3d392dfd174cb7fbbb1b6dc96572d8f7ae958cdcf08eb937"
+    },
+    {
+      "bytes": 2464,
+      "path": "corrections/input-hash-v02/scripts/seal_protocol.py",
+      "sha256": "431bd75b6b7f3fa28aa8087d73f15c2018919ca9e98a8568beb64c3d1427c478"
+    },
+    {
+      "bytes": 3096,
+      "path": "corrections/input-hash-v02/scripts/test_s06_math.py",
+      "sha256": "3b90ec30796a3964371d55cca874350f51e162c6318b756914431894b18adfd0"
+    },
+    {
+      "bytes": 4185,
+      "path": "S06-PROTOCOL.md",
+      "sha256": "8d3f182a34e48560ea1b815984f8a46df0f105a7aafaeb5d609d7e070a344e03"
+    },
+    {
+      "bytes": 1737,
+      "path": "seals/protocol-seal-v01.json",
+      "sha256": "5d501a630aed2135dcaffe3844b34ccf52a7af7861b2530d8fab10368b267bfe"
+    }
+  ],
+  "model_contact": false,
+  "probe_fitting": false,
+  "root_sha256": "ab2bbd4fc1918132e6674e97ef05e29e2eee52945a0ac37229e52c6f9e10b4e7",
+  "seal_id": "FAS_S06_PROTOCOL_SEAL_V02",
+  "status": "SEALED",
+  "supersedes_input_identity_check_only": "FAS_S06_PROTOCOL_SEAL_V01"
+}

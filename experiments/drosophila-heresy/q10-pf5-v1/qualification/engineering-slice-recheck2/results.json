@@ -1,0 +1,129 @@
+{
+  "endpoint_results": [
+    {
+      "baseline_objective": {
+        "maximum_absolute_residual": 3.814697265625e-06,
+        "mismatch_row_count": 243,
+        "residual_l2": 1.7269822252172234e-05,
+        "total_ulp_distance": 339
+      },
+      "candidate": {
+        "final_geometry_pass": true,
+        "geometry": {
+          "axis_absolute_error": 1.0045959714056682e-09,
+          "axis_normalized_error": 1.354776979844589e-06,
+          "cue_linear_absolute_error": 5.794114362909964e-06,
+          "cue_linear_normalized_error": 1.0139409875935031e-06,
+          "final_axis": 0.0007415222928606338,
+          "final_norm": 2.1258180109723783,
+          "norm_absolute_error": 3.9618601288538e-08,
+          "norm_normalized_error": 1.863687381629756e-08,
+          "target_axis": 0.0007415212882646624,
+          "target_norm": 2.125817971353777
+        },
+        "maximum_absolute_residual": 3.814697265625e-06,
+        "mismatch_row_count": 243,
+        "prefix_tuple": [
+          0,
+          1
+        ],
+        "reconstructed_from_f32_bits": true,
+        "residual_l2": 1.7264884313688316e-05,
+        "total_ulp_distance": 338
+      },
+      "coordinates": [
+        20196,
+        20290
+      ],
+      "domains": [
+        [
+          0,
+          -1,
+          1,
+          -2,
+          2,
+          -4,
+          4,
+          -8,
+          8,
+          -16,
+          16
+        ],
+        [
+          0,
+          -1,
+          1,
+          -2,
+          2,
+          -4,
+          4,
+          -8,
+          8,
+          -16,
+          16
+        ]
+      ],
+      "exact_target": false,
+      "group_index": 0,
+      "helpful_component_indices": [
+        16
+      ],
+      "helpful_rows": [
+        38
+      ],
+      "improved_over_baseline": true,
+      "missing_prefixes_replayed": [
+        [
+          -1,
+          -2,
+          2,
+          -4,
+          4,
+          -8,
+          8,
+          -16,
+          16
+        ],
+        [
+          -1,
+          -2,
+          2,
+          -4,
+          4,
+          -8,
+          8,
+          -16,
+          16
+        ]
+      ],
+      "no_helpful_rows": [],
+      "protocol": "Q10-PF5",
+      "replay_plan": {
+        "cartesian_product": 121,
+        "coverage": "partial",
+        "guard_pruned": 47,
+        "mode": "EXACT_ENUMERATION",
+        "nodes_replayed": 121
+      },
+      "rows": [
+        38
+      ],
+      "serialized_steps": [
+        [
+          1
+        ],
+        [
+          1
+        ]
+      ],
+      "set_index": 0,
+      "source_event": "seed9731-L-tau16.json",
+      "status": "PARTIAL_FEASIBILITY_FOUND",
+      "threshold_classes": [
+        "immediate"
+      ]
+    }
+  ],
+  "protocol": "Q10-PF5",
+  "status": "Q10_PF5_ENGINEERING_SLICE_COMPLETE"
+}

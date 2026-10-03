@@ -1,0 +1,94 @@
+{
+  "protocol": "jev-information-density/v0.8p-failed-construction-quarantine-v01",
+  "identity": "v0.8P-fresh-trajectory-instrumented-rerun-v01",
+  "status": "CONSTRUCTION_BOUNDARY_VIOLATION_E1_JOIN_READ",
+  "disposition": {
+    "promotable": false,
+    "raw_panel_status": "NON_PROMOTABLE_UNVALIDATED_QUARANTINED",
+    "training": "NONE",
+    "model_contact": "NONE",
+    "evaluation": "NONE",
+    "scientific_result": "NONE",
+    "panel_validation_performed": false,
+    "panel_reuse_authorized": false
+  },
+  "incident": {
+    "class": "prohibited E1 candidate-join metadata read during P-v01 construction",
+    "source_path": "D:/codex-runs/jev-information-density-v08n/v0.8N-base-v01/phase-b-e1-metadata-v04/e1/output/target-free-schema-candidate-join-v01.jsonl",
+    "extent": "first JSONL row read; no inference, head output, prediction, target value, or treatment metric was available",
+    "use_in_panel_construction": "not used for candidate selection or panel generation",
+    "policy": "construction identity quarantined without arguing immateriality; prohibited source was not re-read or hashed"
+  },
+  "reported_generation_counts_not_independently_validated": {
+    "neighborhoods": 2000,
+    "episodes": 22000,
+    "source": "generator completion output from the failed v01 attempt"
+  },
+  "preserved_artifacts": [
+    {
+      "path": "D:/codex-runs/jev-information-density-v08p/v0.8P-fresh-eval-panel-v01/eval-canonical-episodes.jsonl",
+      "bytes": 222727995,
+      "sha256": "37c11636047d3e312a22f53216a158cc4bf9e5029abda9bf90926254c01aedeb"
+    },
+    {
+      "path": "D:/codex-runs/jev-information-density-v08p/v0.8P-fresh-eval-panel-v01/eval-contrast-certificates.jsonl",
+      "bytes": 8348000,
+      "sha256": "32b47df89c0000022124f49d365076eead2cf9c6bfae3684598669458785c514"
+    },
+    {
+      "path": "D:/codex-runs/jev-information-density-v08p/v0.8P-fresh-eval-panel-v01/eval-exact-world-episodes.jsonl",
+      "bytes": 87280008,
+      "sha256": "4b671dbc7b72eb0c539c89fa6f4135c0469eaf2d0a25f78df25ff45c521512a7"
+    },
+    {
+      "path": "D:/codex-runs/jev-information-density-v08p/v0.8P-fresh-eval-panel-v01/generator-receipt.json",
+      "bytes": 1404,
+      "sha256": "5dde7ae4b60f8f5b0996a19716300b6e881f0af62e12637fb76f6b29430a9978"
+    },
+    {
+      "path": "D:/codex-runs/jev-information-density-v08p/v0.8P-fresh-eval-panel-v01/world-templates.json",
+      "bytes": 130994,
+      "sha256": "9b96edeca3d3ddbf80f9fb55e57aad74dd4b69a39221b366782c08a96b01dbb8"
+    },
+    {
+      "path": "C:/code land/clean-rust/experiments/jev-information-density-v08p/phase_b/trajectory_analysis.py",
+      "bytes": 32855,
+      "sha256": "706b8987b3fd637d03f07a0efffe34efde6370dbb4ae6c9b94f66bbb42b3ca70"
+    }
+  ],
+  "pre_incident_contract_integrity": {
+    "verified_after_incident": true,
+    "contracts": [
+      {
+        "path": "experiments/jev-information-density-v08p/phase_a/fresh-panel-contract-v01.json",
+        "sha256": "ce3b7b97caecb27f3ad99439c0e67dca6e40af5da3db9ca2e356ea5e9f06f823"
+      },
+      {
+        "path": "experiments/jev-information-density-v08p/phase_b/phase-b-p-run-contract-v01.json",
+        "sha256": "e345225b4a17fc18eb35fcab24cbe1d72bd0e34bed9de272f927a7be461853e6"
+      },
+      {
+        "path": "experiments/jev-information-density-v08p/phase_b/phase-b-p-analysis-contract-v01.json",
+        "sha256": "84111122033fda65c84344317cfe3b50639b23be4c71f480ba665c67a23cc939"
+      },
+      {
+        "path": "experiments/jev-information-density-v08p/contracts/contract-bundle-seal-v01.json",
+        "sha256": "67cd6b7902111000dc93a0f81f9f20bc05a9c084732705ed8f9ad82fe965fa85"
+      }
+    ]
+  },
+  "preservation": {
+    "raw_panel_files_modified": false,
+    "trajectory_analysis_draft_modified": false,
+    "raw_panel_files_validated": false,
+    "panel_features_extracted": false,
+    "backbone_loaded": false,
+    "quarantine_identity_parentable": false
+  },
+  "reviewer_disposition": {
+    "delegated_work_stopped": true,
+    "schedule_materializer_files_created": false,
+    "trajectory_analysis_draft_created_by_deputy": true,
+    "trajectory_analysis_draft_tested": false
+  }
+}

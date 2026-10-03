@@ -1,0 +1,9 @@
+{
+  "bound_inputs": 13,
+  "contract_sha256": "475495837462F728743736810A1063EC09AABF9EA7C596F76B81AE1C2231E0A8",
+  "identity": "q10-gc1-lr1-requal1-csc1-uvd0-v1",
+  "pair_outcomes_consulted": false,
+  "pair_replay_performed": false,
+  "protocol": "Q10-CSC1-UVD0",
+  "status": "PREEXECUTION_SEALED"
+}

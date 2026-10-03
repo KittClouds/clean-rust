@@ -1,0 +1,38 @@
+{
+  "hygiene": {
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "python_flag_B": true,
+    "unexpected_path_policy": "FAIL_PROMOTION"
+  },
+  "identity": "q10-gc1-lr1-requal1-sreplace-pairs-rerun1-interaction-v1",
+  "parent_bindings": [
+    {
+      "label": "clean_pair_rerun_execution",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-sreplace-pairs-rerun1-v1/execution.json",
+      "sha256": "F160638BF6009ED4050A1427D3A3D8C8F56DE777CBBE2AFEEAB1704FE28B6B0E"
+    },
+    {
+      "label": "morphology_report",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-sreplace-pairs-rerun1-morphology-v1/REPORT.json",
+      "sha256": "8C58E33BAFB3A0B23417EDF88C08AF1249EA8274731225BB7F8EB952DDE93D29"
+    }
+  ],
+  "plan_sha256": "6C91AFB9EBE1C946B59F6D0DBEF26B8109FBD03796BFD5C90AA8F1071382C42C",
+  "protocol": "REQUAL1-SREPLACE-PAIRS-RERUN1-INTERACTION",
+  "runner_sha256": "AC381CDCEC7BCEDB4312EEACAA1616268982C7D33CEC05309EC981F811853889",
+  "scope": {
+    "behavioral_probe": false,
+    "fresh_replay": true,
+    "pairs": 4999,
+    "scientific_promotion": false
+  },
+  "status": "FROZEN_PRE_EXECUTION__NOT_EXECUTED",
+  "write_surface": [
+    "PLAN.md",
+    "CONTRACT.json",
+    "scripts/interaction.py",
+    "shards/*.jsonl",
+    "execution.json",
+    "STATUS.json"
+  ]
+}

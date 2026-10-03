@@ -1,0 +1,25 @@
+{
+  "contract": "MST_RG2_RESEARCH_INTERFACE_SEAL_V1",
+  "status": "PASS",
+  "sealed_at_utc": "2026-08-12T13:38:11.820459+00:00",
+  "corpus_sha256": "9cbad8545db23cba7ccea2bd062aeba700597deb4be19cecbb74647f65ef8413",
+  "interface_version": "MST_RG2_RESEARCH_INTERFACE_V1_1",
+  "analysis_code_sha256": "7000d52d9b4234de19df4ba0b7ddb225ccf9556d095e3589e4018ed57bac60e6",
+  "artifacts": {
+    "example_queries/result_088117503651c9d5.receipt.json": "81fbe51601ed2f951ada1c43594356c0270aa6cebede4b2db97cf3b39692a152",
+    "example_queries/result_088117503651c9d5.tsv": "fcfd60c11e6ffcc5a3174a7b731c76c03f6f9eef3aa7b96da6ab9cf31f8db33f",
+    "example_queries/result_0b5e038d4e85d0ff.receipt.json": "8aaab9a46b3f2d7e76549ce41717daf217453b2b9c5fac1e5aba4f5d3662c423",
+    "example_queries/result_0b5e038d4e85d0ff.tsv": "37e82d48bb315229ab9c815a42e675a591592bbbd7d079d7cb20732f8709abeb",
+    "example_queries/result_259d541c610ce1cd.receipt.json": "8a41103eb6fbadd42476f44583f274c2e6d168e6e00d52de8fc4d98ccd122126",
+    "example_queries/result_259d541c610ce1cd.tsv": "2a63fb3c1fe53469280761bdf254158311ac0a198fb286afd30c63c9dd32429b",
+    "example_queries/result_42cbfbd8c756c66b.receipt.json": "8c37f5e6d74869f528b13cbba7c926cedb4ec3197ae9b2f7ab6fb61e499ef92c",
+    "example_queries/result_42cbfbd8c756c66b.tsv": "a930290a166e4e1d477fee49ebdff876e4df47d16907cbec4935c59b203ba8b9",
+    "example_queries/result_9b2ee5b3391ad770.receipt.json": "22cf51c6a080586fe4065265679307c37b1f1563df7262ff325bff8d79144f38",
+    "example_queries/result_9b2ee5b3391ad770.tsv": "026501db5bbafb6ba903509293892bc0b173cfde17864283629823ecb4f2e69c",
+    "lifecycle_semantics.json": "a231541232103b7989a521d0a24a128849db52e96263a3b5d5ce3142f41b28a3",
+    "partition_manifest.tsv": "a52bd0779e59acd88408dd10423dbaff80d801ccf6a967c672e34466a2afe274",
+    "phase10_5_exit_gate.json": "f4bf840bb9c87a399c3e0dbc2236ea270135559f3d393082f9112bfbe2e32902",
+    "target_registry.json": "2b20cd7e77e02b655edf04a650897421b86b1ca166923898279018b2ba8029e5",
+    "type_contract.json": "dcd1c8a2ed43b3821bff2deec91c16703e5a9476bad84e9d4428a4b7bc1ad9b6"
+  }
+}

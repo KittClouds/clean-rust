@@ -1,0 +1,27 @@
+{
+  "schema": "FUTURE_PROCESS_TAPE_V1",
+  "materialization": "LAZY_RECONSTRUCTIBLE_SIDECAR_VIEW",
+  "authority_boundary": "RETROSPECTIVE_OUTCOME_AUTHORITY_ONLY_NEVER_CAUSAL_STATE",
+  "source": "SESSION_PROCESS_SCHEMA_V1",
+  "row_fields": [
+    "anchor_id",
+    "anchor_kind",
+    "anchor_known_at",
+    "source_row_id",
+    "bar_open",
+    "bar_close",
+    "raw_open",
+    "raw_high",
+    "raw_low",
+    "raw_close",
+    "elapsed_minutes_after_anchor",
+    "coverage_state"
+  ],
+  "raw_path_stored_once": true,
+  "candidate_x_future_bar_eager_table": false,
+  "horizons_minutes": [1, 2, 5, 10, 15, 30, 60, 120, 240],
+  "terminal_horizon": "ANCHOR_SPECIFIC_VALID_TERMINATION",
+  "time_semantics": "PHYSICAL_M1_MINUTES_NO_STRETCHING_NO_PADDING_NO_EXTRAPOLATION",
+  "knowledge_law": "outcome_known_at >= anchor_known_at",
+  "future_backflow": "FORBIDDEN"
+}

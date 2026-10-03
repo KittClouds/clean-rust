@@ -1,0 +1,7 @@
+object	status	receipt
+K_VS_FREEZE_CLOCK	PERFECT_ALIAS	k is freeze minute after 09:30.
+PURE_SCALE_INDEPENDENT_OF_CLOCK	NOT_IDENTIFIABLE	No independent variation of construction duration and freeze clock.
+RAW_TO_Z	DETERMINISTIC	Positive width maps raw offsets to 2*offset/width.
+Z_TO_RAW_GIVEN_CONTEXT	NOT_RECONSTRUCTIBLE	Design context excludes width.
+Z_TO_RAW_GIVEN_WIDTH	CONDITIONALLY_INVERTIBLE	Multiply each z coordinate by width/2.
+RAW_PLUS_Z	NOT_AUTHORIZED	Complementarity is parked.

@@ -1,0 +1,11 @@
+{
+  "completed_contexts": [],
+  "engineering_only": true,
+  "error": "'readout_bits'",
+  "error_type": "KeyError",
+  "identity": "q10-gc1-lr1-requal1-csc1-alg1-v1",
+  "pair_replay_performed": false,
+  "protocol": "Q10-CSC1-ALG1",
+  "scientific_promotion": false,
+  "status": "BLOCKED_ALG1"
+}

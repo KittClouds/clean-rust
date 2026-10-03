@@ -1,0 +1,16 @@
+claim	status	evidence
+MEAS02_PARENT_BINDING	PASS	sealed root and observer instance
+TWO_QUESTION_FAMILIES_ONLY	PASS	A running-extreme; B fixed-range session process
+SESSION_INFERENTIAL_UNIT	PASS	synthetic unequal-chain fixture
+NESTED_RANGE_SURFACE	PASS	single support-aware k,tau surface
+FORMAL_ESTIMAND_REGISTRY	PASS	three natural-null surface contrasts
+DESCRIPTIVE_FORMAL_SEPARATION	PASS	positive constrained measurements are descriptive
+CENSORING_SEMANTICS	PASS	terminal survivors right-censored for supersession
+NUMERICAL_RESOLUTION	PASS	plus-one p_min and tenfold headroom
+MONTE_CARLO_DECISION_PRECISION	PASS	Wilson 99 percent fail-closed rule
+MULTIPLICITY	PASS	maxT within surface and Holm across three families
+TEMPORAL_ROBUSTNESS	PASS	frozen month offset LOMO and chronological views
+GRAMMAR_EXCLUSION	PASS	capability preserved; substantive family excluded
+DISCOVERY_FIREWALL	PASS	zero MEAS-02 full-corpus values read
+CONFIRMATION_FIREWALL	PASS	zero confirmation rows read
+DETERMINISTIC_REBUILD	PASS	two byte-identical protocol builds

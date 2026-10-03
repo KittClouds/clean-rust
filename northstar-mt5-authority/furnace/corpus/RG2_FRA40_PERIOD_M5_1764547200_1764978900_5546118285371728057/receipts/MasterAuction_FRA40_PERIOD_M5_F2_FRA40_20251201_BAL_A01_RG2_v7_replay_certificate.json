@@ -1,0 +1,56 @@
+﻿{
+    "certificate":  "MST_REPLAY_DETERMINISM_V1",
+    "issued_at_utc":  "2026-08-12T12:45:20.5046735Z",
+    "stem":  "MasterAuction_FRA40_PERIOD_M5_F2_FRA40_20251201_BAL_A01_RG2_v7",
+    "common_files":  "C:\\Users\\shuga\\OneDrive\\Documents\\ChatGPT\\eas\\furnace\\staging\\FRA40_20251201_PROLONGED_BALANCE__F2_FRA40_20251201_BAL_A01\\raw\\auction",
+    "status":  "PASS",
+    "semantic_exclusions":  [
+                                "invocation_id",
+                                "attempts.node_revision (structural reconciliation counter)",
+                                "certificate issue time",
+                                "tester playback speed"
+                            ],
+    "equality_fields":  [
+                            "run_key",
+                            "terminal_hash",
+                            "event_sequence",
+                            "receipt_hash",
+                            "contract_receipt_hash",
+                            "canonical_dataset_hash"
+                        ],
+    "invocations":  [
+                        {
+                            "variant":  "RG2_FRA40_PERIOD_M5_1764547200_1764978900_5546118285371728057_I1764547200_10351984854296394331",
+                            "invocation_id":  "RG2_FRA40_PERIOD_M5_1764547200_1764978900_5546118285371728057_I1764547200_10351984854296394331",
+                            "run_key":  "RG2_FRA40_PERIOD_M5_1764547200_1764978900_5546118285371728057",
+                            "visual_mode":  "0",
+                            "run_status":  "COMPLETE",
+                            "contract_valid":  "1",
+                            "terminal_hash":  "14108620080362592345",
+                            "event_sequence":  "3334",
+                            "receipt_hash":  "1880645484700008217",
+                            "contract_receipt_hash":  "14899110773568086375",
+                            "canonical_dataset_hash":  "7dce75dd5e1b4c81951efb2b6c3fe9308814a6c98577757eb4bcc3a145503cca",
+                            "counts_match_manifest":  true,
+                            "row_counts":  {
+                                               "events":  3334,
+                                               "attempts":  636,
+                                               "episodes":  86,
+                                               "context":  3640,
+                                               "features":  636,
+                                               "transits":  77
+                                           },
+                            "dataset_hashes":  {
+                                                   "events":  "dbb457bf17c2ba374b87e1341278a549bb076261f0c6de43693200ec7d7491a1",
+                                                   "attempts":  "7142e38a8dafaf2e023daee764ce9e0ab93e86424841fa2c0fa2042aad47b191",
+                                                   "episodes":  "d3db3d2294a2a2b961240e677eaa46c824ce8e6b7e9a7e6fcf1fa377973bcdf9",
+                                                   "context":  "22e80efc0031cbe0571af0af3e8b1fd4e30cd4b242d122e419eb843694f3f6fa",
+                                                   "features":  "da8986e82e11f5fe178791ec02755d7f5b82d98e1b3ddec2a995f806f8158eff",
+                                                   "transits":  "42a9029a0886128a026ce29068797607d7831e0afa0041a34335812e592de633"
+                                               }
+                        }
+                    ],
+    "failures":  [
+
+                 ]
+}

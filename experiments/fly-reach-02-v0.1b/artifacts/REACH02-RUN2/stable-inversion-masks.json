@@ -1,0 +1,135 @@
+{
+  "masks": [
+    {
+      "edge_count": 24355,
+      "mask_sha256": "626bc968c617f31af9d5af379c7d58af0ea690c3ae83b20f76c76413e9267dbf",
+      "side": "L",
+      "stable_inversion_fraction": 0.0014370765756518168,
+      "substrate": "fly"
+    },
+    {
+      "edge_count": 24091,
+      "mask_sha256": "1b09bcbc582cb09b27c907b2f5b8dd80f6ae9fe8970f891b9b635544d8af8eee",
+      "side": "R",
+      "stable_inversion_fraction": 0.0013698061516748993,
+      "substrate": "fly"
+    },
+    {
+      "edge_count": 24355,
+      "mask_sha256": "1f4b05399aac1a3f9b154cfedf9b8b266950a32d326fd2630ac6eb6104bb7b21",
+      "side": "L",
+      "stable_inversion_fraction": 0.0,
+      "substrate": "g001"
+    },
+    {
+      "edge_count": 24091,
+      "mask_sha256": "ecda347c532839ffd5dfbd50d0027c6ea2410d6a90f3416f6c944c819af7d53c",
+      "side": "R",
+      "stable_inversion_fraction": 0.0,
+      "substrate": "g001"
+    },
+    {
+      "edge_count": 24355,
+      "mask_sha256": "1f4b05399aac1a3f9b154cfedf9b8b266950a32d326fd2630ac6eb6104bb7b21",
+      "side": "L",
+      "stable_inversion_fraction": 0.0,
+      "substrate": "g002"
+    },
+    {
+      "edge_count": 24091,
+      "mask_sha256": "f1979e8af6c21d8c9c56dbd480c56965530304758f93553bb97bccd5935e0abc",
+      "side": "R",
+      "stable_inversion_fraction": 0.0000415092773234818,
+      "substrate": "g002"
+    },
+    {
+      "edge_count": 24355,
+      "mask_sha256": "1f4b05399aac1a3f9b154cfedf9b8b266950a32d326fd2630ac6eb6104bb7b21",
+      "side": "L",
+      "stable_inversion_fraction": 0.0,
+      "substrate": "g003"
+    },
+    {
+      "edge_count": 24091,
+      "mask_sha256": "9143e838f0da3b67a1f4b09dcf3bef0e90ac5bf5118abd9d6fcb38713dab9a1d",
+      "side": "R",
+      "stable_inversion_fraction": 0.0001245278319704454,
+      "substrate": "g003"
+    },
+    {
+      "edge_count": 24355,
+      "mask_sha256": "1f4b05399aac1a3f9b154cfedf9b8b266950a32d326fd2630ac6eb6104bb7b21",
+      "side": "L",
+      "stable_inversion_fraction": 0.0,
+      "substrate": "g004"
+    },
+    {
+      "edge_count": 24091,
+      "mask_sha256": "ecda347c532839ffd5dfbd50d0027c6ea2410d6a90f3416f6c944c819af7d53c",
+      "side": "R",
+      "stable_inversion_fraction": 0.0,
+      "substrate": "g004"
+    },
+    {
+      "edge_count": 24355,
+      "mask_sha256": "1f4b05399aac1a3f9b154cfedf9b8b266950a32d326fd2630ac6eb6104bb7b21",
+      "side": "L",
+      "stable_inversion_fraction": 0.0,
+      "substrate": "g005"
+    },
+    {
+      "edge_count": 24091,
+      "mask_sha256": "ecda347c532839ffd5dfbd50d0027c6ea2410d6a90f3416f6c944c819af7d53c",
+      "side": "R",
+      "stable_inversion_fraction": 0.0,
+      "substrate": "g005"
+    },
+    {
+      "edge_count": 24355,
+      "mask_sha256": "abac4012cc2b1272ade43b8a8715c79bf8ee7b89f83ce8e3ce219d42f5e95a25",
+      "side": "L",
+      "stable_inversion_fraction": 0.00004105933073290905,
+      "substrate": "g006"
+    },
+    {
+      "edge_count": 24091,
+      "mask_sha256": "ecda347c532839ffd5dfbd50d0027c6ea2410d6a90f3416f6c944c819af7d53c",
+      "side": "R",
+      "stable_inversion_fraction": 0.0,
+      "substrate": "g006"
+    },
+    {
+      "edge_count": 24355,
+      "mask_sha256": "1f4b05399aac1a3f9b154cfedf9b8b266950a32d326fd2630ac6eb6104bb7b21",
+      "side": "L",
+      "stable_inversion_fraction": 0.0,
+      "substrate": "g007"
+    },
+    {
+      "edge_count": 24091,
+      "mask_sha256": "ca1a246b498e172ccb344b1f24b3951742edc3ebb46156cc152a7315bbc44202",
+      "side": "R",
+      "stable_inversion_fraction": 0.0000415092773234818,
+      "substrate": "g007"
+    },
+    {
+      "edge_count": 24355,
+      "mask_sha256": "1f4b05399aac1a3f9b154cfedf9b8b266950a32d326fd2630ac6eb6104bb7b21",
+      "side": "L",
+      "stable_inversion_fraction": 0.0,
+      "substrate": "g008"
+    },
+    {
+      "edge_count": 24091,
+      "mask_sha256": "ecda347c532839ffd5dfbd50d0027c6ea2410d6a90f3416f6c944c819af7d53c",
+      "side": "R",
+      "stable_inversion_fraction": 0.0,
+      "substrate": "g008"
+    }
+  ],
+  "schema": "FLY-REACH-02-derived-mask-v1",
+  "selection_rule": {
+    "max_sign_agreement": 0.2,
+    "min_observations": 128
+  }
+}

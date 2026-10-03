@@ -1,0 +1,47 @@
+{
+  "schema": "CHIEF_KAMMI_E4_0_CUSTODY_DISPOSITION_V1",
+  "issued_utc": "2026-09-27T18:46:36Z",
+  "requesting_lab": "Frozen Fabrique",
+  "request": "Reconcile inherited E4-0 population and parity panel under sealed v16-v09 contract; issue Ledger-native online/cache parity and feature-extraction model-contact authority and a fenced GPU lease if qualified.",
+  "decision": "HOLD_NO_STAGE_AUTHORIZATION",
+  "model_contact_authorized": false,
+  "lease_requested": false,
+  "lease_granted": false,
+  "scientific_flight_started": false,
+  "e4_01_entry_state": "CLOSED_PENDING_E4_0_TERMINAL",
+  "verified": {
+    "library_infrastructure_gate": "OPEN",
+    "library_acceptance_id": "sha256:daae9a9496b6dc15f5a256d966323fcb8848387f3ce3c7d926db7039d7fe7c8c",
+    "current_contract_sha256": "21fc77d5a288b9adef995d88f089890235f8dcb2fbc3c9e452725bb67892a22f",
+    "current_contract_legacy_seal_root": "278ae16eeb6852d3efad44221556a87be6df54964471f0870931fe2e99b305d1",
+    "legacy_contract_closure": "447/447 entries independently replayed under LibraryAcceptanceV1; 432 unique original data objects",
+    "v06_contract_is_member_of_v16_seal": true,
+    "v16_amendment_declares_v06_science_preserved": true,
+    "sealed_runner_source_hashes_match_current_files": true,
+    "population_claimed_root": "27731b483b8242aaef15ca22b97796b7b305a79db9bbb235765e13dcd9d08967",
+    "parity_panel_root": "6ef00306df0df20ada7b7a86b09567ae46e07f112f66d974d7885e8f1e5d4d95",
+    "visible_population_and_panel_file_hashes_match_manifest": true,
+    "protected_label_bytes_opened": false,
+    "full_population_data_closure_independently_replayed": false,
+    "stage_manifest_contract_binding": "Legacy v06 contract sha256:ea4f11cec5d65a3be7716c77febf5d448d8ebf1a5a4049aee5d25d51c0c50958; legacy seal root 7344badf07476d19d9c6228f80d026a112c339e93daa75593e61031f68456e64"
+  },
+  "denial_reasons": [
+    "The live Ledger has no E4-0 execution run, actor grant, policy/spec bindings, inherited-stage acceptance, or E4 GPU resource lease for this model-contact stage. Historical E4 facts and the old stage authorization cannot confer live authority.",
+    "The prior ONLINE_CACHE_PARITY authorization bound v06, not current v16-v09, and expired at 2026-09-27T07:15:14Z.",
+    "The sealed v16-v09 runner e4_runner_modes_v05.py calls make_gpu_lease from e4_gpu_lease_v04.py. That lab-local lock is not the Ledger fenced lease/executor path requested for the new flight. Issuing a Ledger lease alone would not prove that this runner remains fenced during model contact.",
+    "The v06-bound population seal includes two protected truth files. Their bytes were deliberately not opened for this intake, so the full current population closure cannot yet be represented as independently verified Ledger input. The visible members and manifest root are consistent, and the historical population audit is preserved as an assertion."
+  ],
+  "required_capabilities": [
+    "A versioned E4-0 execution adapter/spec that consumes Ledger stage authorization and a fenced lease at launch and throughout parity/extraction, without calling the lab-local authorization or GPU lease issuer. Preserve the frozen scientific contract and old failed attempt; freeze/hash any new Fabrique runner source under a distinct execution identity.",
+    "A scoped inherited-stage custody bridge that records the v06 population/panel roots under the v16-v09 contract with exact source/contract ancestry, distinguishes visible identity verification from protected label custody, and does not expose labels before the separately authorized scoring stage.",
+    "After those are qualified: register the E4-0 live run, actor and resource; bind exact scientific and execution specs; issue scoped grants and a policy; obtain a live stage authorization and fenced GPU lease with a concrete validity window. Recheck source, GPU/resource and protected-evidence boundaries immediately before launch."
+  ],
+  "evidence": {
+    "visible_intake": "C:\\code land\\clean-rust\\program-infrastructure\\governance\\inbox\\20260927\\E4-0-VISIBLE-INTAKE-v1.json",
+    "legacy_contract": "C:\\Users\\shuga\\.codex\\worktrees\\e4-0-contract-work\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\contracts\\e4-0-contract-v16-v09-final.json",
+    "legacy_seal": "C:\\Users\\shuga\\.codex\\worktrees\\e4-0-contract-work\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\seals\\e4-0-contract-v16-v09-seal.json",
+    "precontact_stop": "C:\\Users\\shuga\\.codex\\worktrees\\e4-0-contract-work\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\audits\\e4-0-execution\\online-parity-precontact-stop-v01.json",
+    "old_authorization": "C:\\Users\\shuga\\.codex\\worktrees\\e4-0-contract-work\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\audits\\e4-0-auth-issuer-v02\\online-parity-authorization-v01.json"
+  },
+  "scope": "Chief custody disposition only; it changes no sealed science, imports no protected truth bytes, and issues no model-contact authority."
+}

@@ -1,0 +1,19 @@
+{
+  "research_generation": 2,
+  "configuration_hashes": [
+    "4284550518493202411"
+  ],
+  "config_texts": [
+    "master_tf=5;volkitt_tf=16385;profile_tf=16385;days_tf=5;wayne_tf=16408;atr=100;use_v=1;use_d=1;use_w=1;v_inst=1;d_inst=1;w_inst=1;v_lookback=200;v_clusters=5;v_iterations=50;v_rows=20;v_atr=100;v_cog_bins=180;v_velocity=5;v_profile=1;v_profiles=3;v_va=70;v_bins=12000;d_keep=5;d_close=1;w_keep=5;w_std=1;w_m=1;w_zones=1;epsilon=0.12000000;min_samples=2;max_levels=1024;max_nodes=256;interval=1;center_tol=0.15000000;match=0.20000000;retire=3;auction=1;approach=0.50000000;reject=0.20000000;break=0.00000000;accept_bars=2;accept_dist=0.00000000;reclaim=0.05000000;departure=0.25000000;attempt_bars=24;episode_gap=12;compat_role=1;compat_broken=0;compat_developing=1;family_mask_0=2046;family_mask_1=2046;family_mask_2=2046;family_mask_3=2046;family_mask_4=2046;family_mask_5=2046;family_mask_6=2046;family_mask_7=2046;family_mask_8=2046;family_mask_9=2046;family_mask_10=2046;family_mask_11=2046;family_mask_12=2046;family_mask_13=2046;family_mask_14=2046;family_mask_15=2046;v_identity=2.50000000;v_volume=0;v_motion=0.15000000;v_mass=0.05000000;v_width=0.05000000;v_heavy_bar=0;v_refresh_ms=750;v_sentinels=1;v_sent_trigger=2;v_sent_reset=0;v_sent_arm=0.20000000;v_sent_gap=0.25000000;v_sent_stretch=1.00000000;v_sent_reentry=0.25000000;v_sent_bars=3;v_profile_session=0;v_point_mult=0;v_intraday_start=0;v_intraday_end=1440;v_single_prints=0;v_prominent_poc=101.00000000;regional=ACTIVE_NODE_MEDIAN_POPSIGMA_ROUND3_V1;rg=2;controller=2;topology=2;grammar=1;feature=1;dataset=7;producers=1;preset=RG2_M5_SIX_INDEX_V1"
+  ],
+  "version_matrix": [
+    [
+      "2",
+      "2",
+      "1",
+      "1",
+      "7",
+      "1"
+    ]
+  ]
+}

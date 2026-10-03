@@ -1,0 +1,44 @@
+﻿{
+    "contract":  "MST_HOLDOUT_ADMISSION_V1",
+    "status":  "SEALED",
+    "protocol_sha256":  "098844644e31878725ec4bb7859bb5db2f63f937adfc21bea3fb8ea91b287cf6",
+    "canonical_instrument":  "US500",
+    "broker_symbol":  "US500",
+    "data_source_id":  "METAQUOTES_DEMO",
+    "holdout_id":  "RECOVERY_B",
+    "window_start":  1785110400,
+    "window_end_exclusive":  1785542400,
+    "run_key":  "RG2_US500_PERIOD_M5_1785110400_1785542400_1540509723585601721",
+    "invocation_id":  "RG2_US500_PERIOD_M5_1785110400_1785542400_1540509723585601721_I1785110400_975749958508656151",
+    "auction_stem":  "MasterAuction_US500_PERIOD_M5_P13R_US500_RECOVERY_B_RG2_v7",
+    "structure_stem":  "MasterStructure_US500_PERIOD_M5_P13R_US500_RECOVERY_B_v6",
+    "canonical_dataset_hash":  "3e166325ee3fb201810fcf1004bd408ec293773bb52d1b3da4df019508f36f43",
+    "dataset_hashes":  {
+                           "events":  "9f86c93cd7667f0e34cbd506533d24fd466cfac4e0d6bff049ec894ec007e0e2",
+                           "attempts":  "f6d91ade67ca0f96093b34e1a2f96a4f6549075534da3be6809292d23e3ef83e",
+                           "episodes":  "48c7a1efdee1a59892da18eb8bba28d3f6a9d08ce82b3d7861996fb31bcb9652",
+                           "context":  "76a5a737a83ec5de077a42850360a6ae0d1c817af73367d0b82590dddd674c1e",
+                           "features":  "6de110beffe56fa4bbabb8e20f53e53cd7286a53cdf2d56e0911f0688caeb3e1",
+                           "transits":  "b40e91b7c78be8e4b9c6fa3d39f722c3b7debb35087b2b0059d700521ce86206"
+                       },
+    "row_counts":  {
+                       "events":  2833,
+                       "attempts":  548,
+                       "episodes":  101,
+                       "context":  3719,
+                       "features":  548,
+                       "transits":  61
+                   },
+    "structure_row_counts":  {
+                                 "inputs":  589052,
+                                 "nodes":  59129,
+                                 "events":  1381
+                             },
+    "terminal_hash":  "12950690102475184440",
+    "receipt_hash":  "15055696302269326776",
+    "contract_receipt_hash":  "7405947340816676095",
+    "isolation":  "unique_instance_tag_plus_single_writer_lock",
+    "visual_rendering":  false,
+    "research_logging":  true,
+    "unexpected_data_gaps":  0
+}

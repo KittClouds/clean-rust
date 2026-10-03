@@ -1,0 +1,157 @@
+{
+  "identity": "JEV-V08Q-R1-RESPONSE-PHENOTYPE-REPLICATION-RUN-V01",
+  "status": "SEALED_AUTHORIZED_FOR_PHASE_EXECUTION",
+  "parent_bindings": {
+    "q_source_lock": {
+      "path": "experiments/jev-information-density-v08q/contracts/q-source-lock-v02.json",
+      "sha256": "d6d70768242ac12801069e2bdb27cb976679c907206e81ae8c0921867bea2363",
+      "root_sha256": "5e973916fb62747cde2de51f7deb2e29616ea1ead13ce384dcdb254901d936d3"
+    },
+    "q_run_contract": {
+      "path": "experiments/jev-information-density-v08q/contracts/q-run-contract-v02.json",
+      "sha256": "5f6cd42b6de058a4fcdcbeb70b1939dbe944a6c973ee704a93148f9bea71d1ae"
+    },
+    "q_analysis_contract": {
+      "path": "experiments/jev-information-density-v08q/contracts/q-analysis-contract-v02.json",
+      "sha256": "b5c3c02b56405c0a471f82907bbb400dc4655c5fa8e82a32463dce77675e16cc"
+    },
+    "q_panel_contract": {
+      "path": "experiments/jev-information-density-v08q/contracts/q-panel-contract-v02.json",
+      "sha256": "a48bcce6389cab974aeed56d0358c3cff0d6e71324bbc1dd70954ba9be201811"
+    },
+    "q_executed_result_and_checkpoint_record": {
+      "path": "experiments/jev-information-density-v08q/Q-V08Q-RESULT-SUPPLEMENT-V01.md",
+      "sha256": "387d66bfe0617d721a17de4442a2079ef91dd8a1ba74fe725f1e0d5a7e1786f6",
+      "use": "confirm executed Q checkpoint set 40,80,100,120; not a training-data input"
+    },
+    "q_x1_rationale_only": {
+      "path": "experiments/jev-information-density-v08q/Q-X1-BOUNDARY-GEOMETRY-DIAGNOSTIC-V01.md",
+      "sha256": "34af0132bb9dee50a5f652fbe4b16673e2cf47219b6f05baf04452f8fa41f8a7",
+      "use": "measurement-design motivation only; no Q-X1 predictions, neighborhood rows, or output data are R1 inputs"
+    }
+  },
+  "question": "On a fresh-world panel under the unchanged four-arm Q treatment, how often do the already-registered same-seed response predicates recur, and what decision-state coordinates accompany each trajectory?",
+  "claim_boundary": "Fresh-world replication under the same four semantic families and fixed template/generator definitions; not novel-family or novel-template generalization.",
+  "arms": ["B-DUP", "B-MATCHED", "B-SHAM", "B-SHAM-LOW"],
+  "treatment": {
+    "only_change": "B-SHAM-LOW auxiliary event loss multiplier = 0.5",
+    "semantic_and_brier_terms_scaled": true,
+    "reduction": "sum weighted per-event contributions divided by unchanged total active event count",
+    "sham_and_sham_low_auxiliary_identity_manifest_must_be_byte_identical": true,
+    "no_dose_sweep_or_frequency_change": true
+  },
+  "paired_design": {
+    "seed_count": 12,
+    "seeds": [
+      77720160,
+      4245719435,
+      3815947415,
+      3112928194,
+      4241626823,
+      534474641,
+      3124582801,
+      4247677041,
+      811956520,
+      3972258,
+      950790373,
+      949206414
+    ],
+    "seed_derivation": {
+      "label_template": "jev-information-density-v08q-r1-run-v01/optimizer-seed/{index}",
+      "indices": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+      "operation": "SHA-256 of UTF-8 label; first four bytes unsigned little-endian",
+      "collision_policy": "all 12 outputs are unique and distinct from the three v0.8Q seeds; no outcome-dependent replacement"
+    },
+    "arms_per_seed": 4,
+    "runs": 48,
+    "same_seed_initialization_shared_across_arms": true,
+    "arm_execution_order": "rotate [B-DUP,B-MATCHED,B-SHAM,B-SHAM-LOW] left by seed index modulo four; execution order does not change event schedule",
+    "seed_scope": "12 observed paired trajectories; report n/12 descriptively and do not claim a universal population law"
+  },
+  "training_data_bindings": {
+    "common_primary_stream": "reuse the exact sealed v0.8Q common-primary-occurrence stream; 10000 occurrences; verify its source-lock bindings before use",
+    "auxiliary_sources": "reuse exact sealed v0.8Q B-DUP, B-MATCHED, and B-SHAM manifests; no new training examples",
+    "feature_sources": "reuse the exact sealed v0.8Q training-only state and candidate feature caches",
+    "exact_sources": [
+      {"role": "common-primary-occurrences", "path": "D:/codex-runs/jev-information-density-v08n/v0.8N-base-v01/phase-b-v03-inputs/common-primary-occurrence-manifest.jsonl", "sha256": "773119294a51aa46487de26f9f253355187a7bfd1e75cb2f258c307c86f10b06", "bytes": 6776884},
+      {"role": "B-DUP-auxiliary-events", "path": "D:/codex-runs/jev-information-density-v08n/v0.8N-base-v01/phase-b-v03-inputs/head-input-manifest-B-DUP.jsonl", "sha256": "f6f4ec519a04efeac02962c68c2d2d8ec92cf43d25bb9fd974f168e67c4d3b2b", "bytes": 13872634},
+      {"role": "B-MATCHED-auxiliary-events", "path": "D:/codex-runs/jev-information-density-v08n/v0.8N-base-v01/phase-b-v03-inputs/head-input-manifest-B-MATCHED.jsonl", "sha256": "bd38446c0328f8092dc3293090fd3041d7be5d53945df6f80fb3770244d87b0d", "bytes": 13942636},
+      {"role": "B-SHAM-auxiliary-events", "path": "D:/codex-runs/jev-information-density-v08n/v0.8N-base-v01/phase-b-v03-inputs/head-input-manifest-B-SHAM.jsonl", "sha256": "9dd346766856f56006be326c171e664dcbab23983cdd7501f480b6fabb6ff895", "bytes": 13867636},
+      {"role": "training-state-features", "path": "D:/codex-runs/jev-information-density-v08n/v0.8N-base-v01/shared-feature-cache/shared-training-features.pt", "sha256": "da946af90353c91c3b1298d2951eebc42b9f515708b628d3a053e700a960c4d6", "bytes": 450561952},
+      {"role": "candidate-semantic-features", "path": "D:/codex-runs/jev-information-density-v08n/v0.8N-base-v01/phase-b-run-v01/feature-cache/candidate-features.pt", "sha256": "3bb3036f455a83409361eb3e4150833bd8b255a2a783ec1218b00b12315c0590", "bytes": 394870}
+    ],
+    "evaluation_panel_is_not_a_training_input": true,
+    "training_source_parity_required": true
+  },
+  "frozen_training_basis": {
+    "head": "CompatibilityHead(2048, mlp, 128); 590081 trainable parameters",
+    "optimizer": {
+      "name": "AdamW",
+      "learning_rate": 0.002,
+      "weight_decay": 0.01,
+      "betas": [0.9, 0.999],
+      "epsilon": 1e-8,
+      "amsgrad": false
+    },
+    "base_objective": "cross entropy plus 0.25 multiclass Brier using frozen v0.5 row semantics",
+    "batch_size": 256,
+    "epochs": 3,
+    "steps_per_epoch": 40,
+    "total_steps": 120,
+    "precision": "FP32 head/features, autocast disabled, TF32 matmul disabled",
+    "scheduler": null,
+    "gradient_clipping": null,
+    "gradient_accumulation": null,
+    "early_stopping": false,
+    "extra_seeds_or_restarts": false,
+    "scientific_checkpoint_steps": [40, 80, 100, 120],
+    "scientific_checkpoints_per_run": 4,
+    "trained_checkpoints": 192,
+    "shared_initial_templates": 12,
+    "sealed_training_objects_total": 204,
+    "checkpoint_schedule_resolution": "R1's sole normative scientific checkpoint set is [40,80,100,120]. The inherited Q run-contract field describing 42 checkpoints including every step 81..120 is a historical contract inconsistency, is not normative R1 ancestry, and does not authorize those intermediate checkpoints. The bound executed Q result supplement is the precedence source. v0.8Q artifacts are not modified.",
+    "checkpoint_precedence": {
+      "normative_r1_scientific_checkpoint_steps": [40, 80, 100, 120],
+      "inherited_q_42_checkpoint_field": "historical inconsistency; non-normative for R1",
+      "authority_source": {
+        "path": "experiments/jev-information-density-v08q/Q-V08Q-RESULT-SUPPLEMENT-V01.md",
+        "sha256": "387d66bfe0617d721a17de4442a2079ef91dd8a1ba74fe725f1e0d5a7e1786f6",
+        "binding": "q_executed_result_and_checkpoint_record"
+      }
+    }
+  },
+  "schedule": {
+    "generation": "reuse the frozen v0.8Q schedule-generation algorithm with each R1 seed and the bound common primary stream",
+    "same_seed_schedule_shared_across_all_four_arms": true,
+    "event_ids_positions_weights_and_batch_boundaries_equal_across_arms_except_sham_low_multiplier": true,
+    "schedule_receipt_required_per_seed": true
+  },
+  "restart_semantics": {
+    "resume_only_from_hash_validated_latest_checkpoint_with_complete_prefix_and_rng_state": true,
+    "uncheckpointed_committed_optimizer_step": "terminal fail closed",
+    "corrupt_or_ambiguous_attempt": "preserve and stop; no reseed, replacement, or rescue run",
+    "evaluation_feedback_during_training": false
+  },
+  "evaluation_firewall": {
+    "all_48_runs_and_192_scientific_checkpoints_and_12_initial_templates_sealed_before_panel_open": true,
+    "panel_open_count": 1,
+    "complete_prediction_table_sealed_before_analysis": true,
+    "checkpoint_selection": false,
+    "intermediate_feedback": false,
+    "newtight_or_other_secondary_suite": false
+  },
+  "expected_evaluation": {
+    "cells": 204,
+    "neighborhoods_per_cell": 2000,
+    "views_per_neighborhood": 4,
+    "prediction_rows": 1632000
+  },
+  "authority": {
+    "panel_construction": true,
+    "model_contact": true,
+    "feature_extraction": true,
+    "head_initialization": true,
+    "training": true,
+    "evaluation": true
+  }
+}

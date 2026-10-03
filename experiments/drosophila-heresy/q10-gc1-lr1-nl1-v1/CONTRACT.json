@@ -1,0 +1,14 @@
+{
+  "final_gate": "SNAPSHOT_VERIFIED",
+  "historical_inputs_excluded": [
+    "q10-gc0-lr1-sall1-r2-v1 materialized measurements",
+    "q10-gc0-lr1-sall1-a1-v1 derived coverage",
+    "q10-gc0-lr1-pall1-v1 derived coverage",
+    "q10-gc0-lr1-sall1-a2-r1-v1 derived coverage"
+  ],
+  "identity": "q10-gc1-lr1-nl1-v1",
+  "mutation_policy": "source_read_only_snapshot_write_only",
+  "parent_binding_policy": "complete_current_parent_snapshot_before_replay",
+  "protocol": "Q10-GC1-LR1-NL1-FRESH-PARENT-SNAPSHOT",
+  "scope": "fresh_lineage_parent_snapshot_only"
+}

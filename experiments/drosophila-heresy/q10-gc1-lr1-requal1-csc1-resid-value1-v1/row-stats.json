@@ -1,0 +1,1009 @@
+{
+  "context": [
+    "seed9731-R-tau4.json",
+    3
+  ],
+  "rows": [
+    {
+      "away_value_count": 0,
+      "baseline_bits": 1089003827,
+      "baseline_value": 7.277490139007568,
+      "closest_value_bits": 1089003828,
+      "distance_pattern": "TOWARD_ONLY_NO_HIT",
+      "distinct_changed_values": 1,
+      "distinct_values_total": 2,
+      "equal_distance_value_count": 0,
+      "first_order_by_value": {
+        "1089003827": 1,
+        "1089003828": 2
+      },
+      "minimum_ulp_to_target": 1,
+      "numeric_side_pattern": "ONE_SIDED_NUMERIC",
+      "row": 133,
+      "target_bits": 1089003829,
+      "target_hit": false,
+      "target_value": 7.277491092681885,
+      "toward_value_count": 1,
+      "values_by_order": {
+        "1": [
+          1089003827
+        ],
+        "2": [
+          1089003827,
+          1089003828
+        ],
+        "3": [
+          1089003827,
+          1089003828
+        ]
+      }
+    },
+    {
+      "away_value_count": 1,
+      "baseline_bits": 1102179168,
+      "baseline_value": 22.23992919921875,
+      "closest_value_bits": 1102179168,
+      "distance_pattern": "AWAY_ONLY",
+      "distinct_changed_values": 1,
+      "distinct_values_total": 2,
+      "equal_distance_value_count": 0,
+      "first_order_by_value": {
+        "1102179167": 2,
+        "1102179168": 1
+      },
+      "minimum_ulp_to_target": 2,
+      "numeric_side_pattern": "ONE_SIDED_NUMERIC",
+      "row": 157,
+      "target_bits": 1102179170,
+      "target_hit": false,
+      "target_value": 22.239933013916016,
+      "toward_value_count": 0,
+      "values_by_order": {
+        "1": [
+          1102179168
+        ],
+        "2": [
+          1102179167,
+          1102179168
+        ],
+        "3": [
+          1102179167,
+          1102179168
+        ]
+      }
+    },
+    {
+      "away_value_count": 0,
+      "baseline_bits": 1079707630,
+      "baseline_value": 3.422358989715576,
+      "closest_value_bits": 1079707630,
+      "distance_pattern": "DISTANCE_PLATEAU",
+      "distinct_changed_values": 1,
+      "distinct_values_total": 2,
+      "equal_distance_value_count": 1,
+      "first_order_by_value": {
+        "1079707630": 1,
+        "1079707632": 2
+      },
+      "minimum_ulp_to_target": 1,
+      "numeric_side_pattern": "ONE_SIDED_NUMERIC",
+      "row": 188,
+      "target_bits": 1079707631,
+      "target_hit": false,
+      "target_value": 3.4223592281341553,
+      "toward_value_count": 0,
+      "values_by_order": {
+        "1": [
+          1079707630
+        ],
+        "2": [
+          1079707630,
+          1079707632
+        ],
+        "3": [
+          1079707630,
+          1079707632
+        ]
+      }
+    },
+    {
+      "away_value_count": 2,
+      "baseline_bits": 1082853850,
+      "baseline_value": 4.344952583312988,
+      "closest_value_bits": 1082853850,
+      "distance_pattern": "AWAY_ONLY",
+      "distinct_changed_values": 2,
+      "distinct_values_total": 3,
+      "equal_distance_value_count": 0,
+      "first_order_by_value": {
+        "1082853850": 1,
+        "1082853851": 3,
+        "1082853852": 3
+      },
+      "minimum_ulp_to_target": 1,
+      "numeric_side_pattern": "ONE_SIDED_NUMERIC",
+      "row": 205,
+      "target_bits": 1082853849,
+      "target_hit": false,
+      "target_value": 4.34495210647583,
+      "toward_value_count": 0,
+      "values_by_order": {
+        "1": [
+          1082853850
+        ],
+        "2": [
+          1082853850
+        ],
+        "3": [
+          1082853850,
+          1082853851,
+          1082853852
+        ]
+      }
+    },
+    {
+      "away_value_count": 1,
+      "baseline_bits": 1087324886,
+      "baseline_value": 6.4769086837768555,
+      "closest_value_bits": 1087324886,
+      "distance_pattern": "AWAY_ONLY",
+      "distinct_changed_values": 1,
+      "distinct_values_total": 2,
+      "equal_distance_value_count": 0,
+      "first_order_by_value": {
+        "1087324886": 1,
+        "1087324888": 3
+      },
+      "minimum_ulp_to_target": 1,
+      "numeric_side_pattern": "ONE_SIDED_NUMERIC",
+      "row": 238,
+      "target_bits": 1087324885,
+      "target_hit": false,
+      "target_value": 6.476908206939697,
+      "toward_value_count": 0,
+      "values_by_order": {
+        "1": [
+          1087324886
+        ],
+        "2": [
+          1087324886
+        ],
+        "3": [
+          1087324886,
+          1087324888
+        ]
+      }
+    },
+    {
+      "away_value_count": 1,
+      "baseline_bits": 1104493856,
+      "baseline_value": 26.65484619140625,
+      "closest_value_bits": 1104493856,
+      "distance_pattern": "AWAY_ONLY",
+      "distinct_changed_values": 1,
+      "distinct_values_total": 2,
+      "equal_distance_value_count": 0,
+      "first_order_by_value": {
+        "1104493855": 2,
+        "1104493856": 1
+      },
+      "minimum_ulp_to_target": 1,
+      "numeric_side_pattern": "ONE_SIDED_NUMERIC",
+      "row": 294,
+      "target_bits": 1104493857,
+      "target_hit": false,
+      "target_value": 26.654848098754883,
+      "toward_value_count": 0,
+      "values_by_order": {
+        "1": [
+          1104493856
+        ],
+        "2": [
+          1104493855,
+          1104493856
+        ],
+        "3": [
+          1104493855,
+          1104493856
+        ]
+      }
+    },
+    {
+      "away_value_count": 0,
+      "baseline_bits": 1086630371,
+      "baseline_value": 6.145738124847412,
+      "closest_value_bits": 1086630371,
+      "distance_pattern": "DISTANCE_PLATEAU",
+      "distinct_changed_values": 1,
+      "distinct_values_total": 2,
+      "equal_distance_value_count": 1,
+      "first_order_by_value": {
+        "1086630371": 1,
+        "1086630373": 2
+      },
+      "minimum_ulp_to_target": 1,
+      "numeric_side_pattern": "ONE_SIDED_NUMERIC",
+      "row": 322,
+      "target_bits": 1086630372,
+      "target_hit": false,
+      "target_value": 6.14573860168457,
+      "toward_value_count": 0,
+      "values_by_order": {
+        "1": [
+          1086630371
+        ],
+        "2": [
+          1086630371,
+          1086630373
+        ],
+        "3": [
+          1086630371,
+          1086630373
+        ]
+      }
+    },
+    {
+      "away_value_count": 1,
+      "baseline_bits": 1094633065,
+      "baseline_value": 11.923439979553223,
+      "closest_value_bits": 1094633065,
+      "distance_pattern": "AWAY_ONLY",
+      "distinct_changed_values": 1,
+      "distinct_values_total": 2,
+      "equal_distance_value_count": 0,
+      "first_order_by_value": {
+        "1094633063": 2,
+        "1094633065": 1
+      },
+      "minimum_ulp_to_target": 1,
+      "numeric_side_pattern": "ONE_SIDED_NUMERIC",
+      "row": 34,
+      "target_bits": 1094633066,
+      "target_hit": false,
+      "target_value": 11.923440933227539,
+      "toward_value_count": 0,
+      "values_by_order": {
+        "1": [
+          1094633065
+        ],
+        "2": [
+          1094633063,
+          1094633065
+        ],
+        "3": [
+          1094633063,
+          1094633065
+        ]
+      }
+    },
+    {
+      "away_value_count": 0,
+      "baseline_bits": 1096624833,
+      "baseline_value": 13.822937965393066,
+      "closest_value_bits": 1096624831,
+      "distance_pattern": "TOWARD_ONLY_NO_HIT",
+      "distinct_changed_values": 2,
+      "distinct_values_total": 3,
+      "equal_distance_value_count": 0,
+      "first_order_by_value": {
+        "1096624831": 3,
+        "1096624832": 2,
+        "1096624833": 1
+      },
+      "minimum_ulp_to_target": 1,
+      "numeric_side_pattern": "ONE_SIDED_NUMERIC",
+      "row": 345,
+      "target_bits": 1096624830,
+      "target_hit": false,
+      "target_value": 13.822935104370117,
+      "toward_value_count": 2,
+      "values_by_order": {
+        "1": [
+          1096624833
+        ],
+        "2": [
+          1096624832,
+          1096624833
+        ],
+        "3": [
+          1096624831,
+          1096624832,
+          1096624833
+        ]
+      }
+    },
+    {
+      "away_value_count": 1,
+      "baseline_bits": 1094542230,
+      "baseline_value": 11.836812973022461,
+      "closest_value_bits": 1094542230,
+      "distance_pattern": "AWAY_ONLY",
+      "distinct_changed_values": 1,
+      "distinct_values_total": 2,
+      "equal_distance_value_count": 0,
+      "first_order_by_value": {
+        "1094542230": 1,
+        "1094542231": 1
+      },
+      "minimum_ulp_to_target": 1,
+      "numeric_side_pattern": "ONE_SIDED_NUMERIC",
+      "row": 381,
+      "target_bits": 1094542229,
+      "target_hit": false,
+      "target_value": 11.836812019348145,
+      "toward_value_count": 0,
+      "values_by_order": {
+        "1": [
+          1094542230,
+          1094542231
+        ],
+        "2": [
+          1094542230,
+          1094542231
+        ],
+        "3": [
+          1094542230,
+          1094542231
+        ]
+      }
+    },
+    {
+      "away_value_count": 1,
+      "baseline_bits": 1097350365,
+      "baseline_value": 14.514859199523926,
+      "closest_value_bits": 1097350366,
+      "distance_pattern": "MIXED_DISTANCE",
+      "distinct_changed_values": 2,
+      "distinct_values_total": 3,
+      "equal_distance_value_count": 0,
+      "first_order_by_value": {
+        "1097350364": 3,
+        "1097350365": 1,
+        "1097350366": 2
+      },
+      "minimum_ulp_to_target": 1,
+      "numeric_side_pattern": "ONE_SIDED_NUMERIC",
+      "row": 394,
+      "target_bits": 1097350367,
+      "target_hit": false,
+      "target_value": 14.514861106872559,
+      "toward_value_count": 1,
+      "values_by_order": {
+        "1": [
+          1097350365
+        ],
+        "2": [
+          1097350365,
+          1097350366
+        ],
+        "3": [
+          1097350364,
+          1097350365,
+          1097350366
+        ]
+      }
+    },
+    {
+      "away_value_count": 0,
+      "baseline_bits": 1100833816,
+      "baseline_value": 19.673873901367188,
+      "closest_value_bits": 1100833817,
+      "distance_pattern": "TOWARD_ONLY_NO_HIT",
+      "distinct_changed_values": 1,
+      "distinct_values_total": 2,
+      "equal_distance_value_count": 0,
+      "first_order_by_value": {
+        "1100833816": 1,
+        "1100833817": 2
+      },
+      "minimum_ulp_to_target": 1,
+      "numeric_side_pattern": "ONE_SIDED_NUMERIC",
+      "row": 430,
+      "target_bits": 1100833818,
+      "target_hit": false,
+      "target_value": 19.673877716064453,
+      "toward_value_count": 1,
+      "values_by_order": {
+        "1": [
+          1100833816
+        ],
+        "2": [
+          1100833816,
+          1100833817
+        ],
+        "3": [
+          1100833816,
+          1100833817
+        ]
+      }
+    },
+    {
+      "away_value_count": 0,
+      "baseline_bits": 1100787990,
+      "baseline_value": 19.586467742919922,
+      "closest_value_bits": 1100787988,
+      "distance_pattern": "TOWARD_ONLY_NO_HIT",
+      "distinct_changed_values": 2,
+      "distinct_values_total": 3,
+      "equal_distance_value_count": 0,
+      "first_order_by_value": {
+        "1100787988": 2,
+        "1100787989": 2,
+        "1100787990": 1
+      },
+      "minimum_ulp_to_target": 1,
+      "numeric_side_pattern": "ONE_SIDED_NUMERIC",
+      "row": 477,
+      "target_bits": 1100787987,
+      "target_hit": false,
+      "target_value": 19.586462020874023,
+      "toward_value_count": 2,
+      "values_by_order": {
+        "1": [
+          1100787990
+        ],
+        "2": [
+          1100787988,
+          1100787989,
+          1100787990
+        ],
+        "3": [
+          1100787988,
+          1100787989,
+          1100787990
+        ]
+      }
+    },
+    {
+      "away_value_count": 0,
+      "baseline_bits": 1107369404,
+      "baseline_value": 32.27903747558594,
+      "closest_value_bits": 1107369405,
+      "distance_pattern": "TOWARD_ONLY_NO_HIT",
+      "distinct_changed_values": 1,
+      "distinct_values_total": 2,
+      "equal_distance_value_count": 0,
+      "first_order_by_value": {
+        "1107369404": 1,
+        "1107369405": 2
+      },
+      "minimum_ulp_to_target": 1,
+      "numeric_side_pattern": "ONE_SIDED_NUMERIC",
+      "row": 496,
+      "target_bits": 1107369406,
+      "target_hit": false,
+      "target_value": 32.27904510498047,
+      "toward_value_count": 1,
+      "values_by_order": {
+        "1": [
+          1107369404
+        ],
+        "2": [
+          1107369404,
+          1107369405
+        ],
+        "3": [
+          1107369404,
+          1107369405
+        ]
+      }
+    },
+    {
+      "away_value_count": 1,
+      "baseline_bits": 1084022881,
+      "baseline_value": 4.902390003204346,
+      "closest_value_bits": 1084022881,
+      "distance_pattern": "AWAY_ONLY",
+      "distinct_changed_values": 1,
+      "distinct_values_total": 2,
+      "equal_distance_value_count": 0,
+      "first_order_by_value": {
+        "1084022880": 2,
+        "1084022881": 1
+      },
+      "minimum_ulp_to_target": 1,
+      "numeric_side_pattern": "ONE_SIDED_NUMERIC",
+      "row": 501,
+      "target_bits": 1084022882,
+      "target_hit": false,
+      "target_value": 4.902390480041504,
+      "toward_value_count": 0,
+      "values_by_order": {
+        "1": [
+          1084022881
+        ],
+        "2": [
+          1084022880,
+          1084022881
+        ],
+        "3": [
+          1084022880,
+          1084022881
+        ]
+      }
+    },
+    {
+      "away_value_count": 1,
+      "baseline_bits": 1087531328,
+      "baseline_value": 6.575347900390625,
+      "closest_value_bits": 1087531328,
+      "distance_pattern": "AWAY_ONLY",
+      "distinct_changed_values": 1,
+      "distinct_values_total": 2,
+      "equal_distance_value_count": 0,
+      "first_order_by_value": {
+        "1087531328": 1,
+        "1087531329": 2
+      },
+      "minimum_ulp_to_target": 2,
+      "numeric_side_pattern": "ONE_SIDED_NUMERIC",
+      "row": 507,
+      "target_bits": 1087531326,
+      "target_hit": false,
+      "target_value": 6.575346946716309,
+      "toward_value_count": 0,
+      "values_by_order": {
+        "1": [
+          1087531328
+        ],
+        "2": [
+          1087531328,
+          1087531329
+        ],
+        "3": [
+          1087531328,
+          1087531329
+        ]
+      }
+    },
+    {
+      "away_value_count": 0,
+      "baseline_bits": 1087287384,
+      "baseline_value": 6.459026336669922,
+      "closest_value_bits": 1087287386,
+      "distance_pattern": "TOWARD_ONLY_NO_HIT",
+      "distinct_changed_values": 2,
+      "distinct_values_total": 3,
+      "equal_distance_value_count": 0,
+      "first_order_by_value": {
+        "1087287384": 1,
+        "1087287385": 2,
+        "1087287386": 2
+      },
+      "minimum_ulp_to_target": 1,
+      "numeric_side_pattern": "ONE_SIDED_NUMERIC",
+      "row": 537,
+      "target_bits": 1087287387,
+      "target_hit": false,
+      "target_value": 6.4590277671813965,
+      "toward_value_count": 2,
+      "values_by_order": {
+        "1": [
+          1087287384
+        ],
+        "2": [
+          1087287384,
+          1087287385,
+          1087287386
+        ],
+        "3": [
+          1087287384,
+          1087287385,
+          1087287386
+        ]
+      }
+    },
+    {
+      "away_value_count": 0,
+      "baseline_bits": 1084871232,
+      "baseline_value": 5.306915283203125,
+      "closest_value_bits": 1084871233,
+      "distance_pattern": "TOWARD_ONLY_NO_HIT",
+      "distinct_changed_values": 1,
+      "distinct_values_total": 2,
+      "equal_distance_value_count": 0,
+      "first_order_by_value": {
+        "1084871232": 1,
+        "1084871233": 1
+      },
+      "minimum_ulp_to_target": 1,
+      "numeric_side_pattern": "ONE_SIDED_NUMERIC",
+      "row": 54,
+      "target_bits": 1084871234,
+      "target_hit": false,
+      "target_value": 5.306916236877441,
+      "toward_value_count": 1,
+      "values_by_order": {
+        "1": [
+          1084871232,
+          1084871233
+        ],
+        "2": [
+          1084871232,
+          1084871233
+        ],
+        "3": [
+          1084871232,
+          1084871233
+        ]
+      }
+    },
+    {
+      "away_value_count": 1,
+      "baseline_bits": 1098714941,
+      "baseline_value": 15.8162202835083,
+      "closest_value_bits": 1098714941,
+      "distance_pattern": "AWAY_ONLY",
+      "distinct_changed_values": 1,
+      "distinct_values_total": 2,
+      "equal_distance_value_count": 0,
+      "first_order_by_value": {
+        "1098714941": 1,
+        "1098714942": 2
+      },
+      "minimum_ulp_to_target": 2,
+      "numeric_side_pattern": "ONE_SIDED_NUMERIC",
+      "row": 574,
+      "target_bits": 1098714939,
+      "target_hit": false,
+      "target_value": 15.816218376159668,
+      "toward_value_count": 0,
+      "values_by_order": {
+        "1": [
+          1098714941
+        ],
+        "2": [
+          1098714941,
+          1098714942
+        ],
+        "3": [
+          1098714941,
+          1098714942
+        ]
+      }
+    },
+    {
+      "away_value_count": 2,
+      "baseline_bits": 1090077390,
+      "baseline_value": 7.78940486907959,
+      "closest_value_bits": 1090077390,
+      "distance_pattern": "AWAY_ONLY",
+      "distinct_changed_values": 2,
+      "distinct_values_total": 3,
+      "equal_distance_value_count": 0,
+      "first_order_by_value": {
+        "1090077390": 1,
+        "1090077391": 2,
+        "1090077392": 2
+      },
+      "minimum_ulp_to_target": 1,
+      "numeric_side_pattern": "ONE_SIDED_NUMERIC",
+      "row": 585,
+      "target_bits": 1090077389,
+      "target_hit": false,
+      "target_value": 7.789404392242432,
+      "toward_value_count": 0,
+      "values_by_order": {
+        "1": [
+          1090077390
+        ],
+        "2": [
+          1090077390,
+          1090077391,
+          1090077392
+        ],
+        "3": [
+          1090077390,
+          1090077391,
+          1090077392
+        ]
+      }
+    },
+    {
+      "away_value_count": 0,
+      "baseline_bits": 1096192773,
+      "baseline_value": 13.410893440246582,
+      "closest_value_bits": 1096192771,
+      "distance_pattern": "TOWARD_ONLY_NO_HIT",
+      "distinct_changed_values": 2,
+      "distinct_values_total": 3,
+      "equal_distance_value_count": 0,
+      "first_order_by_value": {
+        "1096192771": 3,
+        "1096192772": 3,
+        "1096192773": 1
+      },
+      "minimum_ulp_to_target": 2,
+      "numeric_side_pattern": "ONE_SIDED_NUMERIC",
+      "row": 586,
+      "target_bits": 1096192769,
+      "target_hit": false,
+      "target_value": 13.410889625549316,
+      "toward_value_count": 2,
+      "values_by_order": {
+        "1": [
+          1096192773
+        ],
+        "2": [
+          1096192773
+        ],
+        "3": [
+          1096192771,
+          1096192772,
+          1096192773
+        ]
+      }
+    },
+    {
+      "away_value_count": 1,
+      "baseline_bits": 1095774870,
+      "baseline_value": 13.012350082397461,
+      "closest_value_bits": 1095774870,
+      "distance_pattern": "AWAY_ONLY",
+      "distinct_changed_values": 1,
+      "distinct_values_total": 2,
+      "equal_distance_value_count": 0,
+      "first_order_by_value": {
+        "1095774870": 1,
+        "1095774871": 1
+      },
+      "minimum_ulp_to_target": 1,
+      "numeric_side_pattern": "ONE_SIDED_NUMERIC",
+      "row": 675,
+      "target_bits": 1095774869,
+      "target_hit": false,
+      "target_value": 13.012349128723145,
+      "toward_value_count": 0,
+      "values_by_order": {
+        "1": [
+          1095774870,
+          1095774871
+        ],
+        "2": [
+          1095774870,
+          1095774871
+        ],
+        "3": [
+          1095774870,
+          1095774871
+        ]
+      }
+    },
+    {
+      "away_value_count": 1,
+      "baseline_bits": 1103757537,
+      "baseline_value": 25.250429153442383,
+      "closest_value_bits": 1103757537,
+      "distance_pattern": "AWAY_ONLY",
+      "distinct_changed_values": 1,
+      "distinct_values_total": 2,
+      "equal_distance_value_count": 0,
+      "first_order_by_value": {
+        "1103757537": 1,
+        "1103757538": 3
+      },
+      "minimum_ulp_to_target": 1,
+      "numeric_side_pattern": "ONE_SIDED_NUMERIC",
+      "row": 695,
+      "target_bits": 1103757536,
+      "target_hit": false,
+      "target_value": 25.25042724609375,
+      "toward_value_count": 0,
+      "values_by_order": {
+        "1": [
+          1103757537
+        ],
+        "2": [
+          1103757537
+        ],
+        "3": [
+          1103757537,
+          1103757538
+        ]
+      }
+    },
+    {
+      "away_value_count": 1,
+      "baseline_bits": 1105173708,
+      "baseline_value": 27.951560974121094,
+      "closest_value_bits": 1105173708,
+      "distance_pattern": "AWAY_ONLY",
+      "distinct_changed_values": 1,
+      "distinct_values_total": 2,
+      "equal_distance_value_count": 0,
+      "first_order_by_value": {
+        "1105173708": 1,
+        "1105173709": 2
+      },
+      "minimum_ulp_to_target": 1,
+      "numeric_side_pattern": "ONE_SIDED_NUMERIC",
+      "row": 697,
+      "target_bits": 1105173707,
+      "target_hit": false,
+      "target_value": 27.95155906677246,
+      "toward_value_count": 0,
+      "values_by_order": {
+        "1": [
+          1105173708
+        ],
+        "2": [
+          1105173708,
+          1105173709
+        ],
+        "3": [
+          1105173708,
+          1105173709
+        ]
+      }
+    },
+    {
+      "away_value_count": 1,
+      "baseline_bits": 1106850479,
+      "baseline_value": 31.149747848510742,
+      "closest_value_bits": 1106850479,
+      "distance_pattern": "AWAY_ONLY",
+      "distinct_changed_values": 1,
+      "distinct_values_total": 2,
+      "equal_distance_value_count": 0,
+      "first_order_by_value": {
+        "1106850478": 1,
+        "1106850479": 1
+      },
+      "minimum_ulp_to_target": 2,
+      "numeric_side_pattern": "ONE_SIDED_NUMERIC",
+      "row": 724,
+      "target_bits": 1106850481,
+      "target_hit": false,
+      "target_value": 31.149751663208008,
+      "toward_value_count": 0,
+      "values_by_order": {
+        "1": [
+          1106850478,
+          1106850479
+        ],
+        "2": [
+          1106850478,
+          1106850479
+        ],
+        "3": [
+          1106850478,
+          1106850479
+        ]
+      }
+    },
+    {
+      "away_value_count": 1,
+      "baseline_bits": 1103091532,
+      "baseline_value": 23.980125427246094,
+      "closest_value_bits": 1103091532,
+      "distance_pattern": "AWAY_ONLY",
+      "distinct_changed_values": 1,
+      "distinct_values_total": 2,
+      "equal_distance_value_count": 0,
+      "first_order_by_value": {
+        "1103091531": 3,
+        "1103091532": 1
+      },
+      "minimum_ulp_to_target": 1,
+      "numeric_side_pattern": "ONE_SIDED_NUMERIC",
+      "row": 737,
+      "target_bits": 1103091533,
+      "target_hit": false,
+      "target_value": 23.980127334594727,
+      "toward_value_count": 0,
+      "values_by_order": {
+        "1": [
+          1103091532
+        ],
+        "2": [
+          1103091532
+        ],
+        "3": [
+          1103091531,
+          1103091532
+        ]
+      }
+    },
+    {
+      "away_value_count": 1,
+      "baseline_bits": 1105686606,
+      "baseline_value": 28.92983627319336,
+      "closest_value_bits": 1105686606,
+      "distance_pattern": "AWAY_ONLY",
+      "distinct_changed_values": 1,
+      "distinct_values_total": 2,
+      "equal_distance_value_count": 0,
+      "first_order_by_value": {
+        "1105686606": 1,
+        "1105686607": 2
+      },
+      "minimum_ulp_to_target": 1,
+      "numeric_side_pattern": "ONE_SIDED_NUMERIC",
+      "row": 746,
+      "target_bits": 1105686605,
+      "target_hit": false,
+      "target_value": 28.929834365844727,
+      "toward_value_count": 0,
+      "values_by_order": {
+        "1": [
+          1105686606
+        ],
+        "2": [
+          1105686606,
+          1105686607
+        ],
+        "3": [
+          1105686606,
+          1105686607
+        ]
+      }
+    },
+    {
+      "away_value_count": 1,
+      "baseline_bits": 1101518285,
+      "baseline_value": 20.979394912719727,
+      "closest_value_bits": 1101518285,
+      "distance_pattern": "AWAY_ONLY",
+      "distinct_changed_values": 1,
+      "distinct_values_total": 2,
+      "equal_distance_value_count": 0,
+      "first_order_by_value": {
+        "1101518284": 3,
+        "1101518285": 1
+      },
+      "minimum_ulp_to_target": 1,
+      "numeric_side_pattern": "ONE_SIDED_NUMERIC",
+      "row": 747,
+      "target_bits": 1101518286,
+      "target_hit": false,
+      "target_value": 20.97939682006836,
+      "toward_value_count": 0,
+      "values_by_order": {
+        "1": [
+          1101518285
+        ],
+        "2": [
+          1101518285
+        ],
+        "3": [
+          1101518284,
+          1101518285
+        ]
+      }
+    },
+    {
+      "away_value_count": 1,
+      "baseline_bits": 1078050486,
+      "baseline_value": 3.0272650718688965,
+      "closest_value_bits": 1078050486,
+      "distance_pattern": "AWAY_ONLY",
+      "distinct_changed_values": 1,
+      "distinct_values_total": 2,
+      "equal_distance_value_count": 0,
+      "first_order_by_value": {
+        "1078050486": 1,
+        "1078050487": 2
+      },
+      "minimum_ulp_to_target": 1,
+      "numeric_side_pattern": "ONE_SIDED_NUMERIC",
+      "row": 768,
+      "target_bits": 1078050485,
+      "target_hit": false,
+      "target_value": 3.0272648334503174,
+      "toward_value_count": 0,
+      "values_by_order": {
+        "1": [
+          1078050486
+        ],
+        "2": [
+          1078050486,
+          1078050487
+        ],
+        "3": [
+          1078050486,
+          1078050487
+        ]
+      }
+    }
+  ]
+}

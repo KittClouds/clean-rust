@@ -1,0 +1,31 @@
+{
+  "receipt_schema": "OBS_OPEN_CLOCK_PROBE_ADMISSION_V1",
+  "scope": "CURRENT_LIVE_INSTANT_ONLY",
+  "probe_source_sha256": "f84609aef63cedab7c486e653adda9485936b2e551d2c6239fa381765dc7dcde",
+  "probe_compiled_sha256": "267f513ec3c7f3966aef7d8acbd614a95040af76c450d162b0656e6ab7aa46c9",
+  "probe_output_sha256": "f8186f3948521a4653c84ebc0979a50fb6a0085b5edf3aa8b191af1c97dc941e",
+  "execution_mode": "LIVE_DEBUG_SCRIPT",
+  "source_symbol": "US30",
+  "source_server_id": "MetaQuotes-Demo",
+  "terminal_build": 6106,
+  "observation": {
+    "source_time": "2026-08-14T14:04:47+03:00",
+    "utc_time": "2026-08-14T11:04:47Z",
+    "new_york_time": "2026-08-14T07:04:47-04:00",
+    "source_utc_offset_seconds": 10800,
+    "new_york_utc_offset_seconds": -14400,
+    "source_minus_new_york_seconds": 25200
+  },
+  "current_mapping": {
+    "new_york_open": "09:30:00",
+    "source_open": "16:30:00",
+    "new_york_horizon_end": "16:00:00",
+    "source_horizon_end": "23:00:00"
+  },
+  "instrument_default_start_status": "NOT_ADMITTED_FOR_OBS_OPEN_01",
+  "instrument_default_start_reason": "The candidate source default is 09:30 broker time; the admitted civil target is 09:30 America/New_York, which mapped to 16:30 broker time at this observed instant.",
+  "historical_offset_authority": "NOT_ESTABLISHED",
+  "historical_session_admission": "BLOCKED",
+  "economic_authority": false,
+  "trading_authority": false
+}

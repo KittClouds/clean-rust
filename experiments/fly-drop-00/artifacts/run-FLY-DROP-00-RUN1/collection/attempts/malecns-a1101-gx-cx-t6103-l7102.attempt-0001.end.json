@@ -1,0 +1,8 @@
+{
+  "attempt": 1,
+  "finished_unix_ms": 1790019925475,
+  "fit_id": "malecns-a1101-gx-cx-t6103-l7102",
+  "receipt_path": "experiments/fly-drop-00/artifacts/run-FLY-DROP-00-RUN1\\collection\\fit-receipts\\malecns-a1101-gx-cx-t6103-l7102.attempt-0001.json",
+  "receipt_sha256": "e9f585c45f31dacb094f0ae09a3653d706b0db15cfe8a371d9515625d4eda167",
+  "status": "complete"
+}

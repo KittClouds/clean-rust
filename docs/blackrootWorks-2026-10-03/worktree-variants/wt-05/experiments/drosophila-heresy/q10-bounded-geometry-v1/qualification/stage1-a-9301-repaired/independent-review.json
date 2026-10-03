@@ -1,0 +1,12 @@
+{
+  "status": "VERIFIED",
+  "stage": "stage1-a",
+  "new_audited_states": 1024,
+  "cumulative_audited_states": 1024,
+  "event_statuses": [
+    "Q10_STAGE1_VALID__BOUNDED_FREEDOM_PRESENT",
+    "Q10_STAGE1_VALID__BOX_CONSTRAINT_DOMINATED"
+  ],
+  "replay": "VERIFIED_BY_NUMPY",
+  "behavioral_inference": false
+}

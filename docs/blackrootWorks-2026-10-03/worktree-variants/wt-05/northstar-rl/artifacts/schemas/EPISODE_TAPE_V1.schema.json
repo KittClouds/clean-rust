@@ -1,0 +1,128 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "EpisodeTape",
+  "type": "object",
+  "properties": {
+    "content_hash": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "episode_spec_id": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "episodes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Episode"
+      }
+    },
+    "runraw_tape_id": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "schema_version": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "runraw_tape_id",
+    "episode_spec_id",
+    "episodes",
+    "content_hash"
+  ],
+  "$defs": {
+    "Digest256": {
+      "description": "Domain-separated BLAKE3 digest",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "Episode": {
+      "type": "object",
+      "properties": {
+        "action_spec_id": {
+          "$ref": "#/$defs/Digest256"
+        },
+        "actionable_rows": {
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        },
+        "content_hash": {
+          "$ref": "#/$defs/Digest256"
+        },
+        "end_time": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "episode_id": {
+          "$ref": "#/$defs/Digest256"
+        },
+        "execution_spec_id": {
+          "$ref": "#/$defs/Digest256"
+        },
+        "first_actionable_row": {
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        },
+        "first_source_row": {
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        },
+        "initial_account_state_id": {
+          "$ref": "#/$defs/Digest256"
+        },
+        "instrument_id": {
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0
+        },
+        "last_source_row": {
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        },
+        "observation_spec_id": {
+          "$ref": "#/$defs/Digest256"
+        },
+        "reward_spec_id": {
+          "$ref": "#/$defs/Digest256"
+        },
+        "source_identity": {
+          "$ref": "#/$defs/Digest256"
+        },
+        "start_time": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "termination_contract_id": {
+          "$ref": "#/$defs/Digest256"
+        },
+        "warmup_rows": {
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "episode_id",
+        "instrument_id",
+        "first_source_row",
+        "last_source_row",
+        "first_actionable_row",
+        "start_time",
+        "end_time",
+        "warmup_rows",
+        "actionable_rows",
+        "initial_account_state_id",
+        "observation_spec_id",
+        "action_spec_id",
+        "execution_spec_id",
+        "reward_spec_id",
+        "termination_contract_id",
+        "source_identity",
+        "content_hash"
+      ]
+    }
+  }
+}

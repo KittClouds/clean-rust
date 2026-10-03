@@ -1,0 +1,18 @@
+{
+  "schema": "FLY-REACH-03-qualification-collection-receipt-v2",
+  "status": "COLLECTION_COMPLETE",
+  "run_id": "qualification-v2",
+  "qualification_only": true,
+  "native_only": true,
+  "cells": 72,
+  "rows": 37748736,
+  "trials": 589824,
+  "expected_rows": 37748736,
+  "expected_trials": 589824,
+  "f4_physical_encoding": "deterministic_replay_descriptor_v1",
+  "terminal_descriptors": 72,
+  "derived_from": "qualification-v1 rows copied without mutation; terminal descriptors added in fresh identity",
+  "estimators_fit": false,
+  "measured_namespace_created": false,
+  "scientific_execution_started": false
+}

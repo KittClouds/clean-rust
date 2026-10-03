@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "InstrumentContract",
+  "type": "object",
+  "properties": {
+    "account_currency": {
+      "type": "string"
+    },
+    "contract_size": {
+      "type": "number",
+      "format": "double"
+    },
+    "conversion_rule": {
+      "type": "string"
+    },
+    "instrument_contract_id": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "instrument_id": {
+      "type": "integer",
+      "format": "uint32",
+      "minimum": 0
+    },
+    "maximum_quantity": {
+      "type": "number",
+      "format": "double"
+    },
+    "minimum_quantity": {
+      "type": "number",
+      "format": "double"
+    },
+    "price_precision": {
+      "type": "integer",
+      "format": "uint8",
+      "maximum": 255,
+      "minimum": 0
+    },
+    "quantity_step": {
+      "type": "number",
+      "format": "double"
+    },
+    "quote_currency": {
+      "type": "string"
+    },
+    "schema_version": {
+      "type": "string"
+    },
+    "tick_size": {
+      "type": "number",
+      "format": "double"
+    },
+    "tick_value": {
+      "type": "number",
+      "format": "double"
+    }
+  },
+  "required": [
+    "schema_version",
+    "instrument_contract_id",
+    "instrument_id",
+    "price_precision",
+    "tick_size",
+    "tick_value",
+    "contract_size",
+    "quantity_step",
+    "minimum_quantity",
+    "maximum_quantity",
+    "quote_currency",
+    "account_currency",
+    "conversion_rule"
+  ],
+  "$defs": {
+    "Digest256": {
+      "description": "Domain-separated BLAKE3 digest",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

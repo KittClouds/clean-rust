@@ -1,0 +1,15 @@
+{
+  "supersession_id": "FAS00_PHASE2A_EXECUTOR_V02_SUPERSESSION",
+  "project_id": "fas-frozen-adaptive-substrate-v00",
+  "supersedes_executor": "phase2a-execution-v01",
+  "superseded_executor_source_root_sha256": "07df89436b7a2b554dfac6ec38257bdad118a368f11b2f64351d35dafde1ec25",
+  "reason": "Executor v01 launched powershell.exe, which resolved to Windows PowerShell 5.1. The unchanged sealed parent scripts require .NET System.IO.Path.GetRelativePath and therefore failed under that host. Executor v02 prefers PowerShell 7 for seal verification.",
+  "failure_disposition": "FAIL_CLOSED_BEFORE_CORPUS_PROJECTION_AND_MODEL_CONTACT",
+  "model_download_performed": false,
+  "model_load_performed": false,
+  "feature_cache_created": false,
+  "phase1_corpus_modified": false,
+  "phase0_or_phase1_seals_modified": false,
+  "phase2a_paperwork_seal_modified": false,
+  "supersession_scope": "Executor host selection only; no scientific protocol, dataset, input, tokenizer, feature, or threshold changes."
+}

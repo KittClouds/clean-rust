@@ -1,0 +1,40 @@
+{
+  "protocol": "jev-decision-data-information-density/v0.8c-phase2c-independent-validation-v02",
+  "status": "frozen_before_independent_validation",
+  "purpose": "rerun raw-record validation of the immutable RM100 provisional candidate after correcting the v01 Eval manifest mapping/set mismatch; candidate construction and search are unchanged",
+  "candidate": {
+    "bank": "RM100",
+    "path": "D:\\codex-runs\\jev-information-density-v08c\\phase2c-v01\\cross-atom-search-v01\\rm100\\candidate-ids.jsonl",
+    "sha256": "1bec67c861b8ce64fb65704533ee85394d24be28baf73001c314b4c5612c41af",
+    "search_report_path": "D:\\codex-runs\\jev-information-density-v08c\\phase2c-v01\\cross-atom-search-v01\\rm100\\search-report.json",
+    "search_report_sha256": "1068b8c6ff30c82a0815056919bf62008ecf251dcbd15073a7fa6ee7b63d318b"
+  },
+  "search_contract_path": "experiments/jev-information-density-v08c/v08c-phase2c-search-contract.json",
+  "search_freeze_receipt_path": "D:\\codex-runs\\jev-information-density-v08c\\phase2c-v01\\cross-atom-search-v01\\freeze-receipt.json",
+  "output": {
+    "path": "D:\\codex-runs\\jev-information-density-v08c\\phase2c-v01\\cross-atom-search-v01\\validation-v02\\rm100-candidate-validation.json",
+    "status": "independent_validation_only"
+  },
+  "pinned_files": {
+    "search_candidate": {
+      "path": "D:\\codex-runs\\jev-information-density-v08c\\phase2c-v01\\cross-atom-search-v01\\rm100\\candidate-ids.jsonl",
+      "sha256": "1bec67c861b8ce64fb65704533ee85394d24be28baf73001c314b4c5612c41af"
+    },
+    "search_report": {
+      "path": "D:\\codex-runs\\jev-information-density-v08c\\phase2c-v01\\cross-atom-search-v01\\rm100\\search-report.json",
+      "sha256": "1068b8c6ff30c82a0815056919bf62008ecf251dcbd15073a7fa6ee7b63d318b"
+    },
+    "search_freeze_receipt": {
+      "path": "D:\\codex-runs\\jev-information-density-v08c\\phase2c-v01\\cross-atom-search-v01\\freeze-receipt.json",
+      "sha256": "c02f657a93248bd252f832a0f4731261b44cf8e8c980f1d1c547a2c369d5382a"
+    },
+    "group_records": {
+      "path": "D:\\codex-runs\\jev-information-density-v08\\full-universe-500k-v08\\group-records.jsonl",
+      "sha256": "9e3546fbe88741666cc5be5ae28907d7a223f74c8578609adfc3036ba7f4e7f2"
+    },
+    "eval_manifest": {
+      "path": "D:\\codex-runs\\jev-information-density-v08\\selection-v08-c100v12\\new-tight-eval-group-ids.jsonl",
+      "sha256": "3e72cd7596fbf0b302501b88dd9dc645a5749de10884b57eceb5552bfc5ef8ae"
+    }
+  }
+}

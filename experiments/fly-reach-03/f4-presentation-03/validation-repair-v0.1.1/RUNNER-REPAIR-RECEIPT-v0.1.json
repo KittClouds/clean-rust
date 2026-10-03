@@ -1,0 +1,15 @@
+{
+  "checkpoint_inference_unchanged": true,
+  "feature_generation_normalization_optimizer_schedule_and_scoring_unchanged": true,
+  "frozen_model_source_unchanged": true,
+  "old_execution_identity_preserved": "F4-PRESENTATION-03-EXECUTION-CONTINUATION-v0.1",
+  "original_runner_sha256": "551683dcca848b9caf76612729c1f6ec964e806aeb072bcaed2b85b6b0904b74",
+  "repaired_runner_sha256": "aa6a1c4b757c2209efae6aa859ba5d6b85ce59f0f918300dee02dac6000f3c52",
+  "schema": "F4-PRESENTATION-03-runner-repair-receipt-v0.1",
+  "source_diff": [
+    "continuation root resolution for the separately versioned runner copy",
+    "Cphi_unshared repeated prediction now consumes the same canonical presented tuples as checkpoint inference"
+  ],
+  "status": "NARROW_DETERMINISTIC_REPLAY_REPAIR",
+  "training_update_path_unchanged": true
+}

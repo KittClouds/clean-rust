@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RewardPrimitives",
+  "type": "object",
+  "properties": {
+    "commission_cost": {
+      "type": "number",
+      "format": "double"
+    },
+    "drawdown": {
+      "type": "number",
+      "format": "double"
+    },
+    "drawdown_change": {
+      "type": "number",
+      "format": "double"
+    },
+    "equity_delta": {
+      "type": "number",
+      "format": "double"
+    },
+    "exposure": {
+      "type": "number",
+      "format": "double"
+    },
+    "exposure_change": {
+      "type": "number",
+      "format": "double"
+    },
+    "gross_mark_to_market_delta": {
+      "type": "number",
+      "format": "double"
+    },
+    "realized_pnl_delta": {
+      "type": "number",
+      "format": "double"
+    },
+    "schema_version_code": {
+      "type": "integer",
+      "format": "uint32",
+      "minimum": 0
+    },
+    "slippage_cost": {
+      "type": "number",
+      "format": "double"
+    },
+    "spread_cost": {
+      "type": "number",
+      "format": "double"
+    },
+    "total_friction": {
+      "type": "number",
+      "format": "double"
+    },
+    "turnover": {
+      "type": "number",
+      "format": "double"
+    },
+    "unrealized_pnl_delta": {
+      "type": "number",
+      "format": "double"
+    }
+  },
+  "required": [
+    "schema_version_code",
+    "gross_mark_to_market_delta",
+    "realized_pnl_delta",
+    "unrealized_pnl_delta",
+    "equity_delta",
+    "turnover",
+    "commission_cost",
+    "spread_cost",
+    "slippage_cost",
+    "total_friction",
+    "exposure",
+    "exposure_change",
+    "drawdown",
+    "drawdown_change"
+  ]
+}

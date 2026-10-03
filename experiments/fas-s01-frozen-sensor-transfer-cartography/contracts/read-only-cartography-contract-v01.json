@@ -1,0 +1,49 @@
+{
+  "contract_id": "FASS01_READONLY_CARTOGRAPHY_V01",
+  "project_id": "fas-s01-frozen-sensor-transfer-cartography",
+  "status": "SEALED_PROSPECTIVE; EXECUTION_NOT_AUTHORIZED",
+  "purpose": "Describe the already revealed FAS-00 context-versus-entity transfer asymmetry using only existing global-mean features and frozen Phase 3 scores.",
+  "input_roots": {
+    "fas00_terminal_closure": "870e1d29d7db3dd458f16fcb56315f6976e5a4f35ba5731d642b3330a8d7d652",
+    "fas00_phase3_result": "09fd072754e3b149ac2a9564928209a792eba091064033ca0d7f455333dda0c5",
+    "fas00_phase2a_cache": "9af2c6c73a2f21608e8a2dc912d8838968eaebffb32b4b1ea0a18364e488d217",
+    "fas00_phase1_v03": "d3ca9f8ef988a6f0ae93318fc0ea7c504b23b3be801dbf133d66f67746a69274"
+  },
+  "output_root": "D:/codex-runs/fas-s01-frozen-sensor-transfer-cartography/read-only-cartography-v01",
+  "data_selection": {
+    "population": "Phase 3 frozen test partition: world seeds 24..31, qualification template 5, non-null observation_text for target-transfer comparisons.",
+    "context_slice": "context_term_id == 3; preserve each canonical exact-target class and its support.",
+    "entity_slice": "entity_term_id == 7; preserve each canonical exact-target class and its support.",
+    "feature_views": ["FULL", "QUERY_ONLY"],
+    "frozen_probe": "HELDOUT_TERM_EXACT_TARGET from the sealed Phase 3 result; read parameters only, never refit.",
+    "no_new_split_or_row_shopping": true
+  },
+  "fixed_descriptive_outputs": [
+    {
+      "id": "TRANSFER_CONFUSION",
+      "rule": "Reconstruct 3x3 exact-target confusion matrices from the existing Phase 3 row scores for test_context_term_3 and test_entity_term_7; report class support and balanced accuracy by world family, task structure, feedback condition, relation ID, and world seed. Report missing-class groups as undefined rather than dropping them."
+    },
+    {
+      "id": "FROZEN_MARGIN",
+      "rule": "Apply the already fitted HELDOUT_TERM_EXACT_TARGET W, b, training mean, and training scale to the existing FULL vectors; margin is true-class logit minus the maximum other-class logit. Report median, 25th and 75th percentiles, and fraction <= 0 for both declared slices and the same fixed subgroups."
+    },
+    {
+      "id": "GLOBAL_VECTOR_GEOMETRY",
+      "rule": "Within each cell (world family, task structure, feedback condition, relation ID, exact target, observation answer index) containing at least five rows for each compared term, compute raw FULL-feature centroid cosine distance and per-term median raw cosine distance to its own centroid. Compare context terms 2 versus 3 while holding entity_term_id fixed, and entity terms 4 versus 7 while holding context_term_id fixed. Report every eligible cell and the number of ineligible cells; no cell selection by outcome."
+    },
+    {
+      "id": "OBSERVATION_INCREMENT",
+      "rule": "For the same selected events, compute FULL minus QUERY_ONLY feature-vector L2 norm and FULL/QUERY_ONLY cosine similarity; report median and quartiles by declared slices and fixed subgroups. This describes the added observation-bearing input, not a token-local representation."
+    }
+  ],
+  "metrics": {
+    "distance_accumulation": "float64 on the existing serialized float32 vectors",
+    "cosine": "1 - dot(a,b)/(max(||a||,1e-12)*max(||b||,1e-12))",
+    "quartiles": "nearest-rank at 25, 50, and 75 percent; report exact sample count",
+    "class_support": "Report all support; no new pass/fail threshold is applied to descriptive groups."
+  },
+  "scientific_status": "Exploratory anatomy of a revealed FAS-00 qualification result; not an independent generalization test and not a representation selection gate.",
+  "forbidden": ["new model contact", "new features", "new probe fitting", "normalization search", "threshold adjustment", "FAS-00 artifact writes", "Phase 4", "online adaptation"],
+  "possible_dispositions": ["DESCRIPTIVE_MAP_COMPLETE", "INPUT_IDENTITY_FAILURE", "CONTRACTED_METRIC_UNDEFINED"],
+  "execution_authorized": false
+}

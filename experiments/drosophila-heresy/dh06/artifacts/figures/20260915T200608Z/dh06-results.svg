@@ -1,0 +1,185 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1160" height="790" viewBox="0 0 1160 790">
+<style>text{font-family:Arial,sans-serif;fill:#252525}.title{font-size:22px;font-weight:600}.subtitle{font-size:14px;fill:#555}.panel-title{font-size:15px;font-weight:600}.axis{font-size:12px}.tick{font-size:11px;fill:#555}.legend{font-size:13px}</style>
+<text x="90" y="42" class="title">DH-06: aligned erosion and off-axis reconfiguration are separable</text>
+<text x="90" y="70" class="subtitle">Right soma slice | 32 fresh seed bundles | realized clipped updates | state restored in all causal cells</text>
+<rect x="90" y="145" width="455" height="255" fill="none" stroke="#b7b7b7"/>
+<line x1="90" y1="360.77" x2="545" y2="360.77" stroke="#dddddd"/>
+<text x="78" y="364.77" text-anchor="end" class="tick">0.00</text>
+<line x1="90" y1="282.31" x2="545" y2="282.31" stroke="#dddddd"/>
+<text x="78" y="286.31" text-anchor="end" class="tick">0.02</text>
+<line x1="90" y1="203.85" x2="545" y2="203.85" stroke="#dddddd"/>
+<text x="78" y="207.85" text-anchor="end" class="tick">0.04</text>
+<line x1="90" y1="164.62" x2="545" y2="164.62" stroke="#dddddd"/>
+<text x="78" y="168.62" text-anchor="end" class="tick">0.05</text>
+<polyline points="90.00,172.11 118.44,176.11 146.88,180.16 203.75,188.55 317.50,204.33 545.00,234.49" fill="none" stroke="#777777" stroke-width="3"/>
+<circle cx="90.00" cy="172.11" r="4" fill="#777777"/>
+<circle cx="118.44" cy="176.11" r="4" fill="#777777"/>
+<circle cx="146.88" cy="180.16" r="4" fill="#777777"/>
+<circle cx="203.75" cy="188.55" r="4" fill="#777777"/>
+<circle cx="317.50" cy="204.33" r="4" fill="#777777"/>
+<circle cx="545.00" cy="234.49" r="4" fill="#777777"/>
+<polyline points="90.00,172.11 118.44,182.70 146.88,192.19 203.75,207.30 317.50,231.41 545.00,268.52" fill="none" stroke="#c65f32" stroke-width="3"/>
+<circle cx="90.00" cy="172.11" r="4" fill="#c65f32"/>
+<circle cx="118.44" cy="182.70" r="4" fill="#c65f32"/>
+<circle cx="146.88" cy="192.19" r="4" fill="#c65f32"/>
+<circle cx="203.75" cy="207.30" r="4" fill="#c65f32"/>
+<circle cx="317.50" cy="231.41" r="4" fill="#c65f32"/>
+<circle cx="545.00" cy="268.52" r="4" fill="#c65f32"/>
+<polyline points="90.00,172.11 118.44,179.76 146.88,186.10 203.75,199.11 317.50,219.63 545.00,255.59" fill="none" stroke="#19766f" stroke-width="3"/>
+<circle cx="90.00" cy="172.11" r="4" fill="#19766f"/>
+<circle cx="118.44" cy="179.76" r="4" fill="#19766f"/>
+<circle cx="146.88" cy="186.10" r="4" fill="#19766f"/>
+<circle cx="203.75" cy="199.11" r="4" fill="#19766f"/>
+<circle cx="317.50" cy="219.63" r="4" fill="#19766f"/>
+<circle cx="545.00" cy="255.59" r="4" fill="#19766f"/>
+<polyline points="90.00,172.11 118.44,185.06 146.88,195.95 203.75,215.21 317.50,242.66 545.00,282.44" fill="none" stroke="#7256a5" stroke-width="3"/>
+<circle cx="90.00" cy="172.11" r="4" fill="#7256a5"/>
+<circle cx="118.44" cy="185.06" r="4" fill="#7256a5"/>
+<circle cx="146.88" cy="195.95" r="4" fill="#7256a5"/>
+<circle cx="203.75" cy="215.21" r="4" fill="#7256a5"/>
+<circle cx="317.50" cy="242.66" r="4" fill="#7256a5"/>
+<circle cx="545.00" cy="282.44" r="4" fill="#7256a5"/>
+<text x="90.00" y="422" text-anchor="middle" class="tick">0</text>
+<text x="118.44" y="422" text-anchor="middle" class="tick">16</text>
+<text x="146.88" y="422" text-anchor="middle" class="tick">32</text>
+<text x="203.75" y="422" text-anchor="middle" class="tick">64</text>
+<text x="317.50" y="422" text-anchor="middle" class="tick">128</text>
+<text x="545.00" y="422" text-anchor="middle" class="tick">256</text>
+<text x="90" y="127" class="panel-title">Old-map expression</text>
+<text x="35" y="272.50" transform="rotate(-90 35 272.50)" text-anchor="middle" class="axis">Old-map margin</text>
+<rect x="625" y="145" width="455" height="255" fill="none" stroke="#b7b7b7"/>
+<line x1="625" y1="372.87" x2="1080" y2="372.87" stroke="#dddddd"/>
+<text x="613" y="376.87" text-anchor="end" class="tick">0.60</text>
+<line x1="625" y1="264.36" x2="1080" y2="264.36" stroke="#dddddd"/>
+<text x="613" y="268.36" text-anchor="end" class="tick">0.80</text>
+<line x1="625" y1="155.85" x2="1080" y2="155.85" stroke="#dddddd"/>
+<text x="613" y="159.85" text-anchor="end" class="tick">1.00</text>
+<polyline points="625.00,155.85 653.44,164.03 681.88,172.71 738.75,186.34 852.50,210.59 1080.00,243.89" fill="none" stroke="#777777" stroke-width="3"/>
+<circle cx="625.00" cy="155.85" r="4" fill="#777777"/>
+<circle cx="653.44" cy="164.03" r="4" fill="#777777"/>
+<circle cx="681.88" cy="172.71" r="4" fill="#777777"/>
+<circle cx="738.75" cy="186.34" r="4" fill="#777777"/>
+<circle cx="852.50" cy="210.59" r="4" fill="#777777"/>
+<circle cx="1080.00" cy="243.89" r="4" fill="#777777"/>
+<polyline points="625.00,155.85 653.44,200.51 681.88,234.25 738.75,275.60 852.50,323.15 1080.00,367.23" fill="none" stroke="#c65f32" stroke-width="3"/>
+<circle cx="625.00" cy="155.85" r="4" fill="#c65f32"/>
+<circle cx="653.44" cy="200.51" r="4" fill="#c65f32"/>
+<circle cx="681.88" cy="234.25" r="4" fill="#c65f32"/>
+<circle cx="738.75" cy="275.60" r="4" fill="#c65f32"/>
+<circle cx="852.50" cy="323.15" r="4" fill="#c65f32"/>
+<circle cx="1080.00" cy="367.23" r="4" fill="#c65f32"/>
+<polyline points="625.00,155.85 653.44,164.59 681.88,173.11 738.75,187.05 852.50,209.97 1080.00,238.57" fill="none" stroke="#19766f" stroke-width="3"/>
+<circle cx="625.00" cy="155.85" r="4" fill="#19766f"/>
+<circle cx="653.44" cy="164.59" r="4" fill="#19766f"/>
+<circle cx="681.88" cy="173.11" r="4" fill="#19766f"/>
+<circle cx="738.75" cy="187.05" r="4" fill="#19766f"/>
+<circle cx="852.50" cy="209.97" r="4" fill="#19766f"/>
+<circle cx="1080.00" cy="238.57" r="4" fill="#19766f"/>
+<polyline points="625.00,155.85 653.44,198.07 681.88,227.36 738.75,263.83 852.50,304.15 1080.00,335.20" fill="none" stroke="#7256a5" stroke-width="3"/>
+<circle cx="625.00" cy="155.85" r="4" fill="#7256a5"/>
+<circle cx="653.44" cy="198.07" r="4" fill="#7256a5"/>
+<circle cx="681.88" cy="227.36" r="4" fill="#7256a5"/>
+<circle cx="738.75" cy="263.83" r="4" fill="#7256a5"/>
+<circle cx="852.50" cy="304.15" r="4" fill="#7256a5"/>
+<circle cx="1080.00" cy="335.20" r="4" fill="#7256a5"/>
+<text x="625.00" y="422" text-anchor="middle" class="tick">0</text>
+<text x="653.44" y="422" text-anchor="middle" class="tick">16</text>
+<text x="681.88" y="422" text-anchor="middle" class="tick">32</text>
+<text x="738.75" y="422" text-anchor="middle" class="tick">64</text>
+<text x="852.50" y="422" text-anchor="middle" class="tick">128</text>
+<text x="1080.00" y="422" text-anchor="middle" class="tick">256</text>
+<text x="625" y="127" class="panel-title">Acquired structure retained</text>
+<text x="570" y="272.50" transform="rotate(-90 570 272.50)" text-anchor="middle" class="axis">Acquisition-axis coordinate</text>
+<rect x="90" y="485" width="455" height="220" fill="none" stroke="#b7b7b7"/>
+<line x1="90" y1="651.34" x2="545" y2="651.34" stroke="#dddddd"/>
+<text x="78" y="655.34" text-anchor="end" class="tick">-6.00</text>
+<line x1="90" y1="597.68" x2="545" y2="597.68" stroke="#dddddd"/>
+<text x="78" y="601.68" text-anchor="end" class="tick">-4.00</text>
+<line x1="90" y1="544.02" x2="545" y2="544.02" stroke="#dddddd"/>
+<text x="78" y="548.02" text-anchor="end" class="tick">-2.00</text>
+<line x1="90" y1="490.37" x2="545" y2="490.37" stroke="#dddddd"/>
+<text x="78" y="494.37" text-anchor="end" class="tick">0.00</text>
+<polyline points="90.00,490.37 118.44,497.83 146.88,505.85 203.75,518.27 317.50,540.57 545.00,571.16" fill="none" stroke="#777777" stroke-width="3"/>
+<circle cx="90.00" cy="490.37" r="4" fill="#777777"/>
+<circle cx="118.44" cy="497.83" r="4" fill="#777777"/>
+<circle cx="146.88" cy="505.85" r="4" fill="#777777"/>
+<circle cx="203.75" cy="518.27" r="4" fill="#777777"/>
+<circle cx="317.50" cy="540.57" r="4" fill="#777777"/>
+<circle cx="545.00" cy="571.16" r="4" fill="#777777"/>
+<polyline points="90.00,490.37 118.44,531.19 146.88,562.54 203.75,600.58 317.50,644.38 545.00,684.85" fill="none" stroke="#c65f32" stroke-width="3"/>
+<circle cx="90.00" cy="490.37" r="4" fill="#c65f32"/>
+<circle cx="118.44" cy="531.19" r="4" fill="#c65f32"/>
+<circle cx="146.88" cy="562.54" r="4" fill="#c65f32"/>
+<circle cx="203.75" cy="600.58" r="4" fill="#c65f32"/>
+<circle cx="317.50" cy="644.38" r="4" fill="#c65f32"/>
+<circle cx="545.00" cy="684.85" r="4" fill="#c65f32"/>
+<polyline points="90.00,490.37 118.44,498.35 146.88,506.18 203.75,518.85 317.50,539.93 545.00,566.24" fill="none" stroke="#19766f" stroke-width="3"/>
+<circle cx="90.00" cy="490.37" r="4" fill="#19766f"/>
+<circle cx="118.44" cy="498.35" r="4" fill="#19766f"/>
+<circle cx="146.88" cy="506.18" r="4" fill="#19766f"/>
+<circle cx="203.75" cy="518.85" r="4" fill="#19766f"/>
+<circle cx="317.50" cy="539.93" r="4" fill="#19766f"/>
+<circle cx="545.00" cy="566.24" r="4" fill="#19766f"/>
+<polyline points="90.00,490.37 118.44,529.01 146.88,556.12 203.75,589.49 317.50,626.60 545.00,655.31" fill="none" stroke="#7256a5" stroke-width="3"/>
+<circle cx="90.00" cy="490.37" r="4" fill="#7256a5"/>
+<circle cx="118.44" cy="529.01" r="4" fill="#7256a5"/>
+<circle cx="146.88" cy="556.12" r="4" fill="#7256a5"/>
+<circle cx="203.75" cy="589.49" r="4" fill="#7256a5"/>
+<circle cx="317.50" cy="626.60" r="4" fill="#7256a5"/>
+<circle cx="545.00" cy="655.31" r="4" fill="#7256a5"/>
+<text x="90.00" y="727" text-anchor="middle" class="tick">0</text>
+<text x="118.44" y="727" text-anchor="middle" class="tick">16</text>
+<text x="146.88" y="727" text-anchor="middle" class="tick">32</text>
+<text x="203.75" y="727" text-anchor="middle" class="tick">64</text>
+<text x="317.50" y="727" text-anchor="middle" class="tick">128</text>
+<text x="545.00" y="727" text-anchor="middle" class="tick">256</text>
+<text x="90" y="467" class="panel-title">Parallel movement</text>
+<text x="35" y="595.00" transform="rotate(-90 35 595.00)" text-anchor="middle" class="axis">Parallel projection</text>
+<rect x="625" y="485" width="455" height="220" fill="none" stroke="#b7b7b7"/>
+<line x1="625" y1="705.00" x2="1080" y2="705.00" stroke="#dddddd"/>
+<text x="613" y="709.00" text-anchor="end" class="tick">0.00</text>
+<line x1="625" y1="642.14" x2="1080" y2="642.14" stroke="#dddddd"/>
+<text x="613" y="646.14" text-anchor="end" class="tick">0.30</text>
+<line x1="625" y1="579.29" x2="1080" y2="579.29" stroke="#dddddd"/>
+<text x="613" y="583.29" text-anchor="end" class="tick">0.60</text>
+<line x1="625" y1="516.43" x2="1080" y2="516.43" stroke="#dddddd"/>
+<text x="613" y="520.43" text-anchor="end" class="tick">0.90</text>
+<polyline points="625.00,705.00 653.44,695.66 681.88,691.47 738.75,685.86 852.50,676.79 1080.00,663.40" fill="none" stroke="#777777" stroke-width="3"/>
+<circle cx="625.00" cy="705.00" r="4" fill="#777777"/>
+<circle cx="653.44" cy="695.66" r="4" fill="#777777"/>
+<circle cx="681.88" cy="691.47" r="4" fill="#777777"/>
+<circle cx="738.75" cy="685.86" r="4" fill="#777777"/>
+<circle cx="852.50" cy="676.79" r="4" fill="#777777"/>
+<circle cx="1080.00" cy="663.40" r="4" fill="#777777"/>
+<polyline points="625.00,705.00 653.44,690.73 681.88,683.41 738.75,674.38 852.50,662.84 1080.00,648.47" fill="none" stroke="#c65f32" stroke-width="3"/>
+<circle cx="625.00" cy="705.00" r="4" fill="#c65f32"/>
+<circle cx="653.44" cy="690.73" r="4" fill="#c65f32"/>
+<circle cx="681.88" cy="683.41" r="4" fill="#c65f32"/>
+<circle cx="738.75" cy="674.38" r="4" fill="#c65f32"/>
+<circle cx="852.50" cy="662.84" r="4" fill="#c65f32"/>
+<circle cx="1080.00" cy="648.47" r="4" fill="#c65f32"/>
+<polyline points="625.00,705.00 653.44,634.88 681.88,610.95 738.75,583.53 852.50,551.97 1080.00,512.86" fill="none" stroke="#19766f" stroke-width="3"/>
+<circle cx="625.00" cy="705.00" r="4" fill="#19766f"/>
+<circle cx="653.44" cy="634.88" r="4" fill="#19766f"/>
+<circle cx="681.88" cy="610.95" r="4" fill="#19766f"/>
+<circle cx="738.75" cy="583.53" r="4" fill="#19766f"/>
+<circle cx="852.50" cy="551.97" r="4" fill="#19766f"/>
+<circle cx="1080.00" cy="512.86" r="4" fill="#19766f"/>
+<polyline points="625.00,705.00 653.44,634.08 681.88,610.79 738.75,582.75 852.50,551.31 1080.00,506.33" fill="none" stroke="#7256a5" stroke-width="3"/>
+<circle cx="625.00" cy="705.00" r="4" fill="#7256a5"/>
+<circle cx="653.44" cy="634.08" r="4" fill="#7256a5"/>
+<circle cx="681.88" cy="610.79" r="4" fill="#7256a5"/>
+<circle cx="738.75" cy="582.75" r="4" fill="#7256a5"/>
+<circle cx="852.50" cy="551.31" r="4" fill="#7256a5"/>
+<circle cx="1080.00" cy="506.33" r="4" fill="#7256a5"/>
+<text x="625.00" y="727" text-anchor="middle" class="tick">0</text>
+<text x="653.44" y="727" text-anchor="middle" class="tick">16</text>
+<text x="681.88" y="727" text-anchor="middle" class="tick">32</text>
+<text x="738.75" y="727" text-anchor="middle" class="tick">64</text>
+<text x="852.50" y="727" text-anchor="middle" class="tick">128</text>
+<text x="1080.00" y="727" text-anchor="middle" class="tick">256</text>
+<text x="625" y="467" class="panel-title">Perpendicular movement</text>
+<text x="570" y="595.00" transform="rotate(-90 570 595.00)" text-anchor="middle" class="axis">Perpendicular norm</text>
+<text x="780" y="95" class="legend"><tspan fill="#777">■ Neither</tspan><tspan dx="24" fill="#c65f32">■ Parallel only</tspan><tspan dx="24" fill="#19766f">■ Perpendicular only</tspan><tspan dx="24" fill="#7256a5">■ Both</tspan></text>
+<text x="90" y="748" class="subtitle">Perpendicular effect on old-map margin: -0.0045 [-0.0054, -0.0035]; parallel effect on acquisition coordinate: -0.2027 [-0.2197, -0.1851]</text>
+</svg>

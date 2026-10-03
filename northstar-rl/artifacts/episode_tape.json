@@ -1,0 +1,27 @@
+{
+  "schema_version": "EPISODE_TAPE_V1",
+  "runraw_tape_id": "c1f6cdf7421c10ca104cce151041ef44d1070da98eba934b37a79abfa3243167",
+  "episode_spec_id": "049907b465fee983bdca02e0c0878de1393ee9c74171d4fc70a22b838eca565f",
+  "episodes": [
+    {
+      "episode_id": "f6ed719eff14c39684077e088cb406e83423e1f8d5fa058bf4d68b68df5b40ce",
+      "instrument_id": 1,
+      "first_source_row": 1,
+      "last_source_row": 12,
+      "first_actionable_row": 3,
+      "start_time": 1800000060000000000,
+      "end_time": 1800000720000000000,
+      "warmup_rows": 2,
+      "actionable_rows": 9,
+      "initial_account_state_id": "b6d6ecd0a39629c12b2eccf07eecd4f28440a0540631fdcbe91d54dac86e5970",
+      "observation_spec_id": "ed829485c839f0419f040ad05de15cb44d680c191b622d763626e815dddbd654",
+      "action_spec_id": "ff42128c28e9250f22e97751d5bf496fde5974e236de390adb8bd81dd1871d65",
+      "execution_spec_id": "31f213973f27cae2419fdd2b75e109f046e0e1b60fae1533a09b2a6d52ae0065",
+      "reward_spec_id": "5ef542088ac1acc0871d8dc00aa15d5787a15d96618a33f676b71a5758560bc9",
+      "termination_contract_id": "a2dc7172867c1e8c520fc6460897ee3e7c168f7a06267bafedad0f5e5357cb1b",
+      "source_identity": "c1f6cdf7421c10ca104cce151041ef44d1070da98eba934b37a79abfa3243167",
+      "content_hash": "37acee34241c762a15c834bd7e89830b375d5bbcff63bf86462a969296565f31"
+    }
+  ],
+  "content_hash": "706c447cc32a8b7740910012681cead9cf8ab27b8ece4675a435818fe5a4c770"
+}

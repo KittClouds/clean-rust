@@ -1,0 +1,57 @@
+{
+  "behavioral_probe": false,
+  "closures": {
+    "twin-a": {
+      "manifest_sha256": "118F7E7C8DAA8000E169B5C072A9639509C1BA1F536C0CC65517FBC8EED3AC56",
+      "repo": "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-lr1-requal1-domain-r1-v1\\closures\\twin-a\\repo"
+    },
+    "twin-b": {
+      "manifest_sha256": "D1275A68D4842DC47111B529E9FDCDACB0A305D34358A3DCD8C7CB3A5CB0E36B",
+      "repo": "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-lr1-requal1-domain-r1-v1\\closures\\twin-b\\repo"
+    }
+  },
+  "comparison": {
+    "candidate_inventory_identical": true,
+    "group_inventory_identical": true,
+    "root_manifest_identical": true,
+    "source_hashes_identical": true,
+    "state_inventory_identical": true,
+    "topology_identical": true
+  },
+  "counts": {
+    "candidate_records_checked": 4158,
+    "raw_groups": 462,
+    "selected_contexts": 8,
+    "singleton_domain_records": 4158
+  },
+  "derived_hashes": {
+    "twin-a": {
+      "raw_group_inventory_sha256": "FD6AC545E457842F95971846D88EAF84A51CFED81D9199059C60907455E50B94",
+      "root_manifest_sha256": "BAA2FA81A714E43CBAF9FB6B06EC7AE8C16C828CB7162CC5CBCDA97EE55EC8D0",
+      "singleton_domain_sha256": "D4B903635870ED1E09DB81C02551B753B27E842B7E533D811E6CA2182E1887AC",
+      "source_hashes_sha256": "BBE3B9A928971431C1EE95FBF62C7746892E48079F52C088699967B726125C55",
+      "state_inventory_sha256": "7D1DF23CCC739BC60FE3B9CCC300220236F45F67AA18E73090223CE98C52301C",
+      "topology_sha256": "8670E556C7210DA51EA834AFEBED9F330B17B5000F08C55BD66A5640077F8E95"
+    },
+    "twin-b": {
+      "raw_group_inventory_sha256": "FD6AC545E457842F95971846D88EAF84A51CFED81D9199059C60907455E50B94",
+      "root_manifest_sha256": "BAA2FA81A714E43CBAF9FB6B06EC7AE8C16C828CB7162CC5CBCDA97EE55EC8D0",
+      "singleton_domain_sha256": "D4B903635870ED1E09DB81C02551B753B27E842B7E533D811E6CA2182E1887AC",
+      "source_hashes_sha256": "BBE3B9A928971431C1EE95FBF62C7746892E48079F52C088699967B726125C55",
+      "state_inventory_sha256": "7D1DF23CCC739BC60FE3B9CCC300220236F45F67AA18E73090223CE98C52301C",
+      "topology_sha256": "8670E556C7210DA51EA834AFEBED9F330B17B5000F08C55BD66A5640077F8E95"
+    }
+  },
+  "engineering_only": true,
+  "firewall": {
+    "pair_replay_allowed": false,
+    "scientific_seed_bundles": 0,
+    "singleton_replay_allowed": false
+  },
+  "identity": "q10-gc1-lr1-requal1-domain-r1-v1",
+  "pair_replay_executed": false,
+  "protocol": "REQUAL1-DOMAIN",
+  "scientific_promotion": false,
+  "singleton_replay_executed": false,
+  "status": "DOMAIN_READY_FOR_SMOKE"
+}

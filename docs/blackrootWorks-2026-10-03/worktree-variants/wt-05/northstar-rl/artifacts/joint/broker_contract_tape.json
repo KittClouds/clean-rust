@@ -1,0 +1,26 @@
+{
+  "schema_version": "BROKER_CONTRACT_TAPE_V1",
+  "rows": [
+    {
+      "northstar_instrument_id": 3,
+      "valid_from_ns": 1800000000000000000,
+      "observed_at_ns": 1800000000000000000,
+      "tick_size": 0.01,
+      "quantity_step": 0.01,
+      "minimum_quantity": 0.01,
+      "contract_size": 1.0,
+      "margin_fields": [
+        [
+          "qualification_margin_rate",
+          0.01
+        ]
+      ],
+      "broker_precision": 2,
+      "quote_denomination": "USD",
+      "trading_availability": "SESSION_OPEN",
+      "source_authority": "SYNTHETIC_TRADELOCKER_CONTRACT_FIXTURE",
+      "source_payload_hash": "145285483efedefc8cd39fde31bb5145ccad8cdfb2c1fb771ee7e949cec777cc"
+    }
+  ],
+  "content_hash": "451bf7eb3bb3a70649f429732e181a126625759fc099766cdba7def8e5baab53"
+}

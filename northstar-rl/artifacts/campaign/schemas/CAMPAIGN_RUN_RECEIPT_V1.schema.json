@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CampaignRunReceipt",
+  "type": "object",
+  "properties": {
+    "campaign_id": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "checkpoint_hashes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Digest256"
+      }
+    },
+    "experiment_id": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "learner_steps_executed": {
+      "type": "integer",
+      "format": "uint64",
+      "minimum": 0
+    },
+    "policy_artifact_id": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Digest256"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "reason_code": {
+      "type": "string"
+    },
+    "run_id": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "schema_version": {
+      "type": "string"
+    },
+    "seed": {
+      "type": "integer",
+      "format": "uint64",
+      "minimum": 0
+    },
+    "status": {
+      "$ref": "#/$defs/CampaignRunStatus"
+    }
+  },
+  "required": [
+    "schema_version",
+    "run_id",
+    "campaign_id",
+    "experiment_id",
+    "seed",
+    "status",
+    "learner_steps_executed",
+    "checkpoint_hashes",
+    "reason_code"
+  ],
+  "$defs": {
+    "CampaignRunStatus": {
+      "type": "string",
+      "enum": [
+        "PLANNED",
+        "EXECUTING",
+        "COMPLETED",
+        "FAILED"
+      ]
+    },
+    "Digest256": {
+      "description": "Domain-separated BLAKE3 digest",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

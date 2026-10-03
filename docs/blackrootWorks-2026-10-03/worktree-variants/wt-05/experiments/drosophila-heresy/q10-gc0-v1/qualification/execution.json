@@ -1,0 +1,11 @@
+{
+  "contract_sha256": "A1FBCC1B562A4521355F5F78D14C3F7F9034DD90F6DA15882BA4B299FC6AA65C",
+  "execution_receipt": "qualification/execution/execution.json",
+  "execution_sha256": "375BC3D9643DEFF7E02D1111C6B4BD2A638C41CB4909041F68B86E2ED09DEC3C",
+  "gc1_authorized": false,
+  "identity": "q10-gc0-v1",
+  "plan_sha256": "D298AEE12140C9EE86411486339D16A66CE10D7EC86208FE6CD640C8A1C7C288",
+  "protocol": "Q10-GC0",
+  "scientific_promotion": false,
+  "status": "GC0_ENGINEERING_COMPLETE_SUPPORT_INCOMPLETE_DIAGNOSTIC_ONLY"
+}

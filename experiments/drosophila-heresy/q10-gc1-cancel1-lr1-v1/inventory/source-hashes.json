@@ -1,0 +1,11 @@
+{
+  "experiments/drosophila-heresy/q10-gc0-gp1-par2-v1/qualification/palettes.jsonl": "56A8BCFD950C2C796279556B03C4905622B1207023C1142076AE7147203477FA",
+  "experiments/drosophila-heresy/q10-gc1-cancel1-v1/CONTRACT.json": "4AD04F0F3B6E1CB56A5C5C17F3984F370C4A9DF8DC6D47B786EB83541A625BF3",
+  "experiments/drosophila-heresy/q10-gc1-cancel1-v1/PLAN.md": "2F4DC200F0D4A2CCBE54E8883F467E74AD8B1789A8F55787A70391EA3F2B6A4E",
+  "experiments/drosophila-heresy/q10-gc1-cancel1-v1/scripts/run_cancel1.py": "2DC8F504628FC29BDBBAD8DDE22225765B3A3EC7A0C9623EDE7412F27700CA9D",
+  "experiments/drosophila-heresy/q10-gc1-par8-v1/qualification/execution.json": "A4304E70F7D32436109CD6F3367C298CD1227FBD5C4AA2578C28D14272721D6B",
+  "experiments/drosophila-heresy/q10-gc1-pf0-v1/qualification/execution.json": "47DB038381C9ACB0C98E7D933AA40864F779584CC635178BDF775FDAB5598762",
+  "experiments/drosophila-heresy/q10-gc1-rq1-v1/qualification/execution.json": "251723BDA26FAA6005B75369E88444767784E82DB500D1EAEC5952446F9A67E5",
+  "experiments/drosophila-heresy/q10-gc1-rq1-v1/scripts/run_rq1.py": "7820F43395EF6BFB82CC32838970CA7F404BC39BF7821B4B63DBE1AEB02585C7",
+  "experiments/drosophila-heresy/q10-pf5-v1/CONTRACT.json": "20995E1826A9C62E0E8689017A2F3E624CC9E63B76B210FBD4AB11D7E9E7D34F"
+}

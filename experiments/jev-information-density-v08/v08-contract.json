@@ -1,0 +1,196 @@
+{
+  "contract": "jev-decision-data-information-density/v0.8",
+  "status": "dataset_construction_pretraining_lock",
+  "scope": {
+    "model_training_authorized": false,
+    "model_feature_extraction_authorized": false,
+    "phoenix_in_scope": false,
+    "v04_v07_mutation_allowed": false,
+    "external_run_root": "D:/codex-runs/jev-information-density-v08"
+  },
+  "question": "Does decision-compiler quality track raw group count or useful semantic information per group, separating quantity, generator, curation, and novelty effects?",
+  "bank_roles": {
+    "Old100": {
+      "role": "historical_quantity_reference",
+      "source": "D:/codex-runs/jev-frozen-scaling-v05/banks/s100k/train.jsonl",
+      "nominal_groups": 100000,
+      "manifest_groups": 100060,
+      "mutable": false
+    },
+    "Old250": {
+      "role": "historical_quantity_reference",
+      "source": "D:/codex-runs/jev-frozen-scaling-v06/banks/s250k/train.jsonl",
+      "nominal_groups": 250000,
+      "manifest_groups": 250052,
+      "mutable": false
+    },
+    "StrictNovel93": {
+      "role": "novelty_transfer_diagnostic",
+      "reported_groups": 93252,
+      "verified_group_count": 93252,
+      "artifact_locator": "C:/Users/shuga/.codex/worktrees/3c8a/clean-rust/experiments/jev-curated-c100-v01/train.jsonl",
+      "selection_manifest": "C:/Users/shuga/.codex/worktrees/3c8a/clean-rust/experiments/jev-curated-c100-v01/selection-manifest.json",
+      "train_sha256": "04521d2fe999bc097eb5c5d4471203610f3e0a7f1f7f9b3f1552ed979b5cf908",
+      "verified_overlap_counts": {
+        "exact_episode_id": 0,
+        "semantic_fingerprint": 0,
+        "exact_text_sha256": 0,
+        "normalized_text_sha256": 0,
+        "structural_fingerprint": 0,
+        "same_root_family": 0
+      },
+      "verified_world_family_coverage": "system_diagnosis_only",
+      "mutable": false,
+      "pad_or_relabel_as_C100": false
+    },
+    "NewTight-Eval": {
+      "role": "new_generator_family_held_out_evaluation",
+      "reserve_before_training_selection": true,
+      "selection_access": false,
+      "training_access": false
+    },
+    "NewTight-R100": {
+      "role": "same_universe_random_stratified_control",
+      "exact_group_count": 100000
+    },
+    "NewTight-C100": {
+      "role": "same_universe_metadata_curated_bank",
+      "exact_group_count": 100000
+    }
+  },
+  "universe": {
+    "preferred_raw_candidate_groups": 500000,
+    "minimum_eligible_training_groups": 300000,
+    "unique_model_input_signatures_are_reported_separately": true,
+    "group_surplus_is_not_claimed_as_unique_semantic_surplus": true,
+    "failure_label_if_below_minimum": "insufficient_selection_surplus",
+    "unit": "atomic_decision_group",
+    "family_bundle_holdout_fraction": 0.2,
+    "split_unit": "family_bundle_id",
+    "holdout_hash": "SHA256(frozen_salt || family_bundle || family_bundle_id)",
+    "bundle_integrity": "each component family ID, root ID, and episode ID belongs to exactly one bundle; bundles are indivisible across train/eval",
+    "held_out_axes": [
+      "world_or_topology_family",
+      "ontology_family",
+      "schema_composition_family",
+      "candidate_set_construction_family",
+      "definition_template_family",
+      "intervention_family"
+    ],
+    "eligible_pool_excludes_all_groups_linked_to_held_out_family_bundles": true
+  },
+  "synthetic_world_semantics": {
+    "topology_and_parameterization_fixed_within_observable_domain_family": true,
+    "sampled_world_truth_and_evidence_still_vary_by_root": true,
+    "same_model_visible_input_must_not_have_conflicting_gold": true,
+    "input_gold_consistency_audit_required_before_selection": true
+  },
+  "preselection_amendment": {
+    "id": "jev-information-density-v0.8-amendment-model-input-redundancy",
+    "trigger": "500000 groups contain 30956 unique model-visible input signatures and 469044 repeated occurrences",
+    "applied_before_bank_selection_or_model_contact": true,
+    "change": "C100 redundancy includes normalized model-input hash; R100 unchanged",
+    "selector_source_hash_required": true
+  },
+  "selection_engineering_amendment": {
+    "id": "jev-information-density-v0.8-amendment-c100-one-pass-ranking",
+    "trigger": "exact dynamic lazy-greedy selection exceeded the declared local compute budget before producing selected IDs",
+    "applied_before_any_r100_or_c100_manifest_was_emitted": true,
+    "change": "replace dynamic greedy updates with one-pass global feature-rarity coverage ranking",
+    "random_selector_unchanged": true,
+    "selector_source_hash_required": true
+  },
+  "model_input_signature": {
+    "fields": [
+      "observable_state",
+      "query_view_and_instruction",
+      "candidate_set_role_semantics_and_ordered_flag",
+      "candidate_name_and_definition",
+      "ordinal_rank_when_applicable"
+    ],
+    "candidate_order_normalized_as_invariant": true,
+    "internal_semantic_ids_or_gold_values_included": false,
+    "presentation_profile": "name_definition"
+  },
+  "firewall": {
+    "compare_against": [
+      "all_prior_generated_training_banks",
+      "v04_v07_training_sources",
+      "StrictNovel93_verified_read_only",
+      "all_protected_evaluation_family_registries"
+    ],
+    "keys": [
+      "episode_and_group_ids",
+      "root_and_parent_ids",
+      "semantic_fingerprint",
+      "exact_observable_text_sha256",
+      "normalized_observable_text_sha256",
+      "runtime_schema_surface_sha256",
+      "normalized_model_input_sha256",
+      "structural_fingerprint",
+      "world_family_id",
+      "ontology_family_id",
+      "schema_composition_id",
+      "generator_template_id",
+      "definition_template_id",
+      "perturbation_family_id"
+    ],
+    "text_normalization": "Unicode NFKC, lowercase, replace non-alphanumeric runs with one space, trim",
+    "protected_text_export": false,
+    "report_collision_counts_and_digests_only": true
+  },
+  "selectors": {
+    "random": {
+      "id": "R100-v1",
+      "seed": "jev-idv08-r100-sha256-v1",
+      "strata": [
+        "world_family",
+        "query_view_type",
+        "candidate_cardinality_bin",
+        "posterior_entropy_quintile"
+      ],
+      "allocation": "proportional_largest_remainder",
+      "within_stratum_order": "ascending SHA256(seed || group_id)",
+      "semantic_value_optimization": false
+    },
+    "curated": {
+      "id": "C100-v1.2-static-frequency-coverage",
+      "seed": "jev-idv08-c100-sha256-v3-static-frequency-coverage",
+      "algorithm": "deterministic_one_pass_global_rarity_weighted_coverage",
+      "axes_equal_weight": [
+        "semantic_novelty",
+        "local_discrimination",
+        "probability_geometry",
+        "structural_coverage",
+        "redundancy"
+      ],
+      "redundancy_features_include": [
+        "root_world_id",
+        "semantic_fingerprint",
+        "structural_fingerprint",
+        "normalized_observation_hash",
+        "normalized_model_input_hash"
+      ],
+      "feature_score": "mean_axes(mean_features(1 / sqrt(eligible_pool_count(feature))))",
+      "selection_complexity": "one scoring pass plus bounded top-k selection; O(N log K)",
+      "tie_break": "ascending SHA256(seed || group_id), then lexical group_id",
+      "allowed_inputs": "eligible training-side metadata and exact gold metadata only",
+      "model_predictions_or_embeddings": false,
+      "evaluation_scores_or_labels": false,
+      "exact_target_groups": 100000
+    }
+  },
+  "required_pretraining_artifacts": [
+    "source-audit.json",
+    "old-tail-audit.json",
+    "new-universe-novelty-audit.json",
+    "input-target-consistency.json",
+    "ood-family-split.json",
+    "source-overlap-report.json",
+    "r100-c100-selection-audit.json",
+    "information-density.json",
+    "novelty-growth-curves.json",
+    "v08-integrity-receipt.json"
+  ],
+  "training_release_condition": "Every listed artifact exists, checks pass, source and bank hashes are sealed, the contract hash is recorded, and a separate run manifest explicitly authorizes LFM model contact."
+}

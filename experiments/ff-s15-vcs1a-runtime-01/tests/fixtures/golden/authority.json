@@ -1,0 +1,133 @@
+{
+ "authority_id": "sha256:1e7434029ddae66783a9159cda7bdd4d7b0741f744bdddb52fa8e87d30857997",
+ "bound_schema": {
+  "schema_hash": "sha256:971ecbebd4c8d42d9020ed91edf8ffa5ded310725e7b0c7fab8f20d3651eef9a",
+  "schema_id": "fixture-z3",
+  "schema_version": "0"
+ },
+ "default": {
+  "reason": "no_region",
+  "type": "ESCALATE"
+ },
+ "overlap": "first_match",
+ "regions": {
+  "diag": {
+   "on_missing": "unknown",
+   "op": "halfspaces",
+   "rows": [
+    {
+     "bound": 0.6,
+     "coefs": {
+      "x1": 1,
+      "x2": 1
+     }
+    }
+   ]
+  },
+  "near": {
+   "center": {
+    "x1": 0.5,
+    "x2": 0.5
+   },
+   "norm": "l2",
+   "on_missing": "unknown",
+   "op": "ball",
+   "radius": 0.25,
+   "weights": {}
+  },
+  "quiet": {
+   "args": [
+    {
+     "cmp": "<",
+     "coord": "x1",
+     "on_missing": "unknown",
+     "op": "cmp",
+     "value": 0.2
+    },
+    {
+     "arg": {
+      "coord": "x4",
+      "op": "present"
+     },
+     "op": "not"
+    }
+   ],
+   "op": "and"
+  },
+  "strong": {
+   "args": [
+    {
+     "cmp": ">=",
+     "coord": "x1",
+     "on_missing": "unknown",
+     "op": "cmp",
+     "value": 0.71
+    },
+    {
+     "coord": "x2",
+     "hi": 0.3,
+     "hi_closed": true,
+     "lo": 0.12,
+     "lo_closed": true,
+     "on_missing": "unknown",
+     "op": "interval"
+    },
+    {
+     "cmp": "==",
+     "coord": "x3",
+     "on_missing": "unknown",
+     "op": "cmp",
+     "value": false
+    }
+   ],
+   "op": "and"
+  }
+ },
+ "rules": [
+  {
+   "disposition": {
+    "action": {
+     "from_context": "proposed_action"
+    },
+    "type": "EXECUTE"
+   },
+   "guards": [],
+   "region": "strong",
+   "rule_id": "go"
+  },
+  {
+   "disposition": {
+    "type": "NOOP"
+   },
+   "guards": [],
+   "region": "quiet",
+   "rule_id": "hold"
+  },
+  {
+   "disposition": {
+    "requirement": {
+     "from_context": "req"
+    },
+    "type": "ASK"
+   },
+   "guards": [
+    {
+     "key": "routes",
+     "test": "nonempty"
+    }
+   ],
+   "region": "near",
+   "rule_id": "ask"
+  },
+  {
+   "disposition": {
+    "reason": "low_mass",
+    "type": "DECLINE_UNAVAILABLE"
+   },
+   "guards": [],
+   "region": "diag",
+   "rule_id": "decline"
+  }
+ ],
+ "schema": "VCS_AUTHORITY_V1"
+}

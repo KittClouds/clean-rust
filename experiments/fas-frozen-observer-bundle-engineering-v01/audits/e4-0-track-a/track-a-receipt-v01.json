@@ -1,0 +1,131 @@
+{
+  "schema": "FAS_E4_0_TRACK_A_RECEIPT_V01",
+  "status": "TRACK_A_COMPLETE_PREAUTHORIZATION",
+  "track": "E4_0_POPULATION_GENERATOR",
+  "issued_utc": "2026-09-26T20:29:05Z",
+  "source_files": [
+    {
+      "path": "source/e4-population-v01/benches/population_hot_path.rs",
+      "bytes": 2522,
+      "sha256": "97ec4da8c5df7c79395f79d1e9385b4871312cb7fcbd2d9d287c7df9d58f1eac",
+      "lines": 52
+    },
+    {
+      "path": "source/e4-population-v01/Cargo.lock",
+      "bytes": 19005,
+      "sha256": "6f68318c480f45db9f3ac58d4d4f5c7dec79158e345902b3ce1b7c8742500d37",
+      "lines": 654
+    },
+    {
+      "path": "source/e4-population-v01/Cargo.toml",
+      "bytes": 500,
+      "sha256": "dc824fec42b6c658c6cbd859f5170c68c083da62c9eec926d1165e515999116b",
+      "lines": 22
+    },
+    {
+      "path": "source/e4-population-v01/src/bin/e4-population-v01.rs",
+      "bytes": 11854,
+      "sha256": "6bb19880c3101c2483cc8cf945d26add646bfa9db27f4a7329aba79ea41720dd",
+      "lines": 315
+    },
+    {
+      "path": "source/e4-population-v01/src/identity.rs",
+      "bytes": 14033,
+      "sha256": "58e5c95ad5d00daeafc810b70d28aefa605f0320b2d7144651e85b5a598f3b5d",
+      "lines": 365
+    },
+    {
+      "path": "source/e4-population-v01/src/lib.rs",
+      "bytes": 3760,
+      "sha256": "8de3e3ddf932011d83ca3131310fb97607e0bb00535e395b36c6712407ce014c",
+      "lines": 101
+    },
+    {
+      "path": "source/e4-population-v01/src/population.rs",
+      "bytes": 30119,
+      "sha256": "674a610a29d5903ec34562d537fd45b573237d96b7a5450978545fc46d4363cf",
+      "lines": 770
+    },
+    {
+      "path": "source/e4-population-v01/src/render.rs",
+      "bytes": 9345,
+      "sha256": "4bfe046c905b19733f809bc59434db781245f5c7412d77723d5bc13358f6f984",
+      "lines": 256
+    },
+    {
+      "path": "source/e4-population-v01/src/schema.rs",
+      "bytes": 4529,
+      "sha256": "bc31c30b5f0bf512edcce7c306fd03fb1511cfe0c570cab03208b0707fdabef9",
+      "lines": 141
+    },
+    {
+      "path": "source/e4-population-v01/src/support.rs",
+      "bytes": 5793,
+      "sha256": "8cbb8b4c2b61238481dfbe0815eb35930c67d1bce1cb8b000358079a33992a88",
+      "lines": 147
+    },
+    {
+      "path": "source/e4-population-v01/src/writer.rs",
+      "bytes": 12143,
+      "sha256": "b9d70061432319991138f19585c2115555deabfbb372963edc56cd9c22a52997",
+      "lines": 320
+    }
+  ],
+  "source_schema": {
+    "model_input": "row_id,quartet_id,variant_id,input_text",
+    "truth_partition_values": [
+      "PRIMARY_TERMINAL",
+      "TEMPLATE_ESCROW"
+    ],
+    "heldout_escrow_labels": "primary terminal fields plus joint_template_lexical",
+    "row_manifest": "row_index,row_id,quartet_id,variant_id,surface_id,truth_partition",
+    "join_key": "row_id",
+    "primary_terminal_labels": "row_id,quartet_id,variant_id,context_term_id,entity_term_id,relation_id,state_id,exact_target,target_candidate_identity,candidate_identity_order,both_terms_train_side,fit_eligibility,score_strata",
+    "surface_id_values": [
+      "PRIMARY_SEEN",
+      "HELDOUT_TEMPLATE"
+    ],
+    "order": "schedule ordinal ascending; PRIMARY_SEEN before HELDOUT_TEMPLATE; A,C,E,P"
+  },
+  "frozen_replay": {
+    "unique_feature_rows": 149336,
+    "selected_whole_quartet_prefix": 18667,
+    "shared_candidate_counter_sum": 7915,
+    "population_namespace": "FAS-E4-0-POP-V01",
+    "model_tokenizer_cuda_contact": false,
+    "template_truth_opened": false,
+    "previous_prefix_minimum_class_count": 248,
+    "maximum_candidate_counter": 8,
+    "world_render_seed_u64": 2026092605,
+    "primary_rows": 74668,
+    "heldout_template_rows": 74668,
+    "selected_minimum_class_count": 252
+  },
+  "validation": {
+    "benchmark_claim": "hot-path engineering measurement only; synthetic inputs; not E4 population throughput claim",
+    "benchmark_case": "synthetic_512_quartets_collision_and_jsonl",
+    "cargo_clippy": "PASS: cargo clippy --all-targets -- -D warnings",
+    "benchmark_estimate": "9.3739 ms point estimate; 95% interval [8.6376 ms, 10.287 ms] per 512 synthetic quartets",
+    "cargo_fmt_check": "PASS",
+    "e1_public_input_replay": "PASS: exact selected prefix, support, collisions, and v11 counter receipt; 28.9 s test body",
+    "cargo_bench": "PASS: optimized synthetic benchmark, 10 samples, 1 s warmup, 2 s measurement",
+    "cargo_test": "PASS: 12 library tests + 2 binary tests; doc-tests pass",
+    "cargo_target_dir": "G:\\cargo-targets\\e4-population-v01"
+  },
+  "materialization": {
+    "required_stage": "POPULATION_GENERATION",
+    "actual_e4_rows_written": false,
+    "output_root": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e4-0-v01",
+    "model_contacted": false,
+    "output_root_created": false,
+    "stage_authorization_schema": "FAS_E4_0_STAGE_AUTH_V01",
+    "cli_runtime": "Not invoked: final v05 contract/seal and stage authorization receipt were not present at closeout; CLI validates all three before creating output paths.",
+    "cuda_initialized": false,
+    "writer_status": "POPULATION_COMPLETE_GATE_PASS",
+    "tokenizer_contacted": false,
+    "terminal_labels_opened": false
+  },
+  "limitations": [
+    "CLI runtime seal/auth end-to-end was not exercised because final contract seal and stage authorization were not yet issued."
+  ]
+}

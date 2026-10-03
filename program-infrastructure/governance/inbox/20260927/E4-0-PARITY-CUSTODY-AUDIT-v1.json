@@ -1,0 +1,25 @@
+{
+  "schema": "CHIEF_E4_0_PARITY_CUSTODY_AUDIT_V1",
+  "status": "PASS_SUPERVISED_OUTPUT_CUSTODY",
+  "scope": "output identities, worker completion, returned stage entries, released fence; no independent scientific parity recomputation",
+  "run_id": "frozen-fabrique.e4-0.supervised.v1",
+  "stage_id": "E4_0_ONLINE_CACHE_PARITY_V1",
+  "authorization_id": "sha256:95f32e3391962b270e601d4b16f2ff5c31421ce0449742f3d3bf1651e35aa658",
+  "lease_id": "lease-dbbb9ed41b787f9afcd72a4d3a2525b9d0e7de0bcaa5d173fdfaa304d1079164",
+  "fencing_token": 1,
+  "model_launch_contact_event": "sha256:11aeaac5d581ad7667cf7136c63f7235257cc680c3014c575f54436c421a59f0",
+  "finish_event": "sha256:d21da56c6a32596e377549ceebb55bd6bbd286f3948d17c54167fb39e1203163",
+  "release_event": "sha256:ebbd833656c93275ef58d12ed566a33eff27e475cef5af8b7af6711a2d8c5143",
+  "output_artifact_ids": {
+    "parity-online-features.f32le": "sha256:f2c30f7a334dcc0f154c4b0b56e65e90d7eb8def1ab677fc64aa265287c0da9e",
+    "parity-receipt-v01.json": "sha256:702d76234baeb554502eb42728adf5d9b32c6d51cc044a325e615a160d61b21c",
+    "stage-seal-v01.json": "sha256:c83b3ab7ed9060c3d6b70dddb74d6f9b8409e61f261b1299f646649fa56a1afe"
+  },
+  "parity_receipt_claim": "ONLINE_CACHE_PARITY_PASS",
+  "lab_stage_seal_root_claim": "21b5cdd1f1dfbaaa132ffc8cea38f31bb26612bc438fb7e10ac3bffcb673ae73",
+  "fence_valid_after_release": false,
+  "library_acceptance_id": "sha256:f98dcd6743c5e8b7ff091cef2d69aa361e53c252711c7b001f3a71d322744602",
+  "journal_projection_match": true,
+  "protected_label_bytes_opened_by_chief": false,
+  "e4_01_entry_open": false
+}

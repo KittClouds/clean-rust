@@ -1,0 +1,95 @@
+{
+  "seal_id": "FAS00_PRE_MODEL_CONTACT_V01",
+  "project_id": "fas-frozen-adaptive-substrate-v00",
+  "disposition": "PRE_MODEL_CONTACT_SEALED",
+  "model_contact_authorized": false,
+  "model_contact_performed": false,
+  "scope": "Protocol, generator, validator, interfaces, local tests, contracts; no LFM, features, heads, or evaluation.",
+  "root_sha256": "c7227d2a10da05f902ed5d16e94a8e12866d2e0ae6b2b2a357ed2da93431b3e6",
+  "files": [
+    {
+      "path": ".gitignore",
+      "sha256": "8b33400996c843bc2b12614e608556a90a67ebf490182de7d22781da4dc552a5"
+    },
+    {
+      "path": "analysis/README.md",
+      "sha256": "b9531c33e38879eeab557b44d6fe7f8e0032c666e4f1f83e6a9cb341e8770bb2"
+    },
+    {
+      "path": "Cargo.lock",
+      "sha256": "1a824afaae03c34ad1560a2c4754486e7d2fab41806c32a3ed680991f51d143f"
+    },
+    {
+      "path": "Cargo.toml",
+      "sha256": "931005a512016db3c3ad3de84108b225c1f82c38ff85dafda2434e34a3f5c713"
+    },
+    {
+      "path": "contracts/feature-contract-v01.json",
+      "sha256": "1f60ef84da2de16a053b3f53a725bd079efa94065728025840fe7f3bcfad85d7"
+    },
+    {
+      "path": "contracts/metric-contract-v01.json",
+      "sha256": "c5422df5e2a538fa186de2738ffebb20837e5cc78dd4eec43b69c1ceadbaad68"
+    },
+    {
+      "path": "contracts/resource-accounting-contract-v01.json",
+      "sha256": "5e08159059d6456bc2edb47c4b109ed680b2c23021f53e936b323dedea913527"
+    },
+    {
+      "path": "contracts/world-contract-v01.json",
+      "sha256": "6266346e535397089779438845399fdb7f95d724f255bb359774e310bfd951a5"
+    },
+    {
+      "path": "FAS-00-PROTOCOL.md",
+      "sha256": "15d8c29a48d8959a3edeff648522adac7d6eb597e420a4785fd77c76023e2df8"
+    },
+    {
+      "path": "manifests/README.md",
+      "sha256": "3389f3a398e83f891cf7b90f330121b7ecaf717bde20e782e70275e19fe1a4e5"
+    },
+    {
+      "path": "README.md",
+      "sha256": "f61fa6ecc95f8f31fab304de1080c9d09373d9f976f293bcc3df12b5bf9b9eed"
+    },
+    {
+      "path": "receipts/pre-model-checks-v01.json",
+      "sha256": "f4875d4fd9ae5b540867cec247524691e66ef3cec847da39ea177477d1f06796"
+    },
+    {
+      "path": "receipts/README.md",
+      "sha256": "c9ef7f714ba83e76563ffb9c2fe3a0007510cda77c1bfa56d7da6cc8382585f2"
+    },
+    {
+      "path": "scripts/seal-pre-model.ps1",
+      "sha256": "aa2d430be3f05ce3dc7265ec3bbddeda495065b78ae5c4df8eb95c20c7792f66"
+    },
+    {
+      "path": "splits/README.md",
+      "sha256": "6d9b7738b61115c1012f5f2a6ec56a47f59582f10ede489b4a1b5fd813b69785"
+    },
+    {
+      "path": "src/interface.rs",
+      "sha256": "27f016b75c7f88d3d0e788c95f13ecab761aaf205ceafd9b6ed0f9d0f8dacb8e"
+    },
+    {
+      "path": "src/lib.rs",
+      "sha256": "af4eafe3fed74cee0f2e6466ee22b28bef2990204d5cf818350e5c7d58daf978"
+    },
+    {
+      "path": "src/main.rs",
+      "sha256": "b6f31fbdbe3a2f69abca7399a9378ae45d137de46a533b1171cdd796dc8a3e46"
+    },
+    {
+      "path": "src/validate.rs",
+      "sha256": "14cf201d4cf6fe8cbf99208da05900b923fd966eab356f735eb3170832828bce"
+    },
+    {
+      "path": "src/world.rs",
+      "sha256": "43f7b26ba4dc477cde43339af64bf13db1d92aba30fcc26b9031c331244711dd"
+    },
+    {
+      "path": "tests/contracts.rs",
+      "sha256": "ada441bb43cef9dd2c068a91ade63c22668cf945f78302a0591977e90482dd67"
+    }
+  ]
+}

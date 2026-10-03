@@ -1,0 +1,11 @@
+{
+  "audited_events": 32,
+  "behavioral_inference": false,
+  "bundle_count": 8,
+  "contract_sha256": "aa3ebffcb464475f1bda4e7e83f5fbc46fd2269fdb58427da6b9a21c4ffe76c2",
+  "dh08b_authorized": false,
+  "plan_sha256": "7dac38df5f857896831d018fd5ba0dd996cb6c280ab2060508cd9deed83cb64f",
+  "protocol": "Q10-DN2",
+  "scientific_seed_bundles": 0,
+  "status": "VERIFIED"
+}

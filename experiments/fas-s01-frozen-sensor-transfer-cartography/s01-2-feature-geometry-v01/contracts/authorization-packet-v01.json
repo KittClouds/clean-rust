@@ -1,0 +1,31 @@
+{
+  "packet_id": "FASS01_S01_2_MODEL_CONTACT_AUTHORIZATION_V01",
+  "project_id": "fas-s01-frozen-sensor-transfer-cartography",
+  "phase_id": "S01-2-feature-geometry-v01",
+  "authorization_basis": "The user explicitly authorized pinned S01-2 frozen feature extraction and the already-frozen geometry analysis in the active conversation on 2026-09-23.",
+  "scope": {
+    "model_id": "LiquidAI/LFM2.5-1.2B-Base",
+    "revision": "7453bca97ca1e67754c4035a4b4c584e1c9dd725",
+    "corpus_sha256": "51a55212ba89d55bd6df532673ad4546c95def1f5d75622661f7c17b3e4a7ad1",
+    "S01_2C_result_tree_root_sha256": "662fa64623e1970417564a9ae2c089d849b510465b70bcd376131eb02537890c",
+    "feature_contract_sha256": "08ddd42795d71d9b598da5015d5541316c6cf1f2c0761ce3c0890229cda4d5b0",
+    "geometry_contract_sha256": "4f6df89b02d0b991e09ab5d8f2658627c48799a10b1dd0557795c433d61099ab"
+  },
+  "permitted": [
+    "Load the exact pinned frozen LFM revision.",
+    "Extract the seven frozen views for the 106496 sealed event inputs using S01-2C assignments.",
+    "Verify the full model state identity before and after extraction and deterministic repeats.",
+    "Repeat the first 256 events and compare token/offset/shape/feature identities exactly.",
+    "Seal the complete feature cache and receipts before geometry.",
+    "Execute the existing frozen descriptive geometry contract over A/C/E/P quartets."
+  ],
+  "forbidden": [
+    "Probe fitting or training", "nonlinear diagnostics", "online adaptation", "view selection or ranking", "pooling/layer/normalization search", "corpus modification", "span ownership reinterpretation", "tokenizer invocation", "backbone writes", "S01-3"
+  ],
+  "terminal_authority": {
+    "S01_2_MODEL_CONTACT_AUTHORIZED": true,
+    "S01_2_FEATURE_EXTRACTION_AUTHORIZED": true,
+    "S01_2_GEOMETRY_ANALYSIS_AUTHORIZED_AFTER_FEATURE_SEAL": true,
+    "S01_3_AUTHORIZED": false
+  }
+}

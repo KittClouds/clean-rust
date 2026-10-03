@@ -1,0 +1,122 @@
+{
+  "contract_id": "FAS_S02_TWO_VIEW_ATTRIBUTION_V01",
+  "experiment_id": "fas-s02-original-corpus-readout-surface-attribution-v01",
+  "status": "SEALED_PROSPECTIVE_CONTRACT; EXECUTION_NOT_AUTHORIZED",
+  "parents": {
+    "parent_binding": "contracts/parent-binding-v01.json",
+    "parent_binding_is_hash_bound_by_construction_seal": true,
+    "fas00_phase1_root_sha256": "d3ca9f8ef988a6f0ae93318fc0ea7c504b23b3be801dbf133d66f67746a69274",
+    "fas00_phase2a_cache_root_sha256": "9af2c6c73a2f21608e8a2dc912d8838968eaebffb32b4b1ea0a18364e488d217",
+    "fas00_phase3_contract_sha256": "7b031e9aa7dfe92174a2ad8e5764b3b7a66505167dd8e32f35c542903a411a4b",
+    "fas00_phase3_result_root_sha256": "09fd072754e3b149ac2a9564928209a792eba091064033ca0d7f455333dda0c5"
+  },
+  "scientific_question": "On the original FAS-00 qualification corpus and grouped split, does final-position readout change exact-target transfer relative to the existing FAS_FEATURE_V1 mean_full readout?",
+  "hypothesis_status": "Diagnostic comparison only; no promotion threshold or pass criterion.",
+  "authorization": {
+    "construction_packet_ready": true,
+    "model_contact_authorized": false,
+    "tokenizer_contact_authorized": false,
+    "final_position_extraction_authorized": false,
+    "probe_training_authorized": false,
+    "prediction_or_scoring_authorized": false,
+    "online_mechanisms_authorized": false,
+    "phase5_generation_authorized": false
+  },
+  "corpus": {
+    "corpus_id": "FAS00_WORLD_QUALIFICATION_V03",
+    "event_sha256": "9fdd7ce9e49b86ac9acb3da035429c616865f527123bd0ac7c312b1b912439ca",
+    "event_count": 32768,
+    "only_feature_input": "FULL",
+    "full_model_input": "Exact token IDs and lengths already recorded in the sealed FAS-00 Phase 2A FULL row receipts; do not retokenize or alter input text.",
+    "extractor_read_projection": ["row_index", "event_id", "source_rendered_event_sha256", "token_ids", "token_ids_sha256", "sequence_length", "hidden_dimension", "model_revision", "tokenizer_identity", "feature_contract_sha256"],
+    "label_and_latent_fields_to_extractor": "FORBIDDEN; the extractor does not deserialize the Phase 1 event labels or latent world state.",
+    "feature_rows_must_preserve_phase1_jsonl_order": true
+  },
+  "split_and_transfer": {
+    "group_field": "world_seed",
+    "train": {"world_seeds_inclusive": [0, 15], "surface_template_ids": [3, 4]},
+    "validation": {"world_seeds_inclusive": [16, 23], "surface_template_ids": [5]},
+    "test": {"world_seeds_inclusive": [24, 31], "surface_template_ids": [5]},
+    "transfer_train_rows": "Training rows with non-null observation_text, context_term_id != 3, and entity_term_id != 7.",
+    "test_context_slice": "Test rows with non-null observation_text and context_term_id == 3.",
+    "test_entity_slice": "Test rows with non-null observation_text and entity_term_id == 7.",
+    "no_resampling_or_reassignment": true,
+    "row_identity_binding": "event_id and Phase 1 JSONL row index; exact target is canonical candidate identity index 0=safe, 1=risky, 2=idle."
+  },
+  "view_contract": {
+    "views": [
+      {
+        "view_id": "MEAN_FULL_REFERENCE",
+        "source": "Read-only FAS-00 Phase 2A FULL feature rows at even row indices.",
+        "layer": "final hidden layer",
+        "pooling": "FAS_FEATURE_V1 arithmetic mean over all model-visible positions",
+        "dimension": 2048,
+        "new_model_forward": false
+      },
+      {
+        "view_id": "FINAL_POSITION",
+        "source": "New S02-only final hidden state extraction from the same sealed FULL token-ID sequences.",
+        "layer": "final hidden layer",
+        "pooling": "none; select hidden state at sequence_length - 1",
+        "dimension": 2048,
+        "new_model_forward": true
+      }
+    ],
+    "input_row_count": 32768,
+    "dtype": "float32 little-endian",
+    "expected_tensor_bytes": 268435456,
+    "output_row_order": "Phase 1 v03 event JSONL order; source FULL feature row 2*i maps to output final-position row i.",
+    "row_receipt_fields": ["row_index", "event_id", "source_rendered_event_sha256", "source_input_utf8_sha256", "token_ids_sha256", "sequence_length", "selected_position", "feature_shape", "feature_sha256", "model_revision", "tokenizer_identity", "source_feature_contract_sha256", "s02_contract_sha256"],
+    "forward_batching": "one row per forward; exact length; no padding; no mixed-length batch",
+    "repeat_sample": "Sort event IDs by SHA-256 of UTF-8 'FAS_S02_FINAL_REPEAT_V01\\0' || event_id; repeat the first 32 distinct events twice and require token/feature byte identity.",
+    "backbone_parameter_identity_before_after": "4a42ee660380cac1912f131594cde3b3585f459d20e0b261b02d630748ef3767",
+    "mismatch_action": "FAIL_CLOSED; preserve inputs and stop without fitting probes."
+  },
+  "linear_readout": {
+    "existing_mean_full_probe": {
+      "source_artifact": "FAS-00 sealed HELDOUT_TERM_EXACT_TARGET probe state",
+      "sha256": "be7c4fa016f1ad5887a8bf087a395a6ca02377d706be291a5ad1b6fbcc9cabbb",
+      "action": "Load read-only and reproduce its original test predictions/metrics. Do not refit this reference probe."
+    },
+    "final_position_probe": {
+      "fit_count": 1,
+      "classes": ["safe", "risky", "idle"],
+      "model": "Multinomial linear softmax logits Wx+b; argmax with lowest-class tie break.",
+      "objective": "Mean multiclass cross entropy + (1.0/2) * squared Frobenius norm of W; bias unregularized.",
+      "standardization": "Per-dimension training-row mean and population standard deviation; divide by max(std, 1e-6); no other transform.",
+      "optimizer": "Deterministic full-batch float64 SciPy L-BFGS-B with analytic gradient, all-zero initialization, maxiter=1000, maxfun=1000000, maxcor=10, maxls=20, gtol=1e-8, ftol=0.0.",
+      "convergence": "Require solver success, finite parameters/objective/gradient, and gradient infinity norm <= 1e-8. No retry or alternate solver.",
+      "implementation_source_sha256": "ff948c4c94acfd7e520292a26b9bf6bc43c13423be8c9fa4013d1359ef065cd3",
+      "runtime": {"python": "3.13.15", "numpy": "2.5.3", "scipy": "1.16.2", "scipy_wheel_sha256": "fda714cf45ba43c9d3bae8f2585c777f64e3f89a2e073b668b32ede412d8f52c", "blas_threads": 4}
+    },
+    "fit_rows_and_labels": "The exact transfer_train_rows above; labels are exact_target from the sealed qualification events.",
+    "evaluation_rows": ["test_context_slice", "test_entity_slice"],
+    "primary_metric": "Three-class balanced accuracy on test_context_slice.",
+    "secondary_metrics": ["ordinary accuracy", "per-class support and recall", "per-world-seed metrics", "per-family/task/feedback/template metrics", "paired event correctness table", "final_position minus mean_full difference"],
+    "no_result_thresholds": true,
+    "no_composite_score": true,
+    "no_confidence_or_significance_claim": true
+  },
+  "failure_semantics": {
+    "source_or_row_identity_mismatch": "S02_FAIL_PARENT_OR_ROW_IDENTITY",
+    "feature_or_backbone_hash_mismatch": "S02_FAIL_FEATURE_INTEGRITY",
+    "repeat_mismatch": "S02_FAIL_NONDETERMINISM",
+    "probe_nonconvergence": "S02_FAIL_FIXED_SOLVER_NONCONVERGENCE",
+    "no_result_driven_repair": true
+  },
+  "forbidden": [
+    "FAS-00 modification or disposition change",
+    "new or modified world generation",
+    "Phase 5 corpus generation or evaluation",
+    "S01 corpus, feature, probe, prediction, or metric reuse as an S02 fitting input",
+    "query-only probes or views",
+    "layer/pooling/normalization/search or threshold changes",
+    "nonlinear probes or optimizer search",
+    "online readout, episodic memory, snapshots, recurrent state, RTRL, JEPA, or any adaptive mechanism",
+    "backbone training, LoRA, quantization, or parameter writes"
+  ],
+  "output_paths_after_future_authorization": {
+    "final_position_cache": "D:/codex-runs/fas-s02-original-corpus-readout-surface-attribution-v01/s02-1-final-position-v01/",
+    "readout_results": "D:/codex-runs/fas-s02-original-corpus-readout-surface-attribution-v01/s02-2-readout-attribution-v01/"
+  }
+}

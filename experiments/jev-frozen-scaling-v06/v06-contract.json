@@ -1,0 +1,35 @@
+{
+  "protocol": "jev-frozen-decision-surface-scaling/v0.6",
+  "status": "active_narrow_extension",
+  "lanes": [
+    {
+      "id": "v0.6-S",
+      "purpose": "250k S100 frozen-head scaling",
+      "backbones": ["minicpm5-1b-base", "qwen3-0.6b-base", "k2-horizon-0.9b"],
+      "scale": 250000,
+      "mixture": "S100",
+      "head": "v0.4 validated MLP, projection 128",
+      "representation": "final_layer_mean_full",
+      "candidate_profile": "name_definition",
+      "loss": "v0.4_L3_source_typed",
+      "epochs": 3,
+      "backbone_frozen": true
+    },
+    {
+      "id": "v0.6-B",
+      "purpose": "contradictory opaque-identity binding evaluation",
+      "gold_rule": "exposed definition controls semantics"
+    },
+    {
+      "id": "v0.6-O",
+      "purpose": "parallel open-world outside-mass extension",
+      "closed_world_curve_unchanged": true,
+      "outside_mass_explicit": true
+    }
+  ],
+  "protected": {
+    "v04_qlora_gate_reopened": false,
+    "v05_inputs_mutated": false,
+    "phoenix_in_scope": false
+  }
+}

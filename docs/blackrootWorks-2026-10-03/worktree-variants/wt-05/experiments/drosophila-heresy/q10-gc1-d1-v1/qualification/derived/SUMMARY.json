@@ -1,0 +1,23 @@
+{
+  "counts": {
+    "baseline": 3386,
+    "cases": 14,
+    "damaged_valid": 118,
+    "fixed_valid": 1050,
+    "states": 28,
+    "valid": 2454
+  },
+  "engineering_only": true,
+  "gate": {
+    "behavioral_probe": false,
+    "new_replay": false,
+    "parents_unchanged": true,
+    "reconciliation_pass": true,
+    "reconstruction_complete": true
+  },
+  "identity": "q10-gc1-d1-v1",
+  "interpretation": "Saved valid/search states reconstructed; aggregate 3386->2454 with 1050 repaired and 118 damaged. Bucket audit and signed geometry retained per state. No causal attribution; no beam recommendation.",
+  "protocol": "Q10-GC1-D1",
+  "scientific_promotion": false,
+  "status": "D1_SAVED_STATE_ANATOMY_COMPLETE"
+}

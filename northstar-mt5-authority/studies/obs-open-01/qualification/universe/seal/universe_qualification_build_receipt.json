@@ -1,0 +1,1 @@
+{"builder":"tools/build_universe_qualification_seal.py","builder_sha256":"25ccee8a2ec96708f6d051e8f9565b03c7078773c10ec34c8ae2c6f03b7f0d3b","determinism_requirement":"TWO_INDEPENDENT_OUTPUT_DIRECTORIES_BYTE_IDENTICAL","schema":"OBS_OPEN_UNIVERSE_QUALIFICATION_BUILD_V1","validation":"PASS"}

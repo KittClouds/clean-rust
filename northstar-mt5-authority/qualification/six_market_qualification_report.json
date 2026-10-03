@@ -1,0 +1,244 @@
+﻿{
+    "contract":  "MST_SIX_MARKET_QUALIFICATION_V1",
+    "research_generation":  2,
+    "issued_at_utc":  "2026-08-12T08:42:53.1414992Z",
+    "status":  "PASS",
+    "matrix":  [
+                   {
+                       "instrument":  "US30",
+                       "symbol_binding":  "US30=US30",
+                       "data_complete":  1,
+                       "producers_valid":  1,
+                       "nodes_valid":  1,
+                       "episodes_observed":  13,
+                       "invariants_valid":  1,
+                       "replay_valid":  1,
+                       "performance_valid":  1,
+                       "qualification_status":  "QUALIFIED"
+                   },
+                   {
+                       "instrument":  "FRA40",
+                       "symbol_binding":  "FRA40=FRA40",
+                       "data_complete":  1,
+                       "producers_valid":  1,
+                       "nodes_valid":  1,
+                       "episodes_observed":  8,
+                       "invariants_valid":  1,
+                       "replay_valid":  1,
+                       "performance_valid":  1,
+                       "qualification_status":  "QUALIFIED"
+                   },
+                   {
+                       "instrument":  "DE40",
+                       "symbol_binding":  "DE40=DE40",
+                       "data_complete":  1,
+                       "producers_valid":  1,
+                       "nodes_valid":  1,
+                       "episodes_observed":  13,
+                       "invariants_valid":  1,
+                       "replay_valid":  1,
+                       "performance_valid":  1,
+                       "qualification_status":  "QUALIFIED"
+                   },
+                   {
+                       "instrument":  "JPN225",
+                       "symbol_binding":  "JPN225=JPN225",
+                       "data_complete":  1,
+                       "producers_valid":  1,
+                       "nodes_valid":  1,
+                       "episodes_observed":  18,
+                       "invariants_valid":  1,
+                       "replay_valid":  1,
+                       "performance_valid":  1,
+                       "qualification_status":  "QUALIFIED"
+                   },
+                   {
+                       "instrument":  "US500",
+                       "symbol_binding":  "US500=US500",
+                       "data_complete":  1,
+                       "producers_valid":  1,
+                       "nodes_valid":  1,
+                       "episodes_observed":  9,
+                       "invariants_valid":  1,
+                       "replay_valid":  1,
+                       "performance_valid":  1,
+                       "qualification_status":  "QUALIFIED"
+                   },
+                   {
+                       "instrument":  "USTEC",
+                       "symbol_binding":  "USTEC=USTEC",
+                       "data_complete":  1,
+                       "producers_valid":  1,
+                       "nodes_valid":  1,
+                       "episodes_observed":  26,
+                       "invariants_valid":  1,
+                       "replay_valid":  1,
+                       "performance_valid":  1,
+                       "qualification_status":  "QUALIFIED"
+                   }
+               ],
+    "details":  {
+                    "US30":  {
+                                 "exact_symbol":  "US30",
+                                 "digits":  2,
+                                 "point":  0.01,
+                                 "tick_size":  0.01,
+                                 "session_count":  5,
+                                 "m5_bars_available":  50000,
+                                 "completed_runs":  3,
+                                 "warmup_valid":  true,
+                                 "producer_set":  [
+                                                      "DAY_SWINGS",
+                                                      "VOLKITT",
+                                                      "WAYNE"
+                                                  ],
+                                 "maximum_nodes_per_snapshot":  10,
+                                 "events_observed":  185,
+                                 "p95_update_us":  169,
+                                 "maximum_update_us":  34269,
+                                 "replay_dataset_hash":  "02a23ad202afcf1527444ba0306259a27f5a51afa14b1ac47a7f70dda93bb8df",
+                                 "qualification_status":  "QUALIFIED",
+                                 "certificate_output":  [
+                                                            "status=PASS",
+                                                            "json=C:\\Users\\shuga\\OneDrive\\Documents\\ChatGPT\\eas\\qualification\\certificates\\MasterAuction_US30_PERIOD_M5_QUALRG2_ACTIVE_RG2_v7_replay_certificate.json",
+                                                            "markdown=C:\\Users\\shuga\\OneDrive\\Documents\\ChatGPT\\eas\\qualification\\certificates\\MasterAuction_US30_PERIOD_M5_QUALRG2_ACTIVE_RG2_v7_replay_certificate.md",
+                                                            "canonical_dataset_hash=02a23ad202afcf1527444ba0306259a27f5a51afa14b1ac47a7f70dda93bb8df"
+                                                        ]
+                             },
+                    "FRA40":  {
+                                  "exact_symbol":  "FRA40",
+                                  "digits":  1,
+                                  "point":  0.1,
+                                  "tick_size":  0.1,
+                                  "session_count":  6,
+                                  "m5_bars_available":  50000,
+                                  "completed_runs":  3,
+                                  "warmup_valid":  true,
+                                  "producer_set":  [
+                                                       "DAY_SWINGS",
+                                                       "VOLKITT",
+                                                       "WAYNE"
+                                                   ],
+                                  "maximum_nodes_per_snapshot":  11,
+                                  "events_observed":  271,
+                                  "p95_update_us":  190,
+                                  "maximum_update_us":  34525,
+                                  "replay_dataset_hash":  "43074d5e08b799c001669103dcd44dc489e7c55a7927433123704737cb09ff11",
+                                  "qualification_status":  "QUALIFIED",
+                                  "certificate_output":  [
+                                                             "status=PASS",
+                                                             "json=C:\\Users\\shuga\\OneDrive\\Documents\\ChatGPT\\eas\\qualification\\certificates\\MasterAuction_FRA40_PERIOD_M5_QUALRG2_ACTIVE_RG2_v7_replay_certificate.json",
+                                                             "markdown=C:\\Users\\shuga\\OneDrive\\Documents\\ChatGPT\\eas\\qualification\\certificates\\MasterAuction_FRA40_PERIOD_M5_QUALRG2_ACTIVE_RG2_v7_replay_certificate.md",
+                                                             "canonical_dataset_hash=43074d5e08b799c001669103dcd44dc489e7c55a7927433123704737cb09ff11"
+                                                         ]
+                              },
+                    "DE40":  {
+                                 "exact_symbol":  "DE40",
+                                 "digits":  2,
+                                 "point":  0.01,
+                                 "tick_size":  0.01,
+                                 "session_count":  10,
+                                 "m5_bars_available":  50000,
+                                 "completed_runs":  3,
+                                 "warmup_valid":  true,
+                                 "producer_set":  [
+                                                      "DAY_SWINGS",
+                                                      "VOLKITT",
+                                                      "WAYNE"
+                                                  ],
+                                 "maximum_nodes_per_snapshot":  11,
+                                 "events_observed":  226,
+                                 "p95_update_us":  193,
+                                 "maximum_update_us":  32546,
+                                 "replay_dataset_hash":  "7f3729242114cfc6c95218bfc79b98748758144f2268d433b35778521a34212e",
+                                 "qualification_status":  "QUALIFIED",
+                                 "certificate_output":  [
+                                                            "status=PASS",
+                                                            "json=C:\\Users\\shuga\\OneDrive\\Documents\\ChatGPT\\eas\\qualification\\certificates\\MasterAuction_DE40_PERIOD_M5_QUALRG2_ACTIVE_RG2_v7_replay_certificate.json",
+                                                            "markdown=C:\\Users\\shuga\\OneDrive\\Documents\\ChatGPT\\eas\\qualification\\certificates\\MasterAuction_DE40_PERIOD_M5_QUALRG2_ACTIVE_RG2_v7_replay_certificate.md",
+                                                            "canonical_dataset_hash=7f3729242114cfc6c95218bfc79b98748758144f2268d433b35778521a34212e"
+                                                        ]
+                             },
+                    "JPN225":  {
+                                   "exact_symbol":  "JPN225",
+                                   "digits":  0,
+                                   "point":  1,
+                                   "tick_size":  1,
+                                   "session_count":  6,
+                                   "m5_bars_available":  50000,
+                                   "completed_runs":  3,
+                                   "warmup_valid":  true,
+                                   "producer_set":  [
+                                                        "DAY_SWINGS",
+                                                        "VOLKITT",
+                                                        "WAYNE"
+                                                    ],
+                                   "maximum_nodes_per_snapshot":  10,
+                                   "events_observed":  438,
+                                   "p95_update_us":  183,
+                                   "maximum_update_us":  34052,
+                                   "replay_dataset_hash":  "cb3a293ad48bf366df0faff859e89c8b5ed74baeefd3fa9e522ccc3154cc3962",
+                                   "qualification_status":  "QUALIFIED",
+                                   "certificate_output":  [
+                                                              "status=PASS",
+                                                              "json=C:\\Users\\shuga\\OneDrive\\Documents\\ChatGPT\\eas\\qualification\\certificates\\MasterAuction_JPN225_PERIOD_M5_QUALRG2_ACTIVE_RG2_v7_replay_certificate.json",
+                                                              "markdown=C:\\Users\\shuga\\OneDrive\\Documents\\ChatGPT\\eas\\qualification\\certificates\\MasterAuction_JPN225_PERIOD_M5_QUALRG2_ACTIVE_RG2_v7_replay_certificate.md",
+                                                              "canonical_dataset_hash=cb3a293ad48bf366df0faff859e89c8b5ed74baeefd3fa9e522ccc3154cc3962"
+                                                          ]
+                               },
+                    "US500":  {
+                                  "exact_symbol":  "US500",
+                                  "digits":  2,
+                                  "point":  0.01,
+                                  "tick_size":  0.01,
+                                  "session_count":  5,
+                                  "m5_bars_available":  50000,
+                                  "completed_runs":  3,
+                                  "warmup_valid":  true,
+                                  "producer_set":  [
+                                                       "DAY_SWINGS",
+                                                       "VOLKITT",
+                                                       "WAYNE"
+                                                   ],
+                                  "maximum_nodes_per_snapshot":  12,
+                                  "events_observed":  239,
+                                  "p95_update_us":  186,
+                                  "maximum_update_us":  36231,
+                                  "replay_dataset_hash":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                                  "qualification_status":  "QUALIFIED",
+                                  "certificate_output":  [
+                                                             "status=PASS",
+                                                             "json=C:\\Users\\shuga\\OneDrive\\Documents\\ChatGPT\\eas\\qualification\\certificates\\MasterAuction_US500_PERIOD_M5_QUALRG2_ACTIVE_RG2_v7_replay_certificate.json",
+                                                             "markdown=C:\\Users\\shuga\\OneDrive\\Documents\\ChatGPT\\eas\\qualification\\certificates\\MasterAuction_US500_PERIOD_M5_QUALRG2_ACTIVE_RG2_v7_replay_certificate.md",
+                                                             "canonical_dataset_hash=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                                                         ]
+                              },
+                    "USTEC":  {
+                                  "exact_symbol":  "USTEC",
+                                  "digits":  2,
+                                  "point":  0.01,
+                                  "tick_size":  0.01,
+                                  "session_count":  5,
+                                  "m5_bars_available":  50004,
+                                  "completed_runs":  3,
+                                  "warmup_valid":  true,
+                                  "producer_set":  [
+                                                       "DAY_SWINGS",
+                                                       "VOLKITT",
+                                                       "WAYNE"
+                                                   ],
+                                  "maximum_nodes_per_snapshot":  12,
+                                  "events_observed":  463,
+                                  "p95_update_us":  194,
+                                  "maximum_update_us":  34381,
+                                  "replay_dataset_hash":  "2ce33f4ae08f85e4dc6be9053ff0e7c98837ed5fc49c1e5f3d8f52fbfb4e3abf",
+                                  "qualification_status":  "QUALIFIED",
+                                  "certificate_output":  [
+                                                             "status=PASS",
+                                                             "json=C:\\Users\\shuga\\OneDrive\\Documents\\ChatGPT\\eas\\qualification\\certificates\\MasterAuction_USTEC_PERIOD_M5_QUALRG2_ACTIVE_RG2_v7_replay_certificate.json",
+                                                             "markdown=C:\\Users\\shuga\\OneDrive\\Documents\\ChatGPT\\eas\\qualification\\certificates\\MasterAuction_USTEC_PERIOD_M5_QUALRG2_ACTIVE_RG2_v7_replay_certificate.md",
+                                                             "canonical_dataset_hash=2ce33f4ae08f85e4dc6be9053ff0e7c98837ed5fc49c1e5f3d8f52fbfb4e3abf"
+                                                         ]
+                              }
+                }
+}

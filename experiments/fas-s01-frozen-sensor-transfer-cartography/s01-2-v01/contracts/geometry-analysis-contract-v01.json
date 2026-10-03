@@ -1,0 +1,34 @@
+{
+  "contract_id": "FASS01_GEOMETRY_ANALYSIS_V01",
+  "status": "PROSPECTIVE_ONLY; EXECUTION_REQUIRES_SEPARATE_AUTHORIZATION_AFTER_EXTRACTION",
+  "input": "only the sealed S01-2 feature cache produced under feature-extraction-contract-v01.json",
+  "unit": "the four features from one A/C/E/P quartet; convert serialized float32 vectors to float64 for all arithmetic",
+  "deltas": {"context": "V(C)-V(A)", "entity": "V(E)-V(A)", "paraphrase": "V(P)-V(A)"},
+  "fixed_metrics": [
+    "L2 norm distributions for each delta factor and view",
+    "within-quartet cosine distributions for context/entity, context/paraphrase, and entity/paraphrase deltas",
+    "within-factor consistency: all unordered pairwise cosines among delta vectors in each declared comparison cell",
+    "matched context binding: within each context substitution pair, compare context displacement vectors over the 16 crossed entity aliases",
+    "matched entity binding: within each entity substitution pair, compare entity displacement vectors over the 16 crossed context aliases",
+    "template invariance: compare matched factor deltas for the same term IDs, relation, state, family, and counterpart term across the balanced observation/query template schedule"
+  ],
+  "primary_factorial_cell": {
+    "key": ["context_term_split", "entity_term_split", "world_family", "relation_id", "state_id", "observation_template_id", "query_template_id", "track=FACTORIAL_BALANCED"],
+    "minimum_quartets": 16,
+    "expected_quartets": 16,
+    "on_shortage": "FAIL_CLOSED; do not merge cells or lower the requirement"
+  },
+  "binding_cell": {
+    "key": ["track", "changed_term_split", "changed_term_pair_id", "fixed_factor_term_split"],
+    "minimum_quartets": 16,
+    "expected_quartets": 16,
+    "on_shortage": "FAIL_CLOSED; each changed-term pair must be crossed with all 16 fixed-factor aliases within the declared split"
+  },
+  "subgroup_reports": ["context term ID", "entity term ID", "term split", "observation template ID", "query template ID", "relation ID", "state ID", "world family", "track"],
+  "descriptive_statistics": "nearest-rank p10, p25, median, p75, and p90, plus n, minimum, and maximum; report every declared subgroup and its support",
+  "cosine": "dot(a,b)/(max(||a||,1e-12)*max(||b||,1e-12)); zero vectors yield 0 cosine and are counted",
+  "distance": "Euclidean L2 over float64-converted raw feature values; no centering, scaling, normalization, learned metric, or dimensionality reduction",
+  "pairwise_rule": "all unordered pairs i<j in each supported cell; no sampled pairs",
+  "analysis_limit": "descriptive cartography only; no probe fitting, hypothesis selection, significance search, representation ranking, or rescue gate",
+  "S01_3_AUTHORIZED": false
+}

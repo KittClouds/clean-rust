@@ -1,0 +1,75 @@
+{
+  "contract": "jev-decision-data-information-density/v0.8b-selection-composition-factorial",
+  "status": "prospective_preflight_only",
+  "purpose": "Separate selection-policy effects from composition/reweighting effects without touching prior banks or contacting models.",
+  "inherited_v08": {
+    "contract_sha256": "d1971ae4a8a8f6dcfcadbda97b2290bf3fa630f201779c4b47019512fc87f98f",
+    "group_records_sha256": "9e3546fbe88741666cc5be5ae28907d7a223f74c8578609adfc3036ba7f4e7f2",
+    "r100_manifest_sha256": "0b9998d94e895e5f540c066bdc618d0d6378b9e9ce632380838b7a14beac008b",
+    "c100_manifest_sha256": "860fbfef8283e707d41639ab970ef7257d116e3001a18a0b180feea9d72579c3",
+    "eval_manifest_sha256": "3e72cd7596fbf0b302501b88dd9dc645a5749de10884b57eceb5552bfc5ef8ae",
+    "selector_source_sha256": "fcc885ace28d6866c9db6dd5736381e41f5e778ef4a442557dc5272d00f42866"
+  },
+  "cells": {
+    "R100": {"composition": "R100", "selection": "random", "state": "existing_immutable"},
+    "CM100": {"composition": "R100", "selection": "curated", "state": "new_manifest"},
+    "RM100": {"composition": "C100", "selection": "random", "state": "new_manifest"},
+    "C100": {"composition": "C100", "selection": "curated", "state": "existing_immutable"}
+  },
+  "targets": {
+    "groups": 100000,
+    "selection_joint_cell_fields": [
+      "world_family",
+      "split_family_bundle_id",
+      "query_view_type",
+      "candidate_cardinality_bin",
+      "posterior_entropy_quintile",
+      "gold_entropy_band"
+    ],
+    "exact_matching": [
+      "group_count",
+      "query_view_counts",
+      "candidate_cardinality_bin_counts",
+      "joint_cell_counts",
+      "exclude_evaluation_and_protected_families"
+    ],
+    "bounded_matching": {
+      "relative_tolerance": 0.02,
+      "total_variation_max": 0.02,
+      "metrics": [
+        "unique_model_input_count_relative_error",
+        "model_input_multiplicity_histogram_tv",
+        "unique_root_count_relative_error",
+        "root_multiplicity_histogram_tv",
+        "ontology_topology_marginal_tv",
+        "intervention_class_marginal_tv"
+      ]
+    }
+  },
+  "estimands": {
+    "selection_r_mix": "CM100 - R100",
+    "selection_c_mix": "C100 - RM100",
+    "composition_random": "RM100 - R100",
+    "composition_curated": "C100 - CM100",
+    "interaction": "(C100 - RM100) - (CM100 - R100)",
+    "computed_per_metric_only": true
+  },
+  "policy": {
+    "curated_objective": "frozen_v08_static_rarity_weighted_coverage_score_within_exact_joint_cells",
+    "curated_seed": "jev-idv08b-cm100-sha256-v1-profile-constrained-curation",
+    "random_objective": "deterministic_seeded_random_selection_within_exact_joint_cells",
+    "random_seed": "jev-idv08b-rm100-sha256-v1-profile-constrained-random",
+    "within_cell_input_profile_matching": "exact_reference_occurrence_histogram_per_joint_cell",
+    "within_input_group_choice": "curated_score_then_stable_digest_for_CM100; stable_digest_for_RM100",
+    "root_profile_matching": "exact_reference_root_occurrence_histogram_via_input_to_root_bipartite_b_matching",
+    "bounded_deterministic_attempts_per_bank": 16,
+    "attempt_selection": "ranked_feasible_search; first candidate satisfying every frozen constraint is accepted",
+    "infeasible_flow_policy": "fail_closed_without_emitting_new_bank_ids",
+    "no_posthoc_tolerance_relaxation": true,
+    "no_training_bank_materialization": true,
+    "model_contact_authorized": false,
+    "phoenix_in_scope": false,
+    "strict_novel93_mutable": false,
+    "existing_v08_banks_mutable": false
+  }
+}

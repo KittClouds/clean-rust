@@ -1,0 +1,1 @@
+{"ground_truth_construction_method":"DECLARATIVE_FINITE_PRODUCT_BFS_AND_HAND_ALGEBRAIC_FIXTURES","oracle_authority_source":"FINITE_EXHAUSTIVE_STATE_PRODUCT","oracle_implementation_id":"INDEPENDENT_FINITE_PRODUCT_ORACLE_V1","production_verifier_as_expected_answer":false,"production_verifier_dependency":"NONE","schema":"G8_REFERENCE_ORACLE_PROVENANCE_V1"}

@@ -1,0 +1,51 @@
+{
+  "schema": "FAS_E4_0_SUPERVISED_ADAPTER_QUALIFICATION_V01",
+  "status": "PASS_SYNTHETIC_NO_MODEL_CONTACT",
+  "issued_local_date": "2026-09-27",
+  "scientific_contract_sha256": "21fc77d5a288b9adef995d88f089890235f8dcb2fbc3c9e452725bb67892a22f",
+  "scientific_contract_seal_root_sha256": "278ae16eeb6852d3efad44221556a87be6df54964471f0870931fe2e99b305d1",
+  "library_acceptance_id": "sha256:daae9a9496b6dc15f5a256d966323fcb8848387f3ce3c7d926db7039d7fe7c8c",
+  "library_handoff_seal_root_sha256": "ad1ffbc9203fd0cac5553ea4a5d3c72654c22054e68348474414096e35dd8cc5",
+  "visible_inheritance_bridge_root_sha256": "aacfd286b6349f0b35adb853a2cd9717c2463fedfeccc052bafaf515c69b027b",
+  "adapter_id": "FAS_FROZEN_OBSERVER_BUNDLE_E4_0_LEDGER_SUPERVISED_ADAPTER_V01",
+  "model_contact_performed": false,
+  "tokenizer_contact_performed": false,
+  "cuda_initialized": false,
+  "feature_extraction_performed": false,
+  "truth_labels_opened": false,
+  "ledger_stage_authorization_issued": false,
+  "ledger_gpu_lease_acquired": false,
+  "qualification_scope": "synthetic CPU-only code and binding checks; not Library qualification or E4 execution authorization",
+  "checks": {
+    "python_compile": "PASS",
+    "synthetic_unit_tests": {"status": "PASS", "passed": 10, "failed": 0},
+    "exact_mode_stage_and_output_inventories": "PASS",
+    "static_input_binding_rejects_authority_and_lease_fields": "PASS",
+    "inherited_seal_manifest_root_replay_without_member_open": "PASS",
+    "unbound_protected_member_bytes_not_opened": "PASS",
+    "runner_does_not_import_or_call_local_gpu_lease_issuer": "PASS",
+    "runner_does_not_call_local_stage_authorization_validator_or_issuer": "PASS",
+    "heavy_model_runtime_imports_remain_lazy": "PASS"
+  },
+  "commands": [
+    "python -m py_compile experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_supervised_execution_adapter_v01.py experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_runtime_helpers_v01.py experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_runner_modes_v06.py experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_online_supervised_v01.py experiments/fas-frozen-observer-bundle-engineering-v01/source/tests/test_e4_supervised_execution_adapter_v01.py",
+    "python experiments/fas-frozen-observer-bundle-engineering-v01/source/tests/test_e4_supervised_execution_adapter_v01.py"
+  ],
+  "execution_plan": "../E4-0-LEDGER-EXECUTION-SPEC-CANDIDATES-v01.json",
+  "fresh_output_roots_checked_absent": [
+    "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e4-0-ledger-run-v01",
+    "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e4-0-ledger-run-v01\\parity",
+    "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e4-0-ledger-run-v01\\features",
+    "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e4-0-ledger-bindings-v01"
+  ],
+  "source_files": [
+    {"path": "C:\\Users\\shuga\\.codex\\worktrees\\e4-0-contract-work\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\source\\scripts\\e4_supervised_execution_adapter_v01.py", "bytes": 8595, "sha256": "6685158e9fcc902cc678a2891f91a692e83cdf87149cbf9e350d0f91b2c87fb8"},
+    {"path": "C:\\Users\\shuga\\.codex\\worktrees\\e4-0-contract-work\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\source\\scripts\\e4_runtime_helpers_v01.py", "bytes": 9449, "sha256": "a80be515dc4a2afd7f06cff875819aa690916756674ef557f7a985d0d6722d33"},
+    {"path": "C:\\Users\\shuga\\.codex\\worktrees\\e4-0-contract-work\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\source\\scripts\\e4_runner_modes_v06.py", "bytes": 41946, "sha256": "7d435b7ec9744a7088c9f56def1aff0570cf8ab797ce03beede64455649a19ac"},
+    {"path": "C:\\Users\\shuga\\.codex\\worktrees\\e4-0-contract-work\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\source\\scripts\\e4_online_supervised_v01.py", "bytes": 1751, "sha256": "39c6daaefc1dd2c6f0d4873802ffd696a74fcc559668ae52c68c8abcb93a72a2"},
+    {"path": "C:\\Users\\shuga\\.codex\\worktrees\\e4-0-contract-work\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\source\\scripts\\e4_runner_common_v05.py", "bytes": 23451, "sha256": "0b508de5c61737ff2b7d4a1838d8277ac9fe5428874e7b9bec834ee1145ca8a4"},
+    {"path": "C:\\Users\\shuga\\.codex\\worktrees\\e4-0-contract-work\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\source\\scripts\\e4_runner_artifacts_v05.py", "bytes": 16642, "sha256": "25c708eeeecd3c2a71beb03847446ff4301779e44114ada5399c93a437fe6d37"},
+    {"path": "C:\\Users\\shuga\\.codex\\worktrees\\e4-0-contract-work\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\source\\tests\\test_e4_supervised_execution_adapter_v01.py", "bytes": 9749, "sha256": "de1392c796f5a03e4f341f0d3a45dedbfad053cb026a29c01fe41914be39e588"}
+  ],
+  "not_authorized": ["E4-0 model contact", "tokenizer contact", "CUDA initialization", "feature extraction", "label opening", "scoring", "E4-01 entry"]
+}

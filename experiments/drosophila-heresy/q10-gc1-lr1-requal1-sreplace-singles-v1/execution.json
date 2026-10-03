@@ -1,0 +1,76 @@
+{
+  "behavioral_probe": false,
+  "closure": {
+    "derived_sha256": "5BF46E18DFE942C259E46055B893301D86204E2FB8493AE44D41D0BBC3611BFE",
+    "manifest_sha256": "F84BB9D1D1E32FE603F29374AFA166B79468CCA7C9F1877B0A46CA1AF1A06606"
+  },
+  "contexts": [
+    [
+      "seed9731-L-tau16.json",
+      2
+    ],
+    [
+      "seed9731-L-tau4.json",
+      3
+    ],
+    [
+      "seed9731-R-tau16.json",
+      1
+    ],
+    [
+      "seed9731-R-tau16.json",
+      3
+    ],
+    [
+      "seed9731-R-tau4.json",
+      0
+    ],
+    [
+      "seed9731-R-tau4.json",
+      1
+    ],
+    [
+      "seed9731-R-tau4.json",
+      2
+    ],
+    [
+      "seed9731-R-tau4.json",
+      3
+    ]
+  ],
+  "counts": {
+    "contexts": 8,
+    "groups": 462,
+    "nonzero_singletons": 3696,
+    "valid_geometry": 57,
+    "valid_strictly_better_than_V": 49
+  },
+  "engineering_only": true,
+  "historical_lr1_results_used_as_evidence": false,
+  "identity": "q10-gc1-lr1-requal1-sreplace-singles-v1",
+  "pair_replay_executed": false,
+  "palette_sha256": "54A2688080A65F5CFE31B11A12F5DA85B92D86BBDE2E42072FB0C0F32F3D3B1A",
+  "parent_execution_sha256": {
+    "domain": "6E526DFFE06A0C5051F3F4FB699EC62A802FC54613FCDFA652EBC9F4A69249AF",
+    "parity": "8E2D69E111BF310D2073B410702310DBC9BD9B47FE88A9D82A5FC3A6B1083001",
+    "reference": "9C47DBA6BF576FC6696E70153F0CE80FB0163B538794BE82158710C1064A04E5",
+    "singles": "E33114398BB775F0F6B1E4E5C222B1E2913EBD6CBC8C247EF12A19076E079A0A",
+    "smoke": "24B37976F56B39DCD66A73DE90BA8F06FACD753761874902C6396F1416B6FA1A"
+  },
+  "pf5_contract_sha256": "730D6B03CEE7CE58A9002320372E9F77EC2AB593EC25A71583F59D90D690BC26",
+  "protocol": "REQUAL1-SREPLACE-SINGLES",
+  "scientific_promotion": false,
+  "semantics": "fresh S-replacement: replace one group in fresh invalid S, compare against fresh valid V",
+  "shard_hashes": {
+    "seed9731-L-tau16__set2": "713494CF0705B58E236BEC78608AD56C69E15FD84CA898C2AAF8F289B105662B",
+    "seed9731-L-tau4__set3": "010715EFC693B9DE1DAC5023C5D4A6005336E802AF7A6B6333B31E868322D1D7",
+    "seed9731-R-tau16__set1": "92D64F8DA9C3C92A2D267644DEA20F4D97E443C1B6D4E50EAEAE6FB55A40F5D1",
+    "seed9731-R-tau16__set3": "FDE07C31018E9B2D5964F8A31DBA6BE03054C12D63882E0AFA7275B3F964227C",
+    "seed9731-R-tau4__set0": "6E9E32EDA6162A597CF1CB306505A860340F71F466EBB4D7A8E1350B6D069968",
+    "seed9731-R-tau4__set1": "D2F6409A74ED98272A1601C9C1C51D89B570630C20B6450B614063757997C50C",
+    "seed9731-R-tau4__set2": "CD82EF6A4E7D00C51F69D3BE4F8A216DCDAD8DF8A859775C755A89DE9EB84FCB",
+    "seed9731-R-tau4__set3": "DF18192E550069DAA2B39FB3356C2E6321358641774F20BB5E34711EB39E90ED"
+  },
+  "source_manifest_sha256": "5133FAC48529E3E39BCACA3EA09367F5AFAEDAFBBE84B5488634630F2085833F",
+  "status": "SREPLACE_SINGLETONS_COMPLETE"
+}

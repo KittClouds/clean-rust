@@ -1,0 +1,1 @@
+{"explorer_imports_verifier":true,"oracle_imports_verifier":false,"schema":"G8_VERIFIER_DEPENDENCY_MANIFEST_V1","verifier_imports_explorer":false,"verifier_imports_oracle":false,"verifier_module_reads":["authority","model","ranking","bitvec","hashbrown"]}

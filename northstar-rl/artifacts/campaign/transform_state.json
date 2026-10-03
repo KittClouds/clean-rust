@@ -1,0 +1,43 @@
+{
+  "schema_version": "TRANSFORM_STATE_V1",
+  "transform_state_id": "dec8e024669dc81256f389442bf4342608eb0b375b732d382014e23c40185199",
+  "source_feature_tape_id": "996edc8e87ea2f513d6721972f055b8a2aa31f04cf9fe4f792c1d1626498f37a",
+  "partition_tape_id": "ea30eec338e8c49b9157ad5586fd60cdf741f22120cc72a59c2583f3ba0f48e8",
+  "fit_role": "TRAIN",
+  "fitted_episode_set_hash": "d61db1ab9c49328fac20ce0a9e671ce758a003daeb13519e444f7e5606b1db8b",
+  "ordered_features": [
+    {
+      "feature_id": "market.simple_return.v1",
+      "method": "STANDARD_SCORE",
+      "center": 10.500000000000002,
+      "scale": 4.925532414391098,
+      "clip_low": -5.0,
+      "clip_high": 5.0,
+      "fitted_sample_count": 24,
+      "missingness_rule": "REJECT_NON_AVAILABLE_OR_NON_FINITE"
+    },
+    {
+      "feature_id": "market.candle_range.v1",
+      "method": "STANDARD_SCORE",
+      "center": 2.75,
+      "scale": 0.5710402407201608,
+      "clip_low": -5.0,
+      "clip_high": 5.0,
+      "fitted_sample_count": 24,
+      "missingness_rule": "REJECT_NON_AVAILABLE_OR_NON_FINITE"
+    },
+    {
+      "feature_id": "clock.session_progress.v1",
+      "method": "STANDARD_SCORE",
+      "center": 0.49999999999999994,
+      "scale": 0.38069349381344053,
+      "clip_low": -5.0,
+      "clip_high": 5.0,
+      "fitted_sample_count": 24,
+      "missingness_rule": "REJECT_NON_AVAILABLE_OR_NON_FINITE"
+    }
+  ],
+  "numeric_contract": "f64_welford_fit_f32_observation_boundary",
+  "implementation_hash": "adeec2202f4f51b5f9fdfa86ef029dad09184d443ed38f2c556e90cec29d0595",
+  "content_hash": "00c331fe7504e7308b06ac57eac44392191cb903233bb4a389ea1df6655fd79f"
+}

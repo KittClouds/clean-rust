@@ -1,0 +1,83 @@
+{
+  "bound_inputs": [
+    {
+      "bytes": 66103,
+      "path": "experiments\\fly-reach-03\\runs\\F4-PRESENTATION-03-ENG1\\SOURCE-INPUT-MANIFEST.json",
+      "sha256": "7310de650f0efd5bb7ccb5342bf30e9cc8ae11a16da968e656512bda0e1b7305"
+    },
+    {
+      "bytes": 67236,
+      "path": "experiments\\fly-reach-03\\f4-presentation-03\\IMPLEMENTATION-FREEZE.json",
+      "sha256": "563f58216e6a276bcdffebd8d14df730fae6d82779311b23914783ccf6282430"
+    },
+    {
+      "bytes": 8954,
+      "path": "experiments\\fly-reach-03\\runs\\F4-PRESENTATION-03-ENG1\\task-bank\\TASK-BANK-MANIFEST.json",
+      "sha256": "ad339f4a710c9cb803e68a7076da923a68486f81b7552aa767c710f885deb0a1"
+    },
+    {
+      "bytes": 19542954,
+      "path": "experiments\\fly-reach-03\\runs\\F4-PRESENTATION-03-ENG1\\task-bank\\training.json",
+      "sha256": "d61a0390fb9ba413b8970ba3ae82b8b5ec9fb717d3fc2247a79d9f8e30431d61"
+    },
+    {
+      "bytes": 15275,
+      "path": "experiments\\fly-reach-03\\runs\\F4-PRESENTATION-03-ENG1\\task-bank\\TASK-SEED-MANIFEST.json",
+      "sha256": "22680d8cffd0a272ff841aa0478e2eb6bb36dce79c2c9c805f2aa93f8fb467a1"
+    },
+    {
+      "bytes": 459,
+      "path": "experiments\\fly-reach-03\\runs\\F4-PRESENTATION-03-ENG1\\task-bank\\TASK-BANK-RECEIPT.json",
+      "sha256": "b0a7aab7c4cd43e8352b7aba10878e24d35faa9f3c93739269da09373035e02f"
+    },
+    {
+      "bytes": 418,
+      "path": "experiments\\fly-reach-03\\runs\\F4-PRESENTATION-03-ENG1\\task-bank\\TASK-SEED-RECEIPT.json",
+      "sha256": "4fc7f4962e6dec639a588686249508fa942f183069dcf7af8994893fdb45347d"
+    },
+    {
+      "bytes": 10012082,
+      "path": "experiments\\fly-reach-03\\runs\\F4-PRESENTATION-03-ENG1\\native-collection\\RAW-PREDICTORS.bin",
+      "sha256": "495c68070624e4b8eaeeba217aeb03bdac6636d75e6691292a59872c11a9455f"
+    },
+    {
+      "bytes": 1141757,
+      "path": "experiments\\fly-reach-03\\runs\\F4-PRESENTATION-03-ENG1\\native-collection\\RAW-SCORING-TRUTH.bin",
+      "sha256": "ff9d000145fc503e83710ca99d65b0304d52c1f94533d92c78e28b9730214d50"
+    },
+    {
+      "bytes": 48593,
+      "path": "experiments\\fly-reach-03\\runs\\F4-PRESENTATION-03-ENG1\\native-collection\\NATIVE-COLLECTION-RECEIPT.json",
+      "sha256": "534a8d817ed3d610d9f257c51392426f05cabc1f4fd157ddfa39d9a5243f34cf"
+    }
+  ],
+  "frozen_hashes_verified": {
+    "graph_manifest_sha256": "9ea9048d424698212b5a14eecdadef56987a93c54ed28e3ef40a9508431014e5",
+    "implementation_freeze_sha256": "563f58216e6a276bcdffebd8d14df730fae6d82779311b23914783ccf6282430",
+    "source_manifest_file_sha256": "7310de650f0efd5bb7ccb5342bf30e9cc8ae11a16da968e656512bda0e1b7305",
+    "task_bank_manifest_sha256": "ad339f4a710c9cb803e68a7076da923a68486f81b7552aa767c710f885deb0a1",
+    "task_bank_receipt_sha256": "b0a7aab7c4cd43e8352b7aba10878e24d35faa9f3c93739269da09373035e02f",
+    "task_seed_manifest_sha256": "22680d8cffd0a272ff841aa0478e2eb6bb36dce79c2c9c805f2aa93f8fb467a1",
+    "task_seed_receipt_sha256": "4fc7f4962e6dec639a588686249508fa942f183069dcf7af8994893fdb45347d",
+    "training_payload_sha256": "d61a0390fb9ba413b8970ba3ae82b8b5ec9fb717d3fc2247a79d9f8e30431d61"
+  },
+  "new_identity": "F4-PRESENTATION-03-VALIDATION-REPAIR-v01",
+  "original_stop_receipt_sha256": "1ce18b2d4618db7a861421dd7b8024855cb59e64e8dccb7f325bfd1987b44544",
+  "parent_identity": "F4-PRESENTATION-03-ENG1",
+  "prohibited": [
+    "task generation",
+    "native recollection",
+    "raw artifact edits",
+    "fits",
+    "truth-value scoring",
+    "comparative analysis"
+  ],
+  "schema": "F4-PRESENTATION-03-validation-repair-amendment-v0.1",
+  "scope": [
+    "repair cell-key translation in wrapper audit",
+    "rerun complete validation against frozen bytes",
+    "seal existing collection tree"
+  ],
+  "status": "VERSIONED_READ_ONLY_VALIDATION_CONTINUATION",
+  "validator_sha256": "7ae3e4518433d27c41bffe588152a4c357da8e26f3769f5a56ffab8d2b09fa76"
+}

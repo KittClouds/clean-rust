@@ -1,0 +1,51 @@
+{
+  "protocol_id": "OBS-OPEN-01-PROTOCOL-V1",
+  "branch_kind": "OBSERVATIONAL",
+  "scientific_question": "Whether reproducible observational structure exists in US30 behavior around and after the New York cash opening interval",
+  "economic_authority": false,
+  "trading_authority": false,
+  "substantive_results_status": "UNOPENED",
+  "instrument": {
+    "canonical_symbol": "US30",
+    "source_symbol": "US30",
+    "geometry_timeframe": "M1",
+    "interaction_timeframe": "M5",
+    "observer_source_sha256": "d2c1f0614ba27289a87172dc9fa79f3b018cace73ebd5829afaf100aed406034",
+    "preexisting_compiled_candidate_sha256": "5505e033d487037a9cc5863788b067123fbf5bc3e48d4c40ddfa0fbe721ac290"
+  },
+  "civil_clock": {
+    "timezone": "America/New_York",
+    "range_start": "09:30:00",
+    "observation_horizon_end": "16:00:00",
+    "mapping_path": ["NEW_YORK_CIVIL", "UTC", "SOURCE_SERVER"],
+    "fixed_offset_assumption_permitted": false,
+    "ambiguous_session_status": "NOT_EVALUABLE_CLOCK"
+  },
+  "range_family": {
+    "first_minutes": 1,
+    "last_minutes": 30,
+    "interval_semantics": "HALF_OPEN",
+    "peer_intervals": true,
+    "selection_optimization_permitted": false
+  },
+  "coverage": {
+    "require_every_m1_bar": true,
+    "require_interaction_continuity": true,
+    "source_bars_stored_once": true,
+    "range_source_provenance_required": true
+  },
+  "typed_terminal_states": [
+    "NOT_EVALUABLE_CLOCK",
+    "NOT_EVALUABLE_SOURCE_COVERAGE",
+    "NOT_EVALUABLE_CONTINUITY",
+    "CENSORED_HORIZON",
+    "CENSORED_DATA_END",
+    "CENSORED_SHUTDOWN",
+    "COMPLETE"
+  ],
+  "storage": {
+    "raw_artifact_location_class": "D_DRIVE_LOCAL_ONLY",
+    "raw_artifacts_online": false,
+    "git_admits": ["SOURCE", "SCHEMA", "MANIFEST", "COMPACT_RECEIPT", "LOGICAL_HASH", "PHYSICAL_METADATA"]
+  }
+}

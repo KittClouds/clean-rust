@@ -1,0 +1,452 @@
+{
+  "contract": "phoenix-gliner25-five-surface-novel-benchmark-summary-v1",
+  "source_receipts": [
+    "bench-five-endrun.json",
+    "bench-five-laterun.json",
+    "bench-five-midrun.json",
+    "bench-five-shortrun.json"
+  ],
+  "documents": [
+    {
+      "name": "endrun.md",
+      "document_bytes": 786148,
+      "engine_load_ms": 2436.0278000000003,
+      "short_window": {
+        "bytes": 1439,
+        "model_words": 270,
+        "whitespace_words": 236
+      },
+      "long_window": {
+        "bytes": 4655,
+        "chunk_words": 384,
+        "model_words": 900,
+        "overlap_words": 64,
+        "whitespace_words": 751
+      },
+      "features": [
+        {
+          "feature": "long_context",
+          "p50_ms": 1480.5548,
+          "p95_ms": 1577.9366000000002,
+          "p99_ms": 1577.9366000000002,
+          "peak_working_set_bytes": 1163190272,
+          "runs": 5,
+          "stable_output_count": 71,
+          "warmup": 1,
+          "working_set_after_bytes": 1163190272,
+          "working_set_before_bytes": 1086509056
+        },
+        {
+          "feature": "wide_span_entities",
+          "p50_ms": 378.3137,
+          "p95_ms": 415.8107,
+          "p99_ms": 415.8107,
+          "peak_working_set_bytes": 1163427840,
+          "runs": 5,
+          "stable_output_count": 19,
+          "warmup": 1,
+          "working_set_after_bytes": 1163427840,
+          "working_set_before_bytes": 1163419648
+        },
+        {
+          "feature": "span_attributes",
+          "p50_ms": 409.21930000000003,
+          "p95_ms": 455.5145,
+          "p99_ms": 455.5145,
+          "peak_working_set_bytes": 1189486592,
+          "runs": 5,
+          "stable_output_count": 11,
+          "warmup": 1,
+          "working_set_after_bytes": 1189486592,
+          "working_set_before_bytes": 1186320384
+        },
+        {
+          "feature": "constrained_classification",
+          "p50_ms": 368.9208,
+          "p95_ms": 434.744,
+          "p99_ms": 434.744,
+          "peak_working_set_bytes": 1189654528,
+          "runs": 5,
+          "stable_output_count": 2,
+          "warmup": 1,
+          "working_set_after_bytes": 1189654528,
+          "working_set_before_bytes": 1189629952
+        },
+        {
+          "feature": "joint_information_extraction",
+          "p50_ms": 467.8619,
+          "p95_ms": 508.9663,
+          "p99_ms": 508.9663,
+          "peak_working_set_bytes": 1222438912,
+          "runs": 5,
+          "stable_output_count": 13,
+          "warmup": 1,
+          "working_set_after_bytes": 1222438912,
+          "working_set_before_bytes": 1218609152
+        }
+      ]
+    },
+    {
+      "name": "laterun.md",
+      "document_bytes": 481465,
+      "engine_load_ms": 2504.7258,
+      "short_window": {
+        "bytes": 1357,
+        "model_words": 270,
+        "whitespace_words": 233
+      },
+      "long_window": {
+        "bytes": 4082,
+        "chunk_words": 384,
+        "model_words": 900,
+        "overlap_words": 64,
+        "whitespace_words": 692
+      },
+      "features": [
+        {
+          "feature": "long_context",
+          "p50_ms": 1470.9761,
+          "p95_ms": 1551.393,
+          "p99_ms": 1551.393,
+          "peak_working_set_bytes": 1156071424,
+          "runs": 5,
+          "stable_output_count": 63,
+          "warmup": 1,
+          "working_set_after_bytes": 1156071424,
+          "working_set_before_bytes": 1083670528
+        },
+        {
+          "feature": "wide_span_entities",
+          "p50_ms": 368.1389,
+          "p95_ms": 440.2529,
+          "p99_ms": 440.2529,
+          "peak_working_set_bytes": 1156087808,
+          "runs": 5,
+          "stable_output_count": 29,
+          "warmup": 1,
+          "working_set_after_bytes": 1156087808,
+          "working_set_before_bytes": 1156079616
+        },
+        {
+          "feature": "span_attributes",
+          "p50_ms": 451.2416,
+          "p95_ms": 486.46270000000004,
+          "p99_ms": 486.46270000000004,
+          "peak_working_set_bytes": 1182474240,
+          "runs": 5,
+          "stable_output_count": 10,
+          "warmup": 1,
+          "working_set_after_bytes": 1182474240,
+          "working_set_before_bytes": 1179303936
+        },
+        {
+          "feature": "constrained_classification",
+          "p50_ms": 347.0449,
+          "p95_ms": 367.9295,
+          "p99_ms": 367.9295,
+          "peak_working_set_bytes": 1182654464,
+          "runs": 5,
+          "stable_output_count": 2,
+          "warmup": 1,
+          "working_set_after_bytes": 1182654464,
+          "working_set_before_bytes": 1182646272
+        },
+        {
+          "feature": "joint_information_extraction",
+          "p50_ms": 414.6128,
+          "p95_ms": 438.22889999999995,
+          "p99_ms": 438.22889999999995,
+          "peak_working_set_bytes": 1183780864,
+          "runs": 5,
+          "stable_output_count": 11,
+          "warmup": 1,
+          "working_set_after_bytes": 1183780864,
+          "working_set_before_bytes": 1183776768
+        }
+      ]
+    },
+    {
+      "name": "midrun.md",
+      "document_bytes": 522922,
+      "engine_load_ms": 2453.0467,
+      "short_window": {
+        "bytes": 749,
+        "model_words": 141,
+        "whitespace_words": 116
+      },
+      "long_window": {
+        "bytes": 749,
+        "chunk_words": 384,
+        "model_words": 141,
+        "overlap_words": 64,
+        "whitespace_words": 116
+      },
+      "features": [
+        {
+          "feature": "long_context",
+          "p50_ms": 257.3335,
+          "p95_ms": 277.5902,
+          "p99_ms": 277.5902,
+          "peak_working_set_bytes": 995651584,
+          "runs": 5,
+          "stable_output_count": 18,
+          "warmup": 1,
+          "working_set_after_bytes": 995651584,
+          "working_set_before_bytes": 969449472
+        },
+        {
+          "feature": "wide_span_entities",
+          "p50_ms": 254.9973,
+          "p95_ms": 267.2502,
+          "p99_ms": 267.2502,
+          "peak_working_set_bytes": 996528128,
+          "runs": 5,
+          "stable_output_count": 18,
+          "warmup": 1,
+          "working_set_after_bytes": 996528128,
+          "working_set_before_bytes": 995659776
+        },
+        {
+          "feature": "span_attributes",
+          "p50_ms": 279.5645,
+          "p95_ms": 342.54069999999996,
+          "p99_ms": 342.54069999999996,
+          "peak_working_set_bytes": 1019908096,
+          "runs": 5,
+          "stable_output_count": 5,
+          "warmup": 1,
+          "working_set_after_bytes": 1019908096,
+          "working_set_before_bytes": 1015025664
+        },
+        {
+          "feature": "constrained_classification",
+          "p50_ms": 240.20340000000002,
+          "p95_ms": 278.8026,
+          "p99_ms": 278.8026,
+          "peak_working_set_bytes": 1020891136,
+          "runs": 5,
+          "stable_output_count": 2,
+          "warmup": 1,
+          "working_set_after_bytes": 1020891136,
+          "working_set_before_bytes": 1020608512
+        },
+        {
+          "feature": "joint_information_extraction",
+          "p50_ms": 339.6078,
+          "p95_ms": 385.281,
+          "p99_ms": 385.281,
+          "peak_working_set_bytes": 1052962816,
+          "runs": 5,
+          "stable_output_count": 4,
+          "warmup": 1,
+          "working_set_after_bytes": 1052962816,
+          "working_set_before_bytes": 1049739264
+        }
+      ]
+    },
+    {
+      "name": "shortrun.md",
+      "document_bytes": 161490,
+      "engine_load_ms": 2402.0782999999997,
+      "short_window": {
+        "bytes": 1350,
+        "model_words": 270,
+        "whitespace_words": 233
+      },
+      "long_window": {
+        "bytes": 4503,
+        "chunk_words": 384,
+        "model_words": 900,
+        "overlap_words": 64,
+        "whitespace_words": 756
+      },
+      "features": [
+        {
+          "feature": "long_context",
+          "p50_ms": 1442.4024,
+          "p95_ms": 1619.6709,
+          "p99_ms": 1619.6709,
+          "peak_working_set_bytes": 1156165632,
+          "runs": 5,
+          "stable_output_count": 80,
+          "warmup": 1,
+          "working_set_after_bytes": 1156165632,
+          "working_set_before_bytes": 1082867712
+        },
+        {
+          "feature": "wide_span_entities",
+          "p50_ms": 380.257,
+          "p95_ms": 423.2884,
+          "p99_ms": 423.2884,
+          "peak_working_set_bytes": 1156272128,
+          "runs": 5,
+          "stable_output_count": 28,
+          "warmup": 1,
+          "working_set_after_bytes": 1156272128,
+          "working_set_before_bytes": 1156268032
+        },
+        {
+          "feature": "span_attributes",
+          "p50_ms": 415.1142,
+          "p95_ms": 475.8691,
+          "p99_ms": 475.8691,
+          "peak_working_set_bytes": 1182502912,
+          "runs": 5,
+          "stable_output_count": 17,
+          "warmup": 1,
+          "working_set_after_bytes": 1182502912,
+          "working_set_before_bytes": 1179283456
+        },
+        {
+          "feature": "constrained_classification",
+          "p50_ms": 341.4912,
+          "p95_ms": 350.28,
+          "p99_ms": 350.28,
+          "peak_working_set_bytes": 1182687232,
+          "runs": 5,
+          "stable_output_count": 2,
+          "warmup": 1,
+          "working_set_after_bytes": 1182687232,
+          "working_set_before_bytes": 1182662656
+        },
+        {
+          "feature": "joint_information_extraction",
+          "p50_ms": 444.9731,
+          "p95_ms": 481.1758,
+          "p99_ms": 481.1758,
+          "peak_working_set_bytes": 1215578112,
+          "runs": 5,
+          "stable_output_count": 18,
+          "warmup": 1,
+          "working_set_after_bytes": 1215578112,
+          "working_set_before_bytes": 1211785216
+        }
+      ]
+    }
+  ],
+  "aggregate": {
+    "long_context": {
+      "p50_ms_across_documents": {
+        "minimum": 257.3335,
+        "median": 1456.68925,
+        "maximum": 1480.5548
+      },
+      "p95_ms_across_documents": {
+        "minimum": 277.5902,
+        "median": 1564.6648,
+        "maximum": 1619.6709
+      },
+      "p99_ms_across_documents": {
+        "minimum": 277.5902,
+        "median": 1564.6648,
+        "maximum": 1619.6709
+      },
+      "stable_output_counts": [
+        18,
+        63,
+        71,
+        80
+      ],
+      "maximum_peak_working_set_bytes": 1163190272
+    },
+    "wide_span_entities": {
+      "p50_ms_across_documents": {
+        "minimum": 254.9973,
+        "median": 373.2263,
+        "maximum": 380.257
+      },
+      "p95_ms_across_documents": {
+        "minimum": 267.2502,
+        "median": 419.54955,
+        "maximum": 440.2529
+      },
+      "p99_ms_across_documents": {
+        "minimum": 267.2502,
+        "median": 419.54955,
+        "maximum": 440.2529
+      },
+      "stable_output_counts": [
+        18,
+        19,
+        28,
+        29
+      ],
+      "maximum_peak_working_set_bytes": 1163427840
+    },
+    "span_attributes": {
+      "p50_ms_across_documents": {
+        "minimum": 279.5645,
+        "median": 412.16675,
+        "maximum": 451.2416
+      },
+      "p95_ms_across_documents": {
+        "minimum": 342.54069999999996,
+        "median": 465.6918,
+        "maximum": 486.46270000000004
+      },
+      "p99_ms_across_documents": {
+        "minimum": 342.54069999999996,
+        "median": 465.6918,
+        "maximum": 486.46270000000004
+      },
+      "stable_output_counts": [
+        5,
+        10,
+        11,
+        17
+      ],
+      "maximum_peak_working_set_bytes": 1189486592
+    },
+    "constrained_classification": {
+      "p50_ms_across_documents": {
+        "minimum": 240.20340000000002,
+        "median": 344.26805,
+        "maximum": 368.9208
+      },
+      "p95_ms_across_documents": {
+        "minimum": 278.8026,
+        "median": 359.10474999999997,
+        "maximum": 434.744
+      },
+      "p99_ms_across_documents": {
+        "minimum": 278.8026,
+        "median": 359.10474999999997,
+        "maximum": 434.744
+      },
+      "stable_output_counts": [
+        2
+      ],
+      "maximum_peak_working_set_bytes": 1189654528
+    },
+    "joint_information_extraction": {
+      "p50_ms_across_documents": {
+        "minimum": 339.6078,
+        "median": 429.79295,
+        "maximum": 467.8619
+      },
+      "p95_ms_across_documents": {
+        "minimum": 385.281,
+        "median": 459.70234999999997,
+        "maximum": 508.9663
+      },
+      "p99_ms_across_documents": {
+        "minimum": 385.281,
+        "median": 459.70234999999997,
+        "maximum": 508.9663
+      },
+      "stable_output_counts": [
+        4,
+        11,
+        13,
+        18
+      ],
+      "maximum_peak_working_set_bytes": 1222438912
+    }
+  },
+  "graph_publications": 0,
+  "interpretation": {
+    "latency": "min/median/max of each document's measured quantile",
+    "quality": "not measured; no human gold set was used",
+    "promotion": "candidate-only shadow evaluation"
+  }
+}

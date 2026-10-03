@@ -1,0 +1,90 @@
+{
+  "schema": "F4-CALIBRATION-02-contract-v0.1",
+  "study_id": "F4-CALIBRATION-02",
+  "run_id": "F4-CALIBRATION-02-QPROMO1",
+  "status": "QUALIFICATION_ONLY_PROSPECTIVE",
+  "contract_markdown_sha256": "2c3f46214cbe9ec1271a2b9a72a2fac130d648f05f23f1e43685c1436c153a90",
+  "qualification_only": true,
+  "measured_reach03_authorized": false,
+  "biological_promotion": false,
+  "parent_evidence": {
+    "qualification_v2_terminal_receipt_sha256": "29f073c42de3160a7cb60385747daa247c43892fa19da6d56a1883d6ee7fea18",
+    "symmetry03_contract_sha256": "7c49b8419896dca4418de3497ecd8566b2167d1c6bf24d7860d904d70f87afe0",
+    "symmetry03_terminal_receipt_sha256": "a5a40dce9710cb9f2e47850d6bdf9b99a44758a910a0fc7e8e8848eaef3d0d01"
+  },
+  "frozen_d_sources": {
+    "model": {
+      "path": "experiments/fly-reach-03/scripts/f4_symmetry_01_model.py",
+      "sha256": "92e260bd0057115867bf69b343d8193bab141035f3338af4586c5e0af61c47f8"
+    },
+    "feature_helpers": {
+      "path": "experiments/fly-reach-03/f4-symmetry-03/scripts/common.py",
+      "sha256": "27024a001f2c89f520b5230bf3796ee8691e499f29ce73c71597ad7c303debf5"
+    },
+    "d_feature_construction": {
+      "path": "experiments/fly-reach-03/f4-symmetry-03/scripts/prepare_fit.py",
+      "sha256": "9da88d9a2e147cad551e8e4e2c8b11ba460b435f5743f57527fbf46d7eb09497"
+    },
+    "fit_recipe": {
+      "path": "experiments/fly-reach-03/f4-symmetry-03/scripts/fit.py",
+      "sha256": "0c8a84f2418c8b2d7fa222675860771e7e4e64b871ad333ec0fb5e3e65af5026"
+    }
+  },
+  "task_bank": {
+    "block_ids": [305000, 305001, 305002, 305003, 305004, 305005, 305006, 305007, 305008, 305009, 305010, 305011],
+    "count": 12,
+    "structural_pattern_selection": false,
+    "replace_blocks": false,
+    "task_seed_rule": "task_pattern_seed and simulator_seed equal block_id",
+    "schedule_seed_rule": "block_id XOR 0x545241494E",
+    "task": {
+      "cues": 4,
+      "trials_per_block": 8192,
+      "delay_steps": 12,
+      "labels": "two positive and two negative, deterministically shuffled"
+    },
+    "substrates": ["fly", "g001", "g002", "g003", "g004", "g005", "g006", "g007", "g008"],
+    "sides": ["L", "R"],
+    "coordinates_per_substrate_side": 64,
+    "native_streams_expected": 216
+  },
+  "estimator": {
+    "arm": "D",
+    "features": "exact frozen 66D admissible base plus canonical 24D relational sidecar",
+    "input_width": 90,
+    "dtype": "float32",
+    "architecture": [90, 128, 64, 1],
+    "normalization": "frozen SYMMETRY-03 fold-training-only D normalization",
+    "epochs": 200,
+    "batch_size": 2048,
+    "optimizer": "Adam",
+    "learning_rate": 0.001,
+    "beta1": 0.9,
+    "beta2": 0.999,
+    "epsilon": 1e-8,
+    "training_order": "frozen global row order, contiguous slices, no shuffle",
+    "cross_validation": "12-fold leave-one-block-out",
+    "fit_count": 12,
+    "initialization": "same model initialization function and zero-based ascending fold index as SYMMETRY-03"
+  },
+  "support_rule": {
+    "evaluable_block": "held-out U-star rows contain at least one Y=+1 and at least one Y=-1",
+    "minimum_evaluable_blocks": 10,
+    "total_blocks": 12,
+    "empty_or_one_class_blocks": "retain; blockwise balanced error undefined; count as non-evaluable; no replacement; available rows remain in pooled scoring",
+    "per_evaluable_block_epsilon_balanced_max": 0.15,
+    "per_evaluable_block_omega_hat_min": 0.7,
+    "pooled_epsilon_balanced_max": 0.1,
+    "pooled_omega_hat_min": 0.8,
+    "omega_hat": "max(0, 1 - 2 * epsilon_balanced)",
+    "pooled_population": "all available out-of-fold U-star rows across the frozen twelve blocks, with inverse-inclusion weights and equal class weighting"
+  },
+  "truth_firewall": "write and hash all twelve held-out prediction streams; pass independent integrity before opening held-out truth",
+  "pass_conditions": [
+    "at least 10 of 12 blocks are evaluable",
+    "every evaluable block has Omega_hat >= 0.70",
+    "pooled held-out balanced error <= 0.10 and Omega_hat >= 0.80"
+  ],
+  "failure_policy": "preserve the failing qualification receipt and stop; no feature, estimator, threshold, support, task, or seed rescue under this identity",
+  "next_step_after_pass": "eligible to prepare a separately sealed measured REACH-03 namespace; this contract does not authorize its execution"
+}

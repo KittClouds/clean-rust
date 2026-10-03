@@ -1,0 +1,50 @@
+{
+  "protocol": "jev-information-density/v0.8p-v02-construction-identity-v01",
+  "identity": "v0.8P-fresh-trajectory-instrumented-rerun-v02",
+  "status": "SETUP_AND_IDENTITY_DENYLIST_ONLY",
+  "prior_attempt": {
+    "identity": "v0.8P-fresh-trajectory-instrumented-rerun-v01",
+    "disposition": "CONSTRUCTION_BOUNDARY_VIOLATION_E1_JOIN_READ",
+    "quarantine_receipt": "experiments/jev-information-density-v08p-v02/provenance/v01-quarantine-receipt.json",
+    "panel_parentage": false
+  },
+  "frozen_scientific_contracts": {
+    "run_contract": {
+      "path": "experiments/jev-information-density-v08p/phase_b/phase-b-p-run-contract-v01.json",
+      "sha256": "e345225b4a17fc18eb35fcab24cbe1d72bd0e34bed9de272f927a7be461853e6"
+    },
+    "analysis_contract": {
+      "path": "experiments/jev-information-density-v08p/phase_b/phase-b-p-analysis-contract-v01.json",
+      "sha256": "84111122033fda65c84344317cfe3b50639b23be4c71f480ba665c67a23cc939"
+    },
+    "design_reference_only": {
+      "path": "experiments/jev-information-density-v08p/phase_a/fresh-panel-contract-v01.json",
+      "sha256": "ce3b7b97caecb27f3ad99439c0e67dca6e40af5da3db9ca2e356ea5e9f06f823",
+      "panel_data_parentage": false
+    },
+    "contract_bundle_seal": {
+      "path": "experiments/jev-information-density-v08p/contracts/contract-bundle-seal-v01.json",
+      "sha256": "67cd6b7902111000dc93a0f81f9f20bc05a9c084732705ed8f9ad82fe965fa85"
+    }
+  },
+  "output_namespace": "D:/codex-runs/jev-information-density-v08p-v02",
+  "identity_denylist": {
+    "extraction_authorized": true,
+    "source": "sealed v0.8N held-out matched-panel manifest, neighborhood_id field only",
+    "e1_candidate_join_access": false,
+    "raw_e1_identity_output": false,
+    "collision_test_authorized_only_during_future_panel_construction": true
+  },
+  "authorization_state": {
+    "v01_quarantine": true,
+    "v02_setup": true,
+    "identity_denylist_extraction": true,
+    "fresh_panel_generation": false,
+    "lfm_load": false,
+    "feature_extraction": false,
+    "head_training": false,
+    "checkpoint_evaluation": false,
+    "trajectory_metrics": false,
+    "newtight_legacy_phoenix": false
+  }
+}

@@ -1,0 +1,44 @@
+{
+ "fold_a": 9923,
+ "fold_b": 10072,
+ "seconds": 214.8429262638092,
+ "t1_precision": {
+  "AT": 0.9988162878787878,
+  "BLOCK": 0.9979381443298969,
+  "CONN": 0.9991745769706974,
+  "CONN_REACH": 0.9988814317673378,
+  "REQ": 0.9992354740061162,
+  "STATE_ACTIVE": 0.9996577686516085,
+  "STATE_INACTIVE": 0.9996648793565683
+ },
+ "t2_alignment": {
+  "aligned": 19995,
+  "excluded": 5,
+  "excluded_examples": [
+   557,
+   2817,
+   13688,
+   15113,
+   15553
+  ],
+  "worlds": 20000
+ },
+ "t2_calibration": {
+  "AT": [
+   2.182874513790793,
+   -0.15054821971248858
+  ],
+  "UNTYPED_LL": [
+   1.2114248903811875,
+   -1.552900171474976
+  ]
+ },
+ "train_sample": 3000,
+ "x0_frozen": {
+  "xg/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "xg/bank.py": "9cc5221c968d5efbfd0df05a70115813c59a02a562c117f6cdc8bb95dcb27723",
+  "xg/build.py": "9b14832b603e195d07c63045c84c57d8c7176eeabd09ec2f3adcb40d632c2aa3",
+  "xg/control.py": "5712e97b70c306614a819d0c5b28e2a9f43ab21dd56fd4256566963f391a50c9",
+  "xg/graph.py": "4dfc38911b53310afa963c9fce17d03fde91331b445c8bdf38c518d515ecf96f"
+ }
+}

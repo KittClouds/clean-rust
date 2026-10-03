@@ -1,0 +1,21 @@
+{
+  "schema": "e013-pregen-seed-receipt/v0.1",
+  "created_date": "2026-09-26",
+  "stage": "before_episode_generation_and_adjudication",
+  "seeds": [
+    {
+      "bank": "E013-C",
+      "private_path": "D:\\codex-runs\\e013-episode-factory-v0.1\\seeds\\C.bin",
+      "bytes": 32,
+      "sha256": "017728a9fbfbf84127f908c02c2be29c434935591d8348a95eab0698d4d25736"
+    },
+    {
+      "bank": "E013-D",
+      "private_path": "D:\\codex-runs\\e013-episode-factory-v0.1\\seeds\\D.bin",
+      "bytes": 32,
+      "sha256": "2aa8b351febb52936a0fc4574e97eb361562c1373c225c0da8da08de8d39f75f"
+    }
+  ],
+  "seed_bytes_in_public_projection": false,
+  "e013_observer_contact": false
+}

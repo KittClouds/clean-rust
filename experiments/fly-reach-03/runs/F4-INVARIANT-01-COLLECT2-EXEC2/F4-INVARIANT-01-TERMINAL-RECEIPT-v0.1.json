@@ -1,0 +1,66 @@
+{
+  "analysis_json_sha256": "8465e9954fd84434b78a8b57d867ca4daa35ad1a68b12671fb6c758e7804616b",
+  "analysis_repair_amendment_sha256": "6c86ea1845375fc9a2cae645ee87489b37a06d89394ee7560d499a2e6918bcf0",
+  "analysis_repair_version": "F4-INVARIANT-01-ANALYSIS-REPAIR-v0.1",
+  "analysis_status": "ANALYSIS_COMPLETE_WITH_PREVIOUS_TRUTH_ACCESS",
+  "analysis_stop_receipt_sha256": "a74c7fa70d27eaa012383fe5449aa0c6e51de944e5dfc71119abfda85e35b80d",
+  "biological_promotion": false,
+  "calibration_advancement_authorized": false,
+  "combined_locked_output_tree_sha256": "f76063d854e9f9243a3dd51ff3903117ab97d7db0c3944e1f789359accbb3aa5",
+  "controller_work_authorized": false,
+  "descriptive_comparison": {
+    "evaluable_block_wins_required": 5,
+    "mean_replicate_pooled_balanced_error": {
+      "D": 0.024122784943543755,
+      "S": 0.059351906538834404
+    },
+    "mean_s_minus_d_balanced_error": 0.035229121595290645,
+    "replicate_s_minus_d_balanced_error": [
+      {
+        "replicate_index": 0,
+        "s_minus_d_balanced_error": 0.06178579897142217
+      },
+      {
+        "replicate_index": 1,
+        "s_minus_d_balanced_error": 0.021884189926225747
+      },
+      {
+        "replicate_index": 2,
+        "s_minus_d_balanced_error": 0.02201737588822402
+      }
+    ],
+    "s_wins_evaluable_blocks": 1,
+    "s_wins_pooled_replicates": 0
+  },
+  "fit_count": 72,
+  "fit_manifest_sha256": "47b440bb4f9f4d93c897b0835dfe4159e7579a92d2fa5e0e41d93b3084bf8048",
+  "fit_outputs_rerun": false,
+  "fit_receipt_count": 72,
+  "fit_receipts_tree_sha256": "9a0e31c01fa2e8fc192938091ce08dc4b790f7225aa0fce7e05febad97f5043f",
+  "heldout_support": {
+    "evaluable_blocks": 7,
+    "required_blocks": 10,
+    "status": "FAIL"
+  },
+  "heldout_truth_previously_opened": true,
+  "integrity_receipt_sha256": "ce9c75ffc2019b3e636bcd376b6602e0165350ebe8550dbba24d999d8e7e040f",
+  "integrity_repair_amendment_sha256": "4075ae6e4d794d6557d5b09d5343412410eb828f3bf830d80a4784f0fa960668",
+  "integrity_status": "PASS",
+  "measured_reach03_authorized": false,
+  "no_comparative_result_produced_before_repair": true,
+  "original_analysis_sha256": "beb30c21df8761efbd0e9ed3fe3745cf57e9f6421cc4fe1750202ffbaa298e75",
+  "original_integrity_startup_stop_receipt_sha256": "7f2d0820480f5aa75e8231a2077064139a1fb10fbb56cd566b2797b7eb4ddf6a",
+  "pheno_status": "unchanged",
+  "polarity_diagnostics_are_secondary": true,
+  "post_analysis_locked_input_rehash": "PASS",
+  "prediction_lock_sha256": "47d812653111164c84d2c6b2e861729d7e5356e39821d9d0ff6d9d8c9d63301a",
+  "prediction_stream_count": 72,
+  "prediction_streams_tree_sha256": "dc6ee795e361e8e23e07a0b94daa9aa9ab178909362739db9c992ca561756b61",
+  "qualification_only": true,
+  "repaired_analysis_sha256": "692e924ff4b692e36e4d5ead81cabf0c9be7b32caabafcc9881a30e28ed5450a",
+  "results_md_sha256": "8f72030b3b5fa73af8820acf41616e896dfbf41c62c78a103b5bed35d1ab901c",
+  "run_id": "F4-INVARIANT-01-COLLECT2-EXEC2",
+  "schema": "F4-INVARIANT-01-terminal-receipt-v0.1",
+  "scientific_disposition": "NOT_EVALUABLE_SUPPORT",
+  "truth_file_sha256": "5691561ec69800f7e067e3b03de2f917d68cfee8412b1f85a0e6fa55b7daad24"
+}

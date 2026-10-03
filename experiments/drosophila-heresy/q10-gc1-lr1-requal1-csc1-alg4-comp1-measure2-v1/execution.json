@@ -1,0 +1,13 @@
+{
+  "contract_sha256": "EC3792E75C1729C21C75690B94F2164F223AA86FEC7A030EC1EACCE64816F291",
+  "domain_count": 31596544,
+  "domain_sha256": "BA9AF9234D5FF129ED584DBAE6B4133C8572E042735E84FFF7C747F8E1971CD4",
+  "engineering_only": true,
+  "identity": "q10-gc1-lr1-requal1-csc1-alg4-comp1-measure2-v1",
+  "measurement_started": false,
+  "preexecution_sha256": "B655012F04552A53A29F26873ED351E408F914A14B80313EFA89AA7A848F4EC9",
+  "protocol": "Q10-ALG4-COMP1-MEASURE2",
+  "replay_executed": false,
+  "scientific_promotion": false,
+  "status": "PREFLIGHT_PASS"
+}

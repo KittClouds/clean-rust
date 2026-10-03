@@ -1,0 +1,84 @@
+﻿{
+    "contract":  "MST_IMMUTABLE_RUN_SEAL_V1",
+    "status":  "SEALED",
+    "run_key":  "RG2_USTEC_PERIOD_M5_1774224000_1774656000_23131991422771867",
+    "invocation_id":  "RG2_USTEC_PERIOD_M5_1774224000_1774656000_23131991422771867_I1774224000_16259711417660035989",
+    "holdout_id":  "RECOVERY_A",
+    "protocol_sha256":  "098844644e31878725ec4bb7859bb5db2f63f937adfc21bea3fb8ea91b287cf6",
+    "canonical_dataset_hash":  "cf6c238e4b235e4986cdb515a2d259bd7cb958231e32ba0f0e3bb91d59a945a5",
+    "sealed_payload_sha256":  "1a9e2ddac798e23d9a594a357b23e60ebb87792c20871f8986898402195564ce",
+    "file_count":  14,
+    "files":  [
+                  {
+                      "path":  "raw/auction/MasterAuction_USTEC_PERIOD_M5_P13R_USTEC_RECOVERY_A_RG2_v7_attempts.tsv",
+                      "bytes":  284841,
+                      "sha256":  "a3efd28acd0997bf525c21d00b243db4c77bda8e9b3000662b6b95f3cf2d3cbc"
+                  },
+                  {
+                      "path":  "raw/auction/MasterAuction_USTEC_PERIOD_M5_P13R_USTEC_RECOVERY_A_RG2_v7_context.tsv",
+                      "bytes":  578879,
+                      "sha256":  "56f47cf2adc726d63c265f655bfcb56ccbe4b1f4bf8fdc43d28d93d44280c574"
+                  },
+                  {
+                      "path":  "raw/auction/MasterAuction_USTEC_PERIOD_M5_P13R_USTEC_RECOVERY_A_RG2_v7_episodes.tsv",
+                      "bytes":  36100,
+                      "sha256":  "bf0877f88fb2ddaa26b2284f143aa624f6361d99152b6c7e537a21e8568c1ce2"
+                  },
+                  {
+                      "path":  "raw/auction/MasterAuction_USTEC_PERIOD_M5_P13R_USTEC_RECOVERY_A_RG2_v7_events.tsv",
+                      "bytes":  942425,
+                      "sha256":  "bef7326e5c6d1f78ac094d77b93e63c9780358fbd94e3a6f0ad57f0d5cedf32f"
+                  },
+                  {
+                      "path":  "raw/auction/MasterAuction_USTEC_PERIOD_M5_P13R_USTEC_RECOVERY_A_RG2_v7_features.tsv",
+                      "bytes":  245966,
+                      "sha256":  "44eece3303c0df4c872f4da6e53789d2c1b6dabc8d303ab891f1ca353b9f4a6f"
+                  },
+                  {
+                      "path":  "raw/auction/MasterAuction_USTEC_PERIOD_M5_P13R_USTEC_RECOVERY_A_RG2_v7_runs.tsv",
+                      "bytes":  5734,
+                      "sha256":  "abb0dcbfc6fd6731ba1a1383c32ffea744b7e1353a83fb42a98aa52ede6967b2"
+                  },
+                  {
+                      "path":  "raw/auction/MasterAuction_USTEC_PERIOD_M5_P13R_USTEC_RECOVERY_A_RG2_v7_transits.tsv",
+                      "bytes":  21263,
+                      "sha256":  "1f463a18d12efb8946eba0a4d50ba50a73b6a84688c9b311d4424984efe408a1"
+                  },
+                  {
+                      "path":  "raw/structure/MasterStructure_USTEC_PERIOD_M5_P13R_USTEC_RECOVERY_A_v6_events.tsv",
+                      "bytes":  143423,
+                      "sha256":  "7d1986cd9be496d71f20f76169cbb4a70de16c585b23122f1ff04abbee4fd6ba"
+                  },
+                  {
+                      "path":  "raw/structure/MasterStructure_USTEC_PERIOD_M5_P13R_USTEC_RECOVERY_A_v6_inputs.tsv",
+                      "bytes":  438838084,
+                      "sha256":  "5fae86586946d15bbaf78eccdf6d3ab35291772b302f66ad9db9d18cf291d0f0"
+                  },
+                  {
+                      "path":  "raw/structure/MasterStructure_USTEC_PERIOD_M5_P13R_USTEC_RECOVERY_A_v6_nodes.tsv",
+                      "bytes":  65002457,
+                      "sha256":  "f75884f9fd4b30b943801753d8dd9b5e1ad98c4bfa4d151c59850ee75e6ccb10"
+                  },
+                  {
+                      "path":  "receipts/admission_receipt.json",
+                      "bytes":  2391,
+                      "sha256":  "64fccdc530113964ad76f45258995c6baa0406638c6b24c4c0788dd67683f26a"
+                  },
+                  {
+                      "path":  "receipts/MasterAuction_USTEC_PERIOD_M5_P13R_USTEC_RECOVERY_A_RG2_v7_replay_certificate.json",
+                      "bytes":  3549,
+                      "sha256":  "b8aa0747fe8b05495f6cf0afd6382a8382de8733ada271a5c9991c767b7b8568"
+                  },
+                  {
+                      "path":  "receipts/MasterAuction_USTEC_PERIOD_M5_P13R_USTEC_RECOVERY_A_RG2_v7_replay_certificate.md",
+                      "bytes":  626,
+                      "sha256":  "7fff890520293b46913055cf00fdf219f5627f9f4b7b3a14c6b26eab216e35dc"
+                  },
+                  {
+                      "path":  "receipts/terminal_run_receipt.json",
+                      "bytes":  4520,
+                      "sha256":  "ced29f52b662682f96b66ffba13a51c38e940408fe6e90459e09b7a7afe99594"
+                  }
+              ],
+    "mutation_rule":  "never overwrite; one-shot holdout evidence is immutable"
+}

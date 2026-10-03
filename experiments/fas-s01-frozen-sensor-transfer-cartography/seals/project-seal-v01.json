@@ -1,0 +1,28 @@
+{
+  "seal_id": "FASS01_CONSTRUCTION_V01",
+  "project_id": "fas-s01-frozen-sensor-transfer-cartography",
+  "fas00_terminal_closure_root_sha256": "870e1d29d7db3dd458f16fcb56315f6976e5a4f35ba5731d642b3330a8d7d652",
+  "root_sha256": "894b4a0c6db98a5d84fe75589168715a00660d48917e47b0c21bb794a2fc3777",
+  "files": [
+    {
+      "path": "contracts/project-identity-v01.json",
+      "sha256": "e10407dc5a7f84dcc859eefcab3c7183344d3b0dab291007fa53bb7933406b80"
+    },
+    {
+      "path": "contracts/read-only-cartography-contract-v01.json",
+      "sha256": "660a76946b7652206e3d823de97dd89947531ebb33f3fa13d35aeeb8dadcb69f"
+    },
+    {
+      "path": "FAS-S01-PROTOCOL.md",
+      "sha256": "ed211f38ce0bda42e694c604664ec5c56aad711e18fb451b7622aed7e997e7d4"
+    },
+    {
+      "path": "README.md",
+      "sha256": "7898612b8ea91f38d7139fc1bace5dd9ce6f91d5905da4bf346c4eaa5c22bb57"
+    },
+    {
+      "path": "scripts/seal-project.ps1",
+      "sha256": "12025e50c177a255b912a2ddaa383b22278e322488bad58d087cd1e29ab6b540"
+    }
+  ]
+}

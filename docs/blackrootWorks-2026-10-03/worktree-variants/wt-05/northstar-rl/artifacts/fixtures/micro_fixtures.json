@@ -1,0 +1,182 @@
+[
+  {
+    "name": "constant_price",
+    "purpose": "zero gross PnL and explicit friction",
+    "rows": [
+      [
+        100.0,
+        100.0,
+        100.0,
+        100.0
+      ],
+      [
+        100.0,
+        100.0,
+        100.0,
+        100.0
+      ],
+      [
+        100.0,
+        100.0,
+        100.0,
+        100.0
+      ],
+      [
+        100.0,
+        100.0,
+        100.0,
+        100.0
+      ]
+    ],
+    "actions": [
+      0.0,
+      1.0,
+      0.0
+    ],
+    "expected": "equity changes only by declared friction"
+  },
+  {
+    "name": "monotonic_rise",
+    "purpose": "positive and negative exposure signs",
+    "rows": [
+      [
+        100.0,
+        100.0,
+        100.0,
+        100.0
+      ],
+      [
+        101.0,
+        101.0,
+        101.0,
+        101.0
+      ],
+      [
+        102.0,
+        102.0,
+        102.0,
+        102.0
+      ],
+      [
+        103.0,
+        103.0,
+        103.0,
+        103.0
+      ]
+    ],
+    "actions": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "expected": "long gross mark-to-market deltas are non-negative after entry"
+  },
+  {
+    "name": "monotonic_fall",
+    "purpose": "negative exposure",
+    "rows": [
+      [
+        100.0,
+        100.0,
+        100.0,
+        100.0
+      ],
+      [
+        99.0,
+        99.0,
+        99.0,
+        99.0
+      ],
+      [
+        98.0,
+        98.0,
+        98.0,
+        98.0
+      ],
+      [
+        97.0,
+        97.0,
+        97.0,
+        97.0
+      ]
+    ],
+    "actions": [
+      -1.0,
+      -1.0,
+      -1.0
+    ],
+    "expected": "short gross mark-to-market deltas are non-negative after entry"
+  },
+  {
+    "name": "gap_and_terminal",
+    "purpose": "gap/source terminal typing",
+    "rows": [
+      [
+        100.0,
+        101.0,
+        99.0,
+        100.0
+      ],
+      [
+        105.0,
+        106.0,
+        104.0,
+        105.0
+      ]
+    ],
+    "actions": [
+      0.5
+    ],
+    "expected": "next-open execution includes the bar gap; typed source gaps stop before execution"
+  },
+  {
+    "name": "exposure_crossings",
+    "purpose": "flat/positive/negative/fractional/rounding",
+    "rows": [
+      [
+        100.0,
+        101.0,
+        99.0,
+        100.0
+      ],
+      [
+        100.0,
+        101.0,
+        99.0,
+        100.0
+      ],
+      [
+        100.0,
+        101.0,
+        99.0,
+        100.0
+      ],
+      [
+        100.0,
+        101.0,
+        99.0,
+        100.0
+      ],
+      [
+        100.0,
+        101.0,
+        99.0,
+        100.0
+      ],
+      [
+        100.0,
+        101.0,
+        99.0,
+        100.0
+      ]
+    ],
+    "actions": [
+      1.0,
+      0.0,
+      -1.0,
+      1.0,
+      0.333
+    ],
+    "expected": "each target is rounded by quantity_step toward zero"
+  }
+]

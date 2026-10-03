@@ -1,0 +1,84 @@
+{
+  "schema_version": "EVALUATION_SPEC_V1",
+  "evaluation_spec_id": "2126f7e1c3c3add4328ebdc73462d921b837537842260eb6d89ef85f77c988b8",
+  "partition_tape_id": "ea30eec338e8c49b9157ad5586fd60cdf741f22120cc72a59c2583f3ba0f48e8",
+  "evaluation_episode_ids": [
+    "59a35be2f207aabc8e1a20d3c7949dea85450c2a63df515ba57b1bfb19edbcef",
+    "6db00d65a0f592927f6c83fe39d4c468f3c34012a2e8349b5f1b1d437c6b4db9"
+  ],
+  "deterministic_policy_inference": true,
+  "policy_selection_uses_evaluation": false,
+  "metrics": [
+    {
+      "metric_id": "normalized_return_sum",
+      "direction": "MAXIMIZE",
+      "aggregation": "SUM",
+      "missingness": "FAIL_CLOSED"
+    },
+    {
+      "metric_id": "gross_mark_to_market_sum",
+      "direction": "MAXIMIZE",
+      "aggregation": "SUM",
+      "missingness": "FAIL_CLOSED"
+    },
+    {
+      "metric_id": "turnover_sum",
+      "direction": "MINIMIZE",
+      "aggregation": "SUM",
+      "missingness": "FAIL_CLOSED"
+    },
+    {
+      "metric_id": "total_friction_sum",
+      "direction": "MINIMIZE",
+      "aggregation": "SUM",
+      "missingness": "FAIL_CLOSED"
+    },
+    {
+      "metric_id": "max_drawdown",
+      "direction": "MINIMIZE",
+      "aggregation": "MAX",
+      "missingness": "FAIL_CLOSED"
+    },
+    {
+      "metric_id": "mean_absolute_exposure",
+      "direction": "DIAGNOSTIC",
+      "aggregation": "MEAN",
+      "missingness": "FAIL_CLOSED"
+    },
+    {
+      "metric_id": "step_count",
+      "direction": "DIAGNOSTIC",
+      "aggregation": "SUM",
+      "missingness": "FAIL_CLOSED"
+    },
+    {
+      "metric_id": "terminal_count",
+      "direction": "REQUIRE_EXACT",
+      "aggregation": "SUM",
+      "missingness": "FAIL_CLOSED"
+    }
+  ],
+  "stress_variants": [
+    {
+      "stress_id": "CANONICAL_DETERMINISTIC",
+      "execution_calibration_id": null,
+      "parameter_overrides": []
+    },
+    {
+      "stress_id": "DOUBLE_FRICTION_DECLARATION_ONLY",
+      "execution_calibration_id": null,
+      "parameter_overrides": [
+        [
+          "friction_multiplier",
+          "2.0"
+        ]
+      ]
+    }
+  ],
+  "aggregation_order": [
+    "episode",
+    "seed",
+    "campaign"
+  ],
+  "implementation_hash": "0d6855a2a66c1b323b984580cb02b34de56eb799cd0876c763736fc0851b127e"
+}

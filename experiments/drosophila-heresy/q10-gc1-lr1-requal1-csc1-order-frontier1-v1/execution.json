@@ -1,0 +1,610 @@
+{
+  "contexts": [
+    {
+      "best_score_comparison": {
+        "best_recorded_order": 1,
+        "order2_vs_order1": "SAME",
+        "order3_vs_order1": "SAME",
+        "order3_vs_order2": "SAME"
+      },
+      "context": [
+        "seed9731-L-tau16.json",
+        2
+      ],
+      "orders": {
+        "1": {
+          "best_valid_score_key": [
+            164.0,
+            208.0,
+            1.4445121408177567e-05,
+            3.814697265625e-06
+          ],
+          "best_valid_source_identity": "seed9731-L-tau16.json|2|[[24149, 0], [24153, -2], [24188, 4]]",
+          "context": [
+            "seed9731-L-tau16.json",
+            2
+          ],
+          "distinct_exact_confirmed": 0,
+          "evaluated_records": 440,
+          "improved_vs_V": 44,
+          "valid_geometry": 50,
+          "zero_mismatch_readouts": 0
+        },
+        "2": {
+          "best_valid_score_key": [
+            164.0,
+            208.0,
+            1.4445121408177567e-05,
+            3.814697265625e-06
+          ],
+          "best_valid_source_identity": "['seed9731-L-tau16.json', 2]|62",
+          "context": [
+            "seed9731-L-tau16.json",
+            2
+          ],
+          "distinct_exact_confirmed": 0,
+          "evaluated_records": 7553,
+          "improved_vs_V": 5456,
+          "valid_geometry": 7553,
+          "zero_mismatch_readouts": 0
+        },
+        "3": {
+          "best_valid_score_key": [
+            164.0,
+            208.0,
+            1.4445121408177567e-05,
+            3.814697265625e-06
+          ],
+          "best_valid_source_identity": "['seed9731-L-tau16.json', 2]|[2, 9, 17]|137",
+          "context": [
+            "seed9731-L-tau16.json",
+            2
+          ],
+          "distinct_exact_confirmed": 0,
+          "evaluated_records": 772155,
+          "improved_vs_V": 405901,
+          "valid_geometry": 772155,
+          "zero_mismatch_readouts": 0
+        }
+      }
+    },
+    {
+      "best_score_comparison": {
+        "best_recorded_order": 3,
+        "order2_vs_order1": "UNAVAILABLE",
+        "order3_vs_order1": "UNAVAILABLE",
+        "order3_vs_order2": "BETTER"
+      },
+      "context": [
+        "seed9731-L-tau4.json",
+        3
+      ],
+      "orders": {
+        "1": {
+          "best_valid_score_key": null,
+          "best_valid_source_identity": null,
+          "context": [
+            "seed9731-L-tau4.json",
+            3
+          ],
+          "distinct_exact_confirmed": 0,
+          "evaluated_records": 496,
+          "improved_vs_V": 0,
+          "valid_geometry": 0,
+          "zero_mismatch_readouts": 0
+        },
+        "2": {
+          "best_valid_score_key": [
+            159.0,
+            200.0,
+            1.613701504352773e-05,
+            5.7220458984375e-06
+          ],
+          "best_valid_source_identity": "['seed9731-L-tau4.json', 3]|6",
+          "context": [
+            "seed9731-L-tau4.json",
+            3
+          ],
+          "distinct_exact_confirmed": 0,
+          "evaluated_records": 7,
+          "improved_vs_V": 7,
+          "valid_geometry": 7,
+          "zero_mismatch_readouts": 0
+        },
+        "3": {
+          "best_valid_score_key": [
+            157.0,
+            206.0,
+            1.6917747092265186e-05,
+            5.7220458984375e-06
+          ],
+          "best_valid_source_identity": "['seed9731-L-tau4.json', 3]|[387, 420, 459]|32628963",
+          "context": [
+            "seed9731-L-tau4.json",
+            3
+          ],
+          "distinct_exact_confirmed": 0,
+          "evaluated_records": 4326,
+          "improved_vs_V": 4326,
+          "valid_geometry": 4326,
+          "zero_mismatch_readouts": 0
+        }
+      }
+    },
+    {
+      "best_score_comparison": {
+        "best_recorded_order": 3,
+        "order2_vs_order1": "UNAVAILABLE",
+        "order3_vs_order1": "UNAVAILABLE",
+        "order3_vs_order2": "BETTER"
+      },
+      "context": [
+        "seed9731-R-tau16.json",
+        1
+      ],
+      "orders": {
+        "1": {
+          "best_valid_score_key": null,
+          "best_valid_source_identity": null,
+          "context": [
+            "seed9731-R-tau16.json",
+            1
+          ],
+          "distinct_exact_confirmed": 0,
+          "evaluated_records": 472,
+          "improved_vs_V": 0,
+          "valid_geometry": 0,
+          "zero_mismatch_readouts": 0
+        },
+        "2": {
+          "best_valid_score_key": [
+            144.0,
+            194.0,
+            2.1114393314864603e-05,
+            7.62939453125e-06
+          ],
+          "best_valid_source_identity": "['seed9731-R-tau16.json', 1]|27",
+          "context": [
+            "seed9731-R-tau16.json",
+            1
+          ],
+          "distinct_exact_confirmed": 0,
+          "evaluated_records": 68,
+          "improved_vs_V": 68,
+          "valid_geometry": 68,
+          "zero_mismatch_readouts": 0
+        },
+        "3": {
+          "best_valid_score_key": [
+            144.0,
+            193.0,
+            2.0502481640161444e-05,
+            7.62939453125e-06
+          ],
+          "best_valid_source_identity": "['seed9731-R-tau16.json', 1]|[139, 240, 466]|43788994",
+          "context": [
+            "seed9731-R-tau16.json",
+            1
+          ],
+          "distinct_exact_confirmed": 0,
+          "evaluated_records": 23820,
+          "improved_vs_V": 23820,
+          "valid_geometry": 23820,
+          "zero_mismatch_readouts": 0
+        }
+      }
+    },
+    {
+      "best_score_comparison": {
+        "best_recorded_order": 3,
+        "order2_vs_order1": "UNAVAILABLE",
+        "order3_vs_order1": "UNAVAILABLE",
+        "order3_vs_order2": "UNAVAILABLE"
+      },
+      "context": [
+        "seed9731-R-tau16.json",
+        3
+      ],
+      "orders": {
+        "1": {
+          "best_valid_score_key": null,
+          "best_valid_source_identity": null,
+          "context": [
+            "seed9731-R-tau16.json",
+            3
+          ],
+          "distinct_exact_confirmed": 0,
+          "evaluated_records": 432,
+          "improved_vs_V": 0,
+          "valid_geometry": 0,
+          "zero_mismatch_readouts": 0
+        },
+        "2": {
+          "best_valid_score_key": null,
+          "best_valid_source_identity": null,
+          "context": [
+            "seed9731-R-tau16.json",
+            3
+          ],
+          "distinct_exact_confirmed": 0,
+          "evaluated_records": 0,
+          "improved_vs_V": 0,
+          "valid_geometry": 0,
+          "zero_mismatch_readouts": 0
+        },
+        "3": {
+          "best_valid_score_key": [
+            142.0,
+            199.0,
+            2.2329239644695024e-05,
+            1.1444091796875e-05
+          ],
+          "best_valid_source_identity": "['seed9731-R-tau16.json', 3]|[281, 397, 429]|61719149",
+          "context": [
+            "seed9731-R-tau16.json",
+            3
+          ],
+          "distinct_exact_confirmed": 0,
+          "evaluated_records": 3,
+          "improved_vs_V": 3,
+          "valid_geometry": 3,
+          "zero_mismatch_readouts": 0
+        }
+      }
+    },
+    {
+      "best_score_comparison": {
+        "best_recorded_order": null,
+        "order2_vs_order1": "UNAVAILABLE",
+        "order3_vs_order1": "UNAVAILABLE",
+        "order3_vs_order2": "UNAVAILABLE"
+      },
+      "context": [
+        "seed9731-R-tau4.json",
+        0
+      ],
+      "orders": {
+        "1": {
+          "best_valid_score_key": null,
+          "best_valid_source_identity": null,
+          "context": [
+            "seed9731-R-tau4.json",
+            0
+          ],
+          "distinct_exact_confirmed": 0,
+          "evaluated_records": 472,
+          "improved_vs_V": 0,
+          "valid_geometry": 0,
+          "zero_mismatch_readouts": 0
+        },
+        "2": {
+          "best_valid_score_key": null,
+          "best_valid_source_identity": null,
+          "context": [
+            "seed9731-R-tau4.json",
+            0
+          ],
+          "distinct_exact_confirmed": 0,
+          "evaluated_records": 0,
+          "improved_vs_V": 0,
+          "valid_geometry": 0,
+          "zero_mismatch_readouts": 0
+        },
+        "3": {
+          "best_valid_score_key": null,
+          "best_valid_source_identity": null,
+          "context": [
+            "seed9731-R-tau4.json",
+            0
+          ],
+          "distinct_exact_confirmed": 0,
+          "evaluated_records": 0,
+          "improved_vs_V": 0,
+          "valid_geometry": 0,
+          "zero_mismatch_readouts": 0
+        }
+      }
+    },
+    {
+      "best_score_comparison": {
+        "best_recorded_order": 3,
+        "order2_vs_order1": "BETTER",
+        "order3_vs_order1": "BETTER",
+        "order3_vs_order2": "BETTER"
+      },
+      "context": [
+        "seed9731-R-tau4.json",
+        1
+      ],
+      "orders": {
+        "1": {
+          "best_valid_score_key": [
+            146.0,
+            194.0,
+            1.8122752791736445e-05,
+            5.7220458984375e-06
+          ],
+          "best_valid_source_identity": "seed9731-R-tau4.json|1|[[4842, 0], [4847, 0], [4848, 0], [4849, 0], [4851, 0], [4857, 0], [4859, 0], [4868, 0], [4877, 0], [4878, 0], [4881, 2], [4886, 0], [4890, 0], [4895, 0], [4917, 0], [4919, 0], [4926, 0], [4929, 0], [4937, 0], [4941, 0], [4945, 0], [4953, 0], [4954, 0], [4955, 0], [4961, 0], [4974, 0], [4975, 0], [4979, 0], [4986, 0], [4988, 0], [4989, 0], [4992, 0], [4995, 0], [4996, 0], [4999, 0], [5005, 0], [5008, 0], [5010, 0], [5017, 0], [5025, 0], [5031, 0], [5039, 0], [5046, 0], [5047, 8], [5052, 0], [5054, 0], [5059, 0], [5060, 0], [5062, 0], [5063, 0], [5083, 0], [5084, 0], [5090, 0], [5093, 0], [5096, 0], [5098, 0], [5100, 0], [5107, 0], [5108, 0], [5117, 0], [5122, 0], [5135, 0], [5139, 0], [5157, 0], [5161, -1], [5167, 0], [5171, 0], [5189, 0], [5191, 0], [5194, 0], [5206, 0]]",
+          "context": [
+            "seed9731-R-tau4.json",
+            1
+          ],
+          "distinct_exact_confirmed": 0,
+          "evaluated_records": 440,
+          "improved_vs_V": 1,
+          "valid_geometry": 1,
+          "zero_mismatch_readouts": 0
+        },
+        "2": {
+          "best_valid_score_key": [
+            144.0,
+            191.0,
+            1.8091359826535287e-05,
+            5.7220458984375e-06
+          ],
+          "best_valid_source_identity": "['seed9731-R-tau4.json', 1]|171",
+          "context": [
+            "seed9731-R-tau4.json",
+            1
+          ],
+          "distinct_exact_confirmed": 0,
+          "evaluated_records": 223,
+          "improved_vs_V": 223,
+          "valid_geometry": 223,
+          "zero_mismatch_readouts": 0
+        },
+        "3": {
+          "best_valid_score_key": [
+            143.0,
+            192.0,
+            1.867271875932476e-05,
+            5.7220458984375e-06
+          ],
+          "best_valid_source_identity": "['seed9731-R-tau4.json', 1]|[189, 356, 439]|89892711",
+          "context": [
+            "seed9731-R-tau4.json",
+            1
+          ],
+          "distinct_exact_confirmed": 0,
+          "evaluated_records": 33961,
+          "improved_vs_V": 33961,
+          "valid_geometry": 33961,
+          "zero_mismatch_readouts": 0
+        }
+      }
+    },
+    {
+      "best_score_comparison": {
+        "best_recorded_order": 1,
+        "order2_vs_order1": "SAME",
+        "order3_vs_order1": "SAME",
+        "order3_vs_order2": "SAME"
+      },
+      "context": [
+        "seed9731-R-tau4.json",
+        2
+      ],
+      "orders": {
+        "1": {
+          "best_valid_score_key": [
+            144.0,
+            191.0,
+            1.9514878381987436e-05,
+            5.7220458984375e-06
+          ],
+          "best_valid_source_identity": "seed9731-R-tau4.json|2|[[9354, 0], [9361, 0], [9383, 0], [9453, 0], [9456, 0], [9468, 0], [9497, 0], [9506, 0], [9509, 0], [9538, 0], [9541, 0], [9548, 0], [9616, 0], [9623, 0], [9630, 0], [9647, 8], [9652, 0], [9659, 0], [9676, 0], [9684, 0], [9687, 0], [9692, 0], [9702, 0], [9711, 0], [9720, 0], [9760, 0], [9761, 0], [9769, 0], [9778, 0], [9788, 0], [9791, 0], [9792, 0], [9795, 0], [9807, 0], [9813, 0], [9815, 0], [9816, 0], [9832, 0], [9834, 0], [9842, 0], [9877, 0], [9900, 0], [9940, 0], [9956, 0], [9966, 0], [9975, 0], [9978, 0], [9981, 0], [9982, 0], [10013, 0], [10015, 0], [10020, 0], [10044, 0], [10059, 0], [10060, 0], [10063, 0], [10075, 0], [10089, 0], [10099, 0], [10103, -2], [10104, 0], [10112, 0], [10135, 0], [10151, 0], [10152, 0], [10155, 0], [10167, 0], [10170, 0], [10173, 0], [10193, 0], [10196, 0], [10227, -8], [10228, 0]]",
+          "context": [
+            "seed9731-R-tau4.json",
+            2
+          ],
+          "distinct_exact_confirmed": 0,
+          "evaluated_records": 472,
+          "improved_vs_V": 1,
+          "valid_geometry": 1,
+          "zero_mismatch_readouts": 0
+        },
+        "2": {
+          "best_valid_score_key": [
+            144.0,
+            191.0,
+            1.9514878381987436e-05,
+            5.7220458984375e-06
+          ],
+          "best_valid_source_identity": "['seed9731-R-tau4.json', 2]|0",
+          "context": [
+            "seed9731-R-tau4.json",
+            2
+          ],
+          "distinct_exact_confirmed": 0,
+          "evaluated_records": 241,
+          "improved_vs_V": 241,
+          "valid_geometry": 241,
+          "zero_mismatch_readouts": 0
+        },
+        "3": {
+          "best_valid_score_key": [
+            144.0,
+            191.0,
+            1.9514878381987436e-05,
+            5.7220458984375e-06
+          ],
+          "best_valid_source_identity": "['seed9731-R-tau4.json', 2]|[0, 12, 380]|92240420",
+          "context": [
+            "seed9731-R-tau4.json",
+            2
+          ],
+          "distinct_exact_confirmed": 0,
+          "evaluated_records": 30886,
+          "improved_vs_V": 30886,
+          "valid_geometry": 30886,
+          "zero_mismatch_readouts": 0
+        }
+      }
+    },
+    {
+      "best_score_comparison": {
+        "best_recorded_order": 1,
+        "order2_vs_order1": "SAME",
+        "order3_vs_order1": "SAME",
+        "order3_vs_order2": "SAME"
+      },
+      "context": [
+        "seed9731-R-tau4.json",
+        3
+      ],
+      "orders": {
+        "1": {
+          "best_valid_score_key": [
+            123.0,
+            162.0,
+            1.866006202952065e-05,
+            7.62939453125e-06
+          ],
+          "best_valid_source_identity": "seed9731-R-tau4.json|3|[[16581, 0], [16593, 0], [16596, 0], [16599, 0], [16603, 0], [16615, 0], [16646, 0], [16676, 0], [16688, 0], [16695, 0], [16704, 0], [16712, 0], [16785, 0], [16800, 0], [16808, 0], [16825, 0], [16834, 0], [16845, 0], [16850, 0], [16853, 0], [16878, 0], [16936, 0], [16966, 0], [16971, 0], [16976, 0], [17018, 0], [17024, 0], [17037, 0], [17039, 0], [17046, 0], [17116, 0], [17183, 0], [17206, 0], [17290, -8], [17314, 0], [17414, 4], [17490, 0], [17493, -16], [17510, 0], [17513, 0]]",
+          "context": [
+            "seed9731-R-tau4.json",
+            3
+          ],
+          "distinct_exact_confirmed": 0,
+          "evaluated_records": 472,
+          "improved_vs_V": 3,
+          "valid_geometry": 5,
+          "zero_mismatch_readouts": 0
+        },
+        "2": {
+          "best_valid_score_key": [
+            123.0,
+            162.0,
+            1.866006202952065e-05,
+            7.62939453125e-06
+          ],
+          "best_valid_source_identity": "['seed9731-R-tau4.json', 3]|0",
+          "context": [
+            "seed9731-R-tau4.json",
+            3
+          ],
+          "distinct_exact_confirmed": 0,
+          "evaluated_records": 1438,
+          "improved_vs_V": 631,
+          "valid_geometry": 1438,
+          "zero_mismatch_readouts": 0
+        },
+        "3": {
+          "best_valid_score_key": [
+            123.0,
+            162.0,
+            1.866006202952065e-05,
+            7.62939453125e-06
+          ],
+          "best_valid_source_identity": "['seed9731-R-tau4.json', 3]|[0, 11, 330]|108881946",
+          "context": [
+            "seed9731-R-tau4.json",
+            3
+          ],
+          "distinct_exact_confirmed": 0,
+          "evaluated_records": 225429,
+          "improved_vs_V": 64752,
+          "valid_geometry": 225429,
+          "zero_mismatch_readouts": 0
+        }
+      }
+    }
+  ],
+  "counts": {
+    "order1_records": 3696,
+    "order2_records": 9530,
+    "order3_records": 1090580,
+    "order3_valid_frontier_records": {
+      "seed9731-L-tau16.json::2": 772155,
+      "seed9731-L-tau4.json::3": 4326,
+      "seed9731-R-tau16.json::1": 23820,
+      "seed9731-R-tau16.json::3": 3,
+      "seed9731-R-tau4.json::0": 0,
+      "seed9731-R-tau4.json::1": 33961,
+      "seed9731-R-tau4.json::2": 30886,
+      "seed9731-R-tau4.json::3": 225429
+    }
+  },
+  "domain_manifest_sha256": "BE5700B428FBE4E890CF2E3DD2B94E118586E07AE52DFA5EB1EF810AD87F24AF",
+  "engineering_only": true,
+  "global": {
+    "1": {
+      "best_valid_score_key": [
+        123.0,
+        162.0,
+        1.866006202952065e-05,
+        7.62939453125e-06
+      ],
+      "best_valid_source_identity": "seed9731-R-tau4.json|3|[[16581, 0], [16593, 0], [16596, 0], [16599, 0], [16603, 0], [16615, 0], [16646, 0], [16676, 0], [16688, 0], [16695, 0], [16704, 0], [16712, 0], [16785, 0], [16800, 0], [16808, 0], [16825, 0], [16834, 0], [16845, 0], [16850, 0], [16853, 0], [16878, 0], [16936, 0], [16966, 0], [16971, 0], [16976, 0], [17018, 0], [17024, 0], [17037, 0], [17039, 0], [17046, 0], [17116, 0], [17183, 0], [17206, 0], [17290, -8], [17314, 0], [17414, 4], [17490, 0], [17493, -16], [17510, 0], [17513, 0]]",
+      "context": [
+        "ALL",
+        -1
+      ],
+      "distinct_exact_confirmed": 0,
+      "evaluated_records": 3696,
+      "improved_vs_V": 49,
+      "valid_geometry": 57,
+      "zero_mismatch_readouts": 0
+    },
+    "2": {
+      "best_valid_score_key": [
+        123.0,
+        162.0,
+        1.866006202952065e-05,
+        7.62939453125e-06
+      ],
+      "best_valid_source_identity": "['seed9731-R-tau4.json', 3]|0",
+      "context": [
+        "ALL",
+        -1
+      ],
+      "distinct_exact_confirmed": 0,
+      "evaluated_records": 9530,
+      "improved_vs_V": 6626,
+      "valid_geometry": 9530,
+      "zero_mismatch_readouts": 0
+    },
+    "3": {
+      "best_valid_score_key": [
+        123.0,
+        162.0,
+        1.866006202952065e-05,
+        7.62939453125e-06
+      ],
+      "best_valid_source_identity": "['seed9731-R-tau4.json', 3]|[0, 11, 330]|108881946",
+      "context": [
+        "ALL",
+        -1
+      ],
+      "distinct_exact_confirmed": 0,
+      "evaluated_records": 1090580,
+      "improved_vs_V": 563649,
+      "valid_geometry": 1090580,
+      "zero_mismatch_readouts": 0
+    },
+    "comparison": {
+      "best_recorded_order": 1,
+      "order2_vs_order1": "SAME",
+      "order3_vs_order1": "SAME",
+      "order3_vs_order2": "SAME"
+    }
+  },
+  "identity": "q10-gc1-lr1-requal1-csc1-order-frontier1-v1",
+  "parents": {
+    "order2_execution_sha256": "5EB2CC6BC10A21CE2497FEA927A0003A85B7BEDDB280D886EF11C9A4A9C8A3A9",
+    "order3_audit_execution_sha256": "0875D639BF9C9850FA835ED39F148B80951CF08BA419BDCD3BD3D2AD7BB11404",
+    "order3_execution_sha256": "67FE6C23420110E0C97A6153F05EB9EDBBCBA22ACA538AA03397987F75522DA2",
+    "singleton_execution_sha256": "EA8E07387F2E0A82DF65AC0F548644290CC200E14D289CBFBD4E19269B82B108"
+  },
+  "protocol": "Q10-CSC1-ORDER-FRONTIER1",
+  "replay_executed": false,
+  "schema_notes": {
+    "order1_distinct_exact": "not explicitly available in singleton receipt schema; zero-mismatch count reported separately",
+    "order2_distinct_exact": "explicit target_readout_match and target_weight_match fields",
+    "order3_distinct_exact": "explicit exact_target_distinct field"
+  },
+  "scientific_promotion": false,
+  "source_file_count": 149,
+  "source_file_hash_manifest_sha256": "E8B63B7AF98C4A866B7BC61E0ADBC62A4D3A6B18792023507ACEA94D3D27988A",
+  "status": "ORDER_FRONTIER_COMPARISON_COMPLETE"
+}

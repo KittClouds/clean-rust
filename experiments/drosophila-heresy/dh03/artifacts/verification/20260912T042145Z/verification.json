@@ -1,0 +1,20 @@
+{
+  "status": "VERIFIED",
+  "checks": {
+    "observer_on": {
+      "all_recorded_non_timing_outputs_equal": true,
+      "raw_sha256": "c817ad1adcf86ccee83a9cd4f14ce8331adcb13319cdfb49063ff407224a81b5"
+    },
+    "observer_off": {
+      "all_recorded_non_timing_outputs_equal": true,
+      "raw_sha256": "9f082e7af292a61d5006761384ccfd077029963be10039b205e1313f2948f022"
+    }
+  },
+  "real_slice_conditions": 6,
+  "arms_per_condition": 2,
+  "scientific_sample_size_increased": false,
+  "parents_unchanged": true,
+  "frozen_files_checked": 33,
+  "output_files_checked": 10,
+  "exact_final_weight_noninterference": "verified in synthetic unit tests; final full weights not persisted in scientific outputs"
+}

@@ -1,0 +1,8 @@
+{
+  "contract_sha256": "0F923F1280218471AA59A2E597ADA642004D2FFDF992FA4086AEA93B113B1386",
+  "identity": "q10-gc1-lr1-requal1-csc1-route1-v2",
+  "outcomes_read_only": true,
+  "protocol": "Q10-CSC1-ROUTE1",
+  "replay_performed": false,
+  "status": "PREEXECUTION_SEALED"
+}

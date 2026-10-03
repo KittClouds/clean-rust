@@ -1,0 +1,204 @@
+{
+  "protocol": "Q10-GC0",
+  "identity": "q10-gc0-v1",
+  "status": "PREEXECUTION_SEALED_NO_EXECUTION",
+  "plan_sha256": "D298AEE12140C9EE86411486339D16A66CE10D7EC86208FE6CD640C8A1C7C288",
+  "purpose": "Global Candidate Palette Qualification, engineering-only, no behavior, no scientific promotion",
+  "parent_bindings": [
+    {
+      "label": "rh1_f2_plan",
+      "path": "experiments/drosophila-heresy/q10-rh1-f2-v1/PLAN.md",
+      "sha256": "E1AE27783A3A95F638B69594B310C8237B736D0A0833A43F78DB17874D852225"
+    },
+    {
+      "label": "rh1_f2_contract",
+      "path": "experiments/drosophila-heresy/q10-rh1-f2-v1/CONTRACT.json",
+      "sha256": "7CBDD2607D55A010D339B796196F7408A70B4664065075F3C3D7A5F64773723C"
+    },
+    {
+      "label": "rh1_f2_preexecution",
+      "path": "experiments/drosophila-heresy/q10-rh1-f2-v1/PREEXECUTION.json",
+      "sha256": "7986F18A231A31BC98C18977905CE992CE87FBD9A797949B17FA7A18FB31C651"
+    },
+    {
+      "label": "rh1_f2_status",
+      "path": "experiments/drosophila-heresy/q10-rh1-f2-v1/STATUS.json",
+      "sha256": "02CFF603390074A4FA31A3B2B11CA5AD58BE9BA391D4BFAAB396FAC60F32E239"
+    },
+    {
+      "label": "rh1_f2_execution",
+      "path": "experiments/drosophila-heresy/q10-rh1-f2-v1/qualification/execution/execution.json",
+      "sha256": "D900B374F076AEC352381D878D31AEA8D7129D8BB5A3E53DB5B7D5B05E3FAFF9"
+    },
+    {
+      "label": "rh1_f2_derived_result",
+      "path": "experiments/drosophila-heresy/q10-rh1-f2-v1/qualification/derived/RESULT.md",
+      "sha256": "DEC41A9DFDCE75EEDFC147494C7B1347A01868B283DC38FD396FDB5E83775F91"
+    },
+    {
+      "label": "rh1_f2_derived_summary",
+      "path": "experiments/drosophila-heresy/q10-rh1-f2-v1/qualification/derived/SUMMARY.json",
+      "sha256": "C56E6B3DCB351867BA2BE9EB2394810B94284F2534AC3F7252502B2956BD8B62"
+    },
+    {
+      "label": "rh1_f2_derived_status",
+      "path": "experiments/drosophila-heresy/q10-rh1-f2-v1/qualification/derived/STATUS.json",
+      "sha256": "6C826ECBA69509DA61DFB007D93B37EC70208298CBC223E517E0F2E6B4DD43F5"
+    },
+    {
+      "label": "rh1_f2_runner",
+      "path": "experiments/drosophila-heresy/q10-rh1-f2-v1/scripts/run_rh1.py",
+      "sha256": "B42644BA0E2C4C8A0CC0F9997135CE18A9F9E6C0836810926300C4D84F198103"
+    },
+    {
+      "label": "rh1_common_runtime",
+      "path": "experiments/drosophila-heresy/q10-rh1-cq1-v1/scripts/common_runtime.py",
+      "sha256": "20BE4D05B2554109AEED10A41FFCE90A915F224A552B5762C3D574B4701F942C"
+    },
+    {
+      "label": "pf5_runner",
+      "path": "experiments/drosophila-heresy/q10-pf5-v1/scripts/run_q10_pf5.py",
+      "sha256": "A00078787DB732906416B3C7158DC777CD41C2E71C3AAE660D1AE525446FB82A"
+    },
+    {
+      "label": "pf5_qualification_runtime",
+      "path": "experiments/drosophila-heresy/q10-pf5-v1/scripts/qualify_q10_pf5.py",
+      "sha256": "6C4B857E7DB4A7F60B2F59AD0D3939AD8F4B07B2E1378681DDAD819F70CC58C9"
+    },
+    {
+      "label": "pf5_contract",
+      "path": "experiments/drosophila-heresy/q10-pf5-v1/CONTRACT.json",
+      "sha256": "20995E1826A9C62E0E8689017A2F3E624CC9E63B76B210FBD4AB11D7E9E7D34F"
+    },
+    {
+      "label": "rh1_ac2_summary",
+      "path": "experiments/drosophila-heresy/q10-rh1-ac2-v1/qualification/SUMMARY.json",
+      "sha256": "C0D93364B17D0739DB47519EA458833DA15E9DF59E28C85E6BD1A7D9B757EB04"
+    },
+    {
+      "label": "rh1_ac2_features",
+      "path": "experiments/drosophila-heresy/q10-rh1-ac2-v1/qualification/features.jsonl",
+      "sha256": "7EC54C783A97078243D4AA5B1AEDC65AC5FBE0475C8F11561D84FF4D8120C2F2"
+    },
+    {
+      "label": "rh1_ac2_effects",
+      "path": "experiments/drosophila-heresy/q10-rh1-ac2-v1/qualification/effects.jsonl",
+      "sha256": "4D45D48375385AE8886A744BF9CE8E926140F9181C30966316D7350608327EE5"
+    }
+  ],
+  "sample": {
+    "mode": "fixed_first_four_endpoint_keys_all_f2_groups",
+    "endpoint_order_source": "RH1-F2 frozen primary_then_secondary group order, first unique endpoint keys",
+    "endpoint_names": [
+      "seed9731-L-tau16.json",
+      "seed9731-L-tau4.json",
+      "seed9731-R-tau16.json",
+      "seed9731-R-tau4.json"
+    ],
+    "endpoint_keys": [
+      ["seed9731-L-tau16.json", 0],
+      ["seed9731-L-tau16.json", 1],
+      ["seed9731-L-tau16.json", 2],
+      ["seed9731-L-tau16.json", 3],
+      ["seed9731-L-tau4.json", 0],
+      ["seed9731-L-tau4.json", 1],
+      ["seed9731-L-tau4.json", 2],
+      ["seed9731-L-tau4.json", 3],
+      ["seed9731-R-tau16.json", 1],
+      ["seed9731-R-tau16.json", 3],
+      ["seed9731-R-tau4.json", 0],
+      ["seed9731-R-tau4.json", 1],
+      ["seed9731-R-tau4.json", 2],
+      ["seed9731-R-tau4.json", 3]
+    ],
+    "expected_endpoint_count": 4,
+    "expected_endpoint_set_count": 14,
+    "expected_group_count": 27,
+    "full_f2_group_count": 55,
+    "selection_is_sealed": true,
+    "selection_is_not_post_outcome": true
+  },
+  "authority": {
+    "source": "sealed RH1-F2 authority ranking and AC2 feature rows",
+    "keys": [
+      "helpful_row_count_desc",
+      "helpful_ulp_burden_desc",
+      "median_first_helpful_scale_asc",
+      "declared_row_count_desc",
+      "coordinate_id_asc"
+    ],
+    "na_information_used": false,
+    "missing_authority_is_fail_closed": true
+  },
+  "candidate_generation": {
+    "horizon": "min(32, group_coordinate_count)",
+    "zero_candidate_required": true,
+    "nonzero_candidates_requested_per_group": 8,
+    "prefix_choices_in_expansion_order": [0, -1, 1, -2, 2, -4, 4, -8, 8, -16, 16],
+    "exact_replay": "sequential_f32_add_after_each_coordinate_from_negative_zero",
+    "max_unique_replays_per_group": 512,
+    "frontier_width": 32,
+    "exploit_width": 24,
+    "explore_width": 8,
+    "cutoff_is_sealed": true,
+    "candidate_identity": {
+      "mapping": "coordinate_id_to_prefix_choice",
+      "canonical_order": "ascending_coordinate_id",
+      "hash": "sha256(canonical_json_pairs)",
+      "excludes": ["authority_rank_position", "visitation_order", "beam_lane", "exploration_order"]
+    }
+  },
+  "retention": {
+    "role_order": [
+      "best_D",
+      "best_P",
+      "lowest_collateral",
+      "lowest_axis_debt",
+      "lowest_norm_debt",
+      "lowest_linear_drive_debt",
+      "distinct_active_coordinate_support",
+      "distinct_prefix_scale_profile"
+    ],
+    "fill_order": "complete_candidate_lexicographic_key",
+    "collateral": "count of baseline-exact physical rows newly made nonexact",
+    "active_coordinate_support": "sorted nonzero coordinate ids",
+    "prefix_scale_profile": "sorted absolute nonzero prefix magnitudes",
+    "shortfall_is_preserved": true
+  },
+  "score_domains": {
+    "D": "declared group rows",
+    "P": "union of physical rows containing any group coordinate",
+    "G": "whole endpoint readout",
+    "reported_scores_are_exact": true,
+    "additive_surrogates_reported_as_candidates": false
+  },
+  "global_gate": {
+    "baseline_global_mismatch_set": "endpoint,set,row where baseline sequential-f32 readout differs from target",
+    "candidate_bearing_support": "union of physical support rows of nonzero retained candidates",
+    "classification_when_incomplete": "SUPPORT_INCOMPLETE_DIAGNOSTIC_ONLY",
+    "incomplete_does_not_imply_global_infeasibility": true,
+    "gc1_authorization": false
+  },
+  "firewall": {
+    "engineering_only": true,
+    "scientific_seed_bundles": 0,
+    "behavioral_probe": false,
+    "scientific_promotion": false,
+    "gc1_global_coalition_assembly": false,
+    "parent_writes": false,
+    "write_root": "experiments/drosophila-heresy/q10-gc0-v1"
+  },
+  "required_outputs": [
+    "PLAN.md",
+    "CONTRACT.json",
+    "PREEXECUTION.json",
+    "scripts/run_gc0.py",
+    "scripts/analyze_gc0.py",
+    "scripts/test_gc0.py",
+    "qualification/execution.json",
+    "qualification/derived/RESULT.md",
+    "qualification/derived/SUMMARY.json",
+    "qualification/derived/STATUS.json",
+    "qualification/derived/conflict-topology.json"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "schema": "OBS_OPEN_04A_DESCENDANT_CANONICAL_ROADMAP_ROOT_RECEIPT_V1",
+  "status": "FROZEN_CANONICAL_ROADMAP",
+  "program_id": "04A_DESCENDANT_BEHAVIORAL_QUALIFICATION_COMPOUND_V1",
+  "ancestor_04A_root": "48102bd529abf01591842f85676b86eb66b0600dc8d702bd0dbb3d6b729b4c41",
+  "content_manifest": "CANONICAL_ROADMAP_CONTENT_MANIFEST.tsv",
+  "artifact_count": 2,
+  "roadmap_root_algorithm": "SHA256_OF_CONTENT_MANIFEST_BYTES",
+  "roadmap_root": "bd5433521f24e17275583c1dc3869476d71376e3667d15019ec7b706d911a6f1",
+  "g0_execution": "NOT_STARTED",
+  "authority": "CANONICAL_PROGRAM_ROADMAP_ONLY",
+  "scientific_finding_authority": false
+}

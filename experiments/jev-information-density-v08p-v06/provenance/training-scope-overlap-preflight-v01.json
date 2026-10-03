@@ -1,0 +1,58 @@
+{
+  "protocol": "jev-information-density/v0.8p-v06-training-scope-overlap-preflight-v01",
+  "identity": "v0.8P-v06-training-scope-overlap-preflight-v01",
+  "status": "NOT_EVALUABLE",
+  "scope": "Preflight only for the exact pre-existing training-scope overlap requirement. No candidate neighborhood was generated and no overlap comparison was attempted.",
+  "authoritative_requirement": {
+    "source_contract_path": "experiments/jev-information-density-v08p/phase_a/fresh-panel-contract-v01.json",
+    "source_contract_sha256": "ce3b7b97caecb27f3ad99439c0e67dca6e40af5da3db9ca2e356ea5e9f06f823",
+    "required_overlap_dimensions": [
+      "world_id",
+      "root_id",
+      "episode_id",
+      "full_rendered_input_hash",
+      "selector_input_hash"
+    ],
+    "reference_scope": "sealed training scope",
+    "semantics_changed": false,
+    "new_similarity_or_text_deduplication_rule_added": false
+  },
+  "available_bound_metadata": {
+    "run_contract_path": "experiments/jev-information-density-v08p/phase_b/phase-b-p-run-contract-v01.json",
+    "run_contract_sha256": "e345225b4a17fc18eb35fcab24cbe1d72bd0e34bed9de272f927a7be461853e6",
+    "common_primary_occurrence_manifest_sha256": "773119294a51aa46487de26f9f253355187a7bfd1e75cb2f258c307c86f10b06",
+    "common_primary_occurrence_rows": 10000,
+    "common_primary_occurrence_anchor_count": 5000,
+    "common_primary_occurrence_fact_flip_count": 5000,
+    "training_state_scope_receipt_sha256": "d98ae657e28b976f187d4d67e58119ce80496e76c061c90362ac2e50ff7f720e",
+    "training_state_scope_manifest_sha256": "aa8cba58f4a8ec46ed6ec8eaf0bfbe992b03b9fa58f815b4259d9fdfe2b009f3",
+    "training_state_scope_content_sha256": "40648e3bbf50e25f31e84d7656221171425cb6e71e07d4c07d4dc72650bb228e",
+    "training_state_scope_rows": 55000
+  },
+  "missing_evidence": [
+    "The authorized contracts provide hashes and counts, not the training world/root/episode identity values required for set intersection.",
+    "No authorized identity-only training-scope inventory containing full rendered-input and selector-input hashes is present among the v06 contract inputs.",
+    "The P-side candidate identity set does not yet exist; materializing it would require generating neighborhoods, which this authorization forbids."
+  ],
+  "result": {
+    "training_scope_overlap_computed": false,
+    "overlap_count": null,
+    "pass_or_fail": null,
+    "classification": "NOT_EVALUABLE_FROM_CURRENTLY_AUTHORIZED_INPUTS",
+    "reason": "Neither side of the required exact overlap comparison is available as identity values: the training contract bindings are digest-only, and P candidates must not be generated in this preflight."
+  },
+  "boundary_audit": {
+    "fresh_neighborhood_generated": false,
+    "v06_collision_stream_consumed": false,
+    "training_identity_manifest_opened": false,
+    "lfm_contact": false,
+    "feature_extraction": false,
+    "head_loading": false,
+    "training": false,
+    "inference": false,
+    "evaluation": false,
+    "phoenix": false,
+    "panel_root_exists": false
+  },
+  "disposition": "Stop. Do not infer a PASS from namespace separation or metadata hashes. No additional material was acquired and no further action is authorized by this preflight."
+}

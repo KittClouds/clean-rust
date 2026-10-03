@@ -1,0 +1,35 @@
+{
+  "protocol": "Q10-SR2",
+  "status": "Q10_SR2_STAGE2A_INVALID",
+  "stage": "STAGE_1A_REVIEW_FAILED",
+  "fresh_engineering_seed_opened": 9511,
+  "configured_stage_1a_events": 1024,
+  "completed_side_tau_blocks": 4,
+  "completed_event_receipts": 1024,
+  "producer_execution_status": "Q10_SR2_STAGE2A_VALID__CAPACITY_GATED_MIXTURE",
+  "producer_counts": {
+    "eligible_states": 1010,
+    "parent_constructor_ineligible": 14,
+    "initially_mismatched": 1010,
+    "capacity_exact": 0,
+    "capacity_gated": 1010,
+    "search_entered": 0,
+    "repair_valid": 0
+  },
+  "stage_valid": false,
+  "scientific_seed_bundles": 0,
+  "behavioral_inference": false,
+  "failure": {
+    "kind": "INDEPENDENT_REVIEW_FAILED",
+    "location": "replay-seed9511-L-tau16-trial1.json",
+    "finding": "reviewer initialized an empty f32 Iterator::sum row with +0.0; the producer's Rust Iterator::sum output is -0.0",
+    "first_differing_row": 8,
+    "producer_bits": "0x80000000",
+    "reviewer_bits": "0x00000000",
+    "source_identity_change_required": true
+  },
+  "partial_directory_preserved": true,
+  "same_identity_resume_authorized": false,
+  "stage_1b_authorized": false,
+  "dh08b_authorized": false
+}

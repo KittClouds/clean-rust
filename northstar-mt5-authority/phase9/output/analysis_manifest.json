@@ -1,0 +1,23 @@
+{
+  "contract": "MST_RG2_PHASE9_ANALYSIS_MANIFEST_V1",
+  "status": "PASS",
+  "corpus_fingerprint": "3de4a043f52ff997e3e8de9428a4bbfcb17d94b41935a2ce9b64ebc0dce80a34",
+  "semantic_result_sha256": "119d87d2be6d9b4337e6af0d7752596c61873c05598f4438514a016ec81574ae",
+  "analysis_code_sha256": "988590f338bb7fa556e4d940bee915bf741990dae9433f931870e2795fe9a5ce",
+  "artifacts": {
+    "continuous_distributions.csv": "e3403fbca59e4afce68c53786a7b66be131ec68af9b9661229f99e7a71e3fd7b",
+    "continuous_stratified.csv": "8cbd8f118a7be4e96b99f5c14c8cb36c37ea7bb01e07c3f414cd6aa4794a9034",
+    "coverage_tables.csv": "0f453c08f2a0e93ca089c01c33d40be2d3a8084c62464756fa4bf4551f168a4c",
+    "cross_coverage.csv": "34aa33bab4a7a463ed2cf1fffffe7207316a6afcc759d6809d3dcfef7c5fd2a8",
+    "data_gaps.csv": "29f6be3eac579fff4df1387fd7404add92c1aac61136401409a7f37f488bd8c9",
+    "entropy_summary.csv": "fcbbb291b46102f2eea04797630f6214796de25b9f5c1409b3f4904b8270467e",
+    "missingness.csv": "3c4575429fd7c8c505cbe5642d7a1cf293e43c774871da8e906ab84049abfd55",
+    "node_lifecycle.csv": "830534623b180d691d425b78390223cf68ff71ffba1bd02340165077c5071553",
+    "phase9_report.html": "841ebcf3496d23dc74605568262cec0365843dba15fa7e92985a4940da9d19bc",
+    "phase9_report.md": "2871a17bb06cd44e3b7b0c0506d59d9351c86b217f17e932a41a4074adc42095",
+    "phase9_summary.json": "39b05da19cdb0ac34e2898e169050cbba989eccde9ecbf3b867f0bf7bbdd19bf",
+    "qc_invariants.csv": "80460ac4321c0ed0c5eee2e1ee9474af3427ec005806ff4ae47863be10bf9b3b",
+    "question_readiness.csv": "0969539864f828a4aa272bedb2b5cdb1bcf8d58490e4b70af43ac75c858e9ecf",
+    "run_qc.csv": "f4add13bc0814930a7a202de3d6bd7c2c6c746b96684ff2768a1d91941f651d2"
+  }
+}

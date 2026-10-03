@@ -1,0 +1,8 @@
+{
+  "protocol": "Q10-GC1-PAR6",
+  "identity": "q10-gc1-par6-v1",
+  "status": "INTERRUPTED_BEFORE_RECEIPT",
+  "authoritative": false,
+  "reason": "Runner was stopped before receipt emission after review required conservative full geometry evaluation, nested runtime provenance, and a stale plan identity correction.",
+  "replacement_identity": "q10-gc1-par7-v1"
+}

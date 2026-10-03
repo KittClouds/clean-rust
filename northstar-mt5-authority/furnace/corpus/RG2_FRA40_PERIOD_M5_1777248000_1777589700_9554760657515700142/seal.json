@@ -1,0 +1,95 @@
+﻿{
+    "contract":  "MST_IMMUTABLE_RUN_SEAL_V1",
+    "status":  "SEALED",
+    "sealed_at_utc":  "2026-08-12T09:19:37.4216536Z",
+    "run_key":  "RG2_FRA40_PERIOD_M5_1777248000_1777589700_9554760657515700142",
+    "invocation_id":  "RG2_FRA40_PERIOD_M5_1777248000_1777589700_9554760657515700142_I1777248000_5770006631441892493",
+    "window_id":  "FRA40_20260427_EVENT_HEAVY",
+    "manifest_sha256":  "5bf12767746b8499ad0edde2597df67b1928cc5941705a8391ae2585a0574092",
+    "canonical_dataset_hash":  "0edfbd5ff1d4353ea148bce07e56f63558d28720637389a250ea683b485e5abc",
+    "sealed_payload_sha256":  "6e3d85767b710eaa050ff1b61502354e849720d68c4ecb49069ad26c796943eb",
+    "file_count":  16,
+    "files":  [
+                  {
+                      "path":  "raw/auction/MasterAuction_FRA40_PERIOD_M5_F2_FRA40_20260427_EVT_A03_RG2_v7_attempts.tsv",
+                      "bytes":  140246,
+                      "sha256":  "232a5d1a9ef993e47127fef92efcb1f899da04e0df2b1b9b3cf76a67879e9cc5"
+                  },
+                  {
+                      "path":  "raw/auction/MasterAuction_FRA40_PERIOD_M5_F2_FRA40_20260427_EVT_A03_RG2_v7_context.tsv",
+                      "bytes":  499700,
+                      "sha256":  "7fb5bb52a55e09f0faca540e1012c93957ad9cdcec7a0f700943668a0b49aa7b"
+                  },
+                  {
+                      "path":  "raw/auction/MasterAuction_FRA40_PERIOD_M5_F2_FRA40_20260427_EVT_A03_RG2_v7_episodes.tsv",
+                      "bytes":  22859,
+                      "sha256":  "950e98b8fe573348625efdb97bed75622feae53ba4bb6632f39baa20f594b7a0"
+                  },
+                  {
+                      "path":  "raw/auction/MasterAuction_FRA40_PERIOD_M5_F2_FRA40_20260427_EVT_A03_RG2_v7_events.tsv",
+                      "bytes":  461580,
+                      "sha256":  "f979339a92d4aad8d6434109e1f75d6ce78daece190304c26db68492a0bf2c0a"
+                  },
+                  {
+                      "path":  "raw/auction/MasterAuction_FRA40_PERIOD_M5_F2_FRA40_20260427_EVT_A03_RG2_v7_features.tsv",
+                      "bytes":  124784,
+                      "sha256":  "9023f2bbe5150f2662c2b2cea43270653bd9e5c4f89d7840fc874c56f4b362d3"
+                  },
+                  {
+                      "path":  "raw/auction/MasterAuction_FRA40_PERIOD_M5_F2_FRA40_20260427_EVT_A03_RG2_v7_runs.tsv",
+                      "bytes":  5738,
+                      "sha256":  "7a996cc1930c32a1d72f4dec2ad7dccadccec94c6d56ca8cecfa750a88704c5c"
+                  },
+                  {
+                      "path":  "raw/auction/MasterAuction_FRA40_PERIOD_M5_F2_FRA40_20260427_EVT_A03_RG2_v7_transits.tsv",
+                      "bytes":  5449,
+                      "sha256":  "20dbf85c6d808cee430ffb8433c38bd96b8f58537f3f645dc71ed2f1c712b809"
+                  },
+                  {
+                      "path":  "raw/structure/MasterStructure_FRA40_PERIOD_M5_F2_FRA40_20260427_EVT_A03_v6_events.tsv",
+                      "bytes":  115354,
+                      "sha256":  "27c56a666b8fb2c77ef50845e33a0258409f1b1515c00f8bae623f29f18ede3e"
+                  },
+                  {
+                      "path":  "raw/structure/MasterStructure_FRA40_PERIOD_M5_F2_FRA40_20260427_EVT_A03_v6_inputs.tsv",
+                      "bytes":  51208197,
+                      "sha256":  "a54ac1d725796fdb9ca9c91cd71f32a661f824e3f48baadc998019103cb2dab5"
+                  },
+                  {
+                      "path":  "raw/structure/MasterStructure_FRA40_PERIOD_M5_F2_FRA40_20260427_EVT_A03_v6_nodes.tsv",
+                      "bytes":  5143541,
+                      "sha256":  "ade7e6a3850417867a690a5aa12ad1b0077486528334e76ec090f3edfaa55ddc"
+                  },
+                  {
+                      "path":  "receipts/admission_receipt.json",
+                      "bytes":  2412,
+                      "sha256":  "6ef78d61b591fe1bfc9985dbc1e890e4dac688899c405c974823ce2fd25b6017"
+                  },
+                  {
+                      "path":  "receipts/campaign_manifest_row.json",
+                      "bytes":  1648,
+                      "sha256":  "ebbf307bd846e0e3f807272d671a32537ed8f653ecf277e98105692d9270515b"
+                  },
+                  {
+                      "path":  "receipts/MasterAuction_FRA40_PERIOD_M5_F2_FRA40_20260427_EVT_A03_RG2_v7_replay_certificate.json",
+                      "bytes":  3573,
+                      "sha256":  "29cba08bf1498a03eb064563d3a9c8ebe2d2e919387e109758f6869c22f06379"
+                  },
+                  {
+                      "path":  "receipts/MasterAuction_FRA40_PERIOD_M5_F2_FRA40_20260427_EVT_A03_RG2_v7_replay_certificate.md",
+                      "bytes":  628,
+                      "sha256":  "02eeaa94ff35fdcebc5b5b3b692e27d2b11ea4d8ac36c81b3e78f0bd4f4091d4"
+                  },
+                  {
+                      "path":  "receipts/terminal_run_receipt.json",
+                      "bytes":  4519,
+                      "sha256":  "761159e9c9e92d17753833598d0a056ad7e5fcdc383195be2acad247c063185d"
+                  },
+                  {
+                      "path":  "tester.ini",
+                      "bytes":  1656,
+                      "sha256":  "00cff8c39f3da1b229f398e31a6a4065f2576a9e2687ae3bdded415ff6015410"
+                  }
+              ],
+    "mutation_rule":  "never overwrite; replacement requires a new invocation and explicit corpus generation"
+}

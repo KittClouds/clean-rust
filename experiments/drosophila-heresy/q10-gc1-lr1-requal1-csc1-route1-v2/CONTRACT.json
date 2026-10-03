@@ -1,0 +1,66 @@
+{
+  "identity": "q10-gc1-lr1-requal1-csc1-route1-v2",
+  "methods": [
+    "random",
+    "readout",
+    "geometry",
+    "geometry_then_readout"
+  ],
+  "parent_bindings": [
+    {
+      "bytes": 1087,
+      "label": "route1_plan",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-route1-v2/PLAN.md",
+      "sha256": "B06E7830CCC4BBCC8B976CD0A76601C2B120F460ED74AB7086823219612B1C85"
+    },
+    {
+      "bytes": 12255,
+      "label": "route1_runner",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-route1-v2/scripts/run_route1.py",
+      "sha256": "4DBE1F6D0A34E095B45747749C6BD5A969FD95C4406293843EB548929BCD2397"
+    },
+    {
+      "bytes": 5090,
+      "label": "upair_execution",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-upair1-v1/execution.json",
+      "sha256": "68F6CDCA1B458E24466750C22C86FB4A3ED231BC1E52DB3921D8BD1DA019DB66"
+    },
+    {
+      "bytes": 9632,
+      "label": "upair_contract",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-upair1-v1/CONTRACT.json",
+      "sha256": "07146C8E52424C954C3B0565B8575C295E80DE84DF34EA5A29F37D812AD28B0F"
+    },
+    {
+      "bytes": 3879,
+      "label": "upair_domain_execution",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-upair1-domain-v1/execution.json",
+      "sha256": "62EC5A0BC762875F5DD4ED69E284632242B82E0C22CE5047DAE4E19B8FBD5C13"
+    },
+    {
+      "bytes": 4042,
+      "label": "upair_domain_contract",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-upair1-domain-v1/CONTRACT.json",
+      "sha256": "D26BBB479924088B8A324DE09276F08744188CBEE77E5D259FD64AB83B6338E2"
+    },
+    {
+      "bytes": 9072,
+      "label": "pf5_contract",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-domain-r2-v1/closures/twin-a/repo/experiments/drosophila-heresy/q10-pf5-v1/CONTRACT.json",
+      "sha256": "730D6B03CEE7CE58A9002320372E9F77EC2AB593EC25A71583F59D90D690BC26"
+    }
+  ],
+  "primary_success": "actual final-valid pair strictly better than fresh V",
+  "protocol": "Q10-CSC1-ROUTE1",
+  "replay_performed": false,
+  "scientific_promotion": false,
+  "status": "SEALED_PREMEASUREMENT",
+  "write_allowlist": [
+    "CONTRACT.json",
+    "PREEXECUTION.json",
+    "execution.json",
+    "STATUS.json",
+    "source-records.jsonl",
+    "REPORT.json"
+  ]
+}

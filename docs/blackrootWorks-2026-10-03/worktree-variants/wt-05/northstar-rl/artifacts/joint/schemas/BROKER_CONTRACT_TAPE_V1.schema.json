@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "BrokerContractTape",
+  "type": "object",
+  "properties": {
+    "content_hash": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "rows": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/BrokerContractRow"
+      }
+    },
+    "schema_version": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "rows",
+    "content_hash"
+  ],
+  "$defs": {
+    "BrokerContractRow": {
+      "type": "object",
+      "properties": {
+        "broker_precision": {
+          "type": "integer",
+          "format": "uint8",
+          "maximum": 255,
+          "minimum": 0
+        },
+        "contract_size": {
+          "type": "number",
+          "format": "double"
+        },
+        "margin_fields": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "maxItems": 2,
+            "minItems": 2,
+            "prefixItems": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number",
+                "format": "double"
+              }
+            ]
+          }
+        },
+        "minimum_quantity": {
+          "type": "number",
+          "format": "double"
+        },
+        "northstar_instrument_id": {
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0
+        },
+        "observed_at_ns": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "quantity_step": {
+          "type": "number",
+          "format": "double"
+        },
+        "quote_denomination": {
+          "type": "string"
+        },
+        "source_authority": {
+          "type": "string"
+        },
+        "source_payload_hash": {
+          "$ref": "#/$defs/Digest256"
+        },
+        "tick_size": {
+          "type": "number",
+          "format": "double"
+        },
+        "trading_availability": {
+          "type": "string"
+        },
+        "valid_from_ns": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "required": [
+        "northstar_instrument_id",
+        "valid_from_ns",
+        "observed_at_ns",
+        "tick_size",
+        "quantity_step",
+        "minimum_quantity",
+        "contract_size",
+        "margin_fields",
+        "broker_precision",
+        "quote_denomination",
+        "trading_availability",
+        "source_authority",
+        "source_payload_hash"
+      ]
+    },
+    "Digest256": {
+      "description": "Domain-separated BLAKE3 digest",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

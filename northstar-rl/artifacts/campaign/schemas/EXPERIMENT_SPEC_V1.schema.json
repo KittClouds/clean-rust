@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ExperimentSpec",
+  "type": "object",
+  "properties": {
+    "environment_id": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "evaluation_spec_id": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "experiment_id": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "feature_tape_id": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "immutable_input_hashes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Digest256"
+      }
+    },
+    "implementation_hashes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Digest256"
+      }
+    },
+    "learner_spec_id": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "observation_spec_id": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "partition_tape_id": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "root_seed": {
+      "type": "integer",
+      "format": "uint64",
+      "minimum": 0
+    },
+    "schema_version": {
+      "type": "string"
+    },
+    "transform_state_id": {
+      "$ref": "#/$defs/Digest256"
+    }
+  },
+  "required": [
+    "schema_version",
+    "experiment_id",
+    "environment_id",
+    "feature_tape_id",
+    "observation_spec_id",
+    "partition_tape_id",
+    "transform_state_id",
+    "learner_spec_id",
+    "evaluation_spec_id",
+    "root_seed",
+    "immutable_input_hashes",
+    "implementation_hashes"
+  ],
+  "$defs": {
+    "Digest256": {
+      "description": "Domain-separated BLAKE3 digest",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

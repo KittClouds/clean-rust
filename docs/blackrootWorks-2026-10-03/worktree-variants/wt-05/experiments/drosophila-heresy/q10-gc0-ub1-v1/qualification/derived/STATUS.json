@@ -1,0 +1,26 @@
+{
+  "behavioral_probe": false,
+  "contract_sha256": "48D5042949A3FE788B9A0DDBF8B13EB7DE54AEFB2988F0A32742790756270CAB",
+  "execution_sha256": "87711E5F1F35ADB36347B7AE082518A6C81DEC057245D8BC1E12F051F78311F5",
+  "gc1_authorized": false,
+  "identity": "q10-gc0-ub1-v1",
+  "plan_sha256": "85B5B69D9C53CF4825B9B3E33888A38DEAEB48F58599F44BCEC629150F714F75",
+  "preexecution_sha256": "FED37E434DAE727731F97BBB032A67B2CAE2753EF5C958AAA06F397E8EAFD329",
+  "protocol": "Q10-GC0-UB1",
+  "raw_group_upper_bound": {
+    "baseline_mismatch_count": 3386,
+    "classification": "COMPLETE_SUPPORT",
+    "constructor_partition_diagnostic": "NONE_RAW_SUPPORT_COMPLETE",
+    "coverage_fraction": 1.0,
+    "covered_mismatch_count": 3386,
+    "gc1_authorized": false,
+    "global_infeasibility_claim": false,
+    "uncovered_mismatch_count": 0,
+    "uncovered_mismatch_identities": [],
+    "union_physical_support_count": 8554
+  },
+  "result_sha256": "5F259AE7BC5B30076AEA7BA4B5DF6C17B1D1E87A6F914DE519FE9BCD6F8CC392",
+  "scientific_promotion": false,
+  "status": "UB1_ENGINEERING_COMPLETE_COMPLETE_SUPPORT",
+  "summary_sha256": "2E8CF1B3586BFF65C0D1D3887CCB2D15C83A687A16DABF251EDE0C772FE60C68"
+}

@@ -1,0 +1,131 @@
+{
+  "protocol": "jev-information-density/v0.8n-posthoc-capability-trajectory-cartography-v01",
+  "identity": "POST-HOC v0.8O CAPABILITY TRAJECTORY CARTOGRAPHY OF SEALED PHASE-B CHECKPOINTS",
+  "registration_status": "POST_HOC_EVALUATION_AUTHORIZED_NO_TRAINING",
+  "authorization": {
+    "source": "explicit user authorization in the active conversation",
+    "scope": "evaluate all 27 sealed epoch checkpoints on the sealed E1 held-out object; include epoch-0 shared initialization baselines because sealed templates exist",
+    "opening_count": 3,
+    "training": false,
+    "checkpoint_selection_or_promotion": false,
+    "newtight": false,
+    "legacy_evaluation": false,
+    "phoenix": false
+  },
+  "parents": {
+    "original_phase_b_disposition": {
+      "path": "experiments/jev-information-density-v08n/phase_b/phase-b-final-disposition-v01.json",
+      "sha256": "bae6d7ac88f5ca0c5684c219e0e0b82f03962bf6f0292c205cba58765c75a656",
+      "status": "EVALUATION_INPUT_CONTRACT_INCOMPLETE"
+    },
+    "training_seal": {
+      "path": "D:/codex-runs/jev-information-density-v08n/v0.8N-base-v01/phase-b-run-v01/training-seal-manifest.json",
+      "sha256": "43932fc963b150167972e81b1c1bb93f6989e9b93faa65ab1eee3ecf55c7b727"
+    },
+    "checkpoint_hash_tree": {
+      "path": "D:/codex-runs/jev-information-density-v08n/v0.8N-base-v01/phase-b-run-v01/checkpoint-hash-tree.json",
+      "sha256": "add6dfd013c936b100e7cbdb205018bf91b95e91ed11ca854b26aed998c66923",
+      "checkpoint_count": 27,
+      "run_count": 9,
+      "hash_tree_entry_count": 81
+    },
+    "e1_result_seal": {
+      "path": "D:/codex-runs/jev-information-density-v08n-e1/v0.8N-E1-postregistered-repaired-heldout-evaluation-v01/e1-result-seal-v01.json",
+      "sha256": "a23b3a6dc90a739888ae8d1cab440ac6c8f6ed23dd12b26c1bfd7786cd56ce68",
+      "identity": "POST-REGISTERED v0.8N-E1 REPAIRED HELD-OUT EVALUATION OF SEALED PHASE-B CHECKPOINTS"
+    },
+    "e1_raw_prediction_tree": {
+      "path": "D:/codex-runs/jev-information-density-v08n-e1/v0.8N-E1-postregistered-repaired-heldout-evaluation-v01/raw-prediction-hash-tree-v01.json",
+      "sha256": "04a05dafabe8a46954d5352378cc9e3e63aca5f266a53c6160f5c563827908af"
+    },
+    "candidate_basis_seal": {
+      "path": "D:/codex-runs/jev-information-density-v08n-e1/v0.8N-E1-heldout-candidate-basis-v01/e1-candidate-basis-seal-v01.json",
+      "sha256": "f3469f326200d1c097969be1d36741e2b01cc7542911ce79c5b240dc5b6c2b33",
+      "feature_shape": [16, 2048]
+    },
+    "candidate_feature_tensor": {
+      "path": "D:/codex-runs/jev-information-density-v08n-e1/v0.8N-E1-heldout-candidate-basis-v01/feature-cache/heldout-candidate-features.pt",
+      "sha256": "58f38feb6af0e1c4f7b6d245b3c374aea3c8777fdbb78b3626c8ee7f13e5448a",
+      "tensor_sha256": "642f7bf4d83866beb1efaa0d92e16544636cdc19e8e1e75b4f1424dce8a50fb8"
+    },
+    "target_free_join": {
+      "path": "D:/codex-runs/jev-information-density-v08n-e1/v0.8N-E1-heldout-candidate-basis-v01/target-free-schema-candidate-join-v01.jsonl",
+      "sha256": "5d9b851b61a305091a6489df6f7a3b09b02dd70c043d2554f17e9487f6544003",
+      "neighborhoods": 2000
+    },
+    "heldout_panel_seal": {
+      "path": "D:/codex-runs/jev-information-density-v08n/v0.8N-eval-panel-v01/seal/seal-manifest.json",
+      "sha256": "425cef320df94e2b47b448203f8a916ebcbb2019539b2d09e51f5b4ced92f614"
+    },
+    "heldout_panel_tree": {
+      "path": "D:/codex-runs/jev-information-density-v08n/v0.8N-eval-panel-v01/seal/heldout-panel-hash-tree.json",
+      "sha256": "fc0adf7f8d1b9a10914dd9aa85282a42b0cd4bbe185f8b09710498b556d0f08f"
+    },
+    "heldout_panel_firewall_record": {
+      "path": "D:/codex-runs/jev-information-density-v08n/v0.8N-eval-panel-v01/seal/evaluation-firewall-lock.json",
+      "sha256": "79d25ac82fba1bc6332e16d8bc5f877fadd11cccaed5ef3f07eacfe5e1877da2"
+    },
+    "frozen_analysis_contract": {
+      "path": "experiments/jev-information-density-v08n/phase_b/phase-b-analysis-contract-v01.json",
+      "sha256": "0072c44903ea253cd8ad288cda8c100270f19d909ddced098af32d388ac29e1f"
+    },
+    "trajectory_analysis_contract": {
+      "path": "experiments/jev-information-density-v08n/phase_b/o/phase-b-o-analysis-contract-v01.json",
+      "sha256": "d3b022f20c16dd11e0923b8d52940d6f6d88cde5d68dfe739085213c13ecb4bf"
+    }
+  },
+  "frozen_implementation_bindings": {
+    "heldout_evaluator": {
+      "path": "experiments/jev-information-density-v08n/phase_b/evaluate_phase_b_v01.py",
+      "sha256": "fa22bc8febff89d2b635091c6cb40be6f3beba4549c4a135d16e213f6fd3dda4",
+      "use": "unchanged metrics_for_run inference path"
+    },
+    "frozen_response_metric": {
+      "path": "experiments/jev-information-density-v08n/phase_b/analyze_phase_b_v01.py",
+      "sha256": "dbde07fe1ec009f2bca7f1f22ad913a2a79f4f8dfb8120a1f31ebf37d5f59b70",
+      "use": "unchanged neighborhood metric semantics"
+    },
+    "head_definition": {
+      "path": "experiments/jev-frozen-readout-v01/probe.py",
+      "sha256": "a3049d52e1183c806c84522a617a05646eb86fbcb69af72b5bb26f4808852cb1",
+      "architecture": "CompatibilityHead(2048, mlp, 128)"
+    }
+  },
+  "evaluation_design": {
+    "seeds": [20260927, 20260928, 20260929],
+    "arms": ["B-DUP", "B-MATCHED", "B-SHAM"],
+    "trained_epochs": [1, 2, 3],
+    "initialization_epoch": 0,
+    "initialization_source": "three sealed shared per-seed head templates; same initialization across all three arms within each seed",
+    "trained_checkpoint_cells": 27,
+    "initialization_baseline_cells": 9,
+    "total_seed_arm_epoch_cells": 36,
+    "neighborhoods_per_cell": 2000,
+    "views_per_neighborhood": ["anchor", "fact_flip", "sham", "matched_neutral"],
+    "expected_prediction_rows": 288000,
+    "inference_order": "seed ascending, epoch 0 through 3, then B-DUP, B-MATCHED, B-SHAM; neighborhood order is the frozen evaluator's lexical neighborhood_id order",
+    "reuse_existing_terminal_predictions": false,
+    "checkpoint_selection": false,
+    "head_training": false,
+    "backbone_loading_or_feature_extraction": false,
+    "newtight_or_legacy": false,
+    "phoenix": false
+  },
+  "parameter_trajectory": {
+    "initial_reference": "sealed per-seed head template",
+    "global_distance": "L2 norm of concatenated state_dict tensor deltas in float64",
+    "layer_distance": "L2 norm per exact state_dict tensor key; no regrouping or layer dropping",
+    "paired_update_cosines": "cosine between full state_dict update vectors from shared initialization for each arm pair at each seed and epoch 1..3; epoch-0 is null",
+    "zero_norm_cosine": null,
+    "state_digest": "existing v0.8N trainer state_digest algorithm"
+  },
+  "output": {
+    "root": "D:/codex-runs/jev-information-density-v08o/v0.8O-capability-trajectory-cartography-v01",
+    "fail_if_root_exists": true,
+    "raw_predictions_sealed_before_analysis": true,
+    "original_phase_b_and_e1_artifacts_mutated": false,
+    "newtight": false,
+    "legacy_evaluation": false,
+    "phoenix": false
+  }
+}

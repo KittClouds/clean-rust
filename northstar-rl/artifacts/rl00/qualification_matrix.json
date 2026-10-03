@@ -1,0 +1,193 @@
+{
+  "project": "FORGE-RL-00",
+  "surface": "NORTHSTAR_RL_SURFACE_V1",
+  "learner_execution": "PROHIBITED_UNTIL_LATER_GATE",
+  "items": [
+    {
+      "name": "ACCOUNT_MACHINE",
+      "status": "QUALIFIED",
+      "reason_code": "RUST_CONTRACT_AND_RECEIPT_PASS",
+      "receipts": [
+        "replay_receipt.json",
+        "double_build_receipt.json"
+      ]
+    },
+    {
+      "name": "ACTION_CONTRACT",
+      "status": "QUALIFIED",
+      "reason_code": "RUST_CONTRACT_AND_RECEIPT_PASS",
+      "receipts": [
+        "replay_receipt.json",
+        "double_build_receipt.json"
+      ]
+    },
+    {
+      "name": "DOUBLE_REBUILD",
+      "status": "QUALIFIED",
+      "reason_code": "RUST_CONTRACT_AND_RECEIPT_PASS",
+      "receipts": [
+        "replay_receipt.json",
+        "double_build_receipt.json"
+      ]
+    },
+    {
+      "name": "ENV_STEP_TAPE",
+      "status": "QUALIFIED",
+      "reason_code": "RUST_CONTRACT_AND_RECEIPT_PASS",
+      "receipts": [
+        "replay_receipt.json",
+        "double_build_receipt.json"
+      ]
+    },
+    {
+      "name": "EPISODE_TAPE",
+      "status": "QUALIFIED",
+      "reason_code": "RUST_CONTRACT_AND_RECEIPT_PASS",
+      "receipts": [
+        "replay_receipt.json",
+        "double_build_receipt.json"
+      ]
+    },
+    {
+      "name": "EXECUTION_KERNEL",
+      "status": "QUALIFIED",
+      "reason_code": "RUST_CONTRACT_AND_RECEIPT_PASS",
+      "receipts": [
+        "replay_receipt.json",
+        "double_build_receipt.json"
+      ]
+    },
+    {
+      "name": "FEATURE_REGISTRY",
+      "status": "QUALIFIED",
+      "reason_code": "RUST_CONTRACT_AND_RECEIPT_PASS",
+      "receipts": [
+        "replay_receipt.json",
+        "double_build_receipt.json"
+      ]
+    },
+    {
+      "name": "FEATURE_TAPE",
+      "status": "QUALIFIED",
+      "reason_code": "RUST_CONTRACT_AND_RECEIPT_PASS",
+      "receipts": [
+        "replay_receipt.json",
+        "double_build_receipt.json"
+      ]
+    },
+    {
+      "name": "GYMNASIUM_CONTRACT",
+      "status": "QUALIFIED",
+      "reason_code": "PYTHON_QUALIFICATION_RECEIPT_PASS",
+      "receipts": [
+        "sb3_compatibility_receipt.json"
+      ]
+    },
+    {
+      "name": "INSTRUMENT_CONTRACT",
+      "status": "QUALIFIED",
+      "reason_code": "RUST_CONTRACT_AND_RECEIPT_PASS",
+      "receipts": [
+        "replay_receipt.json",
+        "double_build_receipt.json"
+      ]
+    },
+    {
+      "name": "KNOWLEDGE_TIME",
+      "status": "QUALIFIED",
+      "reason_code": "RUST_CONTRACT_AND_RECEIPT_PASS",
+      "receipts": [
+        "replay_receipt.json",
+        "double_build_receipt.json"
+      ]
+    },
+    {
+      "name": "OBSERVATION_SPEC",
+      "status": "QUALIFIED",
+      "reason_code": "RUST_CONTRACT_AND_RECEIPT_PASS",
+      "receipts": [
+        "replay_receipt.json",
+        "double_build_receipt.json"
+      ]
+    },
+    {
+      "name": "PERFORMANCE_BASELINE",
+      "status": "QUALIFIED",
+      "reason_code": "RUST_CONTRACT_AND_RECEIPT_PASS",
+      "receipts": [
+        "replay_receipt.json",
+        "double_build_receipt.json"
+      ]
+    },
+    {
+      "name": "PYO3_BRIDGE",
+      "status": "QUALIFIED",
+      "reason_code": "PYTHON_QUALIFICATION_RECEIPT_PASS",
+      "receipts": [
+        "sb3_compatibility_receipt.json"
+      ]
+    },
+    {
+      "name": "REWARD_PRIMITIVES",
+      "status": "QUALIFIED",
+      "reason_code": "RUST_CONTRACT_AND_RECEIPT_PASS",
+      "receipts": [
+        "replay_receipt.json",
+        "double_build_receipt.json"
+      ]
+    },
+    {
+      "name": "REWARD_SPEC",
+      "status": "QUALIFIED",
+      "reason_code": "RUST_CONTRACT_AND_RECEIPT_PASS",
+      "receipts": [
+        "replay_receipt.json",
+        "double_build_receipt.json"
+      ]
+    },
+    {
+      "name": "RUNRAW_TAPE",
+      "status": "QUALIFIED",
+      "reason_code": "RUST_CONTRACT_AND_RECEIPT_PASS",
+      "receipts": [
+        "replay_receipt.json",
+        "double_build_receipt.json"
+      ]
+    },
+    {
+      "name": "SB3_ENV_COMPATIBILITY",
+      "status": "QUALIFIED",
+      "reason_code": "PYTHON_QUALIFICATION_RECEIPT_PASS",
+      "receipts": [
+        "sb3_compatibility_receipt.json"
+      ]
+    },
+    {
+      "name": "SEEDED_REPLAY",
+      "status": "QUALIFIED",
+      "reason_code": "RUST_CONTRACT_AND_RECEIPT_PASS",
+      "receipts": [
+        "replay_receipt.json",
+        "double_build_receipt.json"
+      ]
+    },
+    {
+      "name": "STEP_CLOCK",
+      "status": "QUALIFIED",
+      "reason_code": "RUST_CONTRACT_AND_RECEIPT_PASS",
+      "receipts": [
+        "replay_receipt.json",
+        "double_build_receipt.json"
+      ]
+    },
+    {
+      "name": "TERMINATION_SPEC",
+      "status": "QUALIFIED",
+      "reason_code": "RUST_CONTRACT_AND_RECEIPT_PASS",
+      "receipts": [
+        "replay_receipt.json",
+        "double_build_receipt.json"
+      ]
+    }
+  ]
+}

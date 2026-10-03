@@ -1,0 +1,13 @@
+﻿{
+    "contract":  "MST_FURNACE_RECONCILIATION_V1",
+    "status":  "DIAGNOSTIC_DUPLICATE_OF_ADMITTED_RUN",
+    "reconciled_at_utc":  "2026-08-12T09:21:59.8372781Z",
+    "window_id":  "FRA40_20260427_EVENT_HEAVY",
+    "attempt_tag":  "F2_FRA40_20260427_EVT_A03",
+    "run_key":  "RG2_FRA40_PERIOD_M5_1777248000_1777589700_9554760657515700142",
+    "canonical_dataset_hash":  "0edfbd5ff1d4353ea148bce07e56f63558d28720637389a250ea683b485e5abc",
+    "cause":  "sealer host-stream output was not captured by orchestrator",
+    "corpus_authoritative":  true,
+    "quarantine_preserved":  true,
+    "deletion_performed":  false
+}

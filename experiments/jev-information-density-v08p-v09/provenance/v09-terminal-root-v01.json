@@ -1,0 +1,29 @@
+{
+  "protocol": "jev-information-density/v0.8p-v09-terminal-root-v01",
+  "identity": "v0.8P-v09-bounded-historical-source-recovery-v01",
+  "status": "CLOSED_NOT_EVALUABLE",
+  "disposition_receipt": {
+    "path": "experiments/jev-information-density-v08p-v09/provenance/v09-recovery-terminal-disposition-v01.json",
+    "sha256": "043da9b4f4838f041dad9a29fc7881aeb1c0e370f6f410d76b45fe69a372a5a5",
+    "bytes": 11105
+  },
+  "human_report": {
+    "path": "experiments/jev-information-density-v08p-v09/provenance/v09-recovery-report.md",
+    "sha256": "a0409eeb9d043c4bc0e2e266c514c239c70d8ccf3c0dec08972952266acb3efe",
+    "bytes": 5478
+  },
+  "authoritative_conclusion": "Exact historical training-scope bytes were recovered, but the frozen original overlap predicate cannot be evaluated because required world/root/rendered-input/selector-input mappings are not all defined by the sealed lineage. No panel was constructed and no scientific result exists.",
+  "state": {
+    "historical_source_recovery": "EXACT_SOURCE_BYTES_RECOVERED",
+    "training_scope_identity_manifest": "NOT_CREATED",
+    "training_overlap": "NOT_EVALUABLE",
+    "candidate_staging": "NOT_STARTED",
+    "fresh_panel": "NOT_CONSTRUCTED",
+    "model_or_lfm_contact": false,
+    "training": false,
+    "inference": false,
+    "evaluation": false,
+    "scientific_result": "NONE"
+  },
+  "boundary_note": "A disclosed one-record generic-JSON parse materialized a co-located target subtree transiently during schema inspection; no target values were inspected, output, retained, or used. See the bound disposition receipt."
+}

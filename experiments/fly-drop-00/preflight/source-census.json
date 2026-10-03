@@ -1,0 +1,88 @@
+{
+  "artifact_kind": "read_only_traced_subgraph_diagnostic",
+  "scientific_outcome": false,
+  "dataset": "MaleCNS v1.0, min confidence 0.5",
+  "operator_rule_candidate": "the complete source connection table without annotation filtering; see DESIGN.md",
+  "diagnostic_node_rule": "every annotation row with status=Traced; no class or hemisphere filter",
+  "diagnostic_edge_rule": "count source rows whose pre and post body IDs are both traced",
+  "operator_orientation": "body_pre -> body_post",
+  "source_schema": "body_pre: int64\nbody_post: int64\nweight: int64\n-- schema metadata --\npandas: '{\"index_columns\": [{\"kind\": \"range\", \"name\": null, \"start\": 0, \"' + 604",
+  "verified_sources": [
+    {
+      "name": "body-annotations-male-cns-v1.0-minconf-0.5.feather",
+      "bytes": 14483314,
+      "sha256": "2177e246113e4cfbf1e7772ec37c6da1955ff22e8063d0b1f833101f99a9a3b2",
+      "url": "https://storage.googleapis.com/flyem-male-cns/v1.0/connectome-data/flat-connectome/body-annotations-male-cns-v1.0-minconf-0.5.feather"
+    },
+    {
+      "name": "body-neurotransmitters-male-cns-v1.0.feather",
+      "bytes": 43282834,
+      "sha256": "95c9289220663abeb3409f3ad9e5a7f8a53f8093f5139d15502cd08da8879621",
+      "url": "https://storage.googleapis.com/flyem-male-cns/v1.0/connectome-data/flat-connectome/body-neurotransmitters-male-cns-v1.0.feather"
+    },
+    {
+      "name": "connectome-weights-male-cns-v1.0-minconf-0.5.feather",
+      "bytes": 1051241946,
+      "sha256": "e35da783d1c686b2b58b3b87cd6a403ae43bfcfba8bff28e08ef752c1a56afc1",
+      "url": "https://storage.googleapis.com/flyem-male-cns/v1.0/connectome-data/flat-connectome/connectome-weights-male-cns-v1.0-minconf-0.5.feather"
+    }
+  ],
+  "annotation_sha256": "2177e246113e4cfbf1e7772ec37c6da1955ff22e8063d0b1f833101f99a9a3b2",
+  "annotation_rows": 211577,
+  "annotation_status_counts": {
+    "Traced": 165122,
+    "Orphan": 15925,
+    "Glia": 11864,
+    "Unimportant": 10751,
+    "nan": 5472,
+    "Assign": 1832,
+    "Anchor": 611
+  },
+  "traced_nodes": 165122,
+  "connectome_rows": 151856684,
+  "connectome_weight_sum": 311833243,
+  "source_endpoint_body_ids": 88384522,
+  "endpoint_ids_without_annotation": 88192826,
+  "annotated_ids_without_source_edges": 19881,
+  "full_source_node_universe": 88404403,
+  "traced_to_traced_edge_rows": 25563197,
+  "traced_to_traced_weight_sum": 124025046,
+  "nontraced_to_traced_boundary_rows": 4802106,
+  "nontraced_to_traced_boundary_weight_sum": 6388721,
+  "traced_to_nontraced_boundary_rows": 112538237,
+  "traced_to_nontraced_boundary_weight_sum": 170769707,
+  "edge_row_degree": {
+    "in": {
+      "zero_count": 659,
+      "p50": 100.0,
+      "p90": 320.0,
+      "p99": 861.0,
+      "maximum": 11526
+    },
+    "out": {
+      "zero_count": 1583,
+      "p50": 113.0,
+      "p90": 286.0,
+      "p99": 797.0,
+      "maximum": 11203
+    }
+  },
+  "weighted_degree": {
+    "in": {
+      "zero_count": 659,
+      "p50": 349.0,
+      "p90": 1612.0,
+      "p99": 6835.950000000041,
+      "maximum": 119936
+    },
+    "out": {
+      "zero_count": 1583,
+      "p50": 442.0,
+      "p90": 1475.0,
+      "p99": 5519.370000000024,
+      "maximum": 140897
+    }
+  },
+  "elapsed_seconds": 135.47017669997877,
+  "scope_note": "Preflight metadata for the traced-only induced-subgraph diagnostic. It does not construct a model, select a host task, train, or read evaluation outcomes. The design default uses every source row."
+}

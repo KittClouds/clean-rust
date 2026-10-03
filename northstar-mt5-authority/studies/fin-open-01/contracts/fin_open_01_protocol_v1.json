@@ -1,0 +1,223 @@
+{
+  "contract": "FIN_OPEN_01_RANGE_FREEZE_ECONOMIC_CONSEQUENCE_PROTOCOL_V1",
+  "protocol_id": "FIN-OPEN-01",
+  "agent": "VEGA",
+  "authority": "FINANCIAL_RESEARCH",
+  "status": "PROTOCOL_DESIGN_ONLY",
+  "outcome_inspection": "FORBIDDEN",
+  "research_question": "Does causally known opening-range orientation have a reproducible relationship with the subsequent price path?",
+  "parent_authority": {
+    "study_id": "OBS-OPEN-01",
+    "authority_root_relative_path": "../obs-open-01",
+    "allowed_artifacts": [
+      "contracts/obs_open_01_protocol_v1.json",
+      "qualification/universe/universe/admitted_sessions.tsv",
+      "qualification/universe/universe/partition_manifest.tsv",
+      "qualification/universe/universe/universe_qualification_receipt.json",
+      "qualification/universe/seal/universe_qualification_root_receipt.json",
+      "qualification/universe/clock/clock_transport_receipt.json",
+      "qualification/parity/opening_range_oracle_receipt.json",
+      "qualification/parity/blackbox_parity_receipt.json"
+    ],
+    "substantive_outputs": "FROZEN_UNOPENED",
+    "forbidden_artifact_classes": [
+      "OBS_OPEN_03_SUBSTANTIVE_FINDINGS",
+      "OBS_OPEN_03_DISCOVERY_REPORT",
+      "DISCOVERY_SCALE_SUMMARY",
+      "CANDIDATE_COMMENTARY",
+      "SCIENCE_CONFIRMATION_ROWS"
+    ]
+  },
+  "population": {
+    "source_partition": "DISCOVERY",
+    "session_count": 257,
+    "identity_order": ["civil_date", "session_id"],
+    "source_manifest_metadata_only": true,
+    "qualified_server_offset_minutes": [120, 180],
+    "confirmation_session_count": 69,
+    "confirmation_status": "FROZEN_UNOPENED"
+  },
+  "financial_probe": {
+    "identity": "(session_id, range_minutes, freeze_time, information_contract, orientation)",
+    "anchor": "R_k_FREEZE",
+    "information_contract": [
+      "range_high",
+      "range_low",
+      "range_midpoint",
+      "range_width",
+      "terminal_price_at_freeze",
+      "exact_causal_knowledge_time",
+      "qualified_session_clock_and_source_metadata"
+    ],
+    "forbidden_backward_inputs": [
+      "future_price_path",
+      "future_excursion",
+      "future_range",
+      "terminal_session_state",
+      "volume_behavior",
+      "science_findings",
+      "account_state",
+      "execution_state",
+      "portfolio_state"
+    ]
+  },
+  "range_family": {
+    "start_local": "09:30:00",
+    "timezone": "America/New_York",
+    "interval_semantics": "HALF_OPEN",
+    "range_minutes_first": 1,
+    "range_minutes_last": 30,
+    "range_ids": "R01..R30",
+    "freeze_local": "09:30 + k minutes",
+    "freeze_knowledge_time": "qualified source mapping of the completed final M1 bar close",
+    "required_geometry_bars": "exactly k completed M1 bars in [09:30, 09:30+k)",
+    "terminal_price_at_freeze": "close of the completed final M1 bar ending at freeze",
+    "midpoint_equality": "NON_DIRECTIONAL_NOT_EVALUABLE"
+  },
+  "orientation": {
+    "equation": "sign(terminal_price_at_freeze - range_midpoint)",
+    "positive": "+1",
+    "negative": "-1",
+    "equality": "0",
+    "equality_is_directional": false,
+    "equality_is_assigned": false,
+    "primary_eligibility": "evaluable geometry AND qualified knowledge time AND orientation in {-1,+1}"
+  },
+  "outcome_surface": {
+    "primary_name": "ORIENTATION_ALIGNED_FUTURE_DISPLACEMENT",
+    "surface_coordinates": ["range_minutes", "relative_horizon_minutes"],
+    "range_minutes": "1..30",
+    "horizon_step_minutes": 5,
+    "horizon_start_minutes": 5,
+    "horizon_end": "normal regular-session close at 16:00 America/New_York",
+    "future_price_semantics": "completed source M1 close with close timestamp exactly equal to freeze_time + horizon",
+    "freeze_price_semantics": "terminal_price_at_freeze from completed final M1 close",
+    "equation": "Y_i,k(h) = orientation_i,k * (P_i(freeze_time_i,k + h) - P_i(freeze_time_i,k))",
+    "raw_path_required": true,
+    "source_price_units": true,
+    "economic_language": "geometric displacement only",
+    "one_research_direction": true
+  },
+  "conditioning": {
+    "additional_variables_admitted": [],
+    "explicitly_forbidden": [
+      "width",
+      "volatility",
+      "first_outside_event",
+      "event_count",
+      "terminal_state",
+      "volume_behavior",
+      "weekday",
+      "month",
+      "previous_session",
+      "macro_events",
+      "science_findings",
+      "interpreted_observer_results"
+    ]
+  },
+  "partition": {
+    "method": "chronological metadata-only split",
+    "sort_key": ["civil_date", "session_id"],
+    "development_name": "D_F",
+    "development_count": 180,
+    "development_last_civil_date": "2025-01-30",
+    "validation_name": "V_F",
+    "validation_count": 77,
+    "validation_first_civil_date": "2025-02-03",
+    "both_offset_regimes_required": true,
+    "assignment_inputs": ["session_id", "civil_date", "qualified_source_coverage", "server_offset_minutes"],
+    "outcome_independent": true,
+    "validation_state": "FROZEN_UNOPENED",
+    "partition_mutation": "NEW_PROTOCOL_ROOT_REQUIRED"
+  },
+  "null_and_inference": {
+    "estimand": "delta(k,h) = observed session_mean(Y(k,h)) - block_permutation_null_mean(Y(k,h))",
+    "randomization_unit": "complete 30-scale orientation profile per session",
+    "strata": ["qualified_server_offset_minutes", "exact_eligibility_mask"],
+    "preserve": [
+      "marginal future paths",
+      "profile cross-scale dependence",
+      "midpoint and missingness pattern within eligibility mask",
+      "qualified server-offset regime"
+    ],
+    "destroy": ["session-level orientation/path association"],
+    "permutations": 8192,
+    "seed": 11400714819323198485,
+    "alternative": "two-sided",
+    "alpha_familywise": 0.05,
+    "surface_family": "complete preregistered range_minutes × relative_horizon_minutes surface",
+    "statistic": "maximum absolute standardized deviation over the complete surface",
+    "session_is_independent_unit": true,
+    "cell_independence_assumption": false
+  },
+  "resolution": {
+    "minimum_attainable_p": "1/(8192+1)",
+    "minimum_attainable_p_decimal": 0.000122055,
+    "approximate_alpha_monte_carlo_se": 0.002409,
+    "required_alpha_monte_carlo_se_max": 0.005,
+    "resolution_rule": "PASS when attainable p resolution and Monte Carlo error are below frozen limits",
+    "must_be_proven_before_outcomes": true
+  },
+  "temporal_robustness": {
+    "views": [
+      "chronological D_F first half",
+      "chronological D_F second half",
+      "server_offset_minutes=120",
+      "server_offset_minutes=180"
+    ],
+    "statuses": ["TEMPORALLY_SUPPORTED", "TEMPORALLY_UNSTABLE", "INSUFFICIENT_TEMPORAL_SUPPORT"],
+    "instability_rule": "supported direction reverses across a qualified robustness view",
+    "small_slice_non_significance_is_instability": false
+  },
+  "candidate_policy": {
+    "formal_region_promotion": "DISABLED",
+    "reason": "post-observation heatmap islands cannot define their own boundaries in this opening protocol",
+    "descriptive_surface_allowed": true,
+    "candidate_classes": [
+      "ORIENTATION_PATH_ASSOCIATION",
+      "HORIZON_LOCAL_ASSOCIATION",
+      "SCALE_LOCAL_ASSOCIATION",
+      "SCALE_HORIZON_REGION_ASSOCIATION",
+      "TEMPORALLY_UNSTABLE_ECONOMICS",
+      "NO_SUPPORTED_ORIENTATION_PATH_ASSOCIATION",
+      "INSUFFICIENT_SUPPORT",
+      "NOT_EVALUABLE"
+    ],
+    "strategy_vocabulary_forbidden": ["BUY", "SELL", "ENTRY", "EXIT", "STOP", "TARGET", "WIN_RATE", "SHARPE", "STRATEGY"]
+  },
+  "future_validation": {
+    "opening_authority": "EXPLICIT_FINANCIAL_VALIDATION_GATE_ONLY",
+    "development_outcomes_opened_in_this_root": false,
+    "validation_outcomes_opened_in_this_root": false,
+    "science_confirmation_opened_in_this_root": false,
+    "estimand": "same complete-surface delta and maximum-statistic procedure on untouched V_F",
+    "coordinates": "exactly the frozen R01-R30 × 5-minute horizon surface",
+    "candidate_region_estimand": "NOT_APPLICABLE_WHILE_FORMAL_REGION_PROMOTION_DISABLED"
+  },
+  "synthetic_qualification": {
+    "required_cases": [
+      "NO_ASSOCIATION",
+      "STRONG_SAME_ORIENTATION_ASSOCIATION",
+      "STRONG_OPPOSITE_ORIENTATION_ASSOCIATION",
+      "ISOLATED_FALSE_LOOKING_CELL",
+      "CONTIGUOUS_SCALE_HORIZON_REGION",
+      "TEMPORAL_SIGN_REVERSAL",
+      "SPARSE_MIDPOINT_PROBES",
+      "NESTED_CROSS_SCALE_DEPENDENCE",
+      "CORRELATED_HORIZON_PATHS",
+      "BLOCK_PROFILE_RANDOMIZATION",
+      "OUTCOME_AND_SCIENCE_READ_GUARDS"
+    ],
+    "real_outcomes_permitted": false
+  },
+  "sealing": {
+    "rebuild_count": 2,
+    "required_identity": "byte-identical sealed outputs",
+    "status": "PROTOCOL_QUALIFIED",
+    "financial_development_outcomes": "FROZEN_UNOPENED",
+    "financial_validation": "FROZEN_UNOPENED",
+    "science_confirmation": "FROZEN_UNOPENED",
+    "economic_finding": "NOT_CREATED",
+    "trading_authority": false
+  }
+}

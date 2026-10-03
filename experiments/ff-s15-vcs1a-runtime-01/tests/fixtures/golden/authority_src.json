@@ -1,0 +1,82 @@
+{
+ "bound_schema": {
+  "schema_id": "fixture-z3",
+  "schema_version": "0"
+ },
+ "default": {
+  "reason": "no_region",
+  "type": "ESCALATE"
+ },
+ "regions": {
+  "diag": {
+   "op": "halfspaces",
+   "rows": [
+    {
+     "bound": 0.6,
+     "coefs": {
+      "x1": 1,
+      "x2": 1
+     }
+    }
+   ]
+  },
+  "near": {
+   "center": {
+    "x1": 0.5,
+    "x2": 0.5
+   },
+   "norm": "l2",
+   "op": "ball",
+   "radius": 0.25
+  },
+  "quiet": {
+   "text": "x[\"x1\"] < 0.2 and not present(x[\"x4\"])"
+  },
+  "strong": {
+   "text": "x[\"x1\"] >= 0.71 and x[\"x2\"] in [0.12, 0.30] and x[\"x3\"] == false"
+  }
+ },
+ "rules": [
+  {
+   "disposition": {
+    "action": {
+     "from_context": "proposed_action"
+    },
+    "type": "EXECUTE"
+   },
+   "region": "strong",
+   "rule_id": "go"
+  },
+  {
+   "disposition": {
+    "type": "NOOP"
+   },
+   "region": "quiet",
+   "rule_id": "hold"
+  },
+  {
+   "disposition": {
+    "requirement": {
+     "from_context": "req"
+    },
+    "type": "ASK"
+   },
+   "guards": [
+    {
+     "key": "routes",
+     "test": "nonempty"
+    }
+   ],
+   "region": "near",
+   "rule_id": "ask"
+  },
+  {
+   "disposition": {
+    "reason": "low_mass",
+    "type": "DECLINE_UNAVAILABLE"
+   },
+   "region": "diag",
+   "rule_id": "decline"
+  }
+ ]
+}

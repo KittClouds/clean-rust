@@ -1,0 +1,107 @@
+{
+  "reclaim_given_break": {
+    "contract": "MST_RG2_TARGET_COHORT_RECEIPT_V1",
+    "interface_version": "MST_RG2_RESEARCH_INTERFACE_V1_1",
+    "created_at_utc": "2026-08-12T13:43:46.086385+00:00",
+    "corpus_sha256": "9cbad8545db23cba7ccea2bd062aeba700597deb4be19cecbb74647f65ef8413",
+    "analysis_code_sha256": "7000d52d9b4234de19df4ba0b7ddb225ccf9556d095e3589e4018ed57bac60e6",
+    "query_spec": {
+      "target": "reclaim_given_break",
+      "group_by": [],
+      "filters": [],
+      "partition": "RG2_EXPLORATORY",
+      "censoring_treatment": "exclude_censored_from_estimate_retain_counts"
+    },
+    "query_spec_sha256": "3e0de0c43a009b3f995b11cd5c566fc77e8059a74eb1fa4a881c86addf3ed931",
+    "eligibility_rule": "attempt has a recorded break; reclaim is observed behavioral outcome",
+    "censoring_treatment": "exclude_censored_from_estimate_retain_counts",
+    "eligible_rows": 2073,
+    "observed_rows": 880,
+    "censored_rows": 526,
+    "analyzable_rows": 1547
+  },
+  "initial_acceptance_given_initial_contact": {
+    "contract": "MST_RG2_TARGET_COHORT_RECEIPT_V1",
+    "interface_version": "MST_RG2_RESEARCH_INTERFACE_V1_1",
+    "created_at_utc": "2026-08-12T13:44:23.845858+00:00",
+    "corpus_sha256": "9cbad8545db23cba7ccea2bd062aeba700597deb4be19cecbb74647f65ef8413",
+    "analysis_code_sha256": "7000d52d9b4234de19df4ba0b7ddb225ccf9556d095e3589e4018ed57bac60e6",
+    "query_spec": {
+      "target": "initial_acceptance_given_initial_contact",
+      "group_by": [],
+      "filters": [],
+      "partition": "RG2_EXPLORATORY",
+      "censoring_treatment": "exclude_censored_from_estimate_retain_counts"
+    },
+    "query_spec_sha256": "4846edecd09911fae6f76e7fc1d05c6421b9ffb965c24950281022357d7917e4",
+    "eligibility_rule": "non-retest attempt has contact; ACCEPT_THROUGH_NODE is observed",
+    "censoring_treatment": "exclude_censored_from_estimate_retain_counts",
+    "eligible_rows": 5737,
+    "observed_rows": 667,
+    "censored_rows": 686,
+    "analyzable_rows": 5051
+  },
+  "rejection_given_initial_contact": {
+    "contract": "MST_RG2_TARGET_COHORT_RECEIPT_V1",
+    "interface_version": "MST_RG2_RESEARCH_INTERFACE_V1_1",
+    "created_at_utc": "2026-08-12T13:45:26.401596+00:00",
+    "corpus_sha256": "9cbad8545db23cba7ccea2bd062aeba700597deb4be19cecbb74647f65ef8413",
+    "analysis_code_sha256": "7000d52d9b4234de19df4ba0b7ddb225ccf9556d095e3589e4018ed57bac60e6",
+    "query_spec": {
+      "target": "rejection_given_initial_contact",
+      "group_by": [],
+      "filters": [],
+      "partition": "RG2_EXPLORATORY",
+      "censoring_treatment": "exclude_censored_from_estimate_retain_counts"
+    },
+    "query_spec_sha256": "2be788ebb04c0a45ef02043f90dfd17c54db7d1873d02716ac0c3e1c76079be9",
+    "eligibility_rule": "non-retest attempt has contact; REJECT_TO_ORIGIN is observed",
+    "censoring_treatment": "exclude_censored_from_estimate_retain_counts",
+    "eligible_rows": 5737,
+    "observed_rows": 3504,
+    "censored_rows": 686,
+    "analyzable_rows": 5051
+  },
+  "retest_hold_given_retest_contact": {
+    "contract": "MST_RG2_TARGET_COHORT_RECEIPT_V1",
+    "interface_version": "MST_RG2_RESEARCH_INTERFACE_V1_1",
+    "created_at_utc": "2026-08-12T13:46:29.625061+00:00",
+    "corpus_sha256": "9cbad8545db23cba7ccea2bd062aeba700597deb4be19cecbb74647f65ef8413",
+    "analysis_code_sha256": "7000d52d9b4234de19df4ba0b7ddb225ccf9556d095e3589e4018ed57bac60e6",
+    "query_spec": {
+      "target": "retest_hold_given_retest_contact",
+      "group_by": [],
+      "filters": [],
+      "partition": "RG2_EXPLORATORY",
+      "censoring_treatment": "exclude_censored_from_estimate_retain_counts"
+    },
+    "query_spec_sha256": "1a93a112996a80859b31d6cfdae265f391d92dabf2aa19ab9c94f82c719e7e7e",
+    "eligibility_rule": "retest attempt has contact; ACCEPT_AND_HOLD_RETEST is observed",
+    "censoring_treatment": "exclude_censored_from_estimate_retain_counts",
+    "eligible_rows": 1267,
+    "observed_rows": 763,
+    "censored_rows": 16,
+    "analyzable_rows": 1251
+  },
+  "transit_given_episode_acceptance": {
+    "contract": "MST_RG2_TARGET_COHORT_RECEIPT_V1",
+    "interface_version": "MST_RG2_RESEARCH_INTERFACE_V1_1",
+    "created_at_utc": "2026-08-12T13:47:04.928222+00:00",
+    "corpus_sha256": "9cbad8545db23cba7ccea2bd062aeba700597deb4be19cecbb74647f65ef8413",
+    "analysis_code_sha256": "7000d52d9b4234de19df4ba0b7ddb225ccf9556d095e3589e4018ed57bac60e6",
+    "query_spec": {
+      "target": "transit_given_episode_acceptance",
+      "group_by": [],
+      "filters": [],
+      "partition": "RG2_EXPLORATORY",
+      "censoring_treatment": "exclude_censored_from_estimate_retain_counts"
+    },
+    "query_spec_sha256": "f06b9ff55dc435f1533d04ea35f7bdd8c6ee2b5dba30dd8cd72c8bfb93a51f1e",
+    "eligibility_rule": "episode has ACCEPT_THROUGH_NODE; later TRANSIT_TO_NEXT_NODE receipt observed",
+    "censoring_treatment": "exclude_censored_from_estimate_retain_counts",
+    "eligible_rows": 386,
+    "observed_rows": 227,
+    "censored_rows": 123,
+    "analyzable_rows": 263
+  }
+}

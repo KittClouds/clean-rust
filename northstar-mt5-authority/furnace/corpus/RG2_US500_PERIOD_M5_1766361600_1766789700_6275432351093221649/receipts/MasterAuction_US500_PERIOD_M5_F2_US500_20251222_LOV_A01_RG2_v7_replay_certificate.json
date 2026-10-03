@@ -1,0 +1,56 @@
+﻿{
+    "certificate":  "MST_REPLAY_DETERMINISM_V1",
+    "issued_at_utc":  "2026-08-12T09:36:55.3181180Z",
+    "stem":  "MasterAuction_US500_PERIOD_M5_F2_US500_20251222_LOV_A01_RG2_v7",
+    "common_files":  "C:\\Users\\shuga\\OneDrive\\Documents\\ChatGPT\\eas\\furnace\\staging\\US500_20251222_LOW_VOLATILITY__F2_US500_20251222_LOV_A01\\raw\\auction",
+    "status":  "PASS",
+    "semantic_exclusions":  [
+                                "invocation_id",
+                                "attempts.node_revision (structural reconciliation counter)",
+                                "certificate issue time",
+                                "tester playback speed"
+                            ],
+    "equality_fields":  [
+                            "run_key",
+                            "terminal_hash",
+                            "event_sequence",
+                            "receipt_hash",
+                            "contract_receipt_hash",
+                            "canonical_dataset_hash"
+                        ],
+    "invocations":  [
+                        {
+                            "variant":  "RG2_US500_PERIOD_M5_1766361600_1766789700_6275432351093221649_I1766361600_2757172083031860788",
+                            "invocation_id":  "RG2_US500_PERIOD_M5_1766361600_1766789700_6275432351093221649_I1766361600_2757172083031860788",
+                            "run_key":  "RG2_US500_PERIOD_M5_1766361600_1766789700_6275432351093221649",
+                            "visual_mode":  "0",
+                            "run_status":  "COMPLETE",
+                            "contract_valid":  "1",
+                            "terminal_hash":  "7969915997437361930",
+                            "event_sequence":  "1060",
+                            "receipt_hash":  "10023976212213535168",
+                            "contract_receipt_hash":  "11385026647738625659",
+                            "canonical_dataset_hash":  "e4bb7e7f54d4aa37a6e8a1e776d3ad49685881d832196bbaee611f3908c8c7fc",
+                            "counts_match_manifest":  true,
+                            "row_counts":  {
+                                               "events":  1060,
+                                               "attempts":  224,
+                                               "episodes":  34,
+                                               "context":  1316,
+                                               "features":  224,
+                                               "transits":  3
+                                           },
+                            "dataset_hashes":  {
+                                                   "events":  "dd54fb9b2990f09ce82651b1f85cf7483e222f013c5c9c62a3ae3ca2c1c5a279",
+                                                   "attempts":  "eddd8c234b59ba94290072f99d392f9666b356083592431801572bb6b7aad70e",
+                                                   "episodes":  "d344facaa7c5ce56614e4b23bc225e62547cdc5d6269980e0be9ffd9abf9591e",
+                                                   "context":  "2393152d738bb556d4b881ca1ab5a565d70d2c366998ab238e7e597ea4b74187",
+                                                   "features":  "4dc7ab1363172db6d53fe0091eb37145114cd2e8a3c120061aef3a4e87e78685",
+                                                   "transits":  "70eb5a73290a06e7b24483b62d40b87b0e5c6df9e57818dd72dbcf9384982450"
+                                               }
+                        }
+                    ],
+    "failures":  [
+
+                 ]
+}

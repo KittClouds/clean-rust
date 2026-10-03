@@ -1,0 +1,10 @@
+﻿{
+    "contract":  "NORTHSTAR_PHASE13_ORCHESTRATION_RECOVERY_V1",
+    "status":  "QUARANTINED_INCOMPLETE",
+    "reason":  "desktop_shell_observation_timeout_terminated_wrapper",
+    "instrument":  "DE40",
+    "holdout_id":  "VERIFICATION_A",
+    "files_preserved":  10,
+    "candidate_scoring_performed":  false,
+    "authorization_consumed":  false
+}

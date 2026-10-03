@@ -1,0 +1,60 @@
+{
+  "identity": "JEV-V08Q-EXECUTION-ADDENDUM-V01",
+  "status": "EXECUTION_CADENCE_RECONCILIATION_PRE_HEAD_INITIALIZATION",
+  "parents": {
+    "run_contract_v02_sha256": "5f6cd42b6de058a4fcdcbeb70b1939dbe944a6c973ee704a93148f9bea71d1ae",
+    "analysis_contract_v02_sha256": "b5c3c02b56405c0a471f82907bbb400dc4655c5fa8e82a32463dce77675e16cc",
+    "source_lock_v02_sha256": "d6d70768242ac12801069e2bdb27cb976679c907206e81ae8c0921867bea2363",
+    "q_bundle_root_sha256": "118462335b94a41738e12c3af9b6b1647dc7fcc95cf88c9ae3cdc2ed0cbd43ae",
+    "q_panel_phase_root_sha256": "1b99d39ab6bfed8173a5410f6c8ae0df442aae03038e31bab46b779bd1e039a"
+  },
+  "resolution": {
+    "conflict": "run-contract-v02 requires checkpoints 40, 80, and every step 81..120, while analysis-contract-v02 and the current explicit Q execution instruction require 40, 80, 100, and 120",
+    "supersedes_only": "frozen_training_basis.checkpoints_per_run, checkpoint_steps, trained_checkpoints, sealed_training_objects_total",
+    "checkpoint_steps": [40, 80, 100, 120],
+    "checkpoints_per_run": 4,
+    "runs": 12,
+    "trained_checkpoints_total": 48,
+    "shared_initial_templates": 3,
+    "sealed_model_objects_total": 51,
+    "analysis_cells": 51,
+    "rows_per_cell": 8000,
+    "prediction_rows": 408000
+  },
+  "unchanged_scientific_and_training_fields": [
+    "four arms and the sole SHAM-LOW 0.5 auxiliary multiplier change",
+    "three paired seeds and within-seed arm execution order",
+    "common primary stream, auxiliary identities, count, slots, and target multiset",
+    "batch size, epoch count, optimizer, objective denominator, precision, and update count",
+    "head architecture, frozen feature inputs, candidate order, and panel identity",
+    "evaluation metrics, bootstrap, seed-level joint labels, margins, and interpretation limits"
+  ],
+  "schedule_algorithm": {
+    "rows": 360,
+    "steps_per_epoch": 40,
+    "primary_occurrences_per_epoch": 10000,
+    "auxiliary_anchor_slots_per_epoch": 5000,
+    "source_algorithm": "The sealed P-R2 schedule materializer's schedule_for_seed algorithm (SHA-256 831fdd1a44420bd251ba7fd52b3d3fa72d824fed8cabbd4b15c75c42c6232b1d), instantiated with Q's frozen seeds and common primary stream; sort group IDs lexicographically, shuffle with Python random.Random(seed + epoch - 1), batch 256 groups in order, and place auxiliary events at the anchor slots in each primary batch.",
+    "output_order": "seed order from q-run-contract-v02, then epoch ascending, then step ascending",
+    "arms_share_seed_schedule": true,
+    "treatment_payload_is_the_only_arm_specific_schedule_input": true
+  },
+  "authorization": {
+    "source": "user instruction in the current task authorizing the full Q execution packet and specifying checkpoints 40, 80, 100, 120",
+    "allowed_next_work": [
+      "materialize and independently verify the Q schedule",
+      "implement and smoke-test Q-specific trainer, evaluator, and analysis runner against the sealed contracts",
+      "execute all 12 runs, seal all 51 model states and telemetry, then open the sealed panel once and evaluate the complete frozen matrix"
+    ],
+    "prohibited": [
+      "checkpoint selection or promotion",
+      "extra seeds, dose changes, or training extensions",
+      "panel replacement or rematching",
+      "NewTight, legacy evaluation, or Phoenix",
+      "evaluation feedback during training"
+    ]
+  },
+  "original_v02_contracts_mutated": false,
+  "analysis_contract_v02_mutated": false,
+  "panel_identity_or_contents_changed": false
+}

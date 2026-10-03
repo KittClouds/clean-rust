@@ -1,0 +1,11 @@
+{
+  "autodiff": false,
+  "complete": true,
+  "config": "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\dh02\\artifacts\\verification\\20260912T040045Z\\observer_off\\config.json",
+  "learning_rule_search": false,
+  "observer_feeds_learner": false,
+  "outcome_rows": 6,
+  "protocol": "DH-02",
+  "threads": 1,
+  "wall_seconds": 0.1293897
+}

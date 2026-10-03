@@ -1,0 +1,18 @@
+{
+  "receipt_id": "FAS_FROZEN_OBSERVER_BUNDLE_E2_V02_PREFLIGHT_CHECKER_INCIDENT_V02",
+  "status": "PREFLIGHT_TOOLING_ERROR_PRESERVED_NO_MODEL_CONTACT",
+  "recorded_utc": "2026-09-26T08:34:26.4076124Z",
+  "supersedes": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e2-v02-preflight-checker-incidents-v01.json",
+  "incident": {
+    "operator_script": "e2-v02-operator-preflight-v02.ps1",
+    "issue": "The local helper checked a property on the seal manifest although the protocol hash is carried by the seal entries array.",
+    "disposition": "Preserved v02 unchanged; v03 now checks the exact E0 seal manifest entry and the sealed extractor pre-model verifier."
+  },
+  "model_contact_performed": false,
+  "tokenizer_contact_performed": false,
+  "feature_extraction_performed": false,
+  "cuda_allocator_initialized": false,
+  "e2_v02_output_root_created": false,
+  "authorization_record_created": false,
+  "frozen_contracts_modified": false
+}

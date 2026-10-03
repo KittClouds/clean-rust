@@ -1,0 +1,95 @@
+﻿{
+    "contract":  "MST_IMMUTABLE_RUN_SEAL_V1",
+    "status":  "SEALED",
+    "sealed_at_utc":  "2026-08-12T09:42:33.1979330Z",
+    "run_key":  "RG2_USTEC_PERIOD_M5_1784505600_1784933700_16636102961176583068",
+    "invocation_id":  "RG2_USTEC_PERIOD_M5_1784505600_1784933700_16636102961176583068_I1784505600_1641078661842694290",
+    "window_id":  "USTEC_20260720_QUIET",
+    "manifest_sha256":  "5bf12767746b8499ad0edde2597df67b1928cc5941705a8391ae2585a0574092",
+    "canonical_dataset_hash":  "0ce8918c429028622e6ac1e3f0b9b66f267a0e3cd27354bf597f1c5c93164bee",
+    "sealed_payload_sha256":  "f94cd692d34d9719ef92f0062a17541ef851d0a237376146dbbafb968bfcd35e",
+    "file_count":  16,
+    "files":  [
+                  {
+                      "path":  "raw/auction/MasterAuction_USTEC_PERIOD_M5_F2_USTEC_20260720_QUT_A01_RG2_v7_attempts.tsv",
+                      "bytes":  274799,
+                      "sha256":  "4c4c4129eae184e2d02b58e77c622d8b998b5cd3332bed5a4639fe04b00527a7"
+                  },
+                  {
+                      "path":  "raw/auction/MasterAuction_USTEC_PERIOD_M5_F2_USTEC_20260720_QUT_A01_RG2_v7_context.tsv",
+                      "bytes":  901337,
+                      "sha256":  "d8b1f1363fb2fac9e2501d4adecaacf4e18491450860a391185fa3a894b3684a"
+                  },
+                  {
+                      "path":  "raw/auction/MasterAuction_USTEC_PERIOD_M5_F2_USTEC_20260720_QUT_A01_RG2_v7_episodes.tsv",
+                      "bytes":  30329,
+                      "sha256":  "62b3110d39da4408721b1a63f2aaccd83cec83cc3013a810ae156d33f08cb0c1"
+                  },
+                  {
+                      "path":  "raw/auction/MasterAuction_USTEC_PERIOD_M5_F2_USTEC_20260720_QUT_A01_RG2_v7_events.tsv",
+                      "bytes":  903333,
+                      "sha256":  "032dc2db9b09c8fb32ed7e58eefc96ed034ab15012c213ea2ac60940084d3990"
+                  },
+                  {
+                      "path":  "raw/auction/MasterAuction_USTEC_PERIOD_M5_F2_USTEC_20260720_QUT_A01_RG2_v7_features.tsv",
+                      "bytes":  242335,
+                      "sha256":  "9c50f58194b105ba3c7a4e18cd335fe815e81945aaefc91771a756c56d7a6c61"
+                  },
+                  {
+                      "path":  "raw/auction/MasterAuction_USTEC_PERIOD_M5_F2_USTEC_20260720_QUT_A01_RG2_v7_runs.tsv",
+                      "bytes":  5753,
+                      "sha256":  "5960295594bf1f6bb56d6985c64c8a4b46070066ca140a96f5c38274966b4ec2"
+                  },
+                  {
+                      "path":  "raw/auction/MasterAuction_USTEC_PERIOD_M5_F2_USTEC_20260720_QUT_A01_RG2_v7_transits.tsv",
+                      "bytes":  14817,
+                      "sha256":  "75e27351461f49e5e78c2a30c4990286f18ff02a3d26c543199e68b301e6fba8"
+                  },
+                  {
+                      "path":  "raw/structure/MasterStructure_USTEC_PERIOD_M5_F2_USTEC_20260720_QUT_A01_v6_events.tsv",
+                      "bytes":  139902,
+                      "sha256":  "5eb7f0c7fb190824e53c947829d61e8ada948814eff5648da7d539bf1853076a"
+                  },
+                  {
+                      "path":  "raw/structure/MasterStructure_USTEC_PERIOD_M5_F2_USTEC_20260720_QUT_A01_v6_inputs.tsv",
+                      "bytes":  396943300,
+                      "sha256":  "76fb895e2e923732731ac332a557aa7baae53c7b8f68b1a3b016da525e53743c"
+                  },
+                  {
+                      "path":  "raw/structure/MasterStructure_USTEC_PERIOD_M5_F2_USTEC_20260720_QUT_A01_v6_nodes.tsv",
+                      "bytes":  51338294,
+                      "sha256":  "bfb5f6bad2e4e41f80275a30942d60c396df298ed3489e1e9f167721e8de3811"
+                  },
+                  {
+                      "path":  "receipts/admission_receipt.json",
+                      "bytes":  2765,
+                      "sha256":  "049977e4ef3112bf60b256b39e2a7ed38b4e04039658a89a7c92fdb1ecaaebc2"
+                  },
+                  {
+                      "path":  "receipts/campaign_manifest_row.json",
+                      "bytes":  1628,
+                      "sha256":  "aab01aad006e0d48a2c7371a68ebdb2c7887033fe3c1039ffb37415439935161"
+                  },
+                  {
+                      "path":  "receipts/MasterAuction_USTEC_PERIOD_M5_F2_USTEC_20260720_QUT_A01_RG2_v7_replay_certificate.json",
+                      "bytes":  3572,
+                      "sha256":  "13b09cbe261ee061635f47079769495370fce7e6ee0d0e53dd9a70895f21ffe2"
+                  },
+                  {
+                      "path":  "receipts/MasterAuction_USTEC_PERIOD_M5_F2_USTEC_20260720_QUT_A01_RG2_v7_replay_certificate.md",
+                      "bytes":  631,
+                      "sha256":  "40f5fb01c5d615e23df5b8942764da4251b28552db8a5797543b7bc4c1a7050f"
+                  },
+                  {
+                      "path":  "receipts/terminal_run_receipt.json",
+                      "bytes":  4529,
+                      "sha256":  "a6d34e15f00addae553a97aec0a71e3da59bb9654d236c6a02e757dd9695018d"
+                  },
+                  {
+                      "path":  "tester.ini",
+                      "bytes":  1656,
+                      "sha256":  "40b19fdf3fb245597c6d3bdafce16f44fc27b032de882a7f06171982192ec762"
+                  }
+              ],
+    "mutation_rule":  "never overwrite; replacement requires a new invocation and explicit corpus generation"
+}

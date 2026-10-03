@@ -1,0 +1,97 @@
+{
+  "entries": [
+    {
+      "bytes": 912,
+      "path": "experiments/drosophila-heresy/q10-da2-geometry-v1/CONTRACT.json",
+      "sha256": "A502ED88D90DFEC4990EFFAC5362099A5CE8EF3BE9988F714AC900A7DBC49F46"
+    },
+    {
+      "bytes": 2094,
+      "path": "experiments/drosophila-heresy/q10-da2-geometry-v1/PREEXECUTION.json",
+      "sha256": "9B624F5A21ADBDE4428C07183EC9AD1A7C0964BB52F08B74F34ECA1DCB377B5A"
+    },
+    {
+      "bytes": 390617,
+      "path": "experiments/drosophila-heresy/q10-da2-geometry-v1/qualification/sample-9731-9732/results.json",
+      "sha256": "A76139A924D0D24EE5376378DBCDB12AAE539CE33182DE1050C741DC0475BB23"
+    },
+    {
+      "bytes": 3878,
+      "path": "experiments/drosophila-heresy/q10-gc0-gp1-par2-v1/CONTRACT.json",
+      "sha256": "91628E58275E2D09AA65DFFE40B7BE1584F7CC434521D69C22AE7D29BD29E382"
+    },
+    {
+      "bytes": 674,
+      "path": "experiments/drosophila-heresy/q10-gc0-gp1-par2-v1/PLAN.md",
+      "sha256": "BE226A5427ADE6E1CF2C3CB2B3DD18F542605B9C4CEBF99CB38ED584E111DD4C"
+    },
+    {
+      "bytes": 99213913,
+      "path": "experiments/drosophila-heresy/q10-gc0-gp1-par2-v1/qualification/palettes.jsonl",
+      "sha256": "54A2688080A65F5CFE31B11A12F5DA85B92D86BBDE2E42072FB0C0F32F3D3B1A"
+    },
+    {
+      "bytes": 9186,
+      "path": "experiments/drosophila-heresy/q10-gc0-gp1-par2-v1/scripts/run_par2.py",
+      "sha256": "CA0C6A9EC3DD12F16D07C3006DC861B05BFEB8C4CA85D5EFCDB42FF0AD1B0A9A"
+    },
+    {
+      "bytes": 4863,
+      "path": "experiments/drosophila-heresy/q10-gc1-par8-v1/CONTRACT.json",
+      "sha256": "7BA4A236ED6109A5233F8A3E8A897F45A38193B31CAB13EBB477806F7BE17EEC"
+    },
+    {
+      "bytes": 4063446,
+      "path": "experiments/drosophila-heresy/q10-gc1-par8-v1/qualification/execution.json",
+      "sha256": "2C4BC3875E57BC0E1843F202067E406F5AD28917DEEE6ADAB1031478C34AB018"
+    },
+    {
+      "bytes": 9072,
+      "path": "experiments/drosophila-heresy/q10-pf5-v1/CONTRACT.json",
+      "sha256": "730D6B03CEE7CE58A9002320372E9F77EC2AB593EC25A71583F59D90D690BC26"
+    },
+    {
+      "bytes": 18485,
+      "path": "experiments/drosophila-heresy/q10-pf5-v1/scripts/qualify_q10_pf5.py",
+      "sha256": "205B4EBB153DAC141051243C6989F69405FAA19957CE1685243496CC5D4083A8"
+    },
+    {
+      "bytes": 62185,
+      "path": "experiments/drosophila-heresy/q10-pf5-v1/scripts/run_q10_pf5.py",
+      "sha256": "4442B942F06E8BEC43129058B74C300472D143A82338EFB09E8D3CBE8AA89759"
+    },
+    {
+      "bytes": 827,
+      "path": "experiments/drosophila-heresy/q10-rmt-v1/CONTRACT.json",
+      "sha256": "AF87BCEF77668054B7C20C333F7F15E79ECF0E5FC3C51B0AE2DDFD75F69C4EA1"
+    },
+    {
+      "bytes": 2395,
+      "path": "experiments/drosophila-heresy/q10-rmt-v1/PREEXECUTION.json",
+      "sha256": "F1A102DB83448EF6B1D9903329CCF38E34E730014BF3D37B10904036C9B61982"
+    },
+    {
+      "bytes": 2646948,
+      "path": "experiments/drosophila-heresy/q10-rmt-v1/qualification/sample-9731-9732/components.json",
+      "sha256": "E873F1FAAA1C1D2093F5D90D483AF621D1B371FA205A52EBD3E74D0E7B841977"
+    },
+    {
+      "bytes": 7945509,
+      "path": "experiments/drosophila-heresy/q10-rmt-v1/qualification/sample-9731-9732/endpoints.json",
+      "sha256": "1BE006961358B748CE0ECBCE635347274326494D546F82E6F32CA1FAAC0A7A8C"
+    },
+    {
+      "bytes": 64795795,
+      "path": "experiments/drosophila-heresy/q10-rmt-v1/qualification/sample-9731-9732/moves.jsonl",
+      "sha256": "4FC8859C6A759039CE4FF7581C43EF2687E23147F535378AB9F3147CFAD9799F"
+    },
+    {
+      "bytes": 4231872,
+      "path": "experiments/drosophila-heresy/q10-rmt-v1/qualification/sample-9731-9732/rows.json",
+      "sha256": "A9AE4E5209E7BB32C4815666A32EA9C66B9E60A79C0E1A739C486E68DDE041C3"
+    }
+  ],
+  "identity": "q10-gc1-lr1-requal1-domain-v1",
+  "protocol": "REQUAL1-DOMAIN",
+  "source": "current-live-tree"
+}

@@ -1,0 +1,33 @@
+{
+  "schema": "CHIEF_E4_0_EXTRACT_HANDOFF_ISSUED_V1",
+  "status": "AUTHORIZED_AWAITING_FABRIQUE_LAUNCH",
+  "run_id": "frozen-fabrique.e4-0.supervised.v1",
+  "stage_id": "E4_0_FRESH_FEATURE_EXTRACTION_V1",
+  "actor_id": "fabrique-e4-supervisor-v1",
+  "resource_id": "gpu.local.cuda0.e850fbf0",
+  "policy_hash": "sha256:fb07a60fc04d36495c54c5980343805684bc6c5bd4df2003e2fe94d84349f334",
+  "grant_events": {
+    "authorize_stage": "sha256:f7b3b65553d496a4c4499df11ba35b21fc658c2b728917912bd0f7992e5bb762",
+    "acquire_lease": "sha256:1b6618615daf6ca9e9c9a0b940462f616c6f8587d592437965cfe86f68e970c4",
+    "execute_local": "sha256:2ab79f8a733a10fab009d3eeb9f359e7eaa5275bb2b2c03584df37f6ac3934c6"
+  },
+  "grant_expiry_utc": "2026-09-28T06:41:45.240613+00:00",
+  "authorization_id": "sha256:64e6c203995bfcb0df21389b7780538ccc6eedb2649b3eab5da2b8a4f42b39c1",
+  "authorization_expiry_utc": "2026-09-28T05:41:45.240613+00:00",
+  "lease_id": "lease-4a09edb80a32b53705bcff3de272cccde9e3d4f93bdff9acb2ff2c3806820d50",
+  "fencing_token": 2,
+  "lease_expiry_utc": "2026-09-28T00:11:45.314485+00:00",
+  "request_path": "C:\\code land\\clean-rust\\program-infrastructure\\governance\\inbox\\20260927\\E4-0-EXTRACT-WORKER-REQUEST-v1.json",
+  "request_sha256": "sha256:815d2e90534d5f8e5f70b19f5a8f3451f3410c65ba9c3f7fa7f29113cd9fc140",
+  "receipt_root": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e4-0-ledger-run-v02\\extract-ledger-receipts",
+  "scientific_spec_artifact_id": "sha256:21fc77d5a288b9adef995d88f089890235f8dcb2fbc3c9e452725bb67892a22f",
+  "execution_spec_artifact_id": "sha256:216c7ac33722e0a9d241bc630f21df1385f461d150b48d72c7db54936f18fbe2",
+  "review_seal_root": "sha256:36922e9d7db53b7966c7282e209840819eeac0c790e85ba0881ce857d0bbb503",
+  "library_acceptance_id": "sha256:f98dcd6743c5e8b7ff091cef2d69aa361e53c252711c7b001f3a71d322744602",
+  "worker_cwd": "C:\\code land\\clean-rust\\program-infrastructure\\kammi-ledger",
+  "worker_module": "ledgerd.local_client",
+  "actor_token_file": "C:\\code land\\clean-rust\\program-infrastructure\\kammi-ledger\\.kammi-dev\\operational\\fabrique-e4-supervisor-v1.secret",
+  "model_contact_made": false,
+  "labels_opened": false,
+  "e4_01_entry_open": false
+}

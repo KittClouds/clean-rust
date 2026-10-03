@@ -1,0 +1,22 @@
+{
+  "banks": {
+    "competence": {
+      "path": "inputs/banks/competence.json",
+      "sha256": "a2de2764fa69cdd46ddd09cc8990de4551ac43354c11a8aaaa6828c94b54251a"
+    },
+    "measurement": {
+      "path": "inputs/banks/measurement.json",
+      "sha256": "5ee1a4b7f4b556bf63a7d09ff8428ba34135f16a1c6dbde521b7d8ceada88004"
+    },
+    "n_eval": 256,
+    "training": {
+      "path": "inputs/banks/training.json",
+      "sha256": "c709c6652cad6dde2c1289e336803fa4fded94b16078f5f4022b84fa0167de6c"
+    }
+  },
+  "contract_sha256": "c2c52cd4dcbb76cfb0a758bca3ea1deffd52296497269ee395da2c1e1e963ecb",
+  "fit_rows": 11232,
+  "lesion_substrates": 9,
+  "null_graphs": 8,
+  "primary_rows": 1728
+}

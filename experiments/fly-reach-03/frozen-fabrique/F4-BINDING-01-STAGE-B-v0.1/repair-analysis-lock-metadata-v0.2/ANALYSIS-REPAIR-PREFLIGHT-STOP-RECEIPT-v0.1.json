@@ -1,0 +1,17 @@
+{
+  "schema": "F4-BINDING-01-stage-b-analysis-repair-preflight-stop-v0.1",
+  "identity": "F4-BINDING-01-STAGE-B-ANALYSIS-METADATA-REPAIR-v0.1",
+  "status": "STOP_REPAIR_PREFLIGHT_SCHEMA_MISMATCH",
+  "detected_issue": "The v0.1 runner checked comparison_outputs_written at the top level, but the preserved analysis stop receipt stores it under partial_in_memory_scoring.",
+  "preserved_analysis_stop_receipt_sha256": "0dcafcacd124be3c006be551676e43c84d338c8d852f4a343354f10b67936269",
+  "v0_1_repair_manifest_sha256": "dea4fdfa0ba9a3430c79ec9de5b1e95a4ab28622a7981dbb5cb75d08d8491337",
+  "v0_1_runner_sha256": "72892a52b2e9f2fff8c0202853bc3f78925d93f8822393041cf3ac9a9432b656",
+  "truth_values_previously_opened": true,
+  "this_attempt_entered_frozen_analyzer": false,
+  "this_attempt_scored_any_rows": false,
+  "comparative_result_emitted": false,
+  "analysis_outputs_written": false,
+  "models_refit": false,
+  "predictions_regenerated": false,
+  "locked_inputs_modified": false
+}

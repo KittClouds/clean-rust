@@ -1,0 +1,19 @@
+{
+  "counts": {
+    "exact": 0,
+    "preflight_singles": 3696,
+    "valid_advantage": 259
+  },
+  "engineering_only": true,
+  "gate": {
+    "behavioral_probe": false,
+    "domain_bounded": true,
+    "parents_unchanged": true,
+    "s_frozen": true
+  },
+  "identity": "q10-gc1-cancel1-v1",
+  "interpretation": "Bounded replacement around invalid search states; negatives are domain-bounded, not infeasibility.",
+  "protocol": "Q10-GC1-CANCEL1",
+  "scientific_promotion": false,
+  "status": "CANCEL1_SCREEN_COMPLETE"
+}

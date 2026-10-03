@@ -1,0 +1,83 @@
+{
+  "protocol": "jev-information-density/v0.8p-v05-direct-panel-identity-extraction-v01",
+  "identity": "v0.8P-v05-direct-panel-identity-extraction-v01",
+  "status": "EXTRACTION_AUTHORIZED_PANEL_CONSTRUCTION_NOT_AUTHORIZED",
+  "authority_chain": [
+    {
+      "path": "experiments/jev-information-density-v08p-v04/provenance/stage-a-authority-trace-v01.json",
+      "sha256": "050a24e85f45eaf8b70d382871b4aaa50f973b25c8494ad116531f0b152ed02e",
+      "role": "sealed Stage-A record identifying the exact panel manifest object"
+    },
+    {
+      "path": "experiments/jev-information-density-v08p-v04/provenance/v04-stage-a-seal-v01.json",
+      "sha256": "e8c9154b9af87d098272fdde4ef6fb2e634010ef797cbfa3f6502848208d06ab",
+      "role": "seal binding the Stage-A authority trace"
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08n\\v0.8N-eval-panel-v01\\seal\\evaluation-firewall-lock.json",
+      "sha256": "79d25ac82fba1bc6332e16d8bc5f877fadd11cccaed5ef3f07eacfe5e1877da2",
+      "json_pointer": "/panel_manifest_sha256",
+      "value": "80e09c0f203b8a6505e062a2091a594273dca808258ff2f4539ab8414db9eabe"
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08n\\v0.8N-eval-panel-v01\\matched-panel-v02\\heldout-matched-panel-manifest.jsonl",
+      "sha256": "80e09c0f203b8a6505e062a2091a594273dca808258ff2f4539ab8414db9eabe",
+      "role": "identity source; only neighborhood_id is parsed"
+    }
+  ],
+  "v03_retired_dependency": "seal/seal-manifest.json and its unresolved v03 expected hash are excluded entirely",
+  "extraction_order": [
+    "verify v04 Stage-A trace hash locally",
+    "open only firewall-lock.json; verify its exact SHA-256",
+    "parse only top-level /panel_manifest_sha256 and require the sealed value",
+    "open only the exact heldout-matched-panel-manifest.jsonl path",
+    "hash the complete manifest bytes and require the firewall-bound SHA-256",
+    "only after hash pass, parse top-level neighborhood_id from each JSONL row",
+    "require exactly 2000 valid unique canonical identities",
+    "hash canonical identity UTF-8 bytes with SHA-256; sort the unique hashes",
+    "write denylist and source-access receipt"
+  ],
+  "identity_canonicalization": {
+    "source_field": "top-level neighborhood_id",
+    "json_value_type": "string",
+    "unicode_rule": "must already be Unicode NFC; reject rather than normalize",
+    "whitespace_rule": "must be nonempty and have no leading or trailing whitespace; reject rather than trim",
+    "hash_input": "exact validated canonical string encoded as UTF-8",
+    "raw_identity_output": false
+  },
+  "source_boundary": {
+    "allowed_e1_objects": [
+      "D:/codex-runs/jev-information-density-v08n/v0.8N-eval-panel-v01/seal/evaluation-firewall-lock.json",
+      "D:/codex-runs/jev-information-density-v08n/v0.8N-eval-panel-v01/matched-panel-v02/heldout-matched-panel-manifest.jsonl"
+    ],
+    "all_other_e1_objects_forbidden": true,
+    "directory_enumeration_glob_repository_search": false,
+    "successful_input_opens_logged": true,
+    "observed_source_set_must_equal_authorized_set": true,
+    "successful_open_count_per_source_per_process": 1,
+    "two_clean_processes_required": true,
+    "denylist_output_bytes_must_match": true
+  },
+  "failure_policy": {
+    "source_hash_or_binding_mismatch": "persist failure access receipt with observed digest and stop",
+    "unexpected_source_open": "block, persist blocked-access receipt, stop",
+    "malformed_or_duplicate_identity": "persist failure receipt and stop",
+    "no_retry_or_replacement_shopping": true
+  },
+  "outputs": {
+    "identity_root": "D:/codex-runs/jev-information-density-v08p-v05/identity",
+    "run_labels": ["clean-process-1", "clean-process-2"],
+    "denylist_schema": "canonical-neighborhood-id-sha256-set-v01",
+    "required_count": 2000,
+    "panel_output_root_created": false
+  },
+  "explicit_non_authorizations": {
+    "panel_contract": false,
+    "panel_generation": false,
+    "lfm_contact": false,
+    "training": false,
+    "evaluation": false,
+    "newtight": false,
+    "phoenix": false
+  }
+}

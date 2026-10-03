@@ -1,0 +1,213 @@
+{
+  "context_counts": {
+    "seed9731-L-tau16__set2": {
+      "heldout_directional_observations": 898,
+      "pair_records": 3711
+    },
+    "seed9731-L-tau4__set3": {
+      "heldout_directional_observations": 3,
+      "pair_records": 7
+    },
+    "seed9731-R-tau16__set1": {
+      "heldout_directional_observations": 22,
+      "pair_records": 68
+    },
+    "seed9731-R-tau16__set3": {
+      "heldout_directional_observations": 0,
+      "pair_records": 0
+    },
+    "seed9731-R-tau4__set0": {
+      "heldout_directional_observations": 0,
+      "pair_records": 0
+    },
+    "seed9731-R-tau4__set1": {
+      "heldout_directional_observations": 57,
+      "pair_records": 169
+    },
+    "seed9731-R-tau4__set2": {
+      "heldout_directional_observations": 42,
+      "pair_records": 184
+    },
+    "seed9731-R-tau4__set3": {
+      "heldout_directional_observations": 204,
+      "pair_records": 860
+    }
+  },
+  "identity": "q10-gc1-lr1-requal1-csc1-pred1-v1",
+  "metrics": {
+    "axis_alignment": {
+      "candidates": 886,
+      "estimated_fraction_evaluations_avoided": {
+        "count": 275,
+        "max": 0.9166666666666666,
+        "mean": 0.5862929292929293,
+        "median": 0.6,
+        "min": 0.0
+      },
+      "first_success_rank": {
+        "count": 275,
+        "max": 4.0,
+        "mean": 1.1381818181818182,
+        "median": 1.0,
+        "min": 1.0
+      },
+      "mrr": 0.9384848484848484,
+      "recall_at_1": 0.8836363636363637,
+      "recall_at_10": 1.0,
+      "recall_at_5": 1.0,
+      "sources": 275,
+      "successes": 769,
+      "top_decile_enrichment": {
+        "count": 275,
+        "max": 3.0,
+        "mean": 1.0329366391184573,
+        "median": 1.0,
+        "min": 0.0
+      }
+    },
+    "deterministic_random": {
+      "candidates": 886,
+      "estimated_fraction_evaluations_avoided": {
+        "count": 275,
+        "max": 0.9166666666666666,
+        "mean": 0.577023088023088,
+        "median": 0.5,
+        "min": 0.0
+      },
+      "first_success_rank": {
+        "count": 275,
+        "max": 5.0,
+        "mean": 1.1527272727272728,
+        "median": 1.0,
+        "min": 1.0
+      },
+      "mrr": 0.9328484848484849,
+      "recall_at_1": 0.8727272727272727,
+      "recall_at_10": 1.0,
+      "recall_at_5": 1.0,
+      "sources": 275,
+      "successes": 769,
+      "top_decile_enrichment": {
+        "count": 275,
+        "max": 3.0,
+        "mean": 0.9952561983471074,
+        "median": 1.0,
+        "min": 0.0
+      }
+    },
+    "full_alignment": {
+      "candidates": 886,
+      "estimated_fraction_evaluations_avoided": {
+        "count": 275,
+        "max": 0.9166666666666666,
+        "mean": 0.6045815295815296,
+        "median": 0.6666666666666667,
+        "min": 0.0
+      },
+      "first_success_rank": {
+        "count": 275,
+        "max": 2.0,
+        "mean": 1.0654545454545454,
+        "median": 1.0,
+        "min": 1.0
+      },
+      "mrr": 0.9672727272727273,
+      "recall_at_1": 0.9345454545454546,
+      "recall_at_10": 1.0,
+      "recall_at_5": 1.0,
+      "sources": 275,
+      "successes": 769,
+      "top_decile_enrichment": {
+        "count": 275,
+        "max": 4.0,
+        "mean": 1.1193608815426996,
+        "median": 1.0,
+        "min": 0.0
+      }
+    },
+    "partner_magnitude": {
+      "candidates": 886,
+      "estimated_fraction_evaluations_avoided": {
+        "count": 275,
+        "max": 0.9166666666666666,
+        "mean": 0.5871356421356422,
+        "median": 0.6666666666666667,
+        "min": 0.0
+      },
+      "first_success_rank": {
+        "count": 275,
+        "max": 4.0,
+        "mean": 1.1272727272727272,
+        "median": 1.0,
+        "min": 1.0
+      },
+      "mrr": 0.9454545454545454,
+      "recall_at_1": 0.8981818181818182,
+      "recall_at_10": 1.0,
+      "recall_at_5": 1.0,
+      "sources": 275,
+      "successes": 769,
+      "top_decile_enrichment": {
+        "count": 275,
+        "max": 3.0,
+        "mean": 1.0491790633608815,
+        "median": 1.0,
+        "min": 0.0
+      }
+    },
+    "partner_readout": {
+      "candidates": 886,
+      "estimated_fraction_evaluations_avoided": {
+        "count": 275,
+        "max": 0.9166666666666666,
+        "mean": 0.6305555555555555,
+        "median": 0.6666666666666667,
+        "min": 0.5
+      },
+      "first_success_rank": {
+        "count": 275,
+        "max": 1.0,
+        "mean": 1.0,
+        "median": 1.0,
+        "min": 1.0
+      },
+      "mrr": 1.0,
+      "recall_at_1": 1.0,
+      "recall_at_10": 1.0,
+      "recall_at_5": 1.0,
+      "sources": 275,
+      "successes": 769,
+      "top_decile_enrichment": {
+        "count": 275,
+        "max": 4.0,
+        "mean": 1.2496639118457302,
+        "median": 1.0,
+        "min": 1.0
+      }
+    }
+  },
+  "parents": {
+    "r1_contract_sha256": "6BB7545FEFC0B6EAED9B068FD3BD02A8F32A3056CA3A290B24D2A32815927ED3",
+    "r1_report_sha256": "BDEC8FB942135F535C32C87F42E42CD8697F044ACAC0B71EE10525968F1C1FB5",
+    "vmat_execution_sha256": "CFA417B937ACFCD9A3AD54A28F5305C93E48F67E45D9AA8966E61A3B03FA4D12"
+  },
+  "protocol": "Q10-CSC1-PRED1",
+  "replay_performed": false,
+  "routing_conclusion": "engineering_heldout_prediction_only",
+  "scientific_promotion": false,
+  "score_definitions": {
+    "axis_alignment": "signed scalar direction agreement",
+    "deterministic_random": "ascending SHA-256 key",
+    "full_alignment": "cosine(partner gate displacement, source projected-gate deficit)",
+    "partner_magnitude": "descending partner gate displacement norm",
+    "partner_readout": "ascending partner singleton lexicographic score"
+  },
+  "split": {
+    "candidate_pool": "held-out directional observations only",
+    "eligible_sources": 275,
+    "heldout_directional_observations": 1226,
+    "rule": "sha256(context|pair_index|direction) first eight bytes modulo five equals zero",
+    "source_filter": "geometry-invalid singleton with lexicographically better score than fresh V"
+  },
+  "status": "CSC1_PRED1_COMPLETE"
+}

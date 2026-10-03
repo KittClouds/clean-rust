@@ -1,0 +1,22 @@
+{
+  "analysis_sha256": "d79f885d3d8b8bef0579312cc72c2b5c8fa08b6edb1fcf52b66bcf5abf1b51c5",
+  "assignment_count": 6,
+  "biological_promotion": false,
+  "block_count": 12,
+  "collection_receipt_sha256": "74b4a574519a665dfea0bf2a1196362f1d2ba7e4ff18aae422fb653b4ca00a40",
+  "fit_count": 144,
+  "fit_manifest_sha256": "f71d344c5bc58e86a68e7bd9163aed1ab5d945468bfe84f06a8981e6a1c2ce66",
+  "implementation_freeze_sha256": "563f58216e6a276bcdffebd8d14df730fae6d82779311b23914783ccf6282430",
+  "integrity_receipt_sha256": "cf52cc787b3bf501b3f80944d452af3247e569f82f110c06c597e499bfca2591",
+  "measured_reach03_authorized": false,
+  "pheno_status": "unchanged",
+  "prediction_lock_sha256": "dd387bcc52510eac947774cb6d9303d8cdd8142cee07a60b0e39cddd4dcb54ce",
+  "primary_engineering_disposition": "Cphi_RETAINS_ENGINEERING_LEAD",
+  "qualification_only": true,
+  "results_sha256": "1054082162880dee6422a98b3594f979906a04c81035de01614698f3d6d547b2",
+  "run_id": "F4-PRESENTATION-03-ENG1",
+  "schema": "F4-PRESENTATION-03-terminal-receipt-v1",
+  "status": "PASS_ANALYSIS_COMPLETE_ENGINEERING_ONLY",
+  "task_bank_manifest_sha256": "ad339f4a710c9cb803e68a7076da923a68486f81b7552aa767c710f885deb0a1",
+  "truth_access_provenance": "target polarity opened before fits for the support gate; remaining comparative truth was opened only after integrity PASS"
+}

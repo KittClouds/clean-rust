@@ -1,0 +1,54 @@
+{
+  "protocol": "REQUAL1-SREPLACE-SINGLES",
+  "identity": "q10-gc1-lr1-requal1-sreplace-singles-v1",
+  "status": "FROZEN_PRE_EXECUTION__NOT_EXECUTED",
+  "plan_sha256": "C57EF2ABA1F2CDA09A958884741E2064437DCB8DB168CDB0C7DE85E0F5771AF9",
+  "runner_sha256": "839D885F193D5ED967EDE0EFA1457D245E23DDD86EC30FC00EDF1953732E6C0C",
+  "parent_bindings": [
+    {"label": "fresh_reference_execution", "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-par8-ref1-v1/execution.json", "sha256": "9C47DBA6BF576FC6696E70153F0CE80FB0163B538794BE82158710C1064A04E5"},
+    {"label": "fresh_domain_execution", "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-domain-r2-v1/execution.json", "sha256": "6E526DFFE06A0C5051F3F4FB699EC62A802FC54613FCDFA652EBC9F4A69249AF"},
+    {"label": "fresh_smoke_execution", "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-smoke-v1/execution.json", "sha256": "24B37976F56B39DCD66A73DE90BA8F06FACD753761874902C6396F1416B6FA1A"},
+    {"label": "fresh_singles_execution", "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-singles-v1/execution.json", "sha256": "E33114398BB775F0F6B1E4E5C222B1E2913EBD6CBC8C247EF12A19076E079A0A"},
+    {"label": "fresh_parity_execution", "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-parity-v1/execution.json", "sha256": "8E2D69E111BF310D2073B410702310DBC9BD9B47FE88A9D82A5FC3A6B1083001"},
+    {"label": "closure_manifest", "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-domain-r2-v1/closures/twin-a/MANIFEST.json", "sha256": "F84BB9D1D1E32FE603F29374AFA166B79468CCA7C9F1877B0A46CA1AF1A06606"},
+    {"label": "closure_derived", "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-domain-r2-v1/closures/twin-a/DERIVED.json", "sha256": "5BF46E18DFE942C259E46055B893301D86204E2FB8493AE44D41D0BBC3611BFE"},
+    {"label": "current_palette", "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-domain-r2-v1/closures/twin-a/repo/experiments/drosophila-heresy/q10-gc0-gp1-par2-v1/qualification/palettes.jsonl", "sha256": "54A2688080A65F5CFE31B11A12F5DA85B92D86BBDE2E42072FB0C0F32F3D3B1A"},
+    {"label": "current_pf5_contract", "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-domain-r2-v1/closures/twin-a/repo/experiments/drosophila-heresy/q10-pf5-v1/CONTRACT.json", "sha256": "730D6B03CEE7CE58A9002320372E9F77EC2AB593EC25A71583F59D90D690BC26"},
+    {"label": "current_domain_builder", "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-domain-r2-v1/scripts/build_domain_closure.py", "sha256": "C1C240E09CB619EA882F0BA4A0B25714DCCCF39D0F61D3681FABEFC4A5E9884B"},
+    {"label": "fresh_reference_runner", "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-par8-ref1-v1/scripts/run_ref.py", "sha256": "4CDEE43693981BAD1A687B75E5F68F5893CBE250CEFD37D14D0409BC8BD6AC81"},
+    {"label": "fresh_singleton_runner", "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-singles-v1/scripts/run_singles.py", "sha256": "4B339711BE94659346800E31A1794495DBAF6D57DD74B1287626AD9623028A74"}
+  ],
+  "scope": {
+    "contexts": 8,
+    "groups": 462,
+    "nonzero_singletons": 3696,
+    "operation": "replace one raw group in fresh invalid S with one current palette candidate",
+    "comparison": "fresh valid V and complete target readout",
+    "pair_replay_executed": false,
+    "scientific_seed_bundles": 0,
+    "behavioral_inference": false,
+    "scientific_promotion": false
+  },
+  "semantics": {
+    "baseline": "fresh current PAR8 reference best_search S mapping",
+    "replacement": "simultaneous committed f32 replacement of exactly one group in S",
+    "valid_comparison": "fresh current PAR8 reference best_valid V mapping",
+    "readout": "exact learner-order sequential binary32 replay with bitwise comparison and signed-zero identity",
+    "geometry": "full PF5 geometry_metrics and hard DA2 final gates from committed bytes",
+    "historical_results_as_evidence": false
+  },
+  "outputs": {
+    "per_context_immutable_shards": true,
+    "final_execution_atomic": true,
+    "source_singleton_domain_verified": true,
+    "s_replacement_geometry_diagnostics": true,
+    "pair_replay": false,
+    "behavior": false
+  },
+  "firewall": {
+    "sealed_parent_writes": false,
+    "historical_result_import": false,
+    "scientific_promotion": false,
+    "behavioral_probe": false
+  }
+}

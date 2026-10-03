@@ -1,0 +1,44 @@
+{
+  "contexts": [
+    [
+      "seed9731-L-tau16.json",
+      2
+    ],
+    [
+      "seed9731-L-tau4.json",
+      3
+    ],
+    [
+      "seed9731-R-tau16.json",
+      1
+    ],
+    [
+      "seed9731-R-tau16.json",
+      3
+    ],
+    [
+      "seed9731-R-tau4.json",
+      0
+    ],
+    [
+      "seed9731-R-tau4.json",
+      1
+    ],
+    [
+      "seed9731-R-tau4.json",
+      2
+    ],
+    [
+      "seed9731-R-tau4.json",
+      3
+    ]
+  ],
+  "historical_counts_not_imported": true,
+  "identity": "q10-gc1-lr1-requal1-ris1-domain-v2",
+  "ordered_pair_domain_sha256": "F4841DF69AC5674E246E592CD4D05B7774BF36E7E0347418B08E7640C2EFC686",
+  "ordered_shortlist_sha256": "D026A1CC984665C110CA7209DF2D91BEDE0B43F6B23BE2E5627F44FC3086AE2E",
+  "pair_domain_count": 3801,
+  "pair_replay_executed": false,
+  "protocol": "REQUAL1-RIS1-DOMAIN",
+  "shortlist_count": 256
+}

@@ -1,0 +1,21 @@
+{
+  "fixtures": [
+    {
+      "fixture": "test_end_candle_new_high_is_included",
+      "status": "PASS"
+    },
+    {
+      "fixture": "test_end_candle_new_low_is_included",
+      "status": "PASS"
+    },
+    {
+      "fixture": "test_endpoint_is_shared_by_period_and_area",
+      "status": "PASS"
+    }
+  ],
+  "metrology_evidence": true,
+  "schema": "OBS_OPEN_SRC01_SYNTHETIC_BOUNDARY_FIXTURE_V1",
+  "scientific_evidence": false,
+  "source_sha256": "556c5db8d30afc2f08f1426cf3fde21cc4b0d3eb33af93234e69729cb589461f",
+  "status": "PASS"
+}

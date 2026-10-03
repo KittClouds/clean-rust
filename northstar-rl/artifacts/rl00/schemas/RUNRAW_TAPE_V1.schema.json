@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RunRawHeader",
+  "type": "object",
+  "properties": {
+    "identity": {
+      "$ref": "#/$defs/TapeIdentity"
+    },
+    "row_stride": {
+      "type": "integer",
+      "format": "uint32",
+      "minimum": 0
+    },
+    "storage": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "identity",
+    "row_stride",
+    "storage"
+  ],
+  "$defs": {
+    "Digest256": {
+      "description": "Domain-separated BLAKE3 digest",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "TapeIdentity": {
+      "type": "object",
+      "properties": {
+        "content_hash": {
+          "$ref": "#/$defs/Digest256"
+        },
+        "first_time": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "instrument_set": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0
+          }
+        },
+        "last_time": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "row_count": {
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        },
+        "schema_version": {
+          "type": "string"
+        },
+        "source_manifest_hash": {
+          "$ref": "#/$defs/Digest256"
+        },
+        "source_set": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0
+          }
+        }
+      },
+      "required": [
+        "schema_version",
+        "source_manifest_hash",
+        "row_count",
+        "first_time",
+        "last_time",
+        "instrument_set",
+        "source_set",
+        "content_hash"
+      ]
+    }
+  }
+}

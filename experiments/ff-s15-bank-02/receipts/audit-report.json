@@ -1,0 +1,31 @@
+{
+ "duplicate_world_ids": 0,
+ "files": 1716,
+ "problems": [],
+ "protected_rows": 800000,
+ "public_rows": 350000,
+ "rows": {
+  "protected/DEV": 50000,
+  "protected/TEST-ACTION-COMPOSITION": 25000,
+  "protected/TEST-GRAPH-ISO": 25000,
+  "protected/TEST-HOP-DEPTH": 25000,
+  "protected/TEST-IID": 50000,
+  "protected/TEST-INFORMATION-POLICY": 25000,
+  "protected/TEST-JOINT": 25000,
+  "protected/TEST-RELATION": 25000,
+  "protected/TEST-TEMPLATE": 100000,
+  "protected/TEST-TEMPORAL-COMPOSITION": 25000,
+  "protected/TEST-VOCAB": 25000,
+  "protected/TRAIN": 400000,
+  "public/TEST-ACTION-COMPOSITION": 25000,
+  "public/TEST-GRAPH-ISO": 25000,
+  "public/TEST-HOP-DEPTH": 25000,
+  "public/TEST-IID": 50000,
+  "public/TEST-INFORMATION-POLICY": 25000,
+  "public/TEST-JOINT": 25000,
+  "public/TEST-RELATION": 25000,
+  "public/TEST-TEMPLATE": 100000,
+  "public/TEST-TEMPORAL-COMPOSITION": 25000,
+  "public/TEST-VOCAB": 25000
+ }
+}

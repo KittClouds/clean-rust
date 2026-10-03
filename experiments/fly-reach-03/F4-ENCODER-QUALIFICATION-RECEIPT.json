@@ -1,0 +1,86 @@
+{
+  "architecture": [
+    80,
+    128,
+    "GELU",
+    64,
+    "GELU",
+    1
+  ],
+  "exact_f4_reconstruction": "PASS; Omega(F4)=1 invariant audited separately",
+  "feature_identity": "f4-features-v1",
+  "feature_width": 80,
+  "gate": {
+    "fold_failure_disposition": "ESTIMATOR_CAPACITY_STOP",
+    "per_fold_omega_hat_min": 0.7,
+    "pooled_balanced_error_max": 0.1,
+    "pooled_omega_hat_min": 0.8
+  },
+  "measured_namespace_created": false,
+  "measured_seal_created": false,
+  "negative_rows": 9337,
+  "pooled_heldout": {
+    "balanced_error": 0.7334300170576715,
+    "omega_hat": 0.0,
+    "rows": 13420
+  },
+  "positive_rows": 4083,
+  "qualification_folds": [
+    {
+      "balanced_error": 0.7763285976028866,
+      "holdout_block": 303000,
+      "omega_hat": 0.0,
+      "positive_prediction_rate": 0.5282917672298203,
+      "rows": 3729
+    },
+    {
+      "balanced_error": 0.5,
+      "holdout_block": 303001,
+      "omega_hat": 0.0,
+      "positive_prediction_rate": 0.0,
+      "rows": 2815
+    },
+    {
+      "balanced_error": 0.7578957773948782,
+      "holdout_block": 303002,
+      "omega_hat": 0.0,
+      "positive_prediction_rate": 0.3447793970852466,
+      "rows": 5009
+    },
+    {
+      "balanced_error": 0.23753629753061717,
+      "holdout_block": 303003,
+      "omega_hat": 0.5249274049387657,
+      "positive_prediction_rate": 0.4777718264595608,
+      "rows": 1867
+    }
+  ],
+  "rows": 13420,
+  "run_id": "qualification-v2",
+  "schema": "FLY-REACH-03-F4-encoder-qualification-receipt-v1",
+  "script_sha256": "9cae8b659236096f2a07b32d21bf93ea604afe4ead1481262c59b27df868230b",
+  "spec_sha256": "3325e1b6ce91956162fa3022c9e2c3bdf3396b269e975da9c108f45d9129d43b",
+  "standardization": [
+    {
+      "holdout_block": 303000,
+      "mean_sha256": "e853231d36597d7de4b77ba9514a9a12bb618ec23e5e618b2fdaa968e8baf627",
+      "scale_sha256": "37143932da197a789e6df73ffab6ccc931357c104a9277bb227ecd0935906946"
+    },
+    {
+      "holdout_block": 303001,
+      "mean_sha256": "aa1acb6ea4133e1a44a7ba70633c2a5e44b1207878983b81ccbf48be49ca767f",
+      "scale_sha256": "830107ef8b46442569f573938057d8f29daea042eda6c068682c67180291e853"
+    },
+    {
+      "holdout_block": 303002,
+      "mean_sha256": "15bebbb7ac773f2343f7ff6beae39086346bee530f77069df2113fdad7b5dcf3",
+      "scale_sha256": "dae74c597f9299f5d92d153412627d365b3ed73150ccf9c3682fdd96c28db4c1"
+    },
+    {
+      "holdout_block": 303003,
+      "mean_sha256": "c18b51031565328b765dc9bb180a01b73f38d4446b34c65f03ad5b41a393d980",
+      "scale_sha256": "6856d12ad2182a1e5106d558595fcf1ab75eede7fb90f3748d1f96223da120e9"
+    }
+  ],
+  "status": "ESTIMATOR_CAPACITY_STOP"
+}

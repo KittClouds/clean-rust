@@ -1,0 +1,51 @@
+{
+  "schema": "R1_STAGE1_SENSOR_INPUT_REPAIR_V01",
+  "status": "REPAIRED_PREMODEL_NO_MODEL_CONTACT",
+  "old_identity": "R1-STAGE1-SENSOR-QUALIFICATION-v01",
+  "new_identity": "R1-STAGE1-SENSOR-QUALIFICATION-v02",
+  "old_manifest_sha256": "58031d9a40c8a587f51510e230093a439d4a9ca27bb4aa6597b834112ad439ce",
+  "old_extractor_path": "run_sensor.py",
+  "old_extractor_sha256": "f0e8a8d1ab62098ddd55ccb1b3a578aedf4f9b9ddce3ee93ec6f8e63ef748840",
+  "failed_attempt_path": "D:\\codex-runs\\fas-r1-semantic-particle-reachability-v00\\stage1-v01\\sensor-qualification-v01\\sensor-extraction-v01\\failure.json",
+  "failed_attempt_sha256": "e46c99eb6b8a779ea4ac85d01154e916cd29f72c71cab1520706ad2e9bbed5c6",
+  "failure": {
+    "type": "input_schema_validation",
+    "message": "input line 203 has invalid rendered clauses",
+    "cause": "A valid Stage 0 task family has zero constraints; the v01 parser rejected an empty clauses array.",
+    "execution_phase": "public input parsing before NumPy/Torch import, model loading, or forward inference",
+    "model_contact_occurred": false,
+    "fit_occurred": false
+  },
+  "exact_v02_source_delta": [
+    "SCHEMA changes from R1_STAGE1_SENSOR_EXTRACTION_V01 to R1_STAGE1_SENSOR_EXTRACTION_V02.",
+    "The public task parser now permits an empty clauses array while continuing to reject non-list and non-string entries.",
+    "The output receipt records zero_clause_task_count."
+  ],
+  "new_extractor_path": "run_sensor_v02.py",
+  "new_extractor_sha256": "22d0f09f2b2b6998ddd10a73042a3b113d0905279236f522362cfddb3dc29cf8",
+  "regression_test_path": "test_sensor_extractor_v02.py",
+  "regression_test_sha256": "05b76894842045637360e7815a2cf8df6ed0109bafa2e7024bb0d37fa123fc58",
+  "regression_tests": "PASS 3/3; v01 reproduces stop; v02 retains both renderings of the zero-clause family; malformed clause values remain rejected",
+  "repaired_protocol_path": "R1-STAGE1-SENSOR-QUALIFICATION-PROTOCOL-v02.md",
+  "repaired_protocol_sha256": "a22e889e02d59fa272e304bbd732d6036f03130587c95bc1a6dde313fb312365",
+  "edge_semantics": "The zero-clause task is retained in the frozen family split. For action input only, mean clause representation is an all-zero 2048D vector. No dummy clause is generated.",
+  "immutable_inputs": {
+    "parent_stage0_artifact_root_sha256": "2078a366082a358275fa2b10d9f657967ef71a7c259a709822e631f01ce929d7",
+    "prepared_public_rows_sha256": "8fa9a27eef4cb01505cef252b97982a5d6418b6ad3a4c0063fc24dfb48b644bc",
+    "private_targets_sha256": "1c159f78a9147cb56668857f4674f43cfa5192eb59b1875eb34f8c1ff8a15fdb",
+    "name_queries_sha256": "4c99835235c9b2efb15712123b0adeffe863a1d3a817b25dfdf94b4898ee03d2",
+    "private_action_examples_sha256": "21a0bb7c90a2c01107b70e286873022997fa6b1b929c7ac06da7a65c5315e19d",
+    "family_split_sha256": "83d94095bb5aa0c16f6f8673c160c5b3fe87f3609682ce24483219b9450d3f2e",
+    "model_snapshot_inventory_sha256": "84142f95653f8f0f1c60934d6c5c711747b89e48e8ff3181c67dc437becef103"
+  },
+  "no_change_assertion": {
+    "task_bank_changed": false,
+    "rendered_public_bytes_changed": false,
+    "private_targets_changed": false,
+    "action_examples_changed": false,
+    "split_changed": false,
+    "support_thresholds_changed": false,
+    "probe_architectures_changed": false,
+    "model_snapshot_changed": false
+  }
+}

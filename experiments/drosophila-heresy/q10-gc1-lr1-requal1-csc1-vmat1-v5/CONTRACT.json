@@ -1,0 +1,191 @@
+{
+  "array_schema": {
+    "constraint_gate": "little-endian float64",
+    "constraint_raw": "little-endian float64",
+    "linear_drive": "little-endian float64",
+    "readout": "little-endian uint32 f32 bits",
+    "weights": "little-endian uint32 f32 bits"
+  },
+  "context_schema_sha256": "4DE45F2F087F78528B96826EFC705BF9C892831DE04815BD18EFFFBFFDB71E6C",
+  "counts": {
+    "contexts": 8,
+    "pair_records": 4999,
+    "states_per_pair": 4
+  },
+  "current_context_inventory_sha256": "5C5277897D5148E22E35F002D2837D89F27140B9F6A1EC86912E97CB2DC7C73B",
+  "domain_manifest_sha256": "94E8C9968D799DC934268ACBA2608D078230CE68C0E525B8ACE4E1266A0A2E58",
+  "firewall": {
+    "behavioral_probe": false,
+    "historical_measurement_import": false,
+    "pair_domain_frozen": true,
+    "scientific_promotion": false,
+    "scientific_seed_bundles": 0,
+    "search": false
+  },
+  "geometry_semantics": "signed axis and norm residual intervals plus signed linear-drive residual L2 ball; no componentwise linear-drive gate",
+  "identity": "q10-gc1-lr1-requal1-csc1-vmat1-v5",
+  "parent_bindings": [
+    {
+      "bytes": 5162,
+      "label": "pair_domain_execution",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-sreplace-pair-domain-v1/execution.json",
+      "sha256": "B95B2AC4B26415A53DE865D39F3A64A2C60B0104D9134C688205729AB6B35EAB"
+    },
+    {
+      "bytes": 870,
+      "label": "pair_domain_plan",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-sreplace-pair-domain-v1/PLAN.md",
+      "sha256": "1A93E99FBE74A9206B1E463A6E76CAD182EA52E89F05763EDBA7D7794C1EF3BD"
+    },
+    {
+      "bytes": 3324,
+      "label": "pair_domain_contract",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-sreplace-pair-domain-v1/CONTRACT.json",
+      "sha256": "FAA22B7F70B1C8E451534D0697DA4A5D4CEA681022ABC083D0B92B96CF759C44"
+    },
+    {
+      "bytes": 14103,
+      "label": "pair_domain_runner",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-sreplace-pair-domain-v1/scripts/derive_pair_domain.py",
+      "sha256": "D485E1C8A36779685F622419493F0AC0EBC2563D8DA4ED6573CF1E743C57ABCC"
+    },
+    {
+      "bytes": 2131,
+      "label": "pair_run_execution",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-sreplace-pairs-rerun1-v1/execution.json",
+      "sha256": "F160638BF6009ED4050A1427D3A3D8C8F56DE777CBBE2AFEEAB1704FE28B6B0E"
+    },
+    {
+      "bytes": 16230,
+      "label": "pair_run_runner",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-sreplace-pairs-rerun1-v1/scripts/run_pairs.py",
+      "sha256": "F3F88BE71620084292568DA0992E9C8CB80A7D34814CF624000FDE52437602FA"
+    },
+    {
+      "bytes": 1844,
+      "label": "pair_run_finalizer_report",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-sreplace-pairs-rerun1-finalizer-v1/REPORT.json",
+      "sha256": "322C48C1F2B770D024BE0BADB90B4A11FA913E3BCFC99152CFD5DD4D808AB53B"
+    },
+    {
+      "bytes": 2497,
+      "label": "morphology_report",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-sreplace-pairs-rerun1-morphology-v1/REPORT.json",
+      "sha256": "8C58E33BAFB3A0B23417EDF88C08AF1249EA8274731225BB7F8EB952DDE93D29"
+    },
+    {
+      "bytes": 1800,
+      "label": "interaction_execution",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-sreplace-pairs-rerun1-interaction-v1/execution.json",
+      "sha256": "5016A2331F7336A1684413B5D91E9957ECC2B56622C3B4BD3FB643585A95C6F6"
+    },
+    {
+      "bytes": 834,
+      "label": "interaction_finalizer_report",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-sreplace-pairs-rerun1-interaction-finalizer-v1/REPORT.json",
+      "sha256": "64D3B897D1D76F604DAE5297DD6EB8CD20CEF8F9FD24D011B5B5D5D064DF3EEF"
+    },
+    {
+      "bytes": 1369,
+      "label": "coverage_report",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-coverage-v1/REPORT.json",
+      "sha256": "5740F709A406ED0626C573829256B1BBB702337C0600F4798DBB725CB3B66BD9"
+    },
+    {
+      "bytes": 2193378,
+      "label": "fresh_reference_execution",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-par8-ref1-v1/execution.json",
+      "sha256": "9C47DBA6BF576FC6696E70153F0CE80FB0163B538794BE82158710C1064A04E5"
+    },
+    {
+      "bytes": 6243,
+      "label": "closure_manifest",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-domain-r2-v1/closures/twin-a/MANIFEST.json",
+      "sha256": "F84BB9D1D1E32FE603F29374AFA166B79468CCA7C9F1877B0A46CA1AF1A06606"
+    },
+    {
+      "bytes": 957416,
+      "label": "closure_derived",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-domain-r2-v1/closures/twin-a/DERIVED.json",
+      "sha256": "5BF46E18DFE942C259E46055B893301D86204E2FB8493AE44D41D0BBC3611BFE"
+    },
+    {
+      "bytes": 18143,
+      "label": "current_domain_builder",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-domain-r2-v1/scripts/build_domain_closure.py",
+      "sha256": "C1C240E09CB619EA882F0BA4A0B25714DCCCF39D0F61D3681FABEFC4A5E9884B"
+    },
+    {
+      "bytes": 62185,
+      "label": "current_pf5_runner",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-domain-r2-v1/closures/twin-a/repo/experiments/drosophila-heresy/q10-pf5-v1/scripts/run_q10_pf5.py",
+      "sha256": "4442B942F06E8BEC43129058B74C300472D143A82338EFB09E8D3CBE8AA89759"
+    },
+    {
+      "bytes": 9072,
+      "label": "current_pf5_contract",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-domain-r2-v1/closures/twin-a/repo/experiments/drosophila-heresy/q10-pf5-v1/CONTRACT.json",
+      "sha256": "730D6B03CEE7CE58A9002320372E9F77EC2AB593EC25A71583F59D90D690BC26"
+    },
+    {
+      "bytes": 20298166,
+      "label": "pair_domain_shard:seed9731-L-tau16__set2",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-sreplace-pair-domain-v1/shards/seed9731-L-tau16__set2.jsonl",
+      "sha256": "9EFE5E51746A5DAB109A0C2589BCD833DBBC20E877F1128C997E5A295548A63D"
+    },
+    {
+      "bytes": 38839,
+      "label": "pair_domain_shard:seed9731-L-tau4__set3",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-sreplace-pair-domain-v1/shards/seed9731-L-tau4__set3.jsonl",
+      "sha256": "C159BB9AFF90FC5D9F0A05627B951B3AC28CA2AED32F5AF4372C217F1F3E186F"
+    },
+    {
+      "bytes": 473033,
+      "label": "pair_domain_shard:seed9731-R-tau16__set1",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-sreplace-pair-domain-v1/shards/seed9731-R-tau16__set1.jsonl",
+      "sha256": "2D9C6187EEF355644B5EA7FF94FDA20FDA785A6ADB7A609A236749D93DA7A995"
+    },
+    {
+      "bytes": 3,
+      "label": "pair_domain_shard:seed9731-R-tau16__set3",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-sreplace-pair-domain-v1/shards/seed9731-R-tau16__set3.jsonl",
+      "sha256": "37517E5F3DC66819F61F5A7BB8ACE1921282415F10551D2DEFA5C3EB0985B570"
+    },
+    {
+      "bytes": 3,
+      "label": "pair_domain_shard:seed9731-R-tau4__set0",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-sreplace-pair-domain-v1/shards/seed9731-R-tau4__set0.jsonl",
+      "sha256": "37517E5F3DC66819F61F5A7BB8ACE1921282415F10551D2DEFA5C3EB0985B570"
+    },
+    {
+      "bytes": 1428805,
+      "label": "pair_domain_shard:seed9731-R-tau4__set1",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-sreplace-pair-domain-v1/shards/seed9731-R-tau4__set1.jsonl",
+      "sha256": "C600CF4D8B7BDEFEA0656D7C2E74A7EFF55A7DFAAF03A46AECDCDA199028A71C"
+    },
+    {
+      "bytes": 1316177,
+      "label": "pair_domain_shard:seed9731-R-tau4__set2",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-sreplace-pair-domain-v1/shards/seed9731-R-tau4__set2.jsonl",
+      "sha256": "370246AFE5DAA10EEB5BD0E5A1AA86557F213E9B69041F86E0286C3E80494A40"
+    },
+    {
+      "bytes": 5745507,
+      "label": "pair_domain_shard:seed9731-R-tau4__set3",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-sreplace-pair-domain-v1/shards/seed9731-R-tau4__set3.jsonl",
+      "sha256": "F1129C7032EC26CF8F05355E803DB16F377D32A52C1F579D6A9C78833086F2D6"
+    }
+  ],
+  "plan_sha256": "4240D42B1C70DC881ACB1DFD9CE0054AAE7090B4540E73E0A4F6F61EEAAE4F1A",
+  "protocol": "Q10-CSC1-VMAT1",
+  "runner_sha256": "66C57EDB9D75A3C228A7BB7B56CBB6D49A99020D4A074C0A0AE760A40BC91039",
+  "status": "PREMEASUREMENT_SEALED",
+  "tolerance_schema_sha256": "18F9A6CE2161FCC39F52958448769785C97ECDA9DA95395A2D2B4296487DC9A2",
+  "write_allowlist": [
+    "records/*.jsonl",
+    "shards/*.jsonl",
+    "sidecars/*",
+    "execution.json",
+    "STATUS.json"
+  ]
+}

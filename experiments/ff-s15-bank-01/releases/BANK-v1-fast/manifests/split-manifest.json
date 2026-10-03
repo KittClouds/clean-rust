@@ -1,0 +1,56 @@
+{
+  "budget": {
+    "TRAIN": 2000,
+    "DEV": 300,
+    "TEST-IID": 200,
+    "TEST-LEXICAL": 200,
+    "TEST-ENTITY": 200,
+    "TEST-TEMPLATE": 200,
+    "TEST-COMPOSITION": 200,
+    "TEST-DEPTH": 200,
+    "TEST-ABSTENTION": 200,
+    "TEST-JOINT": 200
+  },
+  "stats": {
+    "TRAIN": {
+      "worlds": 2000,
+      "input_rows": 2400
+    },
+    "DEV": {
+      "worlds": 300,
+      "input_rows": 360
+    },
+    "TEST-IID": {
+      "worlds": 200,
+      "input_rows": 240
+    },
+    "TEST-LEXICAL": {
+      "worlds": 200,
+      "input_rows": 240
+    },
+    "TEST-ENTITY": {
+      "worlds": 200,
+      "input_rows": 240
+    },
+    "TEST-TEMPLATE": {
+      "worlds": 200,
+      "input_rows": 240
+    },
+    "TEST-COMPOSITION": {
+      "worlds": 200,
+      "input_rows": 240
+    },
+    "TEST-DEPTH": {
+      "worlds": 200,
+      "input_rows": 240
+    },
+    "TEST-ABSTENTION": {
+      "worlds": 200,
+      "input_rows": 240
+    },
+    "TEST-JOINT": {
+      "worlds": 200,
+      "input_rows": 240
+    }
+  }
+}

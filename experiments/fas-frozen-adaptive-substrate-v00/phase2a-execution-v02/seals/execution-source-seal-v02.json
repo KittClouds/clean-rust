@@ -1,0 +1,36 @@
+{
+  "seal_id": "FAS00_PHASE2A_EXECUTOR_V02",
+  "project_id": "fas-frozen-adaptive-substrate-v00",
+  "paperwork_root_sha256": "e1ce39935e566f7dad53fae69c18a091dfc05526c3c5a3cdc8fae52b27357189",
+  "extractor_source_sha256": "e9727e834428700afb164636ef2a013b79823aafca743e375c25c511a752bf3b",
+  "execution_plan_sha256": "d9d63b82e16f6b7ccc9f29538f904ee3a61111b298d3244e348d6ee3ea486589",
+  "root_sha256": "bcc60263a7f483ab034b37cc574baf296a514016256f5037ae628837b30b6465",
+  "files": [
+    {
+      "path": "execution-plan-v02.json",
+      "sha256": "d9d63b82e16f6b7ccc9f29538f904ee3a61111b298d3244e348d6ee3ea486589"
+    },
+    {
+      "path": "extract_fas_features.py",
+      "sha256": "e9727e834428700afb164636ef2a013b79823aafca743e375c25c511a752bf3b"
+    },
+    {
+      "path": "README.md",
+      "sha256": "a8bae7bf9bdf79ac5ab877ce8b2a54b56855ac21792f0369c5be96ac0a5fbcc5"
+    },
+    {
+      "path": "scripts/seal-cache.ps1",
+      "sha256": "258557344d92b8ff87475a3e23dbcc744f9999d3f3b11446d92c65b58881d0cf"
+    },
+    {
+      "path": "scripts/seal-execution.ps1",
+      "sha256": "38ece7f0d08dbc6f5078e66e0f9932ce6740b3d7e7e827d1b99081f46803a9a2"
+    },
+    {
+      "path": "supersession-v02.json",
+      "sha256": "e2e5bc52e3aa26e5962b6d36919d74e84634b0f774b7288a95b89fc084e61a3c"
+    }
+  ],
+  "probe_training_performed": false,
+  "model_contact_performed": false
+}

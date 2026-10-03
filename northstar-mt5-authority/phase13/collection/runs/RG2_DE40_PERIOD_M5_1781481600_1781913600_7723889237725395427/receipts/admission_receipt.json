@@ -1,0 +1,44 @@
+﻿{
+    "contract":  "MST_HOLDOUT_ADMISSION_V1",
+    "status":  "SEALED",
+    "protocol_sha256":  "869402c193435f149120f1130ddefd817f87a39240c51bc5536292fd2b285d2d",
+    "canonical_instrument":  "DE40",
+    "broker_symbol":  "DE40",
+    "data_source_id":  "METAQUOTES_DEMO",
+    "holdout_id":  "VERIFICATION_B",
+    "window_start":  1781481600,
+    "window_end_exclusive":  1781913600,
+    "run_key":  "RG2_DE40_PERIOD_M5_1781481600_1781913600_7723889237725395427",
+    "invocation_id":  "RG2_DE40_PERIOD_M5_1781481600_1781913600_7723889237725395427_I1781481600_15250012526071510871",
+    "auction_stem":  "MasterAuction_DE40_PERIOD_M5_P13_DE40_VERIFICATION_B_RG2_v7",
+    "structure_stem":  "MasterStructure_DE40_PERIOD_M5_P13_DE40_VERIFICATION_B_v6",
+    "canonical_dataset_hash":  "012552046029f58cfc78e24158b41435f4756e1cba704c18b3b1ed1d3ef95a2e",
+    "dataset_hashes":  {
+                           "events":  "e9c5edf3f7ceb7045bb3ae2b3300e253d916dd7b180b9abaaa2cdd233c68d564",
+                           "attempts":  "4cc597a2ffe2cbbbb308d3aeb44be42009acfc95ea553a63b18e6c6d84cd2851",
+                           "episodes":  "bccb1d94c1bcd08a3f7d45a031f44f0d5c30a86e4a77e39ef3698ce4a93389f9",
+                           "context":  "8af00837b43a2b37dd9365948936518cca947d16fd34db793cdbe7e0e5fac20f",
+                           "features":  "5294f8e2bf47aac5e55a9a7119d9c6f9f069138df24a3af08532c8cc9f34ce5b",
+                           "transits":  "c49411d844bc72537fa264980a53229cef481460736df4abd102b8d451d1d4da"
+                       },
+    "row_counts":  {
+                       "events":  1555,
+                       "attempts":  319,
+                       "episodes":  53,
+                       "context":  2821,
+                       "features":  319,
+                       "transits":  18
+                   },
+    "structure_row_counts":  {
+                                 "inputs":  348796,
+                                 "nodes":  35715,
+                                 "events":  332
+                             },
+    "terminal_hash":  "835825175104733424",
+    "receipt_hash":  "11456240583947425882",
+    "contract_receipt_hash":  "4930587238820446353",
+    "isolation":  "unique_instance_tag_plus_single_writer_lock",
+    "visual_rendering":  false,
+    "research_logging":  true,
+    "unexpected_data_gaps":  0
+}

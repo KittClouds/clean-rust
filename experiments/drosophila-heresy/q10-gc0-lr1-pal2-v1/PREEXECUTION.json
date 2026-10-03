@@ -1,0 +1,12 @@
+{
+  "identity": "q10-gc0-lr1-pal2-v1",
+  "protocol": "Q10-GC0-LR1-PAL2",
+  "status": "QUALIFIED_NO_CAMPAIGN",
+  "campaign_started": false,
+  "result_exposure": false,
+  "parent_bindings_sealed": true,
+  "plan_sha256": "BD1C87F4DE23AB5D59F98880ADA19C93057D63952BD9D60A45B2041DA397C78B",
+  "runner_sha256": "318200A8B33848FBC47D4A4F49C5507D8B6CBFC18AAD8742DD5A4F0462F688AA",
+  "contract_sha256": "974E2DB208A6438440481EF35AD90D96FE8B7AA2CD0531E5D354E082EDC63AF2",
+  "created_at_utc": "2026-09-18T00:00:00Z"
+}

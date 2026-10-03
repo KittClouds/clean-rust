@@ -1,0 +1,1033 @@
+{
+  "arm_means": {
+    "native": {
+      "excess_large": {
+        "competence_rate": 0.9675925925925926,
+        "max": 0.3109130859375,
+        "mean": 0.07734228063512731,
+        "median": 0.0655517578125,
+        "min": -0.0765380859375
+      },
+      "loss_256": {
+        "competence_rate": 0.16666666666666666,
+        "max": 0.501953125,
+        "mean": 0.3132911964699074,
+        "median": 0.29931640625,
+        "min": 0.17578125
+      },
+      "loss_large": {
+        "competence_rate": 0.1712962962962963,
+        "max": 0.5045166015625,
+        "mean": 0.3133683381257234,
+        "median": 0.29852294921875,
+        "min": 0.17919921875
+      }
+    },
+    "reference_direction_native_support": {
+      "excess_large": {
+        "competence_rate": 1.0,
+        "max": 0.0897216796875,
+        "mean": 0.013573258011429399,
+        "median": 0.01220703125,
+        "min": -0.03863525390625
+      },
+      "loss_256": {
+        "competence_rate": 0.5740740740740741,
+        "max": 0.2802734375,
+        "mean": 0.2489963107638889,
+        "median": 0.248046875,
+        "min": 0.21875
+      },
+      "loss_large": {
+        "competence_rate": 0.5324074074074074,
+        "max": 0.26007080078125,
+        "mean": 0.24959931550202547,
+        "median": 0.24932861328125,
+        "min": 0.22857666015625
+      }
+    },
+    "sign_ref_native_mag": {
+      "excess_large": {
+        "competence_rate": 1.0,
+        "max": -0.161376953125,
+        "mean": -0.23459992585358797,
+        "median": -0.23736572265625,
+        "min": -0.29180908203125
+      },
+      "loss_256": {
+        "competence_rate": 1.0,
+        "max": 0.0068359375,
+        "mean": 0.001320167824074074,
+        "median": 0.0009765625,
+        "min": 0.0
+      },
+      "loss_large": {
+        "competence_rate": 1.0,
+        "max": 0.00311279296875,
+        "mean": 0.0014261316370081018,
+        "median": 0.00140380859375,
+        "min": 0.00048828125
+      }
+    },
+    "stable_inversion_flip": {
+      "excess_large": {
+        "competence_rate": 0.9629629629629629,
+        "max": 0.3154296875,
+        "mean": 0.08069921422887731,
+        "median": 0.071044921875,
+        "min": -0.0765380859375
+      },
+      "loss_256": {
+        "competence_rate": 0.1527777777777778,
+        "max": 0.5009765625,
+        "mean": 0.3170482494212963,
+        "median": 0.302734375,
+        "min": 0.1826171875
+      },
+      "loss_large": {
+        "competence_rate": 0.1527777777777778,
+        "max": 0.5045166015625,
+        "mean": 0.3167252717194734,
+        "median": 0.299957275390625,
+        "min": 0.17950439453125
+      }
+    },
+    "weight_oracle": {
+      "excess_large": {
+        "competence_rate": 1.0,
+        "max": 0.0,
+        "mean": 0.0,
+        "median": 0.0,
+        "min": 0.0
+      },
+      "loss_256": {
+        "competence_rate": 0.6898148148148148,
+        "max": 0.298828125,
+        "mean": 0.23559118200231483,
+        "median": 0.23876953125,
+        "min": 0.1591796875
+      },
+      "loss_large": {
+        "competence_rate": 0.6805555555555556,
+        "max": 0.29290771484375,
+        "mean": 0.23602605749059608,
+        "median": 0.238983154296875,
+        "min": 0.16259765625
+      }
+    }
+  },
+  "by_substrate": {
+    "native": {
+      "fly": {
+        "excess_large": {
+          "competence_rate": 0.9166666666666666,
+          "max": 0.268310546875,
+          "mean": 0.08727773030598958,
+          "median": 0.06475830078125,
+          "min": -0.03277587890625
+        },
+        "loss_large": {
+          "competence_rate": 0.25,
+          "max": 0.44915771484375,
+          "mean": 0.3079121907552083,
+          "median": 0.269500732421875,
+          "min": 0.18768310546875
+        }
+      },
+      "g001": {
+        "excess_large": {
+          "competence_rate": 1.0,
+          "max": 0.20880126953125,
+          "mean": 0.07574971516927083,
+          "median": 0.079803466796875,
+          "min": -0.0765380859375
+        },
+        "loss_large": {
+          "competence_rate": 0.16666666666666666,
+          "max": 0.439208984375,
+          "mean": 0.31098175048828125,
+          "median": 0.30853271484375,
+          "min": 0.198486328125
+        }
+      },
+      "g002": {
+        "excess_large": {
+          "competence_rate": 0.9583333333333334,
+          "max": 0.3109130859375,
+          "mean": 0.07404836018880208,
+          "median": 0.057342529296875,
+          "min": -0.027587890625
+        },
+        "loss_large": {
+          "competence_rate": 0.2916666666666667,
+          "max": 0.4976806640625,
+          "mean": 0.31015777587890625,
+          "median": 0.305908203125,
+          "min": 0.1890869140625
+        }
+      },
+      "g003": {
+        "excess_large": {
+          "competence_rate": 1.0,
+          "max": 0.20855712890625,
+          "mean": 0.07003529866536458,
+          "median": 0.060272216796875,
+          "min": -0.041259765625
+        },
+        "loss_large": {
+          "competence_rate": 0.125,
+          "max": 0.4462890625,
+          "mean": 0.30437469482421875,
+          "median": 0.293975830078125,
+          "min": 0.17919921875
+        }
+      },
+      "g004": {
+        "excess_large": {
+          "competence_rate": 0.9583333333333334,
+          "max": 0.26544189453125,
+          "mean": 0.08039093017578125,
+          "median": 0.074676513671875,
+          "min": -0.03216552734375
+        },
+        "loss_large": {
+          "competence_rate": 0.125,
+          "max": 0.48773193359375,
+          "mean": 0.32027943929036456,
+          "median": 0.300384521484375,
+          "min": 0.223388671875
+        }
+      },
+      "g005": {
+        "excess_large": {
+          "competence_rate": 1.0,
+          "max": 0.24029541015625,
+          "mean": 0.08125050862630208,
+          "median": 0.06756591796875,
+          "min": -0.0015869140625
+        },
+        "loss_large": {
+          "competence_rate": 0.08333333333333333,
+          "max": 0.44921875,
+          "mean": 0.31730397542317706,
+          "median": 0.294891357421875,
+          "min": 0.22967529296875
+        }
+      },
+      "g006": {
+        "excess_large": {
+          "competence_rate": 0.9583333333333334,
+          "max": 0.29571533203125,
+          "mean": 0.07580820719401042,
+          "median": 0.069793701171875,
+          "min": -0.0330810546875
+        },
+        "loss_large": {
+          "competence_rate": 0.16666666666666666,
+          "max": 0.4940185546875,
+          "mean": 0.314666748046875,
+          "median": 0.3004150390625,
+          "min": 0.2060546875
+        }
+      },
+      "g007": {
+        "excess_large": {
+          "competence_rate": 0.9583333333333334,
+          "max": 0.2506103515625,
+          "mean": 0.08286539713541667,
+          "median": 0.062652587890625,
+          "min": -0.02581787109375
+        },
+        "loss_large": {
+          "competence_rate": 0.16666666666666666,
+          "max": 0.5045166015625,
+          "mean": 0.32076263427734375,
+          "median": 0.297149658203125,
+          "min": 0.242919921875
+        }
+      },
+      "g008": {
+        "excess_large": {
+          "competence_rate": 0.9583333333333334,
+          "max": 0.2596435546875,
+          "mean": 0.06865437825520833,
+          "median": 0.072052001953125,
+          "min": -0.0623779296875
+        },
+        "loss_large": {
+          "competence_rate": 0.16666666666666666,
+          "max": 0.46209716796875,
+          "mean": 0.31387583414713544,
+          "median": 0.29559326171875,
+          "min": 0.198974609375
+        }
+      }
+    },
+    "reference_direction_native_support": {
+      "fly": {
+        "excess_large": {
+          "competence_rate": 1.0,
+          "max": 0.066650390625,
+          "mean": 0.023409525553385418,
+          "median": 0.019775390625,
+          "min": -0.03338623046875
+        },
+        "loss_large": {
+          "competence_rate": 0.9166666666666666,
+          "max": 0.25250244140625,
+          "mean": 0.24404398600260416,
+          "median": 0.244537353515625,
+          "min": 0.22857666015625
+        }
+      },
+      "g001": {
+        "excess_large": {
+          "competence_rate": 1.0,
+          "max": 0.06488037109375,
+          "mean": 0.015492757161458334,
+          "median": 0.0169677734375,
+          "min": -0.03692626953125
+        },
+        "loss_large": {
+          "competence_rate": 0.4166666666666667,
+          "max": 0.25982666015625,
+          "mean": 0.25072479248046875,
+          "median": 0.25103759765625,
+          "min": 0.24163818359375
+        }
+      },
+      "g002": {
+        "excess_large": {
+          "competence_rate": 1.0,
+          "max": 0.06146240234375,
+          "mean": 0.01396942138671875,
+          "median": 0.013397216796875,
+          "min": -0.03375244140625
+        },
+        "loss_large": {
+          "competence_rate": 0.5416666666666666,
+          "max": 0.2578125,
+          "mean": 0.25007883707682294,
+          "median": 0.248809814453125,
+          "min": 0.24346923828125
+        }
+      },
+      "g003": {
+        "excess_large": {
+          "competence_rate": 1.0,
+          "max": 0.0897216796875,
+          "mean": 0.015764872233072918,
+          "median": 0.01080322265625,
+          "min": -0.03350830078125
+        },
+        "loss_large": {
+          "competence_rate": 0.5416666666666666,
+          "max": 0.26007080078125,
+          "mean": 0.25010426839192706,
+          "median": 0.25,
+          "min": 0.24310302734375
+        }
+      },
+      "g004": {
+        "excess_large": {
+          "competence_rate": 1.0,
+          "max": 0.0498046875,
+          "mean": 0.01003265380859375,
+          "median": 0.00543212890625,
+          "min": -0.02447509765625
+        },
+        "loss_large": {
+          "competence_rate": 0.5833333333333334,
+          "max": 0.25762939453125,
+          "mean": 0.2499211629231771,
+          "median": 0.249176025390625,
+          "min": 0.2391357421875
+        }
+      },
+      "g005": {
+        "excess_large": {
+          "competence_rate": 1.0,
+          "max": 0.0552978515625,
+          "mean": 0.014551798502604166,
+          "median": 0.01214599609375,
+          "min": -0.0184326171875
+        },
+        "loss_large": {
+          "competence_rate": 0.4166666666666667,
+          "max": 0.25811767578125,
+          "mean": 0.2506052652994792,
+          "median": 0.2513427734375,
+          "min": 0.243408203125
+        }
+      },
+      "g006": {
+        "excess_large": {
+          "competence_rate": 1.0,
+          "max": 0.07440185546875,
+          "mean": 0.011365254720052084,
+          "median": 0.006011962890625,
+          "min": -0.03564453125
+        },
+        "loss_large": {
+          "competence_rate": 0.4583333333333333,
+          "max": 0.25689697265625,
+          "mean": 0.2502237955729167,
+          "median": 0.251251220703125,
+          "min": 0.2381591796875
+        }
+      },
+      "g007": {
+        "excess_large": {
+          "competence_rate": 1.0,
+          "max": 0.056396484375,
+          "mean": 0.012690226236979166,
+          "median": 0.009033203125,
+          "min": -0.03863525390625
+        },
+        "loss_large": {
+          "competence_rate": 0.4166666666666667,
+          "max": 0.25946044921875,
+          "mean": 0.25058746337890625,
+          "median": 0.25079345703125,
+          "min": 0.241943359375
+        }
+      },
+      "g008": {
+        "excess_large": {
+          "competence_rate": 1.0,
+          "max": 0.0601806640625,
+          "mean": 0.0048828125,
+          "median": 0.00347900390625,
+          "min": -0.0362548828125
+        },
+        "loss_large": {
+          "competence_rate": 0.5,
+          "max": 0.2586669921875,
+          "mean": 0.25010426839192706,
+          "median": 0.250091552734375,
+          "min": 0.24151611328125
+        }
+      }
+    },
+    "sign_ref_native_mag": {
+      "fly": {
+        "excess_large": {
+          "competence_rate": 1.0,
+          "max": -0.16656494140625,
+          "mean": -0.21929931640625,
+          "median": -0.220184326171875,
+          "min": -0.271240234375
+        },
+        "loss_large": {
+          "competence_rate": 1.0,
+          "max": 0.00213623046875,
+          "mean": 0.00133514404296875,
+          "median": 0.0013427734375,
+          "min": 0.00067138671875
+        }
+      },
+      "g001": {
+        "excess_large": {
+          "competence_rate": 1.0,
+          "max": -0.18359375,
+          "mean": -0.23371378580729166,
+          "median": -0.233795166015625,
+          "min": -0.28802490234375
+        },
+        "loss_large": {
+          "competence_rate": 1.0,
+          "max": 0.00286865234375,
+          "mean": 0.00151824951171875,
+          "median": 0.001434326171875,
+          "min": 0.00067138671875
+        }
+      },
+      "g002": {
+        "excess_large": {
+          "competence_rate": 1.0,
+          "max": -0.18536376953125,
+          "mean": -0.2346649169921875,
+          "median": -0.237518310546875,
+          "min": -0.28326416015625
+        },
+        "loss_large": {
+          "competence_rate": 1.0,
+          "max": 0.00238037109375,
+          "mean": 0.0014444986979166667,
+          "median": 0.001556396484375,
+          "min": 0.00079345703125
+        }
+      },
+      "g003": {
+        "excess_large": {
+          "competence_rate": 1.0,
+          "max": -0.161376953125,
+          "mean": -0.2330322265625,
+          "median": -0.235992431640625,
+          "min": -0.2811279296875
+        },
+        "loss_large": {
+          "competence_rate": 1.0,
+          "max": 0.002197265625,
+          "mean": 0.0013071695963541667,
+          "median": 0.001312255859375,
+          "min": 0.00048828125
+        }
+      },
+      "g004": {
+        "excess_large": {
+          "competence_rate": 1.0,
+          "max": -0.19647216796875,
+          "mean": -0.238433837890625,
+          "median": -0.24658203125,
+          "min": -0.27178955078125
+        },
+        "loss_large": {
+          "competence_rate": 1.0,
+          "max": 0.00201416015625,
+          "mean": 0.0014546712239583333,
+          "median": 0.00146484375,
+          "min": 0.000732421875
+        }
+      },
+      "g005": {
+        "excess_large": {
+          "competence_rate": 1.0,
+          "max": -0.1951904296875,
+          "mean": -0.2346013387044271,
+          "median": -0.238555908203125,
+          "min": -0.2664794921875
+        },
+        "loss_large": {
+          "competence_rate": 1.0,
+          "max": 0.00244140625,
+          "mean": 0.0014521280924479167,
+          "median": 0.001434326171875,
+          "min": 0.00067138671875
+        }
+      },
+      "g006": {
+        "excess_large": {
+          "competence_rate": 1.0,
+          "max": -0.1737060546875,
+          "mean": -0.2374140421549479,
+          "median": -0.24462890625,
+          "min": -0.28125
+        },
+        "loss_large": {
+          "competence_rate": 1.0,
+          "max": 0.00311279296875,
+          "mean": 0.0014444986979166667,
+          "median": 0.001373291015625,
+          "min": 0.00067138671875
+        }
+      },
+      "g007": {
+        "excess_large": {
+          "competence_rate": 1.0,
+          "max": -0.19366455078125,
+          "mean": -0.23647054036458334,
+          "median": -0.23687744140625,
+          "min": -0.29132080078125
+        },
+        "loss_large": {
+          "competence_rate": 1.0,
+          "max": 0.0028076171875,
+          "mean": 0.00142669677734375,
+          "median": 0.0013427734375,
+          "min": 0.000732421875
+        }
+      },
+      "g008": {
+        "excess_large": {
+          "competence_rate": 1.0,
+          "max": -0.18927001953125,
+          "mean": -0.24376932779947916,
+          "median": -0.24432373046875,
+          "min": -0.29180908203125
+        },
+        "loss_large": {
+          "competence_rate": 1.0,
+          "max": 0.00244140625,
+          "mean": 0.0014521280924479167,
+          "median": 0.001556396484375,
+          "min": 0.0006103515625
+        }
+      }
+    },
+    "stable_inversion_flip": {
+      "fly": {
+        "excess_large": {
+          "competence_rate": 0.875,
+          "max": 0.26751708984375,
+          "mean": 0.11402130126953125,
+          "median": 0.09832763671875,
+          "min": -0.00079345703125
+        },
+        "loss_large": {
+          "competence_rate": 0.041666666666666664,
+          "max": 0.47796630859375,
+          "mean": 0.33465576171875,
+          "median": 0.31951904296875,
+          "min": 0.21966552734375
+        }
+      },
+      "g001": {
+        "excess_large": {
+          "competence_rate": 1.0,
+          "max": 0.20880126953125,
+          "mean": 0.07574971516927083,
+          "median": 0.079803466796875,
+          "min": -0.0765380859375
+        },
+        "loss_large": {
+          "competence_rate": 0.16666666666666666,
+          "max": 0.439208984375,
+          "mean": 0.31098175048828125,
+          "median": 0.30853271484375,
+          "min": 0.198486328125
+        }
+      },
+      "g002": {
+        "excess_large": {
+          "competence_rate": 0.9583333333333334,
+          "max": 0.3154296875,
+          "mean": 0.07377878824869792,
+          "median": 0.067291259765625,
+          "min": -0.027587890625
+        },
+        "loss_large": {
+          "competence_rate": 0.3333333333333333,
+          "max": 0.502197265625,
+          "mean": 0.30988820393880206,
+          "median": 0.307098388671875,
+          "min": 0.1890869140625
+        }
+      },
+      "g003": {
+        "excess_large": {
+          "competence_rate": 1.0,
+          "max": 0.24664306640625,
+          "mean": 0.07323455810546875,
+          "median": 0.054351806640625,
+          "min": -0.041259765625
+        },
+        "loss_large": {
+          "competence_rate": 0.125,
+          "max": 0.4462890625,
+          "mean": 0.30757395426432294,
+          "median": 0.293975830078125,
+          "min": 0.17950439453125
+        }
+      },
+      "g004": {
+        "excess_large": {
+          "competence_rate": 0.9583333333333334,
+          "max": 0.26544189453125,
+          "mean": 0.08039093017578125,
+          "median": 0.074676513671875,
+          "min": -0.03216552734375
+        },
+        "loss_large": {
+          "competence_rate": 0.125,
+          "max": 0.48773193359375,
+          "mean": 0.32027943929036456,
+          "median": 0.300384521484375,
+          "min": 0.223388671875
+        }
+      },
+      "g005": {
+        "excess_large": {
+          "competence_rate": 1.0,
+          "max": 0.24029541015625,
+          "mean": 0.08125050862630208,
+          "median": 0.06756591796875,
+          "min": -0.0015869140625
+        },
+        "loss_large": {
+          "competence_rate": 0.08333333333333333,
+          "max": 0.44921875,
+          "mean": 0.31730397542317706,
+          "median": 0.294891357421875,
+          "min": 0.22967529296875
+        }
+      },
+      "g006": {
+        "excess_large": {
+          "competence_rate": 0.9583333333333334,
+          "max": 0.29571533203125,
+          "mean": 0.07631174723307292,
+          "median": 0.069793701171875,
+          "min": -0.03302001953125
+        },
+        "loss_large": {
+          "competence_rate": 0.16666666666666666,
+          "max": 0.4940185546875,
+          "mean": 0.3151702880859375,
+          "median": 0.3006591796875,
+          "min": 0.2060546875
+        }
+      },
+      "g007": {
+        "excess_large": {
+          "competence_rate": 0.9583333333333334,
+          "max": 0.2506103515625,
+          "mean": 0.0829010009765625,
+          "median": 0.062652587890625,
+          "min": -0.02581787109375
+        },
+        "loss_large": {
+          "competence_rate": 0.16666666666666666,
+          "max": 0.5045166015625,
+          "mean": 0.32079823811848956,
+          "median": 0.297149658203125,
+          "min": 0.242919921875
+        }
+      },
+      "g008": {
+        "excess_large": {
+          "competence_rate": 0.9583333333333334,
+          "max": 0.2596435546875,
+          "mean": 0.06865437825520833,
+          "median": 0.072052001953125,
+          "min": -0.0623779296875
+        },
+        "loss_large": {
+          "competence_rate": 0.16666666666666666,
+          "max": 0.46209716796875,
+          "mean": 0.31387583414713544,
+          "median": 0.29559326171875,
+          "min": 0.198974609375
+        }
+      }
+    },
+    "weight_oracle": {
+      "fly": {
+        "excess_large": {
+          "competence_rate": 1.0,
+          "max": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "min": 0.0
+        },
+        "loss_large": {
+          "competence_rate": 0.875,
+          "max": 0.272705078125,
+          "mean": 0.22063446044921875,
+          "median": 0.221893310546875,
+          "min": 0.16802978515625
+        }
+      },
+      "g001": {
+        "excess_large": {
+          "competence_rate": 1.0,
+          "max": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "min": 0.0
+        },
+        "loss_large": {
+          "competence_rate": 0.8333333333333334,
+          "max": 0.28912353515625,
+          "mean": 0.2352320353190104,
+          "median": 0.2357177734375,
+          "min": 0.18536376953125
+        }
+      },
+      "g002": {
+        "excess_large": {
+          "competence_rate": 1.0,
+          "max": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "min": 0.0
+        },
+        "loss_large": {
+          "competence_rate": 0.6666666666666666,
+          "max": 0.28515625,
+          "mean": 0.23610941569010416,
+          "median": 0.23907470703125,
+          "min": 0.186767578125
+        }
+      },
+      "g003": {
+        "excess_large": {
+          "competence_rate": 1.0,
+          "max": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "min": 0.0
+        },
+        "loss_large": {
+          "competence_rate": 0.6666666666666666,
+          "max": 0.28228759765625,
+          "mean": 0.23433939615885416,
+          "median": 0.23748779296875,
+          "min": 0.16259765625
+        }
+      },
+      "g004": {
+        "excess_large": {
+          "competence_rate": 1.0,
+          "max": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "min": 0.0
+        },
+        "loss_large": {
+          "competence_rate": 0.6666666666666666,
+          "max": 0.2733154296875,
+          "mean": 0.23988850911458334,
+          "median": 0.24798583984375,
+          "min": 0.1982421875
+        }
+      },
+      "g005": {
+        "excess_large": {
+          "competence_rate": 1.0,
+          "max": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "min": 0.0
+        },
+        "loss_large": {
+          "competence_rate": 0.5833333333333334,
+          "max": 0.26739501953125,
+          "mean": 0.236053466796875,
+          "median": 0.239776611328125,
+          "min": 0.1973876953125
+        }
+      },
+      "g006": {
+        "excess_large": {
+          "competence_rate": 1.0,
+          "max": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "min": 0.0
+        },
+        "loss_large": {
+          "competence_rate": 0.5833333333333334,
+          "max": 0.28192138671875,
+          "mean": 0.2388585408528646,
+          "median": 0.24566650390625,
+          "min": 0.1748046875
+        }
+      },
+      "g007": {
+        "excess_large": {
+          "competence_rate": 1.0,
+          "max": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "min": 0.0
+        },
+        "loss_large": {
+          "competence_rate": 0.7083333333333334,
+          "max": 0.2926025390625,
+          "mean": 0.2378972371419271,
+          "median": 0.238372802734375,
+          "min": 0.19464111328125
+        }
+      },
+      "g008": {
+        "excess_large": {
+          "competence_rate": 1.0,
+          "max": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "min": 0.0
+        },
+        "loss_large": {
+          "competence_rate": 0.5416666666666666,
+          "max": 0.29290771484375,
+          "mean": 0.2452214558919271,
+          "median": 0.245635986328125,
+          "min": 0.18988037109375
+        }
+      }
+    }
+  },
+  "cancellation_interpretation": "The measured local cancellation telemetry does not show a dominant cancellation rescue relative to the aggregate sign failure.",
+  "disposition": "SIGN_COUNTERFACTUAL_SUPPORTED_STABLE_MASK_NOT_EXPLANATORY",
+  "improvements_vs_native": {
+    "native": 0.0,
+    "reference_direction_native_support": 0.06376902262369794,
+    "sign_ref_native_mag": 0.3119422064887153,
+    "stable_inversion_flip": -0.00335693359375,
+    "weight_oracle": 0.07734228063512733
+  },
+  "inversion_interpretation": "The qualification-derived stable-inversion flip does not improve the endpoint; aggregate sign failure is not explained by the predeclared stable-inversion class alone.",
+  "native_stage_summary": {
+    "aggregate_sign_agreement_mean": {
+      "competence_rate": 0.0,
+      "max": 0.5586487712549484,
+      "mean": 0.48884683827123565,
+      "median": 0.48821392082227427,
+      "min": 0.4084428298650319
+    },
+    "aggregation_cosine_mean": {
+      "competence_rate": 1.0,
+      "max": 0.01589469342315725,
+      "mean": 0.0030140953947284535,
+      "median": 0.0027571919383001953,
+      "min": -0.008079573918287957
+    },
+    "bound_clip_fraction": {
+      "competence_rate": 0.375,
+      "max": 0.5053569052930866,
+      "mean": 0.27909347231791537,
+      "median": 0.297398567625794,
+      "min": 0.025619912486462452
+    },
+    "cumulative_delivered_l2": {
+      "competence_rate": 0.0,
+      "max": 91.40235146080596,
+      "mean": 80.31587414462268,
+      "median": 81.31437319256611,
+      "min": 61.864174148027885
+    },
+    "delivered_cosine_mean": {
+      "competence_rate": 1.0,
+      "max": 0.005727755765581447,
+      "mean": 0.0002940063823761198,
+      "median": 0.00017572929928170457,
+      "min": -0.002881330753175226
+    },
+    "eligibility_cosine_mean": {
+      "competence_rate": 1.0,
+      "max": 0.039236620387513514,
+      "mean": 0.004907940767563311,
+      "median": 0.0043827985311650774,
+      "min": -0.01951034943787475
+    },
+    "local_cancellation_mean": {
+      "competence_rate": 1.0,
+      "max": 0.017899862754580075,
+      "mean": 0.012381798312834678,
+      "median": 0.012582618823088308,
+      "min": 0.007492863739782799
+    },
+    "local_sign_agreement_mean": {
+      "competence_rate": 0.0,
+      "max": 0.5586487712549484,
+      "mean": 0.48884683827123565,
+      "median": 0.48821392082227427,
+      "min": 0.4084428298650319
+    },
+    "modulation_cosine_mean": {
+      "competence_rate": 1.0,
+      "max": 0.01589469342315725,
+      "mean": 0.0030140953947284535,
+      "median": 0.0027571919383001953,
+      "min": -0.008079573918287957
+    },
+    "native_support_fraction_mean": {
+      "competence_rate": 0.0,
+      "max": 0.39745102852821607,
+      "mean": 0.37375220950066596,
+      "median": 0.37350367759684167,
+      "min": 0.360153516832986
+    },
+    "reference_mass_on_native_support_mean": {
+      "competence_rate": 0.0,
+      "max": 0.8486043453813885,
+      "mean": 0.6446305966308563,
+      "median": 0.6448645522161667,
+      "min": 0.5106093984241021
+    },
+    "stable_correct_fraction": {
+      "competence_rate": 1.0,
+      "max": 0.07953177535179112,
+      "mean": 0.06501910024066028,
+      "median": 0.06615618493217323,
+      "min": 0.04229795359262795
+    },
+    "stable_inverted_fraction": {
+      "competence_rate": 1.0,
+      "max": 0.08106761861275995,
+      "mean": 0.06308169487622692,
+      "median": 0.06405068542673527,
+      "min": 0.03918475779336682
+    },
+    "unstable_fraction": {
+      "competence_rate": 0.0,
+      "max": 0.9148229629322153,
+      "mean": 0.8718992048831128,
+      "median": 0.8703505802321199,
+      "min": 0.8434270059358266
+    }
+  },
+  "native_trajectory_summary": {
+    "1024": {
+      "aggregate_sign_agreement": 0.5002522858767092,
+      "aggregation_cosine": 0.003978656641687904,
+      "delivered_cosine": -0.0004302772855680613,
+      "eligibility_cosine": 0.003700016790003959,
+      "local_cancellation": 0.04540335716248603,
+      "local_sign_agreement": 0.5002522858767092,
+      "modulation_cosine": 0.003978656641687904,
+      "stable_correct_fraction": 0.05597794545029901,
+      "stable_inverted_fraction": 0.052787728790388753,
+      "unstable_fraction": 0.8912343257593123
+    },
+    "2048": {
+      "aggregate_sign_agreement": 0.49396540926553095,
+      "aggregation_cosine": 0.003712639575681346,
+      "delivered_cosine": -0.00024131960825486988,
+      "eligibility_cosine": 0.004669667629742413,
+      "local_cancellation": 0.028685247059981996,
+      "local_sign_agreement": 0.49396540926553095,
+      "modulation_cosine": 0.003712639575681346,
+      "stable_correct_fraction": 0.06060907236905392,
+      "stable_inverted_fraction": 0.05843845800763309,
+      "unstable_fraction": 0.8809524696233131
+    },
+    "4096": {
+      "aggregate_sign_agreement": 0.4901013394635949,
+      "aggregation_cosine": 0.0033936271921059767,
+      "delivered_cosine": 6.268012749637822e-05,
+      "eligibility_cosine": 0.005123460446300898,
+      "local_cancellation": 0.018579022880189127,
+      "local_sign_agreement": 0.4901013394635949,
+      "modulation_cosine": 0.0033936271921059767,
+      "stable_correct_fraction": 0.06319551016981918,
+      "stable_inverted_fraction": 0.06127569772181149,
+      "unstable_fraction": 0.8755287921083693
+    },
+    "512": {
+      "aggregate_sign_agreement": 0.5070362404216935,
+      "aggregation_cosine": 0.004198089248433345,
+      "delivered_cosine": 8.248889355519799e-08,
+      "eligibility_cosine": 0.0020546277829669338,
+      "local_cancellation": 0.07257061558115356,
+      "local_sign_agreement": 0.5070362404216935,
+      "modulation_cosine": 0.004198089248433345,
+      "stable_correct_fraction": 0.04068949883555284,
+      "stable_inverted_fraction": 0.03591845821387123,
+      "unstable_fraction": 0.9233920429505759
+    },
+    "8192": {
+      "aggregate_sign_agreement": 0.48884683827123565,
+      "aggregation_cosine": 0.0030140953947284535,
+      "delivered_cosine": 0.0002940063823761198,
+      "eligibility_cosine": 0.004907940767563311,
+      "local_cancellation": 0.012381798312834678,
+      "local_sign_agreement": 0.48884683827123565,
+      "modulation_cosine": 0.0030140953947284535,
+      "stable_correct_fraction": 0.06501910024066028,
+      "stable_inverted_fraction": 0.06308169487622692,
+      "unstable_fraction": 0.8718992048831128
+    }
+  },
+  "no_biological_promotion": true,
+  "pheno_reseal_authorized": false,
+  "schema": "FLY-REACH-02-analysis-v2",
+  "sign_counterfactual_supported": true,
+  "stable_mask_fraction": {
+    "max": 0.0014370765756518168,
+    "mean": 0.000169749358037613,
+    "min": 0.0
+  },
+  "status": "INTEGRITY_PASS"
+}

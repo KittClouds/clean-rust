@@ -1,0 +1,7 @@
+{
+  "captured_at_utc": "2026-09-18T15:11:00.468298+00:00",
+  "identity": "q10-gc0-lr1-sall1-r2-audit-v1",
+  "protocol": "Q10-GC0-LR1-SALL1-R2-PARENT-INTEGRITY-AUDIT",
+  "sealed": true,
+  "source_execution": "experiments/drosophila-heresy/q10-gc0-lr1-sall1-r2-v1/execution.json"
+}

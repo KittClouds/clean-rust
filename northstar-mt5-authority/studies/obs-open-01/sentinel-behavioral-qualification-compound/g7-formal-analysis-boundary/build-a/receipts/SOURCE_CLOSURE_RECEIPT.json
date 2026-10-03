@@ -1,0 +1,1 @@
+{"schema":"G7_SOURCE_CLOSURE_RECEIPT_V1","source_closure_sha256":"46072b0551cd451b86e752078a02942ef2353c70ec645ad7693633537d19ca03","source_files":["Cargo.toml","Cargo.lock","OBS_OPEN_G7_PROTOCOL_V1.md","src/lib.rs","src/model.rs","src/analysis.rs","src/artifacts.rs","src/fixtures.rs","src/seal.rs","src/main.rs","tests/g7_boundary.rs"],"status":"PASS"}

@@ -1,0 +1,24 @@
+[package]
+name = "jev-decision-world-v01"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.88"
+publish = false
+
+[workspace]
+
+[dependencies]
+anyhow = "1.0"
+blake3 = "1.8"
+hashbrown = "0.16"
+memchr = "2.7"
+memmap2 = "0.9"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+wide = "0.7"
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+panic = "abort"

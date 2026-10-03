@@ -1,0 +1,148 @@
+{
+  "contract_id": "FAS_FROZEN_OBSERVER_BUNDLE_E3_FIT_V02",
+  "status": "E3_V02_FIT_ONLY_FROZEN_BOUND_TO_V02_AUTHORIZATION",
+  "created_utc": "2026-09-26T12:08:14.289757+00:00",
+  "predecessors": {
+    "e0_v10_root_sha256": "899a131c09298fdafdcc6771ad01e8982857a1cd47900259800f97dd7bea7ccd",
+    "e1_v04_root_sha256": "6ba77a899363651e3ba119b005f59a22e86f011f83c86b873857cd3f9ab64b03",
+    "e2_v07_root_sha256": "a2e2aa76f77904665b9abfa2a22f609c05219d8bc64c537bed41f5c634d1da8a",
+    "e2_v07_seal_sha256": "30981abe10b4e97ab4f39eb006f5fc24aaaa799f5381be13170dca49c3ddb7f7",
+    "e2_v07_independent_audit_sha256": "35a8a34f458ea8e35142778b72ca5a389fb1d8ea5efb4c534553d2126eb4e299",
+    "e3_v01_resource_disposition_sha256": "0654bf91f22928ca0395c58b7fdbd6731dfdd1648ae6a034ada1f7575bc6e68e"
+  },
+  "inputs": {
+    "feature_cache": {
+      "path": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e2-v07\\V1_FINAL_POSITION.f32le",
+      "sha256": "8eb80df5f73e761fe6c025fc1c66abef2027d639b6c14f56d4177d6e6a7a45a4",
+      "bytes": 872415232,
+      "rows": 106496,
+      "dimension": 2048,
+      "dtype": "little-endian float32",
+      "access": "read-only mmap"
+    },
+    "fit_labels": {
+      "path": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e1-panel-v04\\labels\\fit-labels-v01.jsonl",
+      "sha256": "1c4223544ff8e164a393f6313db46dd814c50e3ea484a14ebdbed5070ebdfc15",
+      "bytes": 39056730,
+      "access": "read-only; training partition labels only"
+    },
+    "row_manifest": {
+      "path": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e1-panel-v04\\panel\\row-manifest-v01.jsonl",
+      "sha256": "ebfdf0064430ecae7a9ae2edd139f47c0c61291aa6c30c8ccb97daa195f835bc",
+      "bytes": 23126310,
+      "access": "read-only row-to-feature index mapping"
+    },
+    "split_manifest": {
+      "path": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e1-panel-v04\\panel\\split-manifest-v01.jsonl",
+      "sha256": "fb20dd79b5d02a46e7ac65f8a69b621c19f47b193db4e9c5f898778032464e70",
+      "bytes": 5383371,
+      "access": "read-only FIT quartet membership only; no test-label data"
+    }
+  },
+  "evaluation_data_access": "PROHIBITED; evaluation labels and all TEST-label content remain unopened",
+  "tasks": {
+    "context_identity": {
+      "label": "context_term_id",
+      "eligibility": "all FIT rows",
+      "classes": 32
+    },
+    "entity_identity": {
+      "label": "entity_term_id",
+      "eligibility": "all FIT rows",
+      "classes": 32
+    },
+    "relation": {
+      "label": "relation_id",
+      "eligibility": "context_term_id < 16 and entity_term_id < 16",
+      "classes": 2
+    },
+    "observed_state": {
+      "label": "state_id",
+      "eligibility": "context_term_id < 16 and entity_term_id < 16",
+      "classes": 3
+    },
+    "exact_target": {
+      "label": "exact_target",
+      "eligibility": "context_term_id < 16 and entity_term_id < 16",
+      "classes": 3
+    }
+  },
+  "scaler": {
+    "algorithm": "train-only float64 chunked Welford population mean/scale",
+    "chunk_rows": 2048,
+    "zero_scales": "replace with 1",
+    "persist_dtype": "little-endian float32"
+  },
+  "model": {
+    "family": "independent multinomial linear readout",
+    "initialization": "all weights and bias zero",
+    "loss": "mean cross-entropy + 0.5 * 1e-4 * sum(weights squared); no bias regularization",
+    "regularization": 0.0001,
+    "trainable_parameters_expected": 147528,
+    "trainable_parameter_bytes_f32_expected": 590112,
+    "scaler_bytes_f32_expected": 81920,
+    "total_observer_bytes_f32_expected": 672032
+  },
+  "optimizer": {
+    "name": "PyTorch LBFGS",
+    "learning_rate": 1.0,
+    "max_iter": 300,
+    "max_eval": 375,
+    "tolerance_grad": 1e-07,
+    "tolerance_change": 1e-09,
+    "history_size": 10,
+    "line_search": "strong_wolfe",
+    "determinism_seed": 0
+  },
+  "bundle_boundary": {
+    "independent_fits": 5,
+    "shared_trainable_parameters": false,
+    "multitask_loss": false,
+    "view_search": false,
+    "backbone_frozen": true,
+    "feature_cache_immutable": true
+  },
+  "fit_outputs": {
+    "root": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e3-v02",
+    "bundle_id": "FAS_FROZEN_CAPABILITY_FABRIC_LFM12B_E3_V02"
+  },
+  "resources": {
+    "device": "NVIDIA GeForce RTX 3080",
+    "minimum_free_device_memory_bytes": 3221225472,
+    "process_reserved_ceiling_bytes": 4294967296,
+    "minimum_free_disk_bytes": 1073741824,
+    "total_gpu_memory_claimed": false,
+    "device_wide_gpu_metrics": "diagnostic-only",
+    "disk_gate": {
+      "required_before_output_creation": true,
+      "measurement": "Python shutil.disk_usage on output-parent filesystem",
+      "minimum_free_bytes": 1073741824,
+      "record_pre_fit_and_post_fit_free_bytes": true
+    }
+  },
+  "authority": {
+    "training_fit_authorized_by_bound_user_instruction": true,
+    "evaluation_scoring_authorized": false,
+    "heldout_outcomes_opened": false,
+    "hyperparameter_search_authorized": false,
+    "model_updates_authorized": false,
+    "E4_integration_authorized": false
+  },
+  "authorization_source": {
+    "user_instruction_quote": "Once that compatibility test passes, proceed to the real goal: model contact, extraction, cache equality, and then fitting.",
+    "quote_sha256": "f1bf629d961d334b05f9e99efac4545621adaf28c530286ab7ea593ab2171984",
+    "additional_user_instruction_quote": "Version failures, learn from them, and push.",
+    "additional_user_instruction_sha256": "57e78e1ec46c41ba52854ba92cec86808b823bcadaeb5e940a7f0d3d1112d566"
+  },
+  "user_instruction_sha256": "f1bf629d961d334b05f9e99efac4545621adaf28c530286ab7ea593ab2171984",
+  "output_root": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e3-v02",
+  "regularization": 0.0001,
+  "implementation": {
+    "fit_source_path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/fit_observers_e3_v02.py",
+    "fit_source_sha256": "9871d81638c9000ed912d395f3a7ba566301d09dda4fb74ba52ba979ba46487c",
+    "test_source_path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/tests/test_e3_fit_v02.py",
+    "test_source_sha256": "5f655b8df3e7106b464c7af635fcd3596965516e31f6a8d38bde9fb235002c5c",
+    "builder_source_path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/build_e3_contract_v02.py",
+    "builder_source_sha256": "cbd133c745bb968885a4fa23b2f54ed59a2754e20bd86813d1da7aca852d5907"
+  }
+}

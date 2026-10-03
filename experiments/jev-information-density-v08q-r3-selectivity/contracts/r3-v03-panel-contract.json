@@ -1,0 +1,53 @@
+{
+  "schema": "jev-r3-panel-contract-v03",
+  "identity": "JEV-V08Q-R3-SELECTIVITY-V03-PANEL",
+  "status": "SEALED",
+  "construction": {
+    "partition": "eval_v08q_r3_confirmatory_v03",
+    "seed_derivation": "First eight bytes SHA256('jev-information-density-v08q-r3-selectivity-v03/panel-seed'), little-endian uint64.",
+    "seed_u64": 17130370650747150606,
+    "candidate_budget_per_family": 800,
+    "candidate_ordinal_stream": "Within each family, consume candidate ordinals from 0 upward without gaps; stop once exactly 250 valid neighborhoods per direction are admitted or ordinal 799 is exhausted. The 800-ordinal per-family budget is hard; no reseeding or budget extension.",
+    "neighborhoods": 2000,
+    "families": ["exposure_control", "respiratory_monitoring", "salinity_control", "vibration_monitoring"],
+    "neighborhoods_per_family": 500,
+    "directions": ["high_to_low", "low_to_high"],
+    "neighborhoods_per_family_direction": 250,
+    "views_per_neighborhood": ["anchor", "fact"],
+    "candidate_count_per_neighborhood": 4,
+    "candidate_semantics": "Frozen family candidate identities and text; new/old labels follow the exact semantic fact transition, never pole, array position, or row order.",
+    "candidate_permutation": "Synthetic scorer permutation-equivariance sanity test only; output slot is not a scientific factor.",
+    "polarity": "Both directions are represented in both balanced training and evaluation within every family.",
+    "alternate_candidate_realizations": false,
+    "identity_claim": "Candidate identity remains nested within family/pole; identity-specific attribution is out of scope.",
+    "placebo_view": false
+  },
+  "freshness": {
+    "fields": ["world_id", "root_id", "episode_id", "full_rendered_input_hash", "selector_input_hash"],
+    "must_be_disjoint_from": ["all R3 training occurrences including balanced low-to-high SHAM variants", "E1", "P-R2", "Q", "Q-R1", "Q-R2", "R3-calibration-panel", "already-admitted-R3-neighborhoods"],
+    "comparison": "Exact field-wise identity set membership; no fuzzy or semantic similarity.",
+    "training_identity_extension": "For each R3 low-to-high reverse-SHAM occurrence, world_id/root_id bind to its exact low-pole source episode, episode_id is the emitted r3-low-sham:<source_episode_id>, full_rendered_input_hash is SHA-256 of the exact emitted bytes, and selector_input_hash is the bound same-neighborhood training SHAM selector identity.",
+    "exclusion_set_schema": "jev-v08q-r3-field-exclusion-domain-hash-sets-v02; includes Q-R2 panel identities and every R3 training occurrence identity before candidate generation.",
+    "candidate_stream": "One new versioned partition/namespace, prospectively fixed 64-bit seed, fixed maximum candidate ordinal per family, no reseeding or budget extension after observed rejections.",
+    "admission": "Construct both view identities, reject whole neighborhood before admission if any of the five field values collides with any exclusion set or an already admitted neighborhood; apply the sealed E1 neighborhood-ID hash denylist as a separate exact-identity condition.",
+    "failure": "Budget exhaustion or disagreement between online admission receipts and final whole-panel audit makes the panel non-promotable; no hand repair or regeneration under this identity."
+  },
+  "features": {
+    "backbone_revision": "7453bca97ca1e67754c4035a4b4c584e1c9dd725",
+    "representation": "mean_full@16",
+    "backbone_dtype": "BF16",
+    "output_dtype": "FP32",
+    "dimension": 2048,
+    "batch_size": 1,
+    "padding": false,
+    "independent_repeat_max_abs_error": 1e-5,
+    "backbone_identity_before_after": "exact match"
+  },
+  "opening": {
+    "training_inputs_sealed_before_evaluation": true,
+    "target_free_inference_manifest": true,
+    "exact_target_join_separate_and_sealed": true,
+    "panel_opening_count": 1,
+    "predictions_sealed_before_target_join_or_analysis": true
+  }
+}

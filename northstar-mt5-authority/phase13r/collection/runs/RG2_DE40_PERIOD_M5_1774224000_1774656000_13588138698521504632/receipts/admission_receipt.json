@@ -1,0 +1,44 @@
+﻿{
+    "contract":  "MST_HOLDOUT_ADMISSION_V1",
+    "status":  "SEALED",
+    "protocol_sha256":  "098844644e31878725ec4bb7859bb5db2f63f937adfc21bea3fb8ea91b287cf6",
+    "canonical_instrument":  "DE40",
+    "broker_symbol":  "DE40",
+    "data_source_id":  "METAQUOTES_DEMO",
+    "holdout_id":  "RECOVERY_A",
+    "window_start":  1774224000,
+    "window_end_exclusive":  1774656000,
+    "run_key":  "RG2_DE40_PERIOD_M5_1774224000_1774656000_13588138698521504632",
+    "invocation_id":  "RG2_DE40_PERIOD_M5_1774224000_1774656000_13588138698521504632_I1774224000_549634738358983374",
+    "auction_stem":  "MasterAuction_DE40_PERIOD_M5_P13R_DE40_RECOVERY_A_RG2_v7",
+    "structure_stem":  "MasterStructure_DE40_PERIOD_M5_P13R_DE40_RECOVERY_A_v6",
+    "canonical_dataset_hash":  "ef5c24c1fc482edcf0ec758927a51863276f94cad52fab43684c35f014bb3e62",
+    "dataset_hashes":  {
+                           "events":  "c119bf275fc736913ba807ee92d514d9a92ca27a808d8f0f20a58bc70fe1918f",
+                           "attempts":  "431eec354f6bcd2b81fe42332f3e2729ddb264e8d3244b137e968fae614c46dd",
+                           "episodes":  "ce0dd14e76f6afa6aa3e2ff5a8d68955e76510812c98a1b0c0cb115d8eb8e07f",
+                           "context":  "d5b00d938c3f7cddf7449e075b81877256f3d1283af8cc483563b91c1ae330e9",
+                           "features":  "c47c7c5cce9c8b9ddc07580935dd2473c3fc488bdf287c41a39f63700fbc98fc",
+                           "transits":  "60fcf66bb52b0fbf43e7cb70da01cd659f0945c8993dd3a46b0af1a6ab8eac7c"
+                       },
+    "row_counts":  {
+                       "events":  1749,
+                       "attempts":  352,
+                       "episodes":  57,
+                       "context":  2195,
+                       "features":  352,
+                       "transits":  30
+                   },
+    "structure_row_counts":  {
+                                 "inputs":  444376,
+                                 "nodes":  44935,
+                                 "events":  497
+                             },
+    "terminal_hash":  "5419253891729167053",
+    "receipt_hash":  "16687025314947391473",
+    "contract_receipt_hash":  "6110000192548177461",
+    "isolation":  "unique_instance_tag_plus_single_writer_lock",
+    "visual_rendering":  false,
+    "research_logging":  true,
+    "unexpected_data_gaps":  0
+}

@@ -1,0 +1,14 @@
+{
+  "receipt_id": "FAS_E4_0_SYMBOLIC_SUPPORT_PLAN_V03_STOP",
+  "status": "PREMODEL_PLANNING_STOP_COMPILE_TIME_RECEIPT_LIMIT",
+  "source_path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/e4-support-plan-v03/src/main.rs",
+  "source_sha256": "6a0d5f382a3c7c0ee1934b1bef84154e1587ffd35e6ecde79b61dcc061bda7a6",
+  "failure": "serde_json::json! receipt expansion exceeded the default Rust recursion limit after receipt metadata was expanded.",
+  "classification": "PLANNING_TOOL_COMPILE_LIMIT",
+  "e1_artifact_modified": false,
+  "e4_population_rows_written": false,
+  "tokenizer_contacted": false,
+  "model_contacted": false,
+  "labels_opened": false,
+  "repair_policy": "Preserve v03 and use a new v04 source identity with an explicit crate recursion limit; no calculation semantics change."
+}

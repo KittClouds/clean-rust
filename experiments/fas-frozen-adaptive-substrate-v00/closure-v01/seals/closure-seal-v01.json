@@ -1,0 +1,21 @@
+{
+  "seal_id": "FAS00_TERMINAL_CLOSURE_V01",
+  "project_id": "fas-frozen-adaptive-substrate-v00",
+  "terminal_disposition": "SENSOR_FAIL_NO_SIGNAL",
+  "phase3_result_root_sha256": "09fd072754e3b149ac2a9564928209a792eba091064033ca0d7f455333dda0c5",
+  "root_sha256": "870e1d29d7db3dd458f16fcb56315f6976e5a4f35ba5731d642b3330a8d7d652",
+  "files": [
+    {
+      "path": "closure-record-v01.json",
+      "sha256": "3eb499e299783d36afd6ff312d84680e4a23b1a00fd3adb8168d65d228b9bcf5"
+    },
+    {
+      "path": "FAS00-CLOSURE.md",
+      "sha256": "fb46d41c7dbd39b1639ff4063ea04a6140b926d6b2576bc037fa64b92cab4194"
+    },
+    {
+      "path": "scripts/seal-closure.ps1",
+      "sha256": "24c1ef0cbe0d3573731ab4cdaccef816fb6c9f6fd47e3410c239960beaa22a21"
+    }
+  ]
+}

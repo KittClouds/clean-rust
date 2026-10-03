@@ -1,0 +1,36 @@
+{
+  "schema": "OBS_OPEN_04A_DESCENDANT_CANONICAL_ROADMAP_BINDING_V1",
+  "status": "CANONICAL_ROADMAP_SAVED",
+  "program_id": "04A_DESCENDANT_BEHAVIORAL_QUALIFICATION_COMPOUND_V1",
+  "canonical_document": "04A_DESCENDANT_BEHAVIORAL_QUALIFICATION_COMPOUND_V1.md",
+  "canonical_document_sha256": "d7d831273c9da1a6df207761743633d705bc6d4fa3e0857d9e65c2a81a82ab80",
+  "source_attachment_sha256": "1045ed7e0468a30a66ea6770a88de892ee3e66944a1d8381190b4440a8e8f07c",
+  "text_preservation": {
+    "classification": "EXACT_UNICODE_TEXT_AFTER_NEWLINE_NORMALIZATION",
+    "canonical_encoding": "UTF-8",
+    "canonical_newlines": "LF",
+    "source_newlines": "CRLF",
+    "substantive_text_changed": false
+  },
+  "ancestor": {
+    "authority": "OBS_OPEN_04A_SENTINEL_CAUSAL_MEMORY_METROLOGY_V1",
+    "root": "48102bd529abf01591842f85676b86eb66b0600dc8d702bd0dbb3d6b729b4c41",
+    "root_receipt_sha256": "719bb195bbc53bd766e2e2f05566d9c147d45ed6944fbe048b6db3f8d83ec7eb",
+    "sealed_fossil_path": "../sentinel-memory-metrology/seal",
+    "historical_identity_mutated": false
+  },
+  "g0_state": {
+    "execution": "NOT_STARTED",
+    "fossil_identity": "NOT_VERIFIED",
+    "input_bridge": "NOT_EVALUABLE"
+  },
+  "authority_boundary": {
+    "roadmap_identity_frozen": true,
+    "g0_authority_earned": false,
+    "descendant_scientific_authority_earned": false,
+    "prediction_authority": false,
+    "economic_authority": false,
+    "trading_authority": false
+  },
+  "governing_law": "No descendant may inherit an authority its parent did not possess."
+}

@@ -1,0 +1,22 @@
+{
+  "artifact_kind": "frozen-fabrique-phase4a-output",
+  "created_utc": "2026-10-01T22:29:02Z",
+  "imported_file_count": 140,
+  "inventory_shards": [
+    {
+      "bytes": 81338,
+      "path": "files-000.ndjson",
+      "rows": 140,
+      "sha256": "6e2a931f27602760198fcd09f09e402546c9df51b77c8740032dbd4e48b33f6f"
+    }
+  ],
+  "purpose": "completed Lepori bidirectional Phase 4A run tree",
+  "root_id": "lepori-phase4a-output",
+  "schema": "KAMMI_CAS_IMPORT_INVENTORY_V1",
+  "source_agent": "Lepori",
+  "source_lab": "Frozen Fabrique",
+  "source_root": "D:\\codex-runs\\encoder-contrast-01",
+  "status": "IMPORTED_TO_LIBRARY_CAS",
+  "total_bytes": 5605091914,
+  "unique_content_objects": 140
+}

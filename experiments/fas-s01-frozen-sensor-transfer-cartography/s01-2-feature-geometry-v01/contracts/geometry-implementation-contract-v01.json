@@ -1,0 +1,32 @@
+{
+  "contract_id": "FASS01_S01_2_GEOMETRY_IMPLEMENTATION_V01",
+  "status": "FROZEN_BEFORE_FEATURE_OUTCOMES",
+  "parent_metric_contract_sha256": "4f6df89b02d0b991e09ab5d8f2658627c48799a10b1dd0557795c433d61099ab",
+  "implementation": {
+    "quartet_order": ["A", "C", "E", "P"],
+    "deltas": {"context": "C-A", "entity": "E-A", "paraphrase": "P-A"},
+    "per_view_dimensions": {"V0_MEAN_FULL": 2048, "V1_FINAL_POSITION": 2048, "V2_FIRST_POSITION": 2048, "V3_CONTEXT_SPAN_MEAN": 2048, "V4_ENTITY_SPAN_MEAN": 2048, "V5_RELATION_SPAN_MEAN": 2048, "V6_FIXED_SPAN_CONCAT": 6144},
+    "statistics": "nearest-rank p10, p25, p50, p75, and p90 plus n, minimum, and maximum; arithmetic over float64 values",
+    "zero_norm_cosine": "dot(a,b)/(max(norm(a),1e-12)*max(norm(b),1e-12)); zero-vector comparisons are retained and yield 0",
+    "pairwise": "all unordered pairs i<j; no sampling",
+    "primary_factorial_cell_key": ["track_id=FACTORIAL_BALANCED", "context_term_split", "entity_term_split", "world_family_id", "relation_id", "state_id", "observation_template_id", "query_template_id"],
+    "binding_context_cell_key": ["track_id=BINDING_CONTEXT", "context_term_split", "context_pair_id", "entity_term_split"],
+    "binding_entity_cell_key": ["track_id=BINDING_ENTITY", "entity_term_split", "entity_pair_id", "context_term_split"],
+    "required_cell_support": 16,
+    "expected_cells": {"factorial_balanced": 1536, "binding_context": 64, "binding_entity": 64},
+    "template_invariance_key": {
+      "context_delta": ["context_term_split", "context_pair_id", "entity_term_split", "A_entity_term_id", "world_family_id", "relation_id", "state_id"],
+      "entity_delta": ["entity_term_split", "entity_pair_id", "context_term_split", "A_context_term_id", "world_family_id", "relation_id", "state_id"],
+      "paraphrase_delta": ["context_term_split", "A_context_term_id", "entity_term_split", "A_entity_term_id", "world_family_id", "relation_id", "state_id"]
+    },
+    "template_schedule": "the sealed factorial corpus uses all 64 observation/query template pairs exactly 384 times each. Each matched template group contains eight quartets with each of the eight observation template IDs exactly once and each of the eight query template IDs exactly once; the eight pairs vary by group and are not restricted to the diagonal. Validate both marginal uniqueness per group and global pair balance before geometry."
+  },
+  "reporting": {
+    "delta_norms": "global distribution and every declared one-factor subgroup: context term ID/split, entity term ID/split, observation template, query template, relation, state, world family, and track",
+    "within_quartet_cosines": "all three declared factor pairs globally and by each declared one-factor subgroup",
+    "factor_consistency": "per-cell pairwise cosine distributions for each factor in every factorial cell; context-factor consistency in every binding-context cell; entity-factor consistency in every binding-entity cell",
+    "matched_binding": "report all 64 context-binding and 64 entity-binding cells, with 120 pairwise comparisons per cell",
+    "template_invariance": "report every matched group with all 28 pairwise comparisons across the eight template pairs",
+    "scope": "descriptive geometry only; do not select or rank views and do not infer probe accessibility or causal mechanisms"
+  }
+}

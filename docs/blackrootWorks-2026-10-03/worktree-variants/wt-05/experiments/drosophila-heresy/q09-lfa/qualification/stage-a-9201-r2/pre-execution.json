@@ -1,0 +1,137 @@
+{
+  "analysis_threads": 4,
+  "behavioral_inference": false,
+  "config_sha256": "099eae728399e192516f2f2a4d11345cd2a10eb3552abcfff2a609bc9aaf96c0",
+  "executable": "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q09-lfa\\target\\release\\q09-lfa.exe",
+  "executable_sha256": "255ea7c71a9a90450fd032c7d648875520b4f015a175a041f33fa55ad92f04b7",
+  "integrity_tolerance": 1e-9,
+  "protocol": "Q09-LFA",
+  "rank_diagnostics": [
+    100.0,
+    1000.0,
+    10000.0
+  ],
+  "rank_multiplier": 1000.0,
+  "schema_version": 1,
+  "scientific_seed_bundles": 0,
+  "source": [
+    {
+      "path": "CONTRACT.json",
+      "sha256": "981e281b7033f3b7bdeb9382aecb9b6aafb68282ea3071b5dbe2fbcf34a2b897"
+    },
+    {
+      "path": "Cargo.lock",
+      "sha256": "cd8ea7e09de36ef7ae31454e651932d08b4561cc0e55145f89999148cee3ecc3"
+    },
+    {
+      "path": "Cargo.toml",
+      "sha256": "08b9e545df966f6d9a839f66ba20b4c99cf34b67338630080408dd7e2eb49fb9"
+    },
+    {
+      "path": "PLAN.md",
+      "sha256": "c1592bb99a58b48f5485592e4a43a6166f4c16dbe98d750fb1986334f6c999ff"
+    },
+    {
+      "path": "src\\allocation.rs",
+      "sha256": "4fff2a7f1bc7078795abde6916bf14c96d2334579d04e48d4194999a076f826e"
+    },
+    {
+      "path": "src\\baseline.rs",
+      "sha256": "0ac5d54b053a26f97841bf8e4ac8acadeed6296056d466289f116420255212fa"
+    },
+    {
+      "path": "src\\capture.rs",
+      "sha256": "e0ed3fdc33cc1c0cd7236ddd6aba67e29d685fc10e0a6b6a416ec5da81b8c66f"
+    },
+    {
+      "path": "src\\experiment_main.rs",
+      "sha256": "1aec6cabb1e8259817ff7756fca65d539e6fb4b18291331794e51c9d74e1d632"
+    },
+    {
+      "path": "src\\graph.rs",
+      "sha256": "a697285a9fe4560fce32afb5330358ede1c84e96365c23ac96c24d97fe667464"
+    },
+    {
+      "path": "src\\linear.rs",
+      "sha256": "cb053f9ff33250a2009fa7a2bc311164aaeef8c54d20de11d37067352f55d487"
+    },
+    {
+      "path": "src\\linear_tests.rs",
+      "sha256": "be1194526cab747014f8fa2db9a65e7b8bd903955d50ed3dfb685060465e373d"
+    },
+    {
+      "path": "src\\main.rs",
+      "sha256": "0acb2b523716151428e61993c825c14e004b229d0c653026599ae26085009b1a"
+    },
+    {
+      "path": "src\\observer.rs",
+      "sha256": "08fc18ef45d376a9e58d7531231b110dad8a81cc86dc3c0d84e7333f445688ef"
+    },
+    {
+      "path": "src\\plasticity.rs",
+      "sha256": "d08e4057234dfbd6c4c11da660031263aeaa0327a86b68f7cae04cdc4bf9438c"
+    },
+    {
+      "path": "src\\policy.rs",
+      "sha256": "b01b4072d60bc2efc3ccaa121bbaf0763168f3154ef5ea32829c1c85193b08ed"
+    },
+    {
+      "path": "src\\rng.rs",
+      "sha256": "794d04a94d011ece9f5758ad05a680b3acccbc82e94e33f4d9a9179c882dd950"
+    },
+    {
+      "path": "src\\rotation.rs",
+      "sha256": "d50637747333bcc3463fffb4f986c721e8b397cb2f6b6da0bf63b55c6ed599ac"
+    },
+    {
+      "path": "src\\simulation\\dh03.rs",
+      "sha256": "ddaebb5caa82a16fff7745d878babf0f09d204a5ca8dd6360d6e60fa6f4b34e4"
+    },
+    {
+      "path": "src\\simulation\\dh04.rs",
+      "sha256": "1ea9f7df8e36b97f96298dc44fbbb2cb0c4e5eabda103db13c7c076bf71312e2"
+    },
+    {
+      "path": "src\\simulation\\dh06.rs",
+      "sha256": "06cc84d7e4ddcc7bfb34c395fef074835b98fef7b02dd9c95ce5023bb66696c0"
+    },
+    {
+      "path": "src\\simulation\\dh06_tests.rs",
+      "sha256": "1e5750e75b404928b152bd2a63b53847d47cb03857d463215be2213fdf4b55b1"
+    },
+    {
+      "path": "src\\simulation\\dh07.rs",
+      "sha256": "4a3d8df5f3e389d211e19fae96093f12ab6ebe3450be34169fab82010e05909a"
+    },
+    {
+      "path": "src\\simulation\\dh07_null.rs",
+      "sha256": "9a576bfbc0335ac9d2f169ce3fe98a393b6a884879a43257e2c5e218495f17ee"
+    },
+    {
+      "path": "src\\simulation\\dh07_tests.rs",
+      "sha256": "f1e34ec8be6c1721260dc780fcacfe5639321f410c4146fb98a8bc790ba0a588"
+    },
+    {
+      "path": "src\\simulation\\dh08a_tests.rs",
+      "sha256": "2372aae14491498fd621b53317e129ac3aac8ae384d04184a10d02d813880b35"
+    },
+    {
+      "path": "src\\simulation\\experiment.rs",
+      "sha256": "4ef74dfe60ad9cc9ae4b440a995419c648dceb1a903204b0c53fc770c94ba477"
+    },
+    {
+      "path": "src\\simulation\\q09_tests.rs",
+      "sha256": "83ee5e3858c225ed8e484ed29808f3929b5ab0a24884f7977a42a7eac796f8f6"
+    },
+    {
+      "path": "src\\simulation.rs",
+      "sha256": "9624ca39079d2ea78b42398981e85c45c189dd27d0c0b6fdeda16f5c7976ef0c"
+    },
+    {
+      "path": "src\\task.rs",
+      "sha256": "06b4ea25e3c8c4a0106337866c714c6d74e6d1c0377ac0a934c33e859a02dc61"
+    }
+  ],
+  "svd_epsilon": 1e-14,
+  "svd_max_iterations": 100000
+}

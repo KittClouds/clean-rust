@@ -1,0 +1,604 @@
+{
+  "A_B_C_streams": {
+    "A": 72,
+    "B": 72,
+    "C": 72
+  },
+  "B_collection_receipt_sha256": "4873abb29ddd0b24d1fb5d65b6bfb20af09246de3baee3d88271a38afd134412",
+  "C_quantization_exact": true,
+  "C_quantization_receipt_sha256": "c1a64549207ebe778f4a661747a184fcbd4b2dba8b25a71c7a1a9eeb0cdd2971",
+  "analysis_sha256": "de77a7805e8a44bedb90508303b151b46c734d94c871ee9d8e935ea12f949aba",
+  "arm_a_parent_anchor_match": true,
+  "cells": [
+    {
+      "cell": [
+        "fly",
+        "L",
+        303000
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "fly",
+        "L",
+        303001
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "fly",
+        "L",
+        303002
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "fly",
+        "L",
+        303003
+      ],
+      "rows": 899
+    },
+    {
+      "cell": [
+        "fly",
+        "R",
+        303000
+      ],
+      "rows": 1553
+    },
+    {
+      "cell": [
+        "fly",
+        "R",
+        303001
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "fly",
+        "R",
+        303002
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "fly",
+        "R",
+        303003
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "g001",
+        "L",
+        303000
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "g001",
+        "L",
+        303001
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "g001",
+        "L",
+        303002
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "g001",
+        "L",
+        303003
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "g001",
+        "R",
+        303000
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "g001",
+        "R",
+        303001
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "g001",
+        "R",
+        303002
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "g001",
+        "R",
+        303003
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "g002",
+        "L",
+        303000
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "g002",
+        "L",
+        303001
+      ],
+      "rows": 56
+    },
+    {
+      "cell": [
+        "g002",
+        "L",
+        303002
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "g002",
+        "L",
+        303003
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "g002",
+        "R",
+        303000
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "g002",
+        "R",
+        303001
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "g002",
+        "R",
+        303002
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "g002",
+        "R",
+        303003
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "g003",
+        "L",
+        303000
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "g003",
+        "L",
+        303001
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "g003",
+        "L",
+        303002
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "g003",
+        "L",
+        303003
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "g003",
+        "R",
+        303000
+      ],
+      "rows": 147
+    },
+    {
+      "cell": [
+        "g003",
+        "R",
+        303001
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "g003",
+        "R",
+        303002
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "g003",
+        "R",
+        303003
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "g004",
+        "L",
+        303000
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "g004",
+        "L",
+        303001
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "g004",
+        "L",
+        303002
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "g004",
+        "L",
+        303003
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "g004",
+        "R",
+        303000
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "g004",
+        "R",
+        303001
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "g004",
+        "R",
+        303002
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "g004",
+        "R",
+        303003
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "g005",
+        "L",
+        303000
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "g005",
+        "L",
+        303001
+      ],
+      "rows": 1866
+    },
+    {
+      "cell": [
+        "g005",
+        "L",
+        303002
+      ],
+      "rows": 1731
+    },
+    {
+      "cell": [
+        "g005",
+        "L",
+        303003
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "g005",
+        "R",
+        303000
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "g005",
+        "R",
+        303001
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "g005",
+        "R",
+        303002
+      ],
+      "rows": 1939
+    },
+    {
+      "cell": [
+        "g005",
+        "R",
+        303003
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "g006",
+        "L",
+        303000
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "g006",
+        "L",
+        303001
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "g006",
+        "L",
+        303002
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "g006",
+        "L",
+        303003
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "g006",
+        "R",
+        303000
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "g006",
+        "R",
+        303001
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "g006",
+        "R",
+        303002
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "g006",
+        "R",
+        303003
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "g007",
+        "L",
+        303000
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "g007",
+        "L",
+        303001
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "g007",
+        "L",
+        303002
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "g007",
+        "L",
+        303003
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "g007",
+        "R",
+        303000
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "g007",
+        "R",
+        303001
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "g007",
+        "R",
+        303002
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "g007",
+        "R",
+        303003
+      ],
+      "rows": 968
+    },
+    {
+      "cell": [
+        "g008",
+        "L",
+        303000
+      ],
+      "rows": 1058
+    },
+    {
+      "cell": [
+        "g008",
+        "L",
+        303001
+      ],
+      "rows": 893
+    },
+    {
+      "cell": [
+        "g008",
+        "L",
+        303002
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "g008",
+        "L",
+        303003
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "g008",
+        "R",
+        303000
+      ],
+      "rows": 971
+    },
+    {
+      "cell": [
+        "g008",
+        "R",
+        303001
+      ],
+      "rows": 0
+    },
+    {
+      "cell": [
+        "g008",
+        "R",
+        303002
+      ],
+      "rows": 1339
+    },
+    {
+      "cell": [
+        "g008",
+        "R",
+        303003
+      ],
+      "rows": 0
+    }
+  ],
+  "contract_sha256": "5d421392c7d07d0d6c9692033ceb22e311016ddf2efc3bce3f6ba35f6461aada",
+  "duplicate_or_missing_cell_count": 0,
+  "duplicate_row_identity_count": 0,
+  "folds_per_arm": 4,
+  "frozen_inputs_verified": 265,
+  "identity": "F4-PRECISION-01-ANALYSIS-01",
+  "integrity_verifier_sha256": "dcc2d8c6e645263e3b6b0337b7bcab5397c9d386dc2fbc6a7b4a0b61e723d0b0",
+  "measured_namespace_created": false,
+  "nonfinite_feature_or_metric_count": 0,
+  "outcome_access_order_deviation": "Analysis JSON was inspected before this independent structural/hash audit receipt was generated. No settings or analysis were changed in response; classify outputs as qualification diagnostics, not blind confirmation.",
+  "paired_rows": 13420,
+  "schema": "FLY-REACH-03-F4-PRECISION-01-integrity-receipt-v1",
+  "status": "PASS_WITH_OUTCOME_ACCESS_SEQUENCE_DEVIATION",
+  "total_fit_cells": 12
+}

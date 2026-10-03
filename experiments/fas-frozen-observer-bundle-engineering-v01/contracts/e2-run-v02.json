@@ -1,0 +1,155 @@
+{
+  "protocol_id": "FAS_FROZEN_OBSERVER_BUNDLE_E2_RUN_V02",
+  "status": "E2_V02_FROZEN_NOT_AUTHORIZED",
+  "project_id": "fas-frozen-observer-bundle-engineering-v01",
+  "predecessors": {
+    "e0_v04_root_sha256": "fef50e3d7efe6ff35adf671940ee73112caf8ba6192596094aa6bb3e69ae9ab2",
+    "e1_v04_root_sha256": "6ba77a899363651e3ba119b005f59a22e86f011f83c86b873857cd3f9ab64b03",
+    "e2_v01_preservation_root_sha256": "0ff309d833cd87017f7384247e4420a508f582ad9f375c5637f586d73b703f4c",
+    "e2_v01_disposition": "E2_ATTEMPT_PRESERVED_GPU_RESOURCE_GATE_UNVERIFIED; cache is not eligible for fitting and is not reused"
+  },
+  "requires": {
+    "sealed_e0_v05_root_sha256": null,
+    "e1_panel_root_sha256": "6ba77a899363651e3ba119b005f59a22e86f011f83c86b873857cd3f9ab64b03",
+    "new_explicit_user_model_contact_authorization": true,
+    "wait_receipt_status": "WAIT_COMPLETE_STABLE_ABSENCE",
+    "feature_output_root_must_be_new": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e2-v02",
+    "concurrent_run_wait_receipt_path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e2-v02-concurrent-wait-complete-v01.json",
+    "e2_v01_reference_cache_path": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e2-v01\\cache\\V1_FINAL_POSITION.f32le",
+    "e2_v01_reference_cache_sha256": "8eb80df5f73e761fe6c025fc1c66abef2027d639b6c14f56d4177d6e6a7a45a4",
+    "e2_v01_reference_cache_bytes": 872415232
+  },
+  "wait_gate": {
+    "wait_before": "runtime/model/tokenizer import or CUDA model contact in E2 v02",
+    "target_process": {
+      "pid": 34332,
+      "executable": "C:\\Users\\shuga\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "script": "D:\\codex-runs\\fas-s12-observer-plane-causal-dependence-v01\\run-v02\\source\\run_s12_v02.py",
+      "creation_time_local": "2026-09-25T20:08:43"
+    },
+    "also_wait_for": "any process whose command line contains the exact canonical run_s12_v02.py script path, including relaunches under another PID",
+    "success_condition": "zero matching script processes on two consecutive Win32_Process snapshots at least 30 seconds apart",
+    "pid_reuse": "record exact PID reuse and continue matching by canonical script path",
+    "operator_action": "observe and wait; do not terminate, suspend, reprioritize, or otherwise alter the concurrent process",
+    "receipt": "status WAIT_COMPLETE_STABLE_ABSENCE, exact process identity observed, final matching process list empty, stable absence samples and interval recorded, model_contact_performed_by_waiter=false",
+    "implementation_source": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/wait_for_concurrent_gpu_job_v01.ps1",
+    "implementation_source_sha256": "9a41e083b638e09411ad2143375d180730a25d1b42937e330eb0373788acd216",
+    "receipt_path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e2-v02-concurrent-wait-complete-v01.json"
+  },
+  "model_and_representation": {
+    "model_id": "LiquidAI/LFM2.5-1.2B-Base",
+    "revision": "7453bca97ca1e67754c4035a4b4c584e1c9dd725",
+    "read_only": true,
+    "surface": "V1_FINAL_POSITION",
+    "representation_abi_path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/representation-abi-v02.json",
+    "extractor_source_path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/extract_features_v02.py",
+    "extractor_source_sha256": "c026bc682503c2357fcbabaa27a3f9208eb24ad9e0bd554e8887645cdd2c5567",
+    "full_panel_rows": 106496,
+    "hidden_dimension": 2048,
+    "repeat_gate_rows": 256,
+    "representation_or_panel_change": false,
+    "representation_abi_sha256": "17089e961446035a706b3c1c627e7877dfb6905b1b2b28f746844660fad6fbb4"
+  },
+  "gpu_measurement": {
+    "reset_call": "torch.cuda.reset_peak_memory_stats(cuda:0)",
+    "reset_timing": "after CUDA device availability check and before tokenizer/model loading or model transfer",
+    "required_counters": [
+      "torch.cuda.memory_allocated(cuda:0)",
+      "torch.cuda.memory_reserved(cuda:0)",
+      "torch.cuda.max_memory_allocated(cuda:0)",
+      "torch.cuda.max_memory_reserved(cuda:0)"
+    ],
+    "ceiling_bytes": 10737418240,
+    "pass_gate": "max_memory_reserved <= ceiling_bytes and max_memory_allocated <= max_memory_reserved",
+    "final_sampling": "torch.cuda.synchronize(cuda:0) followed by all four counters after extraction and repeat gate",
+    "process_identity": [
+      "PID",
+      "parent PID",
+      "resolved Python executable",
+      "extractor command line"
+    ],
+    "device_wide_diagnostic": "nvidia-smi used/free memory sampled approximately every 10 seconds, plus before/after snapshots; reported separately and never attributed to the extractor PID",
+    "scope_limit": "PyTorch caching-allocator metrics exclude CUDA context and any non-PyTorch driver allocations; the extractor uses PyTorch for model and tensor allocations",
+    "e2_v01_retroactive_reclassification": "none; the preserved v01 GPU resource gate remains UNVERIFIED",
+    "device_wide_snapshot_command": "nvidia-smi --query-gpu=name,memory.total,memory.used,memory.free,utilization.gpu --format=csv,noheader,nounits",
+    "device_wide_preflight_path": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e2-v02\\receipts\\gpu-device-preflight-v02.csv",
+    "device_wide_postflight_path": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e2-v02\\receipts\\gpu-device-postflight-v02.csv",
+    "scope_claim_exact": "E2 GPU gate = extractor-process PyTorch CUDA caching-allocator reserved peak; not total GPU memory used by E2.",
+    "scope_definition": "torch.cuda.max_memory_reserved(cuda:0), sampled in the extractor process after resetting PyTorch CUDA peak statistics; process-local allocator-reserved peak only.",
+    "total_gpu_memory_claimed": false,
+    "excluded_allocations": [
+      "CUDA context",
+      "non-PyTorch CUDA driver allocations"
+    ],
+    "pre_reset_sample_timing": "after CUDA initialization and device availability check, before any tokenizer load, model load, or model transfer",
+    "pre_reset_clean_baseline_gate": "record all four required counters and require each exactly zero; otherwise preserve a stop receipt and stop before tokenizer/model loading",
+    "post_reset_sample_timing": "immediately after peak-statistics reset and before tokenizer load or model transfer",
+    "post_reset_clean_baseline_gate": "record all four required counters and require each exactly zero; otherwise preserve a stop receipt and stop before tokenizer/model loading",
+    "terminal_receipt_required_scope_claim": true,
+    "terminal_receipt_total_gpu_memory_claimed": false,
+    "terminal_receipt_required_fields": [
+      "scope_claim_exact",
+      "total_gpu_memory_claimed",
+      "pre_reset_allocator_counters",
+      "post_reset_allocator_counters",
+      "final_and_process_peak"
+    ],
+    "terminal_receipt_required_values": {
+      "total_gpu_memory_claimed": false
+    }
+  },
+  "other_resource_receipts": {
+    "host_process_memory": "sample extractor PID working set and peak working set; retain host available memory as system-level diagnostic",
+    "storage": "re-run D: free-space preflight and postflight; preserve v04 E1 panel and v01 E2 attempt; read the pinned E2 v01 cache only as a hash comparator, never as v02 feature input; use a fresh e2-v02 output root",
+    "device_wide_gpu": "retain the raw nvidia-smi sample CSV at approximately 10-second intervals, the preflight and postflight snapshots, and clearly separate all device-wide totals from PID-attributed PyTorch allocator peaks",
+    "sampler_source": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/sample_e2_resources_v02.ps1",
+    "sampler_source_sha256": "dda73c48afd804b2d3253bf38b498141a75e4123c2d357526f336a78b2d20754"
+  },
+  "success_gates": [
+    "all E0 v05 and E1 v04 roots and file hashes verify before importing model/tokenizer libraries",
+    "concurrent-run wait receipt hash and exact identity verify before any model/tokenizer contact",
+    "pinned model, tokenizer, config, weights, runtime, and representation ABI hashes match",
+    "registered 256-row repeat is byte exact",
+    "one full panel extraction yields exactly 106496 rows by 2048 little-endian float32 values, all finite",
+    "row identity exactly matches the sealed E1 v04 order",
+    "extractor-process max_memory_reserved <= 10737418240 bytes and max_memory_allocated <= max_memory_reserved",
+    "disk and host resource limits pass",
+    "after CUDA initialization, all four current/peak allocated/reserved counters are exactly zero before peak reset and again immediately after reset, before tokenizer/model loading",
+    "read-only E2 v01 cache hash and byte length match their frozen identity before model/tokenizer contact and remain unchanged after extraction",
+    "new E2 v02 feature cache SHA-256 and exact byte length equal the preserved E2 v01 cache"
+  ],
+  "stop_and_preserve_conditions": [
+    "wait receipt absent, malformed, changed, or indicates a matching concurrent workload",
+    "any predecessor, source, model, tokenizer, config, runtime, or ABI hash mismatch",
+    "storage preflight failure or any frozen host/resource limit failure",
+    "deterministic repeat, feature shape, finite-value, or row-identity failure",
+    "per-process CUDA allocator reserved peak exceeds 10 GiB or allocator peak invariant fails",
+    "any nonzero CUDA allocator counter in the pre-reset or post-reset clean-baseline samples",
+    "E2 v01 reference cache missing, changed from its pinned hash/length, or not unchanged after extraction",
+    "E2 v02 output cache SHA-256 or byte length differs from the pinned E2 v01 cache"
+  ],
+  "authority": {
+    "model_contact_authorized": false,
+    "tokenizer_contact_authorized": false,
+    "feature_extraction_authorized": false,
+    "observer_fitting_authorized": false,
+    "evaluation_scoring_authorized": false,
+    "successful_e2_does_not_authorize_e3": true
+  },
+  "validation_source_sha256": "3e8ca1c5e2fe644902d85c25d7e5308b8eadb1d1dc4e47f9dad31eecdbe8a0b8",
+  "representation_equivalence": {
+    "required": true,
+    "reference_cache_path": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e2-v01\\cache\\V1_FINAL_POSITION.f32le",
+    "reference_cache_sha256": "8eb80df5f73e761fe6c025fc1c66abef2027d639b6c14f56d4177d6e6a7a45a4",
+    "reference_cache_bytes": 872415232,
+    "reference_role": "read-only hash comparator only; E2 v01 cache is not reused as v02 features and is not eligible for observer fitting",
+    "reference_check_timing": [
+      "before model/tokenizer contact",
+      "after full v02 extraction"
+    ],
+    "gate": "exact SHA-256 equality and exact byte length equality",
+    "mismatch_disposition": "preserve v02 cache and failure receipt, then stop; no tolerance comparison or in-place repair",
+    "reference_change_disposition": "preserve and stop"
+  },
+  "freeze_note": "Protocol bytes are frozen as part of E0 v05. This state does not authorize tokenizer or model contact."
+}

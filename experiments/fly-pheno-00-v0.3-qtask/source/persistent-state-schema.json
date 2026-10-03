@@ -1,0 +1,27 @@
+{
+  "schema": "FLY-PHENO-00-persistent-state-v1",
+  "state_owner": "fly-pheno-00 runner",
+  "fields": {
+    "weights": {"kind": "f32_vec", "persistent": true, "trainable": true, "lesion_masked_edges": "stored_values_preserved"},
+    "eligibility": {"kind": "f32_vec", "persistent": true, "allowed_in_weight_frozen_arm": true},
+    "baseline": {"kind": "f32_vec", "persistent": true, "allowed_in_weight_frozen_arm": true},
+    "dan": {"kind": "f32_vec", "persistent": true, "allowed_in_weight_frozen_arm": true},
+    "rng": {"kind": "splitmix64_state", "persistent": true, "paired_stream_required": true},
+    "scale": {"kind": "f32", "persistent": true, "allowed_in_weight_frozen_arm": true},
+    "work": {"kind": "u64_counter", "persistent": true, "paired_stream_required": true},
+    "events": {"kind": "u64_counter", "persistent": true, "paired_stream_required": true},
+    "post": {"kind": "f32_vec", "persistent": false, "evaluation_scratch": true},
+    "probabilities": {"kind": "f32_vec", "persistent": false, "evaluation_scratch": true},
+    "signed_post": {"kind": "f32_vec", "persistent": false, "evaluation_scratch": true},
+    "feedback": {"kind": "f32_vec", "persistent": false, "evaluation_scratch": true},
+    "gain": {"kind": "f32_vec", "persistent": false, "evaluation_scratch": true}
+  },
+  "weight_frozen_allowlist": ["eligibility", "baseline", "dan", "rng", "scale", "work", "events"],
+  "weight_frozen_forbidden_changes": ["weights"],
+  "evaluator_contract": {
+    "may_read": ["weights", "lesion_mask", "task_patterns", "labels", "response_draw_bank"],
+    "may_write": ["disposable_evaluator_copy_only"],
+    "may_not_advance": ["training_rng", "training_work", "training_events", "recovery_schedule"],
+    "result": "heldout_error_fraction"
+  }
+}

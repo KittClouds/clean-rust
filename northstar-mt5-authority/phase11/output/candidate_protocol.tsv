@@ -1,0 +1,6 @@
+target	status	selected_model_class	reason	holdout_authorized	evaluation_unit
+reclaim_given_break	FROZEN_RESEARCH_CANDIDATE	RIDGE_LOGISTIC	ridge is the hard baseline; nonlinear challenger was not uniformly superior	False	run-blocked attempts; episode membership never crosses a run fold
+initial_acceptance_given_initial_contact	FROZEN_RESEARCH_CANDIDATE	RIDGE_LOGISTIC	ridge is the hard baseline; nonlinear challenger was not uniformly superior	False	run-blocked attempts; episode membership never crosses a run fold
+rejection_given_initial_contact	FROZEN_RESEARCH_CANDIDATE	RIDGE_LOGISTIC	ridge is the hard baseline; nonlinear challenger was not uniformly superior	False	run-blocked attempts; episode membership never crosses a run fold
+retest_hold_given_retest_contact	FROZEN_RESEARCH_CANDIDATE	BOOSTED_STUMPS	challenger beats ridge on grouped and forward log loss without material calibration loss	False	run-blocked attempts; episode membership never crosses a run fold
+transit_given_episode_acceptance	NO_HOLDOUT_CANDIDATE	\N	baseline did not clear all stability and run-block uncertainty gates	False	run-blocked attempts; episode membership never crosses a run fold

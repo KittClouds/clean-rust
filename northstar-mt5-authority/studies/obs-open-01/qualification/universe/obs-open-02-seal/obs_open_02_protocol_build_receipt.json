@@ -1,0 +1,1 @@
+{"builder":"tools/build_obs_open_02_protocol_seal.py","builder_sha256":"b9a8663e700076d2359d4d7f964a2b591fa88b0b8c54878a2b0a5a30cac27610","determinism_requirement":"TWO_INDEPENDENT_OUTPUT_DIRECTORIES_BYTE_IDENTICAL","observation_access":"NONE","schema":"OBS_OPEN_DISCOVERY_MEASUREMENT_PROTOCOL_BUILD_V1","validation":"PASS"}

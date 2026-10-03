@@ -1,0 +1,11 @@
+{
+  "contract_sha256": "7E3DF55D8937D4FF520E24CF8C908088BB08D04C7BE770A4A4C5AD46C4846F2E",
+  "domain_count": 31596544,
+  "domain_sha256": "BA9AF9234D5FF129ED584DBAE6B4133C8572E042735E84FFF7C747F8E1971CD4",
+  "engineering_only": true,
+  "identity": "q10-gc1-lr1-requal1-csc1-alg4-comp1-v1",
+  "measurement_started": false,
+  "protocol": "Q10-ALG4-COMP1",
+  "scientific_promotion": false,
+  "status": "PREEXECUTION_SEALED"
+}

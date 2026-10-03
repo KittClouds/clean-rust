@@ -1,0 +1,18 @@
+{
+  "protocol": "Q10-PF6-S1",
+  "status": "ENGINEERING_ONLY_COMPLETE_NO_SCIENTIFIC_PROMOTION",
+  "execution_sha256": "E561D7392D471CC0B47E98E66EC5AD9FC772476F2F61103FBF5994A051BC0E17",
+  "aggregate_sha256": "19724D0A8448C895399C44B53FB8AB0059A17F70C653E80D9244F4A7E20880EF",
+  "audit": {
+    "structural": "Q10_PF6_S1_STRUCTURAL_AUDIT_COMPLETE",
+    "independent_replay": "Q10_PF6_S1_INDEPENDENT_REPLAY_AUDIT_COMPLETE"
+  },
+  "decision": {
+    "longer_horizon_gate": false,
+    "ranking_audit_gate": true,
+    "geometry_balancing_gate": false,
+    "widespread_flat_gate": false,
+    "scientific_bundle_authorized": false,
+    "recommended_next_identity": "Q10-PF7-RANKING-AUDIT"
+  }
+}

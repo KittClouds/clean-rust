@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PartitionTape",
+  "type": "object",
+  "properties": {
+    "assignments": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/PartitionAssignment"
+      }
+    },
+    "chronology_key": {
+      "type": "string"
+    },
+    "content_hash": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "embargo_ns": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "episode_population_hash": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "group_key": {
+      "type": "string"
+    },
+    "partition_tape_id": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "schema_version": {
+      "type": "string"
+    },
+    "sealed": {
+      "type": "boolean"
+    },
+    "source_episode_tape_id": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "strategy": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "partition_tape_id",
+    "source_episode_tape_id",
+    "strategy",
+    "group_key",
+    "chronology_key",
+    "embargo_ns",
+    "assignments",
+    "episode_population_hash",
+    "sealed",
+    "content_hash"
+  ],
+  "$defs": {
+    "Digest256": {
+      "description": "Domain-separated BLAKE3 digest",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "PartitionAssignment": {
+      "type": "object",
+      "properties": {
+        "chronological_ordinal": {
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        },
+        "episode_id": {
+          "$ref": "#/$defs/Digest256"
+        },
+        "group_id": {
+          "type": "string"
+        },
+        "reason_code": {
+          "type": "string"
+        },
+        "role": {
+          "$ref": "#/$defs/PartitionRole"
+        }
+      },
+      "required": [
+        "episode_id",
+        "group_id",
+        "chronological_ordinal",
+        "role",
+        "reason_code"
+      ]
+    },
+    "PartitionRole": {
+      "type": "string",
+      "enum": [
+        "TRAIN",
+        "DEVELOPMENT",
+        "EVALUATION",
+        "EXCLUDED_EMBARGO"
+      ]
+    }
+  }
+}

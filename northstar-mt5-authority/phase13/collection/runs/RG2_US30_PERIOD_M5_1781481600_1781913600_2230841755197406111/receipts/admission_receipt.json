@@ -1,0 +1,44 @@
+﻿{
+    "contract":  "MST_HOLDOUT_ADMISSION_V1",
+    "status":  "SEALED",
+    "protocol_sha256":  "869402c193435f149120f1130ddefd817f87a39240c51bc5536292fd2b285d2d",
+    "canonical_instrument":  "US30",
+    "broker_symbol":  "US30",
+    "data_source_id":  "METAQUOTES_DEMO",
+    "holdout_id":  "VERIFICATION_B",
+    "window_start":  1781481600,
+    "window_end_exclusive":  1781913600,
+    "run_key":  "RG2_US30_PERIOD_M5_1781481600_1781913600_2230841755197406111",
+    "invocation_id":  "RG2_US30_PERIOD_M5_1781481600_1781913600_2230841755197406111_I1781481600_203631081037742297",
+    "auction_stem":  "MasterAuction_US30_PERIOD_M5_P13_US30_VERIFICATION_B_RG2_v7",
+    "structure_stem":  "MasterStructure_US30_PERIOD_M5_P13_US30_VERIFICATION_B_v6",
+    "canonical_dataset_hash":  "29010cf59c61758b47499853d3743388246f1fa8c343489f61eeaf2c2c99f1ae",
+    "dataset_hashes":  {
+                           "events":  "cdad75f35101209108170e32257c7e364fca64e88e10c85cd0547ac2df7f3160",
+                           "attempts":  "6c9663b2ba7e0bbe993262706e9a12a3e581c723d0edf434e67f389d682e7e41",
+                           "episodes":  "c9c9508b0b55d71ef28f6289d697cac8b3945d25b400dcb967bac44b400fa610",
+                           "context":  "f4297300aae9b1f2e5b56e7adad80e2379b4d67264c099b23f71717f454bd784",
+                           "features":  "cb82b4e5cbbed003b5c05b2945633a14bb82fe666fdb7b1470df2a91592da3c3",
+                           "transits":  "d37ddaaddd531d9078bcc163431abde651fcb8e5ac5b8c8f780fb79f904cf9e1"
+                       },
+    "row_counts":  {
+                       "events":  928,
+                       "attempts":  192,
+                       "episodes":  42,
+                       "context":  1653,
+                       "features":  192,
+                       "transits":  9
+                   },
+    "structure_row_counts":  {
+                                 "inputs":  439632,
+                                 "nodes":  44976,
+                                 "events":  553
+                             },
+    "terminal_hash":  "9932640895550855888",
+    "receipt_hash":  "9081547247362950010",
+    "contract_receipt_hash":  "7919780846961958977",
+    "isolation":  "unique_instance_tag_plus_single_writer_lock",
+    "visual_rendering":  false,
+    "research_logging":  true,
+    "unexpected_data_gaps":  0
+}

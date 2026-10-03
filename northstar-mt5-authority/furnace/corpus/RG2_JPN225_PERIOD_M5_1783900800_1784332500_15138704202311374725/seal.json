@@ -1,0 +1,95 @@
+﻿{
+    "contract":  "MST_IMMUTABLE_RUN_SEAL_V1",
+    "status":  "SEALED",
+    "sealed_at_utc":  "2026-08-12T12:46:22.3741448Z",
+    "run_key":  "RG2_JPN225_PERIOD_M5_1783900800_1784332500_15138704202311374725",
+    "invocation_id":  "RG2_JPN225_PERIOD_M5_1783900800_1784332500_15138704202311374725_I1783900800_14814472736450214318",
+    "window_id":  "JPN225_20260713_DIRECTIONAL_EXPANSION_DOWN",
+    "manifest_sha256":  "5bf12767746b8499ad0edde2597df67b1928cc5941705a8391ae2585a0574092",
+    "canonical_dataset_hash":  "7f2593a7d9ee6636ed76d8a7e2fb89bffa242aa3a27cda22de96d84f29e029af",
+    "sealed_payload_sha256":  "0a067acb802af1a749edeba724e06c47f77f7a436ff78dfbbabd8bbb1c19316a",
+    "file_count":  16,
+    "files":  [
+                  {
+                      "path":  "raw/auction/MasterAuction_JPN225_PERIOD_M5_F2_JPN225_20260713_XDN_A01_RG2_v7_attempts.tsv",
+                      "bytes":  314385,
+                      "sha256":  "4b9479d32de90098279b4764981aa9bbe0892c62868462906b1e3d644ab8d5e1"
+                  },
+                  {
+                      "path":  "raw/auction/MasterAuction_JPN225_PERIOD_M5_F2_JPN225_20260713_XDN_A01_RG2_v7_context.tsv",
+                      "bytes":  863572,
+                      "sha256":  "23bf273df5c3e18442cd292834d1cfa27663ee2da93b8495c01510917863486d"
+                  },
+                  {
+                      "path":  "raw/auction/MasterAuction_JPN225_PERIOD_M5_F2_JPN225_20260713_XDN_A01_RG2_v7_episodes.tsv",
+                      "bytes":  33759,
+                      "sha256":  "60ce6a75c9959f14ae42f92636e01161f411c98653774cc69de397373832e967"
+                  },
+                  {
+                      "path":  "raw/auction/MasterAuction_JPN225_PERIOD_M5_F2_JPN225_20260713_XDN_A01_RG2_v7_events.tsv",
+                      "bytes":  1061014,
+                      "sha256":  "15ba49d7c7c2679b936f66803d00df81695ee4c342348e960869e62af44e650a"
+                  },
+                  {
+                      "path":  "raw/auction/MasterAuction_JPN225_PERIOD_M5_F2_JPN225_20260713_XDN_A01_RG2_v7_features.tsv",
+                      "bytes":  272296,
+                      "sha256":  "33311e76796a3be7520bcb71195647e091a3eb09cb9fe58e875e3212ad1c2ab6"
+                  },
+                  {
+                      "path":  "raw/auction/MasterAuction_JPN225_PERIOD_M5_F2_JPN225_20260713_XDN_A01_RG2_v7_runs.tsv",
+                      "bytes":  5751,
+                      "sha256":  "2f25ecad75abaf733c6c9613bf48c29c6b9bcc629f794b21ca057358cdf101f3"
+                  },
+                  {
+                      "path":  "raw/auction/MasterAuction_JPN225_PERIOD_M5_F2_JPN225_20260713_XDN_A01_RG2_v7_transits.tsv",
+                      "bytes":  18295,
+                      "sha256":  "b706846274a1e485dbc82fc35b3e999cd990587796b3d40f3888fe58ed53ad3f"
+                  },
+                  {
+                      "path":  "raw/structure/MasterStructure_JPN225_PERIOD_M5_F2_JPN225_20260713_XDN_A01_v6_events.tsv",
+                      "bytes":  192293,
+                      "sha256":  "d9f6e3cde234277492fef11bbdcd4d18297f4f90991548f6f0269fcdff0eca32"
+                  },
+                  {
+                      "path":  "raw/structure/MasterStructure_JPN225_PERIOD_M5_F2_JPN225_20260713_XDN_A01_v6_inputs.tsv",
+                      "bytes":  189973076,
+                      "sha256":  "36ebc4eac8fa03ca7ae68f93542043400a0611cec988814e564a5bc855170879"
+                  },
+                  {
+                      "path":  "raw/structure/MasterStructure_JPN225_PERIOD_M5_F2_JPN225_20260713_XDN_A01_v6_nodes.tsv",
+                      "bytes":  26024293,
+                      "sha256":  "45cdb32681dd7ffb2d2b86bb0cd4c19918e852fecbb40ac6670211191d91e903"
+                  },
+                  {
+                      "path":  "receipts/admission_receipt.json",
+                      "bytes":  2792,
+                      "sha256":  "f850c6ea5bde33f4355fe305d8b46cf3969483cc71a24fa434213b16ede7f3bf"
+                  },
+                  {
+                      "path":  "receipts/campaign_manifest_row.json",
+                      "bytes":  1677,
+                      "sha256":  "ab04198220f6aa0f2fe24a0046391cc2daaa7518b28df067139b1e8451428d7c"
+                  },
+                  {
+                      "path":  "receipts/MasterAuction_JPN225_PERIOD_M5_F2_JPN225_20260713_XDN_A01_RG2_v7_replay_certificate.json",
+                      "bytes":  3602,
+                      "sha256":  "b921266de0041a7791e25f325ef74ec16ab660b32ab42d22fbeb5d62351ceda6"
+                  },
+                  {
+                      "path":  "receipts/MasterAuction_JPN225_PERIOD_M5_F2_JPN225_20260713_XDN_A01_RG2_v7_replay_certificate.md",
+                      "bytes":  635,
+                      "sha256":  "6ce0beea2a09b9fa54e7cee08caeb1290d9d7b555e147859efea9026a0329231"
+                  },
+                  {
+                      "path":  "receipts/terminal_run_receipt.json",
+                      "bytes":  4528,
+                      "sha256":  "ea6e443edb84e4139fcf2329583a13399c2f3bb32a1cc27509cc1f03735b44ce"
+                  },
+                  {
+                      "path":  "tester.ini",
+                      "bytes":  1660,
+                      "sha256":  "a882fc935aa9da3d5bdff116006c42daa9c2f9269ef09fe9664173a5ad05d613"
+                  }
+              ],
+    "mutation_rule":  "never overwrite; replacement requires a new invocation and explicit corpus generation"
+}

@@ -1,0 +1,8 @@
+{
+  "schema": "FAS_E4_0_SOURCE_PRESERVATION_ATTEMPT_V01",
+  "status": "PARTIAL_SNAPSHOT_STOPPED_BEFORE_SOURCE_MODIFICATION",
+  "reason": "The second snapshot command repeated the nested tests-path naming mistake; integrity.py was copied, then the tests copy failed. No source file was changed. This partial directory remains preserved; a flat-filename retry follows.",
+  "partial_snapshot_path": "audits/e4-0-track-d/history/track-d-v05-source-snapshot-v02/integrity-track-d-v05.py",
+  "partial_snapshot_sha256": "a1bc8feaa9426853e7ec5eb41503f072997418dfeafc522be7175a65e8153d8d",
+  "source_modified": false
+}

@@ -1,5 +1,15 @@
 # Phase 1B — Goal-Relative Candidate Acquisition
 
+> **Historical-reference qualification (Qwen preparation, 2026-10-01).** The
+> inspected harness does not implement its declared isolation contract completely:
+> Phase 1 trains consistency on DEV pairs, Phase 1B omits the declared pair loss
+> and detaches its variance term, and packed candidate entity indices can address
+> another world's entities. Padded action logits are also zeroed rather than
+> excluded. Saved numbers are preserved, but the causal verdicts below are
+> historical interpretations, not clean evidence ruling out objective competition
+> or establishing a substrate ceiling. See CORRECTIONS.md C13. The user authorized
+> repaired Qwen runs only, not MiniCPM reruns.
+
 **Question.** Can MiniCPM acquire goal-relative candidate semantics through the interface it
 already has?
 
@@ -57,7 +67,7 @@ Sensitivity, pre-registered, 12 probe epochs: `e_j` MLP 0.5244, `c_j` MLP 0.5256
 1. **The readout family is demonstrably capable.** The identical code, optimiser and schedule
    solves `candidate_legal` from `e_j` at 0.7479 and from `c_j` at 0.7509. So the null result on
    the goal channel is not the probe failing.
-2. **Legality was never learned — it was already there.** Legality decodes at **0.7608 from the
+2. **Legality was accessible at initialization; acquisition is not demonstrated.** Legality decodes at **0.7608 from the
    untrained graft**, *higher* than from the trained one (0.7479) and higher than the production
    head (0.7495). The candidate-local branch `c_j` linearly encodes legality from
    initialisation, and Phase 1 training was approximately neutral on it, if marginally negative.
@@ -121,15 +131,37 @@ Shallow recoverability is ruled out by stage 1, with a working positive control.
 representation-level fact: the candidate-local branch has no goal input, and the route from the
 global state into a candidate cannot be a shallow readout.
 
-**This is where cross-lane comparison becomes earned.** Not before. The next question is now
-precise and answerable:
+**This is where source-level cross-lane inspection becomes earned.** It is not yet a controlled
+performance comparison. The next question is now precise and answerable:
 
-> Where does Lexi obtain goal-relative candidate structure that MiniCPM's present interface fails
-> to acquire?
+> What candidate-conditioning route does Lexi's frozen causal graft use, and how does it differ
+> from MiniCPM's present interface?
 
-and it is worth asking, because Lexi has exactly the channel MiniCPM lacks. But the sequencing
-rule still holds: a mechanism is last, not first, and the immediate next cheap step is to read
-Lexi's graft and identify what its candidate path receives that `c_j` does not.
+It is worth asking, but the source does **not** establish that Lexi has a dedicated goal-relative
+input channel that MiniCPM lacks. The static source review below identifies an architectural
+difference; it is not a causal explanation for the endpoint gap.
+
+## Static source review — Lexi's P2-CONSIST graft
+
+The Phase 1 wrapper imports the Phase 0 causal graft under lock
+`4e1cc3e3d807bb001a71ab6c50131dd9c7e76f95395dc8cfa710464bedb15279`; the checked-in
+`graft/model.py` matches the locked package hash. Phase 2 verifies and imports that frozen Phase 1
+implementation, so this is the source path inherited by P2-CONSIST.
+
+- **Lexi:** the causal input is the existing final-token + full-mean row vector. Each action query
+  is built from action-type and argument-ordinal embeddings; it attends over the single row token,
+  then the candidate state MLP combines that query/context with the global semantic slot. There
+  are no candidate-specific entity-span vectors on this causal path.
+- **Lepori:** `c_j` gathers the referenced argument entity-span vectors plus action type; the
+  candidate state is an MLP over `[c_j; s]`, where `s` pools the six surface projections.
+
+So the concrete difference is **row-level late fusion with an ordinal-based action query** versus
+**entity-anchored candidates fused with a pooled global state**. Neither source defines a separate
+goal token as a candidate-local input; goal-relative information must be recovered through the
+global representation and candidate-state computation. This source comparison does not show which
+route caused Lexi's higher measured endpoint, and no controlled cross-lane comparison has been run.
+The sequencing rule still holds: source review first, mechanism claims only after a controlled
+comparison.
 
 ## What is *not* concluded
 

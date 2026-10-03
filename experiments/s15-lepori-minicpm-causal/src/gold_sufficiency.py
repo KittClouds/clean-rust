@@ -5,8 +5,10 @@ The question this exists to answer, before any mechanism is chosen:
     Is the action endpoint limited by the graft, or is the typed state not action-sufficient?
 
 Action choice generally needs more than "is this candidate legal". It also needs something like
-"does this candidate advance or satisfy the goal". So if the candidate-goal channel is missing or
-dead, a recurrent action workspace over legality state was never going to fix MOVE.
+"does this candidate advance or satisfy the goal". The L1 MOVE 1-NN score is an estimator result,
+not an information ceiling; see `gold_addendum.py` for the conditional determinism ceilings. Keep
+these separate when interpreting the ladder: an estimator gap does not prove that a recurrent
+action workspace cannot recover the relevant signal.
 
 The ladder asks how well the action can be determined from progressively richer GOLD state:
 

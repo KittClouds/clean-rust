@@ -1,0 +1,22 @@
+{
+  "architecture_parameter_count": 19936,
+  "comparative_outcomes_used_during_fit": false,
+  "fit_count": 36,
+  "fit_manifest_sha256": "91c4c2c3362acb52dfac739bf4794bc3e8e1022550be11f8c5d8b3e0e10c3b49",
+  "identity": "F4-PRESENTATION-02-CPHI-ENG1-V2",
+  "initializer_manifest_sha256": "f954143995f6c08d0e99a94010d4e9dfac0ac1f802f98e4f5ebb1d3d42f7ce43",
+  "native_collection_reused": true,
+  "parent_analysis_sha256": "8465e9954fd84434b78a8b57d867ca4daa35ad1a68b12671fb6c758e7804616b",
+  "parent_input_manifest_sha256": "f90de286950a06ceac4d3f0b6cd3c1ae4d0feaaa7def46f9fae19c383bf49485",
+  "parent_integrity_receipt_sha256": "ce9c75ffc2019b3e636bcd376b6602e0165350ebe8550dbba24d999d8e7e040f",
+  "parent_outputs_modified": false,
+  "parent_prediction_lock_sha256": "47d812653111164c84d2c6b2e861729d7e5356e39821d9d0ff6d9d8c9d63301a",
+  "parent_run_id": "F4-INVARIANT-01-COLLECT2-EXEC2",
+  "parent_scientific_disposition": "NOT_EVALUABLE_SUPPORT",
+  "parent_truth_previously_opened": true,
+  "schema": "F4-PRESENTATION-02-prefit-freeze-v1",
+  "source_manifest_sha256": "b4798ced6fa806abae373ea1daa05f477b23fcf127d5aa4e2e7e3880887b2041",
+  "status": "PASS",
+  "task_bank_reused": true,
+  "truth_used_during_fit": false
+}

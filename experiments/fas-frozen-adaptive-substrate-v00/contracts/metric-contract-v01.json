@@ -1,0 +1,21 @@
+{
+  "contract_id": "FAS_METRIC_V1",
+  "scoring_point": "pre-update prediction; event t feedback can only affect later predictions",
+  "probability_order": ["safe", "risky", "idle"],
+  "accuracy": "1[argmax probability equals exact target], ties choose lowest canonical index",
+  "log_loss": "-ln(max(p[target], 1e-12)); unclipped probabilities additionally retained",
+  "brier": "sum over three classes (p[class]-one_hot[class])^2 / 3",
+  "calibration": "10 fixed-width bins over max probability; report count, mean confidence, empirical accuracy, ECE and reliability curve",
+  "temporal_curves": "Event-level and change-aligned curves, with paired world seed and arm identity preserved",
+  "criterion": "At least 7 correct in the latest 8 scored events for the affected key set; first eligible step after a regime change. Never reached is right-censored at the world end.",
+  "samples_to_criterion": "Number of scored affected-key events from first changed-regime query through first criterion window, inclusive; right-censored if absent.",
+  "switch_latency": "Scored events from true switch to first criterion, right-censored if absent.",
+  "return_recovery_latency": "Same latency at B-to-A return; report separately from first A-to-B switch.",
+  "retention_unaffected_keys": "Mean pre-update accuracy on keys whose exact world-state target did not change across the transition, before versus after transition; report denominator.",
+  "false_update_rate": "Fraction of contradictory-noise feedback opportunities followed by a changed predicted class on next occurrence of the same key while truth is unchanged; report opportunity count.",
+  "poison_persistence": "Number of subsequent same-key scored events after poison burst end until first correct prediction, right-censored if absent.",
+  "context_bound": ["target_key_adaptation", "non_target_key_interference"],
+  "no_composite_score": true,
+  "oracle_flags": ["ORACLE_CURRENT_STATE", "SNAPSHOT_ORACLE_REGIME_ID"],
+  "failure_statuses": ["CENSORED_NEVER_REACHED", "INVALID_PROBABILITY", "MISSING_FEATURE", "RUN_ABORTED"]
+}

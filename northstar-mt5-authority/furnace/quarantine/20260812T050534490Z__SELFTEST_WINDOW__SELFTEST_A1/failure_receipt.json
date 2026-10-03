@@ -1,0 +1,11 @@
+﻿{
+    "contract":  "MST_FURNACE_FAILURE_V1",
+    "status":  "QUARANTINED",
+    "failed_at_utc":  "2026-08-12T09:05:34.4023434Z",
+    "window_id":  "SELFTEST_WINDOW",
+    "attempt_tag":  "SELFTEST_A1",
+    "reason":  "intentional quarantine plumbing proof",
+    "auction_stem":  "NO_AUCTION",
+    "structure_stem":  "NO_STRUCTURE",
+    "deletion_performed":  false
+}

@@ -1,0 +1,261 @@
+{
+  "contract": "phoenix-gliner25-reference-probe-v1",
+  "model": "D:\\phoenix-models\\gliner2.5-base-v1-source-72ac19b",
+  "model_config_sha256": "0eb92d00584d613aab32b2178f84a85176b62c87ae3689ce9084e83f6eba64d1",
+  "gliner2_version": "2.0.0",
+  "torch_version": "2.13.0+cpu",
+  "python": "3.12.13",
+  "cuda_available": false,
+  "graph_publications": 0,
+  "features": [
+    {
+      "feature": "long_context",
+      "status": "observed",
+      "elapsed_ms": 5530.052299844101,
+      "value": {
+        "result": {
+          "entities": {
+            "person": [
+              {
+                "text": "Sam Altman",
+                "confidence": 0.9847689867019653,
+                "start": 8907,
+                "end": 8917
+              }
+            ],
+            "organization": [
+              {
+                "text": "OpenAI",
+                "confidence": 0.6853731274604797,
+                "start": 8890,
+                "end": 8896
+              }
+            ],
+            "location": [
+              {
+                "text": "San Francisco",
+                "confidence": 0.9987342953681946,
+                "start": 8921,
+                "end": 8934
+              }
+            ],
+            "date": [
+              {
+                "text": "Tuesday",
+                "confidence": 0.9864813089370728,
+                "start": 8938,
+                "end": 8945
+              }
+            ]
+          }
+        },
+        "span_check": {
+          "valid": 4,
+          "invalid": 0
+        }
+      }
+    },
+    {
+      "feature": "unlimited_span_candidate",
+      "status": "observed",
+      "elapsed_ms": 459.9888001102954,
+      "value": {
+        "attempts": [
+          {
+            "text": "The operation was named Recover Every Surviving Archive From The Abandoned Underground Observatory Beneath New Rome Before Dawn.",
+            "result": {
+              "entities": {
+                "operation_name": [
+                  {
+                    "text": "Recover Every Surviving Archive From The Abandoned Underground Observatory Beneath New Rome Before Dawn",
+                    "confidence": 0.9578553438186646,
+                    "start": 24,
+                    "end": 127
+                  }
+                ]
+              }
+            },
+            "span_check": {
+              "valid": 1,
+              "invalid": 0
+            }
+          },
+          {
+            "text": "The treaty titled Agreement for the Coordinated Recovery and Preservation of All Cultural Archives Lost During the Fall of New Rome was signed today.",
+            "result": {
+              "entities": {
+                "treaty_title": [
+                  {
+                    "text": "Agreement for the Coordinated Recovery and Preservation of All Cultural Archives Lost During the Fall of New Rome",
+                    "confidence": 0.9175219535827637,
+                    "start": 18,
+                    "end": 131
+                  }
+                ]
+              }
+            },
+            "span_check": {
+              "valid": 1,
+              "invalid": 0
+            }
+          },
+          {
+            "text": "Witnesses remembered The Night When Every Star Above New Rome Turned Crimson And The Sea Rose Against The City.",
+            "result": {
+              "entities": {
+                "event_name": [
+                  {
+                    "text": "New Rome",
+                    "confidence": 0.36766377091407776,
+                    "start": 53,
+                    "end": 61
+                  }
+                ]
+              }
+            },
+            "span_check": {
+              "valid": 1,
+              "invalid": 0
+            }
+          }
+        ],
+        "max_observed_span_words": 18,
+        "span_check": {
+          "valid": 3,
+          "invalid": 0
+        }
+      }
+    },
+    {
+      "feature": "span_attributes",
+      "status": "observed",
+      "elapsed_ms": 171.8301000073552,
+      "value": {
+        "result": {
+          "entities": {
+            "product": [
+              {
+                "text": "iPhone camera",
+                "confidence": 0.9688460230827332,
+                "start": 8,
+                "end": 21,
+                "sentiment": {
+                  "label": "positive",
+                  "confidence": 0.4689755141735077
+                }
+              }
+            ]
+          }
+        },
+        "span_check": {
+          "valid": 1,
+          "invalid": 0
+        }
+      }
+    },
+    {
+      "feature": "constrained_classification",
+      "status": "observed",
+      "elapsed_ms": 5601.198100019246,
+      "value": {
+        "intent": {
+          "value": "delete",
+          "confidence": 0.9999985094116092,
+          "probabilities": {
+            "read": 6.537012278852786e-07,
+            "write": 8.368871630464465e-07,
+            "delete": 0.9999985094116092
+          }
+        },
+        "effects": {
+          "value": [
+            "delete"
+          ],
+          "confidence": 0.9989712454521996,
+          "probabilities": {
+            "read_only": 0.00018989242592293127,
+            "create": 0.0019097850744553564,
+            "modify": 0.001555789291120245,
+            "delete": 0.9995414911163996
+          }
+        },
+        "_meta": {
+          "feasible": true,
+          "decoder": "exact",
+          "exact": true,
+          "objective": 15.036402225494385,
+          "violations": []
+        }
+      }
+    },
+    {
+      "feature": "joint_information_extraction",
+      "status": "observed",
+      "elapsed_ms": 5621.7765000183135,
+      "value": {
+        "result": {
+          "entities": [
+            {
+              "id": "e1",
+              "type": "person",
+              "text": "Alice",
+              "start": 0,
+              "end": 5,
+              "confidence": 0.9983804706148619
+            },
+            {
+              "id": "e2",
+              "type": "organization",
+              "text": "Acme",
+              "start": 16,
+              "end": 20,
+              "confidence": 0.9998673355775174
+            },
+            {
+              "id": "e3",
+              "type": "location",
+              "text": "Paris",
+              "start": 24,
+              "end": 29,
+              "confidence": 0.9995410444344511
+            },
+            {
+              "id": "e4",
+              "type": "person",
+              "text": "Bob",
+              "start": 31,
+              "end": 34,
+              "confidence": 0.9986922820235603
+            },
+            {
+              "id": "e5",
+              "type": "organization",
+              "text": "Acme",
+              "start": 42,
+              "end": 46,
+              "confidence": 0.9997948953405363
+            }
+          ],
+          "relations": [
+            {
+              "type": "works_for",
+              "head": "e1",
+              "tail": "e2",
+              "confidence": 0.9856975234974553
+            },
+            {
+              "type": "works_for",
+              "head": "e4",
+              "tail": "e5",
+              "confidence": 0.8743634908049199
+            }
+          ]
+        },
+        "span_check": {
+          "valid": 5,
+          "invalid": 0
+        }
+      }
+    }
+  ]
+}

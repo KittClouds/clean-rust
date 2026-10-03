@@ -1,0 +1,38 @@
+{
+  "schema_version": "JOINT_WIND_TUNNEL_TOPOLOGY_V1",
+  "path": "MT5 + TradeLocker + RunRaw -> instrument binding -> sealed tapes -> Rust environment -> trajectory receipt",
+  "nodes": [
+    {
+      "kind": "RUNRAW_SOURCE_CONTRACT",
+      "identity": "c40129d6b3235e89fdd135250aa82d690f2ee85c285508cdd15e22345462c6da",
+      "authority": "SYNTHETIC_FIXTURE"
+    },
+    {
+      "kind": "MT5_CAPTURE",
+      "identity": "5e0db92bdf2a03f1be1bd6931d259820e51795cd025981a8f57e9e5920c4fa33",
+      "authority": "SYNTHETIC_FIXTURE"
+    },
+    {
+      "kind": "TRADELOCKER_CAPTURE",
+      "identity": "b63b37140767a3353fb455a4c733c3621e679782a8be6a4b884c7774135c85b8",
+      "authority": "SYNTHETIC_FIXTURE"
+    },
+    {
+      "kind": "INSTRUMENT_BINDING",
+      "identity": "9bdfd61aa3f76ec4408822447c9ddf0efc2546e682d17583964bd630daf1ee2d",
+      "authority": "NORTHSTAR"
+    },
+    {
+      "kind": "RL_ENVIRONMENT",
+      "identity": "bd02a4a5b3f5d21bea2eb0702c685d0d2bbae7dfb0ac661cc883a7bba34d0c1d",
+      "authority": "NORTHSTAR"
+    },
+    {
+      "kind": "TRAJECTORY_RECEIPT",
+      "identity": "d4568cc09824ba3ab6a59c0ba754ea6890694a8d26f3bace67dd85a1a9fa91da",
+      "authority": "NORTHSTAR"
+    }
+  ],
+  "command_authority": "NORTHSTAR_ONLY",
+  "learner_execution": "NOT_EXECUTED"
+}

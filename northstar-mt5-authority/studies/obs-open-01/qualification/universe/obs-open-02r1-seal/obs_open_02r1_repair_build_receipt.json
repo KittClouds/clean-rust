@@ -1,0 +1,10 @@
+{
+  "builder_sha256": "b09f209d99d4640ac6e827cefa031115dac3f178628c7c682720896b0deca932",
+  "gate": "OBS-OPEN-02R1",
+  "manifest_sha256": "9b0f9daa0dd55ac39329d4c08e0a00bb865d03e6ab1c1b249d8c680d59084643",
+  "observation_access": "NONE",
+  "output_identity_path_independent": true,
+  "rebuild_requirement": "two_clean_builds_byte_identical",
+  "repair_root_sha256": "dc8826042d490c5b1e868b836f4c187af8e2baedf9454d11b2be2a5a5aae3da7",
+  "schema": "OBS_OPEN_DISCOVERY_FAMILYWISE_RULE_REPAIR_BUILD_V1"
+}

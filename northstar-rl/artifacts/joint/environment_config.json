@@ -1,0 +1,154 @@
+{
+  "schema_version": "NORTHSTAR_ENV_CONFIG_V1",
+  "runraw_tape_path": "runraw.nrr1",
+  "feature_tape_path": "features.nrf1",
+  "environment_spec": {
+    "schema_version": "RL_ENV_SPEC_V1",
+    "environment_id": "bd02a4a5b3f5d21bea2eb0702c685d0d2bbae7dfb0ac661cc883a7bba34d0c1d",
+    "runraw_tape_id": "de5b69487f00c0bcc84d87bea1b0c6880b6110099b225370791b3977e21d7cd0",
+    "feature_tape_id": "996edc8e87ea2f513d6721972f055b8a2aa31f04cf9fe4f792c1d1626498f37a",
+    "observation_spec_id": "ed829485c839f0419f040ad05de15cb44d680c191b622d763626e815dddbd654",
+    "episode_spec_id": "049907b465fee983bdca02e0c0878de1393ee9c74171d4fc70a22b838eca565f",
+    "action_spec_id": "ff42128c28e9250f22e97751d5bf496fde5974e236de390adb8bd81dd1871d65",
+    "instrument_contract_id": "ba9f8fe2c625cc4c431267e7fee785dade2cb056641cf5bd212ea0b138409275",
+    "execution_spec_id": "ddfa6715e7a1835ec1e2cb98743a15ea2524b2981ea2d939839a32488937ab07",
+    "reward_spec_id": "5ef542088ac1acc0871d8dc00aa15d5787a15d96618a33f676b71a5758560bc9",
+    "termination_spec_id": "a2dc7172867c1e8c520fc6460897ee3e7c168f7a06267bafedad0f5e5357cb1b",
+    "numeric_contract_id": "cbdc71040758788ff485414eb323e6cfa82fe49a22ffd00ef6ac60f688427291",
+    "seed_contract_id": "ff75747d0789e831a0a1a8d6f550067cf03e1f41994db87f15bcdb0a4b473289",
+    "market_source_contract": "c40129d6b3235e89fdd135250aa82d690f2ee85c285508cdd15e22345462c6da",
+    "broker_contract_tape_id": "451bf7eb3bb3a70649f429732e181a126625759fc099766cdba7def8e5baab53",
+    "execution_calibration_id": "54573a6dd64d67d4c68420d9e48c0a9cb306abf9bf0fd5fd97f6245f9dce12f3",
+    "instrument_binding_id": "9bdfd61aa3f76ec4408822447c9ddf0efc2546e682d17583964bd630daf1ee2d",
+    "wind_tunnel_mode": "CROSS_SOURCE_COMPARISON",
+    "implementation_hashes": [
+      "b851edd41227980a5b529e781fe6019dd75df183fe08654f3998de1e7ecff215",
+      "575780fb5df88972419dc62b79c98eef2b2fb3e55abeae0eb7439915e987413c",
+      "a5145adaf2ea8a6aec3021d4f6aa4ec7fcf513732d088b3d1a46054069017195",
+      "afcd7842d80203a0f4cefeb07d0f26a4159662f3458bb8ac3ff95bf7e7ed2af1",
+      "039ebb8ea01d21fbd330e24d6f168ab40045188c9c9d1da8df3962fd173c0fa0",
+      "987493faa23ac2a4942a92c66183178fded166971102e34826b3c515fbeb0d69",
+      "f22b0541c30c9596830ac1d5e5f76818fc946c426e2820357556fad89d5a35cc",
+      "9ea4f392cec3056c05e1d6d65be6d9f704adaf289a7ca54319db7e3f0ff5d44e"
+    ],
+    "extension_implementation_hashes": [
+      "096876ca378c752b0a30335a111884a827478bd170f1ca07f0bd33a96952d020",
+      "d320c027f970194313a0fc2ab6d10c60dc837335c7644d51cadfeac79e2092a4",
+      "e99fd00a09bc7636902ba2419346c326bc7091802ecb3433afd83883d051a571",
+      "7b9b42313dcee17500e9535a837b51aeff0e87931c6cac088a424d49d4b65ad3",
+      "9549d01839569178acf50ec0d532ffc0b8a1be9ef934b30fa6d48b235f2f7524"
+    ]
+  },
+  "observation_spec": {
+    "schema_version": "OBSERVATION_SPEC_V1",
+    "observation_spec_id": "ed829485c839f0419f040ad05de15cb44d680c191b622d763626e815dddbd654",
+    "ordered_feature_ids": [
+      "market.simple_return.v1",
+      "market.candle_range.v1",
+      "market.rolling_mean.v1",
+      "clock.time_of_day_sin.v1",
+      "clock.time_of_day_cos.v1",
+      "clock.session_progress.v1"
+    ],
+    "history_depth": 1,
+    "stacking_semantics": "feature_major_declared_order",
+    "dtype": "float32",
+    "output_shape": [
+      6
+    ],
+    "availability_rule": "all_cells_AVAILABLE_and_t_known_lte_step_time",
+    "layout": "flat"
+  },
+  "action_spec": {
+    "schema_version": "ACTION_SPEC_TARGET_EXPOSURE_V1",
+    "action_spec_id": "ff42128c28e9250f22e97751d5bf496fde5974e236de390adb8bd81dd1871d65",
+    "low": -1.0,
+    "high": 1.0,
+    "shape": [
+      1
+    ],
+    "dtype": "float32",
+    "semantics": "target_normalized_exposure"
+  },
+  "instrument_contract": {
+    "schema_version": "INSTRUMENT_CONTRACT_V1",
+    "instrument_contract_id": "ba9f8fe2c625cc4c431267e7fee785dade2cb056641cf5bd212ea0b138409275",
+    "instrument_id": 3,
+    "price_precision": 2,
+    "tick_size": 0.01,
+    "tick_value": 0.01,
+    "contract_size": 1.0,
+    "quantity_step": 0.1,
+    "minimum_quantity": 0.1,
+    "maximum_quantity": 100.0,
+    "quote_currency": "USD",
+    "account_currency": "USD",
+    "conversion_rule": "identity_quote_equals_account"
+  },
+  "execution_spec": {
+    "schema_version": "EXECUTION_SPEC_V1",
+    "execution_spec_id": "ddfa6715e7a1835ec1e2cb98743a15ea2524b2981ea2d939839a32488937ab07",
+    "action_source": "completed_bar_close",
+    "fill_timing": "next_eligible_bar_open",
+    "reference_fill_price": "source_open",
+    "quantity_rounding": "toward_zero",
+    "fixed_commission": 0.25,
+    "proportional_commission": 0.0001,
+    "spread_ticks": 1.0,
+    "slippage_ticks": 0.5,
+    "calibration_id": null
+  },
+  "reward_spec": {
+    "schema_version": "REWARD_SPEC_V1",
+    "reward_spec_id": "5ef542088ac1acc0871d8dc00aa15d5787a15d96618a33f676b71a5758560bc9",
+    "formula": "equity_delta / initial_equity"
+  },
+  "termination_spec": {
+    "schema_version": "TERMINATION_SPEC_V1",
+    "termination_spec_id": "a2dc7172867c1e8c520fc6460897ee3e7c168f7a06267bafedad0f5e5357cb1b",
+    "account_floor": 100.0,
+    "episode_end_is_truncation": true,
+    "source_gap_is_termination": true
+  },
+  "numeric_contract": {
+    "schema_version": "NUMERIC_CONTRACT_V1",
+    "numeric_contract_id": "cbdc71040758788ff485414eb323e6cfa82fe49a22ffd00ef6ac60f688427291",
+    "authority_float": "ieee754_binary64_little_endian",
+    "observation_float": "ieee754_binary32_contiguous",
+    "action_float": "ieee754_binary32_scalar_box_1",
+    "non_finite_policy": "reject_authority_reject_observation_reject_action"
+  },
+  "seed_contract": {
+    "schema_version": "SEED_CONTRACT_V1",
+    "seed_contract_id": "ff75747d0789e831a0a1a8d6f550067cf03e1f41994db87f15bcdb0a4b473289",
+    "derivation": "domain_separated_blake3(root_seed, component_identity) -> little_endian_u64"
+  },
+  "episode_tape": {
+    "schema_version": "EPISODE_TAPE_V1",
+    "runraw_tape_id": "de5b69487f00c0bcc84d87bea1b0c6880b6110099b225370791b3977e21d7cd0",
+    "episode_spec_id": "049907b465fee983bdca02e0c0878de1393ee9c74171d4fc70a22b838eca565f",
+    "episodes": [
+      {
+        "episode_id": "38dda8024f2b0e74ca5e71d54714bf9de05d4e7172583768775113f057541c40",
+        "instrument_id": 3,
+        "first_source_row": 1,
+        "last_source_row": 12,
+        "first_actionable_row": 3,
+        "start_time": 1800000060000000000,
+        "end_time": 1800000720000000000,
+        "warmup_rows": 2,
+        "actionable_rows": 9,
+        "initial_account_state_id": "b6d6ecd0a39629c12b2eccf07eecd4f28440a0540631fdcbe91d54dac86e5970",
+        "observation_spec_id": "ed829485c839f0419f040ad05de15cb44d680c191b622d763626e815dddbd654",
+        "action_spec_id": "ff42128c28e9250f22e97751d5bf496fde5974e236de390adb8bd81dd1871d65",
+        "execution_spec_id": "ddfa6715e7a1835ec1e2cb98743a15ea2524b2981ea2d939839a32488937ab07",
+        "reward_spec_id": "5ef542088ac1acc0871d8dc00aa15d5787a15d96618a33f676b71a5758560bc9",
+        "termination_contract_id": "a2dc7172867c1e8c520fc6460897ee3e7c168f7a06267bafedad0f5e5357cb1b",
+        "source_identity": "de5b69487f00c0bcc84d87bea1b0c6880b6110099b225370791b3977e21d7cd0",
+        "content_hash": "4775778cdf1751e06748d9eceee7419b8a88366ea3938d005b940deca5421a37"
+      }
+    ],
+    "content_hash": "47eddde61be346bc4160cc8135fd859f58ffac183994f381a27819db75acaa37"
+  },
+  "initial_equity": 1000.0
+}

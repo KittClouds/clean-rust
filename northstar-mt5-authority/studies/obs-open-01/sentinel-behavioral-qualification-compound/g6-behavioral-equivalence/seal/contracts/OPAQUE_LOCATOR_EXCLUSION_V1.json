@@ -1,0 +1,1 @@
+{"excluded":["context.session_id","input.source_row_id","emission.commit.source_row_id"],"schema":"G6_OPAQUE_LOCATOR_EXCLUSION_V1","usable_as_context_equality":false,"usable_as_correspondence_key":false}

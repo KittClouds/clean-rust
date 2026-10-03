@@ -1,0 +1,1 @@
+{"allowed_reads":["preselected token","current applied prefixes","immutable contexts","committed correspondence","prior experiment history"],"current_or_future_response_read":"FORBIDDEN","experiment_selection":"OPEN_LOOP_FINITE_TOKEN_SEQUENCE","oracle_coupling":"FORBIDDEN","realization":"CAUSAL_PREFIX_SENSITIVE_SIDE_SPECIFIC","schema":"G6_COUPLING_CAUSALITY_CONTRACT_V1"}

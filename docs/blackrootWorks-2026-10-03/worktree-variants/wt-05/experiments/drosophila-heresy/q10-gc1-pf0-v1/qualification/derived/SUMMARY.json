@@ -1,0 +1,23 @@
+{
+  "counts": {
+    "coordinate_conflict_pair_count": 0,
+    "endpoint_set_count": 14,
+    "palette_count": 7207,
+    "raw_group_count": 801,
+    "support_overlap_pair_count": 230
+  },
+  "engineering_only": true,
+  "gate": {
+    "canonical_candidate_identities_unique_within_group": true,
+    "coordinate_conflicts_zero": true,
+    "global_assembly_authorized": false,
+    "palette_cardinality_complete": true,
+    "preflight_complete": true,
+    "raw_support_complete": true
+  },
+  "identity": "q10-gc1-pf0-v1",
+  "interpretation": "The complete local palette covers every baseline mismatch and has no cross-group coordinate conflicts. Physical-support overlaps are sparse and are scheduling annotations, not independence claims.",
+  "protocol": "Q10-GC1-PF0",
+  "scientific_promotion": false,
+  "status": "GC1_PF0_ENGINEERING_COMPLETE"
+}

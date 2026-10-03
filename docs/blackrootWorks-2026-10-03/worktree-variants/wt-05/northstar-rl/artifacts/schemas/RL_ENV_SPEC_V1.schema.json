@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RlEnvSpec",
+  "type": "object",
+  "properties": {
+    "action_spec_id": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "environment_id": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "episode_spec_id": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "execution_spec_id": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "feature_tape_id": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "implementation_hashes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Digest256"
+      }
+    },
+    "instrument_contract_id": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "numeric_contract_id": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "observation_spec_id": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "reward_spec_id": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "runraw_tape_id": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "schema_version": {
+      "type": "string"
+    },
+    "seed_contract_id": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "termination_spec_id": {
+      "$ref": "#/$defs/Digest256"
+    }
+  },
+  "required": [
+    "schema_version",
+    "environment_id",
+    "runraw_tape_id",
+    "feature_tape_id",
+    "observation_spec_id",
+    "episode_spec_id",
+    "action_spec_id",
+    "instrument_contract_id",
+    "execution_spec_id",
+    "reward_spec_id",
+    "termination_spec_id",
+    "numeric_contract_id",
+    "seed_contract_id",
+    "implementation_hashes"
+  ],
+  "$defs": {
+    "Digest256": {
+      "description": "Domain-separated BLAKE3 digest",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

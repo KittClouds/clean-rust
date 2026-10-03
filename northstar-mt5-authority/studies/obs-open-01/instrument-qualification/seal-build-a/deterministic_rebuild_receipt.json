@@ -1,0 +1,10 @@
+{
+  "artifact_count": 8,
+  "build_a_product_set_sha256": "1588995221ef4228d8930c7d83f532691e7be366ae3e78d16842b4d313781dbc",
+  "build_b_product_set_sha256": "1588995221ef4228d8930c7d83f532691e7be366ae3e78d16842b4d313781dbc",
+  "byte_mismatch_count": 0,
+  "independent_builds": 2,
+  "schema": "OBS_OPEN_INST01_DETERMINISTIC_REBUILD_RECEIPT_V1",
+  "scope": "FINAL_QUALIFICATION_ARTIFACTS",
+  "status": "PASS"
+}

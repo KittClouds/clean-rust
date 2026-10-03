@@ -1,0 +1,1 @@
+{"allowed_partition":"DISCOVERY","blocked_partition":"CONFIRMATION","blocked_status":"FROZEN_UNOPENED","confirmation_paths_opened":0,"confirmation_rows_read":0,"confirmation_sessions":69,"discovery_sessions":257,"next_source_row_requested":false,"schema":"OBS_OPEN_03_CONFIRMATION_FIREWALL_V1","status":"PASS_FROZEN_UNOPENED"}

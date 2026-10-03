@@ -1,0 +1,26 @@
+{
+  "schema": "OBS_OPEN_03AP_AUTHORITY_V1",
+  "authority_class": "PROTOCOL_FREEZE_ONLY",
+  "parents": {
+    "universe_root": "6b0ca197a394b085707d03dfe06f1569eb0fafbddb2d583817e88647df6f6235",
+    "meas02_root": "f7abf12d1473a5e1eddc8a7efb84ff7224811eda83ad62ba4fe300a7648ce5ea",
+    "disc02p_root": "f6ab7b3f4ba95e70399367e4a16140549bea5e16fe9a58d460e5166ec4200877",
+    "disc02e_root": "b626d058c5719d797e84848ed7141f2a0c0a3d3a5f28ad3b2f7b24b405e62697"
+  },
+  "observer_instance": "CAUSAL_RANGE_EXTREME_M1_V1",
+  "new_authority_if_passed": "OBS_OPEN_03AP_FUTURE_PROCESS_PROTOCOL_V1",
+  "grants": [
+    "FUTURE_PROCESS_OUTCOME_DEFINITION",
+    "ATLAS_POPULATION_ASSIGNMENT",
+    "DERIVED_OUTCOME_FIREWALL"
+  ],
+  "does_not_grant": [
+    "REAL_OUTCOME_COMPUTATION",
+    "REPRESENTATION_GATE_EXECUTION",
+    "CONFIRMATION_ACCESS",
+    "FORMAL_INFERENCE",
+    "CANDIDATE_PROMOTION",
+    "ECONOMIC_AUTHORITY",
+    "TRADING_AUTHORITY"
+  ]
+}

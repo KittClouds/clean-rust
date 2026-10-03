@@ -1,0 +1,10 @@
+[package]
+name = "parcelpath"
+version = "0.1.0"
+edition = "2021"
+publish = false
+description = "parcel delivery state library; frozen E013-D construction template"
+
+[lib]
+name = "e013_repo"
+path = "src/lib.rs"

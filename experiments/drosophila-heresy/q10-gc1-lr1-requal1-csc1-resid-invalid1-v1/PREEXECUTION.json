@@ -1,0 +1,13 @@
+{
+  "contract_sha256": "97006773F4EF1B3963C2B8605B3D1E1F715E9616317CEC0D5BF8A4EFD3D9891D",
+  "domain_counts_planned": {
+    "1": 133,
+    "2": 53279,
+    "3": 10564075
+  },
+  "geometry_prefilter": false,
+  "identity": "q10-gc1-lr1-requal1-csc1-resid-invalid1-v1",
+  "protocol": "Q10-RESID-INVALID1",
+  "scientific_promotion": false,
+  "status": "PREEXECUTION_SEALED"
+}

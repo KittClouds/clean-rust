@@ -1,0 +1,20 @@
+{
+  "protocol": "Q10-RMT",
+  "status": "Q10_RMT_VALID__TOPOLOGY_MAPPED",
+  "declared_da2_endpoints": 32,
+  "primary_valid_endpoints": 2,
+  "primary_valid_endpoint_slice": [
+    8,
+    10
+  ],
+  "excluded_noncontract_endpoints": 4,
+  "mismatch_rows_mapped": 481,
+  "component_records": 174,
+  "repair_applied": false,
+  "behavioral_inference": false,
+  "scientific_seed_bundles_used": 0,
+  "dh08b_authorized": false,
+  "local_replay_checks": 128,
+  "local_replay_passes": 128,
+  "next_decision": "Choose the next correction architecture from the sealed residual topology; do not open DH08B."
+}

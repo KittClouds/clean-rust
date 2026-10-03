@@ -1,0 +1,11 @@
+{
+  "checkpoint_digests_checked": 360,
+  "estimators_started": false,
+  "expected_checkpoint_digests": 432,
+  "expected_trials": 589824,
+  "measured_namespace_created": false,
+  "rows_checked_by_replay": 589824,
+  "schema": "FLY-REACH-03-qualification-f4-reconstruction-receipt-v1",
+  "status": "PASS",
+  "target_channel": "sample target digest recomputed from reference_delta_into"
+}

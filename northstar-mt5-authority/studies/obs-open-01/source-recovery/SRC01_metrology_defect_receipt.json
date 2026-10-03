@@ -1,0 +1,19 @@
+{
+  "admitted_captures": [
+    "OBS_OPEN_SRC01_US30_M1_ONLINE_run1.tsv",
+    "OBS_OPEN_SRC01_US30_M5_ONLINE_run1.tsv",
+    "OBS_OPEN_SRC01_US30_M1_RELOAD_run1.tsv",
+    "OBS_OPEN_SRC01_US30_M1_RELOAD_run2.tsv",
+    "OBS_OPEN_SRC01_US30_M5_RELOAD_run1.tsv",
+    "OBS_OPEN_SRC01_US30_M5_RELOAD_run2.tsv"
+  ],
+  "causal_semantics_modified": false,
+  "corrected_capture_ex5_sha256": "6849c0d2ebffae5d31b9d725b4b026466d52bff85716bfa2215132aa00cd7fae",
+  "corrected_capture_source_sha256": "e46c368dfc948d7fb56e60d087b9ee07a26784de79c988ba6b2ee7a669b43df6",
+  "defect": "CAPTURE_HARNESS_OMITTED_V2_INPUT_GROUP_HEADING_ARGUMENTS",
+  "disposition": "CORRECTED_BEFORE_ADMITTED_PARITY_EVIDENCE",
+  "observer_sources_modified": false,
+  "runtime_abi": "MQL5_INPUT_GROUP_HEADINGS_COUNT_AS_POSITIONAL_STRING_INPUTS",
+  "schema": "OBS_OPEN_SRC01_METROLOGY_DEFECT_V1",
+  "scope": "CAPTURE_HARNESS_ONLY"
+}

@@ -1,0 +1,27 @@
+{
+  "contract_id": "FAS_S06_REPRESENTATION_SCALER_PROBE_COMPATIBILITY_CUBE_V01",
+  "experiment_id": "fas-s06-representation-scaler-probe-compatibility-cube-v01",
+  "question": "Does S05 matched-pipeline compatibility decompose descriptively into center, scale, probe, or interaction sensitivity?",
+  "parent_s05_result_root_sha256": "6e5cb0586611aeb0b07dff7b8788b7b8bea749179bbe5a38ef98a8045e890466",
+  "factor_levels": ["M", "F"],
+  "cell_formula": "logits = W_k * ((h_r - mu_c) / sigma_d) + b_k",
+  "complete_factorial": ["representation r", "center source c", "scale source d", "probe source k"],
+  "expected_factorial_cells": 16,
+  "contracted_bundled_scaler_cells": 8,
+  "center_only_definition": "(mu_F, sigma_M)",
+  "scale_only_definition": "(mu_M, sigma_F)",
+  "populations": {
+    "FAS00_ORIGINAL": {"events": 512, "slices": {"UNION": 512, "CONTEXT_TERM_3": 412, "ENTITY_TERM_7": 212}},
+    "S01_CONTROLLED": {"quartets": 4933, "events": 19732, "slice": "FACTORIAL_TEST"}
+  },
+  "native_cells": {"FAS00_ORIGINAL": ["R_M_C_M_D_M_W_M", "R_F_C_F_D_F_W_F"], "S01_CONTROLLED": ["R_M_C_M_D_M_W_M", "R_F_C_F_D_F_W_F"]},
+  "precision": {"FAS00_ORIGINAL": "FP64 feature cast, scaler, weights, bias, standardization and matrix multiply", "S01_CONTROLLED": "FP32 features, scaler cast, standardization, weights, bias and matrix multiply; semantic state remap after logits"},
+  "metrics": ["accuracy", "balanced_accuracy", "support_by_class", "recall_by_class", "confusion_matrix_true_rows_predicted_columns", "pairwise_margin_mean_median_nearest_rank_p10_p90", "target_margin_mean_median_nearest_rank_p10_p90", "logit_mean_variance_overall_and_by_target", "paired_prediction_transitions", "paired_correctness_transitions"],
+  "affine_geometry": ["effective_class_norms", "effective_pairwise_normal_norms", "pairwise_cosines_and_angles_vs_native_cell", "effective_intercepts", "intercept_displacement_vs_native_cell", "observed_class_logit_means_and_variances"],
+  "required_comparisons": ["native_scaler_probe_swap", "native_probe_bundled_scaler_swap", "native_probe_center_only_transport", "native_probe_scale_only_transport", "native_representation_full_foreign_pipeline"],
+  "arithmetic": {"effective_normal": "N[d,k] = W[k] / sigma[d]", "effective_intercept": "c[c,d,k] = b[k] - N[d,k] @ mu[c]", "pairwise_margin_order": [[0, 1], [0, 2], [1, 2]], "target_margin": "target logit - maximum rival logit", "quantiles": "nearest rank, ceil(p*n)-1", "argmax_tie_break": "lowest output slot before S01 semantic remapping"},
+  "hard_gates": ["all sealed S05 v07 result files reproduce", "all direct feature and readout hashes match", "512/412/212 and 4933/19732 populations match", "FAS00 MM and FF predictions equal S05 ledger", "S01 MM and FF predictions equal S05 ledger and saved S01 argmax", "all outputs finite", "all 16 cells complete"],
+  "forbidden": ["LFM or tokenizer load", "feature extraction", "probe fitting or mutation", "optimizer continuation", "hyperparameter search", "significance tests", "confidence intervals", "SAE", "adaptive mechanism", "parent modification", "FAS00 disposition change"],
+  "outputs": ["preflight-receipt-v01.json", "crossed-cube-ledger-v01.jsonl", "compatibility-summary-v01.json", "prediction-transitions-v01.json", "effective-geometry-v01.json", "execution-receipt-v01.json", "S06-RESULTS.md"],
+  "authority": {"existing_artifact_replay": true, "model_contact": false, "feature_extraction": false, "probe_fitting": false, "SAE_analysis": false, "adaptive_mechanisms": false}
+}

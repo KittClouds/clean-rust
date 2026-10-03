@@ -1,0 +1,44 @@
+{
+  "command": "python -B -m unittest discover -s audits/e4-0-track-e -p test_*.py -v",
+  "created_utc": "2026-09-26T21:38:25.855775+00:00",
+  "schema": "FAS_E4_0_TRACK_E_SOURCE_TESTS_V01",
+  "scope": "Track E auditor/helper unit tests before v04 map creation; actual-map integration test was skipped because final v04 map was absent. No E4 rows, labels, tokenizer/model, or CUDA were accessed.",
+  "sources": [
+    {
+      "bytes": 42744,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/audit_e4_0_track_e.py",
+      "sha256": "518d90d2f0f947f934f1da0f67a0ce04476fbc66800847fab7fad2037b517fc6"
+    },
+    {
+      "bytes": 10558,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/audit_e4_0_track_e_seal.py",
+      "sha256": "c7ffac775b97ed7ccfda21fcd74757379d8785d4699d9b9064766017cf7fd326"
+    },
+    {
+      "bytes": 2539,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/test_audit_e4_0_track_e.py",
+      "sha256": "d305f96de0de69f8593fecf81f24e0cb5ccaef34074eabaf55cbeeb07e3bb960"
+    }
+  ],
+  "status": "TRACK_E_SOURCE_TESTS_PASS_PREMAP_UNIT_TESTS",
+  "supersedes": [
+    {
+      "path": "audits/e4-0-track-e/track-e-source-tests-v01.json",
+      "reason": "Preserved empty file from a failed create-once serialization attempt; excluded from receipt table."
+    },
+    {
+      "path": "audits/e4-0-track-e/track-e-source-tests-v02.json",
+      "reason": "Superseded after the auditor added exact map-row verification and dropped stale aggregate integration v01."
+    },
+    {
+      "path": "audits/e4-0-track-e/track-e-source-tests-v03.json",
+      "reason": "Superseded after the tested production seal-root function was consolidated in the independent seal helper."
+    }
+  ],
+  "tests": {
+    "discovered": 3,
+    "failed": 0,
+    "passed": 2,
+    "skipped": 1
+  }
+}

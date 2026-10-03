@@ -1,0 +1,54 @@
+{
+  "execution_plan_id": "FAS00_PHASE2A_EXECUTION_PLAN_V01",
+  "project_id": "fas-frozen-adaptive-substrate-v00",
+  "phase2a_packet_id": "FAS00_PHASE2A_FEATURE_EXTRACTION_V01",
+  "paperwork_root_sha256": "e1ce39935e566f7dad53fae69c18a091dfc05526c3c5a3cdc8fae52b27357189",
+  "phase1_root_sha256": "d3ca9f8ef988a6f0ae93318fc0ea7c504b23b3be801dbf133d66f67746a69274",
+  "phase1_event_corpus_sha256": "9fdd7ce9e49b86ac9acb3da035429c616865f527123bd0ac7c312b1b912439ca",
+  "feature_contract_sha256": "1f60ef84da2de16a053b3f53a725bd079efa94065728025840fe7f3bcfad85d7",
+  "extractor_source_path": "experiments/fas-frozen-adaptive-substrate-v00/phase2a-execution-v01/extract_fas_features.py",
+  "extractor_source_sha256": "1d85d95659f12b9e3a3a5265360840fdb6ee63c99d49795169027cc3f0a0736b",
+  "backbone": {
+    "repository": "LiquidAI/LFM2.5-1.2B-Base",
+    "revision": "7453bca97ca1e67754c4035a4b4c584e1c9dd725",
+    "loader": "transformers.AutoModel; trust_remote_code=false; load checkpoint-native dtype; move once to CUDA device 0; eval mode; gradients disabled; no optimizer or training call",
+    "expected_hidden_dimension": 2048
+  },
+  "tokenizer": {
+    "repository": "LiquidAI/LFM2.5-1.2B-Base",
+    "revision": "7453bca97ca1e67754c4035a4b4c584e1c9dd725",
+    "loader": "transformers.AutoTokenizer with use_fast=true, local_files_only=true, trust_remote_code=false",
+    "encoding": "encode raw FAS_FEATURE_V1 prompt with add_special_tokens=true; no chat template, padding, truncation, or token rewrite"
+  },
+  "feature_rule": {
+    "views": ["FULL", "QUERY_ONLY"],
+    "batch_size": 1,
+    "pooling": "last_hidden_state over all model-visible positions, cast to float32, arithmetic mean across sequence positions",
+    "serialized_dtype": "float32 little-endian",
+    "feature_shape_per_row": [2048],
+    "row_order": "source JSONL order; FULL then QUERY_ONLY for each event"
+  },
+  "outputs": {
+    "run_root": "D:/codex-runs/fas-frozen-adaptive-substrate-v00/phase2a-v01",
+    "model_snapshot_root": "D:/codex-runs/fas-frozen-adaptive-substrate-v00/phase2a-v01/model-snapshot-v01",
+    "isolated_hf_home": "D:/codex-runs/fas-frozen-adaptive-substrate-v00/phase2a-v01/hf-home-v01",
+    "feature_cache_root": "D:/codex-runs/fas-frozen-adaptive-substrate-v00/phase2a-v01/feature-cache-v01",
+    "expected_feature_rows": 65536,
+    "expected_feature_tensor_bytes": 536870912
+  },
+  "runtime_versions": {
+    "python": "3.13.15",
+    "transformers": "5.17.0",
+    "tokenizers": "0.23.2",
+    "huggingface_hub": "1.32.0",
+    "safetensors": "0.8.0",
+    "numpy": "2.5.3",
+    "torch": "2.11.0+cu128",
+    "cuda_runtime": "12.8",
+    "device_0": "NVIDIA GeForce RTX 3080"
+  },
+  "failure_policy": "Any parent, model revision, tokenizer, corpus, hidden dimension, input, deterministic repeat, feature bytes, or backbone immutability mismatch stops extraction and prohibits probe training. No automatic fallback, retry, or alternate representation is allowed.",
+  "phase3_probe_training_authorized": false,
+  "online_mechanisms_authorized": false,
+  "phase5_corpus_generation_authorized": false
+}

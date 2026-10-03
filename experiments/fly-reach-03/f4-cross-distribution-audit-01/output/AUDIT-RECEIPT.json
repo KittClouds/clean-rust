@@ -1,0 +1,25 @@
+{
+  "analysis_sha256": "b1b2d384293eb42a3ca2983257c607217cf68054e7696ac9c15405332522428e",
+  "audit_scope_sha256": "f7a4baebed1a3d264f325cc9f364daa283305fac3b1289ee59702621e9c8d725",
+  "interpretation_boundary": "descriptive archaeology only; no causal attribution or measured REACH-03 authorization",
+  "no_fits_or_prediction_rescoring": true,
+  "results_sha256": "2478aefeaebeb2412a4ceb97e4053eff20bc9ef4bf17bf25dddd55c8c21f8d8c",
+  "schema": "F4-cross-distribution-audit-receipt-v1",
+  "source_runs": {
+    "QPROMO2": {
+      "native_collection_receipt": "d08966471e6af1c38365f370b9749794931c8ef588a9343ce4945bc1cac05601",
+      "predictors": "344e3e129665df2a0ccac2b6c0f12b9b59a76a5fe39e38627df151738377c390",
+      "scoring_truth": "cab0340a2846c2582cbb61b040cef0af0b28476a37a8680239dbaf8685f836b7",
+      "task_manifest": "c1a63224682550e473b626780d3c1ba68d1636e00b4ef09f501f13dcbbc5967c",
+      "task_training": "9ec1f7c240143e7fb5537ae72eb6d5bb3fb4fb8fc0445bcbafa54ae913a826b5"
+    },
+    "SYMMETRY03": {
+      "native_collection_receipt": "950d770e09da362464237af7cb245d937548e0a2b0b5b6b3e233c3550f4ac187",
+      "predictors": "41bb93ca9a20036aaff513f220b7511442b83eb22d12cac9709adc1fc839e525",
+      "scoring_truth": "4f0609d5f80f43c7f3d5eefefb496c0329e21c50430f08b7b74b826bd307a218",
+      "task_manifest": "96217b4193964ee98ed9c9e2e3b6f7a2fc0422c20368bb103e71a3d279634e70",
+      "task_training": "f91dac177eb5547fd2fb518a55b6156701f1ec3d5c876f3527cfa882f918a04e"
+    }
+  },
+  "status": "PASS_DESCRIPTIVE_AUDIT"
+}

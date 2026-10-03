@@ -1,0 +1,12 @@
+{
+  "protocol": "Q10-PF6-RH1-Q0-AC",
+  "status": "QUALIFICATION_COMPLETE_AUTHORITY_ARM_BLOCKED_NO_MEASURED_FACTORIAL",
+  "report_sha256": "58CAA21B00884C7584162319BB8BABDF872B911B9E4FF4002FB3740556D6A336",
+  "q0_status": "RH1_Q0_CANONICAL_RUNTIME_QUALIFIED_FIXTURE_ONLY",
+  "ac_status": "RH1_AC_AUTHORITY_COVERAGE_AUDIT_COMPLETE",
+  "authority_arm_ready": false,
+  "measured_factorial_started": false,
+  "scientific_seed_bundles": 0,
+  "behavioral_probe": false,
+  "dh08b_authorized": false
+}

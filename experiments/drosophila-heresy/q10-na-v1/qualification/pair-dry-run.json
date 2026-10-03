@@ -1,0 +1,96 @@
+{
+  "behavioral_inference": false,
+  "canonical_repair_applied": false,
+  "contract_plan_sha256": "FC58C1BCB293C9A4131342E32C055CE01276F5C9B7DFD548866CC8A0B0ED2DCB",
+  "dh08b_authorized": false,
+  "engineering_only": true,
+  "protocol": "Q10-NA",
+  "records": [
+    {
+      "best": {
+        "baseline_ulp": 1,
+        "candidate_ulp": 0,
+        "choices": [
+          8,
+          1
+        ],
+        "coordinates": [
+          15172,
+          15290
+        ],
+        "geometry": {
+          "axis": 0.0007416034812859499,
+          "linear_l2": 5.714449369140284,
+          "linear_max_abs": 1.21350867689398,
+          "norm": 2.1258180125010484
+        },
+        "observed_bits": 1087575066,
+        "target_bits": 1087575066
+      },
+      "classification": "pair",
+      "geometry": {
+        "axis": 0.0007416034812859499,
+        "linear_l2": 5.714449369140284,
+        "linear_max_abs": 1.21350867689398,
+        "norm": 2.1258180125010484
+      },
+      "improving_pair_count": 75,
+      "individual_replays": 110,
+      "pair_domain": 6655,
+      "pair_domain_complete": true,
+      "pair_replays": 6655,
+      "support_size": 11,
+      "target": [
+        "seed9731-L-tau16.json",
+        0,
+        19
+      ]
+    },
+    {
+      "best": {
+        "baseline_ulp": 1,
+        "candidate_ulp": 0,
+        "choices": [
+          4,
+          1
+        ],
+        "coordinates": [
+          6339,
+          6519
+        ],
+        "geometry": {
+          "axis": 0.0007415177713006186,
+          "linear_l2": 5.714449363964646,
+          "linear_max_abs": 1.21350867689398,
+          "norm": 2.1258180104300486
+        },
+        "observed_bits": 1065088202,
+        "target_bits": 1065088202
+      },
+      "classification": "pair",
+      "geometry": {
+        "axis": 0.0007415177713006186,
+        "linear_l2": 5.714449363964646,
+        "linear_max_abs": 1.21350867689398,
+        "norm": 2.1258180104300486
+      },
+      "improving_pair_count": 8,
+      "individual_replays": 30,
+      "pair_domain": 363,
+      "pair_domain_complete": true,
+      "pair_replays": 363,
+      "support_size": 3,
+      "target": [
+        "seed9731-L-tau16.json",
+        0,
+        57
+      ]
+    }
+  ],
+  "remaining_pair_budget": 24992982,
+  "scientific_seed_bundles_used": 0,
+  "stage": "PAIR_REPLAY_DRY_RUN",
+  "target_rows_replayed": 2,
+  "target_rows_requested": 2,
+  "triple_replay_executed": false
+}

@@ -1,0 +1,151 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "BrokerInstrumentRegistry",
+  "type": "object",
+  "properties": {
+    "content_hash": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "instruments": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/BrokerInstrument"
+      }
+    },
+    "schema_version": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "instruments",
+    "content_hash"
+  ],
+  "$defs": {
+    "BrokerInstrument": {
+      "type": "object",
+      "properties": {
+        "asset_class": {
+          "type": "string"
+        },
+        "broker": {
+          "type": "string"
+        },
+        "broker_instrument_id": {
+          "type": "string"
+        },
+        "broker_symbol": {
+          "type": "string"
+        },
+        "contract_size": {
+          "type": "number",
+          "format": "double"
+        },
+        "max_quantity": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "double"
+        },
+        "min_quantity": {
+          "type": "number",
+          "format": "double"
+        },
+        "northstar_instrument_id": {
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0
+        },
+        "observed_at_ns": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "price_precision": {
+          "type": "integer",
+          "format": "uint8",
+          "maximum": 255,
+          "minimum": 0
+        },
+        "quantity_precision": {
+          "type": "integer",
+          "format": "uint8",
+          "maximum": 255,
+          "minimum": 0
+        },
+        "quantity_step": {
+          "type": "number",
+          "format": "double"
+        },
+        "quote_currency": {
+          "type": "string"
+        },
+        "raw_metadata": {
+          "$ref": "#/$defs/RawPayloadAuthority"
+        },
+        "tick_size": {
+          "type": "number",
+          "format": "double"
+        },
+        "trading_status": {
+          "type": "string"
+        },
+        "venue": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "broker",
+        "venue",
+        "broker_instrument_id",
+        "broker_symbol",
+        "northstar_instrument_id",
+        "asset_class",
+        "quote_currency",
+        "price_precision",
+        "tick_size",
+        "quantity_precision",
+        "quantity_step",
+        "min_quantity",
+        "contract_size",
+        "trading_status",
+        "raw_metadata",
+        "observed_at_ns"
+      ]
+    },
+    "Digest256": {
+      "description": "Domain-separated BLAKE3 digest",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "RawPayloadAuthority": {
+      "type": "object",
+      "properties": {
+        "payload_hash": {
+          "$ref": "#/$defs/Digest256"
+        },
+        "retained_relative_path": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "retention": {
+          "$ref": "#/$defs/RawRetention"
+        }
+      },
+      "required": [
+        "payload_hash",
+        "retention"
+      ]
+    },
+    "RawRetention": {
+      "type": "string",
+      "enum": [
+        "HASH_ONLY",
+        "RETAINED_WITH_EXPLICIT_AUTHORITY",
+        "SYNTHETIC_FIXTURE"
+      ]
+    }
+  }
+}

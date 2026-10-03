@@ -1,0 +1,28 @@
+{
+  "completed_blocks": 864,
+  "contract_sha256": "342f39886488a41101c355ddf9126e88be3e88b0ccd78480d5eedf88819e79b3",
+  "expected_rows": 4320,
+  "frontier_path": "task-frontier.jsonl",
+  "horizons": [
+    512,
+    1024,
+    2048,
+    4096,
+    8192
+  ],
+  "no_lesions": true,
+  "no_recovery_comparison": true,
+  "nonfinite_rows": 0,
+  "qualification_only": true,
+  "rungs": [
+    "T1",
+    "T2",
+    "T3",
+    "T4"
+  ],
+  "schema": "FLY-PHENO-00-v0.3-QTASK-collection-receipt-v1",
+  "status": "QUALIFICATION_COMPLETE",
+  "study_id": "FLY-PHENO-00-v0.3-QTASK",
+  "threshold": 0.25,
+  "wall_seconds": 398.2764907
+}

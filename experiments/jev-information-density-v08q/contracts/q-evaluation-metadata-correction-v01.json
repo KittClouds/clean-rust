@@ -1,0 +1,31 @@
+{
+  "schema": "jev-v08q-evaluation-metadata-correction-v01",
+  "status": "FROZEN_METADATA_ONLY_CORRECTION_BEFORE_PREDICTIONS",
+  "parent_execution_packet_sha256": "bd263ce025146b9c57c8eebabd46336c28d6367078d153ec145b68ca7e9c177c",
+  "parent_panel_terminal_root_sha256": "1b99d39ab6bfed8173a5410f6c8ae0df442aae03038e31bab46b779bd1e039a6",
+  "mismatch": {
+    "incorrect_check": "The v05 evaluator compared features/q-feature-extraction-receipt.json.panel_root_sha256 directly to the later q-panel-phase-terminal-seal-v01.json.root_sha256.",
+    "receipt_panel_root_sha256": "b9f77d7536c038964ac3fc77c52c495c04492ae443518a34f1c5e1efaf6ed2a2",
+    "correct_parent_field": "q-feature-cache-seal-v01.json.panel_construction_root_sha256",
+    "correct_parent_value_sha256": "b9f77d7536c038964ac3fc77c52c495c04492ae443518a34f1c5e1efaf6ed2a2",
+    "terminal_aggregate_root_sha256": "1b99d39ab6bfed8173a5410f6c8ae0df442aae03038e31bab46b779bd1e039a6",
+    "feature_cache_root_sha256": "57d9ebaea0bd6fa39d388cd7a3429c08eb349b929bd261eead33d6c9a51ea861",
+    "construction_seal_file_sha256": "e7fe0942d116979d3c41a0d80fdbe80e6eb44dd320d27608ff37d96c7c136ff3"
+  },
+  "repair": {
+    "metadata_validation": "Validate the feature receipt panel_root_sha256 against the feature-cache seal's panel_construction_root_sha256; validate the feature receipt panel_seal_sha256 against the sealed construction-seal file; independently validate the feature-cache root and full terminal panel root.",
+    "scientific_inputs_changed": false,
+    "panel_identity_or_content_changed": false,
+    "training_or_checkpoint_changed": false,
+    "metric_or_analysis_changed": false,
+    "retry_or_replacement_panel": false
+  },
+  "failed_preflight": {
+    "failure_receipt": "D:/codex-runs/jev-information-density-v08q-run-v01/evaluation/evaluation-failure-receipt-v01.json",
+    "panel_opening_receipt": "D:/codex-runs/jev-information-density-v08q-run-v01/evaluation/panel-opening-receipt-v01.json",
+    "panel_inputs_read_for_integrity_and_parsing": true,
+    "predictions_emitted": false,
+    "metrics_or_outcome_analysis_emitted": false,
+    "receipt_preservation": "Keep both v01 failed-attempt receipts unchanged. The corrected scored run records total panel access attempts as two and the sole completed evaluation opening as one."
+  }
+}

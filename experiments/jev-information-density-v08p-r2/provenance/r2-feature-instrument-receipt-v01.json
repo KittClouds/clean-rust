@@ -1,0 +1,9 @@
+{
+  "schema": "jev-v08p-r2-feature-instrument-receipt-v01",
+  "instrument_seal": "experiments/jev-information-density-v08p-r2/provenance/r2-feature-instrument-seal-v01.json",
+  "instrument_seal_sha256": "c679eab3b2edf0e7bffa792b48fd9ee7ea243d3fc2184373ed036d64aea94bb0",
+  "status": "FROZEN_LFM_FEATURE_EXTRACTION_AND_RADIUS_MATCHING_READY",
+  "model_contact_authorized_by_r2_packet": true,
+  "head_training": false,
+  "evaluation": false
+}

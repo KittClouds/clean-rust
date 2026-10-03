@@ -1,0 +1,51 @@
+{
+  "schema_version": "INSTRUMENT_BINDING_V1",
+  "binding_id": "9bdfd61aa3f76ec4408822447c9ddf0efc2546e682d17583964bd630daf1ee2d",
+  "northstar_instrument_id": 3,
+  "mt5_terminal_id": "SYNTHETIC_MT5_TERMINAL",
+  "mt5_symbol": "US30",
+  "tradelocker_account_environment": "SYNTHETIC_HEROFX",
+  "tradelocker_instrument_id": "3",
+  "tradelocker_symbol": "US30",
+  "binding_basis": "explicit qualification fixture with shared symbol and typed contract comparison",
+  "observed_contract_fields": [
+    {
+      "field": "price_precision",
+      "mt5_value": "2",
+      "tradelocker_value": "2",
+      "status": "EXACT",
+      "transform": null
+    },
+    {
+      "field": "tick_size",
+      "mt5_value": "0.01",
+      "tradelocker_value": "0.01",
+      "status": "EXACT",
+      "transform": null
+    },
+    {
+      "field": "quantity_step",
+      "mt5_value": "0.01",
+      "tradelocker_value": "0.01",
+      "status": "EXACT",
+      "transform": null
+    },
+    {
+      "field": "quote_currency",
+      "mt5_value": "USD",
+      "tradelocker_value": "USD",
+      "status": "EXACT",
+      "transform": null
+    },
+    {
+      "field": "session_availability",
+      "mt5_value": "fixture_open",
+      "tradelocker_value": "fixture_open",
+      "status": "COMPATIBLE",
+      "transform": null
+    }
+  ],
+  "binding_status": "COMPATIBLE",
+  "created_at_ns": 1800000000000000000,
+  "verified_at_ns": 1800000000000000000
+}

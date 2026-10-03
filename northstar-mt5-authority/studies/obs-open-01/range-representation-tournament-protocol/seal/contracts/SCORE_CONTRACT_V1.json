@@ -1,0 +1,1 @@
+{"baseline_zero":"NOT_EVALUABLE_BASELINE_BRIER_ZERO","delta_brier":"B(M0)-B(MR)","diagnostics_non_claim_bearing":true,"material_floor":0.02,"per_session":"mean over exactly 30 k anchors","population":"mean over complete sessions","relative_skill":"1-B(MR)/B(M0)","schema":"SESSION_WEIGHTED_BRIER_SCORE_V1"}

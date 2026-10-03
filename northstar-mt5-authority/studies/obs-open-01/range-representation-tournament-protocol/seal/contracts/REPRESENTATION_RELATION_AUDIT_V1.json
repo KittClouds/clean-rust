@@ -1,0 +1,1 @@
+{"audit_precedes_modeling":true,"classifications":["INFORMATIONALLY_EQUIVALENT_GIVEN_CONTEXT","LOSSY_QUOTIENT","CONDITIONALLY_INVERTIBLE","NON_EQUIVALENT","NOT_EVALUABLE"],"interpretation_law":"If equivalent given context, score differences are PROBE_ACCESSIBILITY_DIFFERENCE only.","schema":"REPRESENTATION_RELATION_AUDIT_V1"}

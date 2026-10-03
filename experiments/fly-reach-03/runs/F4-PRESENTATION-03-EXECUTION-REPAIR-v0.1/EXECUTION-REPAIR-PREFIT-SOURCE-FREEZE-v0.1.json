@@ -1,0 +1,208 @@
+{
+  "assignment_support": "6/6 evaluable; no replacement or reweighting",
+  "comparative_truth_fields_opened": false,
+  "eligible_count_limitation": "exact pre-sampling eligible counts unavailable from frozen collector; exact sampled counts and unmodified q diagnostics retained; sum(q) remains an estimate",
+  "fit_manifest_created": false,
+  "fits_executed": false,
+  "identity": "F4-PRESENTATION-03-EXECUTION-REPAIR-v0.1",
+  "raw_collection_rehash": "PASS",
+  "recorded_by_source_sha256": "a706557190f08f2a62e0729712c7170535fc811bcc70bb5c8757a79b1b9e4d60",
+  "schema": "F4-PRESENTATION-03-execution-prefit-source-freeze-v0.1",
+  "source_count": 38,
+  "sources": [
+    {
+      "bytes": 9638,
+      "path": "experiments\\fly-reach-03\\f4-presentation-03\\validation-repair-v0.1.1\\prepare_execution_repair.py",
+      "sha256": "044f278c778f274035e851d42b9d856163969fb856a93e2a056c6625cdd7080d"
+    },
+    {
+      "bytes": 5316,
+      "path": "experiments\\fly-reach-03\\f4-presentation-03\\validation-repair-v0.1.1\\seal_execution_repair_prefit.py",
+      "sha256": "a706557190f08f2a62e0729712c7170535fc811bcc70bb5c8757a79b1b9e4d60"
+    },
+    {
+      "bytes": 4339,
+      "path": "experiments\\fly-reach-03\\f4-presentation-03\\validation-repair-v0.1.1\\seal_fit_surface_repair.py",
+      "sha256": "b6621852a0b3f0cb6607a2a064db74f997442794a6dff7e04b4967786f569fd6"
+    },
+    {
+      "bytes": 23756,
+      "path": "experiments\\fly-reach-03\\f4-presentation-03\\validation-repair-v0.1.1\\run_fits_repair.py",
+      "sha256": "aa6a1c4b757c2209efae6aa859ba5d6b85ce59f0f918300dee02dac6000f3c52"
+    },
+    {
+      "bytes": 1654,
+      "path": "experiments\\fly-reach-03\\f4-presentation-03\\validation-repair-v0.1.1\\test_runner_repair.py",
+      "sha256": "160b021bb5b953167e575476b444696b2cb7d2e2a509558c0e3c55f6462e5db6"
+    },
+    {
+      "bytes": 818,
+      "path": "experiments\\fly-reach-03\\f4-presentation-03\\validation-repair-v0.1.1\\RUNNER-REPAIR-RECEIPT-v0.1.json",
+      "sha256": "0ef36b60b0f4444bf0238e4b9a545d8ebdc2a9633a7732aef4458b75b719e1c0"
+    },
+    {
+      "bytes": 1457,
+      "path": "experiments\\fly-reach-03\\f4-presentation-03\\validation-repair-v0.1.1\\EXECUTION-REPAIR-AMENDMENT-v0.1.json",
+      "sha256": "2095f502f0f2c63978df951d2e07206dc7d92c3804b353c41603f487435d710c"
+    },
+    {
+      "bytes": 10275,
+      "path": "experiments\\fly-reach-03\\f4-presentation-03\\validation-repair-v0.1.1\\q_weight_diagnostics_repair.py",
+      "sha256": "487e7875d1b44becd7a14da20391dfaa015b23e8e77cae44169951583262517c"
+    },
+    {
+      "bytes": 7771,
+      "path": "experiments\\fly-reach-03\\runs\\F4-PRESENTATION-03-EXECUTION-CONTINUATION-v0.1\\FIT-EXECUTION-STOP-RECEIPT-v0.1.json",
+      "sha256": "dd7a34ac67e2bd9d34b1fbcb212ea176a221a59fea2a47122c489b98d23b5f58"
+    },
+    {
+      "bytes": 34747,
+      "path": "experiments\\fly-reach-03\\f4-presentation-03\\validation-repair-v0.1.1\\verify_integrity.py",
+      "sha256": "7c7a756b9bb5e577fe1683d2e4829f1d4e8b2fc9d0347157238b1fc77babcd57"
+    },
+    {
+      "bytes": 27987,
+      "path": "experiments\\fly-reach-03\\f4-presentation-03\\validation-repair-v0.1.1\\analyze_results.py",
+      "sha256": "777c2bc7d6f2f817dd40d2654932b9f4bc503335bf5c0ffb15d6e6667409181f"
+    },
+    {
+      "bytes": 10281,
+      "path": "experiments\\fly-reach-03\\f4-presentation-03\\validation-repair-v0.1.1\\q_weight_diagnostics.py",
+      "sha256": "c80da2da9836c35f12498b1a879eaae3ff7c694eece52a6d81d28a3c9a03d958"
+    },
+    {
+      "bytes": 1897,
+      "path": "experiments\\fly-reach-03\\f4-presentation-03\\validation-repair-v0.1.1\\test_q_weight_diagnostics.py",
+      "sha256": "1af28aefd07e883bcec04acacc1792e9d45443f6f7d7222ab6393fb90253e305"
+    },
+    {
+      "bytes": 924,
+      "path": "experiments\\fly-reach-03\\f4-presentation-03\\validation-repair-v0.1.1\\REPAIR-TOOL-COPY-RECEIPT-v0.1.json",
+      "sha256": "25600f91581dbcdb955fc8f7a2dc83443004ebcbedcee083b6d7cd4336d44621"
+    },
+    {
+      "bytes": 15640,
+      "path": "experiments\\fly-reach-03\\f4-presentation-03\\prepare_fit_surface.py",
+      "sha256": "654c6e364585b6e609708a4cda3f7134e00c59a2dcb68bc1d805feda089dd2d7"
+    },
+    {
+      "bytes": 23746,
+      "path": "experiments\\fly-reach-03\\f4-presentation-03\\run_fits.py",
+      "sha256": "551683dcca848b9caf76612729c1f6ec964e806aeb072bcaed2b85b6b0904b74"
+    },
+    {
+      "bytes": 33738,
+      "path": "experiments\\fly-reach-03\\f4-presentation-03\\verify_integrity.py",
+      "sha256": "7f602ac210f1ef4c2fba45a18687faf84240e55102baeeea097ece0359e74eae"
+    },
+    {
+      "bytes": 26952,
+      "path": "experiments\\fly-reach-03\\f4-presentation-03\\analyze_results.py",
+      "sha256": "be2c5198713ccbc47bc0ee83870c318460f75f0530e0db56d459345798c6e7a9"
+    },
+    {
+      "bytes": 7537,
+      "path": "experiments\\fly-reach-03\\f4-presentation-03\\presentation03_data.py",
+      "sha256": "a3d21f7d9379046fe42530eafa0f0523662422be946241ec14207900191c13e5"
+    },
+    {
+      "bytes": 18461,
+      "path": "experiments\\fly-reach-03\\f4-presentation-03\\presentation03_model.py",
+      "sha256": "80ce81ab2a75cd512804352fb74c2400b1c0898f7078b543c90064f35cdc792d"
+    },
+    {
+      "bytes": 67236,
+      "path": "experiments\\fly-reach-03\\f4-presentation-03\\IMPLEMENTATION-FREEZE.json",
+      "sha256": "563f58216e6a276bcdffebd8d14df730fae6d82779311b23914783ccf6282430"
+    },
+    {
+      "bytes": 66103,
+      "path": "experiments\\fly-reach-03\\f4-presentation-03\\SOURCE-INPUT-MANIFEST.json",
+      "sha256": "7310de650f0efd5bb7ccb5342bf30e9cc8ae11a16da968e656512bda0e1b7305"
+    },
+    {
+      "bytes": 112736,
+      "path": "experiments\\fly-reach-03\\f4-presentation-03\\implementation-artifacts\\INITIALIZER-MANIFEST.json",
+      "sha256": "4fe74735648fb49eba9c31bb79ef20e4d8b4e7a82c1f65feb31c065789b23b98"
+    },
+    {
+      "bytes": 8954,
+      "path": "experiments\\fly-reach-03\\runs\\F4-PRESENTATION-03-ENG1\\task-bank\\TASK-BANK-MANIFEST.json",
+      "sha256": "ad339f4a710c9cb803e68a7076da923a68486f81b7552aa767c710f885deb0a1"
+    },
+    {
+      "bytes": 19542954,
+      "path": "experiments\\fly-reach-03\\runs\\F4-PRESENTATION-03-ENG1\\task-bank\\training.json",
+      "sha256": "d61a0390fb9ba413b8970ba3ae82b8b5ec9fb717d3fc2247a79d9f8e30431d61"
+    },
+    {
+      "bytes": 15275,
+      "path": "experiments\\fly-reach-03\\runs\\F4-PRESENTATION-03-ENG1\\task-bank\\TASK-SEED-MANIFEST.json",
+      "sha256": "22680d8cffd0a272ff841aa0478e2eb6bb36dce79c2c9c805f2aa93f8fb467a1"
+    },
+    {
+      "bytes": 459,
+      "path": "experiments\\fly-reach-03\\runs\\F4-PRESENTATION-03-ENG1\\task-bank\\TASK-BANK-RECEIPT.json",
+      "sha256": "b0a7aab7c4cd43e8352b7aba10878e24d35faa9f3c93739269da09373035e02f"
+    },
+    {
+      "bytes": 418,
+      "path": "experiments\\fly-reach-03\\runs\\F4-PRESENTATION-03-ENG1\\task-bank\\TASK-SEED-RECEIPT.json",
+      "sha256": "4fc7f4962e6dec639a588686249508fa942f183069dcf7af8994893fdb45347d"
+    },
+    {
+      "bytes": 10012082,
+      "path": "experiments\\fly-reach-03\\runs\\F4-PRESENTATION-03-ENG1\\native-collection\\RAW-PREDICTORS.bin",
+      "sha256": "495c68070624e4b8eaeeba217aeb03bdac6636d75e6691292a59872c11a9455f"
+    },
+    {
+      "bytes": 1141757,
+      "path": "experiments\\fly-reach-03\\runs\\F4-PRESENTATION-03-ENG1\\native-collection\\RAW-SCORING-TRUTH.bin",
+      "sha256": "ff9d000145fc503e83710ca99d65b0304d52c1f94533d92c78e28b9730214d50"
+    },
+    {
+      "bytes": 48593,
+      "path": "experiments\\fly-reach-03\\runs\\F4-PRESENTATION-03-ENG1\\native-collection\\NATIVE-COLLECTION-RECEIPT.json",
+      "sha256": "534a8d817ed3d610d9f257c51392426f05cabc1f4fd157ddfa39d9a5243f34cf"
+    },
+    {
+      "bytes": 34377,
+      "path": "experiments\\fly-reach-03\\runs\\F4-PRESENTATION-03-VALIDATION-REPAIR-v0.1.1\\COLLECTION-VALIDATION-RECEIPT-v0.1.1.json",
+      "sha256": "9df970a7c9065d9f7058eb3d5af3c189f5dec64c6097b2d78e8c0c26bb75cb3b"
+    },
+    {
+      "bytes": 876,
+      "path": "experiments\\fly-reach-03\\runs\\F4-PRESENTATION-03-VALIDATION-REPAIR-v0.1.1\\RAW-COLLECTION-TREE-SEAL-v0.1.1.json",
+      "sha256": "5d98535f780d5b630b5136c07367791c4698f750013561ad8c243211c6d01b88"
+    },
+    {
+      "bytes": 6655,
+      "path": "experiments\\fly-reach-03\\runs\\F4-PRESENTATION-03-VALIDATION-REPAIR-v0.1.1\\SUPPORT-ACCOUNTING-RECEIPT-v0.1.1.json",
+      "sha256": "966e69845091e6aa6c2c52ccc760723a49d15eb573749066c867699e3b38303a"
+    },
+    {
+      "bytes": 150276,
+      "path": "experiments\\fly-reach-03\\runs\\F4-PRESENTATION-03-VALIDATION-REPAIR-v0.1.1\\CELL-SUPPORT-SURFACE-v0.1.1.csv",
+      "sha256": "41c4cf3531b604f8cfac362f4a8a9e2410e98eb1b845e3aa6a5b6d6de6ef6843"
+    },
+    {
+      "bytes": 515,
+      "path": "experiments\\fly-reach-03\\runs\\F4-PRESENTATION-03-VALIDATION-REPAIR-v0.1.1\\TRAINING-SUPPORT-SURFACE-v0.1.1.csv",
+      "sha256": "d42930d85ee5ea416904ddbe7482b4c16eace6fba45289813db54367bb15a083"
+    },
+    {
+      "bytes": 447,
+      "path": "experiments\\fly-reach-03\\runs\\F4-PRESENTATION-03-VALIDATION-REPAIR-v0.1.1\\ASSIGNMENT-SUPPORT-v0.1.1.csv",
+      "sha256": "f30ff0ad010eb5fccdfff00d31231f3491051d676a808a9e06471bab0cd031a8"
+    },
+    {
+      "bytes": 127435,
+      "path": "experiments\\fly-reach-03\\runs\\F4-PRESENTATION-03-VALIDATION-REPAIR-v0.1.1\\RAW-WEIGHT-DIAGNOSTICS-v0.1.1.json",
+      "sha256": "0d7ef29f0667b4fab030a13211c5c9089e60a297b454f5381e945efef0894b37"
+    }
+  ],
+  "status": "PASS_BEFORE_FIT_MANIFEST",
+  "support_only_target_access_declared": true,
+  "training_support": "12/12 two-class training folds",
+  "validation_repair_identity": "F4-PRESENTATION-03-VALIDATION-REPAIR-v0.1.1"
+}

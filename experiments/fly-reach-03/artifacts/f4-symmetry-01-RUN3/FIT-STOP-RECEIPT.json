@@ -1,0 +1,7 @@
+{
+  "first_mismatch": "ValueError: I/O operation on closed file",
+  "measured_namespace_created": false,
+  "phase": "fit",
+  "schema": "F4-SYMMETRY-01-stop-receipt-v1",
+  "status": "STOP"
+}

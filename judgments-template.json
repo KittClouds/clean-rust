@@ -1,0 +1,190 @@
+[
+  {
+    "packet_id": "e2-05aaa14e43c965c1",
+    "judgment": "SAME"
+  },
+  {
+    "packet_id": "e2-134b3fa79fef585f",
+    "judgment": "SAME"
+  },
+  {
+    "packet_id": "e2-22dad18d1429cc27",
+    "judgment": "SAME"
+  },
+  {
+    "packet_id": "e2-2312a6a89981e7c7",
+    "judgment": "SAME"
+  },
+  {
+    "packet_id": "e2-235caa9bb8f69ff9",
+    "judgment": "SAME"
+  },
+  {
+    "packet_id": "e2-26bb74580ed2a619",
+    "judgment": "DIFFERENT"
+  },
+  {
+    "packet_id": "e2-2c6e051f3074b133",
+    "judgment": "SAME"
+  },
+  {
+    "packet_id": "e2-2d11fb2e3b3352ff",
+    "judgment": "SAME"
+  },
+  {
+    "packet_id": "e2-2dae6a234e4e7831",
+    "judgment": "SAME"
+  },
+  {
+    "packet_id": "e2-351b9ffde45b8888",
+    "judgment": "SAME"
+  },
+  {
+    "packet_id": "e2-372ed149d73baeb4",
+    "judgment": "SAME"
+  },
+  {
+    "packet_id": "e2-3c72d7a2482cc409",
+    "judgment": "DIFFERENT"
+  },
+  {
+    "packet_id": "e2-3d2f97d2658f6794",
+    "judgment": "SAME"
+  },
+  {
+    "packet_id": "e2-426c92756c63a8d9",
+    "judgment": "SAME"
+  },
+  {
+    "packet_id": "e2-482c389061c7c36e",
+    "judgment": "SAME"
+  },
+  {
+    "packet_id": "e2-4f7ce348edcd94b8",
+    "judgment": "SAME"
+  },
+  {
+    "packet_id": "e2-4fa3f8007160f5c0",
+    "judgment": "SAME"
+  },
+  {
+    "packet_id": "e2-5512310203924f31",
+    "judgment": "SAME"
+  },
+  {
+    "packet_id": "e2-58a0acf225ec33b4",
+    "judgment": "SAME"
+  },
+  {
+    "packet_id": "e2-5b24f7f8b7349944",
+    "judgment": "DIFFERENT"
+  },
+  {
+    "packet_id": "e2-5ee86be3e0747144",
+    "judgment": "SAME"
+  },
+  {
+    "packet_id": "e2-63b6d43b0bf77e1a",
+    "judgment": "SAME"
+  },
+  {
+    "packet_id": "e2-68853a8c22c174b6",
+    "judgment": "SAME"
+  },
+  {
+    "packet_id": "e2-68c04d6bf3c6a38c",
+    "judgment": "SAME"
+  },
+  {
+    "packet_id": "e2-82ccd62961c228ec",
+    "judgment": "SAME"
+  },
+  {
+    "packet_id": "e2-8f98c2f8547d7319",
+    "judgment": "SAME"
+  },
+  {
+    "packet_id": "e2-924a7cddde5526a9",
+    "judgment": "SAME"
+  },
+  {
+    "packet_id": "e2-95867cc50742e184",
+    "judgment": "SAME"
+  },
+  {
+    "packet_id": "e2-abad7ea26b4222bf",
+    "judgment": "SAME"
+  },
+  {
+    "packet_id": "e2-b54c2a2d8cecdef8",
+    "judgment": "SAME"
+  },
+  {
+    "packet_id": "e2-ba276550ac221f6d",
+    "judgment": "SAME"
+  },
+  {
+    "packet_id": "e2-be1a911138c70f75",
+    "judgment": "DIFFERENT"
+  },
+  {
+    "packet_id": "e2-c49bc1e042341e81",
+    "judgment": "SAME"
+  },
+  {
+    "packet_id": "e2-c59f5948937a4a72",
+    "judgment": "SAME"
+  },
+  {
+    "packet_id": "e2-c5b4f7ff671f674a",
+    "judgment": "DIFFERENT"
+  },
+  {
+    "packet_id": "e2-c6bd74c920443f81",
+    "judgment": "SAME"
+  },
+  {
+    "packet_id": "e2-ca4c67c73f55377d",
+    "judgment": "DIFFERENT"
+  },
+  {
+    "packet_id": "e2-cc246f5a77e28ddc",
+    "judgment": "SAME"
+  },
+  {
+    "packet_id": "e2-e5ab5f91e0828064",
+    "judgment": "SAME"
+  },
+  {
+    "packet_id": "e2-e61f89fe3d1d66d8",
+    "judgment": "SAME"
+  },
+  {
+    "packet_id": "e2-e96b60b05d1ca3a6",
+    "judgment": "DIFFERENT"
+  },
+  {
+    "packet_id": "e2-ebdf79d638fd7a35",
+    "judgment": "SAME"
+  },
+  {
+    "packet_id": "e2-ec86b60246af6b78",
+    "judgment": "SAME"
+  },
+  {
+    "packet_id": "e2-f4afb1569792ee57",
+    "judgment": "DIFFERENT"
+  },
+  {
+    "packet_id": "e2-f8da40b65a52ad7a",
+    "judgment": "SAME"
+  },
+  {
+    "packet_id": "e2-f913e09bfed06231",
+    "judgment": "SAME"
+  },
+  {
+    "packet_id": "e2-fe54ffc3e8d82f46",
+    "judgment": "SAME"
+  }
+]

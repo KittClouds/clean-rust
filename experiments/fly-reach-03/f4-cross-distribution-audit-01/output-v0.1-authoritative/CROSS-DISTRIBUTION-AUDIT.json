@@ -1,0 +1,723 @@
+{
+  "analyzer_sha256": "187eb54dd3e08190892177fd2944d11fa516108aa902edf1239fee14cbaa3477",
+  "audit_scope_sha256": "f7a4baebed1a3d264f325cc9f364daa283305fac3b1289ee59702621e9c8d725",
+  "comparison": {
+    "D_balanced_error_difference_QPROMO2_minus_SYMMETRY03": 0.27311310025520136,
+    "D_omega_difference_QPROMO2_minus_SYMMETRY03": -0.5462262005104027
+  },
+  "interpretation": "D calibration accessibility differed sharply between these qualification distributions. Both task banks use the same four-cue schedule design, but SYMMETRY-03 task blocks were structure-screened while QPROMO2 blocks were ordinary and unscreened. Differences in scored U* support, target margins, and leverage concentration describe where the sampled populations differ; because block seeds and selection procedures differ, this comparison does not identify structural screening as the sole cause.",
+  "no_fits_or_prediction_rescoring": true,
+  "runs": {
+    "QPROMO2": {
+      "Ustar_support": {
+        "blockwise": [
+          {
+            "block_id": 305012,
+            "class_complete": false,
+            "leverage": {
+              "ess": 17.015268195070988,
+              "ess_fraction": 0.009921439180799409,
+              "top_1pct_share": 0.7848970349034375,
+              "top_20pct_share": 0.9999291033825173,
+              "top_5pct_share": 0.9915720495705842,
+              "total": 0.520868874179273
+            },
+            "negative_count": 1715,
+            "nonempty_substrate_side_cells": 1,
+            "positive_count": 0,
+            "positive_ipw_share": 0.0,
+            "rows": 1715
+          },
+          {
+            "block_id": 305013,
+            "class_complete": true,
+            "leverage": {
+              "ess": 11.746162401908885,
+              "ess_fraction": 0.007219522066323838,
+              "top_1pct_share": 0.864112517850325,
+              "top_20pct_share": 0.999999818924735,
+              "top_5pct_share": 0.9993106351713463,
+              "total": 0.2022457883699325
+            },
+            "negative_count": 1448,
+            "nonempty_substrate_side_cells": 4,
+            "positive_count": 179,
+            "positive_ipw_share": 0.10994216720802502,
+            "rows": 1627
+          },
+          {
+            "block_id": 305014,
+            "class_complete": true,
+            "leverage": {
+              "ess": 19.236424102027918,
+              "ess_fraction": 0.004562719189285559,
+              "top_1pct_share": 0.9005671355214263,
+              "top_20pct_share": 0.9985452369533374,
+              "top_5pct_share": 0.991222406153323,
+              "total": 0.5653695252090984
+            },
+            "negative_count": 1057,
+            "nonempty_substrate_side_cells": 5,
+            "positive_count": 3159,
+            "positive_ipw_share": 0.7513071805676311,
+            "rows": 4216
+          },
+          {
+            "block_id": 305015,
+            "class_complete": true,
+            "leverage": {
+              "ess": 5.036004629035597,
+              "ess_fraction": 0.0037248554948488143,
+              "top_1pct_share": 0.9990538849772558,
+              "top_20pct_share": 0.9999998095900089,
+              "top_5pct_share": 0.9999566082646132,
+              "total": 0.05554852558419889
+            },
+            "negative_count": 1006,
+            "nonempty_substrate_side_cells": 2,
+            "positive_count": 346,
+            "positive_ipw_share": 0.2563089722805119,
+            "rows": 1352
+          },
+          {
+            "block_id": 305016,
+            "class_complete": true,
+            "leverage": {
+              "ess": 18.732487662329245,
+              "ess_fraction": 0.012299729259572715,
+              "top_1pct_share": 0.8102783824840005,
+              "top_20pct_share": 0.999997468822824,
+              "top_5pct_share": 0.9998691425806386,
+              "total": 0.31472176790827344
+            },
+            "negative_count": 413,
+            "nonempty_substrate_side_cells": 4,
+            "positive_count": 1110,
+            "positive_ipw_share": 0.7299652188767054,
+            "rows": 1523
+          },
+          {
+            "block_id": 305017,
+            "class_complete": true,
+            "leverage": {
+              "ess": 34.2651855829832,
+              "ess_fraction": 0.018775444155059287,
+              "top_1pct_share": 0.4062146376470435,
+              "top_20pct_share": 0.8688174023034372,
+              "top_5pct_share": 0.6279132065541086,
+              "total": 0.16149864675847939
+            },
+            "negative_count": 6,
+            "nonempty_substrate_side_cells": 1,
+            "positive_count": 1819,
+            "positive_ipw_share": 0.9967123287671232,
+            "rows": 1825
+          },
+          {
+            "block_id": 305018,
+            "class_complete": true,
+            "leverage": {
+              "ess": 18.176794635298645,
+              "ess_fraction": 0.003710307131108113,
+              "top_1pct_share": 0.983117665618195,
+              "top_20pct_share": 0.9999277662946947,
+              "top_5pct_share": 0.9984255520929467,
+              "total": 0.4603939414755399
+            },
+            "negative_count": 3061,
+            "nonempty_substrate_side_cells": 4,
+            "positive_count": 1838,
+            "positive_ipw_share": 0.37262720204129074,
+            "rows": 4899
+          },
+          {
+            "block_id": 305019,
+            "class_complete": false,
+            "leverage": {
+              "ess": 13.67885161757678,
+              "ess_fraction": 0.014567467111370374,
+              "top_1pct_share": 0.6907946017724526,
+              "top_20pct_share": 0.9990623045631086,
+              "top_5pct_share": 0.9631616641431284,
+              "total": 0.061021737750384775
+            },
+            "negative_count": 939,
+            "nonempty_substrate_side_cells": 3,
+            "positive_count": 0,
+            "positive_ipw_share": 0.0,
+            "rows": 939
+          },
+          {
+            "block_id": 305020,
+            "class_complete": true,
+            "leverage": {
+              "ess": 1.7037189555601797,
+              "ess_fraction": 0.006897647593361051,
+              "top_1pct_share": 0.9517627687817712,
+              "top_20pct_share": 0.9999991750779053,
+              "top_5pct_share": 0.9998552284199632,
+              "total": 0.015185730183097355
+            },
+            "negative_count": 138,
+            "nonempty_substrate_side_cells": 2,
+            "positive_count": 109,
+            "positive_ipw_share": 0.43861014089240374,
+            "rows": 247
+          },
+          {
+            "block_id": 305021,
+            "class_complete": false,
+            "leverage": {
+              "ess": 18.69456194578864,
+              "ess_fraction": 0.011953044722371253,
+              "top_1pct_share": 0.749507009962613,
+              "top_20pct_share": 0.9995200604650049,
+              "top_5pct_share": 0.9916986295254295,
+              "total": 0.025780878486542622
+            },
+            "negative_count": 1564,
+            "nonempty_substrate_side_cells": 1,
+            "positive_count": 0,
+            "positive_ipw_share": 0.0,
+            "rows": 1564
+          },
+          {
+            "block_id": 305022,
+            "class_complete": true,
+            "leverage": {
+              "ess": 224.32071273428681,
+              "ess_fraction": 0.06390903496703328,
+              "top_1pct_share": 0.3033826792940115,
+              "top_20pct_share": 0.9660838864931487,
+              "top_5pct_share": 0.7013304093225302,
+              "total": 1.174398954796504
+            },
+            "negative_count": 3423,
+            "nonempty_substrate_side_cells": 3,
+            "positive_count": 87,
+            "positive_ipw_share": 0.024643144089301825,
+            "rows": 3510
+          },
+          {
+            "block_id": 305023,
+            "class_complete": true,
+            "leverage": {
+              "ess": 9.026408540008433,
+              "ess_fraction": 0.130817515072586,
+              "top_1pct_share": 0.23334008012351562,
+              "top_20pct_share": 0.9538077174961523,
+              "top_5pct_share": 0.5490172818177318,
+              "total": 0.09959412412602607
+            },
+            "negative_count": 23,
+            "nonempty_substrate_side_cells": 2,
+            "positive_count": 46,
+            "positive_ipw_share": 0.6666666666666666,
+            "rows": 69
+          }
+        ],
+        "class_complete_blocks": [
+          305013,
+          305014,
+          305015,
+          305016,
+          305017,
+          305018,
+          305020,
+          305022,
+          305023
+        ],
+        "class_complete_count": 9,
+        "nonempty_substrate_side_cells_by_block": [
+          1,
+          4,
+          5,
+          2,
+          4,
+          1,
+          4,
+          3,
+          2,
+          1,
+          3,
+          2
+        ],
+        "rows_by_block": [
+          1715,
+          1627,
+          4216,
+          1352,
+          1523,
+          1825,
+          4899,
+          939,
+          247,
+          1564,
+          3510,
+          69
+        ],
+        "rows_min_median_max": [
+          69,
+          1595.5,
+          4899
+        ],
+        "total_blocks": 12
+      },
+      "artifact_hashes": {
+        "integrity_receipt": "a2565e8593528de2d711dbfab0c8b1feb309ea17db8a0d573e74f01ed89f8d7f",
+        "native_collection_receipt": "d08966471e6af1c38365f370b9749794931c8ef588a9343ce4945bc1cac05601",
+        "predictors": "344e3e129665df2a0ccac2b6c0f12b9b59a76a5fe39e38627df151738377c390",
+        "scoring_truth": "cab0340a2846c2582cbb61b040cef0af0b28476a37a8680239dbaf8685f836b7",
+        "task_manifest": "c1a63224682550e473b626780d3c1ba68d1636e00b4ef09f501f13dcbbc5967c",
+        "task_training": "9ec1f7c240143e7fb5537ae72eb6d5bb3fb4fb8fc0445bcbafa54ae913a826b5",
+        "terminal_receipt": "6bc1ad80b02795bb71958e3aa5947764f6987adb7b0c9581d01a2fb3db221c56"
+      },
+      "block_ids": [
+        305012,
+        305013,
+        305014,
+        305015,
+        305016,
+        305017,
+        305018,
+        305019,
+        305020,
+        305021,
+        305022,
+        305023
+      ],
+      "class_balance": {
+        "ipw_negative_share": 0.6299914131915929,
+        "ipw_positive_share": 0.37000858680840715,
+        "ipw_weighted_totals": {
+          "negative": 5597952.046875,
+          "positive": 3287807.234375
+        },
+        "observed_counts": {
+          "negative": 14793,
+          "positive": 8693
+        },
+        "observed_positive_share": 0.37013539981265436
+      },
+      "leverage_concentration": {
+        "ess": 215.4633944315409,
+        "ess_fraction": 0.00917412051569194,
+        "top_1pct_share": 0.7296069629905374,
+        "top_20pct_share": 0.9992685117198871,
+        "top_5pct_share": 0.9625585375900636,
+        "total": 3.65662849482735
+      },
+      "pooled_D_outcome_anchor": {
+        "analysis_sha256": "c1464e869d75ea9cd3d2a8e6a5d32fe002fa382dc7a68747d4579ae12907c2d5",
+        "balanced_error": 0.34988114501534634,
+        "omega_hat_clipped": 0.3002377099693073
+      },
+      "row_count": 23486,
+      "run_id": "F4-CALIBRATION-02-QPROMO2",
+      "target_margin_abs_g": {
+        "ipw_weighted_empirical": {
+          "p01": 1.3730243070969594e-12,
+          "p10": 5.2326480821929255e-12,
+          "p50": 2.2926431864078722e-09,
+          "p90": 2.0611383661162108e-05,
+          "p99": 0.00044292345410212874
+        },
+        "ipw_weighted_fraction_at_or_below": {
+          "1e-08": 0.5508468963595918,
+          "1e-10": 0.3151627936466051,
+          "1e-12": 0.0
+        },
+        "unweighted": {
+          "p01": 1.3742920213291598e-12,
+          "p10": 5.2112188262537495e-12,
+          "p50": 2.296413947888709e-09,
+          "p90": 2.090919042530004e-05,
+          "p99": 0.00044307900388958085
+        }
+      },
+      "task_structure": {
+        "block_count": 12,
+        "cue_count": 4,
+        "delay_steps": 12,
+        "delay_token_cv_by_block_min_median_max": [
+          0.013434144618902034,
+          0.01632366938588837,
+          0.020423027656583312
+        ],
+        "delay_token_cv_pooled": 0.004454053947551099,
+        "delay_token_total_counts_4_through_35": [
+          36895,
+          36688,
+          36977,
+          36768,
+          36463,
+          36979,
+          36952,
+          36795,
+          36755,
+          36604,
+          37088,
+          36834,
+          36901,
+          36916,
+          36665,
+          36940,
+          37070,
+          36723,
+          36900,
+          36912,
+          36819,
+          36642,
+          37043,
+          36883,
+          36707,
+          37055,
+          37257,
+          36874,
+          36886,
+          36676,
+          37058,
+          36923
+        ],
+        "distinct_label_assignments": 5,
+        "label_assignment_counts": {
+          "0101": 1,
+          "0110": 4,
+          "1001": 1,
+          "1010": 4,
+          "1100": 2
+        },
+        "positive_negative_labels_per_block": "2/2",
+        "primary_cue_cv_by_block_min_median_max": [
+          0.011086242714592508,
+          0.01517110593095634,
+          0.0296387120958335
+        ],
+        "primary_cue_cv_pooled": 0.002014673854683778,
+        "primary_cue_total_counts": [
+          24558,
+          24636,
+          24605,
+          24505
+        ],
+        "structural_pattern_selection": false,
+        "trials_per_block": 8192
+      }
+    },
+    "SYMMETRY03": {
+      "Ustar_support": {
+        "blockwise": [
+          {
+            "block_id": 304000,
+            "class_complete": true,
+            "leverage": {
+              "ess": 60.597074881992064,
+              "ess_fraction": 0.02597388550449724,
+              "top_1pct_share": 0.556156083527781,
+              "top_20pct_share": 0.999985869017356,
+              "top_5pct_share": 0.9297925133122761,
+              "total": 0.4294564916144614
+            },
+            "negative_count": 1327,
+            "nonempty_substrate_side_cells": 2,
+            "positive_count": 1006,
+            "positive_ipw_share": 0.4285333591868012,
+            "rows": 2333
+          },
+          {
+            "block_id": 304001,
+            "class_complete": true,
+            "leverage": {
+              "ess": 6.821894812389519,
+              "ess_fraction": 0.0040152412079985395,
+              "top_1pct_share": 0.8933459947982657,
+              "top_20pct_share": 0.9999663110797623,
+              "top_5pct_share": 0.996916046335625,
+              "total": 0.062281136577519644
+            },
+            "negative_count": 1692,
+            "nonempty_substrate_side_cells": 4,
+            "positive_count": 7,
+            "positive_ipw_share": 0.0041073807881785995,
+            "rows": 1699
+          },
+          {
+            "block_id": 304002,
+            "class_complete": false,
+            "leverage": {
+              "ess": 7.434247304514264,
+              "ess_fraction": 0.017616699773730482,
+              "top_1pct_share": 0.7607134039531847,
+              "top_20pct_share": 0.999977499507938,
+              "top_5pct_share": 0.9996274719281458,
+              "total": 0.19482415906521494
+            },
+            "negative_count": 0,
+            "nonempty_substrate_side_cells": 1,
+            "positive_count": 422,
+            "positive_ipw_share": 1.0,
+            "rows": 422
+          },
+          {
+            "block_id": 304003,
+            "class_complete": true,
+            "leverage": {
+              "ess": 22.781034340698582,
+              "ess_fraction": 0.0066767392557733245,
+              "top_1pct_share": 0.9374591553190783,
+              "top_20pct_share": 0.9994956333229905,
+              "top_5pct_share": 0.9974499247609964,
+              "total": 0.28619623755459483
+            },
+            "negative_count": 2067,
+            "nonempty_substrate_side_cells": 3,
+            "positive_count": 1345,
+            "positive_ipw_share": 0.39483919139379,
+            "rows": 3412
+          },
+          {
+            "block_id": 304004,
+            "class_complete": true,
+            "leverage": {
+              "ess": 158.8211699858373,
+              "ess_fraction": 0.0449663561681306,
+              "top_1pct_share": 0.364955369918243,
+              "top_20pct_share": 0.9980320370357824,
+              "top_5pct_share": 0.8163779953854764,
+              "total": 1.8113137502979946
+            },
+            "negative_count": 2748,
+            "nonempty_substrate_side_cells": 4,
+            "positive_count": 784,
+            "positive_ipw_share": 0.22382725251074662,
+            "rows": 3532
+          },
+          {
+            "block_id": 304005,
+            "class_complete": false,
+            "leverage": {
+              "ess": 0.0,
+              "ess_fraction": 0.0,
+              "top_1pct_share": 0.0,
+              "top_20pct_share": 0.0,
+              "top_5pct_share": 0.0,
+              "total": 0.0
+            },
+            "negative_count": 0,
+            "nonempty_substrate_side_cells": 0,
+            "positive_count": 0,
+            "positive_ipw_share": null,
+            "rows": 0
+          },
+          {
+            "block_id": 304006,
+            "class_complete": true,
+            "leverage": {
+              "ess": 61.744108009428984,
+              "ess_fraction": 0.01618032180540592,
+              "top_1pct_share": 0.6004500915292784,
+              "top_20pct_share": 0.9780603733425631,
+              "top_5pct_share": 0.8433793440810073,
+              "total": 0.7518897465981225
+            },
+            "negative_count": 3772,
+            "nonempty_substrate_side_cells": 4,
+            "positive_count": 44,
+            "positive_ipw_share": 0.011546040300587533,
+            "rows": 3816
+          },
+          {
+            "block_id": 304007,
+            "class_complete": true,
+            "leverage": {
+              "ess": 17.35206286774476,
+              "ess_fraction": 0.01538303445722053,
+              "top_1pct_share": 0.6836631500451343,
+              "top_20pct_share": 0.9984203447058487,
+              "top_5pct_share": 0.9726265294429375,
+              "total": 0.26661918730710055
+            },
+            "negative_count": 655,
+            "nonempty_substrate_side_cells": 4,
+            "positive_count": 473,
+            "positive_ipw_share": 0.4172185500781929,
+            "rows": 1128
+          }
+        ],
+        "class_complete_blocks": [
+          304000,
+          304001,
+          304003,
+          304004,
+          304006,
+          304007
+        ],
+        "class_complete_count": 6,
+        "nonempty_substrate_side_cells_by_block": [
+          2,
+          4,
+          1,
+          3,
+          4,
+          0,
+          4,
+          4
+        ],
+        "rows_by_block": [
+          2333,
+          1699,
+          422,
+          3412,
+          3532,
+          0,
+          3816,
+          1128
+        ],
+        "rows_min_median_max": [
+          0,
+          2016.0,
+          3816
+        ],
+        "total_blocks": 8
+      },
+      "artifact_hashes": {
+        "integrity_receipt": "8fee402e324a7bf79058f0db0da9f261db5adf28943428902efd40341a7beb86",
+        "native_collection_receipt": "950d770e09da362464237af7cb245d937548e0a2b0b5b6b3e233c3550f4ac187",
+        "predictors": "41bb93ca9a20036aaff513f220b7511442b83eb22d12cac9709adc1fc839e525",
+        "scoring_truth": "4f0609d5f80f43c7f3d5eefefb496c0329e21c50430f08b7b74b826bd307a218",
+        "task_manifest": "96217b4193964ee98ed9c9e2e3b6f7a2fc0422c20368bb103e71a3d279634e70",
+        "task_training": "f91dac177eb5547fd2fb518a55b6156701f1ec3d5c876f3527cfa882f918a04e",
+        "terminal_receipt": "a5a40dce9710cb9f2e47850d6bdf9b99a44758a910a0fc7e8e8848eaef3d0d01"
+      },
+      "block_ids": [
+        304000,
+        304001,
+        304002,
+        304003,
+        304004,
+        304005,
+        304006,
+        304007
+      ],
+      "class_balance": {
+        "ipw_negative_share": 0.7500042665392286,
+        "ipw_positive_share": 0.24999573346077142,
+        "ipw_weighted_totals": {
+          "negative": 4635021.984375,
+          "positive": 1544972.171875
+        },
+        "observed_counts": {
+          "negative": 12261,
+          "positive": 4081
+        },
+        "observed_positive_share": 0.24972463590747768
+      },
+      "leverage_concentration": {
+        "ess": 312.81859604398636,
+        "ess_fraction": 0.019142001960836274,
+        "top_1pct_share": 0.6091153677316522,
+        "top_20pct_share": 0.9988189058991617,
+        "top_5pct_share": 0.9357879140290993,
+        "total": 3.8025807090150088
+      },
+      "pooled_D_outcome_anchor": {
+        "analysis_sha256": "320ad945401889abe4de9a2c44b075399ca07a646c810e56c133ca0e57b8a959",
+        "balanced_error": 0.07676804476014497,
+        "omega_hat_clipped": 0.84646391047971
+      },
+      "row_count": 16342,
+      "run_id": "F4-SYMMETRY-03-QREP1-IMPLFIX1",
+      "target_margin_abs_g": {
+        "ipw_weighted_empirical": {
+          "p01": 1.188517708729242e-12,
+          "p10": 9.87668714175216e-12,
+          "p50": 3.49628130891233e-08,
+          "p90": 5.671583494404331e-05,
+          "p99": 0.001284652971662581
+        },
+        "ipw_weighted_fraction_at_or_below": {
+          "1e-08": 0.4441510975741062,
+          "1e-10": 0.20902233306622311,
+          "1e-12": 0.0
+        },
+        "unweighted": {
+          "p01": 1.1928373599198044e-12,
+          "p10": 9.943269211470929e-12,
+          "p50": 3.504880474736183e-08,
+          "p90": 5.675115135090891e-05,
+          "p99": 0.0012838827003724875
+        }
+      },
+      "task_structure": {
+        "block_count": 8,
+        "cue_count": 4,
+        "delay_steps": 12,
+        "delay_token_cv_by_block_min_median_max": [
+          0.015494116332993899,
+          0.01752624439181468,
+          0.021020997726357155
+        ],
+        "delay_token_cv_pooled": 0.005273000283032331,
+        "delay_token_total_counts_4_through_35": [
+          24488,
+          24320,
+          24520,
+          24701,
+          24570,
+          24681,
+          24496,
+          24555,
+          24908,
+          24482,
+          24431,
+          24598,
+          24625,
+          24449,
+          24722,
+          24462,
+          24614,
+          24681,
+          24522,
+          24679,
+          24421,
+          24606,
+          24640,
+          24690,
+          24656,
+          24369,
+          24773,
+          24520,
+          24635,
+          24344,
+          24708,
+          24566
+        ],
+        "distinct_label_assignments": 5,
+        "label_assignment_counts": {
+          "0101": 2,
+          "0110": 1,
+          "1001": 1,
+          "1010": 3,
+          "1100": 1
+        },
+        "positive_negative_labels_per_block": "2/2",
+        "primary_cue_cv_by_block_min_median_max": [
+          0.012746853009967396,
+          0.019626615262297656,
+          0.028240222150236825
+        ],
+        "primary_cue_cv_pooled": 0.005958200558825862,
+        "primary_cue_total_counts": [
+          16514,
+          16244,
+          16361,
+          16417
+        ],
+        "structural_pattern_selection": true,
+        "trials_per_block": 8192
+      }
+    }
+  },
+  "schema": "F4-cross-distribution-audit-v0.1",
+  "status": "PASS_DESCRIPTIVE_AUDIT"
+}

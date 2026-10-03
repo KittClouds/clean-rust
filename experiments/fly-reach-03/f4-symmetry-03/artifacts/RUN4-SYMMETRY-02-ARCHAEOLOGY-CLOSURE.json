@@ -1,0 +1,19 @@
+{
+  "schema": "F4-SYMMETRY-03-parent-archaeology-closure-v1",
+  "status": "CLOSED_HYPOTHESIS_GENERATION_ONLY",
+  "scope": "F4-SYMMETRY-01 RUN4 and F4-SYMMETRY-02",
+  "source_basis": "User-supplied terminal interpretation; no RUN4 outcomes were re-opened or re-sliced for this replication.",
+  "bounded_observation": "Canonical ordering produced a large leverage-weighted correction concentrated almost entirely in block 303000 by incidence pattern 0011. The pre-observed counter-regime block 303002 by pattern 0101 moved in the opposite direction.",
+  "reported_localization": {
+    "dominant_block_pattern_share_of_net_delta_psi": 0.9472,
+    "dominant_cell_disagreements": 780,
+    "canonical_correct_on_disagreements": 780,
+    "absolute_order_correct_on_disagreements": 0,
+    "counter_regime": "303002x0101",
+    "counter_regime_direction": "D_worse_than_C"
+  },
+  "evidential_status": "hypothesis_generation_only; not pooled with F4-SYMMETRY-03 and not a transferable-effect claim",
+  "prohibited_actions": ["additional RUN4 slicing", "RUN4-based feature tuning", "RUN4-based block or seed selection"],
+  "measured_reach03_authorized": false,
+  "biological_promotion": false
+}

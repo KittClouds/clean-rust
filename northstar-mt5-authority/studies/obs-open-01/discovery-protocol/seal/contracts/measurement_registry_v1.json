@@ -1,0 +1,68 @@
+{
+  "schema": "OBS_OPEN_DISC02P_MEASUREMENT_REGISTRY_V1",
+  "observer_instance": "CAUSAL_RANGE_EXTREME_M1_V1",
+  "time_unit": "COMPLETED_M1_BAR",
+  "candidate_path": {
+    "start": "FIRST_COMPLETED_BAR_AFTER_BIRTH_KNOWLEDGE_TIME",
+    "stop": "SUPERSESSION_COMMIT_INCLUSIVE_OR_SESSION_TERMINATION",
+    "time_to_supersession": "RIGHT_CENSORED_AT_SESSION_END_FOR_TERMINAL_SURVIVOR",
+    "session_weighting": "EQUAL_SESSION_AFTER_WITHIN_SESSION_CANDIDATE_BALANCE",
+    "raw_direction_view": true,
+    "mirrored_side_canonical_view": true,
+    "descriptive_fields": [
+      "candidate_lifetime_minutes",
+      "same_direction_extension",
+      "opposite_displacement",
+      "path_length",
+      "terminal_displacement",
+      "superseded_or_terminal_survivor"
+    ]
+  },
+  "range_surface": {
+    "k_domain": "1..30_PEERS",
+    "tau_origin": "CAUSAL_FREEZE_COMMIT",
+    "first_tau_minutes": 1,
+    "maximum_tau_rule": "SESSION_TERMINATION_MINUS_FREEZE_COMMIT",
+    "coordinates": ["RAW_OHLC", "RANGE_RELATIVE_Z_OHLC"],
+    "support": "EXPLICIT_CELL_MASK",
+    "forbidden": ["ZERO_PADDING", "TERMINAL_PADDING", "EXTRAPOLATION", "STRETCHED_TIME"]
+  },
+  "descriptive_only": [
+    "CANDIDATE_LIFETIME",
+    "PATH_LENGTH",
+    "TERMINAL_DISPLACEMENT",
+    "TERMINAL_STATUS_STRATA",
+    "RAW_PRICE_SURFACES",
+    "SCALE_CURVATURE",
+    "GRAMMAR_RELATIONS"
+  ],
+  "formal_surfaces": [
+    {
+      "estimand_id": "A_SAME_DIRECTION_SIDE_CONTRAST",
+      "family": "RUNNING_EXTREME_PROCESS",
+      "session_value": "mean_upper_same_extension_at_age_minus_mean_mirrored_lower_same_extension_at_age",
+      "domain": "candidate_age_minutes>=1_until_supported",
+      "natural_null": "JOINT_SESSION_REFLECTION_SYMMETRY_EQUALS_ZERO",
+      "candidate_class": "EXTREME_PROCESS_SIDE_ASYMMETRY"
+    },
+    {
+      "estimand_id": "A_OPPOSITE_DISPLACEMENT_SIDE_CONTRAST",
+      "family": "RUNNING_EXTREME_PROCESS",
+      "session_value": "mean_upper_opposite_displacement_at_age_minus_mean_mirrored_lower_opposite_displacement_at_age",
+      "domain": "candidate_age_minutes>=1_until_supported",
+      "natural_null": "JOINT_SESSION_REFLECTION_SYMMETRY_EQUALS_ZERO",
+      "candidate_class": "EXTREME_PROCESS_SIDE_ASYMMETRY"
+    },
+    {
+      "estimand_id": "B_RANGE_RELATIVE_SIGNED_CLOSE_SURFACE",
+      "family": "FIXED_RANGE_SESSION_PROCESS",
+      "session_value": "z_close_at_k_and_minutes_after_freeze",
+      "domain": "k=1..30_and_tau>=1_until_supported",
+      "natural_null": "JOINT_MIDPOINT_REFLECTION_SYMMETRY_EQUALS_ZERO",
+      "candidate_class": "RANGE_RELATIVE_SIDE_ASYMMETRY"
+    }
+  ],
+  "terminal_label_rule": "RETROSPECTIVE_ONLY_WITH_EXPLICIT_CAUSAL_PHASE_ORDER",
+  "equal_wall_clock_rule": "CAUSAL_PHASE_ORDER_OVERRIDES_TIMESTAMP_EQUALITY"
+}
+

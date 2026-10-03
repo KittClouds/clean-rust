@@ -1,0 +1,1 @@
+{"checks":{"candidate_range_relations":true,"equal_extrema_preserve_identity":true,"lazy_path_anchor":true,"one_session_tape":true,"strict_lower_chain":true,"strict_upper_chain":true,"terminal_survivors":true,"thirty_peer_ranges":true},"schema":"OBS_OPEN_MEAS02_SYNTHETIC_FIXTURE_RECEIPT_V1","status":"PASS"}

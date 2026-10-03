@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="580" viewBox="0 0 1000 580">
+<rect width="100%" height="100%" fill="#fbfaf7"/>
+<style>text{font-family:Segoe UI,Arial,sans-serif;fill:#18212a}.title{font-size:23px;font-weight:700}.label{font-size:14px}.tick{font-size:12px;fill:#59636e}.zero{stroke:#9aa3ab;stroke-dasharray:5 5}.ci{stroke-width:2}.line{fill:none;stroke-width:3}</style>
+<text x="50" y="36" class="title">DH-07R post hoc trajectory: true minus matched null</text>
+<text x="50" y="50" class="label" font-weight="700">Old-map margin</text>
+<line x1="95" y1="205" x2="950" y2="205" class="zero"/>
+<line x1="95.00" y1="205.00" x2="95.00" y2="205.00" class="ci" stroke="#0e7490"/>
+<circle cx="95.00" cy="205.00" r="4" fill="#0e7490"/>
+<line x1="148.44" y1="205.48" x2="148.44" y2="195.11" class="ci" stroke="#0e7490"/>
+<circle cx="148.44" cy="200.29" r="4" fill="#0e7490"/>
+<line x1="201.88" y1="201.62" x2="201.88" y2="187.57" class="ci" stroke="#0e7490"/>
+<circle cx="201.88" cy="194.60" r="4" fill="#0e7490"/>
+<line x1="308.75" y1="193.53" x2="308.75" y2="173.53" class="ci" stroke="#0e7490"/>
+<circle cx="308.75" cy="183.53" r="4" fill="#0e7490"/>
+<line x1="522.50" y1="166.51" x2="522.50" y2="140.28" class="ci" stroke="#0e7490"/>
+<circle cx="522.50" cy="153.39" r="4" fill="#0e7490"/>
+<line x1="950.00" y1="145.89" x2="950.00" y2="113.25" class="ci" stroke="#0e7490"/>
+<circle cx="950.00" cy="129.57" r="4" fill="#0e7490"/>
+<polyline points="95.00,205.00 148.44,200.29 201.88,194.60 308.75,183.53 522.50,153.39 950.00,129.57" class="line" stroke="#0e7490"/>
+<line x1="95.00" y1="205.00" x2="95.00" y2="205.00" class="ci" stroke="#7c3aed"/>
+<circle cx="95.00" cy="205.00" r="4" fill="#7c3aed"/>
+<line x1="148.44" y1="206.91" x2="148.44" y2="196.05" class="ci" stroke="#7c3aed"/>
+<circle cx="148.44" cy="201.48" r="4" fill="#7c3aed"/>
+<line x1="201.88" y1="196.89" x2="201.88" y2="181.79" class="ci" stroke="#7c3aed"/>
+<circle cx="201.88" cy="189.34" r="4" fill="#7c3aed"/>
+<line x1="308.75" y1="177.02" x2="308.75" y2="152.54" class="ci" stroke="#7c3aed"/>
+<circle cx="308.75" cy="164.78" r="4" fill="#7c3aed"/>
+<line x1="522.50" y1="147.23" x2="522.50" y2="113.97" class="ci" stroke="#7c3aed"/>
+<circle cx="522.50" cy="130.60" r="4" fill="#7c3aed"/>
+<line x1="950.00" y1="126.64" x2="950.00" y2="87.61" class="ci" stroke="#7c3aed"/>
+<circle cx="950.00" cy="107.13" r="4" fill="#7c3aed"/>
+<polyline points="95.00,205.00 148.44,201.48 201.88,189.34 308.75,164.78 522.50,130.60 950.00,107.13" class="line" stroke="#7c3aed"/>
+<text x="50" y="290" class="label" font-weight="700">Acquisition-axis coordinate</text>
+<line x1="95" y1="445" x2="950" y2="445" class="zero"/>
+<line x1="95.00" y1="445.00" x2="95.00" y2="445.00" class="ci" stroke="#0e7490"/>
+<circle cx="95.00" cy="445.00" r="4" fill="#0e7490"/>
+<line x1="148.44" y1="445.14" x2="148.44" y2="443.51" class="ci" stroke="#0e7490"/>
+<circle cx="148.44" cy="444.33" r="4" fill="#0e7490"/>
+<line x1="201.88" y1="444.26" x2="201.88" y2="442.14" class="ci" stroke="#0e7490"/>
+<circle cx="201.88" cy="443.20" r="4" fill="#0e7490"/>
+<line x1="308.75" y1="442.62" x2="308.75" y2="439.33" class="ci" stroke="#0e7490"/>
+<circle cx="308.75" cy="440.98" r="4" fill="#0e7490"/>
+<line x1="522.50" y1="441.95" x2="522.50" y2="437.25" class="ci" stroke="#0e7490"/>
+<circle cx="522.50" cy="439.60" r="4" fill="#0e7490"/>
+<line x1="950.00" y1="444.80" x2="950.00" y2="436.94" class="ci" stroke="#0e7490"/>
+<circle cx="950.00" cy="440.87" r="4" fill="#0e7490"/>
+<polyline points="95.00,445.00 148.44,444.33 201.88,443.20 308.75,440.98 522.50,439.60 950.00,440.87" class="line" stroke="#0e7490"/>
+<line x1="95.00" y1="445.00" x2="95.00" y2="445.00" class="ci" stroke="#7c3aed"/>
+<circle cx="95.00" cy="445.00" r="4" fill="#7c3aed"/>
+<line x1="148.44" y1="436.37" x2="148.44" y2="429.66" class="ci" stroke="#7c3aed"/>
+<circle cx="148.44" cy="433.02" r="4" fill="#7c3aed"/>
+<line x1="201.88" y1="418.78" x2="201.88" y2="408.26" class="ci" stroke="#7c3aed"/>
+<circle cx="201.88" cy="413.52" r="4" fill="#7c3aed"/>
+<line x1="308.75" y1="389.86" x2="308.75" y2="376.78" class="ci" stroke="#7c3aed"/>
+<circle cx="308.75" cy="383.32" r="4" fill="#7c3aed"/>
+<line x1="522.50" y1="365.41" x2="522.50" y2="344.39" class="ci" stroke="#7c3aed"/>
+<circle cx="522.50" cy="354.90" r="4" fill="#7c3aed"/>
+<line x1="950.00" y1="349.39" x2="950.00" y2="327.61" class="ci" stroke="#7c3aed"/>
+<circle cx="950.00" cy="338.50" r="4" fill="#7c3aed"/>
+<polyline points="95.00,445.00 148.44,433.02 201.88,413.52 308.75,383.32 522.50,354.90 950.00,338.50" class="line" stroke="#7c3aed"/>
+<text x="95.00" y="570" text-anchor="middle" class="tick">0</text>
+<text x="148.44" y="570" text-anchor="middle" class="tick">16</text>
+<text x="201.88" y="570" text-anchor="middle" class="tick">32</text>
+<text x="308.75" y="570" text-anchor="middle" class="tick">64</text>
+<text x="522.50" y="570" text-anchor="middle" class="tick">128</text>
+<text x="950.00" y="570" text-anchor="middle" class="tick">256</text>
+<circle cx="710" cy="36" r="5" fill="#0e7490"/><text x="722" y="41" class="label">parallel off</text>
+<circle cx="830" cy="36" r="5" fill="#7c3aed"/><text x="842" y="41" class="label">parallel on</text>
+<text x="520" y="570" text-anchor="middle" class="label">Reversal trials</text>
+</svg>

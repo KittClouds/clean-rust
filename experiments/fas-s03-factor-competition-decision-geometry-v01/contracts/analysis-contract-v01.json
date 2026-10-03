@@ -1,0 +1,113 @@
+{
+  "contract_id": "FAS_S03_PAIRED_DECISION_GEOMETRY_V01",
+  "experiment_id": "fas-s03-factor-competition-decision-geometry-v01",
+  "status": "SEALED_PROSPECTIVE_CONTRACT; ANALYSIS_AUTHORIZED_BY_USER",
+  "question": "What pre-update linear decision geometry accompanies the context-transfer gain and entity-transfer decline observed in S02 on the same original FAS-00 events?",
+  "method": "Read sealed feature rows and already-fitted probe states; compute event-wise logits, margins, paired deltas, factor-conditioned descriptive distributions, overlap tables, and class-boundary coefficient geometry.",
+  "parents": {
+    "fas00_phase1_root_sha256": "d3ca9f8ef988a6f0ae93318fc0ea7c504b23b3be801dbf133d66f67746a69274",
+    "fas00_phase1_corpus_sha256": "9fdd7ce9e49b86ac9acb3da035429c616865f527123bd0ac7c312b1b912439ca",
+    "fas00_phase2a_cache_root_sha256": "9af2c6c73a2f21608e8a2dc912d8838968eaebffb32b4b1ea0a18364e488d217",
+    "fas00_phase3_result_root_sha256": "09fd072754e3b149ac2a9564928209a792eba091064033ca0d7f455333dda0c5",
+    "s02_construction_root_sha256": "5fbf6f61150f514f17792c4475d1fafd0d1bc5707eebc7ac0e07870bd0825dcb",
+    "s02_final_position_phase_root_sha256": "baed3504533499880873db8f8bf16e37a0164844e657f9bda1397daaa0b4944b",
+    "s02_final_position_cache_root_sha256": "ce7604bcd82b1b13ff4828b71dddf835e0c7f9d924ec1b886af5ad78c415ac11",
+    "s02_readout_result_root_sha256": "1585488434830939e11cdf67dd9ff336ef133ab596a87c011394fb8d42db143d"
+  },
+  "input_paths": {
+    "phase1_events": "D:/codex-runs/fas-frozen-adaptive-substrate-v00/phase1-v03/corpus/qualification-events-v03.jsonl",
+    "phase2a_full_tensor": "D:/codex-runs/fas-frozen-adaptive-substrate-v00/phase2a-v01/feature-cache-v01/features-v01.f32le",
+    "phase2a_feature_rows": "D:/codex-runs/fas-frozen-adaptive-substrate-v00/phase2a-v01/feature-cache-v01/feature-rows-v01.jsonl",
+    "phase2a_cache_seal": "D:/codex-runs/fas-frozen-adaptive-substrate-v00/phase2a-v01/phase2a-v01-cache-seal.json",
+    "mean_full_probe": "D:/codex-runs/fas-frozen-adaptive-substrate-v00/phase3-v02/results-v01/probe-artifacts/HELDOUT_TERM_EXACT_TARGET.npz",
+    "final_position_tensor": "D:/codex-runs/fas-s02-original-corpus-readout-surface-attribution-v01/s02-1-final-position-v02/feature-cache-v01/final-position-v01.f32le",
+    "final_position_rows": "D:/codex-runs/fas-s02-original-corpus-readout-surface-attribution-v01/s02-1-final-position-v02/feature-cache-v01/final-position-rows-v01.jsonl",
+    "final_position_probe": "D:/codex-runs/fas-s02-original-corpus-readout-surface-attribution-v01/s02-2-readout-attribution-v01/correction-v05/results-v01/final-position-probe-v01.npz"
+  },
+  "event_selection": {
+    "test_seed_range_inclusive": [24, 31],
+    "test_surface_template_id": 5,
+    "context_slice": "observation_text is non-null and context_term_id == 3",
+    "entity_slice": "observation_text is non-null and entity_term_id == 7",
+    "analysis_rows": "unique event IDs in the union of context and entity slices; retain separate membership flags; order by original Phase 1 row index",
+    "expected_context_count": 412,
+    "expected_entity_count": 212,
+    "expected_unique_union_count": 512,
+    "expected_intersection_count": 112,
+    "expected_context_support": [212, 134, 66],
+    "expected_entity_support": [106, 64, 42],
+    "feature_manifest_access": "Use only Phase 2A FULL rows at even row indices. Skip QUERY_ONLY rows without deserializing or using them."
+  },
+  "computation": {
+    "model": "Wx+b over each sealed probe's own train-standardized sealed feature view; no fit or update",
+    "class_order": ["safe", "risky", "idle"],
+    "canonical_pair_order": [[0, 1], [0, 2], [1, 2]],
+    "target_margin": "logit[target] - max(logit[other classes])",
+    "true_vs_rival_margins": "logit[target] - logit[rival], one value for each of the two rivals in ascending class index",
+    "top_two_margin": "largest logit minus second-largest logit",
+    "paired_delta": "final_position minus mean_full for each named metric",
+    "prediction": "argmax; lowest class index wins exact ties",
+    "distribution": ["n", "mean", "median", "p10", "p90", "min", "max", "positive", "zero", "negative"],
+    "quantile_method": "numpy linear",
+    "nonfinite_policy": "fail closed",
+    "event_ledger": "one canonical row per union event, ordered by Phase 1 row index",
+    "group_axes": [
+      ["slice", "target_class"],
+      ["slice", "context_term_id", "target_class"],
+      ["slice", "context_id", "target_class"],
+      ["slice", "entity_term_id", "target_class"],
+      ["slice", "entity_id", "target_class"],
+      ["slice", "key_id", "target_class"],
+      ["slice", "world_seed", "target_class"],
+      ["slice", "observation_answer_index", "target_class"],
+      ["slice", "context_term_id", "entity_term_id", "target_class"],
+      ["slice", "world_family", "task_structure", "feedback_condition", "target_class"]
+    ],
+    "weight_geometry": "For each class pair (a,b), compare W[a]-W[b] and the effective original-coordinate normal (W[a]-W[b])/scale between views by norms and cosine. Effective intercept is (bias[a]-bias[b]) - dot(mean/scale, W[a]-W[b]).",
+    "paired_correctness_categories": ["both_correct", "mean_full_only_correct", "final_position_only_correct", "both_incorrect"],
+    "margin_delta_sign_categories": ["positive", "zero", "negative"]
+  },
+  "outputs": [
+    "construction-seal-v01.json",
+    "preflight-v01.json",
+    "selected-events-v01.jsonl",
+    "event-margin-ledger-v01.jsonl",
+    "descriptive-summary-v01.json",
+    "membership-overlap-v01.json",
+    "decision-normal-geometry-v01.json",
+    "execution-receipt-v01.json",
+    "S03-RESULTS.md"
+  ],
+  "required_parity": {
+    "sealed_s02_prediction_rows_exact": true,
+    "context_count": 412,
+    "entity_count": 212,
+    "mean_context_balanced_accuracy": 0.5654062449331388,
+    "mean_entity_balanced_accuracy": 0.8119478137166816,
+    "final_context_balanced_accuracy": 0.6721651889210323,
+    "final_entity_balanced_accuracy": 0.6675932165318957
+  },
+  "limitations": {
+    "separately_fitted_probes": "Cross-view logit and margin deltas describe the two complete fitted pipelines and do not isolate representation surface from fitted parameters or standardization.",
+    "factor_conditioning": "Original-corpus factor-conditioned summaries are observational descriptions, not randomized causal effects.",
+    "forbidden_inference": ["causal factor effect", "semantic axis", "universal representation superiority", "adaptation capability", "backbone representation absence"]
+  },
+  "prohibited": [
+    "LFM/model loading or feature extraction",
+    "probe fitting or parameter updates",
+    "new representation views",
+    "S01 corpus or artifacts",
+    "significance tests, confidence intervals, or p-values",
+    "threshold changes or rescue analyses",
+    "online/adaptive mechanisms",
+    "FAS-00 or S02 artifact modification"
+  ],
+  "terminal_flags": {
+    "S03_MODEL_CONTACT": false,
+    "S03_PROBE_FITTING": false,
+    "S03_SIGNIFICANCE_TESTING": false,
+    "FAS00_SENSOR_PASS": false,
+    "FAS00_PHASE4_AUTHORIZED": false,
+    "S04_OR_COMPOSITIONAL_INTERVENTION_AUTHORIZED": false
+  }
+}

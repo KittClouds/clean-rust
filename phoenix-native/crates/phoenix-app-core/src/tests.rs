@@ -405,11 +405,11 @@ fn scene(generation: u64) -> Result<Arc<ResidentScene>, SceneContractError> {
             &[] as &[PositionRecord],
         )?;
         let path_kind = match manifold {
-            ArchiveManifold::Hybrid | ArchiveManifold::Siegel => PageKind::BundledPaths,
+            ArchiveManifold::Siegel => PageKind::BundledPaths,
             ArchiveManifold::Torus | ArchiveManifold::Hopf | ArchiveManifold::Transit => {
                 PageKind::CurvedPaths
             }
-            ArchiveManifold::Caps => PageKind::StraightPaths,
+            ArchiveManifold::Hybrid | ArchiveManifold::Caps => PageKind::StraightPaths,
         };
         builder.add_page(
             PageKey::manifold(path_kind, manifold),

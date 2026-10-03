@@ -1,0 +1,88 @@
+{
+  "analysis": {
+    "FAS00_access": false,
+    "adaptive_mechanisms": false,
+    "affine_identity_checks": [
+      "pair_margin = n dot h + beta",
+      "pair_margin = n dot (h-mu) + delta_b",
+      "beta = delta_b - n dot mu"
+    ],
+    "cells_per_layer": [
+      "M_NATIVE",
+      "F_NATIVE",
+      "M_REP_F_PIPELINE",
+      "F_REP_M_PIPELINE"
+    ],
+    "effective_geometry_precision": "runtime FP32 weights, bias, mean, and scale; analytical geometry promotes those exact FP32 values to FP64; stored scaler values are explicitly rounded through FP32 first",
+    "fit_and_test_split": "exactly the sealed S01-3 grouped split and masks",
+    "fit_count": 32,
+    "geometry_tolerance": 1e-12,
+    "layers": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16
+    ],
+    "metric_comparison": "exclude only computed ALL_TEST_ROWS aggregate and reference-only interpretation_scope provenance; require exact equality of all remaining condition metric fields",
+    "model_contact": false,
+    "plane_equality_numerics": "principal angles remain in the reported analysis, but terminal identity uses projector Frobenius distance to avoid arccos roundoff at cosines near one",
+    "principal_angle_reporting": "unchanged from v06 and descriptive only; no terminal pass/fail threshold is applied to arccos-derived angles",
+    "probe_and_optimizer": "unchanged from sealed S01-3 linear_core.py and S09-v02 contract",
+    "projector_frobenius_tolerance": 1e-12,
+    "statistics": false,
+    "surfaces": [
+      "M=mean_full",
+      "F=final_position"
+    ],
+    "task": "EXACT_TARGET",
+    "terminal_gate": "fit layer-16 M and F first; require exact saved probe state and test probability arrays, exact condition metrics, pair-normal residual <= 1e-12, and decision-plane projector Frobenius distance <= 1e-12 before fitting layers 1-15"
+  },
+  "archive_path_handling": {
+    "deep_history_policy": "preserve all nested history copies and verify with Windows extended-length paths",
+    "history_files_moved_or_removed": false,
+    "v08_sibling_history_equivalence_audit": "every sibling history entry referenced by the v08 preflight is byte-identical and collectively reproduces the sealed v08 preflight root"
+  },
+  "authority": {
+    "ADAPTIVE_MECHANISMS_AUTHORIZED": false,
+    "FAS00_PHASE4_AUTHORIZED": false,
+    "S09_FIXED_ANALYSIS_AUTHORIZED": true,
+    "S09_RESULT_READY": false
+  },
+  "contract_id": "FAS_S09_DEPTHWISE_DECISION_SUBSPACE_ANALYSIS_V09",
+  "inputs": {
+    "S01_2_construction_root_sha256": "f6065b8163799239e0d7b1200b5dda4aad169772ead14b999130a473ff9d9049",
+    "S01_2_extraction_result_root_sha256": "1fc3aeb432ecdbef21a35aea8fed5b0d59671681eb8eb8032533c9ce751a4384",
+    "S01_2_feature_cache_root_sha256": "4964f35fb87a45a9447cd0f5f028668027ca3ad3a8f0d0c3f9eb7b9cbe7ccaaa",
+    "S01_3_result_root_sha256": "2581b50d75382c197793ea46400bf2b8a27508df22b2ff5bdbe82eb20a5238b7",
+    "S08_S01_analysis_root_sha256": "96be631597a6eddac8624d6dd744927577eb90921f7d07dda509ab4260bbd1fc",
+    "recovered_feature_cache_root_sha256": "82f9eb6ba0b9c37e58c415b03ec1bc4be00032f73cc43e70b3987ac4108f7653",
+    "recovery_cache_seal_file_sha256": "a1165b9d38c75209f7c008b7edc7cc2d2dc359be885fe0aae5762203ce34c306",
+    "recovery_receipt_sha256": "cdba6b96a43be1b16958371cf130b5e1d20e78367930b9e4cfd6f0ad9afd1668"
+  },
+  "project_id": "fas-s09-depthwise-decision-subspace-emergence",
+  "run_id": "fas-s09-depthwise-decision-subspace-emergence-v09",
+  "status": "FROZEN_BEFORE_V09_ANALYSIS",
+  "supersedes": {
+    "analysis_failure": "all fits and terminal gates passed, then the first replay cell failed at a missing pipeline layer field",
+    "analysis_failure_sha256": "214e7d780d37fc264fedde0b12ca57898ad11c9f161949ca89762a7d84f3df85",
+    "fit_state_manifest_sha256": "77a3939096dd6d8377c7b2786ffab78951b78e03e99ad8b1a9762ee9f3df97f9",
+    "fit_state_root_sha256": "85ead86f3a649e140a08cac054080652d69c2f7d7a19e7388f866f4b82c13d59",
+    "preflight_root_sha256": "70f1f5904a060f381a3123cd7dfa40f0ebdc6ba7e89bd1d9d232a7dfe7c8e423",
+    "protocol_root_sha256": "01a64374ba56c058ea2203242db49640818facb794b8538bc6eb35fc7732e273",
+    "protocol_seal_file_sha256": "0cca10c0785018596197ca101d5d8ccfc3d31c8e76b60e3f5825f0303403cadd",
+    "recovery_cache_root_sha256": "82f9eb6ba0b9c37e58c415b03ec1bc4be00032f73cc43e70b3987ac4108f7653",
+    "run_id": "fas-s09-depthwise-decision-subspace-emergence-v08"
+  }
+}

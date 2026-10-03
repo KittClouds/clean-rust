@@ -1,0 +1,42 @@
+{
+  "schema": "CHIEF_E4_INHERITANCE_LEDGER_RECEIPT_V1",
+  "status": "VISIBLE_INHERITANCE_REGISTERED",
+  "artifacts": {
+    "current_contract": {
+      "artifact_id": "sha256:21fc77d5a288b9adef995d88f089890235f8dcb2fbc3c9e452725bb67892a22f",
+      "event_id": "sha256:ef29bf7c1f34445ce2316de00dfea95b00bf59b5dbc9cc0ba96be0a4738e49c0"
+    },
+    "current_seal": {
+      "artifact_id": "sha256:0635de4a384b4d5121d8b2295e88a73f649c53e402ffcda311fcaf9c8d93099c",
+      "event_id": "sha256:02e44752fe91a004f4dbce9218733b61dcd99d925ae82ff08c8e1fc85de4cbb2"
+    },
+    "v06_contract": {
+      "artifact_id": "sha256:ea4f11cec5d65a3be7716c77febf5d448d8ebf1a5a4049aee5d25d51c0c50958",
+      "event_id": "sha256:2ff145cc13320620a905b9e382f33571dbee00a6de5bad12789219330d5d1e8d"
+    },
+    "v06_seal": {
+      "artifact_id": "sha256:799d1535a16ea6fbf2269206443addf96736ef8a70ca5ab3373cdd5e6a44605c",
+      "event_id": "sha256:5523100e0b30e0e1d18f24b3f659fd5a1fe8cba56ed9a2fd63a622b73e116f17"
+    },
+    "POPULATION_GENERATION-manifest": {
+      "artifact_id": "sha256:ad8175710b4f2db9aa6529e787962b0fbce92260f0b7020a322242342fc1af2d",
+      "event_id": "sha256:f6dc0ec753dde967153235b61e0ba5be69abc352a306f61ed7f3488296410393"
+    },
+    "PARITY_PANEL_MATERIALIZATION-manifest": {
+      "artifact_id": "sha256:f67eabda02b19a1f1c0219278b65a656011f728141d94e49c83e0170f339ca5b",
+      "event_id": "sha256:3fc337e6efa27a601029d876de0fbd5abc13846c15522a278b25ed977ab03abc"
+    },
+    "inheritance-bridge": {
+      "artifact_id": "sha256:6064d34fe22098c20f66b407438462d0dfb7a7a8b6e6646eeb7c4c7df10094ae",
+      "event_id": "sha256:78756d8c65219bacff3c15c4c9f7fd4897dd0a4c6c45c42f2964dab0e392f750"
+    }
+  },
+  "seal": {
+    "root": "sha256:aacfd286b6349f0b35adb853a2cd9717c2463fedfeccc052bafaf515c69b027b",
+    "event_id": "sha256:a949bfc74e65b21a0eedf021109523af334edf77ba54695435ea519768047b22"
+  },
+  "scientific_stage_authorized": false,
+  "model_contact_authorized": false,
+  "protected_label_bytes_opened": false,
+  "flight_gate_at_registration": "OPEN"
+}

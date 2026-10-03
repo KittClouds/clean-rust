@@ -1,0 +1,18 @@
+{
+ "applicability": {},
+ "coordinates": {
+  "x1": 0.8,
+  "x2": null,
+  "x3": false,
+  "x4": "p"
+ },
+ "envelope_id": "sha256:66390ebb42b0ee6e6db06484819c901cc66d2f92fcdeca10f19e7f86359b5425",
+ "producer_bundle_id": "bundle-0",
+ "provenance": {
+  "note": "synthetic"
+ },
+ "representation_id": "rep-a",
+ "schema": "VCS_ENVELOPE_V1",
+ "schema_id": "fixture-z3",
+ "schema_version": "0"
+}

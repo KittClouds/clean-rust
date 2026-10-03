@@ -1,0 +1,127 @@
+{
+  "biological_promotion": false,
+  "contract_markdown_sha256": "192b0c3c01b2b7978aedfe55e5490012226e62e0b7660c4410797a08b44a01b8",
+  "estimator": {
+    "architecture": [
+      90,
+      128,
+      64,
+      1
+    ],
+    "arm": "D",
+    "batch_size": 2048,
+    "beta1": 0.9,
+    "beta2": 0.999,
+    "cross_validation": "12-fold leave-one-block-out",
+    "dtype": "float32",
+    "epochs": 200,
+    "epsilon": 1e-08,
+    "features": "exact frozen 66D admissible base plus canonical 24D relational sidecar",
+    "fit_count": 12,
+    "initialization": "same model initialization function and zero-based ascending fold index as SYMMETRY-03",
+    "input_width": 90,
+    "learning_rate": 0.001,
+    "normalization": "frozen SYMMETRY-03 fold-training-only D normalization",
+    "optimizer": "Adam",
+    "training_order": "frozen global row order, contiguous slices, no shuffle"
+  },
+  "failure_policy": "preserve the failing qualification receipt and stop; no feature, estimator, threshold, support, task, or seed rescue under this identity",
+  "frozen_d_sources": {
+    "d_feature_construction": {
+      "path": "experiments/fly-reach-03/f4-symmetry-03/scripts/prepare_fit.py",
+      "sha256": "9da88d9a2e147cad551e8e4e2c8b11ba460b435f5743f57527fbf46d7eb09497"
+    },
+    "feature_helpers": {
+      "path": "experiments/fly-reach-03/f4-symmetry-03/scripts/common.py",
+      "sha256": "27024a001f2c89f520b5230bf3796ee8691e499f29ce73c71597ad7c303debf5"
+    },
+    "fit_recipe": {
+      "path": "experiments/fly-reach-03/f4-symmetry-03/scripts/fit.py",
+      "sha256": "0c8a84f2418c8b2d7fa222675860771e7e4e64b871ad333ec0fb5e3e65af5026"
+    },
+    "model": {
+      "path": "experiments/fly-reach-03/scripts/f4_symmetry_01_model.py",
+      "sha256": "92e260bd0057115867bf69b343d8193bab141035f3338af4586c5e0af61c47f8"
+    }
+  },
+  "implementation_amendment": {
+    "parent_engineering_stop_addendum_sha256": "4bb1fb284fa1d666e5e71bb00c7247ec1ccd3b19cb06e7bb3e91c5739f6f4f8c",
+    "parent_engineering_stop_receipt_sha256": "24c95d84e866e195493825ddc0a8cee458e089941f85afe3eae60b26570ff881",
+    "parent_nonpromotable_run_id": "F4-CALIBRATION-02-QPROMO1",
+    "scope": "fit-launch precondition field-name reconciliation and integrity-launch import path only; D values, training algorithm, thresholds, task definition, and support rule unchanged"
+  },
+  "measured_reach03_authorized": false,
+  "next_step_after_pass": "eligible to prepare a separately sealed measured REACH-03 namespace; this contract does not authorize its execution",
+  "parent_evidence": {
+    "qualification_v2_terminal_receipt_sha256": "29f073c42de3160a7cb60385747daa247c43892fa19da6d56a1883d6ee7fea18",
+    "symmetry03_contract_sha256": "7c49b8419896dca4418de3497ecd8566b2167d1c6bf24d7860d904d70f87afe0",
+    "symmetry03_terminal_receipt_sha256": "a5a40dce9710cb9f2e47850d6bdf9b99a44758a910a0fc7e8e8848eaef3d0d01"
+  },
+  "pass_conditions": [
+    "at least 10 of 12 blocks are evaluable",
+    "every evaluable block has Omega_hat >= 0.70",
+    "pooled held-out balanced error <= 0.10 and Omega_hat >= 0.80"
+  ],
+  "qualification_only": true,
+  "run_id": "F4-CALIBRATION-02-QPROMO2",
+  "schema": "F4-CALIBRATION-02-contract-v0.2",
+  "status": "QUALIFICATION_ONLY_PROSPECTIVE",
+  "study_id": "F4-CALIBRATION-02",
+  "support_rule": {
+    "empty_or_one_class_blocks": "retain; blockwise balanced error undefined; count as non-evaluable; no replacement; available rows remain in pooled scoring",
+    "evaluable_block": "held-out U-star rows contain at least one Y=+1 and at least one Y=-1",
+    "minimum_evaluable_blocks": 10,
+    "omega_hat": "max(0, 1 - 2 * epsilon_balanced)",
+    "per_evaluable_block_epsilon_balanced_max": 0.15,
+    "per_evaluable_block_omega_hat_min": 0.7,
+    "pooled_epsilon_balanced_max": 0.1,
+    "pooled_omega_hat_min": 0.8,
+    "pooled_population": "all available out-of-fold U-star rows across the frozen twelve blocks, with inverse-inclusion weights and equal class weighting",
+    "total_blocks": 12
+  },
+  "task_bank": {
+    "block_ids": [
+      305012,
+      305013,
+      305014,
+      305015,
+      305016,
+      305017,
+      305018,
+      305019,
+      305020,
+      305021,
+      305022,
+      305023
+    ],
+    "coordinates_per_substrate_side": 64,
+    "count": 12,
+    "native_streams_expected": 216,
+    "replace_blocks": false,
+    "schedule_seed_rule": "block_id XOR 0x545241494E",
+    "sides": [
+      "L",
+      "R"
+    ],
+    "structural_pattern_selection": false,
+    "substrates": [
+      "fly",
+      "g001",
+      "g002",
+      "g003",
+      "g004",
+      "g005",
+      "g006",
+      "g007",
+      "g008"
+    ],
+    "task": {
+      "cues": 4,
+      "delay_steps": 12,
+      "labels": "two positive and two negative, deterministically shuffled",
+      "trials_per_block": 8192
+    },
+    "task_seed_rule": "task_pattern_seed and simulator_seed equal block_id; fresh v0.2 range"
+  },
+  "truth_firewall": "write and hash all twelve held-out prediction streams; pass independent integrity before opening held-out truth"
+}

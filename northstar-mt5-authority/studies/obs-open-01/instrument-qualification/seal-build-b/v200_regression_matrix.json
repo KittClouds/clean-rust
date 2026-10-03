@@ -1,0 +1,206 @@
+{
+  "captures": [
+    {
+      "bytes": 5646956,
+      "capture": "OBS_OPEN_INST01_US30_M1_HIST_run1.tsv",
+      "compared_cells": 180000,
+      "event_kinds": {
+        "HISTORICAL_RELOAD": 5000
+      },
+      "first_mismatch": null,
+      "mismatches": 0,
+      "rows": 5000,
+      "sha256": "4cd2ab87c44ad1dd4f9d13ee221e44c3d5709c08978c8548c5f3c0430c518f01",
+      "status": "PASS",
+      "symbols": [
+        "US30"
+      ],
+      "timeframes": [
+        "PERIOD_M1"
+      ]
+    },
+    {
+      "bytes": 5646956,
+      "capture": "OBS_OPEN_INST01_US30_M1_HIST_run2.tsv",
+      "compared_cells": 180000,
+      "event_kinds": {
+        "HISTORICAL_RELOAD": 5000
+      },
+      "first_mismatch": null,
+      "mismatches": 0,
+      "rows": 5000,
+      "sha256": "4cd2ab87c44ad1dd4f9d13ee221e44c3d5709c08978c8548c5f3c0430c518f01",
+      "status": "PASS",
+      "symbols": [
+        "US30"
+      ],
+      "timeframes": [
+        "PERIOD_M1"
+      ]
+    },
+    {
+      "bytes": 5036107,
+      "capture": "OBS_OPEN_INST01_US30_M5_HIST_run1.tsv",
+      "compared_cells": 180000,
+      "event_kinds": {
+        "HISTORICAL_RELOAD": 5000
+      },
+      "first_mismatch": null,
+      "mismatches": 0,
+      "rows": 5000,
+      "sha256": "3bf99462d0d3e8ee4af1073f7101ab8ada283e5605d859fe33a78b8419745b78",
+      "status": "PASS",
+      "symbols": [
+        "US30"
+      ],
+      "timeframes": [
+        "PERIOD_M5"
+      ]
+    },
+    {
+      "bytes": 5036107,
+      "capture": "OBS_OPEN_INST01_US30_M5_HIST_run2.tsv",
+      "compared_cells": 180000,
+      "event_kinds": {
+        "HISTORICAL_RELOAD": 5000
+      },
+      "first_mismatch": null,
+      "mismatches": 0,
+      "rows": 5000,
+      "sha256": "3bf99462d0d3e8ee4af1073f7101ab8ada283e5605d859fe33a78b8419745b78",
+      "status": "PASS",
+      "symbols": [
+        "US30"
+      ],
+      "timeframes": [
+        "PERIOD_M5"
+      ]
+    },
+    {
+      "bytes": 81767,
+      "capture": "OBS_OPEN_INST01_FIXTURE_FULL_M1.tsv",
+      "compared_cells": 2196,
+      "event_kinds": {
+        "HISTORICAL_RELOAD": 61
+      },
+      "first_mismatch": null,
+      "mismatches": 0,
+      "rows": 61,
+      "sha256": "b4fc4ec6ab8b34fb06d8e7e9e196b4ad410ff9b6d9d3df118cc113ae88eb6d70",
+      "status": "PASS",
+      "symbols": [
+        "OBSINST01_FULL"
+      ],
+      "timeframes": [
+        "PERIOD_M1"
+      ]
+    },
+    {
+      "bytes": 75511,
+      "capture": "OBS_OPEN_INST01_FIXTURE_GAP_M1.tsv",
+      "compared_cells": 2160,
+      "event_kinds": {
+        "HISTORICAL_RELOAD": 60
+      },
+      "first_mismatch": null,
+      "mismatches": 0,
+      "rows": 60,
+      "sha256": "0ae7a81ec6071b63f2e03e58a33f76a18ee839e765077f54dba8a4077b6128f9",
+      "status": "PASS",
+      "symbols": [
+        "OBSINST01_GAP"
+      ],
+      "timeframes": [
+        "PERIOD_M1"
+      ]
+    },
+    {
+      "bytes": 18180,
+      "capture": "OBS_OPEN_INST01_FIXTURE_FULL_M5.tsv",
+      "compared_cells": 468,
+      "event_kinds": {
+        "HISTORICAL_RELOAD": 13
+      },
+      "first_mismatch": null,
+      "mismatches": 0,
+      "rows": 13,
+      "sha256": "ab816cb2c1f30d35a06ef28bba66675acb504e0c8a844ba438ebc93a215eb296",
+      "status": "PASS",
+      "symbols": [
+        "OBSINST01_FULL"
+      ],
+      "timeframes": [
+        "PERIOD_M5"
+      ]
+    },
+    {
+      "bytes": 18167,
+      "capture": "OBS_OPEN_INST01_FIXTURE_GAP_M5.tsv",
+      "compared_cells": 468,
+      "event_kinds": {
+        "HISTORICAL_RELOAD": 13
+      },
+      "first_mismatch": null,
+      "mismatches": 0,
+      "rows": 13,
+      "sha256": "328961581d87d91d04d72269360bb416d9e29c96a2eed4cd258783ddf43496f5",
+      "status": "PASS",
+      "symbols": [
+        "OBSINST01_GAP"
+      ],
+      "timeframes": [
+        "PERIOD_M5"
+      ]
+    },
+    {
+      "bytes": 1327125,
+      "capture": "OBS_OPEN_INST01_US30_M1_ONLINE.tsv",
+      "compared_cells": 50940,
+      "event_kinds": {
+        "COMPLETED_BAR": 690,
+        "CURRENT_OPEN": 691,
+        "CURRENT_TICK_SENTINEL_CHANGE": 34
+      },
+      "first_mismatch": null,
+      "mismatches": 0,
+      "rows": 1415,
+      "sha256": "3de4402f0e440bb29957e8db09a9072d5764a9057e810c86ec9f796d98103a89",
+      "status": "PASS",
+      "symbols": [
+        "US30"
+      ],
+      "timeframes": [
+        "PERIOD_M1"
+      ]
+    },
+    {
+      "bytes": 702800,
+      "capture": "OBS_OPEN_INST01_US30_M5_ONLINE.tsv",
+      "compared_cells": 23184,
+      "event_kinds": {
+        "COMPLETED_BAR": 276,
+        "CURRENT_OPEN": 277,
+        "CURRENT_TICK_SENTINEL_CHANGE": 91
+      },
+      "first_mismatch": null,
+      "mismatches": 0,
+      "rows": 644,
+      "sha256": "aeba69b1f11a0e32a5930df7d92c439c08ddd215c1b72b1e42e995f6cb7feb76",
+      "status": "PASS",
+      "symbols": [
+        "US30"
+      ],
+      "timeframes": [
+        "PERIOD_M5"
+      ]
+    }
+  ],
+  "law": "V2_10_BUFFER_0_35_EXACTLY_EQUALS_V2_00",
+  "schema": "OBS_OPEN_INST01_V200_REGRESSION_MATRIX_V1",
+  "status": "PASS",
+  "totals": {
+    "compared_cells": 799416,
+    "mismatches": 0,
+    "rows": 22206
+  }
+}

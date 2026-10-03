@@ -1,0 +1,59 @@
+{
+  "artifact_id": "FAS_S05_S11_OBSERVER_GEOMETRY_SYNTHESIS_V01",
+  "claims_boundary": {
+    "exploratory": "S08/S09/S10 plane geometry, accessibility trajectories, and transport patterns on revealed S01 population.",
+    "freshly_confirmed": "S11 off-diagonal F-minus-M BA advantage and negative M/F distance slopes on the admitted panel with frozen S09 observer bank.",
+    "not_established": [
+      "native LFM causal necessity",
+      "transformer circuits",
+      "semantic features",
+      "model-seed or generator-family generalization"
+    ]
+  },
+  "scope": "Synthesis of sealed S05-S11 findings; no new model or representation analysis.",
+  "sources": [
+    {
+      "experiment": "S05",
+      "result_root_sha256": "6e5cb0586611aeb0b07dff7b8788b7b8bea749179bbe5a38ef98a8045e890466",
+      "run_root": "D:/codex-runs/fas-s05-crossed-representation-readout-decomposition-v07"
+    },
+    {
+      "experiment": "S06",
+      "result_root_sha256": "b21e4cb026d0b3956f9a666c4928a79922e39ee33b9f64653181d6dbc9a0d1b0",
+      "run_root": "D:/codex-runs/fas-s06-representation-scaler-probe-compatibility-cube-v02"
+    },
+    {
+      "disposition": "SAE_NOT_FAITHFUL_FOR_COMPATIBILITY_ANALYSIS",
+      "experiment": "S07",
+      "gate_root_sha256": "fe9bd0bd3de6769cf4374fd09b0cd600650560a7dbbd40d53e94ef0452f8c748",
+      "run_root": "D:/codex-runs/fas-s07-sparse-compatibility-cartography-v01"
+    },
+    {
+      "experiment": "S08",
+      "result_root_sha256": "3f624c68873120fde629ee7e2d9c26ab160eb758310c45afe558e1752a84f4a4",
+      "run_root": "D:/codex-runs/fas-s08-exact-decision-surface-attribution-v02"
+    },
+    {
+      "evidence_status": "exploratory on revealed S01 split",
+      "experiment": "S09",
+      "result_root_sha256": "664af5b22f071b28d52a67d748e9f6f93ae3e67d587edec80b921dd529945880",
+      "run_root": "D:/codex-runs/fas-s09-depthwise-decision-subspace-emergence-v09"
+    },
+    {
+      "evidence_status": "exploratory on revealed S01 split",
+      "experiment": "S10",
+      "result_root_sha256": "549d906042979261ec68fd0727486c21f0d132d6281940cb9222993f3f1357b1",
+      "run_root": "D:/codex-runs/fas-s10-cross-depth-observer-transport-v03"
+    },
+    {
+      "collision_admission_amendment_sha256": "c53fdd8229c31814908c6c4975ddd6847c0b282136b41dcb5fcfa657a30341d8",
+      "experiment": "S11",
+      "final_result_root_sha256": "23758806537df1895772025e97824393dd4cd79ede7956360cd93f341c30740a",
+      "panel_root_sha256": "9011d425faaac7c6c1bee0f619a696a4469816ebeae1c0df2c6d4f8516fde824",
+      "protocol_root_sha256": "9f11fb59d0f01ed12ee9c9f1753ae990ce5bcb20cf4f799d35a11a39079a4598",
+      "run_root": "D:/codex-runs/fas-s11-cross-depth-observer-transport-replication-v01/execution-v01",
+      "status": "S11_CONFIRMATORY_JOINT_REPLICATION_SUPPORTED"
+    }
+  ],
+  "status": "OBSERVATIONAL_LINEAGE_CLOSED_FOR_CURRENT_SCOPE"
+}

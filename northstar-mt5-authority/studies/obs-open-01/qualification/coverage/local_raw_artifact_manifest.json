@@ -1,0 +1,92 @@
+{
+  "manifest_id": "OBS-OPEN-01-QUALIFICATION-RAW-V1",
+  "storage_class": "D_DRIVE_LOCAL_ONLY",
+  "online_publication": false,
+  "artifacts": [
+    {
+      "logical_path": "broker-anchor-v1/OBS_OPEN_01_broker_anchor_bars.tsv",
+      "bytes": 200182,
+      "sha256": "9c9bf2e8b980a4e02aa574f6b0d29723c79cf9977a9a87b0f2b0260175a52c55"
+    },
+    {
+      "logical_path": "broker-anchor-v1/OBS_OPEN_01_broker_anchor_receipt.tsv",
+      "bytes": 749,
+      "sha256": "d4931f06534580edb43155f3d4a5585b8e2a4a02c37bc1e32d5b01b08b50778e"
+    },
+    {
+      "logical_path": "dukascopy-2026-08-13-v1/dukascopy_hour_manifest.tsv",
+      "bytes": 5284,
+      "sha256": "3b53257f20c0d0604944c4b2c03e7e57de9b934eff706fc913ca2af7ad1bab4d"
+    },
+    {
+      "logical_path": "dukascopy-2026-08-13-v1/dukascopy_utc_minutes.tsv",
+      "bytes": 131150,
+      "sha256": "07dac6ff5f42e9076a00e73e40569b4d290d0df52a3caa6d4def7c102052f168"
+    },
+    {
+      "logical_path": "dukascopy-2026-08-13-v1/dukascopy_fixture_receipt.json",
+      "bytes": 468,
+      "sha256": "8615d5aec109d744a18b58517c57e4ac555e7fc80a1a61dd93d5922dbac7df83"
+    },
+    {
+      "logical_path": "clock-parity-2026-08-13-run1/clock_offset_scan.tsv",
+      "bytes": 6129,
+      "sha256": "a73031668a633c92fa3f26d6a13f43cbd945ca3a2a759c267ed3474a368088a1"
+    },
+    {
+      "logical_path": "clock-parity-2026-08-13-run1/clock_parity_receipt.json",
+      "bytes": 1156,
+      "sha256": "caa98286056ebed9f98a3587f6c7bea691319bb729815af60482462ff9235512"
+    },
+    {
+      "logical_path": "opening-range-oracle-2026-08-13-run1/opening_range_oracle.tsv",
+      "bytes": 2572781,
+      "sha256": "aca712b1556476f915a4fb2b5530563b4e0ac0490e568c1b392c23dd9414108e"
+    },
+    {
+      "logical_path": "opening-range-oracle-2026-08-13-run1/opening_range_oracle_receipt.json",
+      "bytes": 376,
+      "sha256": "c975577f8697098e243c321bde69db92847f9b3753f56f167e8a46f8e611b1dc"
+    },
+    {
+      "logical_path": "blackbox-parity-2026-08-13-qualified-v8-run1/OBS_OPEN_01_parity_run1_buffers.tsv",
+      "bytes": 2648894,
+      "sha256": "72af5bf7ee1a5ff2d3aafe1b48d06678f628b5a8a9313fdeac96d8c6d1e5d327"
+    },
+    {
+      "logical_path": "blackbox-parity-2026-08-13-qualified-v8-run1/OBS_OPEN_01_parity_run1_receipt.tsv",
+      "bytes": 247,
+      "sha256": "5aee08a29d59530b8507b728f6fc018dddf4a15ecc136d3dc805cc14efed621e"
+    },
+    {
+      "logical_path": "blackbox-parity-2026-08-13-qualified-v8-run1/parity_mismatches.tsv",
+      "bytes": 49,
+      "sha256": "1fdfbd1ac92d5224c1929441e7d3e377ef787c464a975bb6287074d20525b156"
+    },
+    {
+      "logical_path": "blackbox-parity-2026-08-13-qualified-v8-run1/parity_comparison_receipt.json",
+      "bytes": 549,
+      "sha256": "df8a762958b065bdc8b3349aee306d8de6651bc59ea095ef98bf24f9854ed6be"
+    },
+    {
+      "logical_path": "blackbox-parity-2026-08-13-qualified-v8-run2/OBS_OPEN_01_parity_run1_buffers.tsv",
+      "bytes": 2648894,
+      "sha256": "72af5bf7ee1a5ff2d3aafe1b48d06678f628b5a8a9313fdeac96d8c6d1e5d327"
+    },
+    {
+      "logical_path": "blackbox-parity-2026-08-13-qualified-v8-run2/OBS_OPEN_01_parity_run1_receipt.tsv",
+      "bytes": 247,
+      "sha256": "5aee08a29d59530b8507b728f6fc018dddf4a15ecc136d3dc805cc14efed621e"
+    },
+    {
+      "logical_path": "blackbox-parity-2026-08-13-qualified-v8-run2/parity_mismatches.tsv",
+      "bytes": 49,
+      "sha256": "1fdfbd1ac92d5224c1929441e7d3e377ef787c464a975bb6287074d20525b156"
+    },
+    {
+      "logical_path": "blackbox-parity-2026-08-13-qualified-v8-run2/parity_comparison_receipt.json",
+      "bytes": 549,
+      "sha256": "df8a762958b065bdc8b3349aee306d8de6651bc59ea095ef98bf24f9854ed6be"
+    }
+  ]
+}

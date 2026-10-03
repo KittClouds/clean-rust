@@ -1,0 +1,6 @@
+{
+  "identity": "q10-gc1-lr1-requal1-sreplace-pairs-rerun1-finalizer-v1",
+  "protocol": "REQUAL1-SREPLACE-PAIRS-RERUN1-FINALIZER",
+  "report_sha256": "322C48C1F2B770D024BE0BADB90B4A11FA913E3BCFC99152CFD5DD4D808AB53B",
+  "status": "FINALIZER_PASS"
+}

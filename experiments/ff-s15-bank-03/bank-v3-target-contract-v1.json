@@ -1,0 +1,105 @@
+{
+  "schema": "ff-s15-bank3-target-contract-v1",
+  "status": "FROZEN_POST_V2_0",
+  "version": "0.1",
+  "date": "2026-09-30",
+  "experiment": "FF-S15-BANK-03",
+  "unfrozen_by": {
+    "experiment": "FF-S15-V2-EVAL-00",
+    "receipt": "experiments/ff-s15-v2-eval-00/results/v2-0-receipt.json",
+    "constitution": "V2-0-CONSTITUTION.md",
+    "instrument_check": "B0 all-exact on 50,000 DEV rows across all six targets"
+  },
+
+  "purpose": "freeze the target set and curriculum contract that V2-0's cue dispositions unblocked. Cells, weights and per-rung intervention lists remain unfrozen.",
+
+  "admissible_target_set": {
+    "fully_admissible": ["disposition", "reason", "first_action_type"],
+    "admissible_restricted_to_strata": {
+      "requestability": {
+        "v2_0_best": {"baseline": "B4_surface_cue", "macro_f1": 0.6609},
+        "cue": ["phrase_before tick", "phrase_until tick", "phrase_from tick", "length_decile", "sentence_count"],
+        "restriction": "must be reported within strata; a pooled number would partly measure sentence shape and must not be reported as a capability",
+        "caveat": "the cue is rendering geometry, not information availability"
+      },
+      "missing_cardinality": {
+        "v2_0_best": {"baseline": "B2_schema_frequency", "macro_f1": 0.6061},
+        "cue": ["hidden_facts (weight 3.00, dominant)", "slot_markers (2.48)", "reports (1.10)"],
+        "restriction": "must be reported within strata",
+        "caveat": "substantially predictable from bookkeeping counters rather than semantics; a later rung improving on 0.61 may have learned the counter, not the concept"
+      }
+    },
+    "not_admissible": {
+      "conflict": {
+        "v2_0_best": {"baseline": "B4_surface_cue", "macro_f1": 1.0},
+        "status": "DIAGNOSTIC_ONLY",
+        "no_model_claim_permitted": true,
+        "cue": ["phrase_you may ask", "phrase_nobody can tell", "phrase_reports that", "phrase_says"],
+        "uniform_across_renderer_families": {"V1": 1.0, "V2": 1.0, "V3": 1.0, "V4": 1.0, "V5": 1.0, "V6": 1.0, "V7": 1.0, "V8": 1.0},
+        "cannot_be_restrained_by_stratum": "the cue scores 1.0 in all eight renderer families, so no stratum exists in which it is absent",
+        "root_cause": "renderer artifact, not a semantic property: the report channel is rendered with fixed phrasings that are deterministically coupled to the conflict flag",
+        "prescribed_v3_remedy": "decorrelate report phrasing from the conflict label; vary report surface realization independently of whether a conflict exists, so no fixed phrase set predicts the flag"
+      }
+    },
+    "underpowered_no_claim_permitted": {
+      "strata": ["TRANSFER (DEV n=38)", "WAIT (DEV n=71)"],
+      "rule": "strata below 200 DEV rows are UNDERPOWERED and are not scored",
+      "consistency_note": "consistent with v2's own G06 coverage receipt, which required every core action to be non-zero in all six cells - non-zero, not frequent"
+    }
+  },
+
+  "primary_pressure_target": {
+    "target": "first_action_type",
+    "ladder_stage": 4,
+    "stage_name": "operationalization",
+    "headroom": 0.9032,
+    "every_baseline_at_floor": {"B1": 0.0827, "B2": 0.0839, "B3": 0.0829, "B4": 0.0968, "B5": 0.0872},
+    "why_it_matters": "the bank's action semantics are formally decidable from the record - B0 does it exactly - yet no cheap cue recovers them. This is the first rung-local evidence that the operationalization stage is a real wall rather than an artefact of an earlier interface.",
+    "note": "this is the MOVE wall measured as a target"
+  },
+
+  "curriculum_contract": {
+    "axes_binding": "the ten frozen capability axes in ff-s15-ladder-scaffold-00, unchanged",
+    "design_requirement": "curriculum must vary capability-axis coverage, not just row count",
+    "data_axis": "A_c(N, k; M, I) - acquisition is plotted against coverage with N as a secondary label",
+    "current_data_reality": "acquisition is SYNTHETIC-ONLY until external root permissions resolve; a synthetic-only curve is a real measurement and must never be described as evidence about human-grounded data",
+    "known_positive_signal_to_preserve": {
+      "target": "reason",
+      "finding": "B3 lexical (0.0382) scores BELOW the majority baseline (0.0342 is comparable) while B2 schema counts reach 0.4533",
+      "interpretation": "the reason head is not solvable from surface text at all; this is a genuine good property of the bank and the curriculum must not erode it by making reason lexically signalled"
+    }
+  },
+
+  "v3_synthetic_core_requirements": {
+    "must_inherit_from_v2_by_pinned_hash": ["world schema", "action algebra", "obligation semantics", "requestability semantics", "contradiction/evidence semantics", "refsim", "witness machinery", "paired-intervention grammar"],
+    "must_generate_own_rows": true,
+    "must_not_ingest_v2_rows": true,
+    "render_phrase_decorrelation_required": {
+      "reason": "V2-0 found conflict at 1.0 from four fixed phrases; v3 must not inherit that coupling",
+      "requirement": "report-channel surface realizations must be varied independently of the conflict flag, and the independence must be gate-checked on 100% of rows"
+    },
+    "bookkeeping_counter_decoupling_recommended": {
+      "reason": "missing_cardinality reached 0.6061 from hidden_facts count alone",
+      "requirement": "where feasible, vary the number of hidden non-required facts independently of |M|, so the counter stops being a proxy"
+    },
+    "gate_addition": "G19 CUE-INDEPENDENCE: no fixed phrase set predicts any admitted target at or above the V2-0 bar, checked at 100%",
+    "note": "G19 is proposed here and becomes binding when folded into the next constitution amendment"
+  },
+
+  "seal_path": {
+    "problem": "the frozen constitution's G14-V3 asserts external_roots_imported > 0, which cannot be satisfied while O1 clears zero sources",
+    "not_amended_here": "changing G14-V3 is a constitution change and is a scientific decision, so it is NOT made in this contract",
+    "prepared_for_the_owner": {
+      "smallest_amendment": "split the seal into BANK-v3-core (synthetic only, G14-CORE: external_rows_imported == 0) and BANK-v3-human (external roots, G14-HUMAN provenance gates), so the synthetic core can be sealed now and the human extension sealed later when permissions resolve",
+      "why_preferable_to_waiting": "the synthetic core is a complete, sealable instrument on its own; withholding it until a licensing question resolves elsewhere couples two unrelated risks"
+    }
+  },
+
+  "still_unfrozen": [
+    "capability cells and target membership per rung",
+    "target weights",
+    "per-rung intervention lists",
+    "reliability floors per capability",
+    "G19 as a binding gate (proposed above, adopted by the next amendment)"
+  ]
+}

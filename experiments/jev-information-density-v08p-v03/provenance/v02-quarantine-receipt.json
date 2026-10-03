@@ -1,0 +1,42 @@
+{
+  "protocol": "jev-information-density/v0.8p-v02-quarantine-v01",
+  "identity": "v0.8P-v02-setup-quarantine-v01",
+  "status": "SOURCE_SCOPE_BOUNDARY_VIOLATION",
+  "disposition": {
+    "denylist": "NON_PROMOTABLE",
+    "denylist_audit": "PROVENANCE_ONLY",
+    "fresh_panel_contract_v02": "PROVENANCE_ONLY",
+    "fresh_panel": "NOT_GENERATED",
+    "scientific_result": "NONE",
+    "training": "NONE",
+    "model_contact": "NONE",
+    "evaluation": "NONE"
+  },
+  "handling": {
+    "v02_bytes_modified": false,
+    "v02_bytes_opened_during_quarantine_receipt_creation": false,
+    "v02_denylist_revalidated": false,
+    "v02_inputs_to_v03": false,
+    "note": "Inventory hashes below were captured in the immediately preceding quarantine inventory operation. This receipt does not authorize reopening or using any v02 artifact."
+  },
+  "inventory": [
+    {"path":"C:\\code land\\clean-rust\\experiments\\jev-information-density-v08p-v02\\identity\\denylist-audit-v01.json","bytes":1973,"sha256":"e4af922ea931a7e045d50b1378a6acd6b5995e4492d6cf1c1d98260cec09b627"},
+    {"path":"C:\\code land\\clean-rust\\experiments\\jev-information-density-v08p-v02\\identity\\e1-identity-denylist-extraction-contract-v01.json","bytes":4123,"sha256":"46275891bacfcf1fcb77ca69a21ab2ac7e5fba82e6c7d416ac6c9eed42a17ff1"},
+    {"path":"C:\\code land\\clean-rust\\experiments\\jev-information-density-v08p-v02\\identity\\e1-identity-denylist-extraction-contract-v02.json","bytes":4086,"sha256":"6a27561e053d1505d288d5b14c3bc1132989afa757072f12a6af8f4c389e4caf"},
+    {"path":"C:\\code land\\clean-rust\\experiments\\jev-information-density-v08p-v02\\identity\\e1-identity-denylist-extraction-contract-v03.json","bytes":3890,"sha256":"1c890e9c38bb16ca839adb83c903a1d8deff75845d20d8ff1a0ee35195be3f89"},
+    {"path":"C:\\code land\\clean-rust\\experiments\\jev-information-density-v08p-v02\\identity\\extract_e1_neighborhood_denylist_v02.py","bytes":8985,"sha256":"68c1e0f66dedac589d84ded1b7b9560cd53d030c28af66b1ee1b36887d18b21f"},
+    {"path":"C:\\code land\\clean-rust\\experiments\\jev-information-density-v08p-v02\\identity\\extract_e1_neighborhood_denylist.py","bytes":10637,"sha256":"f202863d30a7e94253781d8899884615f24f15594fae54eadd164498bcfc952a"},
+    {"path":"C:\\code land\\clean-rust\\experiments\\jev-information-density-v08p-v02\\identity\\tests\\test_extract_e1_neighborhood_denylist_v02.py","bytes":2212,"sha256":"624d6a6cc53990df4ebf39bbbc4c10cbbebf59c1967b7dbbe53fdb5399ad910e"},
+    {"path":"C:\\code land\\clean-rust\\experiments\\jev-information-density-v08p-v02\\identity\\tests\\test_extract_e1_neighborhood_denylist.py","bytes":1501,"sha256":"75e06a66c04c0360d4a151233e38e9302bcfa05f88009e22135cefea75bd68cd"},
+    {"path":"C:\\code land\\clean-rust\\experiments\\jev-information-density-v08p-v02\\identity\\v02-construction-identity-v01.json","bytes":2163,"sha256":"4999dffaa610b1fc642f29221ddf1185bbd2403476182f9fa24c4a622f1e9800"},
+    {"path":"C:\\code land\\clean-rust\\experiments\\jev-information-density-v08p-v02\\phase_a\\fresh-panel-contract-v02.json","bytes":6588,"sha256":"729de9dcd0447346af3d220d1652e7ed891e7d0f60908d798381436af54f7df2"},
+    {"path":"C:\\code land\\clean-rust\\experiments\\jev-information-density-v08p-v02\\provenance\\denylist-extraction-preflight-v01.json","bytes":939,"sha256":"7d9239db4ea8442cd54aa0382627a66f56b8796ddaebffb40a07c71200664a2f"},
+    {"path":"C:\\code land\\clean-rust\\experiments\\jev-information-density-v08p-v02\\provenance\\denylist-extraction-preflight-v02.json","bytes":1006,"sha256":"b1a82d3876bd0cbd8acad902f78a8aa4af4b39d8e01db979394f816b31c770a7"},
+    {"path":"C:\\code land\\clean-rust\\experiments\\jev-information-density-v08p-v02\\provenance\\denylist-source-scope-incident-v01.json","bytes":2158,"sha256":"aa637741d93d0bf69ad1e07747debc1be6989adaf30c50585c28c206e33be581"},
+    {"path":"C:\\code land\\clean-rust\\experiments\\jev-information-density-v08p-v02\\provenance\\v01-quarantine-receipt.json","bytes":4144,"sha256":"64fb45335270b6be6e395121d8dcd4fa5cccf0cd45fc625f2d24d8feca8810f7"},
+    {"path":"D:\\codex-runs\\jev-information-density-v08p-v02\\identity-denylist-v03\\denylist-seal.json","bytes":2391,"sha256":"0501a7f2f4c6c71ce6bf31abf26e94311e60117df47d045eb8b36f5643ceec5c"},
+    {"path":"D:\\codex-runs\\jev-information-density-v08p-v02\\identity-denylist-v03\\e1-neighborhood-identity-hashes.jsonl","bytes":174000,"sha256":"11cac12e40bd13dfbd615c0045ed8ea7c87b81ad85d7f0f61ffbc4d7e2819846"}
+  ],
+  "inventory_count": 16,
+  "v03_exclusion": "No v02 artifact, receipt, denylist value, contract, extractor, audit, or output is a v03 input."
+}

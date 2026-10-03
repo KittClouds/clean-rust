@@ -1,0 +1,156 @@
+﻿{
+    "certificate":  "MST_REPLAY_DETERMINISM_V1",
+    "issued_at_utc":  "2026-08-12T08:03:58.7181959Z",
+    "stem":  "MasterAuction_USTEC_PERIOD_M5_REPLAYCERT2_RG1_v7",
+    "common_files":  "C:\\Users\\shuga\\AppData\\Roaming\\MetaQuotes\\Terminal\\Common\\Files",
+    "status":  "FAIL",
+    "semantic_exclusions":  [
+                                "invocation_id",
+                                "certificate issue time",
+                                "tester playback speed"
+                            ],
+    "equality_fields":  [
+                            "run_key",
+                            "terminal_hash",
+                            "event_sequence",
+                            "receipt_hash",
+                            "contract_receipt_hash",
+                            "canonical_dataset_hash"
+                        ],
+    "invocations":  [
+                        {
+                            "variant":  "RG1_USTEC_PERIOD_M5_1785715200_1785775800_2637984089468173683_I1785715200_17063769192003833799",
+                            "invocation_id":  "RG1_USTEC_PERIOD_M5_1785715200_1785775800_2637984089468173683_I1785715200_17063769192003833799",
+                            "run_key":  "RG1_USTEC_PERIOD_M5_1785715200_1785775800_2637984089468173683",
+                            "visual_mode":  "0",
+                            "run_status":  "COMPLETE",
+                            "contract_valid":  "1",
+                            "terminal_hash":  "7713437695258713667",
+                            "event_sequence":  "267",
+                            "receipt_hash":  "14116959112789886817",
+                            "contract_receipt_hash":  "288549698179707457",
+                            "canonical_dataset_hash":  "dcd5695c843f27f52abf97de7c39a5ce4281100b45abf946530037ff2b8f2931",
+                            "counts_match_manifest":  true,
+                            "row_counts":  {
+                                               "events":  267,
+                                               "attempts":  57,
+                                               "episodes":  14,
+                                               "context":  279,
+                                               "features":  57,
+                                               "transits":  2
+                                           },
+                            "dataset_hashes":  {
+                                                   "events":  "2885d03a5a414be489322c2bafdaf5505db3cc1660a0c7017c8b56ad8a5cdfd6",
+                                                   "attempts":  "a0e84b39a67cb7797a6d2ddb904b2e9bd14d75229f4c7e34816b5318419b693c",
+                                                   "episodes":  "519575f77720df55a3ed5a43087aba2f0f3e3ccab00a28908bbebfa3fb7ee4a1",
+                                                   "context":  "1fcc0b4f09b07c21d55c54f1b94f8564054b333bb4cfd4f8165de388452316f0",
+                                                   "features":  "db726ff70f033bd3d936ed019c898b4707611cba6afbaeac7be99cca75f677da",
+                                                   "transits":  "717142940544cb368afbce578ca27fd33eed74084e19cc787a59e32c9a61007f"
+                                               }
+                        },
+                        {
+                            "variant":  "RG1_USTEC_PERIOD_M5_1785715200_1785775800_2637984089468173683_I1785715200_17095416435198631012",
+                            "invocation_id":  "RG1_USTEC_PERIOD_M5_1785715200_1785775800_2637984089468173683_I1785715200_17095416435198631012",
+                            "run_key":  "RG1_USTEC_PERIOD_M5_1785715200_1785775800_2637984089468173683",
+                            "visual_mode":  "0",
+                            "run_status":  "COMPLETE",
+                            "contract_valid":  "1",
+                            "terminal_hash":  "7713437695258713667",
+                            "event_sequence":  "267",
+                            "receipt_hash":  "14116959112789886817",
+                            "contract_receipt_hash":  "288549698179707457",
+                            "canonical_dataset_hash":  "dcd5695c843f27f52abf97de7c39a5ce4281100b45abf946530037ff2b8f2931",
+                            "counts_match_manifest":  true,
+                            "row_counts":  {
+                                               "events":  267,
+                                               "attempts":  57,
+                                               "episodes":  14,
+                                               "context":  279,
+                                               "features":  57,
+                                               "transits":  2
+                                           },
+                            "dataset_hashes":  {
+                                                   "events":  "2885d03a5a414be489322c2bafdaf5505db3cc1660a0c7017c8b56ad8a5cdfd6",
+                                                   "attempts":  "a0e84b39a67cb7797a6d2ddb904b2e9bd14d75229f4c7e34816b5318419b693c",
+                                                   "episodes":  "519575f77720df55a3ed5a43087aba2f0f3e3ccab00a28908bbebfa3fb7ee4a1",
+                                                   "context":  "1fcc0b4f09b07c21d55c54f1b94f8564054b333bb4cfd4f8165de388452316f0",
+                                                   "features":  "db726ff70f033bd3d936ed019c898b4707611cba6afbaeac7be99cca75f677da",
+                                                   "transits":  "717142940544cb368afbce578ca27fd33eed74084e19cc787a59e32c9a61007f"
+                                               }
+                        },
+                        {
+                            "variant":  "RG1_USTEC_PERIOD_M5_1785715200_1785775800_2637984089468173683_I1785715200_17177796244430711976",
+                            "invocation_id":  "RG1_USTEC_PERIOD_M5_1785715200_1785775800_2637984089468173683_I1785715200_17177796244430711976",
+                            "run_key":  "RG1_USTEC_PERIOD_M5_1785715200_1785775800_2637984089468173683",
+                            "visual_mode":  "0",
+                            "run_status":  "COMPLETE",
+                            "contract_valid":  "1",
+                            "terminal_hash":  "7713437695258713667",
+                            "event_sequence":  "267",
+                            "receipt_hash":  "14116959112789886817",
+                            "contract_receipt_hash":  "288549698179707457",
+                            "canonical_dataset_hash":  "d8dfdf12f9892a377a292936f85c6eb3a93f15990f9a3f6cb571f485717049c2",
+                            "counts_match_manifest":  true,
+                            "row_counts":  {
+                                               "events":  267,
+                                               "attempts":  57,
+                                               "episodes":  14,
+                                               "context":  279,
+                                               "features":  57,
+                                               "transits":  2
+                                           },
+                            "dataset_hashes":  {
+                                                   "events":  "2885d03a5a414be489322c2bafdaf5505db3cc1660a0c7017c8b56ad8a5cdfd6",
+                                                   "attempts":  "8a10e89b46fabaeffabf11e81933200dbd0edda69fc317f08e9815db3c7d4f49",
+                                                   "episodes":  "519575f77720df55a3ed5a43087aba2f0f3e3ccab00a28908bbebfa3fb7ee4a1",
+                                                   "context":  "1fcc0b4f09b07c21d55c54f1b94f8564054b333bb4cfd4f8165de388452316f0",
+                                                   "features":  "db726ff70f033bd3d936ed019c898b4707611cba6afbaeac7be99cca75f677da",
+                                                   "transits":  "717142940544cb368afbce578ca27fd33eed74084e19cc787a59e32c9a61007f"
+                                               }
+                        },
+                        {
+                            "variant":  "RG1_USTEC_PERIOD_M5_1785715200_1785775800_2637984089468173683_I1785715200_13308704984709716278",
+                            "invocation_id":  "RG1_USTEC_PERIOD_M5_1785715200_1785775800_2637984089468173683_I1785715200_13308704984709716278",
+                            "run_key":  "RG1_USTEC_PERIOD_M5_1785715200_1785775800_2637984089468173683",
+                            "visual_mode":  "1",
+                            "run_status":  "COMPLETE",
+                            "contract_valid":  "1",
+                            "terminal_hash":  "12571729679703605656",
+                            "event_sequence":  "267",
+                            "receipt_hash":  "11928452617342541988",
+                            "contract_receipt_hash":  "11610228737362206973",
+                            "canonical_dataset_hash":  "97142bb0246621ceb2438359caaf07ea0a4b95b550ec5e17a5ad3389e505c505",
+                            "counts_match_manifest":  true,
+                            "row_counts":  {
+                                               "events":  267,
+                                               "attempts":  57,
+                                               "episodes":  14,
+                                               "context":  279,
+                                               "features":  57,
+                                               "transits":  2
+                                           },
+                            "dataset_hashes":  {
+                                                   "events":  "62e07afdbce6da2b1360d1d4178a293be812a33721ddbfe242fa79bb8e65dec0",
+                                                   "attempts":  "53989fcc79b6792410e1f49a6419798bafeb1d405ecb6f6aa201cc7f981904b9",
+                                                   "episodes":  "bc509c5114751f6b7a8bec9ba07ec6e07ebdb0346deb570e6a3f0ff889034b26",
+                                                   "context":  "212526049740695f10047ed4ca28013105b8e4f1be617580c2759b0d79b7d1a0",
+                                                   "features":  "9f00d3b6b85e2109ef1ba8ade47f1d21ca5bbc17212c614488181ea853334ae9",
+                                                   "transits":  "b31bedfb561ac88cc58a00dadd42583ac580217c54c7a9e3d0efa53e7040cb35"
+                                               }
+                        }
+                    ],
+    "failures":  [
+                     "RG1_USTEC_PERIOD_M5_1785715200_1785775800_2637984089468173683_I1785715200_17177796244430711976: canonical_dataset_hash differs from baseline",
+                     "RG1_USTEC_PERIOD_M5_1785715200_1785775800_2637984089468173683_I1785715200_17177796244430711976: attempts hash differs from baseline",
+                     "RG1_USTEC_PERIOD_M5_1785715200_1785775800_2637984089468173683_I1785715200_13308704984709716278: terminal_hash differs from baseline",
+                     "RG1_USTEC_PERIOD_M5_1785715200_1785775800_2637984089468173683_I1785715200_13308704984709716278: receipt_hash differs from baseline",
+                     "RG1_USTEC_PERIOD_M5_1785715200_1785775800_2637984089468173683_I1785715200_13308704984709716278: contract_receipt_hash differs from baseline",
+                     "RG1_USTEC_PERIOD_M5_1785715200_1785775800_2637984089468173683_I1785715200_13308704984709716278: canonical_dataset_hash differs from baseline",
+                     "RG1_USTEC_PERIOD_M5_1785715200_1785775800_2637984089468173683_I1785715200_13308704984709716278: events hash differs from baseline",
+                     "RG1_USTEC_PERIOD_M5_1785715200_1785775800_2637984089468173683_I1785715200_13308704984709716278: attempts hash differs from baseline",
+                     "RG1_USTEC_PERIOD_M5_1785715200_1785775800_2637984089468173683_I1785715200_13308704984709716278: episodes hash differs from baseline",
+                     "RG1_USTEC_PERIOD_M5_1785715200_1785775800_2637984089468173683_I1785715200_13308704984709716278: context hash differs from baseline",
+                     "RG1_USTEC_PERIOD_M5_1785715200_1785775800_2637984089468173683_I1785715200_13308704984709716278: features hash differs from baseline",
+                     "RG1_USTEC_PERIOD_M5_1785715200_1785775800_2637984089468173683_I1785715200_13308704984709716278: transits hash differs from baseline"
+                 ]
+}

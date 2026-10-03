@@ -1,0 +1,1 @@
+{"context_stitching":"FORBIDDEN","global_view":"TAGGED_UNION_OVER_C_AUTH_G3","prefix_object":"P_EXEC_G3(C)","primary_object":"T_REACH(C)","schema":"G3_REACHABLE_TRANSITION_SEMANTICS_V1","state_object":"K_REACH(C)","state_reachability_is_transition_projection":true,"status":"QUALIFIED","step_codomain":["APPLIED(next_state,ordered_emissions)","REJECTED(reason)"]}

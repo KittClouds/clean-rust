@@ -1,0 +1,8 @@
+{
+    "contract":  "NORTHSTAR_PHASE13_ORCHESTRATION_RECOVERY_V1",
+    "status":  "QUARANTINED_INCOMPLETE",
+    "attempt":  2,
+    "files_preserved":  10,
+    "candidate_scoring_performed":  false,
+    "authorization_consumed":  false
+}

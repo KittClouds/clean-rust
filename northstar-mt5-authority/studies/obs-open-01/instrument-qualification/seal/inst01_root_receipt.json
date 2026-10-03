@@ -1,0 +1,50 @@
+{
+  "inst01_root": "5930c7d4f5b2de4549bfedacbd2c3b9df7da78f68c7d765b9c0669d08a17490f",
+  "payload": {
+    "artifacts": [
+      {
+        "bytes": 609,
+        "path": "authority_earned.json",
+        "sha256": "42c76ff2738646b31385949f8a4359d7b716421fedf9c7e97b38e3868d006f4a"
+      },
+      {
+        "bytes": 5826,
+        "path": "authority_manifest.json",
+        "sha256": "af7eab97b1c347581ff5a9a9c81cdf9a5e4d95b74ee4c3663d48ca18e434d073"
+      },
+      {
+        "bytes": 215,
+        "path": "confirmation_access_receipt.json",
+        "sha256": "603047bbd04bbe0f08d0d8896df9a8fcb996de7c81373fb7f85844069f8ce99f"
+      },
+      {
+        "bytes": 419,
+        "path": "deterministic_rebuild_receipt.json",
+        "sha256": "e0cbe6b9cedebecd59cfc0c94e59c37321a90d361895e14fb23cf24c235d060f"
+      },
+      {
+        "bytes": 10113,
+        "path": "online_historical_reload_comparison.json",
+        "sha256": "af6b2127e82099d00e6a429facc7d48e96a40ef17b14c5352ae711897a9fe064"
+      },
+      {
+        "bytes": 9794,
+        "path": "sentinel_invariant_results.json",
+        "sha256": "18f15e347e3a2fe5f8a50f86a81d48581b8d6b4b450092b8c7464d96d79c85fb"
+      },
+      {
+        "bytes": 1317,
+        "path": "typed_qualification_matrix.json",
+        "sha256": "6e9c341d84d935ffed6b76a5b87b20de510810acf71a3852bf20514087231dc1"
+      },
+      {
+        "bytes": 5235,
+        "path": "v200_regression_matrix.json",
+        "sha256": "b55eff2ff9007321466d550a6bea833ca2ec8d54d360e70cb1937626ff9f15c7"
+      }
+    ],
+    "authority": "CAUSAL_RANGE_EXTREME_INSTRUMENT_V1",
+    "parent_src01_root": "32e1207717afc29533e8a8fb0a7e0f329f9e092f58f3fb3c58d5661c5b7dd0fa",
+    "schema": "OBS_OPEN_INST01_ROOT_PAYLOAD_V1"
+  }
+}

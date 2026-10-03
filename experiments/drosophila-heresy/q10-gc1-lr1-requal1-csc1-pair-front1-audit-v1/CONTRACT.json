@@ -1,0 +1,34 @@
+{
+  "identity": "q10-gc1-lr1-requal1-csc1-pair-front1-audit-v1",
+  "parent_bindings": [
+    {
+      "label": "audit_plan",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-pair-front1-audit-v1/PLAN.md",
+      "sha256": "AE603BAE19ED6F8B9FD278F0289C76A58CABEFBFAF13A55C83558F9182142B3C"
+    },
+    {
+      "label": "audit_runner",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-pair-front1-audit-v1/scripts/audit_front1.py",
+      "sha256": "E692EFAB10F9D17A2C9DCF7B48415C3F94F119FBE94D1446123B1062ECD51F00"
+    },
+    {
+      "label": "front_execution",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-pair-front1-v2/execution.json",
+      "sha256": "5EB2CC6BC10A21CE2497FEA927A0003A85B7BEDDB280D886EF11C9A4A9C8A3A9"
+    },
+    {
+      "label": "exh_execution",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-pair-exh1-v1/execution.json",
+      "sha256": "13303BA195672CEB8D7971D44753CF5DF9F30FF822BE538901CF8AA40ED4C707"
+    }
+  ],
+  "protocol": "Q10-FRONT1-AUDIT",
+  "readout_performed": false,
+  "status": "SEALED_PREMEASUREMENT",
+  "write_allowlist": [
+    "CONTRACT.json",
+    "PREEXECUTION.json",
+    "execution.json",
+    "STATUS.json"
+  ]
+}

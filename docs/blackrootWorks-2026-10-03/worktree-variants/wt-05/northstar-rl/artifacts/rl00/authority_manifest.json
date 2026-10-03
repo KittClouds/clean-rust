@@ -1,0 +1,217 @@
+{
+  "schema_version": "NORTHSTAR_AUTHORITY_MANIFEST_V1",
+  "surface": "NORTHSTAR_RL_SURFACE_V1",
+  "entries": [
+    {
+      "path": "double_build_receipt.json",
+      "bytes": 457,
+      "content_hash": "b8154a0d625700783f6d6cca8cdddafa9028c50f935fa8725322ab1b338d96c6",
+      "authority": "FORGE_RL_00"
+    },
+    {
+      "path": "env_step_tape.json",
+      "bytes": 11730,
+      "content_hash": "f2d9ce4b852ca6027742248153dea9a8310cb43bfe07253717e33db11f4f017b",
+      "authority": "FORGE_RL_00"
+    },
+    {
+      "path": "environment_config.json",
+      "bytes": 6585,
+      "content_hash": "fb35e878aeb460f6f35e6befd527c3a9eac20cc3e6a2b6b1f40108fabb352016",
+      "authority": "FORGE_RL_00"
+    },
+    {
+      "path": "episode_tape.json",
+      "bytes": 1436,
+      "content_hash": "253248ab20fc48b960f18460c23866e406196b8f2221976a350de6945c9364ad",
+      "authority": "FORGE_RL_00"
+    },
+    {
+      "path": "execution_receipts.json",
+      "bytes": 4727,
+      "content_hash": "c4016365122b95c710fdf86ec589649936d595807fce9dc028088e5b1219e999",
+      "authority": "FORGE_RL_00"
+    },
+    {
+      "path": "feature_registry.json",
+      "bytes": 17465,
+      "content_hash": "4adefb7b8b68f5247c66daeb1ba36c4257a0bf32c9a2f009e932fc03acebd0bf",
+      "authority": "FORGE_RL_00"
+    },
+    {
+      "path": "features.nrf1",
+      "bytes": 69904,
+      "content_hash": "e5b394cca15926319b7fff1ad5d199f5beccb42c26242276e1cbeb49da3f9948",
+      "authority": "FORGE_RL_00"
+    },
+    {
+      "path": "fixtures/micro_fixtures.json",
+      "bytes": 2733,
+      "content_hash": "4c86a06a9310656a0fbdd9a67525a02f1c81761d6e9ff11f0b6ee9b7577fa141",
+      "authority": "FORGE_RL_00"
+    },
+    {
+      "path": "observation_dictionary.json",
+      "bytes": 1420,
+      "content_hash": "8bf05b7884a318e8e6952dec9c9215a337c8df4c8de3b348c1506fde2968e00f",
+      "authority": "FORGE_RL_00"
+    },
+    {
+      "path": "performance_report.json",
+      "bytes": 1950,
+      "content_hash": "94a87e3edf6986aba8e1d1cd1db91580e50a18e05401073cab43d6868c3427f7",
+      "authority": "DIAGNOSTIC"
+    },
+    {
+      "path": "qualification_matrix.json",
+      "bytes": 4986,
+      "content_hash": "f5a54e96b8c1f49e650d20f83e2868428fed6e9f87fd54614bf66613ca8ee45a",
+      "authority": "FORGE_RL_00"
+    },
+    {
+      "path": "replay_receipt.json",
+      "bytes": 360,
+      "content_hash": "02d4f92551324bbd45e6a9d8e8a528b36a253c003282825fe23eafcdc0ca9982",
+      "authority": "FORGE_RL_00"
+    },
+    {
+      "path": "rl_env_spec.json",
+      "bytes": 1776,
+      "content_hash": "6f6648bcaa4942c498067d2f82b98227f448a03da42aab8f55601dbc4b9b7905",
+      "authority": "FORGE_RL_00"
+    },
+    {
+      "path": "runraw.nrr1",
+      "bytes": 66784,
+      "content_hash": "7874230a59f55df0daa0842b4263f4440278c915ce9866873ef8aac77cc4020b",
+      "authority": "FORGE_RL_00"
+    },
+    {
+      "path": "sb3_compatibility_receipt.json",
+      "bytes": 1125,
+      "content_hash": "a105b1e37066872d3295af8ad08bb9f9652a13dfaf6868127e5dc21085f6c814",
+      "authority": "FORGE_RL_00"
+    },
+    {
+      "path": "schemas/ACTION_SPEC_TARGET_EXPOSURE_V1.schema.json",
+      "bytes": 913,
+      "content_hash": "f3d52ba3ed239d23f076369b8526463163fdf496866468bc5bb0db86ad1cd000",
+      "authority": "FORGE_RL_00"
+    },
+    {
+      "path": "schemas/AUTHORITY_MANIFEST_V1.schema.json",
+      "bytes": 1175,
+      "content_hash": "7f2b904a765dde12775716bf63aa0b74204b4f8579e8ac44804d0379c49ecdb1",
+      "authority": "FORGE_RL_00"
+    },
+    {
+      "path": "schemas/ENV_STEP_TAPE_V1.schema.json",
+      "bytes": 2402,
+      "content_hash": "84efaa7a3b93e5cb71972c15784702d1053843090035247f61646b97c5179e27",
+      "authority": "FORGE_RL_00"
+    },
+    {
+      "path": "schemas/EPISODE_TAPE_V1.schema.json",
+      "bytes": 2960,
+      "content_hash": "bda7915de3c75dca18695d5c6703653ddceaecaf865939cfff76a36b83b67d52",
+      "authority": "FORGE_RL_00"
+    },
+    {
+      "path": "schemas/EXECUTION_SPEC_V1.schema.json",
+      "bytes": 1623,
+      "content_hash": "d346e0305fcf29ba8af423e742195e7840c4d6e82a4457dd59208f886ec61506",
+      "authority": "FORGE_RL_00"
+    },
+    {
+      "path": "schemas/FEATURE_REGISTRY_V1.schema.json",
+      "bytes": 9221,
+      "content_hash": "c9ba396e0f443093d20457ebd3f651ec6dc4a9a5e71da49b9b88abf30b39d8fb",
+      "authority": "FORGE_RL_00"
+    },
+    {
+      "path": "schemas/FEATURE_TAPE_V1.schema.json",
+      "bytes": 1646,
+      "content_hash": "849432e96b7d4de88a720e4ede469572e9257f41b6c44d4cea26c11ff7b51bd5",
+      "authority": "FORGE_RL_00"
+    },
+    {
+      "path": "schemas/INSTRUMENT_CONTRACT_V1.schema.json",
+      "bytes": 1593,
+      "content_hash": "2802997d5218202d4edb61cfa24844181421996c3a0c7cf9bb952ef01c4b0e2c",
+      "authority": "FORGE_RL_00"
+    },
+    {
+      "path": "schemas/NUMERIC_CONTRACT_V1.schema.json",
+      "bytes": 799,
+      "content_hash": "37dcb1c1d95f7ea1960946dd7d9dfb1d6518bd9ee672b65ec3551bc3512ebadc",
+      "authority": "FORGE_RL_00"
+    },
+    {
+      "path": "schemas/OBSERVATION_SPEC_V1.schema.json",
+      "bytes": 1470,
+      "content_hash": "b39af5b1b666d3c3ad0a481b0044eae5a9a0efc0b29682a12e7468f23eb7ca53",
+      "authority": "FORGE_RL_00"
+    },
+    {
+      "path": "schemas/REPLAY_RECEIPT_V1.schema.json",
+      "bytes": 2698,
+      "content_hash": "7be80ffdad49b14547a4679e9a612d77945a9ef2c840c55cc06832639cdd8ee8",
+      "authority": "FORGE_RL_00"
+    },
+    {
+      "path": "schemas/REWARD_PRIMITIVES_V1.schema.json",
+      "bytes": 1618,
+      "content_hash": "58de6f1500f33012fa8b4b5f2de73a97da4f6fdb7aa441a6ddc799cbceac24d1",
+      "authority": "FORGE_RL_00"
+    },
+    {
+      "path": "schemas/REWARD_SPEC_V1.schema.json",
+      "bytes": 532,
+      "content_hash": "4081e3c454932da31ebd0e606e1e9adea485f48ce429ba4a1a1b208ba1f546a6",
+      "authority": "FORGE_RL_00"
+    },
+    {
+      "path": "schemas/RL_ENV_SPEC_V1.schema.json",
+      "bytes": 2818,
+      "content_hash": "7cb700254fd48cd5a19c531e00a6011c71fd7a66365eb73d2122e2f0a3287432",
+      "authority": "FORGE_RL_00"
+    },
+    {
+      "path": "schemas/RUNRAW_TAPE_V1.schema.json",
+      "bytes": 1761,
+      "content_hash": "9a2e77deaff5a45aed8141beb0430984f0ce719753ff20a3f4d6572d19a3c011",
+      "authority": "FORGE_RL_00"
+    },
+    {
+      "path": "schemas/SEED_CONTRACT_V1.schema.json",
+      "bytes": 544,
+      "content_hash": "1ac0453d97e8e2a59e8d9edb4f4a80aabc571fb787e3978219e73449188d53a4",
+      "authority": "FORGE_RL_00"
+    },
+    {
+      "path": "schemas/TERMINAL_RECEIPT_V1.schema.json",
+      "bytes": 1111,
+      "content_hash": "cf700fbce8d462edf8accf2143d318b6e70c79ea55fbfe26a785a7241e23ff3b",
+      "authority": "FORGE_RL_00"
+    },
+    {
+      "path": "schemas/TERMINATION_SPEC_V1.schema.json",
+      "bytes": 783,
+      "content_hash": "16bbcdb57ca4b683414db5f15c8b63a215a2191955449a65546775e2a4d48e9e",
+      "authority": "FORGE_RL_00"
+    },
+    {
+      "path": "scripted_oracle_receipts.json",
+      "bytes": 2444,
+      "content_hash": "c0d1291d71d89bef382201445513dde7671f8d036b542f8d583686b4f727c225",
+      "authority": "FORGE_RL_00"
+    },
+    {
+      "path": "terminal_receipt.json",
+      "bytes": 361,
+      "content_hash": "1d3ae5cbef5216c9d580fc995715ddb61ec7a9057e9d1bf1767d50050f461d1d",
+      "authority": "FORGE_RL_00"
+    }
+  ],
+  "root_identity": "71b9c46eb2b6800c6ef08d73c07674a99d359aa64b1ab656d0bed2e43c5a843d"
+}

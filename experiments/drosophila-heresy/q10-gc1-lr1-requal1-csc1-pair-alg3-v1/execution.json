@@ -1,0 +1,108 @@
+{
+  "conclusion": "Compatible disjoint order-3 structural composition reproduced exact committed weights and validity across the frozen sample; geometry differences were limited to floating-point evaluation roundoff.",
+  "contexts": [
+    {
+      "context": [
+        "seed9731-L-tau16.json",
+        2
+      ],
+      "max_geometry_abs_error": 4.440892098500626e-16,
+      "records": 256,
+      "result_sha256": "8AF96D4B2AF32AD33472F87E8184C783CA0CAAB51394E0F95651950242DA0903",
+      "validity_mismatches": 0,
+      "weight_mismatches": 0
+    },
+    {
+      "context": [
+        "seed9731-L-tau4.json",
+        3
+      ],
+      "max_geometry_abs_error": 2.220446049250313e-16,
+      "records": 256,
+      "result_sha256": "1FAE7F6BFDDA31A472549266DE06304A90BECAE8C89368D706B58919CDFD8808",
+      "validity_mismatches": 0,
+      "weight_mismatches": 0
+    },
+    {
+      "context": [
+        "seed9731-R-tau16.json",
+        1
+      ],
+      "max_geometry_abs_error": 2.220446049250313e-16,
+      "records": 256,
+      "result_sha256": "817593268844F25BAB65C59542A31C25E73D8E701528A832A730FC83623ABBEE",
+      "validity_mismatches": 0,
+      "weight_mismatches": 0
+    },
+    {
+      "context": [
+        "seed9731-R-tau16.json",
+        3
+      ],
+      "max_geometry_abs_error": 2.220446049250313e-16,
+      "records": 256,
+      "result_sha256": "FF5EEAD05D183BA4252F2C2B0EAB1F5DF94EADCC0B9E5D07C5DFCC0FBCD8A341",
+      "validity_mismatches": 0,
+      "weight_mismatches": 0
+    },
+    {
+      "context": [
+        "seed9731-R-tau4.json",
+        0
+      ],
+      "max_geometry_abs_error": 2.220446049250313e-16,
+      "records": 256,
+      "result_sha256": "5B7B51F51B5058ADBEA153ACFBFBCFBA4CFE7AD680BAED0C93205F1C93B3500C",
+      "validity_mismatches": 0,
+      "weight_mismatches": 0
+    },
+    {
+      "context": [
+        "seed9731-R-tau4.json",
+        1
+      ],
+      "max_geometry_abs_error": 0.0,
+      "records": 256,
+      "result_sha256": "FC6A439FA8714A3B69E610D58714B8DD7E8C766D40F260DAB857438A23D8365D",
+      "validity_mismatches": 0,
+      "weight_mismatches": 0
+    },
+    {
+      "context": [
+        "seed9731-R-tau4.json",
+        2
+      ],
+      "max_geometry_abs_error": 2.220446049250313e-16,
+      "records": 256,
+      "result_sha256": "6F3420DA88D4F7C5C3E6D02F35C19D74CA8904D6A0AD8E42D4BF3CAC2A281BA7",
+      "validity_mismatches": 0,
+      "weight_mismatches": 0
+    },
+    {
+      "context": [
+        "seed9731-R-tau4.json",
+        3
+      ],
+      "max_geometry_abs_error": 2.220446049250313e-16,
+      "records": 256,
+      "result_sha256": "EC894189C7027E64E4ABE7DAF2999FBB4176041AA6D32BAF012B8842378BC515",
+      "validity_mismatches": 0,
+      "weight_mismatches": 0
+    }
+  ],
+  "contract_sha256": "EB99904EFF4CC38199BFA8CBC10588B9C52E8E35570A4D413F4CBF4182CC9EDC",
+  "counts": {
+    "records": 2048,
+    "validity_mismatches": 0,
+    "weight_mismatches": 0
+  },
+  "engineering_only": true,
+  "geometry_executed": true,
+  "identity": "q10-gc1-lr1-requal1-csc1-pair-alg3-v1",
+  "prediction_seal_sha256": "DF38B8DFC58041DDF531B2CD547BC4BFB2DB8D08A75185FAD13306E5E6B54A70",
+  "protocol": "Q10-PAIR-ALG3",
+  "readout_executed": false,
+  "scientific_promotion": false,
+  "status": "ALG3_COMPLETE",
+  "triple_records": 2048
+}

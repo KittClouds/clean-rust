@@ -1,0 +1,38 @@
+[
+  {
+    "schema_version": "CAMPAIGN_RUN_RECEIPT_V1",
+    "run_id": "dee2e70e945ba953a3e966d9edc736f1d28ec3dcf23c17121f1562e30a9c7258",
+    "campaign_id": "a2db4037e285d6964027bc91d6bad9bf79b422ad5e8c1197c2425e18576b11b3",
+    "experiment_id": "a8ecde3e6bd83e00e392480d353fe17eb9dfa304c78a45839596767b78a642b1",
+    "seed": 101,
+    "status": "PLANNED",
+    "learner_steps_executed": 0,
+    "checkpoint_hashes": [],
+    "policy_artifact_id": null,
+    "reason_code": "LEARNER_EXECUTION_PROHIBITED_FORGE_RL_02"
+  },
+  {
+    "schema_version": "CAMPAIGN_RUN_RECEIPT_V1",
+    "run_id": "5e4456031dbcb53813fb82688b5704ee087e982d12b4a4067f54d952bc5058b2",
+    "campaign_id": "a2db4037e285d6964027bc91d6bad9bf79b422ad5e8c1197c2425e18576b11b3",
+    "experiment_id": "a8ecde3e6bd83e00e392480d353fe17eb9dfa304c78a45839596767b78a642b1",
+    "seed": 202,
+    "status": "PLANNED",
+    "learner_steps_executed": 0,
+    "checkpoint_hashes": [],
+    "policy_artifact_id": null,
+    "reason_code": "LEARNER_EXECUTION_PROHIBITED_FORGE_RL_02"
+  },
+  {
+    "schema_version": "CAMPAIGN_RUN_RECEIPT_V1",
+    "run_id": "b29d153811af30a72e231702a08a581f37f0c1de4cafa0b89129f1bc45c5b38a",
+    "campaign_id": "a2db4037e285d6964027bc91d6bad9bf79b422ad5e8c1197c2425e18576b11b3",
+    "experiment_id": "a8ecde3e6bd83e00e392480d353fe17eb9dfa304c78a45839596767b78a642b1",
+    "seed": 303,
+    "status": "PLANNED",
+    "learner_steps_executed": 0,
+    "checkpoint_hashes": [],
+    "policy_artifact_id": null,
+    "reason_code": "LEARNER_EXECUTION_PROHIBITED_FORGE_RL_02"
+  }
+]

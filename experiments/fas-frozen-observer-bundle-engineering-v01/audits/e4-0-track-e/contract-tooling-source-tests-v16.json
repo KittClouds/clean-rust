@@ -1,0 +1,44 @@
+{
+  "schema": "FAS_E4_0_CONTRACT_TOOLING_SOURCE_TESTS_V16",
+  "receipt_id": "E4_0_CONTRACT_TOOLING_V16_SOURCE_TESTS",
+  "status": "PASS_SYNTHETIC_CONTRACT_AND_SOURCE_MAP_TESTS",
+  "commands": [
+    "python -m py_compile experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/build_e4_0_source_map_v16.py experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/finalize_e4_0_contract_v16.py experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/seal_e4_0_contract_v16.py experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/test_e4_0_contract_v16.py",
+    "python experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/test_e4_0_contract_v16.py (30 synthetic tests)"
+  ],
+  "unit_test_count": 30,
+  "py_compile": "PASS",
+  "source_bindings": [
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/build_e4_0_source_map_v16.py",
+      "bytes": 63790,
+      "sha256": "12259849489956542abcb4619b605cd31c051f8c1cacde5db6f54019a025dc65"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/finalize_e4_0_contract_v16.py",
+      "bytes": 64008,
+      "sha256": "801bc2a0c6dd7acf77c103e118406f6404d52d72714a2aade96cd8a5e1a8b379"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/seal_e4_0_contract_v16.py",
+      "bytes": 17713,
+      "sha256": "2d4a695c62250b4a16534619834333eef372d3adab90b3720776da54c16c32d4"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/test_e4_0_contract_v16.py",
+      "bytes": 31146,
+      "sha256": "ef3057b355c4d483fb9a66b85a99a17ee9c2f1aa8b2877d279e21a830e699551"
+    }
+  ],
+  "runtime_access": {
+    "model_contact": false,
+    "tokenizer_contact": false,
+    "cuda_initialized": false,
+    "gpu_lease_acquired": false,
+    "cache_created": false,
+    "labels_opened": false
+  },
+  "scope": "Synthetic v16 source-map builder, contract finalizer, and sealer tests. Covers exact v15 failed-preseal lineage and absent contact-key schema, flattened v12-v14 history, sealed v06-v11 ancestry closure, source/receipt registry identities, implementation-source role projection, output-path protections, and scientific-projection preservation. No map, contract, seal, authorization, or runtime contact.",
+  "execution_authorization_conferred": false,
+  "recorded_utc": "2026-09-27T05:11:19.122782+00:00"
+}

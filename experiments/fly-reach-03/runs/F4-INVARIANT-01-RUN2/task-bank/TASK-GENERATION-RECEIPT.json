@@ -1,0 +1,26 @@
+{
+  "block_ids": [
+    306000,
+    306001,
+    306002,
+    306003,
+    306004,
+    306005,
+    306006,
+    306007,
+    306008,
+    306009,
+    306010,
+    306011
+  ],
+  "fit_manifest_created": false,
+  "schedule_generator_hash_verified": true,
+  "schema": "F4-INVARIANT-01-RUN2-task-generation-receipt-v1",
+  "status": "PASS",
+  "structural_screening_performed": false,
+  "target_or_Ustar_inspection_performed": false,
+  "task_bank_manifest_sha256": "29cfb77356f9ad0a637d1e7e1d5cbb935c4d6c7f28451ae184d9e44d1d9cb745",
+  "task_bank_sha256": "8e49f61018255fa32d4328056d46a0b5a14b70306ccfa98733849dcac245c02c",
+  "task_count": 12,
+  "task_replacement_performed": false
+}

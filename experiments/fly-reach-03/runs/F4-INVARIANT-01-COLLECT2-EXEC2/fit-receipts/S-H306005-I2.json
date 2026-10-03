@@ -1,0 +1,100 @@
+{
+  "analysis_sha256": "beb30c21df8761efbd0e9ed3fe3745cf57e9f6421cc4fe1750202ffbaa298e75",
+  "architecture_id": "shared_set_encoder_v1",
+  "arm": "S",
+  "base_stream_sha256": "66299a6d85fb143ca2cd8f1a8ff43a605c5a9fb58e8c036158678be81ef4da33",
+  "batch_size": 2048,
+  "comparative_metrics_emitted": false,
+  "contract_sha256": "52280190e160fafdbb973b4cda273bf9e24eca6ba96998a0393e90601fc88f40",
+  "epoch_count": 200,
+  "executable_sha256": "2247a06ecb4866eeee077af42d78d888ce7a20a4084ced3e2a7e30e92ad7f748",
+  "final_tensor_hash": "aa4bb06d4bd6d74a4e61f5d49601bd48dee62dc428c0a4560335f5efd7b858bf",
+  "finite_status": "PASS",
+  "fit_id": "S-H306005-I2",
+  "fit_manifest_row_sha256": "375bf7a3d4bc8ae0060b1ce9278cda44c22df1f98624ed942f9bd46bc32c1273",
+  "fold_index": 5,
+  "heldout_block": 306005,
+  "heldout_rows": 5469,
+  "heldout_target_or_reference_read": false,
+  "initial_layer_seeds": [
+    {
+      "fan_in": 6,
+      "layer_name": "phi.w",
+      "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100050000000200000053007068692e77",
+      "seed_u64": 12801037066899308972,
+      "sha256_digest": "ac4124b9636ba6b1ebb6515de8813da35357bed4bc68004ee7afee66671b8cd6",
+      "shape": [
+        6,
+        16
+      ],
+      "tensor_sha256": "d64e9a6004f24ef5538903e649f4e8dc3028e42db3dad942cd8870c2d0e1f4d3"
+    },
+    {
+      "fan_in": 82,
+      "layer_name": "rho.w1",
+      "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000500000002000000530072686f2e7731",
+      "seed_u64": 6208117821095092631,
+      "sha256_digest": "9721252a44aa27563a1344a95abda56031b590919fe51d0dcaf7c9e0d582a6fa",
+      "shape": [
+        82,
+        128
+      ],
+      "tensor_sha256": "4ef2a4a08b61124097746768727d576f316b88759d45b6f98b793addb6422707"
+    },
+    {
+      "fan_in": 128,
+      "layer_name": "rho.w2",
+      "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000500000002000000530072686f2e7732",
+      "seed_u64": 1498032104785625468,
+      "sha256_digest": "7cc1e02b4314ca14f37e3f9758f77ce9292b841ba8db26b8f5190aad550fec32",
+      "shape": [
+        128,
+        64
+      ],
+      "tensor_sha256": "b5d1881e340ace5b66876a4b48fe9bc79ebe09196935bc0427fd9af234921dc8"
+    },
+    {
+      "fan_in": 64,
+      "layer_name": "rho.w3",
+      "payload_hex": "46342d494e56415249414e542d30312d494e49542d7631000500000002000000530072686f2e7733",
+      "seed_u64": 5516949556419838959,
+      "sha256_digest": "ef43273a6424904c378a632294a5e0b895bb7bf68b1e97ee849892c845833bd0",
+      "shape": [
+        64,
+        1
+      ],
+      "tensor_sha256": "e69dc13dbff0bd66833ba3cfd7bb2abed37e7855b63fa47a6d1371d6d6c18db9"
+    }
+  ],
+  "initial_tensor_hash": "66a0cfc9c7803002aa8e4edeb4455ddbbd3fede05472836d63f3f203a17ac563",
+  "initializer_seed_manifest_sha256": "efb32a7c2ca2709407b65c32627dbd206b8b1bde304ce9b0b98b165aeea1da8e",
+  "normalization_sha256": "ddb579078f5b92f1c28c8235f7f9161801353720cf2e403430a7b52c250fc9b9",
+  "normalized_tuple_stream_sha256": "dec7f2cd5e41557e721d621e1aec9db36f8af4ad4aa4906c8e5793d525184304",
+  "paired_source_input_sha256": "93db0c41b58cde91c59697510204c0fe4d58e629f56bfec1da5094db82d4e435",
+  "parameter_count": 19057,
+  "prediction_path": "heldout-predictions/S-H306005-I2.bin",
+  "prediction_sha256": "cad33a2d1d119233b5a39dc347bf4607fabb5fd9a1ae382a9e75646de51c67b4",
+  "repeat_prediction_identical": true,
+  "replicate_index": 2,
+  "runtime": {
+    "numpy": "2.5.3",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python": "3.13.15 (tags/v3.13.15:4061bc4, Aug  5 2026, 13:05:39) [MSC v.1944 64 bit (AMD64)]",
+    "python_executable": "C:\\Users\\shuga\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+    "thread_environment": {
+      "BLIS_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "NUMEXPR_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1"
+    }
+  },
+  "runtime_seconds": 60.63756880001165,
+  "schema": "F4-INVARIANT-01-fit-receipt-v1",
+  "source_manifest_sha256": "1ffd0ecd452edd07546833a0d85977bed3b16d2b52c6f2c472579519c32323b3",
+  "train_rows": 23407,
+  "training_order_hash": "f220ca9764e7b5ff94f29cf8aaea174fd95ff2f39737c65411972cbfa9c0cfb6",
+  "training_row_hash": "3008ff2e439ed26abbe3c716168a0fdc351b0b3df5deac439de128c67e777f1f",
+  "update_count": 2400
+}

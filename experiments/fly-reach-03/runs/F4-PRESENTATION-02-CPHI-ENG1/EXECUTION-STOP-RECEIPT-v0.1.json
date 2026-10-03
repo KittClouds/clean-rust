@@ -1,0 +1,22 @@
+{
+  "schema": "F4-PRESENTATION-02-runtime-stop-receipt-v0.1",
+  "identity": "F4-PRESENTATION-02-CPHI-ENG1",
+  "status": "STOPPED_RUNTIME_SMOKE_BEFORE_FIRST_FIT_OUTPUT",
+  "reason": "Repeated row-wise canonical tuple sorting inside every minibatch made execution impractically slow; implementation-only vectorized/precomputed exact ordering is required.",
+  "fit_process_id": 36552,
+  "completed_fit_count": 0,
+  "prediction_files": 0,
+  "heldout_state_files": 0,
+  "training_trace_files": 0,
+  "fit_receipt_files": 0,
+  "prediction_lock_created": false,
+  "heldout_truth_opened": false,
+  "comparative_outcomes_emitted": false,
+  "parent_task_collection_and_D_S_outputs_modified": false,
+  "source_manifest_sha256": "a6f1005c2fc3509010c944b02ca572cf42a697c6246b0f271a81eead71ee017b",
+  "fit_manifest_sha256": "a60fb1d1b50c5d6a92305e9c782d341c7a785810a515b1b60b3df59adcaa784e",
+  "prefit_freeze_sha256": "5ec3df08a11dd7db63c41b77d1abd577169421a761f0939d69b963ba0342c22a",
+  "stopped_at_utc": "2026-09-25T18:09:03.7332705Z",
+  "next_identity": "F4-PRESENTATION-02-CPHI-ENG1-V2",
+  "engineering_only": true
+}

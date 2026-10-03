@@ -1,0 +1,4 @@
+example	left_session	right_session	selected_ordinal_lag	parent_ordinal_gap	calendar_day_gap	kernel_relation
+1	OBSOPEN_US30_20240103	OBSOPEN_US30_20240104	1	1	1	values[j-1] paired with values[j]
+2	OBSOPEN_US30_20240110	OBSOPEN_US30_20240116	1	2	6	values[j-1] paired with values[j]
+3	OBSOPEN_US30_20240117	OBSOPEN_US30_20240125	1	5	8	values[j-1] paired with values[j]

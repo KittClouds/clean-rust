@@ -1,0 +1,47 @@
+{
+  "protocol": "jev-information-density/v0.8p-r1-implementation-seal-v03",
+  "identity": "v0.8P-R1-fresh-trajectory-instrumented-rerun-v01",
+  "bundle_path": "experiments/jev-information-density-v08p-r1/contracts/r1-execution-bundle-v03.json",
+  "bundle_sha256": "03d988fc187ab53bb8dc2689a5995ac8ee9c6545be2a9ee0770651d53748d317",
+  "scientific_contracts_unchanged": true,
+  "implementation": {
+    "generator_source_sha256": "4b2111dd2ce2c1ffcd12f492860133f03398a053eeb5812a4416f3a68386faca",
+    "release_binary_sha256": "d0bce091904b39868a670cdeaa3bd0994dfd325969ddcea9ae528d0d2fd62967",
+    "tests_passed": 5,
+    "tests_failed": 0
+  },
+  "training_identity_replay": {
+    "root": "D:/codex-runs/jev-information-density-v08p-r1/v0.8P-R1/replay-attempt-03",
+    "raw_identity_rows_sha256": "6aced3e6b7ded5befb348974e55adbcb40566bae85677fc7197c8600c608ef75",
+    "raw_identity_rows": 132000,
+    "training_scope_sha256": "0f5cd945f965c291b13375b16367085a8c4f3dced4e5996b0e1ffbadf279d191",
+    "training_scope_rows": 55000,
+    "parity_receipt_sha256": "5d79c0d2548e3f1caa58f5d277d8477ff9d52407a16074bd05b6cd39751dd7d2",
+    "source_access_receipt_sha256": "023d2ac6124e3e408cd8d64959a6bec7446d65d81d8bd8fc4b002604f323d2ed",
+    "status": "TRAINING_IDENTITY_REPLAY_PASS"
+  },
+  "prior_identity_reconstruction": {
+    "root": "D:/codex-runs/jev-information-density-v08p-r1/v0.8P-R1/prior-reconstruction",
+    "episodes": 22000,
+    "neighborhoods": 2000,
+    "v05_denylist_exact_match": true,
+    "reconstruction_receipt_sha256": "4da975d7145683321846718518514f440295d79335fd1f7dd5c8d62e9c01dc68"
+  },
+  "candidate_staging": {
+    "root": "D:/codex-runs/jev-information-density-v08p-r1/v0.8P-R1/candidate-staging",
+    "neighborhoods": 2000,
+    "episodes": 22000,
+    "per_family": 500,
+    "e1_id_collisions": 0,
+    "semantic_validation": "PASS",
+    "generation_receipt_sha256": "cff2d4bd756f993d7194eddfeb43a6c5516cc777616602b679f87881cee0f310"
+  },
+  "boundaries": {
+    "lfm_contact": false,
+    "feature_extraction": false,
+    "training": false,
+    "inference": false,
+    "evaluation": false,
+    "phoenix_access": false
+  }
+}

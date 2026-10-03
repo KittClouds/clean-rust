@@ -1,0 +1,234 @@
+{
+  "integrity": {
+    "acquisition_hash_parity_comparisons_available": 0,
+    "acquisition_hashes_validated": 256,
+    "bundles": 128,
+    "cells": 256,
+    "e_cells": 128,
+    "events": 32768,
+    "events_per_seed": 1024,
+    "execution": {
+      "autodiff": false,
+      "backprop": false,
+      "canonical_policy": "parallel-off true-perpendicular",
+      "complete": true,
+      "configured_seeds": [
+        8000,
+        8001,
+        8002,
+        8003,
+        8004,
+        8005,
+        8006,
+        8007,
+        8008,
+        8009,
+        8010,
+        8011,
+        8012,
+        8013,
+        8014,
+        8015,
+        8016,
+        8017,
+        8018,
+        8019,
+        8020,
+        8021,
+        8022,
+        8023,
+        8024,
+        8025,
+        8026,
+        8027,
+        8028,
+        8029,
+        8030,
+        8031
+      ],
+      "fresh_seed_bundles": 32,
+      "mode": "run",
+      "outcome_rows": 256,
+      "protocol": "DH-08A",
+      "qualification_seed_bundles": 0,
+      "reward_rule": "action_contingent",
+      "shadow": "event-local Q07 feasible-null endpoint; never committed",
+      "specimens": 1,
+      "wall_seconds": 28.5644508
+    },
+    "final_true_endpoint_weight_hash_parity_checks": 128,
+    "inferential_observations": 32,
+    "max_q07_gate_values": {
+      "axial_error_over_total_norm": 3.8776189300178133e-08,
+      "norm_relative_error": 1.7369489137488732e-08,
+      "residual_abs_cosine": 1.6415493063687693e-08,
+      "residual_norm_relative_error": 1.7371141038102492e-08,
+      "support_size_relative_difference": 0.0038676980528140835
+    },
+    "seed_bundles": 32,
+    "specimens": 1,
+    "status": "PASSED",
+    "z_cells": 128
+  },
+  "limitations": [
+    "One synthetic specimen; computational seed bundles are the inferential units.",
+    "The estimand is event-local and conditional on endogenous true-policy states.",
+    "Q07 permits small within-support differences in realized zero placement.",
+    "The analysis does not decompose the cumulative DH-07R policy contrast."
+  ],
+  "primary": {
+    "bootstrap_ci95": [
+      2.711691550179717e-07,
+      7.802760224019416e-06
+    ],
+    "bootstrap_resamples": 20000,
+    "bootstrap_rng": "numpy.random.default_rng(PCG64)",
+    "bootstrap_seed": 2026091608,
+    "inferential_unit": "computational seed bundle",
+    "mean": 3.8870774331896475e-06,
+    "n_seed_bundles": 32,
+    "sample_sd": 1.1070631256961243e-05,
+    "standard_error": 1.9570296084532616e-06,
+    "t_ci95": [
+      -1.0431076824667642e-07,
+      7.878465634625971e-06
+    ],
+    "t_degrees_of_freedom": 31
+  },
+  "protocol": "DH-08A",
+  "secondary_seed_level": {
+    "null_minus_base": {
+      "inferential_unit": "computational seed bundle",
+      "mean": -2.222939747762394e-05,
+      "n_seed_bundles": 32,
+      "sample_sd": 9.127523656821733e-06,
+      "standard_error": 1.6135334682948201e-06,
+      "t_ci95": [
+        -2.552022068242186e-05,
+        -1.8938574272826023e-05
+      ],
+      "t_degrees_of_freedom": 31
+    },
+    "side_L": {
+      "inferential_unit": "computational seed bundle",
+      "mean": 4.80420059290046e-06,
+      "n_seed_bundles": 32,
+      "sample_sd": 1.754279884409528e-05,
+      "standard_error": 3.1011580059128246e-06,
+      "t_ci95": [
+        -1.5206528595586164e-06,
+        1.1129054045359535e-05
+      ],
+      "t_degrees_of_freedom": 31
+    },
+    "side_R": {
+      "inferential_unit": "computational seed bundle",
+      "mean": 2.9699542734788353e-06,
+      "n_seed_bundles": 32,
+      "sample_sd": 1.4575665297897008e-05,
+      "standard_error": 2.5766379431121032e-06,
+      "t_ci95": [
+        -2.2851334579934816e-06,
+        8.225042004951153e-06
+      ],
+      "t_degrees_of_freedom": 31
+    },
+    "tau_16": {
+      "inferential_unit": "computational seed bundle",
+      "mean": 9.726311267003962e-06,
+      "n_seed_bundles": 32,
+      "sample_sd": 1.5567250823784064e-05,
+      "standard_error": 2.751927155482395e-06,
+      "t_ci95": [
+        4.1137188298942005e-06,
+        1.5338903704113723e-05
+      ],
+      "t_degrees_of_freedom": 31
+    },
+    "tau_4": {
+      "inferential_unit": "computational seed bundle",
+      "mean": -1.9521564006246677e-06,
+      "n_seed_bundles": 32,
+      "sample_sd": 9.635549773637565e-06,
+      "standard_error": 1.703340646349906e-06,
+      "t_ci95": [
+        -5.426142552648849e-06,
+        1.5218297513995141e-06
+      ],
+      "t_degrees_of_freedom": 31
+    },
+    "true_minus_base": {
+      "inferential_unit": "computational seed bundle",
+      "mean": -1.834232004443429e-05,
+      "n_seed_bundles": 32,
+      "sample_sd": 9.291266749936865e-06,
+      "standard_error": 1.6424794311733626e-06,
+      "t_ci95": [
+        -2.1692178929741888e-05,
+        -1.4992461159126695e-05
+      ],
+      "t_degrees_of_freedom": 31
+    },
+    "window_129_256": {
+      "inferential_unit": "computational seed bundle",
+      "mean": 5.3482418645675164e-06,
+      "n_seed_bundles": 32,
+      "sample_sd": 1.3373674654823783e-05,
+      "standard_error": 2.364154009452139e-06,
+      "t_ci95": [
+        5.265179729378988e-07,
+        1.0169965756197134e-05
+      ],
+      "t_degrees_of_freedom": 31
+    },
+    "window_17_32": {
+      "inferential_unit": "computational seed bundle",
+      "mean": 8.187930112464227e-06,
+      "n_seed_bundles": 32,
+      "sample_sd": 4.763631897975125e-05,
+      "standard_error": 8.420991045336886e-06,
+      "t_ci95": [
+        -8.986794356484094e-06,
+        2.536265458141255e-05
+      ],
+      "t_degrees_of_freedom": 31
+    },
+    "window_1_16": {
+      "inferential_unit": "computational seed bundle",
+      "mean": -1.2155452765034713e-05,
+      "n_seed_bundles": 32,
+      "sample_sd": 4.18796696838719e-05,
+      "standard_error": 7.403349606829623e-06,
+      "t_ci95": [
+        -2.7254683836537286e-05,
+        2.9437783064678607e-06
+      ],
+      "t_degrees_of_freedom": 31
+    },
+    "window_33_64": {
+      "inferential_unit": "computational seed bundle",
+      "mean": -5.886223059207778e-07,
+      "n_seed_bundles": 32,
+      "sample_sd": 2.9259685186700166e-05,
+      "standard_error": 5.172430452724814e-06,
+      "t_ci95": [
+        -1.1137863764803296e-05,
+        9.960619152961739e-06
+      ],
+      "t_degrees_of_freedom": 31
+    },
+    "window_65_128": {
+      "inferential_unit": "computational seed bundle",
+      "mean": 6.138017819726567e-06,
+      "n_seed_bundles": 32,
+      "sample_sd": 1.4381169705247837e-05,
+      "standard_error": 2.542255654993822e-06,
+      "t_ci95": [
+        9.530532271893602e-07,
+        1.1322982412263774e-05
+      ],
+      "t_degrees_of_freedom": 31
+    }
+  },
+  "status": "INCONCLUSIVE"
+}

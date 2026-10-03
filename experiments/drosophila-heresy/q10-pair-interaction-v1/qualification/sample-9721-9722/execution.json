@@ -1,0 +1,11 @@
+{
+  "available_events": 8,
+  "behavioral_inference": false,
+  "complete": true,
+  "declared_events": 8,
+  "dh08b_authorized": false,
+  "map_before_overlay": true,
+  "protocol": "Q10-PI1",
+  "scientific_seed_bundles": 0,
+  "unavailable_events": 0
+}

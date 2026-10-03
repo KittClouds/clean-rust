@@ -1,0 +1,27 @@
+[package]
+name = "northstar-rl-broker"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+northstar-rl-core = { path = "../northstar-rl-core" }
+blake3.workspace = true
+bytemuck.workspace = true
+hashbrown.workspace = true
+memchr.workspace = true
+memmap2.workspace = true
+schemars.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+ureq.workspace = true
+zeroize.workspace = true
+zerocopy.workspace = true
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.61", features = ["Win32_Foundation", "Win32_Security_Credentials"] }
+
+[dev-dependencies]
+tempfile = "3.20"

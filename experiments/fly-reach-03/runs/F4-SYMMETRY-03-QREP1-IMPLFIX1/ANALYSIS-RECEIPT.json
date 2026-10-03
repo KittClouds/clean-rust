@@ -1,0 +1,12 @@
+{
+  "analysis_json_sha256": "320ad945401889abe4de9a2c44b075399ca07a646c810e56c133ca0e57b8a959",
+  "analysis_script_sha256": "efc32ca8da54c42d6b357967b74887aca4f9e5860596ae2ba577ab07ab66e79b",
+  "block_pattern_csv_sha256": "fdb11a45c05a23515e584cb6a6788f1ff0c58857c554515e88b4da66c5c35872",
+  "integrity_receipt_sha256": "8fee402e324a7bf79058f0db0da9f261db5adf28943428902efd40341a7beb86",
+  "outcomes_csv_sha256": "468225839dc7abca4697902ee684af4d6ec119fa9b3cad2478a50e4947e128c5",
+  "qualification_only": true,
+  "results_sha256": "3d56207001a580899c9a3a89cfa0859a65acd88f67167f04b6f85d53e63444dd",
+  "schema": "F4-SYMMETRY-03-analysis-receipt-v1",
+  "status": "PASS",
+  "truth_opened_after_integrity_pass": true
+}

@@ -1,0 +1,75 @@
+{
+  "schema": "FAS_E4_0_LEDGER_EXECUTION_SPEC_CANDIDATES_V01",
+  "status": "FABRIQUE_CANDIDATE_ONLY_NOT_REGISTERED_NOT_AUTHORIZED",
+  "adapter_id": "FAS_FROZEN_OBSERVER_BUNDLE_E4_0_LEDGER_SUPERVISED_ADAPTER_V01",
+  "library_execution_spec_schema": "KAMMI_LOCAL_EXECUTION_V1",
+  "scientific_contract_sha256": "21fc77d5a288b9adef995d88f089890235f8dcb2fbc3c9e452725bb67892a22f",
+  "scientific_contract_seal_root_sha256": "278ae16eeb6852d3efad44221556a87be6df54964471f0870931fe2e99b305d1",
+  "library_acceptance_id": "sha256:daae9a9496b6dc15f5a256d966323fcb8848387f3ce3c7d926db7039d7fe7c8c",
+  "library_handoff_seal_root_sha256": "ad1ffbc9203fd0cac5553ea4a5d3c72654c22054e68348474414096e35dd8cc5",
+  "visible_inheritance_bridge_root_sha256": "aacfd286b6349f0b35adb853a2cd9717c2463fedfeccc052bafaf515c69b027b",
+  "python_executable": "C:\\Users\\shuga\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+  "python_version_observed_for_synthetic_qualification": "3.13.15",
+  "cwd": "C:\\Users\\shuga\\.codex\\worktrees\\e4-0-contract-work\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\source\\scripts",
+  "shared_runtime_source_files": [
+    {"path": "C:\\Users\\shuga\\.codex\\worktrees\\e4-0-contract-work\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\source\\scripts\\e4_supervised_execution_adapter_v01.py", "bytes": 8595, "sha256": "sha256:6685158e9fcc902cc678a2891f91a692e83cdf87149cbf9e350d0f91b2c87fb8"},
+    {"path": "C:\\Users\\shuga\\.codex\\worktrees\\e4-0-contract-work\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\source\\scripts\\e4_runtime_helpers_v01.py", "bytes": 9449, "sha256": "sha256:a80be515dc4a2afd7f06cff875819aa690916756674ef557f7a985d0d6722d33"},
+    {"path": "C:\\Users\\shuga\\.codex\\worktrees\\e4-0-contract-work\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\source\\scripts\\e4_runner_modes_v06.py", "bytes": 41946, "sha256": "sha256:7d435b7ec9744a7088c9f56def1aff0570cf8ab797ce03beede64455649a19ac"},
+    {"path": "C:\\Users\\shuga\\.codex\\worktrees\\e4-0-contract-work\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\source\\scripts\\e4_online_supervised_v01.py", "bytes": 1751, "sha256": "sha256:39c6daaefc1dd2c6f0d4873802ffd696a74fcc559668ae52c68c8abcb93a72a2"},
+    {"path": "C:\\Users\\shuga\\.codex\\worktrees\\e4-0-contract-work\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\source\\scripts\\e4_runner_common_v05.py", "bytes": 23451, "sha256": "sha256:0b508de5c61737ff2b7d4a1838d8277ac9fe5428874e7b9bec834ee1145ca8a4"},
+    {"path": "C:\\Users\\shuga\\.codex\\worktrees\\e4-0-contract-work\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\source\\scripts\\e4_runner_artifacts_v05.py", "bytes": 16642, "sha256": "sha256:25c708eeeecd3c2a71beb03847446ff4301779e44114ada5399c93a437fe6d37"}
+  ],
+  "binding_directory": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e4-0-ledger-bindings-v01",
+  "inherited_stage_root": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e4-0-v01",
+  "shared_e4_output_root": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e4-0-ledger-run-v01",
+  "static_binding_files": "Generate only after Chief completes current-stage custody binding; each static binding file must be hash/size pinned as a source input before registering the Ledger execution spec.",
+  "supervised_worker_launcher": {
+    "argv_shape": ["python", "-m", "ledgerd.local_client", "--request", "<Ledger request.json>", "--receipt-root", "<fresh receipt directory>"],
+    "environment": ["KAMMI_URL", "KAMMI_ACTOR_TOKEN_FILE"],
+    "owner": "Chief Kammi / Library"
+  },
+  "stages": [
+    {
+      "mode": "parity",
+      "stage_id": "ONLINE_CACHE_PARITY (Ledger-issued identifier pending)",
+      "binding_path": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e4-0-ledger-bindings-v01\\online-cache-parity-binding-v01.json",
+      "command": [
+        "C:\\Users\\shuga\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+        "C:\\Users\\shuga\\.codex\\worktrees\\e4-0-contract-work\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\source\\scripts\\e4_online_supervised_v01.py",
+        "--mode", "parity", "--binding",
+        "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e4-0-ledger-bindings-v01\\online-cache-parity-binding-v01.json"
+      ],
+      "output_root": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e4-0-ledger-run-v01\\parity",
+      "expected_outputs": ["parity-online-features.f32le", "parity-receipt-v01.json", "stage-seal-v01.json"],
+      "known_exact_output_bytes": {"parity-online-features.f32le": 8388608},
+      "max_output_bytes_per_file": 67108864,
+      "timeout_seconds": 3600,
+      "poll_seconds": 5
+    },
+    {
+      "mode": "extract-e4",
+      "stage_id": "FRESH_FEATURE_EXTRACTION (Ledger-issued identifier pending)",
+      "binding_path": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e4-0-ledger-bindings-v01\\fresh-feature-extraction-binding-v01.json",
+      "command": [
+        "C:\\Users\\shuga\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+        "C:\\Users\\shuga\\.codex\\worktrees\\e4-0-contract-work\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\source\\scripts\\e4_online_supervised_v01.py",
+        "--mode", "extract-e4", "--binding",
+        "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e4-0-ledger-bindings-v01\\fresh-feature-extraction-binding-v01.json"
+      ],
+      "output_root": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e4-0-ledger-run-v01\\features",
+      "expected_outputs": ["V1_FINAL_POSITION.f32le", "feature-extraction-receipt-v01.json", "population-row-manifest-v01.jsonl", "stage-seal-v01.json"],
+      "known_exact_output_bytes": {"V1_FINAL_POSITION.f32le": 1223360512},
+      "copied_population_row_manifest_bytes": "must equal its currently bridged source manifest identity",
+      "max_output_bytes_per_file": 2147483648,
+      "timeout_seconds": 14400,
+      "poll_seconds": 5
+    }
+  ],
+  "constraints": [
+    "The Ledger local worker output_root is stage-specific and fresh; the static E4 binding output_root remains the shared run root so stage seal paths preserve E4_RUN_ROOT semantics.",
+    "Population and inherited panel seal manifests are replayed from listed identities without opening any protected member bytes; only named visible inputs are hashed/read.",
+    "The current v06 population bridge is visible-only. No protected labels enter the binding or adapter.",
+    "No E4 stage ID, run ID, actor grant, authorization, lease, fencing token, source-binding hash, or static input-binding hash exists in this candidate plan.",
+    "No model/tokenizer/CUDA call occurs in either candidate until Chief registers the specs and issues the corresponding stage authorization and fenced lease."
+  ]
+}

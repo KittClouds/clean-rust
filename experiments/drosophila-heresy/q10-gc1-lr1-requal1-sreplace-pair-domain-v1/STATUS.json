@@ -1,0 +1,9 @@
+{
+  "engineering_only": true,
+  "execution_sha256": "B95B2AC4B26415A53DE865D39F3A64A2C60B0104D9134C688205729AB6B35EAB",
+  "identity": "q10-gc1-lr1-requal1-sreplace-pair-domain-v1",
+  "pair_replay_executed": false,
+  "protocol": "REQUAL1-SREPLACE-PAIR-DOMAIN",
+  "scientific_promotion": false,
+  "status": "SREPLACE_PAIR_DOMAIN_COMPLETE"
+}

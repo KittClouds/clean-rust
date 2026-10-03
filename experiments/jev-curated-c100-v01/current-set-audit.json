@@ -1,0 +1,98 @@
+{
+  "v05": {
+    "name": "current_v05_s100k",
+    "rows": 25015,
+    "groups": 100060,
+    "unique_root_families": 1237,
+    "world_families": {
+      "network_incident": 12868,
+      "support_routing": 12147
+    },
+    "schema_families": {
+      "stress-schema-all_local_candidates": 1237,
+      "stress-schema-full_ontology_branch": 1237,
+      "stress-schema-local_plus_unrelated_distractor": 1237,
+      "stress-schema-target_plus_one_sibling": 1237,
+      "stress-schema-target_plus_two_siblings": 1237,
+      "synthetic-runtime-schema-v02": 18830
+    },
+    "operations": {
+      "all_local_candidates": 1237,
+      "base": 1237,
+      "criterion_paraphrase": 2474,
+      "do_intervention": 8659,
+      "full_ontology_branch": 1237,
+      "hide_observation": 3986,
+      "local_plus_unrelated_distractor": 1237,
+      "render_as_json": 1237,
+      "render_as_log": 1237,
+      "target_plus_one_sibling": 1237,
+      "target_plus_two_siblings": 1237
+    },
+    "unique_semantic_fingerprints": 20067,
+    "unique_exact_text_hashes": 1537,
+    "unique_normalized_text_hashes": 1537,
+    "unique_structural_fingerprints": 18,
+    "candidate_set_size": {
+      "count": 156275,
+      "p25": 1.0,
+      "p50": 4.0,
+      "p75": 4.0
+    },
+    "posterior_entropy": {
+      "count": 150090,
+      "p25": 0.35065686710395705,
+      "p50": 0.7046509586498907,
+      "p75": 1.0777897608205846
+    },
+    "distance_bins_proxy": {}
+  },
+  "v06": {
+    "name": "current_v06_s250k",
+    "rows": 62513,
+    "groups": 250052,
+    "unique_root_families": 3097,
+    "world_families": {
+      "network_incident": 34863,
+      "support_routing": 27650
+    },
+    "schema_families": {
+      "stress-schema-all_local_candidates": 3097,
+      "stress-schema-full_ontology_branch": 3097,
+      "stress-schema-local_plus_unrelated_distractor": 3097,
+      "stress-schema-target_plus_one_sibling": 3097,
+      "stress-schema-target_plus_two_siblings": 3097,
+      "synthetic-runtime-schema-v02": 47028
+    },
+    "operations": {
+      "all_local_candidates": 3097,
+      "base": 3097,
+      "criterion_paraphrase": 6194,
+      "do_intervention": 21679,
+      "full_ontology_branch": 3097,
+      "hide_observation": 9864,
+      "local_plus_unrelated_distractor": 3097,
+      "render_as_json": 3097,
+      "render_as_log": 3097,
+      "target_plus_one_sibling": 3097,
+      "target_plus_two_siblings": 3097
+    },
+    "unique_semantic_fingerprints": 50125,
+    "unique_exact_text_hashes": 3371,
+    "unique_normalized_text_hashes": 3371,
+    "unique_structural_fingerprints": 18,
+    "candidate_set_size": {
+      "count": 390563,
+      "p25": 1.0,
+      "p50": 4.0,
+      "p75": 4.0
+    },
+    "posterior_entropy": {
+      "count": 375078,
+      "p25": 0.35086253623013297,
+      "p50": 0.7152126808384721,
+      "p75": 1.0852933465301193
+    },
+    "distance_bins_proxy": {}
+  }
+}

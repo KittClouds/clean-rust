@@ -1,0 +1,20 @@
+{
+  "observe": true,
+  "seeds": [6000,6001,6002,6003,6004,6005,6006,6007,6008,6009,6010,6011,6012,6013,6014,6015,6016,6017,6018,6019,6020,6021,6022,6023,6024,6025,6026,6027,6028,6029,6030,6031],
+  "taus": [4.0,16.0],
+  "sides": ["R","L"],
+  "conditions": ["immediate","quiet","neither","parallel_only","perpendicular_only","both"],
+  "arms": ["E","Z"],
+  "cues": 16,
+  "delay_steps": 12,
+  "trials": 512,
+  "eta": 0.05,
+  "glut_sign": -1.0,
+  "input_salt": 858980352,
+  "threads": 4,
+  "primary_side": "R",
+  "primary_arm": "E",
+  "primary_checkpoints": [0,16,32,64,128,256],
+  "bootstrap_seed": 2026091206,
+  "bootstrap_resamples": 20000
+}

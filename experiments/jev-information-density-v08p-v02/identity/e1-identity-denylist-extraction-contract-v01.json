@@ -1,0 +1,63 @@
+{
+  "protocol": "jev-information-density/v0.8p-v02-e1-identity-denylist-extraction-v01",
+  "identity": "v0.8P-v02-e1-identity-denylist-v01",
+  "status": "FROZEN_BEFORE_EXTRACTION",
+  "purpose": "Produce a denylist of hashes of canonical E1 neighborhood identities for future P-v02 collision checking, without exposing raw E1 identities to the P panel generator.",
+  "source": {
+    "panel_identity": "v0.8N-eval-panel-v01",
+    "panel_contract_sha256": "3fa547c0a2490c4cfb5d578a32dffeb8414c35daa5e59ef339ab1e148e2e9cd6",
+    "panel_manifest_path": "D:/codex-runs/jev-information-density-v08n/v0.8N-eval-panel-v01/matched-panel-v02/heldout-matched-panel-manifest.jsonl",
+    "panel_manifest_sha256": "80e09c0f203b8a6505e062a2091a594273dca808258ff2f4539ab8414db9eabe",
+    "seal_manifest_path": "D:/codex-runs/jev-information-density-v08n/v0.8N-eval-panel-v01/seal/seal-manifest.json",
+    "seal_manifest_sha256": "425cef320df94e2b47b448203f8a916ebcbb2019539b2d09e51f5b4ced92f614",
+    "firewall_lock_path": "D:/codex-runs/jev-information-density-v08n/v0.8N-eval-panel-v01/seal/evaluation-firewall-lock.json",
+    "firewall_lock_sha256": "79d25ac82fba1bc6332e16d8bc5f877fadd11cccaed5ef3f07eacfe5e1877da2",
+    "manifest_producer_path": "experiments/jev-information-density-v08n/phase_a/match_eval_panel_radius.py",
+    "manifest_producer_sha256": "1036f3242c24bbc5d2d1f8112b2129b6454960591d3ea8f003d71ccec7cc9640",
+    "expected_neighborhood_count": 2000,
+    "canonical_identity_field": "neighborhood_id",
+    "canonical_identity_semantics": "The sealed matched-panel manifest producer writes neighborhood_id from the canonical anchor/neighborhood identity. No world/root identity field is present in this panel manifest; this denylist therefore covers canonical E1 neighborhood IDs only."
+  },
+  "extraction": {
+    "extractor_path": "experiments/jev-information-density-v08p-v02/identity/extract_e1_neighborhood_denylist.py",
+    "extractor_sha256": "f202863d30a7e94253781d8899884615f24f15594fae54eadd164498bcfc952a",
+    "read_fields": ["neighborhood_id"],
+    "all_other_manifest_values": "Skipped as opaque JSON bytes; not decoded, retained, emitted, or used.",
+    "raw_e1_identity_values_written": false,
+    "input_row_order_used": false,
+    "expected_unique_identity_count": 2000
+  },
+  "identity_hash": {
+    "algorithm": "SHA-256",
+    "canonicalization": "Decode the one JSON string field as UTF-8; use its exact decoded scalar value with no trimming, case folding, or Unicode normalization; encode that value as strict UTF-8.",
+    "domain_prefix": "jev-information-density-v08p-v02:e1-neighborhood-id:v01\u0000",
+    "formula": "SHA256(UTF8(domain_prefix) || UTF8(neighborhood_id))",
+    "output_representation": "lowercase hexadecimal"
+  },
+  "output": {
+    "path": "D:/codex-runs/jev-information-density-v08p-v02/identity-denylist-v01",
+    "hashes_filename": "e1-neighborhood-identity-hashes.jsonl",
+    "seal_filename": "denylist-seal.json",
+    "format": "sorted unique JSONL; each row contains only identity_sha256",
+    "output_contains_raw_e1_ids": false,
+    "p_collision_rule": "For each P-v02 canonical neighborhood identity, compute the same domain-separated SHA-256 and test membership in this hash set. Report only P-side collision identities/counts; do not emit any E1 metadata.",
+    "panel_generation_authorized_by_this_contract": false
+  },
+  "forbidden_inputs_and_operations": [
+    "E1 candidate joins or candidate feature catalogs",
+    "E1 raw targets or target distributions",
+    "E1 predictions, metrics, treatment outcomes, geometry diagnostics, or head outputs",
+    "reading any P-v01 failed-attempt panel content",
+    "candidate mapping or semantic substitution",
+    "panel generation, LFM loading, feature extraction, training, or evaluation"
+  ],
+  "preconditions": {
+    "source_seal_status": "V08N_HELDOUT_MATCHED_PANEL_SEALED_PHASE_B_GATE_PASS",
+    "panel_locked": true,
+    "phase_b_authorized": false,
+    "body_access_granted": false,
+    "training_process_may_read_panel": false,
+    "evaluation_process_may_read_panel": false,
+    "candidate_join_read": false
+  }
+}

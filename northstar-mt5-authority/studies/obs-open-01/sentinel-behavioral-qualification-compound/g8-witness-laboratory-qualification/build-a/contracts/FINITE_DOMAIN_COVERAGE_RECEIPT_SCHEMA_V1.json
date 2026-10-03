@@ -1,0 +1,1 @@
+{"counter_only":false,"required":["domain_id","domain_cardinality","visited_indices","visited_accumulator_hash","accepted_separator_indices"],"schema":"G8_FINITE_DOMAIN_COVERAGE_RECEIPT_V1","verified_coverage":"Visited equals exact canonical domain index set"}

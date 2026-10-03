@@ -1,0 +1,25 @@
+{
+  "authorization_id": "FAS_S03_USER_AUTHORIZATION_V01",
+  "authorization_source": "Explicit user instruction in this task turn",
+  "status": "AUTHORIZED",
+  "contract": "analysis-contract-v01.json",
+  "authorized_operations": [
+    "read allowlisted sealed mean_full and final_position feature caches",
+    "read the two already-sealed fitted probe states",
+    "recompute pre-update logits, fixed margins, and predictions for contracted test events",
+    "produce frozen paired decision-geometry and factor-conditioned descriptive summaries",
+    "seal S03 outputs"
+  ],
+  "forbidden": [
+    "model loading or feature extraction",
+    "probe fitting or updates",
+    "new feature views",
+    "significance testing",
+    "adaptive mechanisms",
+    "parent artifact modification",
+    "FAS-00 disposition change",
+    "automatic authorization of S04"
+  ],
+  "bound_s02_result_root_sha256": "1585488434830939e11cdf67dd9ff336ef133ab596a87c011394fb8d42db143d",
+  "bound_s02_final_position_phase_root_sha256": "baed3504533499880873db8f8bf16e37a0164844e657f9bda1397daaa0b4944b"
+}

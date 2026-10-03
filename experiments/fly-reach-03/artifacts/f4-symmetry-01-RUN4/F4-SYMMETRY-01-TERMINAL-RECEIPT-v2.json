@@ -1,0 +1,65 @@
+{
+  "PHENO_status_unchanged": true,
+  "actual_fits": 16,
+  "actual_rows": 13420,
+  "analysis_script_sha256": "dc70be0276297f32a6dd01508f7146243390ae3a6adf83ecb39879ba4fc6887d",
+  "analysis_sha256": "ff73428a4370b745de9adec63da6f39d7274489f29e41f0397e37a259162d2f4",
+  "biological_promotion": false,
+  "controlling_contract_sha256": "cfef638aaeac1dfc0b768d13cc95afe7724861f74e3d3111d91401925bed6379",
+  "expected_fits": 16,
+  "expected_rows": 13420,
+  "fit_manifest_sha256": "c00489c417709bac7dd137499f2e6be6fb4067b99ed316a7d2601ae7500ce02b",
+  "heldout_truth_opened_after_integrity": true,
+  "implementation_executable_sha256": "44d22dbe37c849de66690cb7b9842a4d45becd0b2ce62e3bd87883133f75e78f",
+  "integrity_gate_status": {
+    "B_DETERMINISM": "PASS",
+    "CD_VALUE_IDENTITY": "PASS",
+    "FORWARD_PROBABILITY": "PASS",
+    "JOINT_INVERSION_REPRESENTATION": "PASS",
+    "REPRESENTATION_INVARIANTS": "PASS",
+    "ROW_RECONCILIATION": "PASS"
+  },
+  "integrity_receipt_sha256": "3a830fe8ff05a1cd6fe8e062ae3c5106eab6866ba546634c8123bc918fb2ac94",
+  "integrity_status": "PASS",
+  "pre_fit_gate_status": {
+    "B_DETERMINISM": "PASS",
+    "CD_VALUE_IDENTITY": "PASS",
+    "FORWARD_PROBABILITY": "PASS",
+    "JOINT_INVERSION_REPRESENTATION": "PASS",
+    "REPRESENTATION_INVARIANTS": "PASS",
+    "ROW_RECONCILIATION": "PASS"
+  },
+  "prediction_lock_sha256": "1a6828c3956b6f25e057defc808f20698738a9990af4a2f9661dcaebd068aecf",
+  "preflight_receipt_sha256": "74520df2d61a2d7b5371486f4d129f980865ad70b38f729d5f0ac29a000483ca",
+  "primary_error_C_minus_B": -0.09960648729697519,
+  "primary_error_D_minus_C": -0.10072468828994952,
+  "qualification_only": true,
+  "results_markdown_sha256": "ae68095ab741ad75e56f062dc1efa53a0438b467bb3c4767335b2fe58f367062",
+  "runtime_identity": {
+    "loaded_threadpools": "threadpoolctl-unavailable",
+    "numpy_config": "Build Dependencies:\n  blas:\n    detection method: pkgconfig\n    found: true\n    include directory: C:/Users/runneradmin/AppData/Local/Temp/cibw-run-hg727bee/cp313-win_amd64/build/venv/Lib/site-packages/scipy_openblas64/include\n    lib directory: C:/Users/runneradmin/AppData/Local/Temp/cibw-run-hg727bee/cp313-win_amd64/build/venv/Lib/site-packages/scipy_openblas64/lib\n    name: scipy-openblas\n    openblas configuration: OpenBLAS 0.3.34.106.0  USE64BITINT DYNAMIC_ARCH NO_AFFINITY\n      Haswell MAX_THREADS=24\n    pc file directory: D:/a/numpy-release/numpy-release/.openblas\n    version: 0.3.34.106.0\n  lapack:\n    detection method: pkgconfig\n    found: true\n    include directory: C:/Users/runneradmin/AppData/Local/Temp/cibw-run-hg727bee/cp313-win_amd64/build/venv/Lib/site-packages/scipy_openblas64/include\n    lib directory: C:/Users/runneradmin/AppData/Local/Temp/cibw-run-hg727bee/cp313-win_amd64/build/venv/Lib/site-packages/scipy_openblas64/lib\n    name: scipy-openblas\n    openblas configuration: OpenBLAS 0.3.34.106.0  USE64BITINT DYNAMIC_ARCH NO_AFFINITY\n      Haswell MAX_THREADS=24\n    pc file directory: D:/a/numpy-release/numpy-release/.openblas\n    version: 0.3.34.106.0\nCompilers:\n  c:\n    commands: cl\n    linker: link\n    name: msvc\n    version: 19.44.35228\n  c++:\n    commands: cl\n    linker: link\n    name: msvc\n    version: 19.44.35228\n  cython:\n    commands: cython\n    linker: cython\n    name: cython\n    version: 3.3.0\nMachine Information:\n  build:\n    cpu: x86_64\n    endian: little\n    family: x86_64\n    system: windows\n  host:\n    cpu: x86_64\n    endian: little\n    family: x86_64\n    system: windows\nPython Information:\n  path: C:\\Users\\runneradmin\\AppData\\Local\\Temp\\build-env-xf1j587o\\Scripts\\python.exe\n  version: '3.13'\nSIMD Extensions:\n  baseline:\n  - X86_V2\n  found:\n  - X86_V3\n\n",
+    "numpy_version": "2.5.3",
+    "python_executable": "C:\\Users\\shuga\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+    "python_executable_sha256": "85b71d8c6ec1905935f74be0c9869aae198d00e98f39df699ec66f9c5a84cecd",
+    "python_version": "3.13.15 (tags/v3.13.15:4061bc4, Aug  5 2026, 13:05:39) [MSC v.1944 64 bit (AMD64)]",
+    "thread_environment": {
+      "BLIS_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "NUMEXPR_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1"
+    }
+  },
+  "schema": "F4-SYMMETRY-01-terminal-receipt-v2",
+  "scientific_values_recomputed_for_receipt": false,
+  "source_manifest_file_sha256": "e9bcfecdf211d7d12e1e5ad31f345455663226e1ab0cd2d35c466a24b1451a6a",
+  "source_manifest_sha256": "aa9f1e92d630cbfbe20b82ee6edf10c75568b482010ed98e613a77a39ded1525",
+  "status": "CLOSED_QUALIFICATION_ONLY",
+  "supersedes_terminal_receipt": {
+    "path": "F4-SYMMETRY-01-TERMINAL-RECEIPT.json",
+    "sha256": "f907d7af28e281e555b85e588ffb3d71aebf32a1d3f8e7367523a2c8c88bcee2"
+  },
+  "thread_environment_policy_status": "PASS",
+  "threadpool_introspection_status": "UNAVAILABLE"
+}

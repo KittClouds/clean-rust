@@ -1,0 +1,16 @@
+{
+  "contract": "MST_RG2_ANALYTICAL_LIFECYCLE_SEMANTICS_V1",
+  "behavioral_attempt_outcomes": [
+    "ACCEPT_AND_FAIL_RETEST",
+    "ACCEPT_AND_HOLD_RETEST",
+    "ACCEPT_THROUGH_NODE",
+    "RECLAIM_AFTER_BREAK",
+    "REJECT_TO_ORIGIN"
+  ],
+  "NODE_RETIRED": "structural_administrative_censoring",
+  "attempt_TIMEOUT": "attempt_timeout_boundary_censored_for_behavioral_targets",
+  "transit_TIMEOUT": "transit_timeout_boundary_censored_for_transit_targets",
+  "RIGHT_CENSORED": "retained_and_excluded_from_observable_denominator",
+  "episode_resolution": "terminal_receipt_not_whole_episode_outcome",
+  "required_episode_unit": "attempt_chain_or_event_timeline"
+}

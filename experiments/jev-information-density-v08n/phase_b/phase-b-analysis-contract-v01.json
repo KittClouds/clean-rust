@@ -1,0 +1,168 @@
+{
+  "protocol": "jev-information-density/v0.8n-road-b-phase-b-analysis-v01",
+  "identity": "v0.8N-phase-b-analysis-contract-v01",
+  "status": "FROZEN_NOT_AUTHORIZED",
+  "phase_b_ready": true,
+  "phase_b_authorized": false,
+  "parents": {
+    "construction_receipt_sha256": "e86f3cd925841c4e68f8558696e68cb729b9b9ba49a644b9bc35e7e2bcde68a6",
+    "run_contract": {
+      "path": "experiments/jev-information-density-v08n/phase_b/phase-b-run-contract-v01.json",
+      "sha256": "da538aa03355732a2ba362da45d947e169b87aa644d0efd6ba7ef7a546306c1f"
+    },
+    "execution_contract_sha256": "efb2bbe59293d7899083927cc187a292b5dfd1dc2948a0b752b3d9cbae2fd18d",
+    "preflight_sha256": "b3101ce2c89df575628d5413f289a94f9fdee5a6e178ee77020143adaf15881c"
+  },
+  "evaluation_surface": {
+    "identity": "v0.8N-eval-panel-v01/matched-panel-v02",
+    "seal_manifest_sha256": "425cef320df94e2b47b448203f8a916ebcbb2019539b2d09e51f5b4ced92f614",
+    "panel_manifest_sha256": "80e09c0f203b8a6505e062a2091a594273dca808258ff2f4539ab8414db9eabe",
+    "panel_hash_tree_sha256": "fc0adf7f8d1b9a10914dd9aa85282a42b0cd4bbe185f8b09710498b556d0f08f",
+    "firewall_lock_sha256": "79d25ac82fba1bc6332e16d8bc5f877fadd11cccaed5ef3f07eacfe5e1877da2",
+    "neighborhoods": 2000,
+    "families": {
+      "exposure_control": 500,
+      "respiratory_monitoring": 500,
+      "salinity_control": 500,
+      "vibration_monitoring": 500
+    },
+    "views_per_neighborhood": ["anchor", "fact_flip", "sham", "matched_neutral"],
+    "heldout_selected_axis_counts": {"neutral_4": 896, "neutral_5": 1104},
+    "heldout_matched_radius_gate": {
+      "mean_relative_error": 0.05411946167079232,
+      "p95_absolute_error": 0.2208999387977358,
+      "family_mean_relative_error_max": 0.08156774124596741
+    },
+    "unlock_condition": "all run-contract training seals and the complete 27-checkpoint tree validate; then perform one authorized panel unlock",
+    "other_evaluation_surfaces": []
+  },
+  "prediction_alignment": {
+    "candidate_alignment_key": "candidate_semantic_id",
+    "report_order": "canonical candidate order from the sealed panel manifest",
+    "map_tie_break": "max by probability, then lexicographically greatest candidate_semantic_id, matching the frozen v0.8I analyzer",
+    "probabilities": "four-way softmax output; no calibration, temperature fitting, or renormalization beyond the model softmax"
+  },
+  "metric_implementation_reference": {
+    "path": "experiments/jev-information-density-v08i/phase_b/analyze_phase_b.py",
+    "sha256": "892939aaa4d3bd2d7868c18d411cab7ac4f9c03aaef9f0d4a1fdaadb7d39d06a",
+    "scope": "frozen reference for direct contrast definitions and semantic candidate alignment; this contract governs v0.8N-specific aggregation and does not authorize reuse of v0.8I data or predictions"
+  },
+  "metric_definitions": {
+    "locality_per_neighborhood": {
+      "posterior_l1": "sum_c abs(P(c|anchor)-P(c|perturbation)) over aligned candidate_semantic_id values",
+      "map_flip": "1[argmax(P_anchor) != argmax(P_perturbation)]",
+      "gold_probability_movement": "P(known old/new gold candidate|perturbation)-P(same candidate|anchor)",
+      "old_new_margin_movement": "[(P_new-P_old)_perturbation-(P_new-P_old)_anchor]",
+      "margin_magnitude": "absolute value of old_new_margin_movement"
+    },
+    "fact_sensitivity_per_neighborhood": {
+      "strict_old_to_new_transition": "1[argmax(P_anchor)=certified_old and argmax(P_fact)=certified_new]",
+      "anchor_old_map": "1[argmax(P_anchor)=certified_old]",
+      "fact_new_map": "1[argmax(P_fact)=certified_new]",
+      "correct_probability_direction": "1[delta_model*delta_exact>0] when abs(delta_exact)>1e-12, otherwise 1[abs(delta_model)<=1e-12]",
+      "new_candidate_probability_delta": "P_new_fact-P_new_anchor",
+      "exact_delta_mae": "abs((P_new_fact-P_new_anchor)-(gold_new_fact-gold_new_anchor))",
+      "new_candidate_rank_gain": "rank_anchor(new)-rank_fact(new), descending probability with candidate_semantic_id tie-break"
+    },
+    "anchor_preservation": {
+      "categorical_nll": "-sum_c gold_anchor(c)*log(P_anchor(c))",
+      "multiclass_brier": "sum_c (P_anchor(c)-gold_anchor(c))^2",
+      "gold_map_accuracy": "1[argmax(P_anchor)=argmax(gold_anchor)]"
+    }
+  },
+  "estimands": {
+      "primary": {
+      "comparison": "B-SHAM-trained versus B-MATCHED-trained on heldout sham locality",
+      "locality_effect_sign": "positive favors B-SHAM; reported benefit is mean(B-MATCHED metric)-mean(B-SHAM metric) because lower locality is better",
+      "co_primary_metrics": ["mean sham posterior L1", "sham MAP-flip rate"],
+      "unit": "heldout neighborhood, paired across training arms within seed"
+    },
+    "secondary": {
+      "generic_local_support": "B-DUP versus B-MATCHED on heldout sham and matched-neutral locality",
+      "cross_perturbation_interaction": "(R[B-SHAM,S]-R[B-MATCHED,S])-(R[B-SHAM,M]-R[B-MATCHED,M]); lower locality is better; negative indicates a larger SHAM-training advantage on the sham test axis",
+      "response_matrix": "all three training arms by heldout fact_flip, matched_neutral, and sham views",
+      "anchor_preservation": "all training arms on anchor targets",
+      "family_results": "all metrics separately for the four sealed heldout families",
+      "effect_modifiers": [
+        "per-anchor radius error",
+        "cosine sham-neutral",
+        "cosine sham-fact",
+        "cosine matched-neutral-fact",
+        "raw unnormalized head-input-space distances: anchor-to-sham, anchor-to-matched, fact-to-sham, and fact-to-matched",
+        "surface/edit diagnostics: changed field identity, one-based line/token position, character span, whitespace-token count, family, and selected neutral-axis composition",
+        "family"
+      ],
+      "effect_modifier_constraints": "diagnostic only; no candidate replacement, reweighting, threshold changes, or selection based on these quantities",
+      "head_input_space": "raw float32 frozen state features actually supplied to CompatibilityHead; no pre-existing normalization, centering, scaling, or covariance transform is applied"
+    }
+  },
+  "sensitivity_guard_and_claim_rules": {
+    "fact_sensitivity_metric": "strict_old_to_new_transition_rate",
+    "absolute_sensitivity_floor": {
+      "applies_to_arms": ["B-MATCHED", "B-SHAM"],
+      "minimum_per_seed": 0.37,
+      "aggregation": "overall rate across all 2000 heldout neighborhoods for each arm and seed",
+      "rule": "both arms must meet or exceed the floor in every seed before locality differences can support a localized-control claim; otherwise locality is descriptive and the experiment is classified as sensitivity-insufficient",
+      "historical_basis": "lowest terminal K-DUP strict-transition rate across its three seeds",
+      "historical_source": "D:/codex-runs/jev-information-density-v08k/phase-b-v01/reports/k-attribution-summary.json",
+      "historical_source_sha256": "acd86b65aaf3e349e24079a46b9aad865d4df0fd4b867b70b14d600029b45463"
+    },
+    "maximum_mean_loss_vs_matched": 0.05,
+    "localized_radius_control_support": "absolute_sensitivity_floor passes for B-MATCHED and B-SHAM; both co-primary locality metrics favor B-SHAM in all three paired seeds; and mean strict transition B-SHAM minus B-MATCHED is at least -0.05",
+    "near_equivalence_margins": {
+      "posterior_l1_absolute": 0.02383,
+      "map_flip_rate_absolute": 0.04513,
+      "derivation": "10 percent of the v0.8K reported SHAM-DUP effects: 0.2383 L1 and 0.4513 MAP-flip rate",
+      "historical_source_sha256": "acd86b65aaf3e349e24079a46b9aad865d4df0fd4b867b70b14d600029b45463",
+      "equivalence_rule": "describe as approximately equivalent only if each metric's 90 percent paired neighborhood-bootstrap interval is fully within its margin for all three seeds; otherwise do not claim equivalence"
+    },
+    "suppression_rule": "locality improvement with either arm below the absolute sensitivity floor or mean strict fact-transition loss exceeding 0.05 is suppression/coupling or sensitivity-insufficient, not successful localized control",
+    "seed_heterogeneity_rule": "if either co-primary effect changes sign across seeds, report heterogeneous response and make no universal treatment claim",
+    "radius_only_interpretation_ceiling": "SHAM-MATCHED identifies an effect not reproduced by this prospectively radius-matched neutral_4/neutral_5 basis; it does not isolate semantic identity from representation direction, higher-order geometry, or the deliberately different edited field/position",
+    "matched_basis_scope": "the selected controls are prospectively radius-matched invariant perturbations from neutral_4 and neutral_5 only; they do not represent arbitrary irrelevant semantic changes",
+    "duplicate_control_scope": "B-DUP matches auxiliary event count and target weighting but repeats the anchor feature, therefore it controls supervision dose without matching novel support or gradient-correlation structure",
+    "training_effect_claim": "claims concern which auxiliary examples train the frozen-substrate decision head; they are not claims that the frozen backbone capability changed"
+  },
+  "uncertainty_and_multiplicity": {
+    "sampling_unit": "neighborhood; keep anchor, fact, sham, and matched descendants together",
+    "bootstrap": {
+      "replicates": 10000,
+      "stratification": "resample 500 neighborhoods with replacement within each of the four families",
+      "rng": "numpy.random.Generator(PCG64(20260930))",
+      "intervals": "percentile 95 percent for effects; percentile 90 percent for declared equivalence checks"
+    },
+    "seed_reporting": "show all three paired seed effects, mean, and median; bootstrap intervals are conditional on a trained seed and do not treat neighborhoods as independent optimizer replicates",
+    "pooled_seed_inference": "no population-level p-value or confidence interval from only three optimizer seeds",
+    "multiplicity": "the primary claim is an intersection requiring both co-primary metrics; family and interaction results are descriptive with intervals and no confirmatory p-values"
+  },
+  "interpretation_table": {
+    "MATCHED_approximately_SHAM_and_both_lower_locality_than_DUP": "consistent with useful local invariant support at the matched radius; not proof that radius is the mechanism",
+    "SHAM_better_than_MATCHED_with_sensitivity_preserved": "sham effect survives radius control for this selected neutral basis; radius alone is insufficient for this control basis",
+    "SHAM_better_than_MATCHED_better_than_DUP": "consistent with a generic local-support component plus a residual sham-training effect",
+    "MATCHED_at_least_as_good_as_SHAM": "the certified sham is not uniquely favored over this radius-matched control",
+    "locality_better_but_sensitivity_guard_fails": "suppression/coupling",
+    "signs_disagree_by_seed": "heterogeneous treatment response; no universal mechanism claim"
+  },
+  "reporting": {
+    "primary_endpoint": "terminal epoch 3 only",
+    "checkpoint_epochs_1_and_2": "sealed for integrity; not evaluated and not used for selection",
+    "per_arm_seed": ["sham L1", "sham MAP flips", "matched-neutral L1", "matched-neutral MAP flips", "fact strict transition", "correct direction", "delta MAE", "anchor NLL", "anchor Brier"],
+    "by_family": true,
+    "newtight": false,
+    "legacy_panels": false,
+    "composite_score": false,
+    "result_driven_tuning": false
+  },
+  "boundaries": {
+    "panel_open_before_training_seal": false,
+    "newtight_access": false,
+    "legacy_eval_access": false,
+    "temperature_fit": false,
+    "checkpoint_selection": false,
+    "metric_changes": false,
+    "candidate_reselection": false,
+    "follow_on_experiment": false,
+    "phoenix_access": false,
+    "phase_b_authorized": false
+  }
+}

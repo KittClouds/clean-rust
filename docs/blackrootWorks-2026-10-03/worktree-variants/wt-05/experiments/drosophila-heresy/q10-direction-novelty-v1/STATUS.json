@@ -1,0 +1,19 @@
+{
+  "protocol": "Q10-DN1",
+  "status": "Q10_DN1_INVALID",
+  "stage": "EXECUTION_ABORTED_BEFORE_BUNDLE_COMMIT",
+  "sample": {"seeds": [9601, 9602], "trials": [1, 64, 128, 256], "expected_events": 32},
+  "committed_bundles": 0,
+  "failure": {
+    "kind": "DIAGNOSTIC_IMPLEMENTATION_PANIC",
+    "causes": [
+      "empty per-coordinate row family reached symmetric eigendecomposition",
+      "local-effect indices were used as global row indices in one Gram update"
+    ],
+    "scientific_data_opened": false,
+    "same_identity_resume_authorized": false
+  },
+  "scientific_seed_bundles": 0,
+  "behavioral_inference": false,
+  "dh08b_authorized": false
+}

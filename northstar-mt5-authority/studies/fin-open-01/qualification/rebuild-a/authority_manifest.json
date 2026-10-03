@@ -1,0 +1,59 @@
+{
+  "authorized_session_count": 257,
+  "authorized_source_partition": "DISCOVERY",
+  "confirmation_session_count": 69,
+  "confirmation_status": "FROZEN_UNOPENED",
+  "discovery_offset_counts": {
+    "120": 99,
+    "180": 158
+  },
+  "discovery_population_sha256": "b9c44d0cb1e922e0742d5a37162b3412b9249b35bba1d10c39ceaf6158f582c2",
+  "economic_authority_inherited": false,
+  "observer_binary_sha256": "5505e033d487037a9cc5863788b067123fbf5bc3e48d4c40ddfa0fbe721ac290",
+  "observer_source_sha256": "d2c1f0614ba27289a87172dc9fa79f3b018cace73ebd5829afaf100aed406034",
+  "parent_study_id": "OBS-OPEN-01",
+  "qualified_server_offset_minutes": [
+    120,
+    180
+  ],
+  "range_oracle_sha256": "aca712b1556476f915a4fb2b5530563b4e0ac0490e568c1b392c23dd9414108e",
+  "schema": "FIN_OPEN_01_AUTHORITY_MANIFEST_V1",
+  "source_contract_sha256": "6aaf7e990ff01f253aee161d6fdcb81b12894c879dd29094fbf815e65055dfdd",
+  "source_files": {
+    "contracts/obs_open_01_protocol_v1.json": {
+      "bytes": 1801,
+      "sha256": "6aaf7e990ff01f253aee161d6fdcb81b12894c879dd29094fbf815e65055dfdd"
+    },
+    "qualification/parity/blackbox_parity_receipt.json": {
+      "bytes": 1686,
+      "sha256": "c725a2023a1fdbf35a79446c1173bc15893e6edf9337b0cbfd03abe9c9bb1be7"
+    },
+    "qualification/parity/opening_range_oracle_receipt.json": {
+      "bytes": 376,
+      "sha256": "c975577f8697098e243c321bde69db92847f9b3753f56f167e8a46f8e611b1dc"
+    },
+    "qualification/universe/clock/clock_transport_receipt.json": {
+      "bytes": 690,
+      "sha256": "d6fcb0dc95dbbf963acd274cda2e754eca9dca4c0b843b08df2ffdfd69d53d15"
+    },
+    "qualification/universe/seal/universe_qualification_root_receipt.json": {
+      "bytes": 583,
+      "sha256": "ffa428bc24d3c0c2e7ad1d6b38f02b9db5d91a7ffbc1b717d57968b614c85fb8"
+    },
+    "qualification/universe/universe/admitted_sessions.tsv": {
+      "bytes": 20562,
+      "sha256": "76241a1a5ab0657e50d52be58fd45222574fd083db3ac3037da6b00b6764bf7d"
+    },
+    "qualification/universe/universe/partition_manifest.tsv": {
+      "bytes": 20562,
+      "sha256": "76241a1a5ab0657e50d52be58fd45222574fd083db3ac3037da6b00b6764bf7d"
+    },
+    "qualification/universe/universe/universe_qualification_receipt.json": {
+      "bytes": 1571,
+      "sha256": "8ce0abd400f961a5bfc96a5197b48468938bd931aa444be0c6a94fd2dabdd527"
+    }
+  },
+  "substantive_observer_outputs_read": false,
+  "trading_authority_inherited": false,
+  "universe_qualification_root_sha256": "6b0ca197a394b085707d03dfe06f1569eb0fafbddb2d583817e88647df6f6235"
+}

@@ -1,0 +1,16 @@
+{
+  "all_factorial_cells_process_same_distractors": true,
+  "autodiff": false,
+  "complete": true,
+  "config": "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\dh03\\artifacts\\verification\\20260912T042145Z\\observer_on\\config.json",
+  "intervention_factors": [
+    "interval_eligibility",
+    "interval_state"
+  ],
+  "learning_rule_search": false,
+  "observer_feeds_learner": false,
+  "outcome_rows": 12,
+  "protocol": "DH-03",
+  "threads": 1,
+  "wall_seconds": 0.6101916
+}

@@ -1,0 +1,70 @@
+{
+  "error": "Stage B predictor domain mismatch; frozen loader required every block ID to have at least one row",
+  "error_class": "predictor block-domain validation rejected absent zero-row task block",
+  "expected_empty_block_semantics": "Empty blocks are valid cells; their IDs may be absent from row-key streams. Any observed block outside the frozen 24-ID domain remains invalid.",
+  "files": [
+    {
+      "byte_length": 36345,
+      "path": "experiments/fly-reach-03/frozen-fabrique/F4-BINDING-01-STAGE-B-v0.1/IMPLEMENTATION-FREEZE.json",
+      "sha256": "9469ac8b9ef7e0db530ec2febae15cf17677bd58c476886593b12e5a8d0da37b"
+    },
+    {
+      "byte_length": 44290,
+      "path": "experiments/fly-reach-03/frozen-fabrique/F4-BINDING-01-STAGE-B-v0.1/MODEL-REGISTRY.json",
+      "sha256": "8d936560fdf442e69e724f5bdf2898fad3a3b624f116ac385aca8a5b7d637713"
+    },
+    {
+      "byte_length": 14928,
+      "path": "experiments/fly-reach-03/frozen-fabrique/F4-BINDING-01-STAGE-B-v0.1/SOURCE-INPUT-MANIFEST.json",
+      "sha256": "461a959b099ad7cb555d6cfa5dfdc66c191f3ffcdadc79f874801abe36079752"
+    },
+    {
+      "byte_length": 29536,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/task-bank/TASK-SEED-MANIFEST.json",
+      "sha256": "42469f7872f8362456e6988e4f07453e211adae609f1bc393eadd5fe1ebe8ec3"
+    },
+    {
+      "byte_length": 16851,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/task-bank/TASK-BANK-MANIFEST.json",
+      "sha256": "9ed34090f909292cb67cd2ea59c6d43d2bf53899511284e08977dda7111e3bdd"
+    },
+    {
+      "byte_length": 39084919,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/task-bank/training.json",
+      "sha256": "8cac76b0618caaecca501e308eb9ffffe26d30c3980037385562fb53ed7c8188"
+    },
+    {
+      "byte_length": 15937916,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/native-collection/RAW-PREDICTORS.bin",
+      "sha256": "e3084483f7438298abe14bc09a16d243f9aa68c2622fa62e59d94d048c5817e8"
+    },
+    {
+      "byte_length": 1817510,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/native-collection/RAW-SCORING-TRUTH.bin",
+      "sha256": "3e382caa8bfc5b993cc0c4ec10fdf2d54e40bb3b912c6c9f670f004c794c099a"
+    },
+    {
+      "byte_length": 96562,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/native-collection/NATIVE-COLLECTION-RECEIPT.json",
+      "sha256": "394b2a5bc662dc96e884113f52bba5891667d3743d643053c4809ec230b19a1b"
+    },
+    {
+      "byte_length": 57230,
+      "path": "experiments/fly-reach-03/runs/F4-BINDING-01-STAGE-B-PROSP-v0.1/COLLECTION-INTEGRITY-RECEIPT.json",
+      "sha256": "62ca3409dbeb6adfd401bf8dfaf3564eeeeb469b10257413e9270b155aea5a34"
+    },
+    {
+      "byte_length": 11462,
+      "path": "experiments/fly-reach-03/frozen-fabrique/F4-BINDING-01-STAGE-B-v0.1/run_stage_b_inference.py",
+      "sha256": "c8e4440840b53e0417d95839e48b3e17db4773a187edad066bd6df2f8aabcd42"
+    }
+  ],
+  "identity": "F4-BINDING-01-STAGE-B-PROSP-v0.1",
+  "model_inference_started": false,
+  "prediction_outputs_created": false,
+  "schema": "F4-BINDING-01-stage-b-inference-start-stop-v0.1",
+  "stage": "inference startup",
+  "status": "STOP_BEFORE_PREDICTION_OUTPUT",
+  "task_bank_and_collection_preserved": true,
+  "truth_values_opened": false
+}

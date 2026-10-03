@@ -1,0 +1,56 @@
+{
+  "protocol": "DH-07R",
+  "status": "QUALIFIED_FOR_SINGLE_MEASURED_EXECUTION",
+  "fresh_measured_seeds_used": 0,
+  "constructor_qualification": {
+    "protocol": "Q07-BoundedNull-v1",
+    "artifact": "../q07-bounded-null-v1/artifacts/20260915T215754Z",
+    "closed_loop_runs": 48,
+    "closed_loop_events": 12288,
+    "development_events": 8192,
+    "holdout_events": 4096,
+    "failures": 0,
+    "measured_seeds_used": 0,
+    "maximum_residual_abs_cosine": 2.396809552802721e-08,
+    "maximum_axial_error_over_total_norm": 3.076246580247497e-08,
+    "maximum_norm_relative_error": 1.891370027309842e-08,
+    "maximum_residual_norm_relative_error": 1.892242356500732e-08,
+    "boundary_membership_exact": true,
+    "outside_support_changes": 0,
+    "hot_loop_allocations": 0
+  },
+  "exact_orchestration_smoke": {
+    "seed": 9006,
+    "side": "R",
+    "tau": 4.0,
+    "result_cells": 16,
+    "null_events": 512,
+    "all_manipulations_passed": true,
+    "fresh_measured_seeds_used": 0,
+    "summary": "qualification/integration-smoke-summary.json"
+  },
+  "rust": {
+    "tests_passed": 52,
+    "tests_failed": 0,
+    "tests_ignored": 9,
+    "clippy_warnings_denied": true,
+    "release_build_passed": true,
+    "synthetic_low_dimensional_gate_edge": "A fixture event exceeded the axial gate by 3.29936342071515e-9 over its limit; the policy failed closed deterministically. The frozen gate was not relaxed."
+  },
+  "analysis": {
+    "tests_passed": 7,
+    "tests_failed": 0,
+    "interpreter": "../dh06/.dh06-venv/Scripts/python.exe",
+    "python": "3.13.15",
+    "numpy": "2.3.3",
+    "resamples": 20000,
+    "gate_failures_are_fail_closed": true,
+    "svg_plot_smoke_passed": true
+  },
+  "lineage": {
+    "dh06_seal_sha256": "f0c2a67db5a91cb54da04311cb442819a14de97bb3328a4a889af3627566a624",
+    "q07_qualification_seal_sha256": "db08125d2041865f91d8d443fc8a2fad795c7e5b499cda352ffd29cc081de688",
+    "blocked_dh07_measured_seed_bundles": 0,
+    "dh06_clamp_audit_is_post_hoc_descriptive": true
+  }
+}

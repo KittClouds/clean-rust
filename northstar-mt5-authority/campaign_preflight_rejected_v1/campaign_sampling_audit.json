@@ -1,0 +1,306 @@
+﻿{
+    "contract":  "MST_CAMPAIGN_SAMPLING_FRAME_V1",
+    "campaign_id":  "RG2_SIX_INDEX_ENVIRONMENT_FRAME_V1",
+    "status":  "PASS",
+    "research_generation":  2,
+    "production_windows":  54,
+    "instruments":  6,
+    "windows_per_instrument":  9,
+    "exact_duplicate_keys":  0,
+    "overlapping_production_windows":  0,
+    "production_holdout_overlaps":  0,
+    "holdout_windows":  12,
+    "holdout_profile_leaks":  0,
+    "common_windows":  12,
+    "sparse_windows":  30,
+    "directional_windows":  12,
+    "minimum_calendar_separation_days":  9,
+    "manifest_sha256":  "4012ebff1b744ff6121f43ef2184fdfa973a9aacb1a78f1712bf3c795ad2415e",
+    "daily_profile_sha256":  "5bfe9926477ad7fa3930ba6a63962a368badd4d5110ed235f46d158179857013",
+    "calendar_profile_sha256":  "7a12bf19eb82f6a2924fa1d32e504c2c269ed0f30a69482a1ddc4aa3c155c714",
+    "holdout_reservations_sha256":  "a1d32de22a3e4dfa0b315fcb77eca923a2d517e1f76d666eebe4939d9e410777",
+    "selection_details":  {
+                              "US30":  [
+                                           {
+                                               "environment":  "DIRECTIONAL_EXPANSION_UP",
+                                               "start":  "2025-11-24",
+                                               "evidence":  "net_relative=0.031635;range_relative=0.035759;realized_volatility=0.015203;efficiency=0.114334;reversal_score=0.034537;events=73;event_score=118;high_events=8;bars=1036"
+                                           },
+                                           {
+                                               "environment":  "DIRECTIONAL_EXPANSION_DOWN",
+                                               "start":  "2026-03-02",
+                                               "evidence":  "net_relative=-0.020931;range_relative=0.043106;realized_volatility=0.025916;efficiency=0.031310;reversal_score=0.033148;events=72;event_score=140;high_events=14;bars=1363"
+                                           },
+                                           {
+                                               "environment":  "PROLONGED_BALANCE",
+                                               "start":  "2026-05-25",
+                                               "evidence":  "net_relative=0.004053;range_relative=0.015821;realized_volatility=0.013236;efficiency=0.013269;reversal_score=0.013902;events=79;event_score=133;high_events=10;bars=1317"
+                                           },
+                                           {
+                                               "environment":  "HIGH_VOLATILITY",
+                                               "start":  "2026-03-23",
+                                               "evidence":  "net_relative=-0.004186;range_relative=0.042376;realized_volatility=0.043480;efficiency=0.005192;reversal_score=0.041161;events=58;event_score=89;high_events=2;bars=1380"
+                                           },
+                                           {
+                                               "environment":  "LOW_VOLATILITY",
+                                               "start":  "2025-12-22",
+                                               "evidence":  "net_relative=0.009317;range_relative=0.013563;realized_volatility=0.007610;efficiency=0.063433;reversal_score=0.011882;events=54;event_score=88;high_events=6;bars=1047"
+                                           },
+                                           {
+                                               "environment":  "SHARP_REVERSAL",
+                                               "start":  "2026-04-13",
+                                               "evidence":  "net_relative=0.042417;range_relative=0.050693;realized_volatility=0.015346;efficiency=0.124877;reversal_score=0.044683;events=65;event_score=102;high_events=5;bars=1368"
+                                           },
+                                           {
+                                               "environment":  "ORDINARY",
+                                               "start":  "2026-04-27",
+                                               "evidence":  "net_relative=0.006242;range_relative=0.031230;realized_volatility=0.016258;efficiency=0.016697;reversal_score=0.021104;events=92;event_score=166;high_events=14;bars=1368"
+                                           },
+                                           {
+                                               "environment":  "EVENT_HEAVY",
+                                               "start":  "2026-02-16",
+                                               "evidence":  "net_relative=0.001457;range_relative=0.015120;realized_volatility=0.019065;efficiency=0.003440;reversal_score=0.009658;events=104;event_score=178;high_events=10;bars=1320"
+                                           },
+                                           {
+                                               "environment":  "QUIET",
+                                               "start":  "2026-07-20",
+                                               "evidence":  "net_relative=-0.002790;range_relative=0.018756;realized_volatility=0.016611;efficiency=0.006841;reversal_score=0.010904;events=39;event_score=60;high_events=3;bars=1367"
+                                           }
+                                       ],
+                              "FRA40":  [
+                                            {
+                                                "environment":  "DIRECTIONAL_EXPANSION_UP",
+                                                "start":  "2026-03-30",
+                                                "evidence":  "net_relative=0.049553;range_relative=0.054403;realized_volatility=0.030376;efficiency=0.070638;reversal_score=0.052971;events=67;event_score=92;high_events=2;bars=1092"
+                                            },
+                                            {
+                                                "environment":  "DIRECTIONAL_EXPANSION_DOWN",
+                                                "start":  "2026-03-16",
+                                                "evidence":  "net_relative=-0.034409;range_relative=0.063614;realized_volatility=0.029786;efficiency=0.044382;reversal_score=0.057331;events=47;event_score=77;high_events=6;bars=1380"
+                                            },
+                                            {
+                                                "environment":  "PROLONGED_BALANCE",
+                                                "start":  "2025-12-01",
+                                                "evidence":  "net_relative=-0.001601;range_relative=0.014467;realized_volatility=0.015952;efficiency=0.003979;reversal_score=0.006390;events=70;event_score=107;high_events=3;bars=1380"
+                                            },
+                                            {
+                                                "environment":  "HIGH_VOLATILITY",
+                                                "start":  "2026-06-08",
+                                                "evidence":  "net_relative=0.030386;range_relative=0.039742;realized_volatility=0.029498;efficiency=0.040240;reversal_score=0.034638;events=46;event_score=78;high_events=5;bars=1380"
+                                            },
+                                            {
+                                                "environment":  "LOW_VOLATILITY",
+                                                "start":  "2026-01-05",
+                                                "evidence":  "net_relative=0.018234;range_relative=0.026256;realized_volatility=0.014438;efficiency=0.050426;reversal_score=0.025599;events=88;event_score=126;high_events=2;bars=1380"
+                                            },
+                                            {
+                                                "environment":  "SHARP_REVERSAL",
+                                                "start":  "2026-03-02",
+                                                "evidence":  "net_relative=-0.054739;range_relative=0.072136;realized_volatility=0.032514;efficiency=0.065777;reversal_score=0.058221;events=74;event_score=115;high_events=4;bars=1378"
+                                            },
+                                            {
+                                                "environment":  "ORDINARY",
+                                                "start":  "2026-06-22",
+                                                "evidence":  "net_relative=-0.007328;range_relative=0.018218;realized_volatility=0.020189;efficiency=0.013165;reversal_score=0.012660;events=48;event_score=80;high_events=3;bars=1380"
+                                            },
+                                            {
+                                                "environment":  "EVENT_HEAVY",
+                                                "start":  "2026-04-27",
+                                                "evidence":  "net_relative=-0.005354;range_relative=0.034151;realized_volatility=0.022928;efficiency=0.011790;reversal_score=0.008043;events=88;event_score=142;high_events=8;bars=1092"
+                                            },
+                                            {
+                                                "environment":  "QUIET",
+                                                "start":  "2026-07-06",
+                                                "evidence":  "net_relative=-0.019233;range_relative=0.038549;realized_volatility=0.018015;efficiency=0.043017;reversal_score=0.026398;events=35;event_score=47;high_events=1;bars=1380"
+                                            }
+                                        ],
+                              "DE40":  [
+                                           {
+                                               "environment":  "DIRECTIONAL_EXPANSION_UP",
+                                               "start":  "2026-04-13",
+                                               "evidence":  "net_relative=0.049532;range_relative=0.058880;realized_volatility=0.020474;efficiency=0.103835;reversal_score=0.050769;events=61;event_score=94;high_events=3;bars=1307"
+                                           },
+                                           {
+                                               "environment":  "DIRECTIONAL_EXPANSION_DOWN",
+                                               "start":  "2026-03-02",
+                                               "evidence":  "net_relative=-0.049549;range_relative=0.067557;realized_volatility=0.033610;efficiency=0.058520;reversal_score=0.054788;events=74;event_score=115;high_events=4;bars=1303"
+                                           },
+                                           {
+                                               "environment":  "PROLONGED_BALANCE",
+                                               "start":  "2025-12-15",
+                                               "evidence":  "net_relative=0.003012;range_relative=0.020251;realized_volatility=0.015198;efficiency=0.007284;reversal_score=0.018853;events=72;event_score=115;high_events=5;bars=1307"
+                                           },
+                                           {
+                                               "environment":  "HIGH_VOLATILITY",
+                                               "start":  "2026-03-30",
+                                               "evidence":  "net_relative=0.054695;range_relative=0.067436;realized_volatility=0.033205;efficiency=0.072090;reversal_score=0.057706;events=67;event_score=92;high_events=2;bars=1042"
+                                           },
+                                           {
+                                               "environment":  "LOW_VOLATILITY",
+                                               "start":  "2026-01-12",
+                                               "evidence":  "net_relative=0.002454;range_relative=0.012436;realized_volatility=0.012516;efficiency=0.007484;reversal_score=0.005110;events=49;event_score=65;high_events=0;bars=1304"
+                                           },
+                                           {
+                                               "environment":  "SHARP_REVERSAL",
+                                               "start":  "2026-03-16",
+                                               "evidence":  "net_relative=-0.050007;range_relative=0.079972;realized_volatility=0.032675;efficiency=0.060395;reversal_score=0.075925;events=47;event_score=77;high_events=6;bars=1365"
+                                           },
+                                           {
+                                               "environment":  "ORDINARY",
+                                               "start":  "2026-02-02",
+                                               "evidence":  "net_relative=0.013780;range_relative=0.036953;realized_volatility=0.024283;efficiency=0.021568;reversal_score=0.021862;events=61;event_score=94;high_events=6;bars=1306"
+                                           },
+                                           {
+                                               "environment":  "EVENT_HEAVY",
+                                               "start":  "2026-04-27",
+                                               "evidence":  "net_relative=0.005142;range_relative=0.031818;realized_volatility=0.019066;efficiency=0.011611;reversal_score=0.028260;events=88;event_score=142;high_events=8;bars=1055"
+                                           },
+                                           {
+                                               "environment":  "QUIET",
+                                               "start":  "2026-07-06",
+                                               "evidence":  "net_relative=-0.026695;range_relative=0.042205;realized_volatility=0.018897;efficiency=0.057392;reversal_score=0.030869;events=35;event_score=47;high_events=1;bars=1307"
+                                           }
+                                       ],
+                              "JPN225":  [
+                                             {
+                                                 "environment":  "DIRECTIONAL_EXPANSION_UP",
+                                                 "start":  "2026-05-04",
+                                                 "evidence":  "net_relative=0.070827;range_relative=0.079437;realized_volatility=0.027216;efficiency=0.095894;reversal_score=0.079302;events=8;event_score=8;high_events=0;bars=1381"
+                                             },
+                                             {
+                                                 "environment":  "DIRECTIONAL_EXPANSION_DOWN",
+                                                 "start":  "2026-07-13",
+                                                 "evidence":  "net_relative=-0.057822;range_relative=0.092840;realized_volatility=0.049902;efficiency=0.046189;reversal_score=0.060520;events=9;event_score=12;high_events=0;bars=1379"
+                                             },
+                                             {
+                                                 "environment":  "PROLONGED_BALANCE",
+                                                 "start":  "2026-01-12",
+                                                 "evidence":  "net_relative=0.002072;range_relative=0.019838;realized_volatility=0.026090;efficiency=0.003057;reversal_score=0.004068;events=15;event_score=21;high_events=1;bars=1378"
+                                             },
+                                             {
+                                                 "environment":  "HIGH_VOLATILITY",
+                                                 "start":  "2026-03-23",
+                                                 "evidence":  "net_relative=0.013761;range_relative=0.073747;realized_volatility=0.072268;efficiency=0.008976;reversal_score=0.017620;events=15;event_score=21;high_events=0;bars=1379"
+                                             },
+                                             {
+                                                 "environment":  "LOW_VOLATILITY",
+                                                 "start":  "2025-12-01",
+                                                 "evidence":  "net_relative=0.006642;range_relative=0.039753;realized_volatility=0.024656;efficiency=0.010629;reversal_score=0.031123;events=19;event_score=26;high_events=0;bars=1380"
+                                             },
+                                             {
+                                                 "environment":  "SHARP_REVERSAL",
+                                                 "start":  "2026-04-06",
+                                                 "evidence":  "net_relative=0.080790;range_relative=0.089796;realized_volatility=0.041484;efficiency=0.076287;reversal_score=0.089419;events=20;event_score=25;high_events=0;bars=1379"
+                                             },
+                                             {
+                                                 "environment":  "ORDINARY",
+                                                 "start":  "2026-05-18",
+                                                 "evidence":  "net_relative=0.025808;range_relative=0.072298;realized_volatility=0.039098;efficiency=0.025371;reversal_score=0.063587;events=23;event_score=37;high_events=1;bars=1378"
+                                             },
+                                             {
+                                                 "environment":  "EVENT_HEAVY",
+                                                 "start":  "2025-12-15",
+                                                 "evidence":  "net_relative=0.003866;range_relative=0.035714;realized_volatility=0.027922;efficiency=0.005544;reversal_score=0.034139;events=29;event_score=49;high_events=2;bars=1381"
+                                             },
+                                             {
+                                                 "environment":  "QUIET",
+                                                 "start":  "2025-12-29",
+                                                 "evidence":  "net_relative=0.007332;range_relative=0.021938;realized_volatility=0.017434;efficiency=0.019388;reversal_score=0.018015;events=2;event_score=4;high_events=0;bars=1104"
+                                             }
+                                         ],
+                              "US500":  [
+                                            {
+                                                "environment":  "DIRECTIONAL_EXPANSION_UP",
+                                                "start":  "2025-11-24",
+                                                "evidence":  "net_relative=0.031623;range_relative=0.036522;realized_volatility=0.015513;efficiency=0.106185;reversal_score=0.035467;events=73;event_score=118;high_events=8;bars=1044"
+                                            },
+                                            {
+                                                "environment":  "DIRECTIONAL_EXPANSION_DOWN",
+                                                "start":  "2026-06-01",
+                                                "evidence":  "net_relative=-0.025750;range_relative=0.033450;realized_volatility=0.014172;efficiency=0.073963;reversal_score=0.030641;events=66;event_score=131;high_events=14;bars=1368"
+                                            },
+                                            {
+                                                "environment":  "PROLONGED_BALANCE",
+                                                "start":  "2026-01-12",
+                                                "evidence":  "net_relative=-0.003189;range_relative=0.016129;realized_volatility=0.013805;efficiency=0.009797;reversal_score=0.008287;events=91;event_score=167;high_events=15;bars=1365"
+                                            },
+                                            {
+                                                "environment":  "HIGH_VOLATILITY",
+                                                "start":  "2026-03-23",
+                                                "evidence":  "net_relative=-0.017975;range_relative=0.054821;realized_volatility=0.045470;efficiency=0.021995;reversal_score=0.053168;events=58;event_score=89;high_events=2;bars=1379"
+                                            },
+                                            {
+                                                "environment":  "LOW_VOLATILITY",
+                                                "start":  "2025-12-22",
+                                                "evidence":  "net_relative=0.011263;range_relative=0.014269;realized_volatility=0.006485;efficiency=0.084243;reversal_score=0.012416;events=54;event_score=88;high_events=6;bars=1047"
+                                            },
+                                            {
+                                                "environment":  "SHARP_REVERSAL",
+                                                "start":  "2026-04-13",
+                                                "evidence":  "net_relative=0.057552;range_relative=0.062418;realized_volatility=0.013607;efficiency=0.173744;reversal_score=0.058858;events=65;event_score=102;high_events=5;bars=1368"
+                                            },
+                                            {
+                                                "environment":  "ORDINARY",
+                                                "start":  "2026-01-26",
+                                                "evidence":  "net_relative=0.011796;range_relative=0.023738;realized_volatility=0.017726;efficiency=0.027654;reversal_score=0.012831;events=71;event_score=117;high_events=8;bars=1368"
+                                            },
+                                            {
+                                                "environment":  "EVENT_HEAVY",
+                                                "start":  "2026-02-16",
+                                                "evidence":  "net_relative=0.009702;range_relative=0.020530;realized_volatility=0.020770;efficiency=0.019987;reversal_score=0.019726;events=104;event_score=178;high_events=10;bars=1320"
+                                            },
+                                            {
+                                                "environment":  "QUIET",
+                                                "start":  "2026-07-20",
+                                                "evidence":  "net_relative=-0.005674;range_relative=0.020162;realized_volatility=0.017342;efficiency=0.012617;reversal_score=0.015212;events=39;event_score=60;high_events=3;bars=1367"
+                                            }
+                                        ],
+                              "USTEC":  [
+                                            {
+                                                "environment":  "DIRECTIONAL_EXPANSION_UP",
+                                                "start":  "2026-05-04",
+                                                "evidence":  "net_relative=0.051488;range_relative=0.062066;realized_volatility=0.021040;efficiency=0.096882;reversal_score=0.062048;events=76;event_score=144;high_events=12;bars=1368"
+                                            },
+                                            {
+                                                "environment":  "DIRECTIONAL_EXPANSION_DOWN",
+                                                "start":  "2026-06-01",
+                                                "evidence":  "net_relative=-0.046694;range_relative=0.060556;realized_volatility=0.024656;efficiency=0.075692;reversal_score=0.059236;events=66;event_score=131;high_events=14;bars=1368"
+                                            },
+                                            {
+                                                "environment":  "PROLONGED_BALANCE",
+                                                "start":  "2026-01-05",
+                                                "evidence":  "net_relative=0.020053;range_relative=0.023400;realized_volatility=0.017181;efficiency=0.049167;reversal_score=0.021150;events=89;event_score=161;high_events=12;bars=1368"
+                                            },
+                                            {
+                                                "environment":  "HIGH_VOLATILITY",
+                                                "start":  "2026-03-23",
+                                                "evidence":  "net_relative=-0.028178;range_relative=0.063388;realized_volatility=0.048355;efficiency=0.030243;reversal_score=0.062571;events=58;event_score=89;high_events=2;bars=1376"
+                                            },
+                                            {
+                                                "environment":  "LOW_VOLATILITY",
+                                                "start":  "2025-12-22",
+                                                "evidence":  "net_relative=0.008879;range_relative=0.013285;realized_volatility=0.009292;efficiency=0.048363;reversal_score=0.010614;events=54;event_score=88;high_events=6;bars=1047"
+                                            },
+                                            {
+                                                "environment":  "SHARP_REVERSAL",
+                                                "start":  "2026-04-13",
+                                                "evidence":  "net_relative=0.074531;range_relative=0.079124;realized_volatility=0.018168;efficiency=0.163495;reversal_score=0.076981;events=65;event_score=102;high_events=5;bars=1368"
+                                            },
+                                            {
+                                                "environment":  "ORDINARY",
+                                                "start":  "2026-06-29",
+                                                "evidence":  "net_relative=0.021808;range_relative=0.046059;realized_volatility=0.031556;efficiency=0.028531;reversal_score=0.023086;events=53;event_score=101;high_events=12;bars=1319"
+                                            },
+                                            {
+                                                "environment":  "EVENT_HEAVY",
+                                                "start":  "2026-02-16",
+                                                "evidence":  "net_relative=0.010197;range_relative=0.028175;realized_volatility=0.028155;efficiency=0.015553;reversal_score=0.025619;events=104;event_score=178;high_events=10;bars=1320"
+                                            },
+                                            {
+                                                "environment":  "QUIET",
+                                                "start":  "2026-07-20",
+                                                "evidence":  "net_relative=-0.017414;range_relative=0.039761;realized_volatility=0.030297;efficiency=0.021810;reversal_score=0.037297;events=39;event_score=60;high_events=3;bars=1367"
+                                            }
+                                        ]
+                          }
+}

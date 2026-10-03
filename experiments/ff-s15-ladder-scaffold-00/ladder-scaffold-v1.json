@@ -1,0 +1,216 @@
+{
+  "schema": "ff-s15-ladder-scaffold-v1",
+  "status": "SCAFFOLD_FROZEN",
+  "version": "0.1",
+  "date": "2026-09-30",
+  "experiment": "FF-S15-LADDER-SCAFFOLD-00",
+  "scope": "MEASUREMENT_GRAMMAR_ONLY",
+
+  "freezes": [
+    "capability_axes", "per_cell_provenance_requirement", "scale_and_family_identity",
+    "five_stages", "response_vector_schema", "no_composite_score_rule",
+    "residual_family_identity", "interface_declaration_requirement",
+    "graduation_predicate_structure", "data_axis_as_N_coverage_M_I"
+  ],
+  "does_not_freeze": [
+    "capability_cells", "target_membership", "target_weights",
+    "thresholds_tied_to_v2_semantics", "which_interventions_each_rung_must_run",
+    "reliability_floors_per_capability", "axis_measurement_predicates"
+  ],
+
+  "governing_lesson": "persistent residual != substrate limit, until the interface family has actually flattened on the current rung's current task",
+
+  "jev_v0_4_gate_a_scope": {
+    "receipt": "D:/codex-runs/jev-frozen-saturation-v04/reports/qlora-final-gate.json",
+    "status": "EVALUATED_UNAUTHORIZED",
+    "minicpm5_1b_base": {"A": "FAIL", "B": "PASS", "C": "PASS", "D": "PASS", "E": "PASS", "F": "PASS", "authorized": false},
+    "also_A_fail": ["qwen3-0.6b-base", "k2-horizon-0.9b"],
+    "ESTABLISHES": "on that semantic-stress program, with that target family, readout family and evaluation contract, the best reasonable frozen interfaces had not been shown to flatten; adaptation was unauthorized THERE",
+    "DOES_NOT_ESTABLISH": [
+      "that any substrate had reached a substrate limit",
+      "that any System 1.5 model-level intervention is unauthorized",
+      "anything about the causal Lexi lane, the Lepori lane, or any other task or readout family"
+    ],
+    "carried_forward_as": "a METHOD (the A-F ledger and its named controls), not a VERDICT about substrates",
+    "anti_pattern": "a good gate must not become a universal traffic cop"
+  },
+
+  "lane_specificity_corrections": [
+    {
+      "previously_stated": "recurrence got a clean negative",
+      "corrected": "encoder recurrence failed badly; causal recurrence produced a modest useful gain",
+      "why": "different tasks, different interfaces, different experiments; the encoder result is a clean negative for that encoder lane only"
+    },
+    {
+      "previously_stated": "MOVE is 0.0000 in two independent lanes as a general program finding",
+      "corrected": "MOVE was dead in the failed encoder-recurrence lane; the causal Lexi lane has MOVE far above that",
+      "located_evidence": "phase0-semantic-interface/PHASE4A.md:65 records MOVE 0.0000 at every depth in the encoder lane; encoder-contrast-01/REPORT.md:146 records MOVE 0.381 in the encoder lane",
+      "open_provenance_item": "L1"
+    },
+    {
+      "previously_stated": "QLoRA/micro-LoRA is unauthorized everywhere",
+      "corrected": "unauthorized on the Jev v0.4 scope only; no other scope inherits the verdict",
+      "note": "unchanged and correct on that scope"
+    }
+  ],
+
+  "open_provenance_items": [
+    {
+      "id": "L1",
+      "item": "causal-Lexi MOVE figure, stated in program memory as roughly 0.48-0.49",
+      "searched": "repository-wide and D:/codex-runs; NOT located",
+      "nearest_located_value": "encoder-contrast-01/REPORT.md:146 = 0.381 (encoder lane, not causal Lexi)",
+      "rule": "pin from the causal-Lexi run receipt before it enters any matrix cell",
+      "hard_rule": "do not record an unverified number in a matrix"
+    },
+    {
+      "id": "L2",
+      "item": "IHA has no definition in this program",
+      "evidence": "8 mentions, all qualified as 'IHA-style cross-head mixing remains unearned'; never expanded, never built, twice deferred",
+      "consequence": "any matrix cell or rung depending on IHA is unspecifiable until a separate frozen artifact defines it"
+    }
+  ],
+
+  "capability_axes": [
+    "binding", "evidence_support", "counterevidence", "missing_requirements", "conflict",
+    "composition_depth", "transition_depth", "candidate_comparison", "globalization", "nuisance_invariance"
+  ],
+  "axis_count": 10,
+  "axes_are": "structural, per-cell, never free text; measurement predicates are NOT frozen here",
+
+  "scale_and_family": {
+    "two_axes_kept_separate": {
+      "within_family_scale": "M varies, architecture and training recipe held fixed",
+      "between_family": "architecture and training history vary, M roughly matched"
+    },
+    "void_if": "a between-family comparison that has silently also varied scale",
+    "third_confound": {
+      "name": "recipe_maturity",
+      "values": ["fresh", "tuned", "tuned-extensively"],
+      "why": "a family with a long experimental trail has had more attempts at target ontology, surfaces, candidate representation, loss, curriculum and adapters; the confound must be visible rather than absorbed into 'architecture'",
+      "required_field_on_between_family_cells": "recipe_maturity"
+    },
+    "substrates_on_disk": [
+      {"id": "lfm2.5-230m-base-causal", "params": "230M", "family": "LFM", "path": "C:/phoenix-target-overgraph/lexi-h2-rebuild-20260930/inputs/lfm2.5-230m-base-9d2be55"},
+      {"id": "lfm2.5-encoder-230m", "params": "230M", "family": "LFM", "path": "D:/codex-runs/encoder-contrast-01/models/LFM2.5-Encoder-230M", "note": "bidirectional masked-LM"},
+      {"id": "lfm2.5-1.2b-base", "params": "1.2B", "family": "LFM", "path": "D:/codex-runs/jev-lfm-variable-v07/models/lfm2.5-1.2b-base"},
+      {"id": "qwen3-0.6b-base", "params": "0.6B", "family": "Qwen3", "path": "D:/codex-runs/jev-zero-training-recon-v01/models/qwen3-0.6b-base"},
+      {"id": "k2-horizon-0.9b", "params": "0.9B", "family": "K2", "path": "D:/codex-runs/jev-zero-training-recon-v01/models/k2-horizon-0.9b"},
+      {"id": "minicpm5-1b-base", "params": "1B", "family": "MiniCPM", "path": "D:/codex-runs/jev-zero-training-recon-v01/models/minicpm5-1b-base"}
+    ],
+    "ladder_reality": {
+      "only_family_with_multi_rung_pair": "LFM (230M -> 1.2B, ~5x)",
+      "no_350m_substrate": true,
+      "no_2_6b_substrate": true,
+      "minicpm_sizes_available": 1,
+      "absent_families": ["SmolLM", "OLMo", "Granite"],
+      "absent_formats": ["GGUF", "GGML", "ONNX weight graphs"],
+      "rule": "do not write matrix cells for rungs that have no pinned substrate"
+    }
+  },
+
+  "response_vector": {
+    "composite_score_permitted": false,
+    "rule_source": "docs/capability-flight-recorder-response-vector-v01.schema.json",
+    "rule_text": "no composite capability score is permitted",
+    "coordinates": {
+      "direction": "is the capability signalled in the right direction at all",
+      "gain": "how much probability or margin moved",
+      "boundary_crossing": "did it cross from inaccessible to reliable, or merely move",
+      "locality": "is the effect where it should be, against sham controls",
+      "preservation": "did prior capabilities survive the change"
+    },
+    "interpretive_rules": [
+      "direction without boundary_crossing is not competence",
+      "gain without locality is not the effect you think it is",
+      "preservation failure disqualifies a gain"
+    ],
+    "boundary_crossing_requires": "a preregistered reliability floor per capability, which is NOT frozen here because it depends on admitted targets"
+  },
+
+  "five_stages": {
+    "1_accessibility": {"question": "can the distinction be recovered at all", "failure_means": "representation/readout problem"},
+    "2_acquisition": {"question": "can training make it reliable", "failure_means": "data/curriculum problem"},
+    "3_composition": {"question": "can accessible pieces be combined", "failure_means": "architectural/composability problem"},
+    "4_operationalization": {"question": "can the state improve the final action", "failure_means": "grounding problem", "why_a_distinct_stage": "the program has replicated evidence that a good semantic state does not produce a good action"},
+    "5_robustness": {"question": "does it survive renderer, candidate reorder, schema, world-family, sibling and counterfactual shift", "failure_means": "not yet a capability"}
+  },
+
+  "data_axis": {
+    "object": "A_c(N, k; M, I)",
+    "N": "number of examples",
+    "k": "capability-axis coverage vector",
+    "M": "substrate",
+    "I": "interface",
+    "N_alone_is_not_a_data_axis": true,
+    "why": "100k examples concentrated on one easy pattern is not equivalent to 100k examples spanning support, conflict, missingness, composition, transition and nuisance invariance",
+    "plotting_rule": "acquisition curves are plotted against COVERAGE, with N as a secondary label",
+    "current_honest_state": "O1 yielded ZERO permission-cleared human roots, so acquisition curves are SYNTHETIC-ONLY until source permissions resolve; a synthetic-only curve is a real measurement but is not evidence about human-grounded data and must not be described as such",
+    "first_class_in_v3_reporting": true
+  },
+
+  "interface_budget": {
+    "declared_before_the_rung_runs": true,
+    "why": "so that 'reasonable' cannot be defined retroactively by whatever happened to be tried",
+    "ladder": [
+      {"id": "I1", "name": "linear readout"},
+      {"id": "I2", "name": "small nonlinear readout"},
+      {"id": "I3", "name": "larger reasonable nonlinear readout"},
+      {"id": "I4", "name": "high-capacity frozen-feature oracle"},
+      {"id": "I5", "name": "structured graft"},
+      {"id": "I6", "name": "task-specific recurrence, if earned on this rung"},
+      {"id": "I7", "name": "micro-LoRA / backbone adaptation", "reachable_only_after": ["I1", "I2", "I3", "I4", "I5", "I6"]}
+    ],
+    "claim_allowed_only_after": "I1-I6 are exhausted on the current rung's current task",
+    "claim_permitted_then": "this residual survived reasonable access machinery",
+    "inherits_from": "jev v0.4 gate A, generalized: the fix is a declared budget plus a named saturation predicate, not a stronger claim"
+  },
+
+  "graduation": {
+    "conditions": {
+      "1_interface_flattening": "the rung's declared interface set has flattened, via a named terminal transition plus declared controls (the rung-local analogue of Jev gate A)",
+      "2_data_diminishing_returns": "more capability-targeted data, measured on the coverage vector not the raw count, gives diminishing gains",
+      "3_replicated_residual_identity": "the same residual failure families persist across at least a few materially different interventions, quantified by family-level Jaccard overlap"
+    },
+    "all_three_required": true,
+    "scope": "on the rung's own task, within its declared interface budget",
+    "handoff_artifact": "the residual set, NOT the old benchmark",
+    "mechanism_already_exists": {
+      "source": "jev-frozen-saturation-v04",
+      "fields": ["larger_preserves_residual_family", "oracle_preserves_residual_family"],
+      "family_count": 456,
+      "measured_by": "family-level Jaccard overlap",
+      "adopted_not_invented": true
+    },
+    "anti_premature_graduation": "a rung that skipped an interface because it obviously would not help has NOT flattened; undeclared skipped interfaces are recorded as undeclared and condition 1 fails"
+  },
+
+  "residual_family_identity": {
+    "identified_by": "stable ids",
+    "compared_by": "Jaccard overlap",
+    "carried_forward_as": "the next rung's exam",
+    "never_summarized_into": "a single failure rate",
+    "why": "WHICH families persist is what distinguishes a data wall from an architecture wall from a composition wall"
+  },
+
+  "interpretation_rule": {
+    "text": "No rung failure may be reported as a substrate deficit until a RUNG-LOCAL interface saturation check exists for that rung's task",
+    "symmetry": "protects a rung from being understated and from being overstated",
+    "mini_cpm_inherits_exactly_this": true
+  },
+
+  "program_state": {
+    "ordering": [
+      "V2-0",
+      "admissible target set",
+      "capability matrix populated with valid cells only",
+      "smallest-rung accessibility/acquisition",
+      "rung-local interface saturation gate",
+      "constructive interventions I5, I6, I7 in order",
+      "graduation upward carrying the residual set"
+    ],
+    "minicpm_may_continue": "causal Phase 0/1 System 1.5 interface; not invalidated by Jev v0.4 gate A, which is scoped to a different program; inherits the interpretation rule",
+    "lexi": "remains frozen",
+    "micro_lora": "none yet - not by fiat, but because no rung has exhausted a declared interface budget on any task"
+  }
+}

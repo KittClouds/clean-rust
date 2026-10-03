@@ -1,0 +1,1 @@
+{"alpha":0.05,"formal_tests":3,"frozen_randomizations":9999,"headroom_factor":10,"maximum_p_min_allowed":0.0016666666666666668,"minimum_attainable_p":0.0001,"minimum_required_randomizations":599,"monte_carlo_decision":"WILSON_99_PERCENT_FAIL_CLOSED","schema":"OBS_OPEN_DISC02P_NUMERICAL_RESOLUTION_V1","status":"PASS","strictest_first_holm_threshold":0.016666666666666666}

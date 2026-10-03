@@ -1,0 +1,22 @@
+{
+  "source_episodes": {
+    "path": "D:\\codex-runs\\jev-frozen-scaling-v06\\synthetic-stress\\stress-episodes.jsonl",
+    "bytes": 1998007328,
+    "sha256": "96098298c5b46ffd2b866bd4162d85a76c48fc7b2bdba8b97c4806f4ac0c07ef"
+  },
+  "source_metadata": {
+    "path": "D:\\codex-runs\\jev-frozen-scaling-v06\\synthetic-stress\\stress-metadata.jsonl",
+    "bytes": 622697044,
+    "sha256": "d108d6254d8a35e1c310eb45afc4b3d3da7889aca7de98f9f2fd243ff01d204a"
+  },
+  "current_v05_train": {
+    "path": "D:\\codex-runs\\jev-frozen-scaling-v05\\banks\\s100k\\train.jsonl",
+    "bytes": 378556710,
+    "sha256": "cb737e21510848103dd5bad403e2cdb92bd11e395d1aef7619a3ead41e064843"
+  },
+  "current_v06_train": {
+    "path": "D:\\codex-runs\\jev-frozen-scaling-v06\\banks\\s250k\\train.jsonl",
+    "bytes": 946544055,
+    "sha256": "460dd2284218b12bb8f3d5154fced18876580b2d91faf9182986f05837098aa7"
+  }
+}

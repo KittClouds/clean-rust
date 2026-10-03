@@ -1,0 +1,34 @@
+{
+  "actual_v16_contract_and_map_audited": false,
+  "commands": [
+    "python -m py_compile experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/audit_e4_0_track_e_v16.py experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/test_audit_e4_0_track_e_v16.py",
+    "python experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/test_audit_e4_0_track_e_v16.py (from repository root)"
+  ],
+  "execution_authorization_conferred": false,
+  "model_tokenizer_cuda_contact": false,
+  "python_compile": "PASS",
+  "receipt_id": "E4_0_TRACK_E_V16_PREMAP_SYNTHETIC_AUDITOR_TESTS_V01",
+  "recorded_utc": "2026-09-27T05:08:24Z",
+  "schema": "FAS_E4_0_TRACK_E_SOURCE_TESTS_V16_V01",
+  "scope": "Synthetic-only independent Track E v16 auditor tests. Verifies the v06-v11 sealed ancestry inventory and omission/tamper rejection; exact v14 and v15 failed-preseal identities, including absent runtime/contact keys; canonical flattened v12-v14 amendment lineage carried into v16; corrected v07 pre-map receipt path; and source-role projection for v15, v15_v02, and v16 auditor/test files. No v16 contract/map audit, E4 labels/population, model, tokenizer, CUDA, GPU, or authorization access.",
+  "sources": [
+    {
+      "bytes": 129655,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/audit_e4_0_track_e_v16.py",
+      "sha256": "637ea26244c6de73cfdd8f918289fa1361f7b77f4e39a4ca5c2e01440a222f7d"
+    },
+    {
+      "bytes": 8376,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/test_audit_e4_0_track_e_v16.py",
+      "sha256": "42ed788051ffb716e97a9a461cdb8fdbe3610b66d8d529064a1383664e059e9d"
+    }
+  ],
+  "status": "TRACK_E_SOURCE_TESTS_PASS_V16_PREMAP_SYNTHETIC_AUDITOR",
+  "tests": {
+    "discovered": 10,
+    "failed": 0,
+    "passed": 10,
+    "skipped": 0
+  },
+  "truth_payloads_opened": false
+}

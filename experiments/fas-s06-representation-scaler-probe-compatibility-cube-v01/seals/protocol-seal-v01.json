@@ -1,0 +1,56 @@
+{
+  "analysis_execution": false,
+  "feature_extraction": false,
+  "files": [
+    {
+      "bytes": 3517,
+      "path": "contracts/analysis-contract-v01.json",
+      "sha256": "dc588a8ed57c67c5be968029fc953700c417c233e003b038b05d7bc228c087cd"
+    },
+    {
+      "bytes": 657,
+      "path": "contracts/authorization-packet-v01.json",
+      "sha256": "0667e098f36f2269e7aaafd13957818f7187e9e91fd440565403cc86d846959a"
+    },
+    {
+      "bytes": 3611,
+      "path": "contracts/parent-binding-v01.json",
+      "sha256": "5001be41c26b67211674ec51e6dd7792417e41a725648b7d8f82df1ba3785ab7"
+    },
+    {
+      "bytes": 4185,
+      "path": "S06-PROTOCOL.md",
+      "sha256": "8d3f182a34e48560ea1b815984f8a46df0f105a7aafaeb5d609d7e070a344e03"
+    },
+    {
+      "bytes": 30109,
+      "path": "scripts/s06_analyze.py",
+      "sha256": "8742896dcbfdf9b6189f1ed0214b69a7cbb507a3f8cc9bc02847e5b23b3b27b7"
+    },
+    {
+      "bytes": 10736,
+      "path": "scripts/s06_common.py",
+      "sha256": "b5ad30a8c084d9f866fb2b8a59d84bbc3e6249a283395111264afa0b946ea6cd"
+    },
+    {
+      "bytes": 3725,
+      "path": "scripts/s06_preflight.py",
+      "sha256": "a733319331d0abfe9c1f126f8735e581f16a1914598c5d2717484917e93b33eb"
+    },
+    {
+      "bytes": 1968,
+      "path": "scripts/seal_protocol.py",
+      "sha256": "7473b8e060e0870c1c1cc39167ebf949366602e11078a6aed3968eb07f8656aa"
+    },
+    {
+      "bytes": 3096,
+      "path": "scripts/test_s06_math.py",
+      "sha256": "3b90ec30796a3964371d55cca874350f51e162c6318b756914431894b18adfd0"
+    }
+  ],
+  "model_contact": false,
+  "probe_fitting": false,
+  "root_sha256": "4b4584a0b87ac47d4d2905a801b830be5b78dd5e7bdc1fdd78f7d9caf067bdd2",
+  "seal_id": "FAS_S06_PROTOCOL_SEAL_V01",
+  "status": "SEALED"
+}

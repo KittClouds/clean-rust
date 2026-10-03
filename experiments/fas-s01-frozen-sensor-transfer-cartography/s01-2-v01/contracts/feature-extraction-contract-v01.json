@@ -1,0 +1,41 @@
+{
+  "contract_id": "FASS01_FEATURE_EXTRACTION_V01",
+  "status": "PROSPECTIVE_ONLY; MODEL_CONTACT_NOT_AUTHORIZED",
+  "backbone": {
+    "model_id": "LiquidAI/LFM2.5-1.2B-Base",
+    "revision": "7453bca97ca1e67754c4035a4b4c584e1c9dd725",
+    "parameter_delta": 0
+  },
+  "tokenizer": {
+    "identity": "LiquidAI/LFM2.5-1.2B-Base tokenizer at the same pinned revision",
+    "mode": "fast tokenizer with offset_mapping; do not load the LFM model during tokenizer alignment qualification",
+    "offset_unit": "character offsets into the exact ASCII input; ASCII restriction makes byte and character offsets identical",
+    "special_tokens": "record all token IDs and offset mappings; offsets (0,0) are non-source model-visible positions and are excluded from span means",
+    "ambiguity_rejection": "For each recorded half-open source span, the union of overlapping nonspecial token offsets must cover every source character exactly once; no selected token may cross a span boundary, no gap or overlap is accepted, and the selected token positions must be nonempty. Reject the row before model forward on failure and report counts by span type and template."
+  },
+  "input": {
+    "source": "only the sealed S01-2 counterfactual-quartet corpus",
+    "views": ["A", "C", "E", "P"],
+    "input_layout": "exactly the serialized input_text bytes; tokenizer special tokens according to the pinned tokenizer; no added prompt, truncation, padding, or batching",
+    "execution": "single row, exact tokenized length, no padding, no mixed-length batches"
+  },
+  "hidden_state": "final transformer layer, frozen model, float32 serialized output; read-only forward pass",
+  "representation_views": [
+    {"id": "V0_MEAN_FULL", "rule": "arithmetic mean of final-layer hidden states at every model-visible position, including special-token positions"},
+    {"id": "V1_FINAL_POSITION", "rule": "final-layer hidden state at token position sequence_length-1"},
+    {"id": "V2_FIRST_POSITION", "rule": "final-layer hidden state at token position 0 of the exact tokenizer output, including a leading BOS token when the pinned tokenizer emits one"},
+    {"id": "V3_CONTEXT_SPAN_MEAN", "rule": "mean final-layer hidden state over the deduplicated nonspecial token positions aligned to every context-term occurrence"},
+    {"id": "V4_ENTITY_SPAN_MEAN", "rule": "mean final-layer hidden state over the deduplicated nonspecial token positions aligned to every entity-term occurrence"},
+    {"id": "V5_RELATION_SPAN_MEAN", "rule": "mean final-layer hidden state over the deduplicated nonspecial token positions aligned to every relation occurrence"},
+    {"id": "V6_FIXED_SPAN_CONCAT", "rule": "concatenate V3, V4, V5 in that order without projection or normalization"}
+  ],
+  "serialization": {
+    "base_views": "V0..V5 are 2048 float32 values per input; V6 is 6144 float32 values per input",
+    "endianness": "little-endian IEEE-754 float32",
+    "identity_fields": ["quartet_id", "event_id", "variant_id", "input_sha256", "token_ids", "token_ids_sha256", "offset_mapping", "sequence_length", "view_id", "feature_shape", "feature_sha256", "model_id", "model_revision", "feature_contract_sha256"],
+    "cache": "new S01-2-only cache with its own manifests, hashes, receipts, and seal; no parent cache reuse"
+  },
+  "determinism": "Repeat a prospectively fixed sample of 256 events, one row at a time. Token IDs, offsets, shapes, and feature bytes must match exactly; any mismatch fails closed.",
+  "forbidden": ["probe training", "online updates", "view selection", "pooling search", "layer search", "normalization search", "alternative tokenizer", "backbone writes", "FAS-00 artifact writes"],
+  "S01_2_MODEL_CONTACT_AUTHORIZED": false
+}

@@ -1,0 +1,9 @@
+{
+  "episode_id": "38dda8024f2b0e74ca5e71d54714bf9de05d4e7172583768775113f057541c40",
+  "final_step_id": 9,
+  "terminated": false,
+  "truncated": true,
+  "reason": "EPISODE_END",
+  "final_account_hash": "95b24841b850b5270c14aca2e18fd071ff268f17ad78fa977959761b22c3ba34",
+  "trajectory_root": "d4568cc09824ba3ab6a59c0ba754ea6890694a8d26f3bace67dd85a1a9fa91da"
+}

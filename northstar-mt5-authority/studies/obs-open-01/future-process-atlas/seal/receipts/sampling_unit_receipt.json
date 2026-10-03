@@ -1,0 +1,1 @@
+{"distribution_rows":156312,"law":"EVERY_DESCRIPTIVE_DISTRIBUTION_DECLARES_ITS_SAMPLING_UNIT","rows_missing_sampling_unit":0,"schema":"NORTHSTAR_DESCRIPTIVE_SAMPLING_UNIT_RECEIPT_V1","status":"PASS","views":{"ANCHOR_WEIGHTED":"equal mass per eligible causal anchor","SESSION_WEIGHTED":"equal mass per contributing session then equal mass per eligible anchor within session"}}

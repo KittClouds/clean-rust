@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "EvaluationReceipt",
+  "type": "object",
+  "properties": {
+    "aggregates": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/EvaluationAggregate"
+      }
+    },
+    "deterministic_rebuild_hash": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "episode_ids": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Digest256"
+      }
+    },
+    "evaluation_spec_id": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "receipt_id": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "schema_version": {
+      "type": "string"
+    },
+    "subject_class": {
+      "type": "string"
+    },
+    "subject_id": {
+      "$ref": "#/$defs/Digest256"
+    }
+  },
+  "required": [
+    "schema_version",
+    "evaluation_spec_id",
+    "subject_class",
+    "subject_id",
+    "episode_ids",
+    "aggregates",
+    "deterministic_rebuild_hash",
+    "receipt_id"
+  ],
+  "$defs": {
+    "Digest256": {
+      "description": "Domain-separated BLAKE3 digest",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "EvaluationAggregate": {
+      "type": "object",
+      "properties": {
+        "episode_count": {
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        },
+        "metric_id": {
+          "type": "string"
+        },
+        "value": {
+          "type": "number",
+          "format": "double"
+        }
+      },
+      "required": [
+        "metric_id",
+        "value",
+        "episode_count"
+      ]
+    }
+  }
+}

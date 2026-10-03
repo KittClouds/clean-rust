@@ -1,0 +1,12 @@
+{
+  "completed_contexts": [],
+  "engineering_only": true,
+  "error": "'canonical_mapping'",
+  "error_type": "KeyError",
+  "identity": "q10-gc1-lr1-requal1-csc1-pair-front1-v1",
+  "pair_replay_performed": false,
+  "protocol": "Q10-PAIR-FRONT1",
+  "readout_executed": false,
+  "scientific_promotion": false,
+  "status": "BLOCKED_PAIR_FRONT1"
+}

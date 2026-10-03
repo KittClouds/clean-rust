@@ -1,0 +1,223 @@
+{
+  "schema": "OBS_OPEN_EXECUTABLE_DISCOVERY_COMPLETION_V1",
+  "study_id": "OBS-OPEN-01",
+  "gate": "OBS-OPEN-02R2",
+  "parent_universe_root_sha256": "6b0ca197a394b085707d03dfe06f1569eb0fafbddb2d583817e88647df6f6235",
+  "parent_protocol_root_sha256": "141344869c5e6aba6bc7346594872efdc196cb246c834f8d510a0aad90831bb5",
+  "parent_r1_root_sha256": "dc8826042d490c5b1e868b836f4c187af8e2baedf9454d11b2be2a5a5aae3da7",
+  "parent_preflight_logical_sha256": "2e32be4387d51fb993e61c01d2b72b170fe9226e315d330f9173f0f03f7b9e25",
+  "substantive_status": "FROZEN_UNOPENED",
+  "confirmation_status": "FROZEN_UNOPENED",
+  "repair_scope": [
+    "DESCRIPTIVE_MEASUREMENT_FORMULAS_UNDEFINED",
+    "FORMAL_ESTIMAND_REGISTRY_INCOMPLETE",
+    "TEMPORAL_ROBUSTNESS_CONSTRUCTION_UNDEFINED",
+    "CONFIRMATION_ESTIMAND_EMITTER_UNDEFINED",
+    "REJECTION_LEDGER_TRANSITIONS_INCOMPLETE"
+  ],
+  "unchanged_authority": [
+    "OBSERVER",
+    "SOURCE",
+    "SESSION_UNIVERSE",
+    "DISCOVERY_CONFIRMATION_PARTITION",
+    "R01_R30",
+    "MEASUREMENT_VIEWS",
+    "SESSION_RESAMPLING_UNIT",
+    "BOOTSTRAP_2000_SEED_20260814",
+    "HOLM_BONFERRONI_ALPHA_0_05",
+    "CONFIRMATION_FIREWALL"
+  ],
+  "interaction_path": {
+    "source": "COMPLETED_M5_CANDLES",
+    "first_eligible": "bar_open>=range_freeze AND bar_close<=16:00_America/New_York",
+    "last_eligible": "latest completed M5 candle with bar_close<=16:00_America/New_York",
+    "location": {
+      "ABOVE": "close>range_high",
+      "BELOW": "close<range_low",
+      "IN_ZONE": "range_low<=close<=range_high"
+    },
+    "boundary_equality": "IN_ZONE",
+    "continuity": "successive eligible bar opens differ by exactly 300 seconds"
+  },
+  "descriptive_measurement_definitions": {
+    "range_high": "maximum M1 high over [09:30,freeze)",
+    "range_low": "minimum M1 low over [09:30,freeze)",
+    "midpoint": "(range_high+range_low)/2",
+    "width": "range_high-range_low",
+    "range_relative_close": "(close-midpoint)/(width/2); NOT_EVALUABLE_GEOMETRY when width=0",
+    "first_outside_time": "minimum eligible bar_open with location ABOVE or BELOW; NOT_APPLICABLE_NO_OUTSIDE otherwise",
+    "first_outside_side": "+1 for first ABOVE, -1 for first BELOW; NOT_APPLICABLE_NO_OUTSIDE otherwise",
+    "outside_duration": "maximum consecutive eligible outside_run bars, preserving side changes as continuous outside state",
+    "in_zone_duration": "count of eligible completed M5 candles located IN_ZONE",
+    "above_duration": "count of eligible completed M5 candles located ABOVE",
+    "below_duration": "count of eligible completed M5 candles located BELOW",
+    "return_count": "count of frozen grammar events FAILED_ABOVE, RETURNED_FROM_ABOVE, FAILED_BELOW, RETURNED_FROM_BELOW",
+    "cross_through_count": "count of frozen grammar events CROSS_ABOVE_TO_BELOW or CROSS_BELOW_TO_ABOVE",
+    "terminal_location": "location of final eligible completed M5 candle",
+    "signed_displacement": "last eligible close-first eligible close",
+    "positive_excursion": "max(close-first eligible close) over eligible path",
+    "negative_excursion": "min(close-first eligible close) over eligible path",
+    "path_length": "sum(abs(close[t]-close[t-1])) over eligible path",
+    "directional_efficiency": "signed_displacement/path_length; 0 when path_length=0",
+    "return_distance": "terminal-direction peak excursion magnitude minus abs(signed_displacement); when terminal displacement=0 use max absolute excursion",
+    "duration_bars": "eligible completed M5 candle count",
+    "duration_seconds": "last eligible bar close-first eligible bar open",
+    "adjacent_delta": "f(session,k+1)-f(session,k) for the same scalar f",
+    "classification_survival": "1 when adjacent terminal_location values are equal, 0 when unequal",
+    "state_transition": "ordered terminal_location(k)->terminal_location(k+1)",
+    "contiguous_persistence": "maximal contiguous k interval sharing the same terminal_location"
+  },
+  "formal_estimand_templates": {
+    "WIDTH_DELTA_ADJACENT": {
+      "count": 29,
+      "domain": "k=1..29",
+      "population": "FROZEN_DISCOVERY_257",
+      "session_value": "width(k+1)-width(k)",
+      "eligibility_denominator": "sessions with ELIGIBLE geometry at both k and k+1",
+      "availability_rules": "exclude typed unavailable/censored geometry; retain counts",
+      "functional": "arithmetic mean of eligible session values",
+      "natural_null": 0,
+      "representation": "OBSOPEN02_GEOMETRY_RAW_V1",
+      "candidate_class": "SCALE_DEPENDENT_STRUCTURE"
+    },
+    "FIRST_OUTSIDE_SIDE_BALANCE": {
+      "count": 30,
+      "domain": "k=1..30",
+      "population": "FROZEN_DISCOVERY_257",
+      "session_value": "+1 ABOVE, -1 BELOW",
+      "eligibility_denominator": "sessions with at least one eligible outside close",
+      "availability_rules": "no outside close is NOT_APPLICABLE_NO_OUTSIDE and excluded from denominator",
+      "functional": "arithmetic mean of eligible signed sides",
+      "natural_null": 0,
+      "representation": "OBSOPEN02_INTERACTION_SEQUENCE_V1",
+      "candidate_class": "RECURRING_STRUCTURE"
+    },
+    "LOCATION_BALANCE": {
+      "count": 30,
+      "domain": "k=1..30",
+      "population": "FROZEN_DISCOVERY_257",
+      "session_value": "(above_duration-below_duration)/duration_bars",
+      "eligibility_denominator": "sessions with at least one eligible M5 candle",
+      "availability_rules": "zero eligible candles is NOT_EVALUABLE and excluded",
+      "functional": "arithmetic mean of eligible session balances",
+      "natural_null": 0,
+      "representation": "OBSOPEN02_INTERACTION_SEQUENCE_V1",
+      "candidate_class": "RECURRING_STRUCTURE"
+    },
+    "SIGNED_PATH_DISPLACEMENT": {
+      "count": 30,
+      "domain": "k=1..30",
+      "population": "FROZEN_DISCOVERY_257",
+      "session_value": "last eligible close-first eligible close",
+      "eligibility_denominator": "sessions with at least two eligible M5 candles",
+      "availability_rules": "shorter paths are NOT_EVALUABLE and excluded",
+      "functional": "arithmetic mean of eligible session displacements",
+      "natural_null": 0,
+      "representation": "OBSOPEN02_CONTINUOUS_PATH_V1",
+      "candidate_class": "RECURRING_STRUCTURE"
+    }
+  },
+  "temporal_views": {
+    "CALENDAR_MONTH": {
+      "construction": "group by civil_date YYYY-MM",
+      "minimum_eligible_sessions": 10
+    },
+    "SERVER_OFFSET_REGIME": {
+      "construction": "group by frozen server_offset_minutes in {120,180}",
+      "minimum_eligible_sessions": 20,
+      "required_groups": [120, 180]
+    },
+    "LEAVE_ONE_SUPPORTED_MONTH_OUT": {
+      "construction": "for each supported month, remove that month from the aggregate discovery population",
+      "minimum_remaining_eligible_sessions": 129,
+      "minimum_remaining_supported_months": 3,
+      "minimum_remaining_offset_sessions_each": 20
+    },
+    "CHRONOLOGICAL_BLOCK": {
+      "construction": "sort eligible sessions by civil_date then assign block=floor(4*zero_based_index/N)",
+      "block_count": 4,
+      "minimum_eligible_sessions_per_block": 33
+    },
+    "status": {
+      "TEMPORALLY_SUPPORTED": "all required supported slice estimates are nonzero and share aggregate sign",
+      "TEMPORALLY_UNSTABLE": "at least two required supported slices have nonzero sign opposite aggregate",
+      "TEMPORAL_SUPPORT_INSUFFICIENT": "any required slice fails its typed support floor or has exactly zero estimate",
+      "slice_significance_required": false
+    }
+  },
+  "formal_decision": {
+    "bootstrap_unit": "SESSION",
+    "bootstrap_resamples": 2000,
+    "bootstrap_seed": 20260814,
+    "raw_p": "two-sided bootstrap tail probability with plus-one correction",
+    "multiplicity": "single 119-test Holm-Bonferroni family",
+    "alpha": 0.05
+  },
+  "rejection_transition_precedence": [
+    {"when": "availability fails", "class": "NOT_EVALUABLE", "reason": "NOT_EVALUABLE"},
+    {"when": "eligible support fails", "class": "INSUFFICIENT_SUPPORT", "reason": "INSUFFICIENT_ELIGIBLE_SUPPORT"},
+    {"when": "temporal construction support fails", "class": "INSUFFICIENT_SUPPORT", "reason": "INSUFFICIENT_TEMPORAL_SUPPORT"},
+    {"when": "raw_p>0.05", "class": "DESCRIPTIVE_ONLY", "reason": "FAILS_UNADJUSTED_EVIDENCE"},
+    {"when": "raw_p<=0.05 and Holm fails", "class": "DESCRIPTIVE_ONLY", "reason": "FAILS_FAMILYWISE_CORRECTION"},
+    {"when": "Holm passes and temporal status unstable", "class": "TEMPORALLY_UNSTABLE_STRUCTURE", "reason": "TEMPORALLY_UNSTABLE"},
+    {"when": "Holm passes and temporal status supported and template WIDTH_DELTA_ADJACENT", "class": "SCALE_DEPENDENT_STRUCTURE", "reason": null},
+    {"when": "Holm passes and temporal status supported and other formal template", "class": "RECURRING_STRUCTURE", "reason": null}
+  ],
+  "disabled_formal_classes": {
+    "SCALE_STABLE_STRUCTURE": "NO_PREDECLARED_REGION_ESTIMAND",
+    "REPRESENTATION_SENSITIVE_STRUCTURE": "NO_PAIRED_CROSS_VIEW_ESTIMAND",
+    "CONDITIONAL_STRUCTURE": "NO_PREDECLARED_CONDITIONAL_ESTIMAND",
+    "SUPPORTED_NULL_OR_NEAR_NULL": "NO_PREDECLARED_EQUIVALENCE_REGION"
+  },
+  "confirmation_emitter": {
+    "schema": "OBS_OPEN_FUTURE_CONFIRMATION_ESTIMAND_V1",
+    "copy_fields": [
+      "candidate_id",
+      "estimand_id",
+      "template_id",
+      "range_k",
+      "adjacent_to_k",
+      "representation",
+      "session_value_definition",
+      "eligibility_definition",
+      "natural_null",
+      "discovery_effect_sign"
+    ],
+    "population": "FROZEN_CONFIRMATION_69",
+    "effect_functional": "same arithmetic mean as discovery",
+    "bootstrap_unit": "SESSION",
+    "bootstrap_resamples": 2000,
+    "bootstrap_seed": 20260814,
+    "decision": "two-sided raw_p<=0.05 AND estimate sign equals frozen discovery sign",
+    "multiplicity": "Holm-Bonferroni alpha 0.05 across the frozen promoted-candidate registry",
+    "minimum_eligible_sessions": 35,
+    "minimum_supported_months": 2,
+    "minimum_sessions_per_supported_month": 10,
+    "require_both_offset_regimes": true,
+    "minimum_sessions_per_offset_regime": 10,
+    "equivalence_region": null,
+    "discovery_reselection": false
+  },
+  "data_quality": {
+    "scope": "DISCOVERY_SOURCE_ONLY_OUTCOME_BLIND",
+    "raw_authority": "D_DRIVE_LOCAL_ONLY",
+    "confirmation_rows_read": false,
+    "checks": [
+      "PREFIX_ROW_BOUNDARY",
+      "SCHEMA",
+      "TIMESTAMP_PARSE",
+      "TIMESTAMP_ALIGNMENT",
+      "MONOTONICITY",
+      "DUPLICATES",
+      "FINITE_POSITIVE_PRICES",
+      "OHLC_ORDER",
+      "NONNEGATIVE_VOLUME_AND_SPREAD",
+      "SESSION_M1_30_OF_30",
+      "SESSION_M5_79_OF_79",
+      "M1_TO_M5_OHLC_PARITY"
+    ],
+    "m1_to_m5_parity_missing_underlying": "PARITY_NOT_EVALUABLE when missing M1 is outside the authoritative 30-minute opening construction interval; not an observer coverage failure"
+  },
+  "economic_authority": false,
+  "trading_authority": false
+}

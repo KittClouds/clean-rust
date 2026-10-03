@@ -1,0 +1,17 @@
+{
+  "schema": "F4-PRESENTATION-02-analysis-stop-receipt-v0.1",
+  "identity": "F4-PRESENTATION-02-CPHI-ENG1-V2",
+  "status": "ANALYSIS_STOP_AFTER_TRUTH_ACCESS_BEFORE_COMPARATIVE_OUTPUT",
+  "error": "Training trace CSV encodes epoch as a decimal-form string such as 1.0; analysis attempted int(\"1.0\") and stopped.",
+  "truth_opened_by_failed_attempt": true,
+  "comparative_result_produced": false,
+  "analysis_json_created": false,
+  "fit_count": 36,
+  "prediction_tree_sha256": "0acb385fc1136310b8841cf06ed20f29b22b9cc9e173caebc52303b4cf0ff9af",
+  "fit_receipt_tree_sha256": "a9ec95b5935824a3c910691cfae425b1dc2d7474c9cf3f64cc6683bdcb96dd62",
+  "prediction_lock_sha256": "98c2c3e369d5ccbb9e3c0fa4878b3c100e9a6ede3ab296ce87ec1b69323eec5d",
+  "integrity_receipt_sha256": "b67af01ff3732345d1a1332dcd070d74e258842a40ea756882a261d4e2e0027c",
+  "truth_file_sha256": "5691561ec69800f7e067e3b03de2f917d68cfee8412b1f85a0e6fa55b7daad24",
+  "parent_truth_previously_opened": true,
+  "stop_time_utc": "2026-09-25T18:57:50.1242585Z"
+}

@@ -1,0 +1,18 @@
+{
+  "schema": "KAMMI_LOCAL_HANDOFF_AUDIT_V1",
+  "status": "PASS",
+  "checks": {
+    "output_exceeds_normal_upload_cap": true,
+    "output_digest_matches_registered_artifact": true,
+    "completion_receipt_registered": true,
+    "lease_release_recorded": true,
+    "stale_fence_rejected_after_release": true
+  },
+  "stale_validation_response": "Kammi Ledger HTTP 423: {\"detail\":\"local lease fence is stale\"}",
+  "output_artifact_id": "sha256:1854b646fe95f45524c80d8b9291633300bb7482663dd1fa28b7b508fc5038d5",
+  "output_bytes": 19005440,
+  "completion_receipt_artifact_id": "sha256:e969ad5146de76c6da283f715bf0a9d050c3249d0ba82af094913e09a19beb7b",
+  "lease_release_event": "sha256:4ef0539e948ee1aa2cff2b767252d2187d5f6d0a56ab9ce01e731be6512f0278",
+  "model_under_test": false,
+  "e4_authorization_conferred": false
+}

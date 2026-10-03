@@ -1,0 +1,16 @@
+﻿{
+    "contract":  "NORTHSTAR_PHASE13_AUTHORIZATION_ABORT_V1",
+    "status":  "ABORTED_UNCONSUMED_INFRASTRUCTURE_ONLY",
+    "protocol_sha256":  "869402c193435f149120f1130ddefd817f87a39240c51bc5536292fd2b285d2d",
+    "authorization_sha256":  "a5584b1ae837d41f324db80702c0662cfc7b5461d67d8914b664848015cca8f6",
+    "holdout_evaluator_invocations":  0,
+    "sealed_holdout_runs":  0,
+    "candidate_scores_exposed":  0,
+    "cause":  "calendar boundary occurred during closed market; original collector awaited an unreachable bar-time finalizer",
+    "preserved_quarantine":  [
+                                 "orchestration_timeout_DE40_VERIFICATION_A",
+                                 "orchestration_timeout2_DE40_VERIFICATION_A",
+                                 "infrastructure_cutoff_abort3_DE40_VERIFICATION_A"
+                             ],
+    "remediation":  "dedicated collector finalizes before processing the first bar at or beyond the frozen exclusive boundary"
+}

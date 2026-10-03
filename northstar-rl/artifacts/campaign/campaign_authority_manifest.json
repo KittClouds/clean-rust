@@ -1,0 +1,199 @@
+{
+  "schema_version": "NORTHSTAR_CAMPAIGN_AUTHORITY_MANIFEST_V1",
+  "surface": "NORTHSTAR_STRATEGY_EXPERIMENT_RUNTIME_V1",
+  "entries": [
+    {
+      "path": "batched_pyo3_compatibility_receipt.json",
+      "bytes": 590,
+      "content_hash": "b6c39fb6e20b2d7112cf66067cecde08deb6933930e8d6e7db70917b87910668",
+      "authority": "FORGE_RL_02"
+    },
+    {
+      "path": "campaign_double_build_receipt.json",
+      "bytes": 532,
+      "content_hash": "2dba77fdbf388211f282199a80b612df778ca85f53f93e6140fa7846f4e6afd1",
+      "authority": "FORGE_RL_02"
+    },
+    {
+      "path": "campaign_performance_report.json",
+      "bytes": 1430,
+      "content_hash": "5dd4943872a2780fd960252eff7ea5b55c983672c81b64b8e5e40c1286128d6b",
+      "authority": "DIAGNOSTIC"
+    },
+    {
+      "path": "campaign_qualification_matrix.json",
+      "bytes": 4729,
+      "content_hash": "609eb3f6cb80aef35fc0c4f6ed29908a7f4c4dcba19752b0983e1014d13d9d07",
+      "authority": "FORGE_RL_02"
+    },
+    {
+      "path": "campaign_receipt.json",
+      "bytes": 492,
+      "content_hash": "03137b97fa40c5195fbd3c6c43c0d390f5f0a8fb9ef088a97bf3d21ac30fd18e",
+      "authority": "FORGE_RL_02"
+    },
+    {
+      "path": "campaign_spec.json",
+      "bytes": 463,
+      "content_hash": "b1b64d024e08ad4ba9a91873c19ee2f130d616d5eb9816a3ea1f35e263c2f4a7",
+      "authority": "FORGE_RL_02"
+    },
+    {
+      "path": "environment_config.json",
+      "bytes": 6585,
+      "content_hash": "a46748029303d0a7fc7ee595982ec52829541f9fc128457bd0578e1f69c4f0a8",
+      "authority": "FORGE_RL_02"
+    },
+    {
+      "path": "episode_tape.json",
+      "bytes": 1436,
+      "content_hash": "b3f6e03f9499e40dc9ad1386ade53e3e3f5fddebb4c4d9311c3a999947e132bb",
+      "authority": "FORGE_RL_02"
+    },
+    {
+      "path": "evaluation_qualification_receipt.json",
+      "bytes": 1436,
+      "content_hash": "49bfb69166b5536f18a832f30fc714c021e1125c8e5bcb6db4194464daa70a96",
+      "authority": "FORGE_RL_02"
+    },
+    {
+      "path": "evaluation_spec.json",
+      "bytes": 2234,
+      "content_hash": "0d68a1eec8b7b78d405e4a67261b4cd83b67a54e0b2c2e6b03c2835bbd4f642f",
+      "authority": "FORGE_RL_02"
+    },
+    {
+      "path": "experiment_spec.json",
+      "bytes": 1428,
+      "content_hash": "0019728e8307bb9b01d3282259fb552bbc7262ba76b451bb055be69b9efa6f63",
+      "authority": "FORGE_RL_02"
+    },
+    {
+      "path": "feature_registry.json",
+      "bytes": 17465,
+      "content_hash": "5da320fd6264df5aebc7e3ba90fedb1943a49433ab0b7b2fd7b1add8a8a5437f",
+      "authority": "FORGE_RL_02"
+    },
+    {
+      "path": "features.nrf1",
+      "bytes": 69904,
+      "content_hash": "40ed3f224d12ac3cf7f530fa8bc493b7b9ba1d8d03ab97fd8626ff30555fc130",
+      "authority": "FORGE_RL_02"
+    },
+    {
+      "path": "learner_spec.json",
+      "bytes": 793,
+      "content_hash": "dbd2c7d90f46fab809a9110977703332e432c6686bbe857affb4c3dab86d290f",
+      "authority": "FORGE_RL_02"
+    },
+    {
+      "path": "observation_dictionary.json",
+      "bytes": 1420,
+      "content_hash": "95084c6c540421d0f2ed581b4d5b6ca39ea215825e922102a484f009c26b041c",
+      "authority": "FORGE_RL_02"
+    },
+    {
+      "path": "partition_input_fixture.json",
+      "bytes": 2763,
+      "content_hash": "adcaf009f2b20c5a71005d0fbeae44a19a6ff95686abbf69d2b7e8c217c55175",
+      "authority": "FORGE_RL_02"
+    },
+    {
+      "path": "partition_tape.json",
+      "bytes": 3573,
+      "content_hash": "36b56f9dbc32c1f557f66a3f719db6cae177e7fd8ba343d54ea737fd4969036d",
+      "authority": "FORGE_RL_02"
+    },
+    {
+      "path": "planned_run_receipts.json",
+      "bytes": 1545,
+      "content_hash": "f78ba4661367d6c8b2a5539c377b46e548389596030f921b68c123e0572d4685",
+      "authority": "FORGE_RL_02"
+    },
+    {
+      "path": "policy_artifact_contract.json",
+      "bytes": 980,
+      "content_hash": "3b058747fb3330fef83b9dcd5369364958917ade25e8753006e25cc51d4da0dd",
+      "authority": "FORGE_RL_02"
+    },
+    {
+      "path": "rl_env_spec.json",
+      "bytes": 1776,
+      "content_hash": "6fec23ac8e05648a3c9edeed89018fbaa53b98a7a04844045557ac50e3369539",
+      "authority": "FORGE_RL_02"
+    },
+    {
+      "path": "runraw.nrr1",
+      "bytes": 66784,
+      "content_hash": "2cb615884ff6b683e1e3f8a475c04a82b98fd44466c9a417e02906db5868e2ff",
+      "authority": "FORGE_RL_02"
+    },
+    {
+      "path": "schemas/CAMPAIGN_RECEIPT_V1.schema.json",
+      "bytes": 769,
+      "content_hash": "f8908ae525fe20408b2b0f21e132f4f9d6389c64ec9253e23c3ef61e74afdfca",
+      "authority": "FORGE_RL_02"
+    },
+    {
+      "path": "schemas/CAMPAIGN_RUN_RECEIPT_V1.schema.json",
+      "bytes": 1486,
+      "content_hash": "2f66d18ffd3c5be68784ca31aac514f4c80fefece072ee8d001da862785bd8cb",
+      "authority": "FORGE_RL_02"
+    },
+    {
+      "path": "schemas/CAMPAIGN_SPEC_V1.schema.json",
+      "bytes": 1120,
+      "content_hash": "8456584248a95a881c201dbcf30a0d9560274f66f50bf5400a80b81dcc199fce",
+      "authority": "FORGE_RL_02"
+    },
+    {
+      "path": "schemas/EVALUATION_RECEIPT_V1.schema.json",
+      "bytes": 1546,
+      "content_hash": "6b4159a339ffa6c24709b61c463fbcff11b0d92a4f9388fe5358902b0f2e6212",
+      "authority": "FORGE_RL_02"
+    },
+    {
+      "path": "schemas/EVALUATION_SPEC_V1.schema.json",
+      "bytes": 2705,
+      "content_hash": "747b74db08c0a72371da9791d8deac240c63257613684f9c09260ed402b6ca5e",
+      "authority": "FORGE_RL_02"
+    },
+    {
+      "path": "schemas/EXPERIMENT_SPEC_V1.schema.json",
+      "bytes": 1534,
+      "content_hash": "96c8e5b0c0821003f9130b0dc197ab43e78b5a23d251b2de6cf6277b19dc47f4",
+      "authority": "FORGE_RL_02"
+    },
+    {
+      "path": "schemas/LEARNER_SPEC_V1.schema.json",
+      "bytes": 2778,
+      "content_hash": "416caf5e29df88b65de9b2bd2371708ec053f61cb9558c8d830a1eb0b6e80e80",
+      "authority": "FORGE_RL_02"
+    },
+    {
+      "path": "schemas/PARTITION_TAPE_V1.schema.json",
+      "bytes": 2065,
+      "content_hash": "f406de0ea6eda5973c684bfc25770bd6927a65e23347dfd3169b5d2230780717",
+      "authority": "FORGE_RL_02"
+    },
+    {
+      "path": "schemas/POLICY_ARTIFACT_V1.schema.json",
+      "bytes": 2631,
+      "content_hash": "ffccac5aca1cf9886c0f1408e27d3e7d196943d8d86dbf1c29717a9fe5c95834",
+      "authority": "FORGE_RL_02"
+    },
+    {
+      "path": "schemas/TRANSFORM_STATE_V1.schema.json",
+      "bytes": 2628,
+      "content_hash": "77f7188844ab5b27fa8863a0b5954c0e263c12a26efd05ec129191d620bb1a0c",
+      "authority": "FORGE_RL_02"
+    },
+    {
+      "path": "transform_state.json",
+      "bytes": 1632,
+      "content_hash": "d6d28d5df7dafbf213b7dc74d00863933ffa041febccdaff8845fbe9019eb74b",
+      "authority": "FORGE_RL_02"
+    }
+  ],
+  "root_identity": "cd3bbd89a0d7c56c717dc85c474b6c166754b9b43c2b2f71877332eb2470118e"
+}

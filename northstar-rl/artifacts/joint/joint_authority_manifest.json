@@ -1,0 +1,295 @@
+{
+  "schema_version": "NORTHSTAR_JOINT_AUTHORITY_MANIFEST_V1",
+  "surface": "NORTHSTAR_JOINT_WIND_TUNNEL_V1",
+  "entries": [
+    {
+      "path": "broker_account_snapshot.json",
+      "bytes": 911,
+      "content_hash": "7e58986c77a108529f8572fff0f53ba7e81e873440f82af659398892b105d04c",
+      "authority": "FORGE_RL_01"
+    },
+    {
+      "path": "broker_contract_tape.json",
+      "bytes": 786,
+      "content_hash": "344ebf5e819e3dd8d5e12442b634840e1a432fcdcec46e069a5e16e4f945d408",
+      "authority": "FORGE_RL_01"
+    },
+    {
+      "path": "broker_instrument_registry.json",
+      "bytes": 943,
+      "content_hash": "acde53242433df448d3f4069e4811517a7f3d8fbe445828244e8081252a009b7",
+      "authority": "FORGE_RL_01"
+    },
+    {
+      "path": "broker_position_projection.json",
+      "bytes": 3,
+      "content_hash": "043ab26ad5e68e3f818142f6009ea5588558f2145405c19a41fb535e07d686d3",
+      "authority": "FORGE_RL_01"
+    },
+    {
+      "path": "clock_comparison_receipts.json",
+      "bytes": 2227,
+      "content_hash": "87dc8632b463e533dc6b821438277049ae9d0ed0c1fbb54a6a5f15f456eaa0ed",
+      "authority": "FORGE_RL_01"
+    },
+    {
+      "path": "environment_config.json",
+      "bytes": 7405,
+      "content_hash": "1e8b9e1e42490cec53de6fc3978051f7139ec015a180f2561c8bc76027f2e4af",
+      "authority": "FORGE_RL_01"
+    },
+    {
+      "path": "episode_tape.json",
+      "bytes": 1436,
+      "content_hash": "99c1d03f3ba6b44a5c9e84f245d08866d860cde3d392ba9abf1eee2f642c5dbc",
+      "authority": "FORGE_RL_01"
+    },
+    {
+      "path": "execution_calibration.json",
+      "bytes": 1027,
+      "content_hash": "3aef1839ea778e7941869ba0d5f6b5fa50e89b6a13da48affee166b06eff777b",
+      "authority": "FORGE_RL_01"
+    },
+    {
+      "path": "execution_reality_tape.json",
+      "bytes": 226,
+      "content_hash": "4538cc7c0716f4129a6594de74e207d23878513ff95456befb1ce4af56bc71f5",
+      "authority": "FORGE_RL_01"
+    },
+    {
+      "path": "feature_registry.json",
+      "bytes": 17465,
+      "content_hash": "a2fc4d14abfa88819c7ed537b1c3d22899fbb2a0e54272c2732f8a58e0936c0b",
+      "authority": "FORGE_RL_01"
+    },
+    {
+      "path": "features.nrf1",
+      "bytes": 69904,
+      "content_hash": "c60a05e079873531decf91c7cb14af146f79bd0dc02de9b059b4e16cef4c0da9",
+      "authority": "FORGE_RL_01"
+    },
+    {
+      "path": "instrument_binding.json",
+      "bytes": 1412,
+      "content_hash": "e69fdeb2e71a5d39a06b97a178d5e88cd4b18c6c4b0c4a9f85fe55cc24c2f995",
+      "authority": "FORGE_RL_01"
+    },
+    {
+      "path": "joint_double_build_receipt.json",
+      "bytes": 359,
+      "content_hash": "6b5033a02cc984d2ecd74bc72c652f207d294258502ea649e085e080b2543272",
+      "authority": "FORGE_RL_01"
+    },
+    {
+      "path": "joint_environment_replay_receipt.json",
+      "bytes": 360,
+      "content_hash": "7de60f52b781cf2e5dff7ff92cf758f5a486c79f5c48aa25c34c58e6e5a82d84",
+      "authority": "FORGE_RL_01"
+    },
+    {
+      "path": "joint_performance_report.json",
+      "bytes": 6016,
+      "content_hash": "1b354edb56f5a9c08caa4879bd8500866084267e708100422ec69616570e7ce7",
+      "authority": "DIAGNOSTIC"
+    },
+    {
+      "path": "joint_qualification_matrix.json",
+      "bytes": 4610,
+      "content_hash": "2ef189b05ee35dd7b4468373009177c13aaf743dc0d979bb7f5773f45751c804",
+      "authority": "FORGE_RL_01"
+    },
+    {
+      "path": "joint_replay_fixture.json",
+      "bytes": 17010,
+      "content_hash": "72cb703b6209f6751ed9702f7afd9ea2c71e4642be1b9ddb5876728313c080b2",
+      "authority": "FORGE_RL_01"
+    },
+    {
+      "path": "live_broker_account_snapshot.json",
+      "bytes": 1055,
+      "content_hash": "e09799ecf46cbb566197cfa713a5f321d4c7823c322307d1dfde4471d2a56944",
+      "authority": "FORGE_RL_01"
+    },
+    {
+      "path": "live_broker_contract_tape.json",
+      "bytes": 3530,
+      "content_hash": "2f83e031e3b3d4ab3730edc42dc2ac0df422f707e246e1caca0653c29a01e8fa",
+      "authority": "FORGE_RL_01"
+    },
+    {
+      "path": "live_broker_instrument_registry.json",
+      "bytes": 4683,
+      "content_hash": "32f443404c96c2eeefa9a77c861e1179162142d61b88938168c19531fa0a92fe",
+      "authority": "FORGE_RL_01"
+    },
+    {
+      "path": "live_broker_observation_tape.json",
+      "bytes": 4321,
+      "content_hash": "2dc2b4efb57721bb26c9e60f0e3401c23d0501ba2d9941edd4940efb8a02f229",
+      "authority": "FORGE_RL_01"
+    },
+    {
+      "path": "live_broker_position_projection.json",
+      "bytes": 3,
+      "content_hash": "043ab26ad5e68e3f818142f6009ea5588558f2145405c19a41fb535e07d686d3",
+      "authority": "FORGE_RL_01"
+    },
+    {
+      "path": "live_read_receipt.json",
+      "bytes": 16884,
+      "content_hash": "64e8b1756984f3939eeeddcb30352bdfc5b32ebe8da05ca982609aecc105a327",
+      "authority": "FORGE_RL_01"
+    },
+    {
+      "path": "live_tradelocker_capture.nsb1",
+      "bytes": 1168,
+      "content_hash": "7a1b412a42d0a1ddaad4337db0d52e8d03a45a7afdab80981de1017530c09e93",
+      "authority": "FORGE_RL_01"
+    },
+    {
+      "path": "mt5_capture.nsb1",
+      "bytes": 944,
+      "content_hash": "cbde5637eb05ca97caa601ca4a0d62f682b5a04f509b53a64a5e9cfa1d99fe6a",
+      "authority": "FORGE_RL_01"
+    },
+    {
+      "path": "observation_dictionary.json",
+      "bytes": 1420,
+      "content_hash": "058065df949d7280c6be896c5437dae8334420c24878e5c1883319ac5e6ecb81",
+      "authority": "FORGE_RL_01"
+    },
+    {
+      "path": "price_comparison_receipts.json",
+      "bytes": 2691,
+      "content_hash": "1dd0bf892613c4c6304519fe1410634497a2f7b77bd0e7033f4baf2f83494cbe",
+      "authority": "FORGE_RL_01"
+    },
+    {
+      "path": "rl_env_spec.json",
+      "bytes": 2574,
+      "content_hash": "d08b5b7206568fc6673f27aff43621e97e55f61bf4d10e94e9f136f671a091d9",
+      "authority": "FORGE_RL_01"
+    },
+    {
+      "path": "runraw.nrr1",
+      "bytes": 66784,
+      "content_hash": "4015c14871cbda323043fbe75dc89638f7bb90e744122decf6545a7ff523241c",
+      "authority": "FORGE_RL_01"
+    },
+    {
+      "path": "sb3_compatibility_receipt.json",
+      "bytes": 1125,
+      "content_hash": "535aa88c030253b7d2ab8ced3772712c829b9a550b02936f97664711e6e6a898",
+      "authority": "FORGE_RL_01"
+    },
+    {
+      "path": "schemas/BROKER_ACCOUNT_SNAPSHOT_V1.schema.json",
+      "bytes": 2519,
+      "content_hash": "2bbb043541c68397aae65109eb206db4b395d1dd6e9730f9a857790840944319",
+      "authority": "FORGE_RL_01"
+    },
+    {
+      "path": "schemas/BROKER_CONTRACT_TAPE_V1.schema.json",
+      "bytes": 2604,
+      "content_hash": "bf1dac981b7909d384dc2b94d773bfb30436c11daf36a71eaf9dff8fa03d0f41",
+      "authority": "FORGE_RL_01"
+    },
+    {
+      "path": "schemas/BROKER_INSTRUMENT_REGISTRY_V1.schema.json",
+      "bytes": 3308,
+      "content_hash": "82fa99227072e33cb83503d6062210e438e3ac00277231a7ac4ef348927eea1f",
+      "authority": "FORGE_RL_01"
+    },
+    {
+      "path": "schemas/BROKER_OBSERVATION_TAPE_V1.schema.json",
+      "bytes": 2650,
+      "content_hash": "60f1262bea5dc5066f81040d43ce2e5f3fa66dcef6ac62dd88e7183fb1d11733",
+      "authority": "FORGE_RL_01"
+    },
+    {
+      "path": "schemas/BROKER_POSITION_PROJECTION_V1.schema.json",
+      "bytes": 1479,
+      "content_hash": "e97a13c8b0a8e248a54e1c655734259b677fabc00534b14ddc0dd14340034afc",
+      "authority": "FORGE_RL_01"
+    },
+    {
+      "path": "schemas/BROKER_PRICE_COMPARISON_V1.schema.json",
+      "bytes": 2019,
+      "content_hash": "e8a6d0f136f690e24fd55e7b244216de69f19c8b014abd7478d326e600834da0",
+      "authority": "FORGE_RL_01"
+    },
+    {
+      "path": "schemas/CLOCK_COMPARISON_RECEIPT_V1.schema.json",
+      "bytes": 1557,
+      "content_hash": "572ce0d216c96641d82dd2242b0498710ee1e6f504a290040f0db231dcc5032c",
+      "authority": "FORGE_RL_01"
+    },
+    {
+      "path": "schemas/EXECUTION_CALIBRATION_V1.schema.json",
+      "bytes": 2450,
+      "content_hash": "249c48076d71ce2d58e2ba0ea6527f4d70e7db85e8993c403c5727536736fe15",
+      "authority": "FORGE_RL_01"
+    },
+    {
+      "path": "schemas/EXECUTION_REALITY_TAPE_V1.schema.json",
+      "bytes": 3883,
+      "content_hash": "472fdf288ca1321cde915bb287b42517f1aafed8380b3e26ba23c473ad4c4d17",
+      "authority": "FORGE_RL_01"
+    },
+    {
+      "path": "schemas/INSTRUMENT_BINDING_V1.schema.json",
+      "bytes": 2372,
+      "content_hash": "c158e80d22f58e1e97356576b1867c4ae7d845be2c60a592f75183b1742476e0",
+      "authority": "FORGE_RL_01"
+    },
+    {
+      "path": "schemas/STUDIO_BACKTRADER_ADAPTER_V1.schema.json",
+      "bytes": 1113,
+      "content_hash": "ce5332c5a60e43f3f00ab4ae4d7249213535ab998b5f62ad6622d84c322e8d92",
+      "authority": "FORGE_RL_01"
+    },
+    {
+      "path": "schemas/WIND_TUNNEL_MODE_V1.schema.json",
+      "bytes": 1327,
+      "content_hash": "0fe061a298707ebff600be0c3263e5ffbed57d1e522fd120d539e542756c2ec7",
+      "authority": "FORGE_RL_01"
+    },
+    {
+      "path": "studio_backtrader_adapter.json",
+      "bytes": 688,
+      "content_hash": "e648cb3c2be163d804539845628119da3d83d8c315baf15778078206342e99ff",
+      "authority": "FORGE_RL_01"
+    },
+    {
+      "path": "topology_report.json",
+      "bytes": 1287,
+      "content_hash": "9f5389261288b0a6eb62389552c38065906935871764517553c0334765102c4c",
+      "authority": "FORGE_RL_01"
+    },
+    {
+      "path": "tradelocker_capture.nsb1",
+      "bytes": 952,
+      "content_hash": "1513b61a4bb15e7d321ae56ed9fe6ae8293a217bd74a9e3a94a379c7472051a5",
+      "authority": "FORGE_RL_01"
+    },
+    {
+      "path": "tradelocker_capture_header.json",
+      "bytes": 488,
+      "content_hash": "07214140b31bfe0622d4d79652d997b3d26d00c7e4e50de34a7f6e8b6248e5d6",
+      "authority": "FORGE_RL_01"
+    },
+    {
+      "path": "tradelocker_connection_diagnostic.json",
+      "bytes": 401,
+      "content_hash": "49082450fda69e18057f36ba12056c3d486f8b10c9142be6d6e102b0c6ac020b",
+      "authority": "FORGE_RL_01"
+    },
+    {
+      "path": "wind_tunnel_source_spec.json",
+      "bytes": 527,
+      "content_hash": "d92463d206fd45e29376c4d200e465ef6db13234020523241395af71c502f011",
+      "authority": "FORGE_RL_01"
+    }
+  ],
+  "root_identity": "529d28080d111835c520e8aced5941a2b7097a5cc58eabbbd19d3dfea1c9f27b"
+}

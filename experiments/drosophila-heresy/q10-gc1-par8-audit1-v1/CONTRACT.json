@@ -1,0 +1,51 @@
+{
+  "audit": {
+    "behavioral_probe": false,
+    "reconstruct_source": "PAR8 best_valid canonical mapping and sealed PAR2 palette library",
+    "scientific_promotion": false,
+    "search_executed": false
+  },
+  "firewall": {
+    "engineering_only": true,
+    "parent_writes": false,
+    "write_root": "experiments/drosophila-heresy/q10-gc1-par8-audit1-v1"
+  },
+  "identity": "q10-gc1-par8-audit1-v1",
+  "parent_bindings": [
+    {
+      "label": "par8_execution",
+      "path": "experiments/drosophila-heresy/q10-gc1-par8-v1/qualification/execution.json",
+      "sha256": "A4304E70F7D32436109CD6F3367C298CD1227FBD5C4AA2578C28D14272721D6B"
+    },
+    {
+      "label": "par8_status",
+      "path": "experiments/drosophila-heresy/q10-gc1-par8-v1/qualification/derived/STATUS.json",
+      "sha256": "D54C9564CFD43DA7866175F883507390019A70E97FF6F834BD5608900BCE5906"
+    },
+    {
+      "label": "par8_contract",
+      "path": "experiments/drosophila-heresy/q10-gc1-par8-v1/CONTRACT.json",
+      "sha256": "D3323FE08D35371F2F3FFD8B575BC338A37416F37B216C74E3C69936CBE567C4"
+    },
+    {
+      "label": "par8_plan",
+      "path": "experiments/drosophila-heresy/q10-gc1-par8-v1/PLAN.md",
+      "sha256": "1DD4AF7D82B4262EDADF285811D26AF23F6E0418B1D34D0F85542BA84F47E0CD"
+    },
+    {
+      "label": "par2_palettes",
+      "path": "experiments/drosophila-heresy/q10-gc0-gp1-par2-v1/qualification/palettes.jsonl",
+      "sha256": "56A8BCFD950C2C796279556B03C4905622B1207023C1142076AE7147203477FA"
+    },
+    {
+      "label": "pf5_contract",
+      "path": "experiments/drosophila-heresy/q10-pf5-v1/CONTRACT.json",
+      "sha256": "20995E1826A9C62E0E8689017A2F3E624CC9E63B76B210FBD4AB11D7E9E7D34F"
+    }
+  ],
+  "plan_sha256": "DCEE23012873256FBED1BC242E6E20FD484202288CE1BA36993F605FF156679F",
+  "protocol": "Q10-GC1-PAR8-AUDIT1",
+  "runner_sha256": "E3436F59948C897A3CFC1AB3CF3BF4417EE23B8E72892F207024F63A12AC9890",
+  "sealed_runner_sha256": "E3436F59948C897A3CFC1AB3CF3BF4417EE23B8E72892F207024F63A12AC9890",
+  "status": "PREEXECUTION_SEALED_NO_EXECUTION"
+}

@@ -1,0 +1,64 @@
+{
+  "created_utc": "2026-09-26",
+  "dataset_lineage": {
+    "constraint_H_sha256": "8c09bbc2a5219b15047372720a46d11c3ce018369ada4d2200bf0068b8056181",
+    "extraction_receipt_sha256": "9d7714338ba0302d78d76eb75b4a7e8eb553921433e388b3d4b217e6d7ce3939",
+    "identity_model_sha256": "9ffd60dfe8b2134843b50cc1a614a3f05ce69d8cc2fcb458f7999486214f50ff",
+    "public_tasks_sha256": "eed1f65aa9a1a51f7887808dae88655c1266cfeac674bf25611c0cd6cd8f6c58",
+    "q_dataset_manifest_sha256": "6b38000ecf8295163d9eb547aed49b5d6df5804fbd34faff75686c31311257e3",
+    "q_fitted_checkpoint_sha256": "e484bdb0e51196002bcda997a96b9b5a40ace7a4b81e60e08396a32072c6e5f0",
+    "q_mixture_manifest_sha256": "0cd7f5bd26e0ea59b2d29d83240cea013dc80ed75c3ac524ad16bc65473855a5",
+    "selected_candidates_sha256": "05b75ffe1f49dc773732faaca74ae56c185313aeda30b88a7e3845075e3a39e3",
+    "sensor_support_manifest_sha256": "b05e99f83cec97342582dbacec0a3c7ba0bf634130f301dd909a886bcbb66e46"
+  },
+  "evaluation": {
+    "aggregate_test_is_not_unseen_generalization": true,
+    "observed_test_rows": {
+      "overlap_sensor_identity_train": 11,
+      "unseen_to_identity_train": 13
+    },
+    "selection_score": "raw semantic log score; calibrated probability is a confidence output, with calibrated-logit top-1 also reported",
+    "test_strata": [
+      "overlap_sensor_identity_train",
+      "unseen_to_identity_train"
+    ]
+  },
+  "isotonic_comparison": {
+    "calibrated_scores_sha256": "5761c18f076b0be41f3a193da0a9553a073c8d022e1477b839fa6db8c369eb4b",
+    "coefficients_sha256": "6fc4183bc40ed9630904f3084adc5557afb628a7cab397f737780354cbfb40a9",
+    "manifest_sha256": "a40d6f39d6b3d9813e0d7ac3acd9eac3c7bc01046cb8609db6af5a6dc7e6e073",
+    "receipt_sha256": "a98574913c7dfce011034716788d0644b3a50e72d576c5d62fc611523e813683",
+    "report_sha256": "389c078ab46326def888d39518b76864929c7baad32768b69a01234d5019e10a",
+    "source_script_sha256": "c1cd7e59013e2a1d3578b86e12fcde53861a341b47d3ae993d365ed7e913f5a0"
+  },
+  "purpose": "Fit one regularized monotone logistic/temperature calibration from the v03 raw semantic log-product score using Q-v02 train rows only; compare with raw and isotonic outputs on validation/test and sensor-overlap strata. Version 6 sanitizes the fixed vector identifier to prevent candidate-label leakage.",
+  "raw_semantic_source": {
+    "candidate_scores_sha256": "ab95a8cd3284372f090059086f3dd48c6a91d1bccf3893cc65c672a9e1071c19",
+    "manifest_sha256": "f12c8bcf99806955e8eb1566800ab08c1f667c22250052d062dc8df5ddcb8ed1",
+    "receipt_sha256": "cebb07822f02afaea96f272e3358606090ea51a0bee8210f52db2db6bddd0cbc",
+    "report_sha256": "ca2760677311efc7cd8eaec1fa958d54f222d1524104e07fe0b28f42725c7ec4",
+    "source_script_sha256": "c61d0400a218f8115f7c4cf33b8201d2c2c78fd05a06c8810c0c510a8e98fb9a"
+  },
+  "runtime_export": {
+    "format": "five little-endian float64 coefficients: floor, center, scale, nonnegative slope, intercept",
+    "input": "raw semantic log score; replace negative infinity with floor, standardize, apply logistic",
+    "no_labels_or_training_rows_included": true,
+    "probability": "stable sigmoid(intercept + slope * standardized_score)",
+    "reference_identifier_policy": "Fixed vector uses an opaque identifier and omits sample, task, and feature IDs; the selected candidate index remains bound through hashed inputs and receipt."
+  },
+  "schema": "R1_QTERMINAL_SEMANTIC_LOGISTIC_CALIBRATION_V06",
+  "status": "FROZEN_ENGINEERING_CALIBRATION",
+  "training_contract": {
+    "fit_split": "train only",
+    "input": "v03 semantic_log_score; null maps to a train-derived finite lower floor",
+    "model": "sigmoid(intercept + nonnegative_slope * standardized_score)",
+    "objective": "mean binary cross-entropy plus 0.5 * 1.0 * slope^2; intercept unpenalized",
+    "regularization_lambda": 1.0,
+    "score_floor": "min finite training score minus max(1, finite training-score standard deviation)",
+    "standardization": "mean and population standard deviation over all train scores after null-floor substitution",
+    "target": "independent typed-validator labels from Q-v02 selected candidate rows",
+    "temperature": "standardization_scale / fitted_slope; positive slope preserves raw score order",
+    "validation_or_test_labels_used_for_fit": false
+  },
+  "version": 6
+}

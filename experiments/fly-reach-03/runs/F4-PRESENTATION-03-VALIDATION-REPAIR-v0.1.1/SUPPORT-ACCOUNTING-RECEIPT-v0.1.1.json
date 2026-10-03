@@ -1,0 +1,233 @@
+{
+  "all_training_folds_two_class_valid": true,
+  "assignment_evaluable_count": 6,
+  "assignment_support": [
+    {
+      "assignment_bits": "1100",
+      "assignment_index": 0,
+      "blocks": [
+        309004,
+        309011
+      ],
+      "evaluable": true,
+      "positive_cues": [
+        0,
+        1
+      ],
+      "sampled_rows": 4478,
+      "target_negative_rows": 3983,
+      "target_positive_rows": 495
+    },
+    {
+      "assignment_bits": "1010",
+      "assignment_index": 1,
+      "blocks": [
+        309003,
+        309007
+      ],
+      "evaluable": true,
+      "positive_cues": [
+        0,
+        2
+      ],
+      "sampled_rows": 4914,
+      "target_negative_rows": 2461,
+      "target_positive_rows": 2453
+    },
+    {
+      "assignment_bits": "0110",
+      "assignment_index": 2,
+      "blocks": [
+        309005,
+        309008
+      ],
+      "evaluable": true,
+      "positive_cues": [
+        1,
+        2
+      ],
+      "sampled_rows": 6289,
+      "target_negative_rows": 1665,
+      "target_positive_rows": 4624
+    },
+    {
+      "assignment_bits": "1001",
+      "assignment_index": 3,
+      "blocks": [
+        309000,
+        309001
+      ],
+      "evaluable": true,
+      "positive_cues": [
+        0,
+        3
+      ],
+      "sampled_rows": 7287,
+      "target_negative_rows": 5504,
+      "target_positive_rows": 1783
+    },
+    {
+      "assignment_bits": "0101",
+      "assignment_index": 4,
+      "blocks": [
+        309009,
+        309010
+      ],
+      "evaluable": true,
+      "positive_cues": [
+        1,
+        3
+      ],
+      "sampled_rows": 2195,
+      "target_negative_rows": 1792,
+      "target_positive_rows": 403
+    },
+    {
+      "assignment_bits": "0011",
+      "assignment_index": 5,
+      "blocks": [
+        309002,
+        309006
+      ],
+      "evaluable": true,
+      "positive_cues": [
+        2,
+        3
+      ],
+      "sampled_rows": 4112,
+      "target_negative_rows": 1046,
+      "target_positive_rows": 3066
+    }
+  ],
+  "assignment_support_sha256": "f30ff0ad010eb5fccdfff00d31231f3491051d676a808a9e06471bab0cd031a8",
+  "candidate_coordinate_trial_pairs_per_cell": 524288,
+  "cell_count": 216,
+  "collection_validation_sha256": "9df970a7c9065d9f7058eb3d5af3c189f5dec64c6097b2d78e8c0c26bb75cb3b",
+  "comparative_outcomes_emitted": false,
+  "exact_pre_sampling_eligible_counts_recorded_by_frozen_collector": false,
+  "fits_authorized_by_support_gate": true,
+  "fits_executed": false,
+  "generated_trials_per_cell": 8192,
+  "native_collection_unchanged": true,
+  "parent_run_id": "F4-PRESENTATION-03-ENG1",
+  "pre_sampling_eligible_count_policy": "exact count is null; report the observed sampled-eligible count and separately the untrimmed sum(q) population estimate; no replay or recollection",
+  "primary_equal_weight_assignment_aggregate_evaluable": true,
+  "primary_support_disposition": "EVALUABLE",
+  "raw_collection_tree_seal_sha256": "5d98535f780d5b630b5136c07367791c4698f750013561ad8c243211c6d01b88",
+  "raw_weight_diagnostics_sha256": "0d7ef29f0667b4fab030a13211c5c9089e60a297b454f5381e945efef0894b37",
+  "required_evaluable_assignments": 6,
+  "sampled_row_count": 29275,
+  "schema": "F4-PRESENTATION-03-support-accounting-receipt-v0.1.1",
+  "status": "PASS",
+  "support_accounting_amendment_sha256": "2e6792642e0db1b9630c7c4d9a91b895e0f71879d0cb6ecbd4c994ea58a815e9",
+  "support_surface_sha256": "41c4cf3531b604f8cfac362f4a8a9e2410e98eb1b845e3aa6a5b6d6de6ef6843",
+  "training_support": [
+    {
+      "heldout_assignment_index": 3,
+      "heldout_block": 309000,
+      "training_negative_rows": 13887,
+      "training_positive_rows": 12824,
+      "training_rows": 26711,
+      "valid_two_class_training_support": true
+    },
+    {
+      "heldout_assignment_index": 3,
+      "heldout_block": 309001,
+      "training_negative_rows": 13511,
+      "training_positive_rows": 11041,
+      "training_rows": 24552,
+      "valid_two_class_training_support": true
+    },
+    {
+      "heldout_assignment_index": 5,
+      "heldout_block": 309002,
+      "training_negative_rows": 16432,
+      "training_positive_rows": 11072,
+      "training_rows": 27504,
+      "valid_two_class_training_support": true
+    },
+    {
+      "heldout_assignment_index": 1,
+      "heldout_block": 309003,
+      "training_negative_rows": 14416,
+      "training_positive_rows": 11702,
+      "training_rows": 26118,
+      "valid_two_class_training_support": true
+    },
+    {
+      "heldout_assignment_index": 0,
+      "heldout_block": 309004,
+      "training_negative_rows": 12548,
+      "training_positive_rows": 12329,
+      "training_rows": 24877,
+      "valid_two_class_training_support": true
+    },
+    {
+      "heldout_assignment_index": 2,
+      "heldout_block": 309005,
+      "training_negative_rows": 15317,
+      "training_positive_rows": 9809,
+      "training_rows": 25126,
+      "valid_two_class_training_support": true
+    },
+    {
+      "heldout_assignment_index": 5,
+      "heldout_block": 309006,
+      "training_negative_rows": 15424,
+      "training_positive_rows": 11510,
+      "training_rows": 26934,
+      "valid_two_class_training_support": true
+    },
+    {
+      "heldout_assignment_index": 1,
+      "heldout_block": 309007,
+      "training_negative_rows": 16025,
+      "training_positive_rows": 11493,
+      "training_rows": 27518,
+      "valid_two_class_training_support": true
+    },
+    {
+      "heldout_assignment_index": 2,
+      "heldout_block": 309008,
+      "training_negative_rows": 15920,
+      "training_positive_rows": 11215,
+      "training_rows": 27135,
+      "valid_two_class_training_support": true
+    },
+    {
+      "heldout_assignment_index": 4,
+      "heldout_block": 309009,
+      "training_negative_rows": 16451,
+      "training_positive_rows": 12421,
+      "training_rows": 28872,
+      "valid_two_class_training_support": true
+    },
+    {
+      "heldout_assignment_index": 4,
+      "heldout_block": 309010,
+      "training_negative_rows": 14659,
+      "training_positive_rows": 12824,
+      "training_rows": 27483,
+      "valid_two_class_training_support": true
+    },
+    {
+      "heldout_assignment_index": 0,
+      "heldout_block": 309011,
+      "training_negative_rows": 16371,
+      "training_positive_rows": 12824,
+      "training_rows": 29195,
+      "valid_two_class_training_support": true
+    }
+  ],
+  "training_support_sha256": "d42930d85ee5ea416904ddbe7482b4c16eace6fba45289813db54367bb15a083",
+  "truth_fields_not_opened": [
+    "native_delta",
+    "preweight",
+    "reference_value"
+  ],
+  "truth_fields_opened": [
+    "inclusion_probability_p",
+    "target_polarity_Y"
+  ],
+  "validation_repair_identity": "F4-PRESENTATION-03-VALIDATION-REPAIR-v0.1.1"
+}

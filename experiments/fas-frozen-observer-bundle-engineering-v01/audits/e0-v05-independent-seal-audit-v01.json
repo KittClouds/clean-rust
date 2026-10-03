@@ -1,0 +1,37 @@
+{
+  "audit_id": "FAS_FROZEN_OBSERVER_BUNDLE_E0_V05_INDEPENDENT_SEAL_AUDIT_V01",
+  "status": "E0_V05_SEAL_INDEPENDENT_AUDIT_PASS_MODEL_CONTACT_NOT_AUTHORIZED",
+  "created_utc": "2026-09-26T07:37:22.967540+00:00",
+  "seal_path": "experiments/fas-frozen-observer-bundle-engineering-v01/seals/e0-seal-v05.json",
+  "seal_root_sha256": "56ab898130ddae394f3fa12a00eccf2bf6e565fde9c58e56f93eb70dde4bd693",
+  "seal_entry_count": 37,
+  "freeze_contract_path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/e0-freeze-v05-sealed-v02.json",
+  "freeze_contract_sha256": "b03e8f7e1ea9a4efd0f8292b9934a7a94c0b55a81fc4280ecbe14f3759659b10",
+  "e2_protocol_path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/e2-run-v02-sealed-v02.json",
+  "e2_protocol_sha256": "36ec221031ee7438a53cf272ff9b92ceb2b4d0f66e3c741e24b75f9f8ea1c817",
+  "reviewed_v08_draft_tree_root_sha256": "15f193bf0a3e6993918420f2433e217f3cfa0f483350f17045f61d6c72312a96",
+  "checks": {
+    "all_manifest_file_hashes_and_lengths": true,
+    "canonical_entry_tree_root": true,
+    "v05_freeze_included_as_declared_freeze_contract": true,
+    "historical_v02_membership_defect_absent": true,
+    "e2_v02_protocol_frozen_but_not_authorized": true,
+    "representation_abi_v02_hash_and_extractor_binding": true,
+    "wait_receipt_hash_and_completed_status": true,
+    "e2_v01_preservation_root": true,
+    "e2_v01_comparator_cache_hash_and_length": true,
+    "total_gpu_memory_claimed_false": true,
+    "full_v08_draft_tree_and_manifest_included": true,
+    "model_tokenizer_contact_or_extraction_performed": false
+  },
+  "e2_v01_reference_cache": {
+    "sha256": "8eb80df5f73e761fe6c025fc1c66abef2027d639b6c14f56d4177d6e6a7a45a4",
+    "bytes": 872415232,
+    "role": "read-only comparator only; not eligible for fitting"
+  },
+  "model_contact_authorized": false,
+  "tokenizer_contact_authorized": false,
+  "feature_extraction_authorized": false,
+  "observer_fitting_authorized": false,
+  "not_an_e2_authorization": true
+}

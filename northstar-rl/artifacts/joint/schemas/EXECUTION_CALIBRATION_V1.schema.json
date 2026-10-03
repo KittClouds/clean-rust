@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ExecutionCalibration",
+  "type": "object",
+  "properties": {
+    "calibration_hash": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "calibration_id": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "calibration_method": {
+      "type": "string"
+    },
+    "effective_period_ns": {
+      "type": "array",
+      "maxItems": 2,
+      "minItems": 2,
+      "prefixItems": [
+        {
+          "type": "integer",
+          "format": "int64"
+        },
+        {
+          "type": "integer",
+          "format": "int64"
+        }
+      ]
+    },
+    "instrument_id": {
+      "type": "integer",
+      "format": "uint32",
+      "minimum": 0
+    },
+    "market_regime_partition": {
+      "type": "string"
+    },
+    "observed_fill_ratio_distribution": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/EmpiricalPoint"
+      }
+    },
+    "observed_latency_distribution_ns": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/EmpiricalPoint"
+      }
+    },
+    "observed_price_delta_distribution": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/EmpiricalPoint"
+      }
+    },
+    "observed_spread_distribution": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/EmpiricalPoint"
+      }
+    },
+    "sample_count": {
+      "type": "integer",
+      "format": "uint64",
+      "minimum": 0
+    },
+    "schema_version": {
+      "type": "string"
+    },
+    "source_tape_id": {
+      "$ref": "#/$defs/Digest256"
+    }
+  },
+  "required": [
+    "schema_version",
+    "calibration_id",
+    "instrument_id",
+    "market_regime_partition",
+    "observed_spread_distribution",
+    "observed_price_delta_distribution",
+    "observed_latency_distribution_ns",
+    "observed_fill_ratio_distribution",
+    "sample_count",
+    "effective_period_ns",
+    "source_tape_id",
+    "calibration_method",
+    "calibration_hash"
+  ],
+  "$defs": {
+    "Digest256": {
+      "description": "Domain-separated BLAKE3 digest",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "EmpiricalPoint": {
+      "type": "object",
+      "properties": {
+        "cumulative_probability": {
+          "type": "number",
+          "format": "double"
+        },
+        "value": {
+          "type": "number",
+          "format": "double"
+        }
+      },
+      "required": [
+        "value",
+        "cumulative_probability"
+      ]
+    }
+  }
+}

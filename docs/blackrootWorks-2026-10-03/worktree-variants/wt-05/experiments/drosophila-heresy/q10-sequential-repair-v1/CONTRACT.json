@@ -1,0 +1,403 @@
+{
+  "protocol": "Q10-SR",
+  "title": "Sequential-f32 Readout and Discrete ULP Repair Qualification",
+  "kind": "FROZEN_PRE_QUALIFICATION_CONTRACT",
+  "status": "FROZEN_PRE_QUALIFICATION__NOT_EXECUTED",
+  "plan_sha256": "4ABEFD6E886C215BE06ABCD530ECB526854F55B195AA6C41CFB6AC5FC7472561",
+  "lineage": {
+    "parent_protocol": "Q10-SM",
+    "parent_directory": "experiments/drosophila-heresy/q10-safety-margin-v1",
+    "parent_plan_sha256": "8A70CFADA7A833AA1110FDE5DBF0CFAFDDD4AFD4297A06AD846B1959439B8B9D",
+    "parent_contract_sha256": "5A7CD7E15724F6260C2D42296BED5FF3667CA32FA1D8D48E5408EFFA2A0F35BF",
+    "parent_result_sha256": "68200D7F49B8A4B943150A1C3A5AB4B46DF4ED8EB1EBBE7A3DF45F8BEEBBD337",
+    "parent_status_sha256": "D19D051DA550BCDED9C436F9A7164AF0C4322D8BB16C418D7C4CA9E04217A9C4",
+    "required_parent_status": "Q10_SM_STAGE1_VALID__F32_SAFE_FREEDOM_PRESENT",
+    "required_parent_audited_states": 5120,
+    "required_parent_accepted_nonidentity_events": 5026,
+    "required_parent_sequential_f32_readout": "NOT_RUN",
+    "required_parent_ulp_repair": "NOT_RUN",
+    "required_parent_scientific_seed_bundles_used": 0,
+    "required_parent_dh08b_authorized": false,
+    "q08_mutation_forbidden": true,
+    "q09_mutation_forbidden": true,
+    "q10_bg_mutation_forbidden": true,
+    "q10_sm_mutation_forbidden": true
+  },
+  "authorization": {
+    "draft_files_only": false,
+    "authorized_files": [
+      "PLAN.md",
+      "CONTRACT.json"
+    ],
+    "source_creation_or_edit_authorized": true,
+    "build_authorized": true,
+    "qualification_execution_authorized": true,
+    "experiment_run_authorized": false,
+    "artifact_generation_authorized": true,
+    "measured_cli_authorized": true,
+    "behavior_authorized": false,
+    "scientific_seed_bundles_used": 0,
+    "stage_2a_diagnostics_authorized": true,
+    "dh08b_authorized": false
+  },
+  "scientific_scope": {
+    "qualification_only": true,
+    "behavioral_inference": false,
+    "action_observation": false,
+    "reward_observation": false,
+    "margin_observation": false,
+    "future_learning_observation": false,
+    "future_direction_gate": null,
+    "future_behavior_gate": null,
+    "exchangeability_gate": null,
+    "outcome_selection_from_behavior_forbidden": true
+  },
+  "engineering_scope": {
+    "qualification_seeds_allowed": [
+      9501,
+      9502,
+      9503,
+      9504,
+      9505
+    ],
+    "stage_1a_seeds": [
+      9501
+    ],
+    "stage_1b_seeds": [
+      9502,
+      9503,
+      9504,
+      9505
+    ],
+    "sides": [
+      "R",
+      "L"
+    ],
+    "taus": [
+      4.0,
+      16.0
+    ],
+    "reversal_events_per_side_tau": 256,
+    "expected_stage_1a_states": 1024,
+    "expected_stage_1b_new_states": 4096,
+    "expected_cumulative_states": 5120,
+    "scientific_seeds_allowed": [],
+    "replacement_seeds_forbidden": true,
+    "top_up_forbidden": true,
+    "tranche_names_are_execution_stages": true,
+    "qualified_lineage_operation": "STAGE_2A_DIAGNOSTICS"
+  },
+  "parent_endpoint_reconstruction": {
+    "constructor": "exact frozen Q10-SM constructor replayed on fresh engineering states",
+    "constructor_changes_forbidden": true,
+    "base_state": "committed f32 W_B_32 widened exactly to f64 W_B",
+    "true_state": "committed f32 W_T_32 widened exactly to f64 W_T",
+    "true_displacement": "d_T = W_T - W_B",
+    "initial_alternate_state": "W_N_32^0 is the unclipped committed Q10-SM safety-margined alternate endpoint",
+    "initial_alternate_displacement": "d_N^0 = f64(W_N_32^0) - f64(W_B_32)",
+    "permitted_support": "S_t inherits the exact event-local Q10-SM source-coordinate semantics",
+    "true_boundary_set": "B_t preserves separate lower and upper committed boundary membership",
+    "outside_support_set": "O_t is the complement of S_t",
+    "frozen_set": "F_t = B_t union O_t",
+    "variable_set": "I_t = S_t minus B_t",
+    "parent_constructor_ineligible_rule": "retain event in coverage, classify PARENT_CONSTRUCTOR_INELIGIBLE, exclude it from mismatch/capacity/repair denominators, and do not replace it",
+    "required_starting_reserve_ulps_each_direction": 32,
+    "clipping_forbidden": true
+  },
+  "sequential_f32_readout": {
+    "name": "g_seq32",
+    "source": "production learner cue-by-MBON kernel or byte-identical pure instrumented copy frozen before execution",
+    "output_shape": "16 * post_len",
+    "output_order": "exact learner cue, MBON, and source-coordinate order",
+    "authoritative_storage": "committed binary32 inputs and bitwise binary32 outputs",
+    "required_semantics": [
+      "exact learner binary32 multiply semantics",
+      "exact learner binary32 add semantics",
+      "exact learner accumulation order",
+      "exact learner fused-versus-unfused semantics",
+      "exact learner zero, subnormal, and signed-zero handling"
+    ],
+    "forbidden_substitutions": [
+      "f64 accumulation",
+      "reassociation",
+      "SIMD lane reordering absent from the learner",
+      "pairwise reduction absent from the learner",
+      "sorted accumulation",
+      "aggregate cue score",
+      "reduced signature"
+    ],
+    "observer_rng_consumption_forbidden": true,
+    "observer_mutation_forbidden": true,
+    "true_readout": "g_T = g_seq32(W_T_32)",
+    "initial_alternate_readout": "g_N = g_seq32(W_N_32^0)",
+    "already_equal_rule": "record READOUT_ALREADY_EQUAL, perform no repair move, and audit all final simultaneous gates unchanged",
+    "nonfinite_rule": "fail closed"
+  },
+  "mismatch_diagnostic": {
+    "separate_from_capacity": true,
+    "separate_from_repair": true,
+    "required_outputs": [
+      "bitwise mismatch count",
+      "ordered-binary32 ULP distance per output",
+      "maximum ordered-binary32 ULP distance",
+      "sum of ordered-binary32 ULP distances",
+      "f64-widened absolute error per output",
+      "f64-widened squared error",
+      "finite, NaN, infinity, and signed-zero classifications",
+      "mismatch counts by cue and MBON"
+    ],
+    "ordered_key_semantics_must_be_frozen_pre_execution": true,
+    "nan_and_infinity_are_invalid": true
+  },
+  "legal_one_ulp_move_bank": {
+    "stage": "STAGE_2A_1",
+    "starting_state": "W_N_32^0",
+    "coordinates": "I_t only",
+    "directions": [
+      "nextafter32 toward -infinity",
+      "nextafter32 toward +infinity"
+    ],
+    "one_coordinate_per_move": true,
+    "exactly_one_representable_step": true,
+    "starting_reserve_ulps_each_direction": 32,
+    "minimum_reserve_after_bank_move_each_direction": 16,
+    "finite_and_in_bounds_required": true,
+    "outside_support_frozen": true,
+    "separate_lower_upper_boundary_membership_preserved": true,
+    "new_boundary_membership_forbidden": true,
+    "clipping_forbidden": true,
+    "move_effect": "v_j = f64(g_seq32(W_N_32^0 after move_j)) - f64(g_seq32(W_N_32^0))",
+    "full_authoritative_replay_per_move": true,
+    "zero_effect_moves_retained": true,
+    "duplicate_effect_compaction_allowed_with_complete_provenance": true,
+    "required_outputs": [
+      "legal and rejected move counts by direction and reason",
+      "movable, interior, and high-slack counts per readout row",
+      "positive, negative, and zero move effects per readout row",
+      "row and column coverage",
+      "zero-effect and duplicate-effect fractions",
+      "one-move output ULP-effect distribution",
+      "remaining reserve distribution",
+      "coordinate and direction provenance"
+    ]
+  },
+  "relaxed_capacity_diagnostic": {
+    "stage": "STAGE_2A_2",
+    "diagnostic_only": true,
+    "matrix": "R = [v_1, v_2, ..., v_m] in f64-widened committed output space",
+    "error": "e_64 = f64(g_N) - f64(g_T)",
+    "factorization": "deterministic f64 SVD",
+    "rank_cutoff": "sigma_i > sigma_max * max(rows, cols) * f64::EPSILON * 1000",
+    "normalized_projection_tolerance": 2e-10,
+    "required_outputs": [
+      "rank(R)",
+      "e_reachable = P_col(R) e_64",
+      "e_unreachable = e_64 - e_reachable",
+      "absolute and normalized unreachable residual",
+      "minimum-L2 relaxed solution",
+      "relaxed solution L1, L2, and L-infinity norms",
+      "relaxed nonzero coefficient count under frozen numeric resolution",
+      "relaxed-budget ratios"
+    ],
+    "statuses": [
+      "CAPACITY_EXACT_WITHIN_TOLERANCE",
+      "CAPACITY_PARTIAL",
+      "CAPACITY_ZERO_OR_EMPTY_BANK",
+      "CAPACITY_NUMERICALLY_AMBIGUOUS"
+    ],
+    "rounding_relaxed_solution_into_repair_forbidden": true,
+    "discrete_repair_claim_forbidden": true,
+    "impossibility_claim_forbidden": true
+  },
+  "discrete_repair": {
+    "stage": "STAGE_2A_3",
+    "starting_state": "W_N_32^0",
+    "committed_binary32_states_only": true,
+    "authoritative_full_readout_after_every_candidate": true,
+    "beam_width": 64,
+    "maximum_sequential_moves": 64,
+    "branch_shortlist_per_parent": 64,
+    "maximum_moves_per_coordinate_from_start": 16,
+    "minimum_final_reserve_ulps_each_direction": 16,
+    "coordinate_reuse_allowed": true,
+    "immediate_inverse_move_forbidden": true,
+    "clipping_forbidden": true,
+    "simulation_rng_consumption_forbidden": true,
+    "success_condition": "every g_seq32 output element is bitwise equal to g_T",
+    "success_does_not_bypass_final_gates": true,
+    "candidate_generation": "enumerate all currently legal one-ULP successors, rank by exact successor objective, and retain the best 64 per parent",
+    "deduplication": "complete committed weight bytes",
+    "global_retention": "best 64 unique committed states",
+    "revisit_rule": "a state seen at an equal or lower depth is not revisited",
+    "objective_order": [
+      "fewer bitwise-mismatched sequential readout elements",
+      "smaller maximum ordered-binary32 ULP output distance",
+      "smaller sum of ordered-binary32 ULP output distances",
+      "smaller f64-widened squared readout error",
+      "fewer moves",
+      "smaller maximum per-coordinate displacement from W_N_32^0",
+      "deterministic bytewise tie-break"
+    ],
+    "tie_break": [
+      "lower source-coordinate index",
+      "downward before upward",
+      "lexicographic committed bytes"
+    ],
+    "search_ranking_may_not_use": [
+      "acquisition-axis value",
+      "total displacement norm",
+      "residual direction or cosine",
+      "behavior",
+      "future learning"
+    ],
+    "budget_exhaustion_interpretation": "this frozen constructor did not find a repair; impossibility is not established"
+  },
+  "final_simultaneous_gates": {
+    "authoritative_state": "final committed binary32 W_R_32",
+    "all_required": true,
+    "requirements": [
+      "independent full replay gives bitwise g_seq32(W_R_32) == g_seq32(W_T_32) for every output",
+      "coordinates outside S_t are bitwise unchanged from W_N_32^0",
+      "separate true lower and upper boundary memberships are preserved",
+      "no new boundary membership exists",
+      "every changed coordinate lies in I_t",
+      "all weights are finite and in ordinary bounds without clipping",
+      "every variable coordinate retains at least 16 legal nextafter32 steps toward each bound",
+      "no coordinate moved more than 16 representable steps from W_N_32^0",
+      "total sequential moves are at most 64",
+      "normalized f64 cue-by-MBON linear-contract error relative to d_T is at most 2e-6",
+      "normalized global acquisition-axis displacement error relative to d_T is at most 2e-6",
+      "normalized total f64 displacement-norm error relative to d_T is at most 2e-7",
+      "lineage, identity, RNG, purity, and receipt gates pass"
+    ],
+    "normalized_cue_linear_error_max": 2e-6,
+    "normalized_axis_error_max": 2e-6,
+    "normalized_total_norm_error_max": 2e-7,
+    "scalar_normalization_floor": 1e-12,
+    "vector_norm_normalization_floor": 1e-12,
+    "absolute_errors_also_required": true,
+    "residual_direction_reported_descriptively": true,
+    "direction_threshold": null,
+    "behavior_threshold": null,
+    "engineering_validity_does_not_authorize_science": true
+  },
+  "event_statuses": {
+    "mismatch_status_required": true,
+    "capacity_status_required": true,
+    "repair_status_required": true,
+    "repair_status_vocabulary": [
+      "READOUT_ALREADY_EQUAL__FINAL_GATES_PASS",
+      "REPAIR_VALID",
+      "EXACT_READOUT_FOUND__FINAL_GATE_FAILURE",
+      "SEARCH_EXHAUSTED__CAPACITY_PRESENT",
+      "SEARCH_EXHAUSTED__CAPACITY_ABSENT_OR_PARTIAL",
+      "SEARCH_NUMERICALLY_AMBIGUOUS",
+      "PARENT_CONSTRUCTOR_INELIGIBLE",
+      "INTEGRITY_INVALID"
+    ],
+    "denominators_reported_separately": [
+      "all configured events",
+      "parent-constructor-eligible events",
+      "initially mismatched eligible events",
+      "capacity-valid events",
+      "search-entered events"
+    ]
+  },
+  "protocol_status_vocabulary": [
+    "DRAFT_ONLY__NOT_EXECUTED",
+    "Q10_SR_STAGE2A_VALID__REPAIR_FOUND",
+    "Q10_SR_STAGE2A_VALID__NO_REPAIR_WITHIN_FROZEN_SEARCH",
+    "Q10_SR_STAGE2A_VALID__READOUTS_ALREADY_EQUAL",
+    "Q10_SR_STAGE2A_VALID__MIXED_DIAGNOSTIC_OUTCOME",
+    "Q10_SR_STAGE2A_NUMERICALLY_AMBIGUOUS",
+    "Q10_SR_STAGE2A_INVALID"
+  ],
+  "staging": {
+    "stage_1a": {
+      "seeds": [
+        9501
+      ],
+      "expected_events": 1024,
+      "entry_requires_future_explicit_authorization": false,
+      "required_outputs": "complete mismatch, move-bank, relaxed-capacity, discrete-search, final-gate, and independent-replay receipts"
+    },
+    "stage_1b": {
+      "seeds": [
+        9502,
+        9503,
+        9504,
+        9505
+      ],
+      "expected_new_events": 4096,
+      "expected_cumulative_events": 5120,
+      "entry_rule": "Stage 1A source, executable, coverage, observer purity, complete receipts, committed-byte replay, and every fail-closed gate pass without contract changes"
+    },
+    "change_after_stage_1a": "requires a new protocol identity and fresh engineering seeds",
+    "top_up_forbidden": true
+  },
+  "independent_review": {
+    "required": true,
+    "must_not_trust_cached_readouts": true,
+    "required_checks": [
+      "parent file hashes and required parent status",
+      "fresh engineering seed firewall and exact event counts",
+      "Q10-SM constructor identity and starting 32-ULP reserve",
+      "production learner-order sequential arithmetic",
+      "selected legal one-move effects from committed bytes",
+      "move-bank provenance and relaxed factorization receipts",
+      "beam, branch, depth, coordinate-spend, and reserve budgets",
+      "final committed-byte sequential readout equality",
+      "final support and separate boundary memberships",
+      "final reserve, axis, norm, and cue-linear gates",
+      "observer and constructor RNG nonconsumption and nonmutation",
+      "absence of behavior and scientific fields"
+    ]
+  },
+  "required_pre_execution_freeze": {
+    "required": true,
+    "execution_forbidden_until_complete": true,
+    "fields": [
+      "implementation source manifest and SHA-256 identities",
+      "executable SHA-256 and D: target-build receipt",
+      "production sequential-readout source identity and arithmetic audit",
+      "binary32 ordered-key, ULP-distance, nextafter32, signed-zero, subnormal, NaN, infinity, and bound semantics",
+      "event snapshot and receipt schemas and hashes",
+      "SVD implementation identity and deterministic arithmetic policy",
+      "memory and allocation limits for move-bank and beam search",
+      "observer invariance, RNG nonconsumption, nonmutation, finite-value, determinism, unit, smoke, and performance tests",
+      "independent reviewer source identity and replay schema",
+      "scientific-seed, measured-CLI, behavior, and DH-08B rejection tests"
+    ],
+    "outcome_dependent_freezing_forbidden": true
+  },
+  "assumptions": [
+    "Q10-SM's exact constructor can be replayed on fresh engineering states without changing its frozen semantics.",
+    "Model weights, bounds, products, accumulators, and stored readouts use finite IEEE-754 binary32 wherever the production learner does; nonfinite values fail closed.",
+    "The production learner's exact operation order and fused-versus-unfused behavior are part of the observed object and may not be optimized by the diagnostic observer.",
+    "Ordered-binary32 ULP distance uses a frozen total ordering that distinguishes signs and signed zero; NaN and infinity are invalid.",
+    "A legal ULP move is an actual adjacent binary32 storage value, not addition of an estimated decimal epsilon.",
+    "Starting-state one-move effects are a local capacity diagnostic and may change after subsequent moves.",
+    "Relaxed SVD capacity neither proves nor disproves discrete repairability.",
+    "The finite beam search is a deterministic constructor, not a completeness proof; exhaustion does not establish impossibility.",
+    "Exact sequential readout equality is necessary but insufficient without every final geometry and integrity gate.",
+    "The 16-step final reserve, 16-step per-coordinate spend, 64-move budget, beam width 64, and branch width 64 are conservative engineering choices made without behavioral evidence.",
+    "The f64 cue, axis, and norm tolerances are engineering admission gates, not biological, behavioral, direction, or exchangeability thresholds.",
+    "An already-equal endpoint measures storage mismatch frequency but does not demonstrate a nontrivial repair.",
+    "Parent-constructor-ineligible events remain in total coverage and cannot be replaced; repair denominators are reported separately.",
+    "No qualification outcome may change seeds, budgets, tolerances, status rules, or future direction and behavior gates.",
+    "Future behavioral, direction-effect, exchangeability, hidden-learning-state, future-plasticity, and metaplasticity claims remain unset."
+  ],
+  "claims_explicitly_forbidden": [
+    "Q08 vindication",
+    "reinterpretation of Q09, Q10-BG, or Q10-SM",
+    "global box-constrained freedom",
+    "meaningful directional separation",
+    "scientific exchangeability of true and repaired endpoints",
+    "direction effect",
+    "behavior effect",
+    "future-learning effect",
+    "hidden learning state",
+    "metaplasticity",
+    "DH-08B authorization"
+  ]
+}

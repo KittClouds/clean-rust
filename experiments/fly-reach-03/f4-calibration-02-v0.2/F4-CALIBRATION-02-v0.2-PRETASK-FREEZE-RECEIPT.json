@@ -1,0 +1,71 @@
+{
+  "biological_promotion": false,
+  "contract_json_sha256": "f1c3516fbc46aa8b315fc0d679a9b910ecdd3de2a2637a9c3c364ecde7e8ce96",
+  "contract_markdown_sha256": "192b0c3c01b2b7978aedfe55e5490012226e62e0b7660c4410797a08b44a01b8",
+  "evaluable_block_gate": {
+    "empty_or_one_class_blocks": "retain; blockwise balanced error undefined; count as non-evaluable; no replacement; available rows remain in pooled scoring",
+    "evaluable_block": "held-out U-star rows contain at least one Y=+1 and at least one Y=-1",
+    "minimum_evaluable_blocks": 10,
+    "omega_hat": "max(0, 1 - 2 * epsilon_balanced)",
+    "per_evaluable_block_epsilon_balanced_max": 0.15,
+    "per_evaluable_block_omega_hat_min": 0.7,
+    "pooled_epsilon_balanced_max": 0.1,
+    "pooled_omega_hat_min": 0.8,
+    "pooled_population": "all available out-of-fold U-star rows across the frozen twelve blocks, with inverse-inclusion weights and equal class weighting",
+    "total_blocks": 12
+  },
+  "fit_or_outcome_namespace_created": false,
+  "fresh_block_ids": [
+    305012,
+    305013,
+    305014,
+    305015,
+    305016,
+    305017,
+    305018,
+    305019,
+    305020,
+    305021,
+    305022,
+    305023
+  ],
+  "fresh_task_blocks_created": false,
+  "frozen_d_sources_verified": {
+    "d_feature_construction": {
+      "path": "experiments/fly-reach-03/f4-symmetry-03/scripts/prepare_fit.py",
+      "sha256": "9da88d9a2e147cad551e8e4e2c8b11ba460b435f5743f57527fbf46d7eb09497"
+    },
+    "feature_helpers": {
+      "path": "experiments/fly-reach-03/f4-symmetry-03/scripts/common.py",
+      "sha256": "27024a001f2c89f520b5230bf3796ee8691e499f29ce73c71597ad7c303debf5"
+    },
+    "fit_recipe": {
+      "path": "experiments/fly-reach-03/f4-symmetry-03/scripts/fit.py",
+      "sha256": "0c8a84f2418c8b2d7fa222675860771e7e4e64b871ad333ec0fb5e3e65af5026"
+    },
+    "model": {
+      "path": "experiments/fly-reach-03/scripts/f4_symmetry_01_model.py",
+      "sha256": "92e260bd0057115867bf69b343d8193bab141035f3338af4586c5e0af61c47f8"
+    }
+  },
+  "heldout_truth_opened": false,
+  "measured_reach03_authorized": false,
+  "native_collection_started": false,
+  "parent_qpromo1_engineering_stop_addendum_sha256": "4bb1fb284fa1d666e5e71bb00c7247ec1ccd3b19cb06e7bb3e91c5739f6f4f8c",
+  "parent_qpromo1_engineering_stop_receipt_sha256": "24c95d84e866e195493825ddc0a8cee458e089941f85afe3eae60b26570ff881",
+  "pooled_gate": {
+    "empty_or_one_class_blocks": "retain; blockwise balanced error undefined; count as non-evaluable; no replacement; available rows remain in pooled scoring",
+    "evaluable_block": "held-out U-star rows contain at least one Y=+1 and at least one Y=-1",
+    "minimum_evaluable_blocks": 10,
+    "omega_hat": "max(0, 1 - 2 * epsilon_balanced)",
+    "per_evaluable_block_epsilon_balanced_max": 0.15,
+    "per_evaluable_block_omega_hat_min": 0.7,
+    "pooled_epsilon_balanced_max": 0.1,
+    "pooled_omega_hat_min": 0.8,
+    "pooled_population": "all available out-of-fold U-star rows across the frozen twelve blocks, with inverse-inclusion weights and equal class weighting",
+    "total_blocks": 12
+  },
+  "run_id": "F4-CALIBRATION-02-QPROMO2",
+  "schema": "F4-CALIBRATION-02-v0.2-pre-task-freeze-receipt-v1",
+  "status": "CONTRACT_FROZEN_PRETASK"
+}

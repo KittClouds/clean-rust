@@ -1,0 +1,33 @@
+{
+  "contract": "MST_RG2_PHASE11_RESEARCH_SEAL_V1",
+  "status": "PASS",
+  "sealed_at_utc": "2026-08-12T13:47:28.306312+00:00",
+  "corpus_sha256": "9cbad8545db23cba7ccea2bd062aeba700597deb4be19cecbb74647f65ef8413",
+  "phase10_5_interface_sha256": "7000d52d9b4234de19df4ba0b7ddb225ccf9556d095e3589e4018ed57bac60e6",
+  "phase11_code_sha256": "839653093c5af14ace01ea9d87af7568a62481cd1227ca3970afb46af0a20ca9",
+  "semantic_result_sha256": "c572ebdf36b5c523301452f49ad788303598776486fe2d780c8ef22a7eb87c9c",
+  "holdout_windows_touched": 0,
+  "artifacts": {
+    "candidate_protocol.tsv": "8d8525c082be23be43e75e9c15e4002ab598e88fc371c4b482ff7cf2d2a444bf",
+    "coefficients.tsv": "bcd734d20db7c7afe98652c290ac7ec5f0deba9889b63b685b2ad42328783faf",
+    "cohort_receipts.json": "b80f5e54e0e360a4be413e10e06a1d4bf1873d53e661756fa938f811909808da",
+    "continuous.tsv": "d708bf83f0e59d5cd798d19b10bfb56e792d901f1f129e99a68d688c92fb001b",
+    "dependence.tsv": "07c238f4a09da611d7952ac4bf61a526b60cbcadf51dcabf2473c69f124af890",
+    "feature_manifest.tsv": "3fe2dd9558a3c1aa370e6f02a17f54365a7e8cec8c43cf07a4ac735ee40c17a8",
+    "fold_manifest.tsv": "d8fd16c1655a4e0d68f17b34f83bde7ffbe99f66436451e5777fd0d9a466c247",
+    "incidence.tsv": "ed316f7850049141246e4763cb0422b1f8721e70573d379b82aa009aa0d70c5f",
+    "latent_gate.json": "232978c691062ca20e1310ea08edbf5bf26ac244363465a99dc41057bae20172",
+    "model_gates.json": "e06b2f0695282fcbe885efafeee40a2e1b33ffdffa5460794cd708956d2fe394",
+    "model_metrics.tsv": "bbded3c26879e11c593210254d539738bb4fc8cb7f54493463bc90055ccd8936",
+    "model_predictions.tsv": "06a9cba20d9f4a73d4006abdf550c383217c22da2a8113423a5de67afaac5e57",
+    "nonlinear_metrics.tsv": "4c0a80b1f819e89672e96682993e48de57716359e2b8c886b722bbf07b08ffb7",
+    "nonlinear_predictions.tsv": "e98b8b00b282fb06d2f015cea4d805647069e1f3374fac730f532ef6aa89c044",
+    "phase11_report.html": "74458b4ca4863f53fe4b5d6bbcc62ca179da331b4472666bee15e73a3b2ab551",
+    "phase11_report.md": "2a768f6115d2412cb4f0ca6bee2fa119241a1ee2e08f820d6f1a48b7593e4867",
+    "phase11_summary.json": "66890ea6af7b553359fc9a4ec5fffc1fcf78cc8037fe5f8fdd3499c21cf8f17b",
+    "rates.tsv": "4d7c1fba34568bd46be1a2bcc516f1c33f663c25d1cad9ab755ab457ef696b17",
+    "target_summary.tsv": "5301f7ab70cd66d0d1a6801880659aa993c67a2fd1772d049242afd3a45ec315",
+    "transition_stability.tsv": "30dbafc26a81726979ce038966240b87dc6d30afcfd1f0fef84cc6da8bf0555a",
+    "transitions.tsv": "6a6ab3f3dfbf6ef075695d2123761dcd69e4c937f994e991545d8deae68f7b7e"
+  }
+}

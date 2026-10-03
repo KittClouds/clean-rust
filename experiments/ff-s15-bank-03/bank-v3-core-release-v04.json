@@ -1,0 +1,15 @@
+{
+  "acceptance_sha256": "b2ede29c5b72432d6957b4bbf839f454e39ce1d66dd55ae071b556a208e6170c",
+  "actual_path": "C:\\phoenix-target-overgraph\\bank-v3-core-20261002-v04",
+  "core_provenance": "SYNTHETIC_ONLY",
+  "handoff": "C:\\phoenix-target-overgraph\\bank-v3-core-20261002-v04\\PHASE5-HANDOFF.json",
+  "human_extension": "PENDING_PERMISSION_AND_RECONSTRUCTION; prior requirements unchanged",
+  "manifest_sha256": "2033aabd67bce5a018a32ee7417cf2b282c8bb269419ba2458a320b59002524d",
+  "model_contact": "TRAIN_DEV_ONLY; public evaluation inputs only, no protected truth grant",
+  "model_learnability_measured": false,
+  "prospective_amendment": "core-v04/CONSTITUTION.md",
+  "release_identity": "84f0a7e13032e8cdfcecc862217bb33ca23568fade64fafeef410327eb996f12",
+  "report": "C:\\phoenix-target-overgraph\\bank-v3-core-20261002-v04\\REPORT.md",
+  "schema": "BANK-v3-core-release-locator-v04",
+  "status": "SEALED_INDEPENDENTLY_REPLAYED"
+}

@@ -1,0 +1,86 @@
+{
+  "protocol": "jev-information-density/v0.8l-phase-a-v01",
+  "phase_a_identity": "phase-a-v01-clean",
+  "purpose": "Construct matched DUP/NOVEL/SHAM objective streams without head training or evaluation access.",
+  "parentage": {
+    "primary_bank": "sealed v0.8I phase-a-v02-clean F100",
+    "triplets": "sealed v0.8K phase-a-v01-clean triplets",
+    "prior_attribution": "sealed v0.8K phase-b-v01 k-attribution-summary",
+    "forbidden_parent_identity": "phase-a-v01-quarantined"
+  },
+  "source_scope": {
+    "primary_bank": "D:\\codex-runs\\jev-information-density-v08i\\phase-a-v02-clean\\materialized\\F100-groups.jsonl",
+    "triplets": "D:\\codex-runs\\jev-information-density-v08k\\phase-a-v01-clean\\inputs\\triplets.jsonl",
+    "sham_views": "D:\\codex-runs\\jev-information-density-v08j\\phase-a-v01\\inputs\\sham-views.jsonl",
+    "state_inputs": "D:\\codex-runs\\jev-information-density-v08i\\phase-a-v02-clean\\materialized\\state-inputs.jsonl",
+    "training_only": true,
+    "protected_evaluation_bodies_opened": false
+  },
+  "dose": {
+    "primary_groups": 100000,
+    "triplets": 5000,
+    "auxiliary_events_per_arm": 5000,
+    "arms": ["L-DUP", "L-NOVEL", "L-SHAM"]
+  },
+  "hard_match": {
+    "candidate_role": "contrast_role=anchor",
+    "view": "choice",
+    "kind": "choice",
+    "candidate_cardinality": 4,
+    "candidate_semantic_ids": "exact equality",
+    "candidate_order": "name_definition index sequence exact equality",
+    "family_fields": [
+      "world_or_topology_family",
+      "ontology_family",
+      "schema_composition_family",
+      "candidate_set_construction_family",
+      "definition_template_family"
+    ],
+    "family_values": "exact equality",
+    "target": "exact gold vector within 1e-12 per component",
+    "probability_source": "exact_generative_posterior",
+    "root": "different from anchor root",
+    "state": "different canonical state text",
+    "current_triplet": "candidate is not the current anchor, fact-flip, or sham group",
+    "novel_relation": "candidate may be an anchor from another certified training triplet, but is never the certified local sham for the current anchor",
+    "reuse_cap": 1
+  },
+  "representation_matching": {
+    "model_repo_id": "LiquidAI/LFM2.5-1.2B-Base",
+    "model_revision": "7453bca97ca1e67754c4035a4b4c584e1c9dd725",
+    "pooling": "final-layer mean_full",
+    "input_mode": "exact-length, single-row, no padding",
+    "feature_point": "state feature h for the fixed candidate/schema view",
+    "radius": "L2(h_candidate - h_anchor)",
+    "sham_radius": "L2(h_sham - h_anchor)",
+    "matching_cost": "abs(candidate_radius - sham_radius)",
+    "direction_matching": false,
+    "algorithm": "deterministic per-hard-key sorted-radius assignment with self-collision repair",
+    "tie_break": "sha256(anchor_group_id + candidate_group_id + contract_sha256)",
+    "acceptance": {
+      "mean_absolute_radius_error_max": 0.05,
+      "p95_absolute_radius_error_max": 0.15,
+      "max_absolute_radius_error_report_only": true
+    }
+  },
+  "objective_graph": {
+    "base_loss": "existing v0.8J/v0.8K L3 source-typed pointwise objective",
+    "auxiliary_loss": "same target-weighted pointwise L3 event",
+    "auxiliary_weight": 1.0,
+    "normalization": "same N_base_plus_N_aux semantics as v0.8K",
+    "new_invariance_edges": 0,
+    "source_roles": {
+      "L-DUP": "anchor_duplicate",
+      "L-NOVEL": "matched_novel",
+      "L-SHAM": "certified_sham"
+    }
+  },
+  "boundaries": {
+    "model_head_training": false,
+    "evaluation_inference": false,
+    "protected_evaluation_bodies": false,
+    "newtight_access": false,
+    "phoenix_access": false,
+    "phase_b_authorized": false
+  }
+}

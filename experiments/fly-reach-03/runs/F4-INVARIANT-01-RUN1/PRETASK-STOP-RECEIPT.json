@@ -1,0 +1,15 @@
+{
+  "schema": "F4-INVARIANT-01-RUN1-pretask-stop-v1",
+  "status": "STOP",
+  "gate": "TASK_SCHEDULE_SHAPE_VALIDATION",
+  "detail": "Execution guard expected 16 elements per schedule row; frozen task generator emits one cue plus 12 delayed inputs (13 total).",
+  "task_seed_manifest_file_sha256": "26ed7e56fd4546265979c25ce4d06f04682c0c01170f1992baabda8b72594fd2",
+  "task_seed_receipt_file_sha256": "06624a69258a560b562989213462c665903e5091ddb938b65eb3de05d8321c35",
+  "task_payload_created": false,
+  "training_json_created": false,
+  "native_collection_started": false,
+  "fit_manifest_created": false,
+  "fits_executed": false,
+  "qualification_only": true,
+  "scientific_outcomes_opened": false
+}

@@ -1,0 +1,1 @@
+{"bijective_within_side":true,"phases":["READ_COMMITTED","STAGE_ONLY_PERMITTED_EXTENSION","MATCH_CURRENT_PROTECTED_RESPONSE","COMMIT_OR_DISCARD"],"rewrite_committed_mapping":false,"schema":"G6_CORRESPONDENCE_TRANSACTION_POLICY_V1"}

@@ -1,0 +1,38 @@
+[package]
+name = "r1-stage1-search"
+version = "0.1.0"
+edition = "2021"
+publish = false
+autobins = false
+
+[lib]
+name = "r1_stage1_search"
+path = "src/lib.rs"
+
+[[bin]]
+name = "r1_q_v07_rerank"
+path = "src/bin/r1_q_v07_rerank.rs"
+
+[[bin]]
+name = "r1_stage1_pilot"
+path = "src/bin/r1_stage1_pilot.rs"
+
+[[bin]]
+name = "r1_v04_proposal_scores"
+path = "src/bin/r1_v04_proposal_scores.rs"
+
+[[bin]]
+name = "r1_v05_qdelta_parity"
+path = "src/bin/r1_v05_qdelta_parity.rs"
+
+[dependencies]
+libm = "0.2"
+r1-world = { path = "../../stage0-v01/world" }
+r1-search = { path = "../../stage0-v01/search" }
+hashbrown = { version = "0.14", features = ["serde"] }
+bytemuck = "1"
+memchr = "2"
+memmap2 = "0.9"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"

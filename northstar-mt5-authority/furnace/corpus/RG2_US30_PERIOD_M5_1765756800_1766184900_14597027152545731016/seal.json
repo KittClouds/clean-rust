@@ -1,0 +1,95 @@
+﻿{
+    "contract":  "MST_IMMUTABLE_RUN_SEAL_V1",
+    "status":  "SEALED",
+    "sealed_at_utc":  "2026-08-12T09:45:16.6113481Z",
+    "run_key":  "RG2_US30_PERIOD_M5_1765756800_1766184900_14597027152545731016",
+    "invocation_id":  "RG2_US30_PERIOD_M5_1765756800_1766184900_14597027152545731016_I1765756800_2005171585885983666",
+    "window_id":  "US30_20251215_EVENT_HEAVY",
+    "manifest_sha256":  "5bf12767746b8499ad0edde2597df67b1928cc5941705a8391ae2585a0574092",
+    "canonical_dataset_hash":  "d647fda0ca45bdd58d4ce208f609946ae06d3c57113d63074cdcf417abf174dd",
+    "sealed_payload_sha256":  "f17cbd750686b3a5bfcdb4f9b443757fde2136eff02c387974f14ce6b6621ba4",
+    "file_count":  16,
+    "files":  [
+                  {
+                      "path":  "raw/auction/MasterAuction_US30_PERIOD_M5_F2_US30_20251215_EVT_A01_RG2_v7_attempts.tsv",
+                      "bytes":  257629,
+                      "sha256":  "a293a0bb0c224dfdb58733bc44cb1dd066bae8e401b0a48a4d9a2c146971a071"
+                  },
+                  {
+                      "path":  "raw/auction/MasterAuction_US30_PERIOD_M5_F2_US30_20251215_EVT_A01_RG2_v7_context.tsv",
+                      "bytes":  601701,
+                      "sha256":  "e39bc785aacba2a6a3d1a4545327a90b4ba0414bc2cfb04f81308e686c209a00"
+                  },
+                  {
+                      "path":  "raw/auction/MasterAuction_US30_PERIOD_M5_F2_US30_20251215_EVT_A01_RG2_v7_episodes.tsv",
+                      "bytes":  29645,
+                      "sha256":  "4fa0a2913aeceff526ed3f0eb60f55a5715e69e20ed9917272539a3d1e532172"
+                  },
+                  {
+                      "path":  "raw/auction/MasterAuction_US30_PERIOD_M5_F2_US30_20251215_EVT_A01_RG2_v7_events.tsv",
+                      "bytes":  859414,
+                      "sha256":  "9af74fb3c44b57c1a16eb3c83434ef9281388aa9bd4daa37ce1b07471436812b"
+                  },
+                  {
+                      "path":  "raw/auction/MasterAuction_US30_PERIOD_M5_F2_US30_20251215_EVT_A01_RG2_v7_features.tsv",
+                      "bytes":  227300,
+                      "sha256":  "11a83f37dd63375f2af0517dd82378dbea8af9a6f09e874672d106819e02be50"
+                  },
+                  {
+                      "path":  "raw/auction/MasterAuction_US30_PERIOD_M5_F2_US30_20251215_EVT_A01_RG2_v7_runs.tsv",
+                      "bytes":  5741,
+                      "sha256":  "b6708718b2ac96981d6abaa66eb8033f060b6b1a2920fb5c8210209db1ddd87b"
+                  },
+                  {
+                      "path":  "raw/auction/MasterAuction_US30_PERIOD_M5_F2_US30_20251215_EVT_A01_RG2_v7_transits.tsv",
+                      "bytes":  17096,
+                      "sha256":  "b13bfa8c26019794d748d8f062fe3f940f01f4ddf49dfb67d55b133eaecd36a5"
+                  },
+                  {
+                      "path":  "raw/structure/MasterStructure_US30_PERIOD_M5_F2_US30_20251215_EVT_A01_v6_events.tsv",
+                      "bytes":  162895,
+                      "sha256":  "cc96e805493c6a430a35be0520266d3b9cce8097e8ffba30ac1569a667ac8d69"
+                  },
+                  {
+                      "path":  "raw/structure/MasterStructure_US30_PERIOD_M5_F2_US30_20251215_EVT_A01_v6_inputs.tsv",
+                      "bytes":  257121537,
+                      "sha256":  "987a26739a64e7df6c9a8e0686ad4620681705418d378c03dba1b0fe3edbc4bd"
+                  },
+                  {
+                      "path":  "raw/structure/MasterStructure_US30_PERIOD_M5_F2_US30_20251215_EVT_A01_v6_nodes.tsv",
+                      "bytes":  36308384,
+                      "sha256":  "8edf210f8cb113c2b3aa6401db59a2d0439274cee26cf3fe2025262bf718e8f7"
+                  },
+                  {
+                      "path":  "receipts/admission_receipt.json",
+                      "bytes":  2762,
+                      "sha256":  "7d6e7f8e24f43958d990b632b7da354330320d272dc6038a151124890fb9655a"
+                  },
+                  {
+                      "path":  "receipts/campaign_manifest_row.json",
+                      "bytes":  1645,
+                      "sha256":  "88dd1675f5ae72c4de4814044dac9ebd5c2a397339adecefea9dcc7e3a3b98c1"
+                  },
+                  {
+                      "path":  "receipts/MasterAuction_US30_PERIOD_M5_F2_US30_20251215_EVT_A01_RG2_v7_replay_certificate.json",
+                      "bytes":  3571,
+                      "sha256":  "c23fd53f7e55aa139924d69aa4ead3f2ba3887e5cd544d854160c02e44165a47"
+                  },
+                  {
+                      "path":  "receipts/MasterAuction_US30_PERIOD_M5_F2_US30_20251215_EVT_A01_RG2_v7_replay_certificate.md",
+                      "bytes":  628,
+                      "sha256":  "6127a1865024ebaf9d270d5cd6e29a3f4a19b1426ae4781d1498936d042a3bd0"
+                  },
+                  {
+                      "path":  "receipts/terminal_run_receipt.json",
+                      "bytes":  4523,
+                      "sha256":  "60e7eddbcc796a04adde1d9dd5eb53eee22a9c7c798742edd59b8a2daf8f7a0e"
+                  },
+                  {
+                      "path":  "tester.ini",
+                      "bytes":  1652,
+                      "sha256":  "dca3e2daebf7542d53d4e1aebf2cff34fa0ea45ff16c5334e77cc773fb494700"
+                  }
+              ],
+    "mutation_rule":  "never overwrite; replacement requires a new invocation and explicit corpus generation"
+}

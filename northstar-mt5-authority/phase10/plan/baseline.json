@@ -1,0 +1,85 @@
+{
+  "contract": "MST_RG2_PHASE10_BASELINE_V1",
+  "phase": "TARGETED_GAP_COLLECTION_AND_CORPUS_SEAL",
+  "research_generation": 2,
+  "manifest_sha256": "5bf12767746b8499ad0edde2597df67b1928cc5941705a8391ae2585a0574092",
+  "phase9_semantic_hash": "819b274165d236ca8754552049b7eb38b1ad7ebdf7cb9a282930d8087b885077",
+  "lifecycle_audit_semantic_hash": "7921567adea729ce5aebb358342a590ae6ceb127de5c21fb15a0efa6bcda12fe",
+  "target_windows": [
+    "DE40_20260413_DIRECTIONAL_EXPANSION_UP",
+    "FRA40_20251201_PROLONGED_BALANCE",
+    "JPN225_20260713_DIRECTIONAL_EXPANSION_DOWN",
+    "US30_20260413_DIRECTIONAL_EXPANSION_UP",
+    "US500_20260601_DIRECTIONAL_EXPANSION_DOWN",
+    "USTEC_20260105_PROLONGED_BALANCE"
+  ],
+  "metrics": {
+    "runs": 14,
+    "attempts": 5221,
+    "episodes": 1032,
+    "episodes_right_censored": 22,
+    "episode_censoring_rate": 0.02131782945736434,
+    "by_instrument": {
+      "DE40": {
+        "episodes": 177,
+        "attempts": 956,
+        "runs": 2
+      },
+      "FRA40": {
+        "episodes": 135,
+        "attempts": 555,
+        "runs": 2
+      },
+      "JPN225": {
+        "episodes": 213,
+        "attempts": 1034,
+        "runs": 3
+      },
+      "US30": {
+        "episodes": 172,
+        "attempts": 987,
+        "runs": 2
+      },
+      "US500": {
+        "episodes": 200,
+        "attempts": 1114,
+        "runs": 3
+      },
+      "USTEC": {
+        "episodes": 135,
+        "attempts": 575,
+        "runs": 2
+      }
+    },
+    "attempt_resolution_counts": {
+      "ACCEPT_AND_FAIL_RETEST": 303,
+      "ACCEPT_AND_HOLD_RETEST": 544,
+      "ACCEPT_THROUGH_NODE": 433,
+      "NODE_RETIRED": 625,
+      "NONE": 15,
+      "RECLAIM_AFTER_BREAK": 588,
+      "REJECT_TO_ORIGIN": 2337,
+      "TIMEOUT": 376
+    },
+    "episode_terminal_resolution_counts": {
+      "ACCEPT_AND_FAIL_RETEST": 6,
+      "ACCEPT_AND_HOLD_RETEST": 8,
+      "ACCEPT_THROUGH_NODE": 2,
+      "NODE_RETIRED": 601,
+      "NONE": 2,
+      "RECLAIM_AFTER_BREAK": 31,
+      "REJECT_TO_ORIGIN": 12,
+      "RETURN_TO_SOURCE_NODE": 18,
+      "TIMEOUT": 287,
+      "TRANSIT_TO_NEXT_NODE": 65
+    },
+    "episode_initial_region_counts": {
+      "ABOVE": 126,
+      "BELOW": 259,
+      "EXTREME_BELOW": 1,
+      "FAR_ABOVE": 18,
+      "FAR_BELOW": 34,
+      "MEDIAN_CORE": 594
+    }
+  }
+}

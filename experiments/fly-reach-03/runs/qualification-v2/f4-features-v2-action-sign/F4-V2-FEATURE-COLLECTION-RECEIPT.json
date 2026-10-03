@@ -1,0 +1,12 @@
+{
+  "added_channel": "sim.action_sign[coordinate.post]",
+  "feature_identity": "f4-features-v2-action-sign",
+  "feature_width": 81,
+  "measured_namespace_created": false,
+  "native_simulator_mutated": false,
+  "reference_blind": true,
+  "rows": 13420,
+  "run_id": "qualification-v2",
+  "schema": "FLY-REACH-03-f4-feature-v2-collection-receipt-v1",
+  "status": "COLLECTION_COMPLETE"
+}

@@ -1,0 +1,53 @@
+{
+  "protocol": "jev-information-density/v0.8n-road-b-phase-b-implementation-correction-v03",
+  "identity": "v0.8N-phase-b-implementation-correction-v03",
+  "status": "IMPLEMENTATION_ONLY_CORRECTION_SEALED",
+  "parent_authorization_event_sha256": "0cad8d2e45fe8e7e5eed7f9bcdeab406926f24605ad9f62396d83f9512bb0a09",
+  "parent_correction_receipt_sha256": "c1feb348594c9cdcd6404dc37e7125ea20289464dcd7fd4f2d3bd55f48e213c3",
+  "parent_entrypoint_sha256": "4e8e933fa52c6a9bb7b45382d3409cb2505ccfe787b802e67d263852cf8bfa4d",
+  "corrected_entrypoint_sha256": "787c654f5a9bba75a9031a0863ec4d17939e517e43451e639eaa6cb10c835e7e",
+  "frozen_trainer_sha256": "e539bac2d67b47ba2b660b8579c5818e5fffc0cf94fa26cfd3e9dd905ef795ba",
+  "correction_verifier_sha256": "c6f6b7d5563b894193c3fa914fc5afac9ec10d39de7e83e915b2fa5a21efc25b",
+  "correction_test_sha256": "8f2f11e4da76601ebfbaae6eb373f9b26b54f4081dcbf25b32b1e5e6e71daffe",
+  "correction_class": "runtime device-identity-to-locator adapter; semantic impact none",
+  "observed_failure": {
+    "stage": "after frozen input and schedule validation, before seed/head initialization",
+    "exception": "RuntimeError: Invalid device string: NVIDIA GeForce RTX 3080",
+    "root_cause": "the frozen contract stores the verified GPU display identity in the field subsequently passed to Tensor.to as a device locator",
+    "outputs_at_failure": {
+      "head_templates_created": false,
+      "run_directories_created": false,
+      "optimizer_steps": 0,
+      "head_training": false,
+      "heldout_panel_opened": false
+    }
+  },
+  "runtime_device_mapping": {
+    "contract_device_identity": "NVIDIA GeForce RTX 3080",
+    "resolved_torch_device": "cuda:0",
+    "mapping_occurs_after_frozen_runtime_verification": true,
+    "hardware_substitution": false
+  },
+  "correction": {
+    "entrypoint": "experiments/jev-information-density-v08n/phase_b/train_phase_b_corrected_v03.py",
+    "runtime_adapter": "Call the frozen runtime verifier first; only after exact identity match, translate the display name to cuda:0 for tensor/device APIs.",
+    "source_overlay_applied_in_memory": false,
+    "on_disk_authorized_trainer_modified": false,
+    "parent_corrections_inherited": [
+      "v01 cache-container view around the identical tensor",
+      "v02 in-memory move of catalog_ids declaration before first use"
+    ],
+    "correction_test_path": "experiments/jev-information-density-v08n/phase_b/tests/test_v08n_phase_b_correction_v03.py",
+    "correction_verifier_path": "experiments/jev-information-density-v08n/phase_b/verify_phase_b_correction_v03.py",
+    "run_and_training_seal_bind_all_three_correction_receipts": true
+  },
+  "semantic_contract_changed": false,
+  "training_inputs_changed": false,
+  "model_revision_changed": false,
+  "objective_or_loss_changed": false,
+  "seed_or_schedule_changed": false,
+  "evaluation_contract_changed": false,
+  "protected_panel_access": false,
+  "newtight_access": false,
+  "phoenix_access": false
+}

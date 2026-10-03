@@ -1,0 +1,69 @@
+{
+  "protocol": "jev-information-density/v0.8p-v07-training-scope-identity-acquisition-v01",
+  "identity": "v0.8P-v07-training-scope-identity-acquisition-v01",
+  "disposition": "NOT_EVALUABLE",
+  "reason_code": "EXACT_SOURCE_PATH_ALLOWLIST_UNRESOLVABLE_FROM_FROZEN_BINDINGS",
+  "contract_binding": {
+    "path": "experiments/jev-information-density-v08p-v07/protocol/v07-overlap-ordering-repair-contract-v01.json",
+    "sha256": "cf2fc2705ea40d86cc81ddc7e9bd77108c303071e12efe32486653db27c14e0d",
+    "input_root_path": "experiments/jev-information-density-v08p-v07/provenance/v07-input-binding-root-v01.json",
+    "input_root_sha256": "b892aedf985694f541ab8b7fb428593f2a9fee633a603528cbecd345cf8ba2a5"
+  },
+  "source_allowlist_gate": {
+    "status": "NOT_EVALUABLE",
+    "required_logical_sources": [
+      "common_primary_occurrence_manifest",
+      "training_only_state_scope"
+    ],
+    "frozen_hashes_and_counts_present": true,
+    "exact_paths_bound_by_v07": false,
+    "exact_paths_bound_by_original_run_contract": false,
+    "required_field_allowlist_sealed": false,
+    "required_fields": [
+      "world_id",
+      "root_id",
+      "episode_id",
+      "full_rendered_input_hash",
+      "selector_input_hash"
+    ],
+    "failure": "The sealed v07 contract and original run contract provide source digests/counts but do not bind exact source paths for the required identity rows. v07 requires exact path/hash source allowlisting before opening identity bytes."
+  },
+  "exact_control_artifacts_checked": [
+    {
+      "path": "experiments/jev-information-density-v08p-v07/protocol/v07-overlap-ordering-repair-contract-v01.json",
+      "sha256": "cf2fc2705ea40d86cc81ddc7e9bd77108c303071e12efe32486653db27c14e0d"
+    },
+    {
+      "path": "experiments/jev-information-density-v08p-v07/provenance/v07-input-binding-root-v01.json",
+      "sha256": "b892aedf985694f541ab8b7fb428593f2a9fee633a603528cbecd345cf8ba2a5"
+    },
+    {
+      "path": "experiments/jev-information-density-v08p/phase_b/phase-b-p-run-contract-v01.json",
+      "sha256": "e345225b4a17fc18eb35fcab24cbe1d72bd0e34bed9de272f927a7be461853e6"
+    }
+  ],
+  "source_boundary": {
+    "training_identity_source_files_opened": 0,
+    "training_identity_values_read": 0,
+    "training_identity_rows_acquired": false,
+    "candidate_generation_or_staging": false,
+    "collision_stream_consumed": false,
+    "overlap_computed": false,
+    "directory_enumeration_or_search": false,
+    "glob_or_substitute_source_lookup": false,
+    "lfm_or_feature_contact": false,
+    "training": false,
+    "head_loading_or_inference": false,
+    "evaluation": false,
+    "phoenix": false,
+    "note": "Records exact-path contract checks only; this is not OS-level file-open telemetry."
+  },
+  "result_state": {
+    "training_identity_manifest": "ABSENT",
+    "overlap_result": "NONE",
+    "candidate_staging_authorized": false,
+    "panel_promotion_authorized": false,
+    "next_action": "STOP; do not search for or substitute source paths under this authorization."
+  },
+  "root_hash_rule": "SHA-256 of the exact bytes of this receipt; no self-referential hash field."
+}

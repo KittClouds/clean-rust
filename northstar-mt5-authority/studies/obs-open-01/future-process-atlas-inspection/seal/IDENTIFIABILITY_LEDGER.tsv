@@ -1,0 +1,9 @@
+object	status	receipt
+CANDIDATE_AGE_AT_BIRTH	OBSERVER_IMPLIED_ZERO	Every candidate-birth anchor has age zero; survival age is the process time axis, not a birth-time predictor.
+LANDMARK_AGE_STATE	NEW_ANCHOR_PROTOCOL_REQUIRED	Age-conditioned future persistence requires causal landmark anchors O(t+u) conditional on survival to u.
+FINAL_SESSION_MULTIPLICITY	RETROSPECTIVE_NOT_CAUSAL_AT_BIRTH	Final multiplicity becomes known only after session completion.
+CAUSAL_CANDIDATE_GENERATION_HISTORY	FUTURE_PROTOCOL_REQUIRED	Accumulated births or recent birth intensity were not constructed or evaluated here.
+K_AND_FREEZE_CLOCK	PERFECTLY_ALIASED	k minutes implies freeze at 09:30+k in this observer generation.
+PURE_SCALE_INDEPENDENT_OF_CLOCK	NOT_IDENTIFIABLE	The current observer does not independently vary construction scale and freeze clock.
+RANGE_GEOMETRY_AT_FIXED_K	DESCRIPTIVELY_AVAILABLE	Across-session frozen width midpoint and paths vary at fixed design coordinate k.
+RAW_AND_RANGE_Z	PEER_REPRESENTATIONS	Normalization is retained beside raw source-price geometry and denominator receipts.

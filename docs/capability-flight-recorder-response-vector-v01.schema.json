@@ -1,0 +1,152 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:kittclouds:capability-flight-recorder:response-vector:v1",
+  "title": "Capability Flight Recorder response-vector sample",
+  "description": "One arm/seed/checkpoint measurement. Direction, gain, boundary crossing, locality, and preservation stay separate; no composite capability score is permitted.",
+  "$comment": "Append one record per arm, seed, and checkpoint. Keep family rows visible. A missing metric must be represented by a separate explicit availability status in a future schema version; do not silently substitute zero.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "experiment_id",
+    "arm",
+    "seed",
+    "checkpoint",
+    "panel_id",
+    "metric_contract_sha256",
+    "coordinates",
+    "family_metrics"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "experiment_id": { "type": "string", "minLength": 1 },
+    "arm": { "type": "string", "minLength": 1 },
+    "seed": { "type": "integer", "minimum": 0, "maximum": 4294967295 },
+    "checkpoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["global_step", "epoch"],
+      "properties": {
+        "global_step": { "type": "integer", "minimum": 0 },
+        "epoch": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "panel_id": { "type": "string", "minLength": 1 },
+    "metric_contract_sha256": { "$ref": "#/$defs/sha256" },
+    "coordinates": { "$ref": "#/$defs/coordinates" },
+    "family_metrics": {
+      "type": "object",
+      "minProperties": 1,
+      "description": "Same five-coordinate structure, separately measured within each declared family.",
+      "additionalProperties": { "$ref": "#/$defs/coordinates" }
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "rate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["value", "numerator", "denominator"],
+      "properties": {
+        "value": { "type": "number", "minimum": 0, "maximum": 1 },
+        "numerator": { "type": "integer", "minimum": 0 },
+        "denominator": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "scalar": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["value", "n", "unit"],
+      "properties": {
+        "value": { "type": "number" },
+        "n": { "type": "integer", "minimum": 1 },
+        "unit": { "type": "string", "minLength": 1 }
+      }
+    },
+    "jointCell": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["count", "proportion"],
+      "properties": {
+        "count": { "type": "integer", "minimum": 0 },
+        "proportion": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "jointCells": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["A_AND_F", "A_AND_NOT_F", "NOT_A_AND_F", "NOT_A_AND_NOT_F"],
+      "properties": {
+        "A_AND_F": { "$ref": "#/$defs/jointCell" },
+        "A_AND_NOT_F": { "$ref": "#/$defs/jointCell" },
+        "NOT_A_AND_F": { "$ref": "#/$defs/jointCell" },
+        "NOT_A_AND_NOT_F": { "$ref": "#/$defs/jointCell" }
+      }
+    },
+    "coordinates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["direction", "gain", "boundary_crossing", "locality", "preservation"],
+      "properties": {
+        "direction": {
+          "type": "object",
+          "description": "Whether movement follows the target-correct direction, independent of its size.",
+          "additionalProperties": false,
+          "required": ["correct_direction_rate"],
+          "properties": {
+            "correct_direction_rate": { "$ref": "#/$defs/rate" }
+          }
+        },
+        "gain": {
+          "type": "object",
+          "description": "Continuous response magnitude. Keep the signed mean delta and direction rate separate; do not call a tiny correctly signed change a boundary crossing.",
+          "additionalProperties": false,
+          "required": ["new_probability_delta_mean", "exact_delta_mae"],
+          "properties": {
+            "new_probability_delta_mean": { "$ref": "#/$defs/scalar" },
+            "mean_absolute_new_probability_delta": { "$ref": "#/$defs/scalar" },
+            "exact_delta_mae": { "$ref": "#/$defs/scalar" }
+          }
+        },
+        "boundary_crossing": {
+          "type": "object",
+          "description": "Discrete fact-view winner acquisition and joint old-anchor/new-fact transition, with the four-cell decomposition.",
+          "additionalProperties": false,
+          "required": ["fact_new_map_rate", "strict_transition_rate", "four_cell_decomposition"],
+          "properties": {
+            "fact_new_map_rate": { "$ref": "#/$defs/rate" },
+            "strict_transition_rate": { "$ref": "#/$defs/rate" },
+            "four_cell_decomposition": { "$ref": "#/$defs/jointCells" }
+          }
+        },
+        "locality": {
+          "type": "object",
+          "description": "Posterior L1 movement and MAP flips for sham and matched-neutral views, recorded independently.",
+          "additionalProperties": false,
+          "required": ["sham_l1", "sham_map_flip_rate", "matched_l1", "matched_map_flip_rate"],
+          "properties": {
+            "sham_l1": { "$ref": "#/$defs/scalar" },
+            "sham_map_flip_rate": { "$ref": "#/$defs/rate" },
+            "matched_l1": { "$ref": "#/$defs/scalar" },
+            "matched_map_flip_rate": { "$ref": "#/$defs/rate" }
+          }
+        },
+        "preservation": {
+          "type": "object",
+          "description": "Anchor decision preservation and optional anchor calibration diagnostics; include the family breakdown.",
+          "additionalProperties": false,
+          "required": ["anchor_old_map_rate"],
+          "properties": {
+            "anchor_old_map_rate": { "$ref": "#/$defs/rate" },
+            "anchor_gold_map_accuracy": { "$ref": "#/$defs/rate" },
+            "anchor_nll": { "$ref": "#/$defs/scalar" },
+            "anchor_brier": { "$ref": "#/$defs/scalar" }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "schema": "E4_0_TRACK_E_PRESEAL_STOP_PRESERVATION_V01",
+  "receipt_id": "E4_0_TRACK_E_V16_V08_PRESEAL_STOP_PRESERVATION_V01",
+  "recorded_utc": "2026-09-27T08:33:31.399717+00:00",
+  "status": "PRESERVED_PRESEAL_STOP_NO_CONTACT",
+  "contract_candidate": {
+    "path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/e4-0-contract-v16-v06-final.json",
+    "bytes": 128979,
+    "sha256": "7bc5e2e4b5d0f47d0e52f9480995e6350194f9466879a6ba3b1975d25228085a"
+  },
+  "source_map": {
+    "path": "experiments/fas-frozen-observer-bundle-engineering-v01/plans/E4-0-IMPLEMENTATION-SOURCE-MAP-v16-v08.md",
+    "bytes": 124095,
+    "sha256": "8a69757820d9ec8935270ad3cab4005457d1f3726cfa396824e0abe33f03d1f2"
+  },
+  "preseal_receipt": {
+    "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-preseal-receipt-v16-v08.json",
+    "bytes": 154436,
+    "sha256": "d2c397b749df9c1e86706102d807d54ec220dddd5eba8dbc36f4e78125de5f65"
+  },
+  "auditor_source": {
+    "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/audit_e4_0_track_e_v16_v08.py",
+    "bytes": 164677,
+    "sha256": "6000dc58b1fe630cb4ba7f6a903a6c311d2e97613428eace763faf6b0435b96a"
+  },
+  "auditor_test_source": {
+    "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/test_audit_e4_0_track_e_v16_v08.py",
+    "bytes": 3256,
+    "sha256": "5ca8fd23b4cab1193fc0a52a64b61acebc209b0dfef06abd6636b62b13660d43"
+  },
+  "preseal_status": "E4_0_TRACK_E_PRESEAL_STOP_MISMATCHES_RECORDED_V16_V08",
+  "issues": [
+    "failed v16-v05 authorization stop differs from exact pre-contact identity-index evidence",
+    "v16-v06 amendment does not bind the exact sealed v16-v05 contract revision",
+    "v16-v06 amendment does not bind the exact failed v16-v05 authorization attempt",
+    "failed v16-v07 finalizer unexpectedly wrote a contract candidate",
+    "v16 amendment differs from the canonical flattened v12-v16 lineage or exact preserved no-contact stops",
+    "contract implementation_sources does not exactly bind source-map rows by role"
+  ],
+  "candidate_sealed": false,
+  "authorization_written": false,
+  "tokenizer_contact": false,
+  "model_contact": false,
+  "cuda_initialized": false,
+  "gpu_lease_acquired": false,
+  "feature_cache_created": false,
+  "labels_opened": false,
+  "population_truth_files_opened": false,
+  "template_or_joint_truth_opened": false,
+  "scope": "Preserves the v16-v08 contract candidate, map, and failed independent preseal audit as a pre-model contract-verification stop. No scientific execution or truth access occurred."
+}

@@ -1,0 +1,222 @@
+{
+  "schema": "ff-s15-bank3-objects-v1",
+  "status": "SCAFFOLD_PRE_CODE",
+  "version": "0.1",
+  "experiment": "FF-S15-BANK-03",
+  "release": "BANK-v3",
+  "date": "2026-09-30",
+  "stage": "non-contact constitution work only",
+
+  "public_description": "human-grounded inputs with self-derived canonical labels",
+
+  "lineage": {
+    "v1": {
+      "data_import_as_roots": "NEVER",
+      "renderer_family_ideas": "may be reimplemented cleanly",
+      "why": "every v1 row carries the coin-flip ASK label, the folded reasons, and a 14-action schema in which 9 action types are unreachable; importing v1 rows as semantic roots would import exactly the catalogued defects"
+    },
+    "v2": {
+      "inherit_semantics_and_machinery": true,
+      "inherit_row_identity": false,
+      "rule": "V3 inherits V2's semantics and machinery, not V2's sealed row identity",
+      "v2_seal": {
+        "constitution_version": "0.7",
+        "freeze_sha256": "923fb971e513b038f42be2446f32a40d03d1ecba9b86f1d20c72df1c9903417e",
+        "gates_passed": "18/18",
+        "canonical_worlds": 725000,
+        "rendered_rows": 800000,
+        "receipt": "experiments/ff-s15-bank-02/receipts/BANK_v2_SEALED.json",
+        "status": "SEALED",
+        "role_after_v3": "independent historical and evaluation artifact; not extended by v3"
+      },
+      "seal_has_two_source_manifests": {
+        "note": "v2's seal records TWO source manifests by design, because the G10 repair regenerated only the paired panels. Inheriting a hash means reading the manifest that corresponds to the stage being inherited.",
+        "source_manifest": "hashes as of the ROW stage, i.e. before the G10 paired-panel repair",
+        "pairs_stage_source_manifest": "hashes as of the PAIRED-PANEL stage, i.e. the current on-disk state after the repair; all 22 entries verified matching on 2026-09-30",
+        "v3_pins_against": "pairs_stage_source_manifest",
+        "why": "pinning against the row-stage manifest would make v3's inheritance contract unrestorable, because build.py and interventions.py legitimately differ between the two stages"
+      },
+      "inherited_by_pinned_reference": [
+        {"item": "V2 world schema", "pinned_to": "bank-v2-objects.json", "stage": "pairs", "sha256": "923fb971e513b038f42be2446f32a40d03d1ecba9b86f1d20c72df1c9903417e"},
+        {"item": "V2 action algebra", "pinned_to": "src/bank2/algebra.py", "stage": "pairs", "sha256": "08384a17dafd2748dd3052a537240c873037ed47dd1fb74fb8d0c9a13d192875"},
+        {"item": "V2 obligation semantics (required_facts.query evaluator)", "pinned_to": "src/bank2/requirements.py", "stage": "pairs", "sha256": "c753efa6378e5f0ba77af05ba73296856c1b48bc846c3e41e9c48aa3b094500e"},
+        {"item": "V2 requestability semantics", "pinned_to": "src/bank2/requirements.py", "stage": "pairs", "sha256": "c753efa6378e5f0ba77af05ba73296856c1b48bc846c3e41e9c48aa3b094500e"},
+        {"item": "V2 contradiction and evidence semantics", "pinned_to": "src/bank2/algebra.py", "stage": "pairs", "sha256": "08384a17dafd2748dd3052a537240c873037ed47dd1fb74fb8d0c9a13d192875"},
+        {"item": "V2 refsim (independent second simulator implementation)", "pinned_to": "src/bank2/refsim.py", "stage": "pairs", "sha256": "d812238c32b74d2dad419c6a41a72482145ebe87739454ac0fedec924e318b82"},
+        {"item": "V2 witness machinery", "pinned_to": "src/bank2/targets.py", "stage": "pairs", "sha256": "72c1cfa0ed44e2793c5272b0b500e5728e6126471cb87f536315fdd9da49211b", "closes_open_item": "O2"},
+        {"item": "V2 paired-intervention grammar where applicable", "pinned_to": "src/bank2/interventions.py", "stage": "pairs", "sha256": "4c1d57cd68cf10872a39cf6c9a5fe4edcb6a95749d552150568a96bda7f1dfcd"},
+        {"item": "V2 derivation rules that survive V2-0", "pinned_to": "pending V2-0 disposition", "stage": null, "sha256": null, "closes_open_item": "O3"}
+      ],
+      "v3_inherits_v2_data_rows": false,
+      "v3_generates_own_synthetic_core": "W_synthetic^(3) ~ G_V2-compatible(theta_3) through the pinned v2 simulator",
+      "NOT_inherited": [
+        "the 800,000 rendered v2 rows",
+        "v2 row identity, world ids, or split identity",
+        "v2's G14 meaning (external_rows_imported == 0)"
+      ],
+      "synthetic_core": {
+        "form": "W_synthetic^(3) ~ G_V2-compatible(theta_3)",
+        "why": "lets v3 alter curriculum, capability balance, topology, composition depth and contrast structure without contaminating v2's frozen bank identity"
+      }
+    }
+  },
+
+  "external_data": {
+    "allowed": true,
+    "expected": true,
+    "v2_firewall_inverted": true,
+    "v2_invariant": "external_rows_imported == 0  (a defining invariant of v2, not an implementation detail)",
+    "v3_invariant": "no outside material entered anonymously or without an admissible transformation path",
+    "why_new_constitution": "v3 intentionally violates v2's founding assumption, so inheriting v2 G14 would make the seal dishonest",
+    "replaces": "G14-V3 EXTERNAL-PROVENANCE FIREWALL",
+    "required_record_fields_per_source": [
+      "source_dataset",
+      "source_item_id",
+      "source_version",
+      "license",
+      "training_allowed",
+      "derivatives_allowed",
+      "synthetic_seeding_allowed",
+      "redistribution_allowed",
+      "attribution_required",
+      "content_hash"
+    ],
+    "no_mystery_meat": true
+  },
+
+  "label_provenance": {
+    "path": [
+      "external item",
+      "canonical reconstruction",
+      "reconstruction witness",
+      "deterministic derivation",
+      "BANK label"
+    ],
+    "truth_equation": "y_derived = f(W_canonical)",
+    "annotation_equation": "y_human travels ALONGSIDE as a check, never as canonical truth",
+    "constitutional_prohibition": "direct inheritance of external annotations as labels is prohibited",
+    "why": "a human annotation is incomplete and is not a function of any record that can be written down; inheriting it makes provenance unverifiable, which is the v1 disease in new clothes",
+    "allowed_human_annotation_roles": ["CHECK", "DISAGREEMENT_SIGNAL", "METADATA"],
+    "forbidden_label_origin": "HUMAN_INHERITED",
+    "agreement_statistic": "Pr(y_human == y_derived)",
+    "agreement_reported_per": ["source", "target_family", "reconstruction_confidence_class"],
+    "disagreements_are": "a dataset diagnostic, never silently reconciled",
+    "reconstruction_dispositions": {
+      "EXACT_RECONSTRUCTION": {"provides_canonical_target_supervision": true},
+      "PARTIAL_RECONSTRUCTION": {"provides_canonical_target_supervision": false, "may_contribute": "renderer and natural-language material, only with explicitly bounded preserved semantics", "must_not": "pretend to witness facts it cannot reconstruct"},
+      "REJECTED_RECONSTRUCTION": {"provides_canonical_target_supervision": false, "may_contribute": "nothing to the corpus"}
+    },
+    "source_selection_criterion": "how much of a source's semantic structure survives exact reconstruction into the v2 world algebra; the agreement rate is part of source selection",
+    "expected_surprise": "some famous datasets may prove to be poor seeds, and some obscure dataset with highly reconstructable structure may prove to be gold; the design must be able to reveal that"
+  },
+
+  "root_and_lineage": {
+    "unit": "semantic root, not row",
+    "descendant_roles": ["x_natural", "x_paraphrase", "x_distractor", "x_support+", "x_support-", "x_missing", "x_conflict", "x_role-swap", "x_transition", "x_unanswerable"],
+    "every_descendant_retains": ["root_id", "source_dataset", "source_item_id", "transformation", "changed_semantics", "preserved_semantics", "canonical_world", "verifier_receipt"],
+    "lineage_invariant": "every descendant -> exactly one canonical root -> declared transformation -> declared preserved semantics -> declared changed semantics -> verifier receipt",
+    "goal": "train on differences, not just classes"
+  },
+
+  "capability_axes": {
+    "note": "structural capability annotation on every root and every generated child, so curricula are constructed rather than assembled by shuffling",
+    "axes": [
+      "binding",
+      "evidence_support",
+      "counterevidence",
+      "missing_requirements",
+      "conflict",
+      "composition_depth",
+      "transition_depth",
+      "candidate_comparison",
+      "globalization",
+      "nuisance_invariance"
+    ],
+    "axis_count": 10,
+    "example_curriculum": ["support", "support+conflict", "support+conflict+transition"],
+    "rejected_alternative": "shuffle three million rows and pray"
+  },
+
+  "firewall_gates_v3": [
+    {"id": "G14-V3", "name": "EXTERNAL-PROVENANCE FIREWALL", "scope": "100%", "asserts": ["external_roots_imported > 0", "unregistered_external_roots == 0", "roots_without_license_record == 0", "roots_without_reconstruction_witness == 0", "descendants_without_root_lineage == 0"]},
+    {"id": "G-EXT-TRUTH", "name": "LABEL PROVENANCE", "scope": "100%", "asserts": ["canonical_world_present == true", "reconstruction_witness_present == true", "label_origin == DERIVED_FROM_CANONICAL_WORLD", "human_annotation_role in {CHECK, DISAGREEMENT_SIGNAL, METADATA}"], "fails_when": "label_origin == HUMAN_INHERITED"},
+    {"id": "G-LINEAGE", "name": "DESCENDANT LINEAGE", "scope": "100%", "asserts": ["exactly one canonical root per descendant", "declared transformation", "declared preserved semantics", "declared changed semantics", "verifier receipt present"]},
+    {"id": "G-V1-EXCLUSION", "name": "NO V1 ROWS AS ROOTS", "scope": "100%", "asserts": ["no root has a v1 world_id or a v1 world_hash"]}
+  ],
+
+  "ordering": {
+    "sequence": ["V2-0 runs", "interpret cue findings", "freeze v3 target and curriculum constitution", "construct v3 corpus"],
+    "v2_0": {
+      "constitution": "experiments/ff-s15-v2-eval-00/V2-0-CONSTITUTION.md",
+      "status": "FROZEN_PRE_RUN",
+      "has_run": false,
+      "why_first": "cheap, deterministic, already frozen; its purpose is to answer whether obvious cue structure exists before v2 semantics are treated as substrate for model work"
+    },
+    "cue_accessible_disposition": {
+      "does_not_automatically_kill_a_target": true,
+      "permitted_responses": ["bar the cue-bearing renderer family", "decorrelate the target from the identified shortcut", "move the target to diagnostic-only status"],
+      "prohibited": "manufacturing millions of descendants around a target whose decision boundary is already encoded in a cheap accidental cue"
+    },
+    "may_proceed_now": [
+      "source and license ledger schema",
+      "reconstruction-witness schema",
+      "source admissibility rubric",
+      "candidate seed-dataset inventory",
+      "canonical-root format",
+      "lineage and descendant schema",
+      "capability-axis vocabulary",
+      "external-data firewall gates",
+      "rejection dispositions",
+      "per-source agreement reporting format"
+    ],
+    "waits_for_v2_0": [
+      "external root reconstruction at scale",
+      "curriculum allocation",
+      "target-family weighting",
+      "synthetic generation",
+      "render expansion",
+      "training split construction"
+    ]
+  },
+
+  "composition": {
+    "v3_equals": "V2 exact semantic core + new capability curriculum + witnessed external reconstruction",
+    "v3_is_not": "V2 rows plus more rows",
+    "external_roots_estimate": "250k-400k semantic roots",
+    "expected_synthetic_share_of_corpus": "85-95% after expansion",
+    "share_caveat": "true of VOLUME, not of LABEL PROVENANCE; supervision is what matters, and if labels are self-derived the honest description is human-grounded inputs with self-derived labels"
+  },
+
+  "code_authorized": false,
+  "corpus_construction_authorized": false,
+  "corpus_blocked_by": "V2-0 disposition",
+  "root_reconstruction_authorized": false,
+  "root_reconstruction_blocked_by": "V2-0 disposition, plus the reconstruction-yield probe (O1)",
+
+  "amendment_rule": {
+    "applies_to_sections": ["1", "2", "3", "4", "5", "6", "7", "8", "9"],
+    "requires": [
+      "a versioned amendment to BANK-V3-FREEZE.md written before the corresponding code or corpus change",
+      "a new bank-v3-objects.json with an incremented version and a regenerated sha256 sidecar",
+      "an amendment log entry recording what changed, why, and which v1/v2 finding motivated it"
+    ],
+    "retroactive_documentation_is_a_defect": true
+  },
+
+  "open_items": [
+    {"id": "O1", "item": "reconstruction-yield probe", "state": "OPEN", "severity": "high - it is the unblocking measurement and V2-0 does not answer it", "question": "what fraction of candidate-source roots reach EXACT_RECONSTRUCTION, per source and per target family", "why_v2_0_does_not_answer_it": "V2-0 measures cue accessibility of v2's own synthetic semantics; it says nothing about whether an external human dataset can be reconstructed into that algebra at all", "why_it_matters": "the source roster, the root budget, and the whole premise of v3 depend on this number; a low yield would mean v3 is mostly synthetic with a thin human veneer, which is a legitimate outcome but must be discovered before building a corpus on the opposite assumption", "cheap_to_run": true, "blocks": ["root reconstruction at scale", "source selection", "root budget"]},
+    {"id": "O2", "item": "witness machinery pin", "state": "CLOSED_v0.1", "resolution": "targets.py pinned to 72c1cfa0ed44e2793c5272b0b500e5728e6126471cb87f536315fdd9da49211b from the v2 pairs-stage manifest, verified against disk"},
+    {"id": "O3", "item": "V2-0 disposition of derivation rules", "state": "DEFERRED_to_V2_0", "note": "which v2 derivation rules survive V2-0 is not yet known; it is an input to the inheritance contract, not an output of it. The one unpinned inheritance entry is exactly this one.", "blocks": ["v3 target constitution"]}
+  ],
+
+  "done_when": [
+    "V2-0 has run and its cue-accessibility findings are dispositioned per target",
+    "reconstruction-yield probe O1 has reported per-source EXACT_RECONSTRUCTION rates",
+    "every external source has a complete license record with all four permission flags resolved",
+    "G14-V3, G-EXT-TRUTH, G-LINEAGE and G-V1-EXCLUSION PASS at 100%",
+    "no root carries label_origin HUMAN_INHERITED",
+    "every descendant resolves to exactly one canonical root with a verifier receipt",
+    "the agreement statistic Pr(y_human == y_derived) is reported per source and per target family",
+    "source selection is justified by reconstruction yield, not by dataset reputation"
+  ]
+}

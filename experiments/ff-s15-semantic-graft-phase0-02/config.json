@@ -1,0 +1,81 @@
+{
+  "action_embedding_dim": 16,
+  "argument_embedding_dim": 8,
+  "attention_heads": 4,
+  "candidate_schema": "BANK-v1-observable-bindings-action-enumerator/v1",
+  "dev_rows": 2000,
+  "dropout": 0.0,
+  "entity_local_dim": 1024,
+  "entity_role_dim": 32,
+  "epistemic_dim": 64,
+  "evaluation": {
+    "bootstrap_replicates": 1000,
+    "bootstrap_seed": 20261001,
+    "count_rounding": "max(0,floor(raw+0.5))",
+    "held_renderers": [
+      "S7",
+      "S8",
+      "S9"
+    ],
+    "promotion": "No Phase0 promotion or System1.5 integration",
+    "resampling_unit": "canonical paired_world; same draws across compared lanes",
+    "threshold": 0.5
+  },
+  "fabrics": {
+    "causal": "late integrated row-state + candidate-conditioned graft",
+    "encoder": "full-context row-state + existing final-layer entity-local graft"
+  },
+  "hidden_coordinate_alignment": false,
+  "hidden_dim": 128,
+  "input_dim": 2048,
+  "loss": {
+    "action_reduction": "mean CE over canonical eligible ACT endpoints",
+    "contrast_margin": 1.0,
+    "contrast_reduction": "mean eligible directed support-pair hinge; no canonical eligible pairs in this phase",
+    "lambda_A": 0.25,
+    "lambda_CF": 1.0,
+    "lambda_E": 0.1,
+    "lambda_R": 0.1,
+    "lambda_S": 1.0,
+    "renderer_pairs_per_batch": 8,
+    "renderer_reduction": "mean pair squared semantic norm + aligned candidate squared norm averaged over candidates",
+    "supervised_reduction": "sum available coordinates/candidates per row, mean over eligible rows"
+  },
+  "max_entities": 64,
+  "meaning_preserving_renderers": [
+    "S0",
+    "S1",
+    "S2",
+    "S3",
+    "S4",
+    "S6",
+    "S7",
+    "S8",
+    "S10",
+    "S11"
+  ],
+  "population": "First rows in file order; paired renderings grouped by paired_world.",
+  "schema": "frozen-fabrique.semantic-graft-phase0-config/v2",
+  "seed": 20261001,
+  "semantic_dim": 64,
+  "substrates": [
+    "causal_base",
+    "ner_lora_step500",
+    "nli_lora_step500",
+    "encoder_base"
+  ],
+  "surface": "final_plus_mean",
+  "train_rows": 20000,
+  "training": {
+    "aggregation": "Shared five-term weighted objective; unavailable supervision masked",
+    "batch_size": 64,
+    "binary_loss": "masked BCEWithLogits",
+    "checkpoint": "last epoch; no model/surface/width sweep",
+    "count_loss": "masked SmoothL1",
+    "epochs": 5,
+    "gradient_clip": 1.0,
+    "lr": 0.001,
+    "normalization": "TRAIN-only mean/std embedded in graft checkpoint",
+    "weight_decay": 0.0001
+  }
+}

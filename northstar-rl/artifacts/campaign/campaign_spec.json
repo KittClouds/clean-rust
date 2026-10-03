@@ -1,0 +1,16 @@
+{
+  "schema_version": "CAMPAIGN_SPEC_V1",
+  "campaign_id": "a2db4037e285d6964027bc91d6bad9bf79b422ad5e8c1197c2425e18576b11b3",
+  "experiment_id": "a8ecde3e6bd83e00e392480d353fe17eb9dfa304c78a45839596767b78a642b1",
+  "partition_tape_id": "ea30eec338e8c49b9157ad5586fd60cdf741f22120cc72a59c2583f3ba0f48e8",
+  "run_seeds": [
+    101,
+    202,
+    303
+  ],
+  "run_budget_steps": 10000,
+  "variance_axes": [
+    "LEARNER_SEED"
+  ],
+  "state": "SEALED_PRE_EXECUTION"
+}

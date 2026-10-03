@@ -1,0 +1,38 @@
+{
+  "schema_version": "EXECUTION_CALIBRATION_V1",
+  "calibration_id": "54573a6dd64d67d4c68420d9e48c0a9cb306abf9bf0fd5fd97f6245f9dce12f3",
+  "instrument_id": 3,
+  "market_regime_partition": "SYNTHETIC_QUALIFICATION_ONLY",
+  "observed_spread_distribution": [
+    {
+      "value": 1.25,
+      "cumulative_probability": 1.0
+    }
+  ],
+  "observed_price_delta_distribution": [
+    {
+      "value": 0.125,
+      "cumulative_probability": 1.0
+    }
+  ],
+  "observed_latency_distribution_ns": [
+    {
+      "value": 5000000.0,
+      "cumulative_probability": 1.0
+    }
+  ],
+  "observed_fill_ratio_distribution": [
+    {
+      "value": 1.0,
+      "cumulative_probability": 1.0
+    }
+  ],
+  "sample_count": 4,
+  "effective_period_ns": [
+    1800000000000000000,
+    1800000180000000000
+  ],
+  "source_tape_id": "b63b37140767a3353fb455a4c733c3621e679782a8be6a4b884c7774135c85b8",
+  "calibration_method": "empirical_ecdf_fixture_no_interpolation",
+  "calibration_hash": "54573a6dd64d67d4c68420d9e48c0a9cb306abf9bf0fd5fd97f6245f9dce12f3"
+}

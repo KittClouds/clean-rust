@@ -1,0 +1,34 @@
+{
+  "PHENO_status_unchanged": true,
+  "analysis_contract_sha256": "65e3f74e38bc7d5f54ce9a0f91b0a0cf940baadf93cad0c8c556a0dfc9e58db7",
+  "analysis_script_sha256": "313591e73b8384899c5e2306083dc48ebefc9927d0e42cb5f4d198a1a58a64c4",
+  "analysis_sha256": "73683b5d44c9da95f2b2f5bb1fb842e92790205fcc4fa652f7c8c5a5a2c5d905",
+  "biological_promotion": false,
+  "csv_sha256": "2d3c947087d6129294ce8bf1d82cbb5dcbe08cb78f1f63ebac780159b8772c3c",
+  "delta_psi_D_minus_C": 0.39723765456071947,
+  "fits_run": 0,
+  "locked_prediction_hashes_C_D": {
+    "C-H303000": "2848e9a6a54662d62b895d9b7f5f8c15bc62f5754ccc1afc46ff4521f2dec2fe",
+    "C-H303001": "feb77b67cc3c1949e06bc20ddf3c95b700513ed4d060c9c89cd9f5b37adb44cc",
+    "C-H303002": "c0b1d920778c591cbe29d713ad6bf2986eeaf98d0923c65db005873593081eaa",
+    "C-H303003": "d08cf81789311d9cd7d900a6367f8b294b4abdb3c4c24c200e555d528a65d275",
+    "D-H303000": "bf109334500e025fb7b93f3349bffb91197c5732e296beb0f32e29e02b92334a",
+    "D-H303001": "d2f2d1abe1430bc5335779b6c8391a11c381c3866d6a6a6593f206715c44fce8",
+    "D-H303002": "316abd7c03239c214a9599cc53ea4eb5d14f74e7b869d8cd86a9c640d001d3d7",
+    "D-H303003": "d79d3bbd52b578ad4d765c70d3f31e6c5ad5a1df45cc84ecacedf12ab8a7c7fd"
+  },
+  "markdown_sha256": "ae92eff7d7ce242006f5b87fe8f3bb3eae502c2f1937ac4769608e14920b3614",
+  "measured_reach03_result": false,
+  "parent_identity": "F4-SYMMETRY-01-RUN4",
+  "qualification_only": true,
+  "rows": 13420,
+  "schema": "F4-SYMMETRY-02-leverage-localization-receipt-v1",
+  "source_hashes": {
+    "collection_receipt_sha256": "de26bab05ad124c31a6873e04c2cb4fc8b93c2f15807106a614fa6d942c3066a",
+    "integrity_receipt_sha256": "3a830fe8ff05a1cd6fe8e062ae3c5106eab6866ba546634c8123bc918fb2ac94",
+    "prediction_lock_sha256": "1a6828c3956b6f25e057defc808f20698738a9990af4a2f9661dcaebd068aecf",
+    "predictor_sha256": "b201733289faaf8bc33a3147bf1b8d5a4e77e193386e33f89feebb860cf2c13e",
+    "scoring_truth_sha256": "c4af406135aec6ec53b21dc34f1ee6d00f4568f5f205105b8a66837e227c84fd"
+  },
+  "status": "CLOSED_EXPLORATORY_QUALIFICATION_ONLY"
+}

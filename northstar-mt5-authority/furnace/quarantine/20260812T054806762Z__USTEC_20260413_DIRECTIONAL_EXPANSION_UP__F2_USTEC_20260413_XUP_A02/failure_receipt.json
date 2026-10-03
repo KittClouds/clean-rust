@@ -1,0 +1,12 @@
+﻿{
+    "contract":  "MST_FURNACE_FAILURE_V1",
+    "status":  "QUARANTINED",
+    "failed_at_utc":  "2026-08-12T09:48:06.7604870Z",
+    "window_id":  "USTEC_20260413_DIRECTIONAL_EXPANSION_UP",
+    "attempt_tag":  "F2_USTEC_20260413_XUP_A02",
+    "reason":  "Exception setting \"IsReadOnly\": \"Could not find a part of the path \u0027MasterAuction_USTEC_PERIOD_M5_F2_USTEC_20260413_XUP_A02_RG2_v7_attempts.tsv\u0027.\"",
+    "auction_stem":  "MasterAuction_USTEC_PERIOD_M5_F2_USTEC_20260413_XUP_A02_RG2_v7",
+    "structure_stem":  "MasterStructure_USTEC_PERIOD_M5_F2_USTEC_20260413_XUP_A02_v6",
+    "captured_raw_files":  10,
+    "deletion_performed":  false
+}

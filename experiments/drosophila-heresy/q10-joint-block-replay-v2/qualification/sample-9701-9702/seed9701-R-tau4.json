@@ -1,0 +1,154 @@
+{
+  "behavioral_inference": false,
+  "dh08b_authorized": false,
+  "events": [
+    {
+      "base_error_norm": 0.000030521972487017084,
+      "best_disjoint_residual_ratio": 0.9920360016272474,
+      "best_shared_residual_ratio": 0.9998779573876049,
+      "block_count": 6,
+      "blocks": [
+        {
+          "base_error_norm": 0.000030521972487017084,
+          "best_bitwise_mismatch_count": 373,
+          "best_residual_norm": 0.00003051824750575932,
+          "best_residual_ratio": 0.9998779573876049,
+          "best_steps": [
+            1,
+            1,
+            16
+          ],
+          "candidate_count": 125,
+          "category": "shared",
+          "coordinate_a": 4309,
+          "coordinate_b": 4463,
+          "coordinate_c": 12453,
+          "direction_a": "up",
+          "direction_b": "up",
+          "direction_c": "up",
+          "residual_reduction": 0.00012204261239512348,
+          "shared_rows": 1
+        },
+        {
+          "base_error_norm": 0.000030521972487017084,
+          "best_bitwise_mismatch_count": 374,
+          "best_residual_norm": 0.000030521972487017084,
+          "best_residual_ratio": 1.0,
+          "best_steps": [
+            1,
+            1,
+            1
+          ],
+          "candidate_count": 125,
+          "category": "shared",
+          "coordinate_a": 3758,
+          "coordinate_b": 4634,
+          "coordinate_c": 10870,
+          "direction_a": "down",
+          "direction_b": "down",
+          "direction_c": "up",
+          "residual_reduction": 0.0,
+          "shared_rows": 1
+        },
+        {
+          "base_error_norm": 0.000030521972487017084,
+          "best_bitwise_mismatch_count": 374,
+          "best_residual_norm": 0.000030521972487017084,
+          "best_residual_ratio": 1.0,
+          "best_steps": [
+            1,
+            1,
+            1
+          ],
+          "candidate_count": 125,
+          "category": "shared",
+          "coordinate_a": 4263,
+          "coordinate_b": 4338,
+          "coordinate_c": 23580,
+          "direction_a": "down",
+          "direction_b": "up",
+          "direction_c": "up",
+          "residual_reduction": 0.0,
+          "shared_rows": 1
+        },
+        {
+          "base_error_norm": 0.000030521972487017084,
+          "best_bitwise_mismatch_count": 374,
+          "best_residual_norm": 0.000030521972487017084,
+          "best_residual_ratio": 1.0,
+          "best_steps": [
+            1,
+            1,
+            1
+          ],
+          "candidate_count": 125,
+          "category": "disjoint",
+          "coordinate_a": 2794,
+          "coordinate_b": 8571,
+          "coordinate_c": 16761,
+          "direction_a": "down",
+          "direction_b": "up",
+          "direction_c": "up",
+          "residual_reduction": 0.0,
+          "shared_rows": 0
+        },
+        {
+          "base_error_norm": 0.000030521972487017084,
+          "best_bitwise_mismatch_count": 372,
+          "best_residual_norm": 0.00003027889554779728,
+          "best_residual_ratio": 0.9920360016272474,
+          "best_steps": [
+            16,
+            16,
+            1
+          ],
+          "candidate_count": 125,
+          "category": "disjoint",
+          "coordinate_a": 12903,
+          "coordinate_b": 18796,
+          "coordinate_c": 23962,
+          "direction_a": "up",
+          "direction_b": "down",
+          "direction_c": "down",
+          "residual_reduction": 0.007963998372752634,
+          "shared_rows": 0
+        },
+        {
+          "base_error_norm": 0.000030521972487017084,
+          "best_bitwise_mismatch_count": 373,
+          "best_residual_norm": 0.00003051824750575932,
+          "best_residual_ratio": 0.9998779573876049,
+          "best_steps": [
+            1,
+            16,
+            1
+          ],
+          "candidate_count": 125,
+          "category": "disjoint",
+          "coordinate_a": 4884,
+          "coordinate_b": 7603,
+          "coordinate_c": 8537,
+          "direction_a": "down",
+          "direction_b": "up",
+          "direction_c": "down",
+          "residual_reduction": 0.00012204261239512348,
+          "shared_rows": 0
+        }
+      ],
+      "disjoint_block_count": 3,
+      "initial_mismatch_count": 374,
+      "parent_status": "Q10_SM_STAGE1_VALID__F32_SAFE_FREEDOM_PRESENT",
+      "seed": 9701,
+      "shared_block_count": 3,
+      "side": "R",
+      "status": "BLOCK_ORDER_AUDIT_COMPLETE",
+      "tau": 4.0,
+      "trial": 128
+    }
+  ],
+  "protocol": "Q10-JBR2",
+  "scientific_seed_bundles": 0,
+  "seed": 9701,
+  "side": "R",
+  "tau": 4.0
+}

@@ -1,0 +1,107 @@
+{
+  "case_summaries": [
+    {
+      "advantage_pair_effect_union_count": 125,
+      "advantage_pair_new_rows": [],
+      "advantage_pair_records": 100,
+      "all_materialized_effect_union_count": 259,
+      "all_materialized_pair_new_rows": [],
+      "case": "seed9731-L-tau16__set2",
+      "singleton_effect_union_count": 259,
+      "valid_worse_pair_effect_union_count": 19,
+      "valid_worse_pair_new_rows": [],
+      "valid_worse_pair_records": 29
+    },
+    {
+      "advantage_pair_effect_union_count": 157,
+      "advantage_pair_new_rows": [],
+      "advantage_pair_records": 4,
+      "all_materialized_effect_union_count": 324,
+      "all_materialized_pair_new_rows": [],
+      "case": "seed9731-L-tau4__set3",
+      "singleton_effect_union_count": 324,
+      "valid_worse_pair_effect_union_count": 0,
+      "valid_worse_pair_new_rows": [],
+      "valid_worse_pair_records": 0
+    },
+    {
+      "advantage_pair_effect_union_count": 177,
+      "advantage_pair_new_rows": [],
+      "advantage_pair_records": 27,
+      "all_materialized_effect_union_count": 322,
+      "all_materialized_pair_new_rows": [],
+      "case": "seed9731-R-tau16__set1",
+      "singleton_effect_union_count": 322,
+      "valid_worse_pair_effect_union_count": 0,
+      "valid_worse_pair_new_rows": [],
+      "valid_worse_pair_records": 0
+    },
+    {
+      "advantage_pair_effect_union_count": 0,
+      "advantage_pair_new_rows": [],
+      "advantage_pair_records": 0,
+      "all_materialized_effect_union_count": 317,
+      "all_materialized_pair_new_rows": [],
+      "case": "seed9731-R-tau16__set3",
+      "singleton_effect_union_count": 317,
+      "valid_worse_pair_effect_union_count": 0,
+      "valid_worse_pair_new_rows": [],
+      "valid_worse_pair_records": 0
+    },
+    {
+      "advantage_pair_effect_union_count": 0,
+      "advantage_pair_new_rows": [],
+      "advantage_pair_records": 0,
+      "all_materialized_effect_union_count": 320,
+      "all_materialized_pair_new_rows": [],
+      "case": "seed9731-R-tau4__set0",
+      "singleton_effect_union_count": 320,
+      "valid_worse_pair_effect_union_count": 0,
+      "valid_worse_pair_new_rows": [],
+      "valid_worse_pair_records": 0
+    },
+    {
+      "advantage_pair_effect_union_count": 152,
+      "advantage_pair_new_rows": [],
+      "advantage_pair_records": 32,
+      "all_materialized_effect_union_count": 298,
+      "all_materialized_pair_new_rows": [],
+      "case": "seed9731-R-tau4__set1",
+      "singleton_effect_union_count": 298,
+      "valid_worse_pair_effect_union_count": 0,
+      "valid_worse_pair_new_rows": [],
+      "valid_worse_pair_records": 0
+    },
+    {
+      "advantage_pair_effect_union_count": 153,
+      "advantage_pair_new_rows": [],
+      "advantage_pair_records": 7,
+      "all_materialized_effect_union_count": 330,
+      "all_materialized_pair_new_rows": [],
+      "case": "seed9731-R-tau4__set2",
+      "singleton_effect_union_count": 330,
+      "valid_worse_pair_effect_union_count": 0,
+      "valid_worse_pair_new_rows": [],
+      "valid_worse_pair_records": 0
+    },
+    {
+      "advantage_pair_effect_union_count": 142,
+      "advantage_pair_new_rows": [],
+      "advantage_pair_records": 31,
+      "all_materialized_effect_union_count": 312,
+      "all_materialized_pair_new_rows": [],
+      "case": "seed9731-R-tau4__set3",
+      "singleton_effect_union_count": 312,
+      "valid_worse_pair_effect_union_count": 19,
+      "valid_worse_pair_new_rows": [],
+      "valid_worse_pair_records": 27
+    }
+  ],
+  "checks_passed": true,
+  "global_assembly": false,
+  "identity": "q10-gc0-lr1-sall1-a2-r1-v1",
+  "protocol": "ALL_MATERIALIZED_PAIR_EFFECT_COVERAGE_AUDIT",
+  "report_sha256": "1D8762E07241F21E729D5F25087FD7DE38202FF38F284CE563261D9B1629D3D3",
+  "scientific_promotion": false,
+  "status": "COMPLETE"
+}

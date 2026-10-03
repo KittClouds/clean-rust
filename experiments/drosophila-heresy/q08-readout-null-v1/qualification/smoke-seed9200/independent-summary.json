@@ -1,0 +1,85 @@
+{
+  "protocol": "Q08-ReadoutNull-v1",
+  "status": "SMOKE_CONSTRUCTOR_FAILED",
+  "integrity": "VALIDATED",
+  "scientific_seed_bundles_used": 0,
+  "behavioral_hypothesis_test": false,
+  "seed": 9200,
+  "events": 512,
+  "events_failed": 512,
+  "side_events_failed": {
+    "R": 256,
+    "L": 256
+  },
+  "failure_counts": {
+    "axial_match": 0,
+    "total_norm_match": 0,
+    "residual_norm_match": 0,
+    "residual_decorrelation": 511,
+    "boundary_membership": 0,
+    "permitted_support": 0,
+    "weight_bounds": 0,
+    "constructor_allocations": 0,
+    "nonzero_support_size": 0,
+    "cue_mbon_drive_match": 512,
+    "cue_score_match": 0,
+    "shadow_allocations": 0
+  },
+  "zero_residual_events": 0,
+  "structurally_overconstrained_events": 503,
+  "optimistic_residual_cosine_floor": {
+    "minimum": 0.0,
+    "median": 0.14148301044210737,
+    "mean": 0.1424252620272454,
+    "maximum": 0.33432967458546337
+  },
+  "all_group_overconstrained_events": 482,
+  "all_group_optimistic_residual_cosine_floor": {
+    "minimum": 0.0,
+    "median": 0.10415371570462945,
+    "mean": 0.10766714842343846,
+    "maximum": 0.2943075102799306
+  },
+  "actual_residual_cosine": {
+    "minimum": 9.134817895414208e-10,
+    "median": 0.1791604911104791,
+    "mean": 0.1803016426050163,
+    "maximum": 0.3694235771411298
+  },
+  "max_normalized_drive_error": {
+    "minimum": 5.057127623331326e-07,
+    "median": 8.524596069037216e-07,
+    "mean": 8.84556186520058e-07,
+    "maximum": 2.554510274421773e-06
+  },
+  "max_cue_score_error": {
+    "minimum": 4.865685288707455e-09,
+    "median": 9.934107467191033e-09,
+    "mean": 1.2466140714269723e-08,
+    "maximum": 2.2351741790771484e-08
+  },
+  "real_arithmetic_drive_error": {
+    "minimum": 8.553815991426833e-09,
+    "median": 1.6649601491122324e-08,
+    "mean": 1.7207324979248362e-08,
+    "maximum": 3.166673422236634e-08
+  },
+  "rotatable_energy_fraction": {
+    "minimum": 0.3328351588831249,
+    "median": 0.42925845686838005,
+    "mean": 0.42893341481561875,
+    "maximum": 0.5220006592209121
+  },
+  "distractor_drive_difference": {
+    "minimum": 0.16587871313095093,
+    "median": 0.28152063488960266,
+    "mean": 0.29039276178809814,
+    "maximum": 0.6326160430908203
+  },
+  "plan_sha256": "534d7c278c8c232e447d15c41ff95a128871e7b7c2be339c730614ee28a2a138",
+  "input_hashes": {
+    "execution.json": "8965897af8761426017f17efbc1e7bcb5ae09002ba2ce50658b50c5a064be88c",
+    "L-tau4.jsonl": "7b3c19907d315f7e3fbcdd30a97c2660667881a7455d517e198615eb2a46059f",
+    "R-tau4.jsonl": "e35d54b8124f2bbc9e8d87b559397bf9bc7c222bd4559222d9ae1eec571869df"
+  }
+}

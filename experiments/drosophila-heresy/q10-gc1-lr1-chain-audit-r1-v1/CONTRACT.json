@@ -1,0 +1,7 @@
+{
+  "final_gate": "current_runtime_closure_below_pf5_must_be_self_consistent_before_requalification",
+  "identity": "q10-gc1-lr1-chain-audit-r1-v1",
+  "mutation_policy": "read_only",
+  "protocol": "Q10-GC1-LR1-RECURSIVE-RUNTIME-CLOSURE-AUDIT-R1",
+  "scope": "read_only_recursive_parent_and_runtime_closure_audit_revision"
+}

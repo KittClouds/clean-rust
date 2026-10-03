@@ -1,0 +1,117 @@
+{
+  "disposition_id": "FAS00_PHASE1_WORLD_QUALIFICATION_V03",
+  "project_id": "fas-frozen-adaptive-substrate-v00",
+  "phase1_ready": true,
+  "model_contact_authorized": false,
+  "model_contact_performed": false,
+  "qualification_corpus_reusable_for_phase5": false,
+  "supersedes_phase1_v02": true,
+  "root_sha256": "d3ca9f8ef988a6f0ae93318fc0ea7c504b23b3be801dbf133d66f67746a69274",
+  "gates": [
+    {
+      "gate": "WORLD_TARGETS_EXACT",
+      "status": "PASS",
+      "detail": "Independent lookup from serialized world state and parsed query key."
+    },
+    {
+      "gate": "TRANSITIONS_EXACT",
+      "status": "PASS",
+      "detail": "Every adjacent serialized world state was checked against the independent transition rule."
+    },
+    {
+      "gate": "RETURN_IDENTITY",
+      "status": "PASS",
+      "detail": "A return restores identical latent state and target for a matched key while query wording differs."
+    },
+    {
+      "gate": "CONTEXT_BINDING",
+      "status": "PASS",
+      "detail": "Changing context and changing entity each change the target in the declared counterfactual pairs."
+    },
+    {
+      "gate": "FEEDBACK_TIMING",
+      "status": "PASS",
+      "detail": "Post-score visible feedback IDs exactly match fixed reveal steps; current delayed target is absent."
+    },
+    {
+      "gate": "SURFACE_SPLIT_INTEGRITY",
+      "status": "PASS",
+      "detail": "Qualification templates and invented-term IDs stay in their split allocation."
+    },
+    {
+      "gate": "OBSERVATION_AUTHORITY",
+      "status": "PASS",
+      "detail": "Noise/drift/poison observations match frozen rules while latent state is checked independently."
+    },
+    {
+      "gate": "TRANSITION_SHAPE_STABLE",
+      "status": "PASS",
+      "detail": "summed transitions across 128 paired worlds=0; expected=0"
+    },
+    {
+      "gate": "TRANSITION_SHAPE_SINGLE_SWITCH",
+      "status": "PASS",
+      "detail": "summed transitions across 128 paired worlds=128; expected=128"
+    },
+    {
+      "gate": "TRANSITION_SHAPE_RETURN",
+      "status": "PASS",
+      "detail": "summed transitions across 128 paired worlds=256; expected=256"
+    },
+    {
+      "gate": "TRANSITION_SHAPE_CYCLIC",
+      "status": "PASS",
+      "detail": "summed transitions across 128 paired worlds=384; expected=384"
+    },
+    {
+      "gate": "TRANSITION_SHAPE_GRADUAL_DRIFT",
+      "status": "PASS",
+      "detail": "summed transitions across 128 paired worlds=128; expected=128"
+    },
+    {
+      "gate": "TRANSITION_SHAPE_TEMPORARY_RULE",
+      "status": "PASS",
+      "detail": "summed transitions across 128 paired worlds=256; expected=256"
+    },
+    {
+      "gate": "TRANSITION_SHAPE_CONTRADICTORY_NOISE",
+      "status": "PASS",
+      "detail": "summed transitions across 128 paired worlds=0; expected=0"
+    },
+    {
+      "gate": "TRANSITION_SHAPE_POISON_BURST",
+      "status": "PASS",
+      "detail": "summed transitions across 128 paired worlds=0; expected=0"
+    },
+    {
+      "gate": "GRADUAL_DRIFT_DISTRIBUTION",
+      "status": "PASS",
+      "detail": "observed B-evidence rates across four time bins=[0.0625, 0.375, 0.34375, 0.8125]; tolerance=0.08"
+    },
+    {
+      "gate": "CHEAP_TARGET_LEAKAGE",
+      "status": "PASS",
+      "detail": "maximum held-out accuracy across cheap surface/metadata groups=0.4500; threshold=0.45"
+    },
+    {
+      "gate": "TRIVIAL_BASELINE_DIAGNOSTIC",
+      "status": "PASS",
+      "detail": "context-bound LAST_GLOBAL_OBSERVATION accuracy=0.4309; failure threshold=0.98"
+    },
+    {
+      "gate": "COUNTERFACTUAL_LABEL_BALANCE",
+      "status": "PASS",
+      "detail": "canonical target counts=[10848, 11064, 10856]; maximum class-count spread=328 (1% of events)"
+    },
+    {
+      "gate": "SEED_DETERMINISM",
+      "status": "PASS",
+      "detail": "two complete 1,024-world builds match byte-derived IDs and latent/rendered hashes; result=true"
+    },
+    {
+      "gate": "QUALIFICATION_HASH_TREE",
+      "status": "PASS",
+      "detail": "SHA-256 root=d3ca9f8ef988a6f0ae93318fc0ea7c504b23b3be801dbf133d66f67746a69274; files=18"
+    }
+  ]
+}

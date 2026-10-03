@@ -1,0 +1,17 @@
+{
+  "entries": [
+    {
+      "bytes": 9281,
+      "path": "FAS-S05-S11-OBSERVER-GEOMETRY-SYNTHESIS-V01.md",
+      "sha256": "3e47af530895c9df7486ef7aa00ffa79ae678cde0542580d384ed2bc91df8207"
+    },
+    {
+      "bytes": 2858,
+      "path": "source-binding-v01.json",
+      "sha256": "7f9827389062206568075a53cc3739ee987aecbb8d9b19d5e674c28b51113f59"
+    }
+  ],
+  "root_sha256": "b0a64d7c1befe925d50f34bdc5e6a73859b1d6a5c5d90152002feeac71898f3e",
+  "seal_id": "FAS_S05_S11_SYNTHESIS_SEAL_V01",
+  "status": "SEALED_SYNTHESIS_RECORD"
+}

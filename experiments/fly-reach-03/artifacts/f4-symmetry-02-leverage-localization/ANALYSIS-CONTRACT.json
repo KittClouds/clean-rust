@@ -1,0 +1,51 @@
+{
+  "analysis_class": "EXPLORATORY_POST_OUTCOME_QUALIFICATION_ONLY",
+  "analysis_script_sha256": "313591e73b8384899c5e2306083dc48ebefc9927d0e42cb5f4d198a1a58a64c4",
+  "collection_predictor_sha256": "b201733289faaf8bc33a3147bf1b8d5a4e77e193386e33f89feebb860cf2c13e",
+  "collection_receipt_sha256": "de26bab05ad124c31a6873e04c2cb4fc8b93c2f15807106a614fa6d942c3066a",
+  "collection_truth_sha256": "c4af406135aec6ec53b21dc34f1ee6d00f4568f5f205105b8a66837e227c84fd",
+  "delta_psi_row": "2*w*(I[D sign correct]-I[C sign correct])/sum_all(w)",
+  "groupings": {
+    "abs_reference_g_quintile": "pooled unweighted empirical quintiles of abs(g), NumPy linear quantiles at 20/40/60/80%; ties go to the higher bin via searchsorted(side=right)",
+    "block": "the four frozen RUN4 block IDs; include all blocks, including one-class 303003",
+    "cue_incidence_pattern": "four incidence bits in stored absolute cue-slot order; bit c is tuple[c].incidence; pattern integer is sum(bit_c<<c)",
+    "leverage_quintile": "pooled unweighted empirical quintiles of q*abs(native proposed delta)*abs(g), same quantile/tie rule",
+    "native_magnitude_quintile": "pooled unweighted empirical quintiles of abs(native proposed delta), same quantile/tie rule"
+  },
+  "native_magnitude": "m=abs(native proposed delta) from the locked RUN4 scoring truth",
+  "parent_contract_sha256": "cfef638aaeac1dfc0b768d13cc95afe7724861f74e3d3111d91401925bed6379",
+  "parent_identity": "F4-SYMMETRY-01-RUN4",
+  "parent_integrity_receipt_sha256": "3a830fe8ff05a1cd6fe8e062ae3c5106eab6866ba546634c8123bc918fb2ac94",
+  "parent_prediction_lock_sha256": "1a6828c3956b6f25e057defc808f20698738a9990af4a2f9661dcaebd068aecf",
+  "prediction_sign_rule": "+1 when held-out logit > 0; otherwise -1, matching RUN4 scoring",
+  "predictor_sha256": "b201733289faaf8bc33a3147bf1b8d5a4e77e193386e33f89feebb860cf2c13e",
+  "prohibited": [
+    "new fits",
+    "new seeds",
+    "prediction changes",
+    "row replacement",
+    "measured REACH-03 namespace",
+    "biological promotion",
+    "PHENO change"
+  ],
+  "row_leverage_weight": "w=q*m*abs(g), where q is the frozen inclusion weight",
+  "row_population": "all 13,420 existing RUN4 U* rows; no refitting, resampling, or row exclusion",
+  "schema": "F4-SYMMETRY-02-leverage-localization-contract-v1",
+  "scoring_truth_sha256": "c4af406135aec6ec53b21dc34f1ee6d00f4568f5f205105b8a66837e227c84fd",
+  "status": "FROZEN_BEFORE_DERIVED_DIAGNOSTICS",
+  "subgroup_metrics": [
+    "row_count",
+    "leverage_weight",
+    "leverage_share_of_global",
+    "psi_C_local",
+    "psi_D_local",
+    "delta_psi_local",
+    "delta_psi_global_contribution",
+    "disagreement_row_fraction",
+    "disagreement_leverage_fraction",
+    "D_weighted_accuracy_on_disagreements",
+    "disagreement_delta_psi_global_contribution"
+  ],
+  "target_sign": "y=+1 when g>0 else -1; all RUN4 rows are on the already-frozen nonzero target channel",
+  "uncertainty": "none; this is a deterministic decomposition of the already-opened RUN4 qualification predictions, not an inferential estimate"
+}

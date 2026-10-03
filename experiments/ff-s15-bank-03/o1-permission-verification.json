@@ -1,0 +1,223 @@
+{
+  "schema": "ff-s15-bank3-o1-permission-verification-v1",
+  "status": "O1_PHASE_0_COMPLETE",
+  "date": "2026-09-30",
+  "experiment": "FF-S15-BANK-03",
+  "open_item": "O1",
+  "phase": "0 of 3 - permission resolution only",
+
+  "headline": "ZERO of 12 candidate sources are currently permission-cleared to serve as BANK-v3 semantic roots. O1 phase 1 (sampling) therefore has no admissible source and was not run.",
+
+  "why_zero": "the frozen admissibility rubric criterion A2 requires synthetic_seeding_allowed == true, and that flag is UNRESOLVED for 11 of 12 sources. Per the ledger default, an unresolved flag is false, and a false A2 blocks root status. The single affirmative is RuleTaker's GENERATOR (code, Apache-2.0), which is not an external data row at all.",
+
+  "method": {
+    "primary_sources_only": true,
+    "inference_from_reputation": false,
+    "inference_from_code_repo_license_for_data": false,
+    "spot_verified_by_second_analyst": ["RuleTaker LICENSE (Apache-2.0 text fetched directly)", "WIQA HF dataset card (fetched directly)"],
+    "note": "the full 12-source sweep was performed by a research subagent against primary URLs; the two most load-bearing results were independently re-fetched and confirmed by the orchestrating agent"
+  },
+
+  "verdicts": [
+    {
+      "source_dataset": "RuleTaker",
+      "primary_urls": ["https://raw.githubusercontent.com/allenai/ruletaker/master/LICENSE", "https://raw.githubusercontent.com/allenai/ruletaker/master/README.md"],
+      "license_string": "Apache License 2.0, with the copyright line UNFILLED ('Copyright [yyyy] [name of copyright owner]')",
+      "training_allowed": "UNRESOLVED_for_data",
+      "derivatives_allowed": "UNRESOLVED_for_data",
+      "synthetic_seeding_allowed": "YES_FOR_THE_GENERATOR",
+      "redistribution_allowed": "UNRESOLVED_for_data",
+      "nc_restriction": false,
+      "per_item_hash_published": false,
+      "finding": "the repo is code plus a PCFG theory generator. Synthetic generation is affirmatively licensed by construction, which is the cleanest case in the set. But the DATA ZIP has no separate data-license statement, and the Apache-2.0 copyright line is unfilled, which is itself a provenance weakness.",
+      "v3_use": "ADMISSIBLE_AS_CODE_ONLY. Run the generator and produce our own theories. Yields ZERO external rows, so this is not external reconstruction; it is v3 synthetic core with an established inference engine.",
+      "admissible_as_root": false
+    },
+    {
+      "source_dataset": "VitaminC",
+      "primary_urls": ["https://huggingface.co/datasets/tals/vitaminc", "https://raw.githubusercontent.com/TalSchuster/VitaminC/master/LICENSE"],
+      "license_string": "HF tag cc-by-sa-3.0 for the DATA; the repo LICENSE is MIT and covers CODE only",
+      "training_allowed": "YES", "derivatives_allowed": "YES", "redistribution_allowed": "YES_WITH_SHAREALIKE",
+      "synthetic_seeding_allowed": "UNRESOLVED",
+      "nc_restriction": false, "per_item_hash_published": false,
+      "finding": "no statement anywhere addresses synthetic-data generation. CC BY-SA 3.0 permits use and adaptation but silence on synthetic seeding is not a grant.",
+      "blocking_flags": ["synthetic_seeding_allowed"],
+      "admissible_as_root": false
+    },
+    {
+      "source_dataset": "ContractNLI",
+      "primary_urls": ["https://stanfordnlp.github.io/contract-nli/", "https://huggingface.co/datasets/kiddothe2b/contract-nli"],
+      "license_string": "CC BY 4.0 per the official project page, behind a Hitachi America Terms-and-Conditions click-through",
+      "training_allowed": "YES", "derivatives_allowed": "YES", "redistribution_allowed": "YES", "synthetic_seeding_allowed": "UNRESOLVED",
+      "nc_restriction": false, "per_item_hash_published": false,
+      "conflict_flag": "a widely used third-party HF mirror is tagged cc-by-nc-sa-4.0. The primary source states CC BY 4.0 with no NC clause. This must be resolved with the authors before any noncommercial-sensitive use; the primary source is held in the meantime.",
+      "blocking_flags": ["synthetic_seeding_allowed", "unresolved_nc_conflict"],
+      "admissible_as_root": false
+    },
+    {
+      "source_dataset": "MuSiQue",
+      "primary_urls": ["https://raw.githubusercontent.com/StonyBrookNLP/musique/main/README.md", "https://raw.githubusercontent.com/StonyBrookNLP/musique/main/LICENSE"],
+      "license_string": "CC BY 4.0, stated verbatim in the official README under a '# Data' heading",
+      "training_allowed": "YES", "derivatives_allowed": "YES", "redistribution_allowed": "YES", "synthetic_seeding_allowed": "UNRESOLVED",
+      "nc_restriction": false, "per_item_hash_published": false,
+      "operational_restriction": "the README mandates avoiding single-hop question ids listed in data/dev_test_singlehop_questions_v1.0.json when training on the seed sets, and names the upstream seed datasets (SQuAD, T-REx, Natural Questions, MLQA, Zero Shot RE) whose own licenses MuSiQue's CC BY 4.0 does NOT override. Upstream license reconciliation is required, not optional.",
+      "blocking_flags": ["synthetic_seeding_allowed", "unreconciled_upstream_seed_licenses"],
+      "admissible_as_root": false
+    },
+    {
+      "source_dataset": "HotpotQA",
+      "primary_urls": ["https://huggingface.co/datasets/hotpotqa/hotpot_qa"],
+      "license_string": "CC BY-SA 4.0, stated in the card's Licensing Information section and as an HF tag",
+      "training_allowed": "YES", "derivatives_allowed": "YES", "redistribution_allowed": "YES_WITH_SHAREALIKE", "synthetic_seeding_allowed": "UNRESOLVED",
+      "nc_restriction": false, "per_item_hash_published": false,
+      "sharealike_conflict": "any derivative bundling HotpotQA content under a different license conflicts with the ShareAlike obligation and must be handled explicitly in v3's own LICENSE.",
+      "blocking_flags": ["synthetic_seeding_allowed"],
+      "admissible_as_root": false
+    },
+    {
+      "source_dataset": "WIQA",
+      "primary_urls": ["https://huggingface.co/datasets/allenai/wiqa", "https://raw.githubusercontent.com/allenai/wiqa-dataset/master/README.md"],
+      "license_string": "NONE FOUND FOR THE DATA - independently confirmed: the HF card's Licensing Information section reads 'More Information Needed'",
+      "training_allowed": "UNRESOLVED", "derivatives_allowed": "UNRESOLVED", "synthetic_seeding_allowed": "UNRESOLVED", "redistribution_allowed": "UNRESOLVED",
+      "nc_restriction": "unknown", "per_item_hash_published": false,
+      "finding": "the Apache-2.0 in allenai/wiqa-dataset is a CODE license. AI2 published the data separately and no data-license text is recoverable from any primary surface. The repo named in earlier program notes (allenai/wiqa) does not exist; the code repo is allenai/wiqa-dataset.",
+      "additional_concern": "the HF dataset viewer is disabled because the repo requires arbitrary Python code execution, which is a supply-chain risk for ingestion independent of licensing.",
+      "blocking_flags": ["no_data_license", "arbitrary_code_execution_on_load"],
+      "admissible_as_root": false
+    },
+    {
+      "source_dataset": "ALFWorld",
+      "primary_urls": ["https://raw.githubusercontent.com/alfworld/alfworld/master/LICENSE", "https://raw.githubusercontent.com/alfworld/alfworld/master/README.md"],
+      "license_string": "MIT for ALFWorld and TextWorld; GNU GPL v3.0 for bundled Fast Downward",
+      "training_allowed": "UNRESOLVED_for_data", "derivatives_allowed": "UNRESOLVED_for_data", "synthetic_seeding_allowed": "UNRESOLVED", "redistribution_allowed": "UNRESOLVED_for_data",
+      "nc_restriction": false, "per_item_hash_published": false,
+      "finding": "multi-component with incompatible terms. The MIT grant covers software. The data section (PDDL, game files) carries no license statement, and the data ships through a separate download channel whose terms were not retrieved. Fast Downward's GPL v3.0 is strong reciprocal copyleft.",
+      "blocking_flags": ["no_data_license", "gplv3_component", "separate_data_channel"],
+      "admissible_as_root": false
+    },
+    {
+      "source_dataset": "ScienceWorld",
+      "primary_urls": ["https://raw.githubusercontent.com/allenai/ScienceWorld/main/LICENSE", "https://raw.githubusercontent.com/allenai/ScienceWorld/main/README.md"],
+      "license_string": "Apache License 2.0 with the copyright line FILLED IN ('Copyright 2022 Cognitive AI Lab and Allen Institute for Artificial Intelligence')",
+      "training_allowed": "YES", "derivatives_allowed": "YES", "redistribution_allowed": "YES_WITH_ATTRIBUTION", "synthetic_seeding_allowed": "UNRESOLVED",
+      "nc_restriction": false, "per_item_hash_published": false,
+      "finding": "the cleanest single-instrument license in the set: one repo, one license, authored by the dataset makers. But it is a simulator environment, not a text corpus, and synthetic seeding remains unaddressed.",
+      "blocking_flags": ["synthetic_seeding_allowed", "not_a_text_corpus"],
+      "admissible_as_root": false
+    },
+    {
+      "source_dataset": "EntailmentBank",
+      "primary_urls": ["https://api.github.com/repos/allenai/entailment_bank", "https://allenai.org/data/entailmentbank"],
+      "license_string": "NONE FOUND FOR THE DATA - the data page renders only a bare Google Drive folder listing with no license text or terms",
+      "training_allowed": "UNRESOLVED", "derivatives_allowed": "UNRESOLVED", "synthetic_seeding_allowed": "UNRESOLVED", "redistribution_allowed": "UNRESOLVED",
+      "nc_restriction": "unknown", "per_item_hash_published": false,
+      "finding": "the eval CODE repo is Apache-2.0; the DATA has no license. The repo named in earlier program notes (akariasai/EntailmentBank) returns 404; the official code repo is allenai/entailment_bank. A third-party HF mirror tagged cc-by-4.0 is an unaffiliated user's tag and must not be cited as an AI2 grant. Sentences derive from SQuAD/StrategyQA, so upstream licenses likely apply and are unreconciled.",
+      "blocking_flags": ["no_data_license", "unreconciled_upstream_licenses", "third_party_tag_misattribution_risk"],
+      "admissible_as_root": false
+    },
+    {
+      "source_dataset": "TRIP",
+      "primary_urls": ["https://api.github.com/repos/sled-group/Verifiable-Coherent-NLU", "https://huggingface.co/datasets/sled-umich/TRIP"],
+      "license_string": "NONE - the official GitHub repo reports license: null with no LICENSE file, and the official HF mirror has an EMPTY license array",
+      "training_allowed": "UNRESOLVED", "derivatives_allowed": "UNRESOLVED", "synthetic_seeding_allowed": "UNRESOLVED", "redistribution_allowed": "UNRESOLVED",
+      "nc_restriction": "unknown", "per_item_hash_published": false,
+      "finding": "the weakest-provenance item in the set: an all-licenses-absent release with an explicitly empty license field. The repo named in earlier program notes (microsoft/LogicalReasoning) returns 404 and is not Microsoft's; TRIP is from the University of Michigan SLED group (Storks, Gao, Zhang, Chai). Data is crowdsourced worker narratives, a further provenance consideration.",
+      "blocking_flags": ["no_license_at_all", "empty_license_field", "crowdsourced_provenance", "incorrect_attribution_in_prior_notes"],
+      "admissible_as_root": false
+    },
+    {
+      "source_dataset": "FEVER",
+      "primary_urls": ["https://huggingface.co/datasets/fever/fever", "https://fever.ai/dataset/fever.html"],
+      "license_string": "CC BY-SA 3.0 by default, but defined by reference to 'the applicable Wikipedia article pages', so per-article terms may differ",
+      "training_allowed": "YES", "derivatives_allowed": "YES", "redistribution_allowed": "YES_WITH_PER_ARTICLE_CAVEAT", "synthetic_seeding_allowed": "UNRESOLVED",
+      "nc_restriction": false, "per_item_hash_published": false,
+      "finding": "separately DEMOTED on scientific grounds regardless of license: follow-up work found strong claim-only cues that let models predict labels without using evidence, which is exactly the accidental-cue failure V2-0 exists to detect. sheffieldnlp/fever-scorer is Apache-2.0 but that is the scorer code.",
+      "blocking_flags": ["synthetic_seeding_allowed", "per_article_license_caveat", "scientifically_demoted_known_shortcut"],
+      "admissible_as_root": false
+    },
+    {
+      "source_dataset": "ProofWriter",
+      "primary_urls": ["https://allenai.org/data/proofwriter (FETCH FAILED: response exceeded size limit)", "https://raw.githubusercontent.com/allenai/ruletaker/master/README.md"],
+      "license_string": "NONE VERIFIED FROM A PRIMARY SOURCE - the release ships no LICENSE file",
+      "training_allowed": "UNRESOLVED", "derivatives_allowed": "UNRESOLVED", "synthetic_seeding_allowed": "UNRESOLVED", "redistribution_allowed": "UNRESOLVED",
+      "nc_restriction": "unknown", "per_item_hash_published": false,
+      "finding": "inheritance of Apache-2.0 from RuleTaker is plausible but UNCONFIRMED by AI2. The only provenance claim found is from an explicitly unaffiliated third party who concedes in their own card that the ProofWriter release ships no LICENSE file. The ProofWriter paper establishes data lineage, not license.",
+      "blocking_flags": ["no_license_in_release", "unconfirmed_license_inheritance"],
+      "admissible_as_root": false,
+      "resolution_path": "already resolved in principle: use the RuleTaker generator and write bank-owned ProofWriter-like extensions, inheriting no ontology and no data"
+    }
+  ],
+
+  "cross_cutting_findings": [
+    {
+      "id": "F1",
+      "finding": "ZERO of the 12 datasets publish a per-item or per-file content hash. The only two hashes found are file-level MD5s published by third parties, not by the dataset authors.",
+      "implication": "the v3 ledger's required content_hash field must be computed BY US at read time and pinned in our own receipt. It cannot be inherited from the source. This is a real cost of the reconstruct-at-scale plan and should be budgeted."
+    },
+    {
+      "id": "F2",
+      "finding": "the recurring trap is a permissive CODE license sitting beside an unlicensed DATA release. This affects WIQA, RuleTaker's data ZIP, ALFWorld, EntailmentBank, and ProofWriter - five of twelve.",
+      "implication": "Apache-2.0 and MIT are doing unearned work in how these datasets are usually described. The v3 ledger's insistence that license attach to the exact bytes read is vindicated."
+    },
+    {
+      "id": "F3",
+      "finding": "synthetic_seeding_allowed is UNRESOLVED for 11 of 12, and it is the flag v3 depends on most, because v3's entire method is expanding families around a root.",
+      "implication": "the human-data path currently contributes ZERO roots. This is not a failure of the plan; it is the plan's firewall working as designed, discovered before a corpus was built on the opposite assumption."
+    },
+    {
+      "id": "F4",
+      "finding": "three repo attributions in the program's earlier dataset notes are wrong: akariasai/EntailmentBank (404), microsoft/LogicalReasoning (404, and not Microsoft's), and allenai/wiqa (404; the code repo is allenai/wiqa-dataset).",
+      "implication": "corrected in the ledger. Any future citation must use allenai/entailment_bank, sled-group/Verifiable-Coherent-NLU, and allenai/wiqa-dataset."
+    },
+    {
+      "id": "F5",
+      "finding": "three sources carry ShareAlike or per-article obligations that would constrain how v3 bundles them: HotpotQA (CC BY-SA 4.0), VitaminC (CC BY-SA 3.0), FEVER (per-article Wikipedia terms).",
+      "implication": "v3 will need its own LICENSE and NOTICE that accounts for ShareAlike propagation. This is a packaging decision, not a research one, but it must be made before any bundle ships."
+    }
+  ],
+
+  "corrections_to_earlier_program_notes": {
+    "EntailmentBank": "official code repo is allenai/entailment_bank (Apache-2.0, code only); DATA has no license and is distributed via a bare Google Drive folder. akariasai/EntailmentBank does not exist.",
+    "TRIP": "official repo is sled-group/Verifiable-Coherent-NLU (Univ. of Michigan SLED, Storks/Gao/Zhang/Chai). license is null, no LICENSE file, HF mirror license array is empty. microsoft/LogicalReasoning does not exist and is not Microsoft's.",
+    "WIQA": "code repo is allenai/wiqa-dataset (Apache-2.0, code only); DATA license unstated across all AI2 surfaces. allenai/wiqa does not exist.",
+    "ContractNLI": "primary source states CC BY 4.0 with no NC clause; a widely used third-party HF mirror is tagged cc-by-nc-sa-4.0. Conflict unresolved."
+  },
+
+  "what_O1_did_not_do": [
+    "no external data was downloaded",
+    "no item was sampled",
+    "no reconstruction was attempted",
+    "no root, descendant, curriculum allocation, synthetic family or training row was created",
+    "no probe artifact was promoted",
+    "no minimum acceptable yield was pre-specified, per the ruling"
+  ],
+
+  "O1_disposition": {
+    "phase_0": "COMPLETE",
+    "phase_1_sampling": "NOT_RUN - no admissible source",
+    "phase_2_reconstruction": "NOT_RUN",
+    "phase_3_reporting": "PARTIAL - this receipt reports the permission dimension of source value only",
+    "source_value_components_status": {
+      "legal_usability": "MEASURED - and it is the binding constraint, at zero for all 12",
+      "exact_yield": "NOT_MEASURED - requires sampling, which requires permission",
+      "capability_coverage": "NOT_MEASURED",
+      "novelty": "NOT_MEASURED"
+    },
+    "conclusion": "The honest answer to O1's question is that the human-data path contributes nothing today, and that this was knowable for the cost of twelve primary-source fetches rather than after building a corpus. The unblocking work is permission resolution with data authors, not engineering."
+  },
+
+  "recommended_next_actions": [
+    {"priority": 1, "action": "contact the authors of the four highest-value sources (VitaminC, ContractNLI, MuSiQue, HotpotQA) with one question: does the license permit using an item to seed generation of synthetic training data? Record the answer verbatim in the ledger.", "why": "these four have confirmed permissive data licenses and only the synthetic-seeding flag is missing; one email each could unblock the entire human-data path"},
+    {"priority": 2, "action": "resolve the ContractNLI CC BY 4.0 versus cc-by-nc-sa-4.0 conflict with the authors", "why": "an NC tag on the most-used mirror would change the answer materially if the primary is wrong"},
+    {"priority": 3, "action": "for WIQA, EntailmentBank, TRIP and ProofWriter, either obtain an explicit grant or accept they are unusable", "why": "four of twelve have no data license at all; no amount of engineering resolves this"},
+    {"priority": 4, "action": "pursue the RuleTaker generator path (Apache-2.0, code only) as v3's inference-engine substrate, producing zero external rows", "why": "it is the only currently-cleared path, it needs no data license, and it delivers exact deduction with controllable proof depth"},
+    {"priority": 5, "action": "draft v3's LICENSE and NOTICE to account for ShareAlike propagation from HotpotQA, VitaminC and FEVER", "why": "F5 is a packaging obligation that must exist before any bundle ships"}
+  ],
+
+  "constitutional_compliance": {
+    "v3_sections_1_to_9_changed": false,
+    "amendment_required": false,
+    "note": "the constitution anticipated this outcome. The ledger default holds unresolved flags at false, rubric A2 makes synthetic seeding blocking for root status, and O1 was explicitly scoped as reconnaissance that produces no roots. No frozen-contract violation occurred.",
+    "stop_condition_invoked": "license/identity mismatch - one of the three stated stop conditions"
+  }
+}

@@ -1,0 +1,122 @@
+{
+  "contract": "jev-decision-data-information-density/v0.8c-phase2b-witness-seeded-counterfactual-construction",
+  "status": "prospective_frozen_before_candidate_search",
+  "supersedes": {
+    "phase2_contract_sha256": "b62d2165484213af7ef400f4937e2b1c1018bf63d4c6904a0cf34346ecbd03d2",
+    "supersession_scope": "construction instrumentation and candidate acceptance only; prior run remains interrupted and immutable"
+  },
+  "immutable_parent_artifacts": {
+    "v08_contract_sha256": "d1971ae4a8a8f6dcfcadbda97b2290bf3fa630f201779c4b47019512fc87f98f",
+    "v08b_contract_sha256": "16e8a36542ab80c9164ffe21794affd1662df8cd34dcff71858eae237c4d2c8d",
+    "v08b_failed_constructor_report_sha256": "c38c980aed9b231e1bea15cc3ce5d42d67eff767f9b5b3286046fee7f97a778e",
+    "phase1_contract_sha256": "d40ef883b0def1b3a8b07c594f3a79b2d735b5b1ddc7b7a8226918e7f2019ee8",
+    "phase1_receipt_sha256": "ac713dcdc805465118db1c96daad1862a3135578a5f04c87279cd106f2d98932",
+    "phase2_optimizer_sha256": "9c57f98a151870c16f2cfdae5b27853939dd25598e1618b7ac6aeaa7bd52ff1b",
+    "group_records_sha256": "9e3546fbe88741666cc5be5ae28907d7a223f74c8578609adfc3036ba7f4e7f2",
+    "r100_manifest_sha256": "0b9998d94e895e5f540c066bdc618d0d6378b9e9ce632380838b7a14beac008b",
+    "c100_manifest_sha256": "860fbfef8283e707d41639ab970ef7257d116e3001a18a0b180feea9d72579c3",
+    "eval_manifest_sha256": "3e72cd7596fbf0b302501b88dd9dc645a5749de10884b57eceb5552bfc5ef8ae"
+  },
+  "scope": {
+    "dataset": "jev-mixed-information-density-v0.8",
+    "candidate_universe": "the exact pinned eligible training groups from the parent contract",
+    "model_feedback": false,
+    "model_contact_authorized": false,
+    "phoenix_in_scope": false,
+    "existing_banks_mutable": false,
+    "strict_novel93_mutable": false,
+    "candidate_outputs_external_only": true
+  },
+  "targets": {
+    "CM100": {"reference_profile": "R100", "groups": 100000, "joint_cell_counts": "exact"},
+    "RM100": {"reference_profile": "C100", "groups": 100000, "joint_cell_counts": "exact"}
+  },
+  "hard_constraints": {
+    "unique_model_input_count_relative_error": 0.02,
+    "input_occurrence_histogram_tv": 0.02,
+    "unique_root_count_relative_error": 0.02,
+    "root_occurrence_histogram_tv": 0.02,
+    "topology_marginal_tv": 0.02,
+    "intervention_marginal_tv": 0.02,
+    "unique_count_rounding": "outward_floor_lower_ceil_upper",
+    "histogram_tv_integer_form": "25*sum_abs(N_ref*H_sel[k]-N_sel*H_ref[k]) <= N_sel*N_ref",
+    "no_extra_exact_root_histogram": true,
+    "no_extra_exact_per_cell_input_histogram": true,
+    "evaluation_and_protected_families_excluded": true,
+    "group_ids_may_be_compressed_only_when_all_constraint_contributions_are_identical": true
+  },
+  "counterfactual_acceptance": {
+    "candidate_must_differ_from_identity_witness": true,
+    "minimum_changed_group_ids": 1,
+    "additional_overlap_ceiling": null,
+    "overlap_is_reported": true,
+    "profile_witness_is_not_a_counterfactual_incumbent": true,
+    "all_committed_candidates_require_independent_full_audit": true
+  },
+  "objectives": {
+    "CM100": {
+      "direction": "maximize",
+      "definition": "sum of global frozen-v0.8 static rarity-weighted coverage priority ranks over all eligible training groups",
+      "score_order": "descending five-axis v0.8 global rarity-weighted coverage score, then ascending SHA256(curated_seed|group_id), then lexical group_id",
+      "seed": "jev-idv08b-cm100-sha256-v1-profile-constrained-curation"
+    },
+    "RM100": {
+      "direction": "maximize_priority_equivalently_minimize_rank_cost",
+      "definition": "sum of seeded SHA256 random-priority ranks over all eligible training groups",
+      "score_order": "ascending SHA256(random_seed|group_id), then lexical group_id; priority rank is eligible_count minus zero-based rank",
+      "seed": "jev-idv08b-rm100-sha256-v1-profile-constrained-random",
+      "interpretation": "deterministic constrained random-priority objective; not uniform sampling from the feasible-bank set"
+    },
+    "model_outputs_or_embeddings_used": false,
+    "objective_optimality_required": false,
+    "feasible_candidate_policy": "accept only a distinct candidate that passes every independent hard-constraint audit; report OPTIMAL or FEASIBLE_NOT_PROVEN and all available valid bounds"
+  },
+  "separation_gate": {
+    "status_is_policy_score_separation_not_downstream_materiality": true,
+    "CM100": "SEPARATED iff candidate is non-identical, independently feasible, and curated objective sum exceeds R100 identity objective sum by at least one integer priority unit",
+    "RM100": "SEPARATED iff candidate is non-identical, independently feasible, and random-priority sum exceeds C100 identity objective sum by at least one integer priority unit",
+    "absolute_threshold_justification": "one is the smallest positive difference representable by the frozen integer-sum objective; it prevents zero-change candidates but makes no claim of material learning impact",
+    "headroom_metric": "(candidate objective - identity objective)/(valid upper bound - identity objective); report raw components; null when denominator is non-positive",
+    "upper_bound": "sum of the top frozen priority ranks required within each exact joint cell; this relaxes all remaining constraints and is valid but may be loose",
+    "headroom_ratio_is_not_an_acceptance_gate": true,
+    "zero_headroom_denominator": "report null and explain; do not divide"
+  },
+  "statuses": {
+    "profile_feasibility": ["PROFILE_FEASIBLE", "NOT_ESTABLISHED", "FAILED_AUDIT"],
+    "counterfactual_feasibility": ["COUNTERFACTUAL_FEASIBLE", "NOT_CONSTRUCTED", "FAILED_AUDIT"],
+    "policy_separation": ["SEPARATED", "NOT_SEPARATED", "NOT_EVALUATED"],
+    "optimality": ["OPTIMAL", "FEASIBLE_NOT_PROVEN", "NOT_ATTEMPTED"],
+    "search": ["SEARCH_COMPLETE", "SEARCH_EXHAUSTED", "INTERRUPTED", "NOT_STARTED"],
+    "search_exhaustion_semantics": "construction budget ended; never evidence of infeasibility or absence of treatment headroom"
+  },
+  "construction": {
+    "profile_witnesses": {"CM100": "R100 identity", "RM100": "C100 identity"},
+    "witness_use": "initial state only; establish profile feasibility; must be changed before candidate acceptance",
+    "stages": [
+      "constraint-incidence audit",
+      "proven-equivalent substitutions",
+      "small exact-delta exchanges",
+      "input/root bundle exchanges where incidence permits",
+      "bounded compressed/neighborhood refinement"
+    ],
+    "compression_rule": "only merge candidates when every relevant constraint contribution is preserved, the objective is additive over the class, and no residual constraint distinguishes members; expand and independently revalidate"
+  },
+  "budget": {
+    "instrumented_existing_pipeline_baseline_seconds_after_source_load": 900,
+    "per_bank_constructive_and_local_search_seconds": 2700,
+    "per_bank_compressed_or_neighborhood_refinement_seconds": 900,
+    "workers": 1,
+    "random_seed": 20260920,
+    "progress_receipts_seconds": 60,
+    "additional_continuation_authorized": false,
+    "wall_clock_limit_reproducibility_caveat": "same seed and one worker are fixed; wall-clock cutoffs may yield different incumbents across machines; preserve trace and artifact hashes"
+  },
+  "decision_policy": {
+    "valid_bank_and_separation_pass": "independent audit then separate explicit LFM authorization gate; no automatic model contact",
+    "separation_fail_with_certified_bound_excluding_gate": "report gate failure, not infeasibility",
+    "separation_fail_without_excluding_bound": "inconclusive construction quality",
+    "witness_failure": "stop and diagnose provenance/constraint discrepancy",
+    "budget_exhaustion": "report SEARCH_EXHAUSTED; retain best audited candidate; do not infer low headroom",
+    "p_star": "unchanged; invoke only under original source-support infeasibility conditions"
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "TerminalReceipt",
+  "type": "object",
+  "properties": {
+    "episode_id": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "final_account_hash": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "final_step_id": {
+      "type": "integer",
+      "format": "uint64",
+      "minimum": 0
+    },
+    "reason": {
+      "$ref": "#/$defs/TerminalReason"
+    },
+    "terminated": {
+      "type": "boolean"
+    },
+    "trajectory_root": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "truncated": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "episode_id",
+    "final_step_id",
+    "terminated",
+    "truncated",
+    "reason",
+    "final_account_hash",
+    "trajectory_root"
+  ],
+  "$defs": {
+    "Digest256": {
+      "description": "Domain-separated BLAKE3 digest",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "TerminalReason": {
+      "type": "string",
+      "enum": [
+        "EPISODE_END",
+        "ACCOUNT_FLOOR",
+        "DATA_END",
+        "SOURCE_GAP",
+        "MANUAL_TEST_TERMINATION"
+      ]
+    }
+  }
+}

@@ -1,0 +1,590 @@
+{
+  "arm": "B-f64-feature-generation-and-storage",
+  "feature_width": 80,
+  "identity": "F4-PRECISION-01",
+  "measured_namespace_created": false,
+  "native_trajectory_mutated": false,
+  "record_encoding": "float64-little-endian-features-and-magnitude",
+  "rows": 13420,
+  "schema": "FLY-REACH-03-F4-PRECISION-01-feature-collection-v1",
+  "status": "COLLECTION_COMPLETE",
+  "streams": 72,
+  "streams_manifest": [
+    {
+      "block": 303000,
+      "bytes": 35,
+      "cell_key": "fly:L",
+      "path": "fly-L-303000.bin",
+      "rows": 0,
+      "sha256": "52c889cf3a7c9d1bca55720c003b937f72aca44a6131c3616747052cf7841064"
+    },
+    {
+      "block": 303001,
+      "bytes": 35,
+      "cell_key": "fly:L",
+      "path": "fly-L-303001.bin",
+      "rows": 0,
+      "sha256": "dc06eef32567f025383aadfc56fc8d5ddaf2c1763916358d46c69d41d129f7e3"
+    },
+    {
+      "block": 303002,
+      "bytes": 35,
+      "cell_key": "fly:L",
+      "path": "fly-L-303002.bin",
+      "rows": 0,
+      "sha256": "8bce98b0a59adbd45ff125183fcc49fdee400bb1b2601fe8d917145a0c073571"
+    },
+    {
+      "block": 303003,
+      "bytes": 597870,
+      "cell_key": "fly:L",
+      "path": "fly-L-303003.bin",
+      "rows": 899,
+      "sha256": "605b050c2b2a7a7cbd3e85cfe7750e514a343eb1dc48d2860805d61655290f6c"
+    },
+    {
+      "block": 303000,
+      "bytes": 1032780,
+      "cell_key": "fly:R",
+      "path": "fly-R-303000.bin",
+      "rows": 1553,
+      "sha256": "63ad541d23388e5c9f5ff661711297e31dafa9c5d78c44ccd018941211da532d"
+    },
+    {
+      "block": 303001,
+      "bytes": 35,
+      "cell_key": "fly:R",
+      "path": "fly-R-303001.bin",
+      "rows": 0,
+      "sha256": "6192898a259f3a1b1e6d95ba7865a3bbf5dd5f927f461dcd49d3a3b006bd7bb0"
+    },
+    {
+      "block": 303002,
+      "bytes": 35,
+      "cell_key": "fly:R",
+      "path": "fly-R-303002.bin",
+      "rows": 0,
+      "sha256": "2b8dd4aeafa2fd8b2e6d40f491f3376aef7116738dc2eb5963f4ef9bf7079480"
+    },
+    {
+      "block": 303003,
+      "bytes": 35,
+      "cell_key": "fly:R",
+      "path": "fly-R-303003.bin",
+      "rows": 0,
+      "sha256": "5c46a167531876e715634f7f03b425893cbaedcf76953b67d3cb3d58f8b85f50"
+    },
+    {
+      "block": 303000,
+      "bytes": 36,
+      "cell_key": "g001:L",
+      "path": "g001-L-303000.bin",
+      "rows": 0,
+      "sha256": "32c2da44931816e2a271d24fcc546032cbc7a31a819c6076d776baed3f8421cc"
+    },
+    {
+      "block": 303001,
+      "bytes": 36,
+      "cell_key": "g001:L",
+      "path": "g001-L-303001.bin",
+      "rows": 0,
+      "sha256": "c07595b7302c1a732e594448685609a1806c70246d945f66141801740926f257"
+    },
+    {
+      "block": 303002,
+      "bytes": 36,
+      "cell_key": "g001:L",
+      "path": "g001-L-303002.bin",
+      "rows": 0,
+      "sha256": "7918ccca0a4fc010adb53bf881d76de1f306474a5f7315bc783943f0f0d6eb54"
+    },
+    {
+      "block": 303003,
+      "bytes": 36,
+      "cell_key": "g001:L",
+      "path": "g001-L-303003.bin",
+      "rows": 0,
+      "sha256": "ebcd3180d735737e5a47a05172a9ee4007a3f05d27f7ba4fb437b9cfd674dd73"
+    },
+    {
+      "block": 303000,
+      "bytes": 36,
+      "cell_key": "g001:R",
+      "path": "g001-R-303000.bin",
+      "rows": 0,
+      "sha256": "cc8fc93cec8132f8aa32b611eca90015fb5d577d5a29e6952a428333c341bc63"
+    },
+    {
+      "block": 303001,
+      "bytes": 36,
+      "cell_key": "g001:R",
+      "path": "g001-R-303001.bin",
+      "rows": 0,
+      "sha256": "ba6faaf97a5ffd8cc3837736bdb7ca3b2cdf20c09426314c026ed1f5f3513cf8"
+    },
+    {
+      "block": 303002,
+      "bytes": 36,
+      "cell_key": "g001:R",
+      "path": "g001-R-303002.bin",
+      "rows": 0,
+      "sha256": "83b945e973ecd201eaaae35aac9b5086615cfe1d4901a1ced5c811e7d05d22b0"
+    },
+    {
+      "block": 303003,
+      "bytes": 36,
+      "cell_key": "g001:R",
+      "path": "g001-R-303003.bin",
+      "rows": 0,
+      "sha256": "629f5164a67c45640ad4def2b4a10446518837ee47ad9055eec5275b4bfda396"
+    },
+    {
+      "block": 303000,
+      "bytes": 36,
+      "cell_key": "g002:L",
+      "path": "g002-L-303000.bin",
+      "rows": 0,
+      "sha256": "f1fb968086dfe2240bb3849df476936fde5a4029ecc318d3623b0ac0b1873c27"
+    },
+    {
+      "block": 303001,
+      "bytes": 37276,
+      "cell_key": "g002:L",
+      "path": "g002-L-303001.bin",
+      "rows": 56,
+      "sha256": "28ef1581f2e1ca1595691fa7466e4356351d506087189e9539553ff5d6f9af12"
+    },
+    {
+      "block": 303002,
+      "bytes": 36,
+      "cell_key": "g002:L",
+      "path": "g002-L-303002.bin",
+      "rows": 0,
+      "sha256": "efd51fcbd4c84e5fd594e99f1c6f7e4977c180202c4cd845086db4acd31e3dd3"
+    },
+    {
+      "block": 303003,
+      "bytes": 36,
+      "cell_key": "g002:L",
+      "path": "g002-L-303003.bin",
+      "rows": 0,
+      "sha256": "7492496050846c389fa29eb25433f12614f93409a05341ef2d518434214a62f2"
+    },
+    {
+      "block": 303000,
+      "bytes": 36,
+      "cell_key": "g002:R",
+      "path": "g002-R-303000.bin",
+      "rows": 0,
+      "sha256": "b05eff06c23c6bdd2bfde6efe149bb1fdaf0a68f0f7abff5de68f70abc4a8842"
+    },
+    {
+      "block": 303001,
+      "bytes": 36,
+      "cell_key": "g002:R",
+      "path": "g002-R-303001.bin",
+      "rows": 0,
+      "sha256": "707fdd2390832e9209b5651bd45102ce7a9aa9954e4568affda291ce8e10b0fa"
+    },
+    {
+      "block": 303002,
+      "bytes": 36,
+      "cell_key": "g002:R",
+      "path": "g002-R-303002.bin",
+      "rows": 0,
+      "sha256": "ffed08da08b568a4352c2406f26909aa8e873da07306707b9125dac5d6db7589"
+    },
+    {
+      "block": 303003,
+      "bytes": 36,
+      "cell_key": "g002:R",
+      "path": "g002-R-303003.bin",
+      "rows": 0,
+      "sha256": "1f3876a0f29a7fa200955beba75ee6b5a65514853229e22e4a6bb6e1e84b07d1"
+    },
+    {
+      "block": 303000,
+      "bytes": 36,
+      "cell_key": "g003:L",
+      "path": "g003-L-303000.bin",
+      "rows": 0,
+      "sha256": "3f35fd3f524c22f85cf4dd3553dcb71756ee2b0bc70e46ad882d98a9ea5b067b"
+    },
+    {
+      "block": 303001,
+      "bytes": 36,
+      "cell_key": "g003:L",
+      "path": "g003-L-303001.bin",
+      "rows": 0,
+      "sha256": "3a03a6a178931de128af08b2441da5b49dc3ff0cf76e28279a531824e01ff805"
+    },
+    {
+      "block": 303002,
+      "bytes": 36,
+      "cell_key": "g003:L",
+      "path": "g003-L-303002.bin",
+      "rows": 0,
+      "sha256": "cb1225d1d099811a9493d629696c797aef72b7ca0e553dc092ebf026387b52fd"
+    },
+    {
+      "block": 303003,
+      "bytes": 36,
+      "cell_key": "g003:L",
+      "path": "g003-L-303003.bin",
+      "rows": 0,
+      "sha256": "f06790ab6073a9bcb99a20ac26b18e7f3a4d40d2eaedcb57b27361dc5184861d"
+    },
+    {
+      "block": 303000,
+      "bytes": 97791,
+      "cell_key": "g003:R",
+      "path": "g003-R-303000.bin",
+      "rows": 147,
+      "sha256": "9bbdda2665c382c7ef6a70dc1c3ee6f1163198411e6c6faa5c9586b67d1c934b"
+    },
+    {
+      "block": 303001,
+      "bytes": 36,
+      "cell_key": "g003:R",
+      "path": "g003-R-303001.bin",
+      "rows": 0,
+      "sha256": "fb00ca809aa37a3d25147af542d8ce64b60a24235ae3648bc53f7989b44ec902"
+    },
+    {
+      "block": 303002,
+      "bytes": 36,
+      "cell_key": "g003:R",
+      "path": "g003-R-303002.bin",
+      "rows": 0,
+      "sha256": "655f001eae0545b50eb5f47247507269b4aa2e5272a77f24aea459763ae533ef"
+    },
+    {
+      "block": 303003,
+      "bytes": 36,
+      "cell_key": "g003:R",
+      "path": "g003-R-303003.bin",
+      "rows": 0,
+      "sha256": "69057720243d511c47e1f5ff9619a91993daef4733dfa7f9ec39006004a16dbf"
+    },
+    {
+      "block": 303000,
+      "bytes": 36,
+      "cell_key": "g004:L",
+      "path": "g004-L-303000.bin",
+      "rows": 0,
+      "sha256": "9d15809c31c5d42223d73ac1a47f815d1edffa0bbb4a4db1f57e2222399ca3e2"
+    },
+    {
+      "block": 303001,
+      "bytes": 36,
+      "cell_key": "g004:L",
+      "path": "g004-L-303001.bin",
+      "rows": 0,
+      "sha256": "d574852bed36f447bde12c4d3b13155a4365db9b3132b7c07e61b15d54eb050b"
+    },
+    {
+      "block": 303002,
+      "bytes": 36,
+      "cell_key": "g004:L",
+      "path": "g004-L-303002.bin",
+      "rows": 0,
+      "sha256": "91ae7abd157fa7762e3441d7a4f31b552400a5614ab846a06d43eb22b3fb25cb"
+    },
+    {
+      "block": 303003,
+      "bytes": 36,
+      "cell_key": "g004:L",
+      "path": "g004-L-303003.bin",
+      "rows": 0,
+      "sha256": "48fcf3cf92a498df4077a2c35af60243e4a28f82b2c24b60e0b78a36c65c45c4"
+    },
+    {
+      "block": 303000,
+      "bytes": 36,
+      "cell_key": "g004:R",
+      "path": "g004-R-303000.bin",
+      "rows": 0,
+      "sha256": "57df1f219d6f4ad919c5a1ffb93eafef087a0b30a4c184205e6028ab127af444"
+    },
+    {
+      "block": 303001,
+      "bytes": 36,
+      "cell_key": "g004:R",
+      "path": "g004-R-303001.bin",
+      "rows": 0,
+      "sha256": "5e8094778f530eb6b4350f4322f30b9110e4c3def7fd650a3e3da4515dd88166"
+    },
+    {
+      "block": 303002,
+      "bytes": 36,
+      "cell_key": "g004:R",
+      "path": "g004-R-303002.bin",
+      "rows": 0,
+      "sha256": "ec0f0f29373ed85e25fd2764e364c308d9da899434783d26ec3a029eec16d534"
+    },
+    {
+      "block": 303003,
+      "bytes": 36,
+      "cell_key": "g004:R",
+      "path": "g004-R-303003.bin",
+      "rows": 0,
+      "sha256": "d9e1144449bae7b80fafdcb39d5693fc191e71da6850cfb9939785c4f02a1721"
+    },
+    {
+      "block": 303000,
+      "bytes": 36,
+      "cell_key": "g005:L",
+      "path": "g005-L-303000.bin",
+      "rows": 0,
+      "sha256": "354334d7bc44d95d2e8e239f4ee7f5e06a6091987fe8d4c3371aa94c9b7b7f27"
+    },
+    {
+      "block": 303001,
+      "bytes": 1240926,
+      "cell_key": "g005:L",
+      "path": "g005-L-303001.bin",
+      "rows": 1866,
+      "sha256": "5a3780db5d2104dc44c129a56fee9bb4438a5a8ebbc32c2577189fb5c3e4a192"
+    },
+    {
+      "block": 303002,
+      "bytes": 1151151,
+      "cell_key": "g005:L",
+      "path": "g005-L-303002.bin",
+      "rows": 1731,
+      "sha256": "6fb6dfb59f9aec4e63f2e476d0e32913854691b76e71255179c873e7a2a108cc"
+    },
+    {
+      "block": 303003,
+      "bytes": 36,
+      "cell_key": "g005:L",
+      "path": "g005-L-303003.bin",
+      "rows": 0,
+      "sha256": "8f512e5c425d7648147d2c94f489e7ed7d4e90848407d1695512ec7044d63248"
+    },
+    {
+      "block": 303000,
+      "bytes": 36,
+      "cell_key": "g005:R",
+      "path": "g005-R-303000.bin",
+      "rows": 0,
+      "sha256": "216de86672a3fdc9c87ba15c6d5cd0a904eb946c68f16f56e42501b29c675d03"
+    },
+    {
+      "block": 303001,
+      "bytes": 36,
+      "cell_key": "g005:R",
+      "path": "g005-R-303001.bin",
+      "rows": 0,
+      "sha256": "6e93d6467c6eb85621bc6b6ef102841dc7dd5bcfca51c0d1e7a0dc5575e4fa67"
+    },
+    {
+      "block": 303002,
+      "bytes": 1289471,
+      "cell_key": "g005:R",
+      "path": "g005-R-303002.bin",
+      "rows": 1939,
+      "sha256": "642ec0ea7bb4a3454d35bf116e336e034b9469aa325822515782547b44f113b4"
+    },
+    {
+      "block": 303003,
+      "bytes": 36,
+      "cell_key": "g005:R",
+      "path": "g005-R-303003.bin",
+      "rows": 0,
+      "sha256": "70bc767775e259dc4e7793feb9adb38da8f6c74ac262a56af68688f550f0f93b"
+    },
+    {
+      "block": 303000,
+      "bytes": 36,
+      "cell_key": "g006:L",
+      "path": "g006-L-303000.bin",
+      "rows": 0,
+      "sha256": "932aa28d154538d901ec9b2952d8c7087a0d11c101de216a18bfa7eff07e1542"
+    },
+    {
+      "block": 303001,
+      "bytes": 36,
+      "cell_key": "g006:L",
+      "path": "g006-L-303001.bin",
+      "rows": 0,
+      "sha256": "ba5c6468f2f3889ee335bee72e2b96dc4d3a41bfb59c7aa86c1ef3902df4de87"
+    },
+    {
+      "block": 303002,
+      "bytes": 36,
+      "cell_key": "g006:L",
+      "path": "g006-L-303002.bin",
+      "rows": 0,
+      "sha256": "ddee267f5c0a89e5462e81280b791351cb9c574d6b93bc107003e26d406056d6"
+    },
+    {
+      "block": 303003,
+      "bytes": 36,
+      "cell_key": "g006:L",
+      "path": "g006-L-303003.bin",
+      "rows": 0,
+      "sha256": "7e690b9fd99b52a4f1cdb9661eb97f7a99205405d6896f93ea4c59a22645a349"
+    },
+    {
+      "block": 303000,
+      "bytes": 36,
+      "cell_key": "g006:R",
+      "path": "g006-R-303000.bin",
+      "rows": 0,
+      "sha256": "ba19244938f6c3592ffa741a1b5aa0dfa57fc87d8c3deb8c312d16894d345a4a"
+    },
+    {
+      "block": 303001,
+      "bytes": 36,
+      "cell_key": "g006:R",
+      "path": "g006-R-303001.bin",
+      "rows": 0,
+      "sha256": "9a06c1078aae58aa8460ac303c65c0c7c85dea3a1b72a78c4576eeede515483c"
+    },
+    {
+      "block": 303002,
+      "bytes": 36,
+      "cell_key": "g006:R",
+      "path": "g006-R-303002.bin",
+      "rows": 0,
+      "sha256": "6be84be7b12952809595a674bd5ecb9964794e3f0377fcfbb18eddfaa4728d74"
+    },
+    {
+      "block": 303003,
+      "bytes": 36,
+      "cell_key": "g006:R",
+      "path": "g006-R-303003.bin",
+      "rows": 0,
+      "sha256": "71348fd0c80be7e37631745843979ff0d98ef45378473cdaa6f56aff8f9b54a5"
+    },
+    {
+      "block": 303000,
+      "bytes": 36,
+      "cell_key": "g007:L",
+      "path": "g007-L-303000.bin",
+      "rows": 0,
+      "sha256": "6597dac09702b094936d9bd9f9cfbb82edc546494f37ebe58034ec6c87f472a8"
+    },
+    {
+      "block": 303001,
+      "bytes": 36,
+      "cell_key": "g007:L",
+      "path": "g007-L-303001.bin",
+      "rows": 0,
+      "sha256": "de0b0b9c1de8cf5fde030101c48fb589e1992f6b8999a7f5545c05b45615f19a"
+    },
+    {
+      "block": 303002,
+      "bytes": 36,
+      "cell_key": "g007:L",
+      "path": "g007-L-303002.bin",
+      "rows": 0,
+      "sha256": "ef216ad527d90a10241dbd3f4a354e24b7376121ce5802e79db2a63677d1df48"
+    },
+    {
+      "block": 303003,
+      "bytes": 36,
+      "cell_key": "g007:L",
+      "path": "g007-L-303003.bin",
+      "rows": 0,
+      "sha256": "dc9925666d12090500a274044d84e154fe987ebb9455bf29337086543e4b488b"
+    },
+    {
+      "block": 303000,
+      "bytes": 36,
+      "cell_key": "g007:R",
+      "path": "g007-R-303000.bin",
+      "rows": 0,
+      "sha256": "3c534048c1ba9ff9034d5a0d6ace42deb8ab27ffce4d248c69095db5306caed2"
+    },
+    {
+      "block": 303001,
+      "bytes": 36,
+      "cell_key": "g007:R",
+      "path": "g007-R-303001.bin",
+      "rows": 0,
+      "sha256": "067f54010384f80b2fd0f59dd43ee1ccda3672e1b36a5c98b5cb549106a23aa1"
+    },
+    {
+      "block": 303002,
+      "bytes": 36,
+      "cell_key": "g007:R",
+      "path": "g007-R-303002.bin",
+      "rows": 0,
+      "sha256": "be5498d427143ad38d551bfdbc5d0f3f0986349a0c5e40100e6a60c8d4a2d06e"
+    },
+    {
+      "block": 303003,
+      "bytes": 643756,
+      "cell_key": "g007:R",
+      "path": "g007-R-303003.bin",
+      "rows": 968,
+      "sha256": "4bd890af38b819bc6bf94fbfcbc070b00b82fae78b746eac6567609c952f31b6"
+    },
+    {
+      "block": 303000,
+      "bytes": 703606,
+      "cell_key": "g008:L",
+      "path": "g008-L-303000.bin",
+      "rows": 1058,
+      "sha256": "697b2e35498dd2268b2d1c3f24ef7aab6c100268b338e15f79f25cd890257a2c"
+    },
+    {
+      "block": 303001,
+      "bytes": 593881,
+      "cell_key": "g008:L",
+      "path": "g008-L-303001.bin",
+      "rows": 893,
+      "sha256": "cfdb3f013df446f8d8403efa29a7aa8d37b63d23ae1d9f2255d4f39b8b40b807"
+    },
+    {
+      "block": 303002,
+      "bytes": 36,
+      "cell_key": "g008:L",
+      "path": "g008-L-303002.bin",
+      "rows": 0,
+      "sha256": "3714aca9f2cede610ec5b71f29b0fadb85a68306916c41d3c565ce23381cfd92"
+    },
+    {
+      "block": 303003,
+      "bytes": 36,
+      "cell_key": "g008:L",
+      "path": "g008-L-303003.bin",
+      "rows": 0,
+      "sha256": "00290578db589008cf5b12e621e53b08016185062e8daab5e67fe44754aa8a64"
+    },
+    {
+      "block": 303000,
+      "bytes": 645751,
+      "cell_key": "g008:R",
+      "path": "g008-R-303000.bin",
+      "rows": 971,
+      "sha256": "2651055625ba65e9346599436767650f8b26524afd824fbcdb2ac9a606b04c63"
+    },
+    {
+      "block": 303001,
+      "bytes": 36,
+      "cell_key": "g008:R",
+      "path": "g008-R-303001.bin",
+      "rows": 0,
+      "sha256": "a26f4b932471f84849395496eaeb70daa8cf7ac7ed69eb99395062c7af941bb3"
+    },
+    {
+      "block": 303002,
+      "bytes": 890471,
+      "cell_key": "g008:R",
+      "path": "g008-R-303002.bin",
+      "rows": 1339,
+      "sha256": "223f749b08640b52a601df0b79826fb841f2273b41aad98c6fc5f5f6c7695c18"
+    },
+    {
+      "block": 303003,
+      "bytes": 36,
+      "cell_key": "g008:R",
+      "path": "g008-R-303003.bin",
+      "rows": 0,
+      "sha256": "c4e6c30f1d169f806ddfea87662ff046c5dee1230355d2b7760f47928680ebfc"
+    }
+  ]
+}

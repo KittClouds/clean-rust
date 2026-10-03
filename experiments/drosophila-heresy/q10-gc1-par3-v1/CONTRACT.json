@@ -1,0 +1,115 @@
+{
+  "assembly": {
+    "beam_width": 48,
+    "exploit_width": 32,
+    "explore_width": 16,
+    "group_order": "descending baseline physical-support ULP burden, mismatch count, ascending palette size, support degree, group id",
+    "same_coordinate_different_prefix": "hard conflict",
+    "temporary_nonmonotonic_states": true,
+    "worker_count": 4,
+    "zero_candidate_required": true
+  },
+  "candidate_validation": {
+    "candidate_identity": "must equal the sealed canonical coordinate-to-prefix identity",
+    "canonical_mapping": "exactly one entry for every group coordinate, sorted by coordinate id",
+    "committed_bytes": "must equal PF5.legal_prefix_bits(baseline_byte, choice)",
+    "legal_choices": [
+      0,
+      -1,
+      1,
+      -2,
+      2,
+      -4,
+      4,
+      -8,
+      8,
+      -16,
+      16
+    ],
+    "permitted_coordinates": "every changed coordinate must be permitted and interior in the frozen state",
+    "zero": "zero mapping must commit baseline bytes for every group coordinate"
+  },
+  "firewall": {
+    "behavioral_probe": false,
+    "engineering_only": true,
+    "gc1_authorized": false,
+    "global_assembly_executed": true,
+    "parent_writes": false,
+    "scientific_promotion": false,
+    "write_root": "experiments/drosophila-heresy/q10-gc1-par3-v1"
+  },
+  "identity": "q10-gc1-par3-v1",
+  "intermediate_geometry_guardrails": {
+    "axis_normalized_abs": 0.000256,
+    "cue_linear_normalized_abs": 0.000256,
+    "norm_normalized_abs": 2.56e-05
+  },
+  "parent_bindings": [
+    {
+      "label": "gc1_pf0_plan",
+      "path": "experiments/drosophila-heresy/q10-gc1-pf0-v1/PLAN.md",
+      "sha256": "06BB42E896317BB93431913A037AC2572027D6B9DBC307C3067FFF4A823F4469"
+    },
+    {
+      "label": "gc1_pf0_contract",
+      "path": "experiments/drosophila-heresy/q10-gc1-pf0-v1/CONTRACT.json",
+      "sha256": "462121090C3413746617ACCAC4A85A3517C6AE998C03D48F30F3D3134BB84B10"
+    },
+    {
+      "label": "gc1_pf0_execution",
+      "path": "experiments/drosophila-heresy/q10-gc1-pf0-v1/qualification/execution.json",
+      "sha256": "47DB038381C9ACB0C98E7D933AA40864F779584CC635178BDF775FDAB5598762"
+    },
+    {
+      "label": "gc1_pf0_status",
+      "path": "experiments/drosophila-heresy/q10-gc1-pf0-v1/qualification/derived/STATUS.json",
+      "sha256": "B59AB917A7D475543272DD1B27191D156A2C59EA94EC3025264BAE783A31F963"
+    },
+    {
+      "label": "par2_contract",
+      "path": "experiments/drosophila-heresy/q10-gc0-gp1-par2-v1/CONTRACT.json",
+      "sha256": "13EF3F6D7EF2C1C548F5E36B6FF98E48D3BBFBCEA1917E318078A8068E6C57D7"
+    },
+    {
+      "label": "par2_execution",
+      "path": "experiments/drosophila-heresy/q10-gc0-gp1-par2-v1/qualification/execution.json",
+      "sha256": "C74E310443C15C58E9EC897DCAEFFB1C0E86ED23B350E830D4308953751F34D2"
+    },
+    {
+      "label": "par2_status",
+      "path": "experiments/drosophila-heresy/q10-gc0-gp1-par2-v1/qualification/derived/STATUS.json",
+      "sha256": "97C277DBCF3238561E783A545D46D8142C564400FBF04DC3CC20022C87B41019"
+    },
+    {
+      "label": "par2_palettes",
+      "path": "experiments/drosophila-heresy/q10-gc0-gp1-par2-v1/qualification/palettes.jsonl",
+      "sha256": "56A8BCFD950C2C796279556B03C4905622B1207023C1142076AE7147203477FA"
+    },
+    {
+      "label": "pf5_contract",
+      "path": "experiments/drosophila-heresy/q10-pf5-v1/CONTRACT.json",
+      "sha256": "20995E1826A9C62E0E8689017A2F3E624CC9E63B76B210FBD4AB11D7E9E7D34F"
+    },
+    {
+      "label": "gc0_runner",
+      "path": "experiments/drosophila-heresy/q10-gc0-v1/scripts/run_gc0.py",
+      "sha256": "AEEC0DD2A8D06F65744710B099A581D378C4238139B488B0B67445026AC0CC88"
+    }
+  ],
+  "plan_sha256": "36BACDE950637AB7358C8E0DF640D449A8A64DE07355F381C57D9A3F2B1C0254",
+  "protocol": "Q10-GC1-PAR3",
+  "receipt": {
+    "endpoint_mapping": "every processed group is represented; unprocessed groups are explicitly filled with ZERO",
+    "provenance": "execution includes plan, contract, runner, and parent hashes",
+    "whole_endpoint_score_domain": "all endpoint rows G"
+  },
+  "sample": {
+    "expected_endpoint_set_count": 14,
+    "expected_palette_count": 7207,
+    "expected_raw_group_count": 801,
+    "selection_is_not_post_outcome": true,
+    "selection_is_sealed": true
+  },
+  "sealed_runner_sha256": "C6934BADB75DC62173B437994BF85329440AEBF30E8C1E026C6BD4B6B8303EFA",
+  "status": "PREEXECUTION_SEALED_NO_EXECUTION"
+}

@@ -1,0 +1,20 @@
+{
+  "observe":true,
+  "seeds": [2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023],
+  "taus": [4.0,16.0],
+  "sides": ["R","L"],
+  "conditions": ["immediate","quiet","distractor"],
+  "arms": ["E","Z"],
+  "cues":16,
+  "delay_steps":12,
+  "trials":512,
+  "eta":0.05,
+  "glut_sign":-1.0,
+  "input_salt":858980352,
+  "threads":4,
+  "primary_metric":"probe_reversal",
+  "primary_contrast":"quiet_minus_distractor",
+  "primary_side":"R",
+  "bootstrap_seed":2026091202,
+  "bootstrap_resamples":20000
+}

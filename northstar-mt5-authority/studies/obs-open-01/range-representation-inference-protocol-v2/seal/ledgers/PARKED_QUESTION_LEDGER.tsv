@@ -1,0 +1,5 @@
+question_id	state	reason
+CONDITIONAL_SEQUENTIAL_REPRESENTATION_COMPETENCE	PARKED	Different conditional filtration authority; not the average mu_R question.
+DEPENDENT_WILD_BOOTSTRAP	PARKED_METHOD	Stationarity and multiplier-bandwidth authority not selected.
+BLOCK_BOOTSTRAP	PARKED_METHOD	Block-length authority not earned from four short pseudo-D_B blocks.
+RAW_VS_Z_DIRECT_SUPERIORITY	PARKED	Tournament tests each representation only against design context.

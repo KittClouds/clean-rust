@@ -1,0 +1,37 @@
+{
+  "receipt_id": "FAS_E4_0_TEMPLATE_TEXT_AUDIT_V02",
+  "status": "BYTE_NORMALIZATION_COLLISION_AND_PLACEHOLDER_AUDITS_PASS_SEMANTIC_AUTHOR_REVIEW_PASS",
+  "scope": "E1 source identity, exact/normalized collision, stored normalized forms, per-string UTF-8 digests, placeholder counts, and version-diff scope.",
+  "e1_generator_sha256": "fa2bd0617135a0dce4e12f0e0967f82e461133b394a7d969daba5afb11e2cce1",
+  "expected_e1_generator_sha256": "fa2bd0617135a0dce4e12f0e0967f82e461133b394a7d969daba5afb11e2cce1",
+  "parent_manifest_sha256": "ae8c5c29c7ed29d644e88c19d6baffa4476ec2f4c5f17aee89801fd44c72eb57",
+  "template_manifest_path": "experiments/fas-frozen-observer-bundle-engineering-v01/plans/E4-0-HELDOUT-TEMPLATES-v02.json",
+  "template_manifest_sha256": "e3b8a70b90b06fc4185d2e379cbfc7cf3724238d9505590add1cf8bba2e9b068",
+  "text_changes_from_v01": [
+    "query:1",
+    "query:6"
+  ],
+  "expected_text_changes": [
+    "query:1",
+    "query:6"
+  ],
+  "e1_observation_template_count": 8,
+  "e1_query_template_count": 8,
+  "e4_observation_template_count": 8,
+  "e4_query_template_count": 8,
+  "exact_collision_count": 0,
+  "normalized_collision_count": 0,
+  "stored_form_or_digest_error_count": 0,
+  "placeholder_error_count": 0,
+  "template_truth_opened": false,
+  "population_generated": false,
+  "tokenizer_or_model_contact": false,
+  "feature_extraction_performed": false,
+  "scoring_performed": false,
+  "observation_semantic_review": "PASS_PER_USER_REVIEW",
+  "revised_query_semantic_review": "PASS_EXPLICIT_VALUE_REQUEST",
+  "exact_collisions": [],
+  "normalized_collisions": [],
+  "stored_form_or_digest_errors": [],
+  "placeholder_errors": []
+}

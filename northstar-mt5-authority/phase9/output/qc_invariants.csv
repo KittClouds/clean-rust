@@ -1,0 +1,20 @@
+invariant,status,violations,detail
+events_primary_key,PASS,0,duplicate composite primary keys
+attempts_primary_key,PASS,0,duplicate composite primary keys
+episodes_primary_key,PASS,0,duplicate composite primary keys
+features_primary_key,PASS,0,duplicate composite primary keys
+transits_primary_key,PASS,0,duplicate composite primary keys
+attempt_episode_fk,PASS,0,attempts reference existing episodes
+feature_attempt_fk,PASS,0,features reference existing attempts
+context_attempt_fk,PASS,0,context references existing attempts
+event_attempt_fk,PASS,0,non-null event attempts exist
+event_episode_fk,PASS,0,non-null event episodes exist
+transit_attempt_fk,PASS,0,transits reference existing attempts
+transit_episode_fk,PASS,0,transits reference existing episodes
+transit_source_node_fk,PASS,0,source nodes observed structurally
+transit_destination_node_fk,PASS,0,destination nodes observed structurally
+attempt_exactly_one_feature,PASS,0,each attempt has exactly one frozen feature snapshot
+attempt_has_context,PASS,0,each attempt has at least one frozen contributor row
+required_values_present,PASS,0,required identities and timestamps are not null
+terminal_contract_violations,PASS,0,terminal relational contracts reported zero violations
+unexpected_data_gaps,PASS,0,frozen profile reports no unexpected gaps

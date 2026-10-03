@@ -1,0 +1,9 @@
+{
+  "end": 10000000,
+  "exact": 0,
+  "improved": 2480,
+  "records": 2480,
+  "result_path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-csc1-pair-alg3-front2-v3/results/seed9731-R-tau4__set1/009000000-010000000.jsonl",
+  "result_sha256": "973BD454891BA94D51F21B5993F661D7E9F24F7351F7A1BA9A65F01A7FDCEFF4",
+  "start": 9000000
+}

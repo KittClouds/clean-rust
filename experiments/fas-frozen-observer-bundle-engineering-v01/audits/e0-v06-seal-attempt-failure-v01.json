@@ -1,0 +1,43 @@
+{
+  "receipt_id": "FAS_FROZEN_OBSERVER_BUNDLE_E0_V06_SEAL_ATTEMPT_FAILURE_V01",
+  "status": "SEALER_V01_STOPPED_BEFORE_ROOT_PRESERVE_AND_VERSION",
+  "recorded_utc": "2026-09-26T09:15:16.7377016Z",
+  "sealer_path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/seal_e0_v06.py",
+  "sealer_sha256": "f11b654a0015eb19a949cf133b707075cca888a6c80a29ba00b9f42365eae978",
+  "failure": "Version 01 sealer treated pre-generated freeze/protocol/ABI contracts as overwrite targets and stopped when the E0 v06 draft freeze already existed.",
+  "root_produced": false,
+  "seal_manifest_written": false,
+  "frozen_contracts_modified": false,
+  "preserved_unsealed_artifacts": [
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/e0-freeze-v06.json",
+      "bytes": 25399,
+      "sha256": "1ff2eccf344da774f9fb11ee2d5d7b6612adfe6aaffe438ccfd5c704af04cc67"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/e2-run-v03.json",
+      "bytes": 11511,
+      "sha256": "d88bbf9342918f5a1db4e42190128e2adf9d0c726bcddd568ddb9498ab25181d"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/representation-abi-v03.json",
+      "bytes": 3452,
+      "sha256": "db41d64f872c1fe8ec9b76e2aa5caf00a5fc1ec966c23a590d2cce6d5dc27a14"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/extract_features_v03.py",
+      "bytes": 31912,
+      "sha256": "f677d0927bde71f146ce8e7f6f4df83b70864a464a1f009888f52bcd2c59787b"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e0-e2-compatibility-amendment-v06-v03-v01.json",
+      "bytes": 2881,
+      "sha256": "25a1dad326d6d3fad0f27987701f615d1f77012121099f48caf77f62aac71862"
+    }
+  ],
+  "model_contact_performed": false,
+  "tokenizer_contact_performed": false,
+  "feature_extraction_performed": false,
+  "cuda_allocator_initialized": false,
+  "disposition": "Preserve v01 source and v01 draft artifacts. Version the sealer and final freeze contract, then independently re-audit."
+}

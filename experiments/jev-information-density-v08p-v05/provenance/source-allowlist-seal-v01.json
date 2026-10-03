@@ -1,0 +1,27 @@
+{
+  "protocol": "jev-information-density/v0.8p-v05-source-allowlist-seal-v01",
+  "identity": "v0.8P-v05-source-allowlist-sealed-v01",
+  "status": "FROZEN_BEFORE_E1_EXTRACTION",
+  "extraction_contract_sha256": "b2a1446635451e2f4a442f658458f3606767d2566bb31e8395c386acab5e38cb",
+  "source_allowlist_sha256": "3470df15dd74b5e406816e3af5b4fad5760b37dbf0c455456452c4f0dc8e20cb",
+  "extractor_sha256": "436c980977ca5a3bc1878e5c165d13e6733b835e87a31ff70ba2e0d2eb131e89",
+  "synthetic_test_sha256": "d3f8e94c3382695ce182dafacc544891ac911c4b1458661d93fa80a112d4b18a",
+  "synthetic_test_status": "4_OF_4_PASS",
+  "authority": {
+    "v04_stage_a_trace_sha256": "050a24e85f45eaf8b70d382871b4aaa50f973b25c8494ad116531f0b152ed02e",
+    "v04_stage_a_seal_sha256": "e8c9154b9af87d098272fdde4ef6fb2e634010ef797cbfa3f6502848208d06ab",
+    "firewall_lock_sha256": "79d25ac82fba1bc6332e16d8bc5f877fadd11cccaed5ef3f07eacfe5e1877da2",
+    "binding_json_pointer": "/panel_manifest_sha256",
+    "panel_manifest_sha256": "80e09c0f203b8a6505e062a2091a594273dca808258ff2f4539ab8414db9eabe"
+  },
+  "authorized_e1_source_count": 2,
+  "permitted_fields": {
+    "firewall_lock": ["panel_manifest_sha256"],
+    "panel_manifest": ["neighborhood_id"]
+  },
+  "v03_seal_manifest_dependency": "excluded",
+  "panel_generation_authorized": false,
+  "lfm_contact_authorized": false,
+  "training_authorized": false,
+  "evaluation_authorized": false
+}

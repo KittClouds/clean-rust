@@ -1,0 +1,34 @@
+{
+  "actual_v15_contract_and_map_audited": false,
+  "commands": [
+    "python -m py_compile experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/audit_e4_0_track_e_v15_v02.py experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/test_audit_e4_0_track_e_v15_v02.py",
+    "python experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/test_audit_e4_0_track_e_v15_v02.py (from repository root)"
+  ],
+  "execution_authorization_conferred": false,
+  "model_tokenizer_cuda_contact": false,
+  "python_compile": "PASS",
+  "receipt_id": "E4_0_TRACK_E_V15_PREMAP_SYNTHETIC_AUDITOR_TESTS_V03",
+  "recorded_utc": "2026-09-27T04:36:51Z",
+  "schema": "FAS_E4_0_TRACK_E_SOURCE_TESTS_V15_V03",
+  "scope": "Synthetic-only independent Track E v15_v02 auditor tests. Validates sealed v06-v11 ancestor closure, exact v14 failed-preseal contract/map/receipt history, requires runtime/contact keys to be absent from the raw v14 preseal receipt while pass=false/final_seal=null and both truth-closure flags remain false, checks the v12 receipt-schema correction, v13 finalizer stop_receipt identity, and exact v01/v02/current source-test registry lineage for Track E tooling/issuer. No v15 contract/map audit, E4 labels/population, model, tokenizer, CUDA, GPU, or authorization access.",
+  "sources": [
+    {
+      "bytes": 122741,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/audit_e4_0_track_e_v15_v02.py",
+      "sha256": "19828ed550e989a8d605be1429eb9d51c6fe78e7fbec32eaef0d067680a39962"
+    },
+    {
+      "bytes": 8244,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/test_audit_e4_0_track_e_v15_v02.py",
+      "sha256": "1bfbdde3924708ae1d9e2320560269c2cb111f187b590f2a419266e10a354790"
+    }
+  ],
+  "status": "TRACK_E_SOURCE_TESTS_PASS_V15_PREMAP_SYNTHETIC_AUDITOR_V03",
+  "tests": {
+    "discovered": 8,
+    "failed": 0,
+    "passed": 8,
+    "skipped": 0
+  },
+  "truth_payloads_opened": false
+}

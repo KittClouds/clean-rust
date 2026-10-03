@@ -1,0 +1,163 @@
+{
+  "contract": "NORTHSTAR_RG2_HOLDOUT_BUNDLE_V1",
+  "status": "SEALED",
+  "research_generation": 2,
+  "protocol_sha256": "6be4368c07fe912c6e35df0e9c76e96d5c2a60e3c6f40db33c67370125acdebc",
+  "runs": [
+    {
+      "run_key": "RG2_DE40_PERIOD_M5_1774224000_1774656000_13588138698521504632",
+      "canonical_instrument": "DE40",
+      "broker_symbol": "DE40",
+      "data_source_id": "METAQUOTES_DEMO",
+      "holdout_id": "RECOVERY_A",
+      "window_start": 1774224000,
+      "window_end_exclusive": 1774656000,
+      "run_receipt_file": "receipts/RG2_DE40_PERIOD_M5_1774224000_1774656000_13588138698521504632.json",
+      "run_receipt_sha256": "3478743613958a3b50773207ab5e263141ca63f1d9c2b7633fc5ff7babfcf316"
+    },
+    {
+      "run_key": "RG2_DE40_PERIOD_M5_1785110400_1785542400_16483635324487767416",
+      "canonical_instrument": "DE40",
+      "broker_symbol": "DE40",
+      "data_source_id": "METAQUOTES_DEMO",
+      "holdout_id": "RECOVERY_B",
+      "window_start": 1785110400,
+      "window_end_exclusive": 1785542400,
+      "run_receipt_file": "receipts/RG2_DE40_PERIOD_M5_1785110400_1785542400_16483635324487767416.json",
+      "run_receipt_sha256": "37839415477900b4eb569267e4c73330a4d0734c592bf04b191e1022332096b6"
+    },
+    {
+      "run_key": "RG2_FRA40_PERIOD_M5_1774224000_1774656000_16243658068363396382",
+      "canonical_instrument": "FRA40",
+      "broker_symbol": "FRA40",
+      "data_source_id": "METAQUOTES_DEMO",
+      "holdout_id": "RECOVERY_A",
+      "window_start": 1774224000,
+      "window_end_exclusive": 1774656000,
+      "run_receipt_file": "receipts/RG2_FRA40_PERIOD_M5_1774224000_1774656000_16243658068363396382.json",
+      "run_receipt_sha256": "e1d17ceff7a372f04a22a67a60f31b5b31a77a5487dd9f43aec7c345d3b67e98"
+    },
+    {
+      "run_key": "RG2_FRA40_PERIOD_M5_1785110400_1785542400_483794312679891613",
+      "canonical_instrument": "FRA40",
+      "broker_symbol": "FRA40",
+      "data_source_id": "METAQUOTES_DEMO",
+      "holdout_id": "RECOVERY_B",
+      "window_start": 1785110400,
+      "window_end_exclusive": 1785542400,
+      "run_receipt_file": "receipts/RG2_FRA40_PERIOD_M5_1785110400_1785542400_483794312679891613.json",
+      "run_receipt_sha256": "1a93885d8d08bdb44d57f992f15bdb956a1774762ff698ac38817081e2b30538"
+    },
+    {
+      "run_key": "RG2_JPN225_PERIOD_M5_1774224000_1774656000_1629499276554573459",
+      "canonical_instrument": "JPN225",
+      "broker_symbol": "JPN225",
+      "data_source_id": "METAQUOTES_DEMO",
+      "holdout_id": "RECOVERY_A",
+      "window_start": 1774224000,
+      "window_end_exclusive": 1774656000,
+      "run_receipt_file": "receipts/RG2_JPN225_PERIOD_M5_1774224000_1774656000_1629499276554573459.json",
+      "run_receipt_sha256": "a2d791c108b6a95cb5a0e5d8d2105647072923f78a389a2beda17fa1e8c38aef"
+    },
+    {
+      "run_key": "RG2_JPN225_PERIOD_M5_1785110400_1785542400_702896944021223415",
+      "canonical_instrument": "JPN225",
+      "broker_symbol": "JPN225",
+      "data_source_id": "METAQUOTES_DEMO",
+      "holdout_id": "RECOVERY_B",
+      "window_start": 1785110400,
+      "window_end_exclusive": 1785542400,
+      "run_receipt_file": "receipts/RG2_JPN225_PERIOD_M5_1785110400_1785542400_702896944021223415.json",
+      "run_receipt_sha256": "9c753585a7def82778b11f7803d9a3aa0cc93a7364214cea42e8cecc9cd8a3cc"
+    },
+    {
+      "run_key": "RG2_US30_PERIOD_M5_1774224000_1774656000_9928522538213302528",
+      "canonical_instrument": "US30",
+      "broker_symbol": "US30",
+      "data_source_id": "METAQUOTES_DEMO",
+      "holdout_id": "RECOVERY_A",
+      "window_start": 1774224000,
+      "window_end_exclusive": 1774656000,
+      "run_receipt_file": "receipts/RG2_US30_PERIOD_M5_1774224000_1774656000_9928522538213302528.json",
+      "run_receipt_sha256": "7eb1bbbd1208fd5d631e60a5a9d01074ee86a872a30093a8bc9f8ce8c1da0d82"
+    },
+    {
+      "run_key": "RG2_US30_PERIOD_M5_1785110400_1785542400_16425257494332005279",
+      "canonical_instrument": "US30",
+      "broker_symbol": "US30",
+      "data_source_id": "METAQUOTES_DEMO",
+      "holdout_id": "RECOVERY_B",
+      "window_start": 1785110400,
+      "window_end_exclusive": 1785542400,
+      "run_receipt_file": "receipts/RG2_US30_PERIOD_M5_1785110400_1785542400_16425257494332005279.json",
+      "run_receipt_sha256": "ed6cb323cd13bf0e636273382ffaab7d20a1f4bdc10e488cd96f0c57ce2a6a21"
+    },
+    {
+      "run_key": "RG2_US500_PERIOD_M5_1774224000_1774656000_2503187250934627415",
+      "canonical_instrument": "US500",
+      "broker_symbol": "US500",
+      "data_source_id": "METAQUOTES_DEMO",
+      "holdout_id": "RECOVERY_A",
+      "window_start": 1774224000,
+      "window_end_exclusive": 1774656000,
+      "run_receipt_file": "receipts/RG2_US500_PERIOD_M5_1774224000_1774656000_2503187250934627415.json",
+      "run_receipt_sha256": "a2c0c697621df042bbebb6a130460602cbc56cc7aec536e148dd7e15fb8c4ccb"
+    },
+    {
+      "run_key": "RG2_US500_PERIOD_M5_1785110400_1785542400_1540509723585601721",
+      "canonical_instrument": "US500",
+      "broker_symbol": "US500",
+      "data_source_id": "METAQUOTES_DEMO",
+      "holdout_id": "RECOVERY_B",
+      "window_start": 1785110400,
+      "window_end_exclusive": 1785542400,
+      "run_receipt_file": "receipts/RG2_US500_PERIOD_M5_1785110400_1785542400_1540509723585601721.json",
+      "run_receipt_sha256": "274bca1990dd573161d30522e0ca44225f58071261cad09e4828168f57687432"
+    },
+    {
+      "run_key": "RG2_USTEC_PERIOD_M5_1774224000_1774656000_23131991422771867",
+      "canonical_instrument": "USTEC",
+      "broker_symbol": "USTEC",
+      "data_source_id": "METAQUOTES_DEMO",
+      "holdout_id": "RECOVERY_A",
+      "window_start": 1774224000,
+      "window_end_exclusive": 1774656000,
+      "run_receipt_file": "receipts/RG2_USTEC_PERIOD_M5_1774224000_1774656000_23131991422771867.json",
+      "run_receipt_sha256": "ced29f52b662682f96b66ffba13a51c38e940408fe6e90459e09b7a7afe99594"
+    },
+    {
+      "run_key": "RG2_USTEC_PERIOD_M5_1785110400_1785542400_16363302918723309795",
+      "canonical_instrument": "USTEC",
+      "broker_symbol": "USTEC",
+      "data_source_id": "METAQUOTES_DEMO",
+      "holdout_id": "RECOVERY_B",
+      "window_start": 1785110400,
+      "window_end_exclusive": 1785542400,
+      "run_receipt_file": "receipts/RG2_USTEC_PERIOD_M5_1785110400_1785542400_16363302918723309795.json",
+      "run_receipt_sha256": "542c57de4649dca516fcd75c38a73b369c3352c6f338098d9b3f7e3197194763"
+    }
+  ],
+  "targets": [
+    {
+      "target": "initial_acceptance_given_initial_contact",
+      "file": "targets/initial_acceptance_given_initial_contact.tsv",
+      "canonical_sha256": "383c8a7f24e3e65c1751a3b264cb5df4027fd15baef5e814ae85638fc343fe2a"
+    },
+    {
+      "target": "reclaim_given_break",
+      "file": "targets/reclaim_given_break.tsv",
+      "canonical_sha256": "24427016a58b8ca0c5886a669c5d6f08d3fd2fe663806fbafa7eccdfae5371d9"
+    },
+    {
+      "target": "rejection_given_initial_contact",
+      "file": "targets/rejection_given_initial_contact.tsv",
+      "canonical_sha256": "16e5b76c0ba07a20a2d7cb863a9552324c000c3adc37e42637ebe1da36a6b1ce"
+    },
+    {
+      "target": "retest_hold_given_retest_contact",
+      "file": "targets/retest_hold_given_retest_contact.tsv",
+      "canonical_sha256": "a9ad0acec4a39f5bb8c4251f9723d85c6b307c8d751ac733b1aa39d89e9b246b"
+    }
+  ],
+  "bundle_semantic_sha256": "98d5550e327eef9b167d3cfd7ec1e3a7bae9262304d2bf1caff4dc98660c6ce8"
+}

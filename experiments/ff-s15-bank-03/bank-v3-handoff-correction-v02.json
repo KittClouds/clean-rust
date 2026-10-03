@@ -1,0 +1,8 @@
+{
+  "correction_receipt": "C:\\phoenix-target-overgraph\\bank-v3-core-20261002-v04\\HANDOFF-CORRECTION-v02.json",
+  "correction_receipt_sha256": "2261939a8ba3c42ef6dc16bd0c1f19ccb64729d2dff6c2739a7eab16c9bd57a2",
+  "handoff_path": "C:\\phoenix-target-overgraph\\bank-v3-core-20261002-v04\\PHASE5-HANDOFF-v02.json",
+  "handoff_sha256": "08cab38d366d6a30d32af4b0391cafddb243a8ea9e6a7435ad53290462d41a4b",
+  "original_release_identity": "84f0a7e13032e8cdfcecc862217bb33ca23568fade64fafeef410327eb996f12",
+  "status": "PASS_FRIZZ_BINDINGS_ACCEPTED"
+}

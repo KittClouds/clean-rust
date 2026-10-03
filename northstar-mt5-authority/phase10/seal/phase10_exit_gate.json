@@ -1,0 +1,44 @@
+{
+  "contract": "MST_RG2_PHASE10_EXIT_GATE_V1",
+  "status": "SEALED",
+  "research_generation": 2,
+  "baseline_runs": 14,
+  "final_runs": 20,
+  "baseline_episodes": 1032,
+  "final_episodes": 1462,
+  "added_runs": 6,
+  "added_episodes": 430,
+  "minimum_runs_per_instrument": 3,
+  "minimum_episodes_per_instrument": 186,
+  "attempt_resolution_js_divergence_bits": 0.0002061473288516027,
+  "common_behavioral_attempt_counts": {
+    "REJECT_TO_ORIGIN": 3504,
+    "RECLAIM_AFTER_BREAK": 880,
+    "ACCEPT_THROUGH_NODE": 667,
+    "ACCEPT_AND_HOLD_RETEST": 763,
+    "ACCEPT_AND_FAIL_RETEST": 488
+  },
+  "sparse_cells_honestly_retained": {
+    "attempt_resolutions_below_30": {
+      "NONE": 20
+    },
+    "episode_regions_below_30": {
+      "EXTREME_BELOW": 1,
+      "FAR_ABOVE": 29
+    }
+  },
+  "missing_targets": [],
+  "unexpected_attempt_resolution_codes": [],
+  "gates": {
+    "all_target_windows_admitted": true,
+    "minimum_three_runs_per_instrument": true,
+    "minimum_180_episodes_per_instrument": true,
+    "common_behavioral_attempt_outcomes_at_least_30": true,
+    "episode_censoring_at_most_5_percent": true,
+    "no_unexpected_attempt_resolution_codes": true,
+    "marginal_distribution_reproduced_jsd_at_most_0_05_bits": true,
+    "phase9_qc_pass": true,
+    "lifecycle_attempt_analysis_pass": true,
+    "lifecycle_timeout_integrity_pass": true
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "schema": "FAS_E4_0_TRACK_E_BUILDER_ATTEMPT_V01",
+  "status": "PRESERVED_PRESEAL_BUILDER_STOP",
+  "created_utc": "2026-09-26T22:40:42.191456+00:00",
+  "builder": {
+    "path": "source/scripts/build_e4_0_source_map_v05.py",
+    "bytes": 16627,
+    "sha256": "2595d2b1cef12066f1476f84d0edae0a04216957ada87d14101271328dda040f"
+  },
+  "failure": "The v06 source-map builder rejected the preserved v01 auth-issuer receipt because its expected SHA literal omitted one `bf` pair. The receipt file itself was unchanged and its SHA was verified directly.",
+  "expected_sha256_in_builder": "0b5d809100319ae8674e60732f76e606fa6d787335fcf72bad84ca58866b9dc",
+  "actual_sha256": "0b5d809100319ae8674e60732f76e606fa6d787335fcbf72bad84ca58866b9dc",
+  "effects": {
+    "source_map_created": false,
+    "contract_created": false,
+    "seal_created": false,
+    "population_rows_written": false,
+    "tokenizer_contacted": false,
+    "model_contacted": false,
+    "cuda_initialized": false,
+    "labels_opened": false
+  },
+  "repair": "Correct only the builder expected hash literal to the directly recomputed digest, preserve this attempt note, then rerun map construction."
+}

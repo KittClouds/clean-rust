@@ -1,0 +1,86 @@
+{
+  "contract": "jev-frozen-decision-surface-scaling/v0.5",
+  "status": "frozen_scaling_only",
+  "v04_boundary": {
+    "sealed_contract": "jev-frozen-saturation-true-ood-gate/v0.4",
+    "reopen_gate": false,
+    "append_rescue_points": false,
+    "qlora_authorization": "unchanged: unauthorized_for_all_three_backbones"
+  },
+  "backbones": [
+    {
+      "model_name": "minicpm5-1b-base",
+      "repo_id": "openbmb/MiniCPM5-1B-Base",
+      "revision": "156170697656c48f69915b33a2fb44110242187c"
+    },
+    {
+      "model_name": "qwen3-0.6b-base",
+      "repo_id": "Qwen/Qwen3-0.6B-Base",
+      "revision": "da87bfb608c14b7cf20ba1ce41287e8de496c0cd"
+    },
+    {
+      "model_name": "k2-horizon-0.9b",
+      "repo_id": "IFM/K2-Horizon-0.9B",
+      "revision": "9fa6faa55fe1c9eb008bb241cc6fb7e4536d0e91"
+    }
+  ],
+  "fixed_head": {
+    "head_kind": "mlp",
+    "projection_dim": 128,
+    "location": "mean_full",
+    "layer_fraction": 1.0,
+    "profile": "name_definition",
+    "loss_variant": "L3",
+    "lambda_brier": 0.25,
+    "lambda_invariance": 0.10,
+    "augment_reorder": true,
+    "epochs": 3,
+    "learning_rate": 0.002,
+    "weight_decay": 0.01
+  },
+  "synthetic_scales": {
+    "reference": 20000,
+    "required": [50000, 100000],
+    "optional": 250000,
+    "optional_rule": "only_after_100k_if_cost_is_low_and_learning_remains_useful",
+    "nested": true,
+    "family_safe": true,
+    "protected_v04_eval": true
+  },
+  "mixtures": {
+    "S100": {"synthetic": 1.0, "real": 0.0},
+    "S75_R25": {"synthetic": 0.75, "real": 0.25},
+    "S50_R50": {"synthetic": 0.5, "real": 0.5}
+  },
+  "real_sources": [
+    {"source_dataset_id": "ChaosNLI", "lane": "human_disagreement", "required": true},
+    {"source_dataset_id": "google-research-datasets/go_emotions", "lane": "human_disagreement", "required": true},
+    {"source_dataset_id": "AmazonScience/massive", "lane": "hard_choice_and_span", "required": true},
+    {"source_dataset_id": "thunlp/docred", "lane": "structured_separate", "required": false}
+  ],
+  "probability_source_policy": {
+    "exact_generative_posterior": "soft semantic plus probability-quality objective",
+    "empirical_annotator_distribution": "soft distribution objective, source-stratified",
+    "hard_label": "discrimination objective only",
+    "no_probability": "excluded from calibration losses"
+  },
+  "contradictory_binding": {
+    "training": false,
+    "evaluation": true,
+    "definition_controls_semantics": true,
+    "report_separately": true
+  },
+  "required_reports": [
+    "frozen-scaling-curve.json",
+    "semantic-family-scaling.json",
+    "mixture-comparison.json",
+    "real-transfer.json",
+    "synthetic-calibration-retention.json",
+    "residuals-by-scale.json",
+    "persistent-representation-candidates.json",
+    "contradictory-binding.json",
+    "cross-backbone-complementarity.json",
+    "compute-cost-curve.json",
+    "v05-behavior-map.json"
+  ]
+}

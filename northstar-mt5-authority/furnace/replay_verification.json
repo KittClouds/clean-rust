@@ -1,0 +1,17 @@
+﻿{
+    "contract":  "MST_REPLAY_CORPUS_VERIFICATION_V1",
+    "status":  "PASS",
+    "verified_at_utc":  "2026-08-12T12:50:12.2940482Z",
+    "replay_count":  1,
+    "failures":  [
+
+                 ],
+    "replays":  [
+                    {
+                        "run_key":  "RG2_USTEC_PERIOD_M5_1776038400_1776466500_3632165528533734308",
+                        "baseline_invocation_id":  "RG2_USTEC_PERIOD_M5_1776038400_1776466500_3632165528533734308_I1776038400_10924319290598477948",
+                        "replay_invocation_id":  "RG2_USTEC_PERIOD_M5_1776038400_1776466500_3632165528533734308_I1776038400_17891714471850596647",
+                        "canonical_dataset_hash":  "e9353d2aa8ebcbb2d4ce80100b58dc59b52cbc2a81a6220a02e918f47000e26f"
+                    }
+                ]
+}

@@ -1,0 +1,89 @@
+{
+  "behavioral_inference": false,
+  "dh08b_authorized": false,
+  "events": [
+    {
+      "endpoint_coordinates": 5544,
+      "endpoint_count": 182952,
+      "error_norm": 0.000026704277806696637,
+      "initial_mismatch_count": 373,
+      "nonzero_endpoint_count": 59745,
+      "parent_status": "Q10_SM_STAGE1_VALID__F32_SAFE_FREEDOM_PRESENT",
+      "prefix_curve": [
+        {
+          "pass": 1,
+          "residual_norm": 8.41839793600975e-6,
+          "residual_ratio": 0.3152452950402825
+        },
+        {
+          "pass": 2,
+          "residual_norm": 7.762260982347527e-6,
+          "residual_ratio": 0.2906748139206739
+        },
+        {
+          "pass": 3,
+          "residual_norm": 7.716940541053576e-6,
+          "residual_ratio": 0.28897769102440946
+        },
+        {
+          "pass": 4,
+          "residual_norm": 7.680804822475558e-6,
+          "residual_ratio": 0.2876245101280905
+        },
+        {
+          "pass": 5,
+          "residual_norm": 7.65715810633165e-6,
+          "residual_ratio": 0.2867390072017399
+        },
+        {
+          "pass": 6,
+          "residual_norm": 7.65119733891092e-6,
+          "residual_ratio": 0.28651579324838466
+        },
+        {
+          "pass": 7,
+          "residual_norm": 7.649673907302735e-6,
+          "residual_ratio": 0.28645874502490476
+        },
+        {
+          "pass": 8,
+          "residual_norm": 7.649280458800334e-6,
+          "residual_ratio": 0.28644401148650883
+        },
+        {
+          "pass": 9,
+          "residual_norm": 7.648830873702575e-6,
+          "residual_ratio": 0.2864271757907071
+        },
+        {
+          "pass": 10,
+          "residual_norm": 7.648669453728354e-6,
+          "residual_ratio": 0.286421131067259
+        },
+        {
+          "pass": 11,
+          "residual_norm": 7.648613298725278e-6,
+          "residual_ratio": 0.28641902822053605
+        },
+        {
+          "pass": 12,
+          "residual_norm": 7.648573217450164e-6,
+          "residual_ratio": 0.2864175272896588
+        }
+      ],
+      "prefix_passes": 12,
+      "relaxed_residual_norm": 7.648573217450164e-6,
+      "relaxed_residual_ratio": 0.2864175272896588,
+      "seed": 9652,
+      "side": "L",
+      "status": "RELAXATION_PARTIAL",
+      "tau": 4.0,
+      "trial": 128
+    }
+  ],
+  "protocol": "Q10-PF1",
+  "scientific_seed_bundles": 0,
+  "seed": 9652,
+  "side": "L",
+  "tau": 4.0
+}

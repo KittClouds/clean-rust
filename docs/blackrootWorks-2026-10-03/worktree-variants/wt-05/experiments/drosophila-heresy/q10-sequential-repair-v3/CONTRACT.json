@@ -1,0 +1,111 @@
+{
+  "protocol": "Q10-SR3",
+  "version": 1,
+  "status": "FROZEN_PRE_EXECUTION__NOT_EXECUTED",
+  "plan_sha256": "36160A4F2BD55DCA1DCD9C7D26BAF650FA8932401752D9E00750097555C818FB",
+  "parent": {
+    "protocol": "Q10-SM",
+    "plan_sha256": "8A70CFADA7A833AA1110FDE5DBF0CFAFDDD4AFD4297A06AD846B1959439B8B9D",
+    "contract_sha256": "5A7CD7E15724F6260C2D42296BED5FF3667CA32FA1D8D48E5408EFFA2A0F35BF",
+    "result_sha256": "68200D7F49B8A4B943150A1C3A5AB4B46DF4ED8EB1EBBE7A3DF45F8BEEBBD337",
+    "status_sha256": "D19D051DA550BCDED9C436F9A7164AF0C4322D8BB16C418D7C4CA9E04217A9C4",
+    "required_status": "Q10_SM_STAGE1_VALID__F32_SAFE_FREEDOM_PRESENT",
+    "audited_states": 5120,
+    "accepted_nonidentity_events": 5026,
+    "scientific_seed_bundles": 0
+  },
+  "predecessors": {
+    "q10_sr_v1": {
+      "status": "Q10_SR_STAGE2A_INVALID",
+      "reason": "FROZEN_SEARCH_PERFORMANCE_BUDGET_EXCEEDED",
+      "seed_opened": 9501,
+      "resume_forbidden": true
+    },
+    "q10_sr2": {
+      "status": "Q10_SR2_STAGE2A_INVALID",
+      "reason": "INDEPENDENT_REVIEW_FAILED_EMPTY_ROW_SIGNED_ZERO",
+      "seed_opened": 9511,
+      "resume_forbidden": true
+    }
+  },
+  "authorization": {
+    "engineering_only": true,
+    "scientific_seed_bundles": 0,
+    "behavior": false,
+    "rewards": false,
+    "measured_cli": false,
+    "dh08b": false
+  },
+  "seeds": {
+    "stage_1a": [9521],
+    "stage_1b": [9522, 9523, 9524, 9525],
+    "events_per_seed": 1024,
+    "cumulative_events": 5120,
+    "sides": ["R", "L"],
+    "taus": [4.0, 16.0],
+    "replacement_or_topup": false
+  },
+  "arithmetic": {
+    "production_readout": "DriveOperator::sequential canonical rows with f32 Iterator::sum",
+    "reviewer_empty_row_initial": "-0.0",
+    "signed_zero_preserved": true,
+    "nonfinite": "fail_closed",
+    "ordered_key": "negative=!bits; nonnegative=bits xor 0x80000000",
+    "nextafter32": "adjacent IEEE-754 binary32"
+  },
+  "capacity_gate": {
+    "factorization": "deterministic f64 nalgebra SVD",
+    "rank_multiplier": 1000.0,
+    "projection_tolerance": 2e-10,
+    "coefficient_resolution": 1e-12,
+    "search_entry": "initially mismatched and CAPACITY_EXACT_WITHIN_TOLERANCE",
+    "partial_or_empty_action": "record diagnostics and skip discrete search",
+    "numeric_ambiguity_action": "fail closed and do not search",
+    "nonlinear_repairability_claim_forbidden": true
+  },
+  "sparse_search": {
+    "state_weights": "sorted sparse coordinate entries with exact committed f32 bits",
+    "state_readout": "full authoritative f32 readout vector",
+    "candidate_replay": "exact production-order f32 replay of affected rows",
+    "candidate_max": "top-64 ULP cache with exact wide-incidence fallback",
+    "dead_coordinate_pruning": "coordinates absent from every authoritative row only",
+    "materialize_full_weights": "only for returned exact-readout endpoint",
+    "objective_and_ties": "Q10-SR frozen lexicographic semantics"
+  },
+  "search_envelope": {
+    "beam_width": 64,
+    "branch_width": 64,
+    "maximum_moves": 64,
+    "maximum_moves_per_coordinate": 16,
+    "reserve_ulps_at_start": 32,
+    "minimum_final_reserve_ulps": 16,
+    "immediate_inverse_move": false,
+    "clipping": false,
+    "simulation_rng_consumption": false
+  },
+  "final_gates": {
+    "sequential_readout_bitwise_equal": true,
+    "outside_support_unchanged": true,
+    "separate_boundary_memberships_preserved": true,
+    "no_new_boundary_memberships": true,
+    "finite_and_in_bounds": true,
+    "maximum_coordinate_displacement_ulps": 16,
+    "maximum_total_moves": 64,
+    "normalized_cue_error": 2e-6,
+    "normalized_axis_error": 2e-6,
+    "normalized_norm_error": 2e-7,
+    "absolute_errors_required": true
+  },
+  "forbidden_claims": [
+    "capacity partial proves discrete impossibility",
+    "meaningful directional separation",
+    "scientific exchangeability",
+    "behavior effect",
+    "future-learning effect",
+    "hidden learning state",
+    "metaplasticity",
+    "DH-08B authorization"
+  ],
+  "stage_1b_requires_independent_stage_1a_review": true,
+  "post_stage_1a_change_requires_new_protocol_identity": true
+}

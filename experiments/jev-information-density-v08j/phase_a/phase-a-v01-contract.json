@@ -1,0 +1,49 @@
+{
+  "protocol": "jev-information-density/v0.8j-phase-a-v01",
+  "identity": "phase-a-v01-clean",
+  "status": "phase-a-only-model-contact-not-authorized",
+  "scientific_question": "Can explicit sham supervision and an anchor-sham invariance edge preserve relevant-fact sensitivity while reducing irrelevant-fact drift?",
+  "lineage": {
+    "parent_phase": "jev-information-density/v0.8i-phase-a-v02-clean",
+    "parent_phase_a_identity": "phase-a-v02-clean",
+    "quarantined_parent_forbidden": "phase-a-v01",
+    "primary_arm": "F100",
+    "primary_groups": 100000,
+    "selected_anchor_triplets": 5000,
+    "heldout_triplets": 2000,
+    "common_primary_bank": true,
+    "auxiliary_sham_views": true
+  },
+  "arms": {
+    "J00": {"sham_pointwise": false, "anchor_sham_invariance": false},
+    "J10": {"sham_pointwise": true, "anchor_sham_invariance": false},
+    "J01": {"sham_pointwise": false, "anchor_sham_invariance": true},
+    "J11": {"sham_pointwise": true, "anchor_sham_invariance": true}
+  },
+  "loss": {
+    "base": "existing_v08i_L3_source_typed",
+    "sham_pointwise_target": "exact_anchor_posterior",
+    "invariance": "existing_v08i_vectorized_invariant_loss",
+    "invariance_weight": 0.1,
+    "normalization": "(sum_base + S*sum_sham + I*lambda_I*sum_edge)/(N_base + S*N_sham + I*lambda_I*N_edge)",
+    "new_edge_type": "anchor_sham_certified_invariant"
+  },
+  "frozen_model_boundary": {
+    "model_contact_authorized": false,
+    "feature_extraction_authorized": false,
+    "training_authorized": false,
+    "phoenix": false,
+    "backbone_updates": false,
+    "head_search": false,
+    "lambda_search": false
+  },
+  "acceptance": {
+    "same_primary_rows": true,
+    "same_auxiliary_sham_views": true,
+    "exactly_5000_triplets": true,
+    "sham_gold_equals_anchor_tolerance": 1e-12,
+    "fact_flip_changes_certified_map": true,
+    "protected_evaluation_bodies_opened": false,
+    "all_arm_objective_events_reconstructable": true
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "correction_id": "FAS_S07_S01_SOURCE_ROW_IDENTITY_CORRECTION_V01",
+  "scope": "read-only identity reconstruction for the sealed S01 corpus; no corpus bytes or training artifacts changed",
+  "historical_protocol_root_sha256": "da952f0368811bf31688a91c9c69f1a01e2305cf6aabed3c0e380024de08abd4",
+  "observed_schema": "quartet_id is on the corpus quartet object and metadata row; each variant binds by the quartet_id prefix of event_id",
+  "rejected_assumption": "variant objects contain a standalone quartet_id field",
+  "corrected_identity_rule": "event_id.rsplit(':', 1)[0] must equal both the parent quartet quartet_id and the S01 event-metadata quartet_id",
+  "failed_check": "S01 event/quartet identity mismatch before SAE analysis opened any heldout feature values",
+  "corpus_modified": false,
+  "training_repeated": false,
+  "feature_values_opened": false,
+  "scientific_contract_changed": false
+}

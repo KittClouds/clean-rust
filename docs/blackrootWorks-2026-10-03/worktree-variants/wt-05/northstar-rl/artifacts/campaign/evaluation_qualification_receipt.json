@@ -1,0 +1,54 @@
+{
+  "schema_version": "EVALUATION_RECEIPT_V1",
+  "evaluation_spec_id": "2126f7e1c3c3add4328ebdc73462d921b837537842260eb6d89ef85f77c988b8",
+  "subject_class": "SCRIPTED_ORACLE_NOT_LEARNED_POLICY",
+  "subject_id": "f726abd7dbfa8f97105347a7f3c2c7ac9908f53651f6c03c8aff1560aa081c0d",
+  "episode_ids": [
+    "59a35be2f207aabc8e1a20d3c7949dea85450c2a63df515ba57b1bfb19edbcef",
+    "6db00d65a0f592927f6c83fe39d4c468f3c34012a2e8349b5f1b1d437c6b4db9"
+  ],
+  "aggregates": [
+    {
+      "metric_id": "normalized_return_sum",
+      "value": 0.0,
+      "episode_count": 2
+    },
+    {
+      "metric_id": "gross_mark_to_market_sum",
+      "value": 0.0,
+      "episode_count": 2
+    },
+    {
+      "metric_id": "turnover_sum",
+      "value": 0.0,
+      "episode_count": 2
+    },
+    {
+      "metric_id": "total_friction_sum",
+      "value": 0.0,
+      "episode_count": 2
+    },
+    {
+      "metric_id": "max_drawdown",
+      "value": 0.0,
+      "episode_count": 2
+    },
+    {
+      "metric_id": "mean_absolute_exposure",
+      "value": 0.0,
+      "episode_count": 2
+    },
+    {
+      "metric_id": "step_count",
+      "value": 18.0,
+      "episode_count": 2
+    },
+    {
+      "metric_id": "terminal_count",
+      "value": 2.0,
+      "episode_count": 2
+    }
+  ],
+  "deterministic_rebuild_hash": "e457d9a5d34eb214b134aa5e2170f530e1503ca411d4fd0e70593aabfd5283db",
+  "receipt_id": "3580a0652941215efdd52d1e8afa56c9c22e526da2ce3d26e959ba4e9035bf34"
+}

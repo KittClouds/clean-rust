@@ -1,0 +1,128 @@
+{
+  "schema": "ff-s15-bank3-outreach-register-v1",
+  "status": "ACTIVE_NON_CORPUS",
+  "version": "0.1",
+  "date": "2026-09-30",
+  "purpose": "track the owner enquiries that are the only accepted way to resolve a silent permission flag. No inference from a permissive license is permitted.",
+
+  "outreach_records": [
+    {
+      "id": "OUT-001",
+      "priority": 1,
+      "target": "VitaminC",
+      "contact_route": "dataset authors via the HuggingFace dataset page tals/vitaminc, or the ACL Anthology contact of the NAACL 2021 paper",
+      "question": "Does the CC BY-SA 3.0 license covering this dataset permit using an individual item to seed generation of NEW synthetic training data? We are not redistributing the data itself; we would read items, reconstruct structure, and emit our own generated descendants.",
+      "flags_this_would_resolve": ["synthetic_seeding_allowed"],
+      "currently_blocking": ["A2"],
+      "status": "NOT_SENT",
+      "answer": null,
+      "answered_on": null,
+      "verbatim_record": null
+    },
+    {
+      "id": "OUT-002",
+      "priority": 1,
+      "target": "ContractNLI",
+      "contact_route": "Stanford NLP project page contact, referencing the Hitachi terms click-through",
+      "question": "Two questions. (1) Does CC BY 4.0 permit using an item to seed generation of new synthetic training data? (2) The widely used HuggingFace mirror kiddothe2b/contract-nli is tagged cc-by-nc-sa-4.0 while your project page states CC BY 4.0 with no non-commercial clause. Which governs the data?",
+      "flags_this_would_resolve": ["synthetic_seeding_allowed", "the NC conflict"],
+      "currently_blocking": ["A2", "unresolved_nc_conflict"],
+      "status": "NOT_SENT",
+      "answer": null,
+      "answered_on": null,
+      "verbatim_record": null
+    },
+    {
+      "id": "OUT-003",
+      "priority": 1,
+      "target": "MuSiQue",
+      "contact_route": "Stony Brook NLP, via the official repository StonyBrookNLP/musique",
+      "question": "Does CC BY 4.0 permit using an item to seed generation of new synthetic training data? Separately, do the upstream seed datasets (SQuAD, T-REx, Natural Questions, MLQA, Zero Shot RE) impose terms that would extend to generated descendants, and do you consider the dev_test_singlehop_questions_v1.0.json exclusion list sufficient contamination control for generated material?",
+      "flags_this_would_resolve": ["synthetic_seeding_allowed", "upstream license reconciliation"],
+      "currently_blocking": ["A2", "unreconciled_upstream_seed_licenses"],
+      "status": "NOT_SENT",
+      "answer": null,
+      "answered_on": null,
+      "verbatim_record": null
+    },
+    {
+      "id": "OUT-004",
+      "priority": 1,
+      "target": "HotpotQA",
+      "contact_route": "dataset authors via the official HuggingFace org hotpotqa",
+      "question": "Does CC BY-SA 4.0 permit using an item to seed generation of new synthetic training data? If so, we would need to understand how the ShareAlike obligation is expected to apply to generated descendants that quote or structurally derive from the source text.",
+      "flags_this_would_resolve": ["synthetic_seeding_allowed", "ShareAlike propagation semantics"],
+      "currently_blocking": ["A2"],
+      "status": "NOT_SENT",
+      "answer": null,
+      "answered_on": null,
+      "verbatim_record": null
+    },
+    {
+      "id": "OUT-005",
+      "priority": 3,
+      "target": "WIQA",
+      "contact_route": "Allen Institute for AI",
+      "question": "What license governs the WIQA DATA as opposed to the code in allenai/wiqa-dataset? The HF card's Licensing Information section is unfilled and no data-license text is present. Separately, can you confirm the intended way to load the data without arbitrary code execution?",
+      "flags_this_would_resolve": ["training/derivatives/seeding/redistribution flags (all four)"],
+      "currently_blocking": ["no_data_license", "arbitrary_code_execution_on_load"],
+      "status": "NOT_SENT",
+      "answer": null,
+      "answered_on": null,
+      "verbatim_record": null
+    },
+    {
+      "id": "OUT-006",
+      "priority": 3,
+      "target": "EntailmentBank",
+      "contact_route": "Allen Institute for AI",
+      "question": "What license governs the EntailmentBank DATA? The allenai/entailment_bank repo is Apache-2.0 for code, but the data page exposes only a Drive folder with no terms. We will not rely on a third-party mirror's cc-by-4.0 tag.",
+      "flags_this_would_resolve": ["all four flags"],
+      "currently_blocking": ["no_data_license", "unreconciled_upstream_licenses"],
+      "status": "NOT_SENT",
+      "answer": null,
+      "answered_on": null,
+      "verbatim_record": null
+    },
+    {
+      "id": "OUT-007",
+      "priority": 3,
+      "target": "TRIP",
+      "contact_route": "University of Michigan SELD group (Storks, Gao, Zhang, Chai)",
+      "question": "Under what license is TRIP released? The official repository reports no license and the official HuggingFace mirror has an empty license field. Absent an explicit grant we will treat the data as unusable.",
+      "flags_this_would_resolve": ["all four flags"],
+      "currently_blocking": ["no_license_at_all"],
+      "status": "NOT_SENT",
+      "answer": null,
+      "answered_on": null,
+      "verbatim_record": null
+    },
+    {
+      "id": "OUT-008",
+      "priority": 2,
+      "target": "ProofWriter",
+      "contact_route": "Allen Institute for AI",
+      "question": "Does the Apache-2.0 license in allenai/ruletaker extend to the separately hosted ProofWriter dataset release, or does the ProofWriter ZIP carry its own terms? The release appears to ship no LICENSE file. Note: we intend to use the RuleTaker generator and write our own extensions, so a negative answer costs us nothing.",
+      "flags_this_would_resolve": ["all four flags for ProofWriter"],
+      "currently_blocking": ["no_license_in_release", "unconfirmed_license_inheritance"],
+      "status": "NOT_SENT",
+      "answer": null,
+      "answered_on": null,
+      "verbatim_record": null,
+      "note": "low stakes; the resolution path does not require ingesting ProofWriter data"
+    }
+  ],
+
+  "rules": {
+    "no_inference": "an affirmative answer must come from the terms text or the owner. A permissive license is not a grant for synthetic seeding.",
+    "verbatim_recording": "answers are recorded verbatim in verbatim_record, never paraphrased into a boolean by us",
+    "conflicts_stay_separate": "if a mirror and an official source disagree, both are recorded and neither is silently preferred",
+    "an_answer_changes_ledger_state_not_the_constitution": "a resolved flag promotes a source one state along the A0 machine; it never edits the frozen constitution"
+  },
+
+  "expected_effect": {
+    "if_OUT_001_to_004_all_answer_yes": "four sources move to PERMISSION_VERIFIED, which unblocks identity pinning, hashing and hygiene, and makes the O1 probe implementable",
+    "if_all_answer_no": "the human-data path closes and v3 becomes predominantly v2-derived synthetic with a thin human component, which the program has already accepted as an acceptable outcome",
+    "if_silence": "silence is not consent; the flag stays false and the source stays out"
+  }
+}

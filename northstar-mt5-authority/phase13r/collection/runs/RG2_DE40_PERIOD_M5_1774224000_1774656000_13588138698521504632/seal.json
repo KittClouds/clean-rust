@@ -1,0 +1,84 @@
+﻿{
+    "contract":  "MST_IMMUTABLE_RUN_SEAL_V1",
+    "status":  "SEALED",
+    "run_key":  "RG2_DE40_PERIOD_M5_1774224000_1774656000_13588138698521504632",
+    "invocation_id":  "RG2_DE40_PERIOD_M5_1774224000_1774656000_13588138698521504632_I1774224000_549634738358983374",
+    "holdout_id":  "RECOVERY_A",
+    "protocol_sha256":  "098844644e31878725ec4bb7859bb5db2f63f937adfc21bea3fb8ea91b287cf6",
+    "canonical_dataset_hash":  "ef5c24c1fc482edcf0ec758927a51863276f94cad52fab43684c35f014bb3e62",
+    "sealed_payload_sha256":  "2536aaf2c49891e6cad383fb8b07f412a489195722f91ca9c281a0c67cd27bda",
+    "file_count":  14,
+    "files":  [
+                  {
+                      "path":  "raw/auction/MasterAuction_DE40_PERIOD_M5_P13R_DE40_RECOVERY_A_RG2_v7_attempts.tsv",
+                      "bytes":  254427,
+                      "sha256":  "f4d70a3d9b2a8f5ab59d129ae1c3f4b75c44ec435c1174777d50e3944b38bd6f"
+                  },
+                  {
+                      "path":  "raw/auction/MasterAuction_DE40_PERIOD_M5_P13R_DE40_RECOVERY_A_RG2_v7_context.tsv",
+                      "bytes":  702603,
+                      "sha256":  "5aed13cbaf792ca2069d806a6c5ded5918496a5d71f0151a441c1b9403436852"
+                  },
+                  {
+                      "path":  "raw/auction/MasterAuction_DE40_PERIOD_M5_P13R_DE40_RECOVERY_A_RG2_v7_episodes.tsv",
+                      "bytes":  23342,
+                      "sha256":  "1a109a7cdc89bf33b0c0bfa72ca64e4bf0cf92e84137d1a33fc9f656e90cc75b"
+                  },
+                  {
+                      "path":  "raw/auction/MasterAuction_DE40_PERIOD_M5_P13R_DE40_RECOVERY_A_RG2_v7_events.tsv",
+                      "bytes":  848964,
+                      "sha256":  "1e60ee91f62e7bb584433c77b755a07048495da5ea655eb1ac1fb1af120ff84b"
+                  },
+                  {
+                      "path":  "raw/auction/MasterAuction_DE40_PERIOD_M5_P13R_DE40_RECOVERY_A_RG2_v7_features.tsv",
+                      "bytes":  221896,
+                      "sha256":  "047f06ac65dd5afa9e773aff64f090521199571008427d2089b56ce0a4421e15"
+                  },
+                  {
+                      "path":  "raw/auction/MasterAuction_DE40_PERIOD_M5_P13R_DE40_RECOVERY_A_RG2_v7_runs.tsv",
+                      "bytes":  5731,
+                      "sha256":  "a954653c775847430128b2b8fbdba06b688833a92f5080544a3fa8e696e079d8"
+                  },
+                  {
+                      "path":  "raw/auction/MasterAuction_DE40_PERIOD_M5_P13R_DE40_RECOVERY_A_RG2_v7_transits.tsv",
+                      "bytes":  18909,
+                      "sha256":  "6eb7bc34d5b8a282f51657af5f6bed6c6735aceda2170a153d725b9160e9a424"
+                  },
+                  {
+                      "path":  "raw/structure/MasterStructure_DE40_PERIOD_M5_P13R_DE40_RECOVERY_A_v6_events.tsv",
+                      "bytes":  150554,
+                      "sha256":  "5190586696743d5f14354cab0fd06123b55aa2821550505ce1d442c0d1aab0c9"
+                  },
+                  {
+                      "path":  "raw/structure/MasterStructure_DE40_PERIOD_M5_P13R_DE40_RECOVERY_A_v6_inputs.tsv",
+                      "bytes":  160180131,
+                      "sha256":  "9902f463fe0d76a9845d47852b2ba26f7166eea7631c4ce71472a4b3e89f1e90"
+                  },
+                  {
+                      "path":  "raw/structure/MasterStructure_DE40_PERIOD_M5_P13R_DE40_RECOVERY_A_v6_nodes.tsv",
+                      "bytes":  20575966,
+                      "sha256":  "e6236663926dc56100eb04f2e7049e440885255094b8df8ae32b47fbe2f854b1"
+                  },
+                  {
+                      "path":  "receipts/admission_receipt.json",
+                      "bytes":  2384,
+                      "sha256":  "d75446ae70fd5a999e382e3d27e3da6168b3107326854b6a0c859840b8b90953"
+                  },
+                  {
+                      "path":  "receipts/MasterAuction_DE40_PERIOD_M5_P13R_DE40_RECOVERY_A_RG2_v7_replay_certificate.json",
+                      "bytes":  3547,
+                      "sha256":  "73d23d871d28b387a7dec7962d755e7f22868b5f20c027a707bf63aa6249100e"
+                  },
+                  {
+                      "path":  "receipts/MasterAuction_DE40_PERIOD_M5_P13R_DE40_RECOVERY_A_RG2_v7_replay_certificate.md",
+                      "bytes":  623,
+                      "sha256":  "f7bf4e15415fe94765081a8f1e73ed59f8f3d35410ad25e0649aa10f8e096d94"
+                  },
+                  {
+                      "path":  "receipts/terminal_run_receipt.json",
+                      "bytes":  4518,
+                      "sha256":  "3478743613958a3b50773207ab5e263141ca63f1d9c2b7633fc5ff7babfcf316"
+                  }
+              ],
+    "mutation_rule":  "never overwrite; one-shot holdout evidence is immutable"
+}

@@ -1,0 +1,80 @@
+{
+  "schema": "jev-v08p-r2-panel-ready-manifest-v01",
+  "identity": "v0.8P-R2-late-transition-localization-v01",
+  "status": "R2_PANEL_READY",
+  "r2_execution_contract_sha256": "51cd8dee09688f1aa24ff575fa0a181d50b2a6ffc94dc6b7e7ed5b61c58ef14",
+  "construction_panel_manifest_sha256": "565d5e2650db375230fed15eb94471c92a25810c1644d629e7bb9d1490bf4822",
+  "construction_final_audit_sha256": "328650b3fd638bdf7eb147351e6c897abe8b36899b05af35ef5aa925851c5e89",
+  "feature_instrument_seal_sha256": "c679eab3b2edf0e7bffa792b48fd9ee7ea243d3fc2184373ed036d64aea94bb0",
+  "matcher_integrity_correction_sha256": "69e004150a48a3f9983432a3595e8e758881f47e513514a7488708d1a1ed0192",
+  "feature_extraction": {
+    "status": "R2_FROZEN_PANEL_FEATURES_SEALED",
+    "receipt_sha256": "74e701cd87e677c88ea10e0f7a026474ecc7bafab97c021de6c6fcd56c455e09",
+    "model_revision": "7453bca97ca1e67754c4035a4b4c584e1c9dd725",
+    "model_snapshot_hashes_match": true,
+    "runtime": "Python 3.13.15; torch 2.11.0+cu128; transformers 5.17.0; tokenizers 0.23.2; numpy 2.5.3; CUDA 12.8; cuDNN 91900; RTX 3080",
+    "representation": "final-layer mean_full@16; exact-length; single-row; no padding; BF16 backbone; FP32 output; 2048 dimensions",
+    "state_rows": 22000,
+    "candidate_rows": 16,
+    "state_shape": [22000, 2048],
+    "candidate_shape": [16, 2048],
+    "input_token_count_range": [12, 89],
+    "repeat_smoke_max_abs_error": 0.0,
+    "elapsed_seconds": 976.6535
+  },
+  "radius_matching": {
+    "status": "PASS",
+    "matcher_source_sha256": "a02d66151c50fe4ba79fa33305226b08ea0c87b3accdad04a0f3764e03d099c",
+    "rule": "frozen argmin absolute sham-radius mismatch; SHA-256(anchor_id|'|'|neutral_role) lexical tie-break",
+    "mean_relative_error": 0.05409190071388524,
+    "mean_relative_limit": 0.1,
+    "p95_absolute_error": 0.2204886330293149,
+    "p95_absolute_limit": 0.25,
+    "family_mean_relative_error": {
+      "exposure_control": 0.07736826551184206,
+      "respiratory_monitoring": 0.020165786337113325,
+      "salinity_control": 0.0821561080075068,
+      "vibration_monitoring": 0.036677442999078776
+    },
+    "per_family_limit": 0.15,
+    "selected_axis_counts": {"neutral_4": 916, "neutral_5": 1084},
+    "direction_or_cosine_used": false,
+    "outcomes_used": false,
+    "replacement_after_gate": false
+  },
+  "whole_panel_join": {
+    "status": "PASS",
+    "join_key": "exact schema_family_id + candidate_semantic_id",
+    "neighborhoods": 2000,
+    "unique_candidate_vectors_per_neighborhood": 4,
+    "resolved_join_rows": 8000,
+    "missing": 0,
+    "duplicates": 0,
+    "extras": 0,
+    "storage_row_number_used_as_identity": false,
+    "join_preflight_sha256": "5b0a2b47ff12238f474959a247636b5bff40eb675b2b8f9e0b7fab12a1a9410e",
+    "join_manifest_sha256": "4f5c3a287008933a11250c9eed110a8335ac4e834de25935af3dba10718393a1"
+  },
+  "feature_outputs": [
+    {"path":"features/r2-state-features.pt","bytes":180225839,"sha256":"9285214a16100a6f708ae6ce65bd67502fabd8c6df62d909a5027d34d4a74ed8"},
+    {"path":"features/r2-state-feature-manifest.jsonl","bytes":12386890,"sha256":"3b8e76a512afe064cd11eb51dc91949ebd746af3a963e36cf0d9d768418b6346"},
+    {"path":"features/r2-candidate-features.pt","bytes":133515,"sha256":"ce653d23fece96127a3df043d4730041dfffbf2662adafe3800fc9205d96acd8"},
+    {"path":"features/r2-candidate-feature-manifest.jsonl","bytes":7241,"sha256":"458c910629f3187a231fb956705dec99ec8c15ef8b62cd2e8e935e5a5bd7bbd4"},
+    {"path":"features/r2-feature-extraction-receipt.json","bytes":2810,"sha256":"74e701cd87e677c88ea10e0f7a026474ecc7bafab97c021de6c6fcd56c455e09"},
+    {"path":"matching/matched-neutral-selection.jsonl","bytes":1648213,"sha256":"d5fa428eb54496ef996313e8071427d7f2233e15f08cde233de189897ef5496f"},
+    {"path":"matching/radius-gate-report.json","bytes":913,"sha256":"7b0cc009e42174e98d526a84d1835c167ecda93c33582b2e3bec28fd902de196"},
+    {"path":"matching/semantic-axis-composition.json","bytes":205,"sha256":"0da05d2ab86322f4f79a71847a9e1dbae8a1eccf86d578143af988b34c238acc"},
+    {"path":"matching/whole-panel-candidate-join.jsonl","bytes":3696500,"sha256":"4f5c3a287008933a11250c9eed110a8335ac4e834de25935af3dba10718393a1"},
+    {"path":"matching/whole-panel-join-preflight.json","bytes":298,"sha256":"5b0a2b47ff12238f474959a247636b5bff40eb675b2b8f9e0b7fab12a1a9410e"},
+    {"path":"matching/r2-matching-and-join-receipt.json","bytes":1156,"sha256":"b598e1a8427cfb0ba7e39ac386fca9c876693aba2df1b6024fe99cf5ad54dbec"}
+  ],
+  "firewall": {
+    "panel_behaviorally_opened": false,
+    "targets_used_for_feature_extraction_or_matching": false,
+    "head_loaded": false,
+    "training": false,
+    "inference": false,
+    "newtight": false,
+    "phoenix": false
+  }
+}

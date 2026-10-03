@@ -1,0 +1,15 @@
+claim	status	evidence
+INSTRUMENT_PARENT_BINDING	PASS	machine receipt and deterministic ledger
+CLOCK_AUTHORITY_COMPOSITION	PASS	machine receipt and deterministic ledger
+RANGE_OBJECT_RECONSTRUCTION	PASS	machine receipt and deterministic ledger
+EXTREME_CHAIN_RECONSTRUCTION	PASS	machine receipt and deterministic ledger
+CANDIDATE_BIRTH_AVAILABILITY	PASS	machine receipt and deterministic ledger
+SUPERSESSION_AVAILABILITY	PASS	machine receipt and deterministic ledger
+TERMINAL_LABEL_AVAILABILITY	PASS	machine receipt and deterministic ledger
+RANGE_RELATION_RECONSTRUCTION	PASS	machine receipt and deterministic ledger
+GRAMMAR_RELATION_RECONSTRUCTION	PASS	synthetic typed join + sealed V2.10 fixture adapter; real clock-composed slice explicitly unavailable
+CANDIDATE_PATH_RECONSTRUCTION	PASS	machine receipt and deterministic ledger
+COVERAGE_PROPAGATION	PASS	machine receipt and deterministic ledger
+M1_OBSERVER_INSTANCE_IDENTITY	PASS	machine receipt and deterministic ledger
+DETERMINISTIC_REBUILD	PASS	two independent output directories compared byte-for-byte
+CONFIRMATION_FIREWALL	PASS	zero confirmation observation or membership rows read

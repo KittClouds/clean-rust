@@ -1,0 +1,22 @@
+{
+  "authorization_id": "FAS_FROZEN_OBSERVER_BUNDLE_E3_SCORE_V02_USER_AUTHORIZATION",
+  "status": "E3_V02_HELDOUT_SCORING_AUTHORIZED",
+  "recorded_utc": "2026-09-26T13:43:30Z",
+  "authorization_source": "Direct user message in this conversation explicitly authorized one E3 v02 held-out scoring execution; E3 scoring v02 is the corrected precontact plumbing identity for that single execution.",
+  "authorization_statement": "Authorize one E3 v02 held-out scoring execution: one opening of frozen held-out evaluation labels; score only the five already-fitted E3 v02 observers under the frozen E1 split, tasks, metrics, bootstrap, class-support requirements, and eight individual gates; record pass and fail outcomes; seal predictions, metrics, bootstrap outputs, and terminal disposition; independently replay and audit after scoring.",
+  "contract_sha256": "6d1c7f35a7f3405313b9b67cbebebbb1b740c7e1c670b93d5579f280a7889704",
+  "e0_root_sha256": "899a131c09298fdafdcc6771ad01e8982857a1cd47900259800f97dd7bea7ccd",
+  "e1_root_sha256": "6ba77a899363651e3ba119b005f59a22e86f011f83c86b873857cd3f9ab64b03",
+  "e2_v07_root_sha256": "a2e2aa76f77904665b9abfa2a22f609c05219d8bc64c537bed41f5c634d1da8a",
+  "e3_v02_root_sha256": "899ff6a61272b86fdf1cd51d8c14100e77185157c242f27fbffe452803a435e1",
+  "e3_scoring_authorized": true,
+  "one_evaluation_label_opening": true,
+  "refit_authorized": false,
+  "threshold_or_scaler_changes_authorized": false,
+  "representation_or_layer_search_authorized": false,
+  "hyperparameter_rescue_authorized": false,
+  "shared_or_multitask_heads_authorized": false,
+  "drop_failed_endpoint_or_rerun_authorized": false,
+  "E4_integration_authorized": false,
+  "independent_replay_required": true
+}

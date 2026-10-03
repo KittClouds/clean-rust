@@ -1,0 +1,25 @@
+{
+  "accepted_block_ids": [
+    304000,
+    304001,
+    304002,
+    304003,
+    304004,
+    304005,
+    304006,
+    304007
+  ],
+  "block_count": 8,
+  "cue_count": 4,
+  "delay_steps": 12,
+  "labels_balanced_per_block": true,
+  "measured_namespace_created": false,
+  "native_trajectory_collection_started": false,
+  "schedule_parity": "PASS",
+  "schema": "F4-SYMMETRY-03-task-bank-receipt-v1",
+  "status": "PASS",
+  "target_or_prediction_data_read": false,
+  "task_manifest_sha256": "96217b4193964ee98ed9c9e2e3b6f7a2fc0422c20368bb103e71a3d279634e70",
+  "training_sha256": "f91dac177eb5547fd2fb518a55b6156701f1ec3d5c876f3527cfa882f918a04e",
+  "trials_per_block": 8192
+}

@@ -1,0 +1,20 @@
+{
+  "schema": "CHIEF_E4_0_DISPOSITION_CUSTODY_V1",
+  "status": "RECORDED",
+  "receipts": [
+    {
+      "artifact_id": "sha256:d976acb7b53ea2a405a9631b5b36a76bdf934aed60f520b32c655c22eccb1390",
+      "event_id": "sha256:a849e4f8350d2ab7e500ce4c64d45d868b804d6e77e8eee7444ef6b5704bc83f"
+    },
+    {
+      "artifact_id": "sha256:66aba9d1cc9e0420fe68f7bf028d4419160f9ecc43aa329558d928c340ee9c2b",
+      "event_id": "sha256:b5d6f9c9f2a2c6e72aec9c4be5f796be68073ca03f60a8c5669dc98300144132"
+    }
+  ],
+  "seal": {
+    "root": "sha256:1de42e2961152c478ee42fb19e64e937a789dbfe7ce1802d7373586434c48206",
+    "event_id": "sha256:24b32a2ddaf05c0b98169a9630210c8050845c74923346b6dc35c4c3c43805f3"
+  },
+  "scientific_stage_authorized": false,
+  "flight_gate": "OPEN"
+}

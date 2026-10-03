@@ -1,0 +1,44 @@
+{
+  "commands": [
+    "python -m py_compile source/scripts/build_e4_0_source_map_v16_v10.py source/scripts/finalize_e4_0_contract_v16_v10.py source/scripts/seal_e4_0_contract_v16_v09.py source/scripts/test_e4_0_contract_v16_v10.py",
+    "python -m unittest discover -s source/scripts -p 'test_e4_0_contract_v16_v10.py' -v"
+  ],
+  "execution_authorization_conferred": false,
+  "py_compile": "PASS",
+  "receipt_id": "E4_0_CONTRACT_TOOLING_V16_V10_SOURCE_TESTS",
+  "recorded_utc": "2026-09-27T09:07:49.530915+00:00",
+  "runtime_access": {
+    "cache_created": false,
+    "cuda_initialized": false,
+    "gpu_lease_acquired": false,
+    "labels_opened": false,
+    "model_contact": false,
+    "tokenizer_contact": false
+  },
+  "schema": "FAS_E4_0_CONTRACT_TOOLING_SOURCE_TESTS_V16_V10",
+  "scope": "Synthetic-only v16-v10 contract/source-map/sealer regression suite covers the actual v08 preseal schema, separate no-contact preservation receipt, exact v09 in-memory stop, unchanged v06 science, current source closures, and receipt registration. No contract candidate or seal was created by the test suite; no E4 truth, tokenizer, model, CUDA, lease, cache, scoring, or authorization was accessed.",
+  "source_bindings": [
+    {
+      "bytes": 107608,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/build_e4_0_source_map_v16_v10.py",
+      "sha256": "1f95daae46abee2125dd67e8d1f5995fdb4417e6394c8ed390e1c12b5a69e77a"
+    },
+    {
+      "bytes": 114101,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/finalize_e4_0_contract_v16_v10.py",
+      "sha256": "9964b30360bb9ecae91ffeae841585c9e4bad2c6f85f391139ab9bd3cd7f8429"
+    },
+    {
+      "bytes": 18744,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/seal_e4_0_contract_v16_v09.py",
+      "sha256": "78b8f3a43514e9ab3f81c78e04db6907e5b909965a858e21103b437a8c839fc0"
+    },
+    {
+      "bytes": 8307,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/test_e4_0_contract_v16_v10.py",
+      "sha256": "faeb629e14302f73febc8ce3b0bdffa0f1d26dc61914dd4ede7913b9b894dc87"
+    }
+  ],
+  "status": "PASS_SYNTHETIC_CONTRACT_AND_SOURCE_MAP_TESTS_V10",
+  "unit_test_count": 7
+}

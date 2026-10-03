@@ -1,0 +1,44 @@
+{
+  "schema": "FAS_E4_0_STAGE_AUTHORIZATION_PRECONTACT_STOP_V01",
+  "receipt_id": "E4_0_AUTH_ISSUER_V16_V05_ONLINE_PARITY_PRECONTACT_STOP_V01",
+  "recorded_utc": "2026-09-27T08:00:51+00:00",
+  "status": "PRECONTACT_STOP",
+  "stop_class": "AUTHORIZER_REFERENCE_AUTHORIZATION_ID_MISMATCH",
+  "stage": "ONLINE_CACHE_PARITY",
+  "bindings": {
+    "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-auth-issuer-v16-v05/online-parity-bindings-v01.json",
+    "bytes": 4721,
+    "sha256": "72b0cd6899e3c05eda706e4ff3c5fb184e5b65ac17247f56258d2d0fe861a313"
+  },
+  "contract": {
+    "path": "experiments/fas-frozen-observer-bundle-engineering-v01/contracts/e4-0-contract-v16-v05-final.json",
+    "bytes": 122699,
+    "sha256": "762fdeb9705e659136ce8f7c2f448d2762c1d8129228b85125d10571ac818574"
+  },
+  "contract_seal": {
+    "path": "experiments/fas-frozen-observer-bundle-engineering-v01/seals/e4-0-contract-v16-v05-seal.json",
+    "bytes": 150571,
+    "sha256": "37af44de092ca21778b43962b9de106fa7320848384e368a74c689c69f906bb7",
+    "root_sha256": "c2f8d7bf6aa611f18ce886669d5c0bf008f98caf235fc4d98de9af8ea43bfab2"
+  },
+  "contract_audit": {
+    "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-postseal-receipt-v16-v06.json",
+    "bytes": 148002,
+    "sha256": "6b2d7c01ec821568aaa59aec5c4e1389842b855dd6d42457bd9e0bdcbec69d79"
+  },
+  "diagnostic": "AuthorizationError: preserved v06 authorization reference has unexpected contract/stage identity",
+  "authorization_output": {
+    "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-auth-issuer-v16-v05/online-parity-authorization-v01.json",
+    "exists": false
+  },
+  "authorization_written": false,
+  "tokenizer_contact": false,
+  "model_contact": false,
+  "cuda_initialized": false,
+  "gpu_lease_acquired": false,
+  "feature_cache_created": false,
+  "labels_opened": false,
+  "population_truth_files_opened": false,
+  "template_or_joint_truth_opened": false,
+  "scope": "The v16-v05 issuer stopped before writing an online parity grant while checking the historical v16-v01 authorization identity index. The mismatch is a verifier literal error; no tokenizer/model/CUDA contact, lease, cache, or label access occurred."
+}

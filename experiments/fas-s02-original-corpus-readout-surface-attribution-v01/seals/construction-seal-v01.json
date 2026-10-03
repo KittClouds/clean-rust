@@ -1,0 +1,109 @@
+{
+  "canonicalization": "SHA-256 of UTF-8 '<relative_posix_path> <file_sha256>\\n' rows sorted by UTF-8 path bytes.",
+  "experiment_id": "fas-s02-original-corpus-readout-surface-attribution-v01",
+  "feature_extraction_performed": false,
+  "files": [
+    {
+      "path": "README.md",
+      "sha256": "52ba477d7c25f822f6bc2786c4986651fe93bc7cf955ebc42c22e7b764e4233f"
+    },
+    {
+      "path": "S02-PROTOCOL.md",
+      "sha256": "947ae54c0716c821f9ff6bea9ee8f36a8d208896658d8cf9fd71186a671fca62"
+    },
+    {
+      "path": "contracts/parent-binding-v01.json",
+      "sha256": "3aa6c97c29510bd90c1bfbd53748ce049b51218055618f463d3cc0232d0ffce4"
+    },
+    {
+      "path": "contracts/two-view-attribution-contract-v01.json",
+      "sha256": "7d45ca6fdb0da69ed093420c62001f13ca6eccd8a74e32ec71f60be461b27503"
+    },
+    {
+      "path": "scripts/seal_construction.py",
+      "sha256": "6a3ca3302f8eb99e255182f2f865f3c44b63e88f004996fdaf6560c09efd129a"
+    },
+    {
+      "path": "seals/construction-disposition-v01.json",
+      "sha256": "4755c58e91e8fff30a7d437191a254742eda5ac7fc285a4c9f64d9cd09856d50"
+    }
+  ],
+  "model_contact_performed": false,
+  "probe_training_performed": false,
+  "root_sha256": "5fbf6f61150f514f17792c4475d1fafd0d1bc5707eebc7ac0e07870bd0825dcb",
+  "seal_id": "FAS_S02_CONSTRUCTION_V01",
+  "verified_parent_files": [
+    {
+      "path": "C:/code land/clean-rust/experiments/fas-frozen-adaptive-substrate-v00/closure-v01/closure-record-v01.json",
+      "sha256": "3eb499e299783d36afd6ff312d84680e4a23b1a00fd3adb8168d65d228b9bcf5"
+    },
+    {
+      "path": "C:/code land/clean-rust/experiments/fas-frozen-adaptive-substrate-v00/closure-v01/seals/closure-seal-v01.json",
+      "sha256": "22c613b4a03a46db4ba5ae38f2b7f1b855f341b967b4c3c8e8cd162019313ce8"
+    },
+    {
+      "path": "C:/code land/clean-rust/experiments/fas-frozen-adaptive-substrate-v00/phase1-v03/seals/phase1-v03-seal.json",
+      "sha256": "85e2ebdd243c3e44ea79917a0de8c896946ba35f75f38a9a5212826fe35657bc"
+    },
+    {
+      "path": "D:/codex-runs/fas-frozen-adaptive-substrate-v00/phase1-v03/corpus/qualification-events-v03.jsonl",
+      "sha256": "9fdd7ce9e49b86ac9acb3da035429c616865f527123bd0ac7c312b1b912439ca"
+    },
+    {
+      "path": "D:/codex-runs/fas-frozen-adaptive-substrate-v00/phase2a-v01/feature-cache-v01/features-v01.f32le",
+      "sha256": "6205b7d7a224b798b387886b43ec27103b37f091dccd9b623847cb7a52b0c8c2"
+    },
+    {
+      "path": "D:/codex-runs/fas-frozen-adaptive-substrate-v00/phase2a-v01/feature-cache-v01/feature-rows-v01.jsonl",
+      "sha256": "6ee54626d0da6e1b3fab5f544e9af9f4c68f0afd5045bc39d62994e0a629011b"
+    },
+    {
+      "path": "D:/codex-runs/fas-frozen-adaptive-substrate-v00/phase2a-v01/feature-cache-v01/extraction-manifest-v01.json",
+      "sha256": "2d3bb392bad2d47e21b277956fab2aac429b79699f709a0dc20769f259b23b14"
+    },
+    {
+      "path": "D:/codex-runs/fas-frozen-adaptive-substrate-v00/phase2a-v01/phase2a-v01-cache-seal.json",
+      "sha256": "9696f404fd36569363cd2e523442920d9ff5f2550d5683e211da29d8572d8426"
+    },
+    {
+      "path": "C:/code land/clean-rust/experiments/fas-frozen-adaptive-substrate-v00/phase2a-v01/contracts/sensor-qualification-contract-v01.json",
+      "sha256": "7b031e9aa7dfe92174a2ad8e5764b3b7a66505167dd8e32f35c542903a411a4b"
+    },
+    {
+      "path": "D:/codex-runs/fas-frozen-adaptive-substrate-v00/phase3-v02/results-v01/phase3-result-seal-v01.json",
+      "sha256": "d174e4f17e83780621e9dd1b21aba77338b47b0bf665ca6d5beaab3a50809367"
+    },
+    {
+      "path": "D:/codex-runs/fas-frozen-adaptive-substrate-v00/phase3-v02/results-v01/sensor-report-v01.json",
+      "sha256": "3f7e2dd59d5ee16149c7c870b0757fb6ac2bb0393f9b333427260c5f29a6bda1"
+    },
+    {
+      "path": "D:/codex-runs/fas-frozen-adaptive-substrate-v00/phase3-v02/results-v01/probe-artifacts/HELDOUT_TERM_EXACT_TARGET.npz",
+      "sha256": "be7c4fa016f1ad5887a8bf087a395a6ca02377d706be291a5ad1b6fbcc9cabbb"
+    },
+    {
+      "path": "D:/codex-runs/fas-frozen-adaptive-substrate-v00/phase3-v02/results-v01/scores-v01.jsonl",
+      "sha256": "9d2802d57666adad0e86366de573d458c150973b278f709decf76e1bb3e55862"
+    },
+    {
+      "path": "C:/code land/clean-rust/experiments/fas-frozen-adaptive-substrate-v00/phase3-v02/probe_core.py",
+      "sha256": "ff948c4c94acfd7e520292a26b9bf6bc43c13423be8c9fa4013d1359ef065cd3"
+    },
+    {
+      "path": "C:/code land/clean-rust/experiments/fas-frozen-adaptive-substrate-v00/phase3-v02/phase3.py",
+      "sha256": "5f6e72ab909d6567177829f2004e7f95e2f8f83c44b1e02d29737268bd6f6eb6"
+    },
+    {
+      "path": "D:/codex-runs/fas-frozen-adaptive-substrate-v00/phase3-v02/wheels/scipy-1.16.2-cp313-cp313-win_amd64.whl",
+      "sha256": "fda714cf45ba43c9d3bae8f2585c777f64e3f89a2e073b668b32ede412d8f52c"
+    },
+    {
+      "path": "D:/codex-runs/fas-s01-frozen-sensor-transfer-cartography/s01-3-linear-accessibility-v01/seals/result-tree-seal-v01.json",
+      "sha256": "a27655c6aef5ba972df1d57fae0902db24b30f5d09244cabb2b67d90471fc5d2"
+    },
+    {
+      "path": "D:/codex-runs/fas-s01-frozen-sensor-transfer-cartography/s01-3-linear-accessibility-v01/metrics-v01.json",
+      "sha256": "fc55a1058ed6529fb6924d2c51a27cd768e9800b6fee367b52c4f112e9637a59"
+    }
+  ]
+}

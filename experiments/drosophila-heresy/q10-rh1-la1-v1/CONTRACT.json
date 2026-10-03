@@ -1,0 +1,102 @@
+{
+  "protocol": "Q10-PF6-RH1-LA1",
+  "identity": "q10-rh1-la1-v1",
+  "status": "PREEXECUTION_SEALED_NO_BEHAVIOR",
+  "purpose": "engineering-only late-authority endpoint decomposition from sealed RH1-F2 receipts",
+  "source_bindings": [
+    {
+      "label": "f2_execution",
+      "path": "experiments/drosophila-heresy/q10-rh1-f2-v1/qualification/execution/execution.json",
+      "sha256": "D900B374F076AEC352381D878D31AEA8D7129D8BB5A3E53DB5B7D5B05E3FAFF9"
+    },
+    {
+      "label": "f2_summary",
+      "path": "experiments/drosophila-heresy/q10-rh1-f2-v1/qualification/derived/SUMMARY.json",
+      "sha256": "C56E6B3DCB351867BA2BE9EB2394810B94284F2534AC3F7252502B2956BD8B62"
+    },
+    {
+      "label": "f2_interpretation",
+      "path": "experiments/drosophila-heresy/q10-rh1-f2-v1/qualification/INTERPRETATION.json",
+      "sha256": "E00B21C55495A76C98A6F35E47F869F7C13F9CA50ADA44DD57B7879357EE86B9"
+    },
+    {
+      "label": "f2_runner",
+      "path": "experiments/drosophila-heresy/q10-rh1-f2-v1/scripts/run_rh1.py",
+      "sha256": "B42644BA0E2C4C8A0CC0F9997135CE18A9F9E6C0836810926300C4D84F198103"
+    },
+    {
+      "label": "f2_contract",
+      "path": "experiments/drosophila-heresy/q10-rh1-f2-v1/CONTRACT.json",
+      "sha256": "7CBDD2607D55A010D339B796196F7408A70B4664065075F3C3D7A5F64773723C"
+    }
+  ],
+  "raw_execution": {
+    "path": "qualification/execution/execution.json",
+    "expected_status": "LA1_RAW_EXECUTION_COMPLETE",
+    "expected_primary_groups": 32,
+    "selection_source": "sealed_f2_execution_results",
+    "selection_pair": ["authority__h16", "authority__h32"],
+    "strict_score_fields": [
+      "mismatch_count",
+      "total_ulp_distance",
+      "residual_l2",
+      "maximum_absolute_residual"
+    ]
+  },
+  "selection": {
+    "cohort": "primary",
+    "minimum_coordinates": 32,
+    "predicate": "authority_h32.chosen.D < authority_h16.chosen.D in strict lexicographic score order",
+    "hand_picked_group_ids": false
+  },
+  "endpoints": [
+    "W0",
+    "historical_authority_h16",
+    "authority_h32_early_ranks_1_16",
+    "authority_h32_late_only_ranks_17_32",
+    "authority_h32_full"
+  ],
+  "replay": {
+    "readout": "exact learner-order sequential binary32 replay",
+    "comparison": "bitwise including signed-zero identity",
+    "canonical_prefix_map": "ascending coordinate id",
+    "baseline": "one PF5 cloned state per endpoint identity",
+    "interaction": "(full-base)-(early-base)-(late-base) per row"
+  },
+  "score_domains": {
+    "D": "declared group rows; inherited search objective",
+    "P": "union of rows containing any group coordinate; physical support diagnostic",
+    "G": "whole endpoint readout; global diagnostic"
+  },
+  "geometry": {
+    "source": "sealed PF5 contract inherited by the F2 runtime",
+    "actual_endpoints_hard_gate": [
+      "W0",
+      "historical_authority_h16",
+      "authority_h32_full"
+    ],
+    "counterfactual_endpoints_diagnostic_only": [
+      "authority_h32_early_ranks_1_16",
+      "authority_h32_late_only_ranks_17_32"
+    ],
+    "counterfactual_geometry_failure_policy": "record_metrics_and_diagnostic_pass_flag_without_abort",
+    "independent_replay_required": true
+  },
+  "scope": {
+    "engineering_only": true,
+    "behavioral_probe": false,
+    "scientific_seed_bundles": 0,
+    "scientific_promotion": false,
+    "model_mutation": false,
+    "parent_writes": false
+  },
+  "forbidden_output_fields": [
+    "accuracy",
+    "reward",
+    "actions",
+    "behavior",
+    "scientific_finding",
+    "biological_mechanism",
+    "repair_applied_to_canonical_model"
+  ]
+}

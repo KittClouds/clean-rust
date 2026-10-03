@@ -1,0 +1,84 @@
+﻿{
+    "contract":  "MST_IMMUTABLE_RUN_SEAL_V1",
+    "status":  "SEALED",
+    "run_key":  "RG2_JPN225_PERIOD_M5_1785110400_1785542400_702896944021223415",
+    "invocation_id":  "RG2_JPN225_PERIOD_M5_1785110400_1785542400_702896944021223415_I1785110400_8888179950934322122",
+    "holdout_id":  "RECOVERY_B",
+    "protocol_sha256":  "098844644e31878725ec4bb7859bb5db2f63f937adfc21bea3fb8ea91b287cf6",
+    "canonical_dataset_hash":  "416e68835592e5122043ae71a12a7eea44a2cab85a2cfa3a421ef58a7cbe19ef",
+    "sealed_payload_sha256":  "b8275d2ad2b7069e037504c1e066f28ec620adf223e7ce77a4217111f012f26f",
+    "file_count":  14,
+    "files":  [
+                  {
+                      "path":  "raw/auction/MasterAuction_JPN225_PERIOD_M5_P13R_JPN225_RECOVERY_B_RG2_v7_attempts.tsv",
+                      "bytes":  355622,
+                      "sha256":  "ecfdff799fb2a1bda350a353b7914794d3bef754d6e3c621de5074ccc3537b4b"
+                  },
+                  {
+                      "path":  "raw/auction/MasterAuction_JPN225_PERIOD_M5_P13R_JPN225_RECOVERY_B_RG2_v7_context.tsv",
+                      "bytes":  947870,
+                      "sha256":  "ad3fe35a8b3354435e903c6fe5ad8f8028f2e44cf6ab7e1a876d324dcf165640"
+                  },
+                  {
+                      "path":  "raw/auction/MasterAuction_JPN225_PERIOD_M5_P13R_JPN225_RECOVERY_B_RG2_v7_episodes.tsv",
+                      "bytes":  34710,
+                      "sha256":  "2dda56eb7ce0ccbcf1287b6d2450c5f659648e028950c9f1da6195c00127d6de"
+                  },
+                  {
+                      "path":  "raw/auction/MasterAuction_JPN225_PERIOD_M5_P13R_JPN225_RECOVERY_B_RG2_v7_events.tsv",
+                      "bytes":  1234125,
+                      "sha256":  "dbfadae9d4e57036edc79594ad7e3cdb70fd9cf2b9bb8b32c45417d05618f664"
+                  },
+                  {
+                      "path":  "raw/auction/MasterAuction_JPN225_PERIOD_M5_P13R_JPN225_RECOVERY_B_RG2_v7_features.tsv",
+                      "bytes":  309871,
+                      "sha256":  "073bb62e3323dc82b88e9cc39a89c8ddd025f0ba81dc26e623736d702b4f0bcf"
+                  },
+                  {
+                      "path":  "raw/auction/MasterAuction_JPN225_PERIOD_M5_P13R_JPN225_RECOVERY_B_RG2_v7_runs.tsv",
+                      "bytes":  5732,
+                      "sha256":  "f5e8b1112a14c67d601653d76797f5b207a477c7753735c15d55a1d44243b6c4"
+                  },
+                  {
+                      "path":  "raw/auction/MasterAuction_JPN225_PERIOD_M5_P13R_JPN225_RECOVERY_B_RG2_v7_transits.tsv",
+                      "bytes":  26500,
+                      "sha256":  "a95530a87f05aefe2966e3fc131c75a36f84f4ecfecfac5f0cc020cf9cb6dfb7"
+                  },
+                  {
+                      "path":  "raw/structure/MasterStructure_JPN225_PERIOD_M5_P13R_JPN225_RECOVERY_B_v6_events.tsv",
+                      "bytes":  164076,
+                      "sha256":  "df98089dea13e0222eccdf3754a5bbd8f2b6e4fede490673e15c360112c88ff8"
+                  },
+                  {
+                      "path":  "raw/structure/MasterStructure_JPN225_PERIOD_M5_P13R_JPN225_RECOVERY_B_v6_inputs.tsv",
+                      "bytes":  196516118,
+                      "sha256":  "afca754fe6ab08b06890d38723cf4f2e1bca47733a45cbc740a3594173ff084e"
+                  },
+                  {
+                      "path":  "raw/structure/MasterStructure_JPN225_PERIOD_M5_P13R_JPN225_RECOVERY_B_v6_nodes.tsv",
+                      "bytes":  29864073,
+                      "sha256":  "935733b77b4bea4ce92926715d6caf9d2cb5313982d6a5267e8f164e77acab7e"
+                  },
+                  {
+                      "path":  "receipts/admission_receipt.json",
+                      "bytes":  2398,
+                      "sha256":  "6649f663c14a66096a78354e416d02fa768cf37daa98c5e55919324cedbe1f3b"
+                  },
+                  {
+                      "path":  "receipts/MasterAuction_JPN225_PERIOD_M5_P13R_JPN225_RECOVERY_B_RG2_v7_replay_certificate.json",
+                      "bytes":  3556,
+                      "sha256":  "3556e455ad3975d50a000a4e0ae43d58bbd44d92574e308605677d461938a183"
+                  },
+                  {
+                      "path":  "receipts/MasterAuction_JPN225_PERIOD_M5_P13R_JPN225_RECOVERY_B_RG2_v7_replay_certificate.md",
+                      "bytes":  629,
+                      "sha256":  "ae0814fdf24c4c911f3903042e19f8a051b47eaca218336d5e0d823e51ba5ac3"
+                  },
+                  {
+                      "path":  "receipts/terminal_run_receipt.json",
+                      "bytes":  4519,
+                      "sha256":  "9c753585a7def82778b11f7803d9a3aa0cc93a7364214cea42e8cecc9cd8a3cc"
+                  }
+              ],
+    "mutation_rule":  "never overwrite; one-shot holdout evidence is immutable"
+}

@@ -1,0 +1,11 @@
+﻿{
+    "contract":  "MST_FURNACE_FAILURE_V1",
+    "status":  "QUARANTINED",
+    "failed_at_utc":  "2026-08-12T09:07:25.7332321Z",
+    "window_id":  "US30_20260427_ORDINARY",
+    "attempt_tag":  "F2_US30_20260427_ORD_A01",
+    "reason":  "Exception calling \"Open\" with \"4\" argument(s): \"The process cannot access the file \u0027C:\\Users\\shuga\\AppData\\Roaming\\MetaQuotes\\Terminal\\Common\\Files\\MasterAuction_US30_PERIOD_M5_F2_US30_20260427_ORD_A01_RG2_v7_runs.tsv\u0027 because it is being used by another process.\"",
+    "auction_stem":  "MasterAuction_US30_PERIOD_M5_F2_US30_20260427_ORD_A01_RG2_v7",
+    "structure_stem":  "MasterStructure_US30_PERIOD_M5_F2_US30_20260427_ORD_A01_v6",
+    "deletion_performed":  false
+}

@@ -1,0 +1,54 @@
+{
+  "schema": "jev-r3-analysis-contract-v03",
+  "identity": "JEV-V08Q-R3-SELECTIVITY-V03-ANALYSIS",
+  "status": "SEALED",
+  "history_unit": "One independently seeded training history; neighborhoods are within-history measurement units only.",
+  "cell_weights": "Equal weight across the fixed four families and two polarity directions; family order is exposure_control, respiratory_monitoring, salinity_control, vibration_monitoring.",
+  "score": "Raw frozen-head logits; candidate-aligned score is logit(candidate) minus logit(old). No probability reconstruction for primary score contrasts.",
+  "estimands": {
+    "C_direction": "For each history and polarity direction, equal-family mean of HALF-minus-1X anchor (logit_new-logit_old).",
+    "M_C": "0.5 * (C_high_to_low + C_low_to_high); semantic-role-following anchor shift; primary sequence step 1.",
+    "P_C": "0.5 * (C_high_to_low - C_low_to_high); low-pole-following component; secondary.",
+    "S_branch": "Equal mean of the eight family-by-direction means of (logit_new-logit_old)_fact - (logit_new-logit_old)_anchor for the branch.",
+    "D": "S_HALF - S_1X for every technically completed balanced history; signed universal additive contrast; primary sequence step 2.",
+    "R": "log(S_HALF/S_1X), defined only when both signed branch separations are >= S_min=0.01. D remains the universal signed contrast for every technically completed history. R is conditional and cannot be generalized to histories outside its eligible domain; never silently interpret the eligible subset as the full cohort.",
+    "M_D": "0.5 * (D_high_to_low + D_low_to_high); same as balanced D.",
+    "P_D": "0.5 * (D_high_to_low - D_low_to_high); secondary polarity decomposition.",
+    "S80": "At the common step-80 fork, equal mean across the same eight family-by-direction cells of fact-minus-anchor semantic-role logit contrast. New and old are defined by the prospective semantic transition, never by pole, candidate identity, or output index; measured before late branch assignment.",
+    "beta": "OLS D_h = alpha + beta*S80_h + error_h, with two-sided 95% HC3 interval; beta is a state association, not an attenuation fraction. Treat as a continuous state-association test, not a causal mediation claim.",
+    "C_vs_S80": "Descriptive association only; report the OLS slope of history-level M_C on semantic-role S80 with a two-sided 95% HC3 interval, with no confirmatory gate or constant-offset claim.",
+    "bridge_M_C_P_C": "For each of 24 paired bridge seed/init histories, compute balanced-minus-high_to_low M_C and P_C. Summarize the history-level median and the same order-statistic 95% interval; report the mean secondarily. Point estimates and intervals only, no pass gate."
+  },
+  "ratio": {
+    "S_min": 0.01,
+    "eligible_count_minimum": 173,
+    "registered_denominator": 192,
+    "under_coverage_label": "NOT_ESTIMABLE_FOR_COHORT",
+    "signed_values_and_D_reported_for_all": true,
+    "equivalence_band_secondary": ["log(0.9)", "log(1.1)"],
+    "equivalence_rule": "Secondary only. Practically unchanged only if the complete median-R 95% order-statistic interval lies within the band; never infer equivalence from a nonsignificant test.",
+    "coverage_interpretation": "At least 173 of the fixed 192 registered histories must be eligible before any cohort-level median-R confirmatory claim. Below 173, report NOT_ESTIMABLE_FOR_COHORT and the full eligibility reasons; do not relax S_min or change the denominator."
+  },
+  "intervals": {
+    "median": "Narrowest symmetric order-statistic interval with at least 95% binomial coverage; exact sign/order-statistic inversion under a continuous history distribution. Use this same method for median M_C, D, eligible R, and bridge paired contrasts; no bootstrap substitution.",
+    "beta": "Two-sided 95% HC3 interval.",
+    "method_switch": "No post-result switch to bootstrap or alternate quantile method."
+  },
+  "fixed_sequence": [
+    {"step": 1, "test": "lower 95% bound for median(M_C) > 0"},
+    {"step": 2, "test": "upper 95% bound for median(D) < 0"},
+    {"step": 3, "test": "eligible count >= 173 and upper 95% bound for eligible median(R) < 0"},
+    {"step": 4, "test": "zero is outside the two-sided 95% HC3 interval for beta"}
+  ],
+  "sequence_semantics": "Compute and report every estimand even if an earlier gate fails; later results then remain descriptive and lose confirmatory status. Permanent missing histories make affected confirmatory estimands NOT_EVALUABLE, not reduced-denominator tests.",
+  "descriptive_state_summary": "Report the full history-level C, D, R eligibility, S80, S1X, and S_HALF table. Report C-versus-S80 descriptively; report the prespecified beta association with HC3 interval as fixed-sequence step 4. Do not derive strata or cut points from endpoint outcomes.",
+  "technical_failure": "Retry only the identical history under exact replay. A permanent failure remains among 192, is ratio-ineligible and has missing D; report the named history and fixed-sequence consequence.",
+  "baseline_floor_interpretation": "If median S_1X < S_min and the D interval contains zero, describe as baseline discrimination too weak to assess attenuation, not as no effect.",
+  "bridge": {
+    "estimand": "Paired balanced-minus-high_to_low-only differences in M_C and P_C for the 24 hash-selected seed/init pairs.",
+    "status": "Secondary history-level median paired contrasts with 95% order-statistic intervals; mean is secondary. No pass gate.",
+    "evaluation_scope": "Full polarity-balanced panel; low_to_high bridge cells are out of training-polarity distribution by design."
+  },
+  "secondary": ["P_C", "M_D", "P_D", "R equivalence", "family and polarity cells", "bridge contrasts", "history heterogeneity", "competitor identity", "candidate permutation sanity"],
+  "prohibitions": ["composite score", "dose/controller selection", "flexible moderator", "endpoint-conditioned strata", "post-result equivalence margin", "population-law claim"]
+}

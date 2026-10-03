@@ -1,0 +1,73 @@
+[
+  {
+    "episode_id": "38dda8024f2b0e74ca5e71d54714bf9de05d4e7172583768775113f057541c40",
+    "seed": 42,
+    "policy": {
+      "policy": "ALWAYS_FLAT"
+    },
+    "action_count": 9,
+    "trajectory_root": "f726abd7dbfa8f97105347a7f3c2c7ac9908f53651f6c03c8aff1560aa081c0d",
+    "terminal_receipt_hash": "8ca6915caa75da6f5857dd994651b420a769c0d5ce46d36083d95929def11f6f"
+  },
+  {
+    "episode_id": "38dda8024f2b0e74ca5e71d54714bf9de05d4e7172583768775113f057541c40",
+    "seed": 42,
+    "policy": {
+      "policy": "ALWAYS_FULL_POSITIVE"
+    },
+    "action_count": 9,
+    "trajectory_root": "ea549edead0c64f69efa289c722732a878caea61674d05749f437e6221a51c95",
+    "terminal_receipt_hash": "187e61e975d2757f61dc012c1b3fe79e1be8ddf489a85c8db5ead759f0eba173"
+  },
+  {
+    "episode_id": "38dda8024f2b0e74ca5e71d54714bf9de05d4e7172583768775113f057541c40",
+    "seed": 42,
+    "policy": {
+      "policy": "ALWAYS_FULL_NEGATIVE"
+    },
+    "action_count": 9,
+    "trajectory_root": "d1f5c0f20693b6b85693127a224d0079d9ffebeeed7baaf4de1de1a8972c2eaf",
+    "terminal_receipt_hash": "35b7fc3ee67b2d8ddfb4f1cf09e5e11fd89996e5bc91158f632e37475fc34cde"
+  },
+  {
+    "episode_id": "38dda8024f2b0e74ca5e71d54714bf9de05d4e7172583768775113f057541c40",
+    "seed": 42,
+    "policy": {
+      "policy": "ALTERNATE_EXTREMES"
+    },
+    "action_count": 9,
+    "trajectory_root": "d4568cc09824ba3ab6a59c0ba754ea6890694a8d26f3bace67dd85a1a9fa91da",
+    "terminal_receipt_hash": "82e4d9c7ccae38988d623d527b52218bace4bc44cab481db544772d618d8872b"
+  },
+  {
+    "episode_id": "38dda8024f2b0e74ca5e71d54714bf9de05d4e7172583768775113f057541c40",
+    "seed": 42,
+    "policy": {
+      "policy": "FIXED_ACTION_SEQUENCE",
+      "parameters": [
+        0.0,
+        0.25,
+        1.0,
+        -1.0,
+        -0.5,
+        0.0,
+        0.25,
+        1.0,
+        -1.0
+      ]
+    },
+    "action_count": 9,
+    "trajectory_root": "79fad9f5974c3785a6c8e9433c41418c48945ba0255d1192b8bbd655b2717c94",
+    "terminal_receipt_hash": "ab5291b8fdeb33fc43aca50c2c570af105c44e5e7b4f70062d485a4f95bf1e7a"
+  },
+  {
+    "episode_id": "38dda8024f2b0e74ca5e71d54714bf9de05d4e7172583768775113f057541c40",
+    "seed": 42,
+    "policy": {
+      "policy": "SEEDED_RANDOM_ACTIONS"
+    },
+    "action_count": 9,
+    "trajectory_root": "9d6393effdbd9c599d16595f6ee74ab04918a94fed491992c78a70a3b49c5da0",
+    "terminal_receipt_hash": "bc9271f8eb09827a7ef45046b71af6ca369a9567bec659749edd0a948e1c0853"
+  }
+]

@@ -1,0 +1,93 @@
+{
+  "artifact_hashes": [
+    {
+      "bytes": 6180,
+      "path": "manifests/QREAL-CONTRACT.json",
+      "sha256": "aba89e416e73d2f992fc0ff39e6b0abbf0f445edf4dda59d690e192bfc5e6244"
+    },
+    {
+      "bytes": 5283,
+      "path": "manifests/QREAL-MANIFEST.json",
+      "sha256": "50a4967d97bd9b8bd4bb929c37b9fd703c3ae88e65161df1abb79c4aeadd7e2b"
+    },
+    {
+      "bytes": 24330,
+      "path": "manifests/NULL-GRAPH-MANIFEST.json",
+      "sha256": "4bac28af93556a1cdc082be2d3543e572a8d888481abacdf51a9350405da5b9f"
+    },
+    {
+      "bytes": 47855289,
+      "path": "inputs/banks/training.json",
+      "sha256": "8baa5e1896a2176f49a5b7b95ce2f0e8e75fffbb45300c570d02c5f9f6a77c78"
+    },
+    {
+      "bytes": 120096,
+      "path": "inputs/banks/competence.json",
+      "sha256": "e9b0ebe49134d691b31975791bb9ac249fbff89447f8ba8e0cfa4c421de6124c"
+    },
+    {
+      "bytes": 1918677,
+      "path": "inputs/banks/evaluator-large.json",
+      "sha256": "5335cf923aa341f45b6831629aff26b736b0d55da057c410868dae83c0346f78"
+    },
+    {
+      "bytes": 230420,
+      "path": "artifacts/QREAL-RUN1/diagnostics.jsonl",
+      "sha256": "2711073c583e251cfa18f79567453edb17f7f1db12f4853e03282fed025283ef"
+    },
+    {
+      "bytes": 509,
+      "path": "artifacts/QREAL-RUN1/collection-receipt.json",
+      "sha256": "fd57b94dc54e95d819e98b79a495f3efc624aafaa5027da4d43b3cce03aa21f9"
+    },
+    {
+      "bytes": 201,
+      "path": "artifacts/QREAL-RUN1/integrity-receipt.json",
+      "sha256": "0d6e73a52b1118900ce56df6a33df30b5550e41dbe9b2a4a1f640b297d64bcc6"
+    },
+    {
+      "bytes": 17865,
+      "path": "artifacts/QREAL-RUN1/qreal-analysis.json",
+      "sha256": "924a19529688519121190f0770b07068ba02f7094a07a98e32902a31eda60e71"
+    },
+    {
+      "bytes": 1793,
+      "path": "artifacts/QREAL-RUN1/qreal-summary.csv",
+      "sha256": "22255f012d1005f50fb7104421eb259a9e43f69bab25563a9777ddf275106ba5"
+    },
+    {
+      "bytes": 1075,
+      "path": "artifacts/QREAL-RUN1/RESULTS.md",
+      "sha256": "d3a522ad2d9ed9ca7f51c0662abf82df66865b374c94ff9ea488ee23ed0804c5"
+    },
+    {
+      "bytes": 613376,
+      "path": "sealed/fly-pheno-00-v0.4-qreal.exe",
+      "sha256": "21fdf97328ab1dc3d0c242160692a16f1d6777b24185f5bc7cac264042a0a3cd"
+    },
+    {
+      "bytes": 1026,
+      "path": "provenance/PROTECTED-DH08A-TREE-RECEIPT.json",
+      "sha256": "5a8f4beb9a9a4d50c35bbb73455d14551a23ff79f58e4ebcb00e07faedce0466"
+    }
+  ],
+  "closed_at_utc": "2026-09-22T09:42:32.930972+00:00",
+  "disposition": "NATIVE_ADAPTIVE_REACHABILITY_PROBLEM",
+  "evaluator_floor_note": "Large response bank exposes intrinsic action/evaluator stochasticity; deterministic oracle error and panel error are retained separately.",
+  "integrity_status": "INTEGRITY_PASS",
+  "interpretation": "Representation and weight-space oracles passed, but the native adaptive rule did not reach competence under the fixed contract.",
+  "measured_pheno_reseal_authorized": false,
+  "native_pass": false,
+  "native_reachability_earned": true,
+  "no_lesion_outcomes": true,
+  "no_recovery_comparison": true,
+  "no_seed_replacement": true,
+  "no_threshold_relaxation": true,
+  "protected_dh08a_receipt_sha256": "5a8f4beb9a9a4d50c35bbb73455d14551a23ff79f58e4ebcb00e07faedce0466",
+  "representation_pass": true,
+  "run_id": "FLY-PHENO-00-v0.4-QREAL-RUN1",
+  "schema": "FLY-PHENO-00-v0.4-QREAL-terminal-receipt-v1",
+  "status": "CLOSED_QUALIFICATION_ONLY",
+  "study_id": "FLY-PHENO-00-v0.4-QREAL",
+  "weight_space_pass": true
+}

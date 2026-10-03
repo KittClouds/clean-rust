@@ -1,0 +1,27 @@
+{
+  "schema": "OBS_OPEN_DISC02P_AUTHORITY_V1",
+  "gate": "OBS-OPEN-DISC-02P",
+  "authority_class": "PROTOCOL_ONLY",
+  "parent_authorities": {
+    "measurement_authority": "CAUSAL_SESSION_PROCESS_MEASUREMENT_V1",
+    "meas02_root": "f7abf12d1473a5e1eddc8a7efb84ff7224811eda83ad62ba4fe300a7648ce5ea",
+    "instrument_root": "5930c7d4f5b2de4549bfedacbd2c3b9df7da78f68c7d765b9c0669d08a17490f",
+    "universe_root": "6b0ca197a394b085707d03dfe06f1569eb0fafbddb2d583817e88647df6f6235",
+    "observer_instance": "CAUSAL_RANGE_EXTREME_M1_V1"
+  },
+  "populations": {
+    "discovery_sessions": 257,
+    "discovery_state": "MEAS02_DISCOVERY_UNOPENED",
+    "confirmation_sessions": 69,
+    "confirmation_state": "FROZEN_UNOPENED"
+  },
+  "question_families": [
+    "RUNNING_EXTREME_PROCESS",
+    "FIXED_RANGE_SESSION_PROCESS"
+  ],
+  "formal_test_count": 3,
+  "grammar_substantive_claims": "EXCLUDED_FIRST_GENERATION",
+  "economic_authority": false,
+  "trading_authority": false
+}
+

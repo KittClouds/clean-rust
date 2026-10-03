@@ -1,0 +1,33 @@
+{
+  "observe": true,
+  "seeds": [
+    4000
+  ],
+  "taus": [
+    4.0
+  ],
+  "sides": [
+    "R"
+  ],
+  "conditions": [
+    "immediate",
+    "quiet",
+    "eligibility_retained",
+    "eligibility_suppressed"
+  ],
+  "arms": [
+    "E",
+    "Z"
+  ],
+  "cues": 16,
+  "delay_steps": 12,
+  "trials": 512,
+  "eta": 0.05,
+  "glut_sign": -1.0,
+  "input_salt": 858980352,
+  "threads": 1,
+  "primary_side": "R",
+  "primary_metric": "paired_final_reversal_probe",
+  "bootstrap_seed": 2026091204,
+  "bootstrap_resamples": 20000
+}

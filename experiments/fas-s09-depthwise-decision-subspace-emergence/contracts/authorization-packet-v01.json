@@ -1,0 +1,36 @@
+{
+  "packet_id": "FAS_S09_AUTHORIZATION_PACKET_V01",
+  "authorization_basis": "The user directed FAS-S09 on the sealed S01 controlled task, specifying extraction of mean_full and final_position from every transformer layer, independent fixed linear readouts, terminal reproduction gate, cross-surface replay, and subspace trajectory analysis.",
+  "scope": [
+    "verify sealed S01 and S08 parents",
+    "copy and load only the pinned LFM revision",
+    "extract the two frozen views for all 16 layer outputs on sealed S01 inputs",
+    "run deterministic and terminal feature parity checks",
+    "fit the fixed exact-target linear probe recipe at each layer and surface after terminal gate",
+    "run native and cross-surface readouts, metrics, and subspace/convergence analyses",
+    "seal S09 result"
+  ],
+  "prohibitions": [
+    "FAS-00 data or artifact access",
+    "other model revisions, tokenizer calls, new corpus generation, altered splits",
+    "probe/solver/hyperparameter search or extra solver iterations",
+    "additional representation surfaces or layer selection",
+    "significance testing, nonlinear fitting, adaptation, SAE, or backbone updates",
+    "modification of any S01, S08, S07, or FAS-00 artifact"
+  ],
+  "stop_on": [
+    "any parent seal/hash mismatch",
+    "model or runtime identity mismatch",
+    "backbone parameter identity change",
+    "feature determinism or terminal feature parity failure",
+    "terminal S01-3 readout reproduction failure",
+    "S08 terminal plane mismatch above frozen tolerance",
+    "resource floor failure"
+  ],
+  "terminal_states": {
+    "S09_RESULT_READY": false,
+    "S09_TERMINAL_REPRODUCED": false,
+    "FAS00_PHASE4_AUTHORIZED": false,
+    "ADAPTIVE_MECHANISMS_AUTHORIZED": false
+  }
+}

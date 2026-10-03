@@ -1,0 +1,20 @@
+{
+  "accepted": 5043,
+  "aggregate_tables": "INDEPENDENTLY_RECOMPUTED",
+  "analysis_sha256": "83a5a424436e263c376ade4ef65e596f87ee9ff48a060ec2d5c9ecc68293f96e",
+  "behavioral_inference": false,
+  "causal_inference": false,
+  "contract_sha256": "3814a2fff78c51d36d0671e415d2f776638d203600566afec5d464fb5ed42ef4",
+  "correlations": "INDEPENDENTLY_RECOMPUTED",
+  "dominated": 77,
+  "events": 5120,
+  "future_gate_selected": false,
+  "geometry_integrity": "VERIFIED",
+  "models": "INDEPENDENTLY_CHECKED",
+  "plan_sha256": "29626f018be33e4fe949778a34b1aad07c3562809dbe32057bc757b6c5ad425f",
+  "protocol": "Q10-WC",
+  "receipt_manifest_entries": 20,
+  "review_status": "VERIFIED_BY_INDEPENDENT_STDLIB",
+  "scientific_seed_bundles": 0,
+  "stage": "combined"
+}

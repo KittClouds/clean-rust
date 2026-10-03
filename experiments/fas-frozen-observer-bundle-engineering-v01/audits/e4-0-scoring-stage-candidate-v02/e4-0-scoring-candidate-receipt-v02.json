@@ -1,0 +1,97 @@
+{
+  "schema": "FAS_E4_0_SCORING_CANDIDATE_RECEIPT_V02",
+  "status": "CANDIDATE_ONLY_NOT_SEALED_NOT_AUTHORIZED",
+  "created_utc": "2026-09-28T02:42:49.058489+00:00",
+  "spec_candidate": {
+    "path": "experiments\\fas-frozen-observer-bundle-engineering-v01\\audits\\e4-0-scoring-stage-candidate-v02\\e4-0-scoring-execution-spec-candidate-v02.json",
+    "bytes": 63965,
+    "sha256": "80e24afa298c8db0c8300e83715155d10e131762bbef0cf9ac51049e13c1acfa"
+  },
+  "native_execution_spec_candidate": {
+    "path": "experiments\\fas-frozen-observer-bundle-engineering-v01\\audits\\e4-0-scoring-stage-candidate-v02\\kammi-local-execution-v1-candidate-v02.json",
+    "bytes": 9636,
+    "sha256": "d3c38aabd7da770bc3d417d48e4aa03c8d784954cd7713725842cba40c7d2e1f",
+    "schema": "KAMMI_LOCAL_EXECUTION_V1",
+    "source_file_count": 35
+  },
+  "implementation": [
+    {
+      "path": "experiments\\fas-frozen-observer-bundle-engineering-v01\\source\\scripts\\e4_fresh_scorer_ledger_v01\\run_scoring.py",
+      "bytes": 19352,
+      "sha256": "a5741b45e15df917105d94428d83925aa1ad6615c3b9cbad774da212223992e2"
+    },
+    {
+      "path": "experiments\\fas-frozen-observer-bundle-engineering-v01\\source\\scripts\\e4_fresh_scorer_ledger_v01\\ledger_adapter.py",
+      "bytes": 20212,
+      "sha256": "dc8b6f7402ee08a0bd12f959369347ed3dfcffdea29e606ffd01cb64ee7d847a"
+    },
+    {
+      "path": "experiments\\fas-frozen-observer-bundle-engineering-v01\\source\\scripts\\e4_fresh_scorer_ledger_v01\\test_adapter.py",
+      "bytes": 13334,
+      "sha256": "7fc7772cf9578ad19e7d8a2268b94350f83d274427b64263be74187cc46f9479"
+    },
+    {
+      "path": "experiments\\fas-frozen-observer-bundle-engineering-v01\\source\\scripts\\e4_fresh_scorer_ledger_v01\\test_runner.py",
+      "bytes": 7469,
+      "sha256": "cf72ee513fa1487dc64d258375b6e923ed20faf607913114217439bf36391c22"
+    },
+    {
+      "path": "experiments\\fas-frozen-observer-bundle-engineering-v01\\source\\scripts\\e4_fresh_scorer_ledger_v01\\README.md",
+      "bytes": 7357,
+      "sha256": "5502952abff6d00a2f5643caa34216111c5d604df96a4a9c1359d418cf693868"
+    },
+    {
+      "path": "experiments\\fas-frozen-observer-bundle-engineering-v01\\audits\\e4-0-scoring-stage-candidate-v02\\audit_candidate_packet_v02.py",
+      "bytes": 11129,
+      "sha256": "1bd173f99dbf9fa302a43fac07da97293cd770549c7fa3a78d811fd3b099d208"
+    }
+  ],
+  "qualification": {
+    "kind": "synthetic_only",
+    "command": "Python 3.13.15 -m unittest -v test_adapter test_runner",
+    "result": "PASS",
+    "tests_passed": 11,
+    "tests_failed": 0,
+    "duration_seconds": 27.233,
+    "actual_e4_label_bytes_read": false,
+    "actual_feature_cache_bytes_read": false,
+    "actual_e3_head_payload_bytes_read": false,
+    "feature_cache_and_manifest_path_metadata_checked": true,
+    "e3_head_path_metadata_checked": true,
+    "tokenizer_model_cuda_ledger_contact": false,
+    "final_suite_result_pending": false
+  },
+  "current_state": {
+    "panel_id_reserved": "e4-0-primary-terminal-v01",
+    "panel_cas_registration": false,
+    "panel_exposure_count": 0,
+    "execution_grant_issued": false,
+    "labels_opened": false,
+    "real_scoring_performed": false,
+    "output_root_exists_at_build": false
+  },
+  "native_schema": {
+    "fields_exact": [
+      "schema",
+      "run_id",
+      "stage_id",
+      "actor_id",
+      "command",
+      "cwd",
+      "output_root",
+      "expected_outputs",
+      "max_output_bytes",
+      "timeout_seconds",
+      "poll_seconds",
+      "source_files"
+    ],
+    "dynamic_invocation_delivery_excluded_from_source_files": true,
+    "dynamic_sidecar_hash_audit_owner": "Chief Kammi after authorization/exposure and before worker launch"
+  },
+  "candidate_packet_audit": {
+    "path": "experiments\\fas-frozen-observer-bundle-engineering-v01\\audits\\e4-0-scoring-stage-candidate-v02\\e4-0-scoring-candidate-audit-v02.json",
+    "bytes": 2004,
+    "sha256": "dba837f7a928eb4ea7c8b6734dd1f95e4baeee8ce0afcdb503baed3694c0faeb",
+    "status": "PASS_CANDIDATE_PACKET_IDENTITY_AUDIT"
+  }
+}

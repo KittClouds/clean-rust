@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PolicyArtifact",
+  "type": "object",
+  "properties": {
+    "action_spec_id": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "environment_id": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "executor_name": {
+      "type": "string"
+    },
+    "executor_version": {
+      "type": "string"
+    },
+    "inference_signature": {
+      "$ref": "#/$defs/InferenceSignature"
+    },
+    "materialization_state": {
+      "$ref": "#/$defs/PolicyMaterializationState"
+    },
+    "observation_dictionary_hash": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "onnx_export_identity": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Digest256"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "originating_experiment_id": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "policy_artifact_id": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "schema_version": {
+      "type": "string"
+    },
+    "transform_state_id": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "weights_hash": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Digest256"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "required": [
+    "schema_version",
+    "policy_artifact_id",
+    "materialization_state",
+    "originating_experiment_id",
+    "observation_dictionary_hash",
+    "action_spec_id",
+    "transform_state_id",
+    "environment_id",
+    "executor_name",
+    "executor_version",
+    "inference_signature"
+  ],
+  "$defs": {
+    "Digest256": {
+      "description": "Domain-separated BLAKE3 digest",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "InferenceSignature": {
+      "type": "object",
+      "properties": {
+        "deterministic": {
+          "type": "boolean"
+        },
+        "input_dtype": {
+          "type": "string"
+        },
+        "input_shape": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0
+          }
+        },
+        "output_dtype": {
+          "type": "string"
+        },
+        "output_shape": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0
+          }
+        }
+      },
+      "required": [
+        "input_dtype",
+        "input_shape",
+        "output_dtype",
+        "output_shape",
+        "deterministic"
+      ]
+    },
+    "PolicyMaterializationState": {
+      "type": "string",
+      "enum": [
+        "CONTRACT_ONLY_PRE_LEARNER",
+        "MATERIALIZED_WEIGHTS"
+      ]
+    }
+  }
+}

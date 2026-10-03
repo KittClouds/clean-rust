@@ -1,0 +1,21 @@
+{
+  "observe": true,
+  "seeds": [3000,3001,3002,3003,3004,3005,3006,3007,3008,3009,3010,3011,3012,3013,3014,3015,3016,3017,3018,3019,3020,3021,3022,3023],
+  "taus": [4.0,16.0],
+  "sides": ["R","L"],
+  "conditions": ["immediate","quiet","retain_both","suppress_eligibility","restore_state","suppress_both"],
+  "arms": ["E","Z"],
+  "cues": 16,
+  "delay_steps": 12,
+  "trials": 512,
+  "eta": 0.05,
+  "glut_sign": -1.0,
+  "input_salt": 858980352,
+  "threads": 4,
+  "primary_metric": "probe_reversal",
+  "primary_side": "R",
+  "bootstrap_seed": 2026091203,
+  "bootstrap_resamples": 20000,
+  "co_primary_familywise_level": 0.95,
+  "co_primary_interval_level": 0.975
+}

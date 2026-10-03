@@ -1,0 +1,7 @@
+Replay sample failed for USTEC_20260413_DIRECTIONAL_EXPANSION_UP, exit=2
+At C:\Users\shuga\OneDrive\Documents\ChatGPT\eas\Invoke-MasterStructureRG2Collection.ps1:76 char:61
++ ... DE -ne 0) { throw "Replay sample failed for $($candidate[0]), exit=$L ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (Replay sample f...SION_UP, exit=2:String) [], RuntimeException
+    + FullyQualifiedErrorId : Replay sample failed for USTEC_20260413_DIRECTIONAL_EXPANSION_UP, exit=2
+ 

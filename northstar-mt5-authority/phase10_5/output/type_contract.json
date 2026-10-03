@@ -1,0 +1,11 @@
+{
+  "contract": "MST_RG2_RESEARCH_INTERFACE_V1_1",
+  "null_representation_in_memory": "pandas.NA_or_NaN",
+  "null_representation_on_disk": "\\N",
+  "timestamp_storage": "Int64_unix_seconds",
+  "timestamp_timezone": "MT5_SERVER_not_coerced_to_UTC",
+  "identifier_storage": "pandas.StringDtype",
+  "integer_storage": "pandas.Int64_nullable",
+  "continuous_storage": "float64",
+  "price_precision": "symbol_digits_from_runs"
+}

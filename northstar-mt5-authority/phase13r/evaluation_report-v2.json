@@ -1,0 +1,1002 @@
+{
+  "contract": "NORTHSTAR_RG2_HOLDOUT_EVALUATION_V1",
+  "status": "COMPLETE",
+  "protocol_sha256": "6be4368c07fe912c6e35df0e9c76e96d5c2a60e3c6f40db33c67370125acdebc",
+  "authorization_token_sha256": "f45a6fdc2c822498eeba0685b93abf7c50b6d51ad4f9058fd361fb6028985120",
+  "bundle_semantic_sha256": "98d5550e327eef9b167d3cfd7ec1e3a7bae9262304d2bf1caff4dc98660c6ce8",
+  "candidates": [
+    {
+      "target": "initial_acceptance_given_initial_contact",
+      "outcome": "PASS",
+      "failure_reasons": [],
+      "eligible_n": 3686,
+      "censored_n": 428,
+      "censoring_rate": 0.11611502984264786,
+      "runs": 12,
+      "episodes": 819,
+      "metrics": {
+        "n": 3258,
+        "positives": 479,
+        "negatives": 2779,
+        "prevalence": 0.14702271332105588,
+        "auc": 0.7903264943383158,
+        "average_precision": 0.3602706470393331,
+        "brier": 0.10796394157232259,
+        "log_loss": 0.3480544833262866,
+        "ece": 0.018028050238453316,
+        "calibration_intercept": 0.22409226149681707,
+        "calibration_slope": 1.132914260212391
+      },
+      "development_auc": 0.7904281167842813,
+      "development_log_loss": 0.327869757161391,
+      "development_brier": 0.10022065508617645,
+      "auc_delta": -0.00010162244596545467,
+      "log_loss_delta": 0.020184726164895583,
+      "brier_delta": 0.007743286486146139,
+      "bootstrap": {
+        "point_delta": 0.07092510160466564,
+        "lower": 0.053501102458108664,
+        "upper": 0.0886605338702668,
+        "one_sided_p": 0.00009999000099990002
+      },
+      "holm_adjusted_primary_p": 0.00039996000399960006,
+      "reliability": [
+        {
+          "lower": 0.0,
+          "upper": 0.1,
+          "count": 1500,
+          "mean_probability": 0.039679767368489945,
+          "observed_rate": 0.04
+        },
+        {
+          "lower": 0.1,
+          "upper": 0.2,
+          "count": 774,
+          "mean_probability": 0.14654468349108937,
+          "observed_rate": 0.11757105943152454
+        },
+        {
+          "lower": 0.2,
+          "upper": 0.3,
+          "count": 518,
+          "mean_probability": 0.25273163887758193,
+          "observed_rate": 0.28378378378378377
+        },
+        {
+          "lower": 0.3,
+          "upper": 0.4,
+          "count": 424,
+          "mean_probability": 0.33785320191058665,
+          "observed_rate": 0.37971698113207547
+        },
+        {
+          "lower": 0.4,
+          "upper": 0.5,
+          "count": 42,
+          "mean_probability": 0.4287095177097897,
+          "observed_rate": 0.47619047619047616
+        },
+        {
+          "lower": 0.5,
+          "upper": 0.6,
+          "count": 0,
+          "mean_probability": null,
+          "observed_rate": null
+        },
+        {
+          "lower": 0.6,
+          "upper": 0.7,
+          "count": 0,
+          "mean_probability": null,
+          "observed_rate": null
+        },
+        {
+          "lower": 0.7,
+          "upper": 0.8,
+          "count": 0,
+          "mean_probability": null,
+          "observed_rate": null
+        },
+        {
+          "lower": 0.8,
+          "upper": 0.9,
+          "count": 0,
+          "mean_probability": null,
+          "observed_rate": null
+        },
+        {
+          "lower": 0.9,
+          "upper": 1.0,
+          "count": 0,
+          "mean_probability": null,
+          "observed_rate": null
+        }
+      ],
+      "instruments": [
+        {
+          "key": "DE40",
+          "metrics": {
+            "n": 449,
+            "positives": 70,
+            "negatives": 379,
+            "prevalence": 0.155902004454343,
+            "auc": 0.8137203166226913,
+            "average_precision": 0.3988890146152636,
+            "brier": 0.11179143714936986,
+            "log_loss": 0.34924012189640685,
+            "ece": 0.0296008444925028,
+            "calibration_intercept": 0.62539677977253,
+            "calibration_slope": 1.2894850363280763
+          },
+          "primary_delta": 0.08673529928817234
+        },
+        {
+          "key": "FRA40",
+          "metrics": {
+            "n": 515,
+            "positives": 62,
+            "negatives": 453,
+            "prevalence": 0.1203883495145631,
+            "auc": 0.7675710318308053,
+            "average_precision": 0.27808590262048216,
+            "brier": 0.09598457538053502,
+            "log_loss": 0.31743215562912175,
+            "ece": 0.029927055572660646,
+            "calibration_intercept": -0.03197284961062144,
+            "calibration_slope": 1.1131499621585657
+          },
+          "primary_delta": 0.05056663824772495
+        },
+        {
+          "key": "JPN225",
+          "metrics": {
+            "n": 646,
+            "positives": 88,
+            "negatives": 558,
+            "prevalence": 0.13622291021671826,
+            "auc": 0.7563131313131313,
+            "average_precision": 0.3617123063335129,
+            "brier": 0.10469024835410151,
+            "log_loss": 0.34723524013862683,
+            "ece": 0.0327847042207832,
+            "calibration_intercept": -0.024325855902695533,
+            "calibration_slope": 1.034722864272276
+          },
+          "primary_delta": 0.05107245979864281
+        },
+        {
+          "key": "US30",
+          "metrics": {
+            "n": 526,
+            "positives": 74,
+            "negatives": 452,
+            "prevalence": 0.14068441064638784,
+            "auc": 0.7786414733317388,
+            "average_precision": 0.3500970749086433,
+            "brier": 0.10609437854794831,
+            "log_loss": 0.34717703813446255,
+            "ece": 0.02622406996292645,
+            "calibration_intercept": 0.376331961122559,
+            "calibration_slope": 1.0962061329870894
+          },
+          "primary_delta": 0.059670412286253416
+        },
+        {
+          "key": "US500",
+          "metrics": {
+            "n": 659,
+            "positives": 131,
+            "negatives": 528,
+            "prevalence": 0.19878603945371776,
+            "auc": 0.7788861901457321,
+            "average_precision": 0.4033787360269137,
+            "brier": 0.13509180259995668,
+            "log_loss": 0.41144978703994217,
+            "ece": 0.023497544178416232,
+            "calibration_intercept": 0.32874379003551824,
+            "calibration_slope": 1.2495767819269152
+          },
+          "primary_delta": 0.10660989355266982
+        },
+        {
+          "key": "USTEC",
+          "metrics": {
+            "n": 463,
+            "positives": 54,
+            "negatives": 409,
+            "prevalence": 0.11663066954643629,
+            "auc": 0.8091551208910622,
+            "average_precision": 0.3957240881948029,
+            "brier": 0.08565673558367909,
+            "log_loss": 0.29287394157441543,
+            "ece": 0.029637641192380836,
+            "calibration_intercept": 0.24018283020956824,
+            "calibration_slope": 1.118624091741033
+          },
+          "primary_delta": 0.06793228338300485
+        }
+      ],
+      "temporal_blocks": [
+        {
+          "key": "RECOVERY_A",
+          "metrics": {
+            "n": 1715,
+            "positives": 247,
+            "negatives": 1468,
+            "prevalence": 0.14402332361516035,
+            "auc": 0.7629869055367406,
+            "average_precision": 0.32579710193323025,
+            "brier": 0.10921623220908913,
+            "log_loss": 0.3561135543253882,
+            "ece": 0.015688582130693005,
+            "calibration_intercept": 0.15127114533383174,
+            "calibration_slope": 1.1246490085100922
+          },
+          "primary_delta": 0.05712490380422414
+        },
+        {
+          "key": "RECOVERY_B",
+          "metrics": {
+            "n": 1543,
+            "positives": 232,
+            "negatives": 1311,
+            "prevalence": 0.15035644847699287,
+            "auc": 0.8144743417764801,
+            "average_precision": 0.393837992472966,
+            "brier": 0.10657205664552226,
+            "log_loss": 0.33909705833376586,
+            "ece": 0.022552972865768878,
+            "calibration_intercept": 0.29159159518428795,
+            "calibration_slope": 1.1296609378927458
+          },
+          "primary_delta": 0.08626362346322514
+        }
+      ]
+    },
+    {
+      "target": "reclaim_given_break",
+      "outcome": "PASS",
+      "failure_reasons": [],
+      "eligible_n": 1318,
+      "censored_n": 317,
+      "censoring_rate": 0.24051593323216997,
+      "runs": 12,
+      "episodes": 640,
+      "metrics": {
+        "n": 1001,
+        "positives": 522,
+        "negatives": 479,
+        "prevalence": 0.5214785214785215,
+        "auc": 0.6310080867708109,
+        "average_precision": 0.6221482430442082,
+        "brier": 0.23151484928338953,
+        "log_loss": 0.6545543150983951,
+        "ece": 0.018897540802401074,
+        "calibration_intercept": -0.050852111392720736,
+        "calibration_slope": 0.9840160614039439
+      },
+      "development_auc": 0.5889758643183302,
+      "development_log_loss": 0.6654763321351604,
+      "development_brier": 0.2368155398285647,
+      "auc_delta": 0.04203222245248073,
+      "log_loss_delta": -0.010922017036765319,
+      "brier_delta": -0.00530069054517518,
+      "bootstrap": {
+        "point_delta": 0.0404574673272131,
+        "lower": 0.02270984005575921,
+        "upper": 0.06297336467054802,
+        "one_sided_p": 0.00009999000099990002
+      },
+      "holm_adjusted_primary_p": 0.00039996000399960006,
+      "reliability": [
+        {
+          "lower": 0.0,
+          "upper": 0.1,
+          "count": 21,
+          "mean_probability": 0.058274534159136075,
+          "observed_rate": 0.14285714285714285
+        },
+        {
+          "lower": 0.1,
+          "upper": 0.2,
+          "count": 36,
+          "mean_probability": 0.14341065249957957,
+          "observed_rate": 0.1388888888888889
+        },
+        {
+          "lower": 0.2,
+          "upper": 0.3,
+          "count": 31,
+          "mean_probability": 0.24530139367118958,
+          "observed_rate": 0.16129032258064516
+        },
+        {
+          "lower": 0.3,
+          "upper": 0.4,
+          "count": 28,
+          "mean_probability": 0.3615143313131341,
+          "observed_rate": 0.25
+        },
+        {
+          "lower": 0.4,
+          "upper": 0.5,
+          "count": 87,
+          "mean_probability": 0.46630176106715965,
+          "observed_rate": 0.4827586206896552
+        },
+        {
+          "lower": 0.5,
+          "upper": 0.6,
+          "count": 500,
+          "mean_probability": 0.5618593642749978,
+          "observed_rate": 0.544
+        },
+        {
+          "lower": 0.6,
+          "upper": 0.7,
+          "count": 288,
+          "mean_probability": 0.6306982491634711,
+          "observed_rate": 0.6284722222222222
+        },
+        {
+          "lower": 0.7,
+          "upper": 0.8,
+          "count": 10,
+          "mean_probability": 0.724815090625016,
+          "observed_rate": 0.7
+        },
+        {
+          "lower": 0.8,
+          "upper": 0.9,
+          "count": 0,
+          "mean_probability": null,
+          "observed_rate": null
+        },
+        {
+          "lower": 0.9,
+          "upper": 1.0,
+          "count": 0,
+          "mean_probability": null,
+          "observed_rate": null
+        }
+      ],
+      "instruments": [
+        {
+          "key": "DE40",
+          "metrics": {
+            "n": 133,
+            "positives": 63,
+            "negatives": 70,
+            "prevalence": 0.47368421052631576,
+            "auc": 0.6884353741496598,
+            "average_precision": 0.61972111046866,
+            "brier": 0.22862580902161284,
+            "log_loss": 0.6456196438799188,
+            "ece": 0.07328322638627026,
+            "calibration_intercept": -0.5521193334037935,
+            "calibration_slope": 1.8816640936646667
+          },
+          "primary_delta": 0.06065570611426933
+        },
+        {
+          "key": "FRA40",
+          "metrics": {
+            "n": 158,
+            "positives": 96,
+            "negatives": 62,
+            "prevalence": 0.6075949367088608,
+            "auc": 0.6382728494623656,
+            "average_precision": 0.714541773706642,
+            "brier": 0.22471486789151363,
+            "log_loss": 0.6425343520910772,
+            "ece": 0.09042463903096487,
+            "calibration_intercept": 0.3287225929019929,
+            "calibration_slope": 0.8807261297836743
+          },
+          "primary_delta": 0.032182586818934406
+        },
+        {
+          "key": "JPN225",
+          "metrics": {
+            "n": 179,
+            "positives": 91,
+            "negatives": 88,
+            "prevalence": 0.5083798882681564,
+            "auc": 0.7181568431568431,
+            "average_precision": 0.6843538927806532,
+            "brier": 0.20930099764078589,
+            "log_loss": 0.6027622951725565,
+            "ece": 0.050147760950250655,
+            "calibration_intercept": -0.29617723745276586,
+            "calibration_slope": 2.3820209419549525
+          },
+          "primary_delta": 0.0953364098863441
+        },
+        {
+          "key": "US30",
+          "metrics": {
+            "n": 131,
+            "positives": 57,
+            "negatives": 74,
+            "prevalence": 0.4351145038167939,
+            "auc": 0.5756282598387862,
+            "average_precision": 0.4924450198483397,
+            "brier": 0.24582356466871289,
+            "log_loss": 0.6887000470342113,
+            "ece": 0.12718587487158928,
+            "calibration_intercept": -0.2542455364727584,
+            "calibration_slope": 0.5089081258661833
+          },
+          "primary_delta": 0.026664930762277675
+        },
+        {
+          "key": "US500",
+          "metrics": {
+            "n": 284,
+            "positives": 153,
+            "negatives": 131,
+            "prevalence": 0.5387323943661971,
+            "auc": 0.5423838746694607,
+            "average_precision": 0.5878176876669365,
+            "brier": 0.24371347736929558,
+            "log_loss": 0.6826431639398026,
+            "ece": 0.026777769012086342,
+            "calibration_intercept": 0.04255312470657012,
+            "calibration_slope": 0.5917180040555065
+          },
+          "primary_delta": 0.008302440750042491
+        },
+        {
+          "key": "USTEC",
+          "metrics": {
+            "n": 116,
+            "positives": 62,
+            "negatives": 54,
+            "prevalence": 0.5344827586206896,
+            "auc": 0.6615890083632019,
+            "average_precision": 0.6871408411456712,
+            "brier": 0.23234301106687302,
+            "log_loss": 0.653760461989664,
+            "ece": 0.06804704414586506,
+            "calibration_intercept": 0.035189283866897944,
+            "calibration_slope": 0.7948511108801878
+          },
+          "primary_delta": 0.0381866438915933
+        }
+      ],
+      "temporal_blocks": [
+        {
+          "key": "RECOVERY_A",
+          "metrics": {
+            "n": 527,
+            "positives": 280,
+            "negatives": 247,
+            "prevalence": 0.5313092979127134,
+            "auc": 0.6236986697513013,
+            "average_precision": 0.6117726168012553,
+            "brier": 0.23118809989177522,
+            "log_loss": 0.6550067668964512,
+            "ece": 0.031487087141469625,
+            "calibration_intercept": 0.0662435560673307,
+            "calibration_slope": 0.875232919845811
+          },
+          "primary_delta": 0.03768822065520581
+        },
+        {
+          "key": "RECOVERY_B",
+          "metrics": {
+            "n": 474,
+            "positives": 242,
+            "negatives": 232,
+            "prevalence": 0.510548523206751,
+            "auc": 0.6432744371615845,
+            "average_precision": 0.6349416579654655,
+            "brier": 0.23187813394453013,
+            "log_loss": 0.6540512726984473,
+            "ece": 0.04591927460980548,
+            "calibration_intercept": -0.2671635904643976,
+            "calibration_slope": 1.3698502740523981
+          },
+          "primary_delta": 0.04353635550474026
+        }
+      ]
+    },
+    {
+      "target": "rejection_given_initial_contact",
+      "outcome": "PASS",
+      "failure_reasons": [],
+      "eligible_n": 3686,
+      "censored_n": 428,
+      "censoring_rate": 0.11611502984264786,
+      "runs": 12,
+      "episodes": 819,
+      "metrics": {
+        "n": 3258,
+        "positives": 2257,
+        "negatives": 1001,
+        "prevalence": 0.692756292203806,
+        "auc": 0.9089457286178597,
+        "average_precision": 0.9534488167403861,
+        "brier": 0.10293510806088525,
+        "log_loss": 0.3435950681737054,
+        "ece": 0.03733044403991683,
+        "calibration_intercept": 0.030892987710499215,
+        "calibration_slope": 1.0810642382793465
+      },
+      "development_auc": 0.9073447020004796,
+      "development_log_loss": 0.3483029826609859,
+      "development_brier": 0.11012649593381069,
+      "auc_delta": 0.0016010266173801524,
+      "log_loss_delta": -0.004707914487280529,
+      "brier_delta": -0.007191387872925434,
+      "bootstrap": {
+        "point_delta": 0.27389969042546086,
+        "lower": 0.2279911944286916,
+        "upper": 0.32043931911817447,
+        "one_sided_p": 0.00009999000099990002
+      },
+      "holm_adjusted_primary_p": 0.00039996000399960006,
+      "reliability": [
+        {
+          "lower": 0.0,
+          "upper": 0.1,
+          "count": 8,
+          "mean_probability": 0.08545063815654372,
+          "observed_rate": 0.0
+        },
+        {
+          "lower": 0.1,
+          "upper": 0.2,
+          "count": 454,
+          "mean_probability": 0.15803318187260634,
+          "observed_rate": 0.13656387665198239
+        },
+        {
+          "lower": 0.2,
+          "upper": 0.3,
+          "count": 298,
+          "mean_probability": 0.23812710038771312,
+          "observed_rate": 0.16778523489932887
+        },
+        {
+          "lower": 0.3,
+          "upper": 0.4,
+          "count": 85,
+          "mean_probability": 0.3380273623959419,
+          "observed_rate": 0.2
+        },
+        {
+          "lower": 0.4,
+          "upper": 0.5,
+          "count": 70,
+          "mean_probability": 0.4502685827877633,
+          "observed_rate": 0.5
+        },
+        {
+          "lower": 0.5,
+          "upper": 0.6,
+          "count": 133,
+          "mean_probability": 0.5569395027941397,
+          "observed_rate": 0.631578947368421
+        },
+        {
+          "lower": 0.6,
+          "upper": 0.7,
+          "count": 256,
+          "mean_probability": 0.6575544245724418,
+          "observed_rate": 0.75390625
+        },
+        {
+          "lower": 0.7,
+          "upper": 0.8,
+          "count": 257,
+          "mean_probability": 0.7509533450525342,
+          "observed_rate": 0.8132295719844358
+        },
+        {
+          "lower": 0.8,
+          "upper": 0.9,
+          "count": 395,
+          "mean_probability": 0.8524067263565651,
+          "observed_rate": 0.8936708860759494
+        },
+        {
+          "lower": 0.9,
+          "upper": 1.0,
+          "count": 1302,
+          "mean_probability": 0.9693694848188122,
+          "observed_rate": 0.9631336405529954
+        }
+      ],
+      "instruments": [
+        {
+          "key": "DE40",
+          "metrics": {
+            "n": 449,
+            "positives": 316,
+            "negatives": 133,
+            "prevalence": 0.7037861915367484,
+            "auc": 0.9031360045683829,
+            "average_precision": 0.9604301275682727,
+            "brier": 0.11367828433917601,
+            "log_loss": 0.3523983646325097,
+            "ece": 0.02804521743001952,
+            "calibration_intercept": 0.09133506227225761,
+            "calibration_slope": 1.0242693678127415
+          },
+          "primary_delta": 0.25528445217903434
+        },
+        {
+          "key": "FRA40",
+          "metrics": {
+            "n": 515,
+            "positives": 357,
+            "negatives": 158,
+            "prevalence": 0.6932038834951456,
+            "auc": 0.9119951778179626,
+            "average_precision": 0.9547782533594504,
+            "brier": 0.10361486839939033,
+            "log_loss": 0.34404685785920797,
+            "ece": 0.05756422926445034,
+            "calibration_intercept": 0.10733551104373229,
+            "calibration_slope": 1.277753687936591
+          },
+          "primary_delta": 0.27304973394235654
+        },
+        {
+          "key": "JPN225",
+          "metrics": {
+            "n": 646,
+            "positives": 467,
+            "negatives": 179,
+            "prevalence": 0.7229102167182663,
+            "auc": 0.8830404459703564,
+            "average_precision": 0.9448623842082675,
+            "brier": 0.10874815121263266,
+            "log_loss": 0.35947417748683247,
+            "ece": 0.05288422276475937,
+            "calibration_intercept": 0.12549137840406213,
+            "calibration_slope": 1.0464000362891879
+          },
+          "primary_delta": 0.2311963515275159
+        },
+        {
+          "key": "US30",
+          "metrics": {
+            "n": 526,
+            "positives": 395,
+            "negatives": 131,
+            "prevalence": 0.7509505703422054,
+            "auc": 0.8759107160112088,
+            "average_precision": 0.9470236730306376,
+            "brier": 0.10798865797664543,
+            "log_loss": 0.358498065178719,
+            "ece": 0.016392349138432002,
+            "calibration_intercept": 0.08063605311204095,
+            "calibration_slope": 0.9534918773401219
+          },
+          "primary_delta": 0.20722841773352688
+        },
+        {
+          "key": "US500",
+          "metrics": {
+            "n": 659,
+            "positives": 375,
+            "negatives": 284,
+            "prevalence": 0.5690440060698028,
+            "auc": 0.9226103286384977,
+            "average_precision": 0.9438030158366711,
+            "brier": 0.09827040715936539,
+            "log_loss": 0.3365118880906262,
+            "ece": 0.06563819486010404,
+            "calibration_intercept": -0.024629500543579447,
+            "calibration_slope": 1.1751020202929927
+          },
+          "primary_delta": 0.39103444154467076
+        },
+        {
+          "key": "USTEC",
+          "metrics": {
+            "n": 463,
+            "positives": 347,
+            "negatives": 116,
+            "prevalence": 0.7494600431965442,
+            "auc": 0.918786644141906,
+            "average_precision": 0.9565044585171198,
+            "brier": 0.08454824421444916,
+            "log_loss": 0.30555097062683056,
+            "ece": 0.034524072495284,
+            "calibration_intercept": -0.14855758731997232,
+            "calibration_slope": 1.0286645065479167
+          },
+          "primary_delta": 0.26150145055054697
+        }
+      ],
+      "temporal_blocks": [
+        {
+          "key": "RECOVERY_A",
+          "metrics": {
+            "n": 1715,
+            "positives": 1188,
+            "negatives": 527,
+            "prevalence": 0.6927113702623907,
+            "auc": 0.8875232399900331,
+            "average_precision": 0.9397871791902735,
+            "brier": 0.11190209262033762,
+            "log_loss": 0.3701276277284045,
+            "ece": 0.036660545711563075,
+            "calibration_intercept": 0.06854720875738317,
+            "calibration_slope": 1.0864923492780167
+          },
+          "primary_delta": 0.24740709238453976
+        },
+        {
+          "key": "RECOVERY_B",
+          "metrics": {
+            "n": 1543,
+            "positives": 1069,
+            "negatives": 474,
+            "prevalence": 0.6928062216461439,
+            "auc": 0.9275279945372662,
+            "average_precision": 0.9643135564049635,
+            "brier": 0.09296856333019117,
+            "log_loss": 0.3141048934256129,
+            "ece": 0.03807501671206643,
+            "calibration_intercept": -0.02007313943578554,
+            "calibration_slope": 1.0655878627137483
+          },
+          "primary_delta": 0.30334544910347766
+        }
+      ]
+    },
+    {
+      "target": "retest_hold_given_retest_contact",
+      "outcome": "PASS",
+      "failure_reasons": [],
+      "eligible_n": 899,
+      "censored_n": 13,
+      "censoring_rate": 0.014460511679644048,
+      "runs": 12,
+      "episodes": 212,
+      "metrics": {
+        "n": 886,
+        "positives": 561,
+        "negatives": 325,
+        "prevalence": 0.6331828442437923,
+        "auc": 0.8899328122857535,
+        "average_precision": 0.919134282954525,
+        "brier": 0.11490441497141027,
+        "log_loss": 0.39004489190775093,
+        "ece": 0.07808960571453052,
+        "calibration_intercept": -0.18119223455734848,
+        "calibration_slope": 1.3967754025896275
+      },
+      "development_auc": 0.8816641060111389,
+      "development_log_loss": 0.406890064172368,
+      "development_brier": 0.12209692505598647,
+      "auc_delta": 0.008268706274614623,
+      "log_loss_delta": -0.01684517226461707,
+      "brier_delta": -0.007192510084576206,
+      "bootstrap": {
+        "point_delta": 0.2677205494741019,
+        "lower": 0.22896360104303087,
+        "upper": 0.30752596027809764,
+        "one_sided_p": 0.00009999000099990002
+      },
+      "holm_adjusted_primary_p": 0.00039996000399960006,
+      "reliability": [
+        {
+          "lower": 0.0,
+          "upper": 0.1,
+          "count": 0,
+          "mean_probability": null,
+          "observed_rate": null
+        },
+        {
+          "lower": 0.1,
+          "upper": 0.2,
+          "count": 0,
+          "mean_probability": null,
+          "observed_rate": null
+        },
+        {
+          "lower": 0.2,
+          "upper": 0.3,
+          "count": 256,
+          "mean_probability": 0.24427513502990758,
+          "observed_rate": 0.1171875
+        },
+        {
+          "lower": 0.3,
+          "upper": 0.4,
+          "count": 58,
+          "mean_probability": 0.3407921699911127,
+          "observed_rate": 0.41379310344827586
+        },
+        {
+          "lower": 0.4,
+          "upper": 0.5,
+          "count": 0,
+          "mean_probability": null,
+          "observed_rate": null
+        },
+        {
+          "lower": 0.5,
+          "upper": 0.6,
+          "count": 14,
+          "mean_probability": 0.5805146529260637,
+          "observed_rate": 0.6428571428571429
+        },
+        {
+          "lower": 0.6,
+          "upper": 0.7,
+          "count": 5,
+          "mean_probability": 0.6797128321782612,
+          "observed_rate": 0.8
+        },
+        {
+          "lower": 0.7,
+          "upper": 0.8,
+          "count": 18,
+          "mean_probability": 0.7526510019269993,
+          "observed_rate": 0.6111111111111112
+        },
+        {
+          "lower": 0.8,
+          "upper": 0.9,
+          "count": 535,
+          "mean_probability": 0.8497253210802383,
+          "observed_rate": 0.902803738317757
+        },
+        {
+          "lower": 0.9,
+          "upper": 1.0,
+          "count": 0,
+          "mean_probability": null,
+          "observed_rate": null
+        }
+      ],
+      "instruments": [
+        {
+          "key": "DE40",
+          "metrics": {
+            "n": 148,
+            "positives": 104,
+            "negatives": 44,
+            "prevalence": 0.7027027027027027,
+            "auc": 0.9287587412587412,
+            "average_precision": 0.9722414255638673,
+            "brier": 0.10817147095103824,
+            "log_loss": 0.36650806549487097,
+            "ece": 0.11407949846933367,
+            "calibration_intercept": 0.41903762780484677,
+            "calibration_slope": 1.6378805436253376
+          },
+          "primary_delta": 0.25796967616099253
+        },
+        {
+          "key": "FRA40",
+          "metrics": {
+            "n": 104,
+            "positives": 60,
+            "negatives": 44,
+            "prevalence": 0.5769230769230769,
+            "auc": 0.8674242424242424,
+            "average_precision": 0.8865880562733287,
+            "brier": 0.13804510552202776,
+            "log_loss": 0.44716530916725594,
+            "ece": 0.06658329781009358,
+            "calibration_intercept": -0.5604068803052517,
+            "calibration_slope": 1.340718652890702
+          },
+          "primary_delta": 0.23753859674459268
+        },
+        {
+          "key": "JPN225",
+          "metrics": {
+            "n": 182,
+            "positives": 121,
+            "negatives": 61,
+            "prevalence": 0.6648351648351648,
+            "auc": 0.8374204037393307,
+            "average_precision": 0.8403704458895054,
+            "brier": 0.12773825513257434,
+            "log_loss": 0.42167090614809566,
+            "ece": 0.03676442607318274,
+            "calibration_intercept": -0.15021676878746656,
+            "calibration_slope": 1.1967770636278543
+          },
+          "primary_delta": 0.22093867952816354
+        },
+        {
+          "key": "US30",
+          "metrics": {
+            "n": 143,
+            "positives": 98,
+            "negatives": 45,
+            "prevalence": 0.6853146853146853,
+            "auc": 0.8454648526077098,
+            "average_precision": 0.8598116238451069,
+            "brier": 0.1159718687679693,
+            "log_loss": 0.3953587902332129,
+            "ece": 0.06715316456337342,
+            "calibration_intercept": -0.5998633241415126,
+            "calibration_slope": 1.4430511945372266
+          },
+          "primary_delta": 0.23744473220634774
+        },
+        {
+          "key": "US500",
+          "metrics": {
+            "n": 237,
+            "positives": 136,
+            "negatives": 101,
+            "prevalence": 0.5738396624472574,
+            "auc": 0.912893127548049,
+            "average_precision": 0.9335803768268903,
+            "brier": 0.10026519187233691,
+            "log_loss": 0.3569048884629515,
+            "ece": 0.10732275056946594,
+            "calibration_intercept": 0.0045311424212195976,
+            "calibration_slope": 1.6045982604226092
+          },
+          "primary_delta": 0.32927542688753936
+        },
+        {
+          "key": "USTEC",
+          "metrics": {
+            "n": 72,
+            "positives": 42,
+            "negatives": 30,
+            "prevalence": 0.5833333333333334,
+            "auc": 0.9341269841269841,
+            "average_precision": 0.9164419885845001,
+            "brier": 0.10894517844351098,
+            "log_loss": 0.3745071929945789,
+            "ece": 0.10095059393455594,
+            "calibration_intercept": -0.4812797149070317,
+            "calibration_slope": 1.5994577243772887
+          },
+          "primary_delta": 0.30712733540009163
+        }
+      ],
+      "temporal_blocks": [
+        {
+          "key": "RECOVERY_A",
+          "metrics": {
+            "n": 490,
+            "positives": 327,
+            "negatives": 163,
+            "prevalence": 0.6673469387755102,
+            "auc": 0.8823099003771037,
+            "average_precision": 0.9257712693723917,
+            "brier": 0.108808022711944,
+            "log_loss": 0.37677044682312216,
+            "ece": 0.07553000487903239,
+            "calibration_intercept": -0.42048509505707793,
+            "calibration_slope": 1.4891675021487216
+          },
+          "primary_delta": 0.2646364439892648
+        },
+        {
+          "key": "RECOVERY_B",
+          "metrics": {
+            "n": 396,
+            "positives": 234,
+            "negatives": 162,
+            "prevalence": 0.5909090909090909,
+            "auc": 0.8917774612219057,
+            "average_precision": 0.9041361343971932,
+            "brier": 0.12244793064600124,
+            "log_loss": 0.40647034163368123,
+            "ece": 0.08606301951741216,
+            "calibration_intercept": 0.007205932459572384,
+            "calibration_slope": 1.3734702025166052
+          },
+          "primary_delta": 0.2715367406043229
+        }
+      ]
+    }
+  ],
+  "report_semantic_sha256": "ab199b75dd2788875b74e356d2b3e451a555b599c12b90c74aaec7cbdb95452c"
+}

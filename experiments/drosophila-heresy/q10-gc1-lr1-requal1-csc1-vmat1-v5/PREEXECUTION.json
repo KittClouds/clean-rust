@@ -1,0 +1,10 @@
+{
+  "contract_sha256": "4C54C173088C00C8C4848A7179193EE65B0DC72748DAE488FB47D291C051D32A",
+  "domain_manifest_sha256": "94E8C9968D799DC934268ACBA2608D078230CE68C0E525B8ACE4E1266A0A2E58",
+  "execution_started": false,
+  "identity": "q10-gc1-lr1-requal1-csc1-vmat1-v5",
+  "measured_records": 0,
+  "protocol": "Q10-CSC1-VMAT1",
+  "scientific_promotion": false,
+  "status": "PREEXECUTION_SEALED_NO_REPLAY"
+}

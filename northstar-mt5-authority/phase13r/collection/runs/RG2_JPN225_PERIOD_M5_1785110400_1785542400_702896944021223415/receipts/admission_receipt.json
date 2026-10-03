@@ -1,0 +1,44 @@
+﻿{
+    "contract":  "MST_HOLDOUT_ADMISSION_V1",
+    "status":  "SEALED",
+    "protocol_sha256":  "098844644e31878725ec4bb7859bb5db2f63f937adfc21bea3fb8ea91b287cf6",
+    "canonical_instrument":  "JPN225",
+    "broker_symbol":  "JPN225",
+    "data_source_id":  "METAQUOTES_DEMO",
+    "holdout_id":  "RECOVERY_B",
+    "window_start":  1785110400,
+    "window_end_exclusive":  1785542400,
+    "run_key":  "RG2_JPN225_PERIOD_M5_1785110400_1785542400_702896944021223415",
+    "invocation_id":  "RG2_JPN225_PERIOD_M5_1785110400_1785542400_702896944021223415_I1785110400_8888179950934322122",
+    "auction_stem":  "MasterAuction_JPN225_PERIOD_M5_P13R_JPN225_RECOVERY_B_RG2_v7",
+    "structure_stem":  "MasterStructure_JPN225_PERIOD_M5_P13R_JPN225_RECOVERY_B_v6",
+    "canonical_dataset_hash":  "416e68835592e5122043ae71a12a7eea44a2cab85a2cfa3a421ef58a7cbe19ef",
+    "dataset_hashes":  {
+                           "events":  "a66f365ad6f5e5a386f6f1dc7cf92e278c004706aaf63b9de2f97876424d7740",
+                           "attempts":  "4e47190db9f527c0b02f3c51d23aef040f82aaf22c4ad4ddd4dadffd47d6dfc6",
+                           "episodes":  "5032b039011c7ba517ac50a76d6e1bdc52fd847c0031f7c7339207270b984cf7",
+                           "context":  "283f5e6895b0fd98312e64dde6d2e9f10e94cadbf2480f151c99e27508beb184",
+                           "features":  "ee6e0f576ae004e28ccd3fe8f77c8a2713972e603d9a63d84d1fb07e3ecbf685",
+                           "transits":  "954251e1be69ee49b7055f3d0c01a072806be7c571f1677c47c7a44ecb0b7fc5"
+                       },
+    "row_counts":  {
+                       "events":  2593,
+                       "attempts":  510,
+                       "episodes":  86,
+                       "context":  2943,
+                       "features":  510,
+                       "transits":  45
+                   },
+    "structure_row_counts":  {
+                                 "inputs":  553935,
+                                 "nodes":  66915,
+                                 "events":  561
+                             },
+    "terminal_hash":  "14783300689741293501",
+    "receipt_hash":  "18090954634947897267",
+    "contract_receipt_hash":  "4059870080758538754",
+    "isolation":  "unique_instance_tag_plus_single_writer_lock",
+    "visual_rendering":  false,
+    "research_logging":  true,
+    "unexpected_data_gaps":  0
+}

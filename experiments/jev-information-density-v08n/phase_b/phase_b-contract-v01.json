@@ -1,0 +1,73 @@
+{
+  "protocol": "jev-information-density/v0.8n-road-b-phase-b-v01",
+  "status": "BLOCKED_PREAUTHORIZATION_CONTRACT_INCOMPLETE",
+  "phase_b_authorized": false,
+  "parent_identity": "v0.8N-base-v01",
+  "model": {
+    "repo_id": "LiquidAI/LFM2.5-1.2B-Base",
+    "revision": "7453bca97ca1e67754c4035a4b4c584e1c9dd725",
+    "backbone_frozen": true,
+    "feature_path": "exact-length,single-row,no-padding,final-layer mean_full",
+    "head": "dynamic MLP width 128, 590081 trainable parameters",
+    "optimizer": "AdamW",
+    "learning_rate": 0.002,
+    "weight_decay": 0.01,
+    "batch_size": 256,
+    "epochs": 3,
+    "scheduler": "none",
+    "clipping": "none",
+    "seeds": [20260927, 20260928, 20260929]
+  },
+  "arms": ["B-DUP", "B-MATCHED", "B-SHAM"],
+  "frozen_selection_rule": "radius-only argmin with deterministic hash tie-break; no direction/cosine matching",
+  "heldout_panel": {
+    "identity": "v0.8N-eval-panel-v01",
+    "seal_path": "D:/codex-runs/jev-information-density-v08n/v0.8N-eval-panel-v01/seal/seal-manifest.json",
+    "firewall_locked": true,
+    "phase_b_ready_at_panel_scope": true
+  },
+  "preflight": {
+    "report_path": "D:/codex-runs/jev-information-density-v08n/v0.8N-base-v01/phase-b-preflight/preflight-report.json",
+    "status": "V08N_PHASE_B_PREFLIGHT_BLOCKED_PRIMARY_STREAM_UNRESOLVED",
+    "passed": [
+      "train/eval episode, input, family, and template disjointness",
+      "surface edit and extraction-shape audit",
+      "training and held-out radius/cosine diagnostics",
+      "held-out firewall and no-model-contact checks"
+    ],
+    "blocking_requirements": [
+      "materialized immutable common primary occurrence manifest with row/group IDs and hash",
+      "resolved primary-to-auxiliary event ordering and batch schedule in this contract",
+      "materialized candidate/head-input feature manifest for every training occurrence"
+    ]
+  },
+  "analysis_lock": {
+    "primary_estimand": "paired SHAM minus MATCHED neighborhood-level locality difference",
+    "secondary_estimand": "paired MATCHED minus DUP locality difference",
+    "sensitivity_guard": "fact-flip performance and strict transition reported separately; no locality claim without predeclared sensitivity review",
+    "effect_modifiers": [
+      "per-anchor radius error",
+      "cosine sham-neutral",
+      "cosine sham-fact",
+      "cosine matched-neutral-fact",
+      "surface/edit diagnostics",
+      "family"
+    ],
+    "effect_modifier_role": "diagnostic only; cannot replace candidates, alter selection, or change gates",
+    "inference": "paired neighborhood differences with seed-level reporting and family-stratified results",
+    "checkpoint_rule": "fixed terminal epoch and all epoch checkpoints retained; no outcome-based epoch selection",
+    "evaluation_unlock": "only after all terminal checkpoints and training telemetry are sealed"
+  },
+  "forbidden_until_reauthorization": [
+    "head training",
+    "evaluation inference",
+    "NewTight access",
+    "protected evaluation body access",
+    "Phoenix access",
+    "LoRA or QLoRA",
+    "hyperparameter or lambda search",
+    "candidate replacement after geometry inspection",
+    "radius-gate relaxation",
+    "primary-bank inference or reconstruction"
+  ]
+}

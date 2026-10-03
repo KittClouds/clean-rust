@@ -1,0 +1,48 @@
+{
+  "coverage_status_counts": {
+    "PARTIAL_FEASIBILITY_FOUND": 1
+  },
+  "declared_subset": {
+    "endpoint_keys": [
+      [
+        "seed9731-L-tau16.json",
+        0
+      ]
+    ],
+    "endpoint_limit": 1,
+    "group_keys": [
+      [
+        "seed9731-L-tau16.json",
+        0,
+        0
+      ]
+    ],
+    "group_limit_per_endpoint": 1
+  },
+  "firewall": {
+    "behavioral_inference": false,
+    "canonical_repair_applied": false,
+    "dh08b_authorized": false,
+    "scientific_seed_bundles": 0,
+    "sealed_predecessor_writes": false
+  },
+  "parent_hashes": {
+    "da2_results_sha256": "A76139A924D0D24EE5376378DBCDB12AAE539CE33182DE1050C741DC0475BB23",
+    "rmt_contract_sha256": "FFD057E2D2FB86CB8BBBE0F78EA66C10DF752ABB369448549430EDBF4595CC6E",
+    "rmt_plan_sha256": "41DB8A90568A1BDA22DA1E7A3D8288967E24037FDCAD5C8B2518ED53D28511C5",
+    "rmt_preexecution_sha256": "F1A102DB83448EF6B1D9903329CCF38E34E730014BF3D37B10904036C9B61982",
+    "rmt_result_sha256": "938DC5384E8F64A3E2EB453256CADB188B4A35278330C758E175104FEE6989CD",
+    "rmt_status_sha256": "66EBF48C7AEEB2BBE414F6176E28291A4AAE83CE792876C3873D6AB734E62FFD"
+  },
+  "parent_protocol": "Q10-RMT",
+  "protocol": "Q10-PF5",
+  "receipt_root": "qualification/sample-9731-9732",
+  "reconstructed_primary_endpoints": 28,
+  "status": "Q10_PF5_ENGINEERING_SLICE_COMPLETE",
+  "topology": {
+    "helpful_components": 2738,
+    "mismatch_rows": 7003,
+    "raw_support_groups_selected": 1,
+    "serialized_moves": 168071
+  }
+}

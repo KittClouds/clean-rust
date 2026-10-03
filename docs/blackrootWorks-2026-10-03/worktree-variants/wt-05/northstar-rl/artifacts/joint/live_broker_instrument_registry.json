@@ -1,0 +1,144 @@
+{
+  "schema_version": "BROKER_INSTRUMENT_REGISTRY_V1",
+  "instruments": [
+    {
+      "broker": "TRADELOCKER",
+      "venue": "HEROFX",
+      "broker_instrument_id": "3884",
+      "broker_symbol": "NAS100",
+      "northstar_instrument_id": 1,
+      "asset_class": "BROKER_DECLARED_OR_UNRESOLVED",
+      "quote_currency": "UNRESOLVED",
+      "price_precision": 2,
+      "tick_size": 0.01,
+      "quantity_precision": 2,
+      "quantity_step": 0.01,
+      "min_quantity": 0.01,
+      "max_quantity": 500.0,
+      "contract_size": 1.0,
+      "trading_status": "OBSERVED_AVAILABLE",
+      "raw_metadata": {
+        "payload_hash": "ede53d9363ea9881f657a7647a3b096e2e6e123a72fb93a99963f5acadaae371",
+        "retention": "HASH_ONLY",
+        "retained_relative_path": null
+      },
+      "observed_at_ns": 1786749000219867200
+    },
+    {
+      "broker": "TRADELOCKER",
+      "venue": "HEROFX",
+      "broker_instrument_id": "3888",
+      "broker_symbol": "SPX500",
+      "northstar_instrument_id": 2,
+      "asset_class": "BROKER_DECLARED_OR_UNRESOLVED",
+      "quote_currency": "UNRESOLVED",
+      "price_precision": 2,
+      "tick_size": 0.01,
+      "quantity_precision": 2,
+      "quantity_step": 0.01,
+      "min_quantity": 0.01,
+      "max_quantity": 500.0,
+      "contract_size": 1.0,
+      "trading_status": "OBSERVED_AVAILABLE",
+      "raw_metadata": {
+        "payload_hash": "8f9b01dcb353d930229f7c18bbdd21f736d16972f6cc1a0b78700690e32f06c0",
+        "retention": "HASH_ONLY",
+        "retained_relative_path": null
+      },
+      "observed_at_ns": 1786749000219867200
+    },
+    {
+      "broker": "TRADELOCKER",
+      "venue": "HEROFX",
+      "broker_instrument_id": "3883",
+      "broker_symbol": "US30",
+      "northstar_instrument_id": 3,
+      "asset_class": "BROKER_DECLARED_OR_UNRESOLVED",
+      "quote_currency": "UNRESOLVED",
+      "price_precision": 2,
+      "tick_size": 0.01,
+      "quantity_precision": 2,
+      "quantity_step": 0.01,
+      "min_quantity": 0.01,
+      "max_quantity": 500.0,
+      "contract_size": 1.0,
+      "trading_status": "OBSERVED_AVAILABLE",
+      "raw_metadata": {
+        "payload_hash": "682dbbf26501bcf865b8d8bde5c08c181f92b8264fc111017b5947662b974193",
+        "retention": "HASH_ONLY",
+        "retained_relative_path": null
+      },
+      "observed_at_ns": 1786749000219867200
+    },
+    {
+      "broker": "TRADELOCKER",
+      "venue": "HEROFX",
+      "broker_instrument_id": "3890",
+      "broker_symbol": "DE40",
+      "northstar_instrument_id": 4,
+      "asset_class": "BROKER_DECLARED_OR_UNRESOLVED",
+      "quote_currency": "UNRESOLVED",
+      "price_precision": 2,
+      "tick_size": 0.01,
+      "quantity_precision": 2,
+      "quantity_step": 0.01,
+      "min_quantity": 0.01,
+      "max_quantity": 500.0,
+      "contract_size": 1.0,
+      "trading_status": "OBSERVED_AVAILABLE",
+      "raw_metadata": {
+        "payload_hash": "419ff957d878c8beab5221e070daf8e272b4041d9a6471bf22ba71343afa6ad0",
+        "retention": "HASH_ONLY",
+        "retained_relative_path": null
+      },
+      "observed_at_ns": 1786749000219867200
+    },
+    {
+      "broker": "TRADELOCKER",
+      "venue": "HEROFX",
+      "broker_instrument_id": "3889",
+      "broker_symbol": "UK100",
+      "northstar_instrument_id": 5,
+      "asset_class": "BROKER_DECLARED_OR_UNRESOLVED",
+      "quote_currency": "UNRESOLVED",
+      "price_precision": 2,
+      "tick_size": 0.01,
+      "quantity_precision": 2,
+      "quantity_step": 0.01,
+      "min_quantity": 0.01,
+      "max_quantity": 500.0,
+      "contract_size": 1.0,
+      "trading_status": "OBSERVED_AVAILABLE",
+      "raw_metadata": {
+        "payload_hash": "2983a6f81e70be2cc57a5b3c7076c7af839a1bd9542659e3904e1fc52dd4a84b",
+        "retention": "HASH_ONLY",
+        "retained_relative_path": null
+      },
+      "observed_at_ns": 1786749000219867200
+    },
+    {
+      "broker": "TRADELOCKER",
+      "venue": "HEROFX",
+      "broker_instrument_id": "3887",
+      "broker_symbol": "JP225",
+      "northstar_instrument_id": 6,
+      "asset_class": "BROKER_DECLARED_OR_UNRESOLVED",
+      "quote_currency": "UNRESOLVED",
+      "price_precision": 2,
+      "tick_size": 0.01,
+      "quantity_precision": 2,
+      "quantity_step": 0.01,
+      "min_quantity": 0.01,
+      "max_quantity": 500.0,
+      "contract_size": 1.0,
+      "trading_status": "OBSERVED_AVAILABLE",
+      "raw_metadata": {
+        "payload_hash": "acba74cdc0057f392a0ed835a949a3bab35acea945dfb5b5c738bc09be14f08e",
+        "retention": "HASH_ONLY",
+        "retained_relative_path": null
+      },
+      "observed_at_ns": 1786749000219867200
+    }
+  ],
+  "content_hash": "55475189d380a961989ee3ae68840039a5672b103ef92d306ec6c330a2ee5fd6"
+}

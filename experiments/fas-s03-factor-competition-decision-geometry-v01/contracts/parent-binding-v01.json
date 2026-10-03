@@ -1,0 +1,15 @@
+{
+  "binding_id": "FAS_S03_PARENT_BINDING_V01",
+  "source_result_root_sha256": "1585488434830939e11cdf67dd9ff336ef133ab596a87c011394fb8d42db143d",
+  "source_result_seal_path": "D:/codex-runs/fas-s02-original-corpus-readout-surface-attribution-v01/s02-2-readout-attribution-v01/correction-v05/seals/result-tree-seal-v01.json",
+  "source_final_position_phase_root_sha256": "baed3504533499880873db8f8bf16e37a0164844e657f9bda1397daaa0b4944b",
+  "source_final_position_phase_seal_path": "D:/codex-runs/fas-s02-original-corpus-readout-surface-attribution-v01/s02-1-final-position-v02/seals/s02-1-seal-v01.json",
+  "source_final_position_cache_root_sha256": "ce7604bcd82b1b13ff4828b71dddf835e0c7f9d924ec1b886af5ad78c415ac11",
+  "source_final_position_cache_seal_path": "D:/codex-runs/fas-s02-original-corpus-readout-surface-attribution-v01/s02-1-final-position-v02/feature-cache-v01/feature-cache-seal-v01.json",
+  "source_phase2a_cache_root_sha256": "9af2c6c73a2f21608e8a2dc912d8838968eaebffb32b4b1ea0a18364e488d217",
+  "source_phase2a_cache_seal_path": "D:/codex-runs/fas-frozen-adaptive-substrate-v00/phase2a-v01/phase2a-v01-cache-seal.json",
+  "phase1_corpus_sha256": "9fdd7ce9e49b86ac9acb3da035429c616865f527123bd0ac7c312b1b912439ca",
+  "mean_full_probe_sha256": "be7c4fa016f1ad5887a8bf087a395a6ca02377d706be291a5ad1b6fbcc9cabbb",
+  "final_position_probe_sha256": "928e8aca604efb5c09c733ed23e94228ea24336cb417ff190103638d269871cc",
+  "probe_core_source_sha256": "ff948c4c94acfd7e520292a26b9bf6bc43c13423be8c9fa4013d1359ef065cd3"
+}

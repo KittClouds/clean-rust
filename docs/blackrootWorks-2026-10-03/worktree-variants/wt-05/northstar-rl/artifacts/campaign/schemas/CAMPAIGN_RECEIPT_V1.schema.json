@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CampaignReceipt",
+  "type": "object",
+  "properties": {
+    "campaign_id": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "learner_execution": {
+      "type": "string"
+    },
+    "receipt_id": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "run_receipt_ids": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Digest256"
+      }
+    },
+    "schema_version": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "campaign_id",
+    "run_receipt_ids",
+    "learner_execution",
+    "receipt_id"
+  ],
+  "$defs": {
+    "Digest256": {
+      "description": "Domain-separated BLAKE3 digest",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

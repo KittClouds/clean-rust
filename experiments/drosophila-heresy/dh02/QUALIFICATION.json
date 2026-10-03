@@ -1,0 +1,10 @@
+{
+  "stage":"before_first_DH02_scientific_execution",
+  "rust_tests_passed":22,
+  "rust_tests_log_location":"Codex task command output before seal; includes compatibility with the byte-identical archived DH01 simulator",
+  "clippy_release_all_targets_warnings_as_errors":"passed",
+  "required_additional_logs":["qualification/benchmark.log","qualification/build.log","qualification/analysis-tests.log"],
+  "target":"D:/drosophila-heresy/dh02-target",
+  "junction":"C:/code land/clean-rust/experiments/drosophila-heresy/dh02/target",
+  "validation_scope":"synthetic engineering and analysis tests only; no DH02 anatomy-task outcome selection"
+}

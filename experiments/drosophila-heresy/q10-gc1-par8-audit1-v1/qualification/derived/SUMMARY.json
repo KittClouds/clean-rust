@@ -1,0 +1,21 @@
+{
+  "counts": {
+    "best_search_geometry_rejected_count": 8,
+    "endpoint_set_count": 14,
+    "reconstructed_valid_count": 14
+  },
+  "engineering_only": true,
+  "gate": {
+    "all_final_geometry_valid": true,
+    "behavioral_probe": false,
+    "independent_reconstruction_complete": true,
+    "receipt_semantics_complete": true,
+    "scientific_promotion": false,
+    "search_executed": false
+  },
+  "identity": "q10-gc1-par8-audit1-v1",
+  "interpretation": "All PAR8 best_valid global mappings were independently reconstructed from the sealed palette and runtime. Lower-mismatch best_search states were retained only as rejected diagnostics when they failed final geometry. No new search or behavioral probe was run.",
+  "protocol": "Q10-GC1-PAR8-AUDIT1",
+  "scientific_promotion": false,
+  "status": "PAR8_RECEIPT_RECONSTRUCTION_COMPLETE"
+}

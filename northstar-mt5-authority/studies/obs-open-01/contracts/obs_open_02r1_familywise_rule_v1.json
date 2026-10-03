@@ -1,0 +1,149 @@
+{
+  "schema": "OBS_OPEN_DISCOVERY_FAMILYWISE_RULE_CONTRACT_V1",
+  "study_id": "OBS-OPEN-01",
+  "gate": "OBS-OPEN-02R1",
+  "parent_universe_root_sha256": "6b0ca197a394b085707d03dfe06f1569eb0fafbddb2d583817e88647df6f6235",
+  "parent_protocol_root_sha256": "141344869c5e6aba6bc7346594872efdc196cb246c834f8d510a0aad90831bb5",
+  "parent_commit": "1b0f00f24bcc253f741d26e4472b40fc6bab3f9d",
+  "substantive_status": "FROZEN_UNOPENED",
+  "confirmation_status": "FROZEN_UNOPENED",
+  "unchanged_semantics": [
+    "OBS_OPEN_01_SOURCE_AUTHORITY",
+    "OBS_OPEN_01_SESSION_UNIVERSE",
+    "OBS_OPEN_01_DISCOVERY_CONFIRMATION_PARTITION",
+    "OBS_OPEN_02_RANGE_FAMILY_R01_R30",
+    "OBS_OPEN_02_MEASUREMENT_VIEWS",
+    "OBS_OPEN_02_SESSION_DEPENDENCE",
+    "OBS_OPEN_02_BOOTSTRAP_RESAMPLES_2000",
+    "OBS_OPEN_02_BOOTSTRAP_SEED_20260814",
+    "OBS_OPEN_02_TEMPORAL_ROBUSTNESS_VIEWS",
+    "OBS_OPEN_02_CONFIRMATION_FIREWALL"
+  ],
+  "formal_estimand_templates": [
+    {
+      "template_id": "WIDTH_DELTA_ADJACENT",
+      "measurement_view": "geometry_raw",
+      "measurement_definition": "session_width(k+1)-session_width(k)",
+      "range_domain": "k=1..29 adjacent pairs",
+      "functional": "mean_of_session_level_contrasts",
+      "natural_null": "theta=0",
+      "directionality": "two_sided",
+      "candidate_class": "SCALE_DEPENDENT_STRUCTURE"
+    },
+    {
+      "template_id": "FIRST_OUTSIDE_SIDE_BALANCE",
+      "measurement_view": "interaction_sequence",
+      "measurement_definition": "session_first_outside_side in {-1,+1}",
+      "range_domain": "k=1..30",
+      "functional": "mean_signed_side",
+      "natural_null": "theta=0_symmetry",
+      "directionality": "two_sided",
+      "candidate_class": "RECURRING_STRUCTURE"
+    },
+    {
+      "template_id": "LOCATION_BALANCE",
+      "measurement_view": "interaction_sequence",
+      "measurement_definition": "(above_candle_count-below_candle_count)/eligible_candle_count per session",
+      "range_domain": "k=1..30",
+      "functional": "mean_of_session_level_contrasts",
+      "natural_null": "theta=0_symmetry",
+      "directionality": "two_sided",
+      "candidate_class": "RECURRING_STRUCTURE"
+    },
+    {
+      "template_id": "SIGNED_PATH_DISPLACEMENT",
+      "measurement_view": "continuous_path",
+      "measurement_definition": "last_observed_close-first_observed_close per session",
+      "range_domain": "k=1..30",
+      "functional": "mean_of_session_level_displacements",
+      "natural_null": "theta=0",
+      "directionality": "two_sided",
+      "candidate_class": "RECURRING_STRUCTURE"
+    }
+  ],
+  "formal_family": {
+    "family_id": "OBSOPEN02R1_ALL_FORMAL_ESTIMANDS",
+    "expanded_test_count": 119,
+    "expansion": "29 WIDTH_DELTA_ADJACENT + 30 FIRST_OUTSIDE_SIDE_BALANCE + 30 LOCATION_BALANCE + 30 SIGNED_PATH_DISPLACEMENT",
+    "procedure": "HOLM_BONFERRONI",
+    "alpha": 0.05,
+    "sidedness": "TWO_SIDED",
+    "dependence_safe": true,
+    "temporal_views_are_not_new_families": true
+  },
+  "bootstrap": {
+    "unit": "SESSION",
+    "resamples": 2000,
+    "seed": 20260814,
+    "interval": "PERCENTILE_95",
+    "null_test_quantity": "TWO_SIDED_BOOTSTRAP_TAIL_P_WITH_PLUS_ONE_CORRECTION",
+    "candidate_decision_uses": ["point_estimate", "bootstrap_interval", "raw_p", "holm_adjusted_decision"]
+  },
+  "support": {
+    "discovery_population": 257,
+    "minimum_eligible_sessions": 129,
+    "minimum_supported_calendar_months": 4,
+    "minimum_sessions_per_supported_month": 10,
+    "minimum_supported_offset_regimes": 2,
+    "minimum_sessions_per_offset_regime": 20,
+    "conditional_minimum_eligible_sessions": 30,
+    "support_is_predata": true,
+    "censoring_is_not_negative_outcome": true
+  },
+  "near_null": {
+    "equivalence_region": "NONE_PREDECLARED_FOR_R1",
+    "classification": "NEAR_NULL_NOT_EVALUABLE",
+    "failure_to_reject_is_not_supported_null": true
+  },
+  "temporal_stability": {
+    "supported_views": ["CALENDAR_MONTH", "SERVER_OFFSET_REGIME", "LEAVE_ONE_SUPPORTED_MONTH_OUT", "CHRONOLOGICAL_BLOCK"],
+    "minimum_slice_support": "INHERITED_SUPPORT_FLOORS",
+    "temporally_supported": "aggregate_formal_decision_and_all_supported_month_regime_leave_one_out_and_chronological_block_effects_have_nonzero_same_sign",
+    "temporally_unstable": "aggregate_formal_decision_and_two_supported_slices_across_any_predeclared_view_have_opposite_nonzero_signs",
+    "temporal_support_insufficient": "one_or_more_required_month_regime_leave_one_out_or_chronological_block_slices_fail_support_floor",
+    "sensitivity_views_are_not_new_families": true,
+    "slice_significance_not_required": true
+  },
+  "candidate_classes": {
+    "RECURRING_STRUCTURE": "formal_estimand_eligible AND support_pass AND holm_pass AND temporal_supported",
+    "SCALE_DEPENDENT_STRUCTURE": "WIDTH_DELTA_ADJACENT formal_estimand_eligible AND support_pass AND holm_pass",
+    "SCALE_STABLE_STRUCTURE": "DISABLED_R1_NO_PREDECLARED_REGION_ESTIMAND",
+    "TEMPORALLY_UNSTABLE_STRUCTURE": "formal_estimand_eligible AND support_pass AND holm_pass AND temporal_unstable",
+    "REPRESENTATION_SENSITIVE_STRUCTURE": "DESCRIPTIVE_ONLY_R1_NO_CROSS_VIEW_NATURAL_NULL",
+    "CONDITIONAL_STRUCTURE": "DESCRIPTIVE_ONLY_R1_NO_PREDECLARED_CONDITIONAL_ESTIMAND",
+    "SUPPORTED_NULL_OR_NEAR_NULL": "DISABLED_R1_NO_PREDECLARED_EQUIVALENCE_REGION",
+    "INSUFFICIENT_SUPPORT": "support_fail",
+    "NOT_EVALUABLE": "availability_or_geometry_fail"
+  },
+  "precedence": ["NOT_EVALUABLE", "INSUFFICIENT_SUPPORT", "DESCRIPTIVE_ONLY", "TEMPORALLY_UNSTABLE_STRUCTURE", "SCALE_DEPENDENT_STRUCTURE", "RECURRING_STRUCTURE"],
+  "rejection_codes": [
+    "DESCRIPTIVE_ONLY_NO_FORMAL_NULL",
+    "INSUFFICIENT_ELIGIBLE_SUPPORT",
+    "INSUFFICIENT_TEMPORAL_SUPPORT",
+    "FAILS_UNADJUSTED_EVIDENCE",
+    "FAILS_FAMILYWISE_CORRECTION",
+    "TEMPORALLY_UNSTABLE",
+    "REPRESENTATION_CONFLICT",
+    "NEAR_NULL_NOT_EVALUABLE",
+    "NOT_EVALUABLE",
+    "CENSORED_OR_UNAVAILABLE",
+    "NO_PREDECLARED_REGION_RULE",
+    "NO_PREDECLARED_CONDITIONAL_RULE"
+  ],
+  "promotion": {
+    "formal_eligible": true,
+    "support_pass": true,
+    "familywise_pass": true,
+    "temporal_result": "SUPPORTED_OR_EXPLICITLY_UNSTABLE",
+    "future_confirmation_estimand_complete": true,
+    "discretionary_override": false
+  },
+  "repair_accounting": {
+    "previous_protocol_preserved": true,
+    "reason": "named_familywise_rule_had_no_executable_semantics",
+    "discovery_observations_read_during_abort": false,
+    "confirmation_observations_read_during_abort": false
+  },
+  "economic_authority": false,
+  "trading_authority": false
+}

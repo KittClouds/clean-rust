@@ -1,0 +1,1 @@
+{"complete_session_rule":"all 30 range anchors have valid snapshot and observed-complete 60-minute target","failure":"INSUFFICIENT_FORMAL_SUPPORT","no_recalibration":true,"no_refit":true,"one_shot":true,"schema":"D_B_EVALUATION_CONTRACT_V1","sessions_declared":103,"support_floor":{"complete_sessions":80,"plus120":20,"plus180":20}}

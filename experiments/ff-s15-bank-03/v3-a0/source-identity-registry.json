@@ -1,0 +1,150 @@
+{
+  "schema": "ff-s15-bank3-source-identity-v1",
+  "status": "ACTIVE_NON_CORPUS",
+  "version": "0.1",
+  "date": "2026-09-30",
+  "purpose": "corrected identity and provenance for every candidate, from the O1 primary-source sweep. Replaces the guessed pointers in earlier program notes.",
+
+  "corrections_applied": [
+    {"dataset": "EntailmentBank", "was": "github.com/akariasai/EntailmentBank", "now": "github.com/allenai/entailment_bank", "evidence": "the akariasai path returns 404; allenai/entailment_bank is the official code repo (Apache-2.0, code only)", "data_location": "allenai.org/data/entailmentbank, which renders a bare Google Drive folder listing with no license text", "warning": "a third-party HF mirror tagged cc-by-4.0 is an unaffiliated user's tag and must not be cited as an AI2 grant"},
+    {"dataset": "TRIP", "was": "github.com/microsoft/LogicalReasoning", "now": "github.com/sled-group/Verifiable-Coherent-NLU", "evidence": "the microsoft path returns 404 and GitHub search of user:microsoft finds nothing; TRIP is from the University of Michigan SLED group (Shane Storks, Qiaozi Gao, Yichi Zhang, Joyce Chai)", "venue": "Findings of EMNLP 2021, aclanthology.org/2021.findings-emnlp.422, pp. 4902-4918", "warning": "official repo reports license: null with no LICENSE file; official HF mirror has an EMPTY license array"},
+    {"dataset": "WIQA", "was": "github.com/allenai/wiqa", "now": "github.com/allenai/wiqa-dataset", "evidence": "the allenai/wiqa path returns 404; allenai/wiqa-dataset exists and is the CODE repo (Apache-2.0)", "data_license": "NONE FOUND on any AI2 surface; HF card Licensing Information reads 'More Information Needed'"}
+  ],
+
+  "identities": [
+    {
+      "canonical_dataset_name": "VitaminC",
+      "publisher_identity": "Tals Schuster et al. (Saarland University / MPI-INF); hosted on the AllenAI HuggingFace org mirror tals/vitaminc",
+      "canonical_source": "https://huggingface.co/datasets/tals/vitaminc",
+      "venue": "NAACL 2021, aclanthology.org/2021.naacl-main.52",
+      "code_repo": "https://github.com/TalSchuster/VitaminC (MIT, CODE ONLY)",
+      "data_license_string": "cc-by-sa-3.0 (HF tag and card header)",
+      "hosting_location": "HuggingFace, gated download",
+      "version_or_revision": "UNPINNED - must be pinned at ingest",
+      "our_content_hash": null,
+      "hygiene_flags": ["data license and code license are two different instruments; MIT does not govern the data", "ShareAlike obligation attaches"]
+    },
+    {
+      "canonical_dataset_name": "ContractNLI",
+      "publisher_identity": "Stanford NLP; Hitachi America Ltd. terms click-through above the download",
+      "canonical_source": "https://stanfordnlp.github.io/contract-nli/",
+      "venue": "Findings of EMNLP 2021, aclanthology.org/2021.findings-emnlp.164",
+      "third_party_mirror": {"url": "https://huggingface.co/datasets/kiddothe2b/contract-nli", "tag_claim": "cc-by-nc-sa-4.0", "status": "CONFLICTS with the primary CC BY 4.0; unaffiliated; record separately, do not adopt"},
+      "data_license_string": "CC BY 4.0 per the official project page, no non-commercial clause",
+      "hosting_location": "official site, click-through gated",
+      "version_or_revision": "UNPINNED",
+      "our_content_hash": null,
+      "hygiene_flags": ["NC conflict with the dominant mirror unresolved", "607 underlying NDAs are third-party commercial contracts", "long-document evidence spans may be truncated by the gate"]
+    },
+    {
+      "canonical_dataset_name": "MuSiQue",
+      "publisher_identity": "Stony Brook NLP; canonical repository StonyBrookNLP/musique",
+      "canonical_source": "https://github.com/StonyBrookNLP/musique",
+      "venue": "TACL 2022, aclanthology.org/2022.tacl-1.31",
+      "third_party_mirror": {"url": "https://huggingface.co/datasets/dgslibisey/MuSiQue", "status": "NO dataset card and NO license tag; not authoritative; do not use"},
+      "data_license_string": "CC BY 4.0, stated verbatim in the official README under a '# Data' heading",
+      "hosting_location": "GitHub repository",
+      "version_or_revision": "UNPINNED",
+      "our_content_hash": null,
+      "hygiene_flags": ["upstream seed datasets (SQuAD, T-REx, Natural Questions, MLQA, Zero Shot RE) carry their own licenses that MuSiQue's CC BY 4.0 does not override", "README mandates avoiding single-hop ids in data/dev_test_singlehop_questions_v1.0.json when training on seed sets"]
+    },
+    {
+      "canonical_dataset_name": "HotpotQA",
+      "publisher_identity": "HotpotQA authors; official HuggingFace org hotpotqa",
+      "canonical_source": "https://huggingface.co/datasets/hotpotqa/hotpot_qa",
+      "venue": "EMNLP 2018, aclanthology.org/D18-1259",
+      "data_license_string": "CC BY-SA 4.0, stated in the card and as an HF tag",
+      "hosting_location": "HuggingFace, whole-file download gated by accepting HF terms",
+      "version_or_revision": "UNPINNED",
+      "our_content_hash": null,
+      "hygiene_flags": ["ShareAlike: any v3 bundle containing HotpotQA content must propagate CC BY-SA 4.0", "context is verbatim Wikipedia sentences, dual-licensed CC BY-SA 3.0/4.0 upstream"]
+    },
+    {
+      "canonical_dataset_name": "WIQA",
+      "publisher_identity": "Allen Institute for AI",
+      "canonical_source": "https://huggingface.co/datasets/allenai/wiqa",
+      "venue": "EMNLP 2019, arXiv:1909.04739",
+      "code_repo": "https://github.com/allenai/wiqa-dataset (Apache-2.0, CODE ONLY)",
+      "data_license_string": "NONE FOUND",
+      "hosting_location": "HuggingFace",
+      "version_or_revision": "UNPINNED",
+      "our_content_hash": null,
+      "hygiene_flags": ["NO DATA LICENSE - blocking", "the HF dataset viewer is disabled because the repo requires arbitrary Python code execution; this is a supply-chain risk independent of licensing", "39,705 questions across train/validation/test"]
+    },
+    {
+      "canonical_dataset_name": "RuleTaker",
+      "publisher_identity": "Allen Institute for AI",
+      "canonical_source": "https://github.com/allenai/ruletaker",
+      "data_location": "rule-reasoning-dataset-V2020.2.5.zip on S3, linked from the README",
+      "data_license_string": "Apache License 2.0 in the repo, with the copyright line UNFILLED ('Copyright [yyyy] [name of copyright owner]'); applies to CODE, which includes the PCFG theory generator. No separate data-license statement.",
+      "version_or_revision": "repo master; dataset V2020.2.5",
+      "our_content_hash": null,
+      "hygiene_flags": ["unfilled copyright line weakens the grant", "data ZIP license unstated", "the generator is synthetic by construction and is the single affirmatively-cleared asset in the whole set", "per-item ids look like AttNoneg-D3-319"],
+      "v3_role": "ADMISSIBLE AS CODE ONLY. Run the generator, produce our own theories, inherit no ontology and no external rows."
+    },
+    {
+      "canonical_dataset_name": "ALFWorld",
+      "publisher_identity": "Mohit Shridhar et al. (Purdue / AI2); derived from ALFRED (CVPR 2020) and AI2-THOR",
+      "canonical_source": "https://github.com/alfworld/alfworld",
+      "data_license_string": "MIT for ALFWorld and TextWorld; GNU GPL v3.0 for bundled Fast Downward",
+      "version_or_revision": "repo master",
+      "our_content_hash": null,
+      "hygiene_flags": ["NO DATA LICENSE - blocking", "multi-component with incompatible terms; Fast Downward's GPL v3.0 is strong reciprocal copyleft", "the repo ships no data files; alfworld-download fetches PDDL and game files into a cache through a separate channel whose terms were not retrieved"]
+    },
+    {
+      "canonical_dataset_name": "ScienceWorld",
+      "publisher_identity": "Cognitive AI Lab and Allen Institute for Artificial Intelligence",
+      "canonical_source": "https://github.com/allenai/ScienceWorld",
+      "venue": "EMNLP 2022, aclanthology.org/2022.emnlp-main.775",
+      "data_license_string": "Apache License 2.0, copyright line FILLED IN ('Copyright 2022 Cognitive AI Lab and Allen Institute for Artificial Intelligence')",
+      "version_or_revision": "repo main",
+      "our_content_hash": null,
+      "hygiene_flags": ["cleanest single-instrument license in the set", "it is a simulator environment with 30 tasks and variations, not a text corpus, so root yield semantics differ from QA sources", "attribution and NOTICE obligations under Apache-2.0 section 4 apply"]
+    },
+    {
+      "canonical_dataset_name": "EntailmentBank",
+      "publisher_identity": "Allen Institute for AI (Sentiroz Benzvi, Jonathan Rowny, Iz Beltagy)",
+      "canonical_source": "https://github.com/allenai/entailment_bank",
+      "data_location": "https://allenai.org/data/entailmentbank - renders only a Google Drive folder listing",
+      "data_license_string": "NONE FOUND FOR THE DATA",
+      "version_or_revision": "v1_Apr15_2021, v2_May13_2021, v3_May6_2022 available",
+      "our_content_hash": null,
+      "hygiene_flags": ["NO DATA LICENSE - blocking", "sentences derive from SQuAD-derived and StrategyQA material; upstream licenses unreconciled", "annotation tool at cognitiveailab/entailmentbank-tree-annotation-tool", "a third-party MD5 exists for the v3 ZIP but was published by a third party, not AI2"]
+    },
+    {
+      "canonical_dataset_name": "TRIP",
+      "publisher_identity": "University of Michigan, SELD group (Storks, Gao, Zhang, Chai)",
+      "canonical_source": "https://github.com/sled-group/Verifiable-Coherent-NLU",
+      "official_mirror": "https://huggingface.co/datasets/sled-umich/TRIP (license array EMPTY)",
+      "data_license_string": "NONE - repo license is null, no LICENSE file, HF license array is empty",
+      "our_content_hash": null,
+      "hygiene_flags": ["NO LICENSE OF ANY KIND - blocking", "weakest provenance in the set", "data is crowdsourced worker narratives; worker_ids present per row", "structurally a strong fit for v2's CONTRADICTION and the P6 intervention, which makes the licensing gap more costly, not less"]
+    },
+    {
+      "canonical_dataset_name": "FEVER",
+      "publisher_identity": "Sheffield NLP / FEVER workshop",
+      "canonical_source": "https://huggingface.co/datasets/fever/fever",
+      "venue": "NAACL 2018, aclanthology.org/N18-1074",
+      "data_license_string": "CC BY-SA 3.0 by default, but defined by reference to 'the applicable Wikipedia article pages', so per-article terms may differ",
+      "our_content_hash": null,
+      "hygiene_flags": ["per-article license caveat: some Wikipedia articles carry terms other than CC BY-SA 3.0", "SCIENTIFICALLY DEMOTED regardless of license: follow-up work (aclanthology.org/D19-1341) found strong claim-only cues that let models predict labels without using evidence, which is exactly the accidental-cue failure V2-0 screens for", "sheffieldnlp/fever-scorer Apache-2.0 is the scorer code, not the data"]
+    },
+    {
+      "canonical_dataset_name": "ProofWriter",
+      "publisher_identity": "Allen Institute for AI (AI2) per the paper; dataset release provenance unconfirmed",
+      "canonical_source": "https://allenai.org/data/proofwriter (FETCH FAILED at verification time: response exceeded the fetcher size limit)",
+      "data_license_string": "NONE VERIFIED - the release ships no LICENSE file",
+      "our_content_hash": null,
+      "hygiene_flags": ["Apache-2.0 inheritance from RuleTaker is plausible but UNCONFIRMED by AI2", "the only provenance claim found is an explicitly unaffiliated third party whose own card concedes the release ships no LICENSE file", "the paper states 'We reuse (and add to) the RuleTaker datasets', which establishes lineage, not license", "a third-party MD5 (bf490364bca241bb5ff9f0ab0c78b71a) exists for the ZIP but is not an AI2 publication"],
+      "resolution_path": "already resolved in principle: use the RuleTaker generator and write bank-owned ProofWriter-like extensions"
+    }
+  ],
+
+  "universal_hygiene_finding": {
+    "id": "F1-materialised",
+    "finding": "no candidate source publishes a per-item or per-file content hash",
+    "consequence": "every source entering A0 requires us to compute and pin sha256 at the file and item level during ingest. This is now a normal, budgeted cost of the pipeline rather than an edge case."
+  },
+
+  "provenance_rule": "a third-party mirror's license tag is an unaffiliated claim. It is recorded as a claim, never adopted as a grant, and never used to resolve a conflict in the bank's favour."
+}

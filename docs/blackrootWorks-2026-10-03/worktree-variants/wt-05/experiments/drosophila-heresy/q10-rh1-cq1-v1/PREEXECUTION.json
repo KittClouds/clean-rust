@@ -1,0 +1,42 @@
+{
+  "protocol": "Q10-RH1-CQ1",
+  "identity": "q10-rh1-cq1-v1",
+  "status": "PREEXECUTION_SEALED_NO_MEASURED_EXECUTION",
+  "created_utc": "2026-09-17T19:09:01.7745762Z",
+  "plan_sha256": "10AE69EFC1E3A6CCC8DC50D2C772F96939DF47343546E7BFF6A03A1EF1C29BCA",
+  "contract_sha256": "E28592C95AFCA90FC83817A98CB2558E5C6157F6CE0050D260F3420F324F24E4",
+  "source_of_truth": {
+    "historical_s1_execution": "immutable sealed Q10-PF6-S1 execution artifacts",
+    "authority": "immutable Q10-RMT sample-9731-9732 artifacts",
+    "parent_hashes_bound_in": "CONTRACT.json"
+  },
+  "cohorts": {
+    "primary_expected_count": 32,
+    "primary_rule": "coordinates_total >= 32",
+    "primary_horizons": [16, 32],
+    "secondary_expected_count": 23,
+    "secondary_rule": "17 <= coordinates_total <= 31",
+    "secondary_long_horizon": "complete_available_coordinate_horizon",
+    "excluded_selected_group_count": 29
+  },
+  "authority_gate": {
+    "required_level": "endpoint_coordinate_presence",
+    "minimum_fraction": 1.0,
+    "missing_or_mismatched": "FAIL_CLOSED",
+    "missing_prefix_observation": "UNKNOWN_NOT_ZERO"
+  },
+  "budget": {
+    "B16": 32768,
+    "B32": 65536,
+    "scaling": "B32_equals_2_times_B16"
+  },
+  "scope": {
+    "unit_tests_run": false,
+    "smoke_qualification_run": false,
+    "factorial_execution_started": false,
+    "measured_rh1_2x2_started": false,
+    "scientific_seed_bundles_used": 0,
+    "na_information_used": false,
+    "parent_artifacts_modified": false
+  }
+}

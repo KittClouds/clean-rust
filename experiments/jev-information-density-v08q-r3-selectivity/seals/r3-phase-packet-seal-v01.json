@@ -1,0 +1,509 @@
+{
+  "schema": "jev-r3-phase-packet-lock-v01",
+  "identity": "JEV-V08Q-R3-SELECTIVITY-V03",
+  "status": "SEALED_AUTHORIZED_FOR_PHASE_EXECUTION",
+  "authorization_basis": "User authorized one complete phase-sized R3 execution; successful frozen prerequisites advance automatically.",
+  "contracts": [
+    {
+      "name": "run",
+      "path": "C:\\code land\\clean-rust\\experiments\\jev-information-density-v08q-r3-selectivity\\contracts\\r3-v03-run-contract.json",
+      "sha256": "bd9d41be3d9dc47b47a02e682194cf3f1d86992129e149b0f5a1550cdd7a80cf"
+    },
+    {
+      "name": "panel",
+      "path": "C:\\code land\\clean-rust\\experiments\\jev-information-density-v08q-r3-selectivity\\contracts\\r3-v03-panel-contract.json",
+      "sha256": "e7be420b4f296c165c7578e7ba660149fc5724ac92cfc767611357c51d5a71db"
+    },
+    {
+      "name": "analysis",
+      "path": "C:\\code land\\clean-rust\\experiments\\jev-information-density-v08q-r3-selectivity\\contracts\\r3-v03-analysis-contract.json",
+      "sha256": "e6311616f728ebe3d31cb56e7bcddf526cba96d6a09348feacec8ef38c57c520"
+    }
+  ],
+  "execution_sources": [
+    {
+      "name": "R3 panel generator Rust entry",
+      "path": "C:\\code land\\clean-rust\\experiments\\jev-information-density-v08q-r3-selectivity\\generator-v03\\src\\main.rs",
+      "sha256": "169b73f40f3d05ddc6f0170e82c4bb0776ba4a622fe3b469b32019be3739866d",
+      "bytes": 24837
+    },
+    {
+      "name": "R3 panel generator Cargo manifest",
+      "path": "C:\\code land\\clean-rust\\experiments\\jev-information-density-v08q-r3-selectivity\\generator-v03\\Cargo.toml",
+      "sha256": "9a6da3729e38ea9b68dfbe5044e007631208f1ddb26a72029dc51b500573af01",
+      "bytes": 447
+    },
+    {
+      "name": "R3 panel generator Cargo lock",
+      "path": "C:\\code land\\clean-rust\\experiments\\jev-information-density-v08q-r3-selectivity\\generator-v03\\Cargo.lock",
+      "sha256": "95a666fbd38857288cd5e00c5097f292753d15a6959d5d6c270ae4c33c5c2636",
+      "bytes": 8604
+    },
+    {
+      "name": "R3 panel generator tested Windows binary",
+      "path": "C:\\Users\\shuga\\AppData\\Local\\Temp\\jev-r3-v03-generator-20260926.exe",
+      "sha256": "087b102396eb971c63c710e3faa523e779ec5eea9f025ed2c1acb15422242266",
+      "bytes": 656896
+    },
+    {
+      "name": "base decision-world crate manifest",
+      "path": "C:\\code land\\clean-rust\\experiments\\jev-decision-world-v01\\Cargo.toml",
+      "sha256": "69374c00d54dac2251239fb7b3bb289b61cb6a9bca93853e71f6f484691df401",
+      "bytes": 387
+    },
+    {
+      "name": "base decision-world crate lock",
+      "path": "C:\\code land\\clean-rust\\experiments\\jev-decision-world-v01\\Cargo.lock",
+      "sha256": "9b6d29d2e86f53360b1cf7226798eb04c9b790a935b6f024063f0e77cf0b6263",
+      "bytes": 6553
+    },
+    {
+      "name": "base decision-world exact source",
+      "path": "C:\\code land\\clean-rust\\experiments\\jev-decision-world-v01\\src\\exact.rs",
+      "sha256": "8bd90086573eb93a27f8950f35eec994a3f5b51fdeeffc0e3042105b6657a4f3",
+      "bytes": 10412
+    },
+    {
+      "name": "base decision-world families source",
+      "path": "C:\\code land\\clean-rust\\experiments\\jev-decision-world-v01\\src\\families.rs",
+      "sha256": "da2ceacf7a1b921688e3e6dfcc1dc5af2d57c464bbf4d24322fe5e53fa157805",
+      "bytes": 9122
+    },
+    {
+      "name": "base decision-world generation source",
+      "path": "C:\\code land\\clean-rust\\experiments\\jev-decision-world-v01\\src\\generate.rs",
+      "sha256": "03e636fc35595ce8d2d701a57158cae5b18cf14809426908d1c92c0e71bed67d",
+      "bytes": 27202
+    },
+    {
+      "name": "base decision-world library source",
+      "path": "C:\\code land\\clean-rust\\experiments\\jev-decision-world-v01\\src\\lib.rs",
+      "sha256": "ace2147a281cb02ba2328ad5e9de84604a4e9b97606e26965ba906fd9b240470",
+      "bytes": 6558
+    },
+    {
+      "name": "base decision-world types source",
+      "path": "C:\\code land\\clean-rust\\experiments\\jev-decision-world-v01\\src\\types.rs",
+      "sha256": "49be9b4c2276c3cb9437a9a35295b583b08a13467835b29208f01fc975ea77ee",
+      "bytes": 8706
+    },
+    {
+      "name": "base decision-world validator source",
+      "path": "C:\\code land\\clean-rust\\experiments\\jev-decision-world-v01\\src\\validate.rs",
+      "sha256": "89e67736bf94ade30a4da4c33ac27ad3f1a5b962509ecd02bc38569e773ba7f3",
+      "bytes": 24060
+    },
+    {
+      "name": "inherited training family source",
+      "path": "C:\\code land\\clean-rust\\experiments\\jev-information-density-v08n\\generator\\src\\families.rs",
+      "sha256": "e56885005487b36b573c1bf4d47741413ca72df0992ff62bcf48891eecacb429",
+      "bytes": 16889
+    },
+    {
+      "name": "inherited training generator source",
+      "path": "C:\\code land\\clean-rust\\experiments\\jev-information-density-v08n\\generator\\src\\generator.rs",
+      "sha256": "10d4ab54df02a247a8adfed6bee024d4121e685c1ca0e3b2a58630ec3ab2e33a",
+      "bytes": 29881
+    },
+    {
+      "name": "R3 exclusion builder",
+      "path": "C:\\code land\\clean-rust\\experiments\\jev-information-density-v08q-r3-selectivity\\source\\build_r3_v03_exclusion_sets_v02.py",
+      "sha256": "5b80beb1273b18155cb404d395ce42d809247fc21beed6877ecea2d59a8d7538",
+      "bytes": 16669
+    },
+    {
+      "name": "R3 panel validator",
+      "path": "C:\\code land\\clean-rust\\experiments\\jev-information-density-v08q-r3-selectivity\\source\\validate_and_seal_r3_panel_v03.py",
+      "sha256": "83168c8efe5268cb4cfc270d0e138106c017ed9cb6f59c455e78f027b83344f1",
+      "bytes": 16593
+    },
+    {
+      "name": "R3 feature extractor",
+      "path": "C:\\code land\\clean-rust\\experiments\\jev-information-density-v08q-r3-selectivity\\source\\extract_r3_confirmatory_features_v01.py",
+      "sha256": "e99a230632ce8a8c05447ec6a840bd10e84ce764a2dfefd2b301384f7fd53c04",
+      "bytes": 15150
+    },
+    {
+      "name": "R3 feature repeat verifier",
+      "path": "C:\\code land\\clean-rust\\experiments\\jev-information-density-v08q-r3-selectivity\\source\\verify_and_seal_r3_feature_repeat_v01.py",
+      "sha256": "3c95efe862a071f0d5fd694a69a76bab4d934592ef27000c16ee3775a6082fc3",
+      "bytes": 5906
+    },
+    {
+      "name": "R3 schedule materializer",
+      "path": "C:\\code land\\clean-rust\\experiments\\jev-information-density-v08q-r3-selectivity\\source\\materialize_r3_training_schedule_v01.py",
+      "sha256": "5a85bd0f59c94bd0e1eabb1cc3292fa47d0bba15c8ca237c0836b4152370fb26",
+      "bytes": 23426
+    },
+    {
+      "name": "R3 training runtime helper",
+      "path": "C:\\code land\\clean-rust\\experiments\\jev-information-density-v08q-r3-selectivity\\source\\run_r3_pretreatment_calibration_v01.py",
+      "sha256": "c32efef6f7560aca23dd99ad94098c93b752fa20f6d0467b712b9422258006b4",
+      "bytes": 40767
+    },
+    {
+      "name": "R3 training runner",
+      "path": "C:\\code land\\clean-rust\\experiments\\jev-information-density-v08q-r3-selectivity\\source\\run_r3_confirmatory_training_v01.py",
+      "sha256": "491ee396a58859fa308d0fa94b6cb376db7dc672adec39b05b2e7f0d153047e4",
+      "bytes": 26585
+    },
+    {
+      "name": "R3 target-free evaluator",
+      "path": "C:\\code land\\clean-rust\\experiments\\jev-information-density-v08q-r3-selectivity\\source\\evaluate_r3_confirmatory_matrix_v01.py",
+      "sha256": "f55cb64d11bae2a475e907522fab965a3ac8713285a163eac2f7192516b2acde",
+      "bytes": 20490
+    },
+    {
+      "name": "R3 frozen analyzer",
+      "path": "C:\\code land\\clean-rust\\experiments\\jev-information-density-v08q-r3-selectivity\\source\\analyze_r3_confirmatory_v01.py",
+      "sha256": "49abc7c006dc0ab724d9d78ab9bb6090396e37251f03c7a081f7ca119e03ec76",
+      "bytes": 29819
+    },
+    {
+      "name": "R3 independent replay and result sealer",
+      "path": "C:\\code land\\clean-rust\\experiments\\jev-information-density-v08q-r3-selectivity\\source\\verify_r3_independent_replay_v01.py",
+      "sha256": "2e4a55858624b014a37beb48254290e7f5337283cf15251026ca72b1fc8c0c24",
+      "bytes": 28878
+    },
+    {
+      "name": "R3 phase lock builder",
+      "path": "C:\\code land\\clean-rust\\experiments\\jev-information-density-v08q-r3-selectivity\\source\\seal_r3_phase_packet_v01.py",
+      "sha256": "dca09b0b7d62ff6a73f8d4a5f1f320a87c62729f232d46e3187963f63fe1831c",
+      "bytes": 19137
+    },
+    {
+      "name": "R3 design simulation implementation",
+      "path": "C:\\code land\\clean-rust\\experiments\\jev-information-density-v08q-r3-selectivity\\source\\simulate_r3_design_operating_characteristics_v01.py",
+      "sha256": "3d030eee017354ba23118b24368483d8840b7e3a13ae3ccf0e29433f2c863020",
+      "bytes": 22129
+    },
+    {
+      "name": "R3 continuation replay implementation",
+      "path": "C:\\code land\\clean-rust\\experiments\\jev-information-density-v08q-r3-selectivity\\source\\run_r3_continuation_replay_v01.py",
+      "sha256": "4d00546e48db4bc2707d93cbe09f91a4aa1389a791636acb61ca3711387a04ca",
+      "bytes": 16340
+    },
+    {
+      "name": "R3 S80 summary implementation",
+      "path": "C:\\code land\\clean-rust\\experiments\\jev-information-density-v08q-r3-selectivity\\source\\summarize_r3_pretreatment_s80_v01.py",
+      "sha256": "88f4003eede992369cb0c59410ac389e54eefe3b241aa7ad3e18a158d9854acc",
+      "bytes": 17341
+    },
+    {
+      "name": "R3 S120 calibration runner",
+      "path": "C:\\code land\\clean-rust\\experiments\\jev-information-density-v08q-r3-selectivity\\source\\run_r3_calibration_step120_1x_v01.py",
+      "sha256": "55ee6ded2b4a36379a9aa9f07f80c5160f2f5124563c212fd542cced71cf27d8",
+      "bytes": 31428
+    },
+    {
+      "name": "R3 S120 calibration summarizer",
+      "path": "C:\\code land\\clean-rust\\experiments\\jev-information-density-v08q-r3-selectivity\\source\\summarize_r3_calibration_s120_1x_v02.py",
+      "sha256": "70792d842fce627eb2c87d1f301579b29e5e126eee654c0f7507d4e0db25539f",
+      "bytes": 17310
+    },
+    {
+      "name": "R3 candidate permutation sanity test",
+      "path": "C:\\code land\\clean-rust\\experiments\\jev-information-density-v08q-r3-selectivity\\source\\tests\\test_r3_scorer_permutation_equivariance.py",
+      "sha256": "f14fc0fb07b06a9bafe9049b2296991cb7d63f11ab50f1aaa5e5658f48a2a5e9",
+      "bytes": 1154
+    },
+    {
+      "name": "R3 schedule tests",
+      "path": "C:\\code land\\clean-rust\\experiments\\jev-information-density-v08q-r3-selectivity\\source\\tests\\test_r3_training_schedule_v01.py",
+      "sha256": "1aef173c0368c502c5a193417e9d2bb286d8bb9de332225f4cd63905a18e8837",
+      "bytes": 3602
+    },
+    {
+      "name": "R3 analysis tests",
+      "path": "C:\\code land\\clean-rust\\experiments\\jev-information-density-v08q-r3-selectivity\\source\\tests\\test_r3_analysis_v01.py",
+      "sha256": "0848ad44fc26e0a90503d755a14a39ccb3036bddfe3c305d4fcf7442b883850a",
+      "bytes": 2668
+    },
+    {
+      "name": "R3 independent replay tests",
+      "path": "C:\\code land\\clean-rust\\experiments\\jev-information-density-v08q-r3-selectivity\\source\\tests\\test_r3_independent_replay_v01.py",
+      "sha256": "8655f9ae59c82248f370829d60fd715c79e0e1c4f7ecadaf8b38980a234229ca",
+      "bytes": 1593
+    },
+    {
+      "name": "R3 exclusion parser tests",
+      "path": "C:\\code land\\clean-rust\\experiments\\jev-information-density-v08q-r3-selectivity\\source\\tests\\test_r3_v03_exclusion_parser.py",
+      "sha256": "2a385f1796068ea6af116df27cb972405214302e0ec34eae627d0702f633e913",
+      "bytes": 2215
+    },
+    {
+      "name": "R3 exclusion construction tests",
+      "path": "C:\\code land\\clean-rust\\experiments\\jev-information-density-v08q-r3-selectivity\\source\\tests\\test_r3_v03_exclusion_sets_v02.py",
+      "sha256": "3ff8a79426142ad1b391205d3f3c3f6cc85e84eca65993db5a1853c547d7ee6b",
+      "bytes": 1492
+    },
+    {
+      "name": "frozen compatibility head",
+      "path": "C:\\code land\\clean-rust\\experiments\\jev-frozen-readout-v01\\probe.py",
+      "sha256": "a3049d52e1183c806c84522a617a05646eb86fbcb69af72b5bb26f4808852cb1",
+      "bytes": 39238
+    },
+    {
+      "name": "frozen batching implementation",
+      "path": "C:\\code land\\clean-rust\\experiments\\jev-frozen-scaling-v05\\train_v05.py",
+      "sha256": "52033950dab23835c13f4aa74a2f0d5867aec754f8a139a63a739a36b0cb62b9",
+      "bytes": 19051
+    },
+    {
+      "name": "frozen weighted objective",
+      "path": "C:\\code land\\clean-rust\\experiments\\jev-information-density-v08q\\source\\q_weighted_objective_v02.py",
+      "sha256": "fc412072592857be36b02312d852d08ce3df2bf6fa7b28f8c1d59575c28e1ea4",
+      "bytes": 3398
+    },
+    {
+      "name": "pinned LFM extractor adapter",
+      "path": "C:\\code land\\clean-rust\\experiments\\jev-lfm-variable-v07\\extract_lfm.py",
+      "sha256": "b8cd79a9a3265eca0fde5f509ba7c058bc2065d7747efe17ff7c7c1f6335b2d0",
+      "bytes": 12545
+    }
+  ],
+  "sealed_inputs": [
+    {
+      "name": "sealed E1 identity exclusion payload",
+      "path": "D:\\codex-runs\\jev-information-density-v08q-r3-selectivity-v03\\identity-exclusions-v02\\field-exclusion-domain-hashes.json",
+      "sha256": "e206a995582cd47a50f5b6c6411f8660fafd985ab80a1620f4db4caed0066ac3",
+      "bytes": 36700682,
+      "expected_sha256": "e206a995582cd47a50f5b6c6411f8660fafd985ab80a1620f4db4caed0066ac3"
+    },
+    {
+      "name": "sealed E1 exclusion provenance receipt",
+      "path": "D:\\codex-runs\\jev-information-density-v08q-r3-selectivity-v03\\identity-exclusions-v02\\exclusion-receipt.json",
+      "sha256": "477390350e3bc26ba00615aeb361246343e6020cc6e1d5f9e8f11275effb2238",
+      "bytes": 2452,
+      "expected_sha256": null
+    },
+    {
+      "name": "sealed E1 exclusion root",
+      "path": "D:\\codex-runs\\jev-information-density-v08q-r3-selectivity-v03\\identity-exclusions-v02\\root-seal.json",
+      "sha256": "116d7ba8562201868e2fe39fdc46e7967db2adb3c4ec94adf3f4843db3c7ba68",
+      "bytes": 157,
+      "expected_sha256": null
+    },
+    {
+      "name": "R3 balanced S80 pretraining seal",
+      "path": "D:\\codex-runs\\jev-information-density-v08q-r3-selectivity-v02\\calibration-preflight-v03\\pretraining-seal.json",
+      "sha256": "dcf3e524fc57cd359029bda2fc1a9e52b66d77843552394c778723aa34744396",
+      "bytes": 817,
+      "expected_sha256": "dcf3e524fc57cd359029bda2fc1a9e52b66d77843552394c778723aa34744396"
+    },
+    {
+      "name": "R3 balanced S80 calibration summary",
+      "path": "D:\\codex-runs\\jev-information-density-v08q-r3-selectivity-v02\\calibration-training-v02\\pretreatment-s80-calibration-v02.json",
+      "sha256": "841a11b9f8d79e1a0353a38fb1fa38cb5b1a575039b952404a176679ef9f1e78",
+      "bytes": 138456,
+      "expected_sha256": null
+    },
+    {
+      "name": "R3 balanced S80 calibration seal",
+      "path": "D:\\codex-runs\\jev-information-density-v08q-r3-selectivity-v02\\calibration-training-v02\\pretreatment-s80-calibration-v02-seal.json",
+      "sha256": "5a23621afbf93a7c3368399ebae3c4615108f2e8f79c0bd16990d81ba4f8b7dc",
+      "bytes": 875,
+      "expected_sha256": null
+    },
+    {
+      "name": "R3 balanced 1x S120 calibration",
+      "path": "D:\\codex-runs\\jev-information-density-v08q-r3-selectivity-v02\\calibration-s1x-terminal-eval-v02\\step120-s1x-calibration-v02.json",
+      "sha256": "cd50ec49d5d2196cc92df0bb18276f2d10643d2cc5dc12b928dc6459bea16fab",
+      "bytes": 110647,
+      "expected_sha256": "cd50ec49d5d2196cc92df0bb18276f2d10643d2cc5dc12b928dc6459bea16fab"
+    },
+    {
+      "name": "R3 balanced 1x S120 calibration root",
+      "path": "D:\\codex-runs\\jev-information-density-v08q-r3-selectivity-v02\\calibration-s1x-terminal-eval-v02\\root-seal.json",
+      "sha256": "e727f13f404010068176f55fd14081978881027a15c27bde52ca97d5f63f2253",
+      "bytes": 831,
+      "expected_sha256": "e727f13f404010068176f55fd14081978881027a15c27bde52ca97d5f63f2253"
+    },
+    {
+      "name": "R3 continuation exact-replay root",
+      "path": "D:\\codex-runs\\jev-information-density-v08q-r3-selectivity-v02\\continuation-replay-v02\\replay-root-seal.json",
+      "sha256": "f588bad0b6f8ebaadda5438b4f1e72ea9104b4483ddc77cd79d7fd633f4e08f3",
+      "bytes": 2280,
+      "expected_sha256": "f588bad0b6f8ebaadda5438b4f1e72ea9104b4483ddc77cd79d7fd633f4e08f3"
+    },
+    {
+      "name": "R3 design simulation",
+      "path": "D:\\codex-runs\\jev-information-density-v08q-r3-selectivity-v02\\design-simulation-v03\\design-operating-characteristics.json",
+      "sha256": "e098f44cbe0cf7c95395f3559451221d71b9946fa7208961f8460849690c89f5",
+      "bytes": 73649,
+      "expected_sha256": "e098f44cbe0cf7c95395f3559451221d71b9946fa7208961f8460849690c89f5"
+    },
+    {
+      "name": "R3 design simulation seal",
+      "path": "D:\\codex-runs\\jev-information-density-v08q-r3-selectivity-v02\\design-simulation-v03\\design-simulation-seal.json",
+      "sha256": "5ada5a4f442dab7ad5e69ae16d8a91f009ac0c7e473fe3e29a4617f120382ef0",
+      "bytes": 824,
+      "expected_sha256": "5ada5a4f442dab7ad5e69ae16d8a91f009ac0c7e473fe3e29a4617f120382ef0"
+    },
+    {
+      "name": "balanced training primary occurrences",
+      "path": "D:\\codex-runs\\jev-information-density-v08q-r3-selectivity-v02\\calibration-inputs-v03\\balanced-primary-occurrences.jsonl",
+      "sha256": "8c75354d6225762e275552fcf279d65fb4870f382405bdbbccc36576a950a859",
+      "bytes": 9726432,
+      "expected_sha256": "8c75354d6225762e275552fcf279d65fb4870f382405bdbbccc36576a950a859"
+    },
+    {
+      "name": "balanced training SHAM events",
+      "path": "D:\\codex-runs\\jev-information-density-v08q-r3-selectivity-v02\\calibration-inputs-v03\\balanced-sham-events.jsonl",
+      "sha256": "98ec35a78fbf2a65d050b1086bbf6337acaaae743cd4208af89107d235247617",
+      "bytes": 4694036,
+      "expected_sha256": "98ec35a78fbf2a65d050b1086bbf6337acaaae743cd4208af89107d235247617"
+    },
+    {
+      "name": "reverse SHAM text manifest",
+      "path": "D:\\codex-runs\\jev-information-density-v08q-r3-selectivity-v02\\calibration-inputs-v03\\reverse-sham-texts.jsonl",
+      "sha256": "d75104b5574ea52ad62fb0c72c1e778dc7d4f3da76d678cf2cb756fb39ec40d0",
+      "bytes": 1349155,
+      "expected_sha256": "d75104b5574ea52ad62fb0c72c1e778dc7d4f3da76d678cf2cb756fb39ec40d0"
+    },
+    {
+      "name": "sealed shared training feature tensor",
+      "path": "D:\\codex-runs\\jev-information-density-v08n\\v0.8N-base-v01\\shared-feature-cache\\shared-training-features.pt",
+      "sha256": "da946af90353c91c3b1298d2951eebc42b9f515708b628d3a053e700a960c4d6",
+      "bytes": 450561952,
+      "expected_sha256": "da946af90353c91c3b1298d2951eebc42b9f515708b628d3a053e700a960c4d6"
+    },
+    {
+      "name": "sealed candidate feature tensor",
+      "path": "D:\\codex-runs\\jev-information-density-v08n\\v0.8N-base-v01\\phase-b-run-v01\\feature-cache\\candidate-features.pt",
+      "sha256": "3bb3036f455a83409361eb3e4150833bd8b255a2a783ec1218b00b12315c0590",
+      "bytes": 394870,
+      "expected_sha256": "3bb3036f455a83409361eb3e4150833bd8b255a2a783ec1218b00b12315c0590"
+    },
+    {
+      "name": "bridge raw primary occurrence source",
+      "path": "D:\\codex-runs\\jev-information-density-v08n\\v0.8N-base-v01\\phase-b-v03-inputs\\common-primary-occurrence-manifest.jsonl",
+      "sha256": "773119294a51aa46487de26f9f253355187a7bfd1e75cb2f258c307c86f10b06",
+      "bytes": 6776884,
+      "expected_sha256": "773119294a51aa46487de26f9f253355187a7bfd1e75cb2f258c307c86f10b06"
+    },
+    {
+      "name": "bridge raw SHAM source",
+      "path": "D:\\codex-runs\\jev-information-density-v08n\\v0.8N-base-v01\\phase-b-v03-inputs\\head-input-manifest-B-SHAM.jsonl",
+      "sha256": "9dd346766856f56006be326c171e664dcbab23983cdd7501f480b6fabb6ff895",
+      "bytes": 13867636,
+      "expected_sha256": "9dd346766856f56006be326c171e664dcbab23983cdd7501f480b6fabb6ff895"
+    },
+    {
+      "name": "training-only feature scope",
+      "path": "D:\\codex-runs\\jev-information-density-v08n\\v0.8N-base-v01\\shared-feature-cache\\training-only-feature-scope.jsonl",
+      "sha256": "aa8cba58f4a8ec46ed6ec8eaf0bfbe992b03b9fa58f815b4259d9fdfe2b009f3",
+      "bytes": 30195630,
+      "expected_sha256": "aa8cba58f4a8ec46ed6ec8eaf0bfbe992b03b9fa58f815b4259d9fdfe2b009f3"
+    },
+    {
+      "name": "sealed training candidate catalog",
+      "path": "D:\\codex-runs\\jev-information-density-v08n\\v0.8N-base-v01\\phase-b-v03-inputs\\candidate-catalog.json",
+      "sha256": "1698ea2078951837b3cb780a3f873c3c099e5e3d001c714e1d58a41e2951487e",
+      "bytes": 12832,
+      "expected_sha256": "1698ea2078951837b3cb780a3f873c3c099e5e3d001c714e1d58a41e2951487e"
+    },
+    {
+      "name": "pinned LFM model file config.json",
+      "path": "D:\\codex-runs\\jev-lfm-variable-v07\\models\\lfm2.5-1.2b-base\\config.json",
+      "sha256": "15d6157fb6df3f8272e2fe90e18f57727ccf02a125c94469198b0f3281510185",
+      "bytes": 1224,
+      "expected_sha256": "15d6157fb6df3f8272e2fe90e18f57727ccf02a125c94469198b0f3281510185"
+    },
+    {
+      "name": "pinned LFM model file model.safetensors",
+      "path": "D:\\codex-runs\\jev-lfm-variable-v07\\models\\lfm2.5-1.2b-base\\model.safetensors",
+      "sha256": "7678ab9546a0c51c1fca161876b1efc4f0906277f170b5822045f40fdaf9eeff",
+      "bytes": 2340697936,
+      "expected_sha256": "7678ab9546a0c51c1fca161876b1efc4f0906277f170b5822045f40fdaf9eeff"
+    },
+    {
+      "name": "pinned LFM model file tokenizer.json",
+      "path": "D:\\codex-runs\\jev-lfm-variable-v07\\models\\lfm2.5-1.2b-base\\tokenizer.json",
+      "sha256": "d7a0ab0fc22e41ec8c6d7450a9ff9ce40e196ec5e5a2fa6a2105e064e0514ed7",
+      "bytes": 4733020,
+      "expected_sha256": "d7a0ab0fc22e41ec8c6d7450a9ff9ce40e196ec5e5a2fa6a2105e064e0514ed7"
+    },
+    {
+      "name": "pinned LFM model file tokenizer_config.json",
+      "path": "D:\\codex-runs\\jev-lfm-variable-v07\\models\\lfm2.5-1.2b-base\\tokenizer_config.json",
+      "sha256": "8cba5b0c7acab23a0d4cc9ac587346c9220a1b6d288fc5346fe118202fd6f43e",
+      "bytes": 91876,
+      "expected_sha256": "8cba5b0c7acab23a0d4cc9ac587346c9220a1b6d288fc5346fe118202fd6f43e"
+    },
+    {
+      "name": "pinned LFM model file special_tokens_map.json",
+      "path": "D:\\codex-runs\\jev-lfm-variable-v07\\models\\lfm2.5-1.2b-base\\special_tokens_map.json",
+      "sha256": "742aefe2b7dec496e8caffdba03a75d0c1a9925d53bd3f3e0d388c96b591b6f4",
+      "bytes": 434,
+      "expected_sha256": "742aefe2b7dec496e8caffdba03a75d0c1a9925d53bd3f3e0d388c96b591b6f4"
+    }
+  ],
+  "analysis_sources": [
+    {
+      "name": "R3 frozen analyzer",
+      "sha256": "49abc7c006dc0ab724d9d78ab9bb6090396e37251f03c7a081f7ca119e03ec76"
+    },
+    {
+      "name": "R3 independent replay and result sealer",
+      "sha256": "2e4a55858624b014a37beb48254290e7f5337283cf15251026ca72b1fc8c0c24"
+    }
+  ],
+  "design_basis": {
+    "balanced_s80_pretraining_seal_sha256": "dcf3e524fc57cd359029bda2fc1a9e52b66d77843552394c778723aa34744396",
+    "balanced_s120_1x_calibration_sha256": "cd50ec49d5d2196cc92df0bb18276f2d10643d2cc5dc12b928dc6459bea16fab",
+    "continuation_replay_root_sha256": "f588bad0b6f8ebaadda5438b4f1e72ea9104b4483ddc77cd79d7fd633f4e08f3",
+    "design_operating_characteristics_sha256": "e098f44cbe0cf7c95395f3559451221d71b9946fa7208961f8460849690c89f5",
+    "S120_floor_feasibility": {
+      "n": 48,
+      "eligible_at_S_min_0_01": 48,
+      "median_S_1x": 0.30014178512990475,
+      "minimum_S_1x": 0.011724836012348533,
+      "interpretation": "Outcome-blind calibration feasibility only; not a coverage guarantee or confirmatory result."
+    },
+    "simulation_R_median_upper_below_zero_probability": {
+      "null": 0.0186,
+      "10pct_attenuation": 1.0
+    },
+    "simulation_173_of_192_ratio_coverage_probability_at_Smin_0_01": {
+      "10pct_attenuation": 0.9998,
+      "20pct_attenuation": 1.0
+    }
+  },
+  "execution_scope": {
+    "panel_neighborhoods": 2000,
+    "panel_rows": 4000,
+    "balanced_histories": 192,
+    "bridge_histories": 24,
+    "training_histories_total": 216,
+    "continuations": 432,
+    "checkpoint_steps": [
+      80,
+      100,
+      120
+    ],
+    "prediction_cells": 1080,
+    "prediction_rows": 4320000,
+    "raw_logit_shape": [
+      1080,
+      4000,
+      4
+    ],
+    "raw_logit_dtype": "little-endian float32",
+    "panel_openings": 1,
+    "targets_read_before_prediction_seal": false
+  },
+  "firewall": {
+    "training_feedback_from_evaluation": false,
+    "checkpoint_selection": false,
+    "heldout_target_join_opened_only_after_prediction_seal": true,
+    "calibration_histories_join_confirmatory_cohort": false,
+    "E1_metrics_predictions_or_features_are_R3_inputs": false
+  },
+  "preservation": {
+    "failed_prior_attempts_modified": false,
+    "R2_or_R3_endpoint_reinterpretation": false,
+    "result_label": "JEV-V08Q-R3-SELECTIVITY-V03"
+  },
+  "contract_bundle_root_sha256": "adb6e7c2267bb92580c823faf58964179887a53a1a5109fa96ef32e5d097acc4"
+}

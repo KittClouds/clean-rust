@@ -1,0 +1,1 @@
+{"formal_inference":{"authority":"SEPARATELY_QUALIFIED_STOCHASTIC_PROCESS","parameter":"mu_R=E[d_s^R]"},"independent_axes":true,"materiality":{"authority":"FROZEN_DB_POPULATION","floor":0.02,"quantity":"Skill_R^DB=1-B_R/B_0"},"schema":"MATERIALITY_INFERENCE_AUTHORITY_V2","source_kind":"ARTIFACT_DECLARED"}

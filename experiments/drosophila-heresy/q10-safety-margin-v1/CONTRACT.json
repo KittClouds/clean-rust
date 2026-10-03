@@ -1,0 +1,293 @@
+{
+  "protocol": "Q10-SM",
+  "title": "Safety-Margined Bounded Geometry Qualification",
+  "kind": "FROZEN_PRE_QUALIFICATION_CONTRACT",
+  "created_utc": "2026-09-16T20:20:23Z",
+  "status": "FROZEN_PRE_QUALIFICATION_CONTRACT",
+  "plan_sha256": "8A70CFADA7A833AA1110FDE5DBF0CFAFDDD4AFD4297A06AD846B1959439B8B9D",
+  "lineage": {
+    "parent_protocol": "Q10-BG",
+    "parent_directory": "experiments/drosophila-heresy/q10-bounded-geometry-v1",
+    "parent_contract_sha256": "FDD0DFB924D82A798F5C11B661E0B5683FCF9FFF67D48D9E6F302E61474674CA",
+    "parent_plan_sha256": "630F11591247AB2446B617039EFEFDB007AA8794A291B9863EB87D1CDC8BA777",
+    "parent_result_sha256": "29F640B83256605D145DD3ED32C9FC691EC6CA2604A5E521E0B2470F0FBB97C6",
+    "parent_status_sha256": "7C71706C4EF85EA6B74E4F01E9D54CCE18FF52265A03E008370DFB45282A8E7C",
+    "required_parent_status": "Q10_STAGE1_VALID__BOUNDED_FREEDOM_PRESENT",
+    "required_parent_stage2_status": "NOT_RUN",
+    "q08_mutation_forbidden": true,
+    "q09_mutation_forbidden": true,
+    "q10_bg_mutation_forbidden": true
+  },
+  "authorization": {
+    "draft_files_only": false,
+    "source_creation_or_edit_authorized": true,
+    "build_authorized": true,
+    "qualification_execution_authorized": true,
+    "experiment_run_authorized": false,
+    "measured_cli_forbidden": true,
+    "scientific_seed_bundles_used": 0,
+    "behavioral_inference": false,
+    "stage_2_enabled": false,
+    "dh08b_authorized": false
+  },
+  "engineering_scope": {
+    "qualification_seeds_allowed": [
+      9401,
+      9402,
+      9403,
+      9404,
+      9405
+    ],
+    "stage_1a_seeds": [
+      9401
+    ],
+    "stage_1b_seeds": [
+      9402,
+      9403,
+      9404,
+      9405
+    ],
+    "sides": [
+      "R",
+      "L"
+    ],
+    "taus": [
+      4.0,
+      16.0
+    ],
+    "reversal_states_per_side_tau": 256,
+    "expected_stage_1a_states": 1024,
+    "expected_stage_1b_new_states": 4096,
+    "expected_stage_1_cumulative_states": 5120,
+    "scientific_seeds_allowed": [],
+    "top_up_forbidden": true
+  },
+  "event_state": {
+    "base_state": "committed f32 W_B_32 widened exactly to f64 W_B",
+    "true_state": "committed f32 W_T_32 widened exactly to f64 W_T",
+    "true_displacement": "d_T = W_T - W_B",
+    "permitted_support": "S_t is the event-local interval-derived support using unchanged Q09/Q10-BG source-coordinate semantics",
+    "true_boundary_set": "B_t contains coordinates where committed W_T_32 equals W_min or W_max",
+    "outside_support_set": "O_t is the complement of S_t",
+    "frozen_set": "F_t = B_t union O_t",
+    "variable_set": "I_t = S_t minus B_t",
+    "frozen_displacement_rule": "d_N[F_t] = d_T[F_t]"
+  },
+  "f32_safety_reserve": {
+    "reserve_ulps_each_direction": 32,
+    "spacing_reference": "committed true endpoint W_T_32 at each variable interior coordinate",
+    "arithmetic": "IEEE-754 binary32 nextafter neighbors widened exactly to f64",
+    "down_spacing": "ulp_i_down = f64(W_T_32[i]) - f64(nextafter32(W_T_32[i], -infinity))",
+    "up_spacing": "ulp_i_up = f64(nextafter32(W_T_32[i], +infinity)) - f64(W_T_32[i])",
+    "down_margin": "m_i_down = 32 * ulp_i_down",
+    "up_margin": "m_i_up = 32 * ulp_i_up",
+    "safe_lower": "safe_low_i = f64(W_min[i]) + m_i_down",
+    "safe_upper": "safe_high_i = f64(W_max[i]) - m_i_up",
+    "continuous_endpoint_rule": "safe_low_i <= W_B[i] + d_N[i] <= safe_high_i for every i in I_t",
+    "empty_safe_interval": "fail closed and report safety-margin dominated",
+    "nonfinite_or_nonpositive_spacing": "fail closed",
+    "hard_constraint": true,
+    "objective_tradeoff_forbidden": true,
+    "post_construction_clipping_forbidden": true,
+    "boundary_coordinates_exempt_and_frozen": true
+  },
+  "boundary_and_support_contract": {
+    "permitted_support_only": true,
+    "outside_support_exactly_frozen": true,
+    "true_boundary_membership_frozen": true,
+    "lower_and_upper_membership_preserved_separately": true,
+    "no_new_boundary_membership": true,
+    "support_expansion_forbidden": true,
+    "continuous_variable_coordinates_use_safety_box": true,
+    "post_commit_frozen_coordinates_exact": true,
+    "post_commit_variable_coordinates_strictly_interior": true,
+    "clipping_forbidden": true
+  },
+  "linear_contract": {
+    "cue_count": 16,
+    "operator_rows": "16 * post_len exact cue-by-MBON drive rows + 1 global acquisition-axis row",
+    "aggregate_cue_scores_admissible": false,
+    "acquisition_axis": "A = W_A - W_0",
+    "operator": "L = [H_t; A_I^T]",
+    "source_coordinate_order": "unchanged Q09/Q10-BG learner order",
+    "row_scaling": "f64 Euclidean norm",
+    "rank_cutoff": "sigma_i > sigma_max * max(rows, cols) * f64::EPSILON * 1000",
+    "projection": "x_star = V_r V_r^T x_T",
+    "constrained_base": "d_star = d_F + E_I x_star",
+    "endogenous_null_residual": "z_T = x_T - x_star",
+    "implicit_null_projection": "P_N(r) = r - V_r V_r^T r",
+    "required_equalities": [
+      "L d_N = L d_T",
+      "norm2_f64(d_N) = norm2_f64(d_T)"
+    ],
+    "fixed_total_norm_scope": "complete f64 displacement including frozen coordinates",
+    "numerical_tolerances": {
+      "absolute": 2E-10,
+      "normalized": 2E-10,
+      "zero_null_squared_norm": 1E-24,
+      "nonidentity_cosine_epsilon": 1E-08
+    },
+    "tolerance_freeze_rule": "must be frozen before Stage 1A and may not use qualification outcomes"
+  },
+  "stage_1": {
+    "name": "F32_SAFETY_MARGINED_CONTINUOUS_GEOMETRY",
+    "enabled": true,
+    "execution_requires_later_explicit_authorization": false,
+    "constructor_family": "deterministic equal-energy implicit-null-sphere endpoint search",
+    "tangent_construction": [
+      "v_0 = P_N(r)",
+      "v_1 = v_0 - ((v_0 dot z_T) / (z_T dot z_T)) z_T",
+      "v = v_1 * (norm2(z_T) / norm2(v_1))"
+    ],
+    "rotation": "z(theta) = z_T cos(theta) + v sin(theta)",
+    "endpoint": "d(theta) = d_star + E_I z(theta)",
+    "objective_order": [
+      "lineage, support, and exact boundary integrity",
+      "complete cue-by-MBON plus global-axis linear equality",
+      "fixed total f64 norm",
+      "complete 32-ULP continuous safety reserve",
+      "maximum residual directional separation among otherwise valid candidates"
+    ],
+    "candidate_rng": "separate deterministic constructor key; simulation RNG consumption forbidden",
+    "full_null_basis_required": false,
+    "slack_aware_candidate_ranking_allowed": true,
+    "generic_optimizer_required": false,
+    "candidate_count": 16,
+    "candidate_key_schema": "seed xor tau.to_bits xor trial xor candidate * 0xa0761d6478bd642f xor sign_index",
+    "angle_search_method": "path-safe prefix of [0, pi/2] with 32 deterministic bisections",
+    "search_budget": "8 tangent candidates x 2 signs; 32 bisections per path",
+    "degeneracy_rules": "zero null energy or nullity below 2 or tangent norm below 1e-24 is exhausted; no-safe-candidate is safety-margin dominated",
+    "nonidentity_resolution_rule": "abs(cos(theta)) < 1 - 1e-8",
+    "coverage_success_rule": "exact configured event counts: 1024 Stage 1A and 4096 new Stage 1B",
+    "future_direction_cosine_gate": null,
+    "future_behavior_gate": null,
+    "gate_selection_rule": "future gates remain unset and may not use behavioral evidence",
+    "endpoint_feasibility_required": true,
+    "interpolation_path_feasibility_required": true,
+    "required_event_outputs": [
+      "rank, nullity, endogenous null energy, and factorization integrity",
+      "constructor key, candidate count, degeneracy count, and exhaustion status",
+      "accepted rotation angle and c_sm = abs(cos(z_N, z_T))",
+      "continuous lower and upper safety surplus in f64 and true-endpoint ULP units",
+      "limiting coordinates and empty-safe-interval flags",
+      "support and separate lower/upper boundary comparisons",
+      "new-boundary and clipping counts",
+      "normalized cue-drive, global-axis, total-norm, null-annihilation, and reconstruction errors",
+      "RNG, learner-mutation, scientific-seed, and behavior firewalls"
+    ]
+  },
+  "stage_1_post_commit_diagnostics": {
+    "required_after_continuous_acceptance": true,
+    "commit_rule": "W_N_32 = f32(W_B + d_N) using learner storage conversion without clipping",
+    "committed_displacement": "d_N_32 = f64(W_N_32) - f64(W_B_32)",
+    "committed_bytes_authoritative": true,
+    "required_checks": [
+      "outside-support committed coordinates exactly frozen",
+      "lower and upper true boundary memberships exactly preserved",
+      "no new boundary membership on I_t",
+      "all values finite and in bounds without clipping",
+      "actual legal nextafter32 steps toward each bound for every i in I_t",
+      "at least 32 successive legal downward and 32 successive legal upward steps remain strictly interior",
+      "committed minimum safety capacity in each direction",
+      "committed f64 cue-drive drift",
+      "committed f64 global-axis drift",
+      "committed f64 total-norm drift",
+      "committed reconstruction drift",
+      "committed residual-cosine drift"
+    ],
+    "receipt_pass_rule": "all continuous gates pass and every committed variable coordinate retains at least 32 legal nextafter32 moves in both directions while support and boundary rules remain exact",
+    "sequential_f32_readout_tested": false,
+    "readout_ulp_error_tested": false,
+    "repair_capacity_tested": false,
+    "ulp_repair_tested": false
+  },
+  "stage_2": {
+    "name": "COMMITTED_SEQUENTIAL_F32_READOUT_AND_ULP_REPAIR",
+    "enabled": false,
+    "status": "NOT_RUN_STAGE1_GATE",
+    "entry_rule": "disabled until all Stage 1A and Stage 1B safety-margin receipts pass independent review and a later reviewed contract explicitly authorizes Stage 2",
+    "new_seeds_forbidden": true,
+    "sequential_f32_readout_forbidden_in_stage_1": true,
+    "ulp_move_bank_forbidden_in_stage_1": true,
+    "repair_forbidden_in_stage_1": true,
+    "behavioral_simulation_forbidden": true,
+    "fields_required_before_enablement": [
+      "repair-coordinate eligibility",
+      "ULP radius",
+      "candidate and evaluation budget",
+      "beam or discrete search policy",
+      "move budget and coordinate reuse",
+      "exact simultaneous final-state gates",
+      "independent replay and receipt schema"
+    ]
+  },
+  "staging": {
+    "stage_1a": {
+      "seeds": [
+        9401
+      ],
+      "expected_new_states": 1024,
+      "requires_prior_stage": false
+    },
+    "stage_1b": {
+      "seeds": [
+        9402,
+        9403,
+        9404,
+        9405
+      ],
+      "expected_new_states": 4096,
+      "expected_cumulative_states": 5120,
+      "entry_rule": "Stage 1A source, executable, complete receipts, independent replay, safety diagnostics, and fail-closed gates pass without contract changes"
+    },
+    "change_after_stage_1a": "requires a new protocol identity and fresh engineering seeds"
+  },
+  "status_vocabulary": [
+    "DRAFT_ONLY__NOT_EXECUTED",
+    "Q10_SM_STAGE1_VALID__F32_SAFE_FREEDOM_PRESENT",
+    "Q10_SM_STAGE1_VALID__SAFETY_MARGIN_DOMINATED",
+    "Q10_SM_STAGE1_VALID__NUMERICALLY_AMBIGUOUS",
+    "Q10_SM_STAGE1_INVALID",
+    "NOT_RUN_STAGE1_GATE"
+  ],
+  "required_pre_execution_freeze": {
+    "required": true,
+    "fields": [
+      "implementation source identity and executable hash",
+      "binary32 nextafter implementation, signed-zero handling, and bound comparison semantics",
+      "constructor candidate count and deterministic key schema",
+      "endpoint search method and interpolation-path policy",
+      "tangent and residual degeneracy rules",
+      "all continuous and committed numerical tolerances",
+      "nonidentity resolution and Stage 1 coverage rules",
+      "complete receipt schema and independent replay",
+      "observer invariance, finite-value, no-allocation, and fail-closed tests",
+      "scientific-seed, measured-CLI, sequential-readout, repair, and behavior rejection"
+    ],
+    "outcome_dependent_freezing_forbidden": true
+  },
+  "assumptions": [
+    "Model weights and bounds are finite IEEE-754 binary32 values; NaN and infinity fail closed.",
+    "Directional f32 spacing is measured once at committed W_T_32 and widened exactly to f64.",
+    "Separate downward and upward spacings handle exponent transitions and signed zero.",
+    "Post-commit safety requires 32 actual successive legal representable moves in both directions and is stronger than the continuous distance proxy.",
+    "Boundary membership preserves lower versus upper committed membership exactly, using bitwise comparison where signed zero matters.",
+    "Permitted support and source-coordinate order are inherited unchanged from Q09 and Q10-BG.",
+    "Fixed total norm is the f64 Euclidean norm of the complete displacement.",
+    "Only endpoint feasibility is assumed relevant; interpolation-path feasibility must be explicitly frozen before execution if it is to become a gate.",
+    "Q10-SM is a local equal-energy implicit-null-sphere qualification and does not solve the global box-constrained endpoint problem.",
+    "The 32-ULP reserve is an engineering representability and future-repair choice, not a behavioral or biological threshold.",
+    "Future cosine, behavior, exchangeability, direction-effect, future-learning-state, and metaplasticity gates and claims remain unset."
+  ],
+  "claims_explicitly_forbidden": [
+    "Q08 vindication",
+    "Q09 or Q10-BG reinterpretation",
+    "scientific exchangeability of endpoints",
+    "meaningful directional separation from endpoint existence alone",
+    "direction effect",
+    "behavior effect",
+    "future-learning-state claim",
+    "metaplasticity claim",
+    "DH-08B authorization"
+  ]
+}

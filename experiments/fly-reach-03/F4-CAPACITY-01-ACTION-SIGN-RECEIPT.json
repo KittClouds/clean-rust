@@ -1,0 +1,55 @@
+{
+  "biological_promotion": false,
+  "contract_sha256": "9ded206daa85c49ea8baa24bc87552aef638ff9fc2257c2782885c9a59fe0431",
+  "feature_identity": "f4-features-v2-action-sign",
+  "feature_width": 81,
+  "folds": [
+    {
+      "balanced_error": 0.7220447563479033,
+      "holdout_block": 303000,
+      "mean_abs_logit": 7.3121490478515625,
+      "omega_hat": 0.0,
+      "rows": 3729,
+      "signed_margin": 0.5848409263691458,
+      "train_rows": 9691
+    },
+    {
+      "balanced_error": 0.5005599104143337,
+      "holdout_block": 303001,
+      "mean_abs_logit": 10.795597076416016,
+      "omega_hat": 0.0,
+      "rows": 2815,
+      "signed_margin": -7.658956307839755,
+      "train_rows": 10605
+    },
+    {
+      "balanced_error": 0.5221131815786123,
+      "holdout_block": 303002,
+      "mean_abs_logit": 8.244290351867676,
+      "omega_hat": 0.0,
+      "rows": 5009,
+      "signed_margin": -0.7283419746407731,
+      "train_rows": 8411
+    },
+    {
+      "balanced_error": 0.24828444985479656,
+      "holdout_block": 303003,
+      "mean_abs_logit": 5.960533618927002,
+      "omega_hat": 0.5034311002904068,
+      "rows": 1867,
+      "signed_margin": -1.884081287709531,
+      "train_rows": 11553
+    }
+  ],
+  "hyperparameter_search": false,
+  "identity": "F4-CAPACITY-01-ACTION-SIGN",
+  "measured_namespace_created": false,
+  "prediction_flip_rescue": false,
+  "row_weighted_balanced_error": 0.5350516422238342,
+  "row_weighted_omega_hat": 0.0,
+  "rows": 13420,
+  "same_hidden_estimator": true,
+  "schema": "FLY-REACH-03-F4-CAPACITY-01-action-sign-receipt-v1",
+  "scientific_interpretation_opened": false,
+  "status": "ACTION_SIGN_CHANNEL_INSUFFICIENT"
+}

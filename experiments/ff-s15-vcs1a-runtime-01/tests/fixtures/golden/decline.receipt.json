@@ -1,0 +1,30 @@
+{
+ "authority_id": "sha256:1e7434029ddae66783a9159cda7bdd4d7b0741f744bdddb52fa8e87d30857997",
+ "context_id": "sha256:a70afabb3b09eb2417963baf5f7a0c556e2470085f2f7b5a721fed359285c07e",
+ "decision": {
+  "disposition": {
+   "reason": "low_mass",
+   "type": "DECLINE_UNAVAILABLE"
+  },
+  "fired": [
+   "decline"
+  ],
+  "rule_id": "decline",
+  "unknown": [],
+  "via": "rule"
+ },
+ "envelope_id": "sha256:a7b5db9b65476944280a4268b8c4e8d0caed79deada2e591431b6799ae8cceb4",
+ "evidence_grade": "NONE (fixture schema)",
+ "receipt_id": "sha256:ff0b7bc7257ae5cf1d9c7515c55a6c56852e32e0dc4cda624e1ad8ff018558ea",
+ "regions": {
+  "diag": true,
+  "near": false,
+  "quiet": false,
+  "strong": false
+ },
+ "representation_id": "rep-a",
+ "schema": "VCS_RECEIPT_V1",
+ "schema_hash": "sha256:971ecbebd4c8d42d9020ed91edf8ffa5ded310725e7b0c7fab8f20d3651eef9a",
+ "schema_id": "fixture-z3",
+ "schema_version": "0"
+}

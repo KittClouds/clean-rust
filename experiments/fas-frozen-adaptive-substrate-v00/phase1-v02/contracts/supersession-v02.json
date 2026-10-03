@@ -1,0 +1,17 @@
+{
+  "record_id": "FAS00_PHASE1_V01_SUPERSESSION_V02",
+  "supersedes": "phase1-v01 diagnostic-only source and corpus",
+  "superseded_combined_root_sha256": "ead40ead9c41a365c5b4c870dfba25404e324fb1d39fdd9b3c4ef5c1e80c739d",
+  "superseded_corpus_path": "D:/codex-runs/fas-frozen-adaptive-substrate-v00/phase1-v01/corpus/",
+  "reason": [
+    "The v01 context counterfactual diagnostic aggregated across later regime states, including a valid collision in phase C; v02 tests the declared context/entity offset contrast at initial phase A.",
+    "The v01 global class-count spread was 216 of 32,768 events (0.66%) and was compared with an unjustified absolute limit of 32; v02 freezes a 1% corpus-level limit before rerunning.",
+    "The v01 surface audit omitted observation and rendered-input character counts; v02 adds those shortcut checks before any model contact."
+  ],
+  "generator_source_changed": false,
+  "phase1_v02_corpus_materialized": false,
+  "phase1_v01_mutated": false,
+  "parent_pre_model_seal_sha256": "c7227d2a10da05f902ed5d16e94a8e12866d2e0ae6b2b2a357ed2da93431b3e6",
+  "model_contact_authorized": false,
+  "phase5_reuse_authorized": false
+}

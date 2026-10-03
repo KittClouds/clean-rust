@@ -1,0 +1,157 @@
+{
+  "builds": 2,
+  "rows": [
+    {
+      "build_a": {
+        "bytes": 2001,
+        "path": "SRC01_M1_online_parity.json",
+        "sha256": "21dcfdec28137a7d17026a49f910376a4c4a4080062a43d9ae6fe8a4f172c8b4"
+      },
+      "build_b": {
+        "bytes": 2001,
+        "path": "SRC01_M1_online_parity.json",
+        "sha256": "21dcfdec28137a7d17026a49f910376a4c4a4080062a43d9ae6fe8a4f172c8b4"
+      },
+      "byte_identical": true,
+      "path": "SRC01_M1_online_parity.json",
+      "status": "PASS"
+    },
+    {
+      "build_a": {
+        "bytes": 3904,
+        "path": "SRC01_M1_reload_parity_grouped_abi.json",
+        "sha256": "2b67c23078715bb723ff5531e2eb28e559fbc8f30a167cd1e5534b4effe0d65a"
+      },
+      "build_b": {
+        "bytes": 3904,
+        "path": "SRC01_M1_reload_parity_grouped_abi.json",
+        "sha256": "2b67c23078715bb723ff5531e2eb28e559fbc8f30a167cd1e5534b4effe0d65a"
+      },
+      "byte_identical": true,
+      "path": "SRC01_M1_reload_parity_grouped_abi.json",
+      "status": "PASS"
+    },
+    {
+      "build_a": {
+        "bytes": 1982,
+        "path": "SRC01_M5_online_parity.json",
+        "sha256": "e9c0572d7de6b86d2b8ffef5240ee3b245df9ab73987a1338f1d1024d2044fdd"
+      },
+      "build_b": {
+        "bytes": 1982,
+        "path": "SRC01_M5_online_parity.json",
+        "sha256": "e9c0572d7de6b86d2b8ffef5240ee3b245df9ab73987a1338f1d1024d2044fdd"
+      },
+      "byte_identical": true,
+      "path": "SRC01_M5_online_parity.json",
+      "status": "PASS"
+    },
+    {
+      "build_a": {
+        "bytes": 3904,
+        "path": "SRC01_M5_reload_parity_grouped_abi.json",
+        "sha256": "13e60d396593a1b5637dd84f4b2580db81d7fd05713d2b2649f30a76082390f6"
+      },
+      "build_b": {
+        "bytes": 3904,
+        "path": "SRC01_M5_reload_parity_grouped_abi.json",
+        "sha256": "13e60d396593a1b5637dd84f4b2580db81d7fd05713d2b2649f30a76082390f6"
+      },
+      "byte_identical": true,
+      "path": "SRC01_M5_reload_parity_grouped_abi.json",
+      "status": "PASS"
+    },
+    {
+      "build_a": {
+        "bytes": 15446,
+        "path": "SRC01_authority_manifest.json",
+        "sha256": "313f14bdb6cc66841f91bd14e26eb510c1a478e522ac9e41abbce532928ec9ad"
+      },
+      "build_b": {
+        "bytes": 15446,
+        "path": "SRC01_authority_manifest.json",
+        "sha256": "313f14bdb6cc66841f91bd14e26eb510c1a478e522ac9e41abbce532928ec9ad"
+      },
+      "byte_identical": true,
+      "path": "SRC01_authority_manifest.json",
+      "status": "PASS"
+    },
+    {
+      "build_a": {
+        "bytes": 18776,
+        "path": "SRC01_boundary_causal_receipt.json",
+        "sha256": "5ae6e24fead99258403d134ff9f4915ca40985067b7d29b90dbf6a9c98f8a322"
+      },
+      "build_b": {
+        "bytes": 18776,
+        "path": "SRC01_boundary_causal_receipt.json",
+        "sha256": "5ae6e24fead99258403d134ff9f4915ca40985067b7d29b90dbf6a9c98f8a322"
+      },
+      "byte_identical": true,
+      "path": "SRC01_boundary_causal_receipt.json",
+      "status": "PASS"
+    },
+    {
+      "build_a": {
+        "bytes": 909,
+        "path": "SRC01_metrology_defect_receipt.json",
+        "sha256": "e5026006980c52ebc40a165ac7c7c631e35b0086675ef46ef44a36958278f1c0"
+      },
+      "build_b": {
+        "bytes": 909,
+        "path": "SRC01_metrology_defect_receipt.json",
+        "sha256": "e5026006980c52ebc40a165ac7c7c631e35b0086675ef46ef44a36958278f1c0"
+      },
+      "byte_identical": true,
+      "path": "SRC01_metrology_defect_receipt.json",
+      "status": "PASS"
+    },
+    {
+      "build_a": {
+        "bytes": 769,
+        "path": "SRC01_reload_determinism.json",
+        "sha256": "7ae2de78e07cf2a4765baeb3a852f39dedc82b2946a2f136e801a745fdc63537"
+      },
+      "build_b": {
+        "bytes": 769,
+        "path": "SRC01_reload_determinism.json",
+        "sha256": "7ae2de78e07cf2a4765baeb3a852f39dedc82b2946a2f136e801a745fdc63537"
+      },
+      "byte_identical": true,
+      "path": "SRC01_reload_determinism.json",
+      "status": "PASS"
+    },
+    {
+      "build_a": {
+        "bytes": 1225,
+        "path": "SRC01_runtime_receipt.json",
+        "sha256": "532e63d44ba46966f50d26ddb4b9de7e72f3016cb6ffc3ea7df9b90d2e5d498c"
+      },
+      "build_b": {
+        "bytes": 1225,
+        "path": "SRC01_runtime_receipt.json",
+        "sha256": "532e63d44ba46966f50d26ddb4b9de7e72f3016cb6ffc3ea7df9b90d2e5d498c"
+      },
+      "byte_identical": true,
+      "path": "SRC01_runtime_receipt.json",
+      "status": "PASS"
+    },
+    {
+      "build_a": {
+        "bytes": 557,
+        "path": "SRC01_synthetic_fixture_receipt.json",
+        "sha256": "156dedc478e885ed7ceae13b694c68bc800ffdec060148c958eb9fe3f681ae42"
+      },
+      "build_b": {
+        "bytes": 557,
+        "path": "SRC01_synthetic_fixture_receipt.json",
+        "sha256": "156dedc478e885ed7ceae13b694c68bc800ffdec060148c958eb9fe3f681ae42"
+      },
+      "byte_identical": true,
+      "path": "SRC01_synthetic_fixture_receipt.json",
+      "status": "PASS"
+    }
+  ],
+  "schema": "OBS_OPEN_SRC01_REBUILD_DETERMINISM_V1",
+  "status": "PASS"
+}

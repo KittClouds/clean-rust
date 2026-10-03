@@ -1,0 +1,7 @@
+question_id	status	reason
+LANDMARK_AGE_STATE	PARKED	Requires causal landmark anchors.
+CAUSAL_CANDIDATE_GENERATION_HISTORY	PARKED	Final multiplicity is retrospective; a causal-prefix object must be separately frozen.
+CANDIDATE_BIRTH_REPRESENTATION_GATE	PARKED	Not part of first range tournament.
+PURE_SCALE_INDEPENDENT_OF_CLOCK	NOT_IDENTIFIABLE	k and freeze clock are aliases.
+RAW_PLUS_Z_COMPLEMENTARITY	PARKED	Requires later separately frozen question.
+PATH_VARIATION_CONTROL	PARKED_CONTROL	Retained as stopwatch-control outcome.

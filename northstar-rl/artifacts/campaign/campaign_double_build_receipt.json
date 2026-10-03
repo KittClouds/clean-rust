@@ -1,0 +1,17 @@
+{
+  "schema_version": "CAMPAIGN_DOUBLE_BUILD_RECEIPT_V1",
+  "first_root": "1100c77928ae151fd64ba826af5425d488edad70da651816540636c9a3f0ba24",
+  "second_root": "1100c77928ae151fd64ba826af5425d488edad70da651816540636c9a3f0ba24",
+  "byte_identical": true,
+  "files": [
+    "partition_tape.json",
+    "transform_state.json",
+    "learner_spec.json",
+    "evaluation_spec.json",
+    "experiment_spec.json",
+    "campaign_spec.json",
+    "planned_run_receipts.json",
+    "campaign_receipt.json",
+    "policy_artifact_contract.json"
+  ]
+}

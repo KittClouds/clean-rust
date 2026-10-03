@@ -1,0 +1,79 @@
+{
+  "allowed_outputs": [
+    "finite status",
+    "row counts",
+    "inclusion probabilities",
+    "F4 reconstruction receipt",
+    "qualification estimator calibration",
+    "runtime and memory diagnostics"
+  ],
+  "authoritative_math_contract_sha256": "6beb47c4784a7d6e37a91e45688dd86e50b15291a8f0dbf07c56c71aefbe47a7",
+  "blocks": [
+    303000,
+    303001,
+    303002,
+    303003
+  ],
+  "collection": {
+    "classifier_in_native_loop": false,
+    "f4_physical_encoding": "deterministic_replay_descriptor_v1",
+    "f4_reconstruction_required_before_estimator": true,
+    "native_only": true,
+    "reference_sign_controller": false,
+    "telemetry_on_off_fixture_required": true
+  },
+  "coordinates_per_cell": 64,
+  "estimator_qualification": {
+    "F4": "exact reconstruction invariant is audited separately; no learned F4 fit is permitted until an encoder is explicitly frozen",
+    "candidate_batch_sizes": [
+      2048,
+      4096
+    ],
+    "candidate_learning_rates": [
+      0.0003,
+      0.001
+    ],
+    "epochs": 200,
+    "feature_levels": [
+      "F0",
+      "F1",
+      "F2",
+      "F3a",
+      "F3b"
+    ],
+    "model_family": "numpy_mlp_binary_classifier",
+    "purpose": "bounded qualification calibration only; measured analysis uses its sealed full-row procedure",
+    "row_modulus": 256,
+    "row_thinning": "retain primary U* rows where per-stream row_index mod 256 == 0"
+  },
+  "execution_authorized": false,
+  "execution_contract": "EXECUTION-CONTRACT-v0.1.json",
+  "expected_sampled_rows": 37748736,
+  "failure": "stop and preserve qualification identity; no measured namespace creation",
+  "forbidden_outputs": [
+    "measured cells",
+    "measured estimator selection",
+    "scientific fly-specific claim",
+    "PHENO reseal"
+  ],
+  "measured_execution_authorized": false,
+  "namespace": "FLY-REACH-03-qualification-v1",
+  "pretraining_trials": 8192,
+  "schema": "FLY-REACH-03-qualification-contract-v0.1",
+  "sides": [
+    "L",
+    "R"
+  ],
+  "status": "QUALIFICATION_ONLY",
+  "substrates": [
+    "fly",
+    "g001",
+    "g002",
+    "g003",
+    "g004",
+    "g005",
+    "g006",
+    "g007",
+    "g008"
+  ]
+}

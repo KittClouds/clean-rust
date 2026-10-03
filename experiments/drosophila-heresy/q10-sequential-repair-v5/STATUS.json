@@ -1,0 +1,33 @@
+{
+  "protocol": "Q10-SR5",
+  "status": "Q10_SR5_STAGE2A_INVALID",
+  "stage": "STAGE_1A_ABORTED__MULTI_STEP_BANK_PERFORMANCE",
+  "factorization": "multi-step sparse-effect Gram matrix with deterministic f64 symmetric eigendecomposition",
+  "stage_1a": {
+    "configured_seed": 9541,
+    "committed_bundles": 0,
+    "committed_event_receipts": 0,
+    "pre_execution_written": true,
+    "reviewer_opened": false
+  },
+  "stage_1b": {
+    "configured_seeds": [9542, 9543, 9544, 9545],
+    "opened": false,
+    "authorized": false
+  },
+  "failure": {
+    "kind": "MULTI_STEP_CAPACITY_BANK_PERFORMANCE_BUDGET_EXCEEDED",
+    "observation_window_minutes": 10.18,
+    "worker_threads": 8,
+    "peak_observed_working_set_bytes": 1433743360,
+    "interpretation": "The naive 16-step-per-coordinate capacity bank did not commit the first Stage-1A bundle within the inherited bounded engineering window.",
+    "same_identity_resume_authorized": false
+  },
+  "scientific_seed_bundles": 0,
+  "behavioral_inference": false,
+  "dh08b_authorized": false,
+  "promotion": {
+    "scientific": false,
+    "reason": "engineering performance failure before any bundle commit"
+  }
+}

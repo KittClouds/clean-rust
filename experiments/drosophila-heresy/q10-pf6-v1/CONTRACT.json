@@ -1,0 +1,127 @@
+{
+  "protocol": "Q10-PF6",
+  "status": "FROZEN_PRE_EXECUTION__PREFLIGHT_ONLY",
+  "parent_protocol": "Q10-PF5",
+  "purpose": "engineering-only oversize distributed beam qualification",
+  "plan_sha256": "2B030F345FE7E9E8A2AF6DEEA1C8CFA8D225841CB3EC026E7648D7C4EB1043ED",
+  "parent": {
+    "root": "experiments/drosophila-heresy/q10-pf5-v1",
+    "plan_sha256": "91286F84241D120395905E1569218B4D4BA5EE682AE5C82B75879305FC88A75C",
+    "contract_sha256": "20995E1826A9C62E0E8689017A2F3E624CC9E63B76B210FBD4AB11D7E9E7D34F",
+    "runner_sha256": "CECB53DB081545035C430C5A855D976676E7A188C38EE738ECFDB63B9C68A650",
+    "qualification_execution_sha256": "8C4CFC547DA471781D353EE767D0122FFF57A1AB6BD4EDDDF2F0117B0C943439",
+    "qualification_results_sha256": "1B368EAA9B81B323935713CB92951662394B9D5A945A19FCF5D05136F82D7FCB",
+    "audit_execution_sha256": "46991E50F2A0829BB08BE297B726F15A355032241CD212B09D915E4A2605F2CB",
+    "audit_results_sha256": "A2C90AB364BF5025A528A3E4E6A7192EBCF1F70939CD3EABAD0A22EE04ECDD92",
+    "audit_root": "experiments/drosophila-heresy/q10-pf5-v1/qualification/full-run-v3-audit"
+  },
+  "runtime": {
+    "pf5_helper_path": "experiments/drosophila-heresy/q10-pf5-v1/scripts/run_q10_pf5.py",
+    "pf5_helper_sha256": "A00078787DB732906416B3C7158DC777CD41C2E71C3AAE660D1AE525446FB82A",
+    "measured_parent_runner_sha256_remains_distinct": true
+  },
+  "frozen_counts": {
+    "primary_endpoints": 28,
+    "groups": 1596,
+    "oversize_groups": 1457,
+    "partial_groups": 102,
+    "blocked_groups": 37,
+    "missing_prefix_replays": 406119,
+    "raw_rows_added_by_replay": 22364
+  },
+  "search": {
+    "exploit_width": 24,
+    "explore_width": 8,
+    "beam_width": 32,
+    "maximum_rounds": 16,
+    "max_nodes_per_group": 32768,
+    "coordinate_order": {
+      "primary_score": "S_i=sum(e_j^2 for j in R_i intersect M_G)",
+      "sort_terms": [
+        {
+          "name": "S_i",
+          "direction": "descending"
+        },
+        {
+          "name": "raw_support_row_count",
+          "direction": "descending"
+        },
+        {
+          "name": "replayed_raw_prefix_count",
+          "direction": "descending"
+        },
+        {
+          "name": "coordinate_id",
+          "direction": "ascending"
+        }
+      ]
+    },
+    "coordinate_residual_authority": "S_i=sum(e_j^2 for j in R_i intersect M_G)",
+    "coordinate_residual_rows": "R_i intersect M_G",
+    "candidate_replay": "exact_learner_order_sequential_binary32",
+    "surrogate_effects_allowed": false,
+    "one_final_choice_per_coordinate": true,
+    "complete_endpoint_after_each_round": true,
+    "visited_coordinate_choice": "chosen_legal_prefix",
+    "unvisited_coordinate_choice": "legal_0",
+    "horizon_is_coordinate_selection_only": true,
+    "round_16_endpoint": "valid_complete_legal_endpoint",
+    "round_16_max_baseline_departures": 16,
+    "tested_zero_label": "tested_zero",
+    "unselected_zero_label": "unselected_zero_by_horizon",
+    "unselected_coordinate_forbidden_labels": [
+      "ineffective",
+      "no-authority"
+    ],
+    "trajectory_diagnostics": {
+      "rounds_inclusive": {
+        "first": 0,
+        "last": 16,
+        "count": 17
+      },
+      "fields": [
+        "mismatch_count",
+        "total_ulp_distance",
+        "residual_l2",
+        "max_residual",
+        "geometry_debt",
+        "active_coordinate_count",
+        "selected_coordinate_ids",
+        "unselected_coordinate_ids"
+      ],
+      "per_group": true,
+      "diagnostic_only": true,
+      "diagnostics_do_not_alter_stopping_or_objective": true
+    },
+    "bounded_search_failure": {
+      "status": "INCONCLUSIVE_BOUNDED_SEARCH",
+      "inconclusive": true
+    },
+    "no_helpful_rows_are_entry_blockers": true
+  },
+  "geometry": {
+    "intermediate_debt_allowed": true,
+    "final_da2_gates_inherited_from_pf5": true,
+    "final_state_reconstructed_from_f32_bytes": true
+  },
+  "scope": {
+    "scientific_bundle_count": 0,
+    "canonical_state_updated": false,
+    "behavioral_probe": false,
+    "future_protocol_opened": false,
+    "q10_na_imported": false
+  },
+  "forbidden_fields": [
+    "accuracy",
+    "reward",
+    "actions",
+    "old_map_margin",
+    "reversed_map_margin",
+    "behavior",
+    "behavioral_inference",
+    "scientific_seed_id",
+    "repair_applied",
+    "repair_applied_to_canonical_model",
+    "dh08b_authorized"
+  ]
+}

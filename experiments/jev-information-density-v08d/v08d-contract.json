@@ -1,0 +1,109 @@
+{
+  "protocol": "jev-decision-data-information-density/v0.8d-common-support-capacity",
+  "status": "frozen_before_support_construction",
+  "parent": {
+    "v08c_integrity_receipt": {
+      "path": "D:\\codex-runs\\jev-information-density-v08c\\phase2c-v01\\cross-atom-search-v01\\phase2c-integrity-receipt.json",
+      "sha256": "c05b913b739ad34650aa2935b881b640d1b3c8c29df5b32049029828df03f5e7"
+    },
+    "interpretation": "historical-profile factorial not ready; RM100 exact learner-visible distance 0.02843 < 0.10; this result is read-only and not a support-selection score"
+  },
+  "scope": {
+    "metadata_only": true,
+    "model_or_tokenizer_access": false,
+    "feature_cache_access": false,
+    "training_materialized": false,
+    "phoenix_access": false,
+    "prior_banks_or_phases_mutated": false,
+    "raw_text_written_to_outputs": false,
+    "policy_arms_constructed": false,
+    "model_contact_authorized": false
+  },
+  "inputs": {
+    "generation_receipt": {
+      "path": "D:\\codex-runs\\jev-information-density-v08\\full-universe-500k-v08\\generation-receipt.json",
+      "sha256": "6a25632f4e90688d043d0a384112c7e18283a8b5ac9bb67a31da37a69115ec8e"
+    },
+    "group_records": {
+      "path": "D:\\codex-runs\\jev-information-density-v08\\full-universe-500k-v08\\group-records.jsonl",
+      "sha256": "9e3546fbe88741666cc5be5ae28907d7a223f74c8578609adfc3036ba7f4e7f2"
+    },
+    "training_signature_index": {
+      "path": "D:\\codex-runs\\jev-information-density-v08c\\phase2c-v01\\training-signatures.sqlite",
+      "sha256": "8c9614928ce4172665a2a0d7e6f8463b9a3cca4d7af971ad2da01e7710c9d901"
+    },
+    "heldout_manifest": {
+      "path": "D:\\codex-runs\\jev-information-density-v08\\selection-v08-c100v12\\new-tight-eval-group-ids.jsonl",
+      "sha256": "3e72cd7596fbf0b302501b88dd9dc645a5749de10884b57eceb5552bfc5ef8ae"
+    },
+    "preselection_audit": {
+      "path": "D:\\codex-runs\\jev-information-density-v08\\selection-v08-c100v12\\preselection-audit.json",
+      "sha256": "835a34e4c69ab831199a9b48d3f2203bdc3b41a2a56ea6395a67441ac71e589d"
+    },
+    "source_overlap_report": {
+      "path": "D:\\codex-runs\\jev-information-density-v08\\selection-v08-c100v12\\source-overlap-report.json",
+      "sha256": "6f2c1cb1f7ee7cda608b315588b1bb937f1c41523188261b7fcacb98ffc4aa6f"
+    },
+    "input_target_consistency": {
+      "path": "D:\\codex-runs\\jev-information-density-v08\\full-universe-500k-v08\\input-target-consistency.json",
+      "sha256": "3d330dcf7ea7d2b3a830b0cf285e9a58280ae159065429927b413b6606476cd5"
+    },
+    "training_equivalence_audit": {
+      "path": "D:\\codex-runs\\jev-information-density-v08c\\phase2c-v01\\training-equivalence-audit.json",
+      "sha256": "d8e2a7fbf2916b6df9b6bf5747f5e743b863aa9afdc3c5e2b437fdf8dbd32b3a"
+    },
+    "phase2c_freeze_receipt": {
+      "path": "D:\\codex-runs\\jev-information-density-v08c\\phase2c-v01\\phase2c-freeze-receipt.json",
+      "sha256": "e54960a2f25e1ef9a0a3e4c46e4821d99bda851d5fc19560d0d4a5314331ddc1"
+    }
+  },
+  "design": {
+    "target_groups": 100000,
+    "support_stratum": "joint_cell_json × sorted topology tuple × intervention family",
+    "minimum_groups_per_admitted_stratum": 4,
+    "minimum_support_replays_per_quota": 4,
+    "quota_rule": "minimum 1 per admitted stratum; proportional capped largest-remainder allocation; per-stratum upper bound floor(capacity/4); total exactly 100000",
+    "witness_attempts": 32,
+    "witness_seed_prefix": "jev-idv08d-capacity-witness-sha256-v1-",
+    "witness_pair_rule": "within each stratum sort by SHA256(seed|group_id); A takes first q and B the next q",
+    "witness_selection_uses_model_outcomes": false,
+    "profile_constraints": {
+      "exact_stratum_counts": true,
+      "unique_input_relative_error_max": 0.02,
+      "input_occurrence_histogram_tv_max": 0.02,
+      "unique_root_relative_error_max": 0.02,
+      "root_occurrence_histogram_tv_max": 0.02,
+      "extra_family_axis_tv_max": 0.02,
+      "task_kind_tv_max": 0.02,
+      "view_tv_max": 0.02,
+      "candidate_count_tv_max": 0.02,
+      "open_world_tv_max": 0.02,
+      "probability_source_tv_max": 0.02
+    },
+    "required_core_category_coverage": [
+      "world_family",
+      "family_bundle",
+      "query_view",
+      "candidate_cardinality_bin",
+      "entropy_quintile",
+      "entropy_band",
+      "topology",
+      "intervention_family"
+    ],
+    "required_family_category_min_population": 100,
+    "exact_training_distance_gate": 0.20,
+    "exact_training_distance_method": "frozen supervised-signature multiset plus capped v0.5 invariance-pair context; recomputed for each profile-valid witness",
+    "winner_rule": "among all profile-valid attempts, maximize exact D_train; ties break by seed index; pass requires D_train >= 0.20",
+    "if_gate_fails": "report bounded witness result; do not change quotas, coverage rules, or thresholds; no policy arms or model contact"
+  },
+  "outputs": {
+    "external_run_directory": "D:\\codex-runs\\jev-information-density-v08d\\common-support-v01",
+    "support_census": "support-census.json",
+    "pstar_profile": "pstar-profile.json",
+    "witness_report": "capacity-witness-report.json",
+    "witness_a_manifest": "capacity-witness-a-ids.jsonl",
+    "witness_b_manifest": "capacity-witness-b-ids.jsonl",
+    "freeze_receipt": "freeze-receipt.json",
+    "integrity_receipt": "integrity-receipt.json"
+  }
+}

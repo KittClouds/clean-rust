@@ -1,0 +1,34 @@
+{
+  "commands": [
+    "python -m py_compile experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/issue_e4_stage_authorization_v16_v05.py experiments/fas-frozen-observer-bundle-engineering-v01/source/tests/test_e4_stage_authorization_v16_v05.py",
+    "python -m unittest discover -s experiments/fas-frozen-observer-bundle-engineering-v01/source/tests -p test_e4_stage_authorization_v16_v05.py -v"
+  ],
+  "execution_authorization_conferred": false,
+  "py_compile": "PASS",
+  "receipt_id": "E4_0_AUTHORIZATION_ISSUER_V16_V05_SOURCE_TESTS",
+  "recorded_utc": "2026-09-27T07:54:51+00:00",
+  "runtime_access": {
+    "cache_created": false,
+    "cuda_initialized": false,
+    "gpu_lease_acquired": false,
+    "labels_opened": false,
+    "model_contact": false,
+    "tokenizer_contact": false
+  },
+  "schema": "FAS_E4_0_AUTHORIZATION_ISSUER_SOURCE_TESTS_V16_V05",
+  "scope": "Synthetic E4 stage-authorization issuer verification only. Confirms the actual sealed predecessor contract schema and exact preserved v16-v04 pre-contact authorizer stop are accepted as lineage without changing stage scope. No authorization output, model, tokenizer, CUDA, GPU lease, cache, or terminal-label access.",
+  "source_files": [
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/issue_e4_stage_authorization_v16_v05.py",
+      "bytes": 66189,
+      "sha256": "9ea254b3f3d7a15af77ff4ac61216057a1abfb92f19fe30eff2a022b252d7853"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/tests/test_e4_stage_authorization_v16_v05.py",
+      "bytes": 50201,
+      "sha256": "b558b6670680a8b3e15bf19a8d42fb12f999b618863b4254d4b3a9f37fef1a82"
+    }
+  ],
+  "status": "PASS_SYNTHETIC_TESTS_V16_V05",
+  "synthetic_test_count": 18
+}

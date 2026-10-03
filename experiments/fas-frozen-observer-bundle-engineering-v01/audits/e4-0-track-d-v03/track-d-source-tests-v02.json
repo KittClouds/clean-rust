@@ -1,0 +1,165 @@
+{
+  "schema": "FAS_E4_0_TRACK_D_V03_SOURCE_TESTS_V02",
+  "status": "PASS_SYNTHETIC_SOURCE_AND_CLI_TESTS",
+  "source_unit": "E4 independent auditor v03; exact inherited-v06 population path enforcement",
+  "supersedes": {
+    "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-d-v03/track-d-source-tests-v01.json",
+    "bytes": 6409,
+    "sha256": "3ea5e269c7da021daa13f8c991372395d28dde4e63ee2d6dc2e477e435334153"
+  },
+  "recorded_utc": "2026-09-27T00:10:44+00:00",
+  "working_directory": "C:\\Users\\shuga\\.codex\\worktrees\\e4-0-contract-work\\clean-rust",
+  "commands": [
+    "python -m compileall -q experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v03",
+    "python -m unittest discover -s experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v03/tests -v",
+    "PowerShell: set PYTHONPATH to experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts; python -m e4_independent_audit_v03 --help; clear PYTHONPATH",
+    "Version probe: Python 3.13.15; NumPy 2.5.3; Torch 2.11.0+cu128; torch.cuda.is_initialized() == False."
+  ],
+  "results": {
+    "compileall": "PASS",
+    "unittest": "PASS",
+    "tests_run": 17,
+    "tests_passed": 17,
+    "tests_failed": 0,
+    "test_names": [
+      "test_all_non_scoring_runtime_stage_shapes",
+      "test_runtime_authorization_requires_artifact_map_and_exact_roots",
+      "test_scoring_authorization_forbids_runtime_artifact_map",
+      "test_auditor_source_has_no_scorer_imports",
+      "test_cache_and_receipt_tamper_are_rejected",
+      "test_cli_workspace_root_walks_above_project_folder",
+      "test_contract_seal_binds_v07_and_exact_v06_contract_seal_lineage",
+      "test_escrow_sentinel_is_never_opened_by_pre_score_seal_audit",
+      "test_inherited_v06_contract_seal_checks_exact_synthetic_bytes",
+      "test_markdown_source_map_accepts_exact_workspace_project_prefix",
+      "test_source_map_hash_and_path_are_checked",
+      "test_v06_population_and_panel_are_inherited_while_later_stages_require_v07",
+      "test_v06_population_paths_match_source_map_and_reject_stale_aliases",
+      "test_scorer_auditor_disagreement_is_rejected",
+      "test_single_endpoint_failure_is_not_hidden_by_bundle",
+      "test_support_failure_skips_endpoint_bootstrap",
+      "test_synthetic_qualification_passes_and_bootstrap_reproduces"
+    ],
+    "cli_help_smoke": "PASS_CONTRACT_POPULATION_PARITY_FEATURES_SCORE_COMMANDS_LISTED",
+    "path_binding_test": "PASS_CANONICAL_V06_PATHS; BOTH_STALE_ALIASES_REJECTED",
+    "torch_cuda_is_initialized_after_tests": false
+  },
+  "runtime": {
+    "python": "3.13.15",
+    "numpy": "2.5.3",
+    "torch": "2.11.0+cu128",
+    "torch_cuda_initialized_after_probe": false
+  },
+  "identity": {
+    "current_contract_id": "FAS_FROZEN_CAPABILITY_FABRIC_E4_0_V07",
+    "current_contract_seal_id": "FAS_E4_0_CONTRACT_V07_SEAL",
+    "inherited_contract_id": "FAS_FROZEN_CAPABILITY_FABRIC_E4_0_V06",
+    "inherited_contract_seal_id": "FAS_E4_0_CONTRACT_V06_SEAL",
+    "inherited_v06_stages": [
+      "POPULATION_GENERATION",
+      "PARITY_PANEL_MATERIALIZATION"
+    ],
+    "new_v07_stages": [
+      "ONLINE_CACHE_PARITY",
+      "FRESH_FEATURE_EXTRACTION",
+      "FRESH_SCORING"
+    ],
+    "scientific_predecessor_roots": [
+      "e0_v10_root_sha256",
+      "e1_v04_root_sha256",
+      "e2_v07_root_sha256",
+      "e3_v02_bundle_root_sha256"
+    ],
+    "inherited_population_paths": {
+      "source_map_builder": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/build_e4_0_source_map_v06.py",
+      "v06_online_parity_authorization": {
+        "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-auth-issuer-v02/online-parity-authorization-v01.json",
+        "bytes": 9884,
+        "sha256": "59d6ed54ca401ce6606cd2f3053a19ded24252c1a725aa53508cb0625a8197aa"
+      },
+      "population_seal": {
+        "run_root": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e4-0-v01",
+        "run_root_relative_path": "stage-seal-v01.json",
+        "authorization_artifact": {
+          "path": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e4-0-v01\\stage-seal-v01.json",
+          "sha256": "ad8175710b4f2db9aa6529e787962b0fbce92260f0b7020a322242342fc1af2d",
+          "bytes": 2167
+        }
+      },
+      "population_audit": {
+        "workspace_relative_path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-execution/population-independent-audit-receipt-v01.json",
+        "authorization_artifact": {
+          "path": "C:\\Users\\shuga\\.codex\\worktrees\\e4-0-contract-work\\clean-rust\\experiments\\fas-frozen-observer-bundle-engineering-v01\\audits\\e4-0-execution\\population-independent-audit-receipt-v01.json",
+          "sha256": "7dd3eea3133dbed779071fd14e22df06ff5a0ddce994e4446cf4c6ef7b9cbe5a",
+          "bytes": 858
+        }
+      },
+      "legacy_aliases_rejected": [
+        "seals/e4-0-population-v01-seal.json",
+        "audits/e4-0-population-v01-independent-audit.json"
+      ]
+    }
+  },
+  "boundary": {
+    "actual_e4_population_or_feature_data_read": false,
+    "actual_e4_primary_terminal_labels_read": false,
+    "actual_e4_escrow_labels_read": false,
+    "actual_e3_head_files_read": false,
+    "synthetic_e3_head_arrays_used_for_replay_logic": true,
+    "escrow_sentinel_opened": false,
+    "actual_v06_stage_authorization_receipt_read_for_path_confirmation": true,
+    "actual_population_stage_seal_or_audit_receipt_read": false,
+    "tokenizer_contact": false,
+    "backbone_model_contact": false,
+    "torch_imported_for_synthetic_cpu_replay": true,
+    "cuda_initialization": false,
+    "real_e4_audit_or_replay": false
+  },
+  "source_files": {
+    "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v03/README.md": {
+      "bytes": 2186,
+      "sha256": "d0ee84a89cdd23e8237d017705ceebfd60320fbad4d753add922e0718043456e"
+    },
+    "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v03/__init__.py": {
+      "bytes": 71,
+      "sha256": "c5c6939552ed8fc92be9b0dd26f6732123dcccc44ef316eb3ab685f8bf291f12"
+    },
+    "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v03/__main__.py": {
+      "bytes": 48,
+      "sha256": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d"
+    },
+    "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v03/cli.py": {
+      "bytes": 30266,
+      "sha256": "d30865fbb844f650db0e70c08d2fddda92209862367ca73f26f6922c80e3f4a6"
+    },
+    "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v03/constants.py": {
+      "bytes": 4652,
+      "sha256": "119bd0b949519c6c8a21bb11c2b803b6600b507bd9a09fa7cefd77b4e81f3028"
+    },
+    "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v03/features.py": {
+      "bytes": 13065,
+      "sha256": "241f84f6874cf272b173acb52a1541c472445c109c270c230858210b8ab529b5"
+    },
+    "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v03/integrity.py": {
+      "bytes": 26840,
+      "sha256": "f63881593394f4f1a122e53b0cf921dda8aae60fa39c949fcd1cd0fcf4853e55"
+    },
+    "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v03/population.py": {
+      "bytes": 16583,
+      "sha256": "721f7d965777e9c2cb1baee6d4459ef7dbffea8b84c58cb123dedc72e5bf3309"
+    },
+    "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v03/replay.py": {
+      "bytes": 24743,
+      "sha256": "fc2d49b6efe7b300b425d8a69858f4256da7218a400872d2560798456a44b421"
+    },
+    "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/e4_independent_audit_v03/tests/test_audit.py": {
+      "bytes": 40977,
+      "sha256": "d1ccaa8664ab85371bd65d8ec7750eae71ac89225c0d5670cc201df05740852a"
+    }
+  },
+  "notes": [
+    "The auditor now rejects noncanonical population seal/audit CLI paths before opening the population seal or audit receipt.",
+    "Synthetic tests verify the inherited-v06 population and parity-panel stages retain v06 identity while newly produced runtime stages require v07 identity.",
+    "The previous v01 source-test receipt remains byte-identical and is linked through supersedes."
+  ]
+}

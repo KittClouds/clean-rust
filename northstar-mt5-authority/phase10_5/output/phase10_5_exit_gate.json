@@ -1,0 +1,29 @@
+{
+  "contract": "MST_RG2_PHASE10_5_EXIT_GATE_V1",
+  "status": "PASS",
+  "created_at_utc": "2026-08-12T13:38:11.818954+00:00",
+  "interface_version": "MST_RG2_RESEARCH_INTERFACE_V1_1",
+  "corpus_sha256": "9cbad8545db23cba7ccea2bd062aeba700597deb4be19cecbb74647f65ef8413",
+  "analysis_code_sha256": "7000d52d9b4234de19df4ba0b7ddb225ccf9556d095e3589e4018ed57bac60e6",
+  "counts": {
+    "runs": 20,
+    "attempts": 7764,
+    "events": 38957,
+    "transits": 628,
+    "contributor_context_rows": 49281,
+    "reserved_holdout_windows": 12
+  },
+  "gates": {
+    "sealed_corpus_verified_before_and_after": true,
+    "canonical_attempt_view_one_row_per_attempt": true,
+    "attempt_chain_preserves_attempt_cardinality": true,
+    "event_timeline_preserves_event_cardinality": true,
+    "transit_view_preserves_transit_cardinality": true,
+    "context_expansion_is_explicit": true,
+    "node_retired_never_behavioral": true,
+    "attempt_timeout_never_behavioral": true,
+    "holdout_access_fails_closed": true,
+    "all_canonical_targets_have_eligible_observations": true,
+    "replay_partition_available": true
+  }
+}

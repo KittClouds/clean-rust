@@ -1,0 +1,1 @@
+{"schema":"OBS_OPEN_03A_AGGREGATE_RECEIPT_V1","sampling_units":["ANCHOR_WEIGHTED","SESSION_WEIGHTED"],"distribution_rows":156312,"ecdf_query_rows":156312,"tail_mass_rows":593328,"survival_hazard_rows":133826,"multiplicity_rows":154,"visualization_projection_rows":2232,"formal_tests":0,"status":"PASS"}

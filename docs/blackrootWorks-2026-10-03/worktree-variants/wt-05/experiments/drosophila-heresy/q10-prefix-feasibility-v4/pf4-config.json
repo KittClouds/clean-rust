@@ -1,0 +1,1 @@
+{"protocol":"Q10-PF4","seeds":[9681,9682],"taus":[4.0,16.0],"sides":["R","L"],"trials":[128],"observe":true,"cues":16,"delay_steps":12,"total_trials":512,"eta":0.05,"glut_sign":-1.0,"input_salt":858980352,"threads":1}

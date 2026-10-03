@@ -1,0 +1,54 @@
+{
+  "protocol": "jev-information-density/v0.8n-road-b-phase-b-implementation-correction-v02",
+  "identity": "v0.8N-phase-b-implementation-correction-v02",
+  "status": "IMPLEMENTATION_ONLY_CORRECTION_SEALED",
+  "parent_authorization_event_sha256": "0cad8d2e45fe8e7e5eed7f9bcdeab406926f24605ad9f62396d83f9512bb0a09",
+  "parent_correction_receipt_path": "experiments/jev-information-density-v08n/phase_b/phase-b-implementation-correction-v01.json",
+  "parent_correction_receipt_sha256": "9b8118109a02c207d749d8344010350f8d79ccf66a452661c680110d0b075cb2",
+  "corrected_entrypoint_sha256": "4e8e933fa52c6a9bb7b45382d3409cb2505ccfe787b802e67d263852cf8bfa4d",
+  "frozen_trainer_sha256": "e539bac2d67b47ba2b660b8579c5818e5fffc0cf94fa26cfd3e9dd905ef795ba",
+  "parent_frozen_trainer_sha256": "e539bac2d67b47ba2b660b8579c5818e5fffc0cf94fa26cfd3e9dd905ef795ba",
+  "correction_verifier_sha256": "181dd4a10fb872a72cfa5fc54e3c2b6515ea7d85bf0295baf29fc489efe20c3f",
+  "correction_test_sha256": "67c617439ec1dff9ff7575bc21d5581c4561ee7307de434c52b41b11f11ce5b2",
+  "correction_class": "in-memory implementation source-order correction; semantic impact none",
+  "observed_failure": {
+    "stage": "training input verification, before head template initialization",
+    "exception": "UnboundLocalError: catalog_ids referenced before assignment in candidate token receipt ordering check",
+    "root_cause": "the authorized trainer derives catalog_ids after its first use",
+    "outputs_at_failure": {
+      "candidate_extraction_complete": true,
+      "head_templates_created": false,
+      "run_directories_created": false,
+      "optimizer_steps": 0,
+      "head_training": false,
+      "heldout_panel_opened": false
+    }
+  },
+  "correction": {
+    "entrypoint": "experiments/jev-information-density-v08n/phase_b/train_phase_b_corrected_v02.py",
+    "source_overlay": "Move the existing catalog_ids declaration before its first use; remove the former later declaration. No expression, input, order, criterion, or result changes.",
+    "source_overlay_applied_in_memory": true,
+    "on_disk_authorized_trainer_modified": false,
+    "cache_adapter_inherited_from_v01": true,
+    "correction_test_path": "experiments/jev-information-density-v08n/phase_b/tests/test_v08n_phase_b_correction_v02.py",
+    "correction_verifier_path": "experiments/jev-information-density-v08n/phase_b/verify_phase_b_correction_v02.py",
+    "run_and_training_seal_bind_both_correction_receipts": true,
+    "original_authorization_binding_remains_byte_identical": true
+  },
+  "preserved_inputs": {
+    "candidate_feature_receipt_sha256": "29f8d67b24fd2a554500e1cfe2e0fe0b4311d32fad7052ad8ffb3464b7835f44",
+    "candidate_tensor_file_sha256": "3bb3036f455a83409361eb3e4150833bd8b255a2a783ec1218b00b12315c0590",
+    "candidate_tensor_content_sha256": "f76e573779152fd3966845a39e29206c333eef388e0511c5f3e07f8f1b46d593",
+    "candidate_reextraction": false,
+    "primary_schedule_and_arm_manifests_modified": false
+  },
+  "semantic_contract_changed": false,
+  "training_inputs_changed": false,
+  "model_revision_changed": false,
+  "objective_or_loss_changed": false,
+  "seed_or_schedule_changed": false,
+  "evaluation_contract_changed": false,
+  "protected_panel_access": false,
+  "newtight_access": false,
+  "phoenix_access": false
+}

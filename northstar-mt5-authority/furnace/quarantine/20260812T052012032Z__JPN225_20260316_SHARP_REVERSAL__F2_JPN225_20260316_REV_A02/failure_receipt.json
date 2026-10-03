@@ -1,0 +1,12 @@
+﻿{
+    "contract":  "MST_FURNACE_FAILURE_V1",
+    "status":  "QUARANTINED",
+    "failed_at_utc":  "2026-08-12T09:20:12.0295238Z",
+    "window_id":  "JPN225_20260316_SHARP_REVERSAL",
+    "attempt_tag":  "F2_JPN225_20260316_REV_A02",
+    "reason":  "Sealer did not admit run: ",
+    "auction_stem":  "MasterAuction_JPN225_PERIOD_M5_F2_JPN225_20260316_REV_A02_RG2_v7",
+    "structure_stem":  "MasterStructure_JPN225_PERIOD_M5_F2_JPN225_20260316_REV_A02_v6",
+    "captured_raw_files":  10,
+    "deletion_performed":  false
+}

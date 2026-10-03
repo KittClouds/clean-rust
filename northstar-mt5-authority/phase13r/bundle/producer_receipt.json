@@ -1,0 +1,18 @@
+{
+  "contract": "NORTHSTAR_PHASE13_BUNDLE_PRODUCER_V1",
+  "status": "PASS",
+  "protocol_sha256": "098844644e31878725ec4bb7859bb5db2f63f937adfc21bea3fb8ea91b287cf6",
+  "bundle_semantic_sha256": "2c4200dbc633dae41302b3a6a33893c36446fce257125e51d498eddb3e8311f7",
+  "producer_code_sha256": "22d41d35725d20347707655b9472b39d27ecc8b8f7ec9adb833e68553ce0f4e3",
+  "research_interface_sha256": "7000d52d9b4234de19df4ba0b7ddb225ccf9556d095e3589e4018ed57bac60e6",
+  "statistics_code_sha256": "87cffaf207348310ca27b76e4c9133cee2b45ce2d31a69a192ca549bff4eb13a",
+  "contracts_code_sha256": "d94226a4f79ab8502166016ff55960cbd5cd070a7f685be335d80f59520d681a",
+  "sealed_runs": 12,
+  "target_row_counts": {
+    "initial_acceptance_given_initial_contact": 3686,
+    "reclaim_given_break": 1318,
+    "rejection_given_initial_contact": 3686,
+    "retest_hold_given_retest_contact": 899
+  },
+  "market_outcomes_exposed_by_producer": false
+}

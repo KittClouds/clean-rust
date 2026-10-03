@@ -1,0 +1,9 @@
+{
+  "protocol": "Q10-GC0-GP1",
+  "identity": "q10-gc0-gp1-v1",
+  "status": "INTERRUPTED_PRE_DERIVATION",
+  "completed_groups": 9,
+  "reason": "runtime preflight showed inherited sequential Python replay cost would make the single-process run multi-hour",
+  "authoritative": false,
+  "partial_stream": "qualification/partial/palettes_after_9_groups.jsonl"
+}

@@ -1,0 +1,29 @@
+{
+  "identity": "q10-gc1-lr1-requal1-sreplace-pairs-rerun1-interaction-finalizer-v1",
+  "parent_bindings": [
+    {
+      "label": "interaction_execution",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-sreplace-pairs-rerun1-interaction-v1/execution.json",
+      "sha256": "5016A2331F7336A1684413B5D91E9957ECC2B56622C3B4BD3FB643585A95C6F6"
+    },
+    {
+      "label": "interaction_contract",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-sreplace-pairs-rerun1-interaction-v1/CONTRACT.json",
+      "sha256": "DB6B7B95BF6F437C1623FC1F257FC8BB1FC21EAA4741B374E52588986401EFAD"
+    },
+    {
+      "label": "clean_pair_rerun_execution",
+      "path": "experiments/drosophila-heresy/q10-gc1-lr1-requal1-sreplace-pairs-rerun1-v1/execution.json",
+      "sha256": "F160638BF6009ED4050A1427D3A3D8C8F56DE777CBBE2AFEEAB1704FE28B6B0E"
+    }
+  ],
+  "plan_sha256": "052194F3ECA409A81A9EC3D855B4E7CD6AEC45469C39C0A214C5F3D334467346",
+  "protocol": "REQUAL1-SREPLACE-PAIRS-RERUN1-INTERACTION-FINALIZER",
+  "runner_sha256": "E3E3000BEE4D197616ADD67722BF19CEF2A1F0BEF7527CA92B9B6A65E4B45CEC",
+  "scope": {
+    "behavioral_probe": false,
+    "independent_finalization": true,
+    "scientific_promotion": false
+  },
+  "status": "FROZEN_PRE_EXECUTION__NOT_EXECUTED"
+}

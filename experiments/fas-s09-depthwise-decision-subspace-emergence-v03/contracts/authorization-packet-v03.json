@@ -1,0 +1,33 @@
+{
+  "packet_id": "FAS_S09_RECOVERY_AUTHORIZATION_PACKET_V03",
+  "authorization_basis": "Versioned recovery of the already-authorized S09 extraction and fixed analysis. The v02 receipt-assembly defect occurred after feature production and all in-memory qualification checks. v03 independently requalifies the existing cache before any probe fit.",
+  "permitted": [
+    "read and hash the unchanged v02 feature matrices",
+    "scan all matrix values for finiteness",
+    "compare layer-16 M/F matrices byte-for-byte with sealed S01-2 terminal parents",
+    "load only the pinned local LFM weights for the frozen first-256-row deterministic repeat",
+    "verify model asset identity and parameter identity before and after the repeat",
+    "seal v03 recovery receipts and cache identity",
+    "run the already-authorized 32 fixed exact-target linear fits and four replay cells per layer after the layer-16 gate",
+    "seal S09-v03 analysis and result"
+  ],
+  "prohibited": [
+    "modify or reseal v02 files in place",
+    "repeat full-corpus feature extraction",
+    "load a tokenizer or access FAS-00 artifacts",
+    "alter probe, split, thresholds, optimizer, or representation views",
+    "perform additional fitting, search, inference, or adaptive mechanisms"
+  ],
+  "stop_on": [
+    "any feature matrix size, hash, or finite-value failure",
+    "terminal parent parity failure",
+    "model identity or deterministic repeat failure",
+    "backbone parameter identity change",
+    "terminal S01 probe reproduction or S08 plane gate failure"
+  ],
+  "expected_terminal_state": {
+    "S09_RESULT_READY": false,
+    "FAS00_PHASE4_AUTHORIZED": false,
+    "ADAPTIVE_MECHANISMS_AUTHORIZED": false
+  }
+}

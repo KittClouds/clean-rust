@@ -1,0 +1,105 @@
+{
+  "contexts": [
+    {
+      "actions": 440,
+      "context": "seed9731-L-tau16__set2",
+      "coverage_sha256": "C31612958C133E7C0342619EA1054528CFDFA40AAA064082DA0659FF852AF716",
+      "domain_sha256": "DEE73FC801FB6F841EA538DB69DE022D8B43409CD6BF013BE14576D229FD7037",
+      "max_action_coverage": 17,
+      "min_action_coverage": 8,
+      "parent_pairs": 95040,
+      "sample_pairs": 2121
+    },
+    {
+      "actions": 496,
+      "context": "seed9731-L-tau4__set3",
+      "coverage_sha256": "50CFE8A4CAE0FF54B782A6C0AD5AAE3E91098F216BF4142DADCB4CAC8E99219F",
+      "domain_sha256": "A6380FE9492233A85E34D62B7502C7CB5A4E4D44D841DD44B1C1698ED708A57B",
+      "max_action_coverage": 18,
+      "min_action_coverage": 8,
+      "parent_pairs": 121024,
+      "sample_pairs": 2389
+    },
+    {
+      "actions": 472,
+      "context": "seed9731-R-tau16__set1",
+      "coverage_sha256": "12D40A2B538B2DA4286DFE055914AF05D442E2068DDC8E69E88661B72412012B",
+      "domain_sha256": "0275E887A03022E03AA560399460E47A3A1549F92F6B11D0F1053A40DD3D2DFE",
+      "max_action_coverage": 17,
+      "min_action_coverage": 8,
+      "parent_pairs": 109504,
+      "sample_pairs": 2266
+    },
+    {
+      "actions": 432,
+      "context": "seed9731-R-tau16__set3",
+      "coverage_sha256": "ED368714A7756BFE67245113C922DF311A95D4176C5F2C8E898DED86DE01A0FB",
+      "domain_sha256": "F04CF68D2DA84DA2AFB38BB5AD7FA6114230AC5E7E5E9AC49A70ADF5302FCB98",
+      "max_action_coverage": 17,
+      "min_action_coverage": 8,
+      "parent_pairs": 91584,
+      "sample_pairs": 2062
+    },
+    {
+      "actions": 472,
+      "context": "seed9731-R-tau4__set0",
+      "coverage_sha256": "713F37754553FB99180CC31095CF65B94F2A0FDFAB2EBEDDED480FFF43FA4A77",
+      "domain_sha256": "F74418A88B8067316B365CDBBC72B27167A62BA5A08A4E5058BC485FC1575A91",
+      "max_action_coverage": 18,
+      "min_action_coverage": 8,
+      "parent_pairs": 109504,
+      "sample_pairs": 2267
+    },
+    {
+      "actions": 440,
+      "context": "seed9731-R-tau4__set1",
+      "coverage_sha256": "8F9C289DA29C364A9B1F5C580150D035929B26298CF36D06C8987579EC4B88EF",
+      "domain_sha256": "8E0A0F2A6FAF6B161E6FACA652ED565124D6A131EC5F95B22DB881B82BC0C2C4",
+      "max_action_coverage": 18,
+      "min_action_coverage": 8,
+      "parent_pairs": 95040,
+      "sample_pairs": 2099
+    },
+    {
+      "actions": 472,
+      "context": "seed9731-R-tau4__set2",
+      "coverage_sha256": "5077867E97C11C36194BE0EE0656957F254604450780B1A770A9B130E05C8557",
+      "domain_sha256": "15EBF274612925569088EA1D35EB91BA085A7E2578FE180924251C15F07603DE",
+      "max_action_coverage": 17,
+      "min_action_coverage": 8,
+      "parent_pairs": 109504,
+      "sample_pairs": 2253
+    },
+    {
+      "actions": 472,
+      "context": "seed9731-R-tau4__set3",
+      "coverage_sha256": "B45A3B156A9FD77082D82AC4B6B3A078ABD1790D3D2C061AE81EADB176AF7CC8",
+      "domain_sha256": "B6DA6995C4C8DD2013B34AE229B4D011DDBF87656DA1214FEDC50E09D6890F7E",
+      "max_action_coverage": 17,
+      "min_action_coverage": 8,
+      "parent_pairs": 109504,
+      "sample_pairs": 2255
+    }
+  ],
+  "counts": {
+    "actions": 3696,
+    "contexts": 8,
+    "parent_census_pairs": 840704,
+    "sample_pairs": 17712
+  },
+  "coverage": {
+    "max_observed": 18,
+    "min_observed": 8,
+    "partners_per_action_required": 8
+  },
+  "engineering_only": true,
+  "identity": "q10-gc1-lr1-requal1-csc1-upair1-domain-v1",
+  "ordered_domain_sha256": "A99DAFA3FD3114F9DE5301255EC16C07CFA373FB56D033E27D7B7B1317CCD9DB",
+  "pair_outcomes_consulted": false,
+  "pair_replay_performed": false,
+  "parent_uvd0_contract_sha256": "475495837462F728743736810A1063EC09AABF9EA7C596F76B81AE1C2231E0A8",
+  "parent_uvd0_execution_sha256": "768320AA2B19C4F86A91BF369DE039E0C18DAE1806827112DE54DE81F3771223",
+  "protocol": "Q10-CSC1-UPAIR1-DOMAIN",
+  "scientific_promotion": false,
+  "status": "UPAIR1_DOMAIN_COMPLETE"
+}

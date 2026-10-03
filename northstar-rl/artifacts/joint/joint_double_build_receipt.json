@@ -1,0 +1,11 @@
+{
+  "schema_version": "JOINT_DOUBLE_REBUILD_RECEIPT_V1",
+  "first_root": "bbf510b8031b71d00d817e15eb7deb77c7ff038ead9259f11d2e5b8ce56909f0",
+  "second_root": "bbf510b8031b71d00d817e15eb7deb77c7ff038ead9259f11d2e5b8ce56909f0",
+  "byte_identical": true,
+  "files": [
+    "joint_replay_fixture.json",
+    "tradelocker_capture.nsb1",
+    "mt5_capture.nsb1"
+  ]
+}

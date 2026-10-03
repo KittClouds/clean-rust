@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "TerminationSpec",
+  "type": "object",
+  "properties": {
+    "account_floor": {
+      "type": "number",
+      "format": "double"
+    },
+    "episode_end_is_truncation": {
+      "type": "boolean"
+    },
+    "schema_version": {
+      "type": "string"
+    },
+    "source_gap_is_termination": {
+      "type": "boolean"
+    },
+    "termination_spec_id": {
+      "$ref": "#/$defs/Digest256"
+    }
+  },
+  "required": [
+    "schema_version",
+    "termination_spec_id",
+    "account_floor",
+    "episode_end_is_truncation",
+    "source_gap_is_termination"
+  ],
+  "$defs": {
+    "Digest256": {
+      "description": "Domain-separated BLAKE3 digest",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

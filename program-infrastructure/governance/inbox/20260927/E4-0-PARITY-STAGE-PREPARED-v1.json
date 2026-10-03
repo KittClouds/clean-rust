@@ -1,0 +1,20 @@
+{
+  "schema": "CHIEF_E4_0_PARITY_STAGE_PREPARED_V1",
+  "status": "SPECS_BOUND_SEAL_VERIFIED_FLIGHT_AUTHORITY_WITHHELD",
+  "run_id": "frozen-fabrique.e4-0.supervised.v1",
+  "stage_id": "E4_0_ONLINE_CACHE_PARITY_V1",
+  "actor_id": "fabrique-e4-supervisor-v1",
+  "resource_id": "gpu.local.cuda0.e850fbf0",
+  "policy_hash": "sha256:2da19101682c6837474306d66b82a8d283e75656ce7395b2cd847a1f14e2fd09",
+  "bind_spec_grant_event": "sha256:636519ed7733c08f4400517dc753a79b68d5e8dda35580aef9541d77bb7a0ae3",
+  "scientific_spec_artifact_id": "sha256:21fc77d5a288b9adef995d88f089890235f8dcb2fbc3c9e452725bb67892a22f",
+  "execution_spec_artifact_id": "sha256:d78fba69795ce2cbf6e2593b675a8cfc5896ef790222cd2cfaa53ef132a975d9",
+  "spec_seal_root": "sha256:e53bd77a02cd37067342bacfa87d21bf7b41184385e65570cf57ef823d391126",
+  "seal_verification_event": "sha256:01fd6206251641bfd906a96611caeb4c89de90ae4c91b4ae90d50790a745ddb7",
+  "library_acceptance_id": "sha256:f98dcd6743c5e8b7ff091cef2d69aa361e53c252711c7b001f3a71d322744602",
+  "authorization_grant_issued": false,
+  "gpu_lease_issued": false,
+  "stage_authorization_issued": false,
+  "model_contact_authorized": false,
+  "e4_01_entry_open": false
+}

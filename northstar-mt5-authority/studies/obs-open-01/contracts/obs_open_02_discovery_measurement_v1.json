@@ -1,0 +1,120 @@
+{
+  "schema": "OBS_OPEN_DISCOVERY_MEASUREMENT_CONTRACT_V1",
+  "study_id": "OBS-OPEN-01",
+  "gate": "OBS-OPEN-02",
+  "parent_qualification_root_sha256": "6b0ca197a394b085707d03dfe06f1569eb0fafbddb2d583817e88647df6f6235",
+  "parent_commit": "8c6902181d6252d635c45d784ffd1f072006b2fc",
+  "substantive_status": "FROZEN_UNOPENED",
+  "confirmation_status": "FROZEN_UNOPENED",
+  "discovery_sessions": 257,
+  "confirmation_sessions": 69,
+  "range_family": {
+    "start_new_york": "09:30:00",
+    "durations_minutes": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30],
+    "peer_relation": "NESTED_SAME_SESSION",
+    "privileged_duration": null
+  },
+  "authoritative_inputs": [
+    "OpeningRangeGrammar_v1_02_FullState",
+    "M1_RANGE_GEOMETRY",
+    "COMPLETED_M5_INTERACTION_CANDLES",
+    "FROZEN_CLOCK_TRANSPORT",
+    "FROZEN_SESSION_PARTITION"
+  ],
+  "representation_views": {
+    "geometry_raw": {
+      "identity": "OBSOPEN02_GEOMETRY_RAW_V1",
+      "loss_policy": "RETAIN_SOURCE_FIELDS",
+      "fields": ["high", "low", "midpoint", "width", "freeze_time", "knowledge_time"]
+    },
+    "geometry_relative": {
+      "identity": "OBSOPEN02_GEOMETRY_RELATIVE_V1",
+      "loss_policy": "ADDITIONAL_VIEW_ONLY",
+      "formula": "(price-midpoint)/(width/2)",
+      "degenerate_width": "NOT_EVALUABLE_GEOMETRY"
+    },
+    "interaction_sequence": {
+      "identity": "OBSOPEN02_INTERACTION_SEQUENCE_V1",
+      "loss_policy": "PRESERVE_TYPED_EVENTS_AND_ORDER",
+      "source": "FROZEN_OBSERVER_EVENTS"
+    },
+    "continuous_path": {
+      "identity": "OBSOPEN02_CONTINUOUS_PATH_V1",
+      "loss_policy": "RETAIN_RAW_PATH_AND_DERIVED_SUMMARIES",
+      "censor_policy": "OBSERVED_PREFIX_ONLY"
+    },
+    "scale_relation": {
+      "identity": "OBSOPEN02_SCALE_RELATION_V1",
+      "axis": "K_1_TO_K_30",
+      "relation": "ADJACENT_AND_CONTIGUOUS_NESTED_RANGES",
+      "independence": "NOT_ASSUMED"
+    }
+  },
+  "typed_states": [
+    "ELIGIBLE",
+    "NOT_EVALUABLE",
+    "CENSORED",
+    "DATA_GAP",
+    "UNAVAILABLE",
+    "NOT_APPLICABLE",
+    "OPEN",
+    "FROZEN_UNOPENED"
+  ],
+  "measurements": {
+    "geometry": ["raw_price", "range_relative_price", "width", "midpoint"],
+    "sequence": ["first_outside_time", "first_outside_side", "outside_duration", "in_zone_duration", "return_count", "cross_through_count", "terminal_location"],
+    "path": ["signed_displacement", "positive_excursion", "negative_excursion", "path_length", "directional_efficiency", "return_distance", "duration"],
+    "scale": ["adjacent_delta", "classification_survival", "state_transition", "contiguous_persistence"]
+  },
+  "dependence": {
+    "primary_resampling_unit": "SESSION",
+    "nested_range_rows_are_independent": false,
+    "candle_rows_are_independent": false,
+    "bootstrap": {
+      "algorithm": "SESSION_BLOCK_BOOTSTRAP_V1",
+      "resamples": 2000,
+      "seed": 20260814,
+      "interval": "PERCENTILE_95"
+    },
+    "temporal_views": ["AGGREGATE_DISCOVERY", "CALENDAR_MONTH", "SERVER_OFFSET_REGIME", "LEAVE_ONE_SUPPORTED_MONTH_OUT", "CHRONOLOGICAL_BLOCK"]
+  },
+  "multiplicity": {
+    "family": "MEASUREMENT_VIEW_X_RANGE_DURATION_X_TEMPORAL_VIEW",
+    "descriptive_census": "REPORT_ALL_PREREGISTERED_CELLS",
+    "candidate_generation": "FROZEN_FAMILYWISE_DISCOVERY_RULE_V1",
+    "isolated_maximum_is_not_a_finding": true
+  },
+  "candidate_classes": [
+    "RECURRING_STRUCTURE",
+    "SCALE_DEPENDENT_STRUCTURE",
+    "SCALE_STABLE_STRUCTURE",
+    "TEMPORALLY_UNSTABLE_STRUCTURE",
+    "REPRESENTATION_SENSITIVE_STRUCTURE",
+    "CONDITIONAL_STRUCTURE",
+    "SUPPORTED_NULL_OR_NEAR_NULL",
+    "INSUFFICIENT_SUPPORT",
+    "NOT_EVALUABLE"
+  ],
+  "candidate_promotion_required": [
+    "finding_id",
+    "discovery_population_hash",
+    "eligible_denominator",
+    "measurement_definition",
+    "representation_identity",
+    "uncertainty_receipt",
+    "multiplicity_family",
+    "temporal_support",
+    "sensitivity_receipt",
+    "known_insufficiencies",
+    "future_confirmation_estimand"
+  ],
+  "confirmation_firewall": {
+    "allowed_partition": "DISCOVERY",
+    "blocked_partition": "CONFIRMATION",
+    "blocked_status": "FROZEN_UNOPENED",
+    "fail_closed": true,
+    "read_confirmation_observations": false
+  },
+  "economic_authority": false,
+  "trading_authority": false
+}

@@ -1,0 +1,31 @@
+{
+  "binding_id":"FASS01_S01_3_PARENT_INPUT_BINDING_V01",
+  "project_id":"fas-s01-frozen-sensor-transfer-cartography",
+  "phase_id":"s01-3-linear-accessibility-v01",
+  "paths":{
+    "s01_2_result_root":"D:\\codex-runs\\fas-s01-frozen-sensor-transfer-cartography\\s01-2-feature-geometry-v01",
+    "s01_2_corpus":"D:\\codex-runs\\fas-s01-frozen-sensor-transfer-cartography\\s01-2-v01-sealed\\corpus\\counterfactual-quartets-v01.jsonl",
+    "s01_2_cache_root":"D:\\codex-runs\\fas-s01-frozen-sensor-transfer-cartography\\s01-2-feature-geometry-v01\\feature-cache-v01",
+    "s01_2_feature_cache_seal":"D:\\codex-runs\\fas-s01-frozen-sensor-transfer-cartography\\s01-2-feature-geometry-v01\\seals\\feature-cache-seal-v01.json",
+    "s01_2_validation_report":"D:\\codex-runs\\fas-s01-frozen-sensor-transfer-cartography\\s01-2-feature-geometry-v01\\feature-cache-validation-report-v01.json",
+    "s01_2_result_tree_seal":"D:\\codex-runs\\fas-s01-frozen-sensor-transfer-cartography\\s01-2-feature-geometry-v01\\seals\\result-tree-seal-v01.json",
+    "s01_2_feature_rows":"D:\\codex-runs\\fas-s01-frozen-sensor-transfer-cartography\\s01-2-feature-geometry-v01\\feature-cache-v01\\feature-rows-v01.jsonl"
+  },
+  "parent_roots":{
+    "s01_2_result_root_sha256":"1fc3aeb432ecdbef21a35aea8fed5b0d59671681eb8eb8032533c9ce751a4384",
+    "s01_2_feature_cache_root_sha256":"4964f35fb87a45a9447cd0f5f028668027ca3ad3a8f0d0c3f9eb7b9cbe7ccaaa",
+    "s01_2_corpus_sha256":"51a55212ba89d55bd6df532673ad4546c95def1f5d75622661f7c17b3e4a7ad1",
+    "feature_rows_sha256":"a8ea72310c0926962a0783d90eb3ceda19ca0b334bd2c00aafdd226e8aaaa40b"
+  },
+  "cache_files":{
+    "V0_MEAN_FULL.f32le":{"bytes":872415232,"sha256":"9cc840390abd2c9d186f33b6a62948b55d4cdd15d52a4cfe03bd32775a2fe76c"},
+    "V1_FINAL_POSITION.f32le":{"bytes":872415232,"sha256":"095366563e0ef08a38192c325c93a000614cbdbd3a467e2e8c5c92e14acd1409"},
+    "V2_FIRST_POSITION.f32le":{"bytes":872415232,"sha256":"59fbbaa2009eeb5e1ee63cb130a5983a4518910b1972c00fa5cc1418f47f6c96"},
+    "V3_CONTEXT_SPAN_MEAN.f32le":{"bytes":872415232,"sha256":"63fc1f7b14ab0f69d41a435fae715b83e4246334fd6ea71b9a3476d7ea75fdde"},
+    "V4_ENTITY_SPAN_MEAN.f32le":{"bytes":872415232,"sha256":"e22aa53a4bfa8944391a621aea752223af2a26b76521e0983ec6972357ffa360"},
+    "V5_RELATION_SPAN_MEAN.f32le":{"bytes":872415232,"sha256":"33c5de99e430146e69cf3319f366c4713cf2701765b07f1a534a82b5b4a395a3"},
+    "V6_FIXED_SPAN_CONCAT.f32le":{"bytes":2617245696,"sha256":"16ddc3783b0c1a489003fe4d49d5b052161d8ce3ea31658c87a7267a911e7afd"}
+  },
+  "immutable":true,
+  "allowed_read_scope":"the listed corpus metadata, cache arrays, row manifest, validation report, and seal files only; no model weights or other projects"
+}

@@ -1,0 +1,84 @@
+{
+  "files": [
+    {
+      "byte_length": 3496,
+      "label": "experiments/fly-reach-03/f4-presentation-02/F4-PRESENTATION-02-ENGINEERING-SCREEN-v0.1.json",
+      "path": "experiments/fly-reach-03/f4-presentation-02/F4-PRESENTATION-02-ENGINEERING-SCREEN-v0.1.json",
+      "sha256": "a0bddc8a9b921ac448212b0c19d2c9a09458ca2e686a1916d9fa4872ee3140c6"
+    },
+    {
+      "byte_length": 12336,
+      "label": "experiments/fly-reach-03/f4-presentation-02/cphi_model.py",
+      "path": "experiments/fly-reach-03/f4-presentation-02/cphi_model.py",
+      "sha256": "53d2826a9a71e59687c7dc1472cd4e584f4dc938707113c184b9604e85e8634a"
+    },
+    {
+      "byte_length": 17664,
+      "label": "experiments/fly-reach-03/f4-presentation-02/prepare_cphi.py",
+      "path": "experiments/fly-reach-03/f4-presentation-02/prepare_cphi.py",
+      "sha256": "5003ecaab5f63f93f0fcd40e8b6b487d0c8de72120ea72b5ad0d070fb7fe5523"
+    },
+    {
+      "byte_length": 14162,
+      "label": "experiments/fly-reach-03/f4-presentation-02/run_cphi.py",
+      "path": "experiments/fly-reach-03/f4-presentation-02/run_cphi.py",
+      "sha256": "d3274a74449dae38bcf68a5ce73295255c1e6c83cd370a951e17f2a24f562682"
+    },
+    {
+      "byte_length": 9949,
+      "label": "experiments/fly-reach-03/f4-presentation-02/verify_cphi.py",
+      "path": "experiments/fly-reach-03/f4-presentation-02/verify_cphi.py",
+      "sha256": "047d410b4921e9062a70ae3aeda61f15efebd3129ec127b3ba3f211601fe7362"
+    },
+    {
+      "byte_length": 23111,
+      "label": "experiments/fly-reach-03/f4-presentation-02/analyze_cphi.py",
+      "path": "experiments/fly-reach-03/f4-presentation-02/analyze_cphi.py",
+      "sha256": "841d7d2a6843d24cdf2ee74e5513813ca13d5fbe5c1f6237ef15befd1e319d76"
+    },
+    {
+      "byte_length": 4231,
+      "label": "experiments/fly-reach-03/f4-presentation-02/test_cphi_model.py",
+      "path": "experiments/fly-reach-03/f4-presentation-02/test_cphi_model.py",
+      "sha256": "47b62cb18748c61da6737090e3037671c4756635fa5c0e62360536bed5edbe1a"
+    },
+    {
+      "byte_length": 15762,
+      "label": "experiments/fly-reach-03/f4-invariant-01-impl-v2/f4_invariant_01_model.py",
+      "path": "experiments/fly-reach-03/f4-invariant-01-impl-v2/f4_invariant_01_model.py",
+      "sha256": "2882482311355f5729fb3922d0b51fdef960f24a49d793a77ce855d903939f02"
+    },
+    {
+      "byte_length": 5137,
+      "label": "experiments/fly-reach-03/f4-invariant-01-impl-v2/f4_invariant_01_inputs.py",
+      "path": "experiments/fly-reach-03/f4-invariant-01-impl-v2/f4_invariant_01_inputs.py",
+      "sha256": "32f5301842e9e5ec0463276dc507a69522e6bd08989d08cf625678296136d2a9"
+    },
+    {
+      "byte_length": 3811,
+      "label": "experiments/fly-reach-03/scripts/f4_symmetry_01_model.py",
+      "path": "experiments/fly-reach-03/scripts/f4_symmetry_01_model.py",
+      "sha256": "92e260bd0057115867bf69b343d8193bab141035f3338af4586c5e0af61c47f8"
+    },
+    {
+      "byte_length": 12239,
+      "label": "experiments/fly-reach-03/scripts/f4_symmetry_01_common.py",
+      "path": "experiments/fly-reach-03/scripts/f4_symmetry_01_common.py",
+      "sha256": "47ddbeca65ee2b0a94f1712915c8df17fc5855fddfb160c1ac59b9bc48afbeca"
+    },
+    {
+      "byte_length": 12811,
+      "label": "experiments/fly-reach-03/f4-invariant-01-prefit-v2/fit_common.py",
+      "path": "experiments/fly-reach-03/f4-invariant-01-prefit-v2/fit_common.py",
+      "sha256": "6780afc2021ab6d240aee02f27cfeb8ec8326248602ed0b11a9161191e4d30e1"
+    },
+    {
+      "byte_length": 10369,
+      "label": "experiments/fly-reach-03/f4-invariant-01-prefit-v2/fit_contract.py",
+      "path": "experiments/fly-reach-03/f4-invariant-01-prefit-v2/fit_contract.py",
+      "sha256": "b9856dd30721f9ca38adedd3c73fa657b7ead48ddb9ee43cae638fd73d8e0b48"
+    }
+  ],
+  "identity": "F4-PRESENTATION-02-CPHI-ENG1",
+  "schema": "F4-PRESENTATION-02-source-manifest-v1"
+}

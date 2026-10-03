@@ -1,0 +1,57 @@
+{
+  "authority": {
+    "authoritative_contract_sha256": "6beb47c4784a7d6e37a91e45688dd86e50b15291a8f0dbf07c56c71aefbe47a7",
+    "machine_contract_sha256": "7dca0f687258531743014b7ac55681f7324566f40d9497c4a5e303771f6c7c2c",
+    "preimplementation_audit": {
+      "bytes": 5199,
+      "path": "experiments/fly-reach-03/artifacts/preimplementation/REACH03-PREIMPLEMENTATION-AUDIT.json",
+      "sha256": "1951e30994a62265ff0e53372bafa8d5484a77532ad7004a1ce175d92a1485a6"
+    },
+    "run1_nonpromotable": true
+  },
+  "gate_results": {
+    "gate_0_authority_and_provenance": "PASS_HISTORICAL_PRECREATION_AUDIT",
+    "gate_1_executable_contract_roundtrip": "PASS",
+    "gate_2_collector_fixture": {
+      "rows": 12,
+      "snapshots": 4,
+      "status": "PASS",
+      "telemetry_on_off_identical": true
+    },
+    "gate_3_f4_reconstruction_fixture": {
+      "max_abs_error": 0.0,
+      "rows_checked": 12,
+      "status": "PASS",
+      "target_matches": 12,
+      "value_mismatches": 0
+    }
+  },
+  "implementation_contract": {
+    "bytes": 7802,
+    "path": "experiments/fly-reach-03/EXECUTION-CONTRACT-v0.1.json",
+    "sha256": "eb61e23d43689a994275d5453254c94f5cbc985b3d0c4a32eef83bbc997fc0c3"
+  },
+  "measured_namespace_created": false,
+  "next_gate": "QUALIFICATION_ONLY_PREPARATION",
+  "qualification_namespace_created": false,
+  "roundtrip_receipts": {
+    "execution": {
+      "bytes": 353,
+      "path": "experiments/fly-reach-03/artifacts/preimplementation/REACH03-EXECUTION-CONTRACT-ROUNDTRIP.json",
+      "sha256": "ee250fed39d86f8f725a6acb6c13c4bf9d5017157a6f094b1e1b65f9c966c2e1"
+    },
+    "execution_status": "PASS",
+    "runtime": {
+      "bytes": 2578,
+      "path": "experiments/fly-reach-03/artifacts/preimplementation/REACH03-RUNTIME-CONTRACT-ROUNDTRIP.json",
+      "sha256": "67d43068003b8499db7c8970fe046da661ae0fce8ab6146b7208f95c8e65e7e4"
+    },
+    "runtime_status": "PASS"
+  },
+  "schema": "FLY-REACH-03-implementation-receipt-v1",
+  "scientific_boundary": "engineering-only; no biological promotion; no PHENO reseal",
+  "scientific_execution_started": false,
+  "source_mapping": "pre_trace=per-trial presynaptic edge spike count; post_trace=post-baseline deviation; native proposal=proposed_delta_into before apply_delta",
+  "status": "PRE_QUALIFICATION_GATES_PASS",
+  "study_id": "FLY-REACH-03"
+}

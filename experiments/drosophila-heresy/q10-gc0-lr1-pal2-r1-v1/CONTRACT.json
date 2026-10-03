@@ -1,0 +1,35 @@
+{
+  "checks_frozen": {
+    "pair_entries": 201,
+    "singleton_entries": 58,
+    "source_attempt_total": 721,
+    "unique_library_total": 718,
+    "unique_zero_entries": 459,
+    "zero_attempts": 462
+  },
+  "identity": "q10-gc0-lr1-pal2-r1-v1",
+  "parent_bindings": [
+    {
+      "label": "PAL2 execution",
+      "path": "experiments/drosophila-heresy/q10-gc0-lr1-pal2-v1/qualification/execution.json",
+      "sha256": "F8B18615E043FB9C6DFAA0518B24DF4D1CF083E964714C33323CEDBEEB2B16C1"
+    },
+    {
+      "label": "PAL2 augmented library",
+      "path": "experiments/drosophila-heresy/q10-gc0-lr1-pal2-v1/qualification/augmented-library.jsonl",
+      "sha256": "D7A188F4B70FB02C8864C86D4FC3BCE7C90A17A3650150470EE0E7F303CF1F18"
+    },
+    {
+      "label": "PAL2 support audit",
+      "path": "experiments/drosophila-heresy/q10-gc0-lr1-pal2-v1/qualification/case-support-conflict.jsonl",
+      "sha256": "83D1DD19B782B5326065B303B887BFBDBD7306BE7873764FC97431D9B2DA2E25"
+    },
+    {
+      "label": "PAL2 conflict audit",
+      "path": "experiments/drosophila-heresy/q10-gc0-lr1-pal2-v1/qualification/conflict-edges.jsonl",
+      "sha256": "654B9215E2AFDA4F42631102C46F881F5D7395F3853B59B6F9E2DC16B6B80BE3"
+    }
+  ],
+  "protocol": "PAL2_RECONCILIATION_AUDIT",
+  "scope": "read_only_pal2_entry_count_reconciliation"
+}

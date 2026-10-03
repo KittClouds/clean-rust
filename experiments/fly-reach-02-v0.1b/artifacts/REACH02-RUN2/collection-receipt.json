@@ -1,0 +1,29 @@
+{
+  "arms": [
+    "native",
+    "sign_ref_native_mag",
+    "stable_inversion_flip",
+    "reference_direction_native_support",
+    "weight_oracle"
+  ],
+  "checkpoints": [
+    0,
+    512,
+    1024,
+    2048,
+    4096,
+    8192
+  ],
+  "completed_blocks": 216,
+  "contract_sha256": "2124231a0fd1698a3838dbf0df062befde7241d96e83b5987c3c46f7cb12542c",
+  "diagnostic_rows": 1080,
+  "engineering_only": true,
+  "outcome_rows": 5616,
+  "qualification_response_bank_sha256": "318b0a414ba7dd0ce456c655dfd60714e62725601ff86a796619959690b5d484",
+  "qualification_rows": 72,
+  "schema": "FLY-REACH-02-v0.1b-collection-receipt-v1",
+  "status": "COLLECTION_COMPLETE",
+  "study_id": "FLY-REACH-02-v0.1b",
+  "trajectory_rows": 1080,
+  "wall_seconds": 1026.0572973
+}

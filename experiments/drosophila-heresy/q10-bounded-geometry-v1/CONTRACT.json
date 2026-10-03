@@ -1,0 +1,240 @@
+{
+  "protocol": "Q10-BG",
+  "title": "Bounded Geometry and Committed-f32 Repair Qualification",
+  "kind": "DRAFT_PRE_QUALIFICATION_CONTRACT",
+  "created_utc": "2026-09-16T19:28:48Z",
+  "status": "FROZEN_PRE_QUALIFICATION_CONTRACT",
+  "plan_sha256": "630F11591247AB2446B617039EFEFDB007AA8794A291B9863EB87D1CDC8BA777",
+  "lineage": {
+    "parent_q08_archive_sha256": "f0e08a083de067d64e029f72d611d1341236af129324b360dd4280a1b2654a57",
+    "parent_q09_plan_sha256": "493EA78839D961420BFB296ED289FE3998B6F59EDCAD096B2F4797E962368515",
+    "parent_q09_contract_sha256": "2AFB42B0914082FA8A97BCBF72C774D8CDD8833B7A0DC7302D9AAC65422F90CC",
+    "parent_q09_result_sha256": "0B274A1A144B847459DE6EF95BE0C26081CEDE2130B21D16706D2CF8186EED84",
+    "parent_q09_status_sha256": "0F347ABAF93E89D8AF9BC28CBB09E258FD5DD6C6A6B380B8785F3309437164CF",
+    "required_q09_status": "LINEAR_AUDIT_VALID__FREEDOM_PRESENT",
+    "q08_mutation_forbidden": true,
+    "q09_mutation_forbidden": true
+  },
+  "authorization": {
+    "draft_files_only": false,
+    "execution_authorized": true,
+    "source_creation_or_edit_authorized": true,
+    "experiment_run_authorized": true,
+    "measured_cli_forbidden": true,
+    "scientific_seed_bundles_used": 0,
+    "behavioral_inference": false,
+    "dh08b_authorized": false
+  },
+  "engineering_scope": {
+    "qualification_seeds_allowed": [9301, 9302, 9303, 9304, 9305],
+    "stage_1a_seeds": [9301],
+    "stage_1b_seeds": [9302, 9303, 9304, 9305],
+    "sides": ["R", "L"],
+    "taus": [4.0, 16.0],
+    "reversal_states_per_side_tau": 256,
+    "expected_stage_1a_states": 1024,
+    "expected_stage_1b_new_states": 4096,
+    "expected_stage_1_cumulative_states": 5120,
+    "stage_2_uses_stage_1_states_only": true,
+    "new_stage_2_seeds_forbidden": true
+  },
+  "event_state": {
+    "base_state": "committed f32 W_B widened exactly to f64",
+    "true_state": "committed f32 W_T widened exactly to f64",
+    "true_displacement": "d_T = W_T - W_B",
+    "permitted_support": "S_t is the event-local interval-derived support using Q09 source-coordinate semantics",
+    "true_boundary_set": "B_t contains coordinates where committed W_T equals W_min or W_max",
+    "outside_support_set": "O_t is the complement of S_t",
+    "frozen_set": "F_t = B_t union O_t",
+    "variable_set": "I_t = S_t minus B_t",
+    "frozen_displacement_rule": "d_N[F_t] = d_T[F_t]"
+  },
+  "linear_contract": {
+    "cue_count": 16,
+    "operator_rows": "16 * post_len exact cue-by-MBON drive rows + 1 global acquisition-axis row",
+    "aggregate_cue_scores_admissible": false,
+    "acquisition_axis": "A = W_A - W_0",
+    "operator": "L = [H_t; A_I^T]",
+    "row_scaling": "f64 Euclidean norm",
+    "rank_cutoff": "sigma_i > sigma_max * max(rows, cols) * f64::EPSILON * 1000",
+    "projection": "x_star = V_r V_r^T x_T",
+    "constrained_base": "d_star = d_F + E_I x_star",
+    "endogenous_null_residual": "z_T = x_T - x_star",
+    "implicit_null_projection": "P_N(r) = r - V_r V_r^T r",
+    "required_equalities": [
+      "L d_N = L d_T",
+      "norm2(d_N) = norm2(d_T)"
+    ]
+  },
+  "boundary_and_support_contract": {
+    "permitted_support_only": true,
+    "true_boundary_membership_frozen": true,
+    "lower_and_upper_membership_preserved_separately": true,
+    "no_new_boundary_membership": true,
+    "stage_1_variable_endpoint_rule": "W_min[i] < W_B[i] + d_N[i] < W_max[i] for every i in I_t",
+    "stage_2_variable_endpoint_rule": "committed W_N_32[i] is not equal to W_min[i] or W_max[i] for every i in I_t",
+    "post_construction_clipping_forbidden": true,
+    "support_expansion_forbidden": true
+  },
+  "stage_1": {
+    "name": "CONTINUOUS_BOUNDED_GEOMETRY",
+    "enabled": true,
+    "f32_commit_tested": false,
+    "sequential_f32_readout_tested": false,
+    "constructor_family": "deterministic equal-energy null-sphere rotations",
+    "tangent_construction": [
+      "v_0 = P_N(r)",
+      "v_1 = v_0 - ((v_0 dot z_T) / (z_T dot z_T)) z_T",
+      "v = v_1 * (norm2(z_T) / norm2(v_1))"
+    ],
+    "rotation": "z(theta) = z_T cos(theta) + v sin(theta)",
+    "endpoint": "d(theta) = d_star + E_I z(theta)",
+    "candidate_rng": "separate deterministic constructor key; simulation RNG consumption forbidden",
+    "candidate_signs": "both",
+    "candidate_directions": 8,
+    "candidate_sign_count": 2,
+    "angle_domain": "path-safe prefix of [0, pi/2]",
+    "angle_bisections": 32,
+    "zero_norm_squared_floor": 1e-24,
+    "continuous_integrity_tolerance": 2e-10,
+    "directional_non_identity_angle_epsilon": 1e-8,
+    "candidate_key_schema": "seed xor tau_bits xor reversal_trial xor candidate_multiplier xor sign_index",
+    "no_post_construction_clipping": true,
+    "slack_aware_direction_ranking_allowed": true,
+    "generic_optimizer_required": false,
+    "residual_decorrelation_metric": "c_box = abs(cos(z_N, z_T))",
+    "future_dh08b_cosine_gate": null,
+    "future_gate_selection_rule": "may be frozen only from engineering qualification evidence before any scientific execution",
+    "required_event_outputs": [
+      "maximum_feasible_rotation_angle",
+      "accepted_candidate_keys",
+      "c_box_per_candidate_and_event_minimum",
+      "minimum_interior_slack_and_limiting_coordinates",
+      "lower_and_upper_boundary_membership_comparison",
+      "support_violation_count",
+      "new_boundary_count",
+      "normalized_cue_drive_error",
+      "normalized_global_axis_error",
+      "normalized_total_norm_error",
+      "normalized_null_annihilation_error",
+      "normalized_reconstruction_error",
+      "candidate_count",
+      "degeneracy_count",
+      "constructor_exhaustion_status"
+    ],
+    "stage_2_entry_status": "Q10_STAGE1_VALID__BOUNDED_FREEDOM_PRESENT"
+  },
+  "stage_2": {
+    "name": "COMMITTED_F32_ENDPOINT_AND_READOUT_REPAIR",
+    "enabled_by_default": false,
+    "entry_rule": "run only after reviewed Stage 1 status equals Q10_STAGE1_VALID__BOUNDED_FREEDOM_PRESENT",
+    "otherwise_status": "NOT_RUN_STAGE1_GATE",
+    "commit_rule": "W_N_32 = f32(W_B + d_N) using learner commitment semantics",
+    "target": "committed endogenous W_T_32",
+    "readout": "actual learner g_seq32 in source iteration order",
+    "readout_rows": "all 16 * post_len cue-by-MBON drives",
+    "exact_readout_success": "bitwise-equal f32 result for every cue-by-MBON drive",
+    "aggregate_cue_substitution_forbidden": true,
+    "capacity_audit_before_repair": {
+      "required": true,
+      "per_row_metrics": [
+        "permitted_coordinate_count",
+        "interior_coordinate_count",
+        "legal_minus_one_ulp_count",
+        "legal_plus_one_ulp_count",
+        "legal_multi_ulp_count",
+        "actual_seq32_drive_delta_per_tested_move",
+        "zero_capacity_flag",
+        "one_sided_capacity_flag",
+        "cancellation_only_capacity_flag"
+      ]
+    },
+    "repair": {
+      "kind": "deterministic local discrete f32 ULP search",
+      "smooth_gradient_interpretation_forbidden": true,
+      "candidate_coordinates": "reserved high-slack subset within I_t",
+      "actual_seq32_evaluation_required_for_every_accepted_move": true,
+      "recheck_after_every_accepted_move": [
+        "permitted support",
+        "frozen lower and upper boundary memberships",
+        "no new boundary membership",
+        "weight bounds without clipping",
+        "committed global acquisition displacement",
+        "committed total displacement norm",
+        "exact cue-by-MBON sequential-f32 equality",
+        "residual direction cosine"
+      ]
+    },
+    "required_outputs": [
+      "pre_repair_bitwise_mismatch_count",
+      "pre_repair_ulp_error_distribution",
+      "post_repair_bitwise_mismatch_count",
+      "post_repair_ulp_error_distribution",
+      "repair_move_count_and_ulp_distances",
+      "repair_coordinate_reuse",
+      "committed_axis_drift",
+      "committed_norm_drift",
+      "boundary_and_support_integrity",
+      "post_repair_residual_cosine"
+    ],
+    "behavioral_simulation_forbidden": true
+  },
+  "status_vocabulary": {
+    "draft": [
+      "DRAFT_ONLY__NOT_EXECUTED"
+    ],
+    "stage_1": [
+      "Q10_STAGE1_VALID__BOUNDED_FREEDOM_PRESENT",
+      "Q10_STAGE1_VALID__BOX_CONSTRAINT_DOMINATED",
+      "Q10_STAGE1_VALID__NUMERICALLY_AMBIGUOUS",
+      "Q10_STAGE1_INVALID"
+    ],
+    "stage_2": [
+      "Q10_STAGE2_VALID__SEQ32_REPAIR_PRESENT",
+      "Q10_STAGE2_VALID__SEQ32_ALREADY_EQUAL",
+      "Q10_STAGE2_VALID__SEQ32_REPAIR_ABSENT",
+      "Q10_STAGE2_VALID__NUMERICALLY_AMBIGUOUS",
+      "Q10_STAGE2_INVALID",
+      "NOT_RUN_STAGE1_GATE"
+    ]
+  },
+  "required_pre_execution_freeze": {
+    "reason": "The implementation and continuous Stage 1 constructor parameters are frozen before engineering execution.",
+    "fields": [
+      "implementation source identity and executable hash",
+      "constructor candidate count and deterministic key schema",
+      "angle search domain and resolution or analytic interval method",
+      "degenerate residual and tangent fallback rules",
+      "all normalized numerical integrity tolerances",
+      "directional non-identity numerical-resolution rule",
+      "Stage 1 success coverage rule",
+      "Stage 2 high-slack coordinate definition",
+      "Stage 2 ULP radius, candidate budget, beam width, and move budget",
+      "committed-state axis and norm tolerances",
+      "independent replay and receipt schema"
+    ],
+    "changing_frozen_fields_after_stage_1a_requires_new_protocol_identity": true
+  },
+  "qualification_controls": [
+    "Q08 and Q09 lineage hashes unchanged",
+    "Q09 operator dimensions and direct learner-drive agreement",
+    "implicit null projection agreement with independent dense fixtures",
+    "analytic rotation norm and null-annihilation identities",
+    "fail-closed support, boundary, bounds, and no-clipping checks",
+    "no simulation RNG consumption or learner-state mutation",
+    "actual learner sequential-f32 source order and arithmetic",
+    "deterministic and reversible ULP fixtures",
+    "observer on/off invariance",
+    "finite values and complete event receipts",
+    "scientific seed and measured CLI rejection"
+  ],
+  "claims_explicitly_forbidden": [
+    "Q08 vindication",
+    "direction effect",
+    "behavior effect",
+    "scientific exchangeability of endpoints",
+    "DH-08B authorization",
+    "future-learning-state claim",
+    "metaplasticity claim"
+  ]
+}

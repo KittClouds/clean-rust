@@ -1,0 +1,151 @@
+{
+  "protocol": "jev-information-density/v0.8p-v07-overlap-ordering-repair-contract-v01",
+  "identity": "v0.8P-v07-overlap-ordering-repair-v01",
+  "status": "CONTRACT_SEALED_NO_IDENTITY_ACQUISITION_OR_CANDIDATE_GENERATION",
+  "purpose": "Resolve the dependency ordering for the already-frozen training-scope overlap check. This changes when the exact check can run, not its fields, equality semantics, thresholds, training treatment, panel measurement, or scientific estimand.",
+  "authorization_state": {
+    "ordering_repair_contract_authorized": true,
+    "contract_sealed": true,
+    "training_identity_acquisition_authorized": false,
+    "candidate_identity_staging_authorized": false,
+    "panel_promotion_authorized": false,
+    "panel_generation_authorized": false,
+    "lfm_contact": false,
+    "feature_extraction": false,
+    "training": false,
+    "head_loading": false,
+    "inference": false,
+    "evaluation": false,
+    "phoenix": false
+  },
+  "immutable_parent_bindings": {
+    "original_p_contract_bundle": {
+      "path": "experiments/jev-information-density-v08p/contracts/contract-bundle-seal-v01.json",
+      "sha256": "67cd6b7902111000dc93a0f81f9f20bc05a9c084732705ed8f9ad82fe965fa85"
+    },
+    "original_p_run_contract": {
+      "path": "experiments/jev-information-density-v08p/phase_b/phase-b-p-run-contract-v01.json",
+      "sha256": "e345225b4a17fc18eb35fcab24cbe1d72bd0e34bed9de272f927a7be461853e6",
+      "identity": "v0.8P-fresh-trajectory-instrumented-rerun-v01"
+    },
+    "original_p_analysis_contract": {
+      "path": "experiments/jev-information-density-v08p/phase_b/phase-b-p-analysis-contract-v01.json",
+      "sha256": "84111122033fda65c84344317cfe3b50639b23be4c71f480ba665c67a23cc939",
+      "binding_source": "hash field in the sealed original contract bundle; file content not needed for this ordering repair"
+    },
+    "original_p_panel_design_contract": {
+      "path": "experiments/jev-information-density-v08p/phase_a/fresh-panel-contract-v01.json",
+      "sha256": "ce3b7b97caecb27f3ad99439c0e67dca6e40af5da3db9ca2e356ea5e9f06f823",
+      "identity": "v0.8P-fresh-eval-panel-v01"
+    },
+    "v06_contract": {
+      "path": "experiments/jev-information-density-v08p-v06/phase_a/fresh-panel-contract-v01.json",
+      "sha256": "28b7878c9d68026254b8db734959387857b7eafb7b083d658d30d4cca6636a00"
+    },
+    "v06_contract_input_root": {
+      "path": "experiments/jev-information-density-v08p-v06/provenance/v06-input-binding-root-v01.json",
+      "sha256": "447176e523947eab718721c953db16a51102f91a812d0d73c99712f110c21c32"
+    },
+    "v06_not_evaluable_root": {
+      "path": "experiments/jev-information-density-v08p-v06/provenance/training-scope-overlap-preflight-root-v01.json",
+      "sha256": "aeba02e49dcdf3987cae7c38d34d63e69e4a02aee0781dab8e4dfab2a17b9c29"
+    }
+  },
+  "frozen_training_scope_source_bindings": {
+    "common_primary_occurrence_manifest": {
+      "sha256": "773119294a51aa46487de26f9f253355187a7bfd1e75cb2f258c307c86f10b06",
+      "rows": 10000,
+      "anchors": 5000,
+      "fact_flips": 5000
+    },
+    "training_only_state_scope": {
+      "scope_receipt_sha256": "d98ae657e28b976f187d4d67e58119ce80496e76c061c90362ac2e50ff7f720e",
+      "scope_manifest_sha256": "aa8cba58f4a8ec46ed6ec8eaf0bfbe992b03b9fa58f815b4259d9fdfe2b009f3",
+      "scope_content_sha256": "40648e3bbf50e25f31e84d7656221171425cb6e71e07d4c07d4dc72650bb228e",
+      "rows": 55000
+    },
+    "path_resolution_gate": "Before any training identity bytes are opened, a separate exact-path source allowlist must bind each required source path to these original contract hashes. No search, directory enumeration, glob, or replacement source is allowed. If the exact source objects cannot be uniquely resolved, stop NOT_EVALUABLE before acquisition."
+  },
+  "unchanged_overlap_rule": {
+    "authoritative_source": "The training_overlap requirement in the immutable original P panel-design contract.",
+    "required_dimensions": [
+      "world_id",
+      "root_id",
+      "episode_id",
+      "full_rendered_input_hash",
+      "selector_input_hash"
+    ],
+    "comparison": "For each named dimension separately, compare the exact training-scope value set with the exact provisional P candidate value set for that same dimension. No cross-field comparisons.",
+    "pass_condition": "Every one of the five same-field intersections is empty.",
+    "semantics": "Exact equality under the existing source serialization/canonicalization. Reuse the frozen identity and hash encodings; if any field's canonical representation is not uniquely established by the bound source contracts/manifests, stop NOT_EVALUABLE. No normalization change, similarity threshold, fuzzy matching, new text-deduplication class, or relaxed gate.",
+    "reporting": "Report per-field input counts, unique-set counts, and intersection counts. Do not publish raw training identities or values from the training exclusion set. On nonzero overlap, record counts and fail; do not list matched training values.",
+    "all_dimensions_required": true
+  },
+  "ordered_protocol": {
+    "stage_0_source_allowlist": {
+      "action": "Resolve exact paths for only the training identity sources hash-bound above and seal the path/hash/field allowlist.",
+      "allowed_fields_to_extract": [
+        "world_id",
+        "root_id",
+        "episode_id",
+        "full_rendered_input_hash",
+        "selector_input_hash"
+      ],
+      "other_fields": "Do not parse or emit targets, labels, candidate features, predictions, metrics, losses, or model data.",
+      "failure": "If exact source path/hash bindings or required fields are missing or ambiguous, seal NOT_EVALUABLE and stop before reading training identity rows."
+    },
+    "stage_1_training_identity_acquisition": {
+      "action": "Read only the exact allowlisted, hash-verified training scope sources and extract the five frozen fields.",
+      "output": "Seal a sorted opaque training exclusion manifest with one field-separated exact-value set per required dimension, source hashes, row counts, unique counts, extractor hash, and exact observed-open set.",
+      "raw_value_policy": "Raw training identity values remain inside the controlled extraction process; the sealed exclusion manifest stores only deterministic opaque representations sufficient for exact equality checking.",
+      "source_firewall": "Observed opened source set must exactly equal the sealed allowlist; any unexpected open, hash mismatch, unbound source, or missing field fails closed.",
+      "ordering": "This stage completes and its output is sealed before any P candidate identity is generated."
+    },
+    "stage_2_provisional_candidate_identity_staging": {
+      "action": "Generate the already-contracted v06 candidate identity stream into a physically separate, non-promotable v07 staging namespace.",
+      "logical_generator_identity": "Reuse v06 partition namespace eval_v08p_v06, seed derivation, generator/family/identity-constructor hashes, and fixed per-family sequence/collision rule exactly; do not mint a different P panel seed or alter panel semantics.",
+      "e1_exclusion": "Apply only the v06 opaque neighborhood_id SHA-256 denylist collision rule. It remains an identity exclusion, not a similarity test.",
+      "training_exclusion_access": "The candidate generator must not read or mount the stage-1 training exclusion manifest. Training identities cannot steer candidate generation or cause candidate replacement.",
+      "staged_content": "Materialize only the provisional identity records and the exact rendered-input/selector-input hashes required by the five-field overlap test. No LFM features, head inputs, evaluation predictions, or panel promotion artifacts.",
+      "staging_root": "D:/codex-runs/jev-information-density-v08p-v07/identity-staging",
+      "promotable": false
+    },
+    "stage_3_exact_overlap_audit": {
+      "action": "A separate audit process reads only the sealed training exclusion manifest and sealed provisional candidate identity manifest, then applies the five exact same-field set intersections above.",
+      "training_manifest_mutability": "read-only",
+      "candidate_manifest_mutability": "read-only",
+      "no_candidate_resampling_based_on_training_overlap": true,
+      "outcomes": {
+        "all_five_intersections_empty": "OVERLAP_PASS; seal counts and source bindings. Candidate identity manifest becomes eligible to be considered for promotion only under a new explicit authorization.",
+        "any_intersection_nonempty": "OVERLAP_FAIL; seal the failure and counts, mark the staging identity permanently non-promotable. No regeneration, reseeding, row replacement, or candidate shopping under v07.",
+        "missing_or_unverifiable_field": "NOT_EVALUABLE; seal and stop without promotion."
+      }
+    },
+    "stage_4_promotion_boundary": {
+      "rule": "OVERLAP_PASS is necessary but not sufficient for panel promotion. Existing exact-world, surface, family, radius, candidate-join, and panel-sealing requirements from v06 remain unchanged.",
+      "promotion_authorization": "Separate explicit authorization required after the training exclusion manifest and provisional candidate identity manifest are sealed and the exact overlap audit passes.",
+      "regeneration_parity": "Any later full panel materialization must reproduce the sealed provisional identities and identity hashes exactly; mismatch fails the panel identity with no replacement."
+    }
+  },
+  "forbidden_actions_in_this_v07_contract_step": {
+    "training_identity_acquisition": true,
+    "source_path_discovery_or_enumeration": true,
+    "candidate_generation_or_v06_collision_stream_consumption": true,
+    "panel_promotion_or_sealing": true,
+    "lfm_or_feature_contact": true,
+    "training_or_head_loading": true,
+    "inference_or_evaluation": true,
+    "e1_access_beyond_v06_bound_opaque_identity_denylist": true,
+    "v01_v02_v03_artifacts_as_inputs": true,
+    "new_similarity_or_deduplication_rule": true,
+    "newtight_legacy_or_phoenix": true
+  },
+  "claim_and_disposition_limits": {
+    "v06_contract_modified": false,
+    "v06_not_evaluable_result_reinterpreted": false,
+    "scientific_design_changed": false,
+    "current_step_result": "Ordering protocol only; no overlap result exists.",
+    "candidate_staging_is_not_panel_authorization": true,
+    "all_future_stages_require_separate_authorization": true
+  }
+}

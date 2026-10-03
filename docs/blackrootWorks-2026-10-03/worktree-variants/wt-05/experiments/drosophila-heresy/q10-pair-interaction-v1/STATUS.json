@@ -1,0 +1,14 @@
+{
+  "protocol": "Q10-PI1",
+  "status": "ENGINEERING_COMPLETE_TARGET_BLIND_MAP_AND_OVERLAY_AUDITED",
+  "declared_events": 8,
+  "available_events": 8,
+  "scientific_seed_bundles_used": 0,
+  "behavioral_inference": false,
+  "future_dh08b_authorized": false,
+  "independent_map_candidates_replayed": 76800,
+  "independent_overlay_candidates_replayed": 76800,
+  "shared_positive_candidate_fraction": 0.069765625,
+  "disjoint_positive_candidate_fraction": 0.0,
+  "next_decision": "Do not prioritize nonlinear interaction blocks; test a geometry-constrained distributed additive policy next."
+}

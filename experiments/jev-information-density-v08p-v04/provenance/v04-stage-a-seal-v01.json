@@ -1,0 +1,45 @@
+{
+  "protocol": "jev-information-density/v0.8p-v04-stage-a-seal-v01",
+  "identity": "v0.8P-v04-source-identity-adjudication-v01-stage-a-seal",
+  "status": "SEALED_STOPPED_NO_AUTHORITATIVE_SEAL_MANIFEST_HASH",
+  "artifacts": {
+    "v04_contract": {
+      "path": "experiments/jev-information-density-v08p-v04/identity/v04-source-identity-adjudication-contract-v01.json",
+      "sha256": "b22e68f0adebeb015fff818fdbdd776aca9c294eb1cd5b535303ac03b69b878b"
+    },
+    "v04_identity": {
+      "path": "experiments/jev-information-density-v08p-v04/identity/v04-identity-v01.json",
+      "sha256": "7783914929d5cf7065f1c951651c6fa0fc9a6fc0982f32df889b8694397898ad"
+    },
+    "authority_trace": {
+      "path": "experiments/jev-information-density-v08p-v04/provenance/stage-a-authority-trace-v01.json",
+      "sha256": "050a24e85f45eaf8b70d382871b4aaa50f973b25c8494ad116531f0b152ed02e"
+    },
+    "v03_source_allowlist": {
+      "path": "experiments/jev-information-density-v08p-v03/identity/source-allowlist-v01.json",
+      "sha256": "43bdf7408ef2b0e6fbcdd75b4848fd7631870d4312624e39b917ef554d62f854"
+    },
+    "v03_failure_receipt": {
+      "path": "experiments/jev-information-density-v08p-v03/provenance/extraction-attempt-1-failure-v01.json",
+      "sha256": "06932c8100f36218f9ee392f44c17cfa75bfab4756e1c399a3e0bed22a9ab5ce"
+    }
+  },
+  "authority_read": {
+    "path": "D:/codex-runs/jev-information-density-v08n/v0.8N-eval-panel-v01/seal/evaluation-firewall-lock.json",
+    "sha256": "79d25ac82fba1bc6332e16d8bc5f877fadd11cccaed5ef3f07eacfe5e1877da2",
+    "binding_pointer": "/panel_manifest_sha256",
+    "binding_value": "80e09c0f203b8a6505e062a2091a594273dca808258ff2f4539ab8414db9eabe",
+    "binding_object": "heldout-matched-panel-manifest.jsonl",
+    "does_not_bind_v03_expected_seal_manifest_hash": true
+  },
+  "disposition": {
+    "stage_a": "FAILED_TO_ESTABLISH_UNAMBIGUOUS_EXACT_AUTHORITY_BINDING",
+    "stage_b_hash_only_read": "NOT_AUTHORIZED_AND_NOT_PERFORMED",
+    "denylist_extraction": false,
+    "panel_construction": false,
+    "lfm_contact": false,
+    "training": false,
+    "evaluation": false,
+    "v03_retried_or_modified": false
+  }
+}

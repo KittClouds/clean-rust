@@ -1,0 +1,69 @@
+{
+  "authorization_scope": "bundle seal only; no panel construction, model contact, feature extraction, training, or evaluation",
+  "bytes": 59984,
+  "entries": [
+    {
+      "bytes": 4218,
+      "path": "Q-V08Q-PROTOCOL-V02.md",
+      "sha256": "5cf9f3a9e56b724c2f440267e268b01a3db99973001eda9ec0140796612a69f2"
+    },
+    {
+      "bytes": 3678,
+      "path": "contracts/q-analysis-contract-v02.json",
+      "sha256": "b5c3c02b56405c0a471f82907bbb400dc4655c5fa8e82a32463dce77675e16cc"
+    },
+    {
+      "bytes": 2275,
+      "path": "contracts/q-bundle-provenance-v02.json",
+      "sha256": "5c14e0447b18259b13447a5c329b73baecc62549544b5e809e11ff36b4d13218"
+    },
+    {
+      "bytes": 11692,
+      "path": "contracts/q-contrast-proposal-v01.md",
+      "sha256": "d3193efbb0733b9657041b6cbd3497e20a165e82d90c0b27828055123244cbd0"
+    },
+    {
+      "bytes": 1366,
+      "path": "contracts/q-correction-record-v02.json",
+      "sha256": "23e29fc6cd2f95a5ebf11fd0c71d9c8a9a72a922f4eac9a52356ccea34b6a109"
+    },
+    {
+      "bytes": 3226,
+      "path": "contracts/q-panel-contract-v02.json",
+      "sha256": "a48bcce6389cab974aeed56d0358c3cff0d6e71324bbc1dd70954ba9be201811"
+    },
+    {
+      "bytes": 3681,
+      "path": "contracts/q-run-contract-v02.json",
+      "sha256": "5f6cd42b6de058a4fcdcbeb70b1939dbe944a6c973ee704a93148f9bea71d1ae"
+    },
+    {
+      "bytes": 17428,
+      "path": "contracts/q-source-lock-v02.json",
+      "sha256": "d6d70768242ac12801069e2bdb27cb976679c907206e81ae8c0921867bea2363"
+    },
+    {
+      "bytes": 413,
+      "path": "provenance/q-disposition-v02.json",
+      "sha256": "42b964c01fe1f3082795c1a4781a4ed6ecf6a711b7a352d48093c9b8cf8e8332"
+    },
+    {
+      "bytes": 3307,
+      "path": "source/q_analysis_rules_v02.py",
+      "sha256": "4ba7a48438a35f00154e5eefcc76906122080944ff32575a4a26a5b1d29f91b3"
+    },
+    {
+      "bytes": 3398,
+      "path": "source/q_weighted_objective_v02.py",
+      "sha256": "fc412072592857be36b02312d852d08ce3df2bf6fa7b28f8c1d59575c28e1ea4"
+    },
+    {
+      "bytes": 5302,
+      "path": "tests/test_q_rules_v02.py",
+      "sha256": "6353e74ce9c498de6c56111cfa67771a76a2e51e4f6ad15ff8525c5573293ebd"
+    }
+  ],
+  "entry_count": 12,
+  "identity": "JEV_V08Q_BUNDLE_SEAL_V02",
+  "root_sha256": "118462335b94a41738e12c3af9b6b1647dc7fcc95cf88c9ae3cdc2ed0cbd43ae"
+}

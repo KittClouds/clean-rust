@@ -1,0 +1,11 @@
+claim	status	reason
+P2_PARENT_BINDING	PASS	sealed root and members verified
+MEMBERSHIP_ONLY_ACCESS	PASS	no outcome-bearing authority opened
+DB_CHRONOLOGY_RECONSTRUCTION	PASS	257 parent and 103 D_B memberships reconciled
+HAC_LAG_UNIT	PASS	selected D_B session ordinal declared
+STATIONARITY_TARGET	PASS	hash-thinned D_B score process declared
+THINNING_AUTHORITY	PASS	deterministic outcome-blind partition; no randomization claim
+ASYMPTOTIC_AUTHORITY	PASS	finite-sample and exact claims explicitly excluded
+SEMANTIC_CLARIFICATION	PASS	new overlay root required before execution
+D_B_OUTCOME_FIREWALL	PASS	all counts zero
+D_C_FIREWALL	PASS	membership and observations unread

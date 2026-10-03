@@ -1,0 +1,15 @@
+{
+  "schema_version": "DOUBLE_REBUILD_RECEIPT_V1",
+  "compared_files": [
+    "runraw.nrr1",
+    "features.nrf1",
+    "feature_registry.json",
+    "observation_dictionary.json",
+    "episode_tape.json",
+    "rl_env_spec.json",
+    "environment_config.json"
+  ],
+  "first_root": "96aca50a9ae6ece94ba73bdb59b5bf0831499ae443cd5ebc140cac189ab823ad",
+  "second_root": "96aca50a9ae6ece94ba73bdb59b5bf0831499ae443cd5ebc140cac189ab823ad",
+  "byte_identical": true
+}

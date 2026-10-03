@@ -1,0 +1,8 @@
+{
+  "protocol": "Q10-GC1-PAR5",
+  "identity": "q10-gc1-par5-v1",
+  "status": "INTERRUPTED_BEFORE_RECEIPT",
+  "authoritative": false,
+  "reason": "Runner was stopped before receipt emission after review found final-gate boundary, independent-audit, complete-group, parent-path, and PREEXECUTION seal checks still incomplete.",
+  "replacement_identity": "q10-gc1-par6-v1"
+}

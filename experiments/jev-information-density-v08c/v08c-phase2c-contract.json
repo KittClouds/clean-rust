@@ -1,0 +1,131 @@
+{
+  "contract": "jev-decision-data-information-density/v0.8c-phase2c-cross-atom-selection",
+  "status": "frozen_before_training_signature_audit",
+  "lineage": {
+    "parent_phase2b_freeze_sha256": "b74420e44c255f065bb472a2bb487cfabc14eba8bd8c2d0680c1f43993a3b619",
+    "atom_stage_freeze_sha256": "359c8567817426a4185e614ef8f7e2d40b9a7ac075a8b1f7ace12c68a4c9c77e",
+    "atom_stage_validation_sha256": "2c558f368b1d1f7e636c87d2c1061179ce75d8fdf2f56dad469d5dffbd2303a8",
+    "phase2b_construction_sha256": "e0c9ae1d4fcc17fd585768008f5f82282f7b27f57774cd07748065bcca42b044",
+    "phase2b_objective_contract_sha256": "0977af21b956e62f5b6b8533181ac120f3dc577f2781b013cd745047065c65e5",
+    "phase2b_atom_contract_sha256": "f433c6253a2bc2be2a030687dd4dba250086cfd480a92d1726f51940946c69b4",
+    "previous_phases_mutable": false
+  },
+  "inputs": {
+    "group_records_sha256": "9e3546fbe88741666cc5be5ae28907d7a223f74c8578609adfc3036ba7f4e7f2",
+    "canonical_episodes_sha256": "8f613f536d5496c78a93cfce02593b16809be4622558db2784fd1c91bcfa07d2",
+    "r100_manifest_sha256": "0b9998d94e895e5f540c066bdc618d0d6378b9e9ce632380838b7a14beac008b",
+    "c100_manifest_sha256": "860fbfef8283e707d41639ab970ef7257d116e3001a18a0b180feea9d72579c3",
+    "eval_manifest_sha256": "3e72cd7596fbf0b302501b88dd9dc645a5749de10884b57eceb5552bfc5ef8ae",
+    "phase2b_cm100_atom_provisional_sha256": "20e3c7c36ea10ceef2f23016d2e9ff438970c65afae11f6a1ada47af008904df",
+    "phase2b_rm100_atom_provisional_sha256": "424b018937cf5a3ec4c5cdc7a00fd8acbbc85a2bb1cdb0a189dd067074aa82c5",
+    "phase2b_atom_validation_sha256": "2c558f368b1d1f7e636c87d2c1061179ce75d8fdf2f56dad469d5dffbd2303a8",
+    "input_target_consistency_sha256": "3d330dcf7ea7d2b3a830b0cf285e9a58280ae159065429927b413b6606476cd5"
+  },
+  "source_pins": {
+    "experiments/jev-frozen-readout-v01/probe.py": "a3049d52e1183c806c84522a617a05646eb86fbcb69af72b5bb26f4808852cb1",
+    "experiments/jev-frozen-scaling-v05/train_v05.py": "52033950dab23835c13f4aa74a2f0d5867aec754f8a139a63a739a36b0cb62b9",
+    "experiments/jev-frozen-scaling-v05/v05-contract.json": "775fc64df74d7a1d7d476e0d1fc753d2b9c053392ec4f90da2c8abd79a4a259b",
+    "experiments/jev-information-density-v08/select_banks.py": "fcc885ace28d6866c9db6dd5736381e41f5e778ef4a442557dc5272d00f42866",
+    "experiments/jev-information-density-v08/v08-contract.json": "d1971ae4a8a8f6dcfcadbda97b2290bf3fa630f201779c4b47019512fc87f98f",
+    "experiments/jev-information-density-v08/audit_generator_outputs.py": "f610078dc13f98b88e8747c5cd1bc9eb844a78b9e33f2829c411b8a4f2b77d67",
+    "experiments/jev-information-density-v08b/build_factorial_banks.py": "8810694515c2c95da9f38ec53328366f6c14e3978c9837b784195c2ed926eba9",
+    "experiments/jev-information-density-v08b/v08b-contract.json": "16e8a36542ab80c9164ffe21794affd1662df8cd34dcff71858eae237c4d2c8d",
+    "experiments/jev-information-density-v08c/build_phase2b_atom_candidates.py": "01c210e482aa81fbd1c35d81198d52d5a24ac899f45286f53fa9d36f270346c1",
+    "experiments/jev-information-density-v08c/optimize_matched_banks.py": "9c57f98a151870c16f2cfdae5b27853939dd25598e1618b7ac6aeaa7bd52ff1b",
+    "experiments/jev-information-density-v08c/v08c-phase2b-contract.json": "0977af21b956e62f5b6b8533181ac120f3dc577f2781b013cd745047065c65e5",
+    "experiments/jev-information-density-v08c/v08c-phase2b-atom-stage-contract.json": "f433c6253a2bc2be2a030687dd4dba250086cfd480a92d1726f51940946c69b4"
+  },
+  "training_adapter": {
+    "contract": "jev-frozen-decision-surface-scaling/v0.5",
+    "probe_source": "experiments/jev-frozen-readout-v01/probe.py",
+    "trainer_source": "experiments/jev-frozen-scaling-v05/train_v05.py",
+    "trainer_contract": "experiments/jev-frozen-scaling-v05/v05-contract.json",
+    "source_split_implementation": "experiments/jev-information-density-v08/select_banks.py",
+    "source_split_contract": "experiments/jev-information-density-v08/v08-contract.json",
+    "generator_audit_source": "experiments/jev-information-density-v08/audit_generator_outputs.py",
+    "feature_profile": "name_definition",
+    "bank_projection": "materialize only exact group_id entries from each frozen manifest; do not expand a selected episode_id to its unselected sibling queries or perturbation groups",
+    "backbone_frozen": true,
+    "eligible_group_rule": "train split, not open_world, kind in {choice, independent}; v0.8 ordinal rows are exposed by the adapter as choice-kind softmax rows",
+    "loss": {
+      "choice": "soft cross entropy",
+      "independent": "soft binary cross entropy",
+      "brier_weight": 0.25,
+      "brier_probability_sources": ["exact_generative_posterior", "empirical_annotator_distribution", "elicited_subjective_probability", "adjudicated_distribution"],
+      "per_group_weight": 1.0,
+      "candidate_reorder_augmentation": true,
+      "invariance_weight": 0.10,
+      "invariance_pair_cap": 16
+    },
+    "invariance_pair_selection": "train_groups are ordered by group_id by v0.5 stable_sample; probe.invariant_pairs preserves first-key order, selects the first base row with perturbation_class null and first sibling with perturbation_class surfaceinvariance, then vectorized_invariant_loss uses the first 16 directed base-to-sibling pairs",
+    "invariance_pair_loss_inputs": "ordered state-query input and ordered candidate-surface arrays for both endpoints, plus adapter kind; gold targets are not consumed by the pair regularizer"
+  },
+  "training_signature": {
+    "version": "jev-frozen-readout-loss-signature/v1",
+    "fields": [
+      "exact state_query_text string",
+      "name_definition candidate surface strings aligned with float32 target bits",
+      "adapter decision kind and query view",
+      "open_world flag",
+      "probability_source, semantic loss, fixed semantic/Brier coefficients and derived Brier applicability",
+      "per-group sample weight",
+      "candidate-order augmentation rule",
+      "selected directed invariance-pair context when the v0.5 trainer uses the row"
+    ],
+    "choice_permutation_equivalence": "supervised signature canonicalizes aligned candidate-surface/float32-target pairs because the head loss and candidate scorer are permutation-equivariant; ordered-surface signature is also reported as a stricter diagnostic",
+    "excluded_fields": ["row ID", "episode ID", "root bookkeeping", "source identity", "curation features", "audit metadata", "generator metadata not consumed by the adapter"],
+    "target_precision": "IEEE-754 float32 bits, matching the trainer's torch.float32 target tensor",
+    "equivalence_scope": "exact adapter text and loss-input equivalence; different text hashes are counted as distinct even if an unobserved tokenizer or backbone might map them to identical token/features; no tokenizer, model weights, cached embeddings, or model outputs are read in this metadata-only phase",
+    "invariance_pair_order": "reconstructed exactly from the bank's group_id-sorted training rows and frozen v0.5 first-16 selection",
+    "no_raw_text_in_receipts": true
+  },
+  "distances": {
+    "supervised_multiset": "0.5/N * sum_t abs(count_A(t)-count_B(t))",
+    "training_multiset": "same formula over supervised signatures augmented with the exact selected invariance-pair role/event hashes",
+    "atom_allocation": "0.5/N * sum_a abs(k_A(a)-k_B(a))",
+    "model_contact_treatment_strength_minimum": 0.10,
+    "threshold_interpretation": "at least ten percent of 100,000 supervised training mass differs by canonical loss signature; not a model-quality claim"
+  },
+  "counterfactual_statuses": [
+    "PROFILE_FEASIBLE",
+    "COUNTERFACTUAL_FEASIBLE",
+    "MODEL_COUNTERFACTUAL",
+    "POLICY_SEPARATED",
+    "TREATMENT_STRENGTH_PASS",
+    "COUNTERFACTUAL_OPTIMAL",
+    "UNKNOWN_BOUNDED_SEARCH"
+  ],
+  "search_policy": {
+    "order": ["RM100 from C100 witness", "CM100 from R100 witness only if RM100 clears every readiness gate"],
+    "objective": {
+      "direction": "maximize_integer_priority_sum",
+      "curated_seed": "jev-idv08b-cm100-sha256-v1-profile-constrained-curation",
+      "random_seed": "jev-idv08b-rm100-sha256-v1-profile-constrained-random",
+      "curated_priority": "descending global frozen-v0.8 five-axis rarity-weighted coverage score, then ascending SHA256(seed|group_id), then lexical group_id; priority=eligible_count-zero_based_rank",
+      "random_priority": "ascending SHA256(seed|group_id), then lexical group_id; priority=eligible_count-zero_based_rank",
+      "minimum_positive_gain": 1
+    },
+    "constraints": "the complete inherited Phase 2 profile contract, independently recomputed after each checkpoint",
+    "method": "witness-seeded deterministic local/large-neighborhood search over atom counts; retain and checkpoint only full-profile-valid incumbents; exact cell counts remain mandatory",
+    "search_protocol_freeze": "a child search receipt must freeze the concrete neighborhood schedule, tie breaks, budget and source hashes after metadata-only mobility analysis and before candidate optimization",
+    "per_bank_budget_seconds": 2700,
+    "workers": 1,
+    "seed": 20260920,
+    "progress_interval_seconds": 60,
+    "timeout_semantics": "UNKNOWN_BOUNDED_SEARCH; never infer infeasibility or zero headroom"
+  },
+  "authorization": {
+    "metadata_signature_audit": true,
+    "support_mobility_census": true,
+    "cross_atom_candidate_search_after_child_freeze": true,
+    "model_contact": false,
+    "training_materialization": false,
+    "phoenix_access": false,
+    "mutate_frozen_banks_or_prior_phases": false
+  },
+  "acceptance": {
+    "each_bank": ["100,000 eligible IDs", "all Phase 2 hard constraints pass", "training signature multiset differs", "policy objective gain >= 1", "training distance >= 0.10"],
+    "factorial_ready": "both RM100 and CM100 independently pass every per-bank condition",
+    "model_run": "requires a new explicit model-contact authorization; FACTORIAL_READY does not authorize training"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "C_expected_transform_checks": 168341760,
+  "D_invariance_checks": 42085440,
+  "all_kcmb_coordinates": 24355,
+  "cue_permutations": 24,
+  "first_mismatch": null,
+  "gate_id": "REPRESENTATION_INVARIANTS",
+  "joint_inversion_tuple_checks": 1753560,
+  "schema": "F4-SYMMETRY-01-representation-fixture-v1",
+  "snapshot_count": 72,
+  "status": "PASS"
+}

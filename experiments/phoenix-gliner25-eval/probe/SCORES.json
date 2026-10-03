@@ -1,0 +1,1651 @@
+{
+ "entities": {
+  "A": {
+   "tp": 110,
+   "fp": 7,
+   "fn": 50,
+   "precision": 0.94,
+   "recall": 0.688,
+   "type_accuracy": 0.845
+  },
+  "B1": {
+   "tp": 137,
+   "fp": 128,
+   "fn": 23,
+   "precision": 0.517,
+   "recall": 0.856,
+   "type_accuracy": 0.891
+  },
+  "B2": {
+   "tp": 125,
+   "fp": 65,
+   "fn": 35,
+   "precision": 0.658,
+   "recall": 0.781,
+   "type_accuracy": 0.872
+  },
+  "C_entities": {
+   "tp": 141,
+   "fp": 193,
+   "fn": 19,
+   "precision": 0.422,
+   "recall": 0.881,
+   "type_accuracy": 0.858
+  }
+ },
+ "relations": {
+  "C": {
+   "predicted": 174,
+   "tp": 15,
+   "fp": 159,
+   "fn": 23,
+   "precision": 0.086,
+   "recall": 0.395,
+   "pair_precision": 0.178
+  },
+  "C@0.3": {
+   "predicted": 232,
+   "tp": 17,
+   "fp": 215,
+   "fn": 21,
+   "precision": 0.073,
+   "recall": 0.447,
+   "pair_precision": 0.151
+  },
+  "C@0.7": {
+   "predicted": 142,
+   "tp": 14,
+   "fp": 128,
+   "fn": 24,
+   "precision": 0.099,
+   "recall": 0.368,
+   "pair_precision": 0.197
+  },
+  "K (keyword, all)": {
+   "predicted": 0,
+   "tp": 0,
+   "fp": 0,
+   "fn": 38,
+   "precision": 0.0,
+   "recall": 0.0,
+   "pair_precision": 0.0
+  },
+  "K (keyword, mappable types)": {
+   "predicted": 0,
+   "tp": 0,
+   "fp": 0,
+   "fn": 38,
+   "precision": 0.0,
+   "recall": 0.0,
+   "pair_precision": 0.0
+  },
+  "P (all co-occurring pairs)": {
+   "predicted": 356,
+   "pair_precision": 0.107
+  }
+ },
+ "gates": {
+  "entities_adopt_B2": false,
+  "relations": "dropped"
+ },
+ "mean_ms_per_passage": {
+  "B1": 619.1,
+  "B2": 620.8,
+  "C": 1326.0,
+  "C@0.3": 587.4,
+  "C@0.7": 588.2
+ },
+ "false_positive_entities": {
+  "A": {
+   "p00": [
+    "welcome to new rome",
+    "tank truck"
+   ],
+   "p04": [
+    "dumpster"
+   ],
+   "p20": [
+    "corruption",
+    "inspections"
+   ],
+   "p33": [
+    "ryan and lanka",
+    "jamie and ki-jung"
+   ]
+  },
+  "B1": {
+   "p00": [
+    "tank truck",
+    "bliss-addict meth-head"
+   ],
+   "p01": [
+    "barman",
+    "multiculturalism",
+    "briefcase",
+    "mushrooms",
+    "bomb",
+    "immortal"
+   ],
+   "p02": [
+    "car",
+    "assassin",
+    "counter",
+    "road",
+    "spanish muchacho"
+   ],
+   "p03": [
+    "bar",
+    "counter",
+    "trench coat",
+    "floor"
+   ],
+   "p04": [
+    "corporations"
+   ],
+   "p05": [
+    "image"
+   ],
+   "p06": [
+    "hardware",
+    "weapons",
+    "moon"
+   ],
+   "p07": [
+    "maximus",
+    "marauders"
+   ],
+   "p08": [
+    "community"
+   ],
+   "p09": [
+    "junkies",
+    "north neighborhoods",
+    "they",
+    "beer",
+    "mutants"
+   ],
+   "p10": [
+    "mooks",
+    "joint"
+   ],
+   "p11": [
+    "watch",
+    "pier",
+    "bathyspheres",
+    "propellers",
+    "machines",
+    "sea"
+   ],
+   "p12": [
+    "beach",
+    "sea",
+    "walkway",
+    "miss nuclear disaster"
+   ],
+   "p13": [
+    "gauntlets",
+    "walkway",
+    "ice",
+    "horizon"
+   ],
+   "p14": [
+    "bat"
+   ],
+   "p15": [
+    "hazmat girl",
+    "helicopter",
+    "gauntlet"
+   ],
+   "p16": [
+    "mobster",
+    "rusted fisty",
+    "hotel room"
+   ],
+   "p17": [
+    "estate",
+    "summit",
+    "hotel",
+    "security cameras",
+    "mushroom drug",
+    "dick graffiti",
+    "shower"
+   ],
+   "p18": [
+    "orange",
+    "hen house"
+   ],
+   "p19": [
+    "bathyspheres",
+    "black market",
+    "genius goods"
+   ],
+   "p20": [
+    "civilization",
+    "community",
+    "car",
+    "weapons",
+    "corruption"
+   ],
+   "p21": [
+    "weapon",
+    "plushie",
+    "bathyspheres",
+    "crimson-paint",
+    "steampunk"
+   ],
+   "p22": [
+    "normies",
+    "street"
+   ],
+   "p23": [
+    "car",
+    "mosquito",
+    "weapon",
+    "nuclear fire",
+    "superhumans",
+    "city of canals",
+    "china"
+   ],
+   "p24": [
+    "book",
+    "supply bag",
+    "communist",
+    "library"
+   ],
+   "p25": [
+    "metal box",
+    "letter",
+    "syringes",
+    "homo sapiens species",
+    "humanity",
+    "biological evolution"
+   ],
+   "p26": [
+    "mutation"
+   ],
+   "p27": [
+    "car",
+    "technology"
+   ],
+   "p28": [
+    "bomb",
+    "camera"
+   ],
+   "p29": [
+    "chocolate",
+    "depression",
+    "knifepoint"
+   ],
+   "p30": [
+    "kitchen",
+    "tv",
+    "balcony",
+    "biology",
+    "rock-disaster",
+    "tattoos",
+    "biker",
+    "cross pendant"
+   ],
+   "p31": [
+    "others",
+    "cocaine",
+    "garage"
+   ],
+   "p32": [
+    "trenchcoat",
+    "culture",
+    "villains",
+    "bicycle",
+    "car",
+    "gun"
+   ],
+   "p33": [
+    "foundry",
+    "savages",
+    "greek chiton dress",
+    "sandals",
+    "shark tooth necklace",
+    "skull-shaped earrings"
+   ],
+   "p34": [
+    "hit squad",
+    "metal gates"
+   ],
+   "p35": [
+    "suit"
+   ]
+  },
+  "B2": {
+   "p00": [
+    "tank truck"
+   ],
+   "p01": [
+    "briefcase",
+    "bomb"
+   ],
+   "p02": [
+    "car",
+    "assassin",
+    "counter"
+   ],
+   "p03": [
+    "trench coat"
+   ],
+   "p04": [
+    "corporations"
+   ],
+   "p07": [
+    "maximus",
+    "marauders"
+   ],
+   "p09": [
+    "junkies",
+    "they",
+    "beer",
+    "mutants"
+   ],
+   "p11": [
+    "watch",
+    "bathyspheres",
+    "machines"
+   ],
+   "p12": [
+    "miss nuclear disaster",
+    "blades of ice"
+   ],
+   "p13": [
+    "gauntlets"
+   ],
+   "p14": [
+    "bat"
+   ],
+   "p15": [
+    "hazmat girl",
+    "helicopter",
+    "gauntlet"
+   ],
+   "p16": [
+    "mobster",
+    "augusti path",
+    "rusted fisty"
+   ],
+   "p17": [
+    "obelisks",
+    "fortified fence",
+    "security cameras",
+    "dick graffiti"
+   ],
+   "p18": [
+    "orange"
+   ],
+   "p19": [
+    "bathyspheres"
+   ],
+   "p20": [
+    "car",
+    "weapons"
+   ],
+   "p21": [
+    "weapon",
+    "plushie",
+    "bathyspheres",
+    "crimson-paint",
+    "steampunk"
+   ],
+   "p22": [
+    "normies"
+   ],
+   "p23": [
+    "car",
+    "mosquito",
+    "weapon",
+    "superhumans",
+    "city of canals",
+    "china"
+   ],
+   "p24": [
+    "communist"
+   ],
+   "p25": [
+    "metal box",
+    "letter",
+    "syringes",
+    "homo sapiens species"
+   ],
+   "p27": [
+    "car"
+   ],
+   "p28": [
+    "bomb",
+    "camera"
+   ],
+   "p30": [
+    "rock-disaster",
+    "biker"
+   ],
+   "p32": [
+    "bicycle"
+   ],
+   "p33": [
+    "savages",
+    "greek chiton dress",
+    "sandals",
+    "shark tooth necklace",
+    "skull-shaped earrings"
+   ],
+   "p35": [
+    "suit",
+    "others"
+   ]
+  },
+  "C": {
+   "p00": [
+    "highway",
+    "tank truck",
+    "meth-head",
+    "strip"
+   ],
+   "p01": [
+    "front door",
+    "multiculturalism",
+    "briefcase",
+    "mushrooms",
+    "bomb"
+   ],
+   "p02": [
+    "car",
+    "wall",
+    "assassin",
+    "hostile genome",
+    "counter",
+    "road",
+    "muchacho"
+   ],
+   "p03": [
+    "bloodstained bat",
+    "bar",
+    "counter",
+    "trench coat",
+    "mask",
+    "banknotes",
+    "floor"
+   ],
+   "p04": [
+    "northwest neighborhood",
+    "corporations",
+    "industrial plants",
+    "other districts",
+    "rogue geniuses",
+    "adventurers"
+   ],
+   "p05": [
+    "image",
+    "merchandising rights"
+   ],
+   "p06": [
+    "our",
+    "employee",
+    "we",
+    "hardware",
+    "weapons",
+    "moon",
+    "establishment"
+   ],
+   "p07": [
+    "sushi bar",
+    "maximus",
+    "robots",
+    "marauders"
+   ],
+   "p08": [
+    "immortal",
+    "time",
+    "supervillain organization",
+    "us",
+    "houses",
+    "churches",
+    "hospitals"
+   ],
+   "p09": [
+    "junkies",
+    "north neighborhoods",
+    "colosseum battle",
+    "they",
+    "beer",
+    "mutants"
+   ],
+   "p10": [
+    "sea",
+    "superpower",
+    "joint"
+   ],
+   "p11": [
+    "watch",
+    "pier",
+    "machines",
+    "steampunk technology",
+    "design",
+    "crimson paint"
+   ],
+   "p12": [
+    "beach",
+    "ice layer",
+    "sea",
+    "walkway",
+    "scarf",
+    "mask",
+    "miss nuclear disaster",
+    "blades"
+   ],
+   "p13": [
+    "gauntlets",
+    "walkway",
+    "ice",
+    "cheese",
+    "horizon"
+   ],
+   "p14": [
+    "costume",
+    "bat"
+   ],
+   "p15": [
+    "hazmat girl",
+    "suit",
+    "helicopter",
+    "ground",
+    "gauntlet"
+   ],
+   "p16": [
+    "mobster",
+    "augusti path",
+    "rusted fisty",
+    "hotel room"
+   ],
+   "p17": [
+    "obelisks",
+    "diversity",
+    "estate",
+    "summit",
+    "hill",
+    "fortified fence",
+    "immortality",
+    "hotel",
+    "security cameras",
+    "cockroaches",
+    "mushroom drug",
+    "dick graffiti",
+    "shower"
+   ],
+   "p18": [
+    "orange",
+    "hen house",
+    "code"
+   ],
+   "p19": [
+    "bouncers",
+    "business card",
+    "genius technology",
+    "bathyspheres",
+    "black market",
+    "genius goods"
+   ],
+   "p20": [
+    "civilization",
+    "community",
+    "car",
+    "drugs",
+    "weapons",
+    "guards",
+    "corruption"
+   ],
+   "p21": [
+    "weapon",
+    "plushie",
+    "establishment",
+    "bathyspheres",
+    "crimson-paint",
+    "steampunk"
+   ],
+   "p22": [
+    "normies",
+    "street",
+    "childhood"
+   ],
+   "p23": [
+    "car",
+    "a-bomb",
+    "bomb",
+    "mosquito",
+    "weapon",
+    "nuclear fire",
+    "city of canals",
+    "china"
+   ],
+   "p24": [
+    "book",
+    "supply bag",
+    "fork",
+    "library",
+    "communist revolution",
+    "gulag"
+   ],
+   "p25": [
+    "letter",
+    "syringes",
+    "paper",
+    "socio-genetic experiment",
+    "humanity",
+    "biological evolution"
+   ],
+   "p26": [
+    "mutation"
+   ],
+   "p27": [
+    "car",
+    "husk",
+    "technology"
+   ],
+   "p28": [
+    "bathyspheres",
+    "submarines",
+    "town",
+    "bomb",
+    "camera"
+   ],
+   "p29": [
+    "chocolate",
+    "depression",
+    "knifepoint",
+    "dinner party"
+   ],
+   "p30": [
+    "kitchen",
+    "balcony",
+    "kitchen rat",
+    "intelligence",
+    "biology",
+    "rodent telepathy",
+    "balcony girl",
+    "tattoos",
+    "bird symbol",
+    "biker",
+    "cross pendant"
+   ],
+   "p31": [
+    "communities",
+    "roof",
+    "cocaine",
+    "garage"
+   ],
+   "p32": [
+    "trenchcoat",
+    "culture",
+    "villains",
+    "bicycle",
+    "car",
+    "gun",
+    "fool"
+   ],
+   "p33": [
+    "foundry",
+    "savages",
+    "metal gates",
+    "greek chiton dress",
+    "sandals",
+    "shark tooth necklace",
+    "skull-shaped earrings"
+   ],
+   "p34": [
+    "mystery",
+    "hit squad",
+    "metal gates"
+   ],
+   "p35": [
+    "suit",
+    "advanced tech"
+   ]
+  }
+ },
+ "C_relations": {
+  "p00": [
+   [
+    "new rome",
+    "ally_of",
+    "ryan"
+   ],
+   [
+    "new rome",
+    "enemy_of",
+    "ryan"
+   ],
+   [
+    "new rome",
+    "family_of",
+    "ryan"
+   ],
+   [
+    "new rome",
+    "located_in",
+    "campania"
+   ],
+   [
+    "ryan",
+    "leads",
+    "new rome"
+   ],
+   [
+    "ryan",
+    "owns",
+    "plymouth fury"
+   ],
+   [
+    "ryan",
+    "owns",
+    "tank truck"
+   ],
+   [
+    "ryan",
+    "works_for",
+    "new rome"
+   ],
+   [
+    "strip",
+    "located_in",
+    "new rome"
+   ]
+  ],
+  "p01": [
+   [
+    "ryan",
+    "family_of",
+    "wrangler"
+   ],
+   [
+    "wrangler",
+    "works_for",
+    "renesco"
+   ]
+  ],
+  "p02": [
+   [
+    "assassin",
+    "enemy_of",
+    "ryan"
+   ],
+   [
+    "assassin",
+    "family_of",
+    "ryan"
+   ],
+   [
+    "ryan",
+    "owns",
+    "car"
+   ],
+   [
+    "ryan",
+    "works_for",
+    "assassin"
+   ]
+  ],
+  "p03": [
+   [
+    "renesco",
+    "family_of",
+    "ryan"
+   ],
+   [
+    "renesco",
+    "owns",
+    "bar"
+   ],
+   [
+    "renesco",
+    "works_for",
+    "ryan"
+   ]
+  ],
+  "p04": [
+   [
+    "corporations",
+    "enemy_of",
+    "rust town"
+   ],
+   [
+    "corporations",
+    "enemy_of",
+    "ryan"
+   ],
+   [
+    "corporations",
+    "owns",
+    "industrial plants"
+   ],
+   [
+    "corporations",
+    "owns",
+    "junkyard"
+   ],
+   [
+    "len",
+    "ally_of",
+    "rust town"
+   ],
+   [
+    "len",
+    "ally_of",
+    "ryan"
+   ],
+   [
+    "len",
+    "family_of",
+    "rust town"
+   ],
+   [
+    "len",
+    "family_of",
+    "ryan"
+   ],
+   [
+    "len",
+    "member_of",
+    "rogue geniuses"
+   ],
+   [
+    "rust town",
+    "located_in",
+    "new rome"
+   ]
+  ],
+  "p05": [
+   [
+    "dynamis",
+    "owns",
+    "image"
+   ],
+   [
+    "dynamis",
+    "owns",
+    "merchandising rights"
+   ],
+   [
+    "il migliore",
+    "enemy_of",
+    "ryan"
+   ],
+   [
+    "il migliore",
+    "located_in",
+    "new rome"
+   ],
+   [
+    "il migliore",
+    "works_for",
+    "dynamis"
+   ],
+   [
+    "leo hargraves",
+    "family_of",
+    "ryan"
+   ],
+   [
+    "ryan",
+    "family_of",
+    "ryan"
+   ],
+   [
+    "ryan",
+    "leads",
+    "il migliore"
+   ],
+   [
+    "ryan",
+    "member_of",
+    "il migliore"
+   ],
+   [
+    "wyvern",
+    "leads",
+    "il migliore"
+   ],
+   [
+    "wyvern",
+    "member_of",
+    "il migliore"
+   ],
+   [
+    "wyvern",
+    "works_for",
+    "dynamis"
+   ]
+  ],
+  "p06": [
+   [
+    "employee",
+    "works_for",
+    "vulcan"
+   ],
+   [
+    "employee",
+    "works_for",
+    "we"
+   ],
+   [
+    "ryan",
+    "ally_of",
+    "vulcan"
+   ],
+   [
+    "vulcan",
+    "leads",
+    "we"
+   ],
+   [
+    "vulcan",
+    "owns",
+    "establishment"
+   ]
+  ],
+  "p07": [
+   [
+    "colosseum maximus",
+    "located_in",
+    "new rome"
+   ],
+   [
+    "t-rex",
+    "owns",
+    "colosseum maximus"
+   ]
+  ],
+  "p08": [
+   [
+    "ryan",
+    "family_of",
+    "zanbato"
+   ],
+   [
+    "us",
+    "located_in",
+    "italy"
+   ],
+   [
+    "zanbato",
+    "leads",
+    "us"
+   ]
+  ],
+  "p09": [
+   [
+    "colosseum battle",
+    "located_in",
+    "north neighborhoods"
+   ],
+   [
+    "junkies",
+    "enemy_of",
+    "ryan"
+   ],
+   [
+    "junkies",
+    "enemy_of",
+    "zanbato"
+   ],
+   [
+    "renesco",
+    "ally_of",
+    "ryan"
+   ],
+   [
+    "renesco",
+    "ally_of",
+    "zanbato"
+   ],
+   [
+    "ryan",
+    "enemy_of",
+    "they"
+   ],
+   [
+    "they",
+    "enemy_of",
+    "zanbato"
+   ]
+  ],
+  "p10": [
+   [
+    "gruntie",
+    "family_of",
+    "luigi"
+   ],
+   [
+    "luigi",
+    "enemy_of",
+    "ryan"
+   ],
+   [
+    "luigi",
+    "located_in",
+    "sea"
+   ],
+   [
+    "luigi",
+    "works_for",
+    "ryan"
+   ],
+   [
+    "ryan",
+    "ally_of",
+    "ryan"
+   ],
+   [
+    "ryan",
+    "ally_of",
+    "zanbato"
+   ],
+   [
+    "ryan",
+    "enemy_of",
+    "ryan"
+   ]
+  ],
+  "p11": [
+   [
+    "len",
+    "family_of",
+    "ryan"
+   ],
+   [
+    "luigi",
+    "enemy_of",
+    "machines"
+   ],
+   [
+    "luigi",
+    "owns",
+    "watch"
+   ],
+   [
+    "machines",
+    "enemy_of",
+    "ryan"
+   ]
+  ],
+  "p12": [
+   [
+    "adam",
+    "enemy_of",
+    "ghoul"
+   ],
+   [
+    "beach",
+    "located_in",
+    "beach"
+   ],
+   [
+    "beach",
+    "located_in",
+    "sea"
+   ],
+   [
+    "beach",
+    "located_in",
+    "walkway"
+   ],
+   [
+    "ghoul",
+    "enemy_of",
+    "ryan"
+   ],
+   [
+    "miss nuclear disaster",
+    "family_of",
+    "ryan"
+   ],
+   [
+    "miss nuclear disaster",
+    "member_of",
+    "augusti"
+   ]
+  ],
+  "p13": [
+   [
+    "luigi",
+    "ally_of",
+    "ryan"
+   ],
+   [
+    "ryan",
+    "ally_of",
+    "zanbato"
+   ],
+   [
+    "ryan",
+    "enemy_of",
+    "sarin"
+   ],
+   [
+    "ryan",
+    "family_of",
+    "sarin"
+   ],
+   [
+    "sarin",
+    "owns",
+    "gauntlets"
+   ],
+   [
+    "walkway",
+    "located_in",
+    "walkway"
+   ]
+  ],
+  "p14": [
+   [
+    "ghoul",
+    "enemy_of",
+    "ghoul"
+   ],
+   [
+    "ghoul",
+    "enemy_of",
+    "ryan"
+   ],
+   [
+    "ghoul",
+    "family_of",
+    "ghoul"
+   ],
+   [
+    "ryan",
+    "owns",
+    "bat"
+   ],
+   [
+    "ryan",
+    "owns",
+    "costume"
+   ]
+  ],
+  "p15": [
+   [
+    "hazmat girl",
+    "works_for",
+    "dynamis"
+   ],
+   [
+    "helicopter",
+    "enemy_of",
+    "ryan"
+   ],
+   [
+    "helicopter",
+    "enemy_of",
+    "sarin"
+   ],
+   [
+    "helicopter",
+    "located_in",
+    "ground"
+   ]
+  ],
+  "p16": [
+   [
+    "len",
+    "ally_of",
+    "ryan"
+   ],
+   [
+    "len",
+    "enemy_of",
+    "ryan"
+   ],
+   [
+    "len",
+    "family_of",
+    "ryan"
+   ],
+   [
+    "len",
+    "works_for",
+    "mobster"
+   ],
+   [
+    "ryan",
+    "located_in",
+    "hotel room"
+   ],
+   [
+    "ryan",
+    "owns",
+    "rusted fisty"
+   ]
+  ],
+  "p17": [
+   [
+    "len",
+    "ally_of",
+    "ryan"
+   ]
+  ],
+  "p18": [
+   [
+    "hen house",
+    "located_in",
+    "casino royale"
+   ],
+   [
+    "hen house",
+    "located_in",
+    "hen house"
+   ],
+   [
+    "luigi",
+    "family_of",
+    "ryan"
+   ],
+   [
+    "orange",
+    "family_of",
+    "ryan"
+   ],
+   [
+    "ryan",
+    "enemy_of",
+    "zanbato"
+   ],
+   [
+    "ryan",
+    "family_of",
+    "zanbato"
+   ],
+   [
+    "zanbato",
+    "located_in",
+    "casino royale"
+   ],
+   [
+    "zanbato",
+    "located_in",
+    "hen house"
+   ]
+  ],
+  "p19": [
+   [
+    "bouncers",
+    "member_of",
+    "augusti"
+   ],
+   [
+    "len",
+    "family_of",
+    "ryan"
+   ],
+   [
+    "ryan",
+    "family_of",
+    "ryan"
+   ],
+   [
+    "wyvern",
+    "located_in",
+    "bakuto"
+   ],
+   [
+    "wyvern",
+    "located_in",
+    "rust town"
+   ]
+  ],
+  "p20": [
+   [
+    "augusti",
+    "enemy_of",
+    "ryan"
+   ],
+   [
+    "guards",
+    "works_for",
+    "augusti"
+   ],
+   [
+    "guards",
+    "works_for",
+    "meta"
+   ],
+   [
+    "meta",
+    "enemy_of",
+    "ryan"
+   ],
+   [
+    "rust town",
+    "located_in",
+    "community"
+   ],
+   [
+    "ryan",
+    "family_of",
+    "ryan"
+   ],
+   [
+    "ryan",
+    "owns",
+    "car"
+   ]
+  ],
+  "p21": [
+   [
+    "paulie",
+    "enemy_of",
+    "ryan"
+   ],
+   [
+    "paulie",
+    "owns",
+    "plushie"
+   ]
+  ],
+  "p22": [
+   [
+    "genome",
+    "enemy_of",
+    "ryan"
+   ],
+   [
+    "normies",
+    "enemy_of",
+    "ryan"
+   ],
+   [
+    "ryan",
+    "owns",
+    "junkyard"
+   ],
+   [
+    "ryan",
+    "works_for",
+    "private security"
+   ]
+  ],
+  "p23": [
+   [
+    "mosquito",
+    "enemy_of",
+    "ryan"
+   ],
+   [
+    "rust town",
+    "located_in",
+    "china"
+   ],
+   [
+    "ryan",
+    "family_of",
+    "ryan"
+   ],
+   [
+    "ryan",
+    "owns",
+    "car"
+   ],
+   [
+    "ryan",
+    "works_for",
+    "ryan"
+   ]
+  ],
+  "p24": [
+   [
+    "len",
+    "family_of",
+    "ryan"
+   ],
+   [
+    "len",
+    "owns",
+    "supply bag"
+   ],
+   [
+    "ryan",
+    "family_of",
+    "ryan"
+   ]
+  ],
+  "p26": [
+   [
+    "cesare",
+    "ally_of",
+    "len"
+   ],
+   [
+    "len",
+    "ally_of",
+    "ryan"
+   ]
+  ],
+  "p27": [
+   [
+    "car",
+    "located_in",
+    "florence"
+   ],
+   [
+    "ghoul",
+    "enemy_of",
+    "ryan"
+   ],
+   [
+    "ryan",
+    "family_of",
+    "ryan"
+   ],
+   [
+    "ryan",
+    "owns",
+    "car"
+   ]
+  ],
+  "p28": [
+   [
+    "devilry",
+    "enemy_of",
+    "ryan"
+   ],
+   [
+    "geist",
+    "enemy_of",
+    "ryan"
+   ],
+   [
+    "geist",
+    "enemy_of",
+    "zanbato"
+   ],
+   [
+    "luigi",
+    "owns",
+    "invisibility elixir"
+   ],
+   [
+    "mosquito",
+    "enemy_of",
+    "ryan"
+   ],
+   [
+    "ryan",
+    "enemy_of",
+    "sarin"
+   ],
+   [
+    "ryan",
+    "enemy_of",
+    "vulcan"
+   ],
+   [
+    "ryan",
+    "enemy_of",
+    "wardrobe"
+   ],
+   [
+    "ryan",
+    "enemy_of",
+    "wyvern"
+   ]
+  ],
+  "p29": [
+   [
+    "dinner party",
+    "located_in",
+    "knifepoint"
+   ],
+   [
+    "luigi",
+    "ally_of",
+    "zanbato"
+   ],
+   [
+    "ryan",
+    "enemy_of",
+    "zanbato"
+   ],
+   [
+    "ryan",
+    "family_of",
+    "zanbato"
+   ]
+  ],
+  "p30": [
+   [
+    "balcony girl",
+    "ally_of",
+    "ki-jung"
+   ],
+   [
+    "kitchen rat",
+    "located_in",
+    "kitchen"
+   ],
+   [
+    "ryan",
+    "family_of",
+    "ryan"
+   ]
+  ],
+  "p31": [
+   [
+    "jamie",
+    "family_of",
+    "ryan"
+   ],
+   [
+    "len",
+    "ally_of",
+    "ryan"
+   ],
+   [
+    "ryan",
+    "enemy_of",
+    "ryan"
+   ],
+   [
+    "ryan",
+    "member_of",
+    "communities"
+   ]
+  ],
+  "p32": [
+   [
+    "rambo",
+    "family_of",
+    "ryan"
+   ],
+   [
+    "ryan",
+    "owns",
+    "bicycle"
+   ],
+   [
+    "ryan",
+    "owns",
+    "gun"
+   ],
+   [
+    "ryan",
+    "owns",
+    "trenchcoat"
+   ]
+  ],
+  "p33": [
+   [
+    "lanka",
+    "ally_of",
+    "ryan"
+   ],
+   [
+    "ryan",
+    "member_of",
+    "savages"
+   ]
+  ],
+  "p34": [
+   [
+    "hit squad",
+    "ally_of",
+    "jamie"
+   ],
+   [
+    "hit squad",
+    "ally_of",
+    "ryan"
+   ],
+   [
+    "ryan",
+    "ally_of",
+    "vulcan"
+   ],
+   [
+    "ryan",
+    "enemy_of",
+    "ryan"
+   ],
+   [
+    "ryan",
+    "family_of",
+    "vulcan"
+   ],
+   [
+    "ryan",
+    "family_of",
+    "wyvern"
+   ],
+   [
+    "vulcan",
+    "located_in",
+    "metal gates"
+   ]
+  ],
+  "p35": [
+   [
+    "ryan",
+    "enemy_of",
+    "vulcan"
+   ],
+   [
+    "ryan",
+    "family_of",
+    "vulcan"
+   ],
+   [
+    "ryan",
+    "owns",
+    "suit"
+   ],
+   [
+    "vulcan",
+    "owns",
+    "suit"
+   ]
+  ]
+ }
+}

@@ -1,0 +1,11 @@
+﻿{
+    "contract":  "MST_FURNACE_BATCH_RECONCILIATION_V1",
+    "batch_id":  "BATCH_20260812T091913630Z",
+    "status":  "RECONCILED_COMPLETE",
+    "reconciled_at_utc":  "2026-08-12T09:21:59.8930278Z",
+    "admitted":  3,
+    "true_failed":  0,
+    "diagnostic_quarantine_duplicates":  3,
+    "corpus_verification":  "PASS",
+    "deletion_performed":  false
+}

@@ -1,0 +1,732 @@
+{
+  "evaluated_primary_groups": [
+    {
+      "authority_h16_score": [
+        2,
+        2,
+        1.066240299940009e-06,
+        9.5367431640625e-07
+      ],
+      "authority_h32_score": [
+        0,
+        0,
+        0.0,
+        0.0
+      ],
+      "authority_h32_strictly_beats_h16": true,
+      "cohort": "primary",
+      "coordinates_total": 49,
+      "identity": [
+        "seed9731-L-tau16.json",
+        0,
+        45
+      ]
+    },
+    {
+      "authority_h16_score": [
+        3,
+        8,
+        1.5266237824995157e-06,
+        1.430511474609375e-06
+      ],
+      "authority_h32_score": [
+        2,
+        2,
+        5.331201499700045e-07,
+        4.76837158203125e-07
+      ],
+      "authority_h32_strictly_beats_h16": true,
+      "cohort": "primary",
+      "coordinates_total": 44,
+      "identity": [
+        "seed9731-L-tau16.json",
+        1,
+        43
+      ]
+    },
+    {
+      "authority_h16_score": [
+        7,
+        9,
+        3.0994415283203125e-06,
+        1.9073486328125e-06
+      ],
+      "authority_h32_score": [
+        4,
+        5,
+        2.900487198971853e-06,
+        1.9073486328125e-06
+      ],
+      "authority_h32_strictly_beats_h16": true,
+      "cohort": "primary",
+      "coordinates_total": 53,
+      "identity": [
+        "seed9731-L-tau16.json",
+        2,
+        40
+      ]
+    },
+    {
+      "authority_h16_score": [
+        3,
+        3,
+        7.152557373046875e-07,
+        4.76837158203125e-07
+      ],
+      "authority_h32_score": [
+        2,
+        2,
+        6.743495761743046e-07,
+        4.76837158203125e-07
+      ],
+      "authority_h32_strictly_beats_h16": true,
+      "cohort": "primary",
+      "coordinates_total": 45,
+      "identity": [
+        "seed9731-L-tau16.json",
+        3,
+        44
+      ]
+    },
+    {
+      "authority_h16_score": [
+        2,
+        3,
+        1.066240299940009e-06,
+        9.5367431640625e-07
+      ],
+      "authority_h32_score": [
+        2,
+        3,
+        1.066240299940009e-06,
+        9.5367431640625e-07
+      ],
+      "authority_h32_strictly_beats_h16": false,
+      "cohort": "primary",
+      "coordinates_total": 60,
+      "identity": [
+        "seed9731-L-tau4.json",
+        0,
+        41
+      ]
+    },
+    {
+      "authority_h16_score": [
+        2,
+        2,
+        2.6973983046972182e-06,
+        1.9073486328125e-06
+      ],
+      "authority_h32_score": [
+        0,
+        0,
+        0.0,
+        0.0
+      ],
+      "authority_h32_strictly_beats_h16": true,
+      "cohort": "primary",
+      "coordinates_total": 62,
+      "identity": [
+        "seed9731-L-tau4.json",
+        1,
+        43
+      ]
+    },
+    {
+      "authority_h16_score": [
+        1,
+        1,
+        4.76837158203125e-07,
+        4.76837158203125e-07
+      ],
+      "authority_h32_score": [
+        1,
+        1,
+        4.76837158203125e-07,
+        4.76837158203125e-07
+      ],
+      "authority_h32_strictly_beats_h16": false,
+      "cohort": "primary",
+      "coordinates_total": 60,
+      "identity": [
+        "seed9731-L-tau4.json",
+        2,
+        41
+      ]
+    },
+    {
+      "authority_h16_score": [
+        2,
+        4,
+        1.966049969490843e-06,
+        1.9073486328125e-06
+      ],
+      "authority_h32_score": [
+        1,
+        1,
+        2.384185791015625e-07,
+        2.384185791015625e-07
+      ],
+      "authority_h32_strictly_beats_h16": true,
+      "cohort": "primary",
+      "coordinates_total": 58,
+      "identity": [
+        "seed9731-L-tau4.json",
+        3,
+        48
+      ]
+    },
+    {
+      "authority_h16_score": [
+        1,
+        1,
+        4.76837158203125e-07,
+        4.76837158203125e-07
+      ],
+      "authority_h32_score": [
+        0,
+        0,
+        0.0,
+        0.0
+      ],
+      "authority_h32_strictly_beats_h16": true,
+      "cohort": "primary",
+      "coordinates_total": 46,
+      "identity": [
+        "seed9731-R-tau16.json",
+        1,
+        44
+      ]
+    },
+    {
+      "authority_h16_score": [
+        3,
+        3,
+        1.1680077279964342e-06,
+        9.5367431640625e-07
+      ],
+      "authority_h32_score": [
+        3,
+        3,
+        1.1680077279964342e-06,
+        9.5367431640625e-07
+      ],
+      "authority_h32_strictly_beats_h16": false,
+      "cohort": "primary",
+      "coordinates_total": 58,
+      "identity": [
+        "seed9731-R-tau16.json",
+        3,
+        40
+      ]
+    },
+    {
+      "authority_h16_score": [
+        4,
+        5,
+        2.5231850729604633e-06,
+        1.9073486328125e-06
+      ],
+      "authority_h32_score": [
+        4,
+        5,
+        2.5231850729604633e-06,
+        1.9073486328125e-06
+      ],
+      "authority_h32_strictly_beats_h16": false,
+      "cohort": "primary",
+      "coordinates_total": 64,
+      "identity": [
+        "seed9731-R-tau4.json",
+        0,
+        46
+      ]
+    },
+    {
+      "authority_h16_score": [
+        2,
+        2,
+        1.3486991523486091e-06,
+        9.5367431640625e-07
+      ],
+      "authority_h32_score": [
+        2,
+        2,
+        1.3486991523486091e-06,
+        9.5367431640625e-07
+      ],
+      "authority_h32_strictly_beats_h16": false,
+      "cohort": "primary",
+      "coordinates_total": 68,
+      "identity": [
+        "seed9731-R-tau4.json",
+        1,
+        42
+      ]
+    },
+    {
+      "authority_h16_score": [
+        3,
+        6,
+        3.932099938981686e-06,
+        2.86102294921875e-06
+      ],
+      "authority_h32_score": [
+        3,
+        6,
+        3.932099938981686e-06,
+        2.86102294921875e-06
+      ],
+      "authority_h32_strictly_beats_h16": false,
+      "cohort": "primary",
+      "coordinates_total": 64,
+      "identity": [
+        "seed9731-R-tau4.json",
+        2,
+        46
+      ]
+    },
+    {
+      "authority_h16_score": [
+        4,
+        5,
+        2.5231850729604633e-06,
+        1.9073486328125e-06
+      ],
+      "authority_h32_score": [
+        4,
+        5,
+        2.5231850729604633e-06,
+        1.9073486328125e-06
+      ],
+      "authority_h32_strictly_beats_h16": false,
+      "cohort": "primary",
+      "coordinates_total": 64,
+      "identity": [
+        "seed9731-R-tau4.json",
+        3,
+        45
+      ]
+    },
+    {
+      "authority_h16_score": [
+        3,
+        3,
+        1.3696104637475082e-06,
+        9.5367431640625e-07
+      ],
+      "authority_h32_score": [
+        0,
+        0,
+        0.0,
+        0.0
+      ],
+      "authority_h32_strictly_beats_h16": true,
+      "cohort": "primary",
+      "coordinates_total": 59,
+      "identity": [
+        "seed9732-L-tau16.json",
+        0,
+        43
+      ]
+    },
+    {
+      "authority_h16_score": [
+        0,
+        0,
+        0.0,
+        0.0
+      ],
+      "authority_h32_score": [
+        0,
+        0,
+        0.0,
+        0.0
+      ],
+      "authority_h32_strictly_beats_h16": false,
+      "cohort": "primary",
+      "coordinates_total": 49,
+      "identity": [
+        "seed9732-L-tau16.json",
+        2,
+        48
+      ]
+    },
+    {
+      "authority_h16_score": [
+        2,
+        3,
+        3.844384073399806e-06,
+        3.814697265625e-06
+      ],
+      "authority_h32_score": [
+        2,
+        3,
+        3.844384073399806e-06,
+        3.814697265625e-06
+      ],
+      "authority_h32_strictly_beats_h16": false,
+      "cohort": "primary",
+      "coordinates_total": 57,
+      "identity": [
+        "seed9732-L-tau4.json",
+        0,
+        45
+      ]
+    },
+    {
+      "authority_h16_score": [
+        4,
+        7,
+        2.1851423716334533e-06,
+        1.430511474609375e-06
+      ],
+      "authority_h32_score": [
+        1,
+        1,
+        9.5367431640625e-07,
+        9.5367431640625e-07
+      ],
+      "authority_h32_strictly_beats_h16": true,
+      "cohort": "primary",
+      "coordinates_total": 55,
+      "identity": [
+        "seed9732-L-tau4.json",
+        1,
+        41
+      ]
+    },
+    {
+      "authority_h16_score": [
+        3,
+        3,
+        7.152557373046875e-07,
+        4.76837158203125e-07
+      ],
+      "authority_h32_score": [
+        3,
+        3,
+        7.152557373046875e-07,
+        4.76837158203125e-07
+      ],
+      "authority_h32_strictly_beats_h16": false,
+      "cohort": "primary",
+      "coordinates_total": 45,
+      "identity": [
+        "seed9732-L-tau4.json",
+        2,
+        47
+      ]
+    },
+    {
+      "authority_h16_score": [
+        2,
+        2,
+        4.915124923727108e-07,
+        4.76837158203125e-07
+      ],
+      "authority_h32_score": [
+        2,
+        2,
+        4.915124923727108e-07,
+        4.76837158203125e-07
+      ],
+      "authority_h32_strictly_beats_h16": false,
+      "cohort": "primary",
+      "coordinates_total": 55,
+      "identity": [
+        "seed9732-L-tau4.json",
+        3,
+        47
+      ]
+    },
+    {
+      "authority_h16_score": [
+        3,
+        4,
+        4.046097457045827e-06,
+        3.814697265625e-06
+      ],
+      "authority_h32_score": [
+        2,
+        2,
+        2.132480599880018e-06,
+        1.9073486328125e-06
+      ],
+      "authority_h32_strictly_beats_h16": true,
+      "cohort": "primary",
+      "coordinates_total": 76,
+      "identity": [
+        "seed9732-R-tau16.json",
+        0,
+        44
+      ]
+    },
+    {
+      "authority_h16_score": [
+        1,
+        1,
+        2.384185791015625e-07,
+        2.384185791015625e-07
+      ],
+      "authority_h32_score": [
+        1,
+        1,
+        2.384185791015625e-07,
+        2.384185791015625e-07
+      ],
+      "authority_h32_strictly_beats_h16": false,
+      "cohort": "primary",
+      "coordinates_total": 32,
+      "identity": [
+        "seed9732-R-tau16.json",
+        1,
+        27
+      ]
+    },
+    {
+      "authority_h16_score": [
+        3,
+        5,
+        1.6518123698891422e-06,
+        9.5367431640625e-07
+      ],
+      "authority_h32_score": [
+        3,
+        5,
+        1.6518123698891422e-06,
+        9.5367431640625e-07
+      ],
+      "authority_h32_strictly_beats_h16": false,
+      "cohort": "primary",
+      "coordinates_total": 69,
+      "identity": [
+        "seed9732-R-tau16.json",
+        1,
+        39
+      ]
+    },
+    {
+      "authority_h16_score": [
+        4,
+        4,
+        7.539457464619588e-07,
+        4.76837158203125e-07
+      ],
+      "authority_h32_score": [
+        4,
+        4,
+        7.539457464619588e-07,
+        4.76837158203125e-07
+      ],
+      "authority_h32_strictly_beats_h16": false,
+      "cohort": "primary",
+      "coordinates_total": 38,
+      "identity": [
+        "seed9732-R-tau16.json",
+        2,
+        26
+      ]
+    },
+    {
+      "authority_h16_score": [
+        6,
+        9,
+        3.3717478808715227e-06,
+        1.9073486328125e-06
+      ],
+      "authority_h32_score": [
+        5,
+        8,
+        3.2340669551493016e-06,
+        1.9073486328125e-06
+      ],
+      "authority_h32_strictly_beats_h16": true,
+      "cohort": "primary",
+      "coordinates_total": 72,
+      "identity": [
+        "seed9732-R-tau16.json",
+        2,
+        39
+      ]
+    },
+    {
+      "authority_h16_score": [
+        5,
+        5,
+        1.7357134555054946e-06,
+        9.5367431640625e-07
+      ],
+      "authority_h32_score": [
+        0,
+        0,
+        0.0,
+        0.0
+      ],
+      "authority_h32_strictly_beats_h16": true,
+      "cohort": "primary",
+      "coordinates_total": 70,
+      "identity": [
+        "seed9732-R-tau16.json",
+        3,
+        38
+      ]
+    },
+    {
+      "authority_h16_score": [
+        2,
+        4,
+        3.015782985847835e-06,
+        2.86102294921875e-06
+      ],
+      "authority_h32_score": [
+        2,
+        2,
+        1.3486991523486091e-06,
+        9.5367431640625e-07
+      ],
+      "authority_h32_strictly_beats_h16": true,
+      "cohort": "primary",
+      "coordinates_total": 69,
+      "identity": [
+        "seed9732-R-tau4.json",
+        0,
+        43
+      ]
+    },
+    {
+      "authority_h16_score": [
+        1,
+        1,
+        4.76837158203125e-07,
+        4.76837158203125e-07
+      ],
+      "authority_h32_score": [
+        1,
+        1,
+        4.76837158203125e-07,
+        4.76837158203125e-07
+      ],
+      "authority_h32_strictly_beats_h16": false,
+      "cohort": "primary",
+      "coordinates_total": 36,
+      "identity": [
+        "seed9732-R-tau4.json",
+        1,
+        30
+      ]
+    },
+    {
+      "authority_h16_score": [
+        5,
+        9,
+        4.498472753551771e-06,
+        3.814697265625e-06
+      ],
+      "authority_h32_score": [
+        5,
+        8,
+        3.724217260316207e-06,
+        2.86102294921875e-06
+      ],
+      "authority_h32_strictly_beats_h16": true,
+      "cohort": "primary",
+      "coordinates_total": 69,
+      "identity": [
+        "seed9732-R-tau4.json",
+        1,
+        42
+      ]
+    },
+    {
+      "authority_h16_score": [
+        1,
+        1,
+        4.76837158203125e-07,
+        4.76837158203125e-07
+      ],
+      "authority_h32_score": [
+        1,
+        1,
+        4.76837158203125e-07,
+        4.76837158203125e-07
+      ],
+      "authority_h32_strictly_beats_h16": false,
+      "cohort": "primary",
+      "coordinates_total": 32,
+      "identity": [
+        "seed9732-R-tau4.json",
+        2,
+        29
+      ]
+    },
+    {
+      "authority_h16_score": [
+        6,
+        8,
+        3.8462318908933826e-06,
+        1.9073486328125e-06
+      ],
+      "authority_h32_score": [
+        2,
+        2,
+        2.6973983046972182e-06,
+        1.9073486328125e-06
+      ],
+      "authority_h32_strictly_beats_h16": true,
+      "cohort": "primary",
+      "coordinates_total": 61,
+      "identity": [
+        "seed9732-R-tau4.json",
+        2,
+        42
+      ]
+    },
+    {
+      "authority_h16_score": [
+        5,
+        8,
+        3.724217260316207e-06,
+        2.86102294921875e-06
+      ],
+      "authority_h32_score": [
+        5,
+        7,
+        3.0532475649990313e-06,
+        1.9073486328125e-06
+      ],
+      "authority_h32_strictly_beats_h16": true,
+      "cohort": "primary",
+      "coordinates_total": 76,
+      "identity": [
+        "seed9732-R-tau4.json",
+        3,
+        43
+      ]
+    }
+  ],
+  "protocol": "Q10-PF6-RH1-LA1",
+  "selected_group_count": 16,
+  "selected_groups_for_this_run": [
+    [
+      "seed9731-L-tau16.json",
+      0,
+      45
+    ]
+  ],
+  "selection_rule": {
+    "cohort": "primary",
+    "hand_picked_group_ids": false,
+    "minimum_coordinates": 32,
+    "predicate": "authority_h32.chosen.D < authority_h16.chosen.D in strict lexicographic score order"
+  },
+  "smoke": true,
+  "source_hashes": {
+    "f2_contract": "7CBDD2607D55A010D339B796196F7408A70B4664065075F3C3D7A5F64773723C",
+    "f2_execution": "D900B374F076AEC352381D878D31AEA8D7129D8BB5A3E53DB5B7D5B05E3FAFF9",
+    "f2_interpretation": "E00B21C55495A76C98A6F35E47F869F7C13F9CA50ADA44DD57B7879357EE86B9",
+    "f2_runner": "B42644BA0E2C4C8A0CC0F9997135CE18A9F9E6C0836810926300C4D84F198103",
+    "f2_summary": "C56E6B3DCB351867BA2BE9EB2394810B94284F2534AC3F7252502B2956BD8B62"
+  },
+  "status": "LA1_SELECTION_DERIVED_FROM_F2_RECEIPTS"
+}

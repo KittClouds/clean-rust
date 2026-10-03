@@ -1,0 +1,700 @@
+{
+ "act_labelled_kept": 2296,
+ "halluc_per_unsupported_pattern": 0.02,
+ "kept": 4199,
+ "sample": 5000,
+ "sigmas": {
+  "0.0": {
+   "defer_vs_hard_frontier": {
+    "0.2|0.8": {
+     "harm_minus_hard_frontier": 0.0,
+     "how": "interpolated"
+    },
+    "0.3|0.7": {
+     "harm_minus_hard_frontier": 0.0,
+     "how": "interpolated"
+    },
+    "0.4|0.6": {
+     "harm_minus_hard_frontier": 0.0,
+     "how": "above the swept range"
+    }
+   },
+   "one_round_oracle_answers": {
+    "0.2|0.8": {
+     "asked_worlds": 245,
+     "coverage_after_one_round": 1.0,
+     "harm_rate_after_one_round": 0.0,
+     "mean_questions_per_asked_world": 1.636734693877551
+    },
+    "0.3|0.7": {
+     "asked_worlds": 245,
+     "coverage_after_one_round": 1.0,
+     "harm_rate_after_one_round": 0.0,
+     "mean_questions_per_asked_world": 1.636734693877551
+    },
+    "0.4|0.6": {
+     "asked_worlds": 219,
+     "coverage_after_one_round": 1.0,
+     "harm_rate_after_one_round": 0.0,
+     "mean_questions_per_asked_world": 1.7123287671232876
+    }
+   },
+   "points": {
+    "asym|0.2|0.8": {
+     "abstain": 1684,
+     "act": 2296,
+     "ask": 219,
+     "coverage": 1.0,
+     "harm_rate": 0.0,
+     "harmful_acts": 0,
+     "useful_acts": 2296
+    },
+    "asym|0.3|0.7": {
+     "abstain": 1684,
+     "act": 2296,
+     "ask": 219,
+     "coverage": 1.0,
+     "harm_rate": 0.0,
+     "harmful_acts": 0,
+     "useful_acts": 2296
+    },
+    "asym|0.4|0.6": {
+     "abstain": 1684,
+     "act": 2296,
+     "ask": 219,
+     "coverage": 1.0,
+     "harm_rate": 0.0,
+     "harmful_acts": 0,
+     "useful_acts": 2296
+    },
+    "defer|0.2|0.8": {
+     "abstain": 1684,
+     "act": 2270,
+     "ask": 245,
+     "coverage": 0.9886759581881533,
+     "harm_rate": 0.0,
+     "harmful_acts": 0,
+     "useful_acts": 2270
+    },
+    "defer|0.3|0.7": {
+     "abstain": 1684,
+     "act": 2270,
+     "ask": 245,
+     "coverage": 0.9886759581881533,
+     "harm_rate": 0.0,
+     "harmful_acts": 0,
+     "useful_acts": 2270
+    },
+    "defer|0.4|0.6": {
+     "abstain": 1684,
+     "act": 2296,
+     "ask": 219,
+     "coverage": 1.0,
+     "harm_rate": 0.0,
+     "harmful_acts": 0,
+     "useful_acts": 2296
+    },
+    "hard|0.1": {
+     "abstain": 1684,
+     "act": 2297,
+     "ask": 218,
+     "coverage": 0.9817073170731707,
+     "harm_rate": 0.010240533460347702,
+     "harmful_acts": 43,
+     "useful_acts": 2254
+    },
+    "hard|0.2": {
+     "abstain": 1684,
+     "act": 2297,
+     "ask": 218,
+     "coverage": 0.9817073170731707,
+     "harm_rate": 0.010240533460347702,
+     "harmful_acts": 43,
+     "useful_acts": 2254
+    },
+    "hard|0.3": {
+     "abstain": 1684,
+     "act": 2297,
+     "ask": 218,
+     "coverage": 0.9817073170731707,
+     "harm_rate": 0.010240533460347702,
+     "harmful_acts": 43,
+     "useful_acts": 2254
+    },
+    "hard|0.4": {
+     "abstain": 1684,
+     "act": 2296,
+     "ask": 219,
+     "coverage": 1.0,
+     "harm_rate": 0.0,
+     "harmful_acts": 0,
+     "useful_acts": 2296
+    },
+    "hard|0.5": {
+     "abstain": 1684,
+     "act": 2296,
+     "ask": 219,
+     "coverage": 1.0,
+     "harm_rate": 0.0,
+     "harmful_acts": 0,
+     "useful_acts": 2296
+    },
+    "hard|0.6": {
+     "abstain": 1684,
+     "act": 2296,
+     "ask": 219,
+     "coverage": 1.0,
+     "harm_rate": 0.0,
+     "harmful_acts": 0,
+     "useful_acts": 2296
+    },
+    "hard|0.7": {
+     "abstain": 1684,
+     "act": 2296,
+     "ask": 219,
+     "coverage": 1.0,
+     "harm_rate": 0.0,
+     "harmful_acts": 0,
+     "useful_acts": 2296
+    },
+    "hard|0.8": {
+     "abstain": 1684,
+     "act": 2296,
+     "ask": 219,
+     "coverage": 1.0,
+     "harm_rate": 0.0,
+     "harmful_acts": 0,
+     "useful_acts": 2296
+    },
+    "hard|0.9": {
+     "abstain": 1266,
+     "act": 0,
+     "ask": 2933,
+     "coverage": 0.0,
+     "harm_rate": 0.0,
+     "harmful_acts": 0,
+     "useful_acts": 0
+    }
+   }
+  },
+  "0.1": {
+   "defer_vs_hard_frontier": {
+    "0.2|0.8": {
+     "harm_minus_hard_frontier": 0.0,
+     "how": "interpolated"
+    },
+    "0.3|0.7": {
+     "harm_minus_hard_frontier": 0.0019052155275065493,
+     "how": "interpolated"
+    },
+    "0.4|0.6": {
+     "harm_minus_hard_frontier": 0.0004763038818766373,
+     "how": "interpolated"
+    }
+   },
+   "one_round_oracle_answers": {
+    "0.2|0.8": {
+     "asked_worlds": 2501,
+     "coverage_after_one_round": 0.9764808362369338,
+     "harm_rate_after_one_round": 0.00523934270064301,
+     "mean_questions_per_asked_world": 6.59296281487405
+    },
+    "0.3|0.7": {
+     "asked_worlds": 1762,
+     "coverage_after_one_round": 0.9821428571428571,
+     "harm_rate_after_one_round": 0.0057156465825196475,
+     "mean_questions_per_asked_world": 2.9341657207718503
+    },
+    "0.4|0.6": {
+     "asked_worlds": 535,
+     "coverage_after_one_round": 0.9969512195121951,
+     "harm_rate_after_one_round": 0.0011907597046915933,
+     "mean_questions_per_asked_world": 1.949532710280374
+    }
+   },
+   "points": {
+    "asym|0.2|0.8": {
+     "abstain": 1668,
+     "act": 30,
+     "ask": 2501,
+     "coverage": 0.012195121951219513,
+     "harm_rate": 0.0004763038818766373,
+     "harmful_acts": 2,
+     "useful_acts": 28
+    },
+    "asym|0.3|0.7": {
+     "abstain": 1675,
+     "act": 768,
+     "ask": 1756,
+     "coverage": 0.33013937282229966,
+     "harm_rate": 0.0023815194093831865,
+     "harmful_acts": 10,
+     "useful_acts": 758
+    },
+    "asym|0.4|0.6": {
+     "abstain": 1684,
+     "act": 1985,
+     "ask": 530,
+     "coverage": 0.8628048780487805,
+     "harm_rate": 0.0009526077637532746,
+     "harmful_acts": 4,
+     "useful_acts": 1981
+    },
+    "defer|0.2|0.8": {
+     "abstain": 1668,
+     "act": 30,
+     "ask": 2501,
+     "coverage": 0.012195121951219513,
+     "harm_rate": 0.0004763038818766373,
+     "harmful_acts": 2,
+     "useful_acts": 28
+    },
+    "defer|0.3|0.7": {
+     "abstain": 1675,
+     "act": 762,
+     "ask": 1762,
+     "coverage": 0.32752613240418116,
+     "harm_rate": 0.0023815194093831865,
+     "harmful_acts": 10,
+     "useful_acts": 752
+    },
+    "defer|0.4|0.6": {
+     "abstain": 1684,
+     "act": 1980,
+     "ask": 535,
+     "coverage": 0.8606271777003485,
+     "harm_rate": 0.0009526077637532746,
+     "harmful_acts": 4,
+     "useful_acts": 1976
+    },
+    "hard|0.1": {
+     "abstain": 1684,
+     "act": 2298,
+     "ask": 217,
+     "coverage": 0.9834494773519163,
+     "harm_rate": 0.009526077637532746,
+     "harmful_acts": 40,
+     "useful_acts": 2258
+    },
+    "hard|0.2": {
+     "abstain": 1684,
+     "act": 2298,
+     "ask": 217,
+     "coverage": 0.9834494773519163,
+     "harm_rate": 0.009526077637532746,
+     "harmful_acts": 40,
+     "useful_acts": 2258
+    },
+    "hard|0.3": {
+     "abstain": 1684,
+     "act": 2297,
+     "ask": 218,
+     "coverage": 0.9878048780487805,
+     "harm_rate": 0.00690640628721124,
+     "harmful_acts": 29,
+     "useful_acts": 2268
+    },
+    "hard|0.4": {
+     "abstain": 1684,
+     "act": 2297,
+     "ask": 218,
+     "coverage": 0.9956445993031359,
+     "harm_rate": 0.002619671350321505,
+     "harmful_acts": 11,
+     "useful_acts": 2286
+    },
+    "hard|0.5": {
+     "abstain": 1684,
+     "act": 2280,
+     "ask": 235,
+     "coverage": 0.9921602787456446,
+     "harm_rate": 0.0004763038818766373,
+     "harmful_acts": 2,
+     "useful_acts": 2278
+    },
+    "hard|0.6": {
+     "abstain": 1663,
+     "act": 2000,
+     "ask": 536,
+     "coverage": 0.8623693379790941,
+     "harm_rate": 0.004763038818766373,
+     "harmful_acts": 20,
+     "useful_acts": 1980
+    },
+    "hard|0.7": {
+     "abstain": 1571,
+     "act": 795,
+     "ask": 1833,
+     "coverage": 0.32665505226480834,
+     "harm_rate": 0.010716837342224339,
+     "harmful_acts": 45,
+     "useful_acts": 750
+    },
+    "hard|0.8": {
+     "abstain": 1369,
+     "act": 37,
+     "ask": 2793,
+     "coverage": 0.012195121951219513,
+     "harm_rate": 0.0021433674684448677,
+     "harmful_acts": 9,
+     "useful_acts": 28
+    },
+    "hard|0.9": {
+     "abstain": 1279,
+     "act": 0,
+     "ask": 2920,
+     "coverage": 0.0,
+     "harm_rate": 0.0,
+     "harmful_acts": 0,
+     "useful_acts": 0
+    }
+   }
+  },
+  "0.2": {
+   "defer_vs_hard_frontier": {
+    "0.2|0.8": {
+     "harm_minus_hard_frontier": -0.0016670635865682305,
+     "how": "interpolated"
+    },
+    "0.3|0.7": {
+     "harm_minus_hard_frontier": -0.006154194668881673,
+     "how": "interpolated"
+    },
+    "0.4|0.6": {
+     "harm_minus_hard_frontier": -0.004763038818766373,
+     "how": "interpolated"
+    }
+   },
+   "one_round_oracle_answers": {
+    "0.2|0.8": {
+     "asked_worlds": 2499,
+     "coverage_after_one_round": 0.9782229965156795,
+     "harm_rate_after_one_round": 0.0050011907597046915,
+     "mean_questions_per_asked_world": 6.552621048419367
+    },
+    "0.3|0.7": {
+     "asked_worlds": 2336,
+     "coverage_after_one_round": 0.9817073170731707,
+     "harm_rate_after_one_round": 0.00904977375565611,
+     "mean_questions_per_asked_world": 4.345462328767123
+    },
+    "0.4|0.6": {
+     "asked_worlds": 1830,
+     "coverage_after_one_round": 0.9860627177700348,
+     "harm_rate_after_one_round": 0.010954989283162658,
+     "mean_questions_per_asked_world": 2.9989071038251365
+    }
+   },
+   "points": {
+    "asym|0.2|0.8": {
+     "abstain": 1669,
+     "act": 31,
+     "ask": 2499,
+     "coverage": 0.013501742160278746,
+     "harm_rate": 0.0,
+     "harmful_acts": 0,
+     "useful_acts": 31
+    },
+    "asym|0.3|0.7": {
+     "abstain": 1662,
+     "act": 203,
+     "ask": 2334,
+     "coverage": 0.08536585365853659,
+     "harm_rate": 0.0016670635865682305,
+     "harmful_acts": 7,
+     "useful_acts": 196
+    },
+    "asym|0.4|0.6": {
+     "abstain": 1654,
+     "act": 718,
+     "ask": 1827,
+     "coverage": 0.30662020905923343,
+     "harm_rate": 0.003334127173136461,
+     "harmful_acts": 14,
+     "useful_acts": 704
+    },
+    "defer|0.2|0.8": {
+     "abstain": 1669,
+     "act": 31,
+     "ask": 2499,
+     "coverage": 0.013501742160278746,
+     "harm_rate": 0.0,
+     "harmful_acts": 0,
+     "useful_acts": 31
+    },
+    "defer|0.3|0.7": {
+     "abstain": 1662,
+     "act": 201,
+     "ask": 2336,
+     "coverage": 0.08449477351916376,
+     "harm_rate": 0.0016670635865682305,
+     "harmful_acts": 7,
+     "useful_acts": 194
+    },
+    "defer|0.4|0.6": {
+     "abstain": 1654,
+     "act": 715,
+     "ask": 1830,
+     "coverage": 0.30531358885017423,
+     "harm_rate": 0.003334127173136461,
+     "harmful_acts": 14,
+     "useful_acts": 701
+    },
+    "hard|0.1": {
+     "abstain": 1683,
+     "act": 2294,
+     "ask": 222,
+     "coverage": 0.9786585365853658,
+     "harm_rate": 0.011193141224100976,
+     "harmful_acts": 47,
+     "useful_acts": 2247
+    },
+    "hard|0.2": {
+     "abstain": 1683,
+     "act": 2274,
+     "ask": 242,
+     "coverage": 0.9743031358885017,
+     "harm_rate": 0.00881162181471779,
+     "harmful_acts": 37,
+     "useful_acts": 2237
+    },
+    "hard|0.3": {
+     "abstain": 1672,
+     "act": 2219,
+     "ask": 308,
+     "coverage": 0.9516550522648084,
+     "harm_rate": 0.008097165991902834,
+     "harmful_acts": 34,
+     "useful_acts": 2185
+    },
+    "hard|0.4": {
+     "abstain": 1660,
+     "act": 1985,
+     "ask": 554,
+     "coverage": 0.8493031358885017,
+     "harm_rate": 0.008335317932841153,
+     "harmful_acts": 35,
+     "useful_acts": 1950
+    },
+    "hard|0.5": {
+     "abstain": 1628,
+     "act": 1465,
+     "ask": 1106,
+     "coverage": 0.6184668989547039,
+     "harm_rate": 0.010716837342224339,
+     "harmful_acts": 45,
+     "useful_acts": 1420
+    },
+    "hard|0.6": {
+     "abstain": 1543,
+     "act": 758,
+     "ask": 1898,
+     "coverage": 0.30531358885017423,
+     "harm_rate": 0.013574660633484163,
+     "harmful_acts": 57,
+     "useful_acts": 701
+    },
+    "hard|0.7": {
+     "abstain": 1455,
+     "act": 228,
+     "ask": 2516,
+     "coverage": 0.08493031358885017,
+     "harm_rate": 0.007859014050964515,
+     "harmful_acts": 33,
+     "useful_acts": 195
+    },
+    "hard|0.8": {
+     "abstain": 1372,
+     "act": 38,
+     "ask": 2789,
+     "coverage": 0.013501742160278746,
+     "harm_rate": 0.0016670635865682305,
+     "harmful_acts": 7,
+     "useful_acts": 31
+    },
+    "hard|0.9": {
+     "abstain": 1311,
+     "act": 3,
+     "ask": 2885,
+     "coverage": 0.00043554006968641115,
+     "harm_rate": 0.0004763038818766373,
+     "harmful_acts": 2,
+     "useful_acts": 1
+    }
+   }
+  },
+  "0.3": {
+   "defer_vs_hard_frontier": {
+    "0.2|0.8": {
+     "harm_minus_hard_frontier": -0.0015026253416346295,
+     "how": "interpolated"
+    },
+    "0.3|0.7": {
+     "harm_minus_hard_frontier": -0.0036249578844205835,
+     "how": "interpolated"
+    },
+    "0.4|0.6": {
+     "harm_minus_hard_frontier": -0.005239342700643011,
+     "how": "interpolated"
+    }
+   },
+   "one_round_oracle_answers": {
+    "0.2|0.8": {
+     "asked_worlds": 2502,
+     "coverage_after_one_round": 0.9764808362369338,
+     "harm_rate_after_one_round": 0.009526077637532746,
+     "mean_questions_per_asked_world": 6.512789768185452
+    },
+    "0.3|0.7": {
+     "asked_worlds": 2428,
+     "coverage_after_one_round": 0.9773519163763066,
+     "harm_rate_after_one_round": 0.014527268397237437,
+     "mean_questions_per_asked_world": 5.0049423393739705
+    },
+    "0.4|0.6": {
+     "asked_worlds": 2229,
+     "coverage_after_one_round": 0.9790940766550522,
+     "harm_rate_after_one_round": 0.024291497975708502,
+     "mean_questions_per_asked_world": 3.801256168685509
+    }
+   },
+   "points": {
+    "asym|0.2|0.8": {
+     "abstain": 1656,
+     "act": 41,
+     "ask": 2502,
+     "coverage": 0.017857142857142856,
+     "harm_rate": 0.0,
+     "harmful_acts": 0,
+     "useful_acts": 41
+    },
+    "asym|0.3|0.7": {
+     "abstain": 1642,
+     "act": 129,
+     "ask": 2428,
+     "coverage": 0.05444250871080139,
+     "harm_rate": 0.0009526077637532746,
+     "harmful_acts": 4,
+     "useful_acts": 125
+    },
+    "asym|0.4|0.6": {
+     "abstain": 1607,
+     "act": 363,
+     "ask": 2229,
+     "coverage": 0.1489547038327526,
+     "harm_rate": 0.0050011907597046915,
+     "harmful_acts": 21,
+     "useful_acts": 342
+    },
+    "defer|0.2|0.8": {
+     "abstain": 1656,
+     "act": 41,
+     "ask": 2502,
+     "coverage": 0.017857142857142856,
+     "harm_rate": 0.0,
+     "harmful_acts": 0,
+     "useful_acts": 41
+    },
+    "defer|0.3|0.7": {
+     "abstain": 1642,
+     "act": 129,
+     "ask": 2428,
+     "coverage": 0.05444250871080139,
+     "harm_rate": 0.0009526077637532746,
+     "harmful_acts": 4,
+     "useful_acts": 125
+    },
+    "defer|0.4|0.6": {
+     "abstain": 1607,
+     "act": 363,
+     "ask": 2229,
+     "coverage": 0.1489547038327526,
+     "harm_rate": 0.0050011907597046915,
+     "harmful_acts": 21,
+     "useful_acts": 342
+    },
+    "hard|0.1": {
+     "abstain": 1675,
+     "act": 2151,
+     "ask": 373,
+     "coverage": 0.9168118466898955,
+     "harm_rate": 0.010954989283162658,
+     "harmful_acts": 46,
+     "useful_acts": 2105
+    },
+    "hard|0.2": {
+     "abstain": 1670,
+     "act": 1967,
+     "ask": 562,
+     "coverage": 0.837979094076655,
+     "harm_rate": 0.010240533460347702,
+     "harmful_acts": 43,
+     "useful_acts": 1924
+    },
+    "hard|0.3": {
+     "abstain": 1650,
+     "act": 1679,
+     "ask": 870,
+     "coverage": 0.7103658536585366,
+     "harm_rate": 0.011431293165039295,
+     "harmful_acts": 48,
+     "useful_acts": 1631
+    },
+    "hard|0.4": {
+     "abstain": 1612,
+     "act": 1224,
+     "ask": 1363,
+     "coverage": 0.507404181184669,
+     "harm_rate": 0.0140509645153608,
+     "harmful_acts": 59,
+     "useful_acts": 1165
+    },
+    "hard|0.5": {
+     "abstain": 1560,
+     "act": 765,
+     "ask": 1874,
+     "coverage": 0.30705574912891986,
+     "harm_rate": 0.01428911645629912,
+     "harmful_acts": 60,
+     "useful_acts": 705
+    },
+    "hard|0.6": {
+     "abstain": 1496,
+     "act": 386,
+     "ask": 2317,
+     "coverage": 0.1480836236933798,
+     "harm_rate": 0.010954989283162658,
+     "harmful_acts": 46,
+     "useful_acts": 340
+    },
+    "hard|0.7": {
+     "abstain": 1432,
+     "act": 142,
+     "ask": 2625,
+     "coverage": 0.05357142857142857,
+     "harm_rate": 0.004524886877828055,
+     "harmful_acts": 19,
+     "useful_acts": 123
+    },
+    "hard|0.8": {
+     "abstain": 1374,
+     "act": 45,
+     "ask": 2780,
+     "coverage": 0.016986062717770034,
+     "harm_rate": 0.0014289116456299119,
+     "harmful_acts": 6,
+     "useful_acts": 39
+    },
+    "hard|0.9": {
+     "abstain": 1321,
+     "act": 9,
+     "ask": 2869,
+     "coverage": 0.003048780487804878,
+     "harm_rate": 0.0004763038818766373,
+     "harmful_acts": 2,
+     "useful_acts": 7
+    }
+   }
+  }
+ }
+}

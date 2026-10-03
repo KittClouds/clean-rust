@@ -1,0 +1,579 @@
+{
+  "contract": "phoenix-gliner25-rust-five-surface-v1",
+  "features": [
+    {
+      "elapsed_ms": 3061.9439,
+      "feature": "long_context",
+      "status": "observed",
+      "value": [
+        {
+          "char_end": 700,
+          "char_start": 377,
+          "field": "date",
+          "logit": 4.8638081550598145,
+          "query_id": 3,
+          "score": 0.9923381209373474,
+          "text": "filler43 filler44 filler45 filler46 filler47 filler48 filler49 filler50 filler51 filler52 filler53 filler54 filler55 filler56 filler57 filler58 filler59 filler60 filler61 filler62 filler63 filler64 filler65 filler66 filler67 filler68 filler69 filler70 filler71 filler72 filler73 filler74 filler75 filler76 filler77 filler78",
+          "word_end": 79,
+          "word_start": 43
+        },
+        {
+          "char_end": 700,
+          "char_start": 377,
+          "field": "location",
+          "logit": 5.8331708908081055,
+          "query_id": 2,
+          "score": 0.9970797896385193,
+          "text": "filler43 filler44 filler45 filler46 filler47 filler48 filler49 filler50 filler51 filler52 filler53 filler54 filler55 filler56 filler57 filler58 filler59 filler60 filler61 filler62 filler63 filler64 filler65 filler66 filler67 filler68 filler69 filler70 filler71 filler72 filler73 filler74 filler75 filler76 filler77 filler78",
+          "word_end": 79,
+          "word_start": 43
+        },
+        {
+          "char_end": 700,
+          "char_start": 377,
+          "field": "organization",
+          "logit": 5.515221118927002,
+          "query_id": 1,
+          "score": 0.9959911704063416,
+          "text": "filler43 filler44 filler45 filler46 filler47 filler48 filler49 filler50 filler51 filler52 filler53 filler54 filler55 filler56 filler57 filler58 filler59 filler60 filler61 filler62 filler63 filler64 filler65 filler66 filler67 filler68 filler69 filler70 filler71 filler72 filler73 filler74 filler75 filler76 filler77 filler78",
+          "word_end": 79,
+          "word_start": 43
+        },
+        {
+          "char_end": 700,
+          "char_start": 377,
+          "field": "person",
+          "logit": 5.363526821136475,
+          "query_id": 0,
+          "score": 0.9953374862670898,
+          "text": "filler43 filler44 filler45 filler46 filler47 filler48 filler49 filler50 filler51 filler52 filler53 filler54 filler55 filler56 filler57 filler58 filler59 filler60 filler61 filler62 filler63 filler64 filler65 filler66 filler67 filler68 filler69 filler70 filler71 filler72 filler73 filler74 filler75 filler76 filler77 filler78",
+          "word_end": 79,
+          "word_start": 43
+        },
+        {
+          "char_end": 1049,
+          "char_start": 710,
+          "field": "date",
+          "logit": 5.155596733093262,
+          "query_id": 3,
+          "score": 0.9942660927772522,
+          "text": "filler80 filler81 filler82 filler83 filler84 filler85 filler86 filler87 filler88 filler89 filler90 filler91 filler92 filler93 filler94 filler95 filler96 filler97 filler98 filler99 filler100 filler101 filler102 filler103 filler104 filler105 filler106 filler107 filler108 filler109 filler110 filler111 filler112 filler113 filler114 filler115",
+          "word_end": 116,
+          "word_start": 80
+        },
+        {
+          "char_end": 1049,
+          "char_start": 710,
+          "field": "location",
+          "logit": 6.128253936767578,
+          "query_id": 2,
+          "score": 0.9978244304656982,
+          "text": "filler80 filler81 filler82 filler83 filler84 filler85 filler86 filler87 filler88 filler89 filler90 filler91 filler92 filler93 filler94 filler95 filler96 filler97 filler98 filler99 filler100 filler101 filler102 filler103 filler104 filler105 filler106 filler107 filler108 filler109 filler110 filler111 filler112 filler113 filler114 filler115",
+          "word_end": 116,
+          "word_start": 80
+        },
+        {
+          "char_end": 1049,
+          "char_start": 710,
+          "field": "organization",
+          "logit": 5.788893222808838,
+          "query_id": 1,
+          "score": 0.9969479441642761,
+          "text": "filler80 filler81 filler82 filler83 filler84 filler85 filler86 filler87 filler88 filler89 filler90 filler91 filler92 filler93 filler94 filler95 filler96 filler97 filler98 filler99 filler100 filler101 filler102 filler103 filler104 filler105 filler106 filler107 filler108 filler109 filler110 filler111 filler112 filler113 filler114 filler115",
+          "word_end": 116,
+          "word_start": 80
+        },
+        {
+          "char_end": 1049,
+          "char_start": 710,
+          "field": "person",
+          "logit": 5.644964694976807,
+          "query_id": 0,
+          "score": 0.9964771866798401,
+          "text": "filler80 filler81 filler82 filler83 filler84 filler85 filler86 filler87 filler88 filler89 filler90 filler91 filler92 filler93 filler94 filler95 filler96 filler97 filler98 filler99 filler100 filler101 filler102 filler103 filler104 filler105 filler106 filler107 filler108 filler109 filler110 filler111 filler112 filler113 filler114 filler115",
+          "word_end": 116,
+          "word_start": 80
+        },
+        {
+          "char_end": 1749,
+          "char_start": 1550,
+          "field": "date",
+          "logit": 7.0161051750183105,
+          "query_id": 3,
+          "score": 0.9991034865379333,
+          "text": "filler166 filler167 filler168 filler169 filler170 filler171 filler172 filler173 filler174 filler175 filler176 filler177 filler178 filler179 filler180 filler181 filler182 filler183 filler184 filler185",
+          "word_end": 186,
+          "word_start": 166
+        },
+        {
+          "char_end": 1749,
+          "char_start": 1550,
+          "field": "location",
+          "logit": 7.637292861938477,
+          "query_id": 2,
+          "score": 0.9995181560516357,
+          "text": "filler166 filler167 filler168 filler169 filler170 filler171 filler172 filler173 filler174 filler175 filler176 filler177 filler178 filler179 filler180 filler181 filler182 filler183 filler184 filler185",
+          "word_end": 186,
+          "word_start": 166
+        },
+        {
+          "char_end": 1749,
+          "char_start": 1550,
+          "field": "organization",
+          "logit": 7.370473861694336,
+          "query_id": 1,
+          "score": 0.9993708729743958,
+          "text": "filler166 filler167 filler168 filler169 filler170 filler171 filler172 filler173 filler174 filler175 filler176 filler177 filler178 filler179 filler180 filler181 filler182 filler183 filler184 filler185",
+          "word_end": 186,
+          "word_start": 166
+        },
+        {
+          "char_end": 1749,
+          "char_start": 1550,
+          "field": "person",
+          "logit": 7.34550666809082,
+          "query_id": 0,
+          "score": 0.999354898929596,
+          "text": "filler166 filler167 filler168 filler169 filler170 filler171 filler172 filler173 filler174 filler175 filler176 filler177 filler178 filler179 filler180 filler181 filler182 filler183 filler184 filler185",
+          "word_end": 186,
+          "word_start": 166
+        },
+        {
+          "char_end": 1959,
+          "char_start": 1880,
+          "field": "date",
+          "logit": 3.3626339435577393,
+          "query_id": 3,
+          "score": 0.9665161371231079,
+          "text": "filler199 filler200 filler201 filler202 filler203 filler204 filler205 filler206",
+          "word_end": 207,
+          "word_start": 199
+        },
+        {
+          "char_end": 1959,
+          "char_start": 1880,
+          "field": "location",
+          "logit": 3.8645193576812744,
+          "query_id": 2,
+          "score": 0.9794578552246094,
+          "text": "filler199 filler200 filler201 filler202 filler203 filler204 filler205 filler206",
+          "word_end": 207,
+          "word_start": 199
+        },
+        {
+          "char_end": 1959,
+          "char_start": 1880,
+          "field": "organization",
+          "logit": 3.763967752456665,
+          "query_id": 1,
+          "score": 0.9773340821266174,
+          "text": "filler199 filler200 filler201 filler202 filler203 filler204 filler205 filler206",
+          "word_end": 207,
+          "word_start": 199
+        },
+        {
+          "char_end": 1959,
+          "char_start": 1880,
+          "field": "person",
+          "logit": 3.7659947872161865,
+          "query_id": 0,
+          "score": 0.9773789644241333,
+          "text": "filler199 filler200 filler201 filler202 filler203 filler204 filler205 filler206",
+          "word_end": 207,
+          "word_start": 199
+        },
+        {
+          "char_end": 2409,
+          "char_start": 2220,
+          "field": "date",
+          "logit": 6.2908477783203125,
+          "query_id": 3,
+          "score": 0.9981502294540405,
+          "text": "filler233 filler234 filler235 filler236 filler237 filler238 filler239 filler240 filler241 filler242 filler243 filler244 filler245 filler246 filler247 filler248 filler249 filler250 filler251",
+          "word_end": 252,
+          "word_start": 233
+        },
+        {
+          "char_end": 2409,
+          "char_start": 2220,
+          "field": "location",
+          "logit": 6.85455322265625,
+          "query_id": 2,
+          "score": 0.998946487903595,
+          "text": "filler233 filler234 filler235 filler236 filler237 filler238 filler239 filler240 filler241 filler242 filler243 filler244 filler245 filler246 filler247 filler248 filler249 filler250 filler251",
+          "word_end": 252,
+          "word_start": 233
+        },
+        {
+          "char_end": 2409,
+          "char_start": 2220,
+          "field": "organization",
+          "logit": 6.584920883178711,
+          "query_id": 1,
+          "score": 0.998620867729187,
+          "text": "filler233 filler234 filler235 filler236 filler237 filler238 filler239 filler240 filler241 filler242 filler243 filler244 filler245 filler246 filler247 filler248 filler249 filler250 filler251",
+          "word_end": 252,
+          "word_start": 233
+        },
+        {
+          "char_end": 2409,
+          "char_start": 2220,
+          "field": "person",
+          "logit": 6.583672046661377,
+          "query_id": 0,
+          "score": 0.9986191987991333,
+          "text": "filler233 filler234 filler235 filler236 filler237 filler238 filler239 filler240 filler241 filler242 filler243 filler244 filler245 filler246 filler247 filler248 filler249 filler250 filler251",
+          "word_end": 252,
+          "word_start": 233
+        },
+        {
+          "char_end": 3139,
+          "char_start": 2920,
+          "field": "date",
+          "logit": 6.412100791931152,
+          "query_id": 3,
+          "score": 0.9983610510826111,
+          "text": "filler303 filler304 filler305 filler306 filler307 filler308 filler309 filler310 filler311 filler312 filler313 filler314 filler315 filler316 filler317 filler318 filler319 filler320 filler321 filler322 filler323 filler324",
+          "word_end": 325,
+          "word_start": 303
+        },
+        {
+          "char_end": 3169,
+          "char_start": 2920,
+          "field": "location",
+          "logit": 7.152549743652344,
+          "query_id": 2,
+          "score": 0.9992177486419678,
+          "text": "filler303 filler304 filler305 filler306 filler307 filler308 filler309 filler310 filler311 filler312 filler313 filler314 filler315 filler316 filler317 filler318 filler319 filler320 filler321 filler322 filler323 filler324 filler325 filler326 filler327",
+          "word_end": 328,
+          "word_start": 303
+        },
+        {
+          "char_end": 3169,
+          "char_start": 2920,
+          "field": "organization",
+          "logit": 6.835505962371826,
+          "query_id": 1,
+          "score": 0.9989262223243713,
+          "text": "filler303 filler304 filler305 filler306 filler307 filler308 filler309 filler310 filler311 filler312 filler313 filler314 filler315 filler316 filler317 filler318 filler319 filler320 filler321 filler322 filler323 filler324 filler325 filler326 filler327",
+          "word_end": 328,
+          "word_start": 303
+        },
+        {
+          "char_end": 3169,
+          "char_start": 2920,
+          "field": "person",
+          "logit": 6.782406330108643,
+          "query_id": 0,
+          "score": 0.9988677501678467,
+          "text": "filler303 filler304 filler305 filler306 filler307 filler308 filler309 filler310 filler311 filler312 filler313 filler314 filler315 filler316 filler317 filler318 filler319 filler320 filler321 filler322 filler323 filler324 filler325 filler326 filler327",
+          "word_end": 328,
+          "word_start": 303
+        },
+        {
+          "char_end": 3359,
+          "char_start": 3120,
+          "field": "date",
+          "logit": 0.0793466567993164,
+          "query_id": 3,
+          "score": 0.5198262929916382,
+          "text": "filler323 filler324 filler325 filler326 filler327 filler328 filler329 filler330 filler331 filler332 filler333 filler334 filler335 filler336 filler337 filler338 filler339 filler340 filler341 filler342 filler343 filler344 filler345 filler346",
+          "word_end": 347,
+          "word_start": 323
+        },
+        {
+          "char_end": 3359,
+          "char_start": 3120,
+          "field": "location",
+          "logit": 0.061980247497558594,
+          "query_id": 2,
+          "score": 0.5154901146888733,
+          "text": "filler323 filler324 filler325 filler326 filler327 filler328 filler329 filler330 filler331 filler332 filler333 filler334 filler335 filler336 filler337 filler338 filler339 filler340 filler341 filler342 filler343 filler344 filler345 filler346",
+          "word_end": 347,
+          "word_start": 323
+        },
+        {
+          "char_end": 3359,
+          "char_start": 3120,
+          "field": "organization",
+          "logit": 0.05460071563720703,
+          "query_id": 1,
+          "score": 0.5136467814445496,
+          "text": "filler323 filler324 filler325 filler326 filler327 filler328 filler329 filler330 filler331 filler332 filler333 filler334 filler335 filler336 filler337 filler338 filler339 filler340 filler341 filler342 filler343 filler344 filler345 filler346",
+          "word_end": 347,
+          "word_start": 323
+        },
+        {
+          "char_end": 3359,
+          "char_start": 3120,
+          "field": "person",
+          "logit": 0.09598922729492188,
+          "query_id": 0,
+          "score": 0.5239788889884949,
+          "text": "filler323 filler324 filler325 filler326 filler327 filler328 filler329 filler330 filler331 filler332 filler333 filler334 filler335 filler336 filler337 filler338 filler339 filler340 filler341 filler342 filler343 filler344 filler345 filler346",
+          "word_end": 347,
+          "word_start": 323
+        },
+        {
+          "char_end": 3419,
+          "char_start": 3210,
+          "field": "date",
+          "logit": 6.450167655944824,
+          "query_id": 3,
+          "score": 0.9984222650527954,
+          "text": "filler332 filler333 filler334 filler335 filler336 filler337 filler338 filler339 filler340 filler341 filler342 filler343 filler344 filler345 filler346 filler347 filler348 filler349 filler350 filler351 filler352",
+          "word_end": 353,
+          "word_start": 332
+        },
+        {
+          "char_end": 3419,
+          "char_start": 3210,
+          "field": "location",
+          "logit": 7.085546493530273,
+          "query_id": 2,
+          "score": 0.9991636276245117,
+          "text": "filler332 filler333 filler334 filler335 filler336 filler337 filler338 filler339 filler340 filler341 filler342 filler343 filler344 filler345 filler346 filler347 filler348 filler349 filler350 filler351 filler352",
+          "word_end": 353,
+          "word_start": 332
+        },
+        {
+          "char_end": 3419,
+          "char_start": 3210,
+          "field": "organization",
+          "logit": 6.803282737731934,
+          "query_id": 1,
+          "score": 0.9988911747932434,
+          "text": "filler332 filler333 filler334 filler335 filler336 filler337 filler338 filler339 filler340 filler341 filler342 filler343 filler344 filler345 filler346 filler347 filler348 filler349 filler350 filler351 filler352",
+          "word_end": 353,
+          "word_start": 332
+        },
+        {
+          "char_end": 3419,
+          "char_start": 3210,
+          "field": "person",
+          "logit": 6.7775750160217285,
+          "query_id": 0,
+          "score": 0.9988622665405273,
+          "text": "filler332 filler333 filler334 filler335 filler336 filler337 filler338 filler339 filler340 filler341 filler342 filler343 filler344 filler345 filler346 filler347 filler348 filler349 filler350 filler351 filler352",
+          "word_end": 353,
+          "word_start": 332
+        },
+        {
+          "char_end": 3629,
+          "char_start": 3360,
+          "field": "date",
+          "logit": 0.37563037872314453,
+          "query_id": 3,
+          "score": 0.5928187966346741,
+          "text": "filler347 filler348 filler349 filler350 filler351 filler352 filler353 filler354 filler355 filler356 filler357 filler358 filler359 filler360 filler361 filler362 filler363 filler364 filler365 filler366 filler367 filler368 filler369 filler370 filler371 filler372 filler373",
+          "word_end": 374,
+          "word_start": 347
+        },
+        {
+          "char_end": 3629,
+          "char_start": 3360,
+          "field": "location",
+          "logit": 0.3642845153808594,
+          "query_id": 2,
+          "score": 0.5900771617889404,
+          "text": "filler347 filler348 filler349 filler350 filler351 filler352 filler353 filler354 filler355 filler356 filler357 filler358 filler359 filler360 filler361 filler362 filler363 filler364 filler365 filler366 filler367 filler368 filler369 filler370 filler371 filler372 filler373",
+          "word_end": 374,
+          "word_start": 347
+        },
+        {
+          "char_end": 3629,
+          "char_start": 3360,
+          "field": "organization",
+          "logit": 0.3500642776489258,
+          "query_id": 1,
+          "score": 0.5866331458091736,
+          "text": "filler347 filler348 filler349 filler350 filler351 filler352 filler353 filler354 filler355 filler356 filler357 filler358 filler359 filler360 filler361 filler362 filler363 filler364 filler365 filler366 filler367 filler368 filler369 filler370 filler371 filler372 filler373",
+          "word_end": 374,
+          "word_start": 347
+        },
+        {
+          "char_end": 3629,
+          "char_start": 3360,
+          "field": "person",
+          "logit": 0.39904022216796875,
+          "query_id": 0,
+          "score": 0.5984570384025574,
+          "text": "filler347 filler348 filler349 filler350 filler351 filler352 filler353 filler354 filler355 filler356 filler357 filler358 filler359 filler360 filler361 filler362 filler363 filler364 filler365 filler366 filler367 filler368 filler369 filler370 filler371 filler372 filler373",
+          "word_end": 374,
+          "word_start": 347
+        },
+        {
+          "char_end": 3699,
+          "char_start": 3430,
+          "field": "date",
+          "logit": 5.9760894775390625,
+          "query_id": 3,
+          "score": 0.9974677562713623,
+          "text": "filler354 filler355 filler356 filler357 filler358 filler359 filler360 filler361 filler362 filler363 filler364 filler365 filler366 filler367 filler368 filler369 filler370 filler371 filler372 filler373 filler374 filler375 filler376 filler377 filler378 filler379 filler380",
+          "word_end": 381,
+          "word_start": 354
+        },
+        {
+          "char_end": 3699,
+          "char_start": 3430,
+          "field": "location",
+          "logit": 6.793863296508789,
+          "query_id": 2,
+          "score": 0.9988805651664734,
+          "text": "filler354 filler355 filler356 filler357 filler358 filler359 filler360 filler361 filler362 filler363 filler364 filler365 filler366 filler367 filler368 filler369 filler370 filler371 filler372 filler373 filler374 filler375 filler376 filler377 filler378 filler379 filler380",
+          "word_end": 381,
+          "word_start": 354
+        },
+        {
+          "char_end": 3699,
+          "char_start": 3430,
+          "field": "organization",
+          "logit": 6.447483539581299,
+          "query_id": 1,
+          "score": 0.9984179735183716,
+          "text": "filler354 filler355 filler356 filler357 filler358 filler359 filler360 filler361 filler362 filler363 filler364 filler365 filler366 filler367 filler368 filler369 filler370 filler371 filler372 filler373 filler374 filler375 filler376 filler377 filler378 filler379 filler380",
+          "word_end": 381,
+          "word_start": 354
+        },
+        {
+          "char_end": 3699,
+          "char_start": 3430,
+          "field": "person",
+          "logit": 6.39116907119751,
+          "query_id": 0,
+          "score": 0.9983264803886414,
+          "text": "filler354 filler355 filler356 filler357 filler358 filler359 filler360 filler361 filler362 filler363 filler364 filler365 filler366 filler367 filler368 filler369 filler370 filler371 filler372 filler373 filler374 filler375 filler376 filler377 filler378 filler379 filler380",
+          "word_end": 381,
+          "word_start": 354
+        },
+        {
+          "char_end": 4069,
+          "char_start": 3630,
+          "field": "date",
+          "logit": 1.3412113189697266,
+          "query_id": 3,
+          "score": 0.7926890254020691,
+          "text": "filler374 filler375 filler376 filler377 filler378 filler379 filler380 filler381 filler382 filler383 filler384 filler385 filler386 filler387 filler388 filler389 filler390 filler391 filler392 filler393 filler394 filler395 filler396 filler397 filler398 filler399 filler400 filler401 filler402 filler403 filler404 filler405 filler406 filler407 filler408 filler409 filler410 filler411 filler412 filler413 filler414 filler415 filler416 filler417",
+          "word_end": 418,
+          "word_start": 374
+        },
+        {
+          "char_end": 4069,
+          "char_start": 3630,
+          "field": "location",
+          "logit": 1.3569831848144531,
+          "query_id": 2,
+          "score": 0.7952689528465271,
+          "text": "filler374 filler375 filler376 filler377 filler378 filler379 filler380 filler381 filler382 filler383 filler384 filler385 filler386 filler387 filler388 filler389 filler390 filler391 filler392 filler393 filler394 filler395 filler396 filler397 filler398 filler399 filler400 filler401 filler402 filler403 filler404 filler405 filler406 filler407 filler408 filler409 filler410 filler411 filler412 filler413 filler414 filler415 filler416 filler417",
+          "word_end": 418,
+          "word_start": 374
+        },
+        {
+          "char_end": 4069,
+          "char_start": 3630,
+          "field": "organization",
+          "logit": 1.3285751342773438,
+          "query_id": 1,
+          "score": 0.790604829788208,
+          "text": "filler374 filler375 filler376 filler377 filler378 filler379 filler380 filler381 filler382 filler383 filler384 filler385 filler386 filler387 filler388 filler389 filler390 filler391 filler392 filler393 filler394 filler395 filler396 filler397 filler398 filler399 filler400 filler401 filler402 filler403 filler404 filler405 filler406 filler407 filler408 filler409 filler410 filler411 filler412 filler413 filler414 filler415 filler416 filler417",
+          "word_end": 418,
+          "word_start": 374
+        },
+        {
+          "char_end": 4069,
+          "char_start": 3630,
+          "field": "person",
+          "logit": 1.402587890625,
+          "query_id": 0,
+          "score": 0.8025942444801331,
+          "text": "filler374 filler375 filler376 filler377 filler378 filler379 filler380 filler381 filler382 filler383 filler384 filler385 filler386 filler387 filler388 filler389 filler390 filler391 filler392 filler393 filler394 filler395 filler396 filler397 filler398 filler399 filler400 filler401 filler402 filler403 filler404 filler405 filler406 filler407 filler408 filler409 filler410 filler411 filler412 filler413 filler414 filler415 filler416 filler417",
+          "word_end": 418,
+          "word_start": 374
+        }
+      ]
+    },
+    {
+      "elapsed_ms": 452.13890000000004,
+      "feature": "unlimited_span_candidate",
+      "status": "observed",
+      "value": [
+        {
+          "mentions": [],
+          "text": "The operation was named Recover Every Surviving Archive From The Abandoned Underground Observatory Beneath New Rome Before Dawn."
+        },
+        {
+          "mentions": [],
+          "text": "The treaty titled Agreement for the Coordinated Recovery and Preservation of All Cultural Archives Lost During the Fall of New Rome was signed today."
+        },
+        {
+          "mentions": [],
+          "text": "Witnesses remembered The Night When Every Star Above New Rome Turned Crimson And The Sea Rose Against The City."
+        }
+      ]
+    },
+    {
+      "elapsed_ms": 62.5762,
+      "feature": "span_attributes",
+      "status": "observed",
+      "value": []
+    },
+    {
+      "elapsed_ms": 114.1914,
+      "feature": "constrained_classification",
+      "status": "observed",
+      "value": {
+        "meta": {
+          "decoder": "exact",
+          "exact": true,
+          "feasible": true,
+          "objective": -2.118420124053955,
+          "violations": []
+        },
+        "tasks": {
+          "effects": {
+            "confidence": 0.5752536654472351,
+            "probabilities": {
+              "create": 0.2699219882488251,
+              "delete": 0.25148263573646545,
+              "modify": 0.27146634459495544,
+              "read_only": 0.2618401348590851
+            },
+            "value": [
+              "modify"
+            ]
+          },
+          "intent": {
+            "confidence": 0.34498465061187744,
+            "probabilities": {
+              "delete": 0.3234612047672272,
+              "read": 0.331554114818573,
+              "write": 0.34498465061187744
+            },
+            "value": "write"
+          }
+        }
+      }
+    },
+    {
+      "elapsed_ms": 412.08529999999996,
+      "feature": "joint_information_extraction",
+      "status": "observed",
+      "value": {
+        "entities": [
+          {
+            "confidence": 0.5179795026779175,
+            "end": 57,
+            "id": "e1",
+            "start": 0,
+            "text": "Alice works for Acme in Paris. Bob joined Acme last year.",
+            "type": "location"
+          }
+        ],
+        "feasible": true,
+        "relations": []
+      }
+    }
+  ],
+  "graph_publications": 0,
+  "model": "D:\\phoenix-models\\gliner2.5-base-v1-onnx-a639bad"
+}

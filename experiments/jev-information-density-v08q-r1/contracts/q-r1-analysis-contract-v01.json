@@ -1,0 +1,124 @@
+{
+  "identity": "JEV-V08Q-R1-RESPONSE-PHENOTYPE-ANALYSIS-V01",
+  "status": "SEALED_AUTHORIZED_FOR_PHASE_EXECUTION",
+  "parent_bindings": {
+    "q_analysis_contract_sha256": "b5c3c02b56405c0a471f82907bbb400dc4655c5fa8e82a32463dce77675e16cc",
+    "q_run_contract_sha256": "5f6cd42b6de058a4fcdcbeb70b1939dbe944a6c973ee704a93148f9bea71d1ae",
+    "q_x1_rationale_only_sha256": "34af0132bb9dee50a5f652fbe4b16673e2cf47219b6f05baf04452f8fa41f8a7"
+  },
+  "primary_purpose": "Replicate the fixed 0.5 SHAM-LOW intervention on fresh worlds and report recurrence of the unchanged Q same-seed predicates and the full per-seed response matrix.",
+  "primary_checkpoint": 120,
+  "descriptive_checkpoints": [40, 80, 100],
+  "analysis_checkpoints": [40, 80, 100, 120],
+  "q_labels_unchanged": {
+    "material_continuous_gain": "step-120 mean SHAM-LOW minus SHAM delta_p_new >= +0.020",
+    "direction": "SHAM-LOW correct-direction rate >= 0.99 and no more than 0.01 below concurrent SHAM",
+    "material_locality_advantage_over_concurrent_dup": {
+      "sham_l1": "SHAM-LOW <= 0.75 * concurrent DUP",
+      "matched_neutral_l1": "SHAM-LOW <= 0.75 * concurrent DUP",
+      "sham_map_flip": "SHAM-LOW <= concurrent DUP + 0.05",
+      "matched_map_flip": "SHAM-LOW <= concurrent DUP + 0.05",
+      "all_four_channels_must_pass_in_same_seed": true,
+      "zero_dup_l1": "unclassifiable; seed fails locality predicate"
+    },
+    "preservation": "SHAM-LOW A_old >= concurrent SHAM - 0.05 overall and >= concurrent SHAM - 0.10 in every family",
+    "q_operating_point_seed_pass": "same-seed conjunction of gain, direction, material locality advantage over DUP, and preservation",
+    "q_operating_point_cohort": "at least two thirds of R1 paired seeds pass the same-seed conjunction; for 12 seeds this is at least 8",
+    "q_stiff_coupling_seed": "same seed has material gain; each SHAM-LOW L1 differs from concurrent DUP by <=10% relative to DUP; both MAP-flip differences are <=0.05 absolute",
+    "q_stiff_coupling_cohort": "at least two thirds of R1 paired seeds pass the same-seed conjunction; for 12 seeds this is at least 8",
+    "q_map_response_seed": "both F_new and Strict improve by >=0.10 versus concurrent SHAM in the same seed",
+    "q_map_response_cohort": "at least two thirds of R1 paired seeds pass; for 12 seeds this is at least 8",
+    "no_cross_seed_assembly": true,
+    "seed_population_interpretation": "report counts out of 12 as observed recurrence; no universal population law or pooled-seed inferential p-value"
+  },
+  "required_per_seed_arm_checkpoint_metrics": {
+    "original_q_coordinates": [
+      "correct_direction rate",
+      "signed mean new_probability_delta and neighborhood distribution",
+      "exact-delta MAE",
+      "F_new and Strict rates/counts",
+      "sham L1 and sham MAP-flip rate",
+      "matched-neutral L1 and matched-neutral MAP-flip rate",
+      "A_old and anchor gold accuracy",
+      "A/F four-cell decomposition"
+    ],
+    "pairwise_geometry": {
+      "anchor_old_new_margin": "P_A(new_id) - P_A(old_id)",
+      "fact_old_new_margin": "P_F(new_id) - P_F(old_id)",
+      "fact_conditioned_pairwise_margin_movement": "fact_old_new_margin - anchor_old_new_margin",
+      "new_candidate_probability_movement": "P_F(new_id) - P_A(new_id)",
+      "old_candidate_probability_movement": "P_F(old_id) - P_A(old_id)"
+    },
+    "multiclass_geometry": {
+      "anchor_old_winner_gap": "P_A(old_id) - max(P_A(c) for c != old_id)",
+      "fact_new_winner_gap": "P_F(new_id) - max(P_F(c) for c != new_id)",
+      "strongest_competitor_identity": "semantic candidate ID attaining the max over c != intended winner; ties use earliest index in frozen candidate order",
+      "anchor_frozen_argmax_candidate_id": "candidate ID selected by the existing frozen argmax tie convention on P_A",
+      "fact_frozen_argmax_candidate_id": "candidate ID selected by the existing frozen argmax tie convention on P_F",
+      "gap_sign_interpretation": "positive means unique intended winner; negative means intended candidate loses; zero is a tie and actual winner is determined only by the frozen argmax candidate ID",
+      "numeric_gap_does_not_replace_actual_argmax_or_F_new_A_old": true,
+      "probability_space": true
+    },
+    "family_reporting": "all original and added metrics by the four fixed families at every contracted checkpoint"
+  },
+  "secondary_step80_to120_landmark_analysis": {
+    "purpose": "Describe whether the step-80 landmark state, after substantial exposure to the same arm, is associated with step-120 outcomes; not a pre-treatment adjustment, causal mediation, or evidence that initial state predicts intervention response",
+    "step80_state": [
+      "anchor_pairwise_old_new_margin = P_A(new_id) - P_A(old_id)",
+      "fact_pairwise_old_new_margin = P_F(new_id) - P_F(old_id)",
+      "fact_new_winner_gap = P_F(new_id) - max(P_F(c) for c != new_id)",
+      "anchor_old_winner_gap = P_A(old_id) - max(P_A(c) for c != old_id)",
+      "new_candidate_probability_movement = P_F(new_id) - P_A(new_id)",
+      "sham_L1 = sum_c abs(P_A(c) - P_S(c))",
+      "matched_L1 = sum_c abs(P_A(c) - P_M(c))",
+      "A_old = frozen_argmax(P_A) == old_id",
+      "F_new = frozen_argmax(P_F) == new_id",
+      "actual frozen argmax candidate IDs and strongest competitors for anchor and fact views"
+    ],
+    "step120_outcomes": ["F_new", "Strict", "A_old", "pairwise margin movement", "multiclass winner gaps", "sham L1", "matched-neutral L1"],
+    "descriptive_methods": [
+      "per-seed × arm × family joint tables of step-80 state and step-120 outcomes",
+      "Spearman rank association computed as Pearson correlation of average ranks; constant input yields null; report coefficient only, no across-seed p-value",
+      "for each of the seven continuous step-80 variables (two pairwise margins, two multiclass gaps, new-candidate probability movement, sham L1, matched L1), form quartiles separately within seed × arm × family; sort only by that step-80 variable then canonical neighborhood_id, split into four equal groups of 125, and report step-120 outcome rates",
+      "A_old and F_new are binary step-80 strata for cross-tabulation only; do not create quartiles from binary variables",
+      "quartile membership is never derived from step-120 outcomes"
+    ],
+    "initialization_baseline": {
+      "purpose": "descriptive pre-treatment context using the 12 already-budgeted shared initialization states",
+      "report": "for each seed, report the initialization geometry and response coordinates alongside, but separately from, the four arm-specific step-120 outcomes",
+      "counted_as_training_arm": false,
+      "new_gate_or_learned_predictor": false,
+      "interpretation": "descriptive association only; no causal or population claim"
+    },
+    "no_training_feedback_or_adaptation": true
+  },
+  "resampling": {
+    "replicates": 10000,
+    "resamples_per_family": 500,
+    "family_order": ["exposure_control", "respiratory_monitoring", "salinity_control", "vibration_monitoring"],
+    "draw_order": "family-major",
+    "rng": "NumPy PCG64",
+    "seed": 3344893480,
+    "quantile_method": "linear",
+    "interval": "paired neighborhood 2.5th and 97.5th percentiles conditional on each seed and the fixed R1 panel",
+    "shared_resample_plan_across_arms_seeds_checkpoints_and_coordinates": true,
+    "paired_interval_excludes_zero": "annotation only; not an added gate"
+  },
+  "reporting": {
+    "step120_primary": true,
+    "report_all_12_seed_matrices_individually": true,
+    "report_registered_q_labels_separately": true,
+    "report_family_tables_for_all_four_families": true,
+    "no_composite_score": true,
+    "no_checkpoint_selection": true,
+    "no_optimizer_seed_population_p_value": true,
+    "respiratory_crossing_and_vibration_preservation_pair": "predeclared secondary descriptive replication question; failure to repeat does not invalidate broader heterogeneity report",
+    "no_new_phenotype_thresholds": true,
+    "descriptive_patterns": "may be cross-tabulated from the unchanged Q seed predicates; do not promote post-hoc phenotype names to new gates"
+  },
+  "authority": {
+    "panel_access": true,
+    "evaluation": true,
+    "analysis_execution": true
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "analysis_repair_run_started": false,
+  "analysis_stop_receipt_path": "ANALYSIS-STOP-RECEIPT-v0.1.json",
+  "analysis_stop_receipt_sha256": "a74c7fa70d27eaa012383fe5449aa0c6e51de944e5dfc71119abfda85e35b80d",
+  "biological_promotion": false,
+  "combined_locked_output_tree_sha256": "f76063d854e9f9243a3dd51ff3903117ab97d7db0c3944e1f789359accbb3aa5",
+  "exact_source_diff": "@@ weighted_accuracy @@\n-    if not targets or denom <= 0.0:\n+    if len(targets) == 0 or denom <= 0.0:",
+  "fit_manifest_sha256": "47b440bb4f9f4d93c897b0835dfe4159e7579a92d2fa5e0e41d93b3084bf8048",
+  "fit_receipt_count": 72,
+  "fit_receipts_tree_sha256": "9a0e31c01fa2e8fc192938091ce08dc4b790f7225aa0fce7e05febad97f5043f",
+  "frozen_analysis_copy_byte_identical": true,
+  "frozen_integrity_receipt_sha256": "ce9c75ffc2019b3e636bcd376b6602e0165350ebe8550dbba24d999d8e7e040f",
+  "heldout_truth_previously_opened": true,
+  "measured_reach03_authorized": false,
+  "no_comparative_result_produced_before_repair": true,
+  "original_analysis_path": "f4-invariant-01-prefit-v2/fit_analysis.py",
+  "original_analysis_sha256": "beb30c21df8761efbd0e9ed3fe3745cf57e9f6421cc4fe1750202ffbaa298e75",
+  "original_fit_contract_sha256": "b9856dd30721f9ca38adedd3c73fa657b7ead48ddb9ee43cae638fd73d8e0b48",
+  "pheno_status": "unchanged",
+  "pre_repair_analysis_stop_sha256": "a74c7fa70d27eaa012383fe5449aa0c6e51de944e5dfc71119abfda85e35b80d",
+  "prediction_lock_sha256": "47d812653111164c84d2c6b2e861729d7e5356e39821d9d0ff6d9d8c9d63301a",
+  "prediction_stream_count": 72,
+  "prediction_streams_tree_sha256": "dc6ee795e361e8e23e07a0b94daa9aa9ab178909362739db9c992ca561756b61",
+  "qualification_only": true,
+  "repair_semantics": "Only replace Python truthiness on the target sequence with an explicit zero-length check. Empty inputs retain the frozen null result; all nonempty scoring operations and definitions are unchanged.",
+  "repaired_analysis_bundle": {
+    "files": [
+      {
+        "byte_length": 12878,
+        "path": "fit_analysis.py",
+        "sha256": "beb30c21df8761efbd0e9ed3fe3745cf57e9f6421cc4fe1750202ffbaa298e75"
+      },
+      {
+        "byte_length": 10375,
+        "path": "fit_contract.py",
+        "sha256": "a5570e2bd5fa51c6b348c8ae9806c4874eb7e8d8b4acf5ce6cadc7ebcc4c9d57"
+      },
+      {
+        "byte_length": 767,
+        "path": "run_analysis_repair.py",
+        "sha256": "f84537e9a56d8857ffc2956c27e8f17e7664e78cd330ad2f0f167f6bc02dd51a"
+      },
+      {
+        "byte_length": 1836,
+        "path": "test_analysis_repair.py",
+        "sha256": "2d0fa8c2aea5e69ffb50e62d8fa1bbf56a7bea5a078f2168b0ac40792593edf4"
+      }
+    ],
+    "schema": "F4-INVARIANT-01-analysis-repair-source-bundle-v1"
+  },
+  "repaired_analysis_entrypoint_path": "f4-invariant-01-analysis-repair-v0.1/fit_analysis.py",
+  "repaired_analysis_entrypoint_sha256": "beb30c21df8761efbd0e9ed3fe3745cf57e9f6421cc4fe1750202ffbaa298e75",
+  "repaired_analysis_sha256": "692e924ff4b692e36e4d5ead81cabf0c9be7b32caabafcc9881a30e28ed5450a",
+  "repaired_helper_path": "f4-invariant-01-analysis-repair-v0.1/fit_contract.py",
+  "repaired_helper_sha256": "a5570e2bd5fa51c6b348c8ae9806c4874eb7e8d8b4acf5ce6cadc7ebcc4c9d57",
+  "required_support_blocks": 10,
+  "run_id": "F4-INVARIANT-01-COLLECT2-EXEC2",
+  "runner_sha256": "f84537e9a56d8857ffc2956c27e8f17e7664e78cd330ad2f0f167f6bc02dd51a",
+  "schema": "F4-INVARIANT-01-analysis-repair-amendment-v0.1",
+  "scientific_disposition": "NOT_EVALUABLE_SUPPORT",
+  "source_diff_verified_against_frozen_helper": "PASS",
+  "status": "REPAIR_FROZEN_PRE_ANALYSIS",
+  "support_blocks": 7,
+  "tests_sha256": "2d0fa8c2aea5e69ffb50e62d8fa1bbf56a7bea5a078f2168b0ac40792593edf4",
+  "truth_file_sha256": "5691561ec69800f7e067e3b03de2f917d68cfee8412b1f85a0e6fa55b7daad24"
+}

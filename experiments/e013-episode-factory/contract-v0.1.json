@@ -1,0 +1,33 @@
+{
+  "schema": "e013-construction-contract/v0.1",
+  "protocol_predecessor": null,
+  "protocol_predecessor_status": "not_found_user_confirmed_absent",
+  "domain": "rust_local_commit_patch_selection",
+  "model_contact_authorized": false,
+  "banks": {
+    "D": {
+      "repository_count": 6,
+      "families_per_repository": 8,
+      "tasks_per_family": 12,
+      "task_count": 576,
+      "empty_valid_per_cell": 1,
+      "empty_valid_count": 48
+    },
+    "C": {
+      "repository_count": 4,
+      "families_per_repository": 8,
+      "tasks_per_family": 16,
+      "task_count": 512,
+      "empty_valid_per_cell": 1,
+      "empty_valid_count": 32
+    }
+  },
+  "candidate_must_apply": true,
+  "candidate_must_compile": true,
+  "candidate_replay_from_fresh_reset": true,
+  "visible_hidden_fixture_roots_disjoint": true,
+  "candidate_order_independent_of_validity": true,
+  "empty_slot_private": true,
+  "observer_outcome_dependent_curation": false,
+  "seal_confirmation_before_development_observer_outcomes": true
+}

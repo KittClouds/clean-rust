@@ -1,0 +1,1 @@
+{"proof_system_id":"FINITE_PRODUCT_INDUCTIVE_RELATION_V1","left":{"id":"FINITE_EQ_LEFT","initial_state":0,"outputs":[0,1],"transitions":[[0,1],[0,1]],"alphabet_size":2},"right":{"id":"FINITE_EQ_RIGHT","initial_state":0,"outputs":[0,1],"transitions":[[0,1],[0,1]],"alphabet_size":2},"relation":[[0,0],[1,1]]}

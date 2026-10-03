@@ -1,0 +1,772 @@
+{
+  "protocol": "Q10-PF6-S1",
+  "identity": [
+    "seed9732-R-tau16.json",
+    0,
+    18
+  ],
+  "status": "INCONCLUSIVE_BOUNDED_SEARCH",
+  "coverage_state": "partial",
+  "coordinates_total": 9,
+  "coordinates_ranked": [
+    24066,
+    24024,
+    24054,
+    24070,
+    24023,
+    24073,
+    24083,
+    24088,
+    24037
+  ],
+  "rows": [
+    195,
+    293,
+    587
+  ],
+  "nodes_replayed": 2360,
+  "rounds_completed": 9,
+  "baseline": {
+    "mismatch_count": 258,
+    "total_ulp_distance": 365,
+    "residual_l2": 3.2140612994638774e-05,
+    "max_residual": 7.62939453125e-06,
+    "prefix": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "best_search": {
+    "mismatch_count": 256,
+    "total_ulp_distance": 364,
+    "residual_l2": 3.213884436057745e-05,
+    "max_residual": 7.62939453125e-06,
+    "prefix": [
+      16,
+      0,
+      -2,
+      -2,
+      4,
+      0,
+      -4,
+      -2,
+      0
+    ]
+  },
+  "best_search_final_geometry": false,
+  "best_valid": {
+    "mismatch_count": 263,
+    "total_ulp_distance": 424,
+    "residual_l2": 3.2265277568699637e-05,
+    "max_residual": 7.62939453125e-06,
+    "prefix": [
+      -16,
+      8,
+      -8,
+      16,
+      16,
+      16,
+      16,
+      16,
+      -16
+    ]
+  },
+  "best_valid_geometry": {
+    "axis_absolute_error": 7.057397336668325e-09,
+    "axis_normalized_error": 1.0520562530297983e-06,
+    "norm_absolute_error": 7.487571784814406e-08,
+    "norm_normalized_error": 3.857287949015289e-08,
+    "cue_linear_absolute_error": 5.2516305156536025e-06,
+    "cue_linear_normalized_error": 1.1030461700612285e-06,
+    "final_axis": -0.006708200955151236,
+    "target_axis": -0.006708193897753899,
+    "final_norm": 1.9411493703867977,
+    "target_norm": 1.9411492955110798
+  },
+  "best_valid_found": true,
+  "final_audit": {
+    "axis_absolute_error": 7.057397336668325e-09,
+    "axis_normalized_error": 1.0520562530297983e-06,
+    "norm_absolute_error": 7.487571784814406e-08,
+    "norm_normalized_error": 3.857287949015289e-08,
+    "cue_linear_absolute_error": 5.2516305156536025e-06,
+    "cue_linear_normalized_error": 1.1030461700612285e-06,
+    "final_axis": -0.006708200955151236,
+    "target_axis": -0.006708193897753899,
+    "final_norm": 1.9411493703867977,
+    "target_norm": 1.9411492955110798
+  },
+  "final_geometry": {
+    "axis_absolute_error": 7.057397336668325e-09,
+    "axis_normalized_error": 1.0520562530297983e-06,
+    "norm_absolute_error": 7.487571784814406e-08,
+    "norm_normalized_error": 3.857287949015289e-08,
+    "cue_linear_absolute_error": 5.2516305156536025e-06,
+    "cue_linear_normalized_error": 1.1030461700612285e-06,
+    "final_axis": -0.006708200955151236,
+    "target_axis": -0.006708193897753899,
+    "final_norm": 1.9411493703867977,
+    "target_norm": 1.9411492955110798
+  },
+  "final_geometry_pass": true,
+  "active_nonzero_coordinate_count": 9,
+  "trajectory": [
+    {
+      "round": 0,
+      "mismatch_count": 258,
+      "total_ulp_distance": 365,
+      "residual_l2": 3.2140612994638774e-05,
+      "max_residual": 7.62939453125e-06,
+      "geometry_debt": {
+        "axis": -4.833984545856958e-08,
+        "norm": 3.96923261539494e-08,
+        "cue_linear": 9.489500799268085e-07
+      },
+      "active_nonzero_coordinate_count": 0,
+      "selected_coordinate_ids": [],
+      "tested_zero_coordinate_ids": [],
+      "unselected_coordinate_ids": [
+        24066,
+        24024,
+        24054,
+        24070,
+        24023,
+        24073,
+        24083,
+        24088,
+        24037
+      ],
+      "candidate_replays": 0,
+      "cumulative_candidate_replays": 0,
+      "exploit_survivors": 1,
+      "exploration_survivors": 0,
+      "intermediate_geometry_rejects": 0,
+      "bounds_reserve_rejects": 0,
+      "unique_beam_states": 1,
+      "best_state_hash": "27B13BB351C9C87A5E578AFF09B6C4CCDDE8C7BB08E9BD29C345E83590BC1B73",
+      "descriptive_residual_improvement": 0.0,
+      "trajectory_l2_guard": 3.2140612994638774e-05
+    },
+    {
+      "round": 1,
+      "mismatch_count": 258,
+      "total_ulp_distance": 365,
+      "residual_l2": 3.2140612994638774e-05,
+      "max_residual": 7.62939453125e-06,
+      "geometry_debt": {
+        "axis": -4.833984545856958e-08,
+        "norm": 3.96923261539494e-08,
+        "cue_linear": 9.489500799268085e-07
+      },
+      "active_nonzero_coordinate_count": 0,
+      "selected_coordinate_ids": [
+        24066
+      ],
+      "tested_zero_coordinate_ids": [
+        24066
+      ],
+      "unselected_coordinate_ids": [
+        24024,
+        24054,
+        24070,
+        24023,
+        24073,
+        24083,
+        24088,
+        24037
+      ],
+      "candidate_replays": 10,
+      "cumulative_candidate_replays": 10,
+      "exploit_survivors": 11,
+      "exploration_survivors": 0,
+      "intermediate_geometry_rejects": 0,
+      "bounds_reserve_rejects": 0,
+      "unique_beam_states": 11,
+      "best_state_hash": "27B13BB351C9C87A5E578AFF09B6C4CCDDE8C7BB08E9BD29C345E83590BC1B73",
+      "descriptive_residual_improvement": 0.0,
+      "trajectory_l2_guard": 3.2140612994638774e-05
+    },
+    {
+      "round": 2,
+      "mismatch_count": 258,
+      "total_ulp_distance": 365,
+      "residual_l2": 3.2140612994638774e-05,
+      "max_residual": 7.62939453125e-06,
+      "geometry_debt": {
+        "axis": -4.833984545856958e-08,
+        "norm": 3.96923261539494e-08,
+        "cue_linear": 9.489500799268085e-07
+      },
+      "active_nonzero_coordinate_count": 0,
+      "selected_coordinate_ids": [
+        24066,
+        24024
+      ],
+      "tested_zero_coordinate_ids": [
+        24024
+      ],
+      "unselected_coordinate_ids": [
+        24054,
+        24070,
+        24023,
+        24073,
+        24083,
+        24088,
+        24037
+      ],
+      "candidate_replays": 110,
+      "cumulative_candidate_replays": 120,
+      "exploit_survivors": 24,
+      "exploration_survivors": 8,
+      "intermediate_geometry_rejects": 44,
+      "bounds_reserve_rejects": 0,
+      "unique_beam_states": 32,
+      "best_state_hash": "27B13BB351C9C87A5E578AFF09B6C4CCDDE8C7BB08E9BD29C345E83590BC1B73",
+      "descriptive_residual_improvement": 0.0,
+      "trajectory_l2_guard": 3.2140612994638774e-05
+    },
+    {
+      "round": 3,
+      "mismatch_count": 258,
+      "total_ulp_distance": 365,
+      "residual_l2": 3.2140612994638774e-05,
+      "max_residual": 7.62939453125e-06,
+      "geometry_debt": {
+        "axis": -9.341662490346403e-06,
+        "norm": 3.8530234076177084e-08,
+        "cue_linear": 9.504250885465552e-07
+      },
+      "active_nonzero_coordinate_count": 1,
+      "selected_coordinate_ids": [
+        24066,
+        24024,
+        24054
+      ],
+      "tested_zero_coordinate_ids": [
+        24054
+      ],
+      "unselected_coordinate_ids": [
+        24070,
+        24023,
+        24073,
+        24083,
+        24088,
+        24037
+      ],
+      "candidate_replays": 320,
+      "cumulative_candidate_replays": 440,
+      "exploit_survivors": 24,
+      "exploration_survivors": 8,
+      "intermediate_geometry_rejects": 120,
+      "bounds_reserve_rejects": 0,
+      "unique_beam_states": 32,
+      "best_state_hash": "A20042ADFCC7FBAE5215376E328E8DB932E7BEFBC9A707AE27A7139809D12A04",
+      "descriptive_residual_improvement": 0.0,
+      "trajectory_l2_guard": 3.2140612994638774e-05
+    },
+    {
+      "round": 4,
+      "mismatch_count": 256,
+      "total_ulp_distance": 364,
+      "residual_l2": 3.213884436057745e-05,
+      "max_residual": 7.62939453125e-06,
+      "geometry_debt": {
+        "axis": 7.776566351456433e-06,
+        "norm": 3.8836695549280416e-08,
+        "cue_linear": 9.580707847247583e-07
+      },
+      "active_nonzero_coordinate_count": 3,
+      "selected_coordinate_ids": [
+        24066,
+        24024,
+        24054,
+        24070
+      ],
+      "tested_zero_coordinate_ids": [
+        24070
+      ],
+      "unselected_coordinate_ids": [
+        24023,
+        24073,
+        24083,
+        24088,
+        24037
+      ],
+      "candidate_replays": 320,
+      "cumulative_candidate_replays": 760,
+      "exploit_survivors": 24,
+      "exploration_survivors": 8,
+      "intermediate_geometry_rejects": 18,
+      "bounds_reserve_rejects": 0,
+      "unique_beam_states": 32,
+      "best_state_hash": "2E251F27E18BAAEF024CF4B54FDEFF6477CE294DF88D32811D5896FBFB3F0FE8",
+      "descriptive_residual_improvement": 5.502801273942362e-05,
+      "trajectory_l2_guard": 3.213884436057745e-05
+    },
+    {
+      "round": 5,
+      "mismatch_count": 256,
+      "total_ulp_distance": 364,
+      "residual_l2": 3.213884436057745e-05,
+      "max_residual": 7.62939453125e-06,
+      "geometry_debt": {
+        "axis": 6.618235267803669e-06,
+        "norm": 3.845991975418317e-08,
+        "cue_linear": 9.579127913345156e-07
+      },
+      "active_nonzero_coordinate_count": 4,
+      "selected_coordinate_ids": [
+        24066,
+        24024,
+        24054,
+        24070,
+        24023
+      ],
+      "tested_zero_coordinate_ids": [
+        24023
+      ],
+      "unselected_coordinate_ids": [
+        24073,
+        24083,
+        24088,
+        24037
+      ],
+      "candidate_replays": 320,
+      "cumulative_candidate_replays": 1080,
+      "exploit_survivors": 24,
+      "exploration_survivors": 8,
+      "intermediate_geometry_rejects": 0,
+      "bounds_reserve_rejects": 0,
+      "unique_beam_states": 32,
+      "best_state_hash": "A7EADEBCA99D20811DDF9E8E99D8A9797A5D9AF78DDDD1DED8663CDC2FA1B6C4",
+      "descriptive_residual_improvement": 5.502801273942362e-05,
+      "trajectory_l2_guard": 3.213884436057745e-05
+    },
+    {
+      "round": 6,
+      "mismatch_count": 256,
+      "total_ulp_distance": 364,
+      "residual_l2": 3.213884436057745e-05,
+      "max_residual": 7.62939453125e-06,
+      "geometry_debt": {
+        "axis": 6.618235267803669e-06,
+        "norm": 3.845991975418317e-08,
+        "cue_linear": 9.579127913345156e-07
+      },
+      "active_nonzero_coordinate_count": 4,
+      "selected_coordinate_ids": [
+        24066,
+        24024,
+        24054,
+        24070,
+        24023,
+        24073
+      ],
+      "tested_zero_coordinate_ids": [
+        24073
+      ],
+      "unselected_coordinate_ids": [
+        24083,
+        24088,
+        24037
+      ],
+      "candidate_replays": 320,
+      "cumulative_candidate_replays": 1400,
+      "exploit_survivors": 24,
+      "exploration_survivors": 8,
+      "intermediate_geometry_rejects": 0,
+      "bounds_reserve_rejects": 0,
+      "unique_beam_states": 32,
+      "best_state_hash": "A7EADEBCA99D20811DDF9E8E99D8A9797A5D9AF78DDDD1DED8663CDC2FA1B6C4",
+      "descriptive_residual_improvement": 5.502801273942362e-05,
+      "trajectory_l2_guard": 3.213884436057745e-05
+    },
+    {
+      "round": 7,
+      "mismatch_count": 256,
+      "total_ulp_distance": 364,
+      "residual_l2": 3.213884436057745e-05,
+      "max_residual": 7.62939453125e-06,
+      "geometry_debt": {
+        "axis": 6.043092082781437e-06,
+        "norm": 3.8702249702756225e-08,
+        "cue_linear": 9.57572710578677e-07
+      },
+      "active_nonzero_coordinate_count": 5,
+      "selected_coordinate_ids": [
+        24066,
+        24024,
+        24054,
+        24070,
+        24023,
+        24073,
+        24083
+      ],
+      "tested_zero_coordinate_ids": [
+        24083
+      ],
+      "unselected_coordinate_ids": [
+        24088,
+        24037
+      ],
+      "candidate_replays": 320,
+      "cumulative_candidate_replays": 1720,
+      "exploit_survivors": 24,
+      "exploration_survivors": 8,
+      "intermediate_geometry_rejects": 0,
+      "bounds_reserve_rejects": 0,
+      "unique_beam_states": 32,
+      "best_state_hash": "33AE0043B9A3296D3D95BEB88A7F683AC08F7BF2CDF1BD49751F3B6C485F0AF1",
+      "descriptive_residual_improvement": 5.502801273942362e-05,
+      "trajectory_l2_guard": 3.213884436057745e-05
+    },
+    {
+      "round": 8,
+      "mismatch_count": 256,
+      "total_ulp_distance": 364,
+      "residual_l2": 3.213884436057745e-05,
+      "max_residual": 7.62939453125e-06,
+      "geometry_debt": {
+        "axis": 5.935188226843298e-06,
+        "norm": 3.8824879818507534e-08,
+        "cue_linear": 9.574154143478736e-07
+      },
+      "active_nonzero_coordinate_count": 6,
+      "selected_coordinate_ids": [
+        24066,
+        24024,
+        24054,
+        24070,
+        24023,
+        24073,
+        24083,
+        24088
+      ],
+      "tested_zero_coordinate_ids": [
+        24088
+      ],
+      "unselected_coordinate_ids": [
+        24037
+      ],
+      "candidate_replays": 320,
+      "cumulative_candidate_replays": 2040,
+      "exploit_survivors": 24,
+      "exploration_survivors": 8,
+      "intermediate_geometry_rejects": 0,
+      "bounds_reserve_rejects": 0,
+      "unique_beam_states": 32,
+      "best_state_hash": "D77371DCD81F1AB996EC5755EEA5AABC4CD85B7836B6396402F6BB87A8DCF785",
+      "descriptive_residual_improvement": 5.502801273942362e-05,
+      "trajectory_l2_guard": 3.213884436057745e-05
+    },
+    {
+      "round": 9,
+      "mismatch_count": 256,
+      "total_ulp_distance": 364,
+      "residual_l2": 3.213884436057745e-05,
+      "max_residual": 7.62939453125e-06,
+      "geometry_debt": {
+        "axis": 5.935188226843298e-06,
+        "norm": 3.8824879818507534e-08,
+        "cue_linear": 9.574154143478736e-07
+      },
+      "active_nonzero_coordinate_count": 6,
+      "selected_coordinate_ids": [
+        24066,
+        24024,
+        24054,
+        24070,
+        24023,
+        24073,
+        24083,
+        24088,
+        24037
+      ],
+      "tested_zero_coordinate_ids": [
+        24037
+      ],
+      "unselected_coordinate_ids": [],
+      "candidate_replays": 320,
+      "cumulative_candidate_replays": 2360,
+      "exploit_survivors": 24,
+      "exploration_survivors": 8,
+      "intermediate_geometry_rejects": 1,
+      "bounds_reserve_rejects": 0,
+      "unique_beam_states": 32,
+      "best_state_hash": "D77371DCD81F1AB996EC5755EEA5AABC4CD85B7836B6396402F6BB87A8DCF785",
+      "descriptive_residual_improvement": 5.502801273942362e-05,
+      "trajectory_l2_guard": 3.213884436057745e-05
+    },
+    {
+      "round": 10,
+      "mismatch_count": 256,
+      "total_ulp_distance": 364,
+      "residual_l2": 3.213884436057745e-05,
+      "max_residual": 7.62939453125e-06,
+      "geometry_debt": {
+        "axis": 5.935188226843298e-06,
+        "norm": 3.8824879818507534e-08,
+        "cue_linear": 9.574154143478736e-07
+      },
+      "active_nonzero_coordinate_count": 6,
+      "selected_coordinate_ids": [
+        24066,
+        24024,
+        24054,
+        24070,
+        24023,
+        24073,
+        24083,
+        24088,
+        24037
+      ],
+      "tested_zero_coordinate_ids": [],
+      "unselected_coordinate_ids": [],
+      "candidate_replays": 0,
+      "cumulative_candidate_replays": 2360,
+      "exploit_survivors": 24,
+      "exploration_survivors": 8,
+      "intermediate_geometry_rejects": 0,
+      "bounds_reserve_rejects": 0,
+      "unique_beam_states": 32,
+      "best_state_hash": "D77371DCD81F1AB996EC5755EEA5AABC4CD85B7836B6396402F6BB87A8DCF785",
+      "descriptive_residual_improvement": 5.502801273942362e-05,
+      "trajectory_l2_guard": 3.213884436057745e-05
+    },
+    {
+      "round": 11,
+      "mismatch_count": 256,
+      "total_ulp_distance": 364,
+      "residual_l2": 3.213884436057745e-05,
+      "max_residual": 7.62939453125e-06,
+      "geometry_debt": {
+        "axis": 5.935188226843298e-06,
+        "norm": 3.8824879818507534e-08,
+        "cue_linear": 9.574154143478736e-07
+      },
+      "active_nonzero_coordinate_count": 6,
+      "selected_coordinate_ids": [
+        24066,
+        24024,
+        24054,
+        24070,
+        24023,
+        24073,
+        24083,
+        24088,
+        24037
+      ],
+      "tested_zero_coordinate_ids": [],
+      "unselected_coordinate_ids": [],
+      "candidate_replays": 0,
+      "cumulative_candidate_replays": 2360,
+      "exploit_survivors": 24,
+      "exploration_survivors": 8,
+      "intermediate_geometry_rejects": 0,
+      "bounds_reserve_rejects": 0,
+      "unique_beam_states": 32,
+      "best_state_hash": "D77371DCD81F1AB996EC5755EEA5AABC4CD85B7836B6396402F6BB87A8DCF785",
+      "descriptive_residual_improvement": 5.502801273942362e-05,
+      "trajectory_l2_guard": 3.213884436057745e-05
+    },
+    {
+      "round": 12,
+      "mismatch_count": 256,
+      "total_ulp_distance": 364,
+      "residual_l2": 3.213884436057745e-05,
+      "max_residual": 7.62939453125e-06,
+      "geometry_debt": {
+        "axis": 5.935188226843298e-06,
+        "norm": 3.8824879818507534e-08,
+        "cue_linear": 9.574154143478736e-07
+      },
+      "active_nonzero_coordinate_count": 6,
+      "selected_coordinate_ids": [
+        24066,
+        24024,
+        24054,
+        24070,
+        24023,
+        24073,
+        24083,
+        24088,
+        24037
+      ],
+      "tested_zero_coordinate_ids": [],
+      "unselected_coordinate_ids": [],
+      "candidate_replays": 0,
+      "cumulative_candidate_replays": 2360,
+      "exploit_survivors": 24,
+      "exploration_survivors": 8,
+      "intermediate_geometry_rejects": 0,
+      "bounds_reserve_rejects": 0,
+      "unique_beam_states": 32,
+      "best_state_hash": "D77371DCD81F1AB996EC5755EEA5AABC4CD85B7836B6396402F6BB87A8DCF785",
+      "descriptive_residual_improvement": 5.502801273942362e-05,
+      "trajectory_l2_guard": 3.213884436057745e-05
+    },
+    {
+      "round": 13,
+      "mismatch_count": 256,
+      "total_ulp_distance": 364,
+      "residual_l2": 3.213884436057745e-05,
+      "max_residual": 7.62939453125e-06,
+      "geometry_debt": {
+        "axis": 5.935188226843298e-06,
+        "norm": 3.8824879818507534e-08,
+        "cue_linear": 9.574154143478736e-07
+      },
+      "active_nonzero_coordinate_count": 6,
+      "selected_coordinate_ids": [
+        24066,
+        24024,
+        24054,
+        24070,
+        24023,
+        24073,
+        24083,
+        24088,
+        24037
+      ],
+      "tested_zero_coordinate_ids": [],
+      "unselected_coordinate_ids": [],
+      "candidate_replays": 0,
+      "cumulative_candidate_replays": 2360,
+      "exploit_survivors": 24,
+      "exploration_survivors": 8,
+      "intermediate_geometry_rejects": 0,
+      "bounds_reserve_rejects": 0,
+      "unique_beam_states": 32,
+      "best_state_hash": "D77371DCD81F1AB996EC5755EEA5AABC4CD85B7836B6396402F6BB87A8DCF785",
+      "descriptive_residual_improvement": 5.502801273942362e-05,
+      "trajectory_l2_guard": 3.213884436057745e-05
+    },
+    {
+      "round": 14,
+      "mismatch_count": 256,
+      "total_ulp_distance": 364,
+      "residual_l2": 3.213884436057745e-05,
+      "max_residual": 7.62939453125e-06,
+      "geometry_debt": {
+        "axis": 5.935188226843298e-06,
+        "norm": 3.8824879818507534e-08,
+        "cue_linear": 9.574154143478736e-07
+      },
+      "active_nonzero_coordinate_count": 6,
+      "selected_coordinate_ids": [
+        24066,
+        24024,
+        24054,
+        24070,
+        24023,
+        24073,
+        24083,
+        24088,
+        24037
+      ],
+      "tested_zero_coordinate_ids": [],
+      "unselected_coordinate_ids": [],
+      "candidate_replays": 0,
+      "cumulative_candidate_replays": 2360,
+      "exploit_survivors": 24,
+      "exploration_survivors": 8,
+      "intermediate_geometry_rejects": 0,
+      "bounds_reserve_rejects": 0,
+      "unique_beam_states": 32,
+      "best_state_hash": "D77371DCD81F1AB996EC5755EEA5AABC4CD85B7836B6396402F6BB87A8DCF785",
+      "descriptive_residual_improvement": 5.502801273942362e-05,
+      "trajectory_l2_guard": 3.213884436057745e-05
+    },
+    {
+      "round": 15,
+      "mismatch_count": 256,
+      "total_ulp_distance": 364,
+      "residual_l2": 3.213884436057745e-05,
+      "max_residual": 7.62939453125e-06,
+      "geometry_debt": {
+        "axis": 5.935188226843298e-06,
+        "norm": 3.8824879818507534e-08,
+        "cue_linear": 9.574154143478736e-07
+      },
+      "active_nonzero_coordinate_count": 6,
+      "selected_coordinate_ids": [
+        24066,
+        24024,
+        24054,
+        24070,
+        24023,
+        24073,
+        24083,
+        24088,
+        24037
+      ],
+      "tested_zero_coordinate_ids": [],
+      "unselected_coordinate_ids": [],
+      "candidate_replays": 0,
+      "cumulative_candidate_replays": 2360,
+      "exploit_survivors": 24,
+      "exploration_survivors": 8,
+      "intermediate_geometry_rejects": 0,
+      "bounds_reserve_rejects": 0,
+      "unique_beam_states": 32,
+      "best_state_hash": "D77371DCD81F1AB996EC5755EEA5AABC4CD85B7836B6396402F6BB87A8DCF785",
+      "descriptive_residual_improvement": 5.502801273942362e-05,
+      "trajectory_l2_guard": 3.213884436057745e-05
+    },
+    {
+      "round": 16,
+      "mismatch_count": 256,
+      "total_ulp_distance": 364,
+      "residual_l2": 3.213884436057745e-05,
+      "max_residual": 7.62939453125e-06,
+      "geometry_debt": {
+        "axis": 5.935188226843298e-06,
+        "norm": 3.8824879818507534e-08,
+        "cue_linear": 9.574154143478736e-07
+      },
+      "active_nonzero_coordinate_count": 6,
+      "selected_coordinate_ids": [
+        24066,
+        24024,
+        24054,
+        24070,
+        24023,
+        24073,
+        24083,
+        24088,
+        24037
+      ],
+      "tested_zero_coordinate_ids": [],
+      "unselected_coordinate_ids": [],
+      "candidate_replays": 0,
+      "cumulative_candidate_replays": 2360,
+      "exploit_survivors": 24,
+      "exploration_survivors": 8,
+      "intermediate_geometry_rejects": 0,
+      "bounds_reserve_rejects": 0,
+      "unique_beam_states": 32,
+      "best_state_hash": "D77371DCD81F1AB996EC5755EEA5AABC4CD85B7836B6396402F6BB87A8DCF785",
+      "descriptive_residual_improvement": 5.502801273942362e-05,
+      "trajectory_l2_guard": 3.213884436057745e-05
+    }
+  ],
+  "replay_budget_exhausted": false,
+  "pf6_helper_sha256": "79B731A7D86FDA1D3FB45F3FA320C62BABD35933AE9ED5BCC25D0744B3F6EA46",
+  "stratum": "low_coordinate_quartile",
+  "baseline_selection_metadata": {
+    "coordinate_count": 9,
+    "mismatched_row_count": 3,
+    "residual_mass": 3.410605131648481e-13,
+    "bridge_count": 0,
+    "bridge_count_source": "not_present_in_sealed_pf5_group_receipt",
+    "threshold_gated_fraction": 0.0,
+    "row_count": 3
+  }
+}

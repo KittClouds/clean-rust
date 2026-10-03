@@ -1,0 +1,102 @@
+{
+  "protocol": "jev-information-density/v0.8n-e1-candidate-basis-metadata-audit-v01",
+  "status": "PASS_METADATA_ONLY_CANDIDATE_BASIS_CONSTRUCTIBLE",
+  "audit_source_sha256": "8b4e0414d498745a209287b6a3461ac6bc999dd435b9e684a64b07aaa84fb238",
+  "source_sha256": {
+    "run_contract": "da538aa03355732a2ba362da45d947e169b87aa644d0efd6ba7ef7a546306c1f",
+    "family_spec": "e56885005487b36b573c1bf4d47741413ca72df0992ff62bcf48891eecacb429",
+    "generator": "f04a9b1d4f6682522e5957be3c0075db4bd7aa4e4e25968650f2ff24a42c7f5b",
+    "feature_extractor": "b8cd79a9a3265eca0fde5f509ba7c058bc2065d7747efe17ff7c7c1f6335b2d0",
+    "candidate_surface": "a3049d52e1183c806c84522a617a05646eb86fbcb69af72b5bb26f4808852cb1",
+    "training_candidate_catalog": "1698ea2078951837b3cb780a3f873c3c099e5e3d001c714e1d58a41e2951487e",
+    "original_schema_join_receipt": "1db0042f1a15364e6a304daf426a56c561ca44986c632b6453f960bcf4e6d41f"
+  },
+  "candidate_text_manifest_sha256": "7987ae385454b32ddec548e48ef6543253b7b061ee1f077c064363c06304a285",
+  "candidate_count": 16,
+  "expected_feature_tensor_shape": [
+    16,
+    2048
+  ],
+  "expected_feature_dtype": "float32",
+  "feature_key": "mean_full@16",
+  "model_repo_id": "LiquidAI/LFM2.5-1.2B-Base",
+  "model_revision": "7453bca97ca1e67754c4035a4b4c584e1c9dd725",
+  "schema_candidate_order_source": "generator FamilySpec candidate order; candidate_semantic_id is schema slug plus candidate suffix; no training-schema order used",
+  "exact_identity_join": {
+    "jev-v08n-schema:exposure_control": {
+      "neighborhoods": 500,
+      "candidate_semantic_ids": [
+        "exposure_control::overexposure",
+        "exposure_control::underexposure",
+        "exposure_control::contrast_drift",
+        "exposure_control::sensor_bias"
+      ],
+      "unique_count": 4
+    },
+    "jev-v08n-schema:respiratory_monitoring": {
+      "neighborhoods": 500,
+      "candidate_semantic_ids": [
+        "respiratory_monitoring::rapid_breathing",
+        "respiratory_monitoring::slow_breathing",
+        "respiratory_monitoring::irregular_breathing",
+        "respiratory_monitoring::sensor_bias"
+      ],
+      "unique_count": 4
+    },
+    "jev-v08n-schema:salinity_control": {
+      "neighborhoods": 500,
+      "candidate_semantic_ids": [
+        "salinity_control::high_salinity",
+        "salinity_control::low_salinity",
+        "salinity_control::mineral_imbalance",
+        "salinity_control::sensor_bias"
+      ],
+      "unique_count": 4
+    },
+    "jev-v08n-schema:vibration_monitoring": {
+      "neighborhoods": 500,
+      "candidate_semantic_ids": [
+        "vibration_monitoring::excess_vibration",
+        "vibration_monitoring::low_vibration",
+        "vibration_monitoring::resonance",
+        "vibration_monitoring::sensor_bias"
+      ],
+      "unique_count": 4
+    }
+  },
+  "training_candidate_identity_overlap": 0,
+  "tokenizer_only_preflight": {
+    "status": "PASS_NO_TRUNCATION",
+    "tokenizer_loaded": true,
+    "backbone_weights_loaded": false,
+    "feature_encoder_called": false,
+    "candidate_feature_vectors_created": false,
+    "input_count": 16,
+    "max_length": 1024,
+    "token_counts": [
+      14,
+      15,
+      13,
+      14,
+      13,
+      14,
+      12,
+      14,
+      12,
+      13,
+      15,
+      14,
+      13,
+      13,
+      14,
+      14
+    ],
+    "max_observed_tokens": 15
+  },
+  "heldout_targets_read_or_used": false,
+  "head_checkpoints_loaded": false,
+  "predictions_or_metrics_created": false,
+  "panel_reopened": false,
+  "phoenix_access": false,
+  "next_gate": "Seal E1 extraction/evaluation repair contract, then request separate explicit authorization for 16-vector extraction and a separately authorized second panel opening."
+}

@@ -1,0 +1,63 @@
+{
+  "protocol": "jev-information-density/v0.8p-v03-e1-identity-source-allowlist-v01",
+  "identity": "v0.8P-v03-e1-neighborhood-denylist-source-allowlist-v01",
+  "status": "FROZEN_BEFORE_EXTRACTION",
+  "scope": {
+    "semantic_source_field": "top-level neighborhood_id from authoritative E1 matched-panel manifest only",
+    "permitted_semantic_output": [
+      "sorted unique SHA256(canonical neighborhood_id)",
+      "count",
+      "authorized source path hashes and observed source hashes",
+      "extractor source hash",
+      "execution receipt"
+    ],
+    "raw_neighborhood_ids_leave_extractor": false,
+    "e1_candidate_join_or_features_accessed": false,
+    "panel_targets_predictions_metrics_or_geometry_accessed": false
+  },
+  "access_policy": {
+    "exact_paths_only": true,
+    "directory_enumeration": false,
+    "recursive_walk_glob_repository_search_parent_census": false,
+    "unexpected_input_open": "fail_closed",
+    "observed_successful_open_set_must_equal_allowlist": true,
+    "exactly_one_successful_open_per_allowlisted_path_per_run": true,
+    "two_clean_processes_required": true,
+    "denylist_bytes_must_match_between_runs": true
+  },
+  "authorized_sources": [
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08n\\v0.8N-eval-panel-v01\\matched-panel-v02\\heldout-matched-panel-manifest.jsonl",
+      "canonical_path_sha256": "9f134282815a7074dbc43960a8af03e632fe27be4ba8dd5f104ff696a521f972",
+      "expected_sha256": "80e09c0f203b8a6505e062a2091a594273dca808258ff2f4539ab8414db9eabe",
+      "purpose": "extract canonical neighborhood identities; only top-level neighborhood_id values are semantically accessed",
+      "permitted_fields": ["neighborhood_id"]
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08n\\v0.8N-eval-panel-v01\\seal\\seal-manifest.json",
+      "canonical_path_sha256": "2851fb7e5116af416c7c5b02465bafbea01d2ef2a592f2af9f1881480ce1ac69",
+      "expected_sha256": "425cef320df94e2b47b448203f8a916ebbcbb2019539b2d09e51f5b4ced92f614",
+      "purpose": "exact-byte provenance binding; content treated as opaque and never parsed",
+      "permitted_fields": []
+    },
+    {
+      "path": "D:\\codex-runs\\jev-information-density-v08n\\v0.8N-eval-panel-v01\\seal\\evaluation-firewall-lock.json",
+      "canonical_path_sha256": "53f6ff76ae0016c7f826c414b22889413f3d3d7b4f8b2c2799df644bf946f894",
+      "expected_sha256": "79d25ac82fba1bc6332e16d8bc5f877fadd11cccaed5ef3f07eacfe5e1877da2",
+      "purpose": "exact-byte firewall provenance binding; content treated as opaque and never parsed",
+      "permitted_fields": []
+    }
+  ],
+  "extractor": {
+    "path": "experiments/jev-information-density-v08p-v03/identity/extract_e1_neighborhood_denylist_v03.py",
+    "sha256": "e93cc70387c1acd526ad4245b35bec2dfc6ac1f5a68fb104e18010a1c33a6450",
+    "runtime": "Python standard library only, invoked in isolated clean process"
+  },
+  "output": {
+    "denylist_schema": "canonical-neighborhood-id-sha256-set-v01",
+    "expected_identity_count": 2000,
+    "duplicates": "fail_closed",
+    "output_root": "D:/codex-runs/jev-information-density-v08p-v03/identity",
+    "raw_source_values_written": false
+  }
+}

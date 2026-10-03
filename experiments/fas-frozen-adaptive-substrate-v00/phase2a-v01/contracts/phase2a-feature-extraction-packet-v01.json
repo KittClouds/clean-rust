@@ -1,0 +1,127 @@
+{
+  "packet_id": "FAS00_PHASE2A_FEATURE_EXTRACTION_V01",
+  "paperwork_bundle_id": "FAS00_SENSOR_CONTACT_PAPERWORK_V01",
+  "project_id": "fas-frozen-adaptive-substrate-v00",
+  "phase": "2A",
+  "status": "SEALED_AWAITING_EXPLICIT_MODEL_CONTACT_AUTHORIZATION",
+  "model_contact_authorized": false,
+  "model_contact_performed": false,
+  "feature_extraction_authorized": false,
+  "sensor_probe_authorized": false,
+  "online_mechanisms_authorized": false,
+  "phase5_corpus_generation_authorized": false,
+  "parents": {
+    "phase0_pre_model_seal": {
+      "path": "experiments/fas-frozen-adaptive-substrate-v00/seals/pre-model-contact-seal-v01.json",
+      "seal_file_sha256": "b4b8c38d5fdcbea9fa674bd9c8a34dfae8e6bd6fc4794e81646c159ecec29fad",
+      "root_sha256": "c7227d2a10da05f902ed5d16e94a8e12866d2e0ae6b2b2a357ed2da93431b3e6"
+    },
+    "phase1_world_qualification": {
+      "path": "experiments/fas-frozen-adaptive-substrate-v00/phase1-v03/seals/phase1-v03-seal.json",
+      "seal_file_sha256": "85e2ebdd243c3e44ea79917a0de8c896946ba35f75f38a9a5212826fe35657bc",
+      "disposition_file_sha256": "553db7fbfd39f5a49f4927083038efc032234c738792c44e84997a6d352f690a",
+      "root_sha256": "d3ca9f8ef988a6f0ae93318fc0ea7c504b23b3be801dbf133d66f67746a69274",
+      "phase1_ready": true,
+      "phase5_reuse_authorized": false
+    }
+  },
+  "backbone": {
+    "model_id": "LiquidAI/LFM2.5-1.2B-Base",
+    "revision": "7453bca97ca1e67754c4035a4b4c584e1c9dd725",
+    "parameter_delta": 0,
+    "expected_hidden_dimension": 2048,
+    "hidden_dimension_mismatch_disposition": "FAIL_CLOSED",
+    "weights_must_be_loaded_from_fas_only_snapshot": true,
+    "reuse_of_global_or_other_project_model_cache": false
+  },
+  "feature_contract": {
+    "contract_id": "FAS_FEATURE_V1",
+    "path": "experiments/fas-frozen-adaptive-substrate-v00/contracts/feature-contract-v01.json",
+    "sha256": "1f60ef84da2de16a053b3f53a725bd079efa94065728025840fe7f3bcfad85d7",
+    "layer": "final hidden layer",
+    "pooling": "arithmetic mean over all model-visible positions, including consumed special-token positions",
+    "input_formation": "Observation: <observation or [none]>\nQuery: <query>\nCandidates: safe | risky | idle",
+    "tokenizer_call": "Pinned revision tokenizer; encode raw UTF-8 prompt with add_special_tokens=true; no chat template, truncation, padding, or token rewriting.",
+    "forward_shape": "one example per forward call; exact tokenized length; no padding; no mixed-length batching",
+    "pooling_accumulation": "convert final-layer token vectors to float32, then arithmetic-mean across the complete model-visible sequence",
+    "serialized_dtype": "float32 little-endian",
+    "feature_shape": [2048]
+  },
+  "tokenizer_identity": {
+    "repository": "LiquidAI/LFM2.5-1.2B-Base",
+    "required_revision": "7453bca97ca1e67754c4035a4b4c584e1c9dd725",
+    "identity_string": "LiquidAI/LFM2.5-1.2B-Base@7453bca97ca1e67754c4035a4b4c584e1c9dd725",
+    "required_file_hashing": "Before the first model forward, hash every tokenizer file actually used in sorted repository-relative path order; store path and SHA-256 rows plus the canonical manifest SHA-256 in the extraction receipt and every feature row.",
+    "canonical_manifest": "UTF-8 lines '<relative_path> <lowercase_sha256>\\n', sorted by ordinal relative path; SHA-256 of concatenated lines.",
+    "revision_mismatch_disposition": "FAIL_CLOSED"
+  },
+  "input_corpus": {
+    "corpus_id": "FAS00_WORLD_QUALIFICATION_V03",
+    "purpose": "Phase 1 qualification corpus only; not Phase 5 data",
+    "phase1_hash_tree_root_sha256": "d3ca9f8ef988a6f0ae93318fc0ea7c504b23b3be801dbf133d66f67746a69274",
+    "corpus_manifest_path": "D:/codex-runs/fas-frozen-adaptive-substrate-v00/phase1-v03/corpus/corpus-manifest-v03.json",
+    "corpus_manifest_sha256": "1a6905972dd397c2035bc8a3349933530a1ce4184f576df57d7f57746fc0628f",
+    "event_rows_path": "D:/codex-runs/fas-frozen-adaptive-substrate-v00/phase1-v03/corpus/qualification-events-v03.jsonl",
+    "event_rows_sha256": "9fdd7ce9e49b86ac9acb3da035429c616865f527123bd0ac7c312b1b912439ca",
+    "world_manifest_path": "D:/codex-runs/fas-frozen-adaptive-substrate-v00/phase1-v03/corpus/world-manifest-v03.jsonl",
+    "world_manifest_sha256": "59caae81aee1a303f7f2320691665cca8a8673fdd084500d5bd53d9272ee213f",
+    "world_count": 1024,
+    "event_count": 32768,
+    "phase5_reuse_authorized": false
+  },
+  "extractor_input_projection": {
+    "readable_fields": ["event_id", "rendered_event_sha256", "observation_text", "query_text"],
+    "forbidden_to_extractor": ["exact_target", "observation_answer_index", "current_exact_world_state", "latent_regime_id", "latent_regime_phase", "context_id", "entity_id", "relation_id", "feedback_reveal_step", "visible_feedback_ids_after_score", "world_family", "task_structure", "world_seed"],
+    "candidate_text": "Use the canonical literal 'safe | risky | idle' from FAS_FEATURE_V1; do not read the event's display candidate permutation into the model input.",
+    "unknown_json_fields": "Ignore without deserializing or using them; labels and latent state are never passed to the tokenizer or model."
+  },
+  "input_views": [
+    {
+      "view_id": "FULL",
+      "observation_rule": "Use observation_text when non-null; otherwise use [none].",
+      "query_rule": "Use query_text verbatim.",
+      "purpose": "Positive sensor probes."
+    },
+    {
+      "view_id": "QUERY_ONLY",
+      "observation_rule": "Always use [none], including when the source event has an observation.",
+      "query_rule": "Use the same query_text verbatim as FULL.",
+      "purpose": "Negative control for answer leakage from query and canonical candidate text alone."
+    }
+  ],
+  "cache_contract": {
+    "feature_cache_root": "D:/codex-runs/fas-frozen-adaptive-substrate-v00/phase2a-v01/feature-cache-v01",
+    "model_snapshot_root": "D:/codex-runs/fas-frozen-adaptive-substrate-v00/phase2a-v01/model-snapshot-v01",
+    "isolated_hf_home": "D:/codex-runs/fas-frozen-adaptive-substrate-v00/phase2a-v01/hf-home-v01",
+    "fresh_paths_required": true,
+    "reuse_of_existing_feature_cache": false,
+    "reuse_of_existing_model_or_tokenizer_cache": false,
+    "expected_rows": 65536,
+    "row_order": "Phase 1 JSONL order; for each event, FULL then QUERY_ONLY.",
+    "tensor_file": "features-v01.f32le; row-major [65536,2048] contiguous float32 little-endian values.",
+    "tensor_file_expected_bytes": 536870912,
+    "row_receipt_file": "feature-rows-v01.jsonl; one receipt per feature row in tensor order.",
+    "extraction_manifest": "extraction-manifest-v01.json; binds source hashes, model snapshot tree, tokenizer file manifest, runtime identity, output hashes, and feature contract.",
+    "no_labels_in_feature_cache": true
+  },
+  "row_receipt": {
+    "required_fields": ["row_index", "row_id", "event_id", "input_view", "source_rendered_event_sha256", "input_utf8_sha256", "input_utf8_bytes", "token_ids", "token_ids_sha256", "sequence_length", "hidden_dimension", "pooling_rule", "feature_shape", "feature_sha256", "model_id", "model_revision", "tokenizer_identity", "tokenizer_file_manifest_sha256", "feature_contract_sha256"],
+    "row_id": "SHA-256 of UTF-8 'FAS_FEATURE_ROW_V1\\0' || event_id || '\\0' || input_view || '\\0' || lowercase input_utf8_sha256.",
+    "token_ids_sha256": "SHA-256 of bytes 'FAS_TOKEN_IDS_V1\\0' || uint64_le(token_count) || each token ID as uint32_le in model input order.",
+    "feature_sha256": "SHA-256 of the row's contiguous 2048 float32 little-endian feature bytes; reject NaN and infinity before serialization."
+  },
+  "determinism_smoke": {
+    "sample_selection": "Sort unique event IDs by SHA-256 of UTF-8 'FAS_PHASE2A_REPEAT_V01\\0' || event_id; select the first 32 IDs; include both input views.",
+    "procedure": "Before full extraction, forward each selected row twice under the same frozen runtime and compare token IDs, lengths, float32 feature bytes, and hashes byte-for-byte.",
+    "mismatch_disposition": "FAIL_CLOSED; do not extract the remaining corpus."
+  },
+  "runtime_receipt": ["OS build", "CPU model", "accelerator model and driver if used", "framework and kernel versions", "model loader version", "device", "model weight dtype", "deterministic inference settings", "extractor source hash"],
+  "allowed_operation": "After a separate explicit user authorization, resolve the pinned model and tokenizer into the new FAS-only snapshot/cache, run deterministic frozen forward passes for FULL and QUERY_ONLY inputs, serialize features and receipts, and verify hashes.",
+  "forbidden_operations": ["head or probe training", "online updates", "arm or baseline execution", "Phase 5 corpus generation", "evaluation inference", "layer search", "pooling search", "hyperparameter search", "backbone writes", "access to any project or global feature cache", "access to labels or latent state in model inputs"],
+  "authorization_boundary": "This sealed packet records a proposed, bounded operation. It is not authorization to download model files, load the LFM, tokenize corpus rows, or run a forward pass. Wait for a separate explicit user model-contact authorization after this packet and the Phase 3 contract are sealed.",
+  "required_final_state_after_later_authorized_extraction": {
+    "FAS00_FEATURE_CACHE_READY": true,
+    "FAS00_SENSOR_PROBE_AUTHORIZED": false,
+    "FAS00_ONLINE_MECHANISMS_AUTHORIZED": false
+  }
+}

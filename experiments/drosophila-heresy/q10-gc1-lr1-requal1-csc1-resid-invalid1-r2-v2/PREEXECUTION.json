@@ -1,0 +1,46 @@
+{
+  "contract_sha256": "70B31F09413A024A5676EABC1BD874482821F34618647B6934686498D3DA2ED3",
+  "domain_counts_planned": {
+    "1": 133,
+    "2": 53279,
+    "3": 10564075
+  },
+  "expected_domain_identity_sha256": "B9F0066D1116FEA07366E076EDF9E1DA9526F2B62FEC1DDB18C5450C17C9F7FC",
+  "geometry_prefilter": false,
+  "identity": "q10-gc1-lr1-requal1-csc1-resid-invalid1-r2-v2",
+  "protocol": "Q10-RESID-INVALID1-R2-V2",
+  "regression_preflight": {
+    "cases": [
+      {
+        "actions": [
+          15,
+          409
+        ],
+        "expected_bits": 1092185578,
+        "full_readout_sha256": "0250F55ED8D316A75303D8DFF05AB90CFF59757D422A51B1A9473C67291B3757",
+        "full_weight_sha256": "4CB43BE37D5C069BDD25037A02959F8AEBE7B3C8927D7B12753487D3CF0A0F04",
+        "geometry_valid": true,
+        "legacy_bug_bits": 1092185579,
+        "legacy_false_target_reproduced_and_rejected": true,
+        "row": 36
+      },
+      {
+        "actions": [
+          292,
+          357,
+          428
+        ],
+        "expected_bits": 1103757538,
+        "full_readout_sha256": "AF85C26D11F6918F1214AF220D8C463306875CB4869784834D45D94D50089546",
+        "full_weight_sha256": "8931D696EA28FAD4B774D83C540A9C1F3568EE0B7651AA147EF0B7BB1651BF49",
+        "geometry_valid": true,
+        "legacy_bug_bits": 1103757536,
+        "legacy_false_target_reproduced_and_rejected": true,
+        "row": 695
+      }
+    ],
+    "status": "PASS"
+  },
+  "scientific_promotion": false,
+  "status": "PREEXECUTION_SEALED"
+}

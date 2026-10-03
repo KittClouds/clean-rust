@@ -1,0 +1,34 @@
+{
+  "actual_v15_contract_and_map_audited": false,
+  "commands": [
+    "python -m py_compile experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/audit_e4_0_track_e_v15.py experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/test_audit_e4_0_track_e_v15.py",
+    "python experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/test_audit_e4_0_track_e_v15.py (from repository root)"
+  ],
+  "execution_authorization_conferred": false,
+  "model_tokenizer_cuda_contact": false,
+  "python_compile": "PASS",
+  "receipt_id": "E4_0_TRACK_E_V15_PREMAP_SYNTHETIC_AUDITOR_TESTS",
+  "recorded_utc": "2026-09-27T04:16:52Z",
+  "schema": "FAS_E4_0_TRACK_E_SOURCE_TESTS_V15",
+  "scope": "Synthetic-only independent Track E v15 auditor tests. Validates sealed v06-v11 ancestor closure, exact v14 failed-preseal contract/map/receipt history and closed truth/no-contact state, correction of the v12 preseal contract subtree to its exact receipt schema, v13 finalizer stop_receipt identity, and actual predecessor source-test registry identities. No v15 contract/map audit, E4 labels/population, model, tokenizer, CUDA, GPU, or authorization access.",
+  "sources": [
+    {
+      "bytes": 121299,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/audit_e4_0_track_e_v15.py",
+      "sha256": "474a7a79e36c5b0fdc8ce5e5a38555779bf8ad20a0a7c3e3e9de597e742034a7"
+    },
+    {
+      "bytes": 6124,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/test_audit_e4_0_track_e_v15.py",
+      "sha256": "7868ae2d179180f7fd52cebc8f1cf302a5b3ba06bbdcc0c30b553729b200aa13"
+    }
+  ],
+  "status": "TRACK_E_SOURCE_TESTS_PASS_V15_PREMAP_SYNTHETIC_AUDITOR",
+  "tests": {
+    "discovered": 8,
+    "failed": 0,
+    "passed": 8,
+    "skipped": 0
+  },
+  "truth_payloads_opened": false
+}

@@ -1,0 +1,42 @@
+[
+  {
+    "target": "reclaim_given_break",
+    "eligible_count": 2073,
+    "observed_count": 880,
+    "censored_count": 526,
+    "result": "result_0b5e038d4e85d0ff.tsv",
+    "receipt": "result_0b5e038d4e85d0ff.receipt.json"
+  },
+  {
+    "target": "initial_acceptance_given_initial_contact",
+    "eligible_count": 5737,
+    "observed_count": 667,
+    "censored_count": 686,
+    "result": "result_42cbfbd8c756c66b.tsv",
+    "receipt": "result_42cbfbd8c756c66b.receipt.json"
+  },
+  {
+    "target": "rejection_given_initial_contact",
+    "eligible_count": 5737,
+    "observed_count": 3504,
+    "censored_count": 686,
+    "result": "result_088117503651c9d5.tsv",
+    "receipt": "result_088117503651c9d5.receipt.json"
+  },
+  {
+    "target": "retest_hold_given_retest_contact",
+    "eligible_count": 1267,
+    "observed_count": 763,
+    "censored_count": 16,
+    "result": "result_259d541c610ce1cd.tsv",
+    "receipt": "result_259d541c610ce1cd.receipt.json"
+  },
+  {
+    "target": "transit_given_episode_acceptance",
+    "eligible_count": 386,
+    "observed_count": 227,
+    "censored_count": 123,
+    "result": "result_9b2ee5b3391ad770.tsv",
+    "receipt": "result_9b2ee5b3391ad770.receipt.json"
+  }
+]

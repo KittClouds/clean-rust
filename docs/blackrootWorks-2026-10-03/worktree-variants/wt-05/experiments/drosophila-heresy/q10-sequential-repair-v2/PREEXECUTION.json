@@ -1,0 +1,239 @@
+{
+  "arithmetic": {
+    "nextafter32": "adjacent IEEE-754 binary32",
+    "nonfinite": "fail_closed",
+    "ordered_key": "negative=!bits; nonnegative=bits xor 0x80000000"
+  },
+  "behavior": false,
+  "capacity": {
+    "coefficient_resolution": 1e-12,
+    "factorization": "nalgebra deterministic f64 SVD",
+    "projection_tolerance": 2e-10,
+    "rank_multiplier": 1000.0
+  },
+  "contract_sha256": "95a5c47510dc5db2353a902a06c45def7243e131816c763c2cd03cd416620f21",
+  "dh08b": false,
+  "executable": "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-sequential-repair-v2\\target\\release\\q10-sequential-repair.exe",
+  "executable_sha256": "e2e42e72981a33159b3fa161f619909b0241a90622369ffb634b7a132325bbb8",
+  "final_tolerances": {
+    "axis": 2e-6,
+    "cue": 2e-6,
+    "norm": 2e-7
+  },
+  "parent_hashes": {
+    "contract": "5A7CD7E15724F6260C2D42296BED5FF3667CA32FA1D8D48E5408EFFA2A0F35BF",
+    "plan": "8A70CFADA7A833AA1110FDE5DBF0CFAFDDD4AFD4297A06AD846B1959439B8B9D",
+    "result": "68200D7F49B8A4B943150A1C3A5AB4B46DF4ED8EB1EBBE7A3DF45F8BEEBBD337",
+    "status": "D19D051DA550BCDED9C436F9A7164AF0C4322D8BB16C418D7C4CA9E04217A9C4"
+  },
+  "plan_sha256": "83c3c3147390a279807f85e450215b648c918aecbdec3a366674b2d61fc42d64",
+  "production_readout": "DriveOperator::sequential using canonical rows and f32 Iterator::sum",
+  "protocol": "Q10-SR2",
+  "scientific_seeds": 0,
+  "search": {
+    "beam_width": 64,
+    "branch_width": 64,
+    "maximum_coordinate_steps": 16,
+    "maximum_moves": 64,
+    "minimum_final_reserve": 16
+  },
+  "source_manifest": [
+    {
+      "path": "CONTRACT.json",
+      "sha256": "95a5c47510dc5db2353a902a06c45def7243e131816c763c2cd03cd416620f21"
+    },
+    {
+      "path": "Cargo.lock",
+      "sha256": "3c762aaec315d7bfcface75a1f3ecbfe12f696254e083097f4771c62faf8e0be"
+    },
+    {
+      "path": "Cargo.toml",
+      "sha256": "9bb5dbe8101b29bc2c63b039b1fb55c9c06ba4de6e2861606e568d6e6e38be54"
+    },
+    {
+      "path": "PLAN.md",
+      "sha256": "83c3c3147390a279807f85e450215b648c918aecbdec3a366674b2d61fc42d64"
+    },
+    {
+      "path": "scripts/review_q10_sr.py",
+      "sha256": "3120aa9f9f1adc00b64add4e625578cfa278a9cdea2a91f19519260ca3ac6c11"
+    },
+    {
+      "path": "src\\allocation.rs",
+      "sha256": "4fff2a7f1bc7078795abde6916bf14c96d2334579d04e48d4194999a076f826e"
+    },
+    {
+      "path": "src\\baseline.rs",
+      "sha256": "0ac5d54b053a26f97841bf8e4ac8acadeed6296056d466289f116420255212fa"
+    },
+    {
+      "path": "src\\capture.rs",
+      "sha256": "e0ed3fdc33cc1c0cd7236ddd6aba67e29d685fc10e0a6b6a416ec5da81b8c66f"
+    },
+    {
+      "path": "src\\dh03.rs",
+      "sha256": "ddaebb5caa82a16fff7745d878babf0f09d204a5ca8dd6360d6e60fa6f4b34e4"
+    },
+    {
+      "path": "src\\dh04.rs",
+      "sha256": "1ea9f7df8e36b97f96298dc44fbbb2cb0c4e5eabda103db13c7c076bf71312e2"
+    },
+    {
+      "path": "src\\dh06.rs",
+      "sha256": "06cc84d7e4ddcc7bfb34c395fef074835b98fef7b02dd9c95ce5023bb66696c0"
+    },
+    {
+      "path": "src\\dh06_tests.rs",
+      "sha256": "1e5750e75b404928b152bd2a63b53847d47cb03857d463215be2213fdf4b55b1"
+    },
+    {
+      "path": "src\\dh07.rs",
+      "sha256": "4a3d8df5f3e389d211e19fae96093f12ab6ebe3450be34169fab82010e05909a"
+    },
+    {
+      "path": "src\\dh07_null.rs",
+      "sha256": "9a576bfbc0335ac9d2f169ce3fe98a393b6a884879a43257e2c5e218495f17ee"
+    },
+    {
+      "path": "src\\dh07_tests.rs",
+      "sha256": "f1e34ec8be6c1721260dc780fcacfe5639321f410c4146fb98a8bc790ba0a588"
+    },
+    {
+      "path": "src\\dh08a_tests.rs",
+      "sha256": "2372aae14491498fd621b53317e129ac3aac8ae384d04184a10d02d813880b35"
+    },
+    {
+      "path": "src\\experiment.rs",
+      "sha256": "4ef74dfe60ad9cc9ae4b440a995419c648dceb1a903204b0c53fc770c94ba477"
+    },
+    {
+      "path": "src\\experiment_main.rs",
+      "sha256": "eb277782c24c6a7486a06f5e2c4185f2cd0dee7ef0bc1705cad5bf647f887c8c"
+    },
+    {
+      "path": "src\\graph.rs",
+      "sha256": "a697285a9fe4560fce32afb5330358ede1c84e96365c23ac96c24d97fe667464"
+    },
+    {
+      "path": "src\\linear.rs",
+      "sha256": "1523d127f8a36f27266ffc777614d8a5a1ef77729080923106a916364d59d404"
+    },
+    {
+      "path": "src\\linear_tests.rs",
+      "sha256": "7541cc0c7e243727d3ef9822885732c107b6e2c776ef88e221f1887657dc9396"
+    },
+    {
+      "path": "src\\main.rs",
+      "sha256": "85453ac670c9aff1e3d453f12b38596d9a4c68d7823bada3ce2bad70da0d95a8"
+    },
+    {
+      "path": "src\\observer.rs",
+      "sha256": "08fc18ef45d376a9e58d7531231b110dad8a81cc86dc3c0d84e7333f445688ef"
+    },
+    {
+      "path": "src\\plasticity.rs",
+      "sha256": "d08e4057234dfbd6c4c11da660031263aeaa0327a86b68f7cae04cdc4bf9438c"
+    },
+    {
+      "path": "src\\policy.rs",
+      "sha256": "b01b4072d60bc2efc3ccaa121bbaf0763168f3154ef5ea32829c1c85193b08ed"
+    },
+    {
+      "path": "src\\q09_tests.rs",
+      "sha256": "5030f26d4db5d18b8d622017d3654fe90e4dfacadf8b7a6b1e5d7bc6253b0024"
+    },
+    {
+      "path": "src\\q10.rs",
+      "sha256": "d2c5d3a632911501031f5113e2e5996db3e2d445a7a2dfde7464e1c2e1264f53"
+    },
+    {
+      "path": "src\\q10sr\\bank.rs",
+      "sha256": "0b4115b29ad0d281aa1a5deee6f4f747839f58345068e3455787b118d74d6450"
+    },
+    {
+      "path": "src\\q10sr\\capacity.rs",
+      "sha256": "dd05073616c83cf801be12b2a7fb3bf932526421c39d07c4b408b43291256170"
+    },
+    {
+      "path": "src\\q10sr\\gates.rs",
+      "sha256": "84d5b5c5a4dd30b920383594729d70cf12177cbe613f5f4324c751ad767d6303"
+    },
+    {
+      "path": "src\\q10sr\\mod.rs",
+      "sha256": "83baa08f21b681d57323dda7d79e1e97fd21c56c0c698d29710a01d8200ec569"
+    },
+    {
+      "path": "src\\q10sr\\readout.rs",
+      "sha256": "f69288094969ceb44eb92886aab57959a1a643beb3fde4981256a423d197ac4b"
+    },
+    {
+      "path": "src\\q10sr\\repair.rs",
+      "sha256": "d55ca7de16d230527d7703c54bebe066be4db19aa9ea1822d063827e105f81d4"
+    },
+    {
+      "path": "src\\rng.rs",
+      "sha256": "794d04a94d011ece9f5758ad05a680b3acccbc82e94e33f4d9a9179c882dd950"
+    },
+    {
+      "path": "src\\rotation.rs",
+      "sha256": "d50637747333bcc3463fffb4f986c721e8b397cb2f6b6da0bf63b55c6ed599ac"
+    },
+    {
+      "path": "src\\simulation\\dh03.rs",
+      "sha256": "ddaebb5caa82a16fff7745d878babf0f09d204a5ca8dd6360d6e60fa6f4b34e4"
+    },
+    {
+      "path": "src\\simulation\\dh04.rs",
+      "sha256": "1ea9f7df8e36b97f96298dc44fbbb2cb0c4e5eabda103db13c7c076bf71312e2"
+    },
+    {
+      "path": "src\\simulation\\dh06.rs",
+      "sha256": "06cc84d7e4ddcc7bfb34c395fef074835b98fef7b02dd9c95ce5023bb66696c0"
+    },
+    {
+      "path": "src\\simulation\\dh06_tests.rs",
+      "sha256": "1e5750e75b404928b152bd2a63b53847d47cb03857d463215be2213fdf4b55b1"
+    },
+    {
+      "path": "src\\simulation\\dh07.rs",
+      "sha256": "4a3d8df5f3e389d211e19fae96093f12ab6ebe3450be34169fab82010e05909a"
+    },
+    {
+      "path": "src\\simulation\\dh07_null.rs",
+      "sha256": "9a576bfbc0335ac9d2f169ce3fe98a393b6a884879a43257e2c5e218495f17ee"
+    },
+    {
+      "path": "src\\simulation\\dh07_tests.rs",
+      "sha256": "f1e34ec8be6c1721260dc780fcacfe5639321f410c4146fb98a8bc790ba0a588"
+    },
+    {
+      "path": "src\\simulation\\dh08a_tests.rs",
+      "sha256": "2372aae14491498fd621b53317e129ac3aac8ae384d04184a10d02d813880b35"
+    },
+    {
+      "path": "src\\simulation\\experiment.rs",
+      "sha256": "4ef74dfe60ad9cc9ae4b440a995419c648dceb1a903204b0c53fc770c94ba477"
+    },
+    {
+      "path": "src\\simulation\\q09_tests.rs",
+      "sha256": "5030f26d4db5d18b8d622017d3654fe90e4dfacadf8b7a6b1e5d7bc6253b0024"
+    },
+    {
+      "path": "src\\simulation.rs",
+      "sha256": "c02a7baf74760eb94b54b16d283e54a1da998f4b91f82302fb29851463b79ae4"
+    },
+    {
+      "path": "src\\task.rs",
+      "sha256": "06b4ea25e3c8c4a0106337866c714c6d74e6d1c0377ac0a934c33e859a02dc61"
+    },
+    {
+      "path": "stage1-a-config.json",
+      "sha256": "5b48a27c8d215de946d506702bca1ce649ac3aad8de47d3fd5e66590e647afd2"
+    },
+    {
+      "path": "stage1-b-config.json",
+      "sha256": "4348116eec9fd20120221632824ec0a9c59992d85473b0b04d3a595580db661e"
+    }
+  ],
+  "status": "FROZEN_PRE_EXECUTION"
+}

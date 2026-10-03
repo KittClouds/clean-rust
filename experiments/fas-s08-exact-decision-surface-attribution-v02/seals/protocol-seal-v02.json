@@ -1,0 +1,68 @@
+{
+  "algorithm": "SHA256 of ordinal-sorted path<TAB>bytes<TAB>file_sha256 LF rows",
+  "feature_extraction": false,
+  "files": [
+    {
+      "bytes": 10813,
+      "path": "FAS-S08-PROTOCOL.md",
+      "sha256": "39848552fdd2d81e545b8d56be2edca37a2b084078ad1fb188d45d10812103a0"
+    },
+    {
+      "bytes": 5078,
+      "path": "contracts/analysis-contract-v02.json",
+      "sha256": "42d23821ec20b38d51d06d53a21edb222f07a2747821eadb447e22ac885579cc"
+    },
+    {
+      "bytes": 1036,
+      "path": "contracts/authorization-packet-v02.json",
+      "sha256": "6fe560110699abe8becd281df7a3fcce2f76a76c3b1937d49f9d739f232f06e6"
+    },
+    {
+      "bytes": 10417,
+      "path": "contracts/parent-binding-v02.json",
+      "sha256": "94bc05b4b7f12afecb5e6e24ef7dbc1b43dd11ea793a0331aadbdbb9326c1a33"
+    },
+    {
+      "bytes": 607,
+      "path": "contracts/project-identity-v02.json",
+      "sha256": "c537d5610f6451e8c490a1c8862cb51fd8b7b1f17a08713d797a3ce13761d1bb"
+    },
+    {
+      "bytes": 10956,
+      "path": "scripts/freeze_inputs.py",
+      "sha256": "9eaa5318a4e41e745ca03b3a47a42679b9ff82505ff51e4dced4ee4a8dd8ec44"
+    },
+    {
+      "bytes": 9179,
+      "path": "scripts/s08_common.py",
+      "sha256": "1825739666f7e5605a5a48e26f5907f381b20591e3f3b83c8f7045c32a632346"
+    },
+    {
+      "bytes": 10457,
+      "path": "scripts/s08_math.py",
+      "sha256": "57c52d875dab894b3c9773fe91803e7ed0565017b0885144450618a0a1b9ab7e"
+    },
+    {
+      "bytes": 50861,
+      "path": "scripts/s08_run.py",
+      "sha256": "27738f5659b063c09904f50e5ffc4a81937be9e54b82f53cb205d4864842b0cb"
+    },
+    {
+      "bytes": 1416,
+      "path": "scripts/seal_protocol.py",
+      "sha256": "ad5e31b1d5b3c3f7d79380928a050b52474c8fc1d2c878bd6a80f076bac779ee"
+    },
+    {
+      "bytes": 5406,
+      "path": "scripts/test_s08_math.py",
+      "sha256": "c02fb51ccb4d31d459411c1e30072aed2bd17956bea92acaf57d54c8d2877f78"
+    }
+  ],
+  "model_contact": false,
+  "outcome_analysis_started": false,
+  "probe_fitting": false,
+  "protocol_root_sha256": "9b640d39840a5beeca41d72e6e48e4af313deef34575a090eedf4502bf306b04",
+  "root_sha256": "9b640d39840a5beeca41d72e6e48e4af313deef34575a090eedf4502bf306b04",
+  "seal_id": "FAS_S08_PROTOCOL_SEAL_V02",
+  "status": "SEALED"
+}

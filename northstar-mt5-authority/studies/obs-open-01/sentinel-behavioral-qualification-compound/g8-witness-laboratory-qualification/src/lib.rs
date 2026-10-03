@@ -1,0 +1,19 @@
+pub mod artifacts;
+pub mod authority;
+pub mod explorer;
+pub mod fixtures;
+pub mod model;
+pub mod oracle;
+pub mod ranking;
+pub mod seal;
+pub mod verifier;
+
+pub const G3_ROOT: &str = "c936eac1c37cbc70aa9d42bffdea096cdc1afb9269ad73c26f2ddf535eb54bef";
+pub const G4_ROOT: &str = "37ed98b4ebe447ef3c2152e550c99652d0157aea2c77b8a886379d1ba9e08e15";
+pub const G5_ROOT: &str = "808f4089ada22e7736460a90efd71b1dec0726dece460ca4dc1df8cbccac554c";
+pub const G6_ROOT: &str = "cf282d195f90e1ee970b7c5d57329c901848d7894f4ed8c5945755d3935633dd";
+pub const G7_ROOT: &str = "069a5294c37a6fbede436af2f57700964ce1e752643aeaa26b06de6581183bd5";
+pub const THETA_STAR_ID: &str = "THETA_STAR_RELATIVE_TOKEN_AFFINE_ROLE_FIBER_ARCHITECTURE_V1";
+pub const RESULT: &str = "WITNESS_LABORATORY_QUALIFIED_WITH_RESTRICTIONS";
+pub const DISPOSITION: &str = "ADVANCE_WITH_RESTRICTION";
+pub const AUTHORITY: &str = "OBS_OPEN_G8_WITNESS_LABORATORY_WITH_RESTRICTIONS_V1";

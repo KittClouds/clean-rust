@@ -1,0 +1,33 @@
+{
+  "causal_allocation": false,
+  "checks_passed": true,
+  "face_role_counts": {
+    "axis:A_MOVES_TOWARD_FACE_AND_PAIR_CROSSES": 4,
+    "axis:BOTH_MOVE_TOWARD_FACE_AND_PAIR_CROSSES": 56,
+    "axis:PAIR_ONLY_CROSSING": 1,
+    "linear:A_MOVES_TOWARD_FACE_AND_PAIR_CROSSES": 4,
+    "linear:BOTH_MOVE_TOWARD_FACE_AND_PAIR_CROSSES": 25,
+    "linear:NOT_VIOLATED_AT_S": 32,
+    "norm:NOT_VIOLATED_AT_S": 61
+  },
+  "failure_patterns": {
+    "DIFFERENT_FAILED_GATES": 20,
+    "SAME_FAILED_GATES": 41
+  },
+  "final_pair_validity_required": true,
+  "identity": "q10-gc1-cancel1-cg1-v1",
+  "max_additivity_residual": {
+    "axis": 0.0,
+    "linear": 0.0,
+    "norm": 4.440892098500626e-16
+  },
+  "observations_sha256": "C2116225AC6E94B374A955700545273D6E6C3016B4E02DC378B090478718588B",
+  "protocol": "Q10-LR1-CG1",
+  "scope": "derived_read_only_constraint_geometry_audit",
+  "source_two_invalid_pairs": 61,
+  "thresholds": {
+    "axis": 2e-06,
+    "linear": 2e-06,
+    "norm": 2e-07
+  }
+}

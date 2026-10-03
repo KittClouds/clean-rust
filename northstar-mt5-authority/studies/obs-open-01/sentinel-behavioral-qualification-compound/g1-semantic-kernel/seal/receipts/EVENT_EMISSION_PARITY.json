@@ -1,0 +1,1 @@
+{"schema":"G1_EVENT_EMISSION_PARITY_V1","observation_commits":57500,"new_upper_events":2870,"upper_id_change_events":2870,"new_lower_events":2267,"lower_id_change_events":2267,"location_events":1658010,"total_ordered_emissions":1725784,"ordering_mismatches":0,"status":"PASS"}

@@ -1,0 +1,12 @@
+{
+  "alternative_seq32_equality": "NOT_TESTED",
+  "audited_states": 1024,
+  "behavioral_inference": false,
+  "box_feasibility": "NOT_TESTED",
+  "complete": true,
+  "linear_integrity_valid": true,
+  "protocol": "Q09-LFA",
+  "schema_version": 1,
+  "scientific_seed_bundles": 0,
+  "stage": "A"
+}

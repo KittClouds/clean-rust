@@ -1,0 +1,43 @@
+{
+  "recorded_utc": "2026-09-27T01:59:15.193122+00:00",
+  "schema": "FAS_E4_0_CONTRACT_TOOLING_SOURCE_TESTS_V09",
+  "receipt_id": "E4_0_CONTRACT_TOOLING_V09_SOURCE_TESTS_V08",
+  "status": "PASS_SYNTHETIC_CONTRACT_AND_SOURCE_MAP_TESTS",
+  "commands": [
+    "python -m py_compile v09 builder/finalizer/sealer/tests",
+    "python source/scripts/test_e4_0_contract_v09.py"
+  ],
+  "unit_test_count": 18,
+  "py_compile": "PASS",
+  "source_bindings": [
+    {
+      "path": "source/scripts/build_e4_0_source_map_v08.py",
+      "bytes": 37286,
+      "sha256": "06ce339350ed5494bd0bd58c8b82dd9f740a80a748ca3b483a9290293d6cf97c"
+    },
+    {
+      "path": "source/scripts/finalize_e4_0_contract_v09.py",
+      "bytes": 29436,
+      "sha256": "5c2f1911cbd3598322581c2855b6dde9d5d073d935ebe8d4b6f2cd3e50fc7fcb"
+    },
+    {
+      "path": "source/scripts/seal_e4_0_contract_v09.py",
+      "bytes": 12807,
+      "sha256": "5e400d99afb03141f4b93a8b43fc032bd80f60eb6e4a9398cb11956918f24c63"
+    },
+    {
+      "path": "source/scripts/test_e4_0_contract_v09.py",
+      "bytes": 14070,
+      "sha256": "0a2d2f784f298b360fc93af6bec91211c93a8be6140b9a03bdc161f20c09587e"
+    }
+  ],
+  "inherited_v06_binding_preflight": "PASS",
+  "runtime_access": {
+    "model_contact": false,
+    "tokenizer_contact": false,
+    "cuda_initialized": false,
+    "gpu_lease_acquired": false,
+    "truth_opened": false
+  },
+  "execution_authorization_conferred": false
+}

@@ -1,0 +1,28 @@
+{
+  "binding_id": "FAS_S04_PARENT_BINDING_V01",
+  "s01_2": {
+    "project": "C:/code land/clean-rust/experiments/fas-s01-frozen-sensor-transfer-cartography",
+    "run": "D:/codex-runs/fas-s01-frozen-sensor-transfer-cartography",
+    "corpus": "D:/codex-runs/fas-s01-frozen-sensor-transfer-cartography/s01-2-v01-sealed/corpus/counterfactual-quartets-v01.jsonl",
+    "corpus_sha256": "51a55212ba89d55bd6df532673ad4546c95def1f5d75622661f7c17b3e4a7ad1",
+    "feature_cache_root": "D:/codex-runs/fas-s01-frozen-sensor-transfer-cartography/s01-2-feature-geometry-v01/feature-cache-v01",
+    "feature_cache_root_sha256": "4964f35fb87a45a9447cd0f5f028668027ca3ad3a8f0d0c3f9eb7b9cbe7ccaaa",
+    "feature_rows_sha256": "a8ea72310c0926962a0783d90eb3ceda19ca0b334bd2c00aafdd226e8aaaa40b",
+    "V0_MEAN_FULL_sha256": "9cc840390abd2c9d186f33b6a62948b55d4cdd15d52a4cfe03bd32775a2fe76c",
+    "V1_FINAL_POSITION_sha256": "095366563e0ef08a38192c325c93a000614cbdbd3a467e2e8c5c92e14acd1409",
+    "result_tree_root_sha256": "1fc3aeb432ecdbef21a35aea8fed5b0d59671681eb8eb8032533c9ce751a4384"
+  },
+  "s01_3": {
+    "project": "C:/code land/clean-rust/experiments/fas-s01-frozen-sensor-transfer-cartography",
+    "run": "D:/codex-runs/fas-s01-frozen-sensor-transfer-cartography/s01-3-linear-accessibility-v01",
+    "result_tree_root_sha256": "2581b50d75382c197793ea46400bf2b8a27508df22b2ff5bdbe82eb20a5238b7",
+    "test_events_path": "D:/codex-runs/fas-s01-frozen-sensor-transfer-cartography/s01-3-linear-accessibility-v01/metadata/test-events-v01.jsonl",
+    "test_events_sha256": "b8a9e4dbeda07d98519cb3fe3508a839d17652494f5a3e0f7b0c82020fdc3498",
+    "EXACT_TARGET_V0_probe_state_sha256": "1b3db11aa1fe691a98b40b0b9001c3f0125d1acd47f7c069ef53fd487a2d46e4",
+    "EXACT_TARGET_V1_probe_state_sha256": "2cbbd450468ae7ebbe073ca9badaf229dcf9d3b55ff80ed102ccf9eb7e942641",
+    "EXACT_TARGET_V0_probabilities_sha256": "d94ff21e4f3e2377c26cede424775bf8ef3b6ac019e3902347b7f1b6b2c93e2f",
+    "EXACT_TARGET_V1_probabilities_sha256": "cc1451fdd4823cc6ce139375785af90b087793ce309ec5ec558bcf30593b3b03",
+    "EXACT_TARGET_V0_state_iteration_limit_reached": true,
+    "EXACT_TARGET_V1_state_iteration_limit_reached": true
+  }
+}

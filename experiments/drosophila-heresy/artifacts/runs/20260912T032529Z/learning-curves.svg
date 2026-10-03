@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="410" viewBox="0 0 1080 410">
+<rect width="1080" height="410" fill="white"/>
+<text x="25" y="30" font-family="sans-serif" font-size="20">DH-01: measured online accuracy (means; uncertainty in report)</text>
+<text x="55" y="63" font-family="sans-serif" font-size="15">primary</text>
+<path d="M55 330.0h280" stroke="#dddddd"/><text x="23" y="334.0" font-family="sans-serif" font-size="11">0.3</text>
+<path d="M55 260.0h280" stroke="#dddddd"/><text x="23" y="264.0" font-family="sans-serif" font-size="11">0.5</text>
+<path d="M55 190.0h280" stroke="#dddddd"/><text x="23" y="194.0" font-family="sans-serif" font-size="11">0.7</text>
+<path d="M55 119.99999999999997h280" stroke="#dddddd"/><text x="23" y="123.99999999999997" font-family="sans-serif" font-size="11">0.9</text>
+<path d="M195 83V330" stroke="#bbbbbb" stroke-dasharray="4 4"/>
+<polyline points="55,248.37890625 95,231.8017578125 135,221.49088541666669 175,211.806640625 215,301.98404947916663 255,290.53385416666663 295,272.58951822916663 335,260.28483072916663" fill="none" stroke="#167d9a" stroke-width="2"/>
+<polyline points="55,248.66373697916669 95,231.630859375 135,222.9150390625 175,213.23079427083331 215,301.12955729166663 255,289.33756510416663 295,272.0198567708333 335,262.16471354166663" fill="none" stroke="#de6c36" stroke-width="2"/>
+<polyline points="55,243.70768229166669 95,234.5361328125 135,225.87727864583331 175,221.77571614583331 215,291.6162109375 255,286.5462239583333 295,271.1653645833333 335,265.92447916666663" fill="none" stroke="#7651b3" stroke-width="2"/>
+<polyline points="55,244.67610677083331 95,236.52994791666669 135,224.22526041666669 175,223.65559895833331 215,292.24283854166663 255,283.4700520833333 295,269.912109375 335,264.04459635416663" fill="none" stroke="#ae6fa5" stroke-width="2"/>
+<polyline points="55,248.49283854166669 95,232.65625 135,226.50390625 175,212.37630208333331 215,298.8509114583333 255,291.4453125 295,271.62109375 335,262.05078125" fill="none" stroke="#479453" stroke-width="2"/>
+<polyline points="55,254.98697916666669 95,258.6328125 135,258.1770833333333 175,258.4049479166667 215,263.64583333333337 255,267.0638020833333 295,257.7213541666667 335,263.64583333333337" fill="none" stroke="#777777" stroke-width="2"/>
+<text x="55" y="352" font-family="sans-serif" font-size="12">Acquisition → | reversal → (64-trial blocks)</text>
+<text x="405" y="63" font-family="sans-serif" font-size="15">left_transfer</text>
+<path d="M405 330.0h280" stroke="#dddddd"/><text x="373" y="334.0" font-family="sans-serif" font-size="11">0.3</text>
+<path d="M405 260.0h280" stroke="#dddddd"/><text x="373" y="264.0" font-family="sans-serif" font-size="11">0.5</text>
+<path d="M405 190.0h280" stroke="#dddddd"/><text x="373" y="194.0" font-family="sans-serif" font-size="11">0.7</text>
+<path d="M405 119.99999999999997h280" stroke="#dddddd"/><text x="373" y="123.99999999999997" font-family="sans-serif" font-size="11">0.9</text>
+<path d="M545 83V330" stroke="#bbbbbb" stroke-dasharray="4 4"/>
+<polyline points="405,242.79622395833331 445,237.38444010416669 485,220.97819010416669 525,215.45247395833331 565,305.3450520833333 605,283.8118489583333 645,269.00065104166663 685,253.79069010416669" fill="none" stroke="#167d9a" stroke-width="2"/>
+<polyline points="405,242.45442708333331 445,239.09342447916669 485,220.009765625 525,213.62955729166669 565,305.57291666666663 605,285.3499348958333 645,269.912109375 685,255.21484375" fill="none" stroke="#de6c36" stroke-width="2"/>
+<polyline points="405,245.01790364583331 445,235.9033203125 485,219.1552734375 525,214.42708333333331 565,301.8701171875 605,284.8372395833333 645,272.1337890625 685,258.9176432291667" fill="none" stroke="#7651b3" stroke-width="2"/>
+<polyline points="405,245.53059895833331 445,237.6123046875 485,222.28841145833331 525,214.25618489583331 565,300.5598958333333 605,285.3499348958333 645,270.4817708333333 685,258.0631510416667" fill="none" stroke="#ae6fa5" stroke-width="2"/>
+<polyline points="405,241.65690104166669 445,235.048828125 485,219.09830729166669 525,214.08528645833331 565,306.7122395833333 605,286.2044270833333 645,270.9375 685,254.07552083333331" fill="none" stroke="#479453" stroke-width="2"/>
+<polyline points="405,258.4049479166667 445,261.3671875 485,263.19010416666663 525,255.8984375 565,262.96223958333337 605,261.13932291666663 645,259.7721354166667 685,254.30338541666669" fill="none" stroke="#777777" stroke-width="2"/>
+<text x="405" y="352" font-family="sans-serif" font-size="12">Acquisition → | reversal → (64-trial blocks)</text>
+<text x="755" y="63" font-family="sans-serif" font-size="15">task_transfer</text>
+<path d="M755 330.0h280" stroke="#dddddd"/><text x="723" y="334.0" font-family="sans-serif" font-size="11">0.3</text>
+<path d="M755 260.0h280" stroke="#dddddd"/><text x="723" y="264.0" font-family="sans-serif" font-size="11">0.5</text>
+<path d="M755 190.0h280" stroke="#dddddd"/><text x="723" y="194.0" font-family="sans-serif" font-size="11">0.7</text>
+<path d="M755 119.99999999999997h280" stroke="#dddddd"/><text x="723" y="123.99999999999997" font-family="sans-serif" font-size="11">0.9</text>
+<path d="M895 83V330" stroke="#bbbbbb" stroke-dasharray="4 4"/>
+<polyline points="755,263.076171875 795,256.923828125 835,252.59440104166669 875,253.96158854166669 915,271.5071614583333 955,267.97526041666663 995,266.09537760416663 1035,261.31022135416663" fill="none" stroke="#167d9a" stroke-width="2"/>
+<polyline points="755,262.50651041666663 795,253.3349609375 835,253.61979166666669 875,252.76529947916669 915,268.88671875 955,264.84212239583337 995,264.443359375 1035,264.6142578125" fill="none" stroke="#de6c36" stroke-width="2"/>
+<polyline points="755,257.94921875 795,252.138671875 835,255.84147135416669 875,254.53125 915,270.25390625 955,265.2978515625 995,255.10091145833331 1035,262.5634765625" fill="none" stroke="#7651b3" stroke-width="2"/>
+<polyline points="755,259.3733723958333 795,254.75911458333331 835,255.32877604166669 875,253.10709635416669 915,266.77897135416663 955,263.9306640625 995,254.07552083333331 1035,263.64583333333337" fill="none" stroke="#ae6fa5" stroke-width="2"/>
+<polyline points="755,263.53190104166663 795,254.98697916666669 835,253.61979166666669 875,253.73372395833331 915,269.7981770833333 955,267.0638020833333 995,266.0384114583333 1035,262.734375" fill="none" stroke="#479453" stroke-width="2"/>
+<polyline points="755,262.50651041666663 795,256.1263020833333 835,262.05078125 875,264.32942708333337 915,259.5442708333333 955,263.64583333333337 995,269.34244791666663 1035,262.50651041666663" fill="none" stroke="#777777" stroke-width="2"/>
+<text x="755" y="352" font-family="sans-serif" font-size="12">Acquisition → | reversal → (64-trial blocks)</text>
+<text x="55" y="390" fill="#167d9a" font-family="sans-serif" font-size="14">Arm A</text>
+<text x="220" y="390" fill="#de6c36" font-family="sans-serif" font-size="14">Arm B</text>
+<text x="385" y="390" fill="#7651b3" font-family="sans-serif" font-size="14">Arm C</text>
+<text x="550" y="390" fill="#ae6fa5" font-family="sans-serif" font-size="14">Arm D</text>
+<text x="715" y="390" fill="#479453" font-family="sans-serif" font-size="14">Arm E</text>
+<text x="880" y="390" fill="#777777" font-family="sans-serif" font-size="14">Arm Z</text>
+</svg>

@@ -1,0 +1,98 @@
+{
+  "artifact_hashes": [
+    {
+      "bytes": 6366,
+      "path": "manifests/QCOMP-CONTRACT.json",
+      "sha256": "7f0a580fecd737fd67be06878cd0fd0c4ab253ce92e1bc6d2a9acdddec81e6c0"
+    },
+    {
+      "bytes": 5478,
+      "path": "manifests/QCOMP-MANIFEST.json",
+      "sha256": "c96230f88c2f670af2f0f59fc51a26df88ebbec023058841680d548647fdfb72"
+    },
+    {
+      "bytes": 24330,
+      "path": "manifests/NULL-GRAPH-MANIFEST.json",
+      "sha256": "e9201f85cadca8b94dd1ec49b1f607a851cd1bbbe2e7b2e8f5e3678fb5144651"
+    },
+    {
+      "bytes": 21274897,
+      "path": "inputs/banks/training.json",
+      "sha256": "27e56c1b182cc56596e2db884b545c7694a755484fbd74a6bf9f564daf247a0b"
+    },
+    {
+      "bytes": 120156,
+      "path": "inputs/banks/competence.json",
+      "sha256": "8cb8c64ea030448b00288891b3a4da7f1c930b8ee9056991c6c04989d7c94451"
+    },
+    {
+      "bytes": 211395,
+      "path": "artifacts/QCOMP-RUN1/competence-frontier.jsonl",
+      "sha256": "adbc7be11fe7b51912df6fa093e952db90450997cbdd29206bb688e951a2a115"
+    },
+    {
+      "bytes": 588,
+      "path": "artifacts/QCOMP-RUN1/collection-receipt.json",
+      "sha256": "fac110592bbe6335190956c13b06b7cc9b2b0c1f42757d7a0af04e8498193fe0"
+    },
+    {
+      "bytes": 203,
+      "path": "artifacts/QCOMP-RUN1/integrity-receipt.json",
+      "sha256": "90641d4f74f20e295dbc7f05a7ab7f2dcaae03e1c647bc833b92be3b09258a7e"
+    },
+    {
+      "bytes": 3708,
+      "path": "artifacts/QCOMP-RUN1/frontier-analysis.json",
+      "sha256": "74daddae2883ec79dc187bc3bdd131b460db5626582d2061d1a9257fd13fe124"
+    },
+    {
+      "bytes": 493,
+      "path": "artifacts/QCOMP-RUN1/frontier-summary.csv",
+      "sha256": "e0b3826b6e838da8fd00081c2f0bfe5bf705627c6b7b9cb3ad3e4c21da81ae02"
+    },
+    {
+      "bytes": 884,
+      "path": "artifacts/QCOMP-RUN1/RESULTS.md",
+      "sha256": "775ed8d2e2ae2a9c1b6af38712e6d9824f30d298ce7017bfe3be853c913de0db"
+    },
+    {
+      "bytes": 498688,
+      "path": "sealed/fly-pheno-00-v0.2-qcomp.exe",
+      "sha256": "c25d282aaaf29002f8698dbbef3a48eb9d299a041bb64aa85025ee83c4f998ba"
+    },
+    {
+      "bytes": 1026,
+      "path": "provenance/PROTECTED-DH08A-TREE-RECEIPT.json",
+      "sha256": "5a8f4beb9a9a4d50c35bbb73455d14551a23ff79f58e4ebcb00e07faedce0466"
+    }
+  ],
+  "closed_at_utc": "2026-09-22T03:29:58.381729+00:00",
+  "common_supported_horizons": [],
+  "competence_threshold": 0.25,
+  "disposition": "B_HOST_TASK_MISMATCH",
+  "integrity_status": "INTEGRITY_PASS",
+  "interpretation": "The unchanged host/task improved or plateaued without reaching the predeclared 80% support requirement.",
+  "max_rate_by_substrate": {
+    "fly": 0.0,
+    "g001": 0.0,
+    "g002": 0.0,
+    "g003": 0.0,
+    "g004": 0.0,
+    "g005": 0.0,
+    "g006": 0.0,
+    "g007": 0.0,
+    "g008": 0.0
+  },
+  "measured_v0_2_reseal_authorized": false,
+  "no_lesion_outcomes": true,
+  "no_recovery_comparison": true,
+  "no_seed_replacement": true,
+  "no_threshold_relaxation": true,
+  "protected_dh08a_receipt_sha256": "5a8f4beb9a9a4d50c35bbb73455d14551a23ff79f58e4ebcb00e07faedce0466",
+  "run_id": "FLY-PHENO-00-v0.2-QCOMP-RUN1",
+  "schema": "FLY-PHENO-00-v0.2-QCOMP-terminal-receipt-v1",
+  "scientific_pheno_execution_authorized": false,
+  "status": "CLOSED_QUALIFICATION_ONLY",
+  "study_id": "FLY-PHENO-00-v0.2-QCOMP",
+  "support_requirement": 0.8
+}

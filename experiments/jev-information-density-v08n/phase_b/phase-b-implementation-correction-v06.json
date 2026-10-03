@@ -1,0 +1,46 @@
+{
+  "protocol": "jev-information-density/v0.8n-road-b-phase-b-implementation-correction-v06",
+  "identity": "v0.8N-phase-b-implementation-correction-v06",
+  "status": "IMPLEMENTATION_ONLY_CORRECTION_SEALED",
+  "parent_authorization_event_sha256": "0cad8d2e45fe8e7e5eed7f9bcdeab406926f24605ad9f62396d83f9512bb0a09",
+  "parent_correction_receipt_sha256": "fbbb22640da31ea83e55ad244c2abe9ccb943d8310115c83f1ce53d74e66119f",
+  "parent_entrypoint_sha256": "cc2a0f1706d88d37204abc6a2fb7666f577154519aa531ecfb4177fa423349c0",
+  "corrected_entrypoint_sha256": "b0423384ec3e22052c70864ab32e010366325f798057b214411504871b7df333",
+  "frozen_trainer_sha256": "e539bac2d67b47ba2b660b8579c5818e5fffc0cf94fa26cfd3e9dd905ef795ba",
+  "correction_verifier_sha256": "9e2db335239dc644a411b15876cee21588fe3ec0d35f933c8e8f54d7bdfe65ba",
+  "correction_test_sha256": "f41753cb0922c9435e132b21ccb9643b2600f2d4de99f36d58a8f2ae910afb0c",
+  "correction_class": "input materialization call-site correction; semantic impact none",
+  "observed_failure": {
+    "stage": "v05 no-head event-materialization preflight",
+    "exception": "KeyError: candidate_indices",
+    "root_cause": "the frozen trainer passes the lightweight common occurrence metadata rows to prepare_event; full candidate indices and targets are present in each validated arm manifest's first 10,000 rows",
+    "outputs_at_failure": {
+      "head_initialization_during_this_preflight": false,
+      "optimizer_steps": 0,
+      "run_artifacts_created_or_modified": false,
+      "heldout_panel_opened": false
+    }
+  },
+  "correction": {
+    "entrypoint": "experiments/jev-information-density-v08n/phase_b/train_phase_b_corrected_v06.py",
+    "data_source": "the first 10,000 enriched primary rows from the selected arm manifest",
+    "identity_binding": "every arm-prefix row is checked against the common primary occurrence on occurrence index, group, neighborhood, role, source episode, feature scope, target hash, candidate-order hash, and semantic candidate order",
+    "semantic_payload_effect": "none; verify_inputs already independently proves these rows correspond exactly to the common primary stream",
+    "schedule_and_occurrence_order_changed": false,
+    "loss_or_optimizer_changed": false,
+    "on_disk_authorized_trainer_modified": false,
+    "preflight_materializes_all_primary_and_auxiliary_events_without_training": true,
+    "correction_test_path": "experiments/jev-information-density-v08n/phase_b/tests/test_v08n_phase_b_correction_v06.py",
+    "correction_verifier_path": "experiments/jev-information-density-v08n/phase_b/verify_phase_b_correction_v06.py",
+    "run_and_training_seal_bind_all_six_correction_receipts": true
+  },
+  "semantic_contract_changed": false,
+  "training_inputs_changed": false,
+  "model_revision_changed": false,
+  "objective_or_loss_changed": false,
+  "seed_or_schedule_changed": false,
+  "evaluation_contract_changed": false,
+  "protected_panel_access": false,
+  "newtight_access": false,
+  "phoenix_access": false
+}

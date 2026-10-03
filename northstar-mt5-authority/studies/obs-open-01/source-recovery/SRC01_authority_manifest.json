@@ -1,0 +1,364 @@
+{
+  "boundary_minutes": [
+    "09:29",
+    "09:30",
+    "09:34",
+    "09:35",
+    "09:39",
+    "09:40"
+  ],
+  "capture_contract": {
+    "cell_key": [
+      "capture_mode",
+      "event_kind",
+      "symbol",
+      "timeframe",
+      "bar_open",
+      "shift"
+    ],
+    "missing_value": "NA",
+    "online": "CURRENT_OPEN|COMPLETED_BAR|CURRENT_TICK",
+    "parity": "exact canonical cell equality",
+    "reload": "HISTORICAL_RELOAD",
+    "v2_runtime_abi": "GROUP_HEADINGS_ARE_POSITIONAL_STRING_INPUTS"
+  },
+  "causal_buffers": {
+    "geometry_known": 25,
+    "grammar_event": 10,
+    "interaction_eligible": 8,
+    "lifecycle": 4,
+    "location": 9
+  },
+  "clock": {
+    "area_end": "09:40",
+    "begin": "09:30",
+    "civil_zone": "America/New_York",
+    "new_york_clock_transport": "NOT_EVALUATED_BY_SRC01",
+    "period_end": "09:35",
+    "status": "SOURCE_CLOCK_INPUTS_FROZEN",
+    "timestamp_semantics": "SOURCE_CLOCK_WALL_TIME"
+  },
+  "confirmation_sessions": 69,
+  "confirmation_state": "FROZEN_UNOPENED",
+  "generation": "LEGACY_BREAKOUT_OBSERVER_V1",
+  "legacy_buffers": {
+    "original": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "translated": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "v2_compatibility": [
+      17,
+      18,
+      19,
+      20
+    ]
+  },
+  "logical_manifest_sha256": "1f6657197ae1b6f9449ba9731cc3edf55d857275f50940fc46a6cc01ccc8ef28",
+  "parent_generations": [
+    "RECONSTRUCTED_OBSERVER_V1"
+  ],
+  "retained_snapshot_parity": {
+    "rows": [
+      {
+        "live_sha256": "2a39baa46c242e1cac91a9648e859de38fbe14d94a75919b5fd5b52f1b59a869",
+        "name": "BreakOut.mq5",
+        "retained_sha256": "2a39baa46c242e1cac91a9648e859de38fbe14d94a75919b5fd5b52f1b59a869",
+        "status": "PASS"
+      },
+      {
+        "live_sha256": "bd04a892ddf02b5c0f9bb00d030f9eb7d3579b4c81a5466bac342ef6a919b83b",
+        "name": "BreakOut2.mq5",
+        "retained_sha256": "bd04a892ddf02b5c0f9bb00d030f9eb7d3579b4c81a5466bac342ef6a919b83b",
+        "status": "PASS"
+      },
+      {
+        "live_sha256": "9519323848f232ff4255f8d00896d2a78b91d16b7e1dc07ed7bac8451d0fd5c2",
+        "name": "OpeningRangeGrammar_v2_00_LegacyStateMachine.mq5",
+        "retained_sha256": "9519323848f232ff4255f8d00896d2a78b91d16b7e1dc07ed7bac8451d0fd5c2",
+        "status": "PASS"
+      },
+      {
+        "live_sha256": "efc76e21b8bd8413862d2403213887e4734fbf727f3f8620b131249b1e5633cd",
+        "name": "BreakOut.ex5",
+        "retained_sha256": "efc76e21b8bd8413862d2403213887e4734fbf727f3f8620b131249b1e5633cd",
+        "status": "PASS"
+      },
+      {
+        "live_sha256": "58535ce4917f555207cc535c48d7866ca5b6e9e7dea8cd6407eb92fa3c816fe2",
+        "name": "BreakOut2.ex5",
+        "retained_sha256": "58535ce4917f555207cc535c48d7866ca5b6e9e7dea8cd6407eb92fa3c816fe2",
+        "status": "PASS"
+      },
+      {
+        "live_sha256": "6f221fdd9f536ffa64e23842a4d9f77bd218bafda1c350b45458c1232a1a23ed",
+        "name": "OpeningRangeGrammar_v2_00_LegacyStateMachine.ex5",
+        "retained_sha256": "6f221fdd9f536ffa64e23842a4d9f77bd218bafda1c350b45458c1232a1a23ed",
+        "status": "PASS"
+      },
+      {
+        "live_sha256": "e46c368dfc948d7fb56e60d087b9ee07a26784de79c988ba6b2ee7a669b43df6",
+        "name": "OBS_OPEN_SRC01_BufferCaptureEA.mq5",
+        "retained_sha256": "e46c368dfc948d7fb56e60d087b9ee07a26784de79c988ba6b2ee7a669b43df6",
+        "status": "PASS"
+      },
+      {
+        "live_sha256": "6849c0d2ebffae5d31b9d725b4b026466d52bff85716bfa2215132aa00cd7fae",
+        "name": "OBS_OPEN_SRC01_BufferCaptureEA.ex5",
+        "retained_sha256": "6849c0d2ebffae5d31b9d725b4b026466d52bff85716bfa2215132aa00cd7fae",
+        "status": "PASS"
+      }
+    ],
+    "status": "PASS"
+  },
+  "schema": "OBS_OPEN_SRC01_AUTHORITY_V1",
+  "source_authority": [
+    {
+      "bytes": 20312,
+      "label": "original_source",
+      "path": "C:\\Users\\shuga\\AppData\\Roaming\\MetaQuotes\\Terminal\\D0E8209F77C8CF37AD8BF550E51FF075\\MQL5\\Indicators\\BreakOut.mq5",
+      "sha256": "2a39baa46c242e1cac91a9648e859de38fbe14d94a75919b5fd5b52f1b59a869",
+      "status": "PRESENT"
+    },
+    {
+      "bytes": 10156,
+      "label": "translated_source",
+      "path": "C:\\Users\\shuga\\AppData\\Roaming\\MetaQuotes\\Terminal\\D0E8209F77C8CF37AD8BF550E51FF075\\MQL5\\Indicators\\BreakOut2.mq5",
+      "sha256": "bd04a892ddf02b5c0f9bb00d030f9eb7d3579b4c81a5466bac342ef6a919b83b",
+      "status": "PRESENT"
+    },
+    {
+      "bytes": 49535,
+      "label": "v2_source",
+      "path": "C:\\Users\\shuga\\AppData\\Roaming\\MetaQuotes\\Terminal\\D0E8209F77C8CF37AD8BF550E51FF075\\MQL5\\Indicators\\OpeningRangeGrammar_v2_00_LegacyStateMachine.mq5",
+      "sha256": "9519323848f232ff4255f8d00896d2a78b91d16b7e1dc07ed7bac8451d0fd5c2",
+      "status": "PRESENT"
+    },
+    {
+      "bytes": 8879,
+      "label": "capture_source",
+      "path": "C:\\Users\\shuga\\AppData\\Roaming\\MetaQuotes\\Terminal\\D0E8209F77C8CF37AD8BF550E51FF075\\MQL5\\Experts\\Research\\OBS_OPEN_SRC01_BufferCaptureEA.mq5",
+      "sha256": "e46c368dfc948d7fb56e60d087b9ee07a26784de79c988ba6b2ee7a669b43df6",
+      "status": "PRESENT"
+    },
+    {
+      "bytes": 12690,
+      "label": "original_ex5",
+      "path": "C:\\Users\\shuga\\AppData\\Roaming\\MetaQuotes\\Terminal\\D0E8209F77C8CF37AD8BF550E51FF075\\MQL5\\Indicators\\BreakOut.ex5",
+      "sha256": "efc76e21b8bd8413862d2403213887e4734fbf727f3f8620b131249b1e5633cd",
+      "status": "PRESENT"
+    },
+    {
+      "bytes": 13814,
+      "label": "translated_ex5",
+      "path": "C:\\Users\\shuga\\AppData\\Roaming\\MetaQuotes\\Terminal\\D0E8209F77C8CF37AD8BF550E51FF075\\MQL5\\Indicators\\BreakOut2.ex5",
+      "sha256": "58535ce4917f555207cc535c48d7866ca5b6e9e7dea8cd6407eb92fa3c816fe2",
+      "status": "PRESENT"
+    },
+    {
+      "bytes": 46494,
+      "label": "v2_ex5",
+      "path": "C:\\Users\\shuga\\AppData\\Roaming\\MetaQuotes\\Terminal\\D0E8209F77C8CF37AD8BF550E51FF075\\MQL5\\Indicators\\OpeningRangeGrammar_v2_00_LegacyStateMachine.ex5",
+      "sha256": "6f221fdd9f536ffa64e23842a4d9f77bd218bafda1c350b45458c1232a1a23ed",
+      "status": "PRESENT"
+    },
+    {
+      "bytes": 25748,
+      "label": "capture_ex5",
+      "path": "C:\\Users\\shuga\\AppData\\Roaming\\MetaQuotes\\Terminal\\D0E8209F77C8CF37AD8BF550E51FF075\\MQL5\\Experts\\Research\\OBS_OPEN_SRC01_BufferCaptureEA.ex5",
+      "sha256": "6849c0d2ebffae5d31b9d725b4b026466d52bff85716bfa2215132aa00cd7fae",
+      "status": "PRESENT"
+    },
+    {
+      "bytes": 116368928,
+      "label": "compiler",
+      "path": "C:\\Program Files\\MetaTrader 5\\metaeditor64.exe",
+      "sha256": "9bee761959abb8d7de49af54caaf83d1dd05156dd9b10bd855d31da3ae9ad1b9",
+      "status": "PRESENT"
+    },
+    {
+      "bytes": 121982864,
+      "label": "runtime",
+      "path": "C:\\Program Files\\MetaTrader 5\\terminal64.exe",
+      "sha256": "0ab0496b90977d4ef848f8d2591970c3a50721476b37fa60cfb6b1bda74b2983",
+      "status": "PRESENT"
+    },
+    {
+      "bytes": 3324,
+      "label": "compiler_receipt",
+      "path": "C:\\Users\\shuga\\OneDrive\\Documents\\ChatGPT\\eas\\studies\\obs-open-01\\source-recovery\\compile-capture-grouped-abi.log",
+      "sha256": "65d28096424a5536b339e570e607fc5800ad6b0b41edae541404444cb5e79d4e",
+      "status": "PRESENT"
+    },
+    {
+      "bytes": 3159,
+      "label": "metrology_protocol",
+      "path": "C:\\Users\\shuga\\OneDrive\\Documents\\ChatGPT\\eas\\studies\\obs-open-01\\source-recovery\\SRC01_protocol.md",
+      "sha256": "2ced2161273e1d492ec1adf3d9506aa1d40f1aa89832c587a1101a9d6dae4aea",
+      "status": "PRESENT"
+    },
+    {
+      "bytes": 742,
+      "label": "config:SRC01_US30_M1_ONLINE.ini",
+      "path": "C:\\Users\\shuga\\OneDrive\\Documents\\ChatGPT\\eas\\studies\\obs-open-01\\source-recovery\\config\\SRC01_US30_M1_ONLINE.ini",
+      "sha256": "0199eeb2f8cbca79f15f6825a9a436c1ddccbe2814b9a0d2e98e5683a0d31f64",
+      "status": "PRESENT"
+    },
+    {
+      "bytes": 753,
+      "label": "config:SRC01_US30_M1_RELOAD.ini",
+      "path": "C:\\Users\\shuga\\OneDrive\\Documents\\ChatGPT\\eas\\studies\\obs-open-01\\source-recovery\\config\\SRC01_US30_M1_RELOAD.ini",
+      "sha256": "40ac8d08d093717f3198fdd88cd5e559cc6d13641447af214d747273955fbcb4",
+      "status": "PRESENT"
+    },
+    {
+      "bytes": 752,
+      "label": "config:SRC01_US30_M1_RELOAD_TESTER.ini",
+      "path": "C:\\Users\\shuga\\OneDrive\\Documents\\ChatGPT\\eas\\studies\\obs-open-01\\source-recovery\\config\\SRC01_US30_M1_RELOAD_TESTER.ini",
+      "sha256": "67bdb1006ab29e496ee77f55c87b1d5cc6ed72a73810816794d1916bfa5b9e03",
+      "status": "PRESENT"
+    },
+    {
+      "bytes": 742,
+      "label": "config:SRC01_US30_M5_ONLINE.ini",
+      "path": "C:\\Users\\shuga\\OneDrive\\Documents\\ChatGPT\\eas\\studies\\obs-open-01\\source-recovery\\config\\SRC01_US30_M5_ONLINE.ini",
+      "sha256": "def7ed3c87ba304eb9b0f704e284c73e5876ec3f71c39f3cd72b632051d1f017",
+      "status": "PRESENT"
+    },
+    {
+      "bytes": 753,
+      "label": "config:SRC01_US30_M5_RELOAD.ini",
+      "path": "C:\\Users\\shuga\\OneDrive\\Documents\\ChatGPT\\eas\\studies\\obs-open-01\\source-recovery\\config\\SRC01_US30_M5_RELOAD.ini",
+      "sha256": "bafa4587c4d90a6d55381677e5bb7316cdd61a76dd7d75a3a9ea90ab8e20b167",
+      "status": "PRESENT"
+    },
+    {
+      "bytes": 12690,
+      "label": "frozen_authority:BreakOut.ex5",
+      "path": "C:\\Users\\shuga\\OneDrive\\Documents\\ChatGPT\\eas\\studies\\obs-open-01\\source-recovery\\authority\\BreakOut.ex5",
+      "sha256": "efc76e21b8bd8413862d2403213887e4734fbf727f3f8620b131249b1e5633cd",
+      "status": "PRESENT"
+    },
+    {
+      "bytes": 20312,
+      "label": "frozen_authority:BreakOut.mq5",
+      "path": "C:\\Users\\shuga\\OneDrive\\Documents\\ChatGPT\\eas\\studies\\obs-open-01\\source-recovery\\authority\\BreakOut.mq5",
+      "sha256": "2a39baa46c242e1cac91a9648e859de38fbe14d94a75919b5fd5b52f1b59a869",
+      "status": "PRESENT"
+    },
+    {
+      "bytes": 13814,
+      "label": "frozen_authority:BreakOut2.ex5",
+      "path": "C:\\Users\\shuga\\OneDrive\\Documents\\ChatGPT\\eas\\studies\\obs-open-01\\source-recovery\\authority\\BreakOut2.ex5",
+      "sha256": "58535ce4917f555207cc535c48d7866ca5b6e9e7dea8cd6407eb92fa3c816fe2",
+      "status": "PRESENT"
+    },
+    {
+      "bytes": 10156,
+      "label": "frozen_authority:BreakOut2.mq5",
+      "path": "C:\\Users\\shuga\\OneDrive\\Documents\\ChatGPT\\eas\\studies\\obs-open-01\\source-recovery\\authority\\BreakOut2.mq5",
+      "sha256": "bd04a892ddf02b5c0f9bb00d030f9eb7d3579b4c81a5466bac342ef6a919b83b",
+      "status": "PRESENT"
+    },
+    {
+      "bytes": 25748,
+      "label": "frozen_authority:OBS_OPEN_SRC01_BufferCaptureEA.ex5",
+      "path": "C:\\Users\\shuga\\OneDrive\\Documents\\ChatGPT\\eas\\studies\\obs-open-01\\source-recovery\\authority\\OBS_OPEN_SRC01_BufferCaptureEA.ex5",
+      "sha256": "6849c0d2ebffae5d31b9d725b4b026466d52bff85716bfa2215132aa00cd7fae",
+      "status": "PRESENT"
+    },
+    {
+      "bytes": 8879,
+      "label": "frozen_authority:OBS_OPEN_SRC01_BufferCaptureEA.mq5",
+      "path": "C:\\Users\\shuga\\OneDrive\\Documents\\ChatGPT\\eas\\studies\\obs-open-01\\source-recovery\\authority\\OBS_OPEN_SRC01_BufferCaptureEA.mq5",
+      "sha256": "e46c368dfc948d7fb56e60d087b9ee07a26784de79c988ba6b2ee7a669b43df6",
+      "status": "PRESENT"
+    },
+    {
+      "bytes": 46494,
+      "label": "frozen_authority:OpeningRangeGrammar_v2_00_LegacyStateMachine.ex5",
+      "path": "C:\\Users\\shuga\\OneDrive\\Documents\\ChatGPT\\eas\\studies\\obs-open-01\\source-recovery\\authority\\OpeningRangeGrammar_v2_00_LegacyStateMachine.ex5",
+      "sha256": "6f221fdd9f536ffa64e23842a4d9f77bd218bafda1c350b45458c1232a1a23ed",
+      "status": "PRESENT"
+    },
+    {
+      "bytes": 49535,
+      "label": "frozen_authority:OpeningRangeGrammar_v2_00_LegacyStateMachine.mq5",
+      "path": "C:\\Users\\shuga\\OneDrive\\Documents\\ChatGPT\\eas\\studies\\obs-open-01\\source-recovery\\authority\\OpeningRangeGrammar_v2_00_LegacyStateMachine.mq5",
+      "sha256": "9519323848f232ff4255f8d00896d2a78b91d16b7e1dc07ed7bac8451d0fd5c2",
+      "status": "PRESENT"
+    },
+    {
+      "label": "metrology_tool:__pycache__",
+      "path": "C:\\Users\\shuga\\OneDrive\\Documents\\ChatGPT\\eas\\studies\\obs-open-01\\source-recovery\\tools\\__pycache__",
+      "status": "NOT_FOUND"
+    },
+    {
+      "bytes": 6752,
+      "label": "metrology_tool:build_src01_authority.py",
+      "path": "C:\\Users\\shuga\\OneDrive\\Documents\\ChatGPT\\eas\\studies\\obs-open-01\\source-recovery\\tools\\build_src01_authority.py",
+      "sha256": "d069cf8158aa0017815c7fbb5f1d27f8dcfb82b7c9eb2cc4c3d7ec27afe1be1d",
+      "status": "PRESENT"
+    },
+    {
+      "bytes": 6267,
+      "label": "metrology_tool:build_src01_support_receipts.py",
+      "path": "C:\\Users\\shuga\\OneDrive\\Documents\\ChatGPT\\eas\\studies\\obs-open-01\\source-recovery\\tools\\build_src01_support_receipts.py",
+      "sha256": "a388b366882d3bc7dd16c8ba4361de25339fdd6ef0724854b25adfe7f4307afd",
+      "status": "PRESENT"
+    },
+    {
+      "bytes": 5073,
+      "label": "metrology_tool:seal_src01.py",
+      "path": "C:\\Users\\shuga\\OneDrive\\Documents\\ChatGPT\\eas\\studies\\obs-open-01\\source-recovery\\tools\\seal_src01.py",
+      "sha256": "a00ed6ed3eb69efff7bb28268f8077b12cf4a37dc09560bee61b2e170df2c646",
+      "status": "PRESENT"
+    },
+    {
+      "bytes": 6914,
+      "label": "metrology_tool:src01_boundary_audit.py",
+      "path": "C:\\Users\\shuga\\OneDrive\\Documents\\ChatGPT\\eas\\studies\\obs-open-01\\source-recovery\\tools\\src01_boundary_audit.py",
+      "sha256": "aeafaa646549564c450698e8148ec1b6308ac627cd75a8c1a77a41382f3ffab2",
+      "status": "PRESENT"
+    },
+    {
+      "bytes": 4226,
+      "label": "metrology_tool:src01_parity.py",
+      "path": "C:\\Users\\shuga\\OneDrive\\Documents\\ChatGPT\\eas\\studies\\obs-open-01\\source-recovery\\tools\\src01_parity.py",
+      "sha256": "d68a81815fd55b3deca27e36295099afccbc4751625a4b0967fc5c5fdb52c5ef",
+      "status": "PRESENT"
+    },
+    {
+      "bytes": 3157,
+      "label": "metrology_tool:src01_rebuild_receipt.py",
+      "path": "C:\\Users\\shuga\\OneDrive\\Documents\\ChatGPT\\eas\\studies\\obs-open-01\\source-recovery\\tools\\src01_rebuild_receipt.py",
+      "sha256": "c7490c04dae289396da4883df40bfa32d139b87812f369e80fdd018895e39748",
+      "status": "PRESENT"
+    },
+    {
+      "bytes": 1842,
+      "label": "metrology_tool:test_src01_boundary_fixtures.py",
+      "path": "C:\\Users\\shuga\\OneDrive\\Documents\\ChatGPT\\eas\\studies\\obs-open-01\\source-recovery\\tools\\test_src01_boundary_fixtures.py",
+      "sha256": "556c5db8d30afc2f08f1426cf3fde21cc4b0d3eb33af93234e69729cb589461f",
+      "status": "PRESENT"
+    }
+  ],
+  "synthetic_fixture": {
+    "bytes": 1842,
+    "label": "controlled_late_endpoint_fixture",
+    "path": "C:\\Users\\shuga\\OneDrive\\Documents\\ChatGPT\\eas\\studies\\obs-open-01\\source-recovery\\tools\\test_src01_boundary_fixtures.py",
+    "sha256": "556c5db8d30afc2f08f1426cf3fde21cc4b0d3eb33af93234e69729cb589461f",
+    "status": "PRESENT"
+  },
+  "timeframes": [
+    "M1",
+    "M5"
+  ]
+}

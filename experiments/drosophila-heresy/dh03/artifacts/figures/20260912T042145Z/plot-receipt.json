@@ -1,0 +1,9 @@
+{
+  "summary_sha256": "acc8d7a97c1636bfaf4c9dc7948a01a6c0a9f286681c6c1b33dc1c9b1f731eba",
+  "statistics_recomputed": false,
+  "matplotlib_version": "3.11.2",
+  "output_hashes": {
+    "dh03-results.png": "18b78b9ed443a47046c58b4cec1efd5c721ad6ad2e33610bab7aa75d8770b9ba",
+    "dh03-results.svg": "1d21ce4bcc9a08eadd1cf5dfc047ad9c6b37cff2e58a719d5dc31d2e46477792"
+  }
+}

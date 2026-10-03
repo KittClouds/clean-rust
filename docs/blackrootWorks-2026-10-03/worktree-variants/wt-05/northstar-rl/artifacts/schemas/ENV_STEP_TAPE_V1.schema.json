@@ -1,0 +1,118 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "EnvStepRecord",
+  "type": "object",
+  "properties": {
+    "account_state_after_hash": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "account_state_before_hash": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "action": {
+      "type": "number",
+      "format": "float"
+    },
+    "action_spec_id": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "episode_id": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "execution_receipt_id": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "next_source_row_id": {
+      "type": "integer",
+      "format": "uint64",
+      "minimum": 0
+    },
+    "observation_hash": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "observation_spec_id": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "reward": {
+      "type": "number",
+      "format": "double"
+    },
+    "reward_primitive_schema": {
+      "type": "string"
+    },
+    "reward_primitive_vector": {
+      "type": "array",
+      "items": {
+        "type": "number",
+        "format": "double"
+      },
+      "maxItems": 13,
+      "minItems": 13
+    },
+    "schema_version": {
+      "type": "string"
+    },
+    "source_row_id": {
+      "type": "integer",
+      "format": "uint64",
+      "minimum": 0
+    },
+    "step_id": {
+      "type": "integer",
+      "format": "uint64",
+      "minimum": 0
+    },
+    "terminal_reason": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/TerminalReason"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "terminated": {
+      "type": "boolean"
+    },
+    "truncated": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "schema_version",
+    "episode_id",
+    "step_id",
+    "source_row_id",
+    "observation_hash",
+    "observation_spec_id",
+    "action",
+    "action_spec_id",
+    "account_state_before_hash",
+    "account_state_after_hash",
+    "execution_receipt_id",
+    "reward",
+    "reward_primitive_schema",
+    "reward_primitive_vector",
+    "terminated",
+    "truncated",
+    "next_source_row_id"
+  ],
+  "$defs": {
+    "Digest256": {
+      "description": "Domain-separated BLAKE3 digest",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "TerminalReason": {
+      "type": "string",
+      "enum": [
+        "EPISODE_END",
+        "ACCOUNT_FLOOR",
+        "DATA_END",
+        "SOURCE_GAP",
+        "MANUAL_TEST_TERMINATION"
+      ]
+    }
+  }
+}

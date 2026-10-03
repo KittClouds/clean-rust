@@ -1,0 +1,29 @@
+{
+  "protocol": "jev-information-density/v0.8p-v02-source-scope-incident-v01",
+  "identity": "v0.8P-fresh-trajectory-instrumented-rerun-v02",
+  "status": "IDENTITY_DENYLIST_CHAIN_NOT_PROMOTABLE_PENDING_DISPOSITION",
+  "incident": {
+    "class": "E1 metadata access exceeded the narrowly authorized identity-source scope",
+    "authorized_source": "sealed matched-panel manifest plus its seal manifest and firewall lock",
+    "additional_access": "During source discovery, file names were enumerated and SHA-256 hashes were computed for seven unrelated E1 extraction/provenance metadata files: two pass receipts, extraction-start receipt, extraction artifact hash tree, feature-cache repeat-parity receipt, E1 repair contract, and E1 repair seal receipt.",
+    "content_interpretation": "No semantic contents of those seven files were inspected or used; hashing nevertheless read their bytes and exceeded the authorization.",
+    "denied_sources": "No candidate join, candidate feature, raw target, prediction, metric, treatment result, geometry diagnostic, or head output was read during the v02 denylist extraction. The separate v01 E1-join incident remains recorded in v01-quarantine-receipt.json."
+  },
+  "v02_artifacts_at_stop": {
+    "construction_identity_created": true,
+    "denylist_contract_v01_preflight_aborted_before_e1_source_access": true,
+    "denylist_contract_v02_preflight_aborted_before_identity_value_extraction": true,
+    "denylist_contract_v03_extraction_completed": true,
+    "denylist_output_materialized": true,
+    "denylist_output_disposition": "preserve as provenance; do not promote pending user disposition",
+    "fresh_panel_contract_v02_written": true,
+    "fresh_panel_contract_v02_sealed": false,
+    "fresh_panel_generation": false,
+    "lfm_load_or_feature_extraction": false,
+    "training": false,
+    "checkpoint_evaluation_or_inference": false,
+    "trajectory_metrics": false,
+    "newtight_legacy_phoenix": false
+  },
+  "stop_rule": "No further E1 access, panel generation, LFM loading, feature extraction, training, evaluation, or sealing/promotion of the v02 denylist chain pending explicit user disposition."
+}

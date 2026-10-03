@@ -1,0 +1,11 @@
+{
+  "schema_version": "BROKER_OBSERVATION_TAPE_V1",
+  "broker": "TRADELOCKER",
+  "account_environment": "SYNTHETIC_QUALIFICATION",
+  "account_id_hash": "de521246fa5c54b0485e2273844519114b1ce434c8f47641ad87d77a459bc93e",
+  "row_count": 4,
+  "first_time_ns": 1800000000001000000,
+  "last_time_ns": 1800000180001000000,
+  "payload_hash": "5a1a2d61817a62e375ea81cb7a6f4c3213bc496c2588dd7b24895f1d2196d8fd",
+  "capture_id": "eadf8f0374595b95a34f947264d2c68ba2b6837a08633609383c9e72538ff160"
+}

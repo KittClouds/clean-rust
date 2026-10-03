@@ -1,0 +1,213 @@
+use crate::model::{
+    AuthorityMembership as M, Observable, PreservationScope as S, RetentionFidelity as F,
+};
+
+fn observable(id: &str, description: &str, fidelity: F, scopes: &[S], reason: &str) -> Observable {
+    Observable {
+        observable_id: id.into(),
+        description: description.into(),
+        authority_membership: M::InAuthority,
+        retention_fidelity: Some(fidelity),
+        scopes: scopes.to_vec(),
+        cross_history_comparison: crate::model::ComparisonStatus::Deferred,
+        normative_reason: reason.into(),
+        source_authority: vec![
+            "SEALED_G1_KERNEL".into(),
+            "G2_COMPUTATIONAL_ROLE_CENSUS".into(),
+            "G3_SOUND_REACHABILITY_ENVELOPE".into(),
+        ],
+    }
+}
+
+pub fn observables() -> Vec<Observable> {
+    vec![
+        observable(
+            "COB_LIFECYCLE_STATE",
+            "initialized/window-active causal lifecycle class",
+            F::SemanticClass,
+            &[S::StateSnapshot, S::Transition],
+            "Lifecycle gates define whether causal observer state exists and accepts progression.",
+        ),
+        observable(
+            "COB_TRANSITION_ORDINAL",
+            "committed observation ordinal within the execution",
+            F::ExactSemanticValue,
+            &[S::StateSnapshot, S::OrderedTrace, S::Timing],
+            "Transition placement is part of the ordered causal trace.",
+        ),
+        observable(
+            "COB_AUTHORITATIVE_TIME",
+            "event, knowledge, birth, commit and session timing under source/storage resolution",
+            F::ExactSemanticValue,
+            &[
+                S::Timing,
+                S::Transition,
+                S::OrderedTrace,
+                S::ContextConditional,
+            ],
+            "Knowledge availability and boundary decisions depend on semantic time.",
+        ),
+        observable(
+            "COB_UPPER_CANDIDATE_GENEALOGY",
+            "upper running-extreme birth, persistence, renewal and continuity",
+            F::RelationalStructure,
+            &[
+                S::StateSnapshot,
+                S::Transition,
+                S::Emission,
+                S::OrderedTrace,
+                S::Genealogy,
+            ],
+            "Candidate continuity is protected without choosing cross-history integer-label correspondence.",
+        ),
+        observable(
+            "COB_LOWER_CANDIDATE_GENEALOGY",
+            "lower running-extreme birth, persistence, renewal and continuity",
+            F::RelationalStructure,
+            &[
+                S::StateSnapshot,
+                S::Transition,
+                S::Emission,
+                S::OrderedTrace,
+                S::Genealogy,
+            ],
+            "Candidate continuity is protected without choosing cross-history integer-label correspondence.",
+        ),
+        observable(
+            "COB_RUNNING_EXTREME_GEOMETRY",
+            "committed upper and lower running-extreme prices",
+            F::ExactSemanticValue,
+            &[S::StateSnapshot, S::Transition],
+            "Running extrema are core causal observer geometry.",
+        ),
+        observable(
+            "COB_COMMITTED_CLOSE",
+            "committed close used by the observer",
+            F::ExactSemanticValue,
+            &[S::StateSnapshot, S::Transition],
+            "The close is part of the admitted causal state and derived geometry, regardless of next-step read status.",
+        ),
+        observable(
+            "COB_GIVEBACK_GEOMETRY",
+            "upper and lower committed giveback values",
+            F::ExactSemanticValue,
+            &[S::StateSnapshot],
+            "Giveback is an admitted causal measurement and is protected independently of future transition use.",
+        ),
+        observable(
+            "COB_RANGE_LOCATION_STATE",
+            "per-range unavailable/in-zone/above/below semantic location",
+            F::SemanticClass,
+            &[
+                S::StateSnapshot,
+                S::Transition,
+                S::Emission,
+                S::ContextConditional,
+            ],
+            "Range-relative control/location is central observer behavior.",
+        ),
+        observable(
+            "COB_RANGE_EXTENSION_GEOMETRY",
+            "per-range committed upper and lower extensions",
+            F::ExactSemanticValue,
+            &[S::StateSnapshot, S::ContextConditional],
+            "Extensions are admitted causal measurements and remain protected despite not driving the next step.",
+        ),
+        observable(
+            "COB_COVERAGE_STATE",
+            "current causal coverage class",
+            F::SemanticClass,
+            &[S::StateSnapshot, S::Emission, S::ContextConditional],
+            "Coverage records whether the observation path is complete and cannot be silently erased.",
+        ),
+        observable(
+            "COB_SESSION_TIME_CONTEXT",
+            "session start, terminal and observation cadence",
+            F::ExactSemanticValue,
+            &[S::Timing, S::ContextConditional],
+            "These parameters interpret initialization, cadence and termination semantics.",
+        ),
+        observable(
+            "COB_PRICE_UNIT_CONTEXT",
+            "canonical integer price scale",
+            F::ExactSemanticValue,
+            &[S::ContextConditional],
+            "Price integers are meaningful only under their admitted scale.",
+        ),
+        observable(
+            "COB_TIME_RESOLUTION_CONTEXT",
+            "source and storage time resolutions",
+            F::ExactSemanticValue,
+            &[S::Timing, S::ContextConditional],
+            "Stored nanoseconds must not be mistaken for historical source precision.",
+        ),
+        observable(
+            "COB_RANGE_CONTEXT",
+            "range identity, frozen rails and freeze-commit time",
+            F::ExactSemanticValue,
+            &[S::Timing, S::ContextConditional],
+            "Range geometry and availability require immutable interpretation context.",
+        ),
+        observable(
+            "COB_INPUT_AUTHORITY_CLASS",
+            "authority class of the presented completed observation",
+            F::SemanticClass,
+            &[S::Transition, S::Rejection, S::ContextConditional],
+            "Input authority controls whether the kernel may accept the stimulus.",
+        ),
+        observable(
+            "COB_PRESENTED_BAR_GEOMETRY",
+            "presented completed OHLC geometry",
+            F::ExactSemanticValue,
+            &[S::Transition, S::ContextConditional],
+            "Observer behavior is interpreted relative to the exact admitted stimulus.",
+        ),
+        observable(
+            "COB_OBSERVATION_COMMIT_EVENT",
+            "causal observation-commit event and semantic payload",
+            F::RelationalStructure,
+            &[S::Emission, S::OrderedTrace, S::Timing],
+            "Commit emission establishes causal progression and coverage/time payload.",
+        ),
+        observable(
+            "COB_CANDIDATE_RENEWAL_EVENT_ORDER",
+            "ordered new-extreme and candidate-change event structure",
+            F::StructureOnly,
+            &[S::Emission, S::OrderedTrace, S::Genealogy],
+            "Intra-transition renewal-event order is source-authoritative behavior.",
+        ),
+        observable(
+            "COB_LOCATION_TRANSITION_EVENT_ORDER",
+            "ordered per-range location transition structure",
+            F::StructureOnly,
+            &[S::Emission, S::OrderedTrace, S::Timing],
+            "Range event placement, order and semantic payload are authoritative.",
+        ),
+        observable(
+            "COB_TRANSITION_RESULT_CLASS",
+            "KERNEL_APPLIED versus KERNEL_REJECTED(reason)",
+            F::SemanticClass,
+            &[S::Transition, S::Rejection, S::OrderedTrace],
+            "Applied/rejected behavior and sealed rejection class are part of observer behavior.",
+        ),
+        observable(
+            "COB_ORDERED_TRACE_COORDINATES",
+            "transition ordinal and emission ordinal within transition",
+            F::StructureOnly,
+            &[S::OrderedTrace, S::Emission],
+            "Inter-transition and intra-transition order are independently protected.",
+        ),
+        observable(
+            "COB_CAUSAL_TRANSITION_LAW",
+            "guard/update/derivation/emission relationships of the extracted kernel",
+            F::RelationalStructure,
+            &[
+                S::Transition,
+                S::Emission,
+                S::Rejection,
+                S::ContextConditional,
+            ],
+            "Causal transduction relationships, not programmer storage layout, define observer behavior.",
+        ),
+    ]
+}

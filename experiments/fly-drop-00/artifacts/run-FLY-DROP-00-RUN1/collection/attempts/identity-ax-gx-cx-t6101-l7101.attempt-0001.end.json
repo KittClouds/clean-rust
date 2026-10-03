@@ -1,0 +1,8 @@
+{
+  "attempt": 1,
+  "finished_unix_ms": 1790021678500,
+  "fit_id": "identity-ax-gx-cx-t6101-l7101",
+  "receipt_path": "experiments/fly-drop-00/artifacts/run-FLY-DROP-00-RUN1\\collection\\fit-receipts\\identity-ax-gx-cx-t6101-l7101.attempt-0001.json",
+  "receipt_sha256": "4a0ad06093190669aa624b7686cd24a1c70e8705ac0e35be4aa698b5da53d4a0",
+  "status": "complete"
+}

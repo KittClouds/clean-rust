@@ -259,7 +259,6 @@ fn resident_identities(
 ) -> Result<ResidentAnalysisIdentities> {
     let executable = std::env::current_exe().context("resolve analysis bridge executable")?;
     let producer_binary_hash = identity::file_hash(&executable)?;
-    let ner_metadata = ner.metadata();
     let nli_metadata = nli_runtime.metadata();
     let chunker = identity::identity(
         "phoenix-chunker/structural-v1",
@@ -267,7 +266,11 @@ fn resident_identities(
         identity::config_hash(b"ChunkerConfig::default;sentence_ranges;structural_substrate"),
         "rust-native",
     );
-    let dynamic_ner = identity::identity(
+    let dynamic_ner = if let Some(identity) = ner.identity() {
+        identity.clone()
+    } else {
+        let ner_metadata = ner.metadata().context("legacy model metadata missing")?;
+        identity::identity(
         "phoenix-dynamic-ner+gliner-bi-base-v2.0",
         identity::combined_file_hash(&[
             Path::new(&ner_metadata.model_path),
@@ -284,7 +287,8 @@ fn resident_identities(
             .as_bytes(),
         ),
         "ort-2.0.0-rc.9",
-    );
+    )
+    };
     let nli = identity::identity(
         "onnx-community/ModernBERT-base-nli-ONNX",
         identity::combined_file_hash(&[

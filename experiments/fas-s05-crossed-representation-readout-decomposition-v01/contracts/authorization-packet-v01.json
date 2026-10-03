@@ -1,0 +1,14 @@
+{
+  "authorization_id": "FAS_S05_CROSSED_REPLAY_V01",
+  "status": "AUTHORIZED_BY_USER_IN_CURRENT_TASK",
+  "scope": "Analyze only the existing sealed mean_full and final_position feature arrays and their sealed scaler-plus-probe states, on the two frozen populations in analysis-contract-v01.json.",
+  "model_contact": false,
+  "feature_extraction": false,
+  "probe_fitting": false,
+  "scaler_fitting": false,
+  "optimizer_continuation": false,
+  "significance_tests": false,
+  "adaptive_mechanisms": false,
+  "SAE_analysis": false,
+  "FAS00_PHASE4_AUTHORIZED": false
+}

@@ -1,0 +1,145 @@
+{
+  "candidate_execution_sha256": "F2792DE092933E560CFF09757E71E8763D427663A836DE174A17FF133F6D1B8B",
+  "closure_derived_sha256": "5BF46E18DFE942C259E46055B893301D86204E2FB8493AE44D41D0BBC3611BFE",
+  "closure_manifest_sha256": "F84BB9D1D1E32FE603F29374AFA166B79468CCA7C9F1877B0A46CA1AF1A06606",
+  "contexts": [
+    {
+      "all_compatible_pairs": 48669,
+      "context": [
+        "seed9731-L-tau16.json",
+        2
+      ],
+      "coordinate_conflicts": 0,
+      "eligible_candidates": 315,
+      "full_geometry_rejects": 0,
+      "geometry_screened_pairs": 3711,
+      "pair_domain_sha256": "300968FFBF3165694F9A3158151964BBACC7E59095640EB0986A94754958271F",
+      "retained_pairs": 3711
+    },
+    {
+      "all_compatible_pairs": 92659,
+      "context": [
+        "seed9731-L-tau4.json",
+        3
+      ],
+      "coordinate_conflicts": 0,
+      "eligible_candidates": 434,
+      "full_geometry_rejects": 0,
+      "geometry_screened_pairs": 7,
+      "pair_domain_sha256": "FE36111709667E8DF54156176C3649BBC1DD13B93B40C8F79AC5CB725093BA04",
+      "retained_pairs": 7
+    },
+    {
+      "all_compatible_pairs": 84652,
+      "context": [
+        "seed9731-R-tau16.json",
+        1
+      ],
+      "coordinate_conflicts": 0,
+      "eligible_candidates": 415,
+      "full_geometry_rejects": 0,
+      "geometry_screened_pairs": 68,
+      "pair_domain_sha256": "91EC2B048CD50D51612BCC223B1403F36D607D955894EE18C41F7139615CE7C4",
+      "retained_pairs": 68
+    },
+    {
+      "all_compatible_pairs": 70119,
+      "context": [
+        "seed9731-R-tau16.json",
+        3
+      ],
+      "coordinate_conflicts": 0,
+      "eligible_candidates": 378,
+      "full_geometry_rejects": 0,
+      "geometry_screened_pairs": 0,
+      "pair_domain_sha256": "4F53CDA18C2BAA0C0354BB5F9A3ECBE5ED12AB4D8E11BA873C2F11161202B945",
+      "retained_pairs": 0
+    },
+    {
+      "all_compatible_pairs": 85060,
+      "context": [
+        "seed9731-R-tau4.json",
+        0
+      ],
+      "coordinate_conflicts": 0,
+      "eligible_candidates": 416,
+      "full_geometry_rejects": 0,
+      "geometry_screened_pairs": 0,
+      "pair_domain_sha256": "4F53CDA18C2BAA0C0354BB5F9A3ECBE5ED12AB4D8E11BA873C2F11161202B945",
+      "retained_pairs": 0
+    },
+    {
+      "all_compatible_pairs": 72765,
+      "context": [
+        "seed9731-R-tau4.json",
+        1
+      ],
+      "coordinate_conflicts": 0,
+      "eligible_candidates": 385,
+      "full_geometry_rejects": 0,
+      "geometry_screened_pairs": 169,
+      "pair_domain_sha256": "48961E6B08DCA43FDFC2930543E169BD933A11ECC42057838B3B1910608CC88F",
+      "retained_pairs": 169
+    },
+    {
+      "all_compatible_pairs": 84245,
+      "context": [
+        "seed9731-R-tau4.json",
+        2
+      ],
+      "coordinate_conflicts": 0,
+      "eligible_candidates": 414,
+      "full_geometry_rejects": 0,
+      "geometry_screened_pairs": 184,
+      "pair_domain_sha256": "C93F00CC01B87EB997FE50DA64898129EBF025C60DF0B8D9DBA6B6103F7DBDA2",
+      "retained_pairs": 184
+    },
+    {
+      "all_compatible_pairs": 36312,
+      "context": [
+        "seed9731-R-tau4.json",
+        3
+      ],
+      "coordinate_conflicts": 0,
+      "eligible_candidates": 272,
+      "full_geometry_rejects": 0,
+      "geometry_screened_pairs": 860,
+      "pair_domain_sha256": "E5C686688E17A215F682C2A3459040CBA06375D2D7C9EED846EB851719EEAFE7",
+      "retained_pairs": 860
+    }
+  ],
+  "counts": {
+    "all_compatible_pairs": 574481,
+    "contexts": 8,
+    "coordinate_conflicts": 0,
+    "eligible_candidates": 3029,
+    "full_geometry_rejects": 0,
+    "geometry_screened_pairs": 4999,
+    "retained_pairs": 4999
+  },
+  "engineering_only": true,
+  "historical_lr1_results_used_as_evidence": false,
+  "identity": "q10-gc1-lr1-requal1-sreplace-pair-domain-v1",
+  "pair_replay_executed": false,
+  "palette_sha256": "54A2688080A65F5CFE31B11A12F5DA85B92D86BBDE2E42072FB0C0F32F3D3B1A",
+  "pf5_contract_sha256": "730D6B03CEE7CE58A9002320372E9F77EC2AB593EC25A71583F59D90D690BC26",
+  "protocol": "REQUAL1-SREPLACE-PAIR-DOMAIN",
+  "reference_execution_sha256": "9C47DBA6BF576FC6696E70153F0CE80FB0163B538794BE82158710C1064A04E5",
+  "scientific_promotion": false,
+  "screen": {
+    "margin": 1e-12,
+    "method": "committed-byte geometry with full PF5 geometry verification for retained pairs",
+    "sequential_readout_replay": false
+  },
+  "shard_hashes": {
+    "seed9731-L-tau16__set2": "9EFE5E51746A5DAB109A0C2589BCD833DBBC20E877F1128C997E5A295548A63D",
+    "seed9731-L-tau4__set3": "C159BB9AFF90FC5D9F0A05627B951B3AC28CA2AED32F5AF4372C217F1F3E186F",
+    "seed9731-R-tau16__set1": "2D9C6187EEF355644B5EA7FF94FDA20FDA785A6ADB7A609A236749D93DA7A995",
+    "seed9731-R-tau16__set3": "37517E5F3DC66819F61F5A7BB8ACE1921282415F10551D2DEFA5C3EB0985B570",
+    "seed9731-R-tau4__set0": "37517E5F3DC66819F61F5A7BB8ACE1921282415F10551D2DEFA5C3EB0985B570",
+    "seed9731-R-tau4__set1": "C600CF4D8B7BDEFEA0656D7C2E74A7EFF55A7DFAAF03A46AECDCDA199028A71C",
+    "seed9731-R-tau4__set2": "370246AFE5DAA10EEB5BD0E5A1AA86557F213E9B69041F86E0286C3E80494A40",
+    "seed9731-R-tau4__set3": "F1129C7032EC26CF8F05355E803DB16F377D32A52C1F579D6A9C78833086F2D6"
+  },
+  "status": "SREPLACE_PAIR_DOMAIN_COMPLETE"
+}

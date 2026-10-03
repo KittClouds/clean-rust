@@ -1,0 +1,17 @@
+{
+  "receipt_id": "FAS_FROZEN_OBSERVER_BUNDLE_E2_V02_POST_WAIT_GPU_DIAGNOSTIC_V01",
+  "status": "DEVICE_WIDE_DIAGNOSTIC_ONLY",
+  "captured_utc": "2026-09-26T05:19:27.6825337Z",
+  "exact_s12_script_matches": 0,
+  "matched_processes": [],
+  "query": "nvidia-smi --query-gpu=name,memory.total,memory.used,memory.free,utilization.gpu --format=csv,noheader,nounits",
+  "device_wide_observation": {
+    "device": "NVIDIA GeForce RTX 3080",
+    "total_mib": 12288,
+    "used_mib": 2084,
+    "free_mib": 10008,
+    "utilization_percent": 9
+  },
+  "process_attribution": "none; device-wide diagnostic only",
+  "e2_v02_model_contact_performed": false
+}

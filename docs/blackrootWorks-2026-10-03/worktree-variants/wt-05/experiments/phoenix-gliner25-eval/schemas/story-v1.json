@@ -1,0 +1,17 @@
+{
+  "schema_id": "phoenix-story-boundary-shadow-v1",
+  "labels": [
+    "person",
+    "location",
+    "organization",
+    "group",
+    "creature",
+    "item",
+    "concept",
+    "event",
+    "temporal expression",
+    "causal trigger",
+    "memory"
+  ]
+}
+

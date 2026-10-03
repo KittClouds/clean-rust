@@ -1,0 +1,42 @@
+{
+  "schema": "FAS_E4_0_PARITY_SPEC_COMPATIBILITY_REVIEW_V01",
+  "status": "PASS_RUNNER_SPEC_OUTPUT_PATH_COMPATIBILITY_NO_EXECUTION",
+  "execution_spec": {
+    "path": "C:\\code land\\clean-rust\\program-infrastructure\\governance\\inbox\\20260927\\E4-0-PARITY-EXECUTION-SPEC-v1.json",
+    "bytes": 7534,
+    "sha256": "d78fba69795ce2cbf6e2593b675a8cfc5896ef790222cd2cfaa53ef132a975d9"
+  },
+  "authoritative_binding": {
+    "path": "D:\\codex-runs\\fas-frozen-observer-bundle-engineering-v01\\e4-0-ledger-bindings-v02\\online-cache-parity-binding-v02.json",
+    "bytes": 8098,
+    "sha256": "c2888a7cea6a3999e0f1b3b395fb26b99b56e120c75be261f0a6d1c1cd5e6bc4"
+  },
+  "chief_prepared_receipt": {
+    "path": "C:\\code land\\clean-rust\\program-infrastructure\\governance\\inbox\\20260927\\E4-0-PARITY-STAGE-PREPARED-v1.json",
+    "bytes": 1207,
+    "sha256": "1d81a09d73ce7a2f8d5e10680dc2fb2f002f5bf9918e64e92319c62b41bb333d",
+    "status": "SPECS_BOUND_SEAL_VERIFIED_FLIGHT_AUTHORITY_WITHHELD"
+  },
+  "checks": {
+    "run_actor_and_external_stage_identity_match": true,
+    "entrypoint_mode_and_binding_path_match": true,
+    "working_directory_matches_runner_source_directory": true,
+    "ledger_output_root_equals_binding_supervised_output_root": true,
+    "runner_stage_output_root_equals_ledger_output_root": true,
+    "output_inventory_matches_v02_parity_mode": true,
+    "output_cap_covers_exact_8388608_byte_feature_tensor": true,
+    "all_six_runner_source_files_and_binding_are_hash_bound": true,
+    "fresh_output_root_absent": true,
+    "current_contract_and_seal_verify": true,
+    "torch_or_transformers_imported": false,
+    "runner_invoked": false,
+    "model_tokenizer_cuda_contact": false,
+    "protected_label_bytes_opened": false,
+    "stage_authorization_or_gpu_lease_present": false
+  },
+  "notes": [
+    "The Ledger stage ID is external authority metadata; the child static binding correctly carries only mode=parity and stage=ONLINE_CACHE_PARITY.",
+    "The static binding output_root is the shared E4 run root; both the Ledger worker output_root and runner stage_output_root resolve to its fresh parity child.",
+    "The review did not invoke the runner or create the output path."
+  ]
+}

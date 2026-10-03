@@ -1,0 +1,16 @@
+{
+  "dst_transition_transport": "NOT_EVALUABLE_SOURCE_COVERAGE",
+  "economic_authority": false,
+  "frozen_observer_parity": "PASS_BOUNDED_SESSION_ONLY",
+  "historical_clock_authority": "PASS_BOUNDED_SESSION_ONLY",
+  "manifest_rows": 55,
+  "manifest_sha256": "b5a55b74770cbdb9364cdb3087570c33c4b3b41af7004c9ee4b73b5e8078a040",
+  "qualification_logical_root_sha256": "b5a55b74770cbdb9364cdb3087570c33c4b3b41af7004c9ee4b73b5e8078a040",
+  "receipt_schema": "OBS_OPEN_01_QUALIFICATION_SEAL_V1",
+  "replay_determinism": "PASS_BOUNDED_SESSION_BYTE_IDENTICAL",
+  "session_universe_and_confirmation_blocks": "NOT_EVALUABLE_SOURCE_COVERAGE",
+  "study_id": "OBS-OPEN-01",
+  "substantive_results_status": "FROZEN_UNOPENED",
+  "trading_authority": false,
+  "winter_clock_transport": "NOT_EVALUABLE_SOURCE_COVERAGE"
+}

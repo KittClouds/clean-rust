@@ -1,0 +1,32 @@
+{
+  "schema": "FAS_E4_0_TRACK_D_PREDECESSOR_SOURCE_RESTORATION_V01",
+  "status": "RESTORED_EXACT_V05_SEALED_SOURCE_BYTES",
+  "reason": "The post-v05 Track D v05 verifier edits updated two v01 files in place. Their exact later bytes were snapshotted first. Reversing the recorded file-change hunks reproduced both original byte lengths and SHA-256 values declared by the immutable E0 v05 seal.",
+  "recovery_basis": "Codex task file-change history plus E0 v05 seal member hashes. No scientific artifacts were accessed.",
+  "items": [
+    {
+      "historical_v05_path": "source/scripts/e4_independent_audit_v01/integrity.py",
+      "snapshot_path": "audits/e4-0-track-d/history/track-d-v05-source-snapshot-v03/integrity-track-d-v05.py",
+      "snapshot_bytes": 18535,
+      "snapshot_sha256": "a1bc8feaa9426853e7ec5eb41503f072997418dfeafc522be7175a65e8153d8d",
+      "restored_bytes": 16233,
+      "restored_sha256": "d2ea4eba7cb61a40b6115428578e20fe244decc77c892748974f8facf94fc904",
+      "v05_seal_expected_bytes": 16233,
+      "v05_seal_expected_sha256": "d2ea4eba7cb61a40b6115428578e20fe244decc77c892748974f8facf94fc904"
+    },
+    {
+      "historical_v05_path": "source/scripts/e4_independent_audit_v01/tests/test_audit.py",
+      "snapshot_path": "audits/e4-0-track-d/history/track-d-v05-source-snapshot-v03/test_audit-track-d-v05.py",
+      "snapshot_bytes": 25688,
+      "snapshot_sha256": "9f5f280178f78bb508477b01959432bc0b5fbadc52b66db2e487753cd14783a5",
+      "restored_bytes": 23898,
+      "restored_sha256": "c0694dc95646cd1a179ab1d6654886d33c3c9aa8a79ce48f6fe3bd8d2270f876",
+      "v05_seal_expected_bytes": 23898,
+      "v05_seal_expected_sha256": "c0694dc95646cd1a179ab1d6654886d33c3c9aa8a79ce48f6fe3bd8d2270f876"
+    }
+  ],
+  "model_or_tokenizer_contacted": false,
+  "cuda_initialized": false,
+  "e4_population_generated": false,
+  "labels_opened": false
+}

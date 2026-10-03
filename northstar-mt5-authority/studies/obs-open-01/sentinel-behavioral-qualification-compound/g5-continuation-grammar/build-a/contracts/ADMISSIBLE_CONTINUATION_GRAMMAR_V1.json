@@ -1,0 +1,1 @@
+{"behavioral_output_comparison":false,"empty_continuation":"INCLUDED","jointly_presentable_is_applied_by_both":false,"pairwise":"U_Lambda(pi_a,C_a,pi_b,C_b)","prefix_closed":true,"primitive_start":"S_pi=(pi,K_pi,C,rho_pi)","schema":"G5_ADMISSIBLE_CONTINUATION_GRAMMAR_V1","state_sufficiency_assumed":false,"status":"FROZEN","unilateral":"U(pi,C)"}

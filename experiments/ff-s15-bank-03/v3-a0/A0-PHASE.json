@@ -1,0 +1,125 @@
+{
+  "schema": "ff-s15-bank3-a0-v1",
+  "status": "ACTIVE_NON_CORPUS",
+  "version": "0.1",
+  "experiment": "FF-S15-BANK-03",
+  "phase": "V3-A0 Source Audit & Data Hygiene",
+  "date": "2026-09-30",
+
+  "purpose": "turn candidate sources into clean, admissible source packages. Creates NO roots, performs NO reconstruction at scale.",
+  "rationale": "the O1 phase-0 result earned this phase. The correct next move is not to find more datasets but to make the source layer trustworthy enough that when a dataset does enter, we know exactly what entered, under what permission, in what version, with what identity, and what got discarded.",
+
+  "state_machine": {
+    "states": ["CANDIDATE", "PERMISSION_VERIFIED", "IDENTITY_PINNED", "HYGIENE_AUDITED", "O1_RECONSTRUCTION_PROBE_READY"],
+    "transitions": [
+      {"from": "CANDIDATE", "to": "PERMISSION_VERIFIED", "requires": "all four permission flags resolved from primary sources; conflicting mirrors recorded separately rather than resolved by preference"},
+      {"from": "PERMISSION_VERIFIED", "to": "IDENTITY_PINNED", "requires": "canonical name, corrected repository URL, publisher identity, version or revision, hosting location, and our own computed content hashes"},
+      {"from": "IDENTITY_PINNED", "to": "HYGIENE_AUDITED", "requires": "sample inspected for malformed rows, duplicates, missing fields, split leakage, inconsistent ids, dead references, annotation-schema drift, markup junk, encoding issues, mirror differences; every cleaning action carries a receipt; NO silent semantic repair"},
+      {"from": "HYGIENE_AUDITED", "to": "O1_RECONSTRUCTION_PROBE_READY", "requires": "admissibility package complete: pinned version, content hashes, resolved permissions, cleaned schema description, known defects, and a deterministic sampling recipe"}
+    ],
+    "failure": "a source that fails any transition simply stays out. There is no partial admission and no provisional state.",
+    "regression": "a source already past a state that later fails re-audit is returned to the earlier state, and every descendant built under the false premise is quarantined"
+  },
+
+  "stage_1_permission_audit": {
+    "conservative_rule_retained": true,
+    "unresolved_is_unusable": true,
+    "no_inference_from_permissive_license": "synthetic_seeding_allowed must not be inferred from a permissive license unless the terms textually support that reading or the owner explicitly answers",
+    "conflicting_mirrors": "recorded separately; the nicer license is never selected. A third-party mirror tag is an unaffiliated claim and is recorded as such, never as a grant.",
+    "current_state": {"sources": 12, "permission_verified": 0, "note": "0 of 12 cleared; receipt o1-permission-verification.json"},
+    "owner_outreach_is_a_stage_output": "an explicit question to the data owner is the only accepted way to resolve a silent flag"
+  },
+
+  "stage_2_identity_and_provenance": {
+    "correct_from_o1": true,
+    "hashes_computed_by_us": {
+      "required": true,
+      "why": "finding F1: zero of 12 sources publish a per-item or per-file content hash, so the ledger's content_hash must be computed at ingest and pinned in our own receipt. Hashing is now normal ingest cost, not an edge case.",
+      "granularity": ["per-file", "per-item"],
+      "algorithm": "sha256",
+      "pin_in": "the admissibility package, not the upstream record"
+    },
+    "identity_fields": ["canonical_dataset_name", "repository_url", "publisher_identity", "version_or_revision", "hosting_location", "our_content_hash", "source_receipt_url"]
+  },
+
+  "stage_3_raw_data_hygiene": {
+    "runs_only_after_permission_cleared": true,
+    "inspections": [
+      "malformed_rows", "duplicate_rows", "missing_fields", "split_leakage",
+      "inconsistent_ids", "dead_references", "annotation_schema_drift",
+      "html_or_markup_junk", "encoding_issues", "mirror_differences"
+    ],
+    "no_silent_semantic_repair": true,
+    "every_cleaning_action_requires_a_receipt": true,
+    "receipt_fields": ["action_id", "source_dataset", "target_field_or_row", "action", "before", "after", "reason", "reversible"],
+    "supply_chain_note": "where a source requires arbitrary code execution to load (WIQA is a known case), that is a hygiene finding in its own right, independent of licensing"
+  },
+
+  "stage_4_annotation_audit": {
+    "human_labels_remain_checks": true,
+    "human_labels_are_never_bank_truth": true,
+    "record": [
+      "label_vocabulary",
+      "missing_or_ambiguous_annotations",
+      "evidence_span_completeness_where_applicable",
+      "source_specific_quirks_affecting_reconstruction"
+    ],
+    "ambiguity_handling": "ambiguous annotations are recorded as ANNOTATION_AMBIGUOUS and are never counted as derivation failures in the agreement statistic"
+  },
+
+  "stage_5_admissibility_package": {
+    "exit_criteria": [
+      "pinned_version",
+      "content_hashes_per_file_and_per_item",
+      "resolved_permission_flags_all_four",
+      "cleaned_schema_description",
+      "known_defects_list",
+      "deterministic_sampling_recipe_for_O1"
+    ],
+    "deterministic_sampling_recipe": {
+      "required": true,
+      "contents": ["strata_definition", "sample_size_per_stratum", "seed", "reproducible_selection_predicate"],
+      "why": "the O1 probe must be re-runnable and auditable, and must not depend on dataset file ordering that may change between mirrors"
+    }
+  },
+
+  "o1_probe_contract": {
+    "status": "FROZEN_AS_SPEC_NOT_IMPLEMENTED",
+    "rationale": "with zero admissible human sources, implementing a 128-256 item probe is machinery with nothing legal to touch. The contract is frozen now; implementation waits for the first cleared source.",
+    "generic_not_dataset_specific": "the implementation must accept ANY cleared source through one interface, not be written for whichever dataset answers first",
+    "intended_contract": {
+      "inputs": ["admissibility package", "sampling recipe"],
+      "per_item_output": ["reconstruction_disposition", "fact_language_conformance", "preserved_semantics", "changed_semantics", "unreconstructable_elements", "reconstruction_confidence", "label_origin", "human_annotation_role", "human_annotation_present", "verifier_receipt"],
+      "allowed_dispositions": ["EXACT_RECONSTRUCTION", "PARTIAL_RECONSTRUCTION", "REJECTED_RECONSTRUCTION"],
+      "only_exact_provides_target_supervision": true,
+      "per_source_outputs": ["exact_yield", "partial_yield", "rejected_yield", "agreement_on_exact_cases", "top_rejection_reasons", "capability_axes_covered_by_exact_cases", "reconstruction_cost"],
+      "no_prior_yield_threshold": "per the ruling, no minimum acceptable yield is pre-specified. Report the components of source value; do not collapse them to a scalar yet.",
+      "source_value_components": ["exact_yield", "capability_coverage", "novelty", "legal_usability"],
+      "prohibitions": ["no descendant generation", "no curriculum allocation", "no synthetic family expansion", "no training split construction", "no promotion of any probe artifact into a v3 root"]
+    }
+  },
+
+  "program_state": {
+    "V2-0": "ACTIVE - implementation, audit, then the frozen cue screen",
+    "V3-A0": "ACTIVE_NON_CORPUS - permissions, identity, hashes, metadata cleaning, outreach tracking",
+    "O1_reconstruction_yield_probe": "DEFERRED_UNTIL_FIRST_SOURCE_CLEARS",
+    "V3_corpus_construction": "BLOCKED on V2-0 disposition AND admissible sources"
+  },
+
+  "consequence_of_the_negative_o1_result": {
+    "statement": "the human-grounded fraction of v3 is now an empirical outcome, not a design assumption",
+    "implication": "if only two datasets ever clear permissions, v3 may end up predominantly v2-derived synthetic with a smaller but very clean human-root component. That is an acceptable outcome. A thin vein of gold beats 300,000 rows of provenance fog.",
+    "affects": ["root_budget", "public_description_strength", "source_value_composition"]
+  },
+
+  "not_authorized_by_this_phase": [
+    "creating any bank-v3 root",
+    "descendant generation",
+    "curriculum allocation",
+    "target-family weighting",
+    "synthetic family expansion",
+    "training split construction",
+    "implementing the O1 probe before a source clears",
+    "inferring any unresolved permission flag"
+  ]
+}

@@ -1,0 +1,1 @@
+{"alternative":"H1:mu_R>0","conditional_sequential_dominance":false,"design_based":false,"null":"H0:mu_R<=0","parameter":"mu_R=E[d_s^R]","population_statement":"AVERAGE_SESSION_POPULATION_REPRESENTATION_COMPETENCE","schema":"AVERAGE_COMPETENCE_PARAMETER_V1","session_difference":"d_s^R=B_s(M0)-B_s(MR)","source_kind":"ARTIFACT_DECLARED"}

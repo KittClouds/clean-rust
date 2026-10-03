@@ -1,0 +1,29 @@
+{
+  "schema": "FAS_E4_0_FINALIZATION_STOP_V16_V01",
+  "receipt_id": "E4_0_V16_FINALIZER_HELP_INVOCATION_STOP_V01",
+  "status": "E4_0_V16_FINALIZATION_STOP_RECEIPT_CLOSURE_MISMATCH",
+  "command": "python experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/finalize_e4_0_contract_v16_v02.py --help",
+  "diagnostic": "RuntimeError: receipt source closure is not exact for Authorization issuer v15: missing=[experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/issue_e4_stage_authorization_v16.py, experiments/fas-frozen-observer-bundle-engineering-v01/source/tests/test_e4_stage_authorization_v16.py], extra=[experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/issue_e4_stage_authorization_v15.py, experiments/fas-frozen-observer-bundle-engineering-v01/source/tests/test_e4_stage_authorization_v15.py]",
+  "source_map": {
+    "path": "experiments/fas-frozen-observer-bundle-engineering-v01/plans/E4-0-IMPLEMENTATION-SOURCE-MAP-v16.md",
+    "bytes": 100236,
+    "sha256": "34543f8b437adcc5ae003e1638ff77e0503b0089d39c456bbadc6b1dcff03f07"
+  },
+  "finalizer_source": {
+    "path": "experiments/fas-frozen-observer-bundle-engineering-v01/source/scripts/finalize_e4_0_contract_v16_v02.py",
+    "bytes": 64434,
+    "sha256": "a3142cb3ca38d7a4f48d5c80f4b3e20798f010226904b25e40ffd465f00a6dc8"
+  },
+  "contract_candidate_written": false,
+  "seal_written": false,
+  "authorization_written": false,
+  "population_truth_opened": false,
+  "template_or_joint_truth_opened": false,
+  "tokenizer_contact": false,
+  "model_contact": false,
+  "cuda_initialized": false,
+  "gpu_lease_acquired": false,
+  "feature_cache_created": false,
+  "labels_opened": false,
+  "recorded_utc": "2026-09-27T05:39:17Z"
+}

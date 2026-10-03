@@ -1,0 +1,17 @@
+{
+  "base_stream_sha256": "b684bcefbf9ed7240f6185eedec3840b57a522048cd64073a1357dbf22555f3e",
+  "base_width": 66,
+  "contains_task_or_target_data": false,
+  "d_s_shared_pre_presentation_hashes": true,
+  "normalization_payload_sha256": "9e84516cae84a1c8cd8288d27b92745cdf827184be7b84bf963ca50dc3eb5417",
+  "normalized_tuple_stream_sha256": "1c674d549e99b6bce3c965d984d5c68abe259d8257cd0fdab449d2caab3e209a",
+  "paired_source_input_sha256": "f35b99147666de6d59b6f9bab674b9a4fadc2a4175db1a26edd5cdf84377b111",
+  "row_key_width_bytes": 18,
+  "schema": "F4-INVARIANT-01-shared-input-fixture-v1",
+  "status": "PASS",
+  "synthetic_row_count": 5,
+  "tuple_shape": [
+    4,
+    6
+  ]
+}

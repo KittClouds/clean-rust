@@ -1,0 +1,17 @@
+{
+  "protocol": "Q10-WC",
+  "status": "Q10_WC_VALID__DESCRIPTIVE_ASSOCIATIONS_REPORTED",
+  "stage": "COMPLETE",
+  "audited_engineering_states": 5120,
+  "accepted_safe_nonidentity_endpoints": 5043,
+  "safety_margin_dominated_events": 77,
+  "accepted_fraction": 0.9849609375,
+  "median_rotation_radians": 0.004136999934092628,
+  "maximum_rotation_radians": 0.0520156293340325,
+  "independent_review": "VERIFIED_BY_INDEPENDENT_STDLIB",
+  "scientific_seed_bundles": 0,
+  "behavioral_inference": false,
+  "causal_inference": false,
+  "future_gate_selected": false,
+  "dh08b_authorized": false
+}

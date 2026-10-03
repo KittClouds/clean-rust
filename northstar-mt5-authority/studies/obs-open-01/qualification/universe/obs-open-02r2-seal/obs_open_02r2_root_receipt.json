@@ -1,0 +1,21 @@
+{
+  "confirmation_observations_read": false,
+  "confirmation_status": "FROZEN_UNOPENED",
+  "data_quality_logical_sha256": "2a716bc7f51446aa115f7a0b98dd3eeca8127e1044da6b890eb26b999bec914c",
+  "data_quality_outcome": "PASS",
+  "deterministic_rebuild": "PASS_BYTE_IDENTICAL",
+  "economic_authority": false,
+  "formal_estimand_count": 119,
+  "gate": "OBS-OPEN-02R2",
+  "manifest_sha256": "a0a48d280cdb48f09ec510fe0c70dbdcd74c5821073b8c17b24d61338d415a34",
+  "preflight_logical_sha256": "2e32be4387d51fb993e61c01d2b72b170fe9226e315d330f9173f0f03f7b9e25",
+  "protocol_root_sha256": "141344869c5e6aba6bc7346594872efdc196cb246c834f8d510a0aad90831bb5",
+  "r1_root_sha256": "dc8826042d490c5b1e868b836f4c187af8e2baedf9454d11b2be2a5a5aae3da7",
+  "r2_root_sha256": "9f7a011d5f31b498f713b6a2459c36af19dc2e388736678919cf8344f937d234",
+  "repaired_gap_count": 5,
+  "schema": "OBS_OPEN_EXECUTABLE_DISCOVERY_COMPLETION_SEAL_V1",
+  "study_id": "OBS-OPEN-01",
+  "substantive_measurements_computed": false,
+  "trading_authority": false,
+  "universe_root_sha256": "6b0ca197a394b085707d03dfe06f1569eb0fafbddb2d583817e88647df6f6235"
+}

@@ -1,0 +1,97 @@
+{
+  "contexts": [
+    {
+      "context": [
+        "seed9731-L-tau16.json",
+        2
+      ],
+      "shard": "seed9731-L-tau16__set2.jsonl",
+      "shard_sha256": "E6A56343959E403E4C6015098A7BF6ED470E96B21F4442A2C08540B17A50F923",
+      "source_pairs": 95040,
+      "triple_records": 256
+    },
+    {
+      "context": [
+        "seed9731-L-tau4.json",
+        3
+      ],
+      "shard": "seed9731-L-tau4__set3.jsonl",
+      "shard_sha256": "C322DF48391BC75C9D2BC259A5B41FA41B9BE5A9944204E57D785C9CBF7375DD",
+      "source_pairs": 121024,
+      "triple_records": 256
+    },
+    {
+      "context": [
+        "seed9731-R-tau16.json",
+        1
+      ],
+      "shard": "seed9731-R-tau16__set1.jsonl",
+      "shard_sha256": "4F66AB186AE0A57FB89160F67D66AF89D73810B7D865C73DA74E8B1A92C0FC43",
+      "source_pairs": 109504,
+      "triple_records": 256
+    },
+    {
+      "context": [
+        "seed9731-R-tau16.json",
+        3
+      ],
+      "shard": "seed9731-R-tau16__set3.jsonl",
+      "shard_sha256": "497B221A4B46BB5A4C4FE5CFFCD0FEFEF0FD4F0D5A2A49314DB78487782DE0F6",
+      "source_pairs": 91584,
+      "triple_records": 256
+    },
+    {
+      "context": [
+        "seed9731-R-tau4.json",
+        0
+      ],
+      "shard": "seed9731-R-tau4__set0.jsonl",
+      "shard_sha256": "B97DCE908026C417F868BA9A8D53D72781879F1955E7D460F0CA6FEEB14EC24E",
+      "source_pairs": 109504,
+      "triple_records": 256
+    },
+    {
+      "context": [
+        "seed9731-R-tau4.json",
+        1
+      ],
+      "shard": "seed9731-R-tau4__set1.jsonl",
+      "shard_sha256": "89A2D105816E54B57A0712F9F1DC8564D725AA25501B65A4831DC9FBADAC82E9",
+      "source_pairs": 95040,
+      "triple_records": 256
+    },
+    {
+      "context": [
+        "seed9731-R-tau4.json",
+        2
+      ],
+      "shard": "seed9731-R-tau4__set2.jsonl",
+      "shard_sha256": "7984A0CA737A2C96C1B6056DD309CDF78643E9739E8D5A670CABE4A9785EF9BC",
+      "source_pairs": 109504,
+      "triple_records": 256
+    },
+    {
+      "context": [
+        "seed9731-R-tau4.json",
+        3
+      ],
+      "shard": "seed9731-R-tau4__set3.jsonl",
+      "shard_sha256": "99476B6B951D5CAA0DE8A9161769EA8C13D2F51FE2F490B929194F4A6E9007F7",
+      "source_pairs": 109504,
+      "triple_records": 256
+    }
+  ],
+  "contract_sha256": "21AA126D32BDE172B7AE8CA9A8797A3FF4603144991410D83A6009C89D4FA818",
+  "counts": {
+    "contexts": 8,
+    "triple_records": 2048
+  },
+  "engineering_only": true,
+  "geometry_executed": false,
+  "identity": "q10-gc1-lr1-requal1-csc1-pair-alg3-domain-v1",
+  "outcomes_consulted": false,
+  "protocol": "Q10-PAIR-ALG3-DOM1",
+  "readout_executed": false,
+  "scientific_promotion": false,
+  "status": "ALG3_DOMAIN_COMPLETE"
+}

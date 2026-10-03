@@ -1,0 +1,56 @@
+{
+  "protocol": "Q10-SR4",
+  "status": "Q10_SR4_STAGE2A_VALID__CAPACITY_GATED_MIXTURE",
+  "stage": "STAGE_1B_COMPLETE__INDEPENDENT_REVIEW_VERIFIED",
+  "factorization": "sparse-effect Gram matrix with deterministic f64 symmetric eigendecomposition",
+  "stage_1a": {
+    "status": "VERIFIED",
+    "seed": 9531,
+    "audited_states": 1024,
+    "eligible_states": 999,
+    "parent_constructor_ineligible": 25,
+    "initially_mismatched": 999,
+    "capacity_exact": 0,
+    "capacity_gated": 999,
+    "search_entered": 0,
+    "repairs": 0,
+    "replay_count": 4
+  },
+  "stage_1b": {
+    "status": "VERIFIED",
+    "configured_seeds": [9532, 9533, 9534, 9535],
+    "completed_seeds": [9532, 9533, 9534, 9535],
+    "audited_states": 4096,
+    "eligible_states": 4016,
+    "parent_constructor_ineligible": 80,
+    "initially_mismatched": 4016,
+    "capacity_exact": 0,
+    "capacity_gated": 4016,
+    "search_entered": 0,
+    "repairs": 0,
+    "replay_count": 16
+  },
+  "aggregate": {
+    "audited_states": 5120,
+    "eligible_states": 5015,
+    "capacity_partial": 5015,
+    "capacity_exact": 0,
+    "capacity_numerically_ambiguous": 0,
+    "search_entered": 0,
+    "final_gate_failures": 0,
+    "independent_review": "VERIFIED",
+    "normalized_unreachable_min": 0.25050276677403843,
+    "normalized_unreachable_median": 0.43799307984315405,
+    "normalized_unreachable_max": 0.7216418024596388,
+    "rank_min": 436,
+    "rank_median": 592,
+    "rank_max": 646
+  },
+  "scientific_seed_bundles": 0,
+  "behavioral_inference": false,
+  "dh08b_authorized": false,
+  "promotion": {
+    "scientific": false,
+    "reason": "valid engineering qualification only; all eligible readout mismatches were conservatively capacity-gated and no repair search entered"
+  }
+}

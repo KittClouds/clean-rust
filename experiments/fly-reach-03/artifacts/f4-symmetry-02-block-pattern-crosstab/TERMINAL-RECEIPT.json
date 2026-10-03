@@ -1,0 +1,28 @@
+{
+  "PHENO_status_unchanged": true,
+  "analysis_script_sha256": "965d67ba5fe7d40a942043509b585988c48e3b416c6b0ed0284389a26a063d9a",
+  "biological_promotion": false,
+  "contract_sha256": "f8f7ed3807a42f76030630f4990f09f89eb4381a2452ae89e5cf8c93996982a5",
+  "contribution_reconstruction_abs_error": 1.1102230246251565e-16,
+  "csv_sha256": "5d8adb4cb4179674651863dc9311ad9bacaeb57e1eea3fe4b4a7d6e77ae8fd8e",
+  "fits_run": 0,
+  "grid_cells": 64,
+  "json_sha256": "b523aef0d85907ee9c9dcf116486ab4665263450951e59e00adf58f494d6ee26",
+  "markdown_sha256": "bbb603645fa10085b3bdc296e37b18da58504edca196618e309d9c240167c8f5",
+  "measured_reach03_result": false,
+  "nonempty_cells": 10,
+  "parent_identity": "F4-SYMMETRY-01-RUN4",
+  "pooled_psi_D_minus_C": 0.3972376545607194,
+  "qualification_only": true,
+  "rows": 13420,
+  "schema": "F4-SYMMETRY-02-block-pattern-crosstab-receipt-v1",
+  "source_hashes": {
+    "parent_SYMMETRY02_analysis_sha256": "73683b5d44c9da95f2b2f5bb1fb842e92790205fcc4fa652f7c8c5a5a2c5d905",
+    "parent_SYMMETRY02_receipt_sha256": "06adbfac9117d89b4c6eb4e23ef7b2556e04ee6de466f72bf3951d5a5e6520f6",
+    "parent_integrity_receipt_sha256": "3a830fe8ff05a1cd6fe8e062ae3c5106eab6866ba546634c8123bc918fb2ac94",
+    "parent_prediction_lock_sha256": "1a6828c3956b6f25e057defc808f20698738a9990af4a2f9661dcaebd068aecf",
+    "predictor_sha256": "b201733289faaf8bc33a3147bf1b8d5a4e77e193386e33f89feebb860cf2c13e",
+    "scoring_truth_sha256": "c4af406135aec6ec53b21dc34f1ee6d00f4568f5f205105b8a66837e227c84fd"
+  },
+  "status": "CLOSED_EXPLORATORY_QUALIFICATION_ONLY"
+}

@@ -1,0 +1,20 @@
+{
+  "analysis_outputs_created": false,
+  "analysis_source_metrics_changed": false,
+  "comparative_metrics_emitted_to_output_or_user": false,
+  "comparative_truth_opened_after_integrity_pass": true,
+  "failed_analyzer_sha256": "6e9053ae0b3f42f84d75efaba3239dc49a053c5153afdbd6239ed3710bd5878f",
+  "failure": "NameError: name 'sha' is not defined while hashing the already-produced support-receipt provenance field.",
+  "failure_stage": "final analysis object construction after comparative truth load and metric computation, before any ANALYSIS.json/RESULTS.md/terminal receipt write",
+  "fit_manifest_sha256": "f71d344c5bc58e86a68e7bd9163aed1ab5d945468bfe84f06a8981e6a1c2ce66",
+  "integrity_receipt_sha256": "cf52cc787b3bf501b3f80944d452af3247e569f82f110c06c597e499bfca2591",
+  "integrity_repair_amendment_sha256": "3f2f036cfe70348313abb94e8b9d697ed4883cc6ea135f976c47acc6c93a8592",
+  "prediction_lock_sha256": "dd387bcc52510eac947774cb6d9303d8cdd8142cee07a60b0e39cddd4dcb54ce",
+  "prior_analysis_invocation_amendment_sha256": "5f07751e8457dec499f498772c0b9441b8e914a6a98671655b66c97e8051fdf5",
+  "prior_analysis_repair_amendment_sha256": "dbc7f0347b75ce4b005aabdd7440674762447a8ece10c99c770927d8dac14245",
+  "prior_analysis_stop_receipt_sha256": "30673d27814bed01887dcd042dfee0d3a3ff1642ae788eba66df1bb4237a1b43",
+  "raw_truth_file_sha256": "ff9d000145fc503e83710ca99d65b0304d52c1f94533d92c78e28b9730214d50",
+  "schema": "F4-PRESENTATION-03-analysis-stop-receipt-v1",
+  "scoring_values_computed_in_process": true,
+  "status": "STOP_UNDEFINED_RECEIPT_HASH_ALIAS_AFTER_SCORING"
+}

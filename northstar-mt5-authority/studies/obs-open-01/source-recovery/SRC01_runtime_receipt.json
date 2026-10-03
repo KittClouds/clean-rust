@@ -1,0 +1,45 @@
+{
+  "account": "5054311760",
+  "clock_inputs": {
+    "area_end": "09:40",
+    "authority": "SOURCE_CLOCK_WALL_TIME",
+    "begin": "09:30",
+    "period_end": "09:35"
+  },
+  "compile_receipt": {
+    "cpu": "X64 Regular",
+    "elapsed_ms": 585,
+    "result": "0 errors, 0 warnings"
+  },
+  "compiler_binary": {
+    "path": "C:\\Program Files\\MetaTrader 5\\metaeditor64.exe",
+    "sha256": "9bee761959abb8d7de49af54caaf83d1dd05156dd9b10bd855d31da3ae9ad1b9",
+    "version": "5.0.0.6106"
+  },
+  "schema": "OBS_OPEN_SRC01_RUNTIME_RECEIPT_V1",
+  "server": "MetaQuotes-Demo",
+  "server_reported_build": "6104",
+  "symbol": "US30",
+  "terminal_binary": {
+    "path": "C:\\Program Files\\MetaTrader 5\\terminal64.exe",
+    "sha256": "0ab0496b90977d4ef848f8d2591970c3a50721476b37fa60cfb6b1bda74b2983",
+    "version": "5.0.0.6106"
+  },
+  "terminal_data_id": "D0E8209F77C8CF37AD8BF550E51FF075",
+  "terminal_origin": "C:\\Program Files\\MetaTrader 5",
+  "tester_agent_builds_observed": [
+    "6106"
+  ],
+  "tester_model": {
+    "historical_reload": 1,
+    "online": 0
+  },
+  "tester_window": [
+    "2024-01-01T00:00:00",
+    "2024-01-03T00:00:00"
+  ],
+  "timeframes": [
+    "M1",
+    "M5"
+  ]
+}

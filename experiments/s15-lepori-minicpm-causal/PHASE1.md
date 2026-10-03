@@ -1,5 +1,10 @@
 # Lepori Phase 1 — causal baseline on MiniCPM5-1B-Base
 
+> Historical reference only: Qwen preparation exposed TRAIN/DEV consistency,
+> candidate entity-addressing and padded-action masking defects in the inspected
+> harness. Scores below remain unchanged; repaired Qwen is not a fully matched
+> substrate-only comparison. See CORRECTIONS.md C13.
+
 **Question.** Can a 1.08B causal substrate, through a deliberately boring six-surface graft,
 learn useful explicit semantic state and candidate-conditioned epistemic state from the inherited
 causal contract?
@@ -12,10 +17,13 @@ not enough to remove the backbone from the causal story. Global semantic state: 
 majority, with MOVE and ACTIVATE at exactly 0.0000.
 
 **And the candidate state is not yet action-sufficient.** A gold-state sufficiency ladder
-(below) shows legality alone has a determinism ceiling of **0.7605**, while adding the
-already-existing `candidate_satisfies_goal` channel — which this model has dead at 0.5216 — takes
-it to **0.9925**. So a recurrent action workspace over legality state was **provably never going
-to solve MOVE**. See `CORRECTIONS.md` C6, C7.
+(below) gives legality-only state an overall determinism ceiling of **0.7605** and a
+MOVE-conditional ceiling of **0.9335**. The **0.3699** MOVE figure is 1-NN accuracy, not a
+MOVE-specific ceiling. Adding the already-existing `candidate_satisfies_goal` channel — which this
+model has dead at 0.5216 — raises the overall ceiling to **0.9925** and the MOVE ceiling to
+**0.9942**; MOVE 1-NN reaches **0.9306**. This is a large estimation gap for the simple 1-NN
+readout, not proof that a learner or recurrent workspace cannot solve MOVE. See `PHASE1B.md` and
+`CORRECTIONS.md` C11 for the correction.
 
 ## What was run
 
@@ -173,23 +181,28 @@ first candidate 0.0806, uniform chance 0.0637.
 
 **This is the branch-saving result.**
 
-1. **Legality alone cannot solve the endpoint.** Its determinism ceiling is 0.7605 and its
-   achievable ceiling is 0.4887, with MOVE capped at 0.3699. A perfect legality reader would still
-   leave MOVE at ~0.37. So a recurrent action workspace built over legality state was **never going
-   to fix MOVE** — it would have been aimed at a channel with a hard information ceiling.
-2. **The missing ingredient is the goal-relative candidate channel, and we already have it in the
-   ontology.** Adding gold `candidate_satisfies_goal` takes the ceiling from 0.7605 to 0.9925 and
-   the achievable figure from 0.4887 to 0.9624. **This model has that head and it is dead at
-   0.5216** against a 0.336 base rate. The variable is present; the learning is not.
+1. **The simple extractor struggles with legality-only state.** Its overall determinism ceiling is
+   0.7605, its overall 1-NN accuracy is 0.4887, and MOVE 1-NN accuracy is 0.3699. However, the
+   MOVE-conditional determinism ceiling is 0.9335, so the 1-NN result is not an information bound.
+   Adding the goal-relative channel raises MOVE 1-NN to 0.9306. This supports prioritising the
+   existing goal-relative target; it does not establish that legality-only state is inherently
+   unable to support a better learner.
+2. **The largest tested lift comes from goal-relative candidate information, for which the
+   ontology already has a channel.** Adding gold `candidate_satisfies_goal` takes the ceiling from
+   0.7605 to 0.9925 and the 1-NN figure from 0.4887 to 0.9624. **This model has that head and it is
+   near base at 0.5216** against a 0.336 base rate. The target is present; acquisition was not
+   demonstrated.
 3. **The global panels add nothing** (L3 is flat, and marginally *worse* for 1-NN because extra
    dimensions dilute Hamming distance). The ontology's global targets are not where the action
    information is.
 4. **Only a small further gain comes from a field the ontology lacks.** `optimal_next_actions`
    membership takes 0.9624 → 0.9925. Useful, but it is not the main gap.
 
-So the diagnosis is **not** "composition is the bottleneck". It is: **the candidate state is
-missing action-sufficient content, specifically the goal-relative candidate channel, and the
-channel is already in our ontology and simply is not being learned.**
+So the evidence does **not** identify "composition" as the bottleneck. It shows that this trained
+candidate state did not acquire the goal-relative signal, while the gold-state ladder shows that
+signal is highly informative under the simple estimator. That makes it the first measured target
+to investigate, not a proof that it is the only missing ingredient or that no learner can recover
+the action from legality-only state.
 
 A note on the label itself: `selected_action` lies inside the generator's own
 `optimal_next_actions` only **53.3%** of the time, and `optimal_next_actions` is a singleton only
@@ -235,20 +248,24 @@ alone is the lever** — which preserves exactly what was measured without asser
 The gold ladder converts speculation into a decision, so this list is shorter and sharper than it
 was.
 
-- **Do not build a recurrent action workspace over legality state.** Legality alone caps at 0.7605
-  overall and ~0.37 on MOVE. That branch is closed by measurement, not by opinion.
-- **The first target is the existing `candidate_satisfies_goal` head**, which sits at 0.5216 against
-  a 0.336 base rate while the gold ladder says it is worth 0.4887 → 0.9624 on the endpoint. The
-  variable is in the ontology. The learning is missing. That is a supervision/learning question
-  about a head we already have, and it should be attacked before any new mechanism.
-- **Note the mechanistic asymmetry, because it is the interesting part.** `candidate_legal` and
-  `candidate_satisfies_goal` read from the *same* `e_j`. One is a local precondition check and
-  works at 0.7495; the other requires composing the action's effect with the goal and is dead.
-  So the deficit is specifically *action-semantics-into-goal-state* composition, not
-  legality-into-choice composition. Those are different walls and they need different mechanisms.
-- **The global pathway is irrelevant to everything that currently works.** Removing all six surfaces
-  costs 0.0004. A mechanism aimed at the global path or at depth diversity would be aimed at an
-  unused branch. The dead global semantic targets are a separate problem from the dead endpoint.
+- **Do not treat the 1-NN result as a hard limit on legality-only state.** The measured MOVE
+  determinism ceiling is 0.9335, while MOVE 1-NN accuracy is 0.3699. The evidence says the simple
+  extractor is weak; it does not close the branch by an information bound. The goal-relative
+  channel remains the first measured target to investigate because it lifts MOVE 1-NN to 0.9306.
+- **The goal-relative channel is the largest tested addition, and Phase 1B has now tested it.**
+  The shallow probes over `e_j`, `c_j`, and `[c_j;s]` remained near base; isolated supervision
+  reached 0.5171 on DEV while candidate legality held at 0.7506. The signal is valuable in the gold
+  ladder, but this acquisition attempt did not generalize. A repeat of the same shallow-readout or
+  isolated-loss intervention is not the next experiment.
+- **The target asymmetry motivates, but does not prove, a binding hypothesis.** `candidate_legal`
+  and `candidate_satisfies_goal` read from the same `e_j`; legality works at 0.7495 while the
+  goal-relative head is near base. This is consistent with the latter requiring richer action/goal
+  binding, but the experiments do not isolate a specific composition mechanism.
+- **The global pathway is not needed for the currently working legality result.** Removing all six
+  surfaces costs 0.0004, while the global semantic targets remain dead. A mechanism aimed at the
+  global path or depth diversity needs a target-specific rationale; the static Lexi source review
+  in `PHASE1B.md` identifies a different candidate-conditioning route but does not explain the
+  endpoint gap.
 - **`optimal_next_actions` membership is a real but small additional lever** (0.9624 → 0.9925) and
   is the one genuinely missing *field*. It is not the main gap, and it is a target-derivation
   question, which the frozen contract currently forbids — so it needs an explicit decision, not a

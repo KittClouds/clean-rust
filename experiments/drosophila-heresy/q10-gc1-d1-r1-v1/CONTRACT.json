@@ -1,0 +1,62 @@
+{
+  "firewall": {
+    "behavioral_probe": false,
+    "engineering_only": true,
+    "greedy_deletion": false,
+    "parent_writes": false,
+    "scientific_promotion": false,
+    "write_root": "experiments/drosophila-heresy/q10-gc1-d1-r1-v1"
+  },
+  "identity": "q10-gc1-d1-r1-v1",
+  "parent_bindings": [
+    {
+      "label": "par8_execution",
+      "path": "experiments/drosophila-heresy/q10-gc1-par8-v1/qualification/execution.json",
+      "sha256": "A4304E70F7D32436109CD6F3367C298CD1227FBD5C4AA2578C28D14272721D6B"
+    },
+    {
+      "label": "par2_palettes",
+      "path": "experiments/drosophila-heresy/q10-gc0-gp1-par2-v1/qualification/palettes.jsonl",
+      "sha256": "56A8BCFD950C2C796279556B03C4905622B1207023C1142076AE7147203477FA"
+    },
+    {
+      "label": "pf0_execution",
+      "path": "experiments/drosophila-heresy/q10-gc1-pf0-v1/qualification/execution.json",
+      "sha256": "47DB038381C9ACB0C98E7D933AA40864F779584CC635178BDF775FDAB5598762"
+    },
+    {
+      "label": "pf5_contract",
+      "path": "experiments/drosophila-heresy/q10-pf5-v1/CONTRACT.json",
+      "sha256": "20995E1826A9C62E0E8689017A2F3E624CC9E63B76B210FBD4AB11D7E9E7D34F"
+    },
+    {
+      "label": "d1_execution",
+      "path": "experiments/drosophila-heresy/q10-gc1-d1-v1/qualification/execution.json",
+      "sha256": "D276BFE9D90EA872A02DBB2BCC237E02E835809D0687A3F43AE56DAB09CA1FD1"
+    },
+    {
+      "label": "rq1_plan",
+      "path": "experiments/drosophila-heresy/q10-gc1-rq1-v1/PLAN.md",
+      "sha256": "81114145FAF6583992E0704A3489C5738B4D43A62CBCE543D4BB0B1AB5FF14E1"
+    },
+    {
+      "label": "rq1_contract",
+      "path": "experiments/drosophila-heresy/q10-gc1-rq1-v1/CONTRACT.json",
+      "sha256": "B976E87228BE823D029C119D67D1BE9593AF929381EEFEA9C4B36F9525348E03"
+    },
+    {
+      "label": "rq1_execution",
+      "path": "experiments/drosophila-heresy/q10-gc1-rq1-v1/qualification/execution.json",
+      "sha256": "251723BDA26FAA6005B75369E88444767784E82DB500D1EAEC5952446F9A67E5"
+    },
+    {
+      "label": "rq1_runner",
+      "path": "experiments/drosophila-heresy/q10-gc1-rq1-v1/scripts/run_rq1.py",
+      "sha256": "7820F43395EF6BFB82CC32838970CA7F404BC39BF7821B4B63DBE1AEB02585C7"
+    }
+  ],
+  "plan_sha256": "5C8677377A8BBE7AE8E420A7F8B3F165A3514953C45B20A2C9351567F47C9CC9",
+  "protocol": "Q10-GC1-D1-R1",
+  "sealed_runner_sha256": "E9030BDE7FFFC50B8F866DE4683C46010F0F60106C1677913E6AC8EE60E40546",
+  "status": "PREEXECUTION_SEALED_NO_EXECUTION"
+}

@@ -1,0 +1,18 @@
+{
+  "cases": [
+    {
+      "case": "seed9731-L-tau16__set2",
+      "complete": true,
+      "materialized_chunks": 440
+    },
+    {
+      "case": "seed9731-L-tau4__set3",
+      "complete": false,
+      "materialized_chunks": 32
+    }
+  ],
+  "execution_receipt_written": false,
+  "identity": "q10-gc0-lr1-sall1-v1",
+  "reason": "runner stopped after provenance review identified missing strict exact-domain and uncached replay gates",
+  "status": "INTERRUPTED_PRESEAL"
+}

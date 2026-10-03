@@ -1,0 +1,20 @@
+{
+  "PHENO_status_unchanged": true,
+  "actual_fits": 16,
+  "actual_rows": 13420,
+  "analysis_script_sha256": "dc70be0276297f32a6dd01508f7146243390ae3a6adf83ecb39879ba4fc6887d",
+  "biological_promotion": false,
+  "controlling_contract_sha256": "cfef638aaeac1dfc0b768d13cc95afe7724861f74e3d3111d91401925bed6379",
+  "expected_fits": 16,
+  "expected_rows": 13420,
+  "heldout_truth_opened_after_integrity": true,
+  "implementation_executable_sha256": "44d22dbe37c849de66690cb7b9842a4d45becd0b2ce62e3bd87883133f75e78f",
+  "integrity_status": "PASS",
+  "measured_seed_namespace": "qualification-v2-only",
+  "primary_error_C_minus_B": -0.09960648729697519,
+  "primary_error_D_minus_C": -0.10072468828994952,
+  "qualification_only": true,
+  "schema": "F4-SYMMETRY-01-terminal-receipt-v1",
+  "source_manifest_sha256": "aa9f1e92d630cbfbe20b82ee6edf10c75568b482010ed98e613a77a39ded1525",
+  "status": "CLOSED_QUALIFICATION_ONLY"
+}

@@ -1,0 +1,13 @@
+{
+  "schema": "VCS_SCHEMA_DECL_V1",
+  "schema_id": "fixture-z3",
+  "schema_version": "0",
+  "status": "FIXTURE",
+  "owner": "tests: software verification only, zero scientific evidence",
+  "coordinates": [
+    {"name": "x1", "kind": "real", "domain": [0, 1]},
+    {"name": "x2", "kind": "real", "domain": [0, 1], "nullable": true},
+    {"name": "x3", "kind": "bool"},
+    {"name": "x4", "kind": "categorical", "categories": ["p", "q", "r"], "nullable": true}
+  ]
+}

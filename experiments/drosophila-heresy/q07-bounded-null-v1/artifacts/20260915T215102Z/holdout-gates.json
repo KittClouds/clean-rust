@@ -1,0 +1,50 @@
+{
+  "protocol": "Q07-BoundedNull-v1",
+  "phase": "holdout_qualification",
+  "created_utc": "2026-09-15T21:52:12.171884+00:00",
+  "before_holdout_states": true,
+  "development_summary_sha256": "fb23fe251ece21cbd8a38d2ab5f72df1c1e073bed4dec1ef3b573abc046da23b",
+  "constructor_revision": "2-exact-boundary-membership",
+  "binary_sha256": "68aa9486f9e619a33898dc50c609ffbb6552f2f36a26b143a1acdc6953c06494",
+  "constructor_source_sha256": "d50637747333bcc3463fffb4f986c721e8b397cb2f6b6da0bf63b55c6ed599ac",
+  "inspection_script_sha256": "63a69720f3895550802b145213fc86d14e9c4c9c4f292c8c2b4e3e2c95a89b0c",
+  "seeds": [
+    9004,
+    9005
+  ],
+  "taus": [
+    4,
+    16
+  ],
+  "sides": [
+    "R",
+    "L"
+  ],
+  "parallel_contexts": [
+    0,
+    1
+  ],
+  "slots": [
+    1,
+    16,
+    32,
+    64,
+    128,
+    256,
+    "first_max_boundary",
+    "first_min_boundary"
+  ],
+  "gates": {
+    "axial_error_over_total_norm_max": 1e-07,
+    "norm_relative_error_max": 1e-07,
+    "residual_norm_relative_error_max": 1e-07,
+    "residual_abs_cosine_max": 1e-05,
+    "boundary_membership_symmetric_difference_max": 0,
+    "outside_permitted_support_changes_max": 0,
+    "nonzero_support_count_relative_difference_max": 0.01,
+    "hot_allocations_max": 0
+  },
+  "rationale": "Development maxima: normalized errors <=2.1e-8, cosine <=1.3e-8; thresholds allow numerical headroom. Exact boundary membership added after revision1 saturation mismatch. No behavioral outcome used.",
+  "limitation": "Snapshot qualification only; no null-policy trajectory, global solver optimum, or biological claim.",
+  "failure_policy": "Report any failure without parameter adjustment, replacement seeds, or measured launch."
+}

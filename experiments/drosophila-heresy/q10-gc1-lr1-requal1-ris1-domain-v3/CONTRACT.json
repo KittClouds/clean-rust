@@ -1,0 +1,58 @@
+{
+  "behavioral_probe": false,
+  "engineering_only": true,
+  "expected_parent_hashes": {
+    "closure_twin_a_derived_sha256": "5BF46E18DFE942C259E46055B893301D86204E2FB8493AE44D41D0BBC3611BFE",
+    "closure_twin_a_manifest_sha256": "F84BB9D1D1E32FE603F29374AFA166B79468CCA7C9F1877B0A46CA1AF1A06606",
+    "current_par8_execution_sha256": "2C4BC3875E57BC0E1843F202067E406F5AD28917DEEE6ADAB1031478C34AB018",
+    "domain_execution_sha256": "6E526DFFE06A0C5051F3F4FB699EC62A802FC54613FCDFA652EBC9F4A69249AF",
+    "parity_execution_sha256": "8E2D69E111BF310D2073B410702310DBC9BD9B47FE88A9D82A5FC3A6B1083001",
+    "singles_execution_sha256": "E33114398BB775F0F6B1E4E5C222B1E2913EBD6CBC8C247EF12A19076E079A0A"
+  },
+  "expected_parent_identities": {
+    "domain": "q10-gc1-lr1-requal1-domain-r2-v1",
+    "parity": "q10-gc1-lr1-requal1-parity-v1",
+    "singles": "q10-gc1-lr1-requal1-singles-v1"
+  },
+  "historical_counts_are_measurements": false,
+  "identity": "q10-gc1-lr1-requal1-ris1-domain-v3",
+  "pair_replay_allowed": false,
+  "protocol": "REQUAL1-RIS1-DOMAIN",
+  "required_statuses": {
+    "domain": "DOMAIN_READY_FOR_SMOKE",
+    "parity": "PARITY_PASS",
+    "singles": "SINGLES_COMPLETE"
+  },
+  "scientific_promotion": false,
+  "selector": {
+    "collateral_key": [
+      "damaged",
+      "score_key",
+      "excess",
+      "group",
+      "to"
+    ],
+    "collateral_slots": 8,
+    "fill_limit": 32,
+    "geometry_key": [
+      "max_ratio",
+      "excess",
+      "score_key",
+      "group",
+      "to"
+    ],
+    "geometry_slots": 16,
+    "pair_policy": "all selected cross-group pairs within each current context",
+    "reference": "current exact replay of matching PAR8 best_search mapping",
+    "round_robin_bucket": [
+      "group",
+      "axis_sign",
+      "opposition_sign"
+    ],
+    "semantics": "fresh current selector; historical counts are not imported",
+    "tie_fields": [
+      "group",
+      "to"
+    ]
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "schema": "FAS_E4_0_ARTIFACT_SEAL_V01",
+  "status": "SEALED",
+  "required_fields": [
+    "schema",
+    "status",
+    "seal_id",
+    "stage",
+    "path_root_kind",
+    "created_utc",
+    "contract_sha256",
+    "contract_seal_root_sha256",
+    "exact_predecessor_roots",
+    "entries",
+    "entry_count",
+    "root_sha256"
+  ],
+  "entry_fields_exact": ["artifact_id", "path", "bytes", "sha256"],
+  "path_root_kind_values": {
+    "WORKSPACE_ROOT": "The repository/workspace root containing the sealed contract and source map; permitted only for stage E4_0_CONTRACT.",
+    "E4_RUN_ROOT": "The stage authorization's exact shared E4-0 output_root; required for every post-contract stage."
+  },
+  "path_rule": "UTF-8 relative POSIX path under the root selected by path_root_kind; no absolute path, backslash, empty component, dot component, parent component, tab, or line feed.",
+  "entries_rule": "Nonempty, unique artifact_id and unique path; sort entries by UTF-8 artifact_id bytes before root calculation.",
+  "root_algorithm": "SHA-256 over each sorted entry encoded as UTF8(artifact_id || TAB || path || TAB || decimal_bytes || TAB || lowercase_sha256 || LF).",
+  "seal_manifest_sha256": "SHA-256 over the exact UTF-8 manifest bytes serialized as ensure_ascii=true, indent=2 JSON followed by one LF; the manifest does not include its own hash.",
+  "contract_stage_rule": "For stage E4_0_CONTRACT, path_root_kind is WORKSPACE_ROOT and contract_seal_root_sha256 is null. For every later stage, path_root_kind is E4_RUN_ROOT and contract_seal_root_sha256 equals the independently verified final E4-0 contract seal root.",
+  "verification_rule": "A verifier must reject unknown schemas/statuses, duplicate IDs/paths, unsafe paths, wrong member byte lengths or hashes, entry-count mismatch, predecessor-root mismatch, and recomputed-root mismatch.",
+  "notes": [
+    "E4 stage roots bind both artifact identity and relative path, unlike an unsealed file digest.",
+    "The independent audit receipt is not inserted into the population seal after the fact; its exact file SHA-256 is separately bound by all downstream stage authorizations.",
+    "The seal manifest itself is immutable once written; any failed attempt is preserved under a new versioned identity."
+  ]
+}

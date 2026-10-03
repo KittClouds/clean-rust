@@ -1,0 +1,88 @@
+{
+  "analysis_sha256": "beb30c21df8761efbd0e9ed3fe3745cf57e9f6421cc4fe1750202ffbaa298e75",
+  "architecture_id": "sorted_tuple_mlp_v1",
+  "arm": "D",
+  "base_stream_sha256": "98e16ba5339043478f469cd4d5f64d4dc6636d482a0b7475e33b1dafb723ea49",
+  "batch_size": 2048,
+  "comparative_metrics_emitted": false,
+  "contract_sha256": "52280190e160fafdbb973b4cda273bf9e24eca6ba96998a0393e90601fc88f40",
+  "epoch_count": 200,
+  "executable_sha256": "2247a06ecb4866eeee077af42d78d888ce7a20a4084ced3e2a7e30e92ad7f748",
+  "final_tensor_hash": "1d1c8a2d68ff1fe5cb03dccebc62d91f9fb6dab42c12024da07a80b628f22fd5",
+  "finite_status": "PASS",
+  "fit_id": "D-H306009-I2",
+  "fit_manifest_row_sha256": "856b40443d11ec1d7fb1cf7cc52dfcb41a55a1618e9553f376df732845147be7",
+  "fold_index": 9,
+  "heldout_block": 306009,
+  "heldout_rows": 4095,
+  "heldout_target_or_reference_read": false,
+  "initial_layer_seeds": [
+    {
+      "fan_in": 90,
+      "layer_name": "w1",
+      "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100090000000200000044007731",
+      "seed_u64": 1582342537178055374,
+      "sha256_digest": "ce027d69279cf515bc053446d176a0a1699b29737ada46d5e3013a3d0f12aeff",
+      "shape": [
+        90,
+        128
+      ],
+      "tensor_sha256": "08c5d4e57f35b3162ee4e8d7aa8811f5d1890ba341d71aeba3a95b9b888e3c79"
+    },
+    {
+      "fan_in": 128,
+      "layer_name": "w2",
+      "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100090000000200000044007732",
+      "seed_u64": 12210578466327561642,
+      "sha256_digest": "aa057db36bb074a9b7ffd5371621aca01f2e2381ebaef00ba28c1d3aba8e98f4",
+      "shape": [
+        128,
+        64
+      ],
+      "tensor_sha256": "4357eb1da2bf726195ae74ae6d1c94e44a61932d8b21b7a21e6a9c7f666a18e5"
+    },
+    {
+      "fan_in": 64,
+      "layer_name": "w3",
+      "payload_hex": "46342d494e56415249414e542d30312d494e49542d763100090000000200000044007733",
+      "seed_u64": 2552922606764404992,
+      "sha256_digest": "00b141bb95cd6d233469d67b4915de6a9eb76c7e38d559801e52bdd609b60311",
+      "shape": [
+        64,
+        1
+      ],
+      "tensor_sha256": "19e0a3741362538af07a1094a86b39f5a3d64da11d6a4f8b2f0ce9c00ce67af5"
+    }
+  ],
+  "initial_tensor_hash": "c91df7e7be1858970595e77ca70735f9cbf3676f77b72fa0763ffe6413d8ac60",
+  "initializer_seed_manifest_sha256": "efb32a7c2ca2709407b65c32627dbd206b8b1bde304ce9b0b98b165aeea1da8e",
+  "normalization_sha256": "6859800b49087b03453bc10bd29126ea6b481f99678547c9b6bf753bcb44bd84",
+  "normalized_tuple_stream_sha256": "a7664ec924d8ba9b1b27ee99f3da73e992bf0d0176bd4552fc4b6466c4c34123",
+  "paired_source_input_sha256": "7a0f12e8f6056feaea0e0e362c1d6be04b6b4b3d137f407c4a499bed65e6837f",
+  "parameter_count": 19969,
+  "prediction_path": "heldout-predictions/D-H306009-I2.bin",
+  "prediction_sha256": "089d99b588e71a8295f9f9cd7419584e9d5a40989733cf1db61f689c32d94efa",
+  "repeat_prediction_identical": true,
+  "replicate_index": 2,
+  "runtime": {
+    "numpy": "2.5.3",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python": "3.13.15 (tags/v3.13.15:4061bc4, Aug  5 2026, 13:05:39) [MSC v.1944 64 bit (AMD64)]",
+    "python_executable": "C:\\Users\\shuga\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+    "thread_environment": {
+      "BLIS_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "NUMEXPR_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1"
+    }
+  },
+  "runtime_seconds": 40.269797799992375,
+  "schema": "F4-INVARIANT-01-fit-receipt-v1",
+  "source_manifest_sha256": "1ffd0ecd452edd07546833a0d85977bed3b16d2b52c6f2c472579519c32323b3",
+  "train_rows": 24781,
+  "training_order_hash": "613bcf4d2e69af79df9274fb2993392cc2bf2e9f90c5bd62237e49aeb88e14e8",
+  "training_row_hash": "adc4f96c5c0594fd70ecfbd89031200512d55352b8cd86a5209cb8afc702eafa",
+  "update_count": 2600
+}

@@ -1,0 +1,56 @@
+{
+  "protocol": "Q10-SR5",
+  "plan_sha256": "66b7dc2e023d6719d04c618553a9a3d33c5ae3ef7a41e39a8d423037e34d4046",
+  "status": "FROZEN_PRE_EXECUTION__NOT_EXECUTED",
+  "purpose": "engineering qualification of multi-step sequential-f32 repair effect capacity",
+  "parent": {
+    "protocol": "Q10-SM",
+    "plan_sha256": "8A70CFADA7A833AA1110FDE5DBF0CFAFDDD4AFD4297A06AD846B1959439B8B9D",
+    "contract_sha256": "5A7CD7E15724F6260C2D42296BED5FF3667CA32FA1D8D48E5408EFFA2A0F35BF",
+    "result_sha256": "68200D7F49B8A4B943150A1C3A5AB4B46DF4ED8EBBE7A3DF45F8BEEBBD337",
+    "status_sha256": "D19D051DA550BCDED9C436F9A7164AF0C4322D8BB16C418D7C4CA9E04217A9C4"
+  },
+  "predecessor": {
+    "protocol": "Q10-SR4",
+    "interpretation": "valid engineering qualification; one-ULP effect bank partial for all 5015 eligible events; no repair search entered"
+  },
+  "seeds": {
+    "stage1_a": [9541],
+    "stage1_b": [9542, 9543, 9544, 9545],
+    "scientific_seed_bundles": 0
+  },
+  "capacity": {
+    "method": "multi-step sparse effect columns, duplicate compression, readout-space Gram matrix, deterministic f64 symmetric eigendecomposition",
+    "steps_per_direction": 16,
+    "rank_multiplier": 1000.0,
+    "projection_tolerance": 2.0e-10,
+    "coefficient_resolution": 1.0e-12,
+    "partial_policy": "fail closed and skip repair search",
+    "coefficient_interpretation": "linearized diagnostic only; not a path-realizability claim"
+  },
+  "search": {
+    "beam_width": 64,
+    "branch_width": 64,
+    "maximum_moves": 64,
+    "maximum_moves_per_coordinate": 16,
+    "final_reserve_ulps": 16,
+    "final_tolerances": {
+      "cue": 2.0e-6,
+      "axis": 2.0e-6,
+      "norm": 2.0e-7
+    }
+  },
+  "firewall": {
+    "behavioral_inference": false,
+    "dh08b_authorized": false,
+    "forbidden_receipt_fields": ["accuracy", "reward", "actions", "old_map_margin", "behavior"]
+  },
+  "execution": {
+    "stage1_a_states": 1024,
+    "stage1_b_states": 4096,
+    "taus": [4.0, 16.0],
+    "sides": ["R", "L"],
+    "threads": 8,
+    "readout": "DriveOperator::sequential with canonical rows and f32 Iterator::sum"
+  }
+}

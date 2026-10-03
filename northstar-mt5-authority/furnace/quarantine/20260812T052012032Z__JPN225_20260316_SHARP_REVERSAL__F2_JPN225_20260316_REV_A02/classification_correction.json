@@ -1,0 +1,13 @@
+﻿{
+    "contract":  "MST_FURNACE_RECONCILIATION_V1",
+    "status":  "DIAGNOSTIC_DUPLICATE_OF_ADMITTED_RUN",
+    "reconciled_at_utc":  "2026-08-12T09:21:59.8745385Z",
+    "window_id":  "JPN225_20260316_SHARP_REVERSAL",
+    "attempt_tag":  "F2_JPN225_20260316_REV_A02",
+    "run_key":  "RG2_JPN225_PERIOD_M5_1773619200_1774047300_3195075028303676313",
+    "canonical_dataset_hash":  "381360514868216a9d8f184b07be7b14044744446728add58a496939bab20e53",
+    "cause":  "sealer host-stream output was not captured by orchestrator",
+    "corpus_authoritative":  true,
+    "quarantine_preserved":  true,
+    "deletion_performed":  false
+}

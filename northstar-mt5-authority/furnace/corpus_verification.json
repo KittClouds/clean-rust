@@ -1,0 +1,234 @@
+﻿{
+    "contract":  "MST_CORPUS_VERIFICATION_V1",
+    "status":  "PASS",
+    "verified_at_utc":  "2026-08-12T12:50:11.1643916Z",
+    "corpus_directory":  "C:\\Users\\shuga\\OneDrive\\Documents\\ChatGPT\\eas\\furnace\\corpus",
+    "admitted_runs":  20,
+    "unique_run_keys":  20,
+    "unique_windows":  20,
+    "failures":  [
+
+                 ],
+    "runs":  [
+                 {
+                     "run_key":  "RG2_DE40_PERIOD_M5_1765756800_1766181300_3308521111094945957",
+                     "window_id":  "DE40_20251215_PROLONGED_BALANCE",
+                     "invocation_id":  "RG2_DE40_PERIOD_M5_1765756800_1766181300_3308521111094945957_I1765756800_4780056707661219133",
+                     "canonical_dataset_hash":  "4cdfffe50b84c2ea719c270348ca37d5430d1f2929c3b3512420ed914c2af6c8",
+                     "sealed_payload_sha256":  "f910a68f06c88d207f32f461b7ecb89bc4e53d7d63e51ab4cc44b514d7a1532f",
+                     "event_rows":  2596,
+                     "attempt_rows":  508,
+                     "episode_rows":  77,
+                     "transit_rows":  43
+                 },
+                 {
+                     "run_key":  "RG2_DE40_PERIOD_M5_1769990400_1770414900_2017222542755637715",
+                     "window_id":  "DE40_20260202_ORDINARY",
+                     "invocation_id":  "RG2_DE40_PERIOD_M5_1769990400_1770414900_2017222542755637715_I1769990400_8396962631843174347",
+                     "canonical_dataset_hash":  "33a914e813ee47fc6a64e74b20ec93070e27273d6682449626c5d694601ea399",
+                     "sealed_payload_sha256":  "773e457ab4825327ab4d1995fc862e0fabca1434ad0e9fce6a12b4a8ea8d0bef",
+                     "event_rows":  2221,
+                     "attempt_rows":  448,
+                     "episode_rows":  100,
+                     "transit_rows":  33
+                 },
+                 {
+                     "run_key":  "RG2_DE40_PERIOD_M5_1776038400_1776462900_3312069574877448041",
+                     "window_id":  "DE40_20260413_DIRECTIONAL_EXPANSION_UP",
+                     "invocation_id":  "RG2_DE40_PERIOD_M5_1776038400_1776462900_3312069574877448041_I1776038400_358673876995224712",
+                     "canonical_dataset_hash":  "8ed1c118efcd49f98e9b5a9a05f9f4ac8fad015553f5814dabea89d61deea1be",
+                     "sealed_payload_sha256":  "3c634c0092da9bc886e9058feafcf8cf4d837657ea5b1c982a47386fef59a9c6",
+                     "event_rows":  1368,
+                     "attempt_rows":  274,
+                     "episode_rows":  38,
+                     "transit_rows":  17
+                 },
+                 {
+                     "run_key":  "RG2_FRA40_PERIOD_M5_1764547200_1764978900_5546118285371728057",
+                     "window_id":  "FRA40_20251201_PROLONGED_BALANCE",
+                     "invocation_id":  "RG2_FRA40_PERIOD_M5_1764547200_1764978900_5546118285371728057_I1764547200_10351984854296394331",
+                     "canonical_dataset_hash":  "7dce75dd5e1b4c81951efb2b6c3fe9308814a6c98577757eb4bcc3a145503cca",
+                     "sealed_payload_sha256":  "f2c5d9a2284b98407494c684bffb9ee085ae7e549f6a38770ec9f55690f2cb11",
+                     "event_rows":  3334,
+                     "attempt_rows":  636,
+                     "episode_rows":  86,
+                     "transit_rows":  77
+                 },
+                 {
+                     "run_key":  "RG2_FRA40_PERIOD_M5_1772409600_1772841300_6520811157212810975",
+                     "window_id":  "FRA40_20260302_DIRECTIONAL_EXPANSION_DOWN",
+                     "invocation_id":  "RG2_FRA40_PERIOD_M5_1772409600_1772841300_6520811157212810975_I1772409600_2445632796393747639",
+                     "canonical_dataset_hash":  "6654528932cb22a28018f6b9e6546cc1c4dcbff8d42ff7a6c4f804a41ad92669",
+                     "sealed_payload_sha256":  "6855936c89173db85ecde026ce3e4fa0686a3aa6ff6bacfe164db4caa296e53f",
+                     "event_rows":  1777,
+                     "attempt_rows":  355,
+                     "episode_rows":  78,
+                     "transit_rows":  30
+                 },
+                 {
+                     "run_key":  "RG2_FRA40_PERIOD_M5_1777248000_1777589700_9554760657515700142",
+                     "window_id":  "FRA40_20260427_EVENT_HEAVY",
+                     "invocation_id":  "RG2_FRA40_PERIOD_M5_1777248000_1777589700_9554760657515700142_I1777248000_5770006631441892493",
+                     "canonical_dataset_hash":  "0edfbd5ff1d4353ea148bce07e56f63558d28720637389a250ea683b485e5abc",
+                     "sealed_payload_sha256":  "6e3d85767b710eaa050ff1b61502354e849720d68c4ecb49069ad26c796943eb",
+                     "event_rows":  965,
+                     "attempt_rows":  200,
+                     "episode_rows":  57,
+                     "transit_rows":  8
+                 },
+                 {
+                     "run_key":  "RG2_JPN225_PERIOD_M5_1764547200_1764978900_13582613236484951",
+                     "window_id":  "JPN225_20251201_LOW_VOLATILITY",
+                     "invocation_id":  "RG2_JPN225_PERIOD_M5_1764547200_1764978900_13582613236484951_I1764547200_14446123889015261558",
+                     "canonical_dataset_hash":  "1ee6e5af68dc79773dbabdb1708ec782fa2b0aa0e8ef8341c3b566549d6d23d0",
+                     "sealed_payload_sha256":  "b92c9b5ddd96e732e46623fb8a01243fcdc664920b7b51474d4318306b4e3cc7",
+                     "event_rows":  1573,
+                     "attempt_rows":  309,
+                     "episode_rows":  61,
+                     "transit_rows":  31
+                 },
+                 {
+                     "run_key":  "RG2_JPN225_PERIOD_M5_1766966400_1767398100_17845446579741474672",
+                     "window_id":  "JPN225_20251229_QUIET",
+                     "invocation_id":  "RG2_JPN225_PERIOD_M5_1766966400_1767398100_17845446579741474672_I1766966400_12435980598999750367",
+                     "canonical_dataset_hash":  "6d6b7aaf132657eba7cd20fa46f24e024b2cdf742fb044f90492fa31f2bfc263",
+                     "sealed_payload_sha256":  "f5ed53d81b1a652c6574c22e423946d4f7b8d120d831b9fe2a21e24bf1b33293",
+                     "event_rows":  2100,
+                     "attempt_rows":  412,
+                     "episode_rows":  86,
+                     "transit_rows":  40
+                 },
+                 {
+                     "run_key":  "RG2_JPN225_PERIOD_M5_1773619200_1774047300_3195075028303676313",
+                     "window_id":  "JPN225_20260316_SHARP_REVERSAL",
+                     "invocation_id":  "RG2_JPN225_PERIOD_M5_1773619200_1774047300_3195075028303676313_I1773619200_604940214337385776",
+                     "canonical_dataset_hash":  "381360514868216a9d8f184b07be7b14044744446728add58a496939bab20e53",
+                     "sealed_payload_sha256":  "eebef5c5e4de69d86e5892eb7e4cc4d4400db4de1422dc92cfdd30e5e828618e",
+                     "event_rows":  1554,
+                     "attempt_rows":  313,
+                     "episode_rows":  66,
+                     "transit_rows":  25
+                 },
+                 {
+                     "run_key":  "RG2_JPN225_PERIOD_M5_1783900800_1784332500_15138704202311374725",
+                     "window_id":  "JPN225_20260713_DIRECTIONAL_EXPANSION_DOWN",
+                     "invocation_id":  "RG2_JPN225_PERIOD_M5_1783900800_1784332500_15138704202311374725_I1783900800_14814472736450214318",
+                     "canonical_dataset_hash":  "7f2593a7d9ee6636ed76d8a7e2fb89bffa242aa3a27cda22de96d84f29e029af",
+                     "sealed_payload_sha256":  "0a067acb802af1a749edeba724e06c47f77f7a436ff78dfbbabd8bbb1c19316a",
+                     "event_rows":  2207,
+                     "attempt_rows":  445,
+                     "episode_rows":  82,
+                     "transit_rows":  30
+                 },
+                 {
+                     "run_key":  "RG2_US30_PERIOD_M5_1765756800_1766184900_14597027152545731016",
+                     "window_id":  "US30_20251215_EVENT_HEAVY",
+                     "invocation_id":  "RG2_US30_PERIOD_M5_1765756800_1766184900_14597027152545731016_I1765756800_2005171585885983666",
+                     "canonical_dataset_hash":  "d647fda0ca45bdd58d4ce208f609946ae06d3c57113d63074cdcf417abf174dd",
+                     "sealed_payload_sha256":  "f17cbd750686b3a5bfcdb4f9b443757fde2136eff02c387974f14ce6b6621ba4",
+                     "event_rows":  1770,
+                     "attempt_rows":  357,
+                     "episode_rows":  73,
+                     "transit_rows":  27
+                 },
+                 {
+                     "run_key":  "RG2_US30_PERIOD_M5_1776038400_1776466500_16278752941905126714",
+                     "window_id":  "US30_20260413_DIRECTIONAL_EXPANSION_UP",
+                     "invocation_id":  "RG2_US30_PERIOD_M5_1776038400_1776466500_16278752941905126714_I1776038400_2149680765334816370",
+                     "canonical_dataset_hash":  "24a70356dc084f506966cbd17c3fdf5169ca684234c9dde71a9eca1d6d010a28",
+                     "sealed_payload_sha256":  "51d9fd52c77e66dfc942328c51b7bdbcd1804fb170e3ddd4dc22dfcc56656b60",
+                     "event_rows":  1314,
+                     "attempt_rows":  280,
+                     "episode_rows":  62,
+                     "transit_rows":  6
+                 },
+                 {
+                     "run_key":  "RG2_US30_PERIOD_M5_1777248000_1777676100_6859180431116322748",
+                     "window_id":  "US30_20260427_ORDINARY",
+                     "invocation_id":  "RG2_US30_PERIOD_M5_1777248000_1777676100_6859180431116322748_I1777248000_12337987884939598039",
+                     "canonical_dataset_hash":  "b5e4734e2cefb4ec739e00b39c119647da03e4529bbcb8c8137997a2fdb57385",
+                     "sealed_payload_sha256":  "26917dad6627c4354bca99ef5de9cc38a7c9bb1f5f1ba317a2a6f16149d4ea5f",
+                     "event_rows":  3239,
+                     "attempt_rows":  630,
+                     "episode_rows":  99,
+                     "transit_rows":  68
+                 },
+                 {
+                     "run_key":  "RG2_US500_PERIOD_M5_1764547200_1764975300_7828061311987021760",
+                     "window_id":  "US500_20251201_PROLONGED_BALANCE",
+                     "invocation_id":  "RG2_US500_PERIOD_M5_1764547200_1764975300_7828061311987021760_I1764547200_2962433582278886759",
+                     "canonical_dataset_hash":  "3ae7a54425c3a67f3dbb104a9ec791925b3fc2cbda166835a558bb22a18a3b12",
+                     "sealed_payload_sha256":  "c824b4dae9687436917692b60ce8a94d97ca31aac490e4e07bd60842c5635b6a",
+                     "event_rows":  2644,
+                     "attempt_rows":  527,
+                     "episode_rows":  81,
+                     "transit_rows":  40
+                 },
+                 {
+                     "run_key":  "RG2_US500_PERIOD_M5_1766361600_1766789700_6275432351093221649",
+                     "window_id":  "US500_20251222_LOW_VOLATILITY",
+                     "invocation_id":  "RG2_US500_PERIOD_M5_1766361600_1766789700_6275432351093221649_I1766361600_2757172083031860788",
+                     "canonical_dataset_hash":  "e4bb7e7f54d4aa37a6e8a1e776d3ad49685881d832196bbaee611f3908c8c7fc",
+                     "sealed_payload_sha256":  "48e6751be429c660e48b0312924214aa8bda717d2ce36ac60d2158d1cce88187",
+                     "event_rows":  1060,
+                     "attempt_rows":  224,
+                     "episode_rows":  34,
+                     "transit_rows":  3
+                 },
+                 {
+                     "run_key":  "RG2_US500_PERIOD_M5_1773014400_1773442200_10013978319232738791",
+                     "window_id":  "US500_20260309_HIGH_VOLATILITY",
+                     "invocation_id":  "RG2_US500_PERIOD_M5_1773014400_1773442200_10013978319232738791_I1773014400_89433794784499033",
+                     "canonical_dataset_hash":  "830a21f40e7c9cdc5b472680de91177b1974bc33074cdda01be91252d7fffb68",
+                     "sealed_payload_sha256":  "d1d5d6cd60c6a352ea33c841447f04fb6c619bee538e61449ac6b0ced9d33711",
+                     "event_rows":  1807,
+                     "attempt_rows":  363,
+                     "episode_rows":  85,
+                     "transit_rows":  31
+                 },
+                 {
+                     "run_key":  "RG2_US500_PERIOD_M5_1780272000_1780700100_8888579981882631925",
+                     "window_id":  "US500_20260601_DIRECTIONAL_EXPANSION_DOWN",
+                     "invocation_id":  "RG2_US500_PERIOD_M5_1780272000_1780700100_8888579981882631925_I1780272000_13858232681193104555",
+                     "canonical_dataset_hash":  "8704796c3fd6c09dad9d99966c2753c914b68b29a00aa85f0a99bcfc391ce604",
+                     "sealed_payload_sha256":  "0cf258978c9610f499e1df1c6d42bee4aad0fbe82b1c324c3b2fd5fd9fceebe6",
+                     "event_rows":  2755,
+                     "attempt_rows":  540,
+                     "episode_rows":  111,
+                     "transit_rows":  58
+                 },
+                 {
+                     "run_key":  "RG2_USTEC_PERIOD_M5_1767571200_1767999300_9581645730247380597",
+                     "window_id":  "USTEC_20260105_PROLONGED_BALANCE",
+                     "invocation_id":  "RG2_USTEC_PERIOD_M5_1767571200_1767999300_9581645730247380597_I1767571200_4048625288316656791",
+                     "canonical_dataset_hash":  "80028d9de5730b3962cfe83cc171580bbe25a28581f110e26268ae1042c31818",
+                     "sealed_payload_sha256":  "a774125de0bfcf9119a8c65548647d197787e2ce7f0ee89c97a4b62f84203060",
+                     "event_rows":  1874,
+                     "attempt_rows":  368,
+                     "episode_rows":  51,
+                     "transit_rows":  29
+                 },
+                 {
+                     "run_key":  "RG2_USTEC_PERIOD_M5_1776038400_1776466500_3632165528533734308",
+                     "window_id":  "USTEC_20260413_DIRECTIONAL_EXPANSION_UP",
+                     "invocation_id":  "RG2_USTEC_PERIOD_M5_1776038400_1776466500_3632165528533734308_I1776038400_10924319290598477948",
+                     "canonical_dataset_hash":  "e9353d2aa8ebcbb2d4ce80100b58dc59b52cbc2a81a6220a02e918f47000e26f",
+                     "sealed_payload_sha256":  "ac55e1c7b1d1d0f4dd8fcaa7d21b006c32d5c1f987a0a408048aa1cf0264c827",
+                     "event_rows":  953,
+                     "attempt_rows":  197,
+                     "episode_rows":  61,
+                     "transit_rows":  9
+                 },
+                 {
+                     "run_key":  "RG2_USTEC_PERIOD_M5_1784505600_1784933700_16636102961176583068",
+                     "window_id":  "USTEC_20260720_QUIET",
+                     "invocation_id":  "RG2_USTEC_PERIOD_M5_1784505600_1784933700_16636102961176583068_I1784505600_1641078661842694290",
+                     "canonical_dataset_hash":  "0ce8918c429028622e6ac1e3f0b9b66f267a0e3cd27354bf597f1c5c93164bee",
+                     "sealed_payload_sha256":  "f94cd692d34d9719ef92f0062a17541ef851d0a237376146dbbafb968bfcd35e",
+                     "event_rows":  1846,
+                     "attempt_rows":  378,
+                     "episode_rows":  74,
+                     "transit_rows":  23
+                 }
+             ]
+}

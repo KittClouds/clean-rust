@@ -1,0 +1,46 @@
+{
+  "receipt_id": "FAS_FROZEN_OBSERVER_BUNDLE_E0_V06_E2_V03_COMPATIBILITY_AMENDMENT_V01",
+  "status": "DRAFT_READY_FOR_SEAL_AND_INDEPENDENT_AUDIT_NOT_AUTHORIZED_FOR_MODEL_CONTACT",
+  "classification": "contract-literal compatibility fix",
+  "predecessor": {
+    "e0_v05_root_sha256": "56ab898130ddae394f3fa12a00eccf2bf6e565fde9c58e56f93eb70dde4bd693",
+    "e2_v02_authorized_stop_receipt": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e2-v02-authorized-attempt-stop-v01.json",
+    "e2_v02_authorized_stop_receipt_sha256": "93c4ebfa24c5abcf525b90d29e3e9034f319e2edc3f71c39a2f80c4be0e3184f"
+  },
+  "mismatch": {
+    "e2_v02_expected_literal": "E0_V05_FROZEN_NOT_AUTHORIZED_FOR_MODEL_CONTACT",
+    "sealed_e0_v05_actual_literal": "E0_FROZEN_NOT_AUTHORIZED_FOR_MODEL_CONTACT",
+    "independent_e0_v05_audit": "E0_V05_SEAL_INDEPENDENT_AUDIT_PASS_MODEL_CONTACT_NOT_AUTHORIZED"
+  },
+  "repair": {
+    "e2_v03_expected_literal": "E0_FROZEN_NOT_AUTHORIZED_FOR_MODEL_CONTACT",
+    "direct_parent_root": "56ab898130ddae394f3fa12a00eccf2bf6e565fde9c58e56f93eb70dde4bd693",
+    "new_e0_freeze_id": "FAS_FROZEN_OBSERVER_BUNDLE_E0_FREEZE_V06",
+    "new_e2_protocol_id": "FAS_FROZEN_OBSERVER_BUNDLE_E2_RUN_V03",
+    "new_representation_abi_id": "FAS_FROZEN_OBSERVER_BUNDLE_REPRESENTATION_ABI_V03",
+    "extractor_source_sha256": "f677d0927bde71f146ce8e7f6f4df83b70864a464a1f009888f52bcd2c59787b",
+    "protocol_sha256": "d88bbf9342918f5a1db4e42190128e2adf9d0c726bcddd568ddb9498ab25181d",
+    "abi_sha256": "db41d64f872c1fe8ec9b76e2aa5caf00a5fc1ec966c23a590d2cce6d5dc27a14"
+  },
+  "unchanged_frozen_invariants": [
+    "E0 v05 substantive resource semantics and process-scoped PyTorch allocator meaning",
+    "E1 v04 panel root and population",
+    "LiquidAI/LFM2.5-1.2B-Base revision, model hashes, tokenizer revision, tokenizer hashes, and runtime versions",
+    "V1_FINAL_POSITION, final unpadded token position, tensor/hook identity, no alternative pooling",
+    "float32 hidden values serialized as C-order little-endian float32",
+    "ordered E1 rows and whole-quartet split",
+    "registered 256-row deterministic repeat",
+    "10 GiB extractor-process PyTorch CUDA reserved-memory ceiling and clean allocator baselines",
+    "E2 v01 comparator SHA-256 8eb80df5f73e761fe6c025fc1c66abef2027d639b6c14f56d4177d6e6a7a45a4 and length 872415232",
+    "total_gpu_memory_claimed=false; nvidia-smi remains diagnostic only",
+    "preserve-and-stop on every frozen gate failure, with no in-place repair or second run under one identity",
+    "E3 fitting/scoring remains separately unauthorized"
+  ],
+  "authorization": {
+    "model_contact_authorized": false,
+    "tokenizer_contact_authorized": false,
+    "feature_extraction_authorized": false,
+    "observer_fitting_authorized": false,
+    "fresh_explicit_e2_v03_authorization_required_after_seal_and_independent_audit": true
+  }
+}

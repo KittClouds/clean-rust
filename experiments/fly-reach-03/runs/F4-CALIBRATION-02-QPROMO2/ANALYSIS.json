@@ -1,0 +1,375 @@
+{
+  "block_ids": [
+    305012,
+    305013,
+    305014,
+    305015,
+    305016,
+    305017,
+    305018,
+    305019,
+    305020,
+    305021,
+    305022,
+    305023
+  ],
+  "blockwise_D": [
+    {
+      "balanced_error": null,
+      "block_id": 305012,
+      "class_counts": {
+        "negative": 1715,
+        "positive": 0
+      },
+      "eta_del": 0.1470830379984692,
+      "evaluable": false,
+      "leverage_concentration": {
+        "effective_sample_size": 17.015268195070988,
+        "leverage_total": 0.520868874179273,
+        "top_1pct_share": 0.7848970349034375,
+        "top_20pct_share": 0.9999291033825173,
+        "top_5pct_share": 0.9915720495705842
+      },
+      "omega_hat_clipped": null,
+      "omega_hat_unclipped": null,
+      "psi_native_sign": -0.053958172251931114,
+      "psi_prop": 1.0,
+      "psi_reference_sign": 1.0,
+      "rows": 1715,
+      "signed_margin": 14.481342196673069,
+      "signed_margin_scope": "single_class_ipw"
+    },
+    {
+      "balanced_error": 0.005931627090443387,
+      "block_id": 305013,
+      "class_counts": {
+        "negative": 1448,
+        "positive": 179
+      },
+      "eta_del": 0.18938490040521674,
+      "evaluable": true,
+      "leverage_concentration": {
+        "effective_sample_size": 11.746162401908885,
+        "leverage_total": 0.2022457883699325,
+        "top_1pct_share": 0.864112517850325,
+        "top_20pct_share": 0.999999818924735,
+        "top_5pct_share": 0.9993106351713463
+      },
+      "omega_hat_clipped": 0.9881367458191133,
+      "omega_hat_unclipped": 0.9881367458191133,
+      "psi_native_sign": 0.1373483127769064,
+      "psi_prop": 0.7829297667851178,
+      "psi_reference_sign": 1.0,
+      "rows": 1627,
+      "signed_margin": 8.929638224479277,
+      "signed_margin_scope": "class_balanced_ipw"
+    },
+    {
+      "balanced_error": 0.4248687482744404,
+      "block_id": 305014,
+      "class_counts": {
+        "negative": 1057,
+        "positive": 3159
+      },
+      "eta_del": 0.010139862526344736,
+      "evaluable": true,
+      "leverage_concentration": {
+        "effective_sample_size": 19.236424102027918,
+        "leverage_total": 0.5653695252090984,
+        "top_1pct_share": 0.9005671355214263,
+        "top_20pct_share": 0.9985452369533374,
+        "top_5pct_share": 0.991222406153323
+      },
+      "omega_hat_clipped": 0.15026250345111924,
+      "omega_hat_unclipped": 0.15026250345111924,
+      "psi_native_sign": 0.3816333761499664,
+      "psi_prop": 0.06971626214685789,
+      "psi_reference_sign": 1.0,
+      "rows": 4216,
+      "signed_margin": 6.647418341136838,
+      "signed_margin_scope": "class_balanced_ipw"
+    },
+    {
+      "balanced_error": 0.4461741244516495,
+      "block_id": 305015,
+      "class_counts": {
+        "negative": 1006,
+        "positive": 346
+      },
+      "eta_del": 0.08831119587279074,
+      "evaluable": true,
+      "leverage_concentration": {
+        "effective_sample_size": 5.036004629035597,
+        "leverage_total": 0.05554852558419889,
+        "top_1pct_share": 0.9990538849772558,
+        "top_20pct_share": 0.9999998095900089,
+        "top_5pct_share": 0.9999566082646132
+      },
+      "omega_hat_clipped": 0.107651751096701,
+      "omega_hat_unclipped": 0.107651751096701,
+      "psi_native_sign": -0.4178441482559121,
+      "psi_prop": 0.3153131029776828,
+      "psi_reference_sign": 1.0,
+      "rows": 1352,
+      "signed_margin": 0.09723501235656917,
+      "signed_margin_scope": "class_balanced_ipw"
+    },
+    {
+      "balanced_error": 0.07703597913412927,
+      "block_id": 305016,
+      "class_counts": {
+        "negative": 413,
+        "positive": 1110
+      },
+      "eta_del": 0.20297049765831368,
+      "evaluable": true,
+      "leverage_concentration": {
+        "effective_sample_size": 18.732487662329245,
+        "leverage_total": 0.31472176790827344,
+        "top_1pct_share": 0.8102783824840005,
+        "top_20pct_share": 0.999997468822824,
+        "top_5pct_share": 0.9998691425806386
+      },
+      "omega_hat_clipped": 0.8459280417317414,
+      "omega_hat_unclipped": 0.8459280417317414,
+      "psi_native_sign": -0.3107203992319538,
+      "psi_prop": 0.8953796298354946,
+      "psi_reference_sign": 1.0,
+      "rows": 1523,
+      "signed_margin": 6.5245259313325725,
+      "signed_margin_scope": "class_balanced_ipw"
+    },
+    {
+      "balanced_error": 0.7676837089976177,
+      "block_id": 305017,
+      "class_counts": {
+        "negative": 6,
+        "positive": 1819
+      },
+      "eta_del": -0.004224866208099328,
+      "evaluable": true,
+      "leverage_concentration": {
+        "effective_sample_size": 34.2651855829832,
+        "leverage_total": 0.16149864675847939,
+        "top_1pct_share": 0.4062146376470435,
+        "top_20pct_share": 0.8688174023034372,
+        "top_5pct_share": 0.6279132065541086
+      },
+      "omega_hat_clipped": 0.0,
+      "omega_hat_unclipped": -0.5353674179952355,
+      "psi_native_sign": -0.31914220974374763,
+      "psi_prop": -0.3021110330261978,
+      "psi_reference_sign": 1.0,
+      "rows": 1825,
+      "signed_margin": -1.6348922641892227,
+      "signed_margin_scope": "class_balanced_ipw"
+    },
+    {
+      "balanced_error": 0.3475518110356022,
+      "block_id": 305018,
+      "class_counts": {
+        "negative": 3061,
+        "positive": 1838
+      },
+      "eta_del": 0.21038718553098854,
+      "evaluable": true,
+      "leverage_concentration": {
+        "effective_sample_size": 18.176794635298645,
+        "leverage_total": 0.4603939414755399,
+        "top_1pct_share": 0.983117665618195,
+        "top_20pct_share": 0.9999277662946947,
+        "top_5pct_share": 0.9984255520929467
+      },
+      "omega_hat_clipped": 0.30489637792879565,
+      "omega_hat_unclipped": 0.30489637792879565,
+      "psi_native_sign": 0.20106334579821983,
+      "psi_prop": 0.9999605533949647,
+      "psi_reference_sign": 1.0,
+      "rows": 4899,
+      "signed_margin": 6.131934382123709,
+      "signed_margin_scope": "class_balanced_ipw"
+    },
+    {
+      "balanced_error": null,
+      "block_id": 305019,
+      "class_counts": {
+        "negative": 939,
+        "positive": 0
+      },
+      "eta_del": 0.22010719173744672,
+      "evaluable": false,
+      "leverage_concentration": {
+        "effective_sample_size": 13.67885161757678,
+        "leverage_total": 0.061021737750384775,
+        "top_1pct_share": 0.6907946017724526,
+        "top_20pct_share": 0.9990623045631086,
+        "top_5pct_share": 0.9631616641431284
+      },
+      "omega_hat_clipped": null,
+      "omega_hat_unclipped": null,
+      "psi_native_sign": -0.14787865457682403,
+      "psi_prop": 1.0,
+      "psi_reference_sign": 1.0,
+      "rows": 939,
+      "signed_margin": 11.358838920614524,
+      "signed_margin_scope": "single_class_ipw"
+    },
+    {
+      "balanced_error": 0.0,
+      "block_id": 305020,
+      "class_counts": {
+        "negative": 138,
+        "positive": 109
+      },
+      "eta_del": 0.17268178901142145,
+      "evaluable": true,
+      "leverage_concentration": {
+        "effective_sample_size": 1.7037189555601797,
+        "leverage_total": 0.015185730183097355,
+        "top_1pct_share": 0.9517627687817712,
+        "top_20pct_share": 0.9999991750779053,
+        "top_5pct_share": 0.9998552284199632
+      },
+      "omega_hat_clipped": 1.0,
+      "omega_hat_unclipped": 1.0,
+      "psi_native_sign": 0.7860646898242143,
+      "psi_prop": 1.0,
+      "psi_reference_sign": 1.0,
+      "rows": 247,
+      "signed_margin": 6.788134841846986,
+      "signed_margin_scope": "class_balanced_ipw"
+    },
+    {
+      "balanced_error": null,
+      "block_id": 305021,
+      "class_counts": {
+        "negative": 1564,
+        "positive": 0
+      },
+      "eta_del": 0.38856652898643573,
+      "evaluable": false,
+      "leverage_concentration": {
+        "effective_sample_size": 18.69456194578864,
+        "leverage_total": 0.025780878486542622,
+        "top_1pct_share": 0.749507009962613,
+        "top_20pct_share": 0.9995200604650049,
+        "top_5pct_share": 0.9916986295254295
+      },
+      "omega_hat_clipped": null,
+      "omega_hat_unclipped": null,
+      "psi_native_sign": -0.46471378562841825,
+      "psi_prop": 1.0,
+      "psi_reference_sign": 1.0,
+      "rows": 1564,
+      "signed_margin": 6.378697763128049,
+      "signed_margin_scope": "single_class_ipw"
+    },
+    {
+      "balanced_error": 0.13907680431025005,
+      "block_id": 305022,
+      "class_counts": {
+        "negative": 3423,
+        "positive": 87
+      },
+      "eta_del": -0.051413522998727326,
+      "evaluable": true,
+      "leverage_concentration": {
+        "effective_sample_size": 224.32071273428681,
+        "leverage_total": 1.174398954796504,
+        "top_1pct_share": 0.3033826792940115,
+        "top_20pct_share": 0.9660838864931487,
+        "top_5pct_share": 0.7013304093225302
+      },
+      "omega_hat_clipped": 0.7218463913794999,
+      "omega_hat_unclipped": 0.7218463913794999,
+      "psi_native_sign": 0.17447264005311425,
+      "psi_prop": 0.1041934236012867,
+      "psi_reference_sign": 1.0,
+      "rows": 3510,
+      "signed_margin": 4.738509309204549,
+      "signed_margin_scope": "class_balanced_ipw"
+    },
+    {
+      "balanced_error": 0.0,
+      "block_id": 305023,
+      "class_counts": {
+        "negative": 23,
+        "positive": 46
+      },
+      "eta_del": 0.3131637436974356,
+      "evaluable": true,
+      "leverage_concentration": {
+        "effective_sample_size": 9.026408540008433,
+        "leverage_total": 0.09959412412602607,
+        "top_1pct_share": 0.23334008012351562,
+        "top_20pct_share": 0.9538077174961523,
+        "top_5pct_share": 0.5490172818177318
+      },
+      "omega_hat_clipped": 1.0,
+      "omega_hat_unclipped": 1.0,
+      "psi_native_sign": -0.25868648110112835,
+      "psi_prop": 1.0,
+      "psi_reference_sign": 1.0,
+      "rows": 69,
+      "signed_margin": 8.6608661931494,
+      "signed_margin_scope": "class_balanced_ipw"
+    }
+  ],
+  "claim_boundary": "Qualification calibration only. A pass makes a separately sealed measured REACH-03 preparation eligible; it does not authorize measured execution, a polarity controller, PHENO, or biological promotion.",
+  "contract_sha256": "192b0c3c01b2b7978aedfe55e5490012226e62e0b7660c4410797a08b44a01b8",
+  "disposition": "NOT_EVALUABLE_SUPPORT",
+  "gate": {
+    "evaluable_block_gate_pass": false,
+    "evaluable_block_ids": [
+      305013,
+      305014,
+      305015,
+      305016,
+      305017,
+      305018,
+      305020,
+      305022,
+      305023
+    ],
+    "evaluable_blocks": 9,
+    "every_evaluable_block_omega_hat_min": 0.7,
+    "minimum_evaluable_blocks": 10,
+    "pooled_balanced_error_max": 0.1,
+    "pooled_gate_pass": false,
+    "pooled_omega_hat_min": 0.8,
+    "support_pass": false,
+    "total_blocks": 12
+  },
+  "integrity_receipt_sha256": "a2565e8593528de2d711dbfab0c8b1feb309ea17db8a0d573e74f01ed89f8d7f",
+  "measured_reach03_authorized": false,
+  "pooled_D": {
+    "balanced_error": 0.34988114501534634,
+    "class_counts": {
+      "negative": 14793,
+      "positive": 8693
+    },
+    "eta_del": 0.08966518704238485,
+    "evaluable": true,
+    "leverage_concentration": {
+      "effective_sample_size": 215.4633944315409,
+      "leverage_total": 3.65662849482735,
+      "top_1pct_share": 0.7296069629905374,
+      "top_20pct_share": 0.9992685117198871,
+      "top_5pct_share": 0.9625585375900636
+    },
+    "omega_hat_clipped": 0.3002377099693073,
+    "omega_hat_unclipped": 0.3002377099693073,
+    "psi_native_sign": 0.08355574945204514,
+    "psi_prop": 0.4795323310646862,
+    "psi_reference_sign": 1.0,
+    "rows": 23486,
+    "signed_margin": 4.413504406420947,
+    "signed_margin_scope": "class_balanced_ipw"
+  },
+  "qualification_only": true,
+  "row_count": 23486,
+  "run_id": "F4-CALIBRATION-02-QPROMO2",
+  "schema": "F4-CALIBRATION-02-v0.2-analysis-v1",
+  "scoring": "q=1/p_inclusion; equal IPW class weighting; logit zero predicts negative",
+  "truth_opened_after_integrity_pass": true
+}

@@ -1,0 +1,95 @@
+﻿{
+    "contract":  "MST_IMMUTABLE_RUN_SEAL_V1",
+    "status":  "SEALED",
+    "sealed_at_utc":  "2026-08-12T09:40:20.0916122Z",
+    "run_key":  "RG2_US500_PERIOD_M5_1773014400_1773442200_10013978319232738791",
+    "invocation_id":  "RG2_US500_PERIOD_M5_1773014400_1773442200_10013978319232738791_I1773014400_89433794784499033",
+    "window_id":  "US500_20260309_HIGH_VOLATILITY",
+    "manifest_sha256":  "5bf12767746b8499ad0edde2597df67b1928cc5941705a8391ae2585a0574092",
+    "canonical_dataset_hash":  "830a21f40e7c9cdc5b472680de91177b1974bc33074cdda01be91252d7fffb68",
+    "sealed_payload_sha256":  "d1d5d6cd60c6a352ea33c841447f04fb6c619bee538e61449ac6b0ced9d33711",
+    "file_count":  16,
+    "files":  [
+                  {
+                      "path":  "raw/auction/MasterAuction_US500_PERIOD_M5_F2_US500_20260309_HIV_A01_RG2_v7_attempts.tsv",
+                      "bytes":  259518,
+                      "sha256":  "6af7d740d4611bef9e206f06d0102d63787a90c8a4d29b9f81cd9e141a269c55"
+                  },
+                  {
+                      "path":  "raw/auction/MasterAuction_US500_PERIOD_M5_F2_US500_20260309_HIV_A01_RG2_v7_context.tsv",
+                      "bytes":  753753,
+                      "sha256":  "42145f6e6205c0aa6585853902983128e14046cc381c22c14615fa50a9e08436"
+                  },
+                  {
+                      "path":  "raw/auction/MasterAuction_US500_PERIOD_M5_F2_US500_20260309_HIV_A01_RG2_v7_episodes.tsv",
+                      "bytes":  34594,
+                      "sha256":  "c6b135e18a28d8c534547ed947e5c7ede1e5c9fbc7cd9a90abb8930307508bcc"
+                  },
+                  {
+                      "path":  "raw/auction/MasterAuction_US500_PERIOD_M5_F2_US500_20260309_HIV_A01_RG2_v7_events.tsv",
+                      "bytes":  873823,
+                      "sha256":  "9fc60c446235ef65ed6280fa2ccc4d4297d27092b2e8d1f4d4e60b7318af2d5a"
+                  },
+                  {
+                      "path":  "raw/auction/MasterAuction_US500_PERIOD_M5_F2_US500_20260309_HIV_A01_RG2_v7_features.tsv",
+                      "bytes":  227643,
+                      "sha256":  "ceef53a97d9cd7a908859ef21047180c034da99cfdcf6a4daee559a163f82854"
+                  },
+                  {
+                      "path":  "raw/auction/MasterAuction_US500_PERIOD_M5_F2_US500_20260309_HIV_A01_RG2_v7_runs.tsv",
+                      "bytes":  5745,
+                      "sha256":  "5f31a233202572d09ba7c613d99018936c98b0e9871d87a469d4c34808f584ed"
+                  },
+                  {
+                      "path":  "raw/auction/MasterAuction_US500_PERIOD_M5_F2_US500_20260309_HIV_A01_RG2_v7_transits.tsv",
+                      "bytes":  19217,
+                      "sha256":  "8d156c5a699216252381f62779abe080e7f43179f02b7fe4b81a52e4756f32ef"
+                  },
+                  {
+                      "path":  "raw/structure/MasterStructure_US500_PERIOD_M5_F2_US500_20260309_HIV_A01_v6_events.tsv",
+                      "bytes":  142934,
+                      "sha256":  "051b20bbddf3da9bf6d38b6b2b2716c822355cc1f03e5b6f495fad01a724aa7b"
+                  },
+                  {
+                      "path":  "raw/structure/MasterStructure_US500_PERIOD_M5_F2_US500_20260309_HIV_A01_v6_inputs.tsv",
+                      "bytes":  155019582,
+                      "sha256":  "197d60066ef1f04de8e63191c1faf239b1013316f86cf80e10c6393a0d0ef6c4"
+                  },
+                  {
+                      "path":  "raw/structure/MasterStructure_US500_PERIOD_M5_F2_US500_20260309_HIV_A01_v6_nodes.tsv",
+                      "bytes":  23053757,
+                      "sha256":  "2e67b3e2ea610f02f074065b360a34ee6c707cec2c40b286ef6cbd80f0021947"
+                  },
+                  {
+                      "path":  "receipts/admission_receipt.json",
+                      "bytes":  2771,
+                      "sha256":  "d0c31dffd986b1d2900a6e09529b1cbe22a6efc73b81a80840bab0bf7c37714f"
+                  },
+                  {
+                      "path":  "receipts/campaign_manifest_row.json",
+                      "bytes":  1628,
+                      "sha256":  "19daf84c8f8ebe3e39800bd8bc798ec4e0046ae0aa0f66e00a4a917cd7e23c48"
+                  },
+                  {
+                      "path":  "receipts/MasterAuction_US500_PERIOD_M5_F2_US500_20260309_HIV_A01_RG2_v7_replay_certificate.json",
+                      "bytes":  3578,
+                      "sha256":  "6fd4f8b38970cfbf8489f9703132dbf80e98f553828af023b3715a22ebb55e2c"
+                  },
+                  {
+                      "path":  "receipts/MasterAuction_US500_PERIOD_M5_F2_US500_20260309_HIV_A01_RG2_v7_replay_certificate.md",
+                      "bytes":  630,
+                      "sha256":  "c0a8ec71034bdd875ccb583d20dee6a28dc65b1860b52ad3b9dd8e5ed56d75dc"
+                  },
+                  {
+                      "path":  "receipts/terminal_run_receipt.json",
+                      "bytes":  4525,
+                      "sha256":  "bebd5862c5f8a052170b8ac04c9df6d262eaa130cbec95453a14bcd968d9485e"
+                  },
+                  {
+                      "path":  "tester.ini",
+                      "bytes":  1656,
+                      "sha256":  "852b51a632e984bb3b8f7754fa284c0d9e51b0f3330b6684c969e6522f39d728"
+                  }
+              ],
+    "mutation_rule":  "never overwrite; replacement requires a new invocation and explicit corpus generation"
+}

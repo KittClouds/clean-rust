@@ -1,0 +1,352 @@
+{
+  "ar04c": {
+    "adaptive_overfitting_gap_ratio_fixed_vs_rotating": 317.86580610280004,
+    "cell_wins": {
+      "fixed_beats_training": "22/25",
+      "rotating_beats_fixed": "25/25",
+      "rotating_beats_training": "25/25"
+    },
+    "conditional_unbiasedness": {
+      "claim": "E[grad J_St(xt) | xt] = grad J(xt) if St fresh independent of xt",
+      "does_not_imply": "checkpoint action-ranking alignment (AR-H56 not supported)",
+      "status": "holds by construction for rotating panels (disjoint seed namespaces, prospective panel schedule)"
+    },
+    "final_measurement_loss": {
+      "sentinel_fixed128": 3.208658061028,
+      "sentinel_rotating128": 0.768007643223,
+      "training_full96": 4.942043199539
+    },
+    "operational_minus_final": {
+      "fixed": -3.1786580610280004,
+      "rotating": 0.01,
+      "training": -4.942043199539
+    },
+    "spearman_terminal_approx": {
+      "fixed": -0.15,
+      "rotating": 0.02,
+      "training": -0.08
+    },
+    "terminal_operational_loss_approx": {
+      "fixed": 0.03,
+      "rotating": 0.778007643223,
+      "training": 0.0
+    }
+  },
+  "authority_by_substrate": {
+    "fly": {
+      "clip": 0.2671611607423156,
+      "eta_D": 0.00028492736107346115,
+      "eta_M_ratio_of_means": null,
+      "eta_S_L1": 0.6494948502506872,
+      "support_frac": 0.3820733622831314
+    },
+    "g001": {
+      "clip": 0.2618667848785022,
+      "eta_D": 0.00019802307921086128,
+      "eta_M_ratio_of_means": null,
+      "eta_S_L1": 0.6357190489317565,
+      "support_frac": 0.37337882092057023
+    },
+    "g002": {
+      "clip": 0.25781815738243913,
+      "eta_D": 9.576868318318443e-05,
+      "eta_M_ratio_of_means": null,
+      "eta_S_L1": 0.6515688569235311,
+      "support_frac": 0.3740127760752887
+    },
+    "g003": {
+      "clip": 0.3005194510445178,
+      "eta_D": 0.0009241165209961546,
+      "eta_M_ratio_of_means": null,
+      "eta_S_L1": 0.6429257349341048,
+      "support_frac": 0.3721404622691477
+    },
+    "g004": {
+      "clip": 0.3022635256014062,
+      "eta_D": 0.00043807218463423934,
+      "eta_M_ratio_of_means": null,
+      "eta_S_L1": 0.6481623000291773,
+      "support_frac": 0.3722057270440368
+    },
+    "g005": {
+      "clip": 0.2721799841834454,
+      "eta_D": -6.883359005946465e-05,
+      "eta_M_ratio_of_means": null,
+      "eta_S_L1": 0.6430306380321887,
+      "support_frac": 0.36992235838216275
+    },
+    "g006": {
+      "clip": 0.2756736134178027,
+      "eta_D": 0.0002081468677480045,
+      "eta_M_ratio_of_means": null,
+      "eta_S_L1": 0.6659516500741057,
+      "support_frac": 0.37184106259187716
+    },
+    "g007": {
+      "clip": 0.28146233887749483,
+      "eta_D": 0.000412082442030705,
+      "eta_M_ratio_of_means": null,
+      "eta_S_L1": 0.6579215233589636,
+      "support_frac": 0.3714359765526434
+    },
+    "g008": {
+      "clip": 0.2659789262405024,
+      "eta_D": 0.0002055071864265138,
+      "eta_M_ratio_of_means": null,
+      "eta_S_L1": 0.6426563360005446,
+      "support_frac": 0.372283858411937
+    }
+  },
+  "authority_triplet": {
+    "bound_clip_fraction": 0.27610266026315844,
+    "eta_D": 0.0002997567483604066,
+    "eta_M_mean_of_ratios": 182.04641495674096,
+    "eta_M_ratio_of_means": 182.04641495674096,
+    "eta_S_L1_capture": 0.6486034376150066,
+    "magnitude_pearson": 0.013743952078926437,
+    "native_support_fraction": 0.37325493383675507,
+    "sign_agreement": 0.3897530032232756
+  },
+  "claim_checks": {
+    "adaptive_power_ne_progress": {
+      "evidence": "eta_D~0.003; magnitude-swap arm gain <= 0; direction arms recover most of oracle gap",
+      "supported": true
+    },
+    "direction_dominates": {
+      "evidence": 0.06513666223596645,
+      "supported": true
+    },
+    "fresh_evidence_unbiased": {
+      "evidence": "rotating arm operational-final gap ~0.01 vs fixed ~-3.18; H56 ranking claim fails",
+      "supported": "conjecture_consistent_with_AR-04C"
+    },
+    "support_not_primary_bottleneck": {
+      "evidence": "eta_S_L1~0.65; support_expansion incremental gain << direction_on_native_support gain",
+      "supported": true
+    }
+  },
+  "endpoint_losses": {
+    "mag_ref_native_sign": {
+      "excess_large": 0.1019908763744213,
+      "loss_256": 0.33501066984953703,
+      "loss_large": 0.33260232430917247
+    },
+    "native": {
+      "excess_large": 0.08259328206380208,
+      "loss_256": 0.3127034505208333,
+      "loss_large": 0.31320472999855326
+    },
+    "reference_direction_full_support": {
+      "excess_large": 0.01209117748119213,
+      "loss_256": 0.2446017795138889,
+      "loss_large": 0.24270262541594328
+    },
+    "reference_direction_native_support": {
+      "excess_large": 0.017456619827835647,
+      "loss_256": 0.2501763237847222,
+      "loss_large": 0.2480680677625868
+    },
+    "sign_ref_native_mag": {
+      "excess_large": 0.020087630660445603,
+      "loss_256": 0.2519666883680556,
+      "loss_large": 0.25069907859519674
+    },
+    "weight_oracle": {
+      "excess_large": 0.0,
+      "loss_256": 0.23207826967592593,
+      "loss_large": 0.23061144793475116
+    }
+  },
+  "engineering_only": true,
+  "first_order": {
+    "eta_D": 0.0002997567483604066,
+    "eta_M_ratio_of_means": 182.04641495674096,
+    "orthogonal_component": 182.04640677793165,
+    "useful_component": 0.05456964139810196,
+    "useful_fraction": 0.0002997567483604066,
+    "wasted_norm_fraction": 0.9999999550729449
+  },
+  "incremental_spectrum": {
+    "condition_number_proxy_abs": 12.140035812091853,
+    "fraction_channels_nonpositive": 0.2,
+    "gains_as_spectrum": [
+      0.06513666223596645,
+      0.06250565140335651,
+      0.019397594310619215,
+      0.012091177481192122,
+      0.0053654423466435175
+    ],
+    "max_abs_gain": 0.06513666223596645,
+    "min_abs_gain": 0.0053654423466435175,
+    "negative_gain_count": 1,
+    "nonpositive_gain_count": 1,
+    "participation_ratio_effective_rank": 2.264697328344941,
+    "spectral_norm_proxy": 0.09327911038435407
+  },
+  "nested_channels": [
+    {
+      "channel": "direction_on_native_support",
+      "from_arm": "native",
+      "gain": 0.06513666223596645,
+      "loss_large": 0.2480680677625868,
+      "to_arm": "reference_direction_native_support"
+    },
+    {
+      "channel": "support_expansion_after_direction",
+      "from_arm": "reference_direction_native_support",
+      "gain": 0.0053654423466435175,
+      "loss_large": 0.24270262541594328,
+      "to_arm": "reference_direction_full_support"
+    },
+    {
+      "channel": "free_weight_beyond_reference",
+      "from_arm": "reference_direction_full_support",
+      "gain": 0.012091177481192122,
+      "loss_large": 0.23061144793475116,
+      "to_arm": "weight_oracle"
+    },
+    {
+      "channel": "sign_swap_native_magnitude",
+      "from_arm": "native",
+      "gain": 0.06250565140335651,
+      "loss_large": 0.25069907859519674,
+      "to_arm": "sign_ref_native_mag"
+    },
+    {
+      "channel": "magnitude_swap_native_sign",
+      "from_arm": "native",
+      "gain": -0.019397594310619215,
+      "loss_large": 0.33260232430917247,
+      "to_arm": "mag_ref_native_sign"
+    },
+    {
+      "channel": "full_direction_vs_native",
+      "from_arm": "native",
+      "gain": 0.07050210458260997,
+      "loss_large": 0.24270262541594328,
+      "to_arm": "reference_direction_full_support"
+    },
+    {
+      "channel": "oracle_vs_native",
+      "from_arm": "native",
+      "gain": 0.08259328206380209,
+      "loss_large": 0.23061144793475116,
+      "to_arm": "weight_oracle"
+    }
+  ],
+  "no_biological_promotion": true,
+  "north_star": {
+    "objects": [
+      "R_H",
+      "C_H",
+      "G_x=J_c B_x",
+      "kappa_A",
+      "K_H(d)",
+      "chi_AB",
+      "evidence-coupled T_S"
+    ],
+    "question": "What capability trajectories are reachable from x under bounded adaptive authority?"
+  },
+  "primary_source": "REACH-01",
+  "reach01_trajectory_authority": {
+    "1024": {
+      "aggregation_cosine": 0.0036407712152390897,
+      "delivered_cosine": -0.0004073992125420853,
+      "eligibility_cosine": 0.003678847110730287,
+      "magnitude_pearson": -0.01680986302263557,
+      "modulation_cosine": 0.0036407712152390897,
+      "native_support_fraction": 0.3730580392684479,
+      "reference_mass_on_native_support": 0.6616197066118249,
+      "sign_agreement": 0.40361499652832555
+    },
+    "2048": {
+      "aggregation_cosine": 0.0032250813618866945,
+      "delivered_cosine": -0.0002180120892092494,
+      "eligibility_cosine": 0.0032724036281993837,
+      "magnitude_pearson": -0.0032583885317170797,
+      "modulation_cosine": 0.0032250813618866945,
+      "native_support_fraction": 0.37307759022019127,
+      "reference_mass_on_native_support": 0.6543925105967027,
+      "sign_agreement": 0.39644672629031125
+    },
+    "4096": {
+      "aggregation_cosine": 0.0029178111976864004,
+      "delivered_cosine": 3.8353570199477915e-05,
+      "eligibility_cosine": 0.0029580430777332934,
+      "magnitude_pearson": 0.006407203742242536,
+      "modulation_cosine": 0.0029178111976864004,
+      "native_support_fraction": 0.3731303495337696,
+      "reference_mass_on_native_support": 0.6509662091980014,
+      "sign_agreement": 0.3924121484646668
+    },
+    "512": {
+      "aggregation_cosine": 0.004121614879475642,
+      "delivered_cosine": -0.00017482148105488484,
+      "eligibility_cosine": 0.004144389975683825,
+      "magnitude_pearson": -0.038164382813524515,
+      "modulation_cosine": 0.004121614879475642,
+      "native_support_fraction": 0.37298677155869914,
+      "reference_mass_on_native_support": 0.6669073140544454,
+      "sign_agreement": 0.4197816262518472
+    },
+    "8192": {
+      "aggregation_cosine": 0.0027281627859879584,
+      "delivered_cosine": 0.0002997567483604066,
+      "eligibility_cosine": 0.0027673448624058084,
+      "magnitude_pearson": 0.013743952078926437,
+      "modulation_cosine": 0.0027281627859879584,
+      "native_support_fraction": 0.37325493383675507,
+      "reference_mass_on_native_support": 0.6486034376150066,
+      "sign_agreement": 0.3897530032232756
+    }
+  },
+  "row_counts": {
+    "reach00_diagnostics": 1080,
+    "reach00_outcomes": 5616,
+    "reach01_diagnostics": 1296,
+    "reach01_outcomes": 6912,
+    "reach01_trajectories": 1080
+  },
+  "run01_live": false,
+  "schema": "adaptive-authority-geometry-v0.1",
+  "stage_chain": {
+    "drops": [
+      {
+        "delta_cosine": 3.918207641784993e-05,
+        "from": "eligibility",
+        "retention": 0.9858412744468044,
+        "to": "modulation"
+      },
+      {
+        "delta_cosine": 0.0,
+        "from": "modulation",
+        "retention": 1.0,
+        "to": "aggregation"
+      },
+      {
+        "delta_cosine": 0.002428406037627552,
+        "from": "aggregation",
+        "retention": 0.10987494950813748,
+        "to": "delivered"
+      }
+    ],
+    "stages": [
+      {
+        "cosine": 0.0027673448624058084,
+        "stage": "eligibility"
+      },
+      {
+        "cosine": 0.0027281627859879584,
+        "stage": "modulation"
+      },
+      {
+        "cosine": 0.0027281627859879584,
+        "stage": "aggregation"
+      },
+      {
+        "cosine": 0.0002997567483604066,
+        "stage": "delivered"
+      }
+    ]
+  }
+}

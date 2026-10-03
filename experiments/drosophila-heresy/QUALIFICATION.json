@@ -1,0 +1,22 @@
+{
+  "stage": "before_first_biological_slice_task_execution",
+  "rust_unit_and_smoke_tests_passed": 12,
+  "python_analysis_tests_passed": 2,
+  "explicit_synthetic_performance_test_passed": true,
+  "clippy_release_all_targets_warnings_as_errors": "passed",
+  "cargo_release_build": "passed",
+  "python_scripts_syntax_check": "passed",
+  "synthetic_benchmark": {
+    "repetitions": 21,
+    "median_seconds": 0.0016304,
+    "p95_seconds": 0.0023458,
+    "edge_visits_per_run": 345772,
+    "hot_allocations": 0,
+    "scope": "small synthetic fixture; not a full-size biological-slice benchmark"
+  },
+  "compiler": "rustc 1.96.0 (ac68faa20 2026-05-25)",
+  "python_packages": {"numpy":"2.3.5","pandas":"3.0.1","pyarrow":"25.0.1"},
+  "target_directory": "D:/drosophila-heresy/target",
+  "test_link": "C:/code land/clean-rust/experiments/drosophila-heresy/target",
+  "evidence": "Commands and outputs captured in the executing Codex task; rerunnable commands documented in README."
+}

@@ -1,0 +1,1 @@
+{"argument":"EVERY_ACCEPTED_CHILD_HAS STRICTLY SMALLER NATURAL TOKEN LENGTH","every_child_independently_verified":true,"global_minimality":false,"measure":"TOKEN_LENGTH","schema":"G8_SHRINK_TERMINATION_PROOF_V1","shrinker":"DELETION_ONLY_V1","status":"STRICT_COST_DECREASE_UNDER_WELL_FOUNDED_ORDER"}

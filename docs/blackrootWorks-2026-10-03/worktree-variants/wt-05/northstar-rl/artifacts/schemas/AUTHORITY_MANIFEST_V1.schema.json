@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AuthorityManifest",
+  "type": "object",
+  "properties": {
+    "entries": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/AuthorityManifestEntry"
+      }
+    },
+    "root_identity": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "schema_version": {
+      "type": "string"
+    },
+    "surface": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "surface",
+    "entries",
+    "root_identity"
+  ],
+  "$defs": {
+    "AuthorityManifestEntry": {
+      "type": "object",
+      "properties": {
+        "authority": {
+          "type": "string"
+        },
+        "bytes": {
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        },
+        "content_hash": {
+          "$ref": "#/$defs/Digest256"
+        },
+        "path": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "bytes",
+        "content_hash",
+        "authority"
+      ]
+    },
+    "Digest256": {
+      "description": "Domain-separated BLAKE3 digest",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

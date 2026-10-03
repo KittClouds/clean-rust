@@ -1,0 +1,86 @@
+﻿{
+    "certificate":  "MST_REPLAY_DETERMINISM_V1",
+    "issued_at_utc":  "2026-08-12T08:42:53.1137400Z",
+    "stem":  "MasterAuction_USTEC_PERIOD_M5_QUALRG2_ACTIVE_RG2_v7",
+    "common_files":  "C:\\Users\\shuga\\AppData\\Roaming\\MetaQuotes\\Terminal\\Common\\Files",
+    "status":  "PASS",
+    "semantic_exclusions":  [
+                                "invocation_id",
+                                "attempts.node_revision (structural reconciliation counter)",
+                                "certificate issue time",
+                                "tester playback speed"
+                            ],
+    "equality_fields":  [
+                            "run_key",
+                            "terminal_hash",
+                            "event_sequence",
+                            "receipt_hash",
+                            "contract_receipt_hash",
+                            "canonical_dataset_hash"
+                        ],
+    "invocations":  [
+                        {
+                            "variant":  "RG2_USTEC_PERIOD_M5_1785715200_1785775800_15534330206330668573_I1785715200_14518173109068876729",
+                            "invocation_id":  "RG2_USTEC_PERIOD_M5_1785715200_1785775800_15534330206330668573_I1785715200_14518173109068876729",
+                            "run_key":  "RG2_USTEC_PERIOD_M5_1785715200_1785775800_15534330206330668573",
+                            "visual_mode":  "0",
+                            "run_status":  "COMPLETE",
+                            "contract_valid":  "1",
+                            "terminal_hash":  "1582678441047207971",
+                            "event_sequence":  "267",
+                            "receipt_hash":  "14253876305854647809",
+                            "contract_receipt_hash":  "2512476490470614657",
+                            "canonical_dataset_hash":  "2ce33f4ae08f85e4dc6be9053ff0e7c98837ed5fc49c1e5f3d8f52fbfb4e3abf",
+                            "counts_match_manifest":  true,
+                            "row_counts":  {
+                                               "events":  267,
+                                               "attempts":  57,
+                                               "episodes":  14,
+                                               "context":  279,
+                                               "features":  57,
+                                               "transits":  2
+                                           },
+                            "dataset_hashes":  {
+                                                   "events":  "9a66493bb124400299045c1cd892babec503bd54b5a3605eca6635e2bcec5869",
+                                                   "attempts":  "d1b7200d39588d148dfadd5a6a4f6a91df4a8b407d0029126493e79323a50fcf",
+                                                   "episodes":  "2a5fa74e2b3cf02167972cb14048b816065bb102b782f9746f59c3e6ce7e72ae",
+                                                   "context":  "d9e76edf9644d77b2f978adaef3025473b26f7997b02575667404cd4364776dd",
+                                                   "features":  "0cee09a45c0a7c41c0288455a4233e4afea1e8209281c121bd377b110cd66f93",
+                                                   "transits":  "c39649023c2b3a308d49382aae622383ac58cfbf304ef89c00542a48b96f1490"
+                                               }
+                        },
+                        {
+                            "variant":  "RG2_USTEC_PERIOD_M5_1785715200_1785775800_15534330206330668573_I1785715200_14427891109764843308",
+                            "invocation_id":  "RG2_USTEC_PERIOD_M5_1785715200_1785775800_15534330206330668573_I1785715200_14427891109764843308",
+                            "run_key":  "RG2_USTEC_PERIOD_M5_1785715200_1785775800_15534330206330668573",
+                            "visual_mode":  "0",
+                            "run_status":  "COMPLETE",
+                            "contract_valid":  "1",
+                            "terminal_hash":  "1582678441047207971",
+                            "event_sequence":  "267",
+                            "receipt_hash":  "14253876305854647809",
+                            "contract_receipt_hash":  "2512476490470614657",
+                            "canonical_dataset_hash":  "2ce33f4ae08f85e4dc6be9053ff0e7c98837ed5fc49c1e5f3d8f52fbfb4e3abf",
+                            "counts_match_manifest":  true,
+                            "row_counts":  {
+                                               "events":  267,
+                                               "attempts":  57,
+                                               "episodes":  14,
+                                               "context":  279,
+                                               "features":  57,
+                                               "transits":  2
+                                           },
+                            "dataset_hashes":  {
+                                                   "events":  "9a66493bb124400299045c1cd892babec503bd54b5a3605eca6635e2bcec5869",
+                                                   "attempts":  "d1b7200d39588d148dfadd5a6a4f6a91df4a8b407d0029126493e79323a50fcf",
+                                                   "episodes":  "2a5fa74e2b3cf02167972cb14048b816065bb102b782f9746f59c3e6ce7e72ae",
+                                                   "context":  "d9e76edf9644d77b2f978adaef3025473b26f7997b02575667404cd4364776dd",
+                                                   "features":  "0cee09a45c0a7c41c0288455a4233e4afea1e8209281c121bd377b110cd66f93",
+                                                   "transits":  "c39649023c2b3a308d49382aae622383ac58cfbf304ef89c00542a48b96f1490"
+                                               }
+                        }
+                    ],
+    "failures":  [
+
+                 ]
+}

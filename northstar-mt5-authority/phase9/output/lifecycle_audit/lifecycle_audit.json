@@ -1,0 +1,70 @@
+{
+  "contract": "MST_RG2_PHASE9_LIFECYCLE_AUDIT_V1",
+  "scope": "PRE_PHASE10_PHASE9_EXIT_GATE",
+  "verdict": "RG2_ADMISSIBLE_FOR_PHASE10_ATTEMPT_LEVEL_ANALYSIS_ONLY",
+  "verdict_reason": "behavioral attempts are usable, but NODE_RETIRED is a first-absence administrative termination and episode.resolution is not a whole-episode outcome",
+  "constants": {
+    "tracker_match_distance_atr": 0.2,
+    "retire_after_rebuilds": 3,
+    "max_attempt_bars": 24,
+    "episode_gap_bars": 12
+  },
+  "node_retired": {
+    "resolved_attempts": 889,
+    "episodes_containing_node_retired_attempt": 879,
+    "terminal_resolved_episodes": 853,
+    "episode_chains_with_later_or_censored_terminal_receipt": 26,
+    "later_or_censored_terminal_receipts": {
+      "RESOLVED:RETURN_TO_SOURCE_NODE": 10,
+      "RESOLVED:TIMEOUT": 7,
+      "RESOLVED:TRANSIT_TO_NEXT_NODE": 6,
+      "RIGHT_CENSORED:NODE_RETIRED": 3
+    },
+    "explicit_lineage_receipts": 21,
+    "compatible_created_during_grace": 6,
+    "continuity_receipts": 27,
+    "continuity_rate": 0.031652989449003514,
+    "tracker_retire_receipts": 852,
+    "tracker_retire_receipt_rate": 0.9988276670574443,
+    "orphaned_before_tracker_retire": 787,
+    "orphaned_before_tracker_retire_rate": 0.9226260257913247,
+    "same_id_seen_after_attempt_end": 6,
+    "same_id_recovery_rate": 0.007033997655334115,
+    "median_seconds_last_seen_to_retire": 67.5,
+    "median_seconds_attempt_start_to_retire": 594.0,
+    "median_seconds_attempt_end_to_tracker_retire": 18.0,
+    "finding": "auction attempts terminate on first candidate absence, before the tracker's three-miss retirement gate"
+  },
+  "timeout": {
+    "resolved_attempts": 553,
+    "episodes_terminated_by_attempt_timeout": 383,
+    "resolved_transit_timeouts": 12,
+    "episodes_terminated_by_transit_timeout": 12,
+    "terminal_timeout_episodes_total": 395,
+    "all_attempts_exactly_25_bars": true,
+    "all_transits_exactly_49_bars": true,
+    "median_attempt_duration_seconds": 7404.0,
+    "median_terminal_episode_attempts": 6.0,
+    "terminal_phase_counts": {
+      "APPROACH_NO_CONTACT": 331,
+      "PENETRATED_NO_RESOLUTION": 48,
+      "BROKEN_NO_ACCEPTANCE": 4
+    }
+  },
+  "episode_semantics": {
+    "administrative_terminal_episodes": 1248,
+    "with_prior_behavioral_attempt": 719,
+    "prior_behavioral_attempt_rate": 0.5761217948717948,
+    "finding": "episode resolution is the latest completed attempt or transit resolution, not a summary of all attempts"
+  },
+  "phase10_gates": {
+    "behavioral_attempt_analysis": "PASS",
+    "timeout_boundary_integrity": "PASS",
+    "episode_resolution_as_whole_episode_outcome": "FAIL",
+    "node_retired_as_market_behavior_outcome": "FAIL",
+    "required_treatment": "analyze attempt chains; treat NODE_RETIRED as structural administrative censoring; separate attempt TIMEOUT from transit TIMEOUT",
+    "new_generation_required_now": false,
+    "new_generation_trigger": "only if runtime lifecycle or auction semantics are changed"
+  },
+  "semantic_result_sha256": "752d3da65adc8b2a24e05d4525847ad7f700184e924b823040a94aa1dc8caf6e"
+}

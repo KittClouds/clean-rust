@@ -1,0 +1,109 @@
+{
+  "bank": "FF-S15-BANK-01",
+  "release": "BANK-v1",
+  "seed": 0,
+  "fast": true,
+  "budget": {
+    "TRAIN": 2000,
+    "DEV": 300,
+    "TEST-IID": 200,
+    "TEST-LEXICAL": 200,
+    "TEST-ENTITY": 200,
+    "TEST-TEMPLATE": 200,
+    "TEST-COMPOSITION": 200,
+    "TEST-DEPTH": 200,
+    "TEST-ABSTENTION": 200,
+    "TEST-JOINT": 200
+  },
+  "stats": {
+    "TRAIN": {
+      "worlds": 2000,
+      "input_rows": 2400
+    },
+    "DEV": {
+      "worlds": 300,
+      "input_rows": 360
+    },
+    "TEST-IID": {
+      "worlds": 200,
+      "input_rows": 240
+    },
+    "TEST-LEXICAL": {
+      "worlds": 200,
+      "input_rows": 240
+    },
+    "TEST-ENTITY": {
+      "worlds": 200,
+      "input_rows": 240
+    },
+    "TEST-TEMPLATE": {
+      "worlds": 200,
+      "input_rows": 240
+    },
+    "TEST-COMPOSITION": {
+      "worlds": 200,
+      "input_rows": 240
+    },
+    "TEST-DEPTH": {
+      "worlds": 200,
+      "input_rows": 240
+    },
+    "TEST-ABSTENTION": {
+      "worlds": 200,
+      "input_rows": 240
+    },
+    "TEST-JOINT": {
+      "worlds": 200,
+      "input_rows": 240
+    }
+  },
+  "schema_version": "ff-s15-bank-schema-v1",
+  "generator_version": "ff-s15-bank-gen-v1",
+  "code_hashes": {
+    "schema.py": "99d24bf7a35f09ef6aed60b6505e6c221e20cd2ab8e1e4361c4bcf9446625e1c",
+    "worldgen.py": "d13b11d3287c642d4452282f03ff5043b468dba42804a3819d4fc2737e5a6f79",
+    "simulator.py": "37344067422e4aa6846ca01a7fb70a8a0f6647bf3bbaeffc7a0340e386d015a6",
+    "renderer.py": "e2e7a3b00ea939d8f5fae76f9fe75b98c0a99fecd313c6accc942220ff241644",
+    "projections.py": "2cecfa727c1c2a49f6b670dd29b13a9989229511d3461a3cc17aabd83454bc12",
+    "splits.py": "14e11dd9e681523c4273039c4766535e58dc9334dd707a2fb858f9005da835ca",
+    "verify.py": "04e176d4931385ba96029f0bd64531c1ebc31fab5a674ba15223266eeda6aaf8",
+    "build_bank.py": "2aabed632d77cd60f7259580fe2640412f1df1b4cf0950bfdf227c873c2bdacf",
+    "seal.py": "cbd21ba2391b3a09219e9c4cf8390d0f84f421925c4511b93841bda61964f4d2"
+  },
+  "seed_registry_hash": "32a5bad77f61962f1e4e98a186f41f31ed33ecda6e12d0a9465776e1e55f3fa6",
+  "surfaces": [
+    "S0",
+    "S1",
+    "S2",
+    "S3",
+    "S4",
+    "S5",
+    "S6",
+    "S7",
+    "S8",
+    "S9",
+    "S10",
+    "S11"
+  ],
+  "row_hashes": {
+    "TRAIN": "43edfbf060844bae9370925a9ee81208d1fcd18db50949929bdc88385e083f13",
+    "DEV": "dc049f99d02b575809612ea29efad4862479a58ad8debb1b417e2fdce9fa9f31",
+    "TEST-IID": "d66359f0e1cc4ef075c335c7f7807aadca563de0af0c3295f8496a4a2099855c",
+    "TEST-LEXICAL": "b84ef5cac06a9ba09c95df2b9bf66eb553d24c35945ea23051eca6d807777c8a",
+    "TEST-ENTITY": "8c2869d982fffe3ada02bf758788cff50349e80591c6f6e66a4de79a2467347c",
+    "TEST-TEMPLATE": "da9b2375963442097bb60589da6fd9e3538883868d01a25c09226bcb7de79b87",
+    "TEST-COMPOSITION": "c6de31d9fa561eb4fba328e84ea7df69768a384608b3caed8009614f9d3dd615",
+    "TEST-DEPTH": "f1c24a311754f13b94b3150d71ba8bad29710829dbb6b99f79e228035db7b4ee",
+    "TEST-ABSTENTION": "1d1586c66f4f08147e51c3d0a37e3dd2bd0e53e940a1d4937cee095679b07244",
+    "TEST-JOINT": "d6a8e6bed2113b067fd0c30d533c0ee1aa0dc6c4b4a749ac891cda42cbae1fdb"
+  },
+  "unique_fill": {
+    "version": "v1-skip-later-literal-dups-global-order",
+    "skipped_dups": 0,
+    "graph_iso_collisions": 15
+  },
+  "frozen_fabric_contact": false,
+  "system_1_5_training": false,
+  "terminal_truth_opened": false,
+  "external_rows_imported": 0
+}

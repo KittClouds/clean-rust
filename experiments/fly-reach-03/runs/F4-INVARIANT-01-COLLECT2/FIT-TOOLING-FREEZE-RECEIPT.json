@@ -1,0 +1,33 @@
+{
+  "created_after_task_bank": true,
+  "fits_executed": false,
+  "heldout_class_complete_blocks": 7,
+  "heldout_support_used_to_reduce_fit_grid": false,
+  "initial_bundle_count": 72,
+  "initial_bundle_manifest_sha256": "17152cd50833389b2f369924d98bd870875f256e143057af4f63ee1290f65961",
+  "initializer_seed_manifest_sha256": "efb32a7c2ca2709407b65c32627dbd206b8b1bde304ce9b0b98b165aeea1da8e",
+  "qualification_only": true,
+  "run_id": "F4-INVARIANT-01-COLLECT2",
+  "runtime": {
+    "matches_parent_pinned_runtime": true,
+    "numpy_version": "2.5.3",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python_executable": "C:\\Users\\shuga\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+    "python_executable_sha256": "85b71d8c6ec1905935f74be0c9869aae198d00e98f39df699ec66f9c5a84cecd",
+    "python_version": "3.13.15 (tags/v3.13.15:4061bc4, Aug  5 2026, 13:05:39) [MSC v.1944 64 bit (AMD64)]",
+    "thread_environment": {
+      "BLIS_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "NUMEXPR_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1"
+    }
+  },
+  "schema": "F4-INVARIANT-01-fit-tooling-freeze-receipt-v1",
+  "source_entry_count": 166,
+  "source_manifest_canonical_sha256": "79abf0a510d892350a48a59b0dcd0f3d6ca62aacc3af6dcd86f92ad4dcb3a293",
+  "source_manifest_file_sha256": "49e200717b870cb437523a98c98fca994f1cdb48cde4cea57dff10e679d145b8",
+  "status": "PASS",
+  "task_bank_sha256": "8e49f61018255fa32d4328056d46a0b5a14b70306ccfa98733849dcac245c02c"
+}

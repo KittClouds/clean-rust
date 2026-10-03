@@ -1,0 +1,37 @@
+{
+  "conclusion": {
+    "order1_row_level_residual_analysis": "BLOCKED",
+    "order2_row_level_residual_analysis": "AVAILABLE",
+    "order3_row_level_residual_analysis": "BLOCKED",
+    "reason": "order1 and order3 retain readout hashes but not complete readout vectors"
+  },
+  "coverage": {
+    "order1": {
+      "records": 3696,
+      "records_with_readout_bits": 0,
+      "records_with_readout_sha256": 3696
+    },
+    "order2": {
+      "records": 9530,
+      "records_with_readout_bits": 9530,
+      "records_with_readout_sha256": 9530
+    },
+    "order3": {
+      "records": 1090580,
+      "records_with_readout_bits": 0,
+      "records_with_readout_sha256": 1090580
+    }
+  },
+  "engineering_only": true,
+  "identity": "q10-gc1-lr1-requal1-csc1-resid1-coverage-v1",
+  "parent_execution_sha256": {
+    "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-lr1-requal1-csc1-pair-alg3-front2-audit-v1\\execution.json": "0875D639BF9C9850FA835ED39F148B80951CF08BA419BDCD3BD3D2AD7BB11404",
+    "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-lr1-requal1-csc1-pair-alg3-front2-v3\\execution.json": "67FE6C23420110E0C97A6153F05EB9EDBBCBA22ACA538AA03397987F75522DA2",
+    "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-lr1-requal1-csc1-pair-front1-v2\\execution.json": "5EB2CC6BC10A21CE2497FEA927A0003A85B7BEDDB280D886EF11C9A4A9C8A3A9",
+    "C:\\code land\\clean-rust\\experiments\\drosophila-heresy\\q10-gc1-lr1-requal1-sreplace-singles-v1\\execution.json": "EA8E07387F2E0A82DF65AC0F548644290CC200E14D289CBFBD4E19269B82B108"
+  },
+  "protocol": "Q10-RESID1-COVERAGE",
+  "replay_executed": false,
+  "scientific_promotion": false,
+  "status": "RESID1_BLOCKED_READOUT_VECTOR_COVERAGE"
+}

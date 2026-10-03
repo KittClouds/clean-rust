@@ -1,0 +1,1 @@
+{"anchor":"EXTREME_CANDIDATE_SCHEMA_V1","materialization":"LAZY_RECONSTRUCTIBLE_VIEW","output_fields":["candidate_id","source_row_id","bar_open","bar_close","signed_close_minus_candidate","signed_low_minus_candidate","signed_high_minus_candidate","coverage"],"source":"SESSION_PROCESS_SCHEMA_V1","schema":"CANDIDATE_PATH_VIEW_V1"}

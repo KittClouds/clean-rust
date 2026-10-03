@@ -1,0 +1,199 @@
+{
+  "schema": "phoenix-backbone-build-contract/v1",
+  "date": "2026-10-01",
+  "status": "DESIGN_READY_IMPLEMENTATION_PENDING",
+  "purpose": "Construct an executable task-local evidence, obligation, acquisition, and action backbone",
+  "first_application": "Phoenix source-backed evidence packet and revision-checked note patch",
+  "first_kernel_fixture": "Finite structured relocation and activation with explicit providers",
+  "scientific_dispositions": {
+    "VCS_1b": "NOT_EARNED_UNCHANGED",
+    "H2": "CLOSED_UNCHANGED",
+    "existing_experimental_locks": "UNCHANGED",
+    "requires_new_panel_or_human_labels": false
+  },
+  "proposed_implementation_path": "rust-native/phoenix-backbone-v1",
+  "runtime_work_root": "C:\\phoenix-target-overgraph\\backbone-engineering-v1",
+  "runtime_work_drive": "C_NVME_VERIFIED_2026_10_01",
+  "compile_target_convention": {
+    "configured_drive_alias": "G",
+    "existing_host_binding": "D:\\phoenix-target-overgraph",
+    "test_execution_link_drive": "C",
+    "operational_caches_must_not_follow_compile_target": true
+  },
+  "domain_contract": [
+    "types",
+    "predicate_signatures_with_roles_scope_and_validity",
+    "signed_positive_function_free_rules",
+    "action_schemas_with_preconditions_effects_and_read_write_sets",
+    "invariants",
+    "provider_and_admission_contracts"
+  ],
+  "runtime_state": [
+    "domain_id",
+    "snapshot_revision_and_resource_versions",
+    "typed_entities",
+    "source_observations",
+    "candidate_proposals",
+    "model_estimates",
+    "goal",
+    "obligation_graph",
+    "task_grants",
+    "budgets",
+    "justification_graph"
+  ],
+  "source_provenance_fields": [
+    "source_id",
+    "resource_revision",
+    "span_or_structured_field",
+    "producer_id",
+    "provider_contract_id",
+    "artifact_identity",
+    "observed_at",
+    "validity_scope",
+    "applicability",
+    "shared_ancestry_ids"
+  ],
+  "evidence_states": ["UNOBSERVED", "SUPPORTED", "REFUTED", "CONFLICTED"],
+  "obligation_states": [
+    "SATISFIED",
+    "KNOWN_OPPOSITION",
+    "CONFLICTED",
+    "OPEN_REQUESTABLE",
+    "OPEN_UNAVAILABLE",
+    "BUDGET_LIMITED"
+  ],
+  "provider_response_kinds": [
+    "OBSERVATION",
+    "PROPOSAL",
+    "ESTIMATE",
+    "COMPLETE_EMPTY",
+    "UNKNOWN",
+    "UNSUPPORTED"
+  ],
+  "inference": {
+    "rule_language": "bounded_arity_signed_positive_Horn",
+    "negation_as_failure": false,
+    "conflict_policy": "derive_signed_closure_then_recompute_unconflicted_warranted_closure",
+    "absence_policy": "explicit_negative_or_exact_scoped_completeness_certificate",
+    "cyclic_self_justification": false,
+    "justification_storage": "factorized_AND_OR_dependency_graph",
+    "initial_revision_update": "bounded_task_closure_recomputation",
+    "candidate_to_assertion_implicit_cast": false,
+    "estimate_to_assertion_implicit_cast": false
+  },
+  "planning": {
+    "algorithm": "bounded_uniform_cost",
+    "initial_heuristic": "zero",
+    "tie_break": "stable_ids",
+    "costs": "nonnegative_integer",
+    "repair_frontiers": "non_executable_until_required_premises_warranted",
+    "execution": "permit_one_step_then_validate_actual_outcome_and_replan",
+    "outcomes": [
+      "PLAN_FOUND",
+      "NO_PLAN_IN_COMPLETE_REGISTERED_MODEL",
+      "BUDGET_EXHAUSTED",
+      "INCOMPLETE_DOMAIN"
+    ]
+  },
+  "acquisition": {
+    "policy": "task_relevant_obligation_cost_and_shared_frontier_heuristic",
+    "optimality_claim": false,
+    "queries_are_not_guaranteed_to_satisfy_obligations": true,
+    "bounded_retries": true,
+    "top_k_empty_means_absent": false
+  },
+  "proposal_front": {
+    "required_v0": ["existing_lexical_or_structural_candidate_provider"],
+    "optional": ["frozen_edge_provider", "frozen_semantic_provider", "R2a_advisory_estimates"],
+    "candidate_fusion": "optional_RRF",
+    "rrf_k": 60,
+    "score_probability_interpretation": false,
+    "preserve_baseline_candidate_union": true,
+    "learned_future_choice": "query_conditioned_NBFNet_style_provider_if_needed",
+    "new_GNN_training_is_build_dependency": false,
+    "compatibility_transitive_closure": false
+  },
+  "estimator_contract": {
+    "operational_names": ["estimate.n_evidence_facts", "estimate.n_missing_facts"],
+    "provenance_class": "MODEL_ESTIMATE",
+    "runtime_availability": "AVAILABLE_only_with_actual_frozen_artifact",
+    "truth_coordinates": "ORACLE_TRUTH_UNAVAILABLE",
+    "allowed_initial_role": "advisory_scheduling_only",
+    "may_discharge_named_precondition": false,
+    "raw_regression_value": "DIAGNOSTIC_ONLY",
+    "n_missing_facts_scope": "BANK_v1_panel_0_or_1_no_unrestricted_count_claim"
+  },
+  "observer_bundle_identity": [
+    "backbone_revision",
+    "tokenizer",
+    "input_serialization",
+    "surface_definition",
+    "normalization",
+    "head",
+    "calibration_if_present",
+    "task_schema",
+    "applicability_scope"
+  ],
+  "authority_checks": [
+    "existing_applicable_task_grant",
+    "current_resource_versions",
+    "domain_invariants",
+    "remaining_budget",
+    "warranted_action_preconditions",
+    "action_and_payload_identity",
+    "atomic_revision_check_at_execution",
+    "idempotency"
+  ],
+  "dispositions": ["EXECUTE", "ASK", "ESCALATE", "DECLINE_UNAVAILABLE", "NOOP"],
+  "stop_reasons_include": ["BUDGET_EXHAUSTED", "INCOMPLETE_DOMAIN"],
+  "first_application_actions": [
+    "SEARCH",
+    "READ",
+    "VERIFY_SPAN",
+    "ATTACH_CANDIDATE",
+    "ASSEMBLE_PACKET",
+    "PREPARE_PATCH",
+    "COMMIT_PATCH_under_existing_grant"
+  ],
+  "work_packages": [
+    {"id": "W0", "output": "typed_contracts", "depends_on": []},
+    {"id": "W1", "output": "dense_state_admission_warrants", "depends_on": ["W0"]},
+    {"id": "W2", "output": "obligations_bounded_planner", "depends_on": ["W1"]},
+    {"id": "W3", "output": "provider_and_acquisition_loop", "depends_on": ["W2"]},
+    {"id": "W4", "output": "executable_fixture_and_replay", "depends_on": ["W3"]},
+    {"id": "W5", "output": "Phoenix_real_source_and_executor_adapter", "depends_on": ["W4"]},
+    {"id": "W6", "output": "optional_learned_front_adapter", "depends_on": ["W5"]},
+    {"id": "W7", "output": "actual_task_utility_iteration", "depends_on": ["W5"]}
+  ],
+  "core_dependencies": [
+    "hashbrown",
+    "smallvec",
+    "bumpalo",
+    "bitvec",
+    "memmap2",
+    "memchr",
+    "validated_bytemuck_or_zerocopy_layout",
+    "existing_hash_and_serialization_conventions",
+    "bounded_owned_stage_channels"
+  ],
+  "validation": [
+    "small_reference_warrant_interpreter",
+    "small_exact_planning_reference",
+    "conflict_retraction_scope_and_cycle_tests",
+    "layout_and_parser_property_tests",
+    "stale_revision_and_idempotency_tests",
+    "timeout_empty_unsupported_and_retry_traces",
+    "recorded_event_replay",
+    "real_Phoenix_adapter_smoke",
+    "Criterion_and_allocation_profiling"
+  ],
+  "engineering_performance_budgets": {
+    "warm_control_p95_ms": 10,
+    "representative_task_literal_count": 10000,
+    "representative_grounded_clause_count": 20000,
+    "task_memory_excluding_source_and_model_residency_MiB": 64,
+    "per_edge_hot_loop_allocation": 0,
+    "scientific_promotion_gate": false
+  },
+  "new_experiment_rule": "Name competing implementation choices and an outcome that changes the chosen construction; otherwise proceed with software and task validation"
+}

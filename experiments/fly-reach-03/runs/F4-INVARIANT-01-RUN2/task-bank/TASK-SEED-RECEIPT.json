@@ -1,0 +1,9 @@
+{
+  "block_count": 12,
+  "fit_manifest_created": false,
+  "schema": "F4-INVARIANT-01-RUN2-task-seed-seal-v1",
+  "status": "PASS",
+  "task_payload_created": false,
+  "task_seed_manifest_canonical_sha256": "cf5c067728b07b161da90c096a29c099733c1b804feb5535f6cd3f88207de6ed",
+  "task_seed_manifest_file_sha256": "e90a2556ce19bc586ca229556c2e7a8b6fdf8b1a7de26df0140604ecc0801200"
+}

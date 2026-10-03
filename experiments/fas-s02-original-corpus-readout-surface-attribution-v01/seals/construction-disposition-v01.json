@@ -1,0 +1,13 @@
+{
+  "disposition_id": "FAS_S02_CONSTRUCTION_V01",
+  "experiment_id": "fas-s02-original-corpus-readout-surface-attribution-v01",
+  "S02_PACKET_READY": true,
+  "S02_FINAL_POSITION_EXTRACTION_AUTHORIZED": false,
+  "S02_READOUT_ANALYSIS_AUTHORIZED": false,
+  "S02_MODEL_CONTACT_PERFORMED": false,
+  "S02_FEATURE_CACHE_READY": false,
+  "S02_RESULT_READY": false,
+  "FAS00_DISPOSITION_CHANGED": false,
+  "FAS00_ONLINE_MECHANISMS_AUTHORIZED": false,
+  "phase5_generation_authorized": false
+}

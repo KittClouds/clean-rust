@@ -1,0 +1,33 @@
+{
+  "seal_sha256": "18508e8fc6b3e86a7f8d56cde0413fd43b436c06de056f7f7a20a155225b060d",
+  "global_open_marker_sha256": "3880d476535fdae290b71c61644e4c18fe3009a24a067fd4d3bc17e0ce1ee103",
+  "parent_dh06_reverified": true,
+  "q07_reverified": true,
+  "frozen_inputs_reverified": true,
+  "resources": {
+    "exit_code": 0,
+    "wall_seconds_including_launch": 105.20547720004106,
+    "observed_peak_working_set_bytes": 175669248,
+    "method": "Windows GetProcessMemoryInfo peak working set sampled every 0.1 s; simulator only"
+  },
+  "output_hashes": {
+    "analysis\\cells.csv": "9e5b212e540b9716fd1a202f3410aff1fa00e02cb96cfda185ceb27e795f2f88",
+    "analysis\\dh07r_direction_effect.svg": "7750e42286de2ac6d9f54ce4eff97fae358cf7d01678c839607108c182e6eab8",
+    "analysis\\manipulation_cells.csv": "456efe9e4d0b92c6e8d7d7737e23e3bf187de805e8ebf092175d7fff4bdd82c9",
+    "analysis\\REPORT.md": "c6d194b5c4c958a42b8631582b7aaa3ada4b5f408c299941b9d328c162661e9c",
+    "analysis\\seed_contrasts.csv": "d6d2f1e70dfb9ba66e632dee2dbda40f03627466348ad8a6a06877b9c5033a10",
+    "analysis\\summary.json": "68c5888f0e31fb7d37b6ca0918026b7c6be87333d2041e6798106a515dce1b9f",
+    "analysis\\trajectory.csv": "2903e8ed3470eb5c1ccea6bf2208b9cb6497423d99882ad77ee65643036d3121",
+    "execution.json": "d357a635bc295df281704e64b124adb6a09c32416c43e4cc86f1aa9b025639d9",
+    "L-tau16.jsonl": "353c5f71ceaa7ec6e44a4c2dd8ceec2522327cc22c8807a784f088b9b646cf50",
+    "L-tau4.jsonl": "97fa68e3fbc49f218b776c14daa784e42a7c4d0b4463b87e0207e66093624c4e",
+    "MEASURED_SEEDS_OPENED.json": "f6da17f1c6bae476f80649b1f86460b0bdf1f1b3180e96559364e1b72f4bed4b",
+    "preseal-qualification\\execution.json": "ec99554efc5c99eb24a19b41228abc4dc1fe16912fb2765de50c850a5c561d18",
+    "preseal-qualification\\R-tau4.jsonl": "1d12b99144b62de992caea5803caeabd03c06ace59133abddcf209d8e48fa8c5",
+    "preseal-qualification.log": "0a9a2def1224ed90dd187d79f3177de2fcff1b31c6fb53d1c8442bfe9dc9ba8e",
+    "R-tau16.jsonl": "e76d9c3c67a99023105e155585dc2dce5858c2d06eadc823b4ab7a23e8bd42b3",
+    "R-tau4.jsonl": "e7d6bf321375aebdcb1cb6907627485f272de84fd0507ad776127494fe21b08e",
+    "resources.json": "2d9983a01a73d53255686c9ed0b979194c6159b98d6223c74bb504b9774e71cc",
+    "stdout.log": "e7c18de346a955b64b2ee61513378a90e36325d7ba09a9df7d7e38dc11c63776"
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "claims": [
+    {
+      "claim": "V2_00_REGRESSION_PARITY",
+      "status": "PASS"
+    },
+    {
+      "claim": "SENTINEL_WINDOW_SEMANTICS",
+      "status": "PASS"
+    },
+    {
+      "claim": "COMMITTED_EXTREME_MONOTONICITY",
+      "status": "PASS"
+    },
+    {
+      "claim": "CANDIDATE_IDENTITY",
+      "status": "PASS"
+    },
+    {
+      "claim": "BIRTH_TIME_CAUSALITY",
+      "status": "PASS"
+    },
+    {
+      "claim": "LIVE_COMMITTED_SEPARATION",
+      "status": "PASS"
+    },
+    {
+      "claim": "AGE_SEMANTICS",
+      "status": "PASS"
+    },
+    {
+      "claim": "GIVEBACK_IDENTITY",
+      "status": "PASS"
+    },
+    {
+      "claim": "RANGE_EXTENSION_IDENTITY",
+      "status": "PASS"
+    },
+    {
+      "claim": "SENTINEL_CONTINUITY_FAIL_CLOSED",
+      "status": "PASS"
+    },
+    {
+      "claim": "M1_RUNTIME_QUALIFICATION",
+      "status": "PASS"
+    },
+    {
+      "claim": "M5_RUNTIME_QUALIFICATION",
+      "status": "PASS"
+    },
+    {
+      "claim": "HISTORICAL_REBUILD_PARITY",
+      "status": "PASS"
+    },
+    {
+      "claim": "RELOAD_PARITY",
+      "status": "PASS"
+    }
+  ],
+  "maximum_authority_if_pass": "CAUSAL_RANGE_EXTREME_INSTRUMENT_V1",
+  "overall": "PASS",
+  "schema": "OBS_OPEN_INST01_TYPED_QUALIFICATION_MATRIX_V1"
+}

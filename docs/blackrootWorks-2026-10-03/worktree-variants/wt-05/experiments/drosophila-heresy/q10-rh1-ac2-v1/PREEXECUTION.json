@@ -1,0 +1,11 @@
+{
+  "protocol": "Q10-PF6-RH1-AC2",
+  "status": "PREEXECUTION_SEALED_NO_FACTORIAL",
+  "plan_sha256": "43F7E98FE163C5014752D44DED52D2474D69F6A0303C371D8755E8573F5AAFE9",
+  "contract_sha256": "074FF37D79C9EB18855448FB484BEA00B8EFD0457879A28A9773C691B16B4053",
+  "selected_cohort": "all unique endpoint-coordinate pairs from frozen RH1 84-group cohort",
+  "scientific_seed_bundles": 0,
+  "measured_factorial_started": false,
+  "behavioral_probe": false,
+  "dh08b_authorized": false
+}

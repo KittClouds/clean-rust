@@ -1,0 +1,16 @@
+{
+  "protocol": "Q10-PF6-S1A",
+  "status": "FROZEN_PRE_EXECUTION",
+  "identity": "q10-pf6-s1a-v1",
+  "plan_sha256": "3C89F5ECB0BA48B5397B1574BEF13D108990CD73FDEA01EE25CCD7A610CC9EA1",
+  "contract_sha256": "D8961D87C53F874E6D99BEB58997A7E9AD41B4DC877651B4FCBE1C328CB41393",
+  "parent_execution_sha256": "E561D7392D471CC0B47E98E66EC5AD9FC772476F2F61103FBF5994A051BC0E17",
+  "receipt_semantics_only": true,
+  "rerun_search": false,
+  "candidate_generation": false,
+  "scientific_seed_bundles": 0,
+  "behavioral_probe": false,
+  "dh08b_authorized": false,
+  "numerical_replay_coverage": "PARTIAL",
+  "historical_replay_scope": "ONE_RETAINED_CANDIDATE_PER_GROUP"
+}

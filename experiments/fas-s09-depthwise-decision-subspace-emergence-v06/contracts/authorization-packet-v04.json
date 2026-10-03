@@ -1,0 +1,31 @@
+{
+  "packet_id": "FAS_S09_FIXED_ANALYSIS_AUTHORIZATION_PACKET_V04",
+  "authorization_basis": "Continuation of the user-authorized FAS-S09 fixed layerwise analysis. The v03 run stopped at the terminal metrics verifier after exact probe-state and probability reproduction. This packet changes only comparison of computed metrics with the sealed S01-3 metric schema; no model contact or new scientific operation is introduced.",
+  "permitted": [
+    "read sealed S01/S08 inputs and the v03 recovery receipts",
+    "read the already-requalified v02 feature cache under its v03 root",
+    "audit the metric comparison against the saved v03 M terminal probe and sealed S01-3 probabilities",
+    "rerun the exact 32 fixed S01-3 linear fits with the layer-16 terminal gate first",
+    "run the four fixed native/cross-surface replay cells at every layer",
+    "seal the v04 analysis and result tree"
+  ],
+  "prohibited": [
+    "load or re-extract LFM",
+    "modify any v02 or v03 artifact",
+    "change fit rows, test rows, labels, class order, standardization, optimizer, solver limits, metrics, representation views, or subspace method",
+    "read FAS-00 artifacts",
+    "run additional fitting, layer selection, statistics, adaptation, SAE, or nonlinear analysis"
+  ],
+  "stop_on": [
+    "metric-schema audit mismatch",
+    "feature cache integrity mismatch",
+    "terminal probe state, probabilities, condition metrics, or S08 plane mismatch",
+    "any fixed analysis invariant failure"
+  ],
+  "expected_terminal_authority": {
+    "S09_FIXED_ANALYSIS_AUTHORIZED": true,
+    "S09_RESULT_READY": false,
+    "FAS00_PHASE4_AUTHORIZED": false,
+    "ADAPTIVE_MECHANISMS_AUTHORIZED": false
+  }
+}

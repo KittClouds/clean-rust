@@ -1,0 +1,55 @@
+{
+  "identity": "JEV-V08Q-FRESH-PANEL-CONTRACT-V02",
+  "source_lock": {
+    "path": "contracts/q-source-lock-v02.json",
+    "root_sha256": "5e973916fb62747cde2de51f7deb2e29616ea1ead13ce384dcdb254901d936d3",
+    "file_sha256": "d6d70768242ac12801069e2bdb27cb976679c907206e81ae8c0921867bea2363"
+  },
+  "namespace": "eval_v08q",
+  "generator_seed": 90884334,
+  "generator_seed_derivation": {
+    "label": "jev-information-density-v08q-panel/generator-seed-v01",
+    "sha256": "eec86a05fd812b2b12aa33917d299798babd4a52274de708dcdcc45413a1de4c",
+    "first_four_bytes_unsigned_little_endian": 90884334
+  },
+  "families": ["exposure_control", "respiratory_monitoring", "salinity_control", "vibration_monitoring"],
+  "admission": {
+    "neighborhoods_total": 2000,
+    "neighborhoods_per_family": 500,
+    "candidate_ordinals_per_family": {"inclusive_range": [0, 699]},
+    "max_candidates_per_family": 700,
+    "candidate_order": "ascending ordinal independently within each family",
+    "failure": "PANEL_ADMISSION_BUDGET_EXHAUSTED; preserve and stop",
+    "replacement_reseed_or_budget_extension": false,
+    "roles_per_neighborhood": ["anchor", "fact_flip", "sham", "neutral_1", "neutral_2", "neutral_3", "neutral_4", "neutral_5", "neutral_6", "neutral_7", "neutral_8"],
+    "measurement_surfaces": ["p0", "p1", "p2", "p3"]
+  },
+  "exclusion": {
+    "five_identity_fields": ["world_id", "root_id", "episode_id", "full_rendered_input_hash", "selector_input_hash"],
+    "excluded_sets": ["sealed selected-training identities", "sealed prior held-out panel identities", "already admitted Q occurrence identities"],
+    "e1_denylist": "reject if SHA256(canonical(neighborhood_id)) is in the sealed v0.5 E1 denylist",
+    "whole_neighborhood_atomic_admission": true,
+    "raw_excluded_identity_values_in_log": false,
+    "online_admission_and_independent_final_audit_must_agree": true
+  },
+  "matching": {
+    "rule": "argmin absolute radius error between sham and neutral_1..neutral_8 in frozen feature space",
+    "distance": "Euclidean L2 radius from anchor",
+    "tie_break": "ascending SHA256(anchor_id + '|' + neutral_role)",
+    "outcome_or_direction_inputs": false,
+    "radius_gates": {"mean_relative_error_max": 0.10, "p95_absolute_error_max": 0.25, "per_family_mean_relative_error_max": 0.15},
+    "failed_gate_replacement": false
+  },
+  "feature_extraction": {
+    "new_q_cache_only": true,
+    "state_occurrences": 22000,
+    "candidate_texts": 16,
+    "feature": "LiquidAI/LFM2.5-1.2B-Base revision 7453bca97ca1e67754c4035a4b4c584e1c9dd725; final-layer mean_full@16; 2048 FP32",
+    "sequence": "exact-length, one model-visible input per forward call, no padding, maximum 1024 tokens",
+    "backbone": "BF16 frozen; before/after parameter identity required",
+    "repeat_max_abs_error": 0.00001
+  },
+  "expected_evaluation_rows": 8000,
+  "required_pretraining_artifacts": ["panel source and admission logs", "five-field exclusion set", "independent final audit", "new feature tensors and row manifests", "radius matching result", "exact target joins", "panel and feature seals"],
+  "authority": {"panel_construction": false, "model_contact": false, "feature_extraction": false, "training": false, "evaluation": false}
+}

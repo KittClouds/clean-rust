@@ -1,0 +1,402 @@
+{
+  "entries": [
+    {
+      "bytes": 4068,
+      "path": "D:/codex-runs/jev-information-density-v08n/v0.8N-base-v01/phase-b-run-v01/feature-cache/candidate-feature-receipt.json",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "29f8d67b24fd2a554500e1cfe2e0fe0b4311d32fad7052ad8ffb3464b7835f44"
+    },
+    {
+      "bytes": 394870,
+      "path": "D:/codex-runs/jev-information-density-v08n/v0.8N-base-v01/phase-b-run-v01/feature-cache/candidate-features.pt",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "3bb3036f455a83409361eb3e4150833bd8b255a2a783ec1218b00b12315c0590"
+    },
+    {
+      "bytes": 12832,
+      "path": "D:/codex-runs/jev-information-density-v08n/v0.8N-base-v01/phase-b-v03-inputs/candidate-catalog.json",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "1698ea2078951837b3cb780a3f873c3c099e5e3d001c714e1d58a41e2951487e"
+    },
+    {
+      "bytes": 6776884,
+      "path": "D:/codex-runs/jev-information-density-v08n/v0.8N-base-v01/phase-b-v03-inputs/common-primary-occurrence-manifest.jsonl",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "773119294a51aa46487de26f9f253355187a7bfd1e75cb2f258c307c86f10b06"
+    },
+    {
+      "bytes": 2482,
+      "path": "D:/codex-runs/jev-information-density-v08n/v0.8N-base-v01/phase-b-v03-inputs/execution-inputs-receipt.json",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "c022befafd49a1e317f692ff3b6f7efcccd11aee98285ca5f0071f6edbaf817c"
+    },
+    {
+      "bytes": 13872634,
+      "path": "D:/codex-runs/jev-information-density-v08n/v0.8N-base-v01/phase-b-v03-inputs/head-input-manifest-B-DUP.jsonl",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "f6f4ec519a04efeac02962c68c2d2d8ec92cf43d25bb9fd974f168e67c4d3b2b"
+    },
+    {
+      "bytes": 13942636,
+      "path": "D:/codex-runs/jev-information-density-v08n/v0.8N-base-v01/phase-b-v03-inputs/head-input-manifest-B-MATCHED.jsonl",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "bd38446c0328f8092dc3293090fd3041d7be5d53945df6f80fb3770244d87b0d"
+    },
+    {
+      "bytes": 13867636,
+      "path": "D:/codex-runs/jev-information-density-v08n/v0.8N-base-v01/phase-b-v03-inputs/head-input-manifest-B-SHAM.jsonl",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "9dd346766856f56006be326c171e664dcbab23983cdd7501f480b6fabb6ff895"
+    },
+    {
+      "bytes": 450561952,
+      "path": "D:/codex-runs/jev-information-density-v08n/v0.8N-base-v01/shared-feature-cache/shared-training-features.pt",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "da946af90353c91c3b1298d2951eebc42b9f515708b628d3a053e700a960c4d6"
+    },
+    {
+      "bytes": 30195630,
+      "path": "D:/codex-runs/jev-information-density-v08n/v0.8N-base-v01/shared-feature-cache/training-only-feature-scope.jsonl",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "aa8cba58f4a8ec46ed6ec8eaf0bfbe992b03b9fa58f815b4259d9fdfe2b009f3"
+    },
+    {
+      "bytes": 13823160,
+      "path": "D:/codex-runs/jev-information-density-v08p-r1/v0.8P-R1/prior-reconstruction/prior-panel-identities.jsonl",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "5936d6b4e9d6f651edc0406d844709c99108352459ae90494fa327ed7b110ebf"
+    },
+    {
+      "bytes": 34087100,
+      "path": "D:/codex-runs/jev-information-density-v08p-r1/v0.8P-R1/replay-attempt-03/training-scope-identities.jsonl",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "0f5cd945f965c291b13375b16367085a8c4f3dced4e5996b0e1ffbadf279d191"
+    },
+    {
+      "bytes": 134511,
+      "path": "D:/codex-runs/jev-information-density-v08p-v05/identity/run-1/canonical-e1-neighborhood-hash-denylist.json",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "50eebeb5790c29b4a75c6f8df849eb4c2865d3c864932bbd7f636b7a0e52a2cd"
+    },
+    {
+      "bytes": 1224,
+      "path": "D:/codex-runs/jev-lfm-variable-v07/models/lfm2.5-1.2b-base/config.json",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "15d6157fb6df3f8272e2fe90e18f57727ccf02a125c94469198b0f3281510185"
+    },
+    {
+      "bytes": 2340697936,
+      "path": "D:/codex-runs/jev-lfm-variable-v07/models/lfm2.5-1.2b-base/model.safetensors",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "7678ab9546a0c51c1fca161876b1efc4f0906277f170b5822045f40fdaf9eeff"
+    },
+    {
+      "bytes": 434,
+      "path": "D:/codex-runs/jev-lfm-variable-v07/models/lfm2.5-1.2b-base/special_tokens_map.json",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "742aefe2b7dec496e8caffdba03a75d0c1a9925d53bd3f3e0d388c96b591b6f4"
+    },
+    {
+      "bytes": 4733020,
+      "path": "D:/codex-runs/jev-lfm-variable-v07/models/lfm2.5-1.2b-base/tokenizer.json",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "d7a0ab0fc22e41ec8c6d7450a9ff9ce40e196ec5e5a2fa6a2105e064e0514ed7"
+    },
+    {
+      "bytes": 91876,
+      "path": "D:/codex-runs/jev-lfm-variable-v07/models/lfm2.5-1.2b-base/tokenizer_config.json",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "8cba5b0c7acab23a0d4cc9ac587346c9220a1b6d288fc5346fe118202fd6f43e"
+    },
+    {
+      "bytes": 6553,
+      "path": "experiments/jev-decision-world-v01/Cargo.lock",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "9b6d29d2e86f53360b1cf7226798eb04c9b790a935b6f024063f0e77cf0b6263"
+    },
+    {
+      "bytes": 387,
+      "path": "experiments/jev-decision-world-v01/Cargo.toml",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "69374c00d54dac2251239fb7b3bb289b61cb6a9bca93853e71f6f484691df401"
+    },
+    {
+      "bytes": 10412,
+      "path": "experiments/jev-decision-world-v01/src/exact.rs",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "8bd90086573eb93a27f8950f35eec994a3f5b51fdeeffc0e3042105b6657a4f3"
+    },
+    {
+      "bytes": 9122,
+      "path": "experiments/jev-decision-world-v01/src/families.rs",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "da2ceacf7a1b921688e3e6dfcc1dc5af2d57c464bbf4d24322fe5e53fa157805"
+    },
+    {
+      "bytes": 27202,
+      "path": "experiments/jev-decision-world-v01/src/generate.rs",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "03e636fc35595ce8d2d701a57158cae5b18cf14809426908d1c92c0e71bed67d"
+    },
+    {
+      "bytes": 6558,
+      "path": "experiments/jev-decision-world-v01/src/lib.rs",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "ace2147a281cb02ba2328ad5e9de84604a4e9b97606e26965ba906fd9b240470"
+    },
+    {
+      "bytes": 3490,
+      "path": "experiments/jev-decision-world-v01/src/main.rs",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "341918f219f8ef6fea833958c9b2d2690db80d9d16676611255ba3eb2fc3bf0e"
+    },
+    {
+      "bytes": 39238,
+      "path": "experiments/jev-frozen-readout-v01/probe.py",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "a3049d52e1183c806c84522a617a05646eb86fbcb69af72b5bb26f4808852cb1"
+    },
+    {
+      "bytes": 19051,
+      "path": "experiments/jev-frozen-scaling-v05/train_v05.py",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "52033950dab23835c13f4aa74a2f0d5867aec754f8a139a63a739a36b0cb62b9"
+    },
+    {
+      "bytes": 2326,
+      "path": "experiments/jev-information-density-v08n/eval-panel-v01-contract.json",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "3fa547c0a2490c4cfb5d578a32dffeb8414c35daa5e59ef339ab1e148e2e9cd6"
+    },
+    {
+      "bytes": 6725,
+      "path": "experiments/jev-information-density-v08n/generator/Cargo.lock",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "fff5f6d18141df5b3be89302460210c8ed1f3c3153fda2f1c849ec3306b61d2e"
+    },
+    {
+      "bytes": 370,
+      "path": "experiments/jev-information-density-v08n/generator/Cargo.toml",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "b6203ad272dd973c14ab9c09aa5f15574a3ee95e466c1dce5475b6a3f1efcf98"
+    },
+    {
+      "bytes": 16889,
+      "path": "experiments/jev-information-density-v08n/generator/src/families.rs",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "e56885005487b36b573c1bf4d47741413ca72df0992ff62bcf48891eecacb429"
+    },
+    {
+      "bytes": 25787,
+      "path": "experiments/jev-information-density-v08n/generator/src/generator.rs",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "f04a9b1d4f6682522e5957be3c0075db4bd7aa4e4e25968650f2ff24a42c7f5b"
+    },
+    {
+      "bytes": 3904,
+      "path": "experiments/jev-information-density-v08n/phase-a-v01-contract.json",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "f72947a53c7df85d12c7d9f91620c0c32925c047b0c556d9298038c80c51f103"
+    },
+    {
+      "bytes": 23693,
+      "path": "experiments/jev-information-density-v08n/phase_b/evaluate_phase_b_v01.py",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "fa22bc8febff89d2b635091c6cb40be6f3beba4549c4a135d16e213f6fd3dda4"
+    },
+    {
+      "bytes": 4375,
+      "path": "experiments/jev-information-density-v08p-r1/contracts/identity-schema-r1-v01.json",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "a5d9bf108a1b14d05652b78021a55b74500ed55d6bdc759ff02c09560ea6f7ed"
+    },
+    {
+      "bytes": 4255,
+      "path": "experiments/jev-information-density-v08p-r1/provenance/r1-terminal-disposition-v01.json",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "151e28a629cc6877084b5c4d5395309c3a73e346f5b589d1b0cc588027a6596b"
+    },
+    {
+      "bytes": 3500,
+      "path": "experiments/jev-information-density-v08p-r2/contracts/p-r2-analysis-addendum-v01.json",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "4cd14671ffe7c032864fdc0bd5f75db1d1edea666cc58eb43aae0e6c820d0431"
+    },
+    {
+      "bytes": 8855,
+      "path": "experiments/jev-information-density-v08p-r2/contracts/r2-execution-contract-v01.json",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "51cd8dee09688f1aae24ff575fa0a181d50b2a6ffc94dc6b7e7ed5b61c58ef14"
+    },
+    {
+      "bytes": 8581,
+      "path": "experiments/jev-information-density-v08p-r2/generator-r2/Cargo.lock",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "1343fa1903314172c91d1d9a7062f373eb6eb56d56f54ff37199572a4a572abe"
+    },
+    {
+      "bytes": 424,
+      "path": "experiments/jev-information-density-v08p-r2/generator-r2/Cargo.toml",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "37648153586f2cc7a411ee1b11892ca3c85bc51705df53f556f96d49fe9d0813"
+    },
+    {
+      "bytes": 79489,
+      "path": "experiments/jev-information-density-v08p-r2/generator-r2/src/main.rs",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "ec9309861583f6389fa2809dc3636f3cd1dbe0d49a2c0fee7c8cef7ee7f9ef1e"
+    },
+    {
+      "bytes": 3911,
+      "path": "experiments/jev-information-density-v08p-r2/provenance/r2-panel-materialization-manifest-v01.json",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "565d5e2650db375230fed15eb94471c92a25810c1644d629e7bb9d1490bf4822"
+    },
+    {
+      "bytes": 4708,
+      "path": "experiments/jev-information-density-v08p-r2/provenance/r2-panel-ready-manifest-v01.json",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "c0d48381356113451bc72f9578204ade4ef7449a75264cd5018a34d002b313ac"
+    },
+    {
+      "bytes": 502,
+      "path": "experiments/jev-information-density-v08p-r2/provenance/r2-panel-seal-receipt-v01.json",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "cdd68eee06ef9b4239cfbc3ffbb4f65f18c4ced655e474cba1a3981dbb2c0cb5"
+    },
+    {
+      "bytes": 25725,
+      "path": "experiments/jev-information-density-v08p-r2/runner/analyze_r2_trajectory.py",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "ba62d0f494fe788e929120d07a50c427d9e3cb7a7f7689b308695f79d81409e9"
+    },
+    {
+      "bytes": 63220,
+      "path": "experiments/jev-information-density-v08p-r2/runner/evaluate_r2_trajectory.py",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "4c36feb7f1e1b2b493a7d10061f3bf6d89b9c8ffa6f758c659675d374d1cc859"
+    },
+    {
+      "bytes": 17312,
+      "path": "experiments/jev-information-density-v08p-r2/runner/extract_r2_panel_features.py",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "52fe40b0e890288e24b146db1b3f3dbf0e7b5c5ee6d33e9552916d590160bbc7"
+    },
+    {
+      "bytes": 16741,
+      "path": "experiments/jev-information-density-v08p-r2/runner/match_r2_panel_radius.py",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "a02d66151c50fe4ba79fa33305226b08ea0c87b3accdcad04a0f3764e03d099c"
+    },
+    {
+      "bytes": 12726,
+      "path": "experiments/jev-information-density-v08p-r2/runner/materialize_r2_schedule.py",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "831fdd1a44420bd251ba7fd52b3d3fa72d824fed8cabbd4b15c75c42c6232b1d"
+    },
+    {
+      "bytes": 5409,
+      "path": "experiments/jev-information-density-v08p-r2/runner/r2_analysis_adapter.py",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "4e86d2ae412982a2a6ac30952517a00105807568000e0d2c764ea696342d1535"
+    },
+    {
+      "bytes": 6440,
+      "path": "experiments/jev-information-density-v08p-r2/runner/r2_panel_target_join.py",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "e7673ba4bdf0bbac924ffe863dfb7cd2f1aa60ac2dfe8d7e0919fda1e9b350eb"
+    },
+    {
+      "bytes": 2125,
+      "path": "experiments/jev-information-density-v08p-r2/runner/test_r2_evaluator.py",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "60e2199d734b536e2e45c7db9fc6491278785ff9ab9b41d4ec34439dacfdacda"
+    },
+    {
+      "bytes": 4030,
+      "path": "experiments/jev-information-density-v08p-r2/runner/test_r2_panel_target_join.py",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "70a226bc0aacb1b78281d122b168d99a13c9399327807d4ab0adbf0e3fb0e2cd"
+    },
+    {
+      "bytes": 5138,
+      "path": "experiments/jev-information-density-v08p-r2/runner/test_r2_trajectory_analysis.py",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "de9d3a4d769d14305d02ccac5ce1c0c68eb06b3ae0ede5beddddfbf5ac8e44c2"
+    },
+    {
+      "bytes": 73549,
+      "path": "experiments/jev-information-density-v08p-r2/runner/train_r2.py",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "88879bef1eb1843445429aeef81423143b67def453054952ca968022755ed956"
+    },
+    {
+      "bytes": 2744,
+      "path": "experiments/jev-information-density-v08p/contracts/contract-bundle-seal-v01.json",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "67cd6b7902111000dc93a0f81f9f20bc05a9c084732705ed8f9ad82fe965fa85"
+    },
+    {
+      "bytes": 11445,
+      "path": "experiments/jev-information-density-v08p/phase_a/fresh-panel-contract-v01.json",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "ce3b7b97caecb27f3ad99439c0e67dca6e40af5da3db9ca2e356ea5e9f06f823"
+    },
+    {
+      "bytes": 12417,
+      "path": "experiments/jev-information-density-v08p/phase_b/phase-b-p-analysis-contract-v01.json",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "84111122033fda65c84344317cfe3b50639b23be4c71f480ba665c67a23cc939"
+    },
+    {
+      "bytes": 13895,
+      "path": "experiments/jev-information-density-v08p/phase_b/phase-b-p-run-contract-v01.json",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "e345225b4a17fc18eb35fcab24cbe1d72bd0e34bed9de272f927a7be461853e6"
+    },
+    {
+      "bytes": 32855,
+      "path": "experiments/jev-information-density-v08p/phase_b/trajectory_analysis.py",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "706b8987b3fd637d03f07a0efffe34efde6370dbb4ae6c9b94f66bbb42b3ca70"
+    },
+    {
+      "bytes": 11692,
+      "path": "experiments/jev-information-density-v08q/contracts/q-contrast-proposal-v01.md",
+      "role": "Q_local_source",
+      "sha256": "d3193efbb0733b9657041b6cbd3497e20a165e82d90c0b27828055123244cbd0"
+    },
+    {
+      "bytes": 3307,
+      "path": "experiments/jev-information-density-v08q/source/q_analysis_rules_v02.py",
+      "role": "Q_local_source",
+      "sha256": "4ba7a48438a35f00154e5eefcc76906122080944ff32575a4a26a5b1d29f91b3"
+    },
+    {
+      "bytes": 3398,
+      "path": "experiments/jev-information-density-v08q/source/q_weighted_objective_v02.py",
+      "role": "Q_local_source",
+      "sha256": "fc412072592857be36b02312d852d08ce3df2bf6fa7b28f8c1d59575c28e1ea4"
+    },
+    {
+      "bytes": 5302,
+      "path": "experiments/jev-information-density-v08q/tests/test_q_rules_v02.py",
+      "role": "Q_local_source",
+      "sha256": "6353e74ce9c498de6c56111cfa67771a76a2e51e4f6ad15ff8525c5573293ebd"
+    },
+    {
+      "bytes": 12545,
+      "path": "experiments/jev-lfm-variable-v07/extract_lfm.py",
+      "role": "frozen_parent_or_source_binding",
+      "sha256": "b8cd79a9a3265eca0fde5f509ba7c058bc2065d7747efe17ff7c7c1f6335b2d0"
+    }
+  ],
+  "evaluation": false,
+  "feature_extracted": false,
+  "identity": "JEV_V08Q_SOURCE_LOCK_V02",
+  "model_loaded": false,
+  "panel_materialized": false,
+  "root_sha256": "5e973916fb62747cde2de51f7deb2e29616ea1ead13ce384dcdb254901d936d3",
+  "training": false,
+  "verification": "All bound files were SHA-256 streamed during this bundle pass; no model weights or panel outputs were opened by an inference/training process."
+}

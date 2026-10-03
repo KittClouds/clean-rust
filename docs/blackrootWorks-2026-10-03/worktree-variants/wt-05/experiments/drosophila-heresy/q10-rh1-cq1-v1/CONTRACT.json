@@ -1,0 +1,189 @@
+{
+  "protocol": "Q10-RH1-CQ1",
+  "identity": "q10-rh1-cq1-v1",
+  "status": "PREEXECUTION_SEALED_NO_MEASURED_EXECUTION",
+  "purpose": "common-runtime qualification before RH1 ranking-by-horizon evidence",
+  "engineering_only": true,
+  "measured_execution_started": false,
+  "measured_rh1_2x2_authorized": false,
+  "scientific_seed_bundles": 0,
+  "behavioral_probe": false,
+  "no_na_rule": true,
+  "no_na_information_in_ranking": true,
+  "provenance": {
+    "repository_relative_root": "experiments/drosophila-heresy/q10-rh1-cq1-v1",
+    "hash_algorithm": "sha256-uppercase-hex",
+    "parent_bindings": [
+      {
+        "label": "pf5_plan",
+        "path": "experiments/drosophila-heresy/q10-pf5-v1/PLAN.md",
+        "sha256": "91286F84241D120395905E1569218B4D4BA5EE682AE5C82B75879305FC88A75C"
+      },
+      {
+        "label": "pf5_contract",
+        "path": "experiments/drosophila-heresy/q10-pf5-v1/CONTRACT.json",
+        "sha256": "20995E1826A9C62E0E8689017A2F3E624CC9E63B76B210FBD4AB11D7E9E7D34F"
+      },
+      {
+        "label": "pf5_runtime_helper",
+        "path": "experiments/drosophila-heresy/q10-pf5-v1/scripts/run_q10_pf5.py",
+        "sha256": "A00078787DB732906416B3C7158DC777CD41C2E71C3AAE660D1AE525446FB82A"
+      },
+      {
+        "label": "pf6_plan",
+        "path": "experiments/drosophila-heresy/q10-pf6-v1/PLAN.md",
+        "sha256": "2B030F345FE7E9E8A2AF6DEEA1C8CFA8D225841CB3EC026E7648D7C4EB1043ED"
+      },
+      {
+        "label": "pf6_contract",
+        "path": "experiments/drosophila-heresy/q10-pf6-v1/CONTRACT.json",
+        "sha256": "B572E4A99AF93F4B1DF44885787E5B5C739C603CF5DC3FD8A48B713513513782"
+      },
+      {
+        "label": "pf6_runtime_helper",
+        "path": "experiments/drosophila-heresy/q10-pf6-v1/scripts/run_q10_pf6.py",
+        "sha256": "79B731A7D86FDA1D3FB45F3FA320C62BABD35933AE9ED5BCC25D0744B3F6EA46"
+      },
+      {
+        "label": "s1_plan",
+        "path": "experiments/drosophila-heresy/q10-pf6-s1-v1/PLAN.md",
+        "sha256": "651B77A4C9EC848EA17D05726E275A748DCA23EA4106D1A4CA7DEFD523173DCC"
+      },
+      {
+        "label": "s1_contract",
+        "path": "experiments/drosophila-heresy/q10-pf6-s1-v1/CONTRACT.json",
+        "sha256": "C60C17E2C79A04136701ACDCC4F17E72F017DFEE6728DF0EA523BBA2217CEB7D"
+      },
+      {
+        "label": "s1_runner",
+        "path": "experiments/drosophila-heresy/q10-pf6-s1-v1/scripts/run_q10_pf6_s1.py",
+        "sha256": "9C5036F7BF85278ADFA5154E0C312E82952B16A96BF96A518E78C1C70BBB7FB8"
+      },
+      {
+        "label": "s1_sampler",
+        "path": "experiments/drosophila-heresy/q10-pf6-s1-v1/scripts/select_q10_pf6_s1.py",
+        "sha256": "2EEA4F242C45ED40AE435C02699F41C3F8A0D92A0D2CDE470BFDB53ECC2BAE61"
+      },
+      {
+        "label": "s1_sample",
+        "path": "experiments/drosophila-heresy/q10-pf6-s1-v1/qualification/sample.json",
+        "sha256": "0DE70DA72627D834C7D877F667469DA848F04312F072036245DFE312AD863BB9"
+      },
+      {
+        "label": "s1_preexecution",
+        "path": "experiments/drosophila-heresy/q10-pf6-s1-v1/qualification/PREEXECUTION.json",
+        "sha256": "065D9FD8CCB1CDC615C8FA6E93FD7A3C3B2F04668FD90F7453674D77478C41BF"
+      },
+      {
+        "label": "s1_execution",
+        "path": "experiments/drosophila-heresy/q10-pf6-s1-v1/qualification/execution/execution.json",
+        "sha256": "E561D7392D471CC0B47E98E66EC5AD9FC772476F2F61103FBF5994A051BC0E17"
+      },
+      {
+        "label": "rmt_contract",
+        "path": "experiments/drosophila-heresy/q10-rmt-v1/CONTRACT.json",
+        "sha256": "FFD057E2D2FB86CB8BBBE0F78EA66C10DF752ABB369448549430EDBF4595CC6E"
+      },
+      {
+        "label": "rmt_execution",
+        "path": "experiments/drosophila-heresy/q10-rmt-v1/qualification/sample-9731-9732/execution.json",
+        "sha256": "B371FD8D3EFCB2354F78D1152AFC884FC4A6D6CA5D595B5295103DC68FCC7B86"
+      },
+      {
+        "label": "rmt_authority_summary",
+        "path": "experiments/drosophila-heresy/q10-rmt-v1/qualification/sample-9731-9732/authority-summary.json",
+        "sha256": "3389B671F8A4B61D0EA6484654418BF02E83A42C02424D3263FB69BFDBDC40C9"
+      },
+      {
+        "label": "rmt_endpoints",
+        "path": "experiments/drosophila-heresy/q10-rmt-v1/qualification/sample-9731-9732/endpoints.json",
+        "sha256": "1BE006961358B748CE0ECBCE635347274326494D546F82E6F32CA1FAAC0A7A8C"
+      },
+      {
+        "label": "rmt_rows",
+        "path": "experiments/drosophila-heresy/q10-rmt-v1/qualification/sample-9731-9732/rows.json",
+        "sha256": "A9AE4E5209E7BB32C4815666A32EA9C66B9E60A79C0E1A739C486E68DDE041C3"
+      },
+      {
+        "label": "rmt_components",
+        "path": "experiments/drosophila-heresy/q10-rmt-v1/qualification/sample-9731-9732/components.json",
+        "sha256": "E873F1FAAA1C1D2093F5D90D483AF621D1B371FA205A52EBD3E74D0E7B841977"
+      },
+      {
+        "label": "rmt_excluded_noncontract",
+        "path": "experiments/drosophila-heresy/q10-rmt-v1/qualification/sample-9731-9732/excluded-noncontract.json",
+        "sha256": "02A7CDA89BFC68F6AEA8C556546BAEA77559386C2F78C239C6A849A1F846033E"
+      },
+      {
+        "label": "rmt_moves",
+        "path": "experiments/drosophila-heresy/q10-rmt-v1/qualification/sample-9731-9732/moves.jsonl",
+        "sha256": "9FC2FB529A8EDA40F9F6AC1EB43DE1E76C8E7EB1331C2FD66CEC69AE7C1BF83F"
+      }
+    ],
+    "s1_group_receipts_root": "experiments/drosophila-heresy/q10-pf6-s1-v1/qualification/execution/groups",
+    "rmt_sample_root": "experiments/drosophila-heresy/q10-rmt-v1/qualification/sample-9731-9732"
+  },
+  "candidate_state": {
+    "schema": "coordinate_id_to_prefix_choice_v1",
+    "canonical_order": "ascending_coordinate_id",
+    "unvisited_choice": 0,
+    "identity_includes": ["coordinate_id", "prefix_choice"],
+    "identity_excludes": ["ranking_position", "visitation_order", "beam_lane", "exploration_order"],
+    "cache_key_includes_context": true,
+    "tie_break_after_strict_objective": "canonical_state_identity_sha256"
+  },
+  "objective": {
+    "strict_tuple": ["mismatch_count", "total_ulp_distance", "residual_l2", "maximum_absolute_residual"],
+    "prefix_or_hash_not_objective": true
+  },
+  "rankings": {
+    "control": {
+      "name": "PF6_RESIDUAL_SPECIFICATION",
+      "formula": "(-sum_squared_residual_on_mismatched_declared_support_rows, -mismatched_row_count, -replayed_prefix_count, coordinate_id)",
+      "uses_na_information": false
+    },
+    "authority": {
+      "name": "RMT_AUTHORITY_INFORMED_WITH_UNKNOWN_FALLBACK",
+      "coverage_tiers": ["MEASURED_COMPLETE", "MEASURED_PARTIAL", "UNKNOWN"],
+      "missing_record_value": "UNKNOWN",
+      "unknown_fallback": "PF6_RESIDUAL_SPECIFICATION_WITH_RAW_SUPPORT_TIE_BREAK",
+      "uses_na_information": false
+    },
+    "authority_prefixes": [1, -1, 2, -2, 4, -4, 8, -8, 16, -16]
+  },
+  "authority_coverage_gate": {
+    "required_level": "endpoint_coordinate_presence",
+    "minimum_fraction": 1.0,
+    "prefix_completeness_required": false,
+    "prefix_completeness_is_reported_as": "MEASURED_COMPLETE_OR_MEASURED_PARTIAL",
+    "missing_endpoint_or_coordinate": "FAIL_CLOSED"
+  },
+  "cohorts": {
+    "source": "Q10-PF6-S1 selected_groups",
+    "primary": {"coordinate_count_min": 32, "coordinate_count_max": null, "expected_count": 32, "horizons": [16, 32]},
+    "secondary": {"coordinate_count_min": 17, "coordinate_count_max": 31, "expected_count": 23, "long_horizon": "complete_available_coordinate_horizon"},
+    "excluded_selected_groups": 29,
+    "selection_discretion": false
+  },
+  "spatial_score_domains": {
+    "D": "declared group rows",
+    "P": "union of rows in physical support of group coordinates",
+    "G": "whole endpoint readout",
+    "primary_search_domain": "D",
+    "collateral_domain": "P",
+    "global_diagnostic_domain": "G"
+  },
+  "exposure_and_termination": {
+    "exposed_round_rule": "actual_rounds_completed_gte_round_and_coordinate_available",
+    "padded_rounds_are_exposure": false,
+    "termination_reasons": ["NATURAL_COORDINATE_END", "HORIZON", "REPLAY_BUDGET", "NO_EXPANSION", "INVALID"]
+  },
+  "budget": {
+    "unit": "candidate_replays_per_group",
+    "B16": 32768,
+    "B32": 65536,
+    "scaling_rule": "B32_equals_2_times_B16",
+    "qualification_spends_measured_budget": false
+  },
+  "forbidden_scope_fields": ["accuracy", "reward", "actions", "behavior", "behavioral_inference", "scientific_seed_id", "repair_applied", "dh08b_authorized", "na_pair_data", "na_triple_data"]
+}

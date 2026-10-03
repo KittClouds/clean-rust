@@ -1,0 +1,127 @@
+{
+  "captures": [
+    {
+      "capture_modes": {
+        "1": 20000
+      },
+      "causal_columns_present": true,
+      "causal_inference": "SEPARATE_FROM_LEGACY_BUFFER_PARITY",
+      "event_kinds": {
+        "HISTORICAL_RELOAD": 20000
+      },
+      "legacy_parity": [
+        {
+          "cells_compared": 80000,
+          "cells_equal": 80000,
+          "cells_mismatched": 0,
+          "comparison": "original_translated",
+          "left": "original_b",
+          "mismatch_examples": [],
+          "missing_left": 0,
+          "missing_right": 0,
+          "right": "translated_b",
+          "rows_left": 20000,
+          "rows_right": 20000,
+          "rows_union": 20000,
+          "status": "PASS"
+        },
+        {
+          "cells_compared": 80000,
+          "cells_equal": 80000,
+          "cells_mismatched": 0,
+          "comparison": "original_v2_compatibility",
+          "left": "original_b",
+          "mismatch_examples": [],
+          "missing_left": 0,
+          "missing_right": 0,
+          "right": "v2_legacy_b",
+          "rows_left": 20000,
+          "rows_right": 20000,
+          "rows_union": 20000,
+          "status": "PASS"
+        },
+        {
+          "cells_compared": 80000,
+          "cells_equal": 80000,
+          "cells_mismatched": 0,
+          "comparison": "translated_v2_compatibility",
+          "left": "translated_b",
+          "mismatch_examples": [],
+          "missing_left": 0,
+          "missing_right": 0,
+          "right": "v2_legacy_b",
+          "rows_left": 20000,
+          "rows_right": 20000,
+          "rows_union": 20000,
+          "status": "PASS"
+        }
+      ],
+      "path": "studies\\obs-open-01\\source-recovery\\OBS_OPEN_SRC01_US30_M5_RELOAD_run1.tsv",
+      "rows": 20000,
+      "sha256": "7d782affb383d7c7809630e66ad5b09af94d3e62a3e6caf7b567887d1583f90c",
+      "status": "CAPTURE_READ"
+    },
+    {
+      "capture_modes": {
+        "1": 20000
+      },
+      "causal_columns_present": true,
+      "causal_inference": "SEPARATE_FROM_LEGACY_BUFFER_PARITY",
+      "event_kinds": {
+        "HISTORICAL_RELOAD": 20000
+      },
+      "legacy_parity": [
+        {
+          "cells_compared": 80000,
+          "cells_equal": 80000,
+          "cells_mismatched": 0,
+          "comparison": "original_translated",
+          "left": "original_b",
+          "mismatch_examples": [],
+          "missing_left": 0,
+          "missing_right": 0,
+          "right": "translated_b",
+          "rows_left": 20000,
+          "rows_right": 20000,
+          "rows_union": 20000,
+          "status": "PASS"
+        },
+        {
+          "cells_compared": 80000,
+          "cells_equal": 80000,
+          "cells_mismatched": 0,
+          "comparison": "original_v2_compatibility",
+          "left": "original_b",
+          "mismatch_examples": [],
+          "missing_left": 0,
+          "missing_right": 0,
+          "right": "v2_legacy_b",
+          "rows_left": 20000,
+          "rows_right": 20000,
+          "rows_union": 20000,
+          "status": "PASS"
+        },
+        {
+          "cells_compared": 80000,
+          "cells_equal": 80000,
+          "cells_mismatched": 0,
+          "comparison": "translated_v2_compatibility",
+          "left": "translated_b",
+          "mismatch_examples": [],
+          "missing_left": 0,
+          "missing_right": 0,
+          "right": "v2_legacy_b",
+          "rows_left": 20000,
+          "rows_right": 20000,
+          "rows_union": 20000,
+          "status": "PASS"
+        }
+      ],
+      "path": "studies\\obs-open-01\\source-recovery\\OBS_OPEN_SRC01_US30_M5_RELOAD_run2.tsv",
+      "rows": 20000,
+      "sha256": "7d782affb383d7c7809630e66ad5b09af94d3e62a3e6caf7b567887d1583f90c",
+      "status": "CAPTURE_READ"
+    }
+  ],
+  "schema": "OBS_OPEN_SRC01_PARITY_V1"
+}

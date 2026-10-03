@@ -1,0 +1,15 @@
+{
+  "contract": "MST_RG2_PHASE9_LIFECYCLE_AUDIT_MANIFEST_V1",
+  "semantic_result_sha256": "752d3da65adc8b2a24e05d4525847ad7f700184e924b823040a94aa1dc8caf6e",
+  "analysis_code_sha256": "8087a8822eb1c4c3369365ca62d8d28180e58a62f8742b3338d3dd8c44374add",
+  "artifacts": {
+    "node_retirement_traces.csv": "7e991a035890f3e4985343a78085ea3dc2b9d33de1ebc1936097253b874ba9d6",
+    "replacement_candidates.csv": "f025bd2d047a3bc6a57d627bc0e86cdaea9e448b6ed9e31320f9071cef9aa6b0",
+    "timeout_traces.csv": "3fc79c7e4d29e526401ea19c5ea883014c0fd954bc132012b92d07a76c4d8204",
+    "transit_timeout_traces.csv": "2ef1c6cb9e695fbb13296961e7fcf4f5aeed20523446922647abab309c56db7b",
+    "episode_attempt_chains.csv": "4f6d69d4b626831bc176e4956d0fd7fd0f87656df3ee312cd151feb37768e091",
+    "node_history.csv": "fe13a91ddd0183693ac2dbe5dd934a58c4a6f8311fb2f2ec772f858d6be90470",
+    "lifecycle_audit.md": "468cc4f9434b84bfa1db9ec7f71710d3baec15c0a7f313025c8e9c4e931faa5b",
+    "lifecycle_audit.json": "802fcedec8457221ad5c5286c51b20149852ea531780cfb881f28e0a54f55439"
+  }
+}

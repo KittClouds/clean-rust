@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PriceComparison",
+  "type": "object",
+  "properties": {
+    "ask_difference": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "format": "double"
+    },
+    "bar_close_difference": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "format": "double"
+    },
+    "bar_high_difference": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "format": "double"
+    },
+    "bar_low_difference": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "format": "double"
+    },
+    "bar_open_difference": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "format": "double"
+    },
+    "bid_difference": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "format": "double"
+    },
+    "difference_class": {
+      "type": "string"
+    },
+    "midpoint_difference": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "format": "double"
+    },
+    "missing_observation_state": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "mt5_time_ns": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "northstar_instrument_id": {
+      "type": "integer",
+      "format": "uint32",
+      "minimum": 0
+    },
+    "receipt_id": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "schema_version": {
+      "type": "string"
+    },
+    "spread_difference": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "format": "double"
+    },
+    "temporal_alignment": {
+      "type": "string"
+    },
+    "tradelocker_time_ns": {
+      "type": "integer",
+      "format": "int64"
+    }
+  },
+  "required": [
+    "schema_version",
+    "northstar_instrument_id",
+    "mt5_time_ns",
+    "tradelocker_time_ns",
+    "temporal_alignment",
+    "difference_class",
+    "receipt_id"
+  ],
+  "$defs": {
+    "Digest256": {
+      "description": "Domain-separated BLAKE3 digest",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

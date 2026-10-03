@@ -1,0 +1,38 @@
+{
+  "protocol": "DH-07",
+  "status": "BLOCKED_PRESEAL_QUALIFICATION",
+  "sealed": false,
+  "measured_execution": false,
+  "qualification_seed": 9000,
+  "qualification_side": "R",
+  "qualification_tau": 4.0,
+  "dh06_true_endpoint_compatibility": {
+    "perpendicular_only": {"final_weights_exact": true, "curve_exact": true, "acquisition_hash_exact": true},
+    "both": {"final_weights_exact": true, "curve_exact": true, "acquisition_hash_exact": true}
+  },
+  "first_event_failures": {
+    "null_perpendicular": {
+      "reason": "realized true intervention exceeds acquisition-axis leakage gate",
+      "true_axis_cosine": -0.0008165776171753395,
+      "support_size": 8446,
+      "base_at_lower_bound": 228,
+      "base_at_upper_bound": 0,
+      "target_l2": 1.2357305702259622,
+      "attempts": 0
+    },
+    "parallel_null": {
+      "reason": "no feasible jointly orthogonal matched-energy direction from the frozen 64-candidate generator",
+      "true_axis_cosine": -4.72447759400283e-9,
+      "support_size": 8446,
+      "base_at_lower_bound": 0,
+      "base_at_upper_bound": 0,
+      "target_l2": 1.2361914082837924,
+      "attempts": 64,
+      "bound_rejections": 64
+    }
+  },
+  "full_receipt": "qualification/constructor-first-real-seed9000.json",
+  "full_receipt_sha256": "B0807C8BCF6A3A0595570AC7215890276A5E7A21A74F79D6AFEA6E265796CFAA",
+  "independent_audit": "../supervision/dh07/snapshot_audit.json",
+  "interpretation": "The strict planned control is invalid. No direction-specificity inference was run."
+}

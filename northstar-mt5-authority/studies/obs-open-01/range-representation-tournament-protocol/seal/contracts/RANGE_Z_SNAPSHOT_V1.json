@@ -1,0 +1,1 @@
+{"degenerate_width":"NOT_EVALUABLE_DEGENERATE_RANGE","excluded":["width","absolute_midpoint","absolute_price_level","pre_freeze_path","candidate_history","future_information"],"fields":["z_open","z_high","z_low","z_close"],"known_at":"freeze_commit_time","schema":"RANGE_Z_SNAPSHOT_V1","transform":"2*(freeze_bar_value-midpoint)/width","width_field_included":false}

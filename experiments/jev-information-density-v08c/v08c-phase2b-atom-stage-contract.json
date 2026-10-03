@@ -1,0 +1,58 @@
+{
+  "contract": "jev-decision-data-information-density/v0.8c-phase2b-equivalent-atom-substitution",
+  "status": "prospective_frozen_before_candidate_materialization",
+  "parent_phase2b_contract_sha256": "0977af21b956e62f5b6b8533181ac120f3dc577f2781b013cd745047065c65e5",
+  "scope": {
+    "stage": "proven-equivalent substitutions only",
+    "candidate_banks": ["CM100", "RM100"],
+    "models_contacted": false,
+    "phoenix_access": false,
+    "training_materialized": false,
+    "existing_contracts_or_banks_mutated": false,
+    "outputs_external_only": true,
+    "stop_after_independent_candidate_audit": true
+  },
+  "witnesses": {
+    "CM100": {"reference": "R100", "manifest_sha256": "0b9998d94e895e5f540c066bdc618d0d6378b9e9ce632380838b7a14beac008b"},
+    "RM100": {"reference": "C100", "manifest_sha256": "860fbfef8283e707d41639ab970ef7257d116e3001a18a0b180feea9d72579c3"}
+  },
+  "frozen_inputs": {
+    "group_records_sha256": "9e3546fbe88741666cc5be5ae28907d7a223f74c8578609adfc3036ba7f4e7f2",
+    "eval_manifest_sha256": "3e72cd7596fbf0b302501b88dd9dc645a5749de10884b57eceb5552bfc5ef8ae",
+    "phase2_optimizer_sha256": "9c57f98a151870c16f2cfdae5b27853939dd25598e1618b7ac6aeaa7bd52ff1b",
+    "phase2b_contract_sha256": "0977af21b956e62f5b6b8533181ac120f3dc577f2781b013cd745047065c65e5",
+    "ortools_version": "9.15.6755"
+  },
+  "atom_identity": [
+    "model_input_digest",
+    "root_id",
+    "exact_joint_cell(world,bundle,query,cardinality,entropy_quintile,entropy_band)",
+    "complete_sorted_topology_feature_tuple",
+    "intervention_family"
+  ],
+  "construction": {
+    "profile_target": "preserve the identity witness atom-count vector exactly",
+    "candidate_selection": "within each atom choose the required number of eligible groups with highest frozen Phase 2 objective priority; tie-break by group_id",
+    "CM100_priority": "descending frozen global-v0.8 rarity-weighted coverage score, then ascending SHA256(curated_seed|group_id), then group_id",
+    "RM100_priority": "ascending SHA256(random_seed|group_id), then group_id",
+    "objective": "additive integer priority rank from the frozen Phase 2 contract",
+    "optimality_claim": "exact maximum conditional on the witness atom-count vector only; no global profile-constrained optimality claim",
+    "no_additional_search": true
+  },
+  "acceptance": {
+    "candidate_distinct_from_witness": true,
+    "minimum_changed_group_ids": 1,
+    "all_phase2b_hard_constraints_recomputed_from_raw_records": true,
+    "exact_atom_count_vector_recomputed": true,
+    "objective_recomputed_independently": true,
+    "minimum_objective_delta": 1,
+    "final_manifest_emission": "only after both banks pass the independent validator",
+    "failure_policy": "retain provisional artifacts and report failure; do not relax constraints or continue to another neighborhood in this stage"
+  },
+  "interpretation_limits": [
+    "a passing bank proves counterfactual profile feasibility and positive frozen-policy score separation only",
+    "objective separation is not a material downstream model effect",
+    "the conditional atom optimum is not a global optimum",
+    "SEARCH_EXHAUSTED or stage failure is not infeasibility"
+  ]
+}

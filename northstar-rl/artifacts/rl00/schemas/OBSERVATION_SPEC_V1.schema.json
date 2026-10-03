@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ObservationSpec",
+  "type": "object",
+  "properties": {
+    "availability_rule": {
+      "type": "string"
+    },
+    "dtype": {
+      "$ref": "#/$defs/FeatureDType"
+    },
+    "history_depth": {
+      "type": "integer",
+      "format": "uint32",
+      "minimum": 0
+    },
+    "layout": {
+      "$ref": "#/$defs/ObservationLayout"
+    },
+    "observation_spec_id": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "ordered_feature_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "output_shape": {
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "format": "uint32",
+        "minimum": 0
+      }
+    },
+    "schema_version": {
+      "type": "string"
+    },
+    "stacking_semantics": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "observation_spec_id",
+    "ordered_feature_ids",
+    "history_depth",
+    "stacking_semantics",
+    "dtype",
+    "output_shape",
+    "availability_rule",
+    "layout"
+  ],
+  "$defs": {
+    "Digest256": {
+      "description": "Domain-separated BLAKE3 digest",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "FeatureDType": {
+      "type": "string",
+      "enum": [
+        "float64",
+        "float32"
+      ]
+    },
+    "ObservationLayout": {
+      "type": "string",
+      "enum": [
+        "flat",
+        "windowed_matrix"
+      ]
+    }
+  }
+}

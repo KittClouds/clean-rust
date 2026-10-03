@@ -1,0 +1,623 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1060" viewBox="0 0 1600 1060">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<style>text{font-family:Segoe UI,Arial,sans-serif;fill:#17212b}.tick{font-size:11px}.axis{font-size:12px}.panel-title{font-size:14px;font-weight:600}.suptitle{font-size:20px;font-weight:700}.legend{font-size:13px}</style>
+<text class="suptitle" x="800.0" y="32" text-anchor="middle">Matched-neutral locality trajectories — fixed-checkpoint paths (epoch 0–3)</text>
+<text class="panel-title" x="277.2" y="90.0" text-anchor="middle">Seed 20260927 · Strict transition</text>
+<line x1="128.00" y1="106.00" x2="128.00" y2="331.33" stroke="#dce2e7" stroke-width="1"/>
+<line x1="128.00" y1="106.00" x2="426.50" y2="106.00" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="128.00" y="348.33" text-anchor="middle">0.000</text>
+<text class="tick" x="121.00" y="110.00" text-anchor="end">0.699</text>
+<line x1="202.62" y1="106.00" x2="202.62" y2="331.33" stroke="#dce2e7" stroke-width="1"/>
+<line x1="128.00" y1="162.33" x2="426.50" y2="162.33" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="202.62" y="348.33" text-anchor="middle">0.002</text>
+<text class="tick" x="121.00" y="166.33" text-anchor="end">0.524</text>
+<line x1="277.25" y1="106.00" x2="277.25" y2="331.33" stroke="#dce2e7" stroke-width="1"/>
+<line x1="128.00" y1="218.67" x2="426.50" y2="218.67" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="277.25" y="348.33" text-anchor="middle">0.005</text>
+<text class="tick" x="121.00" y="222.67" text-anchor="end">0.349</text>
+<line x1="351.88" y1="106.00" x2="351.88" y2="331.33" stroke="#dce2e7" stroke-width="1"/>
+<line x1="128.00" y1="275.00" x2="426.50" y2="275.00" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="351.88" y="348.33" text-anchor="middle">0.007</text>
+<text class="tick" x="121.00" y="279.00" text-anchor="end">0.175</text>
+<line x1="426.50" y1="106.00" x2="426.50" y2="331.33" stroke="#dce2e7" stroke-width="1"/>
+<line x1="128.00" y1="331.33" x2="426.50" y2="331.33" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="426.50" y="348.33" text-anchor="middle">0.010</text>
+<text class="tick" x="121.00" y="335.33" text-anchor="end">0.000</text>
+<line x1="128.00" y1="106.00" x2="128.00" y2="331.33" stroke="#46525c"/>
+<line x1="128.00" y1="331.33" x2="426.50" y2="331.33" stroke="#46525c"/>
+<polyline points="193.35,331.33 198.39,331.33 197.64,331.33 264.06,331.33" fill="none" stroke="#2878b5" stroke-width="2" opacity="0.9"/>
+<circle cx="193.35" cy="331.33" r="5" fill="#2878b5"/>
+<text class="tick" x="198.35" y="326.33" fill="#2878b5">0</text>
+<rect x="194.39" y="327.33" width="8" height="8" fill="#2878b5"/>
+<text class="tick" x="203.39" y="326.33" fill="#2878b5">1</text>
+<path d="M 197.64 326.33 L 202.64 335.33 L 192.64 335.33 Z" fill="#2878b5"/>
+<text class="tick" x="202.64" y="326.33" fill="#2878b5">2</text>
+<path d="M 264.06 326.33 L 269.06 331.33 L 264.06 336.33 L 259.06 331.33 Z" fill="#2878b5"/>
+<text class="tick" x="269.06" y="326.33" fill="#2878b5">3</text>
+<polyline points="193.35,331.33 194.82,331.33 165.74,331.33 365.32,122.69" fill="none" stroke="#e07b24" stroke-width="2" opacity="0.9"/>
+<circle cx="193.35" cy="331.33" r="5" fill="#e07b24"/>
+<text class="tick" x="198.35" y="326.33" fill="#e07b24">0</text>
+<rect x="190.82" y="327.33" width="8" height="8" fill="#e07b24"/>
+<text class="tick" x="199.82" y="326.33" fill="#e07b24">1</text>
+<path d="M 165.74 326.33 L 170.74 335.33 L 160.74 335.33 Z" fill="#e07b24"/>
+<text class="tick" x="170.74" y="326.33" fill="#e07b24">2</text>
+<path d="M 365.32 117.69 L 370.32 122.69 L 365.32 127.69 L 360.32 122.69 Z" fill="#e07b24"/>
+<text class="tick" x="370.32" y="117.69" fill="#e07b24">3</text>
+<polyline points="193.35,331.33 260.79,331.33 261.92,331.33 299.40,331.33" fill="none" stroke="#27864b" stroke-width="2" opacity="0.9"/>
+<circle cx="193.35" cy="331.33" r="5" fill="#27864b"/>
+<text class="tick" x="198.35" y="326.33" fill="#27864b">0</text>
+<rect x="256.79" y="327.33" width="8" height="8" fill="#27864b"/>
+<text class="tick" x="265.79" y="326.33" fill="#27864b">1</text>
+<path d="M 261.92 326.33 L 266.92 335.33 L 256.92 335.33 Z" fill="#27864b"/>
+<text class="tick" x="266.92" y="326.33" fill="#27864b">2</text>
+<path d="M 299.40 326.33 L 304.40 331.33 L 299.40 336.33 L 294.40 331.33 Z" fill="#27864b"/>
+<text class="tick" x="304.40" y="326.33" fill="#27864b">3</text>
+<text class="axis" x="277.25" y="365.33" text-anchor="middle">Matched-neutral posterior L1</text>
+<text class="panel-title" x="651.8" y="90.0" text-anchor="middle">Seed 20260927 · Anchor old-winner MAP</text>
+<line x1="502.50" y1="106.00" x2="502.50" y2="331.33" stroke="#dce2e7" stroke-width="1"/>
+<line x1="502.50" y1="106.00" x2="801.00" y2="106.00" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="502.50" y="348.33" text-anchor="middle">0.000</text>
+<text class="tick" x="495.50" y="110.00" text-anchor="end">1.000</text>
+<line x1="577.12" y1="106.00" x2="577.12" y2="331.33" stroke="#dce2e7" stroke-width="1"/>
+<line x1="502.50" y1="162.33" x2="801.00" y2="162.33" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="577.12" y="348.33" text-anchor="middle">0.002</text>
+<text class="tick" x="495.50" y="166.33" text-anchor="end">0.750</text>
+<line x1="651.75" y1="106.00" x2="651.75" y2="331.33" stroke="#dce2e7" stroke-width="1"/>
+<line x1="502.50" y1="218.67" x2="801.00" y2="218.67" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="651.75" y="348.33" text-anchor="middle">0.005</text>
+<text class="tick" x="495.50" y="222.67" text-anchor="end">0.500</text>
+<line x1="726.38" y1="106.00" x2="726.38" y2="331.33" stroke="#dce2e7" stroke-width="1"/>
+<line x1="502.50" y1="275.00" x2="801.00" y2="275.00" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="726.38" y="348.33" text-anchor="middle">0.007</text>
+<text class="tick" x="495.50" y="279.00" text-anchor="end">0.250</text>
+<line x1="801.00" y1="106.00" x2="801.00" y2="331.33" stroke="#dce2e7" stroke-width="1"/>
+<line x1="502.50" y1="331.33" x2="801.00" y2="331.33" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="801.00" y="348.33" text-anchor="middle">0.010</text>
+<text class="tick" x="495.50" y="335.33" text-anchor="end">0.000</text>
+<line x1="502.50" y1="106.00" x2="502.50" y2="331.33" stroke="#46525c"/>
+<line x1="502.50" y1="331.33" x2="801.00" y2="331.33" stroke="#46525c"/>
+<polyline points="567.85,331.33 572.89,275.00 572.14,106.00 638.56,114.34" fill="none" stroke="#2878b5" stroke-width="2" opacity="0.9"/>
+<circle cx="567.85" cy="331.33" r="5" fill="#2878b5"/>
+<text class="tick" x="572.85" y="326.33" fill="#2878b5">0</text>
+<rect x="568.89" y="271.00" width="8" height="8" fill="#2878b5"/>
+<text class="tick" x="577.89" y="270.00" fill="#2878b5">1</text>
+<path d="M 572.14 101.00 L 577.14 110.00 L 567.14 110.00 Z" fill="#2878b5"/>
+<text class="tick" x="577.14" y="101.00" fill="#2878b5">2</text>
+<path d="M 638.56 109.34 L 643.56 114.34 L 638.56 119.34 L 633.56 114.34 Z" fill="#2878b5"/>
+<text class="tick" x="643.56" y="109.34" fill="#2878b5">3</text>
+<polyline points="567.85,331.33 569.32,218.67 540.24,106.00 739.82,185.54" fill="none" stroke="#e07b24" stroke-width="2" opacity="0.9"/>
+<circle cx="567.85" cy="331.33" r="5" fill="#e07b24"/>
+<text class="tick" x="572.85" y="326.33" fill="#e07b24">0</text>
+<rect x="565.32" y="214.67" width="8" height="8" fill="#e07b24"/>
+<text class="tick" x="574.32" y="213.67" fill="#e07b24">1</text>
+<path d="M 540.24 101.00 L 545.24 110.00 L 535.24 110.00 Z" fill="#e07b24"/>
+<text class="tick" x="545.24" y="101.00" fill="#e07b24">2</text>
+<path d="M 739.82 180.54 L 744.82 185.54 L 739.82 190.54 L 734.82 185.54 Z" fill="#e07b24"/>
+<text class="tick" x="744.82" y="180.54" fill="#e07b24">3</text>
+<polyline points="567.85,331.33 635.29,106.00 636.42,218.67 673.90,218.67" fill="none" stroke="#27864b" stroke-width="2" opacity="0.9"/>
+<circle cx="567.85" cy="331.33" r="5" fill="#27864b"/>
+<text class="tick" x="572.85" y="326.33" fill="#27864b">0</text>
+<rect x="631.29" y="102.00" width="8" height="8" fill="#27864b"/>
+<text class="tick" x="640.29" y="101.00" fill="#27864b">1</text>
+<path d="M 636.42 213.67 L 641.42 222.67 L 631.42 222.67 Z" fill="#27864b"/>
+<text class="tick" x="641.42" y="213.67" fill="#27864b">2</text>
+<path d="M 673.90 213.67 L 678.90 218.67 L 673.90 223.67 L 668.90 218.67 Z" fill="#27864b"/>
+<text class="tick" x="678.90" y="213.67" fill="#27864b">3</text>
+<text class="axis" x="651.75" y="365.33" text-anchor="middle">Matched-neutral posterior L1</text>
+<text class="panel-title" x="1026.2" y="90.0" text-anchor="middle">Seed 20260927 · Fact new-winner MAP</text>
+<line x1="877.00" y1="106.00" x2="877.00" y2="331.33" stroke="#dce2e7" stroke-width="1"/>
+<line x1="877.00" y1="106.00" x2="1175.50" y2="106.00" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="877.00" y="348.33" text-anchor="middle">0.000</text>
+<text class="tick" x="870.00" y="110.00" text-anchor="end">1.000</text>
+<line x1="951.62" y1="106.00" x2="951.62" y2="331.33" stroke="#dce2e7" stroke-width="1"/>
+<line x1="877.00" y1="162.33" x2="1175.50" y2="162.33" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="951.62" y="348.33" text-anchor="middle">0.002</text>
+<text class="tick" x="870.00" y="166.33" text-anchor="end">0.750</text>
+<line x1="1026.25" y1="106.00" x2="1026.25" y2="331.33" stroke="#dce2e7" stroke-width="1"/>
+<line x1="877.00" y1="218.67" x2="1175.50" y2="218.67" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="1026.25" y="348.33" text-anchor="middle">0.005</text>
+<text class="tick" x="870.00" y="222.67" text-anchor="end">0.500</text>
+<line x1="1100.88" y1="106.00" x2="1100.88" y2="331.33" stroke="#dce2e7" stroke-width="1"/>
+<line x1="877.00" y1="275.00" x2="1175.50" y2="275.00" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="1100.88" y="348.33" text-anchor="middle">0.007</text>
+<text class="tick" x="870.00" y="279.00" text-anchor="end">0.250</text>
+<line x1="1175.50" y1="106.00" x2="1175.50" y2="331.33" stroke="#dce2e7" stroke-width="1"/>
+<line x1="877.00" y1="331.33" x2="1175.50" y2="331.33" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="1175.50" y="348.33" text-anchor="middle">0.010</text>
+<text class="tick" x="870.00" y="335.33" text-anchor="end">0.000</text>
+<line x1="877.00" y1="106.00" x2="877.00" y2="331.33" stroke="#46525c"/>
+<line x1="877.00" y1="331.33" x2="1175.50" y2="331.33" stroke="#46525c"/>
+<polyline points="942.35,218.67 947.39,331.33 946.64,331.33 1013.06,331.33" fill="none" stroke="#2878b5" stroke-width="2" opacity="0.9"/>
+<circle cx="942.35" cy="218.67" r="5" fill="#2878b5"/>
+<text class="tick" x="947.35" y="213.67" fill="#2878b5">0</text>
+<rect x="943.39" y="327.33" width="8" height="8" fill="#2878b5"/>
+<text class="tick" x="952.39" y="326.33" fill="#2878b5">1</text>
+<path d="M 946.64 326.33 L 951.64 335.33 L 941.64 335.33 Z" fill="#2878b5"/>
+<text class="tick" x="951.64" y="326.33" fill="#2878b5">2</text>
+<path d="M 1013.06 326.33 L 1018.06 331.33 L 1013.06 336.33 L 1008.06 331.33 Z" fill="#2878b5"/>
+<text class="tick" x="1018.06" y="326.33" fill="#2878b5">3</text>
+<polyline points="942.35,218.67 943.82,331.33 914.74,331.33 1114.32,106.00" fill="none" stroke="#e07b24" stroke-width="2" opacity="0.9"/>
+<circle cx="942.35" cy="218.67" r="5" fill="#e07b24"/>
+<text class="tick" x="947.35" y="213.67" fill="#e07b24">0</text>
+<rect x="939.82" y="327.33" width="8" height="8" fill="#e07b24"/>
+<text class="tick" x="948.82" y="326.33" fill="#e07b24">1</text>
+<path d="M 914.74 326.33 L 919.74 335.33 L 909.74 335.33 Z" fill="#e07b24"/>
+<text class="tick" x="919.74" y="326.33" fill="#e07b24">2</text>
+<path d="M 1114.32 101.00 L 1119.32 106.00 L 1114.32 111.00 L 1109.32 106.00 Z" fill="#e07b24"/>
+<text class="tick" x="1119.32" y="101.00" fill="#e07b24">3</text>
+<polyline points="942.35,218.67 1009.79,331.33 1010.92,331.33 1048.40,331.33" fill="none" stroke="#27864b" stroke-width="2" opacity="0.9"/>
+<circle cx="942.35" cy="218.67" r="5" fill="#27864b"/>
+<text class="tick" x="947.35" y="213.67" fill="#27864b">0</text>
+<rect x="1005.79" y="327.33" width="8" height="8" fill="#27864b"/>
+<text class="tick" x="1014.79" y="326.33" fill="#27864b">1</text>
+<path d="M 1010.92 326.33 L 1015.92 335.33 L 1005.92 335.33 Z" fill="#27864b"/>
+<text class="tick" x="1015.92" y="326.33" fill="#27864b">2</text>
+<path d="M 1048.40 326.33 L 1053.40 331.33 L 1048.40 336.33 L 1043.40 331.33 Z" fill="#27864b"/>
+<text class="tick" x="1053.40" y="326.33" fill="#27864b">3</text>
+<text class="axis" x="1026.25" y="365.33" text-anchor="middle">Matched-neutral posterior L1</text>
+<text class="panel-title" x="1400.8" y="90.0" text-anchor="middle">Seed 20260927 · Fact new-winner Δp</text>
+<line x1="1251.50" y1="106.00" x2="1251.50" y2="331.33" stroke="#dce2e7" stroke-width="1"/>
+<line x1="1251.50" y1="106.00" x2="1550.00" y2="106.00" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="1251.50" y="348.33" text-anchor="middle">0.000</text>
+<text class="tick" x="1244.50" y="110.00" text-anchor="end">0.264</text>
+<line x1="1326.12" y1="106.00" x2="1326.12" y2="331.33" stroke="#dce2e7" stroke-width="1"/>
+<line x1="1251.50" y1="162.33" x2="1550.00" y2="162.33" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="1326.12" y="348.33" text-anchor="middle">0.002</text>
+<text class="tick" x="1244.50" y="166.33" text-anchor="end">0.198</text>
+<line x1="1400.75" y1="106.00" x2="1400.75" y2="331.33" stroke="#dce2e7" stroke-width="1"/>
+<line x1="1251.50" y1="218.67" x2="1550.00" y2="218.67" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="1400.75" y="348.33" text-anchor="middle">0.005</text>
+<text class="tick" x="1244.50" y="222.67" text-anchor="end">0.132</text>
+<line x1="1475.38" y1="106.00" x2="1475.38" y2="331.33" stroke="#dce2e7" stroke-width="1"/>
+<line x1="1251.50" y1="275.00" x2="1550.00" y2="275.00" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="1475.38" y="348.33" text-anchor="middle">0.007</text>
+<text class="tick" x="1244.50" y="279.00" text-anchor="end">0.066</text>
+<line x1="1550.00" y1="106.00" x2="1550.00" y2="331.33" stroke="#dce2e7" stroke-width="1"/>
+<line x1="1251.50" y1="331.33" x2="1550.00" y2="331.33" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="1550.00" y="348.33" text-anchor="middle">0.010</text>
+<text class="tick" x="1244.50" y="335.33" text-anchor="end">0.000</text>
+<line x1="1251.50" y1="106.00" x2="1251.50" y2="331.33" stroke="#46525c"/>
+<line x1="1251.50" y1="331.33" x2="1550.00" y2="331.33" stroke="#46525c"/>
+<polyline points="1316.85,331.40 1321.89,331.41 1321.14,331.30 1387.56,330.68" fill="none" stroke="#2878b5" stroke-width="2" opacity="0.9"/>
+<circle cx="1316.85" cy="331.40" r="5" fill="#2878b5"/>
+<text class="tick" x="1321.85" y="326.40" fill="#2878b5">0</text>
+<rect x="1317.89" y="327.41" width="8" height="8" fill="#2878b5"/>
+<text class="tick" x="1326.89" y="326.41" fill="#2878b5">1</text>
+<path d="M 1321.14 326.30 L 1326.14 335.30 L 1316.14 335.30 Z" fill="#2878b5"/>
+<text class="tick" x="1326.14" y="326.30" fill="#2878b5">2</text>
+<path d="M 1387.56 325.68 L 1392.56 330.68 L 1387.56 335.68 L 1382.56 330.68 Z" fill="#2878b5"/>
+<text class="tick" x="1392.56" y="325.68" fill="#2878b5">3</text>
+<polyline points="1316.85,331.40 1318.32,331.33 1289.24,330.77 1488.82,122.70" fill="none" stroke="#e07b24" stroke-width="2" opacity="0.9"/>
+<circle cx="1316.85" cy="331.40" r="5" fill="#e07b24"/>
+<text class="tick" x="1321.85" y="326.40" fill="#e07b24">0</text>
+<rect x="1314.32" y="327.33" width="8" height="8" fill="#e07b24"/>
+<text class="tick" x="1323.32" y="326.33" fill="#e07b24">1</text>
+<path d="M 1289.24 325.77 L 1294.24 334.77 L 1284.24 334.77 Z" fill="#e07b24"/>
+<text class="tick" x="1294.24" y="325.77" fill="#e07b24">2</text>
+<path d="M 1488.82 117.70 L 1493.82 122.70 L 1488.82 127.70 L 1483.82 122.70 Z" fill="#e07b24"/>
+<text class="tick" x="1493.82" y="117.70" fill="#e07b24">3</text>
+<polyline points="1316.85,331.40 1384.29,331.31 1385.42,331.24 1422.90,325.04" fill="none" stroke="#27864b" stroke-width="2" opacity="0.9"/>
+<circle cx="1316.85" cy="331.40" r="5" fill="#27864b"/>
+<text class="tick" x="1321.85" y="326.40" fill="#27864b">0</text>
+<rect x="1380.29" y="327.31" width="8" height="8" fill="#27864b"/>
+<text class="tick" x="1389.29" y="326.31" fill="#27864b">1</text>
+<path d="M 1385.42 326.24 L 1390.42 335.24 L 1380.42 335.24 Z" fill="#27864b"/>
+<text class="tick" x="1390.42" y="326.24" fill="#27864b">2</text>
+<path d="M 1422.90 320.04 L 1427.90 325.04 L 1422.90 330.04 L 1417.90 325.04 Z" fill="#27864b"/>
+<text class="tick" x="1427.90" y="320.04" fill="#27864b">3</text>
+<text class="axis" x="1400.75" y="365.33" text-anchor="middle">Matched-neutral posterior L1</text>
+<text class="panel-title" x="277.2" y="397.3" text-anchor="middle">Seed 20260928 · Strict transition</text>
+<line x1="128.00" y1="413.33" x2="128.00" y2="638.67" stroke="#dce2e7" stroke-width="1"/>
+<line x1="128.00" y1="413.33" x2="426.50" y2="413.33" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="128.00" y="655.67" text-anchor="middle">0.000</text>
+<text class="tick" x="121.00" y="417.33" text-anchor="end">0.004</text>
+<line x1="202.62" y1="413.33" x2="202.62" y2="638.67" stroke="#dce2e7" stroke-width="1"/>
+<line x1="128.00" y1="469.67" x2="426.50" y2="469.67" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="202.62" y="655.67" text-anchor="middle">0.008</text>
+<text class="tick" x="121.00" y="473.67" text-anchor="end">0.003</text>
+<line x1="277.25" y1="413.33" x2="277.25" y2="638.67" stroke="#dce2e7" stroke-width="1"/>
+<line x1="128.00" y1="526.00" x2="426.50" y2="526.00" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="277.25" y="655.67" text-anchor="middle">0.015</text>
+<text class="tick" x="121.00" y="530.00" text-anchor="end">0.002</text>
+<line x1="351.88" y1="413.33" x2="351.88" y2="638.67" stroke="#dce2e7" stroke-width="1"/>
+<line x1="128.00" y1="582.33" x2="426.50" y2="582.33" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="351.88" y="655.67" text-anchor="middle">0.023</text>
+<text class="tick" x="121.00" y="586.33" text-anchor="end">0.001</text>
+<line x1="426.50" y1="413.33" x2="426.50" y2="638.67" stroke="#dce2e7" stroke-width="1"/>
+<line x1="128.00" y1="638.67" x2="426.50" y2="638.67" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="426.50" y="655.67" text-anchor="middle">0.031</text>
+<text class="tick" x="121.00" y="642.67" text-anchor="end">0.000</text>
+<line x1="128.00" y1="413.33" x2="128.00" y2="638.67" stroke="#46525c"/>
+<line x1="128.00" y1="638.67" x2="426.50" y2="638.67" stroke="#46525c"/>
+<polyline points="133.42,638.67 139.55,638.67 143.37,638.67 404.79,526.00" fill="none" stroke="#2878b5" stroke-width="2" opacity="0.9"/>
+<circle cx="133.42" cy="638.67" r="5" fill="#2878b5"/>
+<text class="tick" x="138.42" y="633.67" fill="#2878b5">0</text>
+<rect x="135.55" y="634.67" width="8" height="8" fill="#2878b5"/>
+<text class="tick" x="144.55" y="633.67" fill="#2878b5">1</text>
+<path d="M 143.37 633.67 L 148.37 642.67 L 138.37 642.67 Z" fill="#2878b5"/>
+<text class="tick" x="148.37" y="633.67" fill="#2878b5">2</text>
+<path d="M 404.79 521.00 L 409.79 526.00 L 404.79 531.00 L 399.79 526.00 Z" fill="#2878b5"/>
+<text class="tick" x="409.79" y="521.00" fill="#2878b5">3</text>
+<polyline points="133.42,638.67 137.52,638.67 140.56,638.67 146.03,638.67" fill="none" stroke="#e07b24" stroke-width="2" opacity="0.9"/>
+<circle cx="133.42" cy="638.67" r="5" fill="#e07b24"/>
+<text class="tick" x="138.42" y="633.67" fill="#e07b24">0</text>
+<rect x="133.52" y="634.67" width="8" height="8" fill="#e07b24"/>
+<text class="tick" x="142.52" y="633.67" fill="#e07b24">1</text>
+<path d="M 140.56 633.67 L 145.56 642.67 L 135.56 642.67 Z" fill="#e07b24"/>
+<text class="tick" x="145.56" y="633.67" fill="#e07b24">2</text>
+<path d="M 146.03 633.67 L 151.03 638.67 L 146.03 643.67 L 141.03 638.67 Z" fill="#e07b24"/>
+<text class="tick" x="151.03" y="633.67" fill="#e07b24">3</text>
+<polyline points="133.42,638.67 147.67,638.67 141.13,638.67 163.37,638.67" fill="none" stroke="#27864b" stroke-width="2" opacity="0.9"/>
+<circle cx="133.42" cy="638.67" r="5" fill="#27864b"/>
+<text class="tick" x="138.42" y="633.67" fill="#27864b">0</text>
+<rect x="143.67" y="634.67" width="8" height="8" fill="#27864b"/>
+<text class="tick" x="152.67" y="633.67" fill="#27864b">1</text>
+<path d="M 141.13 633.67 L 146.13 642.67 L 136.13 642.67 Z" fill="#27864b"/>
+<text class="tick" x="146.13" y="633.67" fill="#27864b">2</text>
+<path d="M 163.37 633.67 L 168.37 638.67 L 163.37 643.67 L 158.37 638.67 Z" fill="#27864b"/>
+<text class="tick" x="168.37" y="633.67" fill="#27864b">3</text>
+<text class="axis" x="277.25" y="672.67" text-anchor="middle">Matched-neutral posterior L1</text>
+<text class="panel-title" x="651.8" y="397.3" text-anchor="middle">Seed 20260928 · Anchor old-winner MAP</text>
+<line x1="502.50" y1="413.33" x2="502.50" y2="638.67" stroke="#dce2e7" stroke-width="1"/>
+<line x1="502.50" y1="413.33" x2="801.00" y2="413.33" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="502.50" y="655.67" text-anchor="middle">0.000</text>
+<text class="tick" x="495.50" y="417.33" text-anchor="end">1.000</text>
+<line x1="577.12" y1="413.33" x2="577.12" y2="638.67" stroke="#dce2e7" stroke-width="1"/>
+<line x1="502.50" y1="469.67" x2="801.00" y2="469.67" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="577.12" y="655.67" text-anchor="middle">0.008</text>
+<text class="tick" x="495.50" y="473.67" text-anchor="end">0.750</text>
+<line x1="651.75" y1="413.33" x2="651.75" y2="638.67" stroke="#dce2e7" stroke-width="1"/>
+<line x1="502.50" y1="526.00" x2="801.00" y2="526.00" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="651.75" y="655.67" text-anchor="middle">0.015</text>
+<text class="tick" x="495.50" y="530.00" text-anchor="end">0.500</text>
+<line x1="726.38" y1="413.33" x2="726.38" y2="638.67" stroke="#dce2e7" stroke-width="1"/>
+<line x1="502.50" y1="582.33" x2="801.00" y2="582.33" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="726.38" y="655.67" text-anchor="middle">0.023</text>
+<text class="tick" x="495.50" y="586.33" text-anchor="end">0.250</text>
+<line x1="801.00" y1="413.33" x2="801.00" y2="638.67" stroke="#dce2e7" stroke-width="1"/>
+<line x1="502.50" y1="638.67" x2="801.00" y2="638.67" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="801.00" y="655.67" text-anchor="middle">0.031</text>
+<text class="tick" x="495.50" y="642.67" text-anchor="end">0.000</text>
+<line x1="502.50" y1="413.33" x2="502.50" y2="638.67" stroke="#46525c"/>
+<line x1="502.50" y1="638.67" x2="801.00" y2="638.67" stroke="#46525c"/>
+<polyline points="507.92,638.67 514.05,413.33 517.87,413.33 779.29,413.33" fill="none" stroke="#2878b5" stroke-width="2" opacity="0.9"/>
+<circle cx="507.92" cy="638.67" r="5" fill="#2878b5"/>
+<text class="tick" x="512.92" y="633.67" fill="#2878b5">0</text>
+<rect x="510.05" y="409.33" width="8" height="8" fill="#2878b5"/>
+<text class="tick" x="519.05" y="408.33" fill="#2878b5">1</text>
+<path d="M 517.87 408.33 L 522.87 417.33 L 512.87 417.33 Z" fill="#2878b5"/>
+<text class="tick" x="522.87" y="408.33" fill="#2878b5">2</text>
+<path d="M 779.29 408.33 L 784.29 413.33 L 779.29 418.33 L 774.29 413.33 Z" fill="#2878b5"/>
+<text class="tick" x="784.29" y="408.33" fill="#2878b5">3</text>
+<polyline points="507.92,638.67 512.02,413.33 515.06,413.33 520.53,413.33" fill="none" stroke="#e07b24" stroke-width="2" opacity="0.9"/>
+<circle cx="507.92" cy="638.67" r="5" fill="#e07b24"/>
+<text class="tick" x="512.92" y="633.67" fill="#e07b24">0</text>
+<rect x="508.02" y="409.33" width="8" height="8" fill="#e07b24"/>
+<text class="tick" x="517.02" y="408.33" fill="#e07b24">1</text>
+<path d="M 515.06 408.33 L 520.06 417.33 L 510.06 417.33 Z" fill="#e07b24"/>
+<text class="tick" x="520.06" y="408.33" fill="#e07b24">2</text>
+<path d="M 520.53 408.33 L 525.53 413.33 L 520.53 418.33 L 515.53 413.33 Z" fill="#e07b24"/>
+<text class="tick" x="525.53" y="408.33" fill="#e07b24">3</text>
+<polyline points="507.92,638.67 522.17,582.33 515.63,456.26 537.87,413.33" fill="none" stroke="#27864b" stroke-width="2" opacity="0.9"/>
+<circle cx="507.92" cy="638.67" r="5" fill="#27864b"/>
+<text class="tick" x="512.92" y="633.67" fill="#27864b">0</text>
+<rect x="518.17" y="578.33" width="8" height="8" fill="#27864b"/>
+<text class="tick" x="527.17" y="577.33" fill="#27864b">1</text>
+<path d="M 515.63 451.26 L 520.63 460.26 L 510.63 460.26 Z" fill="#27864b"/>
+<text class="tick" x="520.63" y="451.26" fill="#27864b">2</text>
+<path d="M 537.87 408.33 L 542.87 413.33 L 537.87 418.33 L 532.87 413.33 Z" fill="#27864b"/>
+<text class="tick" x="542.87" y="408.33" fill="#27864b">3</text>
+<text class="axis" x="651.75" y="672.67" text-anchor="middle">Matched-neutral posterior L1</text>
+<text class="panel-title" x="1026.2" y="397.3" text-anchor="middle">Seed 20260928 · Fact new-winner MAP</text>
+<line x1="877.00" y1="413.33" x2="877.00" y2="638.67" stroke="#dce2e7" stroke-width="1"/>
+<line x1="877.00" y1="413.33" x2="1175.50" y2="413.33" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="877.00" y="655.67" text-anchor="middle">0.000</text>
+<text class="tick" x="870.00" y="417.33" text-anchor="end">0.548</text>
+<line x1="951.62" y1="413.33" x2="951.62" y2="638.67" stroke="#dce2e7" stroke-width="1"/>
+<line x1="877.00" y1="469.67" x2="1175.50" y2="469.67" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="951.62" y="655.67" text-anchor="middle">0.008</text>
+<text class="tick" x="870.00" y="473.67" text-anchor="end">0.411</text>
+<line x1="1026.25" y1="413.33" x2="1026.25" y2="638.67" stroke="#dce2e7" stroke-width="1"/>
+<line x1="877.00" y1="526.00" x2="1175.50" y2="526.00" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="1026.25" y="655.67" text-anchor="middle">0.015</text>
+<text class="tick" x="870.00" y="530.00" text-anchor="end">0.274</text>
+<line x1="1100.88" y1="413.33" x2="1100.88" y2="638.67" stroke="#dce2e7" stroke-width="1"/>
+<line x1="877.00" y1="582.33" x2="1175.50" y2="582.33" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="1100.88" y="655.67" text-anchor="middle">0.023</text>
+<text class="tick" x="870.00" y="586.33" text-anchor="end">0.137</text>
+<line x1="1175.50" y1="413.33" x2="1175.50" y2="638.67" stroke="#dce2e7" stroke-width="1"/>
+<line x1="877.00" y1="638.67" x2="1175.50" y2="638.67" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="1175.50" y="655.67" text-anchor="middle">0.031</text>
+<text class="tick" x="870.00" y="642.67" text-anchor="end">0.000</text>
+<line x1="877.00" y1="413.33" x2="877.00" y2="638.67" stroke="#46525c"/>
+<line x1="877.00" y1="638.67" x2="1175.50" y2="638.67" stroke="#46525c"/>
+<polyline points="882.42,430.02 888.55,638.67 892.37,638.67 1153.79,637.84" fill="none" stroke="#2878b5" stroke-width="2" opacity="0.9"/>
+<circle cx="882.42" cy="430.02" r="5" fill="#2878b5"/>
+<text class="tick" x="887.42" y="425.02" fill="#2878b5">0</text>
+<rect x="884.55" y="634.67" width="8" height="8" fill="#2878b5"/>
+<text class="tick" x="893.55" y="633.67" fill="#2878b5">1</text>
+<path d="M 892.37 633.67 L 897.37 642.67 L 887.37 642.67 Z" fill="#2878b5"/>
+<text class="tick" x="897.37" y="633.67" fill="#2878b5">2</text>
+<path d="M 1153.79 632.84 L 1158.79 637.84 L 1153.79 642.84 L 1148.79 637.84 Z" fill="#2878b5"/>
+<text class="tick" x="1158.79" y="632.84" fill="#2878b5">3</text>
+<polyline points="882.42,430.02 886.52,638.67 889.56,638.67 895.03,638.67" fill="none" stroke="#e07b24" stroke-width="2" opacity="0.9"/>
+<circle cx="882.42" cy="430.02" r="5" fill="#e07b24"/>
+<text class="tick" x="887.42" y="425.02" fill="#e07b24">0</text>
+<rect x="882.52" y="634.67" width="8" height="8" fill="#e07b24"/>
+<text class="tick" x="891.52" y="633.67" fill="#e07b24">1</text>
+<path d="M 889.56 633.67 L 894.56 642.67 L 884.56 642.67 Z" fill="#e07b24"/>
+<text class="tick" x="894.56" y="633.67" fill="#e07b24">2</text>
+<path d="M 895.03 633.67 L 900.03 638.67 L 895.03 643.67 L 890.03 638.67 Z" fill="#e07b24"/>
+<text class="tick" x="900.03" y="633.67" fill="#e07b24">3</text>
+<polyline points="882.42,430.02 896.67,638.67 890.13,638.67 912.37,638.67" fill="none" stroke="#27864b" stroke-width="2" opacity="0.9"/>
+<circle cx="882.42" cy="430.02" r="5" fill="#27864b"/>
+<text class="tick" x="887.42" y="425.02" fill="#27864b">0</text>
+<rect x="892.67" y="634.67" width="8" height="8" fill="#27864b"/>
+<text class="tick" x="901.67" y="633.67" fill="#27864b">1</text>
+<path d="M 890.13 633.67 L 895.13 642.67 L 885.13 642.67 Z" fill="#27864b"/>
+<text class="tick" x="895.13" y="633.67" fill="#27864b">2</text>
+<path d="M 912.37 633.67 L 917.37 638.67 L 912.37 643.67 L 907.37 638.67 Z" fill="#27864b"/>
+<text class="tick" x="917.37" y="633.67" fill="#27864b">3</text>
+<text class="axis" x="1026.25" y="672.67" text-anchor="middle">Matched-neutral posterior L1</text>
+<text class="panel-title" x="1400.8" y="397.3" text-anchor="middle">Seed 20260928 · Fact new-winner Δp</text>
+<line x1="1251.50" y1="413.33" x2="1251.50" y2="638.67" stroke="#dce2e7" stroke-width="1"/>
+<line x1="1251.50" y1="413.33" x2="1550.00" y2="413.33" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="1251.50" y="655.67" text-anchor="middle">0.000</text>
+<text class="tick" x="1244.50" y="417.33" text-anchor="end">0.041</text>
+<line x1="1326.12" y1="413.33" x2="1326.12" y2="638.67" stroke="#dce2e7" stroke-width="1"/>
+<line x1="1251.50" y1="469.67" x2="1550.00" y2="469.67" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="1326.12" y="655.67" text-anchor="middle">0.008</text>
+<text class="tick" x="1244.50" y="473.67" text-anchor="end">0.030</text>
+<line x1="1400.75" y1="413.33" x2="1400.75" y2="638.67" stroke="#dce2e7" stroke-width="1"/>
+<line x1="1251.50" y1="526.00" x2="1550.00" y2="526.00" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="1400.75" y="655.67" text-anchor="middle">0.015</text>
+<text class="tick" x="1244.50" y="530.00" text-anchor="end">0.020</text>
+<line x1="1475.38" y1="413.33" x2="1475.38" y2="638.67" stroke="#dce2e7" stroke-width="1"/>
+<line x1="1251.50" y1="582.33" x2="1550.00" y2="582.33" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="1475.38" y="655.67" text-anchor="middle">0.023</text>
+<text class="tick" x="1244.50" y="586.33" text-anchor="end">0.010</text>
+<line x1="1550.00" y1="413.33" x2="1550.00" y2="638.67" stroke="#dce2e7" stroke-width="1"/>
+<line x1="1251.50" y1="638.67" x2="1550.00" y2="638.67" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="1550.00" y="655.67" text-anchor="middle">0.031</text>
+<text class="tick" x="1244.50" y="642.67" text-anchor="end">0.000</text>
+<line x1="1251.50" y1="413.33" x2="1251.50" y2="638.67" stroke="#46525c"/>
+<line x1="1251.50" y1="638.67" x2="1550.00" y2="638.67" stroke="#46525c"/>
+<polyline points="1256.92,641.27 1263.05,639.42 1266.87,633.87 1528.29,430.22" fill="none" stroke="#2878b5" stroke-width="2" opacity="0.9"/>
+<circle cx="1256.92" cy="641.27" r="5" fill="#2878b5"/>
+<text class="tick" x="1261.92" y="636.27" fill="#2878b5">0</text>
+<rect x="1259.05" y="635.42" width="8" height="8" fill="#2878b5"/>
+<text class="tick" x="1268.05" y="634.42" fill="#2878b5">1</text>
+<path d="M 1266.87 628.87 L 1271.87 637.87 L 1261.87 637.87 Z" fill="#2878b5"/>
+<text class="tick" x="1271.87" y="628.87" fill="#2878b5">2</text>
+<path d="M 1528.29 425.22 L 1533.29 430.22 L 1528.29 435.22 L 1523.29 430.22 Z" fill="#2878b5"/>
+<text class="tick" x="1533.29" y="425.22" fill="#2878b5">3</text>
+<polyline points="1256.92,641.27 1261.02,637.11 1264.06,634.82 1269.53,598.68" fill="none" stroke="#e07b24" stroke-width="2" opacity="0.9"/>
+<circle cx="1256.92" cy="641.27" r="5" fill="#e07b24"/>
+<text class="tick" x="1261.92" y="636.27" fill="#e07b24">0</text>
+<rect x="1257.02" y="633.11" width="8" height="8" fill="#e07b24"/>
+<text class="tick" x="1266.02" y="632.11" fill="#e07b24">1</text>
+<path d="M 1264.06 629.82 L 1269.06 638.82 L 1259.06 638.82 Z" fill="#e07b24"/>
+<text class="tick" x="1269.06" y="629.82" fill="#e07b24">2</text>
+<path d="M 1269.53 593.68 L 1274.53 598.68 L 1269.53 603.68 L 1264.53 598.68 Z" fill="#e07b24"/>
+<text class="tick" x="1274.53" y="593.68" fill="#e07b24">3</text>
+<polyline points="1256.92,641.27 1271.17,639.55 1264.63,638.35 1286.87,610.55" fill="none" stroke="#27864b" stroke-width="2" opacity="0.9"/>
+<circle cx="1256.92" cy="641.27" r="5" fill="#27864b"/>
+<text class="tick" x="1261.92" y="636.27" fill="#27864b">0</text>
+<rect x="1267.17" y="635.55" width="8" height="8" fill="#27864b"/>
+<text class="tick" x="1276.17" y="634.55" fill="#27864b">1</text>
+<path d="M 1264.63 633.35 L 1269.63 642.35 L 1259.63 642.35 Z" fill="#27864b"/>
+<text class="tick" x="1269.63" y="633.35" fill="#27864b">2</text>
+<path d="M 1286.87 605.55 L 1291.87 610.55 L 1286.87 615.55 L 1281.87 610.55 Z" fill="#27864b"/>
+<text class="tick" x="1291.87" y="605.55" fill="#27864b">3</text>
+<text class="axis" x="1400.75" y="672.67" text-anchor="middle">Matched-neutral posterior L1</text>
+<text class="panel-title" x="277.2" y="704.7" text-anchor="middle">Seed 20260929 · Strict transition</text>
+<line x1="128.00" y1="720.67" x2="128.00" y2="946.00" stroke="#dce2e7" stroke-width="1"/>
+<line x1="128.00" y1="720.67" x2="426.50" y2="720.67" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="128.00" y="963.00" text-anchor="middle">0.000</text>
+<text class="tick" x="121.00" y="724.67" text-anchor="end">1.000</text>
+<line x1="202.62" y1="720.67" x2="202.62" y2="946.00" stroke="#dce2e7" stroke-width="1"/>
+<line x1="128.00" y1="777.00" x2="426.50" y2="777.00" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="202.62" y="963.00" text-anchor="middle">0.027</text>
+<text class="tick" x="121.00" y="781.00" text-anchor="end">0.750</text>
+<line x1="277.25" y1="720.67" x2="277.25" y2="946.00" stroke="#dce2e7" stroke-width="1"/>
+<line x1="128.00" y1="833.33" x2="426.50" y2="833.33" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="277.25" y="963.00" text-anchor="middle">0.054</text>
+<text class="tick" x="121.00" y="837.33" text-anchor="end">0.500</text>
+<line x1="351.88" y1="720.67" x2="351.88" y2="946.00" stroke="#dce2e7" stroke-width="1"/>
+<line x1="128.00" y1="889.67" x2="426.50" y2="889.67" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="351.88" y="963.00" text-anchor="middle">0.082</text>
+<text class="tick" x="121.00" y="893.67" text-anchor="end">0.250</text>
+<line x1="426.50" y1="720.67" x2="426.50" y2="946.00" stroke="#dce2e7" stroke-width="1"/>
+<line x1="128.00" y1="946.00" x2="426.50" y2="946.00" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="426.50" y="963.00" text-anchor="middle">0.109</text>
+<text class="tick" x="121.00" y="950.00" text-anchor="end">0.000</text>
+<line x1="128.00" y1="720.67" x2="128.00" y2="946.00" stroke="#46525c"/>
+<line x1="128.00" y1="946.00" x2="426.50" y2="946.00" stroke="#46525c"/>
+<polyline points="130.70,946.00 133.07,946.00 145.19,946.00 404.59,721.68" fill="none" stroke="#2878b5" stroke-width="2" opacity="0.9"/>
+<circle cx="130.70" cy="946.00" r="5" fill="#2878b5"/>
+<text class="tick" x="135.70" y="941.00" fill="#2878b5">0</text>
+<rect x="129.07" y="942.00" width="8" height="8" fill="#2878b5"/>
+<text class="tick" x="138.07" y="941.00" fill="#2878b5">1</text>
+<path d="M 145.19 941.00 L 150.19 950.00 L 140.19 950.00 Z" fill="#2878b5"/>
+<text class="tick" x="150.19" y="941.00" fill="#2878b5">2</text>
+<path d="M 404.59 716.68 L 409.59 721.68 L 404.59 726.68 L 399.59 721.68 Z" fill="#2878b5"/>
+<text class="tick" x="409.59" y="716.68" fill="#2878b5">3</text>
+<polyline points="130.70,946.00 132.68,946.00 133.13,946.00 146.01,730.92" fill="none" stroke="#e07b24" stroke-width="2" opacity="0.9"/>
+<circle cx="130.70" cy="946.00" r="5" fill="#e07b24"/>
+<text class="tick" x="135.70" y="941.00" fill="#e07b24">0</text>
+<rect x="128.68" y="942.00" width="8" height="8" fill="#e07b24"/>
+<text class="tick" x="137.68" y="941.00" fill="#e07b24">1</text>
+<path d="M 133.13 941.00 L 138.13 950.00 L 128.13 950.00 Z" fill="#e07b24"/>
+<text class="tick" x="138.13" y="941.00" fill="#e07b24">2</text>
+<path d="M 146.01 725.92 L 151.01 730.92 L 146.01 735.92 L 141.01 730.92 Z" fill="#e07b24"/>
+<text class="tick" x="151.01" y="725.92" fill="#e07b24">3</text>
+<polyline points="130.70,946.00 134.98,946.00 134.18,946.00 260.41,783.31" fill="none" stroke="#27864b" stroke-width="2" opacity="0.9"/>
+<circle cx="130.70" cy="946.00" r="5" fill="#27864b"/>
+<text class="tick" x="135.70" y="941.00" fill="#27864b">0</text>
+<rect x="130.98" y="942.00" width="8" height="8" fill="#27864b"/>
+<text class="tick" x="139.98" y="941.00" fill="#27864b">1</text>
+<path d="M 134.18 941.00 L 139.18 950.00 L 129.18 950.00 Z" fill="#27864b"/>
+<text class="tick" x="139.18" y="941.00" fill="#27864b">2</text>
+<path d="M 260.41 778.31 L 265.41 783.31 L 260.41 788.31 L 255.41 783.31 Z" fill="#27864b"/>
+<text class="tick" x="265.41" y="778.31" fill="#27864b">3</text>
+<text class="axis" x="277.25" y="980.00" text-anchor="middle">Matched-neutral posterior L1</text>
+<text class="panel-title" x="651.8" y="704.7" text-anchor="middle">Seed 20260929 · Anchor old-winner MAP</text>
+<line x1="502.50" y1="720.67" x2="502.50" y2="946.00" stroke="#dce2e7" stroke-width="1"/>
+<line x1="502.50" y1="720.67" x2="801.00" y2="720.67" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="502.50" y="963.00" text-anchor="middle">0.000</text>
+<text class="tick" x="495.50" y="724.67" text-anchor="end">1.000</text>
+<line x1="577.12" y1="720.67" x2="577.12" y2="946.00" stroke="#dce2e7" stroke-width="1"/>
+<line x1="502.50" y1="777.00" x2="801.00" y2="777.00" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="577.12" y="963.00" text-anchor="middle">0.027</text>
+<text class="tick" x="495.50" y="781.00" text-anchor="end">0.750</text>
+<line x1="651.75" y1="720.67" x2="651.75" y2="946.00" stroke="#dce2e7" stroke-width="1"/>
+<line x1="502.50" y1="833.33" x2="801.00" y2="833.33" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="651.75" y="963.00" text-anchor="middle">0.054</text>
+<text class="tick" x="495.50" y="837.33" text-anchor="end">0.500</text>
+<line x1="726.38" y1="720.67" x2="726.38" y2="946.00" stroke="#dce2e7" stroke-width="1"/>
+<line x1="502.50" y1="889.67" x2="801.00" y2="889.67" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="726.38" y="963.00" text-anchor="middle">0.082</text>
+<text class="tick" x="495.50" y="893.67" text-anchor="end">0.250</text>
+<line x1="801.00" y1="720.67" x2="801.00" y2="946.00" stroke="#dce2e7" stroke-width="1"/>
+<line x1="502.50" y1="946.00" x2="801.00" y2="946.00" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="801.00" y="963.00" text-anchor="middle">0.109</text>
+<text class="tick" x="495.50" y="950.00" text-anchor="end">0.000</text>
+<line x1="502.50" y1="720.67" x2="502.50" y2="946.00" stroke="#46525c"/>
+<line x1="502.50" y1="946.00" x2="801.00" y2="946.00" stroke="#46525c"/>
+<polyline points="505.20,945.77 507.57,889.67 519.69,720.67 779.09,720.78" fill="none" stroke="#2878b5" stroke-width="2" opacity="0.9"/>
+<circle cx="505.20" cy="945.77" r="5" fill="#2878b5"/>
+<text class="tick" x="510.20" y="940.77" fill="#2878b5">0</text>
+<rect x="503.57" y="885.67" width="8" height="8" fill="#2878b5"/>
+<text class="tick" x="512.57" y="884.67" fill="#2878b5">1</text>
+<path d="M 519.69 715.67 L 524.69 724.67 L 514.69 724.67 Z" fill="#2878b5"/>
+<text class="tick" x="524.69" y="715.67" fill="#2878b5">2</text>
+<path d="M 779.09 715.78 L 784.09 720.78 L 779.09 725.78 L 774.09 720.78 Z" fill="#2878b5"/>
+<text class="tick" x="784.09" y="715.78" fill="#2878b5">3</text>
+<polyline points="505.20,945.77 507.18,777.00 507.63,720.67 520.51,730.92" fill="none" stroke="#e07b24" stroke-width="2" opacity="0.9"/>
+<circle cx="505.20" cy="945.77" r="5" fill="#e07b24"/>
+<text class="tick" x="510.20" y="940.77" fill="#e07b24">0</text>
+<rect x="503.18" y="773.00" width="8" height="8" fill="#e07b24"/>
+<text class="tick" x="512.18" y="772.00" fill="#e07b24">1</text>
+<path d="M 507.63 715.67 L 512.63 724.67 L 502.63 724.67 Z" fill="#e07b24"/>
+<text class="tick" x="512.63" y="715.67" fill="#e07b24">2</text>
+<path d="M 520.51 725.92 L 525.51 730.92 L 520.51 735.92 L 515.51 730.92 Z" fill="#e07b24"/>
+<text class="tick" x="525.51" y="725.92" fill="#e07b24">3</text>
+<polyline points="505.20,945.77 509.48,889.67 508.68,720.67 634.91,776.66" fill="none" stroke="#27864b" stroke-width="2" opacity="0.9"/>
+<circle cx="505.20" cy="945.77" r="5" fill="#27864b"/>
+<text class="tick" x="510.20" y="940.77" fill="#27864b">0</text>
+<rect x="505.48" y="885.67" width="8" height="8" fill="#27864b"/>
+<text class="tick" x="514.48" y="884.67" fill="#27864b">1</text>
+<path d="M 508.68 715.67 L 513.68 724.67 L 503.68 724.67 Z" fill="#27864b"/>
+<text class="tick" x="513.68" y="715.67" fill="#27864b">2</text>
+<path d="M 634.91 771.66 L 639.91 776.66 L 634.91 781.66 L 629.91 776.66 Z" fill="#27864b"/>
+<text class="tick" x="639.91" y="771.66" fill="#27864b">3</text>
+<text class="axis" x="651.75" y="980.00" text-anchor="middle">Matched-neutral posterior L1</text>
+<text class="panel-title" x="1026.2" y="704.7" text-anchor="middle">Seed 20260929 · Fact new-winner MAP</text>
+<line x1="877.00" y1="720.67" x2="877.00" y2="946.00" stroke="#dce2e7" stroke-width="1"/>
+<line x1="877.00" y1="720.67" x2="1175.50" y2="720.67" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="877.00" y="963.00" text-anchor="middle">0.000</text>
+<text class="tick" x="870.00" y="724.67" text-anchor="end">1.000</text>
+<line x1="951.62" y1="720.67" x2="951.62" y2="946.00" stroke="#dce2e7" stroke-width="1"/>
+<line x1="877.00" y1="777.00" x2="1175.50" y2="777.00" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="951.62" y="963.00" text-anchor="middle">0.027</text>
+<text class="tick" x="870.00" y="781.00" text-anchor="end">0.750</text>
+<line x1="1026.25" y1="720.67" x2="1026.25" y2="946.00" stroke="#dce2e7" stroke-width="1"/>
+<line x1="877.00" y1="833.33" x2="1175.50" y2="833.33" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="1026.25" y="963.00" text-anchor="middle">0.054</text>
+<text class="tick" x="870.00" y="837.33" text-anchor="end">0.500</text>
+<line x1="1100.88" y1="720.67" x2="1100.88" y2="946.00" stroke="#dce2e7" stroke-width="1"/>
+<line x1="877.00" y1="889.67" x2="1175.50" y2="889.67" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="1100.88" y="963.00" text-anchor="middle">0.082</text>
+<text class="tick" x="870.00" y="893.67" text-anchor="end">0.250</text>
+<line x1="1175.50" y1="720.67" x2="1175.50" y2="946.00" stroke="#dce2e7" stroke-width="1"/>
+<line x1="877.00" y1="946.00" x2="1175.50" y2="946.00" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="1175.50" y="963.00" text-anchor="middle">0.109</text>
+<text class="tick" x="870.00" y="950.00" text-anchor="end">0.000</text>
+<line x1="877.00" y1="720.67" x2="877.00" y2="946.00" stroke="#46525c"/>
+<line x1="877.00" y1="946.00" x2="1175.50" y2="946.00" stroke="#46525c"/>
+<polyline points="879.70,889.78 882.07,946.00 894.19,946.00 1153.59,721.57" fill="none" stroke="#2878b5" stroke-width="2" opacity="0.9"/>
+<circle cx="879.70" cy="889.78" r="5" fill="#2878b5"/>
+<text class="tick" x="884.70" y="884.78" fill="#2878b5">0</text>
+<rect x="878.07" y="942.00" width="8" height="8" fill="#2878b5"/>
+<text class="tick" x="887.07" y="941.00" fill="#2878b5">1</text>
+<path d="M 894.19 941.00 L 899.19 950.00 L 889.19 950.00 Z" fill="#2878b5"/>
+<text class="tick" x="899.19" y="941.00" fill="#2878b5">2</text>
+<path d="M 1153.59 716.57 L 1158.59 721.57 L 1153.59 726.57 L 1148.59 721.57 Z" fill="#2878b5"/>
+<text class="tick" x="1158.59" y="716.57" fill="#2878b5">3</text>
+<polyline points="879.70,889.78 881.68,946.00 882.13,946.00 895.01,720.67" fill="none" stroke="#e07b24" stroke-width="2" opacity="0.9"/>
+<circle cx="879.70" cy="889.78" r="5" fill="#e07b24"/>
+<text class="tick" x="884.70" y="884.78" fill="#e07b24">0</text>
+<rect x="877.68" y="942.00" width="8" height="8" fill="#e07b24"/>
+<text class="tick" x="886.68" y="941.00" fill="#e07b24">1</text>
+<path d="M 882.13 941.00 L 887.13 950.00 L 877.13 950.00 Z" fill="#e07b24"/>
+<text class="tick" x="887.13" y="941.00" fill="#e07b24">2</text>
+<path d="M 895.01 715.67 L 900.01 720.67 L 895.01 725.67 L 890.01 720.67 Z" fill="#e07b24"/>
+<text class="tick" x="900.01" y="715.67" fill="#e07b24">3</text>
+<polyline points="879.70,889.78 883.98,946.00 883.18,946.00 1009.41,727.31" fill="none" stroke="#27864b" stroke-width="2" opacity="0.9"/>
+<circle cx="879.70" cy="889.78" r="5" fill="#27864b"/>
+<text class="tick" x="884.70" y="884.78" fill="#27864b">0</text>
+<rect x="879.98" y="942.00" width="8" height="8" fill="#27864b"/>
+<text class="tick" x="888.98" y="941.00" fill="#27864b">1</text>
+<path d="M 883.18 941.00 L 888.18 950.00 L 878.18 950.00 Z" fill="#27864b"/>
+<text class="tick" x="888.18" y="941.00" fill="#27864b">2</text>
+<path d="M 1009.41 722.31 L 1014.41 727.31 L 1009.41 732.31 L 1004.41 727.31 Z" fill="#27864b"/>
+<text class="tick" x="1014.41" y="722.31" fill="#27864b">3</text>
+<text class="axis" x="1026.25" y="980.00" text-anchor="middle">Matched-neutral posterior L1</text>
+<text class="panel-title" x="1400.8" y="704.7" text-anchor="middle">Seed 20260929 · Fact new-winner Δp</text>
+<line x1="1251.50" y1="720.67" x2="1251.50" y2="946.00" stroke="#dce2e7" stroke-width="1"/>
+<line x1="1251.50" y1="720.67" x2="1550.00" y2="720.67" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="1251.50" y="963.00" text-anchor="middle">0.000</text>
+<text class="tick" x="1244.50" y="724.67" text-anchor="end">0.289</text>
+<line x1="1326.12" y1="720.67" x2="1326.12" y2="946.00" stroke="#dce2e7" stroke-width="1"/>
+<line x1="1251.50" y1="777.00" x2="1550.00" y2="777.00" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="1326.12" y="963.00" text-anchor="middle">0.027</text>
+<text class="tick" x="1244.50" y="781.00" text-anchor="end">0.217</text>
+<line x1="1400.75" y1="720.67" x2="1400.75" y2="946.00" stroke="#dce2e7" stroke-width="1"/>
+<line x1="1251.50" y1="833.33" x2="1550.00" y2="833.33" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="1400.75" y="963.00" text-anchor="middle">0.054</text>
+<text class="tick" x="1244.50" y="837.33" text-anchor="end">0.145</text>
+<line x1="1475.38" y1="720.67" x2="1475.38" y2="946.00" stroke="#dce2e7" stroke-width="1"/>
+<line x1="1251.50" y1="889.67" x2="1550.00" y2="889.67" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="1475.38" y="963.00" text-anchor="middle">0.082</text>
+<text class="tick" x="1244.50" y="893.67" text-anchor="end">0.072</text>
+<line x1="1550.00" y1="720.67" x2="1550.00" y2="946.00" stroke="#dce2e7" stroke-width="1"/>
+<line x1="1251.50" y1="946.00" x2="1550.00" y2="946.00" stroke="#dce2e7" stroke-width="1"/>
+<text class="tick" x="1550.00" y="963.00" text-anchor="middle">0.109</text>
+<text class="tick" x="1244.50" y="950.00" text-anchor="end">0.000</text>
+<line x1="1251.50" y1="720.67" x2="1251.50" y2="946.00" stroke="#46525c"/>
+<line x1="1251.50" y1="946.00" x2="1550.00" y2="946.00" stroke="#46525c"/>
+<polyline points="1254.20,946.00 1256.57,945.48 1268.69,942.91 1528.09,792.49" fill="none" stroke="#2878b5" stroke-width="2" opacity="0.9"/>
+<circle cx="1254.20" cy="946.00" r="5" fill="#2878b5"/>
+<text class="tick" x="1259.20" y="941.00" fill="#2878b5">0</text>
+<rect x="1252.57" y="941.48" width="8" height="8" fill="#2878b5"/>
+<text class="tick" x="1261.57" y="940.48" fill="#2878b5">1</text>
+<path d="M 1268.69 937.91 L 1273.69 946.91 L 1263.69 946.91 Z" fill="#2878b5"/>
+<text class="tick" x="1273.69" y="937.91" fill="#2878b5">2</text>
+<path d="M 1528.09 787.49 L 1533.09 792.49 L 1528.09 797.49 L 1523.09 792.49 Z" fill="#2878b5"/>
+<text class="tick" x="1533.09" y="787.49" fill="#2878b5">3</text>
+<polyline points="1254.20,946.00 1256.18,945.34 1256.63,938.65 1269.51,737.36" fill="none" stroke="#e07b24" stroke-width="2" opacity="0.9"/>
+<circle cx="1254.20" cy="946.00" r="5" fill="#e07b24"/>
+<text class="tick" x="1259.20" y="941.00" fill="#e07b24">0</text>
+<rect x="1252.18" y="941.34" width="8" height="8" fill="#e07b24"/>
+<text class="tick" x="1261.18" y="940.34" fill="#e07b24">1</text>
+<path d="M 1256.63 933.65 L 1261.63 942.65 L 1251.63 942.65 Z" fill="#e07b24"/>
+<text class="tick" x="1261.63" y="933.65" fill="#e07b24">2</text>
+<path d="M 1269.51 732.36 L 1274.51 737.36 L 1269.51 742.36 L 1264.51 737.36 Z" fill="#e07b24"/>
+<text class="tick" x="1274.51" y="732.36" fill="#e07b24">3</text>
+<polyline points="1254.20,946.00 1258.48,945.36 1257.68,939.31 1383.91,743.65" fill="none" stroke="#27864b" stroke-width="2" opacity="0.9"/>
+<circle cx="1254.20" cy="946.00" r="5" fill="#27864b"/>
+<text class="tick" x="1259.20" y="941.00" fill="#27864b">0</text>
+<rect x="1254.48" y="941.36" width="8" height="8" fill="#27864b"/>
+<text class="tick" x="1263.48" y="940.36" fill="#27864b">1</text>
+<path d="M 1257.68 934.31 L 1262.68 943.31 L 1252.68 943.31 Z" fill="#27864b"/>
+<text class="tick" x="1262.68" y="934.31" fill="#27864b">2</text>
+<path d="M 1383.91 738.65 L 1388.91 743.65 L 1383.91 748.65 L 1378.91 743.65 Z" fill="#27864b"/>
+<text class="tick" x="1388.91" y="738.65" fill="#27864b">3</text>
+<text class="axis" x="1400.75" y="980.00" text-anchor="middle">Matched-neutral posterior L1</text>
+<line x1="620.0" y1="1042" x2="648.0" y2="1042" stroke="#2878b5" stroke-width="3"/>
+<text class="legend" x="654.0" y="1046">B-DUP</text>
+<line x1="750.0" y1="1042" x2="778.0" y2="1042" stroke="#e07b24" stroke-width="3"/>
+<text class="legend" x="784.0" y="1046">B-MATCHED</text>
+<line x1="880.0" y1="1042" x2="908.0" y2="1042" stroke="#27864b" stroke-width="3"/>
+<text class="legend" x="914.0" y="1046">B-SHAM</text>
+</svg>

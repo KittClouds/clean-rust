@@ -1,0 +1,54 @@
+{
+  "protocol": "jev-information-density/v0.8p-v08-input-binding-root-v01",
+  "identity": "v0.8P-v08-source-resolution-and-panel-construction-input-root-v01",
+  "disposition": "AUTHORIZED_PHASE_PACKET_BOUND",
+  "contract": {
+    "path": "experiments/jev-information-density-v08p-v08/protocol/v08-source-resolution-and-panel-construction-v01.json",
+    "sha256": "0b91c228b35aa9fb87adcc4203849f8efdd76bec2faf7c805772e3a32ba94da6"
+  },
+  "verified_input_bindings": [
+    {"path":"experiments/jev-information-density-v08p-v07/protocol/v07-overlap-ordering-repair-contract-v01.json","sha256":"cf2fc2705ea40d86cc81ddc7e9bd77108c303071e12efe32486653db27c14e0d"},
+    {"path":"experiments/jev-information-density-v08p-v07/provenance/v07-input-binding-root-v01.json","sha256":"b892aedf985694f541ab8b7fb428593f2a9fee633a603528cbecd345cf8ba2a5"},
+    {"path":"experiments/jev-information-density-v08p/phase_b/phase-b-p-run-contract-v01.json","sha256":"e345225b4a17fc18eb35fcab24cbe1d72bd0e34bed9de272f927a7be461853e6"},
+    {"path":"experiments/jev-information-density-v08p/phase_a/fresh-panel-contract-v01.json","sha256":"ce3b7b97caecb27f3ad99439c0e67dca6e40af5da3db9ca2e356ea5e9f06f823"},
+    {"path":"experiments/jev-information-density-v08p-v06/phase_a/fresh-panel-contract-v01.json","sha256":"28b7878c9d68026254b8db734959387857b7eafb7b083d658d30d4cca6636a00"},
+    {"path":"experiments/jev-information-density-v08p-v06/provenance/v06-input-binding-root-v01.json","sha256":"447176e523947eab718721c953db16a51102f91a812d0d73c99712f110c21c32"},
+    {"path":"experiments/jev-information-density-v08p-v06/provenance/training-scope-overlap-preflight-v01.json","sha256":"3c8c262214896a0c8888f043caba604ac0e50e6b5b1eac4de2de776c7099d1f3"},
+    {"path":"experiments/jev-information-density-v08p-v06/provenance/training-scope-overlap-source-access-receipt-v01.json","sha256":"9fe3799bb9018aee5cef1b1bab7a34f07c0773c24fa0518d1f8b6027fd654f92"},
+    {"path":"experiments/jev-information-density-v08p-v06/provenance/training-scope-overlap-preflight-root-v01.json","sha256":"aeba02e49dcdf3987cae7c38d34d63e69e4a02aee0781dab8e4dfab2a17b9c29"},
+    {"path":"experiments/jev-information-density-v08p-v05/provenance/v05-denylist-root-seal-v01.json","sha256":"272a14e57c2dcf610568381c0c1c4673c7b40e368ac81b07d3e7160e4e5953a2"},
+    {"path":"D:/codex-runs/jev-information-density-v08p-v05/identity/run-1/canonical-e1-neighborhood-hash-denylist.json","sha256":"50eebeb5790c29b4a75c6f8df849eb4c2865d3c864932bbd7f636b7a0e52a2cd"},
+    {"path":"D:/codex-runs/jev-information-density-v08n/v0.8N-base-v01/phase-b-v03-inputs/execution-inputs-receipt.json","sha256":"c022befafd49a1e317f692ff3b6f7efcccd11aee98285ca5f0071f6edbaf817c"},
+    {"path":"D:/codex-runs/jev-information-density-v08n/v0.8N-base-v01/phase-b-run-v01/training-seal-manifest.json","sha256":"43932fc963b150167972e81b1c1bb93f6989e9b93faa65ab1eee3ecf55c7b727"},
+    {"path":"D:/codex-runs/jev-information-density-v08n/v0.8N-base-v01/synthesis/v08n-synthesis-receipt-final-v09.json","sha256":"e86f3cd925841c4e68f8558696e68cb729b9b9ba49a644b9bc35e7e2bcde68a6"}
+  ],
+  "expected_identity_sources": {
+    "common_primary_occurrence_manifest": {"sha256":"773119294a51aa46487de26f9f253355187a7bfd1e75cb2f258c307c86f10b06","rows":10000,"anchors":5000,"fact_flips":5000},
+    "training_only_state_scope": {"scope_receipt_sha256":"d98ae657e28b976f187d4d67e58119ce80496e76c061c90362ac2e50ff7f720e","scope_manifest_sha256":"aa8cba58f4a8ec46ed6ec8eaf0bfbe992b03b9fa58f815b4259d9fdfe2b009f3","scope_content_sha256":"40648e3bbf50e25f31e84d7656221171425cb6e71e07d4c07d4dc72650bb228e","rows":55000}
+  },
+  "bounded_search_roots": [
+    "D:\\codex-runs\\jev-information-density-v08n\\v0.8N-base-v01\\phase-b-v03-inputs",
+    "D:\\codex-runs\\jev-information-density-v08n\\v0.8N-base-v01\\phase-b-run-v01",
+    "D:\\codex-runs\\jev-information-density-v08n\\v0.8N-base-v01\\synthesis"
+  ],
+  "search_boundary": {
+    "candidate_enumeration_is_path_and_size_only": true,
+    "hash_nonmatching_candidates_only": true,
+    "parse_only_exact_hash_matches": true,
+    "no_ancestor_expansion": true,
+    "no_repository_or_drive_wide_search": true,
+    "no_E1_panel_or_prediction_directory_search": true,
+    "no_v01_through_v07_modification": true
+  },
+  "pre_search_state": {
+    "training_identity_rows_opened": false,
+    "candidate_identities_generated": false,
+    "collision_stream_consumed": false,
+    "overlap_computed": false,
+    "LFM_contact": false,
+    "training": false,
+    "inference": false,
+    "evaluation": false
+  },
+  "root_hash_rule": "SHA-256 of the exact bytes of this receipt; no self-referential hash field."
+}

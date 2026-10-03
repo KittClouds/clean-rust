@@ -1,0 +1,9 @@
+{
+  "schema": "jev-v08p-r2-preconstruction-receipt-v01",
+  "seal_path": "experiments/jev-information-density-v08p-r2/provenance/r2-preconstruction-seal-v01.json",
+  "seal_sha256": "fa686a2e5275312e4829a2b755f24f4df9e74990554d197a6228e797a6ae1dc1",
+  "status": "BOUND_AND_READY_FOR_FROZEN_EXCLUSION_MATERIALIZATION",
+  "candidate_stream_consumed": false,
+  "model_contact": false,
+  "created_utc": "2026-09-24"
+}

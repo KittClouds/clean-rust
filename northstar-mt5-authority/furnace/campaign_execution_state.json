@@ -1,0 +1,13 @@
+{
+  "contract": "MST_CAMPAIGN_EXECUTION_STATE_V1",
+  "campaign_id": "RG2_SIX_INDEX_ENVIRONMENT_FRAME_V3",
+  "manifest_sha256": "5bf12767746b8499ad0edde2597df67b1928cc5941705a8391ae2585a0574092",
+  "status": "PILOT_VALIDATED",
+  "production_windows": 54,
+  "admitted_windows": 4,
+  "remaining_windows": 50,
+  "corpus_verification": "PASS",
+  "phase6_lock_semantics": "execution_started=false records state at freeze time; this execution receipt is current authority",
+  "full_campaign_started": false,
+  "next_action": "explicitly launch remaining frozen windows with Invoke-MasterStructureDataFurnace.ps1"
+}

@@ -1,0 +1,66 @@
+{
+  "contract": "jev-decision-data-information-density/v0.8c-phase2-matched-bank-optimization",
+  "status": "frozen_before_optimization",
+  "phase1_contract_sha256": "d40ef883b0def1b3a8b07c594f3a79b2d735b5b1ddc7b7a8226918e7f2019ee8",
+  "phase1_solver_source_sha256": "c91f2f553af1270e259e7b90fff41a754524ee41aa3eb9bab98437ab1020adc4",
+  "phase1_reference_witnesses": {
+    "R100": "0b9998d94e895e5f540c066bdc618d0d6378b9e9ce632380838b7a14beac008b",
+    "C100": "860fbfef8283e707d41639ab970ef7257d116e3001a18a0b180feea9d72579c3"
+  },
+  "inputs": {
+    "group_records_sha256": "9e3546fbe88741666cc5be5ae28907d7a223f74c8578609adfc3036ba7f4e7f2",
+    "r100_manifest_sha256": "0b9998d94e895e5f540c066bdc618d0d6378b9e9ce632380838b7a14beac008b",
+    "c100_manifest_sha256": "860fbfef8283e707d41639ab970ef7257d116e3001a18a0b180feea9d72579c3",
+    "eval_manifest_sha256": "3e72cd7596fbf0b302501b88dd9dc645a5749de10884b57eceb5552bfc5ef8ae",
+    "v08_contract_sha256": "d1971ae4a8a8f6dcfcadbda97b2290bf3fa630f201779c4b47019512fc87f98f",
+    "v08_selector_sha256": "fcc885ace28d6866c9db6dd5736381e41f5e778ef4a442557dc5272d00f42866",
+    "v08b_contract_sha256": "16e8a36542ab80c9164ffe21794affd1662df8cd34dcff71858eae237c4d2c8d",
+    "v08c_contract_sha256": "d40ef883b0def1b3a8b07c594f3a79b2d735b5b1ddc7b7a8226918e7f2019ee8",
+    "phase1_solver_sha256": "c91f2f553af1270e259e7b90fff41a754524ee41aa3eb9bab98437ab1020adc4",
+    "phase1_receipt_sha256": "ac713dcdc805465118db1c96daad1862a3135578a5f04c87279cd106f2d98932",
+    "phase2_solver_sha256": "9c57f98a151870c16f2cfdae5b27853939dd25598e1618b7ac6aeaa7bd52ff1b"
+  },
+  "target_profiles": {
+    "CM100": {"reference": "R100", "group_count": 100000, "joint_cell_counts": "exact"},
+    "RM100": {"reference": "C100", "group_count": 100000, "joint_cell_counts": "exact"}
+  },
+  "constraints": {
+    "unique_model_input_count_relative_error": 0.02,
+    "input_multiplicity_histogram_tv": 0.02,
+    "unique_root_count_relative_error": 0.02,
+    "root_multiplicity_histogram_tv": 0.02,
+    "topology_marginal_tv": 0.02,
+    "intervention_marginal_tv": 0.02,
+    "evaluation_and_protected_families": "excluded",
+    "no_exact_root_histogram": true,
+    "no_exact_per_cell_input_histogram": true
+  },
+  "objective": {
+    "curated_seed": "jev-idv08b-cm100-sha256-v1-profile-constrained-curation",
+    "random_seed": "jev-idv08b-rm100-sha256-v1-profile-constrained-random",
+    "curated_objective": "maximize_sum_of_global_frozen_v08_coverage_priority_ranks; rank ordered by descending static rarity-weighted coverage score, then frozen stable SHA256 tie-break, then group_id",
+    "random_objective": "maximize_sum_of_seeded_SHA256_random_priority_ranks_within_the_same_constraints",
+    "priority_rank_rule": "eligible_groups_count_minus_zero_based_rank; highest priority receives largest positive integer; one rank per group",
+    "priority_scope": "all eligible training groups; exact joint-cell quotas are enforced by the constraint model",
+    "tie_break": "fully deterministic by pinned seed and unique group_id",
+    "objective_uses_model_outputs_or_protected_evaluation": false,
+    "objective_uses_text_or_embeddings": false,
+    "objective_optimality_required": false,
+    "feasible_incumbent_policy": "emit only after independent full-contract audit; report OPTIMAL versus FEASIBLE and best bound separately"
+  },
+  "solver": {
+    "name": "ortools-cp-sat",
+    "version": "9.15.6755",
+    "workers": 1,
+    "random_seed": 20260920,
+    "wall_time_limit_seconds_per_bank": 1800,
+    "source_sha256": "9c57f98a151870c16f2cfdae5b27853939dd25598e1618b7ac6aeaa7bd52ff1b"
+  },
+  "outputs": {
+    "manifests_external_only": true,
+    "model_contact_authorized": false,
+    "phoenix_in_scope": false,
+    "existing_banks_mutable": false,
+    "strict_novel93_mutable": false
+  }
+}

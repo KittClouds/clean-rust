@@ -1,0 +1,37 @@
+{
+  "actual_v07_contract_and_map_audited": false,
+  "command": "python -m unittest audits.e4-0-track-e.test_audit_e4_0_track_e_v07 -v; python -m py_compile audits/e4-0-track-e/audit_e4_0_track_e_v07.py audits/e4-0-track-e/test_audit_e4_0_track_e_v07.py",
+  "created_utc": "2026-09-27T00:25:42.360298+00:00",
+  "model_tokenizer_cuda_contact": false,
+  "registered_source_test_receipts_checked": 18,
+  "schema": "FAS_E4_0_TRACK_E_SOURCE_TESTS_V04",
+  "scope": "Synthetic-only v07 contract/source/seal auditor. Validates exact registered (track,path,status) identity and payload status for all 12 inherited and 6 current source-map receipts, now binding contract-tooling v03; rejects bypasses, substitutions, duplicates, omissions, unknown tracks, and payload status drift. Verifies v06 scientific invariance, v07 lineage/inherited roots, source-role closure, source-map/member integrity, exact seal members/root, and tampering. No actual v07 contract/map, E4 truth/population, tokenizer, model, or CUDA accessed.",
+  "sources": [
+    {
+      "path": "audits/e4-0-track-e/audit_e4_0_track_e_v07.py",
+      "bytes": 46420,
+      "sha256": "8e86410c4bce3f14964c3321ff023373534bbe28950e2f2de6dd65182aabbd0c"
+    },
+    {
+      "path": "audits/e4-0-track-e/test_audit_e4_0_track_e_v07.py",
+      "bytes": 24980,
+      "sha256": "99d764d915ebcf8dfedd0fc26ec572966df1b275e267bba59db1e4b6c5c7a961"
+    }
+  ],
+  "status": "TRACK_E_SOURCE_TESTS_PASS_V07_PREMAP_SYNTHETIC_AUDITOR",
+  "supersedes": [
+    {
+      "bytes": 2247,
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/track-e-source-tests-v12.json",
+      "reason": "Updates the exact registered receipt set to contract-tooling v03 after the output-path verifier repair; v12 remains unchanged history.",
+      "sha256": "f2613ccd7f78c1b4876870abb73e24025b3da9b623cd157a890fd6d20ee99513"
+    }
+  ],
+  "tests": {
+    "discovered": 13,
+    "failed": 0,
+    "passed": 13,
+    "skipped": 0
+  },
+  "truth_payloads_opened": false
+}

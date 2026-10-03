@@ -1,0 +1,139 @@
+{
+  "identity": "FAS_FF_BUNDLE_TEMPLATE_01_E4_0_TEMPLATE_CANDIDATES_V02",
+  "status": "PROPOSED_TEMPLATE_BYTES_FOR_E4_0_CONTRACT",
+  "scope": "Template source only. No population generation, label access, model contact, feature extraction, or scoring.",
+  "source_schema": {
+    "observation_slots": [
+      "context",
+      "entity",
+      "relation",
+      "state"
+    ],
+    "query_slots": [
+      "context",
+      "entity",
+      "relation"
+    ],
+    "each_required_slot_exactly_once": true,
+    "extra_slots_forbidden": true,
+    "template_id_range": [
+      0,
+      7
+    ],
+    "quartet_query_template_constant_across_variants": true,
+    "P_variant_observation_template_id": "(quartet_observation_template_id + 4) mod 8"
+  },
+  "exclusion_normalization": "Unicode NFKC; Unicode case-fold; trim leading and trailing whitespace; collapse every internal Unicode whitespace run to one ASCII space.",
+  "observation_templates": [
+    {
+      "id": 0,
+      "text": "The record for {entity} in {context} lists {state} as the {relation} value.",
+      "normalized_text": "the record for {entity} in {context} lists {state} as the {relation} value.",
+      "text_sha256_utf8": "6c99d3a0311ec55dfe19d461d0bc358f21af1641a8551ea37fee26b231664088"
+    },
+    {
+      "id": 1,
+      "text": "In the {context} file, {entity} is associated with {state} under {relation}.",
+      "normalized_text": "in the {context} file, {entity} is associated with {state} under {relation}.",
+      "text_sha256_utf8": "88162ff5ae66cdc54c4eff13771b1f8baabfe84fab6f40616bc4df848ffae6aa"
+    },
+    {
+      "id": 2,
+      "text": "For {entity} within {context}, the recorded {relation} value is {state}.",
+      "normalized_text": "for {entity} within {context}, the recorded {relation} value is {state}.",
+      "text_sha256_utf8": "c32f2d5fc9803f004f615ccdb2c5b3b052e858438f76a94cd787247edb7994a9"
+    },
+    {
+      "id": 3,
+      "text": "The {context} entry concerning {entity} gives {relation} as {state}.",
+      "normalized_text": "the {context} entry concerning {entity} gives {relation} as {state}.",
+      "text_sha256_utf8": "eed65ee1e3ad65bbc142eee52c4b279c87b295b4172a05dbd3d320e84e08248d"
+    },
+    {
+      "id": 4,
+      "text": "Look in {context}: {entity} has a {relation} record marked {state}.",
+      "normalized_text": "look in {context}: {entity} has a {relation} record marked {state}.",
+      "text_sha256_utf8": "d2088e82d355b08d9d2e38a9eee661d123d2fbda360b6efcd9795c782a255e11"
+    },
+    {
+      "id": 5,
+      "text": "A {relation} note for {entity} at {context} records {state}.",
+      "normalized_text": "a {relation} note for {entity} at {context} records {state}.",
+      "text_sha256_utf8": "5bf7c9d2d9ac989b96e6bfe974555870a3845398d8e45ae5ad993d55765fae9e"
+    },
+    {
+      "id": 6,
+      "text": "The stored value for {relation} on {entity} in {context} reads {state}.",
+      "normalized_text": "the stored value for {relation} on {entity} in {context} reads {state}.",
+      "text_sha256_utf8": "b3724a797f979dcc341c381354298f16749c6c6c1f50b19570060ff4230bed8a"
+    },
+    {
+      "id": 7,
+      "text": "{entity}, listed under {context}, carries {state} in its {relation} field.",
+      "normalized_text": "{entity}, listed under {context}, carries {state} in its {relation} field.",
+      "text_sha256_utf8": "df348fa5d39cb16d8b3c82bcdb938d618840104de616f253b08a4f26850414bf"
+    }
+  ],
+  "query_templates": [
+    {
+      "id": 0,
+      "text": "At {context}, which value is recorded for {relation} on {entity}?",
+      "normalized_text": "at {context}, which value is recorded for {relation} on {entity}?",
+      "text_sha256_utf8": "f90f94ef6651675b649642c0a16292433b92be61892ce46c73ac1baddf69dd99"
+    },
+    {
+      "id": 1,
+      "text": "Retrieve the value recorded under {relation} for {entity} in {context}.",
+      "normalized_text": "retrieve the value recorded under {relation} for {entity} in {context}.",
+      "text_sha256_utf8": "16870c8ef734288e052bec06b81fd842aa51e9add4d68d72a2c7332f57bb0b26"
+    },
+    {
+      "id": 2,
+      "text": "For {entity} at {context}, return the {relation} entry.",
+      "normalized_text": "for {entity} at {context}, return the {relation} entry.",
+      "text_sha256_utf8": "1080681618946cdb6db993aa228d3655bc8c5a8bb8e0a28b12f50a2700a1d5f3"
+    },
+    {
+      "id": 3,
+      "text": "Look up {entity}'s {relation} value in {context}.",
+      "normalized_text": "look up {entity}'s {relation} value in {context}.",
+      "text_sha256_utf8": "ba7e5368093758fcc31d7dcc7fdd999cfbe4b02880a804315bc1f64a2428dc22"
+    },
+    {
+      "id": 4,
+      "text": "Read the {relation} field for {entity} from {context}.",
+      "normalized_text": "read the {relation} field for {entity} from {context}.",
+      "text_sha256_utf8": "4e15a9e98b6a921012acdeb438f7e9146eea29c5dcf5d02f3442333d07b73bcf"
+    },
+    {
+      "id": 5,
+      "text": "In {context}, what does {entity} have for {relation}?",
+      "normalized_text": "in {context}, what does {entity} have for {relation}?",
+      "text_sha256_utf8": "f131a1802e135f78f59e15708a214941b7c2d6fc7728b2dac195401f423696b3"
+    },
+    {
+      "id": 6,
+      "text": "Find the value assigned under {relation} to {entity} at {context}.",
+      "normalized_text": "find the value assigned under {relation} to {entity} at {context}.",
+      "text_sha256_utf8": "89fa4fd018a4148ad4ba4ac0982586e06be87d389a1c1f2c0bf5e37732419889"
+    },
+    {
+      "id": 7,
+      "text": "Give the value linked to {entity} by {relation} in {context}.",
+      "normalized_text": "give the value linked to {entity} by {relation} in {context}.",
+      "text_sha256_utf8": "63249a7f1c9b0ff320279a11611552b1be7cbc7ec9f2c0135db8105adad839d6"
+    }
+  ],
+  "truth_boundary": {
+    "template_and_joint_strata_labels": "ESCROWED_UNTIL_FF_BUNDLE_TEMPLATE_01_ANALYSIS_CONTRACT_IS_FROZEN",
+    "feature_extraction_before_that_contract": "PERMITTED_ONLY_IF_BOUND_BY_E4_0_CONTRACT_AND_RESOURCE_PREFLIGHT",
+    "template_scores_or_predictions_before_that_contract": false
+  },
+  "promotion_requirements": [
+    "Exact UTF-8 byte hashes and normalized forms are recorded in the E4-0 contract.",
+    "An independent audit finds no exact or normalized collision with any E1 observation/query template or any fitting template.",
+    "Placeholder semantics and the P-variant pairing are verified against the E1 renderer.",
+    "Any amendment creates a new template-set version before E4 population generation."
+  ],
+  "parent_template_set_sha256": "ae8c5c29c7ed29d644e88c19d6baffa4476ec2f4c5f17aee89801fd44c72eb57"
+}

@@ -1,0 +1,14 @@
+{
+  "schema": "FLY-REACH-03-F4-PRECISION-01-collection-attempt-v1",
+  "identity": "F4-PRECISION-01",
+  "contract_version": "0.1.2",
+  "status": "INFRASTRUCTURE_FAILURE_NO_DATA",
+  "failure": "The release runner passed the base authority round-trip, then the main-thread collector invocation terminated with a Rust stack overflow before creating its output directory or any feature stream.",
+  "authority_roundtrip_pass": true,
+  "feature_streams_created": 0,
+  "output_directory_exists_after_attempt": false,
+  "classifier_fits_started": false,
+  "measured_namespace_created": false,
+  "scientific_interpretation_opened": false,
+  "disposition": "Preserved as infrastructure failure. The next attempt uses a dedicated 32 MiB worker stack and a fresh output path; scientific settings are unchanged."
+}

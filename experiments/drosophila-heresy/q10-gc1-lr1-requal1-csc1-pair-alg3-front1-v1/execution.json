@@ -1,0 +1,122 @@
+{
+  "contexts": [
+    {
+      "better_than_V": 9,
+      "context": [
+        "seed9731-L-tau16.json",
+        2
+      ],
+      "evaluated_records": 18,
+      "exact_alternative": 0,
+      "frontier_records": 18,
+      "shard": "seed9731-L-tau16__set2.jsonl",
+      "shard_sha256": "145D961D45488693FE00143F574C31D2D03ACF5BE1C41CDE3D8AA36DC865DB50",
+      "stopped_on_exact": false
+    },
+    {
+      "better_than_V": 0,
+      "context": [
+        "seed9731-L-tau4.json",
+        3
+      ],
+      "evaluated_records": 0,
+      "exact_alternative": 0,
+      "frontier_records": 0,
+      "shard": "seed9731-L-tau4__set3.jsonl",
+      "shard_sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "stopped_on_exact": false
+    },
+    {
+      "better_than_V": 0,
+      "context": [
+        "seed9731-R-tau16.json",
+        1
+      ],
+      "evaluated_records": 0,
+      "exact_alternative": 0,
+      "frontier_records": 0,
+      "shard": "seed9731-R-tau16__set1.jsonl",
+      "shard_sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "stopped_on_exact": false
+    },
+    {
+      "better_than_V": 0,
+      "context": [
+        "seed9731-R-tau16.json",
+        3
+      ],
+      "evaluated_records": 0,
+      "exact_alternative": 0,
+      "frontier_records": 0,
+      "shard": "seed9731-R-tau16__set3.jsonl",
+      "shard_sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "stopped_on_exact": false
+    },
+    {
+      "better_than_V": 0,
+      "context": [
+        "seed9731-R-tau4.json",
+        0
+      ],
+      "evaluated_records": 0,
+      "exact_alternative": 0,
+      "frontier_records": 0,
+      "shard": "seed9731-R-tau4__set0.jsonl",
+      "shard_sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "stopped_on_exact": false
+    },
+    {
+      "better_than_V": 0,
+      "context": [
+        "seed9731-R-tau4.json",
+        1
+      ],
+      "evaluated_records": 0,
+      "exact_alternative": 0,
+      "frontier_records": 0,
+      "shard": "seed9731-R-tau4__set1.jsonl",
+      "shard_sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "stopped_on_exact": false
+    },
+    {
+      "better_than_V": 0,
+      "context": [
+        "seed9731-R-tau4.json",
+        2
+      ],
+      "evaluated_records": 0,
+      "exact_alternative": 0,
+      "frontier_records": 0,
+      "shard": "seed9731-R-tau4__set2.jsonl",
+      "shard_sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "stopped_on_exact": false
+    },
+    {
+      "better_than_V": 0,
+      "context": [
+        "seed9731-R-tau4.json",
+        3
+      ],
+      "evaluated_records": 2,
+      "exact_alternative": 0,
+      "frontier_records": 2,
+      "shard": "seed9731-R-tau4__set3.jsonl",
+      "shard_sha256": "5541795DB70D95A471BAAEABE7836501B6E36325A07889B3E473F4058A429500",
+      "stopped_on_exact": false
+    }
+  ],
+  "contract_sha256": "410BC37733E244A9DEF9195BD5554BBD5042B1B393155591E12F8EA6515AD7CA",
+  "counts": {
+    "better_than_V": 9,
+    "evaluated_records": 20,
+    "exact_alternative": 0,
+    "frontier_records": 20
+  },
+  "engineering_only": true,
+  "identity": "q10-gc1-lr1-requal1-csc1-pair-alg3-front1-v1",
+  "protocol": "Q10-PAIR-ALG3-FRONT1",
+  "readout_executed": true,
+  "scientific_promotion": false,
+  "status": "ALG3_FRONT1_COMPLETE_NO_EXACT",
+  "stopped_on_first_exact": false
+}

@@ -1,0 +1,70 @@
+{
+  "arm": "D",
+  "assignment_index": 2,
+  "base_stream_sha256": "a92ab50ebd258675e2d078da8a76290233db9c06bbf9b29a94557c52485c51b9",
+  "checkpoint_epochs": [
+    1,
+    2,
+    4,
+    8,
+    16,
+    32,
+    64,
+    128,
+    200
+  ],
+  "checkpoint_tensor_hashes": {
+    "1": "65a24009fe9b0beb31859ddbb3b00c919fc57ea48a6a1c66965a4ad1cfada8cc",
+    "128": "b763f32d1aecc338e36a4bb640641c42f9983bbd7277f692e5ecaab436094ae0",
+    "16": "ac00b77f1e8f8051fb9405ca0c034839387fad5d6b403b21ded88a744737db08",
+    "2": "7915158252c1ae7c7df1fd283fee9c92ea2cf01cdaa2bf1ea09107cc2bafc882",
+    "200": "45546d05441993b2c9181e927af38592e634620e2fa572819fdb84e59b93092b",
+    "32": "bafa442c696436af5ab27fa242a035403ec945bdc6ea4608a5079e54c25d4c85",
+    "4": "6ac4c86baeb59284079fa72a34d92d13aa023fd91a2fb512acf7bc8707ceacb2",
+    "64": "46d99d39e1263334fc3a618fefe443d0fe6da69a765f698ea3cb45323cff3651",
+    "8": "8a51b3b9b2dd9999e8ffd4975bc3a7d159266adf47373966d7c551ab694c5d20"
+  },
+  "comparative_metrics_emitted_during_fit": false,
+  "final_tensor_file_sha256": "45546d05441993b2c9181e927af38592e634620e2fa572819fdb84e59b93092b",
+  "final_tensor_sha256": "45546d05441993b2c9181e927af38592e634620e2fa572819fdb84e59b93092b",
+  "finite_status": "PASS",
+  "fit_id": "D-H309008-I1",
+  "fold_index": 8,
+  "heldout_block": 309008,
+  "heldout_rows": 2140,
+  "heldout_state_sha256": "169a287b8e74b52e9f3b422012ccf006259eb7d6baa0c3b4697c8da997b2cef9",
+  "heldout_targets_or_scoring_truth_read_during_fit": false,
+  "initial_tensor_sha256": "c831bf482bd4e8ecc6afa7c630896338cc0298c8fc86d427af3cdb6046126ff6",
+  "normalization_sha256": "5a9ea8ae51aad377c6db8ed073c560dd6239d49f4f96ac84ed5df5024d3a60cc",
+  "normalized_tuple_stream_sha256": "297475a5b1c85450d83779d4c110f4a4e7b6b8dc5685abeded8a612b8f74918e",
+  "optimizer_summary": {
+    "moment_norms": {
+      "b1": 0.00021733996036941598,
+      "b2": 0.00010001298145909019,
+      "b3": 7.230850314954296e-05,
+      "w1": 0.0019319839409221197,
+      "w2": 0.00117377598212774,
+      "w3": 0.001058960025483759
+    },
+    "step": 2800,
+    "variance_norms": {
+      "b1": 1.2626629705766783e-05,
+      "b2": 2.5400182841724834e-05,
+      "b3": 0.0001285499893128872,
+      "w1": 0.00015205300366573818,
+      "w2": 0.0002743250399880817,
+      "w3": 0.0010320526051297903
+    }
+  },
+  "paired_source_input_sha256": "4e3ff543e35c7769e372d4a66745268ceaf37e9c59f30b7c75a0e9080ccdc74e",
+  "parameter_count": 19969,
+  "prediction_sha256": "bcbc8b4ba087861983e2eec6d56c39d317d03ac9e0908790c2fd5effe29df946",
+  "replicate_index": 1,
+  "runtime_seconds": 64.49847299989779,
+  "schema": "F4-PRESENTATION-03-fit-receipt-v1",
+  "training_negative_count": 15920,
+  "training_positive_count": 11215,
+  "training_rows": 27135,
+  "training_trace_sha256": "7543c5c357958e4f9ed03fcca94f400524356396736f19b02603c6560f32a3e7",
+  "update_count": 2800
+}

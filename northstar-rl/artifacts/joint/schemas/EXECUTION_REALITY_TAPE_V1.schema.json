@@ -1,0 +1,180 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ExecutionRealityTape",
+  "type": "object",
+  "properties": {
+    "content_hash": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "rows": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/ExecutionRealityRow"
+      }
+    },
+    "schema_version": {
+      "type": "string"
+    },
+    "source_authority": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "source_authority",
+    "rows",
+    "content_hash"
+  ],
+  "$defs": {
+    "Digest256": {
+      "description": "Domain-separated BLAKE3 digest",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "ExecutionRealityRow": {
+      "type": "object",
+      "properties": {
+        "accepted_time_ns": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int64"
+        },
+        "broker_order_id_hash": {
+          "$ref": "#/$defs/Digest256"
+        },
+        "broker_status": {
+          "type": "string"
+        },
+        "command_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Digest256"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "command_time_ns": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "commission_components": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "maxItems": 2,
+            "minItems": 2,
+            "prefixItems": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number",
+                "format": "double"
+              }
+            ]
+          }
+        },
+        "fill_price": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "double"
+        },
+        "fill_time_ns": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int64"
+        },
+        "filled_quantity": {
+          "type": "number",
+          "format": "double"
+        },
+        "instrument_id": {
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0
+        },
+        "intent_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Digest256"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "latency_components_ns": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "maxItems": 2,
+            "minItems": 2,
+            "prefixItems": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "integer",
+                "format": "int64"
+              }
+            ]
+          }
+        },
+        "observed_spread": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "double"
+        },
+        "price_delta_to_reference": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "double"
+        },
+        "reference_price_at_acceptance": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "double"
+        },
+        "reference_price_at_command": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "double"
+        },
+        "requested_quantity": {
+          "type": "number",
+          "format": "double"
+        },
+        "side": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "broker_order_id_hash",
+        "instrument_id",
+        "side",
+        "requested_quantity",
+        "command_time_ns",
+        "filled_quantity",
+        "broker_status",
+        "latency_components_ns",
+        "commission_components"
+      ]
+    }
+  }
+}

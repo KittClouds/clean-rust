@@ -1,0 +1,136 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "LearnerSpec",
+  "type": "object",
+  "properties": {
+    "algorithm": {
+      "$ref": "#/$defs/LearnerAlgorithm"
+    },
+    "batch_size": {
+      "type": "integer",
+      "format": "uint32",
+      "minimum": 0
+    },
+    "entropy_coefficient": {
+      "type": "number",
+      "format": "double"
+    },
+    "execution_permission": {
+      "type": "string"
+    },
+    "executor_name": {
+      "type": "string"
+    },
+    "executor_version": {
+      "type": "string"
+    },
+    "gae_lambda": {
+      "type": "number",
+      "format": "double"
+    },
+    "gamma": {
+      "type": "number",
+      "format": "double"
+    },
+    "implementation_identity": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "learner_spec_id": {
+      "$ref": "#/$defs/Digest256"
+    },
+    "learning_rate": {
+      "type": "number",
+      "format": "double"
+    },
+    "max_gradient_norm": {
+      "type": "number",
+      "format": "double"
+    },
+    "optimizer": {
+      "type": "string"
+    },
+    "policy_architecture": {
+      "$ref": "#/$defs/PolicyArchitecture"
+    },
+    "rollout_length": {
+      "type": "integer",
+      "format": "uint32",
+      "minimum": 0
+    },
+    "schema_version": {
+      "type": "string"
+    },
+    "seed": {
+      "type": "integer",
+      "format": "uint64",
+      "minimum": 0
+    },
+    "value_coefficient": {
+      "type": "number",
+      "format": "double"
+    }
+  },
+  "required": [
+    "schema_version",
+    "learner_spec_id",
+    "algorithm",
+    "policy_architecture",
+    "optimizer",
+    "learning_rate",
+    "rollout_length",
+    "batch_size",
+    "gamma",
+    "gae_lambda",
+    "entropy_coefficient",
+    "value_coefficient",
+    "max_gradient_norm",
+    "seed",
+    "executor_name",
+    "executor_version",
+    "implementation_identity",
+    "execution_permission"
+  ],
+  "$defs": {
+    "Digest256": {
+      "description": "Domain-separated BLAKE3 digest",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "LearnerAlgorithm": {
+      "type": "string",
+      "enum": [
+        "FUTURE_SB3_PPO",
+        "FUTURE_SB3_SAC",
+        "EXTERNAL_EXECUTOR"
+      ]
+    },
+    "PolicyArchitecture": {
+      "type": "object",
+      "properties": {
+        "activation": {
+          "type": "string"
+        },
+        "hidden_layers": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0
+          }
+        },
+        "policy_class": {
+          "type": "string"
+        },
+        "shared_backbone": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "policy_class",
+        "hidden_layers",
+        "activation",
+        "shared_backbone"
+      ]
+    }
+  }
+}

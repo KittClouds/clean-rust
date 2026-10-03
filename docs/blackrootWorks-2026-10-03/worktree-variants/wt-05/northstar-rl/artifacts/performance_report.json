@@ -1,0 +1,65 @@
+{
+  "schema_version": "PERFORMANCE_REPORT_V1",
+  "optimization_posture": "baseline_receipt_before_further_hot_path_optimization",
+  "metrics": [
+    {
+      "name": "runraw_decode",
+      "value": 127261.9935591291,
+      "unit": "rows_per_second",
+      "workload": "mmap_open_validate_hash_canonical_fixture"
+    },
+    {
+      "name": "feature_compile",
+      "value": 1361933.9462036092,
+      "unit": "rows_per_second",
+      "workload": "21_primitive_features_window_3"
+    },
+    {
+      "name": "feature_tape_scan",
+      "value": 7.662177389064764,
+      "unit": "GB_per_second_payload",
+      "workload": "mmap_value_state_knowledge_column_scan"
+    },
+    {
+      "name": "mapped_artifact_footprint",
+      "value": 136688.0,
+      "unit": "bytes",
+      "workload": "canonical_fixture"
+    },
+    {
+      "name": "environment_step",
+      "value": 38177.65334690761,
+      "unit": "steps_per_second",
+      "workload": "1_environments_sequential_batch"
+    },
+    {
+      "name": "environment_step",
+      "value": 43403.56270910571,
+      "unit": "steps_per_second",
+      "workload": "8_environments_sequential_batch"
+    },
+    {
+      "name": "environment_step",
+      "value": 40469.84364307284,
+      "unit": "steps_per_second",
+      "workload": "32_environments_sequential_batch"
+    },
+    {
+      "name": "reset_latency",
+      "value": 0.7680899999999999,
+      "unit": "microseconds_per_reset",
+      "workload": "canonical_episode"
+    },
+    {
+      "name": "observation_serialization",
+      "value": 209.582,
+      "unit": "nanoseconds_per_f32_vector",
+      "workload": "6_feature_flat_vector"
+    }
+  ],
+  "gaps": [
+    "Python-to-Rust call rate is populated by sb3_compatibility_receipt.json after native import",
+    "random episode seek is represented by reset latency because the qualification corpus contains one episode",
+    "8/32 environment baselines are sequential ownership lanes, not a parallel throughput claim"
+  ]
+}

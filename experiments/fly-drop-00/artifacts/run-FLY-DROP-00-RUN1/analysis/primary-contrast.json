@@ -1,0 +1,130 @@
+{
+  "bootstrap_95_percentile_ci": [
+    -1.2889172705618393e-05,
+    1.0461046327204131e-05
+  ],
+  "bootstrap_replicates": 20000,
+  "bootstrap_seed": 20260921,
+  "cell_count": 64,
+  "cross_factor_consistency": {
+    "adapter_seed": {
+      "direction_agreement_count": 3,
+      "level_count": 4,
+      "levels": [
+        {
+          "agrees_with_overall_direction": true,
+          "level": 1101,
+          "mean_delta": -6.391050253254371e-08,
+          "sign": -1
+        },
+        {
+          "agrees_with_overall_direction": true,
+          "level": 1102,
+          "mean_delta": -3.967299800410745e-06,
+          "sign": -1
+        },
+        {
+          "agrees_with_overall_direction": false,
+          "level": 1103,
+          "mean_delta": 3.2005004082114735e-06,
+          "sign": 1
+        },
+        {
+          "agrees_with_overall_direction": true,
+          "level": 1104,
+          "mean_delta": -2.229896363300718e-06,
+          "sign": -1
+        }
+      ]
+    },
+    "learner_seed": {
+      "direction_agreement_count": 2,
+      "level_count": 4,
+      "levels": [
+        {
+          "agrees_with_overall_direction": true,
+          "level": 7101,
+          "mean_delta": -8.756378234473644e-06,
+          "sign": -1
+        },
+        {
+          "agrees_with_overall_direction": false,
+          "level": 7102,
+          "mean_delta": 2.8968971883883143e-06,
+          "sign": 1
+        },
+        {
+          "agrees_with_overall_direction": false,
+          "level": 7103,
+          "mean_delta": 5.47357114309005e-06,
+          "sign": 1
+        },
+        {
+          "agrees_with_overall_direction": true,
+          "level": 7104,
+          "mean_delta": -2.6746963550372538e-06,
+          "sign": -1
+        }
+      ]
+    },
+    "teacher_seed": {
+      "direction_agreement_count": 2,
+      "level_count": 4,
+      "levels": [
+        {
+          "agrees_with_overall_direction": true,
+          "level": 6101,
+          "mean_delta": -2.911587836981755e-06,
+          "sign": -1
+        },
+        {
+          "agrees_with_overall_direction": true,
+          "level": 6102,
+          "mean_delta": -9.907187921692068e-06,
+          "sign": -1
+        },
+        {
+          "agrees_with_overall_direction": false,
+          "level": 6103,
+          "mean_delta": 4.168875282217072e-06,
+          "sign": 1
+        },
+        {
+          "agrees_with_overall_direction": false,
+          "level": 6104,
+          "mean_delta": 5.589294218424218e-06,
+          "sign": 1
+        }
+      ]
+    }
+  },
+  "degree_realization_summaries": [
+    {
+      "graph_realization": 2101,
+      "mean_male_minus_this_shuffle": 7.195913991151631e-08
+    },
+    {
+      "graph_realization": 2102,
+      "mean_male_minus_this_shuffle": -1.6448691821970007e-07
+    },
+    {
+      "graph_realization": 2103,
+      "mean_male_minus_this_shuffle": -1.2860911557115336e-06
+    },
+    {
+      "graph_realization": 2104,
+      "mean_male_minus_this_shuffle": -1.681987324014117e-06
+    }
+  ],
+  "direction": "lower_loss_for_malecns",
+  "estimand": "mean over adapter, teacher, learner of MaleCNS held-out BCE minus mean degree-shuffle held-out BCE over four graph realizations",
+  "graph_realization_count": 4,
+  "heldout_bce": {
+    "degree_shuffle_mean": 0.25761556969686455,
+    "male_mean": 0.25761480454530006
+  },
+  "missing_or_imputed_cells": 0,
+  "point_estimate_delta": -7.651515645081333e-07,
+  "scope": "bounded to this host, frozen 128D projections, and sealed synthetic task; no biological-function inference",
+  "status": "ESTIMABLE"
+}

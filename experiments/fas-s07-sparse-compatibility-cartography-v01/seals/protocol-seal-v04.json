@@ -1,0 +1,142 @@
+{
+  "entries": [
+    {
+      "bytes": 3442,
+      "path": "contracts/analysis-contract-v01.json",
+      "sha256": "d1aca72413f88f5cbb806757385b601b888b5c8d247abe0da37d736b692933a5"
+    },
+    {
+      "bytes": 898,
+      "path": "contracts/authorization-packet-v01.json",
+      "sha256": "aec14fd8d8325c7978234fc99c9220ecbcbc3a49c61978edbba0c5bc7f201742"
+    },
+    {
+      "bytes": 5541,
+      "path": "contracts/parent-binding-v01.json",
+      "sha256": "1a467be3eb963d1ac0ec33e1d38f6e8cdfece304226056fe47da8f50c0e4f4e0"
+    },
+    {
+      "bytes": 5542,
+      "path": "contracts/parent-binding-v02.json",
+      "sha256": "08858bc948d20518bc52b7453d47dcbb9faf5867b63bd5efa9fe1e8abded9912"
+    },
+    {
+      "bytes": 482,
+      "path": "contracts/project-identity-v01.json",
+      "sha256": "7f088df4c27a710b235b1f0792767b32be53179ab0210e8160922c705aca8f9d"
+    },
+    {
+      "bytes": 1577,
+      "path": "contracts/sae-training-contract-v01.json",
+      "sha256": "b5a971f2052c15c7997daa79d9e639edce244528b0a517d48ea4e3142cd7acbc"
+    },
+    {
+      "bytes": 7077,
+      "path": "FAS-S07-PROTOCOL.md",
+      "sha256": "e18c81004b3989bab0efcddf779c1c96a04a6af5ff134411c4bea80f4f55731b"
+    },
+    {
+      "bytes": 36117,
+      "path": "scripts/s07_analyze.py",
+      "sha256": "0a6df7bc7fe2544827d05b948f436defb4470fee222559e4bbc1dd47715dd0e0"
+    },
+    {
+      "bytes": 11432,
+      "path": "scripts/s07_common.py",
+      "sha256": "c2aa7f25c66c827ee454b2795d3bbe475ef2f0db964df0c37076fbc22823dfec"
+    },
+    {
+      "bytes": 15501,
+      "path": "scripts/s07_external.py",
+      "sha256": "551b29cfc9efdfb45154456ad6ac4cb92f66cbe8f4f2fe9e137443bccd2e2c9d"
+    },
+    {
+      "bytes": 18780,
+      "path": "scripts/s07_gate.py",
+      "sha256": "04457e858ccd196c5a31c010584aa3bbb77043a324a3587d1d5226886bbf1224"
+    },
+    {
+      "bytes": 1764,
+      "path": "scripts/s07_model.py",
+      "sha256": "717b3ccd9fb9fed96dd08b51de5456b891e0ceebd29fc926d23a9eace1d924d1"
+    },
+    {
+      "bytes": 8964,
+      "path": "scripts/s07_preflight.py",
+      "sha256": "7f00dd4abed5ad28052216b4444deaffc5338ebcf80ca1e0c2ba7f154e8d1d3d"
+    },
+    {
+      "bytes": 13900,
+      "path": "scripts/s07_sparse.py",
+      "sha256": "33eb1e10674777f6f4f943b13112042e0a9efca43dbcc414f24019a837b388e9"
+    },
+    {
+      "bytes": 10659,
+      "path": "scripts/s07_train.py",
+      "sha256": "683a22c4a4b6fae5f8a83227f2449c694385b2b753e04f97014f4c5029d9cdae"
+    },
+    {
+      "bytes": 1310,
+      "path": "scripts/seal_protocol.py",
+      "sha256": "527bf5cd0d3a036d9186ab4c1c3585cfe274585003da24dbac70249b9f87963a"
+    },
+    {
+      "bytes": 1790,
+      "path": "scripts/seal_protocol_v02.py",
+      "sha256": "270aa3926adc1a263010f064340f470b20cc98bd5c4b19b83e8ca16697e33b97"
+    },
+    {
+      "bytes": 1894,
+      "path": "scripts/seal_protocol_v03.py",
+      "sha256": "95365b683e3df925db23dd9228417f9039606924a884b35c2eeb47d51a151d16"
+    },
+    {
+      "bytes": 2279,
+      "path": "scripts/seal_protocol_v04.py",
+      "sha256": "d435f9bc1ca6e5315b74b82c4ff558820005a8dbc8db034aa80a09003891aa28"
+    },
+    {
+      "bytes": 5832,
+      "path": "scripts/test_s07_math.py",
+      "sha256": "31b748786db4444efd72898324d81b383362b9c8c3272db0cd2715e34967dd64"
+    },
+    {
+      "bytes": 2562,
+      "path": "scripts/verify_s07_result.py",
+      "sha256": "288e25cf83648513d543db353ca2069f9a55dbb2a44263dd6e19cb0166fccf42"
+    },
+    {
+      "bytes": 1502,
+      "path": "seals/parent-binding-correction-v01.json",
+      "sha256": "bf2b6b37a3710f75210ac2f052579a4321c639a81c19cf39e507adb410d303db"
+    },
+    {
+      "bytes": 1110,
+      "path": "seals/preflight-verifier-correction-v01.json",
+      "sha256": "7ffe975f1f5f02fa5761441505e14b95a767ba742b07001fb48911c2b6e07cfb"
+    },
+    {
+      "bytes": 907,
+      "path": "seals/s01-source-row-identity-correction-v01.json",
+      "sha256": "9927829a4ad644928635174b07adbc7a44c2ede579b01d8afb1a3cc0d3d35b07"
+    },
+    {
+      "bytes": 1767,
+      "path": "seals/semantic-target-mapping-correction-v01.json",
+      "sha256": "5e626f0e928f8914b73eb8db9a0267d5fa4352bed96c858685310561dadd9f30"
+    }
+  ],
+  "evaluation_gate_authorized": true,
+  "feature_extraction": false,
+  "model_contact": false,
+  "probe_fitting": false,
+  "root_sha256": "f0b4900a6633f7c7513d296eb1d3bf74e1d4841c9e96e5b55c0265843b73f012",
+  "sae_fitting_authorized": false,
+  "seal_id": "FAS_S07_PROTOCOL_SEAL_V04",
+  "status": "SEALED_POST_TRAINING_METADATA_CORRECTION",
+  "supersedes_protocol_root_sha256": "da952f0368811bf31688a91c9c69f1a01e2305cf6aabed3c0e380024de08abd4",
+  "supersession_scope": "interpret S01 candidate-position labels through the sealed candidate-to-state map before gate comparison; training contract and sources unchanged",
+  "training_compatible_prior_protocol_roots": [
+    "da952f0368811bf31688a91c9c69f1a01e2305cf6aabed3c0e380024de08abd4"
+  ]
+}

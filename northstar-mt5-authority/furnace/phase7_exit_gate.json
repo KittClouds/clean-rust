@@ -1,0 +1,20 @@
+{
+  "contract": "MST_PHASE7_EXIT_GATE_V1",
+  "status": "PASS",
+  "campaign_id": "RG2_SIX_INDEX_ENVIRONMENT_FRAME_V3",
+  "manifest_sha256": "5bf12767746b8499ad0edde2597df67b1928cc5941705a8391ae2585a0574092",
+  "unattended_batch_valid": true,
+  "single_writer_lock_valid": true,
+  "unique_attempt_output_stems": true,
+  "quarantine_retains_failures": true,
+  "all_admitted_runs_have_complete_receipts": true,
+  "all_admitted_runs_contract_valid": true,
+  "all_admitted_runs_balanced": true,
+  "all_admitted_runs_sealed": true,
+  "resume_skip_valid": true,
+  "admitted_runs": 4,
+  "remaining_frozen_windows": 50,
+  "full_campaign_started": false,
+  "terminal_processes_remaining": 0,
+  "tester_processes_remaining": 0
+}

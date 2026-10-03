@@ -1,0 +1,8 @@
+{
+  "confirmation_sessions": 69,
+  "rows_read": 0,
+  "schema": "OBS_OPEN_INST01_CONFIRMATION_ACCESS_RECEIPT_V1",
+  "state_after": "FROZEN_UNOPENED",
+  "state_before": "FROZEN_UNOPENED",
+  "status": "PASS"
+}

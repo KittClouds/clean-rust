@@ -1,0 +1,42 @@
+﻿{
+    "contract":  "MST_CORPUS_ADMISSION_V1",
+    "status":  "ADMITTED",
+    "admitted_at_utc":  "2026-08-12T09:19:37.2442237Z",
+    "campaign_id":  "RG2_SIX_INDEX_ENVIRONMENT_FRAME_V3",
+    "manifest_sha256":  "5bf12767746b8499ad0edde2597df67b1928cc5941705a8391ae2585a0574092",
+    "window_id":  "FRA40_20260427_EVENT_HEAVY",
+    "run_key":  "RG2_FRA40_PERIOD_M5_1777248000_1777589700_9554760657515700142",
+    "invocation_id":  "RG2_FRA40_PERIOD_M5_1777248000_1777589700_9554760657515700142_I1777248000_5770006631441892493",
+    "auction_stem":  "MasterAuction_FRA40_PERIOD_M5_F2_FRA40_20260427_EVT_A03_RG2_v7",
+    "structure_stem":  "MasterStructure_FRA40_PERIOD_M5_F2_FRA40_20260427_EVT_A03_v6",
+    "canonical_dataset_hash":  "0edfbd5ff1d4353ea148bce07e56f63558d28720637389a250ea683b485e5abc",
+    "dataset_hashes":  {
+                           "events":  "71541cf9b695666f6eeacd611295f5f9b12a4688739ece176965b5beb295c691",
+                           "attempts":  "f3a762caf5a8cbb6a8532b8ea766b45c5bb5bf3efc89d1f7c18d14acc567bb0c",
+                           "episodes":  "f9d33a9d7eccdc574aa014740fce61f37bf344ed03a8fe82f1a687d579f84dcd",
+                           "context":  "fec5e9211d89f0f7e7adb7d2fbfe09dafa17c3d973c9909ae865f845330734db",
+                           "features":  "501f6dc5adb6fcd8259407e873d1050483068440861d652642194fec2e921304",
+                           "transits":  "c4cfa93b8ee63242827d70995a859c6245649f1c319f2bb2ef4f462af386a102"
+                       },
+    "row_counts":  {
+                       "events":  965,
+                       "attempts":  200,
+                       "episodes":  57,
+                       "context":  1551,
+                       "features":  200,
+                       "transits":  8
+                   },
+    "structure_row_counts":  {
+                                 "inputs":  143737,
+                                 "nodes":  11479,
+                                 "events":  393
+                             },
+    "terminal_hash":  "7099532537139187191",
+    "receipt_hash":  "15427130820316933069",
+    "contract_receipt_hash":  "15226341330444066504",
+    "isolation":  "unique_instance_tag_plus_single_writer_lock",
+    "warmup_policy":  "native_history_fixed_producer_lookbacks",
+    "finalization_time":  1777589700,
+    "visual_rendering":  false,
+    "research_logging":  true
+}

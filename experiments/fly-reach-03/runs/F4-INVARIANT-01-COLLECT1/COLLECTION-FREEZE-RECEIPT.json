@@ -1,0 +1,11 @@
+{
+  "collection_started": false,
+  "fit_manifest_created": false,
+  "preflight_file_sha256": "47199d47e96e903375e328afbc3fb8ba2ea9f08f75b74d9758093b614127ea3b",
+  "schema": "F4-INVARIANT-01-COLLECT1-freeze-receipt-v1",
+  "source_manifest_canonical_sha256": "bc3e76911ff0351174101f379312f85dcadd9c3c4331a7a624674421c3c42750",
+  "source_manifest_file_sha256": "ea5abc4a1337dfd4844828bff0954af32c733b4d7d4a4287b82ed66a7c4f175f",
+  "status": "PASS",
+  "task_bank_reused_without_regeneration": true,
+  "task_bank_sha256": "8e49f61018255fa32d4328056d46a0b5a14b70306ccfa98733849dcac245c02c"
+}

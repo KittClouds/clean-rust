@@ -1,0 +1,46 @@
+{
+  "alpha": 0.05,
+  "bootstrap": {
+    "candidate_decision_uses": [
+      "point_estimate",
+      "bootstrap_interval",
+      "raw_p",
+      "holm_adjusted_decision"
+    ],
+    "interval": "PERCENTILE_95",
+    "null_test_quantity": "TWO_SIDED_BOOTSTRAP_TAIL_P_WITH_PLUS_ONE_CORRECTION",
+    "resamples": 2000,
+    "seed": 20260814,
+    "unit": "SESSION"
+  },
+  "confirmation_observations_read": false,
+  "confirmation_status": "FROZEN_UNOPENED",
+  "deterministic_rebuild": "PASS_BYTE_IDENTICAL",
+  "discovery_observations_read": false,
+  "economic_authority": false,
+  "familywise_procedure": "HOLM_BONFERRONI",
+  "formal_estimand_count": 119,
+  "gate": "OBS-OPEN-02R1",
+  "manifest_sha256": "9b0f9daa0dd55ac39329d4c08e0a00bb865d03e6ab1c1b249d8c680d59084643",
+  "parent_commit": "1b0f00f24bcc253f741d26e4472b40fc6bab3f9d",
+  "parent_protocol_root_sha256": "141344869c5e6aba6bc7346594872efdc196cb246c834f8d510a0aad90831bb5",
+  "parent_universe_root_sha256": "6b0ca197a394b085707d03dfe06f1569eb0fafbddb2d583817e88647df6f6235",
+  "repair_reason": "named_familywise_rule_had_no_executable_semantics",
+  "repair_root_sha256": "dc8826042d490c5b1e868b836f4c187af8e2baedf9454d11b2be2a5a5aae3da7",
+  "schema": "OBS_OPEN_DISCOVERY_FAMILYWISE_RULE_REPAIR_SEAL_V1",
+  "study_id": "OBS-OPEN-01",
+  "substantive_status": "FROZEN_UNOPENED",
+  "support": {
+    "censoring_is_not_negative_outcome": true,
+    "conditional_minimum_eligible_sessions": 30,
+    "discovery_population": 257,
+    "minimum_eligible_sessions": 129,
+    "minimum_sessions_per_offset_regime": 20,
+    "minimum_sessions_per_supported_month": 10,
+    "minimum_supported_calendar_months": 4,
+    "minimum_supported_offset_regimes": 2,
+    "support_is_predata": true
+  },
+  "synthetic_adversarial_tests": "PASS",
+  "trading_authority": false
+}

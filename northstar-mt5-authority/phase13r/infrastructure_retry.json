@@ -1,0 +1,14 @@
+{
+  "contract": "NORTHSTAR_PHASE13_INFRASTRUCTURE_RETRY_V1",
+  "status": "AUTHORIZED_RETRY_BEFORE_SCORING",
+  "reason": "Python TSV boolean title-case rejected during pre-consumption preparation; no state, report, abort receipt, or candidate score was produced.",
+  "previous_protocol_sha256": "098844644e31878725ec4bb7859bb5db2f63f937adfc21bea3fb8ea91b287cf6",
+  "replacement_protocol_sha256": "6be4368c07fe912c6e35df0e9c76e96d5c2a60e3c6f40db33c67370125acdebc",
+  "previous_authorization_token_sha256": "448f8900ab88107a13060e37efb3df9350e6a803a17998e20c187b901bd83303",
+  "collection_semantics_unchanged": true,
+  "candidate_semantics_unchanged": true,
+  "evaluation_policy_unchanged": true,
+  "previous_consumption_absent": true,
+  "previous_report_absent": true,
+  "receipt_semantic_sha256": "ae974d0adc5dbb9319eeec6e337ebf78721350cf55329278d4efc6608818eed5"
+}

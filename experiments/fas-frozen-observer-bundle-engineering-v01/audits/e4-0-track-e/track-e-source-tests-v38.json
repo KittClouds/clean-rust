@@ -1,0 +1,34 @@
+{
+  "commands": [
+    "python -m py_compile audits/e4-0-track-e/audit_e4_0_track_e_v16_v11.py audits/e4-0-track-e/test_audit_e4_0_track_e_v16_v11.py",
+    "python audits/e4-0-track-e/test_audit_e4_0_track_e_v16_v11.py"
+  ],
+  "execution_authorization_conferred": false,
+  "py_compile": "PASS",
+  "receipt_id": "E4_0_TRACK_E_V16_V11_SOURCE_TESTS",
+  "recorded_utc": "2026-09-27T09:28:58.064574+00:00",
+  "runtime_access": {
+    "cache_created": false,
+    "cuda_initialized": false,
+    "gpu_lease_acquired": false,
+    "labels_opened": false,
+    "model_contact": false,
+    "tokenizer_contact": false
+  },
+  "schema": "FAS_E4_0_TRACK_E_SOURCE_TESTS_V16_V11",
+  "scope": "Independent synthetic auditor tests verify the v16-v10 failed-preseal evidence and absent runtime fields, actual v16-v05 nested identity serialization, predecessor receipt registration, v11 contract/map/seal defaults, and independent-auditor source closure. No E4 truth, tokenizer, model, CUDA, GPU lease, cache, score, seal, or execution authorization was accessed or created.",
+  "sources": [
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/audit_e4_0_track_e_v16_v11.py",
+      "bytes": 176786,
+      "sha256": "97c7cf4a97451961602f1cba5406fcee83051367d5dcd23228298e3d4e712b2b"
+    },
+    {
+      "path": "experiments/fas-frozen-observer-bundle-engineering-v01/audits/e4-0-track-e/test_audit_e4_0_track_e_v16_v11.py",
+      "bytes": 4616,
+      "sha256": "99e1695a2b5f7a13aabc363300ddfed7d7963eddf47e13e148e1a19c345a9d7a"
+    }
+  ],
+  "status": "TRACK_E_SOURCE_TESTS_PASS_V16_PREMAP_SYNTHETIC_AUDITOR_V11",
+  "synthetic_test_count": 5
+}

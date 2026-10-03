@@ -1,0 +1,45 @@
+{
+  "contract": "phoenix-gliner25-shadow-provenance-v1",
+  "captured_at": "2026-08-25",
+  "phoenix_source_revision": "cbf349be8ee0dd878549242966d61b75fefe853f",
+  "gliner2_python_revision": "3c913c7369301133d3b7699252074c4303ada50e",
+  "gliner25_rust_revision": "a639bad1ee744a7884deea2bd01512fddd886b8d",
+  "base_model_revision": "72ac19b486cd4557424c8d61114e7530c243e9b0",
+  "base_config_sha256": "0eb92d00584d613aab32b2178f84a85176b62c87ae3689ce9084e83f6eba64d1",
+  "onnx_manifest_sha256": "1cfea3cc7bcef60f0ecdde1590828a21a8d831401cb5766920227dbbf82ce550",
+  "cargo_lock_sha256": "05577ec701d0b3f634c1859fcf12857c38488c91b43f911effc6de9eb02a9280",
+  "runtime": {
+    "rustc": "1.96.0",
+    "cargo": "1.96.0",
+    "python": "3.12.13",
+    "ort_binding": "2.0.0-rc.13",
+    "ort_dylib": "D:\\phoenix-upstream\\gliner25-eval-20260825\\py312\\Lib\\site-packages\\onnxruntime\\capi\\onnxruntime.dll"
+  },
+  "hardware": {
+    "cpu": "AMD Ryzen 7 5800X3D",
+    "logical_processors": 16,
+    "ram_gib": 31.89,
+    "gpu": "NVIDIA GeForce RTX 3080 12GB",
+    "nvidia_driver": "591.86",
+    "cuda_reported": "13.1"
+  },
+  "documents": {
+    "docs/shortrun.md": "21470D2874E061B29BAEB1CD2F41A989C598170E025EE063362D8B815A3EA977",
+    "docs/midrun.md": "1B50582EA26E4CCF2FD2AAA20C471CC93AA18649363345A6AE311B054607D512",
+    "docs/laterun.md": "F89CEB8BE1AC55F3C09A80E7E612D8EA67F5AE54989BCFC69EAE894D6974603E",
+    "docs/endrun.md": "62DEA5A12399961F831D9797F353ECB8094EAAF8E6A7A2D1A792E828C4BEDCB3"
+  },
+  "preserved_live_processes": [
+    {
+      "pid": 26104,
+      "name": "phoenix-shell",
+      "path": "C:\\phoenix-bin\\atlas-runtime-qualified-cbf349be-20260813\\phoenix-shell.exe"
+    },
+    {
+      "pid": 36016,
+      "name": "phoenix-analysis-bridge",
+      "path": "C:\\phoenix-bin\\atlas-runtime-qualified-cbf349be-20260813\\phoenix-analysis-bridge.exe"
+    }
+  ],
+  "graph_publications": 0
+}
