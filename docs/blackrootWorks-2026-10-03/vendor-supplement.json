@@ -1,0 +1,51 @@
+[
+  {
+    "source": "C:\\code land\\clean-rust\\phoenix-native\\vendor\\velotype\\src\\components\\block\\element.rs",
+    "path": "phoenix-native/vendor/velotype/src/components/block/element.rs",
+    "sha256": "99c9a3f0bac108e88908c6146f9a30ed924335953b47ff33d23fdff692939a4a",
+    "bytes": 66533,
+    "mtime_ns": 1790905407995951000
+  },
+  {
+    "source": "C:\\code land\\clean-rust\\phoenix-native\\vendor\\velotype\\src\\components\\block\\runtime\\mod.rs",
+    "path": "phoenix-native/vendor/velotype/src/components/block/runtime/mod.rs",
+    "sha256": "71a5d1a42ab74dec80dc5f48db8a210448c48ba17aec44e86f69fbba79357eb3",
+    "bytes": 93526,
+    "mtime_ns": 1790905408003355700
+  },
+  {
+    "source": "C:\\code land\\clean-rust\\phoenix-native\\vendor\\velotype\\src\\editor\\file_drop.rs",
+    "path": "phoenix-native/vendor/velotype/src/editor/file_drop.rs",
+    "sha256": "bb1a14a28c44f34d1e8837a8a939b156f0dba8081831974f6345013a2b84b372",
+    "bytes": 14925,
+    "mtime_ns": 1790905408035530200
+  },
+  {
+    "source": "C:\\code land\\clean-rust\\phoenix-native\\vendor\\velotype\\src\\editor\\mod.rs",
+    "path": "phoenix-native/vendor/velotype/src/editor/mod.rs",
+    "sha256": "d6c6625b45e0af84eee2cef75ff981ae827f6382e993b00b7c918228d667e280",
+    "bytes": 17494,
+    "mtime_ns": 1790905408037356400
+  },
+  {
+    "source": "C:\\code land\\clean-rust\\phoenix-native\\vendor\\velotype\\src\\editor\\selection_toolbar.rs",
+    "path": "phoenix-native/vendor/velotype/src/editor/selection_toolbar.rs",
+    "sha256": "5af626e7a80e79b750925c07760c1b03a2ec20f008b9fca99c743e984d1242e1",
+    "bytes": 31012,
+    "mtime_ns": 1790905408044132000
+  },
+  {
+    "source": "C:\\code land\\clean-rust\\phoenix-native\\vendor\\velotype\\src\\editor\\semantic_highlights.rs",
+    "path": "phoenix-native/vendor/velotype/src/editor/semantic_highlights.rs",
+    "sha256": "9d5cc813302461647252de2aad18655d4208eba7dcbf2460bded7d7296825b74",
+    "bytes": 24252,
+    "mtime_ns": 1790905408050733200
+  },
+  {
+    "source": "C:\\code land\\clean-rust\\phoenix-native\\vendor\\velotype\\src\\editor\\window_state.rs",
+    "path": "phoenix-native/vendor/velotype/src/editor/window_state.rs",
+    "sha256": "4f982449f6b1ceef1cf603f09dfd22095f4a5cd0765fa0a1b032bc23ff13456e",
+    "bytes": 19565,
+    "mtime_ns": 1790905408057742900
+  }
+]
