@@ -1,0 +1,13 @@
+__pycache__/
+corpus/
+generated/
+releases/
+models/
+*.jsonl
+*.npz
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.onnx
+*.bin
